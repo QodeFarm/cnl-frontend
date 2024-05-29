@@ -1,0 +1,93 @@
+<div class="ta-row p-0 justify-content-end">
+    <div class="ta-cell">
+        <div class="h2">{{options.title}}</div>
+    </div>
+    <div class="ta-cell">
+        <div class="ta-row p-0 justify-content-end flex-nowrap">
+            <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton">
+                <input type="text" nz-input placeholder="Search" [(ngModel)]="globalSearchValue"
+                    (keyup.enter)="globalSearch()" />
+            </nz-input-group>
+            <ng-template #suffixIconButton>
+                <i nz-icon class="ant-input-clear-icon" nzTheme="fill" nzType="close-circle" *ngIf="globalSearchValue"
+                    (click)="globalSearchClear()"></i>
+                <button nz-button nzType="primary" nzSearch (click)="globalSearch()"><i nz-icon
+                        nzType="search"></i></button>
+            </ng-template>
+            <button nz-button (click)="export()" *ngIf="options.export"> <i nz-icon nzType="file-excel"
+                    nzTheme="outline"></i> Export</button>
+            <ng-content nz-col select=".after-search">
+            </ng-content>
+        </div>
+    </div>
+</div>
+
+<!-- [nzTitle]="options.title"  (nzQueryParams)="onQueryParamsChange($event)"-->
+<nz-table #taTable nzShowSizeChanger [nzPageSizeOptions]="options.pageSizeOptions" [nzTableLayout]="options.tableLayout"
+    [nzBordered]="options.bordered" [nzScroll]="{ x: options.scrollX, y: options.scrollY }" [nzData]="rows"
+    [nzFrontPagination]="false" [nzShowTotal]="totalTemplate" [nzLoading]="loading" [nzTotal]="total"
+    [nzPageSize]="options.pageSize" (nzQueryParams)="onQueryParamsChange($event)" [nzPageIndex]="pageIndex"
+    [nzPaginationPosition]="options.paginationPosition">
+    <thead>
+        <tr>
+            <ng-container *ngFor="let c of options.cols">
+                <th (nzSortOrderChange)="nzSortOrderChange($event)" [nzColumnKey]="c.sortKey || c.fieldKey"
+                    [nzFilterFn]="false" [nzSortDirections]="(c.sort)?[]:[null]" [nzSortOrder]="c.sortOrder"
+                    [nzSortFn]="c.sort" [nzWidth]="c.width" nzCustomFilter>{{c.name}} 
+                    <nz-filter-trigger *ngIf="c.filter" [(nzVisible)]="c.visible"
+                        [nzActive]="c.filterValue && c.filterValue.length > 0" [nzDropdownMenu]="menu">
+                        <i nz-icon nzType="filter"></i>
+                    </nz-filter-trigger>
+
+                    <nz-dropdown-menu #menu="nzDropdownMenu">
+
+                        <div class="ant-table-filter-dropdown">
+                            <ta-filters [c]="c" (search)="setFilter($event)" (reset)="reset(c)"></ta-filters>
+                        </div>
+                    </nz-dropdown-menu>
+                </th>
+            </ng-container>
+
+        </tr>
+        <!-- <tr>
+            <th nzColumnKey="username" [nzSortFn]="true">Name</th>
+            <th nzColumnKey="gender" [nzFilters]="filterGender">Gender</th>
+            <th nzColumnKey="email" [nzSortFn]="true">Email</th>
+        </tr> -->
+    </thead>
+    <tbody>
+        <tr *ngFor="let data of rows">
+            <td [ngClass]="c.tdClassName" *ngFor="let c of options.cols" [nzEllipsis]="c.ellipsis">
+                <label class="col-name">{{c.name}} :</label>
+                <ng-container *ngTemplateOutlet="(c.type==='action') ? actions : datalable; context:{col:c,row:data }">
+                </ng-container>
+
+
+            </td>
+        </tr>
+    </tbody>
+</nz-table>
+
+
+<ng-template #totalTemplate let-total>
+    Total Records - {{total}}
+    <button nz-button nzType="default" nzShape="circle" (click)="refresh()"><i nz-icon nzType="sync"></i></button>
+    <div nz-row nzGutter="8">
+        <div nz-col nzXs="24" nzSm="12" nzMd="12">
+        </div>
+    </div>
+    <!-- should be translated -->
+</ng-template>
+<ng-template #datalable let-col="col" let-row="row">
+    <!-- <ng-contentainer [ngSwitch]="col.displayType">
+        <div *ngSwitchCase="'map'">
+           
+        </div>
+        <div *ngSwitchDefault>{{row[col.fieldKey]}}</div>
+    </ng-contentainer> -->
+    <ta-table-cell-dynamic [col]="col" [row]="row" [value]="row[col.fieldKey]"></ta-table-cell-dynamic>
+
+</ng-template>
+<ng-template #actions let-col="col" let-row="row">
+    <ta-table-actions [actions]="col.actions" [row]="row"></ta-table-actions>
+</ng-template>

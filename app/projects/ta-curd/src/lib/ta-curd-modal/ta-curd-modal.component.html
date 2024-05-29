@@ -1,0 +1,21 @@
+<!-- <div nz-row nzGutter="16" class="mb-md">
+
+    <nz-card [nzBordered]="false">
+
+    </nz-card>
+
+
+</div> -->
+<ta-table #table [options]="options.tableConfig" (doAction)="tableAction($event)">
+    <div class="after-search">
+        <button nz-button nzType="primary" class="ml-md" (click)="openDrawer()">
+            <i nz-icon nzType="plus"></i>Add
+        </button>
+    </div>
+</ta-table>
+
+<nz-drawer [nzClosable]="false" [nzHeight]="options.drawerHeight || '100%'" [nzWidth]="options.drawerSize || 'auto'" [nzVisible]="visible" [nzClosable]="true" [nzPlacement]="options.drawerPlacement || 'right'" [nzTitle]="formTitle" (nzOnClose)="close()">
+    <ng-template nzDrawerContent>
+        <ta-form *ngIf="visible" #form [options]="options.formConfig"></ta-form>
+    </ng-template>
+</nz-drawer>

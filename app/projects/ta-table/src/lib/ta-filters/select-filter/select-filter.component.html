@@ -1,0 +1,8 @@
+<nz-select (ngModelChange)="changeValue($event)" style="width: 100%;" [(ngModel)]="col.filterValue" (nzOnSearch)="onSearch($event)" nzAllowClear nzShowSearch [nzServerSearch]="serverSearch" [nzPlaceHolder]="col.filter.placeholder" [nzMode]="multiple ? 'multiple' : 'default'">
+    <ng-container *ngFor="let item of filter.options">
+        <nz-option *ngIf="!(isLoading$ | async) && !item.group" [nzValue]="item.value" [nzDisabled]="item.disabled" [nzLabel]="item.label"></nz-option>
+    </ng-container>
+    <nz-option *ngIf="isLoading$ | async" nzDisabled nzCustomContent>
+        <i nz-icon nzType="loading" class="loading-icon"></i> Loading Data...
+    </nz-option>
+</nz-select>

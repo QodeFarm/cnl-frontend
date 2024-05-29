@@ -1,0 +1,60 @@
+<div class="inner-content" *ngIf="showForm">
+    <form nz-form [nzLayout]="'vertical'" [formGroup]="form" (ngSubmit)="onSubmit()">
+    
+        <div [ngSwitch]="options.isBuilder">
+            <div *ngSwitchCase="true">
+                <ta-plugin *ngIf="options.isBuilder" [config]="{plugId:'page-builder',pageJson:{child:options.fields}}"></ta-plugin>
+            </div>
+            <div *ngSwitchCase="false">
+                <formly-form [form]="form" [model]="options.model" [options]="formlyOptions"  [fields]="fields"></formly-form>
+                <!-- <formly-form [form]="form" [model]="options.model" [options]="formlyOptions"  [fields]="[item]"></formly-form> -->
+                <!-- <ng-container *ngTemplateOutlet="recursiveList; context: { $implicit: fields}"></ng-container> -->
+                <!-- <ta-field-builder [fields]="{child:options.fields}"></ta-field-builder> -->
+                <!-- <ta-plugin *ngIf="!options.isBuilder" [config]="{plugId:'page-view',pageJson:{child:fields}}"></ta-plugin>  -->
+            </div>
+            <div *ngSwitchDefault>  
+                    <formly-form *ngIf="!options.isBuilder && showForm"  hide-directive="ng-show" #formlyForm [form]="form" [options]="formlyOptions" [model]="options.model" [fields]="options.fields">
+                    </formly-form>
+            </div>
+        </div>
+       
+       
+         <!-- <ta-page-builder *ngIf="options.isBuilder"  [pageJson]="{child:options.fields}"></ta-page-builder> -->
+
+        <div nz-row class="ta-row" *ngIf="options.showActionBtn" style="justify-content: center;">
+            <button class="me-2" nz-button nzType="primary" type="submit" [nzLoading]="isLoading">
+                {{options.submit?.label || 'Submit'}}
+            </button>
+            <button nz-button nzDanger type="button" (click)="onReset()">
+                {{options.reset?.label || 'Reset'}}
+            </button>
+        </div>
+    </form>
+</div>
+
+
+
+
+
+
+<ng-template #recursiveList let-list>
+    <div *ngFor="let item of list;  let i = index" [ngClass]="item.cssClass" [ngStyle]="item.cssStyle">
+        <ng-container *ngIf="item.plugId !='block'">
+            <ng-container [ngSwitch]="item.plugId">
+                <div *ngSwitchCase="'html'" class="d-contents" [ta-dynamic-template]="item.htmlTemplate">
+                </div>
+                <div *ngSwitchCase="'form-field'" class="d-contents">
+                    {{item.type}}
+                    <formly-field class="col" [field]="item"></formly-field>
+                    <!-- <formly-form [form]="form" [model]="options.model" [options]="formlyOptions"  [fields]="[item]"></formly-form> -->
+                </div>
+                <ng-container *ngSwitchDefault>
+                    <ta-plugin [config]="item" [isBuilder]="false"></ta-plugin>
+                </ng-container>
+            </ng-container>
+        </ng-container>
+        <ng-container *ngIf="item.child">
+            <ng-container *ngTemplateOutlet="recursiveList; context: { $implicit: item.child }"></ng-container>
+        </ng-container>
+    </div>
+</ng-template>

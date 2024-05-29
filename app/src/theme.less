@@ -1,0 +1,59 @@
+// Custom Theming for NG-ZORRO
+// For more information: https://ng.ant.design/docs/customize-theme/en
+@import "../node_modules/ng-zorro-antd/ng-zorro-antd.less";
+
+// Override less variables to here
+// View all variables: https://github.com/NG-ZORRO/ng-zorro-antd/blob/master/components/style/themes/default.less
+
+// @primary-color: #1890ff;
+
+.ant-table-content {
+  tr {
+    td {
+      .col-name {
+        display: none;
+      }
+    }
+  }
+}
+
+.ant-collapse-content-box {
+  padding: 3px !important;
+}
+
+@media screen and (max-width: 960px) {
+  .ant-table-content {
+    table {
+      col {
+        display: flex;
+      }
+    }
+
+    thead {
+      display: none;
+    }
+
+    tr {
+      display: flex;
+      width: 100%;
+      flex-direction: column;
+      border-bottom: 5px solid #333;
+
+      td {
+        .col-name {
+          color: #c9b2b2;
+          display: inline;
+        }
+      }
+    }
+  }
+}
+
+formly-field,
+ta-field-block {
+  display: block;
+}
+
+formly-field {
+  padding-bottom: 0.4rem;
+}

@@ -1,0 +1,21 @@
+<nz-input-group [nzAddOnBeforeIcon]="to.addonLeftIcon" [nzAddOnAfterIcon]="to.addonRightIcon">
+    <input *ngIf="to.type !== 'number'; else numberTmp" nz-input [formControl]="formControl" [type]="to.type || 'text'" [formlyAttributes]="field" />
+</nz-input-group>
+<ng-template #numberTmp>
+    <nz-input-number nzPrecisionMode="cut" [nzPrecision]="precision" [formControl]="formControl" [formlyAttributes]="field"></nz-input-number>
+</ng-template>
+
+<ng-template #prefixTemplateUser>
+    <ng-container *ngIf="to.addonLeft">
+        <i nz-icon nzType="to.addonLeft.icon" *ngIf="to.addonLeft.icon"></i>
+        <span *ngIf="to.addonLeft.text">{{to.addonLeft.text}}</span>
+    </ng-container>
+
+</ng-template>
+<ng-template #suffixTemplateInfo>
+    <!-- <i nz-icon nz-tooltip nzTooltipTitle="Extra information" nzType="info-circle"></i> -->
+    <ng-container *ngIf="to.addonRight">
+        <i nz-icon nzType="to.addonRight.icon" *ngIf="to.addonRight.icon"></i>
+        <span *ngIf="to.addonRight.text">{{to.addonLeft.text}}</span>
+    </ng-container>
+</ng-template>

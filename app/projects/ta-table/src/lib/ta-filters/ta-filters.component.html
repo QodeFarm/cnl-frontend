@@ -1,0 +1,12 @@
+<div class="search-box" [ngSwitch]="filterType">
+    <div *ngSwitchCase="'select'">
+        <ta-select-filter [col]="c"></ta-select-filter>
+    </div>
+    <div *ngSwitchCase="'date-range'">
+        <ta-date-range-filter [col]="c"></ta-date-range-filter>
+    </div>
+    <div *ngSwitchDefault> <input type="text" (keyup.enter)="setFilter(c)" nz-input [placeholder]="placeholder" [(ngModel)]="c.filterValue" /></div>
+
+    <button nz-button nzSize="small" nzType="primary" (click)="setFilter(c)" class="search-button">Search</button>
+    <button nz-button nzSize="small" (click)="resetFilter(c)">Reset</button>
+</div>

@@ -1,0 +1,29 @@
+<nz-card [nzBordered]="true" [nzTitle]="to.title" [nzExtra]="extraTemplate">
+    <div class="ant-table-container">
+        <table>
+            <tbody class="ant-table-tbody">
+                <tr class="ant-table-row" *ngFor="let field of field.fieldGroup; let i = index;">
+                    <td>
+                        <formly-field class="col" [field]="field"></formly-field>
+                    </td>
+                    <td>
+                        <div class="ant-col-4 d-flex align-items-center">
+                            <button nz-button nzDanger type="button" (click)="remove(i)">Remove</button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+</nz-card>
+<ng-template #extraTemplate>
+    <button nz-button nzType="primary" type="button" (click)="add()">{{ to.addText }}</button>
+</ng-template>
+
+
+
+<!-- <div *ngFor="let field of field.fieldGroup; let i = index;" class="row">
+    <formly-field class="col" [field]="field"></formly-field>
+  
+</div> -->

@@ -1,0 +1,21 @@
+.search-box {
+    padding: 8px;
+    width: 250px;
+}
+
+.search-box input,
+.search-box ta-select-filter,
+.search-box ta-date-range-filter {
+    /* width: 160px;
+    max-width: 160px; */
+    margin-bottom: 8px;
+    display: block;
+}
+
+.search-box button {
+    width: 90px;
+}
+
+.search-button {
+    margin-right: 0px;
+}

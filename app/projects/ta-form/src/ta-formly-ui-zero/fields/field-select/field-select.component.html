@@ -1,0 +1,20 @@
+<nz-select style="width: 100%;" 
+[class.ng-dirty]="showError"
+ (nzOnSearch)="onSearch($event)" 
+ nzAllowClear nzShowSearch [nzServerSearch]="serverSearch" 
+ [compareWith]="compareFn" [nzPlaceHolder]="to.placeholder" 
+ [formControl]="formControl" [formlyAttributes]="field" [nzMode]="to.multiple ? 'multiple' :(to.mode)?to.mode: 'default'">
+
+    <nz-option *ngIf="to.lazy && lazySelectedItem" nzDisabled [nzValue]="lazySelectedItem.value" [nzLabel]="lazySelectedItem.label"></nz-option>
+    <ng-container *ngFor="let item of to.options | formlySelectOptions: field | async">
+        <nz-option-group *ngIf="item.group" [nzLabel]="item.label">
+            <nz-option *ngFor="let child of item.group" [nzValue]="child.value" [nzDisabled]="child.disabled" [nzLabel]="child.label">
+            </nz-option>
+        </nz-option-group>
+
+        <nz-option *ngIf="!(isLoading$ | async) && !item.group" [nzValue]="item.value" [nzDisabled]="item.disabled" [nzLabel]="item.label"></nz-option>
+    </ng-container>
+    <nz-option *ngIf="isLoading$ | async" nzDisabled nzCustomContent>
+        <i nz-icon nzType="loading" class="loading-icon"></i> Loading Data...
+    </nz-option>
+</nz-select>

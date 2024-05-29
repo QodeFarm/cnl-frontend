@@ -1,0 +1,6 @@
+<div [ngClass]="field.cssClass" [ngStyle]="field.cssStyle">
+    <ng-container  *ngFor="let f of field.fieldGroup; let i = index; let last = last">
+    <formly-field [field]="f"></formly-field>
+    </ng-container>
+</div>
+    
