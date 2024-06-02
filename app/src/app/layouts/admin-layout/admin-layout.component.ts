@@ -10,6 +10,7 @@ import { RouterModule } from '@angular/router';
   imports: [CommonModule, RouterModule]
 })
 export class AdminLayoutComponent {
+  menulList = <any>[];
   constructor(private elementRef: ElementRef, private renderer: Renderer2) { }
 
   @HostListener('window:resize', ['$event'])
@@ -27,6 +28,59 @@ export class AdminLayoutComponent {
     }
   }
   ngOnInit() {
+    this.menulList = [
+      {
+        link: '/admin/dashboard',
+        label: 'Dashboard',
+        icon: 'fas fa-tachometer-alt',
+      },
+      {
+        label: 'Sales',
+        icon: 'fas fa-file-invoice-dollar',
+        child: [
+          {
+            link: '/admin/employee',
+            label: 'Customer',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/employee',
+            label: 'Sales Price List',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/employee',
+            label: 'Estimate',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/employee',
+            label: 'Sales Order',
+            icon: 'fas fa-tachometer-alt',
+          }
+        ]
+      },
+      {
+        link: '/admin/dashboard',
+        label: 'Purchase',
+        icon: 'fas fa-hand-holding-usd',
+      },
+      {
+        link: '/admin/dashboard',
+        label: 'Finance',
+        icon: 'fas fa-chart-line',
+      },
+      {
+        link: '/admin/dashboard',
+        label: 'Inventory',
+        icon: 'fas fa-boxes',
+      },
+      {
+        link: '/admin/dashboard',
+        label: 'Inventory',
+        icon: 'fas fa-boxes',
+      }
+    ]
     this.closeMenu();
   }
   closeMenu() {

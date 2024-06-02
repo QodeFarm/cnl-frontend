@@ -2,14 +2,14 @@
     <!-- Topbar -->
     <nav class="navbar navbar-expand navbar-light topbar static-top ">
         <a class="sidebar-brand d-flex align-items-center justify-content-center" [routerLink]="['/admin/dashboard']">
-           <img style="width: 2.2rem;" src="assets/img/logo.png" /> </a> 
-       <!-- Sidebar Toggle (Topbar) -->
-       <button id="sidebarToggleTop" (click)="menuToggle()" class="btn bar-toggle ml-2 mr-2">
+            <img style="width: 2.2rem;" src="assets/img/logo.png" /> </a>
+        <!-- Sidebar Toggle (Topbar) -->
+        <button id="sidebarToggleTop" (click)="menuToggle()" class="btn bar-toggle ml-2 mr-2">
          <i class="fa fa-bars"></i>
      </button>
-   
-       <!-- Topbar Search -->
-       <!-- <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+
+        <!-- Topbar Search -->
+        <!-- <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
            <div class="input-group">
                <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
                <div class="input-group-append">
@@ -19,9 +19,9 @@
                </div>
            </div>
        </form> -->
-   
-       <!-- Topbar Navbar -->
-       <ul class="navbar-nav ml-auto">
+
+        <!-- Topbar Navbar -->
+        <ul class="navbar-nav ml-auto">
             <!-- Nav Item - Alerts -->
             <li class="nav-item dropdown no-arrow mx-1">
                 <a class="nav-link dropdown-toggle" id="alertsDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -70,138 +70,138 @@
                     <a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
                 </div>
             </li>
-           <!-- Nav Item - Search Dropdown -->
-           <li class="nav-item dropdown no-arrow">
-   
-               <a class="nav-link dropdown-toggle" id="searchDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                   <i class="fas fa-search fa-fw"></i>
-               </a>
-               <!-- Dropdown - Messages -->
-               <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in" aria-labelledby="searchDropdown">
-                   <form class="form-inline mr-auto w-100 navbar-search">
-                       <div class="input-group">
-                           <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
-                           <div class="input-group-append">
-                               <button class="btn btn-primary" type="button">
+            <!-- Nav Item - Search Dropdown -->
+            <li class="nav-item dropdown no-arrow">
+
+                <a class="nav-link dropdown-toggle" id="searchDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-search fa-fw"></i>
+                </a>
+                <!-- Dropdown - Messages -->
+                <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in" aria-labelledby="searchDropdown">
+                    <form class="form-inline mr-auto w-100 navbar-search">
+                        <div class="input-group">
+                            <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="button">
                                  <i class="fas fa-search fa-sm"></i>
                              </button>
-                           </div>
-                       </div>
-                   </form>
-               </div>
-           </li>
-           <!-- Nav Item - Messages -->
-           <li class="nav-item dropdown no-arrow mx-1">
-               <a class="nav-link dropdown-toggle" id="messagesDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                   <i class="fas fa-envelope fa-fw"></i>
-                   <!-- Counter - Messages -->
-                   <span class="badge badge-danger badge-counter">7</span>
-               </a>
-               <!-- Dropdown - Messages -->
-               <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="messagesDropdown">
-                   <h6 class="dropdown-header">
-                       Message Center
-                   </h6>
-                   <a class="dropdown-item d-flex align-items-center" href="#">
-                       <div class="dropdown-list-image mr-3">
-                           <img class="rounded-circle" src="assets/img/undraw_profile_1.svg" alt="...">
-                           <div class="status-indicator bg-success"></div>
-                       </div>
-                       <div class="font-weight-bold">
-                           <div class="text-truncate">Hi there! I am wondering if you can help me with a problem I've been having.</div>
-                           <div class="small text-gray-500">Emily Fowler · 58m</div>
-                       </div>
-                   </a>
-                   <a class="dropdown-item d-flex align-items-center" href="#">
-                       <div class="dropdown-list-image mr-3">
-                           <img class="rounded-circle" src="assets/img/undraw_profile_2.svg" alt="...">
-                           <div class="status-indicator"></div>
-                       </div>
-                       <div>
-                           <div class="text-truncate">I have the photos that you ordered last month, how would you like them sent to you?</div>
-                           <div class="small text-gray-500">Jae Chun · 1d</div>
-                       </div>
-                   </a>
-                   <a class="dropdown-item d-flex align-items-center" href="#">
-                       <div class="dropdown-list-image mr-3">
-                           <img class="rounded-circle" src="assets/img/undraw_profile_3.svg" alt="...">
-                           <div class="status-indicator bg-warning"></div>
-                       </div>
-                       <div>
-                           <div class="text-truncate">Last month's report looks great, I am very happy with the progress so far, keep up the good work!</div>
-                           <div class="small text-gray-500">Morgan Alvarez · 2d</div>
-                       </div>
-                   </a>
-                   <a class="dropdown-item d-flex align-items-center" href="#">
-                       <div class="dropdown-list-image mr-3">
-                           <img class="rounded-circle" src="https://source.unsplash.com/Mv9hjnEUHR4/60x60" alt="...">
-                           <div class="status-indicator bg-success"></div>
-                       </div>
-                       <div>
-                           <div class="text-truncate">Am I a good boy? The reason I ask is because someone told me that people say this to all dogs, even if they aren't good...</div>
-                           <div class="small text-gray-500">Chicken the Dog · 2w</div>
-                       </div>
-                   </a>
-                   <a class="dropdown-item text-center small text-gray-500" href="#">Read More Messages</a>
-               </div>
-           </li>
-           <!-- Nav Item - Configuration -->
-           <li class="nav-item dropdown no-arrow mx-1">
-            <a class="nav-link dropdown-toggle" id="configDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fas fa-cog fa-fw" title="Configuration"></i>
-              </a>
-            <!-- Dropdown - Configuration -->
-            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="configDropdown">
-                <h6 class="dropdown-header">
-                    Configuration
-                </h6>
-            </div>
-        </li>
-           <!-- Nav Item - Favourite -->
-           <li class="nav-item dropdown no-arrow mx-1">
-            <a class="nav-link dropdown-toggle" id="favouriteDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fas fa-star fa-fw" title="Favourite"></i>
-             
-            </a>
-            <!-- Dropdown - Favourite -->
-            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="configDropdown">
-                <h6 class="dropdown-header">
-                    Favourite
-                </h6>
-            </div>
-        </li>
-          
-           <div class="topbar-divider d-none d-sm-block"></div>
-   
-           <!-- Nav Item - User Information -->
-           <li class="nav-item dropdown no-arrow">
-               <a class="nav-link dropdown-toggle p-0" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                   <span class="mr-2 d-none d-lg-inline text-white-600">Tulasi Ram</span>
-                   <img class="img-profile rounded-circle" src="assets/img/logo.png">
-               </a>
-               <!-- Dropdown - User Information -->
-               <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-                   <a class="dropdown-item">
-                       <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i> Profile
-                   </a>
-                   <!-- <a class="dropdown-item" href="#">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </li>
+            <!-- Nav Item - Messages -->
+            <li class="nav-item dropdown no-arrow mx-1">
+                <a class="nav-link dropdown-toggle" id="messagesDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-envelope fa-fw"></i>
+                    <!-- Counter - Messages -->
+                    <span class="badge badge-danger badge-counter">7</span>
+                </a>
+                <!-- Dropdown - Messages -->
+                <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="messagesDropdown">
+                    <h6 class="dropdown-header">
+                        Message Center
+                    </h6>
+                    <a class="dropdown-item d-flex align-items-center" href="#">
+                        <div class="dropdown-list-image mr-3">
+                            <img class="rounded-circle" src="assets/img/undraw_profile_1.svg" alt="...">
+                            <div class="status-indicator bg-success"></div>
+                        </div>
+                        <div class="font-weight-bold">
+                            <div class="text-truncate">Hi there! I am wondering if you can help me with a problem I've been having.</div>
+                            <div class="small text-gray-500">Emily Fowler · 58m</div>
+                        </div>
+                    </a>
+                    <a class="dropdown-item d-flex align-items-center" href="#">
+                        <div class="dropdown-list-image mr-3">
+                            <img class="rounded-circle" src="assets/img/undraw_profile_2.svg" alt="...">
+                            <div class="status-indicator"></div>
+                        </div>
+                        <div>
+                            <div class="text-truncate">I have the photos that you ordered last month, how would you like them sent to you?</div>
+                            <div class="small text-gray-500">Jae Chun · 1d</div>
+                        </div>
+                    </a>
+                    <a class="dropdown-item d-flex align-items-center" href="#">
+                        <div class="dropdown-list-image mr-3">
+                            <img class="rounded-circle" src="assets/img/undraw_profile_3.svg" alt="...">
+                            <div class="status-indicator bg-warning"></div>
+                        </div>
+                        <div>
+                            <div class="text-truncate">Last month's report looks great, I am very happy with the progress so far, keep up the good work!</div>
+                            <div class="small text-gray-500">Morgan Alvarez · 2d</div>
+                        </div>
+                    </a>
+                    <a class="dropdown-item d-flex align-items-center" href="#">
+                        <div class="dropdown-list-image mr-3">
+                            <img class="rounded-circle" src="https://source.unsplash.com/Mv9hjnEUHR4/60x60" alt="...">
+                            <div class="status-indicator bg-success"></div>
+                        </div>
+                        <div>
+                            <div class="text-truncate">Am I a good boy? The reason I ask is because someone told me that people say this to all dogs, even if they aren't good...</div>
+                            <div class="small text-gray-500">Chicken the Dog · 2w</div>
+                        </div>
+                    </a>
+                    <a class="dropdown-item text-center small text-gray-500" href="#">Read More Messages</a>
+                </div>
+            </li>
+            <!-- Nav Item - Configuration -->
+            <li class="nav-item dropdown no-arrow mx-1">
+                <a class="nav-link dropdown-toggle" id="configDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-cog fa-fw" title="Configuration"></i>
+                </a>
+                <!-- Dropdown - Configuration -->
+                <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="configDropdown">
+                    <h6 class="dropdown-header">
+                        Configuration
+                    </h6>
+                </div>
+            </li>
+            <!-- Nav Item - Favourite -->
+            <li class="nav-item dropdown no-arrow mx-1">
+                <a class="nav-link dropdown-toggle" id="favouriteDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-star fa-fw" title="Favourite"></i>
+
+                </a>
+                <!-- Dropdown - Favourite -->
+                <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="configDropdown">
+                    <h6 class="dropdown-header">
+                        Favourite
+                    </h6>
+                </div>
+            </li>
+
+            <div class="topbar-divider d-none d-sm-block"></div>
+
+            <!-- Nav Item - User Information -->
+            <li class="nav-item dropdown no-arrow">
+                <a class="nav-link dropdown-toggle p-0" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="mr-2 d-none d-lg-inline text-white-600">Tulasi Ram</span>
+                    <img class="img-profile rounded-circle" src="assets/img/logo.png">
+                </a>
+                <!-- Dropdown - User Information -->
+                <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                    <a class="dropdown-item">
+                        <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i> Profile
+                    </a>
+                    <!-- <a class="dropdown-item" href="#">
                        <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i> Settings
                    </a>
                    <a class="dropdown-item" href="#">
                        <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i> Activity Log
                    </a> -->
-                   <div class="dropdown-divider"></div>
-                   <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#logoutModal" [routerLink]="['/login']">
-                       <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i> Logout
-                   </a>
-               </div>
-           </li>
-   
-       </ul>
-   
-   </nav>
-   <!-- End of Topbar -->
-       </header>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#logoutModal" [routerLink]="['/login']">
+                        <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i> Logout
+                    </a>
+                </div>
+            </li>
+
+        </ul>
+
+    </nav>
+    <!-- End of Topbar -->
+</header>
 <div id="wrapper">
 
     <!-- Sidebar -->
@@ -209,42 +209,49 @@
 
         <!-- Sidebar - Brand -->
         <!-- <a class="sidebar-brand d-flex align-items-center justify-content-center" [routerLink]="['/admin/dashboard']"> -->
-            <!-- <div class="sidebar-brand-icon rotate-n-15">
+        <!-- <div class="sidebar-brand-icon rotate-n-15">
                 <i class="fas fa-laugh-wink"></i>
             </div> -->
-            <!-- <div class="logo-text"> -->
-                <!-- <img style="width: 3rem;" src="assets/img/logo.png" /> -->
-                <!-- CRM -->
-            <!-- </div> -->
-            <!-- <div class="sidebar-brand-text mx-3">HRMS Admin</div> -->
+        <!-- <div class="logo-text"> -->
+        <!-- <img style="width: 3rem;" src="assets/img/logo.png" /> -->
+        <!-- CRM -->
+        <!-- </div> -->
+        <!-- <div class="sidebar-brand-text mx-3">HRMS Admin</div> -->
         <!-- </a> -->
 
-       
+        <li class="nav-item" *ngFor="let m of menulList" [ngClass]="{'sub-menu': (m.child && m.child.length > 0)}">
+            <a *ngIf="!(m.child && m.child.length > 0)" class="nav-link" [routerLink]="[m.link]" routerLinkActive="active" (click)="closeMenu()">
+                <i class="" [ngClass]="m.icon"></i><span>{{m.label}}</span>
+            </a>
+            <a *ngIf="m.child && m.child.length > 0" class="nav-link collapsed" [attr.data-bs-toggle]="'collapse'" [attr.data-bs-target]="'#collapseMenu'+index" [attr.aria-expanded]="'true'" [attr.aria-controls]="'collapseMenu'+index">
+                <i [ngClass]="m.icon"></i>
+                <span>{{m.label}}</span>
+            </a>
+            <div *ngIf="m.child && m.child.length > 0" id="collapseMenu{{index}}" class="collapse sub-menu-items" [attr.aria-labelledby]="'heading'+index" [attr.data-parent]="'#accordionSidebar'">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <!-- <h6 class="collapse-header">{{m.label}}:</h6> -->
+                    <a (click)="closeMenu()" class="collapse-item" *ngFor="let sm of m.child" [routerLink]="[sm.link]" routerLinkActive="active">{{sm.label}}</a>
+                </div>
+            </div>
+        </li>
+
+
         <!-- Nav Item - Dashboard -->
-        <li class="nav-item">
-            <a class="nav-link" [routerLink]="['/admin/dashboard']"  routerLinkActive="active" (click)="closeMenu()">
+        <!-- <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/admin/dashboard']" routerLinkActive="active" (click)="closeMenu()">
                 <i class="fas fa-tachometer-alt"></i><span>DashBoard</span></a>
         </li>
         <li class="nav-item sub-menu">
-            <!-- <a class="nav-link"> <i class="fas fa-file-invoice-dollar"></i><span>Sales</span></a> -->
             <a class="nav-link collapsed" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
                 <i class="fas fa-file-invoice-dollar"></i><span>Sales</span>
             </a>
             <div id="collapseTwo" class="collapse sub-menu-items" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                 <div class="bg-white py-2 collapse-inner rounded">
-                    <!-- <h6 class="collapse-header">Custom Components:</h6> -->
-                    <!-- <a class="collapse-item sub-menu collapsed"  data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="true" aria-controls="collapse3"><span>Customer</span></a>
-                    <div id="collapse3" class="collapse sub-menu-items" aria-labelledby="heading3" data-parent="#accordionSidebar">
-                        <div class="bg-white py-2 collapse-inner rounded">
-                            <a class="collapse-item" [routerLink]="['/admin/employee/create']" (click)="closeMenu()" routerLinkActive="active">Sales Price List</a>
-                            <a class="collapse-item" [routerLink]="['/admin/leaves']" (click)="closeMenu()" routerLinkActive="active">Estimate</a>
-                            <a class="collapse-item" [routerLink]="['/dashboard']" (click)="closeMenu()" routerLinkActive="active">Sales Order</a>
-                          </div>
-                    </div> -->
+
                     <a class="collapse-item" [routerLink]="['/admin/sales']" (click)="closeMenu()" routerLinkActive="active">Sales Price List</a>
                     <a class="collapse-item">Estimate</a>
                     <a class="collapse-item">Sales Order</a>
-                  </div>
+                </div>
             </div>
         </li>
         <li class="nav-item">
@@ -270,75 +277,7 @@
         </li>
         <li class="nav-item">
             <a class="nav-link" [routerLink]="['/admin/employee']" routerLinkActive="active"> <i class="fas fa-suitcase"></i><span>Employee</span></a>
-        </li>
-        <!-- Divider -->
-        <!-- <hr class="sidebar-divider"> -->
-
-        <!-- Heading -->
-        <!-- <div class="sidebar-heading">
-            Employees
-        </div> -->
-
-        <!-- Nav Item - Pages Collapse Menu -->
-        <!-- <li class="nav-item">
-            <a class="nav-link collapsed" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
-                <i class="fas fa-fw fa-user"></i>
-                <span>Employees</span>
-            </a>
-            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <h6 class="collapse-header">Custom Components:</h6>
-                    <a class="collapse-item" [routerLink]="['/admin/employee']" (click)="closeMenu()" routerLinkActive="active">All Employees</a>
-                    <a class="collapse-item" [routerLink]="['/admin/employee/create']" (click)="closeMenu()" routerLinkActive="active">Create Employee</a>
-                    <a class="collapse-item" [routerLink]="['/admin/leaves']" (click)="closeMenu()" routerLinkActive="active">Leaves</a>
-                    <a class="collapse-item" [routerLink]="['/dashboard']" (click)="closeMenu()" routerLinkActive="active">Leaves (Admin)</a>
-                    <a class="collapse-item" [routerLink]="['/dashboard']" (click)="closeMenu()" routerLinkActive="active">Leaves (Employee)</a> -->
-                    <!-- <a class="collapse-item" [routerLink]="['/admin/master/leave-settings']" (click)="closeMenu()" routerLinkActive="active">Leaves Settings</a>
-                    <a class="collapse-item" [routerLink]="['/dashboard']" (click)="closeMenu()" routerLinkActive="active">Attendance (admin)</a>
-                    <a class="collapse-item" [routerLink]="['/dashboard']" (click)="closeMenu()" routerLinkActive="active">Attendance (Employee)</a>
-                    <a class="collapse-item" [routerLink]="['/dashboard']" (click)="closeMenu()" routerLinkActive="active">Departments</a>
-                </div>
-            </div>
         </li> -->
-        <!-- <hr class="sidebar-divider"> -->
-        <!-- <li class="nav-item">
-            <a class="nav-link collapsed" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
-                <i class="fas fa-fw fa-user"></i>
-                <span>Masters</span>
-            </a>
-            <div id="collapseThree" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                <div class="bg-white py-2 collapse-inner rounded">
-                   <h6 class="collapse-header">Custom Components:</h6> 
-                    <a class="collapse-item" [routerLink]="['/admin/master/job-type']" (click)="closeMenu()" routerLinkActive="active">Job Types</a>
-                    <a class="collapse-item" [routerLink]="['/admin/master/designations']" (click)="closeMenu()" routerLinkActive="active">Designations</a>
-                    <a class="collapse-item" [routerLink]="['/admin/master/job-codes']" (click)="closeMenu()" routerLinkActive="active">Job Codes</a>
-                    <a class="collapse-item" [routerLink]="['/admin/master/departments']" (click)="closeMenu()" routerLinkActive="active">Departments</a>
-                    <a class="collapse-item" [routerLink]="['/admin/master/shifts']" (click)="closeMenu()" routerLinkActive="active">Shifts</a>
-                </div>
-            </div>
-        </li> -->
-
-
-        <!-- Divider -->
-        <!-- <hr class="sidebar-divider"> -->
-        <!-- <li class="nav-item">
-            <a class="nav-link">
-                <i class="fas fa-fw fa-table"></i>
-                <span>Tables</span></a>
-        </li> -->
-
-
-        <!-- Nav Item - Tables -->
-
-
-        <!-- Divider -->
-        <!-- <hr class="sidebar-divider d-none d-md-block"> -->
-
-        <!-- Sidebar Toggler (Sidebar) -->
-        <!-- <div class="text-center d-none d-md-inline">
-            <button class="rounded-circle border-0" (click)="menuToggle()" id="sidebarToggle"></button>
-        </div> -->
-
     </ul>
     <!-- End of Sidebar -->
 
@@ -348,7 +287,7 @@
         <!-- Main Content -->
         <div id="content">
 
-           
+
 
             <!-- Begin Page Content -->
             <!-- <div class="container-fluid"> -->
