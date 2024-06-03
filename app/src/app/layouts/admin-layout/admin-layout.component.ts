@@ -35,6 +35,22 @@ export class AdminLayoutComponent {
         icon: 'fas fa-tachometer-alt',
       },
       {
+        label: 'User Management',
+        icon: 'fas fa-user',
+        child: [
+          {
+            link: '/admin/users',
+            label: 'Users list',
+            icon: 'fas fa-user',
+          },
+          {
+            link: '/admin/users',
+            label: 'User Roles',
+            icon: 'fas fa-user',
+          }
+        ]
+      },
+      {
         label: 'Sales',
         icon: 'fas fa-file-invoice-dollar',
         child: [
