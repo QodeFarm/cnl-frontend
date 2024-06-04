@@ -40,12 +40,12 @@ export class AdminLayoutComponent {
         child: [
           {
             link: '/admin/users',
-            label: 'Users list',
+            label: 'Users',
             icon: 'fas fa-user',
           },
           {
-            link: '/admin/users',
-            label: 'User Roles',
+            link: '/admin/roles',
+            label: 'Roles',
             icon: 'fas fa-user',
           }
         ]
