@@ -5,13 +5,13 @@ import { UserComponent } from './user.component';
 import { UserRoutingModule } from './user-routing.module';
 
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
-import { RoleComponent } from './role/role.component';
+import { RolesComponent } from './roles/roles.component';
 
 
 @NgModule({
   declarations: [
     UserComponent,
-    RoleComponent
+    RolesComponent
   ],
   imports: [
     CommonModule,

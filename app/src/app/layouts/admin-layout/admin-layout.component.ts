@@ -44,7 +44,7 @@ export class AdminLayoutComponent {
             icon: 'fas fa-user',
           },
           {
-            link: '/admin/roles',
+            link: '/admin/users/roles',
             label: 'Roles',
             icon: 'fas fa-user',
           }
