@@ -142,7 +142,7 @@ export class TaFormComponent implements OnInit {
           if (res.success || res) {
 
 
-            let msg = 'Save Successfull';
+            let msg = res.message || 'Save Successfull';
             if (this.options.submit) {
               if (this.options.submit.submittedFn) {
                 this.options.submit.submittedFn(res);
@@ -169,14 +169,22 @@ export class TaFormComponent implements OnInit {
 
           // this.form.reset();
         }, error => {
-          const e = Object.keys(error);
-          if (e) {
-            e.forEach(er => {
-              this.notification.error(error[er][0], er);
-            });
-          }
-          this.notification.error('Failure Error', '')
+          // debugger;
           this.isLoading = false;
+          if (error.error) {
+            const e = Object.keys(error.error);
+            const erors = error.error;
+            if (e) {
+              e.forEach(er => {
+                if (erors[er] && erors[er][0]) {
+                  this.notification.error(erors[er][0], '');
+                }
+              });
+            }
+          }
+
+          this.notification.error('Failure Error', '')
+
         });
       } else {
         if (this.options.submit && this.options.submit.submittedFn) {

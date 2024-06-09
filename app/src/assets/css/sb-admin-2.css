@@ -24,10 +24,12 @@
     flex-grow: 1;
     flex-basis: 100%;
 }
-.ta-cell .h2{
+
+.ta-cell .h2 {
     font-size: 18px !important;
     font-weight: 500 !important;
 }
+
 :root {
     --blue: #4e73df;
     --indigo: #6610f2;
@@ -2286,7 +2288,7 @@ textarea.form-control.is-valid {
     margin-top: 0;
     font-size: 80%;
     color: #e74a3b;
-    position: absolute;
+    /* position: absolute; */
 }
 
 .invalid-tooltip {
@@ -10562,6 +10564,7 @@ a:focus {
     background-color: #fff;
 }
 
+
 /* .topbar #sidebarToggleTop:active {
     background-color: #dddfeb;
 } */
@@ -10676,27 +10679,28 @@ a:focus {
         left: auto;
         top: 53px;
     }
-    .topbar .dropdown .dropdown-menu:before{
-            color: #7f7f7f;
-            content: "";
-            display: block;
-            position: absolute;
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
-            border-bottom: 10px solid #ccc;
-            right: 15px;
-            top: -10px;
+    .topbar .dropdown .dropdown-menu:before {
+        color: #7f7f7f;
+        content: "";
+        display: block;
+        position: absolute;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-bottom: 10px solid #ccc;
+        right: 15px;
+        top: -10px;
     }
-    .topbar .dropdown .dropdown-menu:after{
-            color: #7f7f7f;
-            content: "";
-            display: block;
-            position: absolute;
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
-            border-bottom: 10px solid #fff;
-            right: 15px;
-            top: -9px;;
+    .topbar .dropdown .dropdown-menu:after {
+        color: #7f7f7f;
+        content: "";
+        display: block;
+        position: absolute;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-bottom: 10px solid #fff;
+        right: 15px;
+        top: -9px;
+        ;
     }
     .topbar .dropdown-list {
         width: 20rem !important;
@@ -10922,8 +10926,8 @@ a:focus {
 @media (min-width: 768px) {
     .sidebar {
         width: 3.8rem !important;
-    transition: all 0.3s;
-    min-width: 3.8rem;
+        transition: all 0.3s;
+        min-width: 3.8rem;
     }
     .sidebar .nav-item .collapse {
         position: relative;
@@ -11020,8 +11024,8 @@ a:focus {
     }
     .sidebar.toggled .nav-item .collapse .collapse-inner {
         box-shadow: none;
-    border-radius: 0 !important;
-    background-color: #f7f7f7 !important
+        border-radius: 0 !important;
+        background-color: #f7f7f7 !important
     }
     .sidebar.toggled .nav-item .collapsing {
         display: none;
@@ -11341,21 +11345,25 @@ form.user .form-control-user {
     border-bottom: 2px solid #fcfdfd;
     color: #fff;
 }
-form.user .form-group i{
+
+form.user .form-group i {
     color: #c9cdcb;
     position: absolute;
     top: 8px;
     left: 7px;
     font-size: 1rem;
 }
-form.user .form-control::placeholder{
+
+form.user .form-control::placeholder {
     color: #c9cdcb;
 }
+
 form.user .form-control:focus {
     border-color: #bac8f3;
     outline: 0;
     box-shadow: none;
 }
+
 form.user .btn-user {
     font-size: 1.2rem;
     border-radius: 10px;
@@ -11365,7 +11373,8 @@ form.user .btn-user {
     font-weight: 300;
     color: #fff;
 }
-form.user .btn-user:hover{
+
+form.user .btn-user:hover {
     color: #5b6c77;
     background: #fff;
 }

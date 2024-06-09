@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { LoginRoutingModule } from './login-routing.module';
 import { LoginComponent } from './login.component';
 import { ForgotPasswordComponent } from '../forgot-password/forgot-password.component';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 
 @NgModule({
@@ -13,7 +14,8 @@ import { ForgotPasswordComponent } from '../forgot-password/forgot-password.comp
   ],
   imports: [
     CommonModule,
-    LoginRoutingModule
+    LoginRoutingModule,
+    AdminCommmonModule
   ]
 })
 export class LoginModule { }

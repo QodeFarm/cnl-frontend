@@ -15,8 +15,10 @@ export interface TaFormConfig {
     icon?: string,
     submittedFn?: (res: any) => any;
     successMsg?: string;
+    cssClass?: string;
   };
   reset?: {
+    cssClass?: string,
     label?: string,
     icon?: string,
     resetFn?: (res: any) => any;

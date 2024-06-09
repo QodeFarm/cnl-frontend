@@ -20,7 +20,7 @@ export class UserComponent {
       },
       cols: [
         {
-          fieldKey: 'first_name',
+          fieldKey: 'username',
           name: 'Name',
           sort: true
         },
@@ -66,92 +66,194 @@ export class UserComponent {
     formConfig: {
       url: 'users/create_user/',
       title: 'User',
-      pkId: "leave_id",
+      pkId: "user_id",
       exParams: [
+        {
+          key: 'company_id',
+          type: 'script',
+          value: 'data.company.company_id'
+        },
+        {
+          key: 'role_id',
+          type: 'script',
+          value: 'data.role.role_id'
+        },
         {
           key: 'status_id',
           type: 'script',
-          value: 'data.status.status_id'
-        },
-        {
-          key: 'employee_id',
-          type: 'script',
-          value: 'data.employee.employee_id'
-        },
-        {
-          key: 'leave_type_id',
-          type: 'script',
-          value: 'data.leave_type.leave_type_id'
+          value: '"f8edc445-7017-4ae1-819e-280c8c061484"'
         }
       ],
       fields: [
         {
           fieldGroupClassName: 'row',
           fieldGroup: [
-        {
-          key: 'user',
-          type: 'text',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'User Name',
-            dataKey: 'user',
-            dataLabel: "user",
-            required: true
-          },
-          hooks: {
-            onInit: (field: any) => {
-              //field.templateOptions.options = this.cs.getRole();
-            }
-          }
-        },
-        {
-          key: 'role_name',
-          type: 'select',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'User Role',
-            dataKey: 'role_name',
-            dataLabel: "role_name",
-            options: [],
-            lazy: {
-              url: 'users/role/',
-              lazyOneTime: true
+            {
+              key: 'username',
+              type: 'text',
+              className: 'ta-cell pr-md col-md-6 col-12',
+              templateOptions: {
+                label: 'User Name',
+                dataKey: 'user',
+                dataLabel: "user",
+                required: true
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  //field.templateOptions.options = this.cs.getRole();
+                }
+              }
             },
-            required: true
-          },
-          hooks: {
-            onInit: (field: any) => {
-              //field.templateOptions.options = this.cs.getRole();
+            {
+              key: 'first_name',
+              type: 'text',
+              className: 'ta-cell pr-md col-md-6 col-12',
+              templateOptions: {
+                label: 'First Name',
+                required: true
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  //field.templateOptions.options = this.cs.getRole();
+                }
+              }
+            },
+            {
+              key: 'last_name',
+              type: 'text',
+              className: 'ta-cell pr-md col-md-6 col-12',
+              templateOptions: {
+                label: 'Last Name',
+                required: true
+              }
+            },
+            {
+              key: 'email',
+              type: 'text',
+              className: 'ta-cell pr-md col-md-6 col-12',
+              templateOptions: {
+                label: 'User Email',
+                dataKey: 'user',
+                dataLabel: "user",
+                required: true
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  //field.templateOptions.options = this.cs.getRole();
+                }
+              }
+            },
+            {
+              key: 'mobile',
+              type: 'text',
+              className: 'ta-cell pr-md col-md-6 col-12',
+              templateOptions: {
+                label: 'Mobile',
+                required: true
+              }
+            },
+            {
+              key: 'role',
+              type: 'select',
+              className: 'ta-cell pr-md col-md-6 col-12',
+              templateOptions: {
+                label: 'User Role',
+                dataKey: 'role_name',
+                dataLabel: "role_name",
+                options: [],
+                lazy: {
+                  url: 'users/role/',
+                  lazyOneTime: true
+                },
+                required: true
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  //field.templateOptions.options = this.cs.getRole();
+                }
+              }
+            },
+            {
+              key: 'company',
+              type: 'select',
+              className: 'ta-cell pr-md col-md-6 col-12',
+              templateOptions: {
+                label: 'Company',
+                dataKey: 'company_id',
+                dataLabel: "name",
+                options: [],
+                lazy: {
+                  url: 'company/companies/',
+                  lazyOneTime: true
+                },
+                required: true
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  //field.templateOptions.options = this.cs.getRole();
+                }
+              }
+            },
+            {
+              key: 'gender',
+              type: 'select',
+              className: 'ta-cell pr-md col-md-6 col-12',
+              templateOptions: {
+                label: 'Gender',
+                required: true,
+                options: [
+                  { 'label': "Male", value: 'Male' },
+                  { 'label': "Female", value: 'Female' }
+                ]
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  //field.templateOptions.options = this.cs.getRole();
+                }
+              }
+            },
+            {
+              key: 'password',
+              type: 'text',
+              className: 'ta-cell pr-md col-md-6 col-12',
+              templateOptions: {
+                type: 'password',
+                label: 'Password',
+                required: true
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  //field.templateOptions.options = this.cs.getRole();
+                }
+              }
+            },
+            {
+              key: 're_password',
+              type: 'text',
+              className: 'ta-cell pr-md col-md-6 col-12',
+              templateOptions: {
+                type: 'password',
+                label: 'Re Password',
+                required: true
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  //field.templateOptions.options = this.cs.getRole();
+                }
+              }
+            },
+            {
+              key: 'bio',
+              type: 'textarea',
+              className: 'ta-cell pr-md col-md-6 col-12',
+              templateOptions: {
+                label: 'Comments',
+                placeholder: 'Enter comments',
+                required: true,
+              }
             }
-          }
-        },
-        {
-          key: 'user',
-          type: 'text',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'User Email',
-            dataKey: 'user',
-            dataLabel: "user",
-            required: true
-          },
-          hooks: {
-            onInit: (field: any) => {
-              //field.templateOptions.options = this.cs.getRole();
-            }
-          }
-        },
-        {
-          key: 'comments',
-          type: 'textarea',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'Comments',
-            placeholder: 'Enter comments',
-            required: true,
-          }
-        },
-      ]}
+          ]
+        }
       ]
     }
 

@@ -15,7 +15,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TaTableModule } from '@ta/ta-table';
 import { TaCurdModule } from '@ta/ta-curd';
 import { TaFormComponent, TaFormModule } from '@ta/ta-form';
+import { RouterModule } from '@angular/router';
 const module = [NzListModule,
+  RouterModule,
   NzSkeletonModule,
   NzLayoutModule,
   NzGridModule,
