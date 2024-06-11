@@ -87,14 +87,19 @@ export class AdminLayoutComponent {
         icon: 'fas fa-chart-line',
       },
       {
-        link: '/admin/dashboard',
+        link: '/admin/inventory',
         label: 'Inventory',
         icon: 'fas fa-boxes',
       },
       {
-        link: '/admin/dashboard',
-        label: 'Inventory',
-        icon: 'fas fa-boxes',
+        label: 'Product Masters',
+        icon: 'fas fa-database',
+        child: [
+          {
+            link: '/admin/products/product-types',
+            label: 'Product Types',
+            icon: 'fas fa-tachometer-alt',
+          },]
       }
     ]
     this.closeMenu();
