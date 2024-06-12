@@ -14,6 +14,24 @@ import { TaCurdConfig } from '@ta/ta-curd';
 export class MasterDetailsComponent {
   masterCode: any;
   curdConfig: TaCurdConfig;
+  actions = {
+    fieldKey: "code",
+    name: "Action",
+    type: 'action',
+    actions: [
+      {
+        type: 'delete',
+        label: 'Delete',
+        confirm: true,
+        confirmMsg: "Sure to delete?",
+        apiUrl: 'users/role/'
+      },
+      {
+        type: 'edit',
+        label: 'Edit'
+      },
+    ]
+  };
   constructor(private activRouter: ActivatedRoute) { }
   ngOnInit(): void {
     this.masterCode = this.activRouter.snapshot.params.code;
@@ -49,25 +67,8 @@ export class MasterDetailsComponent {
                 fieldKey: 'created_at',
                 name: 'Created TS',
                 sort: true
-              },
-              {
-                fieldKey: "code",
-                name: "Action",
-                type: 'action',
-                actions: [
-                  {
-                    type: 'delete',
-                    label: 'Delete',
-                    confirm: true,
-                    confirmMsg: "Sure to delete?",
-                    apiUrl: 'users/role/'
-                  },
-                  {
-                    type: 'edit',
-                    label: 'Edit'
-                  },
-                ]
-              }
+              }, this.actions
+
             ]
           },
           formConfig: {
@@ -100,13 +101,20 @@ export class MasterDetailsComponent {
 
             ]
           }
-        }
+        };
+        break;
+      case 'role2':
+
 
         break;
-
       default:
         break;
     }
+  }
+  getCurdFormate(data: any): TaCurdConfig {
+    const config: any = {};
+
+    return config
   }
 
 }
