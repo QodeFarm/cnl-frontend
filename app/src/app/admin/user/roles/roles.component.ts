@@ -52,13 +52,6 @@ export class RolesComponent {
               type: 'edit',
               label: 'Edit'
             },
-            // {
-            //   type: 'callBackFn',
-            //   label: 'Edit',
-            //   // callBackFn: (row, action) => {
-            //   //   this.router.navigateByUrl('/admin/employee/create/' + row.employee_id);
-            //   // }
-            // }
           ]
         }
       ]
@@ -72,7 +65,7 @@ export class RolesComponent {
       fields: [
         {
           key: 'role_name',
-          type: 'textarea',
+          type: 'input',
           className: 'ta-cell pr-md',
           templateOptions: {
             label: 'Role Nmae',

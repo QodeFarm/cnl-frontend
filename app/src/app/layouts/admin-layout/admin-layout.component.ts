@@ -92,9 +92,9 @@ export class AdminLayoutComponent {
         icon: 'fas fa-boxes',
       },
       {
-        link: '/admin/dashboard',
-        label: 'Inventory',
-        icon: 'fas fa-boxes',
+        link: '/admin/master',
+        label: 'Master',
+        icon: 'fas fa-cog',
       }
     ]
     this.closeMenu();

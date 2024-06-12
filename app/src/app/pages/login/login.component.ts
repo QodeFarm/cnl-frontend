@@ -100,8 +100,8 @@ export class LoginComponent {
   constructor(private router: Router) { }
   formSubmiiterd(res: any) {
     // console.log('res', res);
-    localStorage.setItem('accessToken', res.access);
-    TaLocalStorage.setItem('user', {});
+    localStorage.setItem('accessToken', res.data[0].access_token);
+    TaLocalStorage.setItem('user', res.data[0]);
 
     this.router.navigateByUrl('/admin');
 
