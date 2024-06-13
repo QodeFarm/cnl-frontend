@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { TaCurdConfig } from '@ta/ta-curd';
 
 @Component({
   selector: 'app-products',
@@ -6,5 +7,4 @@ import { Component } from '@angular/core';
   styleUrls: ['./products.component.scss']
 })
 export class ProductsComponent {
-
 }

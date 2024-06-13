@@ -104,9 +104,116 @@ export class InventoryComponent   {
         value: 'data.stock_unit.stock_unit_id'
       }
     ],
-    // fields: [
-    // ]
+    fields: [
+      {
+        fieldGroupClassName: 'row',
+        fieldGroup: [
+          {
+            key: 'name',
+            type: 'input',
+            className: 'ta-cell pr-md col-md-6 col-12',
+            templateOptions: {
+              label: 'Name',
+              required: true
+            },
+            hooks: {
+              onInit: (field: any) => {
+                //field.templateOptions.options = this.cs.getRole();
+              }
+            }
+          },
+          {
+            key: 'product_group_id',
+            type: 'select',
+            className: 'ta-cell pr-md',
+            templateOptions: {
+              label: 'Product Group',
+              dataKey: 'product_group_id',
+              dataLabel: "group_name",
+              options: [],
+              lazy: {
+                url: 'products/product_groups/',
+                lazyOneTime: true
+              },
+              required: true
+            },
+            hooks: {
+              onInit: (field: any) => {
+                //field.templateOptions.options = this.cs.getRole();
+              }
+            }
+          },
+          {
+            key: 'sales_description',
+            type: 'text',
+            className: 'ta-cell pr-md col-md-6 col-12',
+            templateOptions: {
+              label: 'Sales Description',
+            },
+            hooks: {
+              onInit: (field: any) => {
+                //field.templateOptions.options = this.cs.getRole();
+              }
+            }
+          },
+          {
+            key: 'mrp',
+            type: 'input',
+            className: 'ta-cell pr-md col-md-6 col-12',
+            templateOptions: {
+              label: 'MRP',
+            },
+            hooks: {
+              onInit: (field: any) => {
+                //field.templateOptions.options = this.cs.getRole();
+              }
+            }
+          },
+          {
+            key: 'sales_rate',
+            type: 'input',
+            className: 'ta-cell pr-md col-md-6 col-12',
+            templateOptions: {
+              label: 'Sales Rate',
+            },
+            hooks: {
+              onInit: (field: any) => {
+                //field.templateOptions.options = this.cs.getRole();
+              }
+            }
+          },
+          {
+            key: 'wholesale_rate',
+            type: 'input',
+            className: 'ta-cell pr-md col-md-6 col-12',
+            templateOptions: {
+              label: 'Wholesale Rate',
+            }
+          },
+          {
+            key: 'stock_unit_id',
+            type: 'select',
+            className: 'ta-cell pr-md',
+            templateOptions: {
+              label: 'Stock Unit',
+              dataKey: 'stock_unit_id',
+              dataLabel: "stock_unit_name",
+              options: [],
+              lazy: {
+                url: 'products/product_stock_units/',
+                lazyOneTime: true
+              },
+              required: true
+            },
+            hooks: {
+              onInit: (field: any) => {
+                //field.templateOptions.options = this.cs.getRole();
+              }
+            }
+          },
+        ]
+      }
+    ]
   }
-
 }
 }

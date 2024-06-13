@@ -96,10 +96,41 @@ export class AdminLayoutComponent {
         icon: 'fas fa-database',
         child: [
           {
-            link: '/admin/products/product-types',
-            label: 'Product Types',
+            link: '/admin/products/product-groups',
+            label: 'Product Groups',
             icon: 'fas fa-tachometer-alt',
-          },]
+          },
+          {
+            link: '/admin/products/product-categories',
+            label: 'Product Categories',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/products/product-stock-units',
+            label: 'Product Stock Units',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/products/product-gst-classifications',
+            label: 'Product GST Classifications',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/products/product-sales-gl',
+            label: 'Product Sales GL',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/products/product-purchase-gl',
+            label: 'Product Purchase GL',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/products/products',
+            label: 'Products',
+            icon: 'fas fa-tachometer-alt',
+          },
+        ]
       }
     ]
     this.closeMenu();
