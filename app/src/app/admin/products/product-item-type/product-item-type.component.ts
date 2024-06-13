@@ -3,26 +3,25 @@ import { TaCurdConfig } from '@ta/ta-curd';
 import { TaTableConfig } from '@ta/ta-table';
 
 @Component({
-  selector: 'app-product-types',
-  templateUrl: './product-types.component.html',
-  styleUrls: ['./product-types.component.scss']
+  selector: 'app-product-item-type',
+  templateUrl: './product-item-type.component.html',
+  styleUrls: ['./product-item-type.component.scss']
 })
-export class ProductTypesComponent {
-
+export class ProductItemTypeComponent {
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
     drawerPlacement: 'right',
     tableConfig: {
-      apiUrl: 'masters/product_types/',
-      title: 'Product Types',
-      pkId: "type_id",
+      apiUrl: 'masters/product_item_type/',
+      title: 'Product Item Type',
+      pkId: "item_type_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['type_id', 'type_name']
+        keys: ['item_type_id', 'item_name']
       },
       cols: [
         {
-          fieldKey: 'type_name',
+          fieldKey: 'item_name',
           name: 'Name'
         },
         {
@@ -35,7 +34,7 @@ export class ProductTypesComponent {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
-              apiUrl: 'masters/product_types'
+              apiUrl: 'masters/product_item_type'
             },
             {
               type: 'edit',
@@ -53,19 +52,19 @@ export class ProductTypesComponent {
       ]
     },
     formConfig: {
-      url: 'masters/product_types/',
-      title: 'Product Types',
-      pkId: "type_id",
+      url: 'masters/product_item_type/',
+      title: 'Product Item Type',
+      pkId: "item_type_id",
       exParams: [
       ],
       fields: [
         {
-          key: 'type_name',
+          key: 'item_name',
           type: 'textarea',
           className: 'ta-cell pr-md',
           templateOptions: {
-            label: 'Type Name',
-            placeholder: 'Enter Type Name',
+            label: 'Drug Item Name',
+            placeholder: 'Enter Item Name',
             required: true,
           }
         },
@@ -76,16 +75,16 @@ export class ProductTypesComponent {
 
 
   tableConfig: TaTableConfig = {
-    apiUrl: 'masters/product_types/',
-    title: 'Product Types',
-    pkId: "type_id",
+    apiUrl: 'masters/product_item_type/',
+    title: 'Product Item Type',
+    pkId: "item_type_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['type_id', 'type_name']
+      keys: ['item_type_id', 'item_name']
     },
     cols: [
       {
-        fieldKey: 'type_name',
+        fieldKey: 'item_name',
         name: 'Name'
       },
       {
@@ -98,7 +97,7 @@ export class ProductTypesComponent {
             label: 'Delete',
             confirm: true,
             confirmMsg: "Sure to delete?",
-            apiUrl: 'api/masters/product_types/'
+            apiUrl: 'api/masters'
           },
           {
             type: 'callBackFn',

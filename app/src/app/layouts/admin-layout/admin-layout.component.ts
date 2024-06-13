@@ -126,6 +126,36 @@ export class AdminLayoutComponent {
             icon: 'fas fa-tachometer-alt',
           },
           {
+            link: '/admin/products/product-unique-quantity-codes',
+            label: 'Product Unique Quantity Codes',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/products/unit-options',
+            label: 'Unit Options',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/products/product-drug-types',
+            label: 'Product Drug Types',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/products/product-item-type',
+            label: 'Product Item Type',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/products/brand-salesman',
+            label: 'Brand Salesman',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/products/product-brands',
+            label: 'Product Brands',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
             link: '/admin/products/products',
             label: 'Products',
             icon: 'fas fa-tachometer-alt',

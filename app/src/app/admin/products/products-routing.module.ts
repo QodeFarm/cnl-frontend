@@ -7,8 +7,13 @@ import { ProductStockUnitsComponent } from './product-stock-units/product-stock-
 import { ProductGstClassificationsComponent } from './product-gst-classifications/product-gst-classifications.component';
 import { ProductSalesGlComponent } from './product-sales-gl/product-sales-gl.component';
 import { ProductPurchaseGlComponent } from './product-purchase-gl/product-purchase-gl.component';
-import { InventoryComponent } from '../inventory/inventory.component';
 import { ProductsComponent } from './products.component';
+import { ProductUniqueQuantityCodesComponent } from './product-unique-quantity-codes/product-unique-quantity-codes.component';
+import { UnitOptionsComponent } from './unit-options/unit-options.component';
+import { ProductDrugTypesComponent } from './product-drug-types/product-drug-types.component';
+import { ProductItemTypeComponent } from './product-item-type/product-item-type.component';
+import { BrandSalesmanComponent } from './brand-salesman/brand-salesman.component';
+import { ProductBrandsComponent } from './product-brands/product-brands.component';
 
 const routes: Routes = [
   {
@@ -38,6 +43,34 @@ const routes: Routes = [
   {
     path : 'products',
     component: ProductsComponent
+  },
+  {
+    path : 'product-types',
+    component: ProductTypesComponent
+  },
+  {
+    path : 'product-unique-quantity-codes',
+    component: ProductUniqueQuantityCodesComponent
+  },
+  {
+    path : 'unit-options',
+    component: UnitOptionsComponent
+  },
+  {
+    path : 'product-drug-types',
+    component: ProductDrugTypesComponent
+  },
+  {
+    path : 'product-item-type',
+    component: ProductItemTypeComponent
+  },
+  {
+    path : 'brand-salesman',
+    component: BrandSalesmanComponent
+  },
+  {
+    path : 'product-brands',
+    component: ProductBrandsComponent
   },
 ];
 
