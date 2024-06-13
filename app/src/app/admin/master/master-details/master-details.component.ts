@@ -103,7 +103,7 @@ export class MasterDetailsComponent {
           }
         };
         break;
-      case 'role2':
+      case 'gst-types':
 
 
         break;

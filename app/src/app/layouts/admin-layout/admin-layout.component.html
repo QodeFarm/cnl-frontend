@@ -176,7 +176,7 @@
             <!-- Nav Item - User Information -->
             <li class="nav-item dropdown no-arrow">
                 <a class="nav-link dropdown-toggle p-0" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <span class="mr-2 d-none d-lg-inline text-white-600">Tulasi Ram</span>
+                    <span class="mr-2 d-none d-lg-inline text-white-600">{{userName | uppercase}}</span>
                     <img class="img-profile rounded-circle" src="assets/img/logo.png">
                 </a>
                 <!-- Dropdown - User Information -->
@@ -191,7 +191,7 @@
                        <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i> Activity Log
                    </a> -->
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#logoutModal" [routerLink]="['/login']">
+                    <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#logoutModal">
                         <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i> Logout
                     </a>
                 </div>
@@ -324,7 +324,7 @@
 </a> -->
 
 <!-- Logout Modal-->
-<!-- <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -336,8 +336,8 @@
             <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
-                <a class="btn btn-primary" data-bs-dismiss="modal" [routerLink]="['/login']">Logout</a>
+                <a class="btn btn-primary" data-bs-dismiss="modal" (click)="logout()">Logout</a>
             </div>
         </div>
     </div>
-</div> -->
+</div>
