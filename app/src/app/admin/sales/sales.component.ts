@@ -1,214 +1,610 @@
 import { Component } from '@angular/core';
-import { TaCurdConfig } from '@ta/ta-curd';
+import { TaFormConfig } from '@ta/ta-form';
+
 @Component({
   selector: 'app-sales',
   templateUrl: './sales.component.html',
   styleUrls: ['./sales.component.scss']
 })
 export class SalesComponent {
-  curdConfig: TaCurdConfig = {
-    drawerSize: 500,
-    drawerPlacement: 'right',
-    tableConfig: {
-      apiUrl: 'leaves/employeeleaves/',
-      title: 'Sales Price List',
-      pkId: "leave_id",
-      pageSize: 10,
-      "globalSearch": {
-        keys: ['id', 'name']
-      },
-      cols: [
-        {
-          fieldKey: 'leave_id',
-          name: 'ID',
-          sort: true
-        },
-        {
-          fieldKey: 'employee',
-          name: 'Employee',
-          displayType: "map",
-          mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.employee.first_name} ${row.employee.last_name}`;
-          },
-          sort: true
-        },
-        {
-          fieldKey: 'leave_type',
-          name: 'Leave Type',
-          displayType: "map",
-          mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.leave_type.leave_type_name}`;
-          },
-          sort: true
-        },
-        {
-          fieldKey: 'comments',
-          name: 'Comments',
-          sort: true
-        },
-        {
-          fieldKey: 'start_date',
-          name: 'Start Date',
-          type: 'date',
-          sort: true
-        },
-        {
-          fieldKey: 'end_date',
-          name: 'End Date',
-          type: 'date',
-          sort: true
-        },
-        {
-          fieldKey: 'status',
-          name: 'Status',
-          displayType: "map",
-          mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.status.status_name}`;
-          },
-          sort: true
-        },
-
-        {
-          fieldKey: "code",
-          name: "Action",
-          type: 'action',
-          actions: [
-            {
-              type: 'delete',
-              label: 'Delete',
-              confirm: true,
-              confirmMsg: "Sure to delete?",
-              apiUrl: 'leaves/employeeleaves'
-            },
-            {
-              type: 'edit',
-              label: 'Edit'
-            }
-          ]
-        }
-      ]
+  formConfig: TaFormConfig = {
+    url: "sales-order",
+    title: '',
+    formState:{
+      viewMode:false
     },
-    formConfig: {
-      url: 'leaves/employeeleaves/',
-      title: 'Sales',
-      pkId: "leave_id",
-      exParams: [
-        {
-          key: 'status_id',
-          type: 'script',
-          value: 'data.status.status_id'
-        },
-        {
-          key: 'employee_id',
-          type: 'script',
-          value: 'data.employee.employee_id'
-        },
-        {
-          key: 'leave_type_id',
-          type: 'script',
-          value: 'data.leave_type.leave_type_id'
-        }
-      ],
-      fields: [
-        {
-          fieldGroupClassName: 'row',
-          fieldGroup: [
-        {
-          key: 'employee',
-          type: 'select',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'Empployee',
-            dataKey: 'employee_id',
-            dataLabel: "first_name",
-            options: [],
-            lazy: {
-              url: 'employees/employees/',
-              lazyOneTime: true
-            },
-            required: true
-          },
-          hooks: {
-            onInit: (field: any) => {
-              //field.templateOptions.options = this.cs.getRole();
-            }
-          }
-        },
-        {
-          key: 'start_date',
-          type: 'date',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'Start Date',
-            placeholder: 'Enter Start Date',
-            required: true,
-          }
-        },
-        {
-          key: 'end_date',
-          type: 'date',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'End Date',
-            placeholder: 'Enter End Date',
-            required: true,
-          }
-        },
-        {
-          key: 'comments',
-          type: 'textarea',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'Comments',
-            placeholder: 'Enter comments',
-            required: true,
-          }
-        },
-        {
-          key: 'status',
-          type: 'select',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'Status',
-            dataKey: 'status_id',
-            dataLabel: "status_name",
-            options: [],
-            lazy: {
-              url: 'leaves/status/',
-              lazyOneTime: true
-            },
-            required: true
-          },
-          hooks: {
-            onInit: (field: any) => {
-              //field.templateOptions.options = this.cs.getRole();
-            }
-          }
-        },
-        {
-          key: 'leave_type',
-          type: 'select',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'Status',
-            dataKey: 'leave_type_id',
-            dataLabel: "leave_type_name",
-            options: [],
-            lazy: {
-              url: 'leaves/leavetypes/',
-              lazyOneTime: true
-            },
-            required: true
-          },
-          hooks: {
-            onInit: (field: any) => {
-              //field.templateOptions.options = this.cs.getRole();
-            }
-          }
-        }
-      ]}
-      ]
-    }
+    submit: {
+    },
+    fields: [
+      {
 
-  }
+        fieldGroupClassName: "ant-row",
+        fieldGroup: [
+          {
+            key: 'email',
+            type: 'input',
+            defaultValue: "",
+            className: 'ant-col-4 pr-md m-3',
+            templateOptions: {
+              type: 'input',
+              label: 'Email',
+              placeholder: 'Enter Email',
+              required: true
+            }
+          },
+          {
+            key: 'delivery_date',
+            type: 'date',
+            defaultValue: new Date(),
+            className: 'ant-col-4 pr-md m-3',
+            templateOptions: {
+              type: 'date',
+              label: 'Delivery date',
+              // placeholder: 'Select Oder Date',
+              required: true
+            }
+          },
+          {
+            key: 'order_no',
+            type: 'input',
+            className: 'ant-col-4 pr-md m-3',
+            templateOptions: {
+              label: 'Order no',
+              placeholder: 'Enter Order No',
+              required: true,
+            },
+            hooks: {
+              onInit: (field: any) => {
+                // field.templateOptions.options = this.cs.getLco()
+              }
+            }
+          },
+          {
+            key: 'order_date',
+            type: 'date',
+            defaultValue: new Date(),
+            className: 'ant-col-4 pr-md m-3',
+            templateOptions: {
+              type: 'date',
+              label: 'Order date',
+              // placeholder: 'Select Order Date',
+              required: true
+            }
+          },
+          {
+            key: 'ref_no',
+            type: 'input',
+            defaultValue: "",
+            className: 'ant-col-4 pr-md m-3',
+            templateOptions: {
+              type: 'input',
+              label: 'Ref No',
+              placeholder: 'Enter Ref No',
+              required: true
+            }
+          },
+          {
+            key: 'ref_date',
+            type: 'date',
+            defaultValue: new Date(),
+            className: 'ant-col-4 pr-md m-3',
+            templateOptions: {
+              type: 'date',
+              label: 'Ref date',
+              placeholder: 'Select Ref date',
+              required: true
+            }
+          },
+          {
+            key: 'tax',
+            type: 'select',
+            className: 'ant-col-4 pr-md m-3',
+            templateOptions: {
+              label: 'Tax',
+              dataKey: 'id',
+              options: [
+                {
+                  "label":"Inclusive"
+                },
+                {
+                  "label":"Exclusive"
+                }
+              ],
+              required: true
+            }
+          },
+          {
+            key: 'advance_amount',
+            type: 'input',
+            defaultValue: "",
+            className: 'ant-col-4 pr-md m-3',
+            templateOptions: {
+              type: 'input',
+              label: 'Advance amount',
+              placeholder: 'Enter Advance amount',
+              required: true
+            }
+          },          
+          {
+            key: 'item_value',
+            type: 'input',
+            defaultValue: "",
+            className: 'ant-col-4 pr-md m-3',
+            templateOptions: {
+              type: 'input',
+              label: 'Item value',
+              placeholder: 'Enter Item value',
+              required: true
+            }
+          },
+          {
+            key: 'items',
+            type: 'table',
+            defaultValue: [{}],
+            // fieldGroupClassName: 'table-field pr-md',
+            templateOptions: {
+              // title: 'Items',
+              addText: 'Add Item',
+            },
+            fieldArray: {
+              fieldGroup: [
+                {
+                  fieldGroupClassName: "ant-row",
+                  fieldGroup: [
+                    {
+                      key: 'item',
+                      type: 'select',
+                      className: 'ant-col-6 pr-md',
+                      templateOptions: {
+                        label: 'Select Item',
+                        dataKey: 'id',
+                        dataLabel:'name',
+                        options: [],
+                        required: true,
+                        lazy:{
+                          
+                          
+                        }
+                      },
+                      // hooks: {
+                      //   onInit: (field: any) => {
+                      //     let allItems: any = [];
+                      //     this.cs.getItems().subscribe(res => {
+                      //       allItems = res;
+                      //       field.templateOptions.options = allItems;
+                      //     });
+                      //     const categoryC = field.form.parent.parent.get('category'); //controls[]
+    
+                      //     this.cs.getItems().subscribe(res => {
+                      //       allItems = res;
+                      //       if (allItems) {
+                      //         field.templateOptions.options = allItems.filter((item: any) => {
+                      //           if (categoryC && categoryC.value && item.value.category.code == categoryC.value.code)
+                      //             return item;
+                      //         });
+                      //       }
+                      //     });
+                      //     const warehouseC = field.form.parent.parent.get('warehouse');
+                      //     warehouseC.valueChanges.pipe(
+                      //       distinctUntilChanged()
+                      //     ).subscribe((data: any) => {
+                      //       field.formControl.setValue(null);
+                      //     });
+                      //     const lcoC = field.form.parent.parent.get('lco');
+                      //     lcoC.valueChanges.pipe(
+                      //       distinctUntilChanged()
+                      //     ).subscribe((data: any) => {
+                      //       field.formControl.setValue(null);
+                      //     });
+                      //     categoryC.valueChanges.pipe(
+                      //       distinctUntilChanged()
+                      //     ).subscribe((data: any) => {
+                      //       field.formControl.setValue(null);
+                      //       if (allItems) {
+                      //         field.templateOptions.options = allItems.filter((item: any) => {
+                      //           if (item.value && data && item.value.category.code == data.code) {
+                      //             return item;
+                      //           }
+                      //         });
+                      //       }
+                      //     });
+    
+                      //   }
+                      // }
+                    },
+                    {
+                      type: 'input',
+                      key: 'price',
+                      className: 'ant-col-3 pr-md',
+                      // defaultValue: 0,
+                      templateOptions: {
+                        // type: 'number',
+                        label: 'Decription',
+                        // min: 1,
+                        required: true
+                      },
+                      expressionProperties: {
+                        // 'templateOptions.disabled': (model) => (model.item && model.item.sale_price) ? false : true
+                      },
+                      // hooks: {
+                      //   onInit: (field: any) => {
+                      //     // const quntityControl = field.parent.formControl.controls.quantity;
+                      //     field.form.get('item').valueChanges.pipe(
+                      //       distinctUntilChanged()
+                      //     ).subscribe((data: any) => {
+                      //       if (data && data.sale_price)
+                      //         field.formControl.setValue(data.sale_price);
+    
+                      //     });
+    
+                      //   }
+                      // }
+                    },
+                    {
+                      type: 'input',
+                      key: 'quantity',
+                      className: 'ant-col-3 pr-md',
+                      // defaultValue: 1,
+                      templateOptions: {
+                        // type: 'number',
+                        label: 'Attribute',
+                        // min: 1,
+                        required: true
+                      },
+                    },
+                    {
+                      type: 'input',
+                      key: 'cgst',
+                      className: 'ant-col-3 pr-md',
+                      // defaultValue: 0,
+                      templateOptions: {
+                        // type: 'number',
+                        label: 'Widget',
+                      },
+                      expressionProperties: {
+                        // 'templateOption6s.disabled': (model) => (model.item && model.item.sale_price) ? false : true
+                      },
+                      // hooks: {
+                      //   onInit: (field: any) => {
+                      //     // const quntityControl = field.parent.formControl.controls.quantity;
+                      //     console.log('fff', field);
+                      //     console.log('model', field.parent.parent.parent.parent.model);
+                      //     const pModel = field.parent.parent.parent.parent.model;
+    
+                      //     field.form.get('price').valueChanges.pipe(
+                      //       distinctUntilChanged()
+                      //     ).subscribe((data: any) => {
+                      //       if (pModel.lco && pModel.warehouse && pModel.lco && pModel.lco.state && pModel.lco.state.code === pModel.warehouse.state.code) {
+                      //         const m = field.model;
+                      //         const v: number = ((m.price * m.quantity) / 100) * 9;
+                      //         field.formControl.setValue(v);
+                      //       } else {
+                      //         field.formControl.setValue(0);
+                      //       }
+                      //     });
+                      //     field.form.get('quantity').valueChanges.pipe(
+                      //       distinctUntilChanged()
+                      //     ).subscribe((data: any) => {
+                      //       if (pModel.lco && pModel.warehouse && pModel.lco && pModel.lco.state && pModel.lco.state.code === pModel.warehouse.state.code) {
+                      //         const m = field.model;
+                      //         const v: number = ((m.price * m.quantity) / 100) * 9;
+                      //         field.formControl.setValue(v);
+                      //       } else {
+                      //         field.formControl.setValue(0);
+                      //       }
+                      //     });
+    
+                      //   }
+                      // }
+                    },
+                    {
+                      type: 'input',
+                      key: 'sgst',
+                      className: 'ant-col-3 pr-md',
+                      defaultValue: 0,
+                      templateOptions: {
+                        type: 'number',
+                        label: 'Dimension',
+                      },
+                      // hooks: {
+                      //   onInit: (field: any) => {
+                      //     // const quntityControl = field.parent.formControl.controls.quantity;
+                      //     const pModel = field.parent.parent.parent.parent.model;
+                      //     field.form.get('price').valueChanges.pipe(
+                      //       distinctUntilChanged()
+                      //     ).subscribe((data: any) => {
+                      //       if (pModel.lco && pModel.warehouse && pModel.lco && pModel.lco.state && pModel.lco.state.code === pModel.warehouse.state.code) {
+                      //         const m = field.model;
+                      //         const v = ((m.price * m.quantity) / 100) * 9;
+                      //         field.formControl.setValue(v);
+                      //       } else {
+                      //         field.formControl.setValue(0);
+                      //       }
+                      //     });
+                      //     field.form.get('quantity').valueChanges.pipe(
+                      //       distinctUntilChanged()
+                      //     ).subscribe((data: any) => {
+                      //       if (pModel.lco && pModel.warehouse && pModel.lco && pModel.lco.state && pModel.lco.state.code === pModel.warehouse.state.code) {
+                      //         const m = field.model;
+                      //         const v: number = ((m.price * m.quantity) / 100) * 9;
+                      //         field.formControl.setValue(v);
+                      //       } else {
+                      //         field.formControl.setValue(0);
+                      //       }
+                      //     });
+    
+                      //   }
+                      // }
+                    },
+                    {
+                      type: 'input',
+                      key: 'igst',
+                      className: 'ant-col-3 pr-md',
+                      defaultValue: 0,
+                      templateOptions: {
+                        type: 'number',
+                        label: 'Unit',
+                      },
+                      // hooks: {
+                      //   onInit: (field: any) => {
+                      //     // const quntityControl = field.parent.formControl.controls.quantity;
+                      //     const pModel = field.parent.parent.parent.parent.model;
+                      //     field.form.get('price').valueChanges.pipe(
+                      //       distinctUntilChanged()
+                      //     ).subscribe((data: any) => {
+                      //       if (pModel.lco && pModel.warehouse && pModel.lco && pModel.lco.state && pModel.lco.state.code !== pModel.warehouse.state.code) {
+                      //         const m = field.model;
+                      //         const v = ((m.price * m.quantity) / 100) * 18;
+                      //         field.formControl.setValue(v);
+                      //       } else {
+                      //         field.formControl.setValue(0);
+                      //       }
+                      //     });
+                      //     field.form.get('quantity').valueChanges.pipe(
+                      //       distinctUntilChanged()
+                      //     ).subscribe((data: any) => {
+                      //       if (pModel.lco && pModel.warehouse && pModel.lco && pModel.lco.state && pModel.lco.state.code !== pModel.warehouse.state.code) {
+                      //         const m = field.model;
+                      //         const v: number = ((m.price * m.quantity) / 100) * 18;
+                      //         field.formControl.setValue(v);
+                      //       } else {
+                      //         field.formControl.setValue(0);
+                      //       }
+                      //     });
+    
+                      //   }
+                      // }
+                    },
+                    {
+                      type: 'input',
+                      key: 'total',
+                      className: 'ant-col-3 pr-md',
+                      templateOptions: {
+                        type: 'number',
+                        label: 'Quantity',
+                        required: true
+                      },
+                      // hooks: {
+                      //   onInit: (field: any) => {
+                      //     // const quntityControl = field.parent.formControl.controls.quantity;
+                      //     field.form.get('price').valueChanges.pipe(
+                      //       distinctUntilChanged()
+                      //     ).subscribe((data: any) => {
+                      //       const m = field.model;
+                      //       const v: number = (m.price * m.quantity) + m.cgst + m.cgst;
+                      //       field.formControl.setValue(v);
+                      //     });
+                      //     field.form.get('quantity').valueChanges.pipe(
+                      //       distinctUntilChanged()
+                      //     ).subscribe((data: any) => {
+                      //       const m = field.model;
+                      //       const v = (m.price * m.quantity) + m.cgst + m.cgst;
+                      //       field.formControl.setValue(v);
+                      //     });
+    
+                      //   }
+                      // }
+                    }
+                  ]
+                }
+              ],
+            },
+          },
+          {
+            key: 'discount',
+            type: 'input',
+            defaultValue: "",
+            className: 'ant-col-4 pr-md m-3',
+            templateOptions: {
+              type: 'input',
+              label: 'Discount',
+              placeholder: 'Enter Discount',
+              required: true
+            }
+          },
+          {
+            key: 'dis_amt',
+            type: 'input',
+            defaultValue: "",
+            className: 'ant-col-4 pr-md m-3',
+            templateOptions: {
+              type: 'input',
+              label: 'Dis amt',
+              placeholder: 'Enter Dis amt',
+              required: true
+            }
+          },
+          {
+            key: 'taxable',
+            type: 'input',
+            defaultValue: "",
+            className: 'ant-col-4 pr-md m-3',
+            templateOptions: {
+              type: 'input',
+              label: 'Taxable',
+              placeholder: 'Enter Taxable',
+              required: true
+            }
+          },
+          {
+            key: 'tax_amount',
+            type: 'input',
+            defaultValue: "",
+            className: 'ant-col-4 pr-md m-3',
+            templateOptions: {
+              type: 'input',
+              label: 'Tax amount',
+              placeholder: 'Enter Tax amount',
+              required: true
+            }
+          },
+          {
+            key: 'cess_amount',
+            type: 'input',
+            defaultValue: "",
+            className: 'ant-col-4 pr-md m-3',
+            templateOptions: {
+              type: 'input',
+              label: 'Cess amount',
+              placeholder: 'Enter Cess amount',
+              required: true
+            }
+          },
+          {
+            key: 'round_off',
+            type: 'input',
+            defaultValue: "",
+            className: 'ant-col-4 pr-md m-3',
+            templateOptions: {
+              type: 'input',
+              label: 'Round off',
+              placeholder: 'Enter Round off',
+              required: true
+            }
+          },
+          {
+            key: 'doc_amount',
+            type: 'input',
+            defaultValue: "",
+            className: 'ant-col-4 pr-md m-3',
+            templateOptions: {
+              type: 'input',
+              label: 'Doc amount',
+              placeholder: 'Enter Doc amount',
+              required: true
+            }
+          },
+          {
+            key: 'vehicle_name',
+            type: 'input',
+            defaultValue: "",
+            className: 'ant-col-4 pr-md m-3',
+            templateOptions: {
+              type: 'input',
+              label: 'Vehicle name',
+              placeholder: 'Enter Vehicle name',
+              required: true
+            }
+          },
+          {
+            key: 'total_boxes',
+            type: 'input',
+            defaultValue: "",
+            className: 'ant-col-4 pr-md m-3',
+            templateOptions: {
+              type: 'input',
+              label: 'Total boxes',
+              placeholder: 'Enter Total boxes',
+              required: true
+            }
+          },
+          {
+            key: 'gst_type_id',
+            type: 'select',
+            className: 'ant-col-4 pr-md m-3',
+            templateOptions: {
+              label: 'Gst type id',
+              options: [],
+              required: true
+            }
+          },
+          
+          {
+            key: 'customer_id',
+            type: 'input',
+            defaultValue: "",
+            className: 'ant-col-4 pr-md m-3',
+            templateOptions: {
+              type: 'input',
+              label: 'Customer id',
+              placeholder: 'Enter Customer id',
+              required: true
+            }
+          },
+          {
+            key: 'customer_address_id',
+            type: 'select',
+            className: 'ant-col-4 pr-md m-3',
+            templateOptions: {
+              label: 'Customer address id',
+              options: [],
+              required: true
+            }
+          },
+          {
+            key: 'payment_term_id',
+            type: 'select',
+            className: 'ant-col-4 pr-md m-3',
+            templateOptions: {
+              label: 'Payment term id',
+              options: [],
+              required: true
+            }
+          },
+          {
+            key: 'sale_type_id',
+            type: 'select',
+            className: 'ant-col-4 pr-md m-3',
+            templateOptions: {
+              label: 'Sale type id',
+              options: [],
+              required: true
+            }
+          },
+          {
+            key: 'ledger_account_id',
+            type: 'select',
+            className: 'ant-col-4 pr-md m-3',
+            templateOptions: {
+              label: 'Ledger account id',
+              options: [],
+              required: true
+            }
+          },
+          {
+            key: 'order_status_id',
+            type: 'select',
+            className: 'ant-col-4 pr-md m-3',
+            templateOptions: {
+              label: 'Order status id',
+              options: [],
+              required: true
+            }
+          },
+
+          {
+            key: 'remarks',
+            type: 'textarea',
+            className: 'ant-col-12 pr-md m-3',
+            templateOptions: {
+              label: 'Remarks',
+              placeholder: 'Enter Remarks',
+              required: true,
+            }
+          },
+        ]
+      }
+    ]
+
+  };
 }

@@ -5,6 +5,7 @@ import { SalesRoutingModule } from './sales-routing.module';
 import { SalesComponent } from './sales.component';
 
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { SalesListComponent } from './sales-list/sales-list.component';
 
 @NgModule({
   declarations: [
@@ -13,7 +14,8 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
   imports: [
     CommonModule,
     AdminCommmonModule,
-    SalesRoutingModule
+    SalesRoutingModule,
+    SalesListComponent
   ]
 })
 export class SalesModule { }
