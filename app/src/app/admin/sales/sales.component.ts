@@ -20,6 +20,29 @@ export class SalesComponent {
 
         fieldGroupClassName: "ant-row",
         fieldGroup: [
+          
+          {
+            key: 'sale_type_id',
+            type: 'select',
+            className: 'ant-col-4 pr-md m-3',
+            templateOptions: {
+              label: 'Sale type id',
+              options: [],
+              required: true
+            }
+          },
+          {
+            key: 'customer_id',
+            type: 'input',
+            defaultValue: "",
+            className: 'ant-col-4 pr-md m-3',
+            templateOptions: {
+              type: 'input',
+              label: 'Customer id',
+              placeholder: 'Enter Customer id',
+              required: true
+            }
+          },
           {
             key: 'email',
             type: 'input',
@@ -101,39 +124,10 @@ export class SalesComponent {
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
               label: 'Tax',
-              dataKey: 'id',
               options: [
-                {
-                  "label":"Inclusive"
-                },
-                {
-                  "label":"Exclusive"
-                }
+                { 'label': "Inclusive", value: 'Inclusive' },
+                { 'label': "Exclusive", value: 'Exclusive' }
               ],
-              required: true
-            }
-          },
-          {
-            key: 'advance_amount',
-            type: 'input',
-            defaultValue: "",
-            className: 'ant-col-4 pr-md m-3',
-            templateOptions: {
-              type: 'input',
-              label: 'Advance amount',
-              placeholder: 'Enter Advance amount',
-              required: true
-            }
-          },          
-          {
-            key: 'item_value',
-            type: 'input',
-            defaultValue: "",
-            className: 'ant-col-4 pr-md m-3',
-            templateOptions: {
-              type: 'input',
-              label: 'Item value',
-              placeholder: 'Enter Item value',
               required: true
             }
           },
@@ -242,99 +236,28 @@ export class SalesComponent {
                     },
                     {
                       type: 'input',
-                      key: 'quantity',
+                      key: 'price',
                       className: 'ant-col-3 pr-md',
                       // defaultValue: 1,
                       templateOptions: {
                         // type: 'number',
-                        label: 'Attribute',
+                        label: 'Price',
                         // min: 1,
                         required: true
                       },
                     },
                     {
                       type: 'input',
-                      key: 'cgst',
+                      key: 'discount',
                       className: 'ant-col-3 pr-md',
                       // defaultValue: 0,
                       templateOptions: {
                         // type: 'number',
-                        label: 'Widget',
+                        label: 'Discount',
                       },
                       expressionProperties: {
                         // 'templateOption6s.disabled': (model) => (model.item && model.item.sale_price) ? false : true
-                      },
-                      // hooks: {
-                      //   onInit: (field: any) => {
-                      //     // const quntityControl = field.parent.formControl.controls.quantity;
-                      //     console.log('fff', field);
-                      //     console.log('model', field.parent.parent.parent.parent.model);
-                      //     const pModel = field.parent.parent.parent.parent.model;
-    
-                      //     field.form.get('price').valueChanges.pipe(
-                      //       distinctUntilChanged()
-                      //     ).subscribe((data: any) => {
-                      //       if (pModel.lco && pModel.warehouse && pModel.lco && pModel.lco.state && pModel.lco.state.code === pModel.warehouse.state.code) {
-                      //         const m = field.model;
-                      //         const v: number = ((m.price * m.quantity) / 100) * 9;
-                      //         field.formControl.setValue(v);
-                      //       } else {
-                      //         field.formControl.setValue(0);
-                      //       }
-                      //     });
-                      //     field.form.get('quantity').valueChanges.pipe(
-                      //       distinctUntilChanged()
-                      //     ).subscribe((data: any) => {
-                      //       if (pModel.lco && pModel.warehouse && pModel.lco && pModel.lco.state && pModel.lco.state.code === pModel.warehouse.state.code) {
-                      //         const m = field.model;
-                      //         const v: number = ((m.price * m.quantity) / 100) * 9;
-                      //         field.formControl.setValue(v);
-                      //       } else {
-                      //         field.formControl.setValue(0);
-                      //       }
-                      //     });
-    
-                      //   }
-                      // }
-                    },
-                    {
-                      type: 'input',
-                      key: 'sgst',
-                      className: 'ant-col-3 pr-md',
-                      defaultValue: 0,
-                      templateOptions: {
-                        type: 'number',
-                        label: 'Dimension',
-                      },
-                      // hooks: {
-                      //   onInit: (field: any) => {
-                      //     // const quntityControl = field.parent.formControl.controls.quantity;
-                      //     const pModel = field.parent.parent.parent.parent.model;
-                      //     field.form.get('price').valueChanges.pipe(
-                      //       distinctUntilChanged()
-                      //     ).subscribe((data: any) => {
-                      //       if (pModel.lco && pModel.warehouse && pModel.lco && pModel.lco.state && pModel.lco.state.code === pModel.warehouse.state.code) {
-                      //         const m = field.model;
-                      //         const v = ((m.price * m.quantity) / 100) * 9;
-                      //         field.formControl.setValue(v);
-                      //       } else {
-                      //         field.formControl.setValue(0);
-                      //       }
-                      //     });
-                      //     field.form.get('quantity').valueChanges.pipe(
-                      //       distinctUntilChanged()
-                      //     ).subscribe((data: any) => {
-                      //       if (pModel.lco && pModel.warehouse && pModel.lco && pModel.lco.state && pModel.lco.state.code === pModel.warehouse.state.code) {
-                      //         const m = field.model;
-                      //         const v: number = ((m.price * m.quantity) / 100) * 9;
-                      //         field.formControl.setValue(v);
-                      //       } else {
-                      //         field.formControl.setValue(0);
-                      //       }
-                      //     });
-    
-                      //   }
-                      // }
+                      }
                     },
                     {
                       type: 'input',
@@ -411,14 +334,36 @@ export class SalesComponent {
             },
           },
           {
-            key: 'discount',
+            key: 'remarks',
+            type: 'textarea',
+            className: 'ant-col-16 pr-md m-3',
+            templateOptions: {
+              label: 'Remarks',
+              placeholder: 'Enter Remarks',
+              required: true,
+            }
+          },          
+          {
+            key: 'item_value',
             type: 'input',
             defaultValue: "",
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
               type: 'input',
-              label: 'Discount',
-              placeholder: 'Enter Discount',
+              label: 'Item value',
+              placeholder: 'Enter Item value',
+              required: true
+            }
+          },
+          {
+            key: 'vehicle_name',
+            type: 'input',
+            defaultValue: "",
+            className: 'ant-col-16 pr-md m-3',
+            templateOptions: {
+              type: 'input',
+              label: 'Vehicle name',
+              placeholder: 'Enter Vehicle name',
               required: true
             }
           },
@@ -429,8 +374,56 @@ export class SalesComponent {
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
               type: 'input',
-              label: 'Dis amt',
-              placeholder: 'Enter Dis amt',
+              label: 'Discount amt',
+              placeholder: 'Enter Discount amt',
+              required: true
+            }
+          },
+          {
+            key: 'total_boxes',
+            type: 'input',
+            defaultValue: "",
+            className: 'ant-col-16 pr-md m-3',
+            templateOptions: {
+              type: 'input',
+              label: 'Total boxes',
+              placeholder: 'Enter Total boxes',
+              required: true
+            }
+          },
+          {
+            key: 'cess_amount',
+            type: 'input',
+            defaultValue: "",
+            className: 'ant-col-4 pr-md m-3',
+            templateOptions: {
+              type: 'input',
+              label: 'Cess amount',
+              placeholder: 'Enter Cess amount',
+              required: true
+            }
+          },
+          {
+            key: 'advance_amount',
+            type: 'input',
+            defaultValue: "",
+            className: 'ant-col-16 pr-md m-3',
+            templateOptions: {
+              type: 'input',
+              label: 'Advance amount',
+              placeholder: 'Enter Advance amount',
+              required: true
+            }
+          },
+          {
+            key: 'discount',
+            type: 'input',
+            defaultValue: "",
+            className: 'ant-col-4 pr-md m-3',
+            templateOptions: {
+              type: 'input',
+              label: 'Discount',
+              placeholder: 'Enter Discount',
               required: true
             }
           },
@@ -459,18 +452,6 @@ export class SalesComponent {
             }
           },
           {
-            key: 'cess_amount',
-            type: 'input',
-            defaultValue: "",
-            className: 'ant-col-4 pr-md m-3',
-            templateOptions: {
-              type: 'input',
-              label: 'Cess amount',
-              placeholder: 'Enter Cess amount',
-              required: true
-            }
-          },
-          {
             key: 'round_off',
             type: 'input',
             defaultValue: "",
@@ -495,49 +476,12 @@ export class SalesComponent {
             }
           },
           {
-            key: 'vehicle_name',
-            type: 'input',
-            defaultValue: "",
-            className: 'ant-col-4 pr-md m-3',
-            templateOptions: {
-              type: 'input',
-              label: 'Vehicle name',
-              placeholder: 'Enter Vehicle name',
-              required: true
-            }
-          },
-          {
-            key: 'total_boxes',
-            type: 'input',
-            defaultValue: "",
-            className: 'ant-col-4 pr-md m-3',
-            templateOptions: {
-              type: 'input',
-              label: 'Total boxes',
-              placeholder: 'Enter Total boxes',
-              required: true
-            }
-          },
-          {
             key: 'gst_type_id',
             type: 'select',
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
               label: 'Gst type id',
               options: [],
-              required: true
-            }
-          },
-          
-          {
-            key: 'customer_id',
-            type: 'input',
-            defaultValue: "",
-            className: 'ant-col-4 pr-md m-3',
-            templateOptions: {
-              type: 'input',
-              label: 'Customer id',
-              placeholder: 'Enter Customer id',
               required: true
             }
           },
@@ -562,16 +506,6 @@ export class SalesComponent {
             }
           },
           {
-            key: 'sale_type_id',
-            type: 'select',
-            className: 'ant-col-4 pr-md m-3',
-            templateOptions: {
-              label: 'Sale type id',
-              options: [],
-              required: true
-            }
-          },
-          {
             key: 'ledger_account_id',
             type: 'select',
             className: 'ant-col-4 pr-md m-3',
@@ -589,17 +523,6 @@ export class SalesComponent {
               label: 'Order status id',
               options: [],
               required: true
-            }
-          },
-
-          {
-            key: 'remarks',
-            type: 'textarea',
-            className: 'ant-col-12 pr-md m-3',
-            templateOptions: {
-              label: 'Remarks',
-              placeholder: 'Enter Remarks',
-              required: true,
             }
           },
         ]
