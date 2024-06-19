@@ -9,7 +9,7 @@ import { FieldType } from '@ngx-formly/core';
 export class FieldFileComponent extends FieldType {
   config = {
     plugId: 'file-upload',
-    multiple: true,
+    multiple: false,
     displayStyle: 'button',
     doneFn: (data) => {
       this.uploaded(data);

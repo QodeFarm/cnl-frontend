@@ -1,13 +1,21 @@
-<nz-upload class="avatar-uploader" [nzAction]="options.url" nzName="files" nzListType="text" [nzShowUploadList]="true" [nzMultiple]="options.multiple" [nzBeforeUpload]="beforeUpload" [nzFileList]="fileList" (nzChange)="handleChange($event)">
+<nz-upload nzType="drag" class="avatar-uploader" [nzAction]="options.url" nzName="files" nzListType="text" [nzShowUploadList]="true" [nzMultiple]="options.multiple" [nzBeforeUpload]="beforeUpload" [nzFileList]="fileList" (nzChange)="handleChange($event)">
     <ng-containe [ngSwitch]="options.displayStyle">
         <div *ngSwitchCase="'icon'">
             <i class='bx bx-cloud-upload'></i>
         </div>
-        <div *ngSwitchCase="'button'">
-            <button class="btn" type="button">
+        <div *ngSwitchCase="'button'" class="ant-upload-drag-container">
+
+            <p class="ant-upload-drag-icon">
+                <span nz-icon nzType="inbox"></span>
+            </p>
+            <p class="ant-upload-text">Click or drag file to this area to upload</p>
+            <p class="ant-upload-hint">
+                Support for a single or bulk upload. Strictly prohibit from uploading company data or other band files
+            </p>
+            <!-- <button class="btn" type="button">
               <span ></span>
               Click to Upload
-            </button>
+            </button> -->
         </div>
         <div *ngSwitchDefault>
             <ng-container *ngIf="!avatarUrl">
