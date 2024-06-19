@@ -32,6 +32,30 @@ export class SalesComponent {
             }
           },
           {
+            key: 'customer',
+            type: 'select',
+            className: 'ta-cell pr-md col-4',
+            templateOptions: {
+              label: 'Customer',
+              dataKey: 'name',
+              dataLabel: "name",
+              options: [],
+              lazy: {
+                url: 'customers/customers/',
+                lazyOneTime: true
+              },
+              required: true,
+              
+            },
+            hooks: {
+              onChanges: (field: any) => {
+                console.log(field);
+                
+                // field.templateOptions.options = this.cs.getRole();
+              }
+            }
+          },
+          {
             key: 'customer_id',
             type: 'input',
             defaultValue: "",
