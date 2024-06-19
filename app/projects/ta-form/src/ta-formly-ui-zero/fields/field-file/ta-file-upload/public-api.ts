@@ -1,0 +1,1 @@
+export * from './ta-file-upload.component';

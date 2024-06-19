@@ -1,0 +1,23 @@
+<nz-upload class="avatar-uploader" [nzAction]="options.url" nzName="files" nzListType="text" [nzShowUploadList]="true" [nzMultiple]="options.multiple" [nzBeforeUpload]="beforeUpload" [nzFileList]="fileList" (nzChange)="handleChange($event)">
+    <ng-containe [ngSwitch]="options.displayStyle">
+        <div *ngSwitchCase="'icon'">
+            <i class='bx bx-cloud-upload'></i>
+        </div>
+        <div *ngSwitchCase="'button'">
+            <button class="btn" type="button">
+              <span ></span>
+              Click to Upload
+            </button>
+        </div>
+        <div *ngSwitchDefault>
+            <ng-container *ngIf="!avatarUrl">
+                <!-- <span class="upload-icon" nz-icon [nzType]="loading ? 'loading' : 'plus'"></span> -->
+                <div class="ant-upload-text">Upload</div>
+            </ng-container>
+            testing
+            <img *ngIf="avatarUrl" [src]="avatarUrl" style="width: 100%" />
+        </div>
+    </ng-containe>
+
+
+</nz-upload>
