@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
+import { distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-sales',
@@ -34,7 +35,7 @@ export class SalesComponent {
           {
             key: 'customer',
             type: 'select',
-            className: 'ta-cell pr-md col-4',
+            className: 'ant-col-4 pr-md m-3',
             templateOptions: {
               label: 'Customer',
               dataKey: 'name',
@@ -65,7 +66,24 @@ export class SalesComponent {
               label: 'Customer id',
               placeholder: 'Enter Customer id',
               required: true
-            }
+            },
+            hooks: {
+                onInit: (field: any) => {
+                  // const quntityControl = field.parent.formControl.controls.quantity;
+                  field.form.get('customer').valueChanges.pipe(
+                    distinctUntilChanged()
+                  ).subscribe((data: any) => {
+                    console.log("data", data);
+                    if (data && data.customer_id) {
+                      field.formControl.setValue(data.customer_id);
+                    } else {
+                      console.log("customer_id not found");
+                    }
+                    
+                  });
+
+                }
+              }
           },
           {
             key: 'email',
@@ -77,7 +95,22 @@ export class SalesComponent {
               label: 'Email',
               placeholder: 'Enter Email',
               required: true
-            }
+            },
+            hooks: {
+                onInit: (field: any) => {
+                  // const quntityControl = field.parent.formControl.controls.quantity;
+                  field.form.get('customer').valueChanges.pipe(
+                    distinctUntilChanged()
+                  ).subscribe((data: any) => {
+                    if (data && data.website) {
+                      field.formControl.setValue(data.website);
+                    } else {
+                      console.log("website not found");
+                    }
+                  });
+
+                }
+              }
           },
           {
             key: 'delivery_date',
@@ -143,7 +176,7 @@ export class SalesComponent {
             }
           },
           {
-            key: 'tax',
+            key: 'tax_type',
             type: 'select',
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
@@ -153,7 +186,22 @@ export class SalesComponent {
                 { 'label': "Exclusive", value: 'Exclusive' }
               ],
               required: true
-            }
+            },
+            hooks: {
+                onInit: (field: any) => {
+                  // const quntityControl = field.parent.formControl.controls.quantity;
+                  field.form.get('customer').valueChanges.pipe(
+                    distinctUntilChanged()
+                  ).subscribe((data: any) => {
+                    if (data && data.tax_type) {
+                      field.formControl.setValue(data.tax_type);
+                    } else {
+                      console.log("tax_type not found");
+                    }
+                  });
+
+                }
+              }
           },
           {
             key: 'items',
@@ -501,51 +549,82 @@ export class SalesComponent {
           },
           {
             key: 'gst_type_id',
-            type: 'select',
+            type: 'input',
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
               label: 'Gst type id',
-              options: [],
+              placeholder: 'Enter Gst type id',
               required: true
             }
           },
           {
             key: 'customer_address_id',
-            type: 'select',
+            type: 'input',
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
               label: 'Customer address id',
-              options: [],
+              placeholder: 'Enter Customer address id',
               required: true
-            }
+            },
+            hooks: {
+                onInit: (field: any) => {
+                  // const quntityControl = field.parent.formControl.controls.quantity;
+                  field.form.get('customer').valueChanges.pipe(
+                    distinctUntilChanged()
+                  ).subscribe((data: any) => {
+                    if (data && data.customer_address_id) {
+                      field.formControl.setValue(data.customer_address_id);
+                    } else {
+                      console.log("customer_address_id not found");
+                    }
+                  });
+
+                }
+              }
           },
           {
             key: 'payment_term_id',
-            type: 'select',
+            type: 'input',
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
               label: 'Payment term id',
-              options: [],
+              placeholder: 'Enter Payment term id',
               required: true
             }
           },
           {
             key: 'ledger_account_id',
-            type: 'select',
+            type: 'input',
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
               label: 'Ledger account id',
-              options: [],
+              placeholder: 'Enter Ledger account id',
               required: true
-            }
+            },
+            hooks: {
+                onInit: (field: any) => {
+                  // const quntityControl = field.parent.formControl.controls.quantity;
+                  field.form.get('customer').valueChanges.pipe(
+                    distinctUntilChanged()
+                  ).subscribe((data: any) => {
+                    
+                    if (data && data.ledger_account_id) {
+                      field.formControl.setValue(data.ledger_account_id);
+                    } else {
+                      console.log("ledger_account_id not found");
+                    }
+                  });
+
+                }
+              }
           },
           {
             key: 'order_status_id',
-            type: 'select',
+            type: 'input',
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
               label: 'Order status id',
-              options: [],
+              placeholder: 'Enter Order status id',
               required: true
             }
           },
