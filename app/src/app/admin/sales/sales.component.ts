@@ -50,8 +50,25 @@ export class SalesComponent {
             },
             hooks: {
               onChanges: (field: any) => {
-                console.log(field);
-                
+                field.formControl.valueChanges.subscribe(data => {
+                  console.log("data", data)
+                  
+                  if (field.form && field.form.controls && field.form.controls.customer_id) {
+                    field.form.controls.customer_id.setValue(data.customer_id)
+                  }
+                  if (field.form && field.form.controls && field.form.controls.ledger_account_id) {
+                    field.form.controls.ledger_account_id.setValue(data.ledger_account_id)
+                  }
+                  if (field.form && field.form.controls && field.form.controls.customer_address_id) {
+                    field.form.controls.customer_address_id.setValue(data.customer_address_id)
+                  }
+                  if (field.form && field.form.controls && field.form.controls.tax_type) {
+                    field.form.controls.tax_type.setValue(data.tax_type)
+                  }
+                  if (field.form && field.form.controls && field.form.controls.website) {
+                    field.form.controls.email.setValue(data.website)
+                  }
+                });
                 // field.templateOptions.options = this.cs.getRole();
               }
             }
@@ -70,17 +87,17 @@ export class SalesComponent {
             hooks: {
                 onInit: (field: any) => {
                   // const quntityControl = field.parent.formControl.controls.quantity;
-                  field.form.get('customer').valueChanges.pipe(
-                    distinctUntilChanged()
-                  ).subscribe((data: any) => {
-                    console.log("data", data);
-                    if (data && data.customer_id) {
-                      field.formControl.setValue(data.customer_id);
-                    } else {
-                      console.log("customer_id not found");
-                    }
+                  // field.form.get('customer').valueChanges.pipe(
+                  //   distinctUntilChanged()
+                  // ).subscribe((data: any) => {
+                  //   console.log("data", data);
+                  //   if (data && data.customer_id) {
+                  //     field.formControl.setValue(data.customer_id);
+                  //   } else {
+                  //     console.log("customer_id not found");
+                  //   }
                     
-                  });
+                  // });
 
                 }
               }
@@ -97,19 +114,7 @@ export class SalesComponent {
               required: true
             },
             hooks: {
-                onInit: (field: any) => {
-                  // const quntityControl = field.parent.formControl.controls.quantity;
-                  field.form.get('customer').valueChanges.pipe(
-                    distinctUntilChanged()
-                  ).subscribe((data: any) => {
-                    if (data && data.website) {
-                      field.formControl.setValue(data.website);
-                    } else {
-                      console.log("website not found");
-                    }
-                  });
-
-                }
+                onInit: (field: any) => {}
               }
           },
           {
@@ -189,17 +194,6 @@ export class SalesComponent {
             },
             hooks: {
                 onInit: (field: any) => {
-                  // const quntityControl = field.parent.formControl.controls.quantity;
-                  field.form.get('customer').valueChanges.pipe(
-                    distinctUntilChanged()
-                  ).subscribe((data: any) => {
-                    if (data && data.tax_type) {
-                      field.formControl.setValue(data.tax_type);
-                    } else {
-                      console.log("tax_type not found");
-                    }
-                  });
-
                 }
               }
           },
@@ -568,17 +562,6 @@ export class SalesComponent {
             },
             hooks: {
                 onInit: (field: any) => {
-                  // const quntityControl = field.parent.formControl.controls.quantity;
-                  field.form.get('customer').valueChanges.pipe(
-                    distinctUntilChanged()
-                  ).subscribe((data: any) => {
-                    if (data && data.customer_address_id) {
-                      field.formControl.setValue(data.customer_address_id);
-                    } else {
-                      console.log("customer_address_id not found");
-                    }
-                  });
-
                 }
               }
           },
@@ -602,21 +585,8 @@ export class SalesComponent {
               required: true
             },
             hooks: {
-                onInit: (field: any) => {
-                  // const quntityControl = field.parent.formControl.controls.quantity;
-                  field.form.get('customer').valueChanges.pipe(
-                    distinctUntilChanged()
-                  ).subscribe((data: any) => {
-                    
-                    if (data && data.ledger_account_id) {
-                      field.formControl.setValue(data.ledger_account_id);
-                    } else {
-                      console.log("ledger_account_id not found");
-                    }
-                  });
-
-                }
-              }
+               
+            }
           },
           {
             key: 'order_status_id',
