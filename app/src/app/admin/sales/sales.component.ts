@@ -11,8 +11,8 @@ export class SalesComponent {
   formConfig: TaFormConfig = {
     url: "sales-order",
     title: '',
-    formState:{
-      viewMode:false
+    formState: {
+      viewMode: false
     },
     submit: {
     },
@@ -21,7 +21,7 @@ export class SalesComponent {
 
         fieldGroupClassName: "ant-row",
         fieldGroup: [
-          
+
           {
             key: 'sale_type_id',
             type: 'select',
@@ -46,13 +46,13 @@ export class SalesComponent {
                 lazyOneTime: true
               },
               required: true,
-              
+
             },
             hooks: {
               onChanges: (field: any) => {
                 field.formControl.valueChanges.subscribe(data => {
                   console.log("data", data)
-                  
+
                   if (field.form && field.form.controls && field.form.controls.customer_id) {
                     field.form.controls.customer_id.setValue(data.customer_id)
                   }
@@ -60,7 +60,7 @@ export class SalesComponent {
                     field.form.controls.ledger_account_id.setValue(data.ledger_account_id)
                   }
                   if (field.form && field.form.controls && field.form.controls.customer_address_id) {
-                    field.form.controls.customer_address_id.setValue(data.customer_address_id)
+                    field.form.controls.customer_address_id.setValue(data.customer_category_id)
                   }
                   if (field.form && field.form.controls && field.form.controls.tax_type) {
                     field.form.controls.tax_type.setValue(data.tax_type)
@@ -85,22 +85,22 @@ export class SalesComponent {
               required: true
             },
             hooks: {
-                onInit: (field: any) => {
-                  // const quntityControl = field.parent.formControl.controls.quantity;
-                  // field.form.get('customer').valueChanges.pipe(
-                  //   distinctUntilChanged()
-                  // ).subscribe((data: any) => {
-                  //   console.log("data", data);
-                  //   if (data && data.customer_id) {
-                  //     field.formControl.setValue(data.customer_id);
-                  //   } else {
-                  //     console.log("customer_id not found");
-                  //   }
-                    
-                  // });
+              onInit: (field: any) => {
+                // const quntityControl = field.parent.formControl.controls.quantity;
+                // field.form.get('customer').valueChanges.pipe(
+                //   distinctUntilChanged()
+                // ).subscribe((data: any) => {
+                //   console.log("data", data);
+                //   if (data && data.customer_id) {
+                //     field.formControl.setValue(data.customer_id);
+                //   } else {
+                //     console.log("customer_id not found");
+                //   }
 
-                }
+                // });
+
               }
+            }
           },
           {
             key: 'email',
@@ -114,8 +114,8 @@ export class SalesComponent {
               required: true
             },
             hooks: {
-                onInit: (field: any) => {}
-              }
+              onInit: (field: any) => { }
+            }
           },
           {
             key: 'delivery_date',
@@ -193,9 +193,9 @@ export class SalesComponent {
               required: true
             },
             hooks: {
-                onInit: (field: any) => {
-                }
+              onInit: (field: any) => {
               }
+            }
           },
           {
             key: 'items',
@@ -204,7 +204,7 @@ export class SalesComponent {
             // fieldGroupClassName: 'table-field pr-md',
             templateOptions: {
               // title: 'Items',
-              addText: 'Add Item',
+              addText: 'Add Product',
             },
             fieldArray: {
               fieldGroup: [
@@ -212,20 +212,43 @@ export class SalesComponent {
                   fieldGroupClassName: "ant-row",
                   fieldGroup: [
                     {
-                      key: 'item',
+                      key: 'product',
                       type: 'select',
                       className: 'ant-col-6 pr-md',
                       templateOptions: {
-                        label: 'Select Item',
-                        dataKey: 'id',
-                        dataLabel:'name',
+                        label: 'Select Product',
+                        dataKey: 'name',
+                        dataLabel: 'name',
                         options: [],
                         required: true,
-                        lazy:{
-                          
-                          
+                        lazy: {
+                          url: 'products/products/?summary=true',
+                          lazyOneTime: true
                         }
                       },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          field.formControl.valueChanges.subscribe(data => {
+                            console.log("products data", data)
+
+                            if (field.form && field.form.controls && field.form.controls.description) {
+                              field.form.controls.description.setValue(data.sales_description)
+                            }
+                            if (field.form && field.form.controls && field.form.controls.mrp) {
+                              field.form.controls.mrp.setValue(data.mrp)
+                            }
+                            if (field.form && field.form.controls && field.form.controls.discount) {
+                              field.form.controls.discount.setValue(data.dis_amount)
+                            }
+                            if (field.form && field.form.controls && field.form.controls.unit) {
+                              if (data.unit_options && data.unit_options.unit_name) {
+                                field.form.controls.unit.setValue(data.unit_options.unit_name)
+                              }
+                            }
+                          });
+                          // field.templateOptions.options = this.cs.getRole();
+                        }
+                      }
                       // hooks: {
                       //   onInit: (field: any) => {
                       //     let allItems: any = [];
@@ -234,7 +257,7 @@ export class SalesComponent {
                       //       field.templateOptions.options = allItems;
                       //     });
                       //     const categoryC = field.form.parent.parent.get('category'); //controls[]
-    
+
                       //     this.cs.getItems().subscribe(res => {
                       //       allItems = res;
                       //       if (allItems) {
@@ -268,18 +291,18 @@ export class SalesComponent {
                       //         });
                       //       }
                       //     });
-    
+
                       //   }
                       // }
                     },
                     {
                       type: 'input',
-                      key: 'price',
-                      className: 'ant-col-3 pr-md',
+                      key: 'description',
+                      className: 'ant-col-6 pr-md',
                       // defaultValue: 0,
                       templateOptions: {
                         // type: 'number',
-                        label: 'Decription',
+                        label: 'Description',
                         // min: 1,
                         required: true
                       },
@@ -294,15 +317,15 @@ export class SalesComponent {
                       //     ).subscribe((data: any) => {
                       //       if (data && data.sale_price)
                       //         field.formControl.setValue(data.sale_price);
-    
+
                       //     });
-    
+
                       //   }
                       // }
                     },
                     {
-                      type: 'input',
-                      key: 'price',
+                      type: 'number',
+                      key: 'mrp',
                       className: 'ant-col-3 pr-md',
                       // defaultValue: 1,
                       templateOptions: {
@@ -327,9 +350,8 @@ export class SalesComponent {
                     },
                     {
                       type: 'input',
-                      key: 'igst',
+                      key: 'unit',
                       className: 'ant-col-3 pr-md',
-                      defaultValue: 0,
                       templateOptions: {
                         type: 'number',
                         label: 'Unit',
@@ -360,7 +382,7 @@ export class SalesComponent {
                       //         field.formControl.setValue(0);
                       //       }
                       //     });
-    
+
                       //   }
                       // }
                     },
@@ -368,6 +390,7 @@ export class SalesComponent {
                       type: 'input',
                       key: 'total',
                       className: 'ant-col-3 pr-md',
+                      defaultValue: 1,
                       templateOptions: {
                         type: 'number',
                         label: 'Quantity',
@@ -390,7 +413,7 @@ export class SalesComponent {
                       //       const v = (m.price * m.quantity) + m.cgst + m.cgst;
                       //       field.formControl.setValue(v);
                       //     });
-    
+
                       //   }
                       // }
                     }
@@ -408,7 +431,7 @@ export class SalesComponent {
               placeholder: 'Enter Remarks',
               required: true,
             }
-          },          
+          },
           {
             key: 'item_value',
             type: 'input',
@@ -561,9 +584,9 @@ export class SalesComponent {
               required: true
             },
             hooks: {
-                onInit: (field: any) => {
-                }
+              onInit: (field: any) => {
               }
+            }
           },
           {
             key: 'payment_term_id',
@@ -585,7 +608,7 @@ export class SalesComponent {
               required: true
             },
             hooks: {
-               
+
             }
           },
           {
