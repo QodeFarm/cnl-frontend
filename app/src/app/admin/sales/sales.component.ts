@@ -323,7 +323,7 @@ export class SalesComponent {
                       type: 'number',
                       key: 'mrp',
                       className: 'ant-col-3 pr-md',
-                      // defaultValue: 1,
+                      defaultValue: 0,
                       templateOptions: {
                         label: 'Price',
                         placeholder: 'Enter Price',
