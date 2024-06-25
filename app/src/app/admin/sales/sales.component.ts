@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { distinctUntilChanged } from 'rxjs/operators';
@@ -8,6 +9,16 @@ import { distinctUntilChanged } from 'rxjs/operators';
   styleUrls: ['./sales.component.scss']
 })
 export class SalesComponent {
+  orderNumber: any;
+
+  constructor(private http: HttpClient) {
+  }
+
+
+  ngOnInit() {
+    this.getOrderNo()
+  }
+
   formConfig: TaFormConfig = {
     url: "sales-order",
     title: '',
@@ -16,18 +27,34 @@ export class SalesComponent {
     },
     submit: {
     },
+    model: {},
     fields: [
       {
 
         fieldGroupClassName: "ant-row",
         fieldGroup: [
-
+          {
+            key: 'order_no',
+            type: 'input',
+            className: 'ant-col-4 pr-md m-3',
+            templateOptions: {
+              label: 'Order no',
+              placeholder: 'Enter Order No',
+              required: true,
+            },
+            hooks: {
+              onInit: (field: any) => {
+                // field.form.controls.order_no.setValue(this.orderNumber)
+                // field.form.controls.order_no.value = this.orderNumber;
+              }
+            }
+          },
           {
             key: 'sale_type_id',
             type: 'select',
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
-              label: 'Sale type id',
+              label: 'Sale type',
               options: [],
               required: true
             }
@@ -42,7 +69,7 @@ export class SalesComponent {
               dataLabel: "name",
               options: [],
               lazy: {
-                url: 'customers/customers/',
+                url: 'customers/customers/?summary=true',
                 lazyOneTime: true
               },
               required: true,
@@ -56,49 +83,14 @@ export class SalesComponent {
                   if (field.form && field.form.controls && field.form.controls.customer_id) {
                     field.form.controls.customer_id.setValue(data.customer_id)
                   }
-                  if (field.form && field.form.controls && field.form.controls.ledger_account_id) {
-                    field.form.controls.ledger_account_id.setValue(data.ledger_account_id)
-                  }
                   if (field.form && field.form.controls && field.form.controls.customer_address_id) {
                     field.form.controls.customer_address_id.setValue(data.customer_category_id)
                   }
-                  if (field.form && field.form.controls && field.form.controls.tax_type) {
-                    field.form.controls.tax_type.setValue(data.tax_type)
-                  }
-                  if (field.form && field.form.controls && field.form.controls.website) {
-                    field.form.controls.email.setValue(data.website)
+                  if (field.form && field.form.controls && field.form.controls.email) {
+                    field.form.controls.email.setValue(data.email)
                   }
                 });
                 // field.templateOptions.options = this.cs.getRole();
-              }
-            }
-          },
-          {
-            key: 'customer_id',
-            type: 'input',
-            defaultValue: "",
-            className: 'ant-col-4 pr-md m-3',
-            templateOptions: {
-              type: 'input',
-              label: 'Customer id',
-              placeholder: 'Enter Customer id',
-              required: true
-            },
-            hooks: {
-              onInit: (field: any) => {
-                // const quntityControl = field.parent.formControl.controls.quantity;
-                // field.form.get('customer').valueChanges.pipe(
-                //   distinctUntilChanged()
-                // ).subscribe((data: any) => {
-                //   console.log("data", data);
-                //   if (data && data.customer_id) {
-                //     field.formControl.setValue(data.customer_id);
-                //   } else {
-                //     console.log("customer_id not found");
-                //   }
-
-                // });
-
               }
             }
           },
@@ -127,21 +119,6 @@ export class SalesComponent {
               label: 'Delivery date',
               // placeholder: 'Select Oder Date',
               required: true
-            }
-          },
-          {
-            key: 'order_no',
-            type: 'input',
-            className: 'ant-col-4 pr-md m-3',
-            templateOptions: {
-              label: 'Order no',
-              placeholder: 'Enter Order No',
-              required: true,
-            },
-            hooks: {
-              onInit: (field: any) => {
-                // field.templateOptions.options = this.cs.getLco()
-              }
             }
           },
           {
@@ -195,6 +172,26 @@ export class SalesComponent {
             hooks: {
               onInit: (field: any) => {
               }
+            }
+          },
+          {
+            key: 'billing_address',
+            type: 'textarea',
+            className: 'ant-col-11 pr-md m-3',
+            templateOptions: {
+              label: 'Billing address',
+              placeholder: 'Enter Billing address',
+              required: true,
+            }
+          },
+          {
+            key: 'invoice_address',
+            type: 'textarea',
+            className: 'ant-col-11 pr-md m-3',
+            templateOptions: {
+              label: 'Invoice address',
+              placeholder: 'Enter Invoice address',
+              required: true,
             }
           },
           {
@@ -301,9 +298,8 @@ export class SalesComponent {
                       className: 'ant-col-6 pr-md',
                       // defaultValue: 0,
                       templateOptions: {
-                        // type: 'number',
                         label: 'Description',
-                        // min: 1,
+                        placeholder: 'Enter Description',
                         required: true
                       },
                       expressionProperties: {
@@ -329,8 +325,8 @@ export class SalesComponent {
                       className: 'ant-col-3 pr-md',
                       // defaultValue: 1,
                       templateOptions: {
-                        // type: 'number',
                         label: 'Price',
+                        placeholder: 'Enter Price',
                         // min: 1,
                         required: true
                       },
@@ -341,7 +337,7 @@ export class SalesComponent {
                       className: 'ant-col-3 pr-md',
                       // defaultValue: 0,
                       templateOptions: {
-                        // type: 'number',
+                        placeholder: 'Enter Discount',
                         label: 'Discount',
                       },
                       expressionProperties: {
@@ -353,8 +349,8 @@ export class SalesComponent {
                       key: 'unit',
                       className: 'ant-col-3 pr-md',
                       templateOptions: {
-                        type: 'number',
                         label: 'Unit',
+                        placeholder: 'Enter Unit',
                       },
                       // hooks: {
                       //   onInit: (field: any) => {
@@ -394,6 +390,7 @@ export class SalesComponent {
                       templateOptions: {
                         type: 'number',
                         label: 'Quantity',
+                        placeholder: 'Enter Quantity',
                         required: true
                       },
                       // hooks: {
@@ -575,20 +572,6 @@ export class SalesComponent {
             }
           },
           {
-            key: 'customer_address_id',
-            type: 'input',
-            className: 'ant-col-4 pr-md m-3',
-            templateOptions: {
-              label: 'Customer address id',
-              placeholder: 'Enter Customer address id',
-              required: true
-            },
-            hooks: {
-              onInit: (field: any) => {
-              }
-            }
-          },
-          {
             key: 'payment_term_id',
             type: 'input',
             className: 'ant-col-4 pr-md m-3',
@@ -600,15 +583,20 @@ export class SalesComponent {
           },
           {
             key: 'ledger_account_id',
-            type: 'input',
+            type: 'select',
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
+              dataKey: 'name',
+              dataLabel: "name",
               label: 'Ledger account id',
               placeholder: 'Enter Ledger account id',
-              required: true
+              required: true,
+              lazy: {
+                url: 'masters/ledger_groups/',
+                lazyOneTime: true
+              }
             },
             hooks: {
-
             }
           },
           {
@@ -626,4 +614,15 @@ export class SalesComponent {
     ]
 
   };
+
+  getOrderNo() {
+    this.http.get('masters/generate_order_no/?type=SO').subscribe((res: any) => {
+      console.log(res);
+      if (res && res.data && res.data.order_number) {
+        this.formConfig.model.order_no = res.data.order_number;
+        this.orderNumber = res.data.order_number;
+      }
+    })
+  }
+
 }
