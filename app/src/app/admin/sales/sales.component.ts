@@ -20,7 +20,7 @@ export class SalesComponent {
   }
 
   formConfig: TaFormConfig = {
-    url: "sales-order",
+    url: "sales/sale_order/",
     title: '',
     formState: {
       viewMode: false
@@ -40,7 +40,7 @@ export class SalesComponent {
             templateOptions: {
               label: 'Order no',
               placeholder: 'Enter Order No',
-              required: true,
+              // required: true,
             },
             hooks: {
               onInit: (field: any) => {
@@ -56,7 +56,7 @@ export class SalesComponent {
             templateOptions: {
               label: 'Sale type',
               options: [],
-              required: true
+              // required: true
             }
           },
           {
@@ -72,7 +72,7 @@ export class SalesComponent {
                 url: 'customers/customers/?summary=true',
                 lazyOneTime: true
               },
-              required: true,
+              // required: true,
 
             },
             hooks: {
@@ -103,7 +103,7 @@ export class SalesComponent {
               type: 'input',
               label: 'Email',
               placeholder: 'Enter Email',
-              required: true
+              // required: true
             },
             hooks: {
               onInit: (field: any) => { }
@@ -118,7 +118,7 @@ export class SalesComponent {
               type: 'date',
               label: 'Delivery date',
               // placeholder: 'Select Oder Date',
-              required: true
+              // required: true
             }
           },
           {
@@ -130,7 +130,7 @@ export class SalesComponent {
               type: 'date',
               label: 'Order date',
               // placeholder: 'Select Order Date',
-              required: true
+              // required: true
             }
           },
           {
@@ -142,7 +142,7 @@ export class SalesComponent {
               type: 'input',
               label: 'Ref No',
               placeholder: 'Enter Ref No',
-              required: true
+              // required: true
             }
           },
           {
@@ -154,7 +154,7 @@ export class SalesComponent {
               type: 'date',
               label: 'Ref date',
               placeholder: 'Select Ref date',
-              required: true
+              // required: true
             }
           },
           {
@@ -167,7 +167,7 @@ export class SalesComponent {
                 { 'label': "Inclusive", value: 'Inclusive' },
                 { 'label': "Exclusive", value: 'Exclusive' }
               ],
-              required: true
+              // required: true
             },
             hooks: {
               onInit: (field: any) => {
@@ -181,7 +181,7 @@ export class SalesComponent {
             templateOptions: {
               label: 'Billing address',
               placeholder: 'Enter Billing address',
-              required: true,
+              // required: true,
             }
           },
           {
@@ -191,7 +191,7 @@ export class SalesComponent {
             templateOptions: {
               label: 'Invoice address',
               placeholder: 'Enter Invoice address',
-              required: true,
+              // required: true,
             }
           },
           {
@@ -217,7 +217,7 @@ export class SalesComponent {
                         dataKey: 'name',
                         dataLabel: 'name',
                         options: [],
-                        required: true,
+                        // required: true,
                         lazy: {
                           url: 'products/products/?summary=true',
                           lazyOneTime: true
@@ -300,7 +300,7 @@ export class SalesComponent {
                       templateOptions: {
                         label: 'Description',
                         placeholder: 'Enter Description',
-                        required: true
+                        // required: true
                       },
                       expressionProperties: {
                         // 'templateOptions.disabled': (model) => (model.item && model.item.sale_price) ? false : true
@@ -328,7 +328,7 @@ export class SalesComponent {
                         label: 'Price',
                         placeholder: 'Enter Price',
                         // min: 1,
-                        required: true
+                        // required: true
                       },
                     },
                     {
@@ -391,7 +391,7 @@ export class SalesComponent {
                         type: 'number',
                         label: 'Quantity',
                         placeholder: 'Enter Quantity',
-                        required: true
+                        // required: true
                       },
                       // hooks: {
                       //   onInit: (field: any) => {
@@ -426,7 +426,7 @@ export class SalesComponent {
             templateOptions: {
               label: 'Remarks',
               placeholder: 'Enter Remarks',
-              required: true,
+              // required: true,
             }
           },
           {
@@ -438,7 +438,7 @@ export class SalesComponent {
               type: 'input',
               label: 'Item value',
               placeholder: 'Enter Item value',
-              required: true
+              // required: true
             }
           },
           {
@@ -450,7 +450,7 @@ export class SalesComponent {
               type: 'input',
               label: 'Vehicle name',
               placeholder: 'Enter Vehicle name',
-              required: true
+              // required: true
             }
           },
           {
@@ -462,7 +462,7 @@ export class SalesComponent {
               type: 'input',
               label: 'Discount amt',
               placeholder: 'Enter Discount amt',
-              required: true
+              // required: true
             }
           },
           {
@@ -474,7 +474,7 @@ export class SalesComponent {
               type: 'input',
               label: 'Total boxes',
               placeholder: 'Enter Total boxes',
-              required: true
+              // required: true
             }
           },
           {
@@ -486,7 +486,7 @@ export class SalesComponent {
               type: 'input',
               label: 'Cess amount',
               placeholder: 'Enter Cess amount',
-              required: true
+              // required: true
             }
           },
           {
@@ -498,7 +498,7 @@ export class SalesComponent {
               type: 'input',
               label: 'Advance amount',
               placeholder: 'Enter Advance amount',
-              required: true
+              // required: true
             }
           },
           {
@@ -510,7 +510,7 @@ export class SalesComponent {
               type: 'input',
               label: 'Discount',
               placeholder: 'Enter Discount',
-              required: true
+              // required: true
             }
           },
           {
@@ -522,7 +522,7 @@ export class SalesComponent {
               type: 'input',
               label: 'Taxable',
               placeholder: 'Enter Taxable',
-              required: true
+              // required: true
             }
           },
           {
@@ -534,7 +534,7 @@ export class SalesComponent {
               type: 'input',
               label: 'Tax amount',
               placeholder: 'Enter Tax amount',
-              required: true
+              // required: true
             }
           },
           {
@@ -546,7 +546,7 @@ export class SalesComponent {
               type: 'input',
               label: 'Round off',
               placeholder: 'Enter Round off',
-              required: true
+              // required: true
             }
           },
           {
@@ -558,7 +558,7 @@ export class SalesComponent {
               type: 'input',
               label: 'Doc amount',
               placeholder: 'Enter Doc amount',
-              required: true
+              // required: true
             }
           },
           {
@@ -568,7 +568,7 @@ export class SalesComponent {
             templateOptions: {
               label: 'Gst type id',
               placeholder: 'Enter Gst type id',
-              required: true
+              // required: true
             }
           },
           {
@@ -578,7 +578,7 @@ export class SalesComponent {
             templateOptions: {
               label: 'Payment term id',
               placeholder: 'Enter Payment term id',
-              required: true
+              // required: true
             }
           },
           {
@@ -590,7 +590,7 @@ export class SalesComponent {
               dataLabel: "name",
               label: 'Ledger account id',
               placeholder: 'Enter Ledger account id',
-              required: true,
+              // required: true,
               lazy: {
                 url: 'masters/ledger_groups/',
                 lazyOneTime: true
@@ -606,7 +606,7 @@ export class SalesComponent {
             templateOptions: {
               label: 'Order status id',
               placeholder: 'Enter Order status id',
-              required: true
+              // required: true
             }
           },
         ]
@@ -621,8 +621,94 @@ export class SalesComponent {
       if (res && res.data && res.data.order_number) {
         this.formConfig.model.order_no = res.data.order_number;
         this.orderNumber = res.data.order_number;
+        this.formConfig.model = this.sampleDataForSaleOrder;
       }
     })
   }
+
+  sampleDataForSaleOrder = {
+    "sale_order": {
+      "email": "testing@example.com",
+      "delivery_date": "2024-02-02",
+      "order_date": "2024-02-02",
+      "order_no": "SO-2406-000905",
+      "ref_no": "7777700",
+      "ref_date": "2024-02-02",
+      "tax": "Exclusive",
+      "remarks": "This is a remark",
+      "advance_amount": "77777.00",
+      "item_value": "777770.00",
+      "discount": "77777.00",
+      "dis_amt": "777770.00",
+      "taxable": "777770.00",
+      "tax_amount": "777770.00",
+      "cess_amount": "77777.00",
+      "round_off": "7777700.25",
+      "doc_amount": "7777700.25",
+      "vehicle_name": "bike",
+      "total_boxes": 77777,
+      "shipping_address": "777770 Shipping St, Shipping City, SC, USA",
+      "billing_address": "777770 Billing St, Billing City, BC, USA",
+      "order_type": "sale_order",
+      "gst_type_id": "888ddb1b-5d74-4051-903f-171e2b4f9aab",
+      "customer_id": "39534bd5-2062-491f-bc24-9f2393b7fd4b",
+      "customer_address_id": null,
+      "payment_term_id": "3b4cc23d-6dc3-42e9-9894-02624fdf9934",
+      "sale_type_id": "d4d85a98-a703-4772-8b3c-736fc4cbf849",
+      "ledger_account_id": null,
+      "order_status_id": "0d790583-50b3-4bb7-930c-c99f2d2fe526"
+    },
+    "sale_order_items": [
+      {
+        "quantity": "777770.00",
+        "unit_price": "77777.00",
+        "rate": "77777.00",
+        "amount": "77777.00",
+        "discount_percentage": "100.00",
+        "discount": "100.00",
+        "dis_amt": "100.00",
+        "tax_code": "77777",
+        "tax_rate": "777770.22",
+        "product_id": "1963ecfb-c647-41b7-81bc-86769a2b1d4b"
+      },
+      {
+        "quantity": "777770.00",
+        "unit_price": "77777.00",
+        "rate": "77777.00",
+        "amount": "77777.00",
+        "discount_percentage": "100.00",
+        "discount": "100.00",
+        "dis_amt": "100.00",
+        "tax_code": "77777",
+        "tax_rate": "777770.22",
+        "product_id": "04720e1d-bb3a-4668-9fb8-017d5a2fc63d"
+      }
+    ],
+    "order_attachments": [
+      {
+        "attachment_name": "image",
+        "attachment_path": "/folder/folder/image.png"
+      },
+      {
+        "attachment_name": "photo",
+        "attachment_path": "/folder/folder/photo.jpg"
+      }
+    ],
+    "order_shipments": {
+      "destination": "ndd",
+      "shipping_tracking_no": "Trc11903",
+      "shipping_date": "2024-06-22",
+      "shipping_charges": "120.00",
+      "vehicle_vessel": "not hhhh",
+      "charge_type": "best",
+      "document_through": "mail",
+      "port_of_landing": "hh",
+      "port_of_discharge": "hh",
+      "no_of_packets": 2,
+      "weight": "200.00",
+      "shipping_mode_id": "4d6345b2-d388-4a48-a01b-80cde0a9afa1",
+      "shipping_company_id": "3c334a08-d854-4a00-9b99-fa3ab6b80d6b"
+    }
+  };
 
 }

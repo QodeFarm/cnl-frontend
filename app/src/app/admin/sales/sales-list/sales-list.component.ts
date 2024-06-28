@@ -23,27 +23,37 @@ export class SalesListComponent {
       keys: ['id', 'first_name', 'last_name']
     },
     cols: [
-      {
-        fieldKey: 'Edit',
-        name: 'ID',
-        // sort: true
-      },
+      // {
+      //   fieldKey: 'Edit',
+      //   name: 'ID',
+      //   // sort: true
+      // },
       {
         fieldKey: 'first_name',
         name: 'Voucher'
       },
       {
-        fieldKey: 'last_name',
-        name: 'Date',
+        fieldKey: 'order_date',
+        name: 'Order Date',
         sort: true
       },
+      
       {
-        fieldKey: 'email',
-        name: 'Party',
+        fieldKey: 'customer',
+        name: 'Customer',
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          return `${row.customer.name}`;
+        },
         sort: true
       },
+      // {
+      //   fieldKey: 'email',
+      //   name: 'Party',
+      //   sort: true
+      // },
       {
-        fieldKey: 'phone',
+        fieldKey: 'item_value',
         name: 'Amount',
         sort: true
       },
@@ -57,24 +67,24 @@ export class SalesListComponent {
         name: 'Approval Status',
         sort: true
       },
-      {
-        fieldKey: 'job_type_id',
-        name: 'Document Status',
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.job_type_id.job_type_name}`;
-        },
-        sort: true
-      },
-      {
-        fieldKey: 'job_code_id',
-        name: 'Print Count',
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.job_code_id.job_code}`;
-        },
-        sort: true
-      },
+      // {
+      //   fieldKey: 'job_type_id',
+      //   name: 'Document Status',
+      //   displayType: "map",
+      //   mapFn: (currentValue: any, row: any, col: any) => {
+      //     return `${row.job_type_id.job_type_name}`;
+      //   },
+      //   sort: true
+      // },
+      // {
+      //   fieldKey: 'job_code_id',
+      //   name: 'Print Count',
+      //   displayType: "map",
+      //   mapFn: (currentValue: any, row: any, col: any) => {
+      //     return `${row.job_code_id.job_code}`;
+      //   },
+      //   sort: true
+      // },
       {
         fieldKey: 'job_code_id',
         name: 'Cash / Credit',
