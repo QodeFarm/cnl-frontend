@@ -59,6 +59,31 @@ export class AdminLayoutComponent {
         label: 'Sales',
         icon: 'fas fa-file-invoice-dollar',
         child: [
+          // {
+          //   link: '/admin/employee',
+          //   label: 'Sales Price List',
+          //   icon: 'fas fa-tachometer-alt',
+          // },
+          // {
+          //   link: '/admin/employee',
+          //   label: 'Estimate',
+          //   icon: 'fas fa-tachometer-alt',
+          // },
+          {
+            link: '/admin/sales',
+            label: 'Sale Order',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/sales',
+            label: 'Sale Invoice',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/sales',
+            label: 'Sale Return',
+            icon: 'fas fa-tachometer-alt',
+          },
           {
             link: '/admin/employee',
             label: 'Customer',
@@ -66,19 +91,9 @@ export class AdminLayoutComponent {
           },
           {
             link: '/admin/employee',
-            label: 'Sales Price List',
+            label: 'Order Shipment',
             icon: 'fas fa-tachometer-alt',
           },
-          {
-            link: '/admin/employee',
-            label: 'Estimate',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/employee',
-            label: 'Sales Order',
-            icon: 'fas fa-tachometer-alt',
-          }
         ]
       },
       {
