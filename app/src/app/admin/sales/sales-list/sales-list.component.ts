@@ -90,7 +90,7 @@ export class SalesListComponent {
         name: 'Cash / Credit',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.job_code_id.job_code}`;
+          // return `${row.job_code_id.job_code}`;
         },
         sort: true
       },
