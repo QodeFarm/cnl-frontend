@@ -1,0 +1,119 @@
+<div class="container mt-4">
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link active" data-bs-toggle="tab" href="#general">General</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#users">Users</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#products">Products</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#sales">Sales</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#finance">Finance</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane container active" id="general">
+            <!-- Content for General tab -->
+            <div class="row">
+                <div class="col-md-3">
+                    <h6>Sales Master</h6>
+                    <ul class="list-unstyled">
+                        <li><a [routerLink]="['/admin/master/gst-types']">Gst type</a></li>
+                        <li><a [routerLink]="['/admin/master/sale-order-items']">Order Items</a></li>
+                        <li><a [routerLink]="['/admin/master/sale-invoice-order']">Invoice Order</a></li>
+                        <li><a [routerLink]="['/admin/master/payment-transactions']">payment_transactions</a></li>
+                        <li><a [routerLink]="['/admin/master/sale_invoice_items']">sale_invoice_items</a></li>
+                        <li><a [routerLink]="['/admin/master/sale_return_orders']">sale_return_orders</a></li>
+                        <li><a [routerLink]="['/admin/master/sale_return_items']">sale_return_items</a></li>
+                        <li>
+                            <a [routerLink]="['/admin/master/sale_return_items']"></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h6>User Profile</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#">Overview</a></li>
+                        <li><a href="#">Projects</a></li>
+                        <li><a href="#">Campaigns</a></li>
+                        <li><a href="#">Documents</a></li>
+                        <li><a href="#">Followers</a></li>
+                        <li><a href="#">Activity</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-md-3">
+                    <h6>Corporate</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Our Team</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Licenses</a></li>
+                        <li><a href="#">Sitemap</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h6>FAQ</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#">FAQ Classic</a></li>
+                        <li><a href="#">FAQ Extended</a></li>
+                    </ul>
+                    <h6>Blog</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#">Blog Home</a></li>
+                        <li><a href="#">Blog Post</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h6>Careers</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#">Careers List</a></li>
+                        <li><a href="#">Careers Apply</a></li>
+                    </ul>
+                    <h6>Pricing</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#">Column Pricing</a></li>
+                        <li><a href="#">Table Pricing</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane container fade" id="users">
+            <!-- Content for Users tab -->
+            <p>Users content...</p>
+        </div>
+        <div class="tab-pane container fade" id="products">
+            <!-- Content for Products tab -->
+            <p>Products content...</p>
+        </div>
+        <div class="tab-pane container fade" id="sales">
+            <!-- Content for Sales tab -->
+            <div class="row">
+                <div class="col-md-3">
+                    <h6>Sales Master</h6>
+                    <ul class="list-unstyled">
+                        <li><a [routerLink]="['/admin/master/sales-price-list']">Price List</a></li>
+                        <li><a [routerLink]="['/admin/master/sale-order-items']">Order Items</a></li>
+                        <li><a [routerLink]="['/admin/master/sale-invoice-order']">Invoice Order</a></li>
+                        <li><a [routerLink]="['/admin/master/payment-transactions']">payment_transactions</a></li>
+                        <li><a [routerLink]="['/admin/master/sale_invoice_items']">sale_invoice_items</a></li>
+                        <li><a [routerLink]="['/admin/master/sale_return_orders']">sale_return_orders</a></li>
+                        <li><a [routerLink]="['/admin/master/sale_return_items']">sale_return_items</a></li>
+                        <li>
+                            <a [routerLink]="['/admin/master/sale_return_items']"></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane container fade" id="finance">
+            <!-- Content for Finance tab -->
+            <p>Finance content...</p>
+        </div>
+    </div>
+</div>

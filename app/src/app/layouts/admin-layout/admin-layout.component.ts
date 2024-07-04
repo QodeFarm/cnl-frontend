@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, HostListener, ElementRef, Renderer2 } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { LocalStorageService } from '@ta/ta-core';
 
 @Component({
   selector: 'app-admin-layout',
@@ -11,7 +12,8 @@ import { RouterModule } from '@angular/router';
 })
 export class AdminLayoutComponent {
   menulList = <any>[];
-  constructor(private elementRef: ElementRef, private renderer: Renderer2) { }
+  userName: any;
+  constructor(private elementRef: ElementRef, private renderer: Renderer2, private router: Router, private taLoacal: LocalStorageService) { }
 
   @HostListener('window:resize', ['$event'])
   onResize(event: Event) {
@@ -28,6 +30,9 @@ export class AdminLayoutComponent {
     }
   }
   ngOnInit() {
+    const user = this.taLoacal.getItem('user');
+    if (user)
+      this.userName = user.username
     this.menulList = [
       {
         link: '/admin/dashboard',
@@ -160,7 +165,12 @@ export class AdminLayoutComponent {
             label: 'Products',
             icon: 'fas fa-tachometer-alt',
           },
-        ]
+        ],
+      },
+      {
+        link: '/admin/master',
+        label: 'Master',
+        icon: 'fas fa-cog',
       }
     ]
     this.closeMenu();
@@ -203,6 +213,12 @@ export class AdminLayoutComponent {
         collapse.classList.remove('show');
       });
     }
+  }
+  logout() {
+    localStorage.removeItem('user');
+    localStorage.removeItem('accessToken');
+    this.router.navigateByUrl('/login');
+
   }
 
 }
