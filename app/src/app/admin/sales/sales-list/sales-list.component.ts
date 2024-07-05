@@ -12,8 +12,8 @@ import { Router } from '@angular/router';
   styleUrls: ['./sales-list.component.scss']
 })
 export class SalesListComponent {
- 
-  
+
+
   tableConfig: TaTableConfig = {
     apiUrl: 'sales/sale_order/',
     // title: 'Edit Sales Order List',
@@ -37,7 +37,7 @@ export class SalesListComponent {
         name: 'Order Date',
         sort: true
       },
-      
+
       {
         fieldKey: 'customer',
         name: 'Customer',
@@ -118,7 +118,7 @@ export class SalesListComponent {
     ]
   };
 
-  constructor ( private router: Router){
+  constructor(private router: Router) {
 
   }
 }
