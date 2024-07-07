@@ -4,7 +4,7 @@
             <button type="button" class="btn pl-0" style="color: black;">
                 <b>Create Sales Order</b>
             </button>
-            <button type="button" class="button" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            <button (click)="showSaleOrderListFn()" type="button" class="button" data-bs-toggle="modal" data-bs-target="#exampleModal">
                 Sales Order List
             </button>
         </div>
@@ -27,7 +27,7 @@
                 <h5 class="modal-title" id="exampleModalLabel">Edit Sales Order List</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" *ngIf="showSaleOrderList">
                 <app-sales-list></app-sales-list>
             </div>
             <div class="modal-footer">

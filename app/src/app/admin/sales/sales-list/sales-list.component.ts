@@ -28,14 +28,29 @@ export class SalesListComponent {
       //   name: 'ID',
       //   // sort: true
       // },
-      {
-        fieldKey: 'first_name',
-        name: 'Voucher'
-      },
+      // {
+      //   fieldKey: 'first_name',
+      //   name: 'Voucher'
+      // },
       {
         fieldKey: 'order_date',
         name: 'Order Date',
         sort: true
+      },
+      {
+        fieldKey: 'order_no',
+        name: 'Order No',
+        sort: true
+      },
+      {
+        fieldKey: 'sale_type',
+        name: 'Sale Type',
+        sort: true,
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          // console.log("-->", currentValue);
+          return `${currentValue.name}`;
+        },
       },
 
       {
@@ -47,11 +62,6 @@ export class SalesListComponent {
         },
         sort: true
       },
-      // {
-      //   fieldKey: 'email',
-      //   name: 'Party',
-      //   sort: true
-      // },
       {
         fieldKey: 'item_value',
         name: 'Amount',
@@ -63,8 +73,8 @@ export class SalesListComponent {
         sort: true
       },
       {
-        fieldKey: 'phone',
-        name: 'Approval Status',
+        fieldKey: 'advance_amount',
+        name: 'Advance Amt',
         sort: true
       },
       // {
@@ -86,8 +96,8 @@ export class SalesListComponent {
       //   sort: true
       // },
       {
-        fieldKey: 'job_code_id',
-        name: 'Cash / Credit',
+        fieldKey: 'status',
+        name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
           // return `${row.job_code_id.job_code}`;

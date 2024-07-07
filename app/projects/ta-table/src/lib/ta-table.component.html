@@ -25,7 +25,7 @@
 <!-- [nzTitle]="options.title"  (nzQueryParams)="onQueryParamsChange($event)"-->
 <nz-table #taTable nzShowSizeChanger [nzPageSizeOptions]="options.pageSizeOptions" [nzTableLayout]="options.tableLayout"
     [nzBordered]="options.bordered" [nzScroll]="{ x: options.scrollX, y: options.scrollY }" [nzData]="rows"
-    [nzFrontPagination]="false" [nzShowTotal]="totalTemplate" [nzLoading]="loading" [nzTotal]="total"
+    [nzFrontPagination]="true" [nzShowTotal]="totalTemplate" [nzLoading]="loading" [nzTotal]="total"
     [nzPageSize]="options.pageSize" (nzQueryParams)="onQueryParamsChange($event)" [nzPageIndex]="pageIndex"
     [nzPaginationPosition]="options.paginationPosition">
     <thead>

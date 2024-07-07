@@ -10,10 +10,10 @@ import { distinctUntilChanged } from 'rxjs/operators';
 })
 export class SalesComponent {
   orderNumber: any;
+  showSaleOrderList: boolean = false;
 
   constructor(private http: HttpClient) {
   }
-
 
   ngOnInit() {
     this.getOrderNo()
@@ -36,7 +36,7 @@ export class SalesComponent {
     },
     model: {
       sale_order: {},
-      sale_order_items: [],
+      sale_order_items: [{}],
       order_attachments: [],
       order_shipments: {}
     },
@@ -52,7 +52,7 @@ export class SalesComponent {
             templateOptions: {
               label: 'Order no',
               placeholder: 'Enter Order No',
-              // required: true,
+              required: true,
             },
             hooks: {
               onInit: (field: any) => {
@@ -65,13 +65,13 @@ export class SalesComponent {
             key: 'sale_type',
             type: 'select',
             className: 'ant-col-4 pr-md m-3',
-            defaultValue: "d4d85a98-a703-4772-8b3c-736fc4cbf849",
+            // defaultValue: "d4d85a98-a703-4772-8b3c-736fc4cbf849",
             templateOptions: {
               label: 'Sale type',
               dataKey: 'name',
               dataLabel: "name",
               options: [],
-              // required: true,
+              required: true,
               lazy: {
                 url: 'masters/sale_types/',
                 lazyOneTime: true
@@ -101,7 +101,7 @@ export class SalesComponent {
                 url: 'customers/customers/?summary=true',
                 lazyOneTime: true
               },
-              // required: true,
+              required: true,
 
             },
             hooks: {
@@ -128,13 +128,13 @@ export class SalesComponent {
           {
             key: 'email',
             type: 'input',
-            defaultValue: "testing@example.com",
+            // defaultValue: "testing@example.com",
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
               type: 'input',
               label: 'Email',
               placeholder: 'Enter Email',
-              // required: true
+              required: true
             },
             hooks: {
               onInit: (field: any) => { }
@@ -149,7 +149,7 @@ export class SalesComponent {
               type: 'date',
               label: 'Delivery date',
               // placeholder: 'Select Oder Date',
-              // required: true
+              required: true
             }
           },
           {
@@ -161,19 +161,19 @@ export class SalesComponent {
               type: 'date',
               label: 'Order date',
               // placeholder: 'Select Order Date',
-              // required: true
+              required: true
             }
           },
           {
             key: 'ref_no',
             type: 'input',
-            defaultValue: "7777700",
+            // defaultValue: "7777700",
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
               type: 'input',
               label: 'Ref No',
               placeholder: 'Enter Ref No',
-              // required: true
+              required: true
             }
           },
           {
@@ -185,13 +185,13 @@ export class SalesComponent {
               type: 'date',
               label: 'Ref date',
               placeholder: 'Select Ref date',
-              // required: true
+              required: true
             }
           },
           {
             key: 'tax_type',
             type: 'select',
-            defaultValue: 'Exclusive',
+            // defaultValue: 'Exclusive',
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
               label: 'Tax',
@@ -199,7 +199,7 @@ export class SalesComponent {
                 { 'label': "Inclusive", value: 'Inclusive' },
                 { 'label': "Exclusive", value: 'Exclusive' }
               ],
-              // required: true
+              required: true
             },
             hooks: {
               onInit: (field: any) => {
@@ -209,23 +209,23 @@ export class SalesComponent {
           {
             key: 'billing_address',
             type: 'textarea',
-            defaultValue: '777770 Shipping St, Shipping City, SC, USA',
+            // defaultValue: '777770 Shipping St, Shipping City, SC, USA',
             className: 'ant-col-11 pr-md m-3',
             templateOptions: {
               label: 'Billing address',
               placeholder: 'Enter Billing address',
-              // required: true,
+              required: true,
             }
           },
           {
             key: 'shipping_address',
             type: 'textarea',
             className: 'ant-col-11 pr-md m-3',
-            defaultValue: '88652 Shipping St, Shipping City, SC, USA',
+            // defaultValue: '88652 Shipping St, Shipping City, SC, USA',
             templateOptions: {
               label: 'Shipping address',
               placeholder: 'Enter Shipping address',
-              // required: true,
+              required: true,
             }
           }
         ]
@@ -255,7 +255,7 @@ export class SalesComponent {
                     dataKey: 'product_id',
                     dataLabel: 'name',
                     options: [],
-                    // required: true,
+                    required: true,
                     lazy: {
                       url: 'products/products/?summary=true',
                       lazyOneTime: true
@@ -348,11 +348,11 @@ export class SalesComponent {
                   type: 'number',
                   key: 'rate',
                   className: 'ant-col-3 pr-md',
-                  defaultValue: 77777,
+                  // defaultValue: 1000,
                   templateOptions: {
                     label: 'Price',
                     placeholder: 'Enter Price',
-                    // min: 1,
+                    type: 'number',
                     // required: true
                   },
                 },
@@ -360,9 +360,10 @@ export class SalesComponent {
                   type: 'input',
                   key: 'discount',
                   className: 'ant-col-3 pr-md',
-                  defaultValue: 90,
+                  // defaultValue: 90,
                   templateOptions: {
                     placeholder: 'Enter Discount',
+                    type: 'number',
                     label: 'Discount',
                   },
                   expressionProperties: {
@@ -382,7 +383,7 @@ export class SalesComponent {
                   type: 'input',
                   key: 'total',
                   className: 'ant-col-3 pr-md',
-                  defaultValue: 23,
+                  // defaultValue: 23,
                   templateOptions: {
                     type: 'number',
                     label: 'Quantity',
@@ -406,144 +407,144 @@ export class SalesComponent {
           {
             key: 'remarks',
             type: 'textarea',
-            defaultValue: 'This is a remark',
+            // defaultValue: 'This is a remark',
             className: 'ant-col-16 pr-md m-3',
             templateOptions: {
               label: 'Remarks',
               placeholder: 'Enter Remarks',
-              // required: true,
+              required: true,
             }
           },
           {
             key: 'item_value',
             type: 'input',
-            defaultValue: "777770.00",
+            // defaultValue: "777770.00",
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
               type: 'input',
               label: 'Item value',
               placeholder: 'Enter Item value',
-              // required: true
+              required: true
             }
           },
           {
             key: 'vehicle_name',
             type: 'input',
-            defaultValue: "bike",
+            // defaultValue: "bike",
             className: 'ant-col-16 pr-md m-3',
             templateOptions: {
               type: 'input',
               label: 'Vehicle name',
               placeholder: 'Enter Vehicle name',
-              // required: true
+              required: true
             }
           },
           {
             key: 'dis_amt',
             type: 'input',
-            defaultValue: "777770",
+            // defaultValue: "777770",
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
               type: 'input',
               label: 'Discount amt',
               placeholder: 'Enter Discount amt',
-              // required: true
+              required: true
             }
           },
           {
             key: 'total_boxes',
             type: 'input',
-            defaultValue: 77777,
+            // defaultValue: 77777,
             className: 'ant-col-16 pr-md m-3',
             templateOptions: {
               type: 'input',
               label: 'Total boxes',
               placeholder: 'Enter Total boxes',
-              // required: true
+              required: true
             }
           },
           {
             key: 'cess_amount',
             type: 'input',
-            defaultValue: "7777700",
+            // defaultValue: "7777700",
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
               type: 'input',
               label: 'Cess amount',
               placeholder: 'Enter Cess amount',
-              // required: true
+              required: true
             }
           },
           {
             key: 'advance_amount',
             type: 'input',
-            defaultValue: "77777.00",
+            // defaultValue: "77777.00",
             className: 'ant-col-16 pr-md m-3',
             templateOptions: {
               type: 'input',
               label: 'Advance amount',
               placeholder: 'Enter Advance amount',
-              // required: true
+              required: true
             }
           },
           {
             key: 'discount',
             type: 'input',
-            defaultValue: "77777",
+            // defaultValue: "77777",
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
               type: 'input',
               label: 'Discount',
               placeholder: 'Enter Discount',
-              // required: true
+              required: true
             }
           },
           {
             key: 'taxable',
             type: 'input',
-            defaultValue: "777770",
+            // defaultValue: "777770",
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
               type: 'input',
               label: 'Taxable',
               placeholder: 'Enter Taxable',
-              // required: true
+              required: true
             }
           },
           {
             key: 'tax_amount',
             type: 'input',
-            defaultValue: "777770",
+            // defaultValue: "777770",
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
               type: 'input',
               label: 'Tax amount',
               placeholder: 'Enter Tax amount',
-              // required: true
+              required: true
             }
           },
           {
             key: 'round_off',
             type: 'input',
-            defaultValue: "7777700",
+            // defaultValue: "7777700",
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
               type: 'input',
               label: 'Round off',
               placeholder: 'Enter Round off',
-              // required: true
+              required: true
             }
           },
           {
             key: 'doc_amount',
             type: 'input',
-            defaultValue: "12",
+            // defaultValue: "12",
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
               type: 'input',
               label: 'Doc amount',
               placeholder: 'Enter Doc amount',
-              // required: true
+              required: true
             }
           },
           {
@@ -554,7 +555,7 @@ export class SalesComponent {
             templateOptions: {
               label: 'Gst type',
               placeholder: 'Select Gst type',
-              // required: true,
+              required: true,
               dataKey: 'name',
               dataLabel: "name",
               lazy: {
@@ -577,11 +578,11 @@ export class SalesComponent {
             key: 'payment_term',
             type: 'select',
             className: 'ant-col-4 pr-md m-3',
-            defaultValue: '3b4cc23d-6dc3-42e9-9894-02624fdf9934',
+            // defaultValue: '3b4cc23d-6dc3-42e9-9894-02624fdf9934',
             templateOptions: {
               label: 'Payment term',
               placeholder: 'Select Payment term',
-              // required: true,
+              required: true,
               dataKey: 'name',
               dataLabel: "name",
               lazy: {
@@ -609,7 +610,7 @@ export class SalesComponent {
               dataLabel: "name",
               label: 'Ledger account',
               placeholder: 'Select Ledger account',
-              // // required: true,
+              required: true,
               lazy: {
                 url: 'masters/ledger_groups/',
                 lazyOneTime: true
@@ -629,14 +630,14 @@ export class SalesComponent {
           {
             key: 'order_Type',
             type: 'select',
-            defaultValue: '0d790583-50b3-4bb7-930c-c99f2d2fe526',
+            // defaultValue: '0d790583-50b3-4bb7-930c-c99f2d2fe526',
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
               label: 'Order Type',
               dataKey: 'name',
               dataLabel: "name",
               placeholder: 'Select Order type',
-              // required: true,
+              required: true,
               lazy: {
                 url: 'masters/order_types/',
                 lazyOneTime: true
@@ -656,14 +657,14 @@ export class SalesComponent {
           {
             key: 'order_status',
             type: 'select',
-            defaultValue: '0d790583-50b3-4bb7-930c-c99f2d2fe526',
+            // defaultValue: '0d790583-50b3-4bb7-930c-c99f2d2fe526',
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
               label: 'Order status Type',
               dataKey: 'status_name',
               dataLabel: "status_name",
               placeholder: 'Select Order status type',
-              // required: true,
+              required: true,
               lazy: {
                 url: 'masters/order_status/',
                 lazyOneTime: true
@@ -683,7 +684,6 @@ export class SalesComponent {
         ]
       },
 
-      // new fields
       {
         fieldGroupClassName: "ant-row",
         fieldGroup: [
@@ -693,7 +693,7 @@ export class SalesComponent {
             className: 'ta-cell pr-md col-md-6 col-12',
             templateOptions: {
               label: 'Order Attachments',
-              // // required: true
+              // required: true
             }
           },
           {
@@ -702,126 +702,26 @@ export class SalesComponent {
             className: 'ta-cell pr-md col-md-6 col-12',
             templateOptions: {
               label: 'Order Shipments',
-              // // required: true
+              // required: true
             }
           },
         ]
       }
     ]
-  }
-    ;
+  } ;
 
   getOrderNo() {
     this.http.get('masters/generate_order_no/?type=SO').subscribe((res: any) => {
       console.log(res);
       if (res && res.data && res.data.order_number) {
-        this.formConfig.model['sale_order_items'] = this.sampleDataForSaleOrderItems;
         this.formConfig.model['sale_order']['order_no'] = res.data.order_number;
         this.orderNumber = res.data.order_number;
       }
     })
   }
 
-  sampleDataForSaleOrderItems = [
-    {
-      "quantity": "777770.00",
-      "rate": "77777.00",
-      "discount": "100.00",
-      "product_id": "1963ecfb-c647-41b7-81bc-86769a2b1d4b"
-    },
-    {
-      "quantity": "777770.00",
-      "rate": "77777.00",
-      "discount": "100.00",
-      "product_id": "1963ecfb-c647-41b7-81bc-86769a2b1d4b"
-    }
-  ];
-
-
-  // sample data for save
-  sampleData = {
-    "sale_order": {
-      "email": "hello@example.com",
-      "delivery_date": "2024-02-02",
-      "order_date": "2024-02-02",
-      "order_no": "SO-2406-9001",
-      "ref_no": null,
-      "ref_date": "2024-02-02",
-      "tax": null,
-      "remarks": null,
-      "advance_amount": "77777.00",
-      "item_value": "777770.00",
-      "discount": "77777.00",
-      "dis_amt": "777770.00",
-      "taxable": "777770.00",
-      "tax_amount": "777770.00",
-      "cess_amount": "77777.00",
-      "round_off": "7777700.25",
-      "doc_amount": "7777700.25",
-      "vehicle_name": "bike",
-      "total_boxes": 77777,
-      "shipping_address": "777770 Shipping St, Shipping City, SC, USA",
-      "billing_address": "777770 Billing St, Billing City, BC, USA",
-      "order_type": "Advance Order",
-      "gst_type_id": "19d72648-2c97-460e-ae3d-5c8844f2ef7b",
-      "customer_id": "08cb7924-a901-4a66-af42-d1706fee5805",
-      "customer_address_id": null,
-      "payment_term_id": "09d2d652-c6db-455a-8168-25773c643f01",
-      "sale_type_id": "a0718928-0fb5-4e04-8712-b91c3f023eda",
-      "ledger_account_id": "20731884-e270-42df-a23b-d28e5170001e",
-      "order_status_id": "01d001c0-0835-4044-9b1a-303d3ac5eead"
-    },
-    "sale_order_items": [
-      {
-        "quantity": "100.00",
-        "unit_price": "100.00",
-        "rate": "100.00",
-        "amount": "10000.00",
-        "discount_percentage": "0.00",
-        "discount": "0.00",
-        "dis_amt": "0.00",
-        "tax_code": "150",
-        "tax_rate": "0.0",
-        "product_id": "00164be3-6343-4374-af29-1648643f5b28"
-      },
-      {
-        "quantity": "50.00",
-        "unit_price": "10.00",
-        "rate": "10.00",
-        "amount": "500.00",
-        "discount_percentage": "0.00",
-        "discount": "0.00",
-        "dis_amt": "0.00",
-        "tax_code": "150",
-        "tax_rate": "0.00",
-        "product_id": "0de27f78-0b13-42a7-8a9c-bdb12322553c"
-      }
-    ],
-    "order_attachments": [
-      {
-        "attachment_name": "image",
-        "attachment_path": "/folder/folder/image.png"
-      },
-      {
-        "attachment_name": "photo",
-        "attachment_path": "/folder/folder/photo.jpg"
-      }
-    ],
-    "order_shipments": {
-      "destination": "ndd",
-      "shipping_tracking_no": "SHIP-2406-00001",
-      "shipping_date": "2024-06-22",
-      "shipping_charges": "120.00",
-      "vehicle_vessel": "Lorry",
-      "charge_type": "best",
-      "document_through": "mail",
-      "port_of_landing": "chennai",
-      "port_of_discharge": "chennai",
-      "no_of_packets": 2,
-      "weight": "200.00",
-      "shipping_mode_id": "3bff6b8b-a3b1-4102-95ef-ec677c6fa90b",
-      "shipping_company_id": "09ab4e13-28bd-4a09-97db-1891d99277b2"
-    }
+  showSaleOrderListFn(){
+    this.showSaleOrderList = true;
   }
 
 }
