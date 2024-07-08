@@ -138,7 +138,7 @@ export class ProductPurchaseGlComponent {
                 }
               }
             },
-			{
+			     {
               key: 'purchase_accounts',
               type: 'input',
               className: 'ta-cell pr-md col-md-6 col-12',
@@ -180,7 +180,7 @@ export class ProductPurchaseGlComponent {
                 label: 'Inactive'
               }
             },
-			{
+			      {
               key: 'type',
               type: 'input',
               className: 'ta-cell pr-md col-md-6 col-12',
@@ -244,7 +244,7 @@ export class ProductPurchaseGlComponent {
                 label: 'TDS Applicable'
               }
             },
-			{
+			      {
               key: 'address',
               type: 'text',
               className: 'ta-cell pr-md col-md-6 col-12',
@@ -257,7 +257,7 @@ export class ProductPurchaseGlComponent {
                 }
               }
             },
-			{
+			      {
               key: 'pan',
               type: 'input',
               className: 'ta-cell pr-md col-md-6 col-12',
@@ -270,7 +270,7 @@ export class ProductPurchaseGlComponent {
                 }
               }
             },
-			{
+			      {
               key: 'employee',
               type: 'checkbox',
               className: 'ta-cell pr-md col-md-6 col-12',
