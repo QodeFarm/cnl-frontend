@@ -51,12 +51,12 @@ export class ProductPurchaseGlComponent {
           name: 'Type',
           sort: false
         },
-		{
-		  fieldKey: 'account_no',
-		  name: 'Account No',
-		  sort: false,
-		  isEncrypted: true
-		},
+        {
+          fieldKey: 'account_no',
+          name: 'Account No',
+          sort: false,
+          isEncrypted: true
+        },
         {
           fieldKey: 'rtgs_ifsc_code', 
           name: 'RTGS IFSC Code',
@@ -71,13 +71,13 @@ export class ProductPurchaseGlComponent {
           fieldKey: 'is_loan_account', 
           name: 'Is Loan Account',
           sort: false,
-		  type: 'boolean'
+		      type: 'boolean'
         },
         {
           fieldKey: 'tds_applicable', 
           name: 'TDS Applicable',
           sort: false,
-		  type: 'boolean'
+		      type: 'boolean'
         },
         {
           fieldKey: 'address', 
@@ -88,7 +88,7 @@ export class ProductPurchaseGlComponent {
           fieldKey: 'employee', 
           name: 'Employee',
           sort: false,
-		  type: 'boolean'
+		      type: 'boolean'
         },
         {
           fieldKey: 'pan', 

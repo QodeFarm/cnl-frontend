@@ -102,68 +102,55 @@ export class AdminLayoutComponent {
         child: [
           {
             link: '/admin/products/product-groups',
-            label: 'Product Groups',
-            icon: 'fas fa-tachometer-alt',
+            label: 'Product Groups'
           },
           {
             link: '/admin/products/product-categories',
-            label: 'Product Categories',
-            icon: 'fas fa-tachometer-alt',
+            label: 'Product Categories'
           },
           {
             link: '/admin/products/product-stock-units',
-            label: 'Product Stock Units',
-            icon: 'fas fa-tachometer-alt',
+            label: 'Product Stock Units'
           },
           {
             link: '/admin/products/product-gst-classifications',
-            label: 'Product GST Classifications',
-            icon: 'fas fa-tachometer-alt',
+            label: 'Product GST Classifications'
           },
           {
             link: '/admin/products/product-sales-gl',
-            label: 'Product Sales GL',
-            icon: 'fas fa-tachometer-alt',
+            label: 'Product Sales GL'
           },
           {
             link: '/admin/products/product-purchase-gl',
-            label: 'Product Purchase GL',
-            icon: 'fas fa-tachometer-alt',
+            label: 'Product Purchase GL'
           },
           {
             link: '/admin/products/product-unique-quantity-codes',
-            label: 'Product Unique Quantity Codes',
-            icon: 'fas fa-tachometer-alt',
+            label: 'Product Unique Quantity Codes'
           },
           {
             link: '/admin/products/unit-options',
-            label: 'Unit Options',
-            icon: 'fas fa-tachometer-alt',
+            label: 'Unit Options'
           },
           {
             link: '/admin/products/product-drug-types',
-            label: 'Product Drug Types',
-            icon: 'fas fa-tachometer-alt',
+            label: 'Product Drug Types'
           },
           {
             link: '/admin/products/product-item-type',
-            label: 'Product Item Type',
-            icon: 'fas fa-tachometer-alt',
+            label: 'Product Item Type'
           },
           {
             link: '/admin/products/brand-salesman',
-            label: 'Brand Salesman',
-            icon: 'fas fa-tachometer-alt',
+            label: 'Brand Salesman'
           },
           {
             link: '/admin/products/product-brands',
-            label: 'Product Brands',
-            icon: 'fas fa-tachometer-alt',
+            label: 'Product Brands'
           },
           {
             link: '/admin/products/products',
             label: 'Products',
-            icon: 'fas fa-tachometer-alt',
           },
         ],
       },

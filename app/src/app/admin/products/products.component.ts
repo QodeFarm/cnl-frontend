@@ -293,7 +293,7 @@ export class ProductsComponent  {
             {
               key: 'product_group',
               type: 'select',
-              className: 'ta-cell pr-md',
+              className: 'ta-cell pr-md col-md-6 col-12',
               templateOptions: {
                 label: 'Product Group',
                 dataKey: 'product_group_id',
@@ -314,7 +314,7 @@ export class ProductsComponent  {
             {
               key: 'category_id',
               type: 'select',
-              className: 'ta-cell pr-md',
+              className: 'ta-cell pr-md col-md-6 col-12',
               templateOptions: {
                 label: 'Category',
                 dataKey: 'category_id',
@@ -334,7 +334,7 @@ export class ProductsComponent  {
             {
               key: 'type_id',
               type: 'select',
-              className: 'ta-cell pr-md',
+              className: 'ta-cell pr-md col-md-6 col-12',
               templateOptions: {
                 label: 'Type',
                 dataKey: 'type_id',
@@ -380,7 +380,7 @@ export class ProductsComponent  {
             {
               key: 'unit_options',
               type: 'select',
-              className: 'ta-cell pr-md',
+              className: 'ta-cell pr-md col-md-6 col-12',
               templateOptions: {
                 label: 'Unit Options',
                 dataKey: 'unit_options_id',
@@ -413,7 +413,7 @@ export class ProductsComponent  {
             {
               key: 'stock_unit',
               type: 'select',
-              className: 'ta-cell pr-md',
+              className: 'ta-cell pr-md col-md-6 col-12',
               templateOptions: {
                 label: 'Stock Unit',
                 dataKey: 'stock_unit_id',
@@ -447,7 +447,7 @@ export class ProductsComponent  {
             {
               key: 'gst_classification',
               type: 'select',
-              className: 'ta-cell pr-md',
+              className: 'ta-cell pr-md col-md-6 col-12',
               templateOptions: {
                 label: 'GST Classification',
                 dataKey: 'gst_classification_id',
@@ -480,7 +480,7 @@ export class ProductsComponent  {
             {
               key: 'sales_gl',
               type: 'select',
-              className: 'ta-cell pr-md',
+              className: 'ta-cell pr-md col-md-6 col-12',
               templateOptions: {
                 label: 'Sales GL',
                 required: true,
@@ -618,7 +618,7 @@ export class ProductsComponent  {
             {
               key: 'purchase_gl',
               type: 'select',
-              className: 'ta-cell pr-md',
+              className: 'ta-cell pr-md col-md-6 col-12',
               templateOptions: {
                 label: 'Purchase GL',
                 required: true,
@@ -678,7 +678,7 @@ export class ProductsComponent  {
             {
               key: 'brand_id',
               type: 'select',
-              className: 'ta-cell pr-md',
+              className: 'ta-cell pr-md col-md-6 col-12',
               templateOptions: {
                 label: 'Brand',
                 dataKey: 'brand_id',
