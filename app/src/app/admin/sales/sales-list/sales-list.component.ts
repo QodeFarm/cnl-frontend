@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
@@ -13,25 +13,19 @@ import { Router } from '@angular/router';
 })
 export class SalesListComponent {
 
+  @Output('edit') edit = new EventEmitter<void>();
+
 
   tableConfig: TaTableConfig = {
     apiUrl: 'sales/sale_order/',
     // title: 'Edit Sales Order List',
-    pkId: "employee_id",
+    showCheckbox:true,
+    pkId: "sale_order_id",
     pageSize: 10,
     "globalSearch": {
       keys: ['id', 'first_name', 'last_name']
     },
     cols: [
-      // {
-      //   fieldKey: 'Edit',
-      //   name: 'ID',
-      //   // sort: true
-      // },
-      // {
-      //   fieldKey: 'first_name',
-      //   name: 'Voucher'
-      // },
       {
         fieldKey: 'order_date',
         name: 'Order Date',
@@ -49,7 +43,7 @@ export class SalesListComponent {
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
           // console.log("-->", currentValue);
-          return `${currentValue.name}`;
+          return `${currentValue?.name}`;
         },
       },
 
@@ -114,13 +108,15 @@ export class SalesListComponent {
             label: 'Delete',
             confirm: true,
             confirmMsg: "Sure to delete?",
-            apiUrl: 'api/users'
+            apiUrl: 'sales/sale_order'
           },
           {
             type: 'callBackFn',
             label: 'Edit',
             callBackFn: (row, action) => {
-              this.router.navigateByUrl('/admin/employee/create/' + row.employee_id);
+              console.log(row);
+              this.edit.emit(row.sale_order_id);
+              // this.router.navigateByUrl('/admin/sales/edit/' + row.sale_order_id);
             }
           }
         ]

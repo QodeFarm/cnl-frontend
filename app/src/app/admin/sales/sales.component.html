@@ -1,8 +1,9 @@
 <div class="container-fluid pt-3">
     <div class="sales-banner">
         <div class="col-12 px-1" style="display: flex; justify-content: space-between;">
-            <button type="button" class="btn pl-0" style="color: black;">
-                <b>Create Sales Order</b>
+            <button (click)="SaleOrderEditID = null" type="button" class="btn pl-0" style="color: black;">
+                <b *ngIf="SaleOrderEditID">Update Sales Order</b>
+                <b *ngIf="!SaleOrderEditID">Create Sales Order</b>
             </button>
             <button (click)="showSaleOrderListFn()" type="button" class="button" data-bs-toggle="modal" data-bs-target="#exampleModal">
                 Sales Order List
@@ -11,7 +12,7 @@
     </div>
 
     <div class="row">
-        <div class="col-12 px-1" *ngIf="orderNumber">
+        <div class="col-12 px-1" *ngIf="orderNumber || showForm">
             <ta-form [options]="formConfig"></ta-form>
         </div>
     </div>
@@ -25,10 +26,10 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Edit Sales Order List</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" *ngIf="showSaleOrderList">
-                <app-sales-list></app-sales-list>
+                <app-sales-list (edit)="editSaleOrder($event)" ></app-sales-list>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
