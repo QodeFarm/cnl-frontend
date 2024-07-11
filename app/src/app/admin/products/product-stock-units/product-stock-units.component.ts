@@ -48,7 +48,7 @@ export class ProductStockUnitsComponent {
               type: 'delete',
               label: 'Delete',
               confirm: true,
-              confirmMsg: "Sure to delete?",
+              confirmMsg: "are you Sure to delete?",
               apiUrl: 'products/product_stock_units'
             },
             {

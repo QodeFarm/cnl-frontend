@@ -17,12 +17,12 @@ export class ProductsComponent  {
     drawerSize: 500,
     drawerPlacement: 'right',
     tableConfig: {
-      apiUrl: 'products/products/',
+      apiUrl: 'products/products/?summary=true&summary=true&page=1&limit=10&sort[0]=name,DESC', //THIS SHOULD REMOVED IN FUTURE AND FIXED ACCORDNING TO THE COMMAN PATTERN
       title: 'Products',
       pkId: "product_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['id', 'name']
+        keys: ['product_id', 'name']
       },
       cols: [
         {
@@ -31,101 +31,18 @@ export class ProductsComponent  {
           sort: true
         },
         {
-          fieldKey: 'product_group_id',
-          name: 'Product Group',
-          displayType: "map",
-          mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.product_group.group_name}`;
-          },
-          sort: true
-        },
-        {
-          fieldKey: 'category_id',
-          name: 'Category',
-          displayType: "map",
-          mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.category.category_name}`;
-          },
-          sort: true
-        },
-        {
-          fieldKey: 'type_id',
-          name: 'Type',
-          displayType: "map",
-          mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.type.type_name}`;
-          },
-          sort: true
-        },
-        {
           fieldKey: 'code',
-          name: 'Code'
+          name: 'Code',
+          sort: false
         },
         {
-          fieldKey: 'barcode',
-          name: 'Barcode',
-          sort: true
-        },
-        {
-          fieldKey: 'unit_options_id',
-          name: 'Unit Option',
-          displayType: "map",
+          fieldKey: 'unit_options.unit_name',
+          name: 'Unit Name',
+          sort: false,
+          displayType: 'map',
           mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.unit_options.unit_name}`;
+            return row.unit_options.unit_name;
           },
-          sort: true
-        },
-        {
-          fieldKey: 'gst_input',
-          name: 'GST Input',
-          sort: false
-        },
-        {
-          fieldKey: 'stock_unit_id',
-          name: 'Stock Unit',
-          displayType: "map",
-          mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.stock_unit.stock_unit_name}`;
-          },
-          sort: true
-        },
-        {
-          fieldKey: 'print_barcode',
-          name: 'Print Barcode',
-          sort: false
-        },
-        {
-          fieldKey: 'gst_classification_id',
-          name: 'GST Classification',
-          displayType: "map",
-          mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.gst_classification.type}`;
-          },
-          sort: true
-        },
-        {
-          fieldKey: 'sales_description',
-          name: 'Sales Des.',
-          sort: false
-        },
-        {
-          fieldKey: 'sales_gl_id',
-          name: 'Sales GL',
-          displayType: "map",
-          mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.sales_gl.name}`;
-          },
-          sort: true
-        },
-        {
-          fieldKey: 'mrp', 
-          name: 'MRP',
-          sort: false
-        },
-        {
-          fieldKey: 'minimum_price', 
-          name: 'Min Price',
-          sort: false
         },
         {
           fieldKey: 'sales_rate',
@@ -133,23 +50,8 @@ export class ProductsComponent  {
           sort: false
         },
         {
-          fieldKey: 'wholesale_rate',
-          name: 'Wholesale Rate',
-          sort: false
-        },
-        {
-          fieldKey: 'dealer_rate', 
-          name: 'Dealer Rate',
-          sort: false
-        },
-        {
-          fieldKey: 'rate_factor',
-          name: 'Rate Factor',
-          sort: false
-        }, 
-        {
-          fieldKey: 'discount',
-          name: 'Discount',
+          fieldKey: 'mrp', 
+          name: 'MRP',
           sort: false
         },
         {
@@ -158,46 +60,23 @@ export class ProductsComponent  {
           sort: false
         },
         {
-          fieldKey: 'purchase_description',
-          name: 'Purchase Disc.',
+          fieldKey: 'product_balance',
+          name: 'Product Balance',
           sort: false
         }, 
         {
-          fieldKey: 'purchase_gl_id',
-          name: 'Purchase GL',
-          sort: true,
-          displayType: "map",
-          mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.purchase_gl.name}`;
-          },
+          fieldKey: 'print_name',
+          name: 'Print Name',
+          sort: true
         },
         {
-          fieldKey: 'purchase_rate',
-          name: 'Purchase Rate',
+          fieldKey: 'hsn_code',
+          name: 'HSN Code',
           sort: false
         },
         {
-          fieldKey: 'purchase_rate_factor',
-          name: 'Purchase Rate Fact.',
-          sort: false
-        },
-        {
-          fieldKey: 'purchase_discount', 
-          name: 'Purchase Dis.',
-          sort: false
-        },  
-        {
-          fieldKey: 'brand_id',
-          name: 'Brand',
-          sort: true,
-          displayType: "map",
-          mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.brand.brand_name}`;
-          },
-        },
-        {
-          fieldKey: 'status',
-          name: 'Status',
+          fieldKey: 'barcode',
+          name: 'Barcode',
           sort: false
         },
         {
@@ -209,7 +88,7 @@ export class ProductsComponent  {
               type: 'delete',
               label: 'Delete',
               confirm: true,
-              confirmMsg: "Sure to delete?",
+              confirmMsg: "are you Sure to delete?",
               apiUrl: 'products/products'
             },
             {
@@ -312,7 +191,7 @@ export class ProductsComponent  {
               }
             },
             {
-              key: 'category_id',
+              key: 'category',
               type: 'select',
               className: 'ta-cell pr-md col-md-6 col-12',
               templateOptions: {
@@ -332,7 +211,7 @@ export class ProductsComponent  {
               }
             },
             {
-              key: 'type_id',
+              key: 'type',
               type: 'select',
               className: 'ta-cell pr-md col-md-6 col-12',
               templateOptions: {
@@ -357,6 +236,35 @@ export class ProductsComponent  {
               className: 'ta-cell pr-md col-md-6 col-12',
               templateOptions: {
                 label: 'Code',
+                required: true
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  //field.templateOptions.options = this.cs.getRole();
+                }
+              }
+            },
+            {
+              key: 'print_name',
+              type: 'input',
+              className: 'ta-cell pr-md col-md-6 col-12',
+              templateOptions: {
+                label: 'Print Name',
+                required: true
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  //field.templateOptions.options = this.cs.getRole();
+                }
+              }
+            },
+            {
+              key: 'hsn_code',
+              type: 'input',
+              className: 'ta-cell pr-md col-md-6 col-12',
+              templateOptions: {
+                label: 'HSN',
+                required: true
               },
               hooks: {
                 onInit: (field: any) => {
@@ -370,6 +278,7 @@ export class ProductsComponent  {
               className: 'ta-cell pr-md col-md-6 col-12',
               templateOptions: {
                 label: 'Barcode',
+                required: true
               },
               hooks: {
                 onInit: (field: any) => {
@@ -386,9 +295,10 @@ export class ProductsComponent  {
                 dataKey: 'unit_options_id',
                 dataLabel: "unit_name",
                 options: [],
+                required: true,
                 lazy: {
                   url: 'masters/unit_options/',
-                  lazyOneTime: true
+                  lazyOneTime: true,
                 },
               },
               hooks: {
@@ -504,6 +414,7 @@ export class ProductsComponent  {
               className: 'ta-cell pr-md col-md-6 col-12',
               templateOptions: {
                 label: 'MRP',
+                required: true
               },
               hooks: {
                 onInit: (field: any) => {
@@ -530,6 +441,7 @@ export class ProductsComponent  {
               className: 'ta-cell pr-md col-md-6 col-12',
               templateOptions: {
                 label: 'Sales Rate',
+                required: true
               },
               hooks: {
                 onInit: (field: any) => {
@@ -595,6 +507,7 @@ export class ProductsComponent  {
               className: 'ta-cell pr-md col-md-6 col-12',
               templateOptions: {
                 label: 'Dis Amount',
+                required: true
               },
               hooks: {
                 onInit: (field: any) => {
@@ -676,7 +589,7 @@ export class ProductsComponent  {
               }
             },
             {
-              key: 'brand_id',
+              key: 'brand',
               type: 'select',
               className: 'ta-cell pr-md col-md-6 col-12',
               templateOptions: {
@@ -697,10 +610,14 @@ export class ProductsComponent  {
             },
             {
               key: 'status',
-              type: 'input',
+              type: 'select',
               className: 'ta-cell pr-md col-md-6 col-12',
               templateOptions: {
                 label: 'Status',
+                options: [
+                  { value: 'Active', label: 'Active' },
+                  { value: 'Inactive', label: 'Inactive' }
+                ],
               },
               hooks: {
                 onInit: (field: any) => {

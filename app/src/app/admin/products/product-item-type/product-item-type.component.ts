@@ -33,7 +33,7 @@ export class ProductItemTypeComponent {
               type: 'delete',
               label: 'Delete',
               confirm: true,
-              confirmMsg: "Sure to delete?",
+              confirmMsg: "are you Sure to delete?",
               apiUrl: 'masters/product_item_type'
             },
             {

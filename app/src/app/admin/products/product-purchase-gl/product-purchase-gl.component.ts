@@ -104,7 +104,7 @@ export class ProductPurchaseGlComponent {
               type: 'delete',
               label: 'Delete',
               confirm: true,
-              confirmMsg: "Sure to delete?",
+              confirmMsg: "are you Sure to delete?",
               apiUrl: 'products/product_purchase_gl'
             },
             {
