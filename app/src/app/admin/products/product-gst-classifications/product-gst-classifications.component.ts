@@ -70,11 +70,16 @@ export class ProductGstClassificationsComponent {
           fieldGroup: [
             {
               key: 'type',
-              type: 'input',
+              type: 'select',
               className: 'ta-cell pr-md col-md-6 col-12',
               templateOptions: {
                 label: 'Type',
-                required: true
+                required: true,
+                options: [
+                  {value: 'HSN', label: 'HSN'},
+                  {value: 'SAC', label: 'SAC'},
+                  {value: 'Both', label: 'Both'}
+                ]
               },
               hooks: {
                 onInit: (field: any) => {

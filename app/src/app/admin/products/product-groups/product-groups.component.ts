@@ -13,7 +13,7 @@ export class ProductGroupsComponent   {
   tableConfig: {
     apiUrl: 'products/product_groups/',
     title: 'Product Groups',
-    pkId: "group_id",
+    pkId: "product_group_id",
     pageSize: 10,
     "globalSearch": {
       keys: ['id', 'name']
@@ -53,7 +53,7 @@ export class ProductGroupsComponent   {
   formConfig: {
     url: 'products/product_groups/',
     title: 'Product Groups',
-    pkId: "group_id",
+    pkId: "product_group_id",
     exParams: [],
     fields: [
       {

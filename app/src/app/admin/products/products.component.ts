@@ -1,27 +1,35 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { TaCurdConfig } from '@ta/ta-curd';
+
 
 @Component({
   selector: 'app-products',
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.scss']
 })
-export class ProductsComponent  {
-  initLoading = true; // bug
+export class ProductsComponent implements OnInit {
+  initLoading = true;
   loadingMore = false;
   data: any[] = [];
   list: Array<{ loading: boolean; name: any }> = [];
   viewMode = 0;
 
+  constructor(private http: HttpClient) {}
+
+  ngOnInit() {
+    this.initializeProductCode();
+  }
+
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
     drawerPlacement: 'right',
     tableConfig: {
-      apiUrl: 'products/products/?summary=true&summary=true&page=1&limit=10&sort[0]=name,DESC', //THIS SHOULD REMOVED IN FUTURE AND FIXED ACCORDNING TO THE COMMAN PATTERN
+      apiUrl: 'products/products/?summary=true&summary=true&page=1&limit=10&sort[0]=name,DESC',
       title: 'Products',
       pkId: "product_id",
       pageSize: 10,
-      "globalSearch": {
+      globalSearch: {
         keys: ['product_id', 'name']
       },
       cols: [
@@ -50,12 +58,12 @@ export class ProductsComponent  {
           sort: false
         },
         {
-          fieldKey: 'mrp', 
+          fieldKey: 'mrp',
           name: 'MRP',
           sort: false
         },
         {
-          fieldKey: 'dis_amount', 
+          fieldKey: 'dis_amount',
           name: 'Dis Amount',
           sort: false
         },
@@ -63,7 +71,7 @@ export class ProductsComponent  {
           fieldKey: 'product_balance',
           name: 'Product Balance',
           sort: false
-        }, 
+        },
         {
           fieldKey: 'print_name',
           name: 'Print Name',
@@ -88,7 +96,7 @@ export class ProductsComponent  {
               type: 'delete',
               label: 'Delete',
               confirm: true,
-              confirmMsg: "are you Sure to delete?",
+              confirmMsg: "Are you sure to delete?",
               apiUrl: 'products/products'
             },
             {
@@ -154,7 +162,6 @@ export class ProductsComponent  {
         {
           fieldGroupClassName: 'row',
           fieldGroup: [
-
             {
               key: 'name',
               type: 'input',
@@ -240,7 +247,11 @@ export class ProductsComponent  {
               },
               hooks: {
                 onInit: (field: any) => {
-                  //field.templateOptions.options = this.cs.getRole();
+                  this.http.get('masters/generate_order_no/?type=prd').subscribe((res: any) => {
+                    if (res && res.data && res.data.order_number) {
+                      field.formControl.setValue(res.data.order_number);
+                    }
+                  });
                 }
               }
             },
@@ -629,6 +640,12 @@ export class ProductsComponent  {
         }
       ]
     }
-
+  };
+  initializeProductCode() {
+    this.http.get('masters/generate_order_no/?type=prd').subscribe((res: any) => {
+      if (res && res.data && res.data.order_number) {
+        this.curdConfig.formConfig.model['code'] = res.data.order_number;
+      }
+    });
   }
 }

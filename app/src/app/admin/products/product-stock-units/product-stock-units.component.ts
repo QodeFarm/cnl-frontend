@@ -25,7 +25,7 @@ export class ProductStockUnitsComponent {
           sort: true
         },
         {
-          fieldKey: 'quantity_code',
+          fieldKey: 'quantity_code_id',
           name: 'Quantity Code',
           sort: true,
           displayType: "map",
@@ -65,7 +65,7 @@ export class ProductStockUnitsComponent {
       pkId: "stock_unit_id",
       exParams: [
         {
-          key: 'quantity_code',
+          key: 'quantity_code_id',
           type: 'script',
           value: 'data.quantity_code.quantity_code_id'
         },

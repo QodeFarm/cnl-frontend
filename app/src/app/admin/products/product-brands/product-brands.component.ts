@@ -1,14 +1,14 @@
 import { Component } from '@angular/core';
 import { TaCurdConfig } from '@ta/ta-curd';
 import { TaTableConfig } from '@ta/ta-table';
-
+ 
 @Component({
   selector: 'app-product-brands',
   templateUrl: './product-brands.component.html',
   styleUrls: ['./product-brands.component.scss']
 })
 export class ProductBrandsComponent {
-
+ 
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
     drawerPlacement: 'right',
@@ -27,17 +27,17 @@ export class ProductBrandsComponent {
           sort: true
         },
         {
-          fieldKey: 'code', 
+          fieldKey: 'code',
           name: 'Code',
           sort: true
         },
         {
-          fieldKey: 'picture', 
+          fieldKey: 'picture',
           name: 'Picture',
           sort: true
         },
         {
-          fieldKey: 'brand_salesman_id',
+          fieldKey: 'brand_salesman',
           name: 'Brand Salesman',
           sort: true,
           displayType: "map",
@@ -54,7 +54,7 @@ export class ProductBrandsComponent {
               type: 'delete',
               label: 'Delete',
               confirm: true,
-              confirmMsg: "are you Sure to delete?",
+              confirmMsg: "Sure to delete?",
               apiUrl: 'masters/product_brands'
             },
             {
@@ -73,7 +73,7 @@ export class ProductBrandsComponent {
         {
           key: 'brand_salesman_id',
           type: 'script',
-          value: 'data.brand_salesman.name'
+          value: 'data.brand_salesman.brand_salesman_id'
         },
       ],
       fields: [
@@ -108,12 +108,12 @@ export class ProductBrandsComponent {
         //   }
         // },
         {
-          key: 'brand_salesman_id',
+          key: 'brand_salesman',
           type: 'select',
           className: 'ta-cell pr-md col-md-6 col-12',
           templateOptions: {
             label: 'Brand Salesman Id',
-            dataKey: 'brand_salesman',
+            dataKey: 'name',
             dataLabel: "name",
             options: [],
             lazy: {
@@ -130,7 +130,7 @@ export class ProductBrandsComponent {
         },
       ]
     }
-
+ 
   }
 tableConfig: TaTableConfig = {
     apiUrl: 'masters/product_brands/',
@@ -145,7 +145,7 @@ tableConfig: TaTableConfig = {
         fieldKey: 'code',
         name: 'Code'
       },
-	    {
+      {
           fieldKey: 'name',
           name: 'Name'
       },
@@ -173,3 +173,4 @@ tableConfig: TaTableConfig = {
     ]
   };
 }
+ 
