@@ -317,6 +317,40 @@ export class SalesComponent {
           templateOptions: {
             // title: 'Items',
             addText: 'Add Product',
+            tableCols: [
+              { 
+                name: 'product', 
+                label: 'Product' 
+              },
+              { 
+                name: 'code', 
+                label: 'Code' 
+              },
+              { 
+                name: 'unit', 
+                label: 'Unit' 
+              },
+              { 
+                name: 'total_boxes', 
+                label: 'Total Boxes' 
+              },
+              { 
+                name: 'quantity', 
+                label: 'Quantity' 
+              },
+              { 
+                name: 'amount', 
+                label: 'Price' 
+              },
+              { 
+                name: 'rate', 
+                label: 'Rate' 
+              },
+              { 
+                name: 'discount', 
+                label: 'Discount' 
+              }
+            ]
           },
           fieldArray: {
             fieldGroup: [
@@ -330,6 +364,7 @@ export class SalesComponent {
                     templateOptions: {
                       label: 'Select Product',
                       // dataKey: 'product_id',
+                      hideLabel : true,
                       dataLabel: 'name',
                       options: [],
                       required: true,
@@ -420,6 +455,7 @@ export class SalesComponent {
                     templateOptions: {
                       label: 'Code',
                       placeholder: 'Enter code',
+                      hideLabel : true,
                       // // required: true
                     },
                     expressionProperties: {
@@ -434,6 +470,7 @@ export class SalesComponent {
                     templateOptions: {
                       label: 'Unit',
                       placeholder: 'Enter Unit',
+                      hideLabel : true,
                       // // required: true
                     },
                   },
@@ -445,6 +482,7 @@ export class SalesComponent {
                     templateOptions: {
                       label: 'Total Boxes',
                       placeholder: 'Enter Total Boxes',
+                      hideLabel : true,
                       // // required: true
                     },
                   },
@@ -457,6 +495,7 @@ export class SalesComponent {
                     templateOptions: {
                       label: 'Quantity',
                       placeholder: 'Enter Quantity',
+                      hideLabel : true,
                       // // required: true
                     },
                   },
@@ -468,6 +507,7 @@ export class SalesComponent {
                     templateOptions: {
                       label: 'Price',
                       placeholder: 'Enter Price',
+                      hideLabel : true,
                       // type: 'number',
                       // // required: true
                     },
@@ -480,6 +520,7 @@ export class SalesComponent {
                     templateOptions: {
                       label: 'Rate',
                       placeholder: 'Enter Rate',
+                      hideLabel : true,
                       // type: 'number',
                       // // required: true
                     },
@@ -493,6 +534,7 @@ export class SalesComponent {
                       placeholder: 'Enter Discount',
                       // type: 'number',
                       label: 'Discount',
+                      hideLabel : true,
                     },
                     expressionProperties: {
                       // 'templateOption6s.disabled': (model) => (model.item && model.item.sale_price) ? false : true
@@ -791,25 +833,14 @@ export class SalesComponent {
           ]
         },
         {
+          template:'<div> <hr> <b> Shipping Details </b> </div>',
+          fieldGroupClassName: "ant-row",
+        },
+        {
           fieldGroupClassName: "ant-row",
           key:'order_shipments',
           fieldGroup: [
-            
-            
-  // "order_shipments": {
-  //   "destination": "ndd",
-  //   "port_of_landing": "chennai",
-  //   "shipping_mode_id": "4d6345b2-d388-4a48-a01b-80cde0a9afa1",
-  //   "port_of_discharge": "chennai",
-  //   "shipping_company_id": "3c334a08-d854-4a00-9b99-fa3ab6b80d6b",
-  //   "no_of_packets": 2,
-  //   "shipping_company_address": "textarea",
-  //   "weight": "200.00",
-    
-  //   "shipping_tracking_no": "TRC-001",
-  //   "shipping_date": "2024-06-22",
-  //   "shipping_charges": "120.00",
-  // }
+       
             {
               key: 'destination',
               type: 'input',

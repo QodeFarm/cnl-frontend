@@ -1,6 +1,13 @@
 <nz-card [nzBordered]="true" [nzTitle]="to.title" [nzExtra]="extraTemplate">
     <div class="ant-table-container">
         <table>
+            <!-- <thead *ngIf="to.tableCols">
+                <tr>
+                    <th  *ngFor="let col of to.tableCols;">
+                        {{ col.label }}
+                    </th>
+                </tr>
+            </thead> -->
             <tbody class="ant-table-tbody">
                 <tr class="ant-table-row" *ngFor="let field of field.fieldGroup; let i = index;">
                     <td>
