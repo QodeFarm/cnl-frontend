@@ -92,9 +92,16 @@ export class AdminLayoutComponent {
         icon: 'fas fa-chart-line',
       },
       {
-        link: '/admin/dashboard',
+        // link: '/admin/dashboard',
         label: 'Inventory',
         icon: 'fas fa-boxes',
+        child: [
+          {
+            link: '/admin/warehouses',
+            label: 'warehouses',
+            icon: 'fas fa-tachometer-alt',
+          },
+        ]
       },
       {
         link: '/admin/master',
