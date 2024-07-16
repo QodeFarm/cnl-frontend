@@ -100,7 +100,23 @@ export class AdminLayoutComponent {
         link: '/admin/master',
         label: 'Master',
         icon: 'fas fa-cog',
-      }
+      },
+      {
+        label: 'Company',
+        icon: 'fas fa-file-invoice-dollar',
+        child: [
+          {
+            link: '/admin/company',
+            label: 'Company',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/company/branches',
+            label: 'Branches',
+            icon: 'fas fa-tachometer-alt',
+          },
+        ]
+      },
     ]
     this.closeMenu();
   }
