@@ -1,0 +1,101 @@
+import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { Component, EventEmitter, Output } from '@angular/core';
+import { Router } from '@angular/router';
+import { TaTableConfig } from '@ta/ta-table';
+import { NzMessageService } from 'ng-zorro-antd/message';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+
+@Component({
+  selector: 'app-customers-list',
+  standalone: true,
+  imports: [CommonModule, AdminCommmonModule],
+  templateUrl: './customers-list.component.html',
+  styleUrls: ['./customers-list.component.scss']
+})
+export class CustomersListComponent {
+
+  @Output('edit') edit = new EventEmitter<void>();
+
+  tableConfig: TaTableConfig = {
+    apiUrl: 'customers/customers/?summary=true&summary=true&page=1&limit=10&sort[0]=name,DESC', //THIS SHOULD REMOVED IN FUTURE AND FIXED ACCORDNING TO THE COMMAN PATTERN
+    showCheckbox:true,
+    pkId: "customer_id",
+    pageSize: 10,
+    "globalSearch": {
+      keys: ['customer_id', 'name']
+    },
+    cols: [
+      {
+        fieldKey: 'name',
+        name: 'Name',
+        sort: true
+      },
+      {
+        fieldKey: 'email',
+        name: 'Email',
+        sort: false,
+      },
+      {
+        fieldKey: 'phone',
+        name: 'Phone',
+        sort: false,
+      },
+      {
+        fieldKey: 'gst',
+        name: 'GST',
+        sort: false,
+      },
+      {
+        fieldKey: 'city.name',
+        name: 'City Name',
+        sort: false,
+        displayType: 'map',
+        mapFn: (currentValue: any, row: any, col: any) => {
+          return row.city.city_name;
+        },
+      },
+      {
+        fieldKey: 'ledger_account_id.name',
+        name: 'Ledger Account',
+        sort: false,
+        displayType: 'map',
+        mapFn: (currentValue: any, row: any, col: any) => {
+          return row.ledger_account_id.name;
+        },
+      },
+      {
+        fieldKey: 'created_at',
+        name: 'Created At',
+        sort: false,
+        displayType: "date"
+      },      
+      {
+        fieldKey: "code",
+        name: "Action",
+        type: 'action',
+        actions: [
+          {
+            type: 'delete',
+            label: 'Delete',
+            // confirm: true,
+            // confirmMsg: "are you Sure to delete?",
+            apiUrl: 'customers/customers'
+          },
+          {
+            type: 'callBackFn',
+            label: 'Edit',
+            callBackFn: (row, action) => {
+              console.log(row);
+              this.edit.emit(row.customer_id);
+            }
+          }         
+        ]
+      },
+    ]
+  };
+  
+  constructor(private router: Router) {
+
+  }
+}

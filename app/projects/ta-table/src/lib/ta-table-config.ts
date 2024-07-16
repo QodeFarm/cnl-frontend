@@ -18,6 +18,7 @@ export interface TaTableConfig {
   bordered?: boolean;
   tableLayout?: 'fixed' | 'auto';
   pageSizeOptions?: number[];
+  showCheckbox?:boolean;
 }
 
 export interface Export {
