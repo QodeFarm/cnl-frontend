@@ -117,6 +117,63 @@ export class AdminLayoutComponent {
           },
         ]
       },
+      {
+        label: 'HRMS',
+        icon: 'fas fa-file-invoice-dollar',
+        child: [
+          {
+            link: '/admin/hrms/designations',
+            label: 'designations',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/hrms/departments',
+            label: 'departments',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/hrms/employees ',
+            label: 'employees',
+            icon: 'fas fa-tachometer-alt',
+          },
+        ]
+      },
+      {
+        label: 'LEADS',
+        icon: 'fas fa-file-invoice-dollar',
+        child: [
+          {
+            link: '/admin/leads',
+            label: 'Leads',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/leads/lead_statuses',
+            label: 'Lead statuses',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/leads/interaction_types',
+            label: 'Interaction types',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/leads/lead_assignments',
+            label: 'Lead assignments',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/leads/lead_interactions',
+            label: 'Lead interactions',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/leads/lead_assignment_history',
+            label: 'Lead assignment history',
+            icon: 'fas fa-tachometer-alt',
+          },
+        ]
+      },
     ]
     this.closeMenu();
   }
