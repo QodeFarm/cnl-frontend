@@ -552,7 +552,7 @@ export class CustomersComponent {
             },
           ]
       },
-          {
+      {
         key: 'customer_attachments',
         type: 'repeat',
         templateOptions: {
