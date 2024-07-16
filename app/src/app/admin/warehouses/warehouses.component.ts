@@ -35,15 +35,6 @@ export class WarehousesComponent {
           sort: false
         },
         {
-          fieldKey: 'customer_id',
-          name: 'Customer',
-          sort: true,
-          displayType: "map",
-          mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.customer.name}`;
-          },
-        },
-        {
           fieldKey: 'city_id',
           name: 'City',
           sort: true,
@@ -92,11 +83,6 @@ export class WarehousesComponent {
           value: 'data.item_type.item_type_id'
         },
         {
-          key: 'customer_id',
-          type: 'script',
-          value: 'data.customer.customer_id'
-        },
-        {
           key: 'city_id',
           type: 'script',
           value: 'data.city.city_id'
@@ -114,214 +100,182 @@ export class WarehousesComponent {
       ],
       fields: [
         {
-          key: 'name',
-          type: 'input',
-          className: 'ta-cell pr-md col-md-6',
-          templateOptions: {
-            label: 'Name',
-            placeholder: 'Enter Name',
-            required: true,
-          }
-        },
-        {
-          key: 'code',
-          type: 'input',
-          className: 'ta-cell pr-md col-md-6',
-          templateOptions: {
-            label: 'Code',
-            placeholder: 'Enter Code',
-            required: false,
-          }
-        },
-        {
-          key: 'address',
-          type: 'textarea',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'Address',
-            required: false,
-          },
-          hooks: {
-            onInit: (field: any) => {
-              //field.templateOptions.options = this.cs.getRole();
-            }
-          }
-        },
-        {
-          key: 'pin_code',
-          type: 'input',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'Pin Code',
-            required: false,
-          },
-          hooks: {
-            onInit: (field: any) => {
-              //field.templateOptions.options = this.cs.getRole();
-            }
-          }
-        },
-        {
-          key: 'phone',
-          type: 'input',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'Phone',
-            required: false,
-          },
-          hooks: {
-            onInit: (field: any) => {
-              //field.templateOptions.options = this.cs.getRole();
-            }
-          }
-        },
-        {
-          key: 'email',
-          type: 'input',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'Email',
-            required: false,
-          },
-          hooks: {
-            onInit: (field: any) => {
-              //field.templateOptions.options = this.cs.getRole();
-            }
-          }
-        },
-        {
-          key: 'longitude',
-          type: 'input',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'Longitude',
-            required: false,
-          },
-          hooks: {
-            onInit: (field: any) => {
-              //field.templateOptions.options = this.cs.getRole();
-            }
-          }
-        },
-        {
-          key: 'latitude',
-          type: 'input',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'Latitude',
-            required: false,
-          },
-          hooks: {
-            onInit: (field: any) => {
-              //field.templateOptions.options = this.cs.getRole();
-            }
-          }
-        },
-        {
-          key: 'item_type',
-          type: 'select',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'Item Type',
-            dataKey: 'item_type_id',
-            dataLabel: "item_name",
-            options: [],
-            lazy: {
-              url: 'masters/product_item_type/',
-              lazyOneTime: true
+          fieldGroupClassName: "ant-row",
+          fieldGroup: [ 
+            {
+              key: 'name',
+              type: 'input',
+              className: 'ant-col-7 pr-md m-3',
+              templateOptions: {
+                label: 'Name',
+                placeholder: 'Enter Name',
+                required: true,
+              }
             },
-            required: false
-          },
-          hooks: {
-            onInit: (field: any) => {
-              //field.templateOptions.options = this.cs.getRole();
-            }
-          }
-        },
-        {
-          key: 'customer',
-          type: 'select',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'Customer',
-            dataKey: 'customer_id',
-            dataLabel: "name",
-            options: [],
-            lazy: {
-              url: 'customers/customer/',
-              lazyOneTime: true
+            {
+              key: 'code',
+              type: 'input',
+              className: 'ant-col-7 pr-md m-3',
+              templateOptions: {
+                label: 'Code',
+                placeholder: 'Enter Code',
+                required: false,
+              }
             },
-            required: true
-          },
-          hooks: {
-            onInit: (field: any) => {
-              //field.templateOptions.options = this.cs.getRole();
-            }
-          }
-        },
-        {
-          key: 'city',
-          type: 'select',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'City',
-            dataKey: 'city_id',
-            dataLabel: "city_name",
-            options: [],
-            lazy: {
-              url: 'masters/city/',
-              lazyOneTime: true
+            {
+              key: 'phone',
+              type: 'input',
+              className: 'ant-col-7 pr-md m-3',
+              templateOptions: {
+                label: 'Phone',
+                placeholder: 'Enter Phone Number',
+                required: false,
+              }
             },
-            required: true
-          },
-          hooks: {
-            onInit: (field: any) => {
-              //field.templateOptions.options = this.cs.getRole();
-            }
-          }
-        },
-        {
-          key: 'state',
-          type: 'select',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'State',
-            dataKey: 'state_id',
-            dataLabel: "state_name",
-            options: [],
-            lazy: {
-              url: 'masters/state/',
-              lazyOneTime: true
+            {
+              key: 'email',
+              type: 'input',
+              className: 'ant-col-7 pr-md m-3',
+              templateOptions: {
+                label: 'Email',
+                placeholder: 'Enter Email',
+                required: false,
+              }
             },
-            required: true
-          },
-          hooks: {
-            onInit: (field: any) => {
-              //field.templateOptions.options = this.cs.getRole();
-            }
-          }
-        },
-        {
-          key: 'country',
-          type: 'select',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'Country',
-            dataKey: 'country_id',
-            dataLabel: "country_name",
-            options: [],
-            lazy: {
-              url: 'masters/country/',
-              lazyOneTime: true
+            {
+              key: 'address',
+              type: 'textarea',
+              className: 'ant-col-7 pr-md m-3',
+              templateOptions: {
+                label: 'Address',
+                placeholder: 'Enter Address',
+                required: false,
+              },
             },
-            required: false
-          },
-          hooks: {
-            onInit: (field: any) => {
-              //field.templateOptions.options = this.cs.getRole();
-            }
-          }
-        },
+            {
+              key: 'city',
+              type: 'select',
+              className: 'ant-col-7 pr-md m-3',
+              templateOptions: {
+                label: 'City',
+                dataKey: 'city_id',
+                dataLabel: "city_name",
+                options: [],
+                lazy: {
+                  url: 'masters/city/',
+                  lazyOneTime: true
+                },
+                required: true
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  //field.templateOptions.options = this.cs.getRole();
+                }
+              }
+            },
+            {
+              key: 'state',
+              type: 'select',
+              className: 'ant-col-7 pr-md m-3',
+              templateOptions: {
+                label: 'State',
+                dataKey: 'state_id',
+                dataLabel: "state_name",
+                options: [],
+                lazy: {
+                  url: 'masters/state/',
+                  lazyOneTime: true
+                },
+                required: true
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  //field.templateOptions.options = this.cs.getRole();
+                }
+              }
+            },
+            {
+              key: 'country',
+              type: 'select',
+              className: 'ant-col-7 pr-md m-3',
+              templateOptions: {
+                label: 'Country',
+                dataKey: 'country_id',
+                dataLabel: "country_name",
+                options: [],
+                lazy: {
+                  url: 'masters/country/',
+                  lazyOneTime: true
+                },
+                required: false
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  //field.templateOptions.options = this.cs.getRole();
+                }
+              }
+            },
+            {
+              key: 'pin_code',
+              type: 'input',
+              className: 'ant-col-7 pr-md m-3',
+              templateOptions: {
+                label: 'Pin Code',
+                placeholder: 'Enter Pin Code',
+                required: false,
+              },
+            },
+            {
+              key: 'item_type',
+              type: 'select',
+              className: 'ant-col-7 pr-md m-3',
+              templateOptions: {
+                label: 'Item Type',
+                dataKey: 'item_type_id',
+                dataLabel: "item_name",
+                options: [],
+                lazy: {
+                  url: 'masters/product_item_type/',
+                  lazyOneTime: true
+                },
+                required: false
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  //field.templateOptions.options = this.cs.getRole();
+                }
+              }
+            },
+            {
+              key: 'longitude',
+              type: 'input',
+              className: 'ant-col-7 pr-md m-3',
+              templateOptions: {
+                label: 'Longitude',
+                required: false,
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  //field.templateOptions.options = this.cs.getRole();
+                }
+              }
+            },
+            {
+              key: 'latitude',
+              type: 'input',
+              className: 'ant-col-7 pr-md m-3',
+              templateOptions: {
+                label: 'Latitude',
+                required: false,
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  //field.templateOptions.options = this.cs.getRole();
+                }
+              }
+            },
+          ]
+        }
       ]
     }
   }

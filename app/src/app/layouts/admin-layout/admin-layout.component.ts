@@ -98,7 +98,7 @@ export class AdminLayoutComponent {
         child: [
           {
             link: '/admin/warehouses',
-            label: 'warehouses',
+            label: 'Warehouses',
             icon: 'fas fa-tachometer-alt',
           },
         ]
