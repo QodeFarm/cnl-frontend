@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaCurdConfig } from '@ta/ta-curd';
+import { TaFormConfig } from '@ta/ta-form';
 
 
 @Component({
@@ -8,106 +9,77 @@ import { TaCurdConfig } from '@ta/ta-curd';
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.scss']
 })
-export class ProductsComponent implements OnInit {
-  initLoading = true;
-  loadingMore = false;
-  data: any[] = [];
-  list: Array<{ loading: boolean; name: any }> = [];
-  viewMode = 0;
+export class ProductsComponent {
+  showProductsList: boolean = false;
+  showForm: boolean = false;
+  ProductEditID: any;
+  formConfig: TaFormConfig = {};
+  // router: any;
+  // deleteProductID: any;
 
-  constructor(private http: HttpClient) {}
-
-  ngOnInit() {
-    this.initializeProductCode();
+  constructor(private http: HttpClient) {
   }
 
-  curdConfig: TaCurdConfig = {
-    drawerSize: 500,
-    drawerPlacement: 'right',
-    tableConfig: {
-      apiUrl: 'products/products/?summary=true&summary=true&page=1&limit=10&sort[0]=name,DESC',
-      title: 'Products',
-      pkId: "product_id",
-      pageSize: 10,
-      globalSearch: {
-        keys: ['product_id', 'name']
-      },
-      cols: [
-        {
-          fieldKey: 'name',
-          name: 'Name',
-          sort: true
-        },
-        {
-          fieldKey: 'code',
-          name: 'Code',
-          sort: false
-        },
-        {
-          fieldKey: 'unit_options.unit_name',
-          name: 'Unit Name',
-          sort: false,
-          displayType: 'map',
-          mapFn: (currentValue: any, row: any, col: any) => {
-            return row.unit_options.unit_name;
-          },
-        },
-        {
-          fieldKey: 'sales_rate',
-          name: 'Sales Rate',
-          sort: false
-        },
-        {
-          fieldKey: 'mrp',
-          name: 'MRP',
-          sort: false
-        },
-        {
-          fieldKey: 'dis_amount',
-          name: 'Dis Amount',
-          sort: false
-        },
-        {
-          fieldKey: 'product_balance',
-          name: 'Product Balance',
-          sort: false
-        },
-        {
-          fieldKey: 'print_name',
-          name: 'Print Name',
-          sort: true
-        },
-        {
-          fieldKey: 'hsn_code',
-          name: 'HSN Code',
-          sort: false
-        },
-        {
-          fieldKey: 'barcode',
-          name: 'Barcode',
-          sort: false
-        },
-        {
-          fieldKey: "code",
-          name: "Action",
-          type: 'action',
-          actions: [
-            {
-              type: 'delete',
-              label: 'Delete',
-              confirm: true,
-              confirmMsg: "Are you sure to delete?",
-              apiUrl: 'products/products'
-            },
-            {
-              type: 'edit',
-              label: 'Edit'
-            }
-          ]
-        }
-      ]
-    },
-    formConfig: {
+  ngOnInit() {
+    this.showProductsList = false;
+    this.showForm = true;
+    // set form config
+    this.setFormConfig();
+    console.log('this.formConfig', this.formConfig);
+
+    // set sale_order default value
+    // this.formConfig.model['sale_order']['order_type'] = 'sale_order';
+  
+    // to get SaleOrder number for save
+    // this.getOrderNo();
+  }
+
+  hide(){
+      document.getElementById('modalClose').click();
+  }
+
+  editProducts(event) {
+    console.log('event', event);
+    this.ProductEditID = event;
+    this.http.get('products/products/' + event).subscribe((res: any) => {
+      console.log('--------> res ', res);
+      console.log("Result ended here")
+      if (res) {
+        console.log('Edit started')
+        this.formConfig.model = res;
+        // Set labels for update
+        this.formConfig.submit.label = 'Update';
+        // Show form after setting form values
+        this.formConfig.pkId = 'product_id';
+        console.log("Edit runnnig")
+        this.formConfig.model['product_id'] = this.ProductEditID;
+        console.log("showfarm runnnig")
+        this.showForm = true;
+      }
+    });
+    this.hide();
+  }
+
+  // onDelete(productId: string) {
+  //   // Perform deletion logic here (assuming synchronous operation)
+  //   console.log(`Deleting product with ID ${productId}`);
+
+  //   // After deletion, navigate back to product list
+  //   this.router.navigate(['/products-list']);
+  // }
+
+  onDelete(productId: string) {
+    if (confirm(`Are you sure you want to delete product with ID ${productId}?`)) {
+      
+    }
+  }
+
+  showProductsListFn() {
+    this.showProductsList = true;
+  }
+
+  setFormConfig() {
+    this.formConfig = {
       url: 'products/products/',
       title: 'Products',
       pkId: "product_id",
@@ -158,14 +130,21 @@ export class ProductsComponent implements OnInit {
           value: 'data.brand.brand_id'
         },
       ],
+      submit: {
+        // label:'Submit',
+        submittedFn : ()=>this.ngOnInit()        
+      },
+      reset: {
+
+      },
       fields: [
         {
-          fieldGroupClassName: 'row',
+          fieldGroupClassName: "ant-row",
           fieldGroup: [
             {
               key: 'name',
               type: 'input',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ant-col-4 pr-md m-3',
               templateOptions: {
                 label: 'Name',
                 required: true
@@ -179,7 +158,7 @@ export class ProductsComponent implements OnInit {
             {
               key: 'product_group',
               type: 'select',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ant-col-4 pr-md m-3',
               templateOptions: {
                 label: 'Product Group',
                 dataKey: 'product_group_id',
@@ -200,7 +179,7 @@ export class ProductsComponent implements OnInit {
             {
               key: 'category',
               type: 'select',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ant-col-4 pr-md m-3',
               templateOptions: {
                 label: 'Category',
                 dataKey: 'category_id',
@@ -220,7 +199,7 @@ export class ProductsComponent implements OnInit {
             {
               key: 'type',
               type: 'select',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ant-col-4 pr-md m-3',
               templateOptions: {
                 label: 'Type',
                 dataKey: 'type_id',
@@ -240,7 +219,7 @@ export class ProductsComponent implements OnInit {
             {
               key: 'code',
               type: 'input',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ant-col-4 pr-md m-3',
               templateOptions: {
                 label: 'Code',
                 required: true
@@ -258,7 +237,7 @@ export class ProductsComponent implements OnInit {
             {
               key: 'print_name',
               type: 'input',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ant-col-4 pr-md m-3',
               templateOptions: {
                 label: 'Print Name',
                 required: true
@@ -272,7 +251,7 @@ export class ProductsComponent implements OnInit {
             {
               key: 'hsn_code',
               type: 'input',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ant-col-4 pr-md m-3',
               templateOptions: {
                 label: 'HSN',
                 required: true
@@ -286,7 +265,7 @@ export class ProductsComponent implements OnInit {
             {
               key: 'barcode',
               type: 'input',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ant-col-4 pr-md m-3',
               templateOptions: {
                 label: 'Barcode',
                 required: true
@@ -300,7 +279,7 @@ export class ProductsComponent implements OnInit {
             {
               key: 'unit_options',
               type: 'select',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ant-col-4 pr-md m-3',
               templateOptions: {
                 label: 'Unit Options',
                 dataKey: 'unit_options_id',
@@ -321,7 +300,7 @@ export class ProductsComponent implements OnInit {
             {
               key: 'gst_input',
               type: 'input',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ant-col-4 pr-md m-3',
               templateOptions: {
                 label: 'GST Input',
               },
@@ -334,7 +313,7 @@ export class ProductsComponent implements OnInit {
             {
               key: 'stock_unit',
               type: 'select',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ant-col-4 pr-md m-3',
               templateOptions: {
                 label: 'Stock Unit',
                 dataKey: 'stock_unit_id',
@@ -355,7 +334,7 @@ export class ProductsComponent implements OnInit {
             {
               key: 'print_barcode',
               type: 'checkbox',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ant-col-4 pr-md m-3',
               templateOptions: {
                 label: 'Print Barcode',
               },
@@ -368,7 +347,7 @@ export class ProductsComponent implements OnInit {
             {
               key: 'gst_classification',
               type: 'select',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ant-col-4 pr-md m-3',
               templateOptions: {
                 label: 'GST Classification',
                 dataKey: 'gst_classification_id',
@@ -388,7 +367,7 @@ export class ProductsComponent implements OnInit {
             {
               key: 'sales_description',
               type: 'text',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ant-col-4 pr-md m-3',
               templateOptions: {
                 label: 'Sales Description',
               },
@@ -401,7 +380,7 @@ export class ProductsComponent implements OnInit {
             {
               key: 'sales_gl',
               type: 'select',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ant-col-4 pr-md m-3',
               templateOptions: {
                 label: 'Sales GL',
                 required: true,
@@ -422,7 +401,7 @@ export class ProductsComponent implements OnInit {
             {
               key: 'mrp',
               type: 'input',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ant-col-4 pr-md m-3',
               templateOptions: {
                 label: 'MRP',
                 required: true
@@ -436,7 +415,7 @@ export class ProductsComponent implements OnInit {
             {
               key: 'minimum_price',
               type: 'input',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ant-col-4 pr-md m-3',
               templateOptions: {
                 label: 'Min Price',
               },
@@ -449,7 +428,7 @@ export class ProductsComponent implements OnInit {
             {
               key: 'sales_rate',
               type: 'input',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ant-col-4 pr-md m-3',
               templateOptions: {
                 label: 'Sales Rate',
                 required: true
@@ -463,7 +442,7 @@ export class ProductsComponent implements OnInit {
             {
               key: 'wholesale_rate',
               type: 'input',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ant-col-4 pr-md m-3',
               templateOptions: {
                 label: 'Wholesale Rate',
               },
@@ -476,7 +455,7 @@ export class ProductsComponent implements OnInit {
             {
               key: 'dealer_rate',
               type: 'input',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ant-col-4 pr-md m-3',
               templateOptions: {
                 label: 'Dealer Rate',
               },
@@ -489,7 +468,7 @@ export class ProductsComponent implements OnInit {
             {
               key: 'rate_factor',
               type: 'input',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ant-col-4 pr-md m-3',
               templateOptions: {
                 label: 'Rate Factor',
               },
@@ -502,7 +481,7 @@ export class ProductsComponent implements OnInit {
             {
               key: 'discount',
               type: 'input',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ant-col-4 pr-md m-3',
               templateOptions: {
                 label: 'Discount',
               },
@@ -515,7 +494,7 @@ export class ProductsComponent implements OnInit {
             {
               key: 'dis_amount',
               type: 'input',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ant-col-4 pr-md m-3',
               templateOptions: {
                 label: 'Dis Amount',
                 required: true
@@ -529,7 +508,7 @@ export class ProductsComponent implements OnInit {
             {
               key: 'purchase_description',
               type: 'text',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ant-col-4 pr-md m-3',
               templateOptions: {
                 label: 'Purchase Description',
               },
@@ -542,7 +521,7 @@ export class ProductsComponent implements OnInit {
             {
               key: 'purchase_gl',
               type: 'select',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ant-col-4 pr-md m-3',
               templateOptions: {
                 label: 'Purchase GL',
                 required: true,
@@ -563,7 +542,7 @@ export class ProductsComponent implements OnInit {
             {
               key: 'purchase_rate',
               type: 'input',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ant-col-4 pr-md m-3',
               templateOptions: {
                 label: 'Purchase Rate',
               },
@@ -576,7 +555,7 @@ export class ProductsComponent implements OnInit {
             {
               key: 'purchase_rate_factor',
               type: 'input',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ant-col-4 pr-md m-3',
               templateOptions: {
                 label: 'Purchase Rate Factor',
               },
@@ -589,7 +568,7 @@ export class ProductsComponent implements OnInit {
             {
               key: 'purchase_discount',
               type: 'input',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ant-col-4 pr-md m-3',
               templateOptions: {
                 label: 'Purchase Discount',
               },
@@ -602,7 +581,7 @@ export class ProductsComponent implements OnInit {
             {
               key: 'brand',
               type: 'select',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ant-col-4 pr-md m-3',
               templateOptions: {
                 label: 'Brand',
                 dataKey: 'brand_id',
@@ -622,7 +601,7 @@ export class ProductsComponent implements OnInit {
             {
               key: 'status',
               type: 'select',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ant-col-4 pr-md m-3',
               templateOptions: {
                 label: 'Status',
                 options: [
@@ -640,12 +619,5 @@ export class ProductsComponent implements OnInit {
         }
       ]
     }
-  };
-  initializeProductCode() {
-    this.http.get('masters/generate_order_no/?type=prd').subscribe((res: any) => {
-      if (res && res.data && res.data.order_number) {
-        this.curdConfig.formConfig.model['code'] = res.data.order_number;
-      }
-    });
   }
 }

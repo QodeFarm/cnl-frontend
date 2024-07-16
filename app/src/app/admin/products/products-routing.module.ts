@@ -14,8 +14,17 @@ import { ProductDrugTypesComponent } from './product-drug-types/product-drug-typ
 import { ProductItemTypeComponent } from './product-item-type/product-item-type.component';
 import { BrandSalesmanComponent } from './brand-salesman/brand-salesman.component';
 import { ProductBrandsComponent } from './product-brands/product-brands.component';
+import { ProductsListComponent } from './products-list/products-list.component';
 
 const routes: Routes = [
+  {
+    path : 'products',
+    component: ProductsComponent
+  },
+  // {
+  //   path : 'products-list',
+  //   component: ProductsListComponent
+  // },
   {
     path : 'product-groups',
     component: ProductGroupsComponent
@@ -39,10 +48,6 @@ const routes: Routes = [
   {
     path : 'product-purchase-gl',
     component: ProductPurchaseGlComponent
-  },
-  {
-    path : 'products',
-    component: ProductsComponent
   },
   {
     path : 'product-types',

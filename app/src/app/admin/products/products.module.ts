@@ -17,6 +17,7 @@ import { ProductDrugTypesComponent } from './product-drug-types/product-drug-typ
 import { ProductItemTypeComponent } from './product-item-type/product-item-type.component';
 import { BrandSalesmanComponent } from './brand-salesman/brand-salesman.component';
 import { ProductBrandsComponent } from './product-brands/product-brands.component';
+import { ProductsListComponent } from './products-list/products-list.component';
 
 
 @NgModule({
@@ -34,12 +35,14 @@ import { ProductBrandsComponent } from './product-brands/product-brands.componen
     ProductDrugTypesComponent,
     ProductItemTypeComponent,
     BrandSalesmanComponent,
-    ProductBrandsComponent
+    ProductBrandsComponent,
+    // ProductsListComponent
   ],
   imports: [
     CommonModule,
     ProductsRoutingModule,
-    AdminCommmonModule
+    AdminCommmonModule,
+    ProductsListComponent
   ]
 })
 export class ProductsModule { }
