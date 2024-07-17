@@ -14,7 +14,7 @@ export class BranchesComponent {
     drawerPlacement: 'right',
     tableConfig: {
       apiUrl: 'company/branches/',
-      title: 'Branches List',
+      title: 'Branches',
       pkId: "branch_id",
       pageSize: 10,
       "globalSearch": {
@@ -31,19 +31,19 @@ export class BranchesComponent {
         },
         {
           fieldKey: 'phone',
-          name: 'phone'
+          name: 'Phone'
         },
         {
           fieldKey: 'email',
-          name: 'email'
+          name: 'Email'
         },
         {
           fieldKey: 'address',
-          name: 'address',
+          name: 'Address',
         },
         {
           fieldKey: 'status_id',
-          name: 'status',
+          name: 'Status',
           displayType: "map",
           mapFn: (currentValue: any, row: any, col: any) => {
             return `${row.status.status_name}`;
@@ -52,7 +52,7 @@ export class BranchesComponent {
         },
         {
           fieldKey: 'city_id',
-          name: 'city',
+          name: 'City',
           displayType: "map",
           mapFn: (currentValue: any, row: any, col: any) => {
             return `${row.city.city_name}`;

@@ -3,6 +3,8 @@ import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TaCurdConfig } from '@ta/ta-curd';
 import { TaFormConfig } from 'projects/ta-form/src/lib/ta-form-config';
+import { switchMap, catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-company',
@@ -45,7 +47,7 @@ export class CompanyComponent {
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
               label: 'Name',
-              placeholder: 'Enter Name',
+              placeholder: 'Enter name',
               required: true,
             }
           },
@@ -55,7 +57,7 @@ export class CompanyComponent {
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
               label: 'Print name',
-              placeholder: 'Enter Name',
+              placeholder: 'Enter name',
               required: true,
             }
           },
@@ -65,7 +67,7 @@ export class CompanyComponent {
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
               label: 'Short name',
-              placeholder: 'Enter Name',
+              placeholder: 'Enter name',
               required: false,
             }
           },
@@ -75,7 +77,7 @@ export class CompanyComponent {
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
               label: 'Phone',
-              placeholder: 'Enter Name',
+              placeholder: 'Enter number',
               required: false,
             }
           },
@@ -85,7 +87,7 @@ export class CompanyComponent {
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
               label: 'Email',
-              placeholder: 'Enter Name',
+              placeholder: 'Enter email',
               required: false,
             }
           },
@@ -95,7 +97,7 @@ export class CompanyComponent {
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
               label: 'Code',
-              placeholder: 'Enter Name',
+              placeholder: 'Enter code',
               required: false,
             }
           },
@@ -104,8 +106,8 @@ export class CompanyComponent {
             type: 'input',
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
-              label: 'num_branches',
-              placeholder: 'Enter Name',
+              label: 'Num branches',
+              placeholder: 'Enter number',
               required: false,
             }
           },
@@ -114,8 +116,8 @@ export class CompanyComponent {
             type: 'input',
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
-              label: 'num_employees',
-              placeholder: 'Enter Name',
+              label: 'Num employees',
+              placeholder: 'Enter number',
               required: false,
             }
           },
@@ -124,8 +126,8 @@ export class CompanyComponent {
             type: 'input',
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
-              label: 'logo',
-              placeholder: 'Enter Name',
+              label: 'Logo',
+              placeholder: 'upload',
               required: false,
             }
           },
@@ -135,7 +137,7 @@ export class CompanyComponent {
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
               label: 'Pin code',
-              placeholder: 'Enter Name',
+              placeholder: 'Enter pin code',
               required: false,
             }
           },
@@ -144,7 +146,7 @@ export class CompanyComponent {
             type: 'select',
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
-              label: 'City name',
+              label: 'City',
               dataKey: 'city_id',
               dataLabel: "city_name",
               options: [],
@@ -165,7 +167,7 @@ export class CompanyComponent {
             type: 'select',
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
-              label: 'State name',
+              label: 'State',
               dataKey: 'state_id',
               dataLabel: "state_name",
               options: [],
@@ -208,7 +210,7 @@ export class CompanyComponent {
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
               label: 'Longitude',
-              placeholder: 'Enter Name',
+              placeholder: 'Enter longitude',
               required: false,
             }
           },
@@ -218,7 +220,7 @@ export class CompanyComponent {
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
               label: 'Latitude',
-              placeholder: 'Enter Name',
+              placeholder: 'Enter latitude',
               required: false,
             }
           },
@@ -232,8 +234,8 @@ export class CompanyComponent {
             type: 'textarea',
             className: 'ant-col-11 pr-md m-1',
             templateOptions: {
-              label: 'address',
-              placeholder: 'Enter Name',
+              label: 'Address',
+              placeholder: 'Enter address',
               required: false,
             }
           },
@@ -242,8 +244,8 @@ export class CompanyComponent {
             type:  'textarea',
             className: 'ant-col-11 pr-md m-1',
             templateOptions: {
-              label: 'print_address',
-              placeholder: 'Enter Name',
+              label: 'Print Address',
+              placeholder: 'Enter address',
               required: false,
             }
           },
@@ -257,8 +259,8 @@ export class CompanyComponent {
             type: 'input',
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
-              label: 'website',
-              placeholder: 'Enter Name',
+              label: 'Website',
+              placeholder: 'Enter URL',
               required: false,
             }
           },
@@ -267,8 +269,8 @@ export class CompanyComponent {
             type: 'input',
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
-              label: 'facebook_url',
-              placeholder: 'Enter Name',
+              label: 'Facebook url',
+              placeholder: 'Enter URL',
               required: false,
             }
           },
@@ -277,8 +279,8 @@ export class CompanyComponent {
             type: 'input',
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
-              label: 'skype_id',
-              placeholder: 'Enter Name',
+              label: 'Skype id',
+              placeholder: 'Enter URL',
               required: false,
             }
           },
@@ -287,8 +289,8 @@ export class CompanyComponent {
             type: 'input',
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
-              label: 'twitter handle',
-              placeholder: 'Upload',
+              label: 'Twitter handle',
+              placeholder: 'Enter URL',
               required: false,
             }
           },
@@ -297,7 +299,7 @@ export class CompanyComponent {
             type: 'input',
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
-              label: 'linkedin url',
+              label: 'Linkedin url',
               placeholder: 'Enter Name',
               required: false,
             }
@@ -307,7 +309,7 @@ export class CompanyComponent {
             type: 'input',
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
-              label: 'pan',
+              label: 'PAN',
               placeholder: 'Enter Name',
               required: false,
             }
@@ -317,7 +319,7 @@ export class CompanyComponent {
             type: 'input',
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
-              label: 'tan',
+              label: 'TAN',
               placeholder: 'Enter Name',
               required: false,
             }
@@ -327,7 +329,7 @@ export class CompanyComponent {
             type: 'input',
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
-              label: 'cin',
+              label: 'CIN',
               placeholder: 'Enter Name',
               required: false,
             }
@@ -337,7 +339,7 @@ export class CompanyComponent {
             type: 'input',
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
-              label: 'gst_tin',
+              label: 'GST TIN',
               placeholder: 'Enter Name',
               required: false,
             }
@@ -347,7 +349,7 @@ export class CompanyComponent {
             type: 'input',
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
-              label: 'establishment_code',
+              label: 'Establishment code',
               placeholder: 'Enter Name',
               required: false,
             }
@@ -357,7 +359,7 @@ export class CompanyComponent {
             type: 'input',
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
-              label: 'esi_no',
+              label: 'ESI no',
               placeholder: 'Enter Name',
               required: false,
             }
@@ -367,7 +369,7 @@ export class CompanyComponent {
             type: 'input',
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
-              label: 'pf_no',
+              label: 'PF no',
               placeholder: 'Enter Name',
               required: false,
             }
@@ -377,7 +379,7 @@ export class CompanyComponent {
             type: 'input',
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
-              label: 'authorized_person',
+              label: 'Authorized person',
               placeholder: 'Enter Name',
               required: false,
             }
@@ -387,7 +389,7 @@ export class CompanyComponent {
             type: 'input',
             className: 'ant-col-4 pr-md m-3',
             templateOptions: {
-              label: 'iec_code',
+              label: 'IEC code',
               placeholder: 'Enter Name',
               required: false,
             }
@@ -409,7 +411,7 @@ export class CompanyComponent {
                 type: 'input',
                 className: 'ant-col-4 pr-md m-3',
                 templateOptions: {
-                  label: 'eway username',
+                  label: 'E-Way username',
                   placeholder: 'Enter Name',
                   required: false,
                 }
@@ -419,7 +421,7 @@ export class CompanyComponent {
                 type: 'input',
                 className: 'ant-col-4 pr-md m-3',
                 templateOptions: {
-                  label: 'eway password',
+                  label: 'E-Way password',
                   placeholder: 'Enter Name',
                   required: false,
                 }
@@ -449,7 +451,7 @@ export class CompanyComponent {
                 type: 'checkbox',
                 className: 'ant-col-4 pr-md m-3',
                 templateOptions: {
-                  label: 'E-invoice approved only',
+                  label: 'E-Invoice approved only',
                   placeholder: 'Enter Name',
                   required: false,
                 }
@@ -552,22 +554,45 @@ export class CompanyComponent {
   }
   constructor(private router: Router, private activeRouter: ActivatedRoute, private http: HttpClient) {}
 
+  // ngOnInit(): void {
+  //   this.http.get('company/companies/').subscribe((res: any) => {
+  //     this.formConfig.model = res.data;
+  //     // Check if the object is empty
+  //     if (!res || res === 0) {
+  //       this.showForm = true;
+  //     } else {
+  //       const id = res.data[0].company_id;
+  //       this.title = "company";
+  //       const url = `company/companies/${id}/`;
+  //       this.http.get(url).subscribe(res => {
+  //         this.formConfig.model = res;
+  //         this.showForm = true;
+  //       })
+  //     }
+  //   })
+  // }
+
   ngOnInit(): void {
-    this.http.get('company/companies/').subscribe((res: any) => {
-      this.formConfig.model = res.data;
-      // Check if the object is empty
-      if (!res || res === 0) {
-        console.log('Data is empty');
-        this.showForm = true;
-      } else {
-        const id = res.data[0].company_id;
-        this.title = "company";
-        const url = `company/companies/${id}/`;
-        this.http.get(url).subscribe(res => {
-          this.formConfig.model = res;
+    this.http.get<{ data: any[] }>('company/companies/').pipe(
+      switchMap(res => {
+        if (!res || !res.data || res.data.length === 0) {
           this.showForm = true;
-        })
+          return of(null); // Return an observable with null value
+        } else {
+          const id = res.data[0].company_id;
+          this.title = 'company';
+          const url = `company/companies/${id}/`;
+          return this.http.get(url);
+        }
+      }),
+      catchError(err => {
+        return of(null); // Handle the error by returning an observable with null value
+      })
+    ).subscribe(res => {
+      if (res) {
+        this.formConfig.model = res;
       }
-    })
+      this.showForm = true;
+    });
   }
 }
