@@ -104,6 +104,37 @@ export class AdminLayoutComponent {
         ]
       },
       {
+        label: 'Assets',
+        icon: 'fas fa-boxes',
+        child: [
+          {
+            link: '/admin/assets/assets',
+            label: 'Assets',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/assets/asset_statuses',
+            label: 'Asset Statuses',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/assets/asset_categories',
+            label: 'Asset Categories',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/assets/locations',
+            label: 'Locations',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/assets/asset_maintenance',
+            label: 'Asset Maintenance',
+            icon: 'fas fa-tachometer-alt',
+          },
+        ]
+      },
+      {
         link: '/admin/master',
         label: 'Master',
         icon: 'fas fa-cog',
