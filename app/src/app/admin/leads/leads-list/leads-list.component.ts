@@ -49,10 +49,10 @@ export class LeadsListComponent {
       },
       {
         fieldKey: 'lead_status_id',
-        name: 'lead_status_id',
+        name: 'Lead Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.lead_status_id.lead_status_id}`;
+          return `${row.lead_status_id}`;
         },
         sort: true
       },
@@ -66,15 +66,14 @@ export class LeadsListComponent {
             label: 'Delete',
             confirm: true,
             confirmMsg: "Sure to delete?",
-            apiUrl: 'sales/sale_order'
+            apiUrl: 'leads/leads'
           },
           {
             type: 'callBackFn',
             label: 'Edit',
             callBackFn: (row, action) => {
-              console.log(row);
-              this.edit.emit(row.sale_order_id);
-              // this.router.navigateByUrl('/admin/sales/edit/' + row.sale_order_id);
+              this.edit.emit(row.lead_id);
+              // this.router.navigateByUrl('leads/leads/' + row.lead_id);
             }
           }
         ]
