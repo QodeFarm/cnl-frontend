@@ -1,1 +1,18 @@
-<p>leads works!</p>
+<div class="container-fluid pt-3">
+    <div class="sales-banner">
+        <div class="col-12 px-1" style="display: flex; justify-content: space-between;">
+            <button type="button" class="btn pl-0" style="color: black;">
+                <b *ngIf="LeadsEditID">Update Leads</b>
+                <b *ngIf="!LeadsEditID">Create Leads</b>
+            </button>
+            <button (click)="showLeadsListFn()" type="button" class="button" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                Leads List
+            </button>
+        </div>
+    </div>
+    <div class="row">
+        <div>
+            <ta-form [options]="formConfig"></ta-form>
+        </div>
+    </div>
+</div>

@@ -119,7 +119,7 @@ export class AdminLayoutComponent {
       },
       {
         label: 'HRMS',
-        icon: 'fas fa-file-invoice-dollar',
+        icon: 'fas fa-lock',
         child: [
           {
             link: '/admin/hrms/designations',
@@ -140,7 +140,7 @@ export class AdminLayoutComponent {
       },
       {
         label: 'LEADS',
-        icon: 'fas fa-file-invoice-dollar',
+        icon: 'fas fa-star fa-fw',
         child: [
           {
             link: '/admin/leads',
@@ -156,22 +156,7 @@ export class AdminLayoutComponent {
             link: '/admin/leads/interaction_types',
             label: 'Interaction types',
             icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/leads/lead_assignments',
-            label: 'Lead assignments',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/leads/lead_interactions',
-            label: 'Lead interactions',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/leads/lead_assignment_history',
-            label: 'Lead assignment history',
-            icon: 'fas fa-tachometer-alt',
-          },
+          }
         ]
       },
     ]

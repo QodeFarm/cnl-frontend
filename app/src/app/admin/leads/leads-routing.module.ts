@@ -1,7 +1,14 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { LeadsComponent } from './leads.component';
+import { LeadingComment } from '@angular/compiler';
 
-const routes: Routes = [];
+const routes: Routes = [
+  {
+    path: '',
+    component: LeadsComponent,
+  },
+];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
