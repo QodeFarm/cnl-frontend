@@ -455,6 +455,20 @@ export class SalesComponent {
                   }
                 }
               },
+
+              {
+                type: 'input',
+                key: 'sales_rate',
+                // defaultValue: 1000,
+                templateOptions: {
+                  label: 'Rate',
+                  placeholder: 'Enter Rate',
+                  hideLabel: true,
+                  // type: 'number',
+                  // // required: true
+                },
+              },
+
               {
                 type: 'input',
                 key: 'amount',
@@ -462,18 +476,6 @@ export class SalesComponent {
                 templateOptions: {
                   label: 'Amount',
                   placeholder: 'Enter Amount',
-                  hideLabel: true,
-                  // type: 'number',
-                  // // required: true
-                },
-              },
-              {
-                type: 'input',
-                key: 'amount',
-                // defaultValue: 1000,
-                templateOptions: {
-                  label: 'Rate',
-                  placeholder: 'Enter Rate',
                   hideLabel: true,
                   // type: 'number',
                   // // required: true
@@ -505,7 +507,7 @@ export class SalesComponent {
                 key: 'print_name',
                 // defaultValue: 1000,
                 templateOptions: {
-                  label: 'Product Print name',
+                  label: 'Print name',
                   placeholder: 'Enter Product Print name',
                   hideLabel: true,
                   // type: 'number',
@@ -543,6 +545,30 @@ export class SalesComponent {
                 templateOptions: {
                   label: 'Remarks',
                   placeholder: 'Enter Remarks',
+                  hideLabel: true,
+                  // type: 'number',
+                  // // required: true mrp tax 
+                },
+              },
+              {
+                type: 'input',
+                key: 'tax',
+                // defaultValue: 1000,
+                templateOptions: {
+                  label: 'HSN',
+                  placeholder: 'Tax',
+                  hideLabel: true,
+                  // type: 'number',
+                  // // required: true mrp tax 
+                },
+              },
+              {
+                type: 'input',
+                key: 'tax',
+                // defaultValue: 1000,
+                templateOptions: {
+                  label: 'Barcode',
+                  placeholder: 'Barcode',
                   hideLabel: true,
                   // type: 'number',
                   // // required: true mrp tax 
