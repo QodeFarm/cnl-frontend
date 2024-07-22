@@ -53,6 +53,15 @@ export class AssetsComponent {
           },
         },
         {
+          fieldKey: 'unit_options_id',
+          name: 'Unit Options',
+          sort: true,
+          displayType: "map",
+          mapFn: (currentValue: any, row: any, col: any) => {
+            return `${row.unit_options.unit_name}`;
+          },
+        },
+        {
           fieldKey: 'location_id',
           name: 'Location',
           sort: true,
@@ -173,6 +182,27 @@ export class AssetsComponent {
             options: [],
             lazy: {
               url: 'http://195.35.20.172:8000/api/v1/assets/asset_statuses/',
+              lazyOneTime: true
+            },
+            required: true
+          },
+          hooks: {
+            onInit: (field: any) => {
+              //field.templateOptions.options = this.cs.getRole();
+            }
+          }
+        },
+        {
+          key: 'unit_options',
+          type: 'select',
+          className: 'ta-cell pr-md col-md-6 col-12',
+          templateOptions: {
+            label: 'Unit Options',
+            dataKey: 'unit_options_id',
+            dataLabel: "unit_name",
+            options: [],
+            lazy: {
+              url: 'http://195.35.20.172:8000/api/v1/masters/unit_options/',
               lazyOneTime: true
             },
             required: true
