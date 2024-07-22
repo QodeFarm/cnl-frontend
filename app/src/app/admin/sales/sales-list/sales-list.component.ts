@@ -1,24 +1,26 @@
-import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Output } from '@angular/core';
-import { Router } from '@angular/router';
-import { TaTableConfig } from '@ta/ta-table';
+import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { TaTableConfig } from '@ta/ta-table';
+import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-purchase-list',
+  selector: 'app-sales-list',
   standalone: true,
   imports: [CommonModule, AdminCommmonModule],
-  templateUrl: './purchase-list.component.html',
-  styleUrls: ['./purchase-list.component.scss']
+  templateUrl: './sales-list.component.html',
+  styleUrls: ['./sales-list.component.scss']
 })
-export class PurchaseListComponent {
-  
+export class SalesListComponent {
+
   @Output('edit') edit = new EventEmitter<void>();
-  
+
+
   tableConfig: TaTableConfig = {
-    apiUrl: 'purchase/purchase_orders_get/',
+    apiUrl: 'sales/sale_order/',
+    // title: 'Edit Sales Order List',
     showCheckbox:true,
-    pkId: "purchase_order_id",
+    pkId: "sale_order_id",
     pageSize: 10,
     "globalSearch": {
       keys: ['id', 'first_name', 'last_name']
@@ -35,8 +37,8 @@ export class PurchaseListComponent {
         sort: true
       },
       {
-        fieldKey: 'purchase_type',
-        name: 'Purchase Type',
+        fieldKey: 'sale_type',
+        name: 'Sale Type',
         sort: true,
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
@@ -46,35 +48,53 @@ export class PurchaseListComponent {
       },
 
       {
-        fieldKey: 'vendor',
-        name: 'Vendor',
+        fieldKey: 'customer',
+        name: 'Customer',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.vendor.name}`;
+          return `${row.customer.name}`;
         },
         sort: true
       },
       {
         fieldKey: 'item_value',
         name: 'Amount',
-        sort: false
+        sort: true
       },
       {
-        fieldKey: 'tax',
+        fieldKey: 'phone',
         name: 'Tax',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'advance_amount',
-        name: 'Advance Amount',
-        sort: false
+        name: 'Advance Amt',
+        sort: true
       },
+      // {
+      //   fieldKey: 'job_type_id',
+      //   name: 'Document Status',
+      //   displayType: "map",
+      //   mapFn: (currentValue: any, row: any, col: any) => {
+      //     return `${row.job_type_id.job_type_name}`;
+      //   },
+      //   sort: true
+      // },
+      // {
+      //   fieldKey: 'job_code_id',
+      //   name: 'Print Count',
+      //   displayType: "map",
+      //   mapFn: (currentValue: any, row: any, col: any) => {
+      //     return `${row.job_code_id.job_code}`;
+      //   },
+      //   sort: true
+      // },
       {
-        fieldKey: 'order_status',
+        fieldKey: 'status',
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.order_status.status_name}`;
+          // return `${row.job_code_id.job_code}`;
         },
         sort: true
       },
@@ -86,16 +106,17 @@ export class PurchaseListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            // confirm: true,
-            // confirmMsg: "Sure to delete?",
-            apiUrl: 'purchase/purchase_orders_get'
+            confirm: true,
+            confirmMsg: "Sure to delete?",
+            apiUrl: 'sales/sale_order'
           },
           {
             type: 'callBackFn',
             label: 'Edit',
             callBackFn: (row, action) => {
               console.log(row);
-              this.edit.emit(row.purchase_order_id);
+              this.edit.emit(row.sale_order_id);
+              // this.router.navigateByUrl('/admin/sales/edit/' + row.sale_order_id);
             }
           }
         ]
@@ -107,4 +128,3 @@ export class PurchaseListComponent {
 
   }
 }
-

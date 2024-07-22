@@ -25,12 +25,15 @@
 <!-- [nzTitle]="options.title"  (nzQueryParams)="onQueryParamsChange($event)"-->
 <nz-table #taTable nzShowSizeChanger [nzPageSizeOptions]="options.pageSizeOptions" [nzTableLayout]="options.tableLayout"
     [nzBordered]="options.bordered" [nzScroll]="{ x: options.scrollX, y: options.scrollY }" [nzData]="rows"
-    [nzFrontPagination]="false" [nzShowTotal]="totalTemplate" [nzLoading]="loading" [nzTotal]="total"
+    [nzFrontPagination]="true" [nzShowTotal]="totalTemplate" [nzLoading]="loading" [nzTotal]="total"
     [nzPageSize]="options.pageSize" (nzQueryParams)="onQueryParamsChange($event)" [nzPageIndex]="pageIndex"
     [nzPaginationPosition]="options.paginationPosition">
     <thead>
         <tr>
+            <th *ngIf="options.showCheckbox" style="width: 50px;" [nzChecked]="false" nzLabel="Select all"></th>
+
             <ng-container *ngFor="let c of options.cols">
+
                 <th (nzSortOrderChange)="nzSortOrderChange($event)" [nzColumnKey]="c.sortKey || c.fieldKey"
                     [nzFilterFn]="false" [nzSortDirections]="(c.sort)?[]:[null]" [nzSortOrder]="c.sortOrder"
                     [nzSortFn]="c.sort" [nzWidth]="c.width" nzCustomFilter>{{c.name}} 
@@ -57,6 +60,9 @@
     </thead>
     <tbody>
         <tr *ngFor="let data of rows">
+            <td *ngIf="options.showCheckbox" style="width: 50px;" [nzChecked]="false" 
+            [nzDisabled]="false" [nzLabel]="data.name"></td>
+
             <td [ngClass]="c.tdClassName" *ngFor="let c of options.cols" [nzEllipsis]="c.ellipsis">
                 <label class="col-name">{{c.name}} :</label>
                 <ng-container *ngTemplateOutlet="(c.type==='action') ? actions : datalable; context:{col:c,row:data }">

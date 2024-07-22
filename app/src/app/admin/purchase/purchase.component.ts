@@ -19,15 +19,15 @@ export class PurchaseComponent {
   }
   ngOnInit() {
     this.showPurchaseOrderList = false;
-    this.showForm = false;
+    this.showForm = true;
     // set form config
     this.setFormConfig();
     console.log('this.formConfig', this.formConfig);
 
     // set purchase_order default value
-    this.formConfig.model['purchase_order']['order_type'] = 'purchase_order';
+    this.formConfig.model['purchase_order_data']['order_type'] = 'purchase_order';
 
-    // to get SaleOrder number for save
+    // to get PurchaseOrder number for save
     this.getOrderNo();
   }
   formConfig: TaFormConfig = {};
@@ -45,7 +45,7 @@ export class PurchaseComponent {
 
         this.formConfig.model = res.data;
         // set purchase_order default value
-        this.formConfig.model['purchase_order']['order_type'] = 'purchase_order';
+        this.formConfig.model['purchase_order_data']['order_type'] = 'purchase_order';
         // set labels for update
         this.formConfig.submit.label = 'Update';
         // show form after setting form values
@@ -63,11 +63,12 @@ export class PurchaseComponent {
   getOrderNo() {
     // this.formConfig.reset()
     this.orderNumber = null;
-    this.http.get('masters/generate_order_no/?type=SO').subscribe((res: any) => {
+    this.http.get('masters/generate_order_no/?type=PO').subscribe((res: any) => {
       console.log(res);
       if (res && res.data && res.data.order_number) {
-        this.formConfig.model['purchase_order']['order_no'] = res.data.order_number;
+        this.formConfig.model['purchase_order_data']['order_no'] = res.data.order_number;
         this.orderNumber = res.data.order_number;
+        console.log("PurchaseOrder NO: ", this.orderNumber);
         console.log("get PurchaseOrder number called");
 
         // set purchase_order default value
@@ -108,7 +109,7 @@ export class PurchaseComponent {
 
       },
       model: {
-        purchase_order: {},
+        purchase_order_data: {},
         purchase_order_items: [{}],
         order_attachments: [],
         order_shipments: {}
@@ -135,7 +136,7 @@ export class PurchaseComponent {
                 }
               },
               // expressionProperties: {
-              //   'templateOptions.disabled': this.SaleOrderEditID ? 'true' : 'fa'
+              //   'templateOptions.disabled': this.PurchaseOrderEditID ? 'true' : 'fa'
               // }
             },
             {
@@ -145,7 +146,7 @@ export class PurchaseComponent {
               // defaultValue: "d4d85a98-a703-4772-8b3c-736fc4cbf849",
               templateOptions: {
                 label: 'Purchase type',
-                dataKey: 'name',
+                dataKey: 'purchase_type_id',
                 dataLabel: "name",
                 options: [],
                 // required: true,
@@ -158,19 +159,19 @@ export class PurchaseComponent {
                 onChanges: (field: any) => {
                   field.formControl.valueChanges.subscribe(data => {
                     console.log("purchase_type", data);
-                    if (data && data.sale_type_id) {
-                      this.formConfig.model['purchase_order']['purchase_type_id'] = data.purchase_type_id;
+                    if (data && data.purchase_type_id) {
+                      this.formConfig.model['purchase_order_data']['purchase_type_id'] = data.purchase_type_id;
                     }
                   });
                 }
               }
             },
             {
-              key: 'vendor_id',
+              key: 'vendor',
               type: 'select',
               className: 'ant-col-4 pr-md m-3',
               templateOptions: {
-                label: 'Vendors',
+                label: 'Vendor',
                 dataKey: 'vendor_id',
                 dataLabel: "name",
                 options: [],
@@ -184,13 +185,13 @@ export class PurchaseComponent {
               hooks: {
                 onChanges: (field: any) => {
                   field.formControl.valueChanges.subscribe(data => {
-                    console.log("vendors", data);
+                    // console.log("vendors", data);
                     if (data && data.vendor_id) {
-                      this.formConfig.model['purchase_order']['vendor_id'] = data.vendor_id;
+                      this.formConfig.model['purchase_order_data']['vendor_id'] = data.vendor_id;
                     }
 
-                    // if (field.form && field.form.controls && field.form.controls.vendor_id) {
-                    //   field.form.controls.vendor_id.setValue(data.vendor_id)
+                    // if (field.form && field.form.controls && field.form.controls.customer_id) {
+                    //   field.form.controls.customer_id.setValue(data.customer_id)
                     // }
                     // if (field.form && field.form.controls && field.form.controls.customer_address_id) {
                     //   field.form.controls.customer_address_id.setValue(data.customer_category_id)
@@ -215,6 +216,30 @@ export class PurchaseComponent {
               },
               hooks: {
                 onInit: (field: any) => { }
+              }
+            },
+            {
+              key: 'advance_amount',
+              type: 'input',
+              // defaultValue: "7777700",
+              className: 'ant-col-4 pr-md m-3',
+              templateOptions: {
+                type: 'input',
+                label: 'ADV.Amount',
+                placeholder: 'Enter ADV.Amount',
+                // required: true
+              }
+            },
+            {
+              key: 'item_value',
+              type: 'input',
+              // defaultValue: "7777700",
+              className: 'ant-col-4 pr-md m-3',
+              templateOptions: {
+                type: 'input',
+                label: 'Amount',
+                placeholder: 'Enter Amount',
+                // required: true
               }
             },
             {
@@ -469,33 +494,6 @@ export class PurchaseComponent {
                   }
                 }
               },
-
-              {
-                type: 'input',
-                key: 'sales_rate',
-                // defaultValue: 1000,
-                templateOptions: {
-                  label: 'Rate',
-                  placeholder: 'Enter Rate',
-                  hideLabel: true,
-                  // type: 'number',
-                  // // required: true
-                },
-                hooks: {
-                  onChanges: (field: any) => {
-                    field.formControl.valueChanges.subscribe(data => {
-                      // this.formConfig.model['productQuantity'] = data;
-                      if (field.form && field.form.controls && field.form.controls.quantity && data) {
-                        const quantity = field.form.controls.quantity.value;
-                        const rate = data;
-                        if (rate && quantity) {
-                          field.form.controls.totalAmount.setValue(parseInt(rate) * parseInt(quantity));
-                        }
-                      }
-                    })
-                  }
-                }
-              },
               {
                 type: 'input',
                 key: 'discount',
@@ -544,7 +542,7 @@ export class PurchaseComponent {
               },
               {
                 type: 'input',
-                key: 'totalAmount',
+                key: 'total_amount',
                 templateOptions: {
                   label: 'Amount',
                   placeholder: 'Enter Amount',
@@ -724,30 +722,6 @@ export class PurchaseComponent {
                   fieldGroupClassName: "ant-row",
                   key: 'purchase_order',
                   fieldGroup: [
-        
-                    // {
-                    //   key: 'remarks',
-                    //   type: 'textarea',
-                    //   // defaultValue: 'This is a remark',
-                    //   className: 'ant-col-11 pr-md m-3',
-                    //   templateOptions: {
-                    //     label: 'Remarks',
-                    //     placeholder: 'Enter Remarks',
-                    //     // required: true,
-                    //   }
-                    // },
-                    // {
-                    //   key: 'vehicle_name',
-                    //   type: 'input',
-                    //   // defaultValue: "bike",
-                    //   className: 'ant-col-8 pr-md m-3',
-                    //   templateOptions: {
-                    //     type: 'input',
-                    //     label: 'Vehicle name',
-                    //     placeholder: 'Enter Vehicle name',
-                    //     // required: true
-                    //   }
-                    // },
                     {
                       key: 'total_boxes',
                       type: 'input',
@@ -841,39 +815,39 @@ export class PurchaseComponent {
                           field.formControl.valueChanges.subscribe(data => {
                             console.log("gst_type", data);
                             if (data && data.gst_type_id) {
-                              this.formConfig.model['purchase_order']['gst_type_id'] = data.gst_type_id;
+                              this.formConfig.model['purchase_order_data']['gst_type_id'] = data.gst_type_id;
                             }
                           });
                         }
                       }
                     },
-                    {
-                      key: 'payment_term',
-                      type: 'select',
-                      className: 'ant-col-6 pr-md m-3',
-                      // defaultValue: '3b4cc23d-6dc3-42e9-9894-02624fdf9934',
-                      templateOptions: {
-                        label: 'Payment term',
-                        placeholder: 'Select Payment term',
-                        // required: true,
-                        dataKey: 'name',
-                        dataLabel: "name",
-                        lazy: {
-                          url: 'masters/customer_payment_terms/',
-                          lazyOneTime: true
-                        }
-                      },
-                      hooks: {
-                        onChanges: (field: any) => {
-                          field.formControl.valueChanges.subscribe(data => {
-                            console.log("payment_term", data);
-                            if (data && data.payment_term_id) {
-                              this.formConfig.model['purchase_order']['payment_term_id'] = data.payment_term_id;
-                            }
-                          });
-                        }
-                      }
-                    },
+                    // {
+                    //   key: 'payment_term',
+                    //   type: 'select',
+                    //   className: 'ant-col-6 pr-md m-3',
+                    //   // defaultValue: '3b4cc23d-6dc3-42e9-9894-02624fdf9934',
+                    //   templateOptions: {
+                    //     label: 'Payment term',
+                    //     placeholder: 'Select Payment term',
+                    //     // required: true,
+                    //     dataKey: 'name',
+                    //     dataLabel: "name",
+                    //     lazy: {
+                    //       url: 'masters/customer_payment_terms/',
+                    //       lazyOneTime: true
+                    //     }
+                    //   },
+                    //   hooks: {
+                    //     onChanges: (field: any) => {
+                    //       field.formControl.valueChanges.subscribe(data => {
+                    //         console.log("payment_term", data);
+                    //         if (data && data.payment_term_id) {
+                    //           this.formConfig.model['purchase_order_data']['payment_term_id'] = data.payment_term_id;
+                    //         }
+                    //       });
+                    //     }
+                    //   }
+                    // },
                     {
                       key: 'ledger_account',
                       type: 'select',
@@ -894,12 +868,44 @@ export class PurchaseComponent {
                           field.formControl.valueChanges.subscribe(data => {
                             console.log("ledger_account", data);
                             if (data && data.ledger_account_id) {
-                              this.formConfig.model['purchase_order']['ledger_account_id'] = data.ledger_account_id;
+                              this.formConfig.model['purchase_order_data']['ledger_account_id'] = data.ledger_account_id;
                             }
                           });
                         }
                       }
                     },
+                    // {
+                    //   key: 'order_type',
+                    //   type: 'select',
+                    //   // defaultValue: '0d790583-50b3-4bb7-930c-c99f2d2fe526',
+                    //   className: 'ant-col-6 pr-md m-3',
+                    //   templateOptions: {
+                    //     label: 'Order Type',
+                    //     dataKey: 'name',
+                    //     dataLabel: "name",
+                    //     placeholder: 'Select Order type',
+                    //     // required: true,
+                    //     defaultValue: 'purchase_order',
+                    //     lazy: {
+                    //       url: 'masters/order_types/',
+                    //       lazyOneTime: true
+                    //     }
+                    //   },
+                    //   hooks: {
+                    //     onChanges: (field: any) => {
+                    //       field.formControl.valueChanges.subscribe(data => {
+                    //         console.log("order_type", data);
+                    //         if (data.purchase_order) {
+                    //           console.log("order_type:", data.name);
+                    //           this.formConfig.model['purchase_order_data']['order_type'] = data.purchase_order;
+                    //         }
+                    //       });
+                    //       // if (!field.formControl.value) {
+                    //       //   field.formControl.setValue('purchase_order');
+                    //       // }
+                    //     }
+                    //   }
+                    // },
                     {
                       key: 'order_status',
                       type: 'select',
@@ -921,7 +927,7 @@ export class PurchaseComponent {
                           field.formControl.valueChanges.subscribe(data => {
                             console.log("order_status", data);
                             if (data && data.order_status_id) {
-                              this.formConfig.model['purchase_order']['order_status_id'] = data.order_status_id;
+                              this.formConfig.model['purchase_order_data']['order_status_id'] = data.order_status_id;
                             }
                           });
                         }
@@ -930,7 +936,7 @@ export class PurchaseComponent {
                     {
                       key: 'item_value',
                       type: 'input',
-                      defaultValue: "0",
+                      // defaultValue: "0",
                       className: 'ant-col-6 pr-md m-3',
                       templateOptions: {
                         type: 'input',
