@@ -82,9 +82,16 @@ export class AdminLayoutComponent {
         ]
       },
       {
-        link: '/admin/dashboard',
+        // link: '/admin/purchase/purchase',
         label: 'Purchase',
         icon: 'fas fa-hand-holding-usd',
+        child: [
+          {
+            link: '/admin/purchase/purchase',
+            label: 'Purchase',
+            icon: 'fas fa-tachometer-alt',
+          }
+        ]
       },
       {
         link: '/admin/dashboard',
