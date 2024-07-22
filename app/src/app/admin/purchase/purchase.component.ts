@@ -821,33 +821,33 @@ export class PurchaseComponent {
                         }
                       }
                     },
-                    // {
-                    //   key: 'payment_term',
-                    //   type: 'select',
-                    //   className: 'ant-col-6 pr-md m-3',
-                    //   // defaultValue: '3b4cc23d-6dc3-42e9-9894-02624fdf9934',
-                    //   templateOptions: {
-                    //     label: 'Payment term',
-                    //     placeholder: 'Select Payment term',
-                    //     // required: true,
-                    //     dataKey: 'name',
-                    //     dataLabel: "name",
-                    //     lazy: {
-                    //       url: 'masters/customer_payment_terms/',
-                    //       lazyOneTime: true
-                    //     }
-                    //   },
-                    //   hooks: {
-                    //     onChanges: (field: any) => {
-                    //       field.formControl.valueChanges.subscribe(data => {
-                    //         console.log("payment_term", data);
-                    //         if (data && data.payment_term_id) {
-                    //           this.formConfig.model['purchase_order_data']['payment_term_id'] = data.payment_term_id;
-                    //         }
-                    //       });
-                    //     }
-                    //   }
-                    // },
+                    {
+                      key: 'payment_term_id',
+                      type: 'select',
+                      className: 'ant-col-6 pr-md m-3',
+                      // defaultValue: '3b4cc23d-6dc3-42e9-9894-02624fdf9934',
+                      templateOptions: {
+                        label: 'Payment term',
+                        placeholder: 'Select Payment term',
+                        // required: true,
+                        dataKey: 'payment_term_id',
+                        dataLabel: "name",
+                        lazy: {
+                          url: 'vendors/vendor_payment_terms/',
+                          lazyOneTime: true
+                        }
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          field.formControl.valueChanges.subscribe(data => {
+                            console.log("payment_term", data);
+                            if (data && data.payment_term_id) {
+                              this.formConfig.model['purchase_order_data']['payment_term_id'] = data.payment_term_id;
+                            }
+                          });
+                        }
+                      }
+                    },
                     {
                       key: 'ledger_account',
                       type: 'select',
