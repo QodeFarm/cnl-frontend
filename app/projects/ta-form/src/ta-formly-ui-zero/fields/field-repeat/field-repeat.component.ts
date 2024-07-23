@@ -10,4 +10,7 @@ export class FieldRepeatComponent extends FieldArrayType {
   constructor() {
     super();
   }
+  ngOnInit(): void {
+    console.log(this.field, this.field.fieldGroup);
+  }
 }

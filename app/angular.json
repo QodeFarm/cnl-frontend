@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "hrms": {
+    "cnl": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/hrms",
+            "outputPath": "dist/cnl",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [
@@ -57,7 +57,7 @@
                 {
                   "type": "anyComponentStyle",
                   "maximumWarning": "2kb",
-                  "maximumError": "4kb"
+                  "maximumError": "40kb"
                 }
               ],
               "outputHashing": "all"
@@ -77,10 +77,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "hrms:build:production"
+              "browserTarget": "cnl:build:production"
             },
             "development": {
-              "browserTarget": "hrms:build:development"
+              "browserTarget": "cnl:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -88,7 +88,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "hrms:build"
+            "browserTarget": "cnl:build"
           }
         },
         "test": {
