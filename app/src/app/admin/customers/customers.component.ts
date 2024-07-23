@@ -16,9 +16,7 @@ export class CustomersComponent {
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
-    // console.log("Started customer list")
     this.showCustomerList = false;
-    // console.log("showing customer list")
     this.showForm = true;  //temporary change 'true'
     // Set form config
     this.setFormConfig();
@@ -42,9 +40,7 @@ export class CustomersComponent {
         this.formConfig.submit.label = 'Update';
         // Show form after setting form values
         this.formConfig.pkId = 'customer_id';
-        console.log("Edit runnnig")
         this.formConfig.model['customer_id'] = this.CustomerEditID;
-        console.log("showfarm runnnig")
         this.showForm = true;
       }
     });
@@ -176,7 +172,6 @@ export class CustomersComponent {
                 dataLabel: 'name',
                 label: 'Firm Status',
                 placeholder: 'Firm Status',
-                required: true,
                 lazy: {
                   url: 'masters/firm_statuses/',
                   lazyOneTime: true
@@ -204,7 +199,6 @@ export class CustomersComponent {
                 dataLabel: 'name',
                 label: 'Territory',
                 placeholder: 'Territory',
-                required: true,
                 lazy: {
                   url: 'masters/territory/',
                   lazyOneTime: true
@@ -232,7 +226,6 @@ export class CustomersComponent {
                 dataLabel: 'name',
                 label: 'Category',
                 placeholder: 'Category',
-                required: true,
                 lazy: {
                   url: 'masters/customer_categories/',
                   lazyOneTime: true
@@ -267,6 +260,33 @@ export class CustomersComponent {
               templateOptions: {
                 label: 'Picture',
                 placeholder: 'Enter Picture URL',
+              }
+            },
+            {
+              key: 'gst_category',
+              type: 'select',
+              className: 'ant-col-4 pr-md m-3',
+              templateOptions: {
+                dataKey: 'gst_category_id',
+                dataLabel: 'name',
+                label: 'GST Category',
+                placeholder: 'GST Category',
+                lazy: {
+                  url: 'masters/gst_categories/',
+                  lazyOneTime: true
+                }
+              },
+              hooks: {
+                onChanges: (field: any) => {
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    console.log('customer_category', data);
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
+                      this.formConfig.model['customer_data']['gst_category_id'] = data.gst_category_id;
+                    } else {
+                      console.error('Form config or customer data model is not defined.');
+                    }
+                  });
+                }
               }
             },
             {
@@ -307,34 +327,6 @@ export class CustomersComponent {
               }
             },
             {
-              key: 'gst_category',
-              type: 'select',
-              className: 'ant-col-4 pr-md m-3',
-              templateOptions: {
-                dataKey: 'gst_category_id',
-                dataLabel: 'name',
-                label: 'GST Category',
-                placeholder: 'GST Category',
-                required: true,
-                lazy: {
-                  url: 'masters/gst_categories/',
-                  lazyOneTime: true
-                }
-              },
-              hooks: {
-                onChanges: (field: any) => {
-                  field.formControl.valueChanges.subscribe((data: any) => {
-                    console.log('customer_category', data);
-                    if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
-                      this.formConfig.model['customer_data']['gst_category_id'] = data.gst_category_id;
-                    } else {
-                      console.error('Form config or customer data model is not defined.');
-                    }
-                  });
-                }
-              }
-            },
-            {
               className: 'ant-col-4 pr-md m-3',
               key: 'tax_type',
               type: 'select',
@@ -346,6 +338,33 @@ export class CustomersComponent {
                   { value: 'Exclusive', label: 'Exclusive' }
                 ],
                 required: true,
+              }
+            },
+            {
+              key: 'transporter',
+              type: 'select',
+              className: 'ant-col-4 pr-md m-3',
+              templateOptions: {
+                dataKey: 'transporter_id',
+                dataLabel: 'name',
+                label: 'Transporters',
+                placeholder: 'Transporters',
+                lazy: {
+                  url: 'masters/transporters/',
+                  lazyOneTime: true
+                }
+              },
+              hooks: {
+                onChanges: (field: any) => {
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    console.log('transporter', data);
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
+                      this.formConfig.model['customer_data']['transporter_id'] = data.transporter_id;
+                    } else {
+                      console.error('Form config or customer data model is not defined.');
+                    }
+                  });
+                }
               }
             },
             {
@@ -412,7 +431,6 @@ export class CustomersComponent {
                 dataLabel: 'name',
                 label: 'Payment Term',
                 placeholder: 'Payment Term',
-                required: true,
                 lazy: {
                   url: 'masters/customer_payment_terms/',
                   lazyOneTime: true
@@ -440,7 +458,6 @@ export class CustomersComponent {
                 dataLabel: 'name',
                 label: 'Price Category',
                 placeholder: 'Price Category',
-                required: true,
                 lazy: {
                   url: 'masters/price_categories/',
                   lazyOneTime: true
@@ -469,31 +486,19 @@ export class CustomersComponent {
               }
             },
             {
-              key: 'transporter',
-              type: 'select',
               className: 'ant-col-4 pr-md m-3',
+              key: 'tds_on_gst_applicable',
+              type: 'checkbox',
               templateOptions: {
-                dataKey: 'transporter_id',
-                dataLabel: 'name',
-                label: 'Price Category',
-                placeholder: 'Price Category',
-                required: true,
-                lazy: {
-                  url: 'masters/transporters/',
-                  lazyOneTime: true
-                }
-              },
-              hooks: {
-                onChanges: (field: any) => {
-                  field.formControl.valueChanges.subscribe((data: any) => {
-                    console.log('transporter', data);
-                    if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
-                      this.formConfig.model['customer_data']['transporter_id'] = data.transporter_id;
-                    } else {
-                      console.error('Form config or customer data model is not defined.');
-                    }
-                  });
-                }
+                label: 'TDS on GST Applicable',
+              }
+            },
+            {
+              className: 'ant-col-4 pr-md m-3',
+              key: 'tds_applicable',
+              type: 'checkbox',
+              templateOptions: {
+                label: 'TDS Applicable',
               }
             },
             {
@@ -534,22 +539,6 @@ export class CustomersComponent {
                 label: 'GST Suspend',
               }
             },
-            {
-              className: 'ant-col-4 pr-md m-3',
-              key: 'tds_on_gst_applicable',
-              type: 'checkbox',
-              templateOptions: {
-                label: 'TDS on GST Applicable',
-              }
-            },
-            {
-              className: 'ant-col-4 pr-md m-3',
-              key: 'tds_applicable',
-              type: 'checkbox',
-              templateOptions: {
-                label: 'TDS Applicable',
-              }
-            },
           ]
       },
       {
@@ -562,7 +551,7 @@ export class CustomersComponent {
           fieldGroupClassName: 'row',
           fieldGroup: [
           {
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-10 pr-md m-3',
             key: 'attachment_name',
             type: 'input',
             templateOptions: {
@@ -572,7 +561,7 @@ export class CustomersComponent {
             }
           },
           {
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-10 pr-md m-3',
             key: 'attachment_path',
             type: 'input',
             templateOptions: {
@@ -685,7 +674,6 @@ export class CustomersComponent {
                   dataLabel: 'country_name',
                   label: 'Country',
                   placeholder: 'Select Country',
-                  required: true,
                   lazy: {
                     url: 'masters/country/',
                     lazyOneTime: true
