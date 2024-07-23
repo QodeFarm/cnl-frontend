@@ -219,30 +219,6 @@ export class PurchaseComponent {
               }
             },
             {
-              key: 'advance_amount',
-              type: 'input',
-              // defaultValue: "7777700",
-              className: 'ant-col-4 pr-md m-3',
-              templateOptions: {
-                type: 'input',
-                label: 'ADV.Amount',
-                placeholder: 'Enter ADV.Amount',
-                // required: true
-              }
-            },
-            {
-              key: 'item_value',
-              type: 'input',
-              // defaultValue: "7777700",
-              className: 'ant-col-4 pr-md m-3',
-              templateOptions: {
-                type: 'input',
-                label: 'Amount',
-                placeholder: 'Enter Amount',
-                // required: true
-              }
-            },
-            {
               key: 'delivery_date',
               type: 'date',
               defaultValue: new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate(),

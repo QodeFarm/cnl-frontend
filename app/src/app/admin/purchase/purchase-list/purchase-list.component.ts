@@ -56,7 +56,7 @@ export class PurchaseListComponent {
       },
       {
         fieldKey: 'item_value',
-        name: 'Amount',
+        name: 'Total amount',
         sort: false
       },
       {
