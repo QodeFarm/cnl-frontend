@@ -102,8 +102,13 @@ export class AdminLayoutComponent {
         icon: 'fas fa-hand-holding-usd',
         child: [
           {
-            link: '/admin/purchase/purchase',
+            link: '/admin/purchase',
             label: 'Purchase',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/purchase/invoice',
+            label: 'Purchase Invoice',
             icon: 'fas fa-tachometer-alt',
           }
         ]

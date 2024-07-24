@@ -4,31 +4,31 @@ import { TaFormConfig } from '@ta/ta-form';
 import { distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-purchase',
-  templateUrl: './purchase.component.html',
-  styleUrls: ['./purchase.component.scss']
+  selector: 'app-purchase-invoice',
+  templateUrl: './purchase-invoice.component.html',
+  styleUrls: ['./purchase-invoice.component.scss']
 })
-export class PurchaseComponent {
-  orderNumber: any;
-  showPurchaseOrderList: boolean = false;
+export class PurchaseInvoiceComponent {
+  invoiceNumber: any;
+  showPurchaseInvoiceList: boolean = false;
   showForm: boolean = false;
-  PurchaseOrderEditID: any;
+  PurchaseInvoiceEditID: any;
   productOptions: any;
 
   constructor(private http: HttpClient) {
   }
   ngOnInit() {
-    this.showPurchaseOrderList = false;
+    this.showPurchaseInvoiceList = false;
     this.showForm = true;
     // set form config
     this.setFormConfig();
     console.log('this.formConfig', this.formConfig);
 
     // set purchase_order default value
-    this.formConfig.model['purchase_order_data']['order_type'] = 'purchase_order';
+    this.formConfig.model['purchase_invoice_orders']['order_type'] = 'purchase_invoice';
 
     // to get PurchaseOrder number for save
-    this.getOrderNo();
+    this.getInvoiceNo();
   }
   formConfig: TaFormConfig = {};
 
@@ -36,40 +36,38 @@ export class PurchaseComponent {
     document.getElementById('modalClose').click();
   }
 
-  editPurchaseOrder(event) {
+  editPurchaseInvoice(event) {
     console.log('event', event);
-    this.PurchaseOrderEditID = event;
-    this.http.get('purchase/purchase_order/' + event).subscribe((res: any) => {
+    this.PurchaseInvoiceEditID = event;
+    this.http.get('purchase/purchase_invoice_order/' + event).subscribe((res: any) => {
       console.log('--------> res ', res);
       if (res && res.data) {
 
         this.formConfig.model = res.data;
         // set purchase_order default value
-        this.formConfig.model['purchase_order_data']['order_type'] = 'purchase_order';
+        this.formConfig.model['purchase_invoice_orders']['order_type'] = 'purchase_invoice';
         // set labels for update
         this.formConfig.submit.label = 'Update';
         // show form after setting form values
 
-        // this.formConfig.url= "sales/purchase_order/" + this.PurchaseOrderEditID;
-        this.formConfig.pkId = 'purchase_order_id';
+        this.formConfig.pkId = 'purchase_invoice_id';
 
-        this.formConfig.model['purchase_order_id'] = this.PurchaseOrderEditID;
+        this.formConfig.model['purchase_invoice_id'] = this.PurchaseInvoiceEditID;
         this.showForm = true;
       }
     })
     this.hide();
   }
 
-  getOrderNo() {
-    // this.formConfig.reset()
-    this.orderNumber = null;
-    this.http.get('masters/generate_order_no/?type=PO').subscribe((res: any) => {
+  getInvoiceNo() {
+    this.invoiceNumber = null;
+    this.http.get('masters/generate_order_no/?type=PO-INV').subscribe((res: any) => {
       console.log(res);
       if (res && res.data && res.data.order_number) {
-        this.formConfig.model['purchase_order_data']['order_no'] = res.data.order_number;
-        this.orderNumber = res.data.order_number;
-        console.log("PurchaseOrder NO: ", this.orderNumber);
-        console.log("get PurchaseOrder number called");
+        this.formConfig.model['purchase_invoice_orders']['invoice_no'] = res.data.order_number;
+        this.invoiceNumber = res.data.order_number;
+        console.log("PurchaseInvoice NO: ", this.invoiceNumber);
+        console.log("get PurchaseInvoice number called");
 
         // set purchase_order default value
         // this.formConfig.model['purchase_order']['order_type'] = 'purchase_order';
@@ -77,22 +75,21 @@ export class PurchaseComponent {
     })
   }
 
-  showPurchaseOrderListFn() {
-    this.showPurchaseOrderList = true;
+  showPurchaseInvoiceListFn() {
+    this.showPurchaseInvoiceList = true;
   }
-
   setFormConfig() {
     this.formConfig = {
-      url: "purchase/purchase_order/",
+      url: "purchase/purchase_invoice_order/",
       title: '',
       formState: {
         viewMode: false
       },
       exParams: [
         {
-          key: 'purchase_order_items',
+          key: 'purchase_invoice_items',
           type: 'script',
-          value: 'data.purchase_order_items.map(m=> {m.product_id = m.product.product_id; if(m.product.unit_options){m.unit_options_id = m.product.unit_options.unit_options_id};  if(m.unit_options){m.unit_options_id = m.unit_options.unit_options_id};  return m ;})'
+          value: 'data.purchase_invoice_items.map(m=> {m.product_id = m.product.product_id; if(m.product.unit_options){m.unit_options_id = m.product.unit_options.unit_options_id};  if(m.unit_options){m.unit_options_id = m.unit_options.unit_options_id};  return m ;})'
         },
         // {
         //   key: 'order_attachments',
@@ -109,23 +106,23 @@ export class PurchaseComponent {
 
       },
       model: {
-        purchase_order_data: {},
-        purchase_order_items: [{}],
+        purchase_invoice_orders: {},
+        purchase_invoice_items: [{}],
         order_attachments: [],
         order_shipments: {}
       },
       fields: [
         {
           fieldGroupClassName: "ant-row",
-          key: 'purchase_order_data',
+          key: 'purchase_invoice_orders',
           fieldGroup: [
             {
-              key: 'order_no',
+              key: 'invoice_no',
               type: 'input',
               className: 'ant-col-4 pr-md m-3',
               templateOptions: {
-                label: 'Order no',
-                placeholder: 'Enter Order No',
+                label: 'Invoice no',
+                placeholder: 'Enter Invoice No',
                 required: true,
                 // disabled: true
               },
@@ -160,7 +157,7 @@ export class PurchaseComponent {
                   field.formControl.valueChanges.subscribe(data => {
                     console.log("purchase_type", data);
                     if (data && data.purchase_type_id) {
-                      this.formConfig.model['purchase_order_data']['purchase_type_id'] = data.purchase_type_id;
+                      this.formConfig.model['purchase_invoice_orders']['purchase_type_id'] = data.purchase_type_id;
                     }
                   });
                 }
@@ -187,7 +184,7 @@ export class PurchaseComponent {
                   field.formControl.valueChanges.subscribe(data => {
                     // console.log("vendors", data);
                     if (data && data.vendor_id) {
-                      this.formConfig.model['purchase_order_data']['vendor_id'] = data.vendor_id;
+                      this.formConfig.model['purchase_invoice_orders']['vendor_id'] = data.vendor_id;
                     }
 
                     // if (field.form && field.form.controls && field.form.controls.customer_id) {
@@ -231,39 +228,15 @@ export class PurchaseComponent {
               }
             },
             {
-              key: 'order_date',
+              key: 'invoice_date',
               type: 'date',
               defaultValue: new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate(),
               className: 'ant-col-4 pr-md m-3',
               templateOptions: {
                 type: 'date',
-                label: 'Order date',
+                label: 'Invoice date',
                 // placeholder: 'Select Order Date',
                 required: true
-              }
-            },
-            {
-              key: 'ref_no',
-              type: 'input',
-              // defaultValue: "7777700",
-              className: 'ant-col-4 pr-md m-3',
-              templateOptions: {
-                type: 'input',
-                label: 'Ref No',
-                placeholder: 'Enter Ref No',
-                // required: true
-              }
-            },
-            {
-              key: 'ref_date',
-              type: 'date',
-              defaultValue: new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate(),
-              className: 'ant-col-4 pr-md m-3',
-              templateOptions: {
-                type: 'date',
-                label: 'Ref date',
-                placeholder: 'Select Ref date',
-                // required: true
               }
             },
             {
@@ -282,6 +255,21 @@ export class PurchaseComponent {
               hooks: {
                 onInit: (field: any) => {
                 }
+              }
+            },
+            {
+              key: 'supplier_invoice_no',
+              type: 'input',
+              // defaultValue: "testing@example.com",
+              className: 'ant-col-4 pr-md m-3',
+              templateOptions: {
+                type: 'input',
+                label: 'Supiler invoice no',
+                placeholder: 'Enter Supiler invoice no',
+                // required: true
+              },
+              hooks: {
+                onInit: (field: any) => { }
               }
             },
             {
@@ -311,7 +299,7 @@ export class PurchaseComponent {
         // end of purchase_order
 
         {
-          key: 'purchase_order_items',
+          key: 'purchase_invoice_items',
           type: 'table',
           // defaultValue: [],
           // fieldGroupClassName: 'table-field pr-md',
@@ -696,7 +684,7 @@ export class PurchaseComponent {
                 },
                 {
                   fieldGroupClassName: "ant-row",
-                  key: 'purchase_order_data',
+                  key: 'purchase_invoice_orders',
                   fieldGroup: [
                     {
                       key: 'total_boxes',
@@ -791,14 +779,14 @@ export class PurchaseComponent {
                           field.formControl.valueChanges.subscribe(data => {
                             console.log("gst_type", data);
                             if (data && data.gst_type_id) {
-                              this.formConfig.model['purchase_order_data']['gst_type_id'] = data.gst_type_id;
+                              this.formConfig.model['purchase_invoice_orders']['gst_type_id'] = data.gst_type_id;
                             }
                           });
                         }
                       }
                     },
                     {
-                      key: 'payment_term_id',
+                      key: 'payment_term',
                       type: 'select',
                       className: 'ant-col-6 pr-md m-3',
                       // defaultValue: '3b4cc23d-6dc3-42e9-9894-02624fdf9934',
@@ -818,7 +806,7 @@ export class PurchaseComponent {
                           field.formControl.valueChanges.subscribe(data => {
                             console.log("payment_term", data);
                             if (data && data.payment_term_id) {
-                              this.formConfig.model['purchase_order_data']['payment_term_id'] = data.payment_term_id;
+                              this.formConfig.model['purchase_invoice_orders']['payment_term_id'] = data.payment_term_id;
                             }
                           });
                         }
@@ -844,7 +832,7 @@ export class PurchaseComponent {
                           field.formControl.valueChanges.subscribe(data => {
                             console.log("ledger_account", data);
                             if (data && data.ledger_account_id) {
-                              this.formConfig.model['purchase_order_data']['ledger_account_id'] = data.ledger_account_id;
+                              this.formConfig.model['purchase_invoice_orders']['ledger_account_id'] = data.ledger_account_id;
                             }
                           });
                         }
@@ -873,7 +861,7 @@ export class PurchaseComponent {
                     //         console.log("order_type", data);
                     //         if (data.purchase_order) {
                     //           console.log("order_type:", data.name);
-                    //           this.formConfig.model['purchase_order_data']['order_type'] = data.purchase_order;
+                    //           this.formConfig.model['purchase_invoice_orders']['order_type'] = data.purchase_order;
                     //         }
                     //       });
                     //       // if (!field.formControl.value) {
@@ -903,7 +891,7 @@ export class PurchaseComponent {
                           field.formControl.valueChanges.subscribe(data => {
                             console.log("order_status", data);
                             if (data && data.order_status_id) {
-                              this.formConfig.model['purchase_order_data']['order_status_id'] = data.order_status_id;
+                              this.formConfig.model['purchase_invoice_orders']['order_status_id'] = data.order_status_id;
                             }
                           });
                         }

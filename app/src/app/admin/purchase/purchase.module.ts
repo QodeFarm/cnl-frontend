@@ -5,6 +5,8 @@ import { PurchaseRoutingModule } from './purchase-routing.module';
 import { PurchaseComponent } from './purchase.component';
 import { PurchaseListComponent } from './purchase-list/purchase-list.component';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { PurchaseInvoiceComponent } from './purchase-invoice/purchase-invoice.component';
+import { PurchaseInvoiceModule } from './purchase-invoice/purchase-invoice.module';
 
 
 @NgModule({
@@ -16,7 +18,7 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
     CommonModule,
     AdminCommmonModule,
     PurchaseRoutingModule,
-    PurchaseListComponent
+    PurchaseListComponent,
   ]
 })
 export class PurchaseModule { }

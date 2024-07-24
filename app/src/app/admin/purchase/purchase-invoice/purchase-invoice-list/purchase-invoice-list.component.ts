@@ -5,38 +5,48 @@ import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 @Component({
-  selector: 'app-purchase-list',
+  selector: 'app-purchase-invoice-list',
   standalone: true,
   imports: [CommonModule, AdminCommmonModule],
-  templateUrl: './purchase-list.component.html',
-  styleUrls: ['./purchase-list.component.scss']
+  templateUrl: './purchase-invoice-list.component.html',
+  styleUrls: ['./purchase-invoice-list.component.scss']
 })
-export class PurchaseListComponent {
+export class PurchaseInvoiceListComponent {
   
   @Output('edit') edit = new EventEmitter<void>();
   
   tableConfig: TaTableConfig = {
-    apiUrl: 'purchase/purchase_order/',
-    showCheckbox:true,
-    pkId: "purchase_order_id",
+    apiUrl: 'purchase/purchase_invoice_order/',
+    // showCheckbox:true,
+    pkId: "purchase_invoice_id",
     pageSize: 10,
     "globalSearch": {
       keys: ['id', 'first_name', 'last_name']
     },
     cols: [
       {
-        fieldKey: 'order_date',
-        name: 'Order Date',
+        fieldKey: 'invoice_no',
+        name: 'Invoice No',
         sort: true
       },
       {
-        fieldKey: 'order_no',
-        name: 'Order No',
+        fieldKey: 'invoice_date',
+        name: 'Invoice Date',
         sort: true
+      },
+      {
+        fieldKey: 'supplier_invoice_no',
+        name: 'Supplier invoice no',
+        sort: false
       },
       {
         fieldKey: 'tax',
         name: 'Tax',
+        sort: false
+      },
+      {
+        fieldKey: 'total_amount',
+        name: 'Total amount',
         sort: false
       },
       {
@@ -45,8 +55,8 @@ export class PurchaseListComponent {
         sort: false
       },
       {
-        fieldKey: 'total_amount',
-        name: 'Total amount',
+        fieldKey: 'advance_amount',
+        name: 'Advance Amount',
         sort: false
       },
       {
@@ -92,14 +102,14 @@ export class PurchaseListComponent {
             label: 'Delete',
             // confirm: true,
             // confirmMsg: "Sure to delete?",
-            apiUrl: 'purchase/purchase_order'
+            apiUrl: 'purchase/purchase_invoice_orders_get'
           },
           {
             type: 'callBackFn',
             label: 'Edit',
             callBackFn: (row, action) => {
               console.log(row);
-              this.edit.emit(row.purchase_order_id);
+              this.edit.emit(row.purchase_invoice_id);
             }
           }
         ]
@@ -111,4 +121,3 @@ export class PurchaseListComponent {
 
   }
 }
-
