@@ -32,13 +32,9 @@ export class CustomersListComponent {
         sort: true
       },
       {
-        fieldKey: 'customer_address.email',
+        fieldKey: 'email',
         name: 'Email',
-        sort: false,
-        displayType: 'map',
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return row.customer_addresses?.email || '';
-        },
+        sort: true
       },
       {
         fieldKey: 'phone',
@@ -50,21 +46,12 @@ export class CustomersListComponent {
         name: 'GST',
         sort: false,
       },
-      // {
-      //   fieldKey: 'city',
-      //   name: 'City Name',
-      //   sort: false,
-      //   displayType: 'map',
-      //   mapFn: (currentValue: any, row: any, col: any) => {
-      //     return row.city.city_name;
-      //   },
-      // },
       {
         fieldKey: 'city.name',
         name: 'City Name',
         sort: false,
         displayType: 'map',
-        mapFn: (currentValue, row, col) => {
+        mapFn: (currentValue: any, row: any, col: any) => {
           return row.city.city_name;
         },
       },
