@@ -18,7 +18,7 @@ export class CustomersListComponent {
   @Output('edit') edit = new EventEmitter<void>();
 
   tableConfig: TaTableConfig = {
-    apiUrl: 'customers/customers/?summary=true&summary=true&page=1&limit=10&sort[0]=name,DESC', //THIS SHOULD REMOVED IN FUTURE AND FIXED ACCORDNING TO THE COMMAN PATTERN
+    apiUrl: 'customers/customers/',
     showCheckbox:true,
     pkId: "customer_id",
     pageSize: 10,
@@ -32,9 +32,13 @@ export class CustomersListComponent {
         sort: true
       },
       {
-        fieldKey: 'email',
+        fieldKey: 'customer_address.email',
         name: 'Email',
         sort: false,
+        displayType: 'map',
+        mapFn: (currentValue: any, row: any, col: any) => {
+          return row.customer_addresses?.email || '';
+        },
       },
       {
         fieldKey: 'phone',
@@ -46,22 +50,31 @@ export class CustomersListComponent {
         name: 'GST',
         sort: false,
       },
+      // {
+      //   fieldKey: 'city',
+      //   name: 'City Name',
+      //   sort: false,
+      //   displayType: 'map',
+      //   mapFn: (currentValue: any, row: any, col: any) => {
+      //     return row.city.city_name;
+      //   },
+      // },
       {
         fieldKey: 'city.name',
         name: 'City Name',
         sort: false,
         displayType: 'map',
-        mapFn: (currentValue: any, row: any, col: any) => {
+        mapFn: (currentValue, row, col) => {
           return row.city.city_name;
         },
       },
       {
-        fieldKey: 'ledger_account_id.name',
+        fieldKey: 'ledger_account',
         name: 'Ledger Account',
         sort: false,
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
-          return row.ledger_account_id.name;
+          return row.ledger_account.name;
         },
       },
       {
