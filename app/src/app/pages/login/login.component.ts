@@ -26,7 +26,7 @@ export class LoginComponent {
       {
         key: 'username',
         type: 'input',
-        className: "pb-3",
+        className: "form-group",
         templateOptions: {
           hideLabel: true,
           addonLeftIcon: "user",
@@ -44,6 +44,7 @@ export class LoginComponent {
       {
         key: 'password',
         type: 'input',
+        className: "form-group",
         templateOptions: {
           hideLabel: true,
           addonLeftIcon: "lock",
