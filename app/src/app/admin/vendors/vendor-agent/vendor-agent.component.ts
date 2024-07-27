@@ -1,0 +1,138 @@
+import { Component } from '@angular/core';
+import { TaCurdConfig } from '@ta/ta-curd';
+
+@Component({
+  selector: 'app-vendor-agent',
+  templateUrl: './vendor-agent.component.html',
+  styleUrls: ['./vendor-agent.component.scss']
+})
+export class VendorAgentComponent {
+  curdConfig: TaCurdConfig = {
+    drawerSize: 500,
+    drawerPlacement: 'right',
+    tableConfig: {
+      apiUrl: 'vendors/vendor_agent/',
+      title: 'Vendor Agent List',
+      pkId: "vendor_agent_id",
+      pageSize: 10,
+      "globalSearch": {
+        keys: ['vendor_agent_id', 'name']
+      },
+      cols: [
+        {
+          fieldKey: 'code',
+          name: 'code'
+        },
+		    {
+          fieldKey: 'name',
+          name: 'Name'
+        },
+		    {
+          fieldKey: 'commission_rate',
+          name: 'Commission Rate'
+        },
+		    {
+          fieldKey: 'rate_on',
+          name: 'Rate On'
+        },
+		    {
+          fieldKey: 'amount_type',
+          name: 'Amount Type'
+        },
+        {
+          fieldKey: "code",
+          name: "Action",
+          type: 'action',
+          actions: [
+            {
+              type: 'delete',
+              label: 'Delete',
+              confirm: true,
+              confirmMsg: "Sure to delete?",
+              apiUrl: 'vendors/vendor_agent'
+            },
+            {
+              type: 'edit',
+              label: 'Edit'
+            },
+            // {
+            //   type: 'callBackFn',
+            //   label: 'Edit',
+            //   // callBackFn: (row, action) => {
+            //   //   this.router.navigateByUrl('/admin/employee/create/' + row.employee_id);
+            //   // }
+            // }
+          ]
+        }
+      ]
+    },
+    formConfig: {
+      url: 'vendors/vendor_agent/',
+      title: 'Vendor Agent List',
+      pkId: "vendor_agent_id",
+      exParams: [
+      ],
+      fields: [
+        {
+          key: 'code',
+          type: 'textarea',
+          className: 'ta-cell pr-md',
+          templateOptions: {
+            label: 'Code',
+            placeholder: 'Enter code',
+            required: true,
+          }
+        },
+		    {
+          key: 'name',
+          type: 'textarea',
+          className: 'ta-cell pr-md',
+          templateOptions: {
+            label: 'Name',
+            placeholder: 'Enter name',
+            required: true,
+          }
+        },
+		    {
+          key: 'commission_rate',
+          type: 'textarea',
+          className: 'ta-cell pr-md',
+          templateOptions: {
+            label: 'Commission rate',
+            placeholder: 'Enter commission rate',
+            required: true,
+          }        
+        },
+        {
+          key: 'rate_on',
+          type: 'select',
+          className: 'ta-cell pr-md',
+          templateOptions: {
+            label: 'Rate On',
+            placeholder: 'Enter rate on',
+            required: true,
+            options: [
+              { 'label': "Qty", value: 'Qty' },
+              { 'label': "Amount", value: 'Amount' }
+            ]
+          }
+        },
+        {
+          key: 'amount_type',
+          type: 'select',
+          className: 'ta-cell pr-md',
+          templateOptions: {
+            label: 'Amount Type',
+            placeholder: 'Enter amount type',
+            required: true,
+            options: [
+              { 'label': "Taxable", value: 'Taxable' },
+              { 'label': "BillAmount", value: 'BillAmount' }
+            ]
+          }
+        },
+      ]
+    }
+
+  }
+}
