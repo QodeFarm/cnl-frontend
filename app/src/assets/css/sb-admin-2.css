@@ -2288,7 +2288,7 @@ textarea.form-control.is-valid {
     margin-top: 0;
     font-size: 80%;
     color: #e74a3b;
-    /* position: absolute; */
+    position: absolute;
 }
 
 .invalid-tooltip {
@@ -10980,6 +10980,7 @@ a:focus {
         display: inline;
         font-weight: 500;
         color: #545764;
+        line-height: 1rem;
     }
     .sidebar-toggled .sidebar .nav-item .nav-link[data-bs-toggle="collapse"]::after {
         width: 1rem;
