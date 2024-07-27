@@ -115,6 +115,17 @@ export class AdminLayoutComponent {
         link: '/admin/master',
         label: 'Master',
         icon: 'fas fa-cog',
+      },
+      {
+        label: 'Purchase',
+        icon: 'fas fa-file-invoice-dollar',
+        child: [
+          {
+            link: '/admin/purchasereturnorders',
+            label: 'Purchase Returns',
+            icon: 'fas fa-cog',
+          }
+        ]
       }
     ]
     this.closeMenu();
