@@ -459,15 +459,34 @@ ta-table {
         transform: translate(-50%, 20px);
         margin-bottom: 20px;
         height: calc(100% - 40px);
+        // max-height: calc(100% - 40px);
+         overflow-y: auto;
         .ant-drawer-header {
-            background-color: #f7f7f7;
+            background-color: #142768;
+            padding: 12px 18px;
         }
         .ant-drawer-header-title {
             .ant-drawer-close {
                 position: absolute;
                 right: 0;
+                background-color: #fff;
+                opacity: 1;
+                border-radius: 50px;
+                margin-top: 0px;
+                padding: 5px 6px;
+                color: #000;
+            }
+            .ant-drawer-title{
+                color: #fff;
+                font-size: 18px;
+                font-weight: 500;
             }
         }
+        // .ant-drawer-body{
+        //     max-height: calc(100% - 100px); 
+        //     overflow-y: auto; 
+        //     overflow-x: hidden;
+        // }
     }
 }
 
@@ -648,6 +667,11 @@ ta-form {
     }
 }
 .custom-list{
+    .h2{
+        color: #142768;
+        font-size: 1.2rem !important;
+        font-weight: 600 !important; 
+    }
     table{
         thead{
           th{
@@ -686,5 +710,44 @@ ta-form {
 .field-no-bottom-space{
     >formly-field{
         padding-bottom: 0;
+    }
+}
+.ant-popover-buttons{
+    display: flex;
+    align-items: center;
+    .ant-btn-sm{
+        display: flex;
+        align-items: center;  
+    }
+}
+.ant-table-thead th.ant-table-column-has-sorters:hover,
+.ant-table-thead th.ant-table-column-sort {
+    background: #142768;
+}
+.custom-tabs{
+    .nav-tabs{
+        .nav-item{
+            .nav-link {
+                color: #666666;
+                font-size: 16px;
+                font-weight: 500;
+                &:hover{
+                    color: #142768;
+                }
+                &.active{
+                    color: #142768;
+                    background-color: #fff;
+                    border-color: #142768 #142768 #fff;
+                }
+            }
+        }
+    }
+    .tab-content{
+        padding: 15px;
+        background-color: #fff;
+        border: 1px solid #142768;
+        border-top: 0;
+        border-bottom-left-radius: 0.35rem;
+        border-bottom-right-radius: 0.35rem;
     }
 }

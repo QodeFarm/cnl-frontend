@@ -73,12 +73,12 @@ export class VendorsComponent implements OnInit {
       },
       fields: [
         {
-          fieldGroupClassName: "ant-row",
+          fieldGroupClassName: "ant-row custom-form-block",
           key: 'vendor_data',
           fieldGroup: [
             // First row: Basic Information
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'name',
               type: 'input',
               templateOptions: {
@@ -88,7 +88,7 @@ export class VendorsComponent implements OnInit {
               }
             },
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'print_name',
               type: 'input',
               templateOptions: {
@@ -98,7 +98,7 @@ export class VendorsComponent implements OnInit {
               }
             },
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'identification',
               type: 'input',
               templateOptions: {
@@ -107,7 +107,7 @@ export class VendorsComponent implements OnInit {
               }
             },
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'code',
               type: 'input',
               templateOptions: {
@@ -120,7 +120,7 @@ export class VendorsComponent implements OnInit {
             {
               key: 'ledger_account',
               type: 'select',
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               templateOptions: {
                 dataKey: 'ledger_account_id',
                 dataLabel: 'name',
@@ -146,7 +146,7 @@ export class VendorsComponent implements OnInit {
               }
             },
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'firm_status',
               type: 'select',
               templateOptions: {
@@ -172,7 +172,7 @@ export class VendorsComponent implements OnInit {
               }
             },
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'territory',
               type: 'select',
               templateOptions: {
@@ -198,7 +198,7 @@ export class VendorsComponent implements OnInit {
               }
             },
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'vendor_category',
               type: 'select',
               templateOptions: {
@@ -225,7 +225,7 @@ export class VendorsComponent implements OnInit {
             },
             // Third row: GST and Tax Information
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'gst_category',
               type: 'select',
               templateOptions: {
@@ -251,7 +251,7 @@ export class VendorsComponent implements OnInit {
               }
             },
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'tax_type',
               type: 'select',
               templateOptions: {
@@ -265,7 +265,7 @@ export class VendorsComponent implements OnInit {
               }
             },
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'gst',
               type: 'input',
               templateOptions: {
@@ -274,7 +274,7 @@ export class VendorsComponent implements OnInit {
               }
             },
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'registration_date',
               type: 'input',
               templateOptions: {
@@ -285,7 +285,7 @@ export class VendorsComponent implements OnInit {
             },
             // Fourth row: Contact Information
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'contact_person',
               type: 'input',
               templateOptions: {
@@ -294,7 +294,7 @@ export class VendorsComponent implements OnInit {
               }
             },
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'picture',
               type: 'input',
               templateOptions: {
@@ -303,7 +303,7 @@ export class VendorsComponent implements OnInit {
               }
             },
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'cin',
               type: 'input',
               templateOptions: {
@@ -312,7 +312,7 @@ export class VendorsComponent implements OnInit {
               }
             },
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'pan',
               type: 'input',
               templateOptions: {
@@ -322,7 +322,7 @@ export class VendorsComponent implements OnInit {
             },
             // Fifth row: website links
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'website',
               type: 'input',
               templateOptions: {
@@ -331,7 +331,7 @@ export class VendorsComponent implements OnInit {
               }
             },
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'facebook',
               type: 'input',
               templateOptions: {
@@ -340,7 +340,7 @@ export class VendorsComponent implements OnInit {
               }
             },
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'skype',
               type: 'input',
               templateOptions: {
@@ -349,7 +349,7 @@ export class VendorsComponent implements OnInit {
               }
             },
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'twitter',
               type: 'input',
               templateOptions: {
@@ -358,7 +358,7 @@ export class VendorsComponent implements OnInit {
               }
             },
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'linked_in',
               type: 'input',
               templateOptions: {
@@ -368,7 +368,7 @@ export class VendorsComponent implements OnInit {
             },
             // Sixth row: Terms and Categories
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'payment_term',
               type: 'select',
               templateOptions: {
@@ -394,7 +394,7 @@ export class VendorsComponent implements OnInit {
               }
             },
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'price_category',
               type: 'select',
               templateOptions: {
@@ -421,7 +421,7 @@ export class VendorsComponent implements OnInit {
             },
             // Seventh row: Agents and Transport
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'vendor_agent',
               type: 'select',
               templateOptions: {
@@ -447,7 +447,7 @@ export class VendorsComponent implements OnInit {
               }
             },
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'transporter',
               type: 'select',
               templateOptions: {
@@ -473,7 +473,7 @@ export class VendorsComponent implements OnInit {
               }
             },
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'distance',
               type: 'input',
               templateOptions: {
@@ -484,7 +484,7 @@ export class VendorsComponent implements OnInit {
             },
             // Eighth row: Credit
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'credit_limit',
               type: 'input',
               templateOptions: {
@@ -494,7 +494,7 @@ export class VendorsComponent implements OnInit {
               }
             },
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'max_credit_days',
               type: 'input',
               templateOptions: {
@@ -504,7 +504,7 @@ export class VendorsComponent implements OnInit {
               }
             },
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'interest_rate_yearly',
               type: 'input',
               templateOptions: {
@@ -515,7 +515,7 @@ export class VendorsComponent implements OnInit {
             },
             // Ninth row: Bank Information
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'rtgs_ifsc_code',
               type: 'input',
               templateOptions: {
@@ -524,7 +524,7 @@ export class VendorsComponent implements OnInit {
               }
             },
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'account_number',
               type: 'input',
               templateOptions: {
@@ -533,7 +533,7 @@ export class VendorsComponent implements OnInit {
               }
             },
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'bank_name',
               type: 'input',
               templateOptions: {
@@ -542,7 +542,7 @@ export class VendorsComponent implements OnInit {
               }
             },
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'branch',
               type: 'input',
               templateOptions: {
@@ -552,7 +552,7 @@ export class VendorsComponent implements OnInit {
             },
             // Tenth row: Checkboxes
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2 d-flex align-items-center',
               key: 'gst_suspend',
               type: 'checkbox',
               templateOptions: {
@@ -560,7 +560,7 @@ export class VendorsComponent implements OnInit {
               }
             },
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-3 d-flex align-items-center',
               key: 'tds_on_gst_applicable',
               type: 'checkbox',
               templateOptions: {
@@ -568,7 +568,7 @@ export class VendorsComponent implements OnInit {
               }
             },
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'tds_applicable',
               type: 'checkbox',
               templateOptions: {
@@ -576,7 +576,7 @@ export class VendorsComponent implements OnInit {
               }
             },
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-4',
               key: 'vendor_common_for_sales_purchase',
               type: 'checkbox',
               templateOptions: {
@@ -584,7 +584,7 @@ export class VendorsComponent implements OnInit {
               }
             },
             {
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-2',
               key: 'is_sub_vendor',
               type: 'checkbox',
               templateOptions: {
@@ -596,6 +596,7 @@ export class VendorsComponent implements OnInit {
         {
           key: 'vendor_attachments',
           type: 'repeat',
+          className: 'custom-form-list',
           templateOptions: {
             addText: 'Add Attachment',
           },
@@ -603,7 +604,7 @@ export class VendorsComponent implements OnInit {
             fieldGroupClassName: 'row',
             fieldGroup: [
               {
-                className: 'ant-col-10 pr-md m-3',
+                className: 'col-10 p-0',
                 key: 'attachment_name',
                 type: 'input',
                 templateOptions: {
@@ -615,7 +616,7 @@ export class VendorsComponent implements OnInit {
               {
                 key: 'attachment_path',
                 type: 'input',
-                className: 'ant-col-10 pr-md m-3',
+                className: 'col-10 p-0',
                 templateOptions: {
                   label: 'Attachment Path',
                   placeholder: 'Enter Attachment Path',
@@ -628,6 +629,7 @@ export class VendorsComponent implements OnInit {
         {
           key: 'vendor_addresses',
           type: 'repeat',
+          className: 'custom-form-list',
           templateOptions: {
             addText: 'Add Address',
           },
@@ -635,7 +637,7 @@ export class VendorsComponent implements OnInit {
             fieldGroupClassName: 'row',
             fieldGroup: [
               {
-                className: 'ant-col-4 pr-md m-3',
+                className: 'col',
                 key: 'address_type',
                 type: 'input',
                 templateOptions: {
@@ -653,14 +655,14 @@ export class VendorsComponent implements OnInit {
               {
                 key: 'address',
                 type: 'textarea',
-                className: 'ant-col-4 pr-md m-3',
+                className: 'col',
                 templateOptions: {
                   label: 'Address',
                   placeholder: 'Enter Address',
                 }
               },
               {
-                className: 'ant-col-4 pr-md m-3',
+                className: 'col',
                 key: 'city',
                 type: 'select',
                 templateOptions: {
@@ -692,7 +694,7 @@ export class VendorsComponent implements OnInit {
               {
                 key: 'state',
                 type: 'select',
-                className: 'ant-col-4 pr-md m-3',
+                className: 'col',
                 templateOptions: {
                   dataKey: 'state_id',
                   dataLabel: 'state_name',
@@ -722,7 +724,7 @@ export class VendorsComponent implements OnInit {
               {
                 key: 'country',
                 type: 'select',
-                className: 'ant-col-4 pr-md m-3',
+                className: 'col',
                 templateOptions: {
                   dataKey: 'country_id',
                   dataLabel: 'country_name',
@@ -751,7 +753,7 @@ export class VendorsComponent implements OnInit {
               {
                 key: 'pin_code',
                 type: 'input',
-                className: 'ant-col-4 pr-md m-3',
+                className: 'col',
                 templateOptions: {
                   label: 'Pin Code',
                   placeholder: 'Enter Pin Code',
@@ -760,7 +762,7 @@ export class VendorsComponent implements OnInit {
               {
                 key: 'phone',
                 type: 'input',
-                className: 'ant-col-4 pr-md m-3',
+                className: 'col',
                 templateOptions: {
                   label: 'Phone',
                   placeholder: 'Enter Phone',
@@ -769,7 +771,7 @@ export class VendorsComponent implements OnInit {
               {
                 key: 'email',
                 type: 'input',
-                className: 'ant-col-4 pr-md m-3',
+                className: 'col',
                 templateOptions: {
                   label: 'Email',
                   placeholder: 'Enter Email',
@@ -778,7 +780,7 @@ export class VendorsComponent implements OnInit {
               {
                 key: 'longitude',
                 type: 'input',
-                className: 'ant-col-4 pr-md m-3',
+                className: 'col',
                 templateOptions: {
                   label: 'Longitude',
                   placeholder: 'Enter Longitude',
@@ -788,7 +790,7 @@ export class VendorsComponent implements OnInit {
               {
                 key: 'latitude',
                 type: 'input',
-                className: 'ant-col-4 pr-md m-3',
+                className: 'col',
                 templateOptions: {
                   label: 'Latitude',
                   placeholder: 'Enter Latitude',
@@ -798,7 +800,7 @@ export class VendorsComponent implements OnInit {
               {
                 key: 'route_map',
                 type: 'input',
-                className: 'ant-col-4 pr-md m-3',
+                className: 'col',
                 templateOptions: {
                   label: 'Route Map',
                   placeholder: 'Enter Route Map URL',
