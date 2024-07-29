@@ -59,6 +59,31 @@ export class AdminLayoutComponent {
         label: 'Sales',
         icon: 'fas fa-file-invoice-dollar',
         child: [
+          // {
+          //   link: '/admin/employee',
+          //   label: 'Sales Price List',
+          //   icon: 'fas fa-tachometer-alt',
+          // },
+          // {
+          //   link: '/admin/employee',
+          //   label: 'Estimate',
+          //   icon: 'fas fa-tachometer-alt',
+          // },
+          {
+            link: '/admin/sales',
+            label: 'Sale Order',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/sales',
+            label: 'Sale Invoice',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/sales',
+            label: 'Sale Return',
+            icon: 'fas fa-tachometer-alt',
+          },
           {
             link: '/admin/employee',
             label: 'Customer',
@@ -66,19 +91,9 @@ export class AdminLayoutComponent {
           },
           {
             link: '/admin/employee',
-            label: 'Sales Price List',
+            label: 'Order Shipment',
             icon: 'fas fa-tachometer-alt',
           },
-          {
-            link: '/admin/employee',
-            label: 'Estimate',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/employee',
-            label: 'Sales Order',
-            icon: 'fas fa-tachometer-alt',
-          }
         ]
       },
       {
@@ -159,6 +174,52 @@ export class AdminLayoutComponent {
           }
         ]
       },
+      {
+        label: 'Vendors',
+        icon: 'fas fa-user',
+        child: [
+          {
+            link: '/admin/vendors/',
+            label: 'Vendors',
+            icon: 'fas fa-user',
+          },
+          // {
+          //   link: '/admin/vendors/vendors-list',
+          //   label: 'vendors list',
+          //   icon: 'fas fa-user',
+          // },
+          {
+            link: '/admin/vendors/vendor-category',
+            label: 'Vendor Category',
+            icon: 'fas fa-user',
+          },
+          {
+            link: '/admin/vendors/vendor-payment-terms',
+            label: 'Vendor Payment Terms',
+            icon: 'fas fa-user',
+          },
+          {
+            link: '/admin/vendors/vendor-agent',
+            label: 'Vendor Agent',
+            icon: 'fas fa-user',
+          },
+          {
+            link: '/admin/vendors/firm-statuses',
+            label: 'Firm Statuses',
+            icon: 'fas fa-user',
+          },
+          {
+            link: '/admin/vendors/gst-categories',
+            label: 'Gst Categories',
+            icon: 'fas fa-user',
+          },
+          {
+            link: '/admin/vendors/price-categories',
+            label: 'Price Categories',
+            icon: 'fas fa-user',
+          },
+        ]
+      }
     ]
     this.closeMenu();
   }

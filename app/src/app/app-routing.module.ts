@@ -33,6 +33,7 @@ const routes: Routes = [
       { path: 'company', canActivate: [], loadChildren: () => import('./admin/company/company.module').then(m => m.CompanyModule) },
       { path: 'employees', canActivate: [], loadChildren: () => import('./admin/hrms/hrms.module').then(m => m.EmployeeModule) },
       { path: 'leads', canActivate: [], loadChildren: () => import('./admin/leads/leads.module').then(m => m.LeadsModule) },
+      { path: 'vendors', canActivate: [], loadChildren: () => import('./admin/vendors/vendors.module').then(m => m.VendorsModule) },
     ]
   }
 

@@ -19,7 +19,7 @@ export class FieldDatepickerComponent extends FieldType implements OnInit {
     this.dateValue = this.formControl.value;
   }
   onChange(result: Date): void {
-    debugger
+    // debugger
     const data = this.datepipe.transform(result, 'yyyy-MM-dd');
     this.formControl.setValue(data);
   }
