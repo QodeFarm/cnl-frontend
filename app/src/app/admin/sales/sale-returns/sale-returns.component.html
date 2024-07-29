@@ -26,7 +26,7 @@
           <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body" *ngIf="showSaleReturnOrderList">
-          <app-sale-returns-list (edit)="editSaleReturnOrder($event)"></app-sale-returns-list>
+          <app-sale-returns-list (edit)="editSaleReturnOrder($event)" class="custom-list"></app-sale-returns-list>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
