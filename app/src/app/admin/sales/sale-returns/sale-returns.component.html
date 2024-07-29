@@ -1,0 +1,36 @@
+<div class="container-fluid pt-3">
+    <div class="sale-returns-banner">
+      <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;">
+        <button type="button" class="btn pl-0">
+          <span *ngIf="SaleReturnOrderEditID" class="custom-heading">Update Sale Returns</span>
+          <span *ngIf="!SaleReturnOrderEditID" class="custom-heading">Create Sale Returns</span>
+        </button>
+        <button (click)="showSalesReturnOrderListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+          Sale Invoice List
+        </button>
+      </div>
+    </div>
+  
+    <div class="row custom-form">
+      <div class="col-12 px-1" *ngIf="returnNumber">
+        <ta-form [options]="formConfig"></ta-form>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal fade custom-modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Edit Sale Returns List</h5>
+          <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" *ngIf="showSaleReturnOrderList">
+          <app-sale-returns-list (edit)="editSaleReturnOrder($event)"></app-sale-returns-list>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
