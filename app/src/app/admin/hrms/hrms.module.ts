@@ -2,18 +2,22 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { HrmsRoutingModule } from './hrms-routing.module';
-import { HrmsComponent } from './hrms.component';
+import { EmployeesComponent } from './hrms.component';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { DepartmentsComponent } from './departments/departments.component';
+import { DesignationsComponent } from './designations/designations.component';
 
 
 @NgModule({
   declarations: [
-    HrmsComponent
+    EmployeesComponent,
+    DepartmentsComponent,
+    DesignationsComponent
   ],
   imports: [
     CommonModule,
     HrmsRoutingModule,
-    AdminCommmonModule
+    AdminCommmonModule,
   ]
 })
-export class HrmsModule { }
+export class EmployeeModule {};

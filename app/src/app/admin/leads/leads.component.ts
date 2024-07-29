@@ -1,100 +1,96 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
-import { distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-leads',
   templateUrl: './leads.component.html',
   styleUrls: ['./leads.component.scss']
 })
+
 export class LeadsComponent {
   showLeadsList: boolean = false;
   showForm: boolean = false;
   LeadsEditID: any;
 
-  constructor(private http: HttpClient) {
-  }
+
+  set_default_status_id(): any {
+    return (this.http.get('leads/lead_statuses/').subscribe((res: any) => {
+      if (res && res.data) {
+        const key = 'status_name';
+        const value = 'Open';
+        const filteredDataSet = res.data.filter((item: any) => item[key] === value);
+        const lead_status_id = filteredDataSet[0].lead_status_id;
+        this.formConfig.model['lead']['lead_status_id'] = lead_status_id; // set default is 'Open'
+      }
+    }));
+  };
+
+  constructor(private http: HttpClient) {};
 
   ngOnInit() {
     this.showLeadsList = false;
     this.showForm = false;
     // set form config
     this.setFormConfig();
-    console.log('this.formConfig', this.formConfig);
+    this.set_default_status_id(); // lead_status_id = 'Open'
   }
 
   formConfig: TaFormConfig = {};
 
-  hide(){
-      document.getElementById('modalClose').click();
+  hide() {
+    document.getElementById('modalClose').click();
   }
 
-  editLeads(event){
-    console.log('event',event);
+  editLeads(event) {
     this.LeadsEditID = event;
     this.http.get('leads/leads/' + event).subscribe((res: any) => {
-      console.log('--------> res ', res);
       if (res && res.data) {
         this.formConfig.model = res.data;
         // set labels for update
         this.formConfig.submit.label = 'Update';
-        // show form after setting form values
-
-        // this.formConfig.url= "sales/lead/" + this.LeadsEditID;
         this.formConfig.pkId = 'lead_id';
-        
         this.formConfig.model['lead_id'] = this.LeadsEditID;
         this.showForm = true;
       }
     })
     this.hide();
-  }
+  };
 
 
   showLeadsListFn() {
     this.showLeadsList = true;
-  }
+  };
 
   setFormConfig() {
     this.formConfig = {
-      url: "leads/leads/" ,
+      url: "leads/leads/",
       // title: 'leads',
       formState: {
-        viewMode: false
+        viewMode: false,
+        // isEdit: false,
       },
-      exParams: [
-        {
-          key: 'lead_status_id',
-          type: 'script',
-          value: 'data.lead_status_id.lead_status_id'
-        }
-      ],
+      exParams: [],
       submit: {
-        label:'Submit',
-        submittedFn : ()=>this.ngOnInit()        
+        label: 'Submit',
+        submittedFn: () => this.ngOnInit()
       },
-      // reset: {},
-      // model: {
-      //   lead: {},
-      //   assignment: {},
-      //   assignment_history: {},
-      //   interaction: {},
-      // },
-      fields:[
-        {
-          template:'<div> <hr> <b>Lead</b> </div>',
-          fieldGroupClassName: "ant-row",
-        },
+      reset: {},
+      model: {
+        lead: {},
+        assignment: {},
+        assignment_history: [{}],
+        interaction: {},
+      },
+      fields: [
+        //-----------------------------------------L E A D S -----------------------------------//
         {
           fieldGroupClassName: "ant-row",
-          key:'lead',
-          fieldGroup: [
-            {
+          key: 'lead',
+          fieldGroup: [{
               key: 'name',
               type: 'input',
               className: 'ant-col-4 pr-md m-3',
-              defaultValue: "test name",
               templateOptions: {
                 label: 'Name',
                 placeholder: 'Enter name',
@@ -102,14 +98,12 @@ export class LeadsComponent {
                 // disabled: true
               },
               hooks: {
-                onInit: (field: any) => {
-                }
+                onInit: (field: any) => {}
               },
             },
             {
               key: 'email',
               type: 'input',
-              defaultValue: "testing@example.com",
               className: 'ant-col-4 pr-md m-3',
               templateOptions: {
                 type: 'input',
@@ -118,14 +112,13 @@ export class LeadsComponent {
                 // required: true
               },
               hooks: {
-                onInit: (field: any) => { }
+                onInit: (field: any) => {}
               }
             },
             {
               key: 'phone',
               type: 'input',
               className: 'ant-col-4 pr-md m-3',
-              defaultValue: "+919985757477",
               templateOptions: {
                 label: 'Phone',
                 placeholder: 'Enter number',
@@ -133,19 +126,29 @@ export class LeadsComponent {
               }
             },
             {
-              key: 'lead_status_id',
+              key: 'lead_status',
               type: 'select',
               className: 'ant-col-4 pr-md m-3',
-              defaultValue: "3f186760-ad4d-4a86-a53d-4207658140ca",
               templateOptions: {
                 label: 'Lead Status',
-                dataKey: 'name',
+                dataKey: 'lead_status_id',
                 dataLabel: "status_name",
                 options: [],
                 // required: true,
                 lazy: {
                   url: 'leads/lead_statuses/',
                   lazyOneTime: true
+                }
+              },
+              hooks: {
+                onChanges: (field: any) => {
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['lead']) {
+                      this.formConfig.model['lead']['lead_status_id'] = data.lead_status_id;
+                    } else {
+                      console.error('Form config or lead_status data model is not defined.');
+                    }
+                  });
                 }
               }
             },
@@ -162,177 +165,45 @@ export class LeadsComponent {
           ]
         },
         // end of lead
-
-        {
-          template:'<div> <hr> <b>Lead Assignment </b> </div>',
-          fieldGroupClassName: "ant-row",
-        },
+        //-----------------------------------------A S S I G N M E N T -----------------------------------//
         {
           fieldGroupClassName: "ant-row",
-          key:'assignment',
-          fieldGroup: [
-            {
-              key: 'lead_id',
-              type: 'select',
-              className: 'ant-col-4 pr-md m-3',
-              templateOptions: {
-                label: 'Lead',
-                dataKey: 'lead_id',
-                dataLabel: "name",
-                options: [],
-                lazy: {
-                  url: 'leads/leads/',
-                  lazyOneTime: true
-                },
-                required: false
+          key: 'assignment',
+          fieldGroup: [{
+            key: 'sales_rep',
+            type: 'select',
+            className: 'ant-col-4 pr-md m-3',
+            templateOptions: {
+              label: 'Sales Representative',
+              dataKey: 'employee_id',
+              dataLabel: "name",
+              options: [],
+              lazy: {
+                url: 'hrms/employees/',
+                lazyOneTime: true
               },
-              hooks: {
-                onInit: (field: any) => {
-                  //field.templateOptions.options = this.cs.getRole();
-                }
-              }
+              required: false
             },
-            {
-              key: 'sales_rep_id',
-              type: 'select',
-              className: 'ant-col-4 pr-md m-3',
-              templateOptions: {
-                label: 'Sales Representative',
-                dataKey: 'sales_rep_id',
-                dataLabel: "name",
-                options: [],
-                lazy: {
-                  url: 'hrms/employees/',
-                  lazyOneTime: true
-                },
-                required: false
-              },
-              hooks: {
-                onInit: (field: any) => {
-                }
-              }
-            },
-            {
-              key: 'assignment_date',
-              type: 'date',
-              defaultValue: new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate(),
-              className: 'ant-col-4 pr-md m-3',
-              templateOptions: {
-                type: 'date',
-                label: 'Assignment date',
-                // placeholder: 'Select Oder Date',
-                required: false
+            hooks: {
+              onChanges: (field: any) => {
+                field.formControl.valueChanges.subscribe((data: any) => {
+                  if (this.formConfig && this.formConfig.model && this.formConfig.model['assignment']) {
+                    this.formConfig.model['assignment']['sales_rep_id'] = data.employee_id;
+                  } else {
+                    console.error('Form config or vendor data model is not defined.');
+                  }
+                });
               }
             }
-          ]
+          }]
         },
         // end of assignment
-
-        {
-          template:'<div> <hr> <b>Assignment History</b> </div>',
-          fieldGroupClassName: "ant-row",
-        },
+        //----------------------------------------- I N T E R A C T I O N  -----------------------------------//
         {
           fieldGroupClassName: "ant-row",
-          key:'assignment_history',
-          fieldGroup: [
-            {
-              key: 'lead_id',
-              type: 'select',
-              className: 'ant-col-4 pr-md m-3',
-              templateOptions: {
-                label: 'Lead',
-                dataKey: 'lead_id',
-                dataLabel: "name",
-                options: [],
-                lazy: {
-                  url: 'leads/leads/',
-                  lazyOneTime: true
-                },
-                required: false
-              },
-              hooks: {
-                onInit: (field: any) => {
-                  //field.templateOptions.options = this.cs.getRole();
-                }
-              }
-            },
-            {
-              key: 'sales_rep_id',
-              type: 'select',
-              className: 'ant-col-4 pr-md m-3',
-              templateOptions: {
-                label: 'Sales Representative',
-                dataKey: 'sales_rep_id',
-                dataLabel: "name",
-                options: [],
-                lazy: {
-                  url: 'hrms/employees/',
-                  lazyOneTime: true
-                },
-                required: false
-              },
-              hooks: {
-                onInit: (field: any) => {
-                }
-              }
-            },
-            {
-              key: 'assignment_date',
-              type: 'date',
-              className: 'ant-col-4 pr-md m-3',
-              templateOptions: {
-                type: 'date',
-                label: 'Assignment date',
-                // placeholder: 'Select Oder Date',
-                required: false
-              }
-            },
-            {
-              key: 'end_date',
-              type: 'date',
-              className: 'ant-col-4 pr-md m-3',
-              templateOptions: {
-                type: 'date',
-                label: 'End date',
-                // placeholder: 'Select Oder Date',
-                required: false
-              }
-            }
-          ]
-        },
-        // end of assignment history
-        {
-          template:'<div> <hr> <b>Interaction</b> </div>',
-          fieldGroupClassName: "ant-row",
-        },
-        {
-          fieldGroupClassName: "ant-row",
-          key:'interaction',
-          fieldGroup: [
-            {
-              key: 'lead_id',
-              type: 'select',
-              className: 'ant-col-4 pr-md m-3',
-              templateOptions: {
-                label: 'Lead',
-                dataKey: 'lead_id',
-                dataLabel: "name",
-                options: [],
-                lazy: {
-                  url: 'leads/leads/',
-                  lazyOneTime: true
-                },
-                required: false
-              },
-              hooks: {
-                onInit: (field: any) => {
-                  //field.templateOptions.options = this.cs.getRole();
-                }
-              }
-            },
-            {
-              key: 'interaction_type_id',
+          key: 'interaction',
+          fieldGroup: [{
+              key: 'interaction_type',
               type: 'select',
               className: 'ant-col-4 pr-md m-3',
               templateOptions: {
@@ -347,19 +218,25 @@ export class LeadsComponent {
                 required: false
               },
               hooks: {
-                onInit: (field: any) => {
+                onChanges: (field: any) => {
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['interaction']) {
+                      this.formConfig.model['interaction']['interaction_type_id'] = data.interaction_type_id;
+                    } else {
+                      console.error('Form config or lead_status data model is not defined.');
+                    }
+                  });
                 }
               }
             },
             {
               key: 'interaction_date',
-              type: 'date',
-              defaultValue: new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate(),
+              type: 'input',
               className: 'ant-col-4 pr-md m-3',
               templateOptions: {
-                type: 'date',
+                type: 'datetime-local',
                 label: 'Interaction date',
-                // placeholder: 'Select Oder Date',
+                placeholder: 'Select interaction date',
                 required: false
               }
             },

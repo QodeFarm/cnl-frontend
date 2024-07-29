@@ -122,20 +122,20 @@ export class AdminLayoutComponent {
         icon: 'fas fa-lock',
         child: [
           {
-            link: '/admin/hrms/designations',
+            link: '/admin/employees',
+            label: 'employees',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/employees/designations',
             label: 'designations',
             icon: 'fas fa-tachometer-alt',
           },
           {
-            link: '/admin/hrms/departments',
+            link: '/admin/employees/departments',
             label: 'departments',
             icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/hrms/employees ',
-            label: 'employees',
-            icon: 'fas fa-tachometer-alt',
-          },
+          }
         ]
       },
       {

@@ -29,17 +29,26 @@ export class LeadsListComponent {
     cols: [
       {
         fieldKey: 'name',
-        name: 'name',
+        name: 'Name',
         sort: true
       },
       {
         fieldKey: 'email',
-        name: 'email',
+        name: 'Email',
         sort: true
       },
       {
         fieldKey: 'phone',
-        name: 'Tax',
+        name: 'Phone',
+        sort: true
+      },
+      {
+        fieldKey: 'lead_status',
+        name: 'Lead Status',
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          return `${row.lead_status.status_name}`;
+        },
         sort: true
       },
       {
@@ -48,12 +57,17 @@ export class LeadsListComponent {
         sort: true
       },
       {
-        fieldKey: 'lead_status_id',
-        name: 'Lead Status',
+        fieldKey: 'sales_rep_id',
+        name: 'Sales Representative',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.lead_status_id}`;
+          return `${row.sales_rep_id}`;
         },
+        sort: true
+      },
+      {
+        fieldKey: '',
+        name: 'Last Interaction Date',
         sort: true
       },
       {
@@ -64,8 +78,8 @@ export class LeadsListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            confirm: true,
-            confirmMsg: "Sure to delete?",
+            // confirm: true,
+            // confirmMsg: "Sure to delete?",
             apiUrl: 'leads/leads'
           },
           {

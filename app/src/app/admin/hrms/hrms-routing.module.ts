@@ -1,11 +1,21 @@
-import { Component, NgModule } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { HrmsComponent } from './hrms.component';
+import { EmployeesComponent } from './hrms.component';
+import { DepartmentsComponent } from './departments/departments.component';
+import { DesignationsComponent } from './designations/designations.component';
 
 const routes: Routes = [
   {
     path: '',
-    component: HrmsComponent // employee component
+    component: EmployeesComponent // employee component
+  },
+  {
+    path: 'departments',
+    component: DepartmentsComponent
+  },
+  {
+    path: 'designations',
+    component: DesignationsComponent
   }
 ];
 

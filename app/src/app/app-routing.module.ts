@@ -31,7 +31,7 @@ const routes: Routes = [
       { path: 'employee', canActivate: [], loadChildren: () => import('./admin/employee/employee.module').then(m => m.EmployeeModule) },
       { path: 'master', canActivate: [], loadChildren: () => import('./admin/master/master.module').then(m => m.MasterModule) },
       { path: 'company', canActivate: [], loadChildren: () => import('./admin/company/company.module').then(m => m.CompanyModule) },
-      { path: 'hrms', canActivate: [], loadChildren: () => import('./admin/hrms/hrms.module').then(m => m.HrmsModule) },
+      { path: 'employees', canActivate: [], loadChildren: () => import('./admin/hrms/hrms.module').then(m => m.EmployeeModule) },
       { path: 'leads', canActivate: [], loadChildren: () => import('./admin/leads/leads.module').then(m => m.LeadsModule) },
     ]
   }

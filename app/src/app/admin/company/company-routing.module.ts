@@ -5,14 +5,13 @@ import { BranchesComponent } from './branches/branches.component';
 
 const routes: Routes = [
   {
-      path : '',
-      component: CompanyComponent,
-    },
-    {
-      path : 'branches',
-      component: BranchesComponent,
-    },
-   
+    path : '',
+    component: CompanyComponent,
+  },
+  {
+    path : 'branches',
+    component: BranchesComponent,
+  }
 ];
 
 @NgModule({

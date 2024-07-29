@@ -6,11 +6,15 @@ import { LeadsComponent } from './leads.component';
 
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { LeadsListComponent } from './leads-list/leads-list.component';
+import { LeadStatusesComponent } from './lead-statuses/lead-statuses.component';
+import { InteractionTypesComponent } from './interaction-types/interaction-types.component';
 
 
 @NgModule({
   declarations: [
-    LeadsComponent
+    LeadsComponent,
+    LeadStatusesComponent,
+    InteractionTypesComponent
   ],
   imports: [
     CommonModule,
