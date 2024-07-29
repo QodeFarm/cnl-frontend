@@ -9,7 +9,7 @@ import { TaCurdConfig } from '@ta/ta-curd';
 export class VendorAgentComponent {
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
-    drawerPlacement: 'right',
+    drawerPlacement: 'top',
     tableConfig: {
       apiUrl: 'vendors/vendor_agent/',
       title: 'Vendor Agent List',
@@ -74,9 +74,12 @@ export class VendorAgentComponent {
       ],
       fields: [
         {
+          fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
+          fieldGroup: [
+        {
           key: 'code',
           type: 'textarea',
-          className: 'ta-cell pr-md',
+          className: 'col-6 pb-3 ps-0',
           templateOptions: {
             label: 'Code',
             placeholder: 'Enter code',
@@ -86,7 +89,7 @@ export class VendorAgentComponent {
 		    {
           key: 'name',
           type: 'textarea',
-          className: 'ta-cell pr-md',
+          className: 'col-6 pb-3 pe-0',
           templateOptions: {
             label: 'Name',
             placeholder: 'Enter name',
@@ -96,7 +99,7 @@ export class VendorAgentComponent {
 		    {
           key: 'commission_rate',
           type: 'textarea',
-          className: 'ta-cell pr-md',
+          className: 'col-6 pb-3 ps-0',
           templateOptions: {
             label: 'Commission rate',
             placeholder: 'Enter commission rate',
@@ -106,7 +109,7 @@ export class VendorAgentComponent {
         {
           key: 'rate_on',
           type: 'select',
-          className: 'ta-cell pr-md',
+          className: 'col-6 pb-3 pe-0',
           templateOptions: {
             label: 'Rate On',
             placeholder: 'Enter rate on',
@@ -120,7 +123,7 @@ export class VendorAgentComponent {
         {
           key: 'amount_type',
           type: 'select',
-          className: 'ta-cell pr-md',
+          className: 'col-6 ps-0',
           templateOptions: {
             label: 'Amount Type',
             placeholder: 'Enter amount type',
@@ -130,7 +133,8 @@ export class VendorAgentComponent {
               { 'label': "BillAmount", value: 'BillAmount' }
             ]
           }
-        },
+        },]
+      }
       ]
     }
 
