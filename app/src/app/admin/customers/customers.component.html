@@ -1,24 +1,23 @@
 <div class="container-fluid pt-3">
   <div class="customers-banner">
-    <div class="col-12 px-1" style="display: flex; justify-content: space-between;">
+    <div class="col-12 px-0" style="display: flex; justify-content: space-between;align-items: center;">
       <button (click)="CustomerEditID = null" type="button" class="btn pl-0" style="color: black;">
-        <b *ngIf="CustomerEditID">Update Customers</b>
-        <b *ngIf="!CustomerEditID">Create Customers</b>
+        <span *ngIf="CustomerEditID" class="custom-heading">Update Customer</span>
+        <span *ngIf="!CustomerEditID" class="custom-heading">Create Customer</span>
       </button>
-      <button (click)="showCustomerListFn()" type="button" class="button" data-bs-toggle="modal" data-bs-target="#exampleModal">
-        Customers List
+      <button (click)="showCustomerListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Customer List
       </button>
     </div>
   </div>
 
-  <div class="row">
-    <div class="col-12 px-1" *ngIf="CustomerEditID || showForm">
+  <div class="row custom-form">
+    <div class="col-12 px-1" *ngIf="showForm">
       <ta-form [options]="formConfig"></ta-form>
     </div>
   </div>
 </div>
 
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade custom-modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header">
@@ -26,10 +25,10 @@
         <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body" *ngIf="showCustomerList">
-        <app-customers-list (edit)="editCustomer($event)"></app-customers-list>
+        <app-customers-list (edit)="editCustomer($event)" class="custom-list"></app-customers-list>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
