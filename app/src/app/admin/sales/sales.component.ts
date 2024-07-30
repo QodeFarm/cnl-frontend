@@ -189,17 +189,18 @@ export class SalesComponent {
                     console.log("customer", data);
                     if (data && data.customer_id) {
                       this.formConfig.model['sale_order']['customer_id'] = data.customer_id;
+                      alert(data.customer_id);
                     }
-
-                    // if (field.form && field.form.controls && field.form.controls.customer_id) {
-                    //   field.form.controls.customer_id.setValue(data.customer_id)
-                    // }
-                    // if (field.form && field.form.controls && field.form.controls.customer_address_id) {
-                    //   field.form.controls.customer_address_id.setValue(data.customer_category_id)
-                    // }
-                    // if (field.form && field.form.controls && field.form.controls.email) {
-                    //   field.form.controls.email.setValue(data.email)
-                    // }
+                  //   if (field.form && field.form.controls && field.form.controls.customer_id) {
+                  //     alert("Hi")
+                  //     field.form.controls.customer_id.setValue(data.customer_id)
+                  //   }
+                  //   if (field.form && field.form.controls && field.form.controls.customer_address_id) {
+                  //     field.form.controls.customer_address_id.setValue(data.customer_category_id)
+                  //   }
+                  //   if (field.form && field.form.controls && field.form.controls.email) {
+                  //     field.form.controls.email.setValue(data.email)
+                  //   }
                   });
                 }
               }
@@ -1075,7 +1076,6 @@ export class SalesComponent {
                           },
                         ]
                       }
-                   
                   ]
                 },
                 
