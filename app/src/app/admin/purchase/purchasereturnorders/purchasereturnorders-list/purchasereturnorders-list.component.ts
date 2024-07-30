@@ -1,63 +1,66 @@
-import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Output } from '@angular/core';
-import { Router } from '@angular/router';
-import { TaTableConfig } from '@ta/ta-table';
+import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { TaTableConfig } from '@ta/ta-table';
+import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-purchase-list',
+  selector: 'app-purchasereturnorders-list',
   standalone: true,
   imports: [CommonModule, AdminCommmonModule],
-  templateUrl: './purchase-list.component.html',
-  styleUrls: ['./purchase-list.component.scss']
+  templateUrl: './purchasereturnorders-list.component.html',
+  styleUrls: ['./purchasereturnorders-list.component.scss']
 })
-export class PurchaseListComponent {
-  
+export class PurchasereturnordersListComponent {
   @Output('edit') edit = new EventEmitter<void>();
-  
+
   tableConfig: TaTableConfig = {
-    apiUrl: 'purchase/purchase_order/',
-    showCheckbox:true,
-    pkId: "purchase_order_id",
+    apiUrl: 'purchase/purchase_return_order/',
+    showCheckbox: true,
+    pkId: "purchase_return_id",
     pageSize: 10,
-    "globalSearch": {
-      keys: ['id', 'first_name', 'last_name']
+    globalSearch: {
+      keys: []
     },
     cols: [
       {
         fieldKey: 'purchase_type',
         name: 'Purchase Type',
-        sort: true,
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          // console.log("-->", currentValue);
-          return `${currentValue?.name}`;
+          return `${row.purchase_type.name}`;
         },
-      },
-      {
-        fieldKey: 'order_date',
-        name: 'Order Date',
         sort: true
       },
       {
-        fieldKey: 'order_no',
-        name: 'Order No',
+        fieldKey: 'return_no',
+        name: 'Return No',
+        sort: true
+      },
+      {
+        fieldKey: 'return_reason',
+        name: 'Return Reason',
+        sort: true
+      },
+      {
+        fieldKey: 'due_date',
+        name: 'Due Date',
         sort: true
       },
       {
         fieldKey: 'tax',
         name: 'Tax',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'tax_amount',
-        name: 'Tax amount',
-        sort: false
+        name: 'Tax Amount',
+        sort: true
       },
       {
         fieldKey: 'total_amount',
-        name: 'Total amount',
-        sort: false
+        name: 'Total Amount',
+        sort: true
       },
       {
         fieldKey: 'vendor',
@@ -80,26 +83,23 @@ export class PurchaseListComponent {
       {
         fieldKey: 'remarks',
         name: 'Remarks',
-        sort: false
+        sort: true
       },
       {
-        fieldKey: "code",
+        fieldKey: "actions",
         name: "Action",
         type: 'action',
         actions: [
           {
             type: 'delete',
             label: 'Delete',
-            // confirm: true,
-            // confirmMsg: "Sure to delete?",
-            apiUrl: 'purchase/purchase_order'
+            apiUrl: 'purchase/purchase_return_order'
           },
           {
             type: 'callBackFn',
             label: 'Edit',
             callBackFn: (row, action) => {
-              console.log(row);
-              this.edit.emit(row.purchase_order_id);
+              this.edit.emit(row.purchase_return_id);
             }
           }
         ]
@@ -107,8 +107,5 @@ export class PurchaseListComponent {
     ]
   };
 
-  constructor(private router: Router) {
-
-  }
+  constructor(private router: Router) {}
 }
-

@@ -110,6 +110,11 @@ export class AdminLayoutComponent {
             link: '/admin/purchase/invoice',
             label: 'Purchase Invoice',
             icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/purchase/purchasereturns',
+            label: 'Purchase Returns',
+            icon: 'fas fa-tachometer-alt',
           }
         ]
       },
@@ -130,7 +135,7 @@ export class AdminLayoutComponent {
       },
       {
         label: 'Vendors',
-        icon: 'fas fa-user',
+        icon: 'fas fa-shopping-bag',
         child: [
           {
             link: '/admin/vendors/',

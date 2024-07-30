@@ -1,132 +1,110 @@
-import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
 import { distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-purchase-invoice',
-  templateUrl: './purchase-invoice.component.html',
-  styleUrls: ['./purchase-invoice.component.scss']
+  selector: 'app-purchasereturnorders',
+  templateUrl: './purchasereturnorders.component.html',
+  styleUrls: ['./purchasereturnorders.component.scss']
 })
-export class PurchaseInvoiceComponent {
-  invoiceNumber: any;
-  showPurchaseInvoiceList: boolean = false;
+export class PurchasereturnordersComponent {
+  orderNumber: any;
+  showPurchaseReturnOrderList: boolean = false;
   showForm: boolean = false;
-  PurchaseInvoiceEditID: any;
+  PurchaseReturnOrderEditID: any;
   productOptions: any;
 
-  constructor(private http: HttpClient) {
-  }
+  constructor(private http: HttpClient) {}
+
   ngOnInit() {
-    this.showPurchaseInvoiceList = false;
+    this.showPurchaseReturnOrderList = false;
     this.showForm = true;
-    // set form config
     this.setFormConfig();
     console.log('this.formConfig', this.formConfig);
 
-    // set purchase_order default value
-    this.formConfig.model['purchase_invoice_orders']['order_type'] = 'purchase_invoice';
+    this.formConfig.model['purchase_return_orders']['order_type'] = 'purchase_return';
 
-    // to get PurchaseOrder number for save
-    this.getInvoiceNo();
+    this.getOrderNo();
   }
+
   formConfig: TaFormConfig = {};
 
   hide() {
     document.getElementById('modalClose').click();
   }
 
-  editPurchaseInvoice(event) {
+  editPurchaseReturnOrder(event) {
     console.log('event', event);
-    this.PurchaseInvoiceEditID = event;
-    this.http.get('purchase/purchase_invoice_order/' + event).subscribe((res: any) => {
+    this.PurchaseReturnOrderEditID = event;
+    this.http.get('purchase/purchase_return_order/' + event).subscribe((res: any) => {
       console.log('--------> res ', res);
       if (res && res.data) {
-
         this.formConfig.model = res.data;
-        // set purchase_order default value
-        this.formConfig.model['purchase_invoice_orders']['order_type'] = 'purchase_invoice';
-        // set labels for update
+        this.formConfig.model['purchase_return_orders']['order_type'] = 'purchase_return';
         this.formConfig.submit.label = 'Update';
-        // show form after setting form values
-
-        this.formConfig.pkId = 'purchase_invoice_id';
-
-        this.formConfig.model['purchase_invoice_id'] = this.PurchaseInvoiceEditID;
+        this.formConfig.pkId = 'purchase_return_id';
+        this.formConfig.model['purchase_return_id'] = this.PurchaseReturnOrderEditID;
         this.showForm = true;
       }
-    })
+    });
     this.hide();
   }
 
-  getInvoiceNo() {
-    this.invoiceNumber = null;
-    this.http.get('masters/generate_order_no/?type=PO-INV').subscribe((res: any) => {
+  getOrderNo() {
+    this.orderNumber = null;
+    this.http.get('masters/generate_order_no/?type=PR').subscribe((res: any) => {
       console.log(res);
       if (res && res.data && res.data.order_number) {
-        this.formConfig.model['purchase_invoice_orders']['invoice_no'] = res.data.order_number;
-        this.invoiceNumber = res.data.order_number;
-        console.log("PurchaseInvoice NO: ", this.invoiceNumber);
-        console.log("get PurchaseInvoice number called");
-
-        // set purchase_order default value
-        // this.formConfig.model['purchase_order']['order_type'] = 'purchase_order';
+        this.formConfig.model['purchase_return_orders']['return_no'] = res.data.order_number;
+        this.orderNumber = res.data.order_number;
+        console.log("get PurchaseReturnOrder number called");
       }
-    })
+    });
   }
 
-  showPurchaseInvoiceListFn() {
-    this.showPurchaseInvoiceList = true;
+  showPurchaseReturnOrderListFn() {
+    this.showPurchaseReturnOrderList = true;
   }
+
   setFormConfig() {
     this.formConfig = {
-      url: "purchase/purchase_invoice_order/",
+      url: "purchase/purchase_return_order/",
       title: '',
       formState: {
         viewMode: false
       },
       exParams: [
         {
-          key: 'purchase_invoice_items',
+          key: 'purchase_return_items',
           type: 'script',
-          value: 'data.purchase_invoice_items.map(m=> {m.product_id = m.product.product_id; if(m.product.unit_options){m.unit_options_id = m.product.unit_options.unit_options_id};  if(m.unit_options){m.unit_options_id = m.unit_options.unit_options_id};  return m ;})'
-        },
-        // {
-        //   key: 'order_attachments',
-        //   type: 'script',
-        //   value: 'data.order_attachments.map(m=> {m = m.response.data[0]; return m ;})'
-        // },
-
+          value: 'data.purchase_return_items.map(m=> {m.product_id = m.product.product_id; if(m.product.unit_options){m.unit_options_id = m.product.unit_options.unit_options_id};  if(m.unit_options){m.unit_options_id = m.unit_options.unit_options_id};  return m ;})'
+        }
       ],
       submit: {
-        // label:'Submit',
         submittedFn: () => this.ngOnInit()
       },
-      reset: {
-
-      },
+      reset: {},
       model: {
-        purchase_invoice_orders: {},
-        purchase_invoice_items: [{}],
+        purchase_return_orders: {},
+        purchase_return_items: [{}],
         order_attachments: [],
         order_shipments: {}
       },
       fields: [
         {
           fieldGroupClassName: "ant-row custom-form-block",
-          key: 'purchase_invoice_orders',
+          key: 'purchase_return_orders',
           fieldGroup: [
             {
               key: 'purchase_type',
               type: 'select',
               className: 'col-2',
-              // defaultValue: "d4d85a98-a703-4772-8b3c-736fc4cbf849",
               templateOptions: {
-                label: 'Purchase type',
-                dataKey: 'purchase_type_id',
+                label: 'Purchase Type',
+                dataKey: 'name',
                 dataLabel: "name",
                 options: [],
-                // required: true,
                 lazy: {
                   url: 'masters/purchase_types/',
                   lazyOneTime: true
@@ -134,10 +112,10 @@ export class PurchaseInvoiceComponent {
               },
               hooks: {
                 onChanges: (field: any) => {
-                  field.formControl.valueChanges.subscribe(data => {
+                  field.formControl.valueChanges.subscribe((data: any) => {
                     console.log("purchase_type", data);
                     if (data && data.purchase_type_id) {
-                      this.formConfig.model['purchase_invoice_orders']['purchase_type_id'] = data.purchase_type_id;
+                      this.formConfig.model['purchase_return_orders']['purchase_type_id'] = data.purchase_type_id;
                     }
                   });
                 }
@@ -164,7 +142,7 @@ export class PurchaseInvoiceComponent {
                   field.formControl.valueChanges.subscribe(data => {
                     // console.log("vendors", data);
                     if (data && data.vendor_id) {
-                      this.formConfig.model['purchase_invoice_orders']['vendor_id'] = data.vendor_id;
+                      this.formConfig.model['purchase_return_orders']['vendor_id'] = data.vendor_id;
                     }
 
                     // if (field.form && field.form.controls && field.form.controls.customer_id) {
@@ -181,14 +159,13 @@ export class PurchaseInvoiceComponent {
               }
             },
             {
-              key: 'invoice_no',
+              key: 'return_no',
               type: 'input',
               className: 'col-2',
               templateOptions: {
-                label: 'Invoice no',
-                placeholder: 'Enter Invoice No',
+                label: 'Return No',
+                placeholder: 'Enter Return No',
                 required: true,
-                // disabled: true
               },
               hooks: {
                 onInit: (field: any) => {
@@ -197,52 +174,67 @@ export class PurchaseInvoiceComponent {
                 }
               },
               // expressionProperties: {
-              //   'templateOptions.disabled': this.PurchaseOrderEditID ? 'true' : 'fa'
+              //   'templateOptions.disabled': this.SaleOrderEditID ? 'true' : 'fa'
               // }
             },
             {
               key: 'email',
               type: 'input',
-              // defaultValue: "testing@example.com",
               className: 'col-2',
               templateOptions: {
                 type: 'input',
                 label: 'Email',
                 placeholder: 'Enter Email',
-                // required: true
-              },
-              hooks: {
+              },hooks: {
                 onInit: (field: any) => { }
               }
             },
             {
-              key: 'delivery_date',
+              key: 'return_date',
               type: 'date',
               defaultValue: new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate(),
               className: 'col-2',
               templateOptions: {
                 type: 'date',
-                label: 'Delivery date',
-                // placeholder: 'Select Oder Date',
+                label: 'Return Date',
                 required: true
               }
             },
             {
-              key: 'invoice_date',
+              key: 'ref_no',
+              type: 'input',
+              className: 'col-2',
+              templateOptions: {
+                type: 'input',
+                label: 'Ref No',
+                placeholder: 'Enter Ref No',
+              }
+            },
+            {
+              key: 'ref_date',
               type: 'date',
               defaultValue: new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate(),
               className: 'col-2',
               templateOptions: {
                 type: 'date',
-                label: 'Invoice date',
-                // placeholder: 'Select Order Date',
-                required: true
+                label: 'Ref Date',
+                placeholder: 'Select Ref Date',
+              }
+            },
+            {
+              key: 'due_date',
+              type: 'date',
+              defaultValue: new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate(),
+              className: 'col-2',
+              templateOptions: {
+                type: 'date',
+                label: 'Due Date',
+                placeholder: 'Select Due Date',
               }
             },
             {
               key: 'tax',
               type: 'select',
-              // defaultValue: 'Exclusive',
               className: 'col-2',
               templateOptions: {
                 label: 'Tax',
@@ -250,96 +242,67 @@ export class PurchaseInvoiceComponent {
                   { 'label': "Inclusive", value: 'Inclusive' },
                   { 'label': "Exclusive", value: 'Exclusive' }
                 ],
-                // required: true
               },
               hooks: {
                 onInit: (field: any) => {
                 }
               }
+              
             },
             {
-              key: 'supplier_invoice_no',
-              type: 'input',
-              // defaultValue: "testing@example.com",
+              key: 'remarks',
+              type: 'textarea',
               className: 'col-2',
               templateOptions: {
-                type: 'input',
-                label: 'Supiler invoice no',
-                placeholder: 'Enter Supiler invoice no',
-                required: true
-              },
-              hooks: {
-                onInit: (field: any) => { }
+                label: 'Remarks',
+                placeholder: 'Enter Remarks',
+              }
+            },
+            {
+              key: 'return_reason',
+              type: 'textarea',
+              className: 'col-2',
+              templateOptions: {
+                label: 'Return Reason',
+                placeholder: 'Enter Return Reason',
               }
             },
             {
               key: 'billing_address',
               type: 'textarea',
-              // defaultValue: '777770 Shipping St, Shipping City, SC, USA',
               className: 'col-3',
               templateOptions: {
-                label: 'Billing address',
-                placeholder: 'Enter Billing address',
-                // required: true,
+                label: 'Billing Address',
+                placeholder: 'Enter Billing Address',
               }
             },
             {
               key: 'shipping_address',
               type: 'textarea',
               className: 'col-3',
-              // defaultValue: '88652 Shipping St, Shipping City, SC, USA',
               templateOptions: {
-                label: 'Shipping address',
-                placeholder: 'Enter Shipping address',
-                // required: true,
+                label: 'Shipping Address',
+                placeholder: 'Enter Shipping Address',
               }
             }
           ]
         },
-        // end of purchase_order
-
         {
-          key: 'purchase_invoice_items',
+          key: 'purchase_return_items',
           type: 'table',
           className: 'custom-form-list',
-          // defaultValue: [],
-          // fieldGroupClassName: 'table-field pr-md',
           templateOptions: {
             title: 'Products',
             addText: 'Add Product',
             tableCols: [
-              {
-                name: 'product',
-                label: 'Product'
-              },
-              {
-                name: 'code',
-                label: 'Code'
-              },
-              {
-                name: 'unit',
-                label: 'Unit'
-              },
-              {
-                name: 'total_boxes',
-                label: 'Total Boxes'
-              },
-              {
-                name: 'quantity',
-                label: 'Quantity'
-              },
-              {
-                name: 'amount',
-                label: 'Price'
-              },
-              {
-                name: 'rate',
-                label: 'Rate'
-              },
-              {
-                name: 'discount',
-                label: 'Discount'
-              }
+              { name: 'product', label: 'Product' },
+              { name: 'code', label: 'Code' },
+              { name: 'unit', label: 'Unit' },
+              { name: 'total_boxes', label: 'Total Boxes' },
+              { name: 'quantity', label: 'Quantity' },
+              { name: 'amount', label: 'Price' },
+              { name: 'rate', label: 'Rate' },
+              { name: 'discount', label: 'Discount' }
             ]
           },
           fieldArray: {
@@ -459,12 +422,39 @@ export class PurchaseInvoiceComponent {
                   }
                 }
               },
+
+              {
+                type: 'input',
+                key: 'sales_rate',
+                // defaultValue: 1000,
+                templateOptions: {
+                  label: 'Rate',
+                  placeholder: 'Enter Rate',
+                  hideLabel: true,
+                  // type: 'number',
+                  // // required: true
+                },
+                hooks: {
+                  onChanges: (field: any) => {
+                    field.formControl.valueChanges.subscribe(data => {
+                      // this.formConfig.model['productQuantity'] = data;
+                      if (field.form && field.form.controls && field.form.controls.quantity && data) {
+                        const quantity = field.form.controls.quantity.value;
+                        const rate = data;
+                        if (rate && quantity) {
+                          field.form.controls.totalAmount.setValue(parseInt(rate) * parseInt(quantity));
+                        }
+                      }
+                    })
+                  }
+                }
+              },
               {
                 type: 'input',
                 key: 'discount',
                 // defaultValue: 90,
                 templateOptions: {
-                  placeholder: 'Enter Discount',
+                  placeholder: 'Enter Disc',
                   // type: 'number',
                   label: 'Disc',
                   hideLabel: true,
@@ -507,7 +497,7 @@ export class PurchaseInvoiceComponent {
               },
               {
                 type: 'input',
-                key: 'total_amount',
+                key: 'totalAmount',
                 templateOptions: {
                   label: 'Amount',
                   placeholder: 'Enter Amount',
@@ -581,10 +571,6 @@ export class PurchaseInvoiceComponent {
             ]
           },
         },
-        // end of purchase_order keys
-
-        // start of order_shipments keys
-        
         {
           fieldGroupClassName: "row col-12 m-0 custom-form-card",
           fieldGroup: [
@@ -712,63 +698,67 @@ export class PurchaseInvoiceComponent {
                     {
                       className: 'col-12 mb-3 custom-form-card-block w-100',
                       fieldGroup:[
-                // start of purchase_order keys
+              
                 {
                   template: '<div class="custom-form-card-title"> Billing Details </div>',
                   fieldGroupClassName: "ant-row",
                 },
                 {
                   fieldGroupClassName: "ant-row",
-                  key: 'purchase_invoice_orders',
+                  key: 'purchase_return_orders',
                   fieldGroup: [
                     {
                       key: 'total_boxes',
                       type: 'input',
-                      // defaultValue: 77777,
                       className: 'col-4',
                       templateOptions: {
                         type: 'input',
-                        label: 'Total boxes',
-                        placeholder: 'Enter Total boxes',
-                        // required: true
+                        label: 'Total Boxes',
+                        placeholder: 'Enter Total Boxes',
                       }
                     },
                     {
                       key: 'cess_amount',
                       type: 'input',
-                      // defaultValue: "7777700",
                       className: 'col-4',
                       templateOptions: {
                         type: 'input',
-                        label: 'Cess amount',
-                        placeholder: 'Enter Cess amount',
-                        // required: true
+                        label: 'Cess Amount',
+                        placeholder: 'Enter Cess Amount',
                       }
                     },
                     {
                       key: 'advance_amount',
                       type: 'input',
-                      // defaultValue: "77777.00",
                       className: 'col-4',
                       templateOptions: {
                         type: 'input',
-                        label: 'Advance amount',
-                        placeholder: 'Enter Advance amount',
-                        // required: true
+                        label: 'Advance Amount',
+                        placeholder: 'Enter Advance Amount',
                       }
                     },
                     {
                       key: 'taxable',
                       type: 'input',
-                      // defaultValue: "777770",
                       className: 'col-4',
                       templateOptions: {
                         type: 'input',
                         label: 'Taxable',
                         placeholder: 'Enter Taxable',
-                        // required: true
                       }
                     },
+                    // {
+                    //   type: 'input',
+                    //   key: 'print_name',
+                    //   // defaultValue: 1000,
+                    //   templateOptions: {
+                    //     label: 'Print name',
+                    //     placeholder: 'Enter Product Print name',
+                    //     hideLabel: true,
+                    //     // type: 'number',
+                    //     // // required: true mrp tax 
+                    //   },
+                    // },
                     {
                       key: 'tax_amount',
                       type: 'input',
@@ -781,27 +771,13 @@ export class PurchaseInvoiceComponent {
                         // required: true
                       }
                     },
-                    // {
-                    //   key: 'round_off',
-                    //   type: 'input',
-                    //   // defaultValue: "7777700",
-                    //   className: 'col-4',
-                    //   templateOptions: {
-                    //     type: 'input',
-                    //     label: 'Round off',
-                    //     placeholder: 'Enter Round off',
-                    //     // required: true
-                    //   }
-                    // },
                     {
                       key: 'gst_type',
                       type: 'select',
-                      // defaultValue: "888ddb1b-5d74-4051-903f-171e2b4f9aab",
                       className: 'col-4',
                       templateOptions: {
-                        label: 'Gst type',
-                        placeholder: 'Select Gst type',
-                        // required: true,
+                        label: 'Gst Type',
+                        placeholder: 'Select Gst Type',
                         dataKey: 'name',
                         dataLabel: "name",
                         lazy: {
@@ -811,10 +787,9 @@ export class PurchaseInvoiceComponent {
                       },
                       hooks: {
                         onChanges: (field: any) => {
-                          field.formControl.valueChanges.subscribe(data => {
-                            console.log("gst_type", data);
-                            if (data && data.gst_type_id) {
-                              this.formConfig.model['purchase_invoice_orders']['gst_type_id'] = data.gst_type_id;
+                          field.formControl.valueChanges.subscribe((data: any) => {
+                            if (this.formConfig && this.formConfig.model && this.formConfig.model['purchase_return_orders']) {
+                              this.formConfig.model['purchase_return_orders']['gst_type_id'] = data.gst_type_id;
                             }
                           });
                         }
@@ -824,13 +799,10 @@ export class PurchaseInvoiceComponent {
                       key: 'payment_term',
                       type: 'select',
                       className: 'col-4',
-                      // defaultValue: '3b4cc23d-6dc3-42e9-9894-02624fdf9934',
                       templateOptions: {
-                        label: 'Payment term',
-                        placeholder: 'Select Payment term',
-                        // required: true,
+                        label: 'Payment Term',
                         dataKey: 'payment_term_id',
-                        dataLabel: "name",
+                        dataLabel: 'name',
                         lazy: {
                           url: 'vendors/vendor_payment_terms/',
                           lazyOneTime: true
@@ -838,84 +810,49 @@ export class PurchaseInvoiceComponent {
                       },
                       hooks: {
                         onChanges: (field: any) => {
-                          field.formControl.valueChanges.subscribe(data => {
-                            console.log("payment_term", data);
-                            if (data && data.payment_term_id) {
-                              this.formConfig.model['purchase_invoice_orders']['payment_term_id'] = data.payment_term_id;
-                            }
-                          });
-                        }
-                      }
-                    },
-                    {
-                      key: 'ledger_account',
-                      type: 'select',
-                      className: 'col-4',
-                      templateOptions: {
-                        dataKey: 'name',
-                        dataLabel: "name",
-                        label: 'Ledger account',
-                        placeholder: 'Select Ledger account',
-                        // required: true,
-                        lazy: {
-                          url: 'customers/ledger_accounts/',
-                          lazyOneTime: true
-                        }
-                      },
-                      hooks: {
-                        onChanges: (field: any) => {
-                          field.formControl.valueChanges.subscribe(data => {
-                            console.log("ledger_account", data);
-                            if (data && data.ledger_account_id) {
-                              this.formConfig.model['purchase_invoice_orders']['ledger_account_id'] = data.ledger_account_id;
+                          field.formControl.valueChanges.subscribe((data: any) => {
+                            if (this.formConfig && this.formConfig.model && this.formConfig.model['purchase_return_orders']) {
+                              this.formConfig.model['purchase_return_orders']['payment_term_id'] = data.payment_term_id;
                             }
                           });
                         }
                       }
                     },
                     // {
-                    //   key: 'order_type',
+                    //   key: 'ledger_account',
                     //   type: 'select',
-                    //   // defaultValue: '0d790583-50b3-4bb7-930c-c99f2d2fe526',
                     //   className: 'ant-col-6 pr-md m-3',
                     //   templateOptions: {
-                    //     label: 'Order Type',
+                    //     label: 'Ledger Account',
+                    //     placeholder: 'Select Ledger Account',
                     //     dataKey: 'name',
                     //     dataLabel: "name",
-                    //     placeholder: 'Select Order type',
-                    //     // required: true,
-                    //     defaultValue: 'purchase_order',
                     //     lazy: {
-                    //       url: 'masters/order_types/',
+                    //       url: 'customers/ledger_accounts/',
                     //       lazyOneTime: true
                     //     }
                     //   },
                     //   hooks: {
                     //     onChanges: (field: any) => {
-                    //       field.formControl.valueChanges.subscribe(data => {
-                    //         console.log("order_type", data);
-                    //         if (data.purchase_order) {
-                    //           console.log("order_type:", data.name);
-                    //           this.formConfig.model['purchase_invoice_orders']['order_type'] = data.purchase_order;
+                    //       field.formControl.valueChanges.subscribe((data: any) => {
+                    //         if (this.formConfig && this.formConfig.model && this.formConfig.model['purchase_return_orders']) {
+                    //           this.formConfig.model['purchase_return_orders']['ledger_account_id'] = data.ledger_account_id;
+                    //         } else {
+                    //           console.error('Form config or vendor data model is not defined.');
                     //         }
                     //       });
-                    //       // if (!field.formControl.value) {
-                    //       //   field.formControl.setValue('purchase_order');
-                    //       // }
                     //     }
                     //   }
                     // },
                     {
                       key: 'order_status',
                       type: 'select',
-                      // defaultValue: '0d790583-50b3-4bb7-930c-c99f2d2fe526',
                       className: 'col-4',
                       templateOptions: {
-                        label: 'Order status Type',
+                        label: 'Order Status Type',
+                        placeholder: 'Select Order Status Type',
                         dataKey: 'status_name',
                         dataLabel: "status_name",
-                        placeholder: 'Select Order status type',
-                        // required: true,
                         lazy: {
                           url: 'masters/order_status/',
                           lazyOneTime: true
@@ -926,7 +863,7 @@ export class PurchaseInvoiceComponent {
                           field.formControl.valueChanges.subscribe(data => {
                             console.log("order_status", data);
                             if (data && data.order_status_id) {
-                              this.formConfig.model['purchase_invoice_orders']['order_status_id'] = data.order_status_id;
+                              this.formConfig.model['purchase_return_orders']['order_status_id'] = data.order_status_id;
                             }
                           });
                         }
@@ -935,7 +872,7 @@ export class PurchaseInvoiceComponent {
                     {
                       key: 'item_value',
                       type: 'input',
-                      // defaultValue: "0",
+                      defaultValue: "0",
                       className: 'col-4',
                       templateOptions: {
                         type: 'input',
@@ -945,7 +882,7 @@ export class PurchaseInvoiceComponent {
                       },
                       hooks: {
                         onInit: (field: any) => {
-                          field.parent.form.get('purchase_order_items').valueChanges.pipe(
+                          field.parent.form.get('purchase_return_items').valueChanges.pipe(
                             distinctUntilChanged()
                           ).subscribe((data: any) => {
                             let sum = 0;
@@ -973,7 +910,7 @@ export class PurchaseInvoiceComponent {
                       },
                       hooks: {
                         onInit: (field: any) => {
-                          field.parent.form.get('purchase_order_items').valueChanges.pipe(
+                          field.parent.form.get('purchase_return_items').valueChanges.pipe(
                             distinctUntilChanged()
                           ).subscribe((data: any) => {
                             let totalDiscount = 0;
@@ -989,7 +926,7 @@ export class PurchaseInvoiceComponent {
                       }
                     },
                     {
-                      key: 'doc_amount',
+                      key: 'total_amount',
                       type: 'input',
                       // defaultValue: "12",
                       className: 'col-4',
@@ -1001,7 +938,7 @@ export class PurchaseInvoiceComponent {
                       },
                       hooks: {
                         onInit: (field: any) => {
-                          field.parent.form.get('purchase_order_items').valueChanges.pipe(
+                          field.parent.form.get('purchase_return_items').valueChanges.pipe(
                             distinctUntilChanged()
                           ).subscribe((data: any) => {
                             let totalItemsValue = field.form.controls.item_value.value;
@@ -1020,67 +957,79 @@ export class PurchaseInvoiceComponent {
                         }
                       }
                     },
+                    // {
+                    //   key: 'transport_charges',
+                    //   type: 'input',
+                    //   className: 'ant-col-6 pr-md m-3',
+                    //   templateOptions: {
+                    //     type: 'input',
+                    //     label: 'Transport Charges',
+                    //     placeholder: 'Enter Transport Charges',
+                    //   }
+                    // },
+                    // {
+                    //   key: 'round_off',
+                    //   type: 'input',
+                    //   className: 'ant-col-6 pr-md m-3',
+                    //   templateOptions: {
+                    //     type: 'input',
+                    //     label: 'Round Off',
+                    //     placeholder: 'Enter Round Off',
+                    //   }
+                    // }
                   ]
                 },
               ]
             }
           ]
         },
-
         {
           className: 'col-12 custom-form-card-block w-100',
           fieldGroup:[
             {
               template: '<div class="custom-form-card-title"> Order Attachments </div>',
               fieldGroupClassName: "ant-row",
+            // {
+            //   key: 'order_shipments.shipping_tracking_no',
+            //   type: 'input',
+            //   className: 'ant-col-3 pr-md m-3',
+            //   templateOptions: {
+            //     label: 'Shipping Tracking No.',
+            //     placeholder: 'Enter Shipping Tracking No.',
+            //   }
+            // },
+            // {
+            //   key: 'order_shipments.shipping_date',
+            //   type: 'date',
+            //   className: 'ant-col-3 pr-md m-3',
+            //   templateOptions: {
+            //     label: 'Shipping Date',
+            //   }
+            // },
+            // {
+            //   key: 'order_shipments.shipping_charges',
+            //   type: 'input',
+            //   className: 'ant-col-3 pr-md m-3',
+            //   templateOptions: {
+            //     label: 'Shipping Charges',
+            //     placeholder: 'Enter Shipping Charges',
+            //   }
             },
-          // fieldGroup: [
-
-          //   {
-          //     key: 'order_shipments.shipping_tracking_no',
-          //     type: 'input',
-          //     className: 'ant-col-3 pr-md m-3',
-          //     templateOptions: {
-          //       label: 'Shipping Tracking No.',
-          //       placeholder: 'Enter Shipping Tracking No.',
-          //     }
-          //   },
-          //   {
-          //     key: 'order_shipments.shipping_date',
-          //     type: 'date',
-          //     className: 'ant-col-3 pr-md m-3',
-          //     templateOptions: {
-          //       label: 'Shipping Date',
-          //       // placeholder: 'Enter Shipping Tracking No.',
-          //     }
-          //   },
-          //   {
-          //     key: 'order_shipments.shipping_charges',
-          //     type: 'input',
-          //     className: 'ant-col-3 pr-md m-3',
-          //     templateOptions: {
-          //       label: 'Shipping Charges.',
-          //       placeholder: 'Enter Shipping Charges',
-          //     }
-          //   },
             {
               key: 'order_attachments',
               type: 'file',
               className: 'ta-cell col-12 custom-file-attachement',
               templateOptions: {
                 // label: 'Order Attachments',
-                // // required: true
-                // required: true
               }
             },
           ]
-        }
-      ]
-    },
-  ]
+            }
+          ]
         },
       ]
-    }
+        }
+      ]
+    };
   }
-
 }

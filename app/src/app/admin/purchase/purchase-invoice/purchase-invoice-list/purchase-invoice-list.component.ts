@@ -25,6 +25,16 @@ export class PurchaseInvoiceListComponent {
     },
     cols: [
       {
+        fieldKey: 'purchase_type',
+        name: 'Purchase Type',
+        sort: true,
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          // console.log("-->", currentValue);
+          return `${currentValue?.name}`;
+        },
+      },
+      {
         fieldKey: 'invoice_no',
         name: 'Invoice No',
         sort: true
@@ -67,16 +77,6 @@ export class PurchaseInvoiceListComponent {
           return `${row.vendor.name}`;
         },
         sort: true
-      },
-      {
-        fieldKey: 'purchase_type',
-        name: 'Purchase Type',
-        sort: true,
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          // console.log("-->", currentValue);
-          return `${currentValue?.name}`;
-        },
       },
       {
         fieldKey: 'order_status',

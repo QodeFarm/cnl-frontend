@@ -833,7 +833,7 @@ export class PurchaseComponent {
                       }
                     },
                     {
-                      key: 'payment_term_id',
+                      key: 'payment_term',
                       type: 'select',
                       className: 'col-4',
                       // defaultValue: '3b4cc23d-6dc3-42e9-9894-02624fdf9934',
