@@ -14,7 +14,7 @@ import { of } from 'rxjs';
 
 export class CompanyComponent {
   ids: string[] = []; // Array to hold extracted IDs
-  title = "";
+  title = "Company";
   showForm = false;
   formConfig: TaFormConfig = {
     url: 'company/companies/',
@@ -44,7 +44,7 @@ export class CompanyComponent {
           {
             key: 'name',
             type: 'input',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'Name',
               placeholder: 'Enter name',
@@ -54,7 +54,7 @@ export class CompanyComponent {
           {
             key: 'print_name',
             type: 'input',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'Print name',
               placeholder: 'Enter name',
@@ -64,7 +64,7 @@ export class CompanyComponent {
           {
             key: 'short_name',
             type: 'input',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'Short name',
               placeholder: 'Enter name',
@@ -74,7 +74,7 @@ export class CompanyComponent {
           {
             key: 'phone',
             type: 'input',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'Phone',
               placeholder: 'Enter number',
@@ -84,7 +84,7 @@ export class CompanyComponent {
           {
             key: 'email',
             type: 'input',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'Email',
               placeholder: 'Enter email',
@@ -94,7 +94,7 @@ export class CompanyComponent {
           {
             key: 'code',
             type: 'input',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'Code',
               placeholder: 'Enter code',
@@ -104,7 +104,7 @@ export class CompanyComponent {
           {
             key: 'num_branches',
             type: 'input',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'Num branches',
               placeholder: 'Enter number',
@@ -114,7 +114,7 @@ export class CompanyComponent {
           {
             key: 'num_employees',
             type: 'input',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'Num employees',
               placeholder: 'Enter number',
@@ -124,7 +124,7 @@ export class CompanyComponent {
           {
             key: 'logo',
             type: 'input',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'Logo',
               placeholder: 'upload',
@@ -134,7 +134,7 @@ export class CompanyComponent {
           {
             key: 'pin_code',
             type: 'input',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'Pin code',
               placeholder: 'Enter pin code',
@@ -144,7 +144,7 @@ export class CompanyComponent {
           {
             key: 'city',
             type: 'select',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'City',
               dataKey: 'city_id',
@@ -165,7 +165,7 @@ export class CompanyComponent {
           {
             key: 'state',
             type: 'select',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'State',
               dataKey: 'state_id',
@@ -186,7 +186,7 @@ export class CompanyComponent {
           {
             key: 'country',
             type: 'select',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'Country',
               dataKey: 'country_id',
@@ -207,7 +207,7 @@ export class CompanyComponent {
           {
             key: 'longitude',
             type: 'input',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'Longitude',
               placeholder: 'Enter longitude',
@@ -217,7 +217,7 @@ export class CompanyComponent {
           {
             key: 'latitude',
             type: 'input',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'Latitude',
               placeholder: 'Enter latitude',
@@ -257,7 +257,7 @@ export class CompanyComponent {
           {
             key: 'website',
             type: 'input',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'Website',
               placeholder: 'Enter URL',
@@ -267,9 +267,9 @@ export class CompanyComponent {
           {
             key: 'facebook_url',
             type: 'input',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
-              label: 'Facebook url',
+              label: 'Facebook URL',
               placeholder: 'Enter URL',
               required: false,
             }
@@ -277,7 +277,7 @@ export class CompanyComponent {
           {
             key: 'skype_id',
             type: 'input',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'Skype id',
               placeholder: 'Enter URL',
@@ -287,7 +287,7 @@ export class CompanyComponent {
           {
             key: 'twitter_handle',
             type: 'input',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'Twitter handle',
               placeholder: 'Enter URL',
@@ -297,9 +297,9 @@ export class CompanyComponent {
           {
             key: 'linkedin_url',
             type: 'input',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
-              label: 'Linkedin url',
+              label: 'Linkedin URL',
               placeholder: 'Enter Name',
               required: false,
             }
@@ -307,7 +307,7 @@ export class CompanyComponent {
           {
             key: 'pan',
             type: 'input',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'PAN',
               placeholder: 'Enter Name',
@@ -317,7 +317,7 @@ export class CompanyComponent {
           {
             key: 'tan',
             type: 'input',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'TAN',
               placeholder: 'Enter Name',
@@ -327,7 +327,7 @@ export class CompanyComponent {
           {
             key: 'cin',
             type: 'input',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'CIN',
               placeholder: 'Enter Name',
@@ -337,7 +337,7 @@ export class CompanyComponent {
           {
             key: 'gst_tin',
             type: 'input',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'GST TIN',
               placeholder: 'Enter Name',
@@ -347,7 +347,7 @@ export class CompanyComponent {
           {
             key: 'establishment_code',
             type: 'input',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'Establishment code',
               placeholder: 'Enter Name',
@@ -357,7 +357,7 @@ export class CompanyComponent {
           {
             key: 'esi_no',
             type: 'input',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'ESI no',
               placeholder: 'Enter Name',
@@ -367,7 +367,7 @@ export class CompanyComponent {
           {
             key: 'pf_no',
             type: 'input',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'PF no',
               placeholder: 'Enter Name',
@@ -377,7 +377,7 @@ export class CompanyComponent {
           {
             key: 'authorized_person',
             type: 'input',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'Authorized person',
               placeholder: 'Enter Name',
@@ -387,7 +387,7 @@ export class CompanyComponent {
           {
             key: 'iec_code',
             type: 'input',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'IEC code',
               placeholder: 'Enter Name',
@@ -397,7 +397,7 @@ export class CompanyComponent {
           {
             key: 'turnover_less_than_5cr',
             type: 'checkbox',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'Turnover less than 5cr',
               placeholder: 'Enter Name',
@@ -409,9 +409,9 @@ export class CompanyComponent {
               {
                 key: 'eway_username',
                 type: 'input',
-                className: 'ant-col-4 pr-md m-3',
+                className: 'ant-col-4 pr-md m-1',
                 templateOptions: {
-                  label: 'E-Way username',
+                  label: 'E-Way Username',
                   placeholder: 'Enter Name',
                   required: false,
                 }
@@ -419,7 +419,7 @@ export class CompanyComponent {
               {
                 key: 'eway_password',
                 type: 'input',
-                className: 'ant-col-4 pr-md m-3',
+                className: 'ant-col-4 pr-md m-1',
                 templateOptions: {
                   label: 'E-Way password',
                   placeholder: 'Enter Name',
@@ -429,9 +429,9 @@ export class CompanyComponent {
               {
                 key: 'gstn_username',
                 type: 'input',
-                className: 'ant-col-4 pr-md m-3',
+                className: 'ant-col-4 pr-md m-1',
                 templateOptions: {
-                  label: 'Gstn username',
+                  label: 'GSTN Username',
                   placeholder: 'Enter Name',
                   required: false,
                 }
@@ -439,9 +439,9 @@ export class CompanyComponent {
               {
                 key: 'gstn_password',
                 type: 'input',
-                className: 'ant-col-4 pr-md m-3',
+                className: 'ant-col-4 pr-md m-1',
                 templateOptions: {
-                  label: 'Gstn password',
+                  label: 'GSTN password',
                   placeholder: 'Enter Name',
                   required: false,
                 }
@@ -449,7 +449,7 @@ export class CompanyComponent {
               {
                 key: 'einvoice_approved_only',
                 type: 'checkbox',
-                className: 'ant-col-4 pr-md m-3',
+                className: 'ant-col-4 pr-md m-1',
                 templateOptions: {
                   label: 'E-Invoice approved only',
                   placeholder: 'Enter Name',
@@ -461,9 +461,9 @@ export class CompanyComponent {
           {
             key: 'vat_gst_status',
             type: 'select',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
-              label: 'Vat gst status',
+              label: 'Vat GST status',
               placeholder: 'select',
               required: false,
               options: [
@@ -476,9 +476,9 @@ export class CompanyComponent {
           {
             key: 'gst_type',
             type: 'select',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
-              label: 'Gst type',
+              label: 'GST type',
               placeholder: 'select',
               required: false,
               options: [
@@ -491,9 +491,9 @@ export class CompanyComponent {
           {
             key: 'marketplace_url',
             type: 'input',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
-              label: 'Marketplace url',
+              label: 'Marketplace URL',
               placeholder: 'Enter Name',
               required: false,
             }
@@ -501,7 +501,7 @@ export class CompanyComponent {
           {
             key: 'drug_license_no',
             type: 'input',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'Drug license no',
               placeholder: 'Enter Name',
@@ -511,7 +511,7 @@ export class CompanyComponent {
           {
             key: 'is_deleted',
             type: 'checkbox',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'Is Deleted',
               placeholder: 'Enter Name',
@@ -521,7 +521,7 @@ export class CompanyComponent {
           {
             key: 'other_license_1',
             type: 'input',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'Other license 1',
               placeholder: 'Enter Name',
@@ -531,7 +531,7 @@ export class CompanyComponent {
           {
             key: 'other_license_2',
             type: 'input',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'Other license 2',
               placeholder: 'Enter Name',
@@ -541,7 +541,7 @@ export class CompanyComponent {
           {
             key: 'drug_license_no',
             type: 'input',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'ant-col-4 pr-md m-1',
             templateOptions: {
               label: 'Drug license no',
               placeholder: 'Enter Name',

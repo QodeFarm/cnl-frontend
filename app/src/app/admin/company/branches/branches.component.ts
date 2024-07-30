@@ -11,7 +11,7 @@ import { TaCurdConfig } from '@ta/ta-curd';
 export class BranchesComponent {
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
-    drawerPlacement: 'right',
+    drawerPlacement: 'top',
     tableConfig: {
       apiUrl: 'company/branches/',
       title: 'Branches',
@@ -81,7 +81,7 @@ export class BranchesComponent {
     },
     formConfig: {
       url: 'company/branches/',
-      title: 'new branch',
+      title: 'Branch',
       pkId: "branch_id",
       exParams: [
 	    {
@@ -112,12 +112,12 @@ export class BranchesComponent {
       ],
       fields: [
         {
-          fieldGroupClassName: "ant-row",
+          fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
           fieldGroup: [
             {
               key: 'name',
               type: 'input',
-              className: 'ant-col-5 pr-md m-3',
+              className: 'col-6 pb-3 ps-0',
               templateOptions: {
                 label: 'Name',
                 placeholder: 'Enter Name',
@@ -127,7 +127,7 @@ export class BranchesComponent {
             {
               key: 'code',
               type: 'input',
-              className: 'ant-col-5 pr-md m-3',
+              className: 'col-6 pb-3 pe-0',
               templateOptions: {
                 label: 'Code',
                 placeholder: 'Enter Code',
@@ -137,7 +137,7 @@ export class BranchesComponent {
             {
               key: 'phone',
               type: 'input',
-              className: 'ant-col-5 pr-md m-3',
+              className: 'col-6 pb-3 ps-0',
               templateOptions: {
                 label: 'Phone',
                 placeholder: 'Enter Number',
@@ -147,7 +147,7 @@ export class BranchesComponent {
             {
               key: 'email',
               type: 'input',
-              className: 'ant-col-5 pr-md m-3',
+              className: 'col-6 pb-3 pe-0',
               templateOptions: {
                 label: 'Email',
                 placeholder: 'Enter Email',
@@ -157,7 +157,7 @@ export class BranchesComponent {
             {
               key: 'address',
               type: 'textarea',
-              className: 'ant-col-5 pr-md m-3',
+              className: 'col-6 pb-3 ps-0',
               templateOptions: {
                 label: 'Address',
                 placeholder: 'Enter Address',
@@ -167,7 +167,7 @@ export class BranchesComponent {
             {
               key: 'city',
               type: 'select',
-              className: 'ant-col-5 pr-md m-3',
+              className: 'col-6 pb-3 pe-0',
               templateOptions: {
                 label: 'City',
                 dataKey: 'city_id',
@@ -188,7 +188,7 @@ export class BranchesComponent {
         {
               key: 'state',
               type: 'select',
-              className: 'ant-col-5 pr-md m-3',
+              className: 'col-6 pb-3 ps-0',
               templateOptions: {
                 label: 'State',
                 dataKey: 'state_id',
@@ -209,7 +209,7 @@ export class BranchesComponent {
         {
               key: 'country',
               type: 'select',
-              className: 'ant-col-5 pr-md m-3',
+              className: 'col-6 pb-3 pe-0',
               templateOptions: {
                 label: 'Country',
                 dataKey: 'country_id',
@@ -230,7 +230,7 @@ export class BranchesComponent {
             {
               key: 'pin_code',
               type: 'input',
-              className: 'ant-col-5 pr-md m-3',
+              className: 'col-6 pb-3 ps-0',
               templateOptions: {
                 label: 'Pin code',
                 placeholder: 'Enter code',
@@ -240,7 +240,7 @@ export class BranchesComponent {
             {
               key: 'gst_no',
               type: 'input',
-              className: 'ant-col-5 pr-md m-3',
+              className: 'col-6 pb-3 pe-0',
               templateOptions: {
                 label: 'Gst No',
                 placeholder: 'Enter Gst No',
@@ -250,7 +250,7 @@ export class BranchesComponent {
             {
               key: 'status',
               type: 'select',
-              className: 'ant-col-5 pr-md m-3',
+              className: 'col-6 pb-3 ps-0',
               templateOptions: {
                 label: 'Status',
                 dataKey: 'status_id',
@@ -271,7 +271,7 @@ export class BranchesComponent {
             {
               key: 'allowed_warehouse',
               type: 'input',
-              className: 'ant-col-5 pr-md m-3',
+              className: 'col-6 pb-3 pe-0',
               templateOptions: {
                 label: 'Allowed Warehouse',
                 placeholder: 'Enter allowed warehouse',
@@ -281,7 +281,7 @@ export class BranchesComponent {
             {
               key: 'e_way_username',
               type: 'input',
-              className: 'ant-col-5 pr-md m-3',
+              className: 'col-6 pb-3 ps-0',
               templateOptions: {
                 label: 'e-way username',
                 placeholder: 'Enter e-way username',
@@ -291,7 +291,7 @@ export class BranchesComponent {
             {
               key: 'e_way_password',
               type: 'input',
-              className: 'ant-col-5 pr-md m-3',
+              className: 'col-6 pb-3 pe-0',
               templateOptions: {
                 label: 'e-way password',
                 placeholder: 'Enter e-way password',
@@ -301,7 +301,7 @@ export class BranchesComponent {
             {
               key: 'other_license_1',
               type: 'input',
-              className: 'ant-col-5 pr-md m-3',
+              className: 'col-6 pb-3 ps-0',
               templateOptions: {
                 label: 'Other license 1',
                 placeholder: 'Enter license name',
@@ -311,7 +311,7 @@ export class BranchesComponent {
             {
               key: 'other_license_2',
               type: 'input',
-              className: 'ant-col-5 pr-md m-3',
+              className: 'col-6 pb-3 pe-0',
               templateOptions: {
                 label: 'Other license 2',
                 placeholder: 'Enter license name',
@@ -321,7 +321,7 @@ export class BranchesComponent {
             {
               key: 'gstn_username',
               type:  'input',
-              className: 'ant-col-5 pr-md m-3',
+              className: 'col-6 pb-3 ps-0',
               templateOptions: {
                 label: 'Gstn username',
                 placeholder: 'Enter username',
@@ -331,7 +331,7 @@ export class BranchesComponent {
             {
               key: 'gstn_password',
               type: 'input',
-              className: 'ant-col-5 pr-md m-3',
+              className: 'col-6 pb-3 pe-0',
               templateOptions: {
                 label: 'Gstn password',
                 placeholder: 'Enter password',
@@ -341,7 +341,7 @@ export class BranchesComponent {
             {
               key: 'longitude',
               type: 'input',
-              className: 'ant-col-5 pr-md m-3',
+              className: 'col-6 pb-3 ps-0',
               templateOptions: {
                 label: 'Longitude',
                 placeholder: 'Enter longitude',
@@ -351,7 +351,7 @@ export class BranchesComponent {
             {
               key: 'latitude',
               type: 'input',
-              className: 'ant-col-5 pr-md m-3',
+              className: 'col-6 pb-3 pe-0',
               templateOptions: {
                 label: 'Latitude',
                 placeholder: 'Enter latitude',
@@ -360,8 +360,8 @@ export class BranchesComponent {
             },
             {
               key: 'picture',
-              type: 'input',
-              className: 'ant-col-5 pr-md m-3',
+              type: 'file',
+              className: 'col-6 pb-3 ps-0',
               templateOptions: {
                 label: 'picture',
                 placeholder: 'Upload',
