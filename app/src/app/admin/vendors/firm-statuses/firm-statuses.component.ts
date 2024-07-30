@@ -62,8 +62,8 @@ export class FirmStatusesComponent {
           fieldGroup: [
 		{
           key: 'name',
-          type: 'textarea',
-          className: 'col-12 p-0',
+          type: 'input',
+          className: 'col-6 p-0',
           templateOptions: {
             label: 'Name',
             placeholder: 'Enter name',

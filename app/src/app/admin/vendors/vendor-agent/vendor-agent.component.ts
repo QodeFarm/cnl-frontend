@@ -78,7 +78,7 @@ export class VendorAgentComponent {
           fieldGroup: [
         {
           key: 'code',
-          type: 'textarea',
+          type: 'input',
           className: 'col-6 pb-3 ps-0',
           templateOptions: {
             label: 'Code',
@@ -88,7 +88,7 @@ export class VendorAgentComponent {
         },
 		    {
           key: 'name',
-          type: 'textarea',
+          type: 'input',
           className: 'col-6 pb-3 pe-0',
           templateOptions: {
             label: 'Name',
@@ -98,7 +98,7 @@ export class VendorAgentComponent {
         },
 		    {
           key: 'commission_rate',
-          type: 'textarea',
+          type: 'input',
           className: 'col-6 pb-3 ps-0',
           templateOptions: {
             label: 'Commission rate',
