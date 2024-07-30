@@ -105,7 +105,7 @@ export class AdminLayoutComponent {
       },
       {
         label: 'Assets',
-        icon: 'fas fa-boxes',
+        icon: 'fas fa-box',
         child: [
           {
             link: '/admin/assets/assets',
@@ -130,6 +130,22 @@ export class AdminLayoutComponent {
           {
             link: '/admin/assets/asset_maintenance',
             label: 'Asset Maintenance',
+            icon: 'fas fa-tachometer-alt',
+          },
+        ]
+      },
+      {
+        label: 'TASKS',
+        icon: 'fas fa-tasks',
+        child: [
+          {
+            link: '/admin/tasks/',
+            label: 'Tasks',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/tasks/task_priorities', 
+            label: 'Task Priorities',
             icon: 'fas fa-tachometer-alt',
           },
         ]

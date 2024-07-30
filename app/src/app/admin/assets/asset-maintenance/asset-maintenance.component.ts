@@ -76,68 +76,73 @@ export class AssetMaintenanceComponent {
       ],
       fields: [
         {
-          key: 'asset',
-          type: 'select',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'Asset',
-            dataKey: 'asset_id',
-            dataLabel: "name",
-            options: [],
-            lazy: {
-              url: 'http://195.35.20.172:8000/api/v1/assets/assets/',
-              lazyOneTime: true
+          fieldGroupClassName: 'ant-row custom-form-block',
+          fieldGroup: [
+            {
+              key: 'asset',
+              type: 'select',
+              className: 'ant-col-10 pr-md m-3',
+              templateOptions: {
+                label: 'Asset',
+                dataKey: 'asset_id',
+                dataLabel: "name",
+                options: [],
+                lazy: {
+                  url: 'http://195.35.20.172:8000/api/v1/assets/assets/',
+                  lazyOneTime: true
+                },
+                required: true
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  //field.templateOptions.options = this.cs.getRole();
+                }
+              }
             },
-            required: true
-          },
-          hooks: {
-            onInit: (field: any) => {
-              //field.templateOptions.options = this.cs.getRole();
-            }
-          }
-        },
-        {
-          key: 'cost',
-          type: 'input',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'Cost',
-            required: true,
-          },
-          hooks: {
-            onInit: (field: any) => {
-              //field.templateOptions.options = this.cs.getRole();
-            }
-          }
-        },
-        {
-          key: 'maintenance_date',
-          type: 'date',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'Maintenance Date',
-            required: true,
-          },
-          hooks: {
-            onInit: (field: any) => {
-              //field.templateOptions.options = this.cs.getRole();
-            }
-          }
-        },
-        {
-          key: 'maintenance_description',
-          type: 'input',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'Maintenance Description',
-            required: false,
-          },
-          hooks: {
-            onInit: (field: any) => {
-              //field.templateOptions.options = this.cs.getRole();
-            }
-          }
-        },
+            {
+              key: 'cost',
+              type: 'input',
+              className: 'ant-col-10 pr-md m-3',
+              templateOptions: {
+                label: 'Cost',
+                required: true,
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  //field.templateOptions.options = this.cs.getRole();
+                }
+              }
+            },
+            {
+              key: 'maintenance_date',
+              type: 'date',
+              className: 'ant-col-10 pr-md m-3',
+              templateOptions: {
+                label: 'Maintenance Date',
+                required: true,
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  //field.templateOptions.options = this.cs.getRole();
+                }
+              }
+            },
+            {
+              key: 'maintenance_description',
+              type: 'input',
+              className: 'ant-col-10 pr-md m-3',
+              templateOptions: {
+                label: 'Maintenance Description',
+                required: false,
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  //field.templateOptions.options = this.cs.getRole();
+                }
+              }
+            },
+          ]
+        }
       ]    
     }
   }

@@ -55,25 +55,30 @@ export class LocationsComponent {
       pkId: "location_id",
       fields: [
         {
-          key: 'location_name',
-          type: 'input',
-          className: 'ta-cell pr-md col-md-6',
-          templateOptions: {
-            label: 'Location Name',
-            placeholder: 'Enter Location Name',
-            required: true,
-          }
-        },
-        {
-          key: 'address',
-          type: 'textarea',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'Address',
-            placeholder: 'Enter Address',
-            required: false,
-          },
-        },
+          fieldGroupClassName: 'ant-row custom-form-block',
+          fieldGroup: [
+            {
+              key: 'location_name',
+              type: 'input',
+              className: 'ant-col-10 pr-md m-3',
+              templateOptions: {
+                label: 'Location Name',
+                placeholder: 'Enter Location Name',
+                required: true,
+              }
+            },
+            {
+              key: 'address',
+              type: 'textarea',
+              className: 'ant-col-10 pr-md m-3 col-12',
+              templateOptions: {
+                label: 'Address',
+                placeholder: 'Enter Address',
+                required: false,
+              },
+            },
+          ]
+        }
       ]
     }
   }

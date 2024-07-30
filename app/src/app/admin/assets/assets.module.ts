@@ -8,6 +8,7 @@ import { AssetCategoriesComponent } from './asset-categories/asset-categories.co
 import { LocationsComponent } from './locations/locations.component';
 import { AssetMaintenanceComponent } from './asset-maintenance/asset-maintenance.component';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { AssetsListComponent } from './assets-list/assets-list.component';
 
 
 @NgModule({
@@ -17,11 +18,13 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
     AssetCategoriesComponent,
     LocationsComponent,
     AssetMaintenanceComponent
+
   ],
   imports: [
     CommonModule,
     AdminCommmonModule,
-    AssetsRoutingModule
+    AssetsRoutingModule,
+    AssetsListComponent
   ]
 })
 export class AssetsModule { }
