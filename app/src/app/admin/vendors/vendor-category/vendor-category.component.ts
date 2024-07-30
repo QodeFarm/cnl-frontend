@@ -67,7 +67,7 @@ export class VendorCategoryComponent {
         fieldGroup: [
         {
           key: 'code',
-          type: 'textarea',
+          type: 'input',
           className: 'col-6 ps-0',
           templateOptions: {
             label: 'Code',
@@ -77,7 +77,7 @@ export class VendorCategoryComponent {
         },
 		    {
           key: 'name',
-          type: 'textarea',
+          type: 'input',
           className: 'col-6 pe-0',
           templateOptions: {
             label: 'Name',
