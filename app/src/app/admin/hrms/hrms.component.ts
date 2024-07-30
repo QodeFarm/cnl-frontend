@@ -10,7 +10,7 @@ export class EmployeesComponent {
 
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
-    drawerPlacement: 'right',
+    drawerPlacement: 'top',
     tableConfig: {
       apiUrl: 'hrms/employees/',
       title: 'Employees',
@@ -93,7 +93,7 @@ export class EmployeesComponent {
             {
               key: 'name',
               type: 'input',
-              className: 'ant-col-5 pr-md m-3',
+              className: 'ta-cell pr-md col-md-8',
               templateOptions: {
                 label: 'Name',
                 placeholder: 'Enter Name',
@@ -103,7 +103,7 @@ export class EmployeesComponent {
             {
               key: 'email',
               type: 'input',
-              className: 'ant-col-5 pr-md m-3',
+              className: 'ta-cell pr-md col-md-8',
               templateOptions: {
                 label: 'Email',
                 placeholder: 'Enter Email',
@@ -113,7 +113,7 @@ export class EmployeesComponent {
             {
               key: 'phone',
               type: 'input',
-              className: 'ant-col-5 pr-md m-3',
+              className: 'ta-cell pr-md col-md-8',
               templateOptions: {
                 label: 'Phone',
                 placeholder: 'Enter Number',
@@ -123,7 +123,7 @@ export class EmployeesComponent {
             {
               key: 'department',
               type: 'select',
-              className: 'ant-col-5 pr-md m-3',
+              className: 'ta-cell pr-md col-md-8',
               templateOptions: {
                 label: 'Department',
                 dataKey: 'department_id',
@@ -144,7 +144,7 @@ export class EmployeesComponent {
             {
               key: 'designation',
               type: 'select',
-              className: 'ant-col-5 pr-md m-3',
+              className: 'ta-cell pr-md col-md-8',
               templateOptions: {
                 label: 'Designation',
                 dataKey: 'designation_id',
@@ -157,8 +157,7 @@ export class EmployeesComponent {
                 required: true
               },
               hooks: {
-                onInit: (field: any) => {
-                  
+                onInit: (field: any) => { 
                 }
               }
             },

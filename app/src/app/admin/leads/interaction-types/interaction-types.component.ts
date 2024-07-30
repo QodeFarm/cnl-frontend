@@ -10,7 +10,7 @@ export class InteractionTypesComponent {
 
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
-    drawerPlacement: 'right',
+    drawerPlacement: 'top',
     tableConfig: {
       apiUrl: 'leads/interaction_types/',
       title: 'Interaction type',
@@ -54,7 +54,7 @@ export class InteractionTypesComponent {
         fieldGroup: [{
           key: 'interaction_type',
           type: 'input',
-          className: 'ant-col-5 pr-md m-3',
+          className: 'ant-col-6 pr-md m-3',
           templateOptions: {
             label: 'Interaction type',
             placeholder: 'Enter Interaction type',

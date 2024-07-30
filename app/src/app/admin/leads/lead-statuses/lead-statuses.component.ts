@@ -10,7 +10,7 @@ export class LeadStatusesComponent {
 
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
-    drawerPlacement: 'right',
+    drawerPlacement: 'top',
     tableConfig: {
       apiUrl: 'leads/lead_statuses/',
       title: 'Lead statuses',
@@ -52,7 +52,7 @@ export class LeadStatusesComponent {
         fieldGroup: [{
           key: 'status_name',
           type: 'input',
-          className: 'ant-col-4 pr-md m-3',
+          className: 'ant-col-6 pr-md m-3',
           templateOptions: {
             label: 'Status Name',
             placeholder: 'Enter Status Name',

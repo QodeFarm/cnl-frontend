@@ -42,6 +42,13 @@ export class LeadsComponent {
     document.getElementById('modalClose').click();
   }
 
+  // hide() {
+  //   const modalCloseButton = document.getElementById('modalClose');
+  //   if (modalCloseButton) {
+  //     modalCloseButton.click();
+  //   }
+  // }
+
   editLeads(event) {
     this.LeadsEditID = event;
     this.http.get('leads/leads/' + event).subscribe((res: any) => {
@@ -200,7 +207,8 @@ export class LeadsComponent {
         // end of assignment
         //----------------------------------------- I N T E R A C T I O N  -----------------------------------//
         {
-          fieldGroupClassName: "ant-row",
+          // fieldGroupClassName: "ant-row",
+          fieldGroupClassName: "ant-row custom-form-block",
           key: 'interaction',
           fieldGroup: [{
               key: 'interaction_type',

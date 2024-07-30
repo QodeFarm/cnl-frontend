@@ -10,7 +10,7 @@ export class DesignationsComponent {
 
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
-    drawerPlacement: 'right',
+    drawerPlacement: 'top',
     tableConfig: {
       apiUrl: 'hrms/designations/',
       title: 'Designation',
@@ -48,11 +48,11 @@ export class DesignationsComponent {
       pkId: "designation_id",
       exParams: [],
       fields: [{
-        fieldGroupClassName: "ant-row",
+        fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
         fieldGroup: [{
           key: 'designation_name',
-          type: 'input',
-          className: 'ant-col-5 pr-md m-3',
+          type: 'textarea',
+          className: 'col-12 p-0',
           templateOptions: {
             label: 'Designation Name',
             placeholder: 'Enter Designation Name',
