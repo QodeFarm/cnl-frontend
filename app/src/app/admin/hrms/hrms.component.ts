@@ -33,20 +33,20 @@ export class EmployeesComponent {
           name: 'Phone'
         },
         {
-          fieldKey: 'designation_id',
+          fieldKey: 'designation',
           name: 'Designation',
           displayType: "map",
           mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.designation_id}`;
+            return `${row.designation.designation_name}`;
           },
           sort: true
         },
         {
-          fieldKey: 'department_id',
+          fieldKey: 'department',
           name: 'Department',
           displayType: "map",
           mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.department_id}`;
+            return `${row.department.department_name}`;
           },
           sort: true
         },
@@ -76,12 +76,12 @@ export class EmployeesComponent {
       pkId: "employee_id",
       exParams: [
         {
-          key: 'designation_id',
+          key: 'designation',
           type: 'script',
           value: 'data.designation.designation_id'
         },
         {
-          key: 'department_id',
+          key: 'department',
           type: 'script',
           value: 'data.department.department_id'
         }
