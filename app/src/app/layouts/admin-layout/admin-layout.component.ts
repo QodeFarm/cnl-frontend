@@ -273,6 +273,17 @@ export class AdminLayoutComponent {
             icon: 'fas fa-user',
           },
         ]
+      },
+      {
+        label: 'Quick Packs',
+        icon: 'fas fa-shopping-cart',
+        child: [
+          {
+            link: '/admin/quickpacks',
+            label: 'Quick Packs',
+            icon: 'fas fa-user',
+          },
+        ]
       }
     ]
     this.closeMenu();

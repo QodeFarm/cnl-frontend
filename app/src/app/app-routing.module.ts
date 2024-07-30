@@ -37,9 +37,9 @@ const routes: Routes = [
       { path: 'warehouses', canActivate: [], loadChildren: () => import('./admin/warehouses/warehouses.module').then(m => m.WarehousesModule) },
       { path: 'assets', canActivate: [], loadChildren: () => import('./admin/assets/assets.module').then(m => m.AssetsModule) },
       { path: 'tasks', canActivate: [], loadChildren: () => import('./admin/tasks/tasks.module').then(m => m.TasksModule) },
+      { path: 'quickpacks', canActivate: [], loadChildren: () => import('./admin/quickpacks/quickpacks.module').then(m => m.QuickpacksModule) },
     ]
   }
-
 ];
 
 @NgModule({
