@@ -182,6 +182,27 @@ export class SaleReturnsComponent {
               }
             },
             {
+              key: 'against_bill',
+              type: 'input',
+              className: 'col-2',
+              templateOptions: {
+                type: 'input',
+                label: 'Against bill',
+                placeholder: 'Enter Against bill',
+              }
+            },
+            {
+              key: 'against_bill_date',
+              type: 'date',
+              defaultValue: new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate(),
+              className: 'col-2',
+              templateOptions: {
+                type: 'date',
+                label: 'Against bill date',
+                placeholder: 'Select Against bill date',
+              }
+            },
+            {
               key: 'due_date',
               type: 'date',
               defaultValue: new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate(),
@@ -249,6 +270,81 @@ export class SaleReturnsComponent {
                     // console.log("order_type", data);
                     if (data && data.sale_invoice_id) {
                       this.formConfig.model['sale_return_order']['sale_invoice_id'] = data.sale_invoice_id;
+                    }
+                  });
+                }
+              }
+            },
+            {
+              key: 'order_salesman',
+              type: 'select',
+              className: 'col-2',
+              templateOptions: {
+                label: 'Order Salesman',
+                dataKey: 'order_salesman_id',
+                dataLabel: "name",
+                options: [],
+                lazy: {
+                  url: 'masters/orders_salesman/',
+                  lazyOneTime: true
+                }
+              },
+              hooks: {
+                onChanges: (field: any) => {
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    // console.log("order_type", data);
+                    if (data && data.order_salesman_id) {
+                      this.formConfig.model['sale_return_order']['order_salesman_id'] = data.order_salesman_id;
+                    }
+                  });
+                }
+              }
+            },
+            {
+              key: 'customer_address_id',
+              type: 'select',
+              className: 'col-2',
+              templateOptions: {
+                label: 'Customer addresses',
+                dataKey: 'customer_address_id',
+                dataLabel: "address",
+                options: [],
+                lazy: {
+                  url: 'customers/customers_addresses/',
+                  lazyOneTime: true
+                }
+              },
+              hooks: {
+                onChanges: (field: any) => {
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    // console.log("order_type", data);
+                    if (data && data.customer_address_id) {
+                      this.formConfig.model['sale_return_order']['customer_address_id'] = data.customer_address_id;
+                    }
+                  });
+                }
+              }
+            },
+            {
+              key: 'payment_link_type_id',
+              type: 'select',
+              className: 'col-2',
+              templateOptions: {
+                label: 'Payment link type',
+                dataKey: 'payment_link_type_id',
+                dataLabel: "name",
+                options: [],
+                lazy: {
+                  url: 'masters/payment_link_type/',
+                  lazyOneTime: false
+                }
+              },
+              hooks: {
+                onChanges: (field: any) => {
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    // console.log("order_type", data);
+                    if (data && data.payment_link_type_id) {
+                      this.formConfig.model['sale_return_order']['payment_link_type_id'] = data.payment_link_type_id;
                     }
                   });
                 }
@@ -476,9 +572,9 @@ export class SaleReturnsComponent {
                 key: 'discount',
                 // defaultValue: 90,
                 templateOptions: {
-                  placeholder: 'Enter Disc',
+                  placeholder: 'Enter Discount',
                   // type: 'number',
-                  label: 'Disc',
+                  label: 'Discount',
                   hideLabel: true,
                 },
                 hooks: {
@@ -979,26 +1075,26 @@ export class SaleReturnsComponent {
                         }
                       }
                     },
-                    // {
-                    //   key: 'transport_charges',
-                    //   type: 'input',
-                    //   className: 'ant-col-6 pr-md m-3',
-                    //   templateOptions: {
-                    //     type: 'input',
-                    //     label: 'Transport Charges',
-                    //     placeholder: 'Enter Transport Charges',
-                    //   }
-                    // },
-                    // {
-                    //   key: 'round_off',
-                    //   type: 'input',
-                    //   className: 'ant-col-6 pr-md m-3',
-                    //   templateOptions: {
-                    //     type: 'input',
-                    //     label: 'Round Off',
-                    //     placeholder: 'Enter Round Off',
-                    //   }
-                    // }
+                    {
+                      key: 'transport_charges',
+                      type: 'input',
+                      className: 'ant-col-6 pr-md m-3',
+                      templateOptions: {
+                        type: 'input',
+                        label: 'Transport Charges',
+                        placeholder: 'Enter Transport Charges',
+                      }
+                    },
+                    {
+                      key: 'round_off',
+                      type: 'input',
+                      className: 'ant-col-6 pr-md m-3',
+                      templateOptions: {
+                        type: 'input',
+                        label: 'Round Off',
+                        placeholder: 'Enter Round Off',
+                      }
+                    }
                   ]
                 },
               ]
