@@ -9,7 +9,7 @@ import { TaCurdConfig } from '@ta/ta-curd';
 export class AssetMaintenanceComponent {
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
-    drawerPlacement: 'right',
+    drawerPlacement: 'top',
     tableConfig: {
       apiUrl: 'http://195.35.20.172:8000/api/v1/assets/asset_maintenance/',
       title: 'Asset Maintenance',
@@ -76,12 +76,12 @@ export class AssetMaintenanceComponent {
       ],
       fields: [
         {
-          fieldGroupClassName: 'ant-row custom-form-block',
+          fieldGroupClassName: 'row col-12 p-0 m-0 custom-form field-no-bottom-space',
           fieldGroup: [
             {
               key: 'asset',
               type: 'select',
-              className: 'ant-col-10 pr-md m-3',
+              className: 'col-6 pb-3 ps-0',
               templateOptions: {
                 label: 'Asset',
                 dataKey: 'asset_id',
@@ -102,7 +102,7 @@ export class AssetMaintenanceComponent {
             {
               key: 'cost',
               type: 'input',
-              className: 'ant-col-10 pr-md m-3',
+              className: 'col-6 pb-3 ps-0',
               templateOptions: {
                 label: 'Cost',
                 required: true,
@@ -116,7 +116,7 @@ export class AssetMaintenanceComponent {
             {
               key: 'maintenance_date',
               type: 'date',
-              className: 'ant-col-10 pr-md m-3',
+              className: 'col-6 pb-3 ps-0',
               templateOptions: {
                 label: 'Maintenance Date',
                 required: true,
@@ -129,8 +129,8 @@ export class AssetMaintenanceComponent {
             },
             {
               key: 'maintenance_description',
-              type: 'input',
-              className: 'ant-col-10 pr-md m-3',
+              type: 'textarea',
+              className: 'col-6 pb-3 ps-0',
               templateOptions: {
                 label: 'Maintenance Description',
                 required: false,

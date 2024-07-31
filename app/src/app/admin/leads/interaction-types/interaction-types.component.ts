@@ -50,11 +50,11 @@ export class InteractionTypesComponent {
       pkId: "interaction_type_id",
       exParams: [],
       fields: [{
-        fieldGroupClassName: "ant-row",
+        fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
         fieldGroup: [{
           key: 'interaction_type',
           type: 'input',
-          className: 'ant-col-6 pr-md m-3',
+          className: 'col-6 p-0',
           templateOptions: {
             label: 'Interaction type',
             placeholder: 'Enter Interaction type',

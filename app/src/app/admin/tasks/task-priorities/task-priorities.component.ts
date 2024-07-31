@@ -9,7 +9,7 @@ import { TaCurdConfig } from '@ta/ta-curd';
 export class TaskPrioritiesComponent {
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
-    drawerPlacement: 'right',
+    drawerPlacement: 'top',
     tableConfig: {
       apiUrl: 'masters/task_priorities/',
       title: 'Task Priorities',
@@ -50,15 +50,20 @@ export class TaskPrioritiesComponent {
       pkId: "priority_id",
       fields: [
         {
-          key: 'priority_name',
-          type: 'input',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'Priority Name',
-            placeholder: 'Enter Name',
-            required: true,
-          }
-        },
+          fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
+          fieldGroup: [
+            {
+              key: 'priority_name',
+              type: 'input',
+              className: 'col-6 p-0',
+              templateOptions: {
+                label: 'Priority Name',
+                placeholder: 'Enter Name',
+                required: true,
+              }
+            },
+          ]
+        }
       ]
     }
   }

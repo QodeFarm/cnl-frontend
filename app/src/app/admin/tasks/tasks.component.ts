@@ -74,13 +74,13 @@ export class TasksComponent implements OnInit {
           fieldGroupClassName: 'ant-row',
         },
         {
-          fieldGroupClassName: 'ant-row',
+          fieldGroupClassName: 'ant-row custom-form-block',
           key: 'task',
           fieldGroup: [
             {
               key: 'user',
               type: 'select',
-              className: 'ant-col-5 pr-md m-3',
+              className: 'col-3',
               templateOptions: {
                 label: 'User',
                 dataKey: 'user_id',
@@ -107,7 +107,7 @@ export class TasksComponent implements OnInit {
             {
               key: 'status',
               type: 'select',
-              className: 'ant-col-5 pr-md m-3',
+              className: 'col-3',
               templateOptions: {
                 label: 'Statuses',
                 dataKey: 'status_id',
@@ -134,7 +134,7 @@ export class TasksComponent implements OnInit {
             {
               key: 'priority',
               type: 'select',
-              className: 'ant-col-5 pr-md m-3',
+              className: 'col-3',
               templateOptions: {
                 label: 'Priorities',
                 dataKey: 'priority_id',
@@ -161,7 +161,7 @@ export class TasksComponent implements OnInit {
             {
               key: 'title',
               type: 'input',
-              className: 'ant-col-5 pr-md m-3',
+              className: 'col-3',
               templateOptions: {
                 label: 'Title',
                 placeholder: 'Enter title',
@@ -171,7 +171,7 @@ export class TasksComponent implements OnInit {
             {
               key: 'description',
               type: 'textarea',
-              className: 'ant-col-5 pr-md m-3',
+              className: 'col-3',
               templateOptions: {
                 label: 'Description',
                 placeholder: 'Enter description',
@@ -181,7 +181,7 @@ export class TasksComponent implements OnInit {
             {
               key: 'due_date',
               type: 'date',
-              className: 'ant-col-5 pr-md m-3',
+              className: 'col-3',
               templateOptions: {
                 type: 'date',
                 label: 'Due date',
@@ -209,7 +209,7 @@ export class TasksComponent implements OnInit {
               {
                 key: 'user',
                 type: 'select',
-                className: 'ant-col-10 pr-md m-3',
+                className: 'col-10',
                 templateOptions: {
                   label: 'User',
                   dataKey: 'user_id',
@@ -249,7 +249,7 @@ export class TasksComponent implements OnInit {
               {
                 key: 'comment_text',
                 type: 'text',
-                className: 'ant-col-10 pr-md m-3',
+                className: 'col-8',
                 templateOptions: {
                   label: 'Comment Text',
                   placeholder: 'Enter Comment Text',
@@ -278,7 +278,7 @@ export class TasksComponent implements OnInit {
               {
                 key: 'attachment_name',
                 type: 'input',
-                className: 'ant-col-10 pr-md m-3',
+                className: 'col-9',
                 templateOptions: {
                   label: 'Attachment Name',
                   placeholder: 'Enter Attachment Name',
@@ -288,7 +288,7 @@ export class TasksComponent implements OnInit {
               {
                 key: 'attachment_path',
                 type: 'input',
-                className: 'ant-col-10 pr-md m-3',
+                className: 'col-9',
                 templateOptions: {
                   label: 'Attachment Path',
                   placeholder: 'Enter Attachment Path',

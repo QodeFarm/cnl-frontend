@@ -9,7 +9,7 @@ import { TaCurdConfig } from '@ta/ta-curd';
 export class LocationsComponent {
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
-    drawerPlacement: 'right',
+    drawerPlacement: 'top',
     tableConfig: {
       apiUrl: 'http://195.35.20.172:8000/api/v1/assets/locations/',
       title: 'Locations',
@@ -55,12 +55,12 @@ export class LocationsComponent {
       pkId: "location_id",
       fields: [
         {
-          fieldGroupClassName: 'ant-row custom-form-block',
+          fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
           fieldGroup: [
             {
               key: 'location_name',
               type: 'input',
-              className: 'ant-col-10 pr-md m-3',
+              className: 'col-6 pe-0',
               templateOptions: {
                 label: 'Location Name',
                 placeholder: 'Enter Location Name',
@@ -70,7 +70,7 @@ export class LocationsComponent {
             {
               key: 'address',
               type: 'textarea',
-              className: 'ant-col-10 pr-md m-3 col-12',
+              className: 'col-6 pe-0',
               templateOptions: {
                 label: 'Address',
                 placeholder: 'Enter Address',

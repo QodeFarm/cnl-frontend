@@ -88,12 +88,12 @@ export class EmployeesComponent {
       ],
       fields: [
         {
-          fieldGroupClassName: "ant-row",
+          fieldGroupClassName: 'row col-12 p-0 m-0 custom-form field-no-bottom-space',
           fieldGroup: [
             {
               key: 'name',
               type: 'input',
-              className: 'ta-cell pr-md col-md-8',
+              className: 'col-6 pb-3 ps-0',
               templateOptions: {
                 label: 'Name',
                 placeholder: 'Enter Name',
@@ -103,7 +103,7 @@ export class EmployeesComponent {
             {
               key: 'email',
               type: 'input',
-              className: 'ta-cell pr-md col-md-8',
+              className: 'col-6 pb-3 ps-0',
               templateOptions: {
                 label: 'Email',
                 placeholder: 'Enter Email',
@@ -113,7 +113,7 @@ export class EmployeesComponent {
             {
               key: 'phone',
               type: 'input',
-              className: 'ta-cell pr-md col-md-8',
+              className: 'col-6 pb-3 ps-0',
               templateOptions: {
                 label: 'Phone',
                 placeholder: 'Enter Number',
@@ -123,7 +123,7 @@ export class EmployeesComponent {
             {
               key: 'department',
               type: 'select',
-              className: 'ta-cell pr-md col-md-8',
+              className: 'col-6 pb-3 ps-0',
               templateOptions: {
                 label: 'Department',
                 dataKey: 'department_id',
@@ -144,7 +144,7 @@ export class EmployeesComponent {
             {
               key: 'designation',
               type: 'select',
-              className: 'ta-cell pr-md col-md-8',
+              className: 'col-6 pb-3 ps-0',
               templateOptions: {
                 label: 'Designation',
                 dataKey: 'designation_id',

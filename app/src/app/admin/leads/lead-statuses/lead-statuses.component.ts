@@ -47,19 +47,23 @@ export class LeadStatusesComponent {
       title: 'Lead status',
       pkId: "lead_status_id",
       exParams: [],
-      fields: [{
-        fieldGroupClassName: "ant-row",
-        fieldGroup: [{
-          key: 'status_name',
-          type: 'input',
-          className: 'ant-col-6 pr-md m-3',
-          templateOptions: {
-            label: 'Status Name',
-            placeholder: 'Enter Status Name',
-            required: true,
-          }
-        }]
-      }]
+      fields: [
+        {
+          fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
+          fieldGroup: [
+            {
+              key: 'status_name',
+              type: 'input',
+              className: 'col-6 p-0',
+              templateOptions: {
+                label: 'Status Name',
+                placeholder: 'Enter Status Name',
+                required: true,
+              }
+            },
+          ]
+        }
+      ]
     }
   }
-};
+}

@@ -9,7 +9,7 @@ import { TaCurdConfig } from '@ta/ta-curd';
 export class AssetCategoriesComponent {
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
-    drawerPlacement: 'right',
+    drawerPlacement: 'top',
     tableConfig: {
       apiUrl: 'http://195.35.20.172:8000/api/v1/assets/asset_categories/',
       title: 'Asset Categories',
@@ -50,15 +50,20 @@ export class AssetCategoriesComponent {
       pkId: "asset_category_id",
       fields: [
         {
-          key: 'category_name',
-          type: 'input',
-          className: 'ta-cell pr-md col-md-6',
-          templateOptions: {
-            label: 'Category Name',
-            placeholder: 'Enter Category Name',
-            required: true,
-          }
-        },
+          fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
+          fieldGroup: [
+            {
+              key: 'category_name',
+              type: 'input',
+              className: 'col-6 pe-0',
+              templateOptions: {
+                label: 'Category Name',
+                placeholder: 'Enter Category Name',
+                required: true,
+              }
+            },
+          ]
+        }
       ]
     }
   }

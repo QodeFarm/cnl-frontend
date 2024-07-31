@@ -9,7 +9,7 @@ import { TaCurdConfig } from '@ta/ta-curd';
 export class AssetStatusesComponent {
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
-    drawerPlacement: 'right',
+    drawerPlacement: 'top',
     tableConfig: {
       apiUrl: 'http://195.35.20.172:8000/api/v1/assets/asset_statuses/',
       title: 'Asset Statuses',
@@ -50,15 +50,20 @@ export class AssetStatusesComponent {
       pkId: "asset_status_id",
       fields: [
         {
-          key: 'status_name',
-          type: 'input',
-          className: 'ta-cell pr-md col-md-6',
-          templateOptions: {
-            label: 'Status Name',
-            placeholder: 'Enter Status Name',
-            required: true,
-          }
-        },
+          fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
+          fieldGroup: [
+            {
+              key: 'status_name',
+              type: 'input',
+              className: 'col-6 p-0',
+              templateOptions: {
+                label: 'Status Name',
+                placeholder: 'Enter Status Name',
+                required: true,
+              }
+            },
+          ]
+        }
       ]
     }
   }

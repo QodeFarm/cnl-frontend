@@ -9,7 +9,7 @@ import { TaCurdConfig } from '@ta/ta-curd';
 export class WarehousesComponent {
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
-    drawerPlacement: 'right',
+    drawerPlacement: 'top',
     tableConfig: {
       apiUrl: 'inventory/warehouses/',
       title: 'Warehouses',
@@ -100,12 +100,12 @@ export class WarehousesComponent {
       ],
       fields: [
         {
-          fieldGroupClassName: "ant-row",
+          fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
           fieldGroup: [ 
             {
               key: 'name',
               type: 'input',
-              className: 'ant-col-7 pr-md m-3',
+              className: 'col-6 pb-3 ps-0',
               templateOptions: {
                 label: 'Name',
                 placeholder: 'Enter Name',
@@ -115,7 +115,7 @@ export class WarehousesComponent {
             {
               key: 'code',
               type: 'input',
-              className: 'ant-col-7 pr-md m-3',
+              className: 'col-6 pb-3 ps-0',
               templateOptions: {
                 label: 'Code',
                 placeholder: 'Enter Code',
@@ -125,7 +125,7 @@ export class WarehousesComponent {
             {
               key: 'phone',
               type: 'input',
-              className: 'ant-col-7 pr-md m-3',
+              className: 'col-6 pb-3 ps-0',
               templateOptions: {
                 label: 'Phone',
                 placeholder: 'Enter Phone Number',
@@ -135,7 +135,7 @@ export class WarehousesComponent {
             {
               key: 'email',
               type: 'input',
-              className: 'ant-col-7 pr-md m-3',
+              className: 'col-6 pb-3 ps-0',
               templateOptions: {
                 label: 'Email',
                 placeholder: 'Enter Email',
@@ -145,7 +145,7 @@ export class WarehousesComponent {
             {
               key: 'address',
               type: 'textarea',
-              className: 'ant-col-7 pr-md m-3',
+              className: 'col-6 pb-3 ps-0',
               templateOptions: {
                 label: 'Address',
                 placeholder: 'Enter Address',
@@ -155,7 +155,7 @@ export class WarehousesComponent {
             {
               key: 'city',
               type: 'select',
-              className: 'ant-col-7 pr-md m-3',
+              className: 'col-6 pb-3 ps-0',
               templateOptions: {
                 label: 'City',
                 dataKey: 'city_id',
@@ -176,7 +176,7 @@ export class WarehousesComponent {
             {
               key: 'state',
               type: 'select',
-              className: 'ant-col-7 pr-md m-3',
+              className: 'col-6 pb-3 ps-0',
               templateOptions: {
                 label: 'State',
                 dataKey: 'state_id',
@@ -197,7 +197,7 @@ export class WarehousesComponent {
             {
               key: 'country',
               type: 'select',
-              className: 'ant-col-7 pr-md m-3',
+              className: 'col-6 pb-3 ps-0',
               templateOptions: {
                 label: 'Country',
                 dataKey: 'country_id',
@@ -218,7 +218,7 @@ export class WarehousesComponent {
             {
               key: 'pin_code',
               type: 'input',
-              className: 'ant-col-7 pr-md m-3',
+              className: 'col-6 pb-3 ps-0',
               templateOptions: {
                 label: 'Pin Code',
                 placeholder: 'Enter Pin Code',
@@ -228,7 +228,7 @@ export class WarehousesComponent {
             {
               key: 'item_type',
               type: 'select',
-              className: 'ant-col-7 pr-md m-3',
+              className: 'col-6 pb-3 ps-0',
               templateOptions: {
                 label: 'Item Type',
                 dataKey: 'item_type_id',
@@ -249,7 +249,7 @@ export class WarehousesComponent {
             {
               key: 'longitude',
               type: 'input',
-              className: 'ant-col-7 pr-md m-3',
+              className: 'col-6 pb-3 ps-0',
               templateOptions: {
                 label: 'Longitude',
                 required: false,
@@ -263,7 +263,7 @@ export class WarehousesComponent {
             {
               key: 'latitude',
               type: 'input',
-              className: 'ant-col-7 pr-md m-3',
+              className: 'col-6 pb-3 ps-0',
               templateOptions: {
                 label: 'Latitude',
                 required: false,

@@ -83,7 +83,7 @@ export class AssetsComponent{
         fieldGroupClassName: 'ant-row custom-form-block',
         fieldGroup: [
           {
-            className: 'ant-col-5 pr-md m-3',
+            className: 'col-3',
             key: 'name',
             type: 'input',
             templateOptions: {
@@ -95,7 +95,7 @@ export class AssetsComponent{
           {
             key: 'purchase_date',
             type: 'date',
-            className: 'ant-col-5 pr-md m-3',
+            className: 'col-3',
             templateOptions: {
               label: 'Purchase Date',
               required: false,
@@ -109,7 +109,7 @@ export class AssetsComponent{
           {
             key: 'price',
             type: 'input',
-            className: 'ant-col-5 pr-md m-3',
+            className: 'col-3',
             templateOptions: {
               label: 'Price',
               required: false,
@@ -124,7 +124,7 @@ export class AssetsComponent{
           {
             key: 'asset_category',
             type: 'select',
-            className: 'ant-col-5 pr-md m-3',
+            className: 'col-3',
             templateOptions: {
               label: 'Asset Category',
               dataKey: 'asset_category_id',
@@ -145,7 +145,7 @@ export class AssetsComponent{
           {
             key: 'asset_status',
             type: 'select',
-            className: 'ant-col-5 pr-md m-3',
+            className: 'col-3',
             templateOptions: {
               label: 'Asset Status',
               dataKey: 'asset_status_id',
@@ -166,7 +166,7 @@ export class AssetsComponent{
           {
             key: 'unit_options',
             type: 'select',
-            className: 'ant-col-5 pr-md m-3',
+            className: 'col-3',
             templateOptions: {
               label: 'Unit Options',
               dataKey: 'unit_options_id',
@@ -187,7 +187,7 @@ export class AssetsComponent{
           {
             key: 'location',
             type: 'select',
-            className: 'ant-col-5 pr-md m-3',
+            className: 'col-3',
             templateOptions: {
               label: 'Location',
               dataKey: 'location_id',
