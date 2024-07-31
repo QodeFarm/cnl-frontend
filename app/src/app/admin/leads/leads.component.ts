@@ -34,6 +34,9 @@ export class LeadsComponent {
     // set form config
     this.setFormConfig();
     this.set_default_status_id(); // lead_status_id = 'Open'
+    this.formConfig.fields[0].fieldGroup[4].hide = true; // Leads[lead_status_id]   hide = true
+    this.formConfig.fields[1].hide = true; // assignments   hide = true
+    this.formConfig.fields[2].hide = true; // Interaction hide = ture
   }
 
   formConfig: TaFormConfig = {};
@@ -41,13 +44,6 @@ export class LeadsComponent {
   hide() {
     document.getElementById('modalClose').click();
   }
-
-  // hide() {
-  //   const modalCloseButton = document.getElementById('modalClose');
-  //   if (modalCloseButton) {
-  //     modalCloseButton.click();
-  //   }
-  // }
 
   editLeads(event) {
     this.LeadsEditID = event;
@@ -59,6 +55,9 @@ export class LeadsComponent {
         this.formConfig.pkId = 'lead_id';
         this.formConfig.model['lead_id'] = this.LeadsEditID;
         this.showForm = true;
+        this.formConfig.fields[0].fieldGroup[4].hide = false; // Leads[lead_status_id]   hide = false
+        this.formConfig.fields[1].hide = false; // assignments   hide = false
+        this.formConfig.fields[2].hide = false; // Interaction hide = false
       }
     })
     this.hide();
@@ -133,6 +132,16 @@ export class LeadsComponent {
               }
             },
             {
+              key: 'score',
+              type: 'input',
+              className: 'ant-col-4 pr-md m-3',
+              templateOptions: {
+                label: 'Score',
+                placeholder: 'Enter score',
+                // required: true,
+              }
+            },
+            {
               key: 'lead_status',
               type: 'select',
               className: 'ant-col-4 pr-md m-3',
@@ -158,17 +167,7 @@ export class LeadsComponent {
                   });
                 }
               }
-            },
-            {
-              key: 'score',
-              type: 'input',
-              className: 'ant-col-4 pr-md m-3',
-              templateOptions: {
-                label: 'Score',
-                placeholder: 'Enter score',
-                // required: true,
-              }
-            },
+            }
           ]
         },
         // end of lead
@@ -207,8 +206,7 @@ export class LeadsComponent {
         // end of assignment
         //----------------------------------------- I N T E R A C T I O N  -----------------------------------//
         {
-          // fieldGroupClassName: "ant-row",
-          fieldGroupClassName: "ant-row custom-form-block",
+          fieldGroupClassName: "ant-row",
           key: 'interaction',
           fieldGroup: [{
               key: 'interaction_type',
