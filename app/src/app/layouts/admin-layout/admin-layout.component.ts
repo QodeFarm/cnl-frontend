@@ -217,17 +217,17 @@ export class AdminLayoutComponent {
         child: [
           {
             link: '/admin/employees',
-            label: 'employees',
+            label: 'Employees',
             icon: 'fas fa-tachometer-alt',
           },
           {
             link: '/admin/employees/designations',
-            label: 'designations',
+            label: 'Designations',
             icon: 'fas fa-tachometer-alt',
           },
           {
             link: '/admin/employees/departments',
-            label: 'departments',
+            label: 'Departments',
             icon: 'fas fa-tachometer-alt',
           }
         ]

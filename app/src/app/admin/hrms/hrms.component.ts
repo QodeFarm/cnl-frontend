@@ -1,99 +1,89 @@
+import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { TaCurdConfig } from '@ta/ta-curd';
+import { TaFormConfig } from '@ta/ta-form';
 
 @Component({
   selector: 'app-hrms',
   templateUrl: './hrms.component.html',
   styleUrls: ['./hrms.component.scss']
 })
-export class EmployeesComponent {
 
-  curdConfig: TaCurdConfig = {
-    drawerSize: 500,
-    drawerPlacement: 'top',
-    tableConfig: {
-      apiUrl: 'hrms/employees/',
-      title: 'Employees',
-      pkId: "employee_id",
-      pageSize: 10,
-      "globalSearch": {
-        keys: ['employee_id', 'name']
+export class EmployeesComponent {
+  showEmployeesList: boolean = false;
+  showForm: boolean = false;
+  EmployeeEditID: any;
+
+  constructor(private http: HttpClient) {
+  }
+
+  ngOnInit() {
+    this.showEmployeesList = false;
+    this.showForm = true;
+    // set form config
+    this.setFormConfig();
+    console.log('this.formConfig', this.formConfig);
+
+  };
+
+  formConfig: TaFormConfig = {};
+
+  hide() {
+    document.getElementById('modalClose').click();
+  };
+
+  editEmployee(event) {
+    console.log('event', event);
+    this.EmployeeEditID = event;
+    this.http.get('hrms/employees/' + event).subscribe((res: any) => {
+      if (res) {
+        this.formConfig.model = res;
+        //set labels for update
+        this.formConfig.submit.label = 'Update';
+        this.formConfig.pkId = 'employee_id';
+        this.showForm = true;
+      }
+    })
+    this.hide();
+  };
+
+
+  showEmployeesListFn() {
+    this.showEmployeesList = true;
+  };
+
+  setFormConfig() {
+    this.formConfig = {
+      url: "hrms/employees/",
+      // title: 'leads',
+      formState: {
+        viewMode: false,
       },
-      cols: [
-        {
-          fieldKey: 'name',
-          name: 'Name'
-        },
-        {
-          fieldKey: 'email',
-          name: 'Email'
-        },
-        {
-          fieldKey: 'phone',
-          name: 'Phone'
-        },
-        {
-          fieldKey: 'designation',
-          name: 'Designation',
-          displayType: "map",
-          mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.designation.designation_name}`;
-          },
-          sort: true
-        },
-        {
-          fieldKey: 'department',
-          name: 'Department',
-          displayType: "map",
-          mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.department.department_name}`;
-          },
-          sort: true
-        },
-        {
-          fieldKey: "code",
-          name: "Action",
-          type: 'action',
-          actions: [
-            {
-              type: 'delete',
-              label: 'Delete',
-              confirm: true,
-              confirmMsg: "Sure to delete?",
-              apiUrl: 'hrms/employees'
-            },
-            {
-              type: 'edit',
-              label: 'Edit'
-            }
-          ]
-        }
-      ]
-    },
-    formConfig: {
-      url: 'hrms/employees/',
-      title: 'Employee',
-      pkId: "employee_id",
       exParams: [
         {
-          key: 'designation',
-          type: 'script',
-          value: 'data.designation.designation_id'
-        },
-        {
-          key: 'department',
+          key: 'department_id',
           type: 'script',
           value: 'data.department.department_id'
+        },
+        {
+          key: 'designation_id',
+          type: 'script',
+          value: 'data.designation.designation_id'
         }
       ],
+      submit: {
+        label: 'Submit',
+        submittedFn: () => this.ngOnInit()
+      },
+      reset: {},
+      model:{},
       fields: [
         {
-          fieldGroupClassName: "ant-row",
+          fieldGroupClassName: "ant-row custom-form-block",
           fieldGroup: [
             {
               key: 'name',
               type: 'input',
-              className: 'ta-cell pr-md col-md-8',
+              className: 'col-3 pb-3 ps-0',
               templateOptions: {
                 label: 'Name',
                 placeholder: 'Enter Name',
@@ -103,7 +93,7 @@ export class EmployeesComponent {
             {
               key: 'email',
               type: 'input',
-              className: 'ta-cell pr-md col-md-8',
+              className: 'col-3 pb-3 ps-0',
               templateOptions: {
                 label: 'Email',
                 placeholder: 'Enter Email',
@@ -113,20 +103,20 @@ export class EmployeesComponent {
             {
               key: 'phone',
               type: 'input',
-              className: 'ta-cell pr-md col-md-8',
+              className: 'col-3 pb-3 ps-0',
               templateOptions: {
                 label: 'Phone',
-                placeholder: 'Enter Number',
+                placeholder: 'Enter with country code',
                 required: false,
               }
             },
             {
               key: 'department',
               type: 'select',
-              className: 'ta-cell pr-md col-md-8',
+              className: 'col-3 pb-3 ps-0',
               templateOptions: {
                 label: 'Department',
-                dataKey: 'department_id',
+                dataKey: 'department',
                 dataLabel: "department_name",
                 options: [],
                 lazy: {
@@ -137,14 +127,20 @@ export class EmployeesComponent {
               },
               hooks: {
                 onInit: (field: any) => {
-                  
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['department_id']) {
+                      this.formConfig.model['department_id'] = data.department_id
+                    } else {
+                      console.error('Form config or lead_status data model is not defined.');
+                    }
+                  });
                 }
               }
             },
             {
               key: 'designation',
               type: 'select',
-              className: 'ta-cell pr-md col-md-8',
+              className: 'col-3 pb-3 ps-0',
               templateOptions: {
                 label: 'Designation',
                 dataKey: 'designation_id',
@@ -157,15 +153,20 @@ export class EmployeesComponent {
                 required: true
               },
               hooks: {
-                onInit: (field: any) => { 
-                }
+                onInit: (field: any) => {
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['designation_id']) {
+                      this.formConfig.model['designation_id'] = data.designation_id
+                    } else {
+                      console.error('Form config or lead_status data model is not defined.');
+                    }
+                  });
+                },
               }
-            },
+            }
           ]
         }
       ]
     }
- 
   }
-};
-
+}
