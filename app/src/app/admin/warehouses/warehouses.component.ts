@@ -1,5 +1,6 @@
+import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { TaCurdConfig } from '@ta/ta-curd';
+import { TaFormConfig } from '@ta/ta-form';
 
 @Component({
   selector: 'app-warehouses',
@@ -7,75 +8,54 @@ import { TaCurdConfig } from '@ta/ta-curd';
   styleUrls: ['./warehouses.component.scss']
 })
 export class WarehousesComponent {
-  curdConfig: TaCurdConfig = {
-    drawerSize: 500,
-    drawerPlacement: 'top',
-    tableConfig: {
-      apiUrl: 'inventory/warehouses/',
-      title: 'Warehouses',
-      pkId: "warehouse_id",
-      pageSize: 10,
-      "globalSearch": {
-        keys: ['warehouse_id', 'name']
+  showWarehousesList: boolean = false;
+  showForm: boolean = false;
+  WarehousesEditID: any;
+
+  constructor(private http: HttpClient) {
+  }
+
+  ngOnInit() {
+    this.showWarehousesList = false;
+    this.showForm = true;
+    // set form config
+    this.setFormConfig();
+    console.log('this.formConfig', this.formConfig);
+
+  };
+  formConfig: TaFormConfig = {};
+
+  hide() {
+    document.getElementById('modalClose').click();
+  };
+
+  editWarehouses(event) {
+    console.log('event', event);
+    this.WarehousesEditID = event;
+    this.http.get('inventory/warehouses/' + event).subscribe((res: any) => {
+      if (res) {
+        this.formConfig.model = res;
+        //set labels for update
+        this.formConfig.submit.label = 'Update';
+        this.formConfig.pkId = 'warehouse_id';
+        this.showForm = true;
+      }
+    })
+    this.hide();
+  };
+
+
+  showWarehousesListFn() {
+    this.showWarehousesList = true;
+  };
+
+  setFormConfig() {
+    this.formConfig = {
+      url: "inventory/warehouses/",
+      // title: 'warehouses',
+      formState: {
+        viewMode: false,
       },
-      cols: [
-        {
-          fieldKey: 'name',
-          name: 'Name',
-          sort: true
-        },
-        {
-          fieldKey: 'code',
-          name: 'Code',
-          sort: true
-        },
-        {
-          fieldKey: 'phone', 
-          name: 'Phone',
-          sort: false
-        },
-        {
-          fieldKey: 'city_id',
-          name: 'City',
-          sort: true,
-          displayType: "map",
-          mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.city.city_name}`;
-          },
-        },
-        {
-          fieldKey: 'state_id',
-          name: 'State',
-          sort: true,
-          displayType: "map",
-          mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.state.state_name}`;
-          },
-        },
-        {
-          fieldKey: "code",
-          name: "Action",
-          type: 'action',
-          actions: [
-            {
-              type: 'delete',
-              label: 'Delete',
-              confirm: true,
-              confirmMsg: "Sure to delete?",
-              apiUrl: 'inventory/warehouses'
-            },
-            {
-              type: 'edit',
-              label: 'Edit'
-            }
-          ]
-        }
-      ]
-    },
-    formConfig: {
-      url: 'inventory/warehouses/',
-      title: 'Warehouses',
-      pkId: "warehouse_id",
       exParams: [
         {
           key: 'item_type_id',
@@ -97,15 +77,26 @@ export class WarehousesComponent {
           type: 'script',
           value: 'data.country.country_id'
         },
-      ],
+        {
+          key: 'customer_id',
+          type: 'script',
+          value: 'data.customer.customer_id'
+        },
+      ],	  
+      submit: {
+        label: 'Submit',
+        submittedFn: () => this.ngOnInit()
+      },
+      reset: {},
+      model:{},	  
       fields: [
         {
-          fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
-          fieldGroup: [ 
+          fieldGroupClassName: "ant-row custom-form-block",
+          fieldGroup: [	  
             {
               key: 'name',
               type: 'input',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-3 pb-3 ps-0',
               templateOptions: {
                 label: 'Name',
                 placeholder: 'Enter Name',
@@ -115,7 +106,7 @@ export class WarehousesComponent {
             {
               key: 'code',
               type: 'input',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-3 pb-3 ps-0',
               templateOptions: {
                 label: 'Code',
                 placeholder: 'Enter Code',
@@ -125,7 +116,7 @@ export class WarehousesComponent {
             {
               key: 'phone',
               type: 'input',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-3 pb-3 ps-0',
               templateOptions: {
                 label: 'Phone',
                 placeholder: 'Enter Phone Number',
@@ -135,7 +126,7 @@ export class WarehousesComponent {
             {
               key: 'email',
               type: 'input',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-3 pb-3 ps-0',
               templateOptions: {
                 label: 'Email',
                 placeholder: 'Enter Email',
@@ -145,7 +136,7 @@ export class WarehousesComponent {
             {
               key: 'address',
               type: 'textarea',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-3 pb-3 ps-0',
               templateOptions: {
                 label: 'Address',
                 placeholder: 'Enter Address',
@@ -155,7 +146,7 @@ export class WarehousesComponent {
             {
               key: 'city',
               type: 'select',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-3 pb-3 ps-0',
               templateOptions: {
                 label: 'City',
                 dataKey: 'city_id',
@@ -176,7 +167,7 @@ export class WarehousesComponent {
             {
               key: 'state',
               type: 'select',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-3 pb-3 ps-0',
               templateOptions: {
                 label: 'State',
                 dataKey: 'state_id',
@@ -197,7 +188,7 @@ export class WarehousesComponent {
             {
               key: 'country',
               type: 'select',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-3 pb-3 ps-0',
               templateOptions: {
                 label: 'Country',
                 dataKey: 'country_id',
@@ -218,7 +209,7 @@ export class WarehousesComponent {
             {
               key: 'pin_code',
               type: 'input',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-3 pb-3 ps-0',
               templateOptions: {
                 label: 'Pin Code',
                 placeholder: 'Enter Pin Code',
@@ -228,7 +219,7 @@ export class WarehousesComponent {
             {
               key: 'item_type',
               type: 'select',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-3 pb-3 ps-0',
               templateOptions: {
                 label: 'Item Type',
                 dataKey: 'item_type_id',
@@ -240,16 +231,27 @@ export class WarehousesComponent {
                 },
                 required: false
               },
+              // hooks: {
+              //   onInit: (field: any) => {
+              //     //field.templateOptions.options = this.cs.getRole();
+              //   }
+              // }
               hooks: {
                 onInit: (field: any) => {
-                  //field.templateOptions.options = this.cs.getRole();
-                }
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['item_type_id']) {
+                      this.formConfig.model['item_type_id'] = data.item_type_id
+                    } else {
+                      console.error('Form config or item type data model is not defined.');
+                    }
+                  });
+                },
               }
             },
             {
               key: 'longitude',
               type: 'input',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-3 pb-3 ps-0',
               templateOptions: {
                 label: 'Longitude',
                 required: false,
@@ -263,10 +265,31 @@ export class WarehousesComponent {
             {
               key: 'latitude',
               type: 'input',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-3 pb-3 ps-0',
               templateOptions: {
                 label: 'Latitude',
                 required: false,
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  //field.templateOptions.options = this.cs.getRole();
+                }
+              }
+            },
+            {
+              key: 'customer',
+              type: 'select',
+              className: 'col-3 pb-3 ps-0',
+              templateOptions: {
+                label: 'Customer',
+                dataKey: 'customer_id',
+                dataLabel: "name",
+                options: [],
+                lazy: {
+                  url: 'customers/customer/',
+                  lazyOneTime: true
+                },
+                required: false
               },
               hooks: {
                 onInit: (field: any) => {

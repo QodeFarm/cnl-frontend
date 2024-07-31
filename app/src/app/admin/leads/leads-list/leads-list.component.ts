@@ -20,7 +20,7 @@ export class LeadsListComponent {
   tableConfig: TaTableConfig = {
     apiUrl: 'leads/leads/',
     // title: 'Edit Sales Order List',
-    // showCheckbox:true,
+    showCheckbox:true,
     pkId: "lead_id",
     pageSize: 10,
     "globalSearch": {

@@ -9,6 +9,7 @@ import { LocationsComponent } from './locations/locations.component';
 import { AssetMaintenanceComponent } from './asset-maintenance/asset-maintenance.component';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { AssetsListComponent } from './assets-list/assets-list.component';
+import { AssetMaintenanceListComponent } from './asset-maintenance/asset-maintenance-list/asset-maintenance-list.component';
 
 
 @NgModule({
@@ -24,7 +25,8 @@ import { AssetsListComponent } from './assets-list/assets-list.component';
     CommonModule,
     AdminCommmonModule,
     AssetsRoutingModule,
-    AssetsListComponent
+    AssetsListComponent,
+    AssetMaintenanceListComponent
   ]
 })
 export class AssetsModule { }

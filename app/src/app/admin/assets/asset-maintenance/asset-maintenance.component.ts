@@ -1,5 +1,6 @@
+import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { TaCurdConfig } from '@ta/ta-curd';
+import { TaFormConfig } from '@ta/ta-form';
 
 @Component({
   selector: 'app-asset-maintenance',
@@ -7,143 +8,142 @@ import { TaCurdConfig } from '@ta/ta-curd';
   styleUrls: ['./asset-maintenance.component.scss']
 })
 export class AssetMaintenanceComponent {
-  curdConfig: TaCurdConfig = {
-    drawerSize: 500,
-    drawerPlacement: 'top',
-    tableConfig: {
-      apiUrl: 'http://195.35.20.172:8000/api/v1/assets/asset_maintenance/',
-      title: 'Asset Maintenance',
-      pkId: "asset_maintenance_id",
-      pageSize: 10,
-      "globalSearch": {
-        keys: ['asset_maintenance_id']
-      },
-      cols: [
-        {
-          fieldKey: 'asset_id',
-          name: 'Asset',
-          sort: true,
-          displayType: "map",
-          mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.asset.name}`;
+  showAssetMaintenanceList: boolean = false;
+  showForm: boolean = false;
+  AssetMaintenanceEditID: any;
+
+  constructor(private http: HttpClient) {
+  }
+
+  ngOnInit() {
+    this.showAssetMaintenanceList = false;
+    this.showForm = true;
+    // set form config
+    this.setFormConfig();
+    console.log('this.formConfig', this.formConfig);
+
+  };
+  formConfig: TaFormConfig = {};
+
+  hide() {
+    document.getElementById('modalClose').click();
+  };
+
+  editAssetMaintenance(event) {
+    console.log('event', event);
+    this.AssetMaintenanceEditID = event;
+    this.http.get('http://195.35.20.172:8000/api/v1/assets/asset_maintenance/'  + event).subscribe((res: any) => {
+      if (res) {
+        this.formConfig.model = res;
+        // Set labels for update
+        this.formConfig.submit.label = 'Update';
+        // Show form after setting form values
+        this.formConfig.pkId = 'asset_maintenance_id';
+        this.formConfig.model['asset_maintenance_id'] = this.AssetMaintenanceEditID;
+        this.showForm = true;
+      }
+    });
+    this.hide();
+  }
+
+  showAssetMaintenanceListFn() {
+    this.showAssetMaintenanceList = true;
+  };
+
+    setFormConfig() {
+      this.formConfig = {
+        url: 'http://195.35.20.172:8000/api/v1/assets/asset_maintenance/',
+        // title: 'Asset Maintenance',
+        formState: {
+          viewMode: false,
+        },
+        exParams: [
+          {
+            key: 'asset_id',
+            type: 'script',
+            value: 'data.asset.asset_id'
           },
+        ],
+        submit: {
+          label: 'Submit',
+          submittedFn: () => this.ngOnInit()
         },
-        {
-          fieldKey: 'cost', 
-          name: 'Cost',
-          sort: true
-        },
-        {
-          fieldKey: 'maintenance_date',
-          name: 'Maintenance Date',
-          sort: true
-        },
-        {
-          fieldKey: 'maintenance_description',
-          name: 'Maintenance Description',
-          sort: false
-        },
-        {
-          fieldKey: "code",
-          name: "Action",
-          type: 'action',
-          actions: [
-            {
-              type: 'delete',
-              label: 'Delete',
-              confirm: true,
-              confirmMsg: "Sure to delete?",
-              apiUrl: 'http://195.35.20.172:8000/api/v1/assets/asset_maintenance'
-            },
-            {
-              type: 'edit',
-              label: 'Edit'
-            }
-          ]
-        }
-      ]
-    },
-    formConfig: {
-      url: 'http://195.35.20.172:8000/api/v1/assets/asset_maintenance/',
-      title: 'Asset Maintenance',
-      pkId: "asset_maintenance_id",
-      exParams: [
-        {
-          key: 'asset_id',
-          type: 'script',
-          value: 'data.asset.asset_id'
-        },
-      ],
-      fields: [
-        {
-          fieldGroupClassName: 'row col-12 p-0 m-0 custom-form field-no-bottom-space',
-          fieldGroup: [
-            {
-              key: 'asset',
-              type: 'select',
-              className: 'col-6 pb-3 ps-0',
-              templateOptions: {
-                label: 'Asset',
-                dataKey: 'asset_id',
-                dataLabel: "name",
-                options: [],
-                lazy: {
-                  url: 'http://195.35.20.172:8000/api/v1/assets/assets/',
-                  lazyOneTime: true
+        reset: {},
+        model:{},
+        fields: [
+          {
+            fieldGroupClassName: 'ant-row custom-form-block',
+            fieldGroup: [
+              {
+                key: 'asset',
+                type: 'select',
+                className: 'col-3',
+                templateOptions: {
+                  label: 'Asset',
+                  dataKey: 'asset_id',
+                  dataLabel: "name",
+                  options: [],
+                  lazy: {
+                    url: 'http://195.35.20.172:8000/api/v1/assets/assets/',
+                    lazyOneTime: true
+                  },
+                  required: true
                 },
-                required: true
-              },
-              hooks: {
-                onInit: (field: any) => {
-                  //field.templateOptions.options = this.cs.getRole();
+                hooks: {
+                  onInit: (field: any) => {
+                    field.formControl.valueChanges.subscribe((data: any) => {
+                      if (this.formConfig && this.formConfig.model && this.formConfig.model['asset_id']) {
+                        this.formConfig.model['asset_id'] = data.asset_id
+                      } else {
+                        console.error('Form config or asset data model is not defined.');
+                      }
+                    });
+                  },
                 }
-              }
-            },
-            {
-              key: 'cost',
-              type: 'input',
-              className: 'col-6 pb-3 ps-0',
-              templateOptions: {
-                label: 'Cost',
-                required: true,
               },
-              hooks: {
-                onInit: (field: any) => {
-                  //field.templateOptions.options = this.cs.getRole();
+              {
+                key: 'cost',
+                type: 'input',
+                className: 'col-3',
+                templateOptions: {
+                  label: 'Cost',
+                  required: true,
+                  placeholder: 'Enter cost',
+                },
+                hooks: {
+                  onInit: (field: any) => {
+                    //field.templateOptions.options = this.cs.getRole();
+                  }
                 }
-              }
-            },
-            {
-              key: 'maintenance_date',
-              type: 'date',
-              className: 'col-6 pb-3 ps-0',
-              templateOptions: {
-                label: 'Maintenance Date',
-                required: true,
               },
-              hooks: {
-                onInit: (field: any) => {
-                  //field.templateOptions.options = this.cs.getRole();
+              {
+                key: 'maintenance_date',
+                type: 'input',
+                className: 'col-3',
+                templateOptions: {
+                  type: 'date',
+                  label: 'Maintenance date',
+                  placeholder: 'Select Maintenance date',
+                  required: false
                 }
-              }
-            },
-            {
-              key: 'maintenance_description',
-              type: 'textarea',
-              className: 'col-6 pb-3 ps-0',
-              templateOptions: {
-                label: 'Maintenance Description',
-                required: false,
               },
-              hooks: {
-                onInit: (field: any) => {
-                  //field.templateOptions.options = this.cs.getRole();
+              {
+                key: 'maintenance_description',
+                type: 'textarea',
+                className: 'col-3',
+                templateOptions: {
+                  label: 'Maintenance Description',
+                  required: false,
+                },
+                hooks: {
+                  onInit: (field: any) => {
+                    //field.templateOptions.options = this.cs.getRole();
+                  }
                 }
-              }
-            },
+              },
           ]
-        }
-      ]    
+        },
+      ]
     }
   }
 }

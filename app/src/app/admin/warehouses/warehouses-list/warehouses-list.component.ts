@@ -5,24 +5,23 @@ import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-assets-list',
+  selector: 'app-warehouses-list',
   standalone: true,
   imports: [CommonModule, AdminCommmonModule],
-  templateUrl: './assets-list.component.html',
-  styleUrls: ['./assets-list.component.scss']
+  templateUrl: './warehouses-list.component.html',
+  styleUrls: ['./warehouses-list.component.scss']
 })
-export class AssetsListComponent {
-
+export class WarehousesListComponent {
   @Output('edit') edit = new EventEmitter<void>();
 
   tableConfig: TaTableConfig = {
-    apiUrl: 'http://195.35.20.172:8000/api/v1/assets/assets/',
+    apiUrl: 'inventory/warehouses/',
     // title: 'Edit Tasks List',
     showCheckbox:true,
-    pkId: "asset_id",
+    pkId: "warehouse_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['asset_id']
+      keys: ['warehouse_id']
     },
     cols: [
       {
@@ -31,50 +30,31 @@ export class AssetsListComponent {
         sort: true
       },
       {
-          fieldKey: 'price', 
-          name: 'Price',
-          sort: false
+        fieldKey: 'code',
+        name: 'Code',
+        sort: true
       },
       {
-        fieldKey: 'asset_category_id',
-        name: 'Category',
+        fieldKey: 'phone', 
+        name: 'Phone',
+        sort: false
+      },
+      {
+        fieldKey: 'city_id',
+        name: 'City',
         sort: true,
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.asset_category.category_name}`;
+          return `${row.city.city_name}`;
         },
       },
       {
-        fieldKey: 'unit_options_id',
-        name: 'Unit Options',
+        fieldKey: 'state_id',
+        name: 'State',
         sort: true,
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.unit_options.unit_name}`;
-        },
-      },
-      {
-        fieldKey: 'purchase_date', 
-        name: 'Purchase Date',
-        sort: false,
-        displayType: "date"
-      },
-      {
-        fieldKey: 'location_id',
-        name: 'Location',
-        sort: true,
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.location.location_name}`;
-        },
-      },
-      {
-        fieldKey: 'asset_status_id',
-        name: 'Status',
-        sort: true,
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.asset_status.status_name}`;
+          return `${row.state.state_name}`;
         },
       },
       {
@@ -87,15 +67,15 @@ export class AssetsListComponent {
             label: 'Delete',
             // confirm: true,
             // confirmMsg: "Sure to delete?",
-            apiUrl: 'http://195.35.20.172:8000/api/v1/assets/assets'
+            apiUrl: 'inventory/warehouses'
           },
           {
             type: 'callBackFn',
             label: 'Edit',
             callBackFn: (row, action) => {
               console.log(row);
-              this.edit.emit(row.asset_id);
-              // this.router.navigateByUrl('assets/assets/' + row.asset_id);
+              this.edit.emit(row.warehouse_id);
+              // this.router.navigateByUrl('inventory/warehouses/' + row.warehouse_id);
             }
           }
         ]
@@ -105,16 +85,3 @@ export class AssetsListComponent {
 
   constructor(private router: Router) {}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

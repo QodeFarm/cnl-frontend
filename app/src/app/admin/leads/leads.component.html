@@ -1,16 +1,16 @@
 <div class="container-fluid pt-3">
-    <div class="sales-banner">
-        <div class="col-12 px-1" style="display: flex; justify-content: space-between;">
-            <button type="button" class="btn pl-0" style="color: black;">
-                <b *ngIf="LeadsEditID">Update Leads</b>
-                <b *ngIf="!LeadsEditID">Create Leads</b>
+    <div class="leads-banner">
+        <div class="col-12 px-0" style="display: flex; justify-content: space-between;align-items: center;">
+            <button (click)="LeadsEditID = null" type="button" class="btn pl-0" style="color: black;">
+                <span *ngIf="LeadsEditID" class="custom-heading">Update Leads</span>
+                <span *ngIf="!LeadsEditID" class="custom-heading">Create Leads</span>
             </button>
-            <button (click)="showLeadsListFn()" type="button" class="button" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            <button (click)="showLeadsListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#leadsListModal">
                 Leads List
             </button>
         </div>
     </div>
-    <div class="row">
+    <div class="row custom-form">
         <div>
             <ta-form [options]="formConfig"></ta-form>
         </div>
@@ -19,19 +19,19 @@
 
 <!-- Leads List Modal -->
 
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade custom-modal" id="leadsListModal" tabindex="-1" aria-labelledby="leadsListModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl ">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Edit Leads List</h5>
+                <h5 class="modal-title" id="leadsListModalLabel">Edit Leads List</h5>
                 <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" *ngIf="showLeadsList">
-                <app-leads-list (edit)="editLeads($event)" ></app-leads-list>
+                <app-leads-list (edit)="editLeads($event)" class="custom-list"></app-leads-list>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
             </div>
         </div>
     </div>

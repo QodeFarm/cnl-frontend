@@ -88,31 +88,31 @@ export class QuickpacksComponent implements OnInit {
                 required: true
               }
             },
-            {
-              key: 'customer',
-              type: 'select',
-              className: 'col-3',
-              templateOptions: {
-                label: 'Customer',
-                dataKey: 'customer_id',
-                dataLabel: 'name',
-                options: [],
-                required: true,
-                lazy: {
-                  url: 'customers/customers/?summary=true',
-                  lazyOneTime: true
-                }
-              },
-              hooks: {
-                onChanges: (field: any) => {
-                  field.formControl.valueChanges.subscribe((data: any) => {
-                    if (data && data.customer_id) {
-                      this.formConfig.model['quick_pack_data']['customer_id'] = data.customer_id;
-                    }
-                  });
-                }
-              }
-            },
+            // {
+            //   key: 'customer',
+            //   type: 'select',
+            //   className: 'col-3',
+            //   templateOptions: {
+            //     label: 'Customer',
+            //     dataKey: 'customer_id',
+            //     dataLabel: 'name',
+            //     options: [],
+            //     required: true,
+            //     lazy: {
+            //       url: 'customers/customers/?summary=true',
+            //       lazyOneTime: true
+            //     }
+            //   },
+            //   hooks: {
+            //     onChanges: (field: any) => {
+            //       field.formControl.valueChanges.subscribe((data: any) => {
+            //         if (data && data.customer_id) {
+            //           this.formConfig.model['quick_pack_data']['customer_id'] = data.customer_id;
+            //         }
+            //       });
+            //     }
+            //   }
+            // },
             {
               key: 'active',
               type: 'select',
@@ -139,7 +139,7 @@ export class QuickpacksComponent implements OnInit {
             {
               key: 'description',
               type: 'textarea',
-              className: 'col-4',
+              className: 'col-3',
               templateOptions: {
                 label: 'Description',
                 placeholder: 'Enter Description',

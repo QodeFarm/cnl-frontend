@@ -5,68 +5,49 @@ import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-tasks-list',
+  selector: 'app-asset-maintenance-list',
   standalone: true,
   imports: [CommonModule, AdminCommmonModule],
-  templateUrl: './tasks-list.component.html',
-  styleUrls: ['./tasks-list.component.scss']
+  templateUrl: './asset-maintenance-list.component.html',
+  styleUrls: ['./asset-maintenance-list.component.scss']
 })
-export class TasksListComponent {
+export class AssetMaintenanceListComponent {
 
   @Output('edit') edit = new EventEmitter<void>();
 
   tableConfig: TaTableConfig = {
-    apiUrl: 'tasks/task/',
+    apiUrl: 'http://195.35.20.172:8000/api/v1/assets/asset_maintenance/',
     // title: 'Edit Tasks List',
     showCheckbox:true,
-    pkId: "task_id",
+    pkId: "asset_maintenance_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['task_id']
+      keys: ['asset_maintenance_id']
     },
     cols: [
       {
-        fieldKey: 'title',
-        name: 'Title',
-        sort: true
-      },
-      {
-        fieldKey: 'user_id',
-        name: 'User',
+        fieldKey: 'asset_id',
+        name: 'Asset',
+        sort: true,
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.user.first_name}`;
+          return `${row.asset.name}`;
         },
+      },
+      {
+        fieldKey: 'cost', 
+        name: 'Cost',
         sort: true
       },
       {
-        fieldKey: 'description',
-        name: 'Description',
+        fieldKey: 'maintenance_date',
+        name: 'Maintenance Date',
+        sort: true
+      },
+      {
+        fieldKey: 'maintenance_description',
+        name: 'Maintenance Description',
         sort: false
-      },
-      {
-        fieldKey: 'priority_id',
-        name: 'priority',
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.priority.priority_name}`;
-        },
-        sort: true
-      },
-      {
-        fieldKey: 'due_date',
-        name: 'Due Date',
-        sort: false,
-        displayType: "date"
-      },
-      {
-        fieldKey: 'status_id',
-        name: 'Statuses',
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.status.status_name}`;
-        },
-        sort: true
       },
       {
         fieldKey: "code",
@@ -78,15 +59,15 @@ export class TasksListComponent {
             label: 'Delete',
             // confirm: true,
             // confirmMsg: "Sure to delete?",
-            apiUrl: 'tasks/task'
+            apiUrl: 'http://195.35.20.172:8000/api/v1/assets/asset_maintenance'
           },
           {
             type: 'callBackFn',
             label: 'Edit',
             callBackFn: (row, action) => {
               console.log(row);
-              this.edit.emit(row.task_id);
-              // this.router.navigateByUrl('tasks/task/' + row.task_id);
+              this.edit.emit(row.asset_maintenance_id);
+              // this.router.navigateByUrl('assets/asset_maintenance/' + row.asset_maintenance_id);
             }
           }
         ]

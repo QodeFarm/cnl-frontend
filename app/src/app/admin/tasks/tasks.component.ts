@@ -266,6 +266,38 @@ export class TasksComponent implements OnInit {
           template: '<div> <hr> <b>Task Attachments</b> </div>',
           fieldGroupClassName: 'ant-row',
         },
+        // {
+        //   key: 'task_attachments',
+        //   type: 'repeat',
+        //   templateOptions: {
+        //     addText: 'Add Attachment'
+        //   },
+        //   fieldArray: {
+        //     fieldGroupClassName: 'row',
+        //     fieldGroup: [
+        //       {
+        //         key: 'attachment_name',
+        //         type: 'input',
+        //         className: 'col-9',
+        //         templateOptions: {
+        //           label: 'Attachment Name',
+        //           placeholder: 'Enter Attachment Name',
+        //           required: false
+        //         }
+        //       },
+        //       {
+        //         key: 'attachment_path',
+        //         type: 'input',
+        //         className: 'col-9',
+        //         templateOptions: {
+        //           label: 'Attachment Path',
+        //           placeholder: 'Enter Attachment Path',
+        //           required: false
+        //         }
+        //       }
+        //     ]
+        //   }
+        // },
         {
           key: 'task_attachments',
           type: 'repeat',
@@ -286,14 +318,22 @@ export class TasksComponent implements OnInit {
                 }
               },
               {
-                key: 'attachment_path',
-                type: 'input',
-                className: 'col-9',
-                templateOptions: {
-                  label: 'Attachment Path',
-                  placeholder: 'Enter Attachment Path',
-                  required: false
-                }
+                className: 'col-12 custom-form-card-block w-100',
+                fieldGroup:[
+                  {
+                    template: '<div class="custom-form-card-title"> Attachment Path </div>',
+                    fieldGroupClassName: "ant-row",
+                  },
+                  {
+                    key: 'attachment_path',
+                    type: 'file',
+                    className: 'ta-cell col-12 custom-file-attachement',
+                    templateOptions: {
+                      // // required: true
+                      // required: true
+                    }
+                  },
+                ]
               }
             ]
           }
