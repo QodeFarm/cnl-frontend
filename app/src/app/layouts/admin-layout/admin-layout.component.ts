@@ -75,7 +75,7 @@ export class AdminLayoutComponent {
             icon: 'fas fa-tachometer-alt',
           },
           {
-            link: '/admin/sales',
+            link: '/admin/sales/salesinvoice',
             label: 'Sale Invoice',
             icon: 'fas fa-tachometer-alt',
           },
