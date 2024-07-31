@@ -1,6 +1,6 @@
-import { Binary } from '@angular/compiler';
+import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { TaCurdConfig } from '@ta/ta-curd';
+import { TaFormConfig } from '@ta/ta-form';
 
 @Component({
   selector: 'app-branches',
@@ -9,90 +9,58 @@ import { TaCurdConfig } from '@ta/ta-curd';
 })
 
 export class BranchesComponent {
-  curdConfig: TaCurdConfig = {
-    drawerSize: 500,
-    drawerPlacement: 'top',
-    tableConfig: {
-      apiUrl: 'company/branches/',
-      title: 'Branches',
-      pkId: "branch_id",
-      pageSize: 10,
-      "globalSearch": {
-        keys: ['branch_id', 'name']
+  showBranchList: boolean = false;
+  showForm: boolean = false;
+  BranchEditID: any;
+
+  constructor(private http: HttpClient) {
+  }
+
+  ngOnInit() {
+    this.showBranchList = false;
+    this.showForm = true;
+    // set form config
+    this.setFormConfig();
+  };
+
+  formConfig: TaFormConfig = {};
+
+  hide() {
+    document.getElementById('modalClose').click();
+  };
+
+  editBranch(event) {
+    console.log('event', event);
+    this.BranchEditID = event;
+    this.http.get('company/branches/' + event).subscribe((res: any) => {
+      if (res) {
+        this.formConfig.model = res;
+        //set labels for update
+        this.formConfig.submit.label = 'Update';
+        this.formConfig.pkId = 'branch_id';
+        this.showForm = true;
+      }
+    })
+    this.hide();
+  };
+
+
+  showBranchListFn() {
+    this.showBranchList = true;
+  };
+
+  setFormConfig() {
+    this.formConfig = {
+      url: "company/branches/",
+      // title: 'Branches',
+      formState: {
+        viewMode: false,
       },
-      cols: [
-        {
-          fieldKey: 'name',
-          name: 'Name'
-        },
-        {
-          fieldKey: 'code',
-          name: 'Code'
-        },
-        {
-          fieldKey: 'phone',
-          name: 'Phone'
-        },
-        {
-          fieldKey: 'email',
-          name: 'Email'
-        },
-        {
-          fieldKey: 'address',
-          name: 'Address',
-        },
-        {
-          fieldKey: 'status_id',
-          name: 'Status',
-          displayType: "map",
-          mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.status.status_name}`;
-          },
-          sort: true
-        },
-        {
-          fieldKey: 'city_id',
-          name: 'City',
-          displayType: "map",
-          mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.city.city_name}`;
-          },
-          sort: true
-        },
-        {
-          fieldKey: "code",
-          name: "Action",
-          type: 'action',
-          actions: [
-            {
-              type: 'delete',
-              label: 'Delete',
-              confirm: true,
-              confirmMsg: "Sure to delete?",
-              apiUrl: 'company/branches'
-            },
-            {
-              type: 'edit',
-              label: 'Edit'
-            }
-          ]
-        }
-      ]
-    },
-    formConfig: {
-      url: 'company/branches/',
-      title: 'Branch',
-      pkId: "branch_id",
       exParams: [
-	    {
-          key: 'company_id',
-          type: 'script',
-          value: 'data.company.company_id'
-        },
         {
-          key: 'city_id',
+          key: 'status_id',
           type: 'script',
-          value: 'data.city.city_id'
+          value: 'data.status.status_id'
         },
         {
           key: 'state_id',
@@ -100,24 +68,35 @@ export class BranchesComponent {
           value: 'data.state.state_id'
         },
         {
+          key: 'city_id',
+          type: 'script',
+          value: 'data.city.city_id'
+        },
+        {
           key: 'country_id',
           type: 'script',
           value: 'data.country.country_id'
         },
         {
-          key: 'status_id',
+          key: 'company_id',
           type: 'script',
-          value: 'data.status.status_id'
+          value: 'data.company.company_id'
         },
       ],
+      submit: {
+        label: 'Submit',
+        submittedFn: () => this.ngOnInit()
+      },
+      reset: {},
+      model:{},
       fields: [
         {
-          fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
+          fieldGroupClassName: "ant-row custom-form-block",
           fieldGroup: [
             {
               key: 'name',
               type: 'input',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-3 pb-3 ps-0',
               templateOptions: {
                 label: 'Name',
                 placeholder: 'Enter Name',
@@ -127,27 +106,27 @@ export class BranchesComponent {
             {
               key: 'code',
               type: 'input',
-              className: 'col-6 pb-3 pe-0',
+              className: 'col-3 pb-3 ps-0',
               templateOptions: {
                 label: 'Code',
                 placeholder: 'Enter Code',
-                required: false,
+                required: true,
               }
             },
             {
               key: 'phone',
               type: 'input',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-3 pb-3 ps-0',
               templateOptions: {
                 label: 'Phone',
-                placeholder: 'Enter Number',
+                placeholder: 'Enter Phone',
                 required: false,
               }
             },
             {
               key: 'email',
               type: 'input',
-              className: 'col-6 pb-3 pe-0',
+              className: 'col-3 pb-3 ps-0',
               templateOptions: {
                 label: 'Email',
                 placeholder: 'Enter Email',
@@ -155,22 +134,12 @@ export class BranchesComponent {
               }
             },
             {
-              key: 'address',
-              type: 'textarea',
-              className: 'col-6 pb-3 ps-0',
-              templateOptions: {
-                label: 'Address',
-                placeholder: 'Enter Address',
-                required: false,
-              }
-            },
-            {
               key: 'city',
               type: 'select',
-              className: 'col-6 pb-3 pe-0',
+              className: 'col-3 pb-3 ps-0',
               templateOptions: {
                 label: 'City',
-                dataKey: 'city_id',
+                dataKey: 'city',
                 dataLabel: "city_name",
                 options: [],
                 lazy: {
@@ -181,17 +150,23 @@ export class BranchesComponent {
               },
               hooks: {
                 onInit: (field: any) => {
-                  
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['city_id']) {
+                      this.formConfig.model['city_id'] = data.city_id
+                    } else {
+                      console.error('Form config or city_id data model is not defined.');
+                    }
+                  });
                 }
               }
             },
-        {
+            {
               key: 'state',
               type: 'select',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-3 pb-3 ps-0',
               templateOptions: {
                 label: 'State',
-                dataKey: 'state_id',
+                dataKey: 'state',
                 dataLabel: "state_name",
                 options: [],
                 lazy: {
@@ -202,58 +177,70 @@ export class BranchesComponent {
               },
               hooks: {
                 onInit: (field: any) => {
-                  
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['state_id']) {
+                      this.formConfig.model['state_id'] = data.state_id
+                    } else {
+                      console.error('Form config or state_id data model is not defined.');
+                    }
+                  });
                 }
               }
             },
-        {
+            {
               key: 'country',
               type: 'select',
-              className: 'col-6 pb-3 pe-0',
+              className: 'col-3 pb-3 ps-0',
               templateOptions: {
                 label: 'Country',
-                dataKey: 'country_id',
+                dataKey: 'country',
                 dataLabel: "country_name",
                 options: [],
                 lazy: {
                   url: 'masters/country/',
                   lazyOneTime: true
                 },
-                required: true
+                required: false
               },
               hooks: {
                 onInit: (field: any) => {
-                  
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['country_id']) {
+                      this.formConfig.model['country_id'] = data.country_id
+                    } else {
+                      console.error('Form config or city_id data model is not defined.');
+                    }
+                  });
                 }
               }
             },
             {
               key: 'pin_code',
               type: 'input',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-3 pb-3 ps-0',
               templateOptions: {
-                label: 'Pin code',
-                placeholder: 'Enter code',
+                label: 'PIN Code',
+                placeholder: 'Enter PIN Code',
                 required: false,
               }
             },
             {
-              key: 'gst_no',
-              type: 'input',
-              className: 'col-6 pb-3 pe-0',
+              key: 'address',
+              type: 'textarea',
+              className: 'col-3 pb-3 ps-0',
               templateOptions: {
-                label: 'Gst No',
-                placeholder: 'Enter Gst No',
+                label: 'Address',
+                placeholder: 'Enter Address',
                 required: false,
               }
             },
             {
               key: 'status',
               type: 'select',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-3 pb-3 ps-0',
               templateOptions: {
                 label: 'Status',
-                dataKey: 'status_id',
+                dataKey: 'status',
                 dataLabel: "status_name",
                 options: [],
                 lazy: {
@@ -264,114 +251,160 @@ export class BranchesComponent {
               },
               hooks: {
                 onInit: (field: any) => {
-                  
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['status_id']) {
+                      this.formConfig.model['status_id'] = data.status_id
+                    } else {
+                      console.error('Form config or city_id data model is not defined.');
+                    }
+                  });
                 }
-              }
-            },
-            {
-              key: 'allowed_warehouse',
-              type: 'input',
-              className: 'col-6 pb-3 pe-0',
-              templateOptions: {
-                label: 'Allowed Warehouse',
-                placeholder: 'Enter allowed warehouse',
-                required: false,
-              }
-            },
-            {
-              key: 'e_way_username',
-              type: 'input',
-              className: 'col-6 pb-3 ps-0',
-              templateOptions: {
-                label: 'e-way username',
-                placeholder: 'Enter e-way username',
-                required: false,
-              }
-            },
-            {
-              key: 'e_way_password',
-              type: 'input',
-              className: 'col-6 pb-3 pe-0',
-              templateOptions: {
-                label: 'e-way password',
-                placeholder: 'Enter e-way password',
-                required: false,
-              }
-            },
-            {
-              key: 'other_license_1',
-              type: 'input',
-              className: 'col-6 pb-3 ps-0',
-              templateOptions: {
-                label: 'Other license 1',
-                placeholder: 'Enter license name',
-                required: false,
-              }
-            },
-            {
-              key: 'other_license_2',
-              type: 'input',
-              className: 'col-6 pb-3 pe-0',
-              templateOptions: {
-                label: 'Other license 2',
-                placeholder: 'Enter license name',
-                required: false,
-              }
-            },
-            {
-              key: 'gstn_username',
-              type:  'input',
-              className: 'col-6 pb-3 ps-0',
-              templateOptions: {
-                label: 'Gstn username',
-                placeholder: 'Enter username',
-                required: false,
-              }
-            },
-            {
-              key: 'gstn_password',
-              type: 'input',
-              className: 'col-6 pb-3 pe-0',
-              templateOptions: {
-                label: 'Gstn password',
-                placeholder: 'Enter password',
-                required: false,
               }
             },
             {
               key: 'longitude',
               type: 'input',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-3 pb-3 ps-0',
               templateOptions: {
                 label: 'Longitude',
-                placeholder: 'Enter longitude',
+                placeholder: 'Enter Longitude',
                 required: false,
               }
             },
             {
               key: 'latitude',
               type: 'input',
-              className: 'col-6 pb-3 pe-0',
+              className: 'col-3 pb-3 ps-0',
               templateOptions: {
                 label: 'Latitude',
-                placeholder: 'Enter latitude',
+                placeholder: 'Enter Latitude',
                 required: false,
               }
             },
             {
-              key: 'picture',
-              type: 'file',
-              className: 'col-6 pb-3 ps-0',
+              key: 'e_way_username',
+              type: 'input',
+              className: 'col-3 pb-3 ps-0',
               templateOptions: {
-                label: 'picture',
-                placeholder: 'Upload',
+                label: 'E-Way Username',
+                placeholder: 'Enter E-Way Username',
                 required: false,
               }
+            },
+            {
+              key: 'gstn_username',
+              type: 'input',
+              className: 'col-3 pb-3 ps-0',
+              templateOptions: {
+                label: 'GSTN Username',
+                placeholder: 'Enter GSTN Username',
+                required: false,
+              }
+            },
+            {
+              key: 'other_license_1',
+              type: 'input',
+              className: 'col-3 pb-3 ps-0',
+              templateOptions: {
+                label: 'Other License 1',
+                placeholder: 'Enter Other License 1',
+                required: false,
+              }
+            },
+            {
+              key: 'allowed_warehouse',
+              type: 'input',
+              className: 'col-3 pb-3 ps-0',
+              templateOptions: {
+                label: 'Allowed Warehouse',
+                placeholder: 'Enter Allowed Warehouse',
+                required: false,
+              }
+            },
+            {
+              key: 'e_way_password',
+              type: 'input',
+              className: 'col-3 pb-3 ps-0',
+              templateOptions: {
+                label: 'E-Way Password',
+                placeholder: 'Enter E-Way Password',
+                required: false,
+              }
+            },
+            {
+              key: 'gstn_password',
+              type: 'input',
+              className: 'col-3 pb-3 ps-0',
+              templateOptions: {
+                label: 'GSTN Password',
+                placeholder: 'Enter GSTN Password',
+                required: false,
+              }
+            },
+            {
+              key: 'other_license_2',
+              type: 'input',
+              className: 'col-3 pb-3 ps-0',
+              templateOptions: {
+                label: 'Other License 2',
+                placeholder: 'Enter Other License 2',
+                required: false,
+              }
+            },
+            {
+              key: 'gst_no',
+              type: 'input',
+              className: 'col-3 pb-3 ps-0',
+              templateOptions: {
+                label: 'GST No',
+                placeholder: 'Enter GST No',
+                required: false,
+              }
+            },
+            {
+              key: 'company',
+              type: 'select',
+              className: 'col-3 pb-3 ps-0',
+              templateOptions: {
+                label: 'Company',
+                dataKey: 'company',
+                dataLabel: "name",
+                options: [],
+                lazy: {
+                  url: 'company/companies/',
+                  lazyOneTime: true
+                },
+                required: true
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['company_id']) {
+                      this.formConfig.model['company_id'] = data.company_id
+                    } else {
+                      console.error('Form config or city_id data model is not defined.');
+                    }
+                  });
+                }
+              }
+            },
+            {
+              className: 'col-3 p-0',
+              fieldGroup:[
+                {
+                  key: 'picture',
+                  type: 'file',
+                  className: 'ta-cell pr-md col-12',
+                  templateOptions: {
+                    label: 'Picture',
+                    required: false
+                  }
+                },
+              ]
             },
           ]
         }
       ]
     }
- 
   }
 }
