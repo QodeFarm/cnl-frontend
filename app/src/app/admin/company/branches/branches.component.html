@@ -1,7 +1,39 @@
 <div class="container-fluid pt-3">
-    <div class="row">
-        <div class="col-12 px-2 py-1">
-            <ta-curd-modal [options]="curdConfig" class="custom-list"></ta-curd-modal>
+    <div class="branches-banner">
+        <div class="col-12 px-0" style="display: flex; justify-content: space-between;align-items: center;">
+            <button type="button" class="btn pl-0" >
+                <span *ngIf="BranchEditID" class="custom-heading">Update Branch</span>
+                <span *ngIf="!BranchEditID" class="custom-heading">Create Branch</span>
+            </button>
+            <button (click)="showBranchListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                Branch List
+            </button>
+        </div>
+    </div>
+    <div class="row custom-form">
+        <div class="col-12 px-1" *ngIf="showForm">
+            <ta-form [options]="formConfig"></ta-form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Branch list Modal -->
+
+<div class="modal fade custom-modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Branch List</h5>
+                <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" *ngIf="showBranchList">
+                <app-branch-list (edit)="editBranch($event)" class="custom-list"></app-branch-list>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+            </div>
         </div>
     </div>
 </div>

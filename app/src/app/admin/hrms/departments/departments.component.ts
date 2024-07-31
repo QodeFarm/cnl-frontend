@@ -51,8 +51,8 @@ export class DepartmentsComponent {
         fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
         fieldGroup: [{
           key: 'department_name',
-          type: 'textarea',
-          className: 'col-12 p-0',
+          type: 'input',
+          className: 'col-6 p-0',
           templateOptions: {
             label: 'Department Name',
             placeholder: 'Enter Department Name',

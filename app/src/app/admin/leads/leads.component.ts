@@ -49,6 +49,9 @@ export class LeadsComponent {
     this.LeadsEditID = event;
     this.http.get('leads/leads/' + event).subscribe((res: any) => {
       if (res && res.data) {
+        console.log('-------------------------------')
+        console.log('model :',this.formConfig.model);
+        console.log('data :',res.data);
         this.formConfig.model = res.data;
         // set labels for update
         this.formConfig.submit.label = 'Update';

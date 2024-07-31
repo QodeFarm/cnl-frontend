@@ -51,8 +51,8 @@ export class DesignationsComponent {
         fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
         fieldGroup: [{
           key: 'designation_name',
-          type: 'textarea',
-          className: 'col-12 p-0',
+          type: 'input',
+          className: 'col-6 p-0',
           templateOptions: {
             label: 'Designation Name',
             placeholder: 'Enter Designation Name',

@@ -216,21 +216,21 @@ export class AdminLayoutComponent {
       },
       {
         label: 'HRMS',
-        icon: 'fas fa-lock',
+        icon: 'fas fa-heading',
         child: [
           {
             link: '/admin/employees',
-            label: 'employees',
+            label: 'Employees',
             icon: 'fas fa-tachometer-alt',
           },
           {
             link: '/admin/employees/designations',
-            label: 'designations',
+            label: 'Designations',
             icon: 'fas fa-tachometer-alt',
           },
           {
             link: '/admin/employees/departments',
-            label: 'departments',
+            label: 'Departments',
             icon: 'fas fa-tachometer-alt',
           }
         ]
@@ -304,7 +304,7 @@ export class AdminLayoutComponent {
       },
       {
         label: 'Company',
-        icon: 'fas fa-file-invoice-dollar',
+        icon: 'fas fa-building',
         child: [
           {
             link: '/admin/company',
