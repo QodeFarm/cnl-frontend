@@ -1,30 +1,27 @@
-import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Output } from '@angular/core';
-import { Router } from '@angular/router';
-import { TaTableConfig } from '@ta/ta-table';
+import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
-
+import { TaTableConfig } from '@ta/ta-table';
+import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-leads-list',
+  selector: 'app-warehouses-list',
   standalone: true,
   imports: [CommonModule, AdminCommmonModule],
-  templateUrl: './leads-list.component.html',
-  styleUrls: ['./leads-list.component.scss']
+  templateUrl: './warehouses-list.component.html',
+  styleUrls: ['./warehouses-list.component.scss']
 })
-
-export class LeadsListComponent {
-
+export class WarehousesListComponent {
   @Output('edit') edit = new EventEmitter<void>();
 
   tableConfig: TaTableConfig = {
-    apiUrl: 'leads/leads/',
-    // title: 'Edit Sales Order List',
+    apiUrl: 'inventory/warehouses/',
+    // title: 'Edit Tasks List',
     showCheckbox:true,
-    pkId: "lead_id",
+    pkId: "warehouse_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['lead_id']
+      keys: ['warehouse_id']
     },
     cols: [
       {
@@ -33,42 +30,32 @@ export class LeadsListComponent {
         sort: true
       },
       {
-        fieldKey: 'email',
-        name: 'Email',
+        fieldKey: 'code',
+        name: 'Code',
         sort: true
       },
       {
-        fieldKey: 'phone',
+        fieldKey: 'phone', 
         name: 'Phone',
-        sort: true
+        sort: false
       },
       {
-        fieldKey: 'lead_status',
-        name: 'Lead Status',
+        fieldKey: 'city_id',
+        name: 'City',
+        sort: true,
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.lead_status.status_name}`;
+          return `${row.city.city_name}`;
         },
-        sort: true
       },
       {
-        fieldKey: 'score',
-        name: 'Score',
-        sort: true
-      },
-      {
-        fieldKey: 'sales_rep_id',
-        name: 'Sales Representative',
+        fieldKey: 'state_id',
+        name: 'State',
+        sort: true,
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.sales_rep_id}`;
+          return `${row.state.state_name}`;
         },
-        sort: true
-      },
-      {
-        fieldKey: '',
-        name: 'Last Interaction Date',
-        sort: true
       },
       {
         fieldKey: "code",
@@ -80,14 +67,15 @@ export class LeadsListComponent {
             label: 'Delete',
             // confirm: true,
             // confirmMsg: "Sure to delete?",
-            apiUrl: 'leads/leads'
+            apiUrl: 'inventory/warehouses'
           },
           {
             type: 'callBackFn',
             label: 'Edit',
             callBackFn: (row, action) => {
-              this.edit.emit(row.lead_id);
-              // this.router.navigateByUrl('leads/leads/' + row.lead_id);
+              console.log(row);
+              this.edit.emit(row.warehouse_id);
+              // this.router.navigateByUrl('inventory/warehouses/' + row.warehouse_id);
             }
           }
         ]

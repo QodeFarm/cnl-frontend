@@ -124,9 +124,121 @@ export class AdminLayoutComponent {
         icon: 'fas fa-chart-line',
       },
       {
-        link: '/admin/inventory',
+        // link: '/admin/dashboard',
+        // link: '/admin/inventory',
         label: 'Inventory',
         icon: 'fas fa-boxes',
+        child: [
+          {
+            link: '/admin/inventory',
+            label: 'Inventory',
+            icon: 'fas fa-boxes',
+          },           
+          {
+            link: '/admin/warehouses',
+            label: 'Warehouses',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/quickpacks',
+            label: 'Quick Packs',
+            icon: 'fas fa-user',
+          },
+        ]
+      },
+      {
+        label: 'TASKS',
+        icon: 'fas fa-tasks',
+        child: [
+          {
+            link: '/admin/tasks/',
+            label: 'Tasks',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/tasks/task_priorities', 
+            label: 'Task Priorities',
+            icon: 'fas fa-tachometer-alt',
+          },
+        ]
+      },
+      {
+        label: 'LEADS',
+        icon: 'fas fa-star fa-fw',
+        child: [
+          {
+            link: '/admin/leads',
+            label: 'Leads',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/leads/lead_statuses',
+            label: 'Lead statuses',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/leads/interaction_types',
+            label: 'Interaction types',
+            icon: 'fas fa-tachometer-alt',
+          }
+        ]
+      },
+      {
+        label: 'Assets',
+        icon: 'fas fa-box',
+        child: [
+          {
+            link: '/admin/assets/assets',
+            label: 'Assets',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/assets/asset_statuses',
+            label: 'Asset Statuses',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/assets/asset_categories',
+            label: 'Asset Categories',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/assets/locations',
+            label: 'Locations',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/assets/asset_maintenance',
+            label: 'Asset Maintenance',
+            icon: 'fas fa-tachometer-alt',
+          },
+        ]
+      },
+      {
+        label: 'HRMS',
+        icon: 'fas fa-heading',
+        child: [
+          {
+            link: '/admin/employees',
+            label: 'Employees',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/employees/designations',
+            label: 'Designations',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/employees/departments',
+            label: 'Departments',
+            icon: 'fas fa-tachometer-alt',
+          }
+        ]
+      },
+      {
+        link: '/admin/master',
+        label: 'Master',
+        icon: 'fas fa-cog',
       },
       {
         label: 'Product Masters',
@@ -191,13 +303,8 @@ export class AdminLayoutComponent {
         ],
       },
       {
-        link: '/admin/master',
-        label: 'Master',
-        icon: 'fas fa-cog',
-      },
-      {
         label: 'Company',
-        icon: 'fas fa-file-invoice-dollar',
+        icon: 'fas fa-building',
         child: [
           {
             link: '/admin/company',
@@ -209,48 +316,6 @@ export class AdminLayoutComponent {
             label: 'Branches',
             icon: 'fas fa-tachometer-alt',
           },
-        ]
-      },
-      {
-        label: 'HRMS',
-        icon: 'fas fa-lock',
-        child: [
-          {
-            link: '/admin/employees',
-            label: 'Employees',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/employees/designations',
-            label: 'Designations',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/employees/departments',
-            label: 'Departments',
-            icon: 'fas fa-tachometer-alt',
-          }
-        ]
-      },
-      {
-        label: 'LEADS',
-        icon: 'fas fa-star fa-fw',
-        child: [
-          {
-            link: '/admin/leads',
-            label: 'Leads',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/leads/lead_statuses',
-            label: 'Lead statuses',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/leads/interaction_types',
-            label: 'Interaction types',
-            icon: 'fas fa-tachometer-alt',
-          }
         ]
       },
       {
@@ -298,7 +363,7 @@ export class AdminLayoutComponent {
             icon: 'fas fa-user',
           },
         ]
-      }
+      },
     ]
     this.closeMenu();
   }

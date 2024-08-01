@@ -94,12 +94,12 @@ export class LeadsComponent {
       fields: [
         //-----------------------------------------L E A D S -----------------------------------//
         {
-          fieldGroupClassName: "ant-row",
+          fieldGroupClassName: "ant-row custom-form-block",
           key: 'lead',
           fieldGroup: [{
               key: 'name',
               type: 'input',
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-3',
               templateOptions: {
                 label: 'Name',
                 placeholder: 'Enter name',
@@ -113,7 +113,7 @@ export class LeadsComponent {
             {
               key: 'email',
               type: 'input',
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-3',
               templateOptions: {
                 type: 'input',
                 label: 'Email',
@@ -127,7 +127,7 @@ export class LeadsComponent {
             {
               key: 'phone',
               type: 'input',
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-3',
               templateOptions: {
                 label: 'Phone',
                 placeholder: 'Enter number',
@@ -137,7 +137,7 @@ export class LeadsComponent {
             {
               key: 'score',
               type: 'input',
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-3',
               templateOptions: {
                 label: 'Score',
                 placeholder: 'Enter score',
@@ -147,7 +147,7 @@ export class LeadsComponent {
             {
               key: 'lead_status',
               type: 'select',
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-3',
               templateOptions: {
                 label: 'Lead Status',
                 dataKey: 'lead_status_id',
@@ -176,12 +176,12 @@ export class LeadsComponent {
         // end of lead
         //-----------------------------------------A S S I G N M E N T -----------------------------------//
         {
-          fieldGroupClassName: "ant-row",
+          fieldGroupClassName: "ant-row custom-form-block",
           key: 'assignment',
           fieldGroup: [{
             key: 'sales_rep',
             type: 'select',
-            className: 'ant-col-4 pr-md m-3',
+            className: 'col-3',
             templateOptions: {
               label: 'Sales Representative',
               dataKey: 'employee_id',
@@ -209,12 +209,12 @@ export class LeadsComponent {
         // end of assignment
         //----------------------------------------- I N T E R A C T I O N  -----------------------------------//
         {
-          fieldGroupClassName: "ant-row",
+          fieldGroupClassName: "ant-row custom-form-block",
           key: 'interaction',
           fieldGroup: [{
               key: 'interaction_type',
               type: 'select',
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-3',
               templateOptions: {
                 label: 'Interaction Type',
                 dataKey: 'interaction_type_id',
@@ -241,7 +241,7 @@ export class LeadsComponent {
             {
               key: 'interaction_date',
               type: 'input',
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-3',
               templateOptions: {
                 type: 'datetime-local',
                 label: 'Interaction date',
@@ -252,7 +252,7 @@ export class LeadsComponent {
             {
               key: 'notes',
               type: 'textarea',
-              className: 'ant-col-4 pr-md m-3',
+              className: 'col-3',
               templateOptions: {
                 type: 'input',
                 label: 'Notes',

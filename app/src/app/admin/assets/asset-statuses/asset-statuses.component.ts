@@ -2,37 +2,42 @@ import { Component } from '@angular/core';
 import { TaCurdConfig } from '@ta/ta-curd';
 
 @Component({
-  selector: 'app-lead-statuses',
-  templateUrl: './lead-statuses.component.html',
-  styleUrls: ['./lead-statuses.component.scss']
+  selector: 'app-asset-statuses',
+  templateUrl: './asset-statuses.component.html',
+  styleUrls: ['./asset-statuses.component.scss']
 })
-export class LeadStatusesComponent {
+export class AssetStatusesComponent {
 
+  baseUrl: string = 'http://195.35.20.172:8000/api/v1/';
+  
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
     drawerPlacement: 'top',
     tableConfig: {
-      apiUrl: 'leads/lead_statuses/',
-      title: 'Lead statuses',
-      pkId: "lead_status_id",
+      apiUrl: this.baseUrl + 'assets/asset_statuses/',
+      title: 'Asset Statuses',
+      pkId: "asset_status_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['lead_status_id', 'status_name']
+        keys: ['asset_status_id', 'status_name']
       },
-      cols: [{
+      cols: [
+        {
           fieldKey: 'status_name',
-          name: 'Status Name'
+          name: 'Status Name',
+          sort: true
         },
         {
           fieldKey: "code",
           name: "Action",
           type: 'action',
-          actions: [{
+          actions: [
+            {
               type: 'delete',
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
-              apiUrl: 'leads/lead_statuses'
+              apiUrl: this.baseUrl + 'assets/asset_statuses'
             },
             {
               type: 'edit',
@@ -43,10 +48,9 @@ export class LeadStatusesComponent {
       ]
     },
     formConfig: {
-      url: 'leads/lead_statuses/',
-      title: 'Lead status',
-      pkId: "lead_status_id",
-      exParams: [],
+      url: this.baseUrl + 'assets/asset_statuses/',
+      title: 'Asset Statuses',
+      pkId: "asset_status_id",
       fields: [
         {
           fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",

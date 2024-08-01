@@ -2,37 +2,39 @@ import { Component } from '@angular/core';
 import { TaCurdConfig } from '@ta/ta-curd';
 
 @Component({
-  selector: 'app-lead-statuses',
-  templateUrl: './lead-statuses.component.html',
-  styleUrls: ['./lead-statuses.component.scss']
+  selector: 'app-task-priorities',
+  templateUrl: './task-priorities.component.html',
+  styleUrls: ['./task-priorities.component.scss']
 })
-export class LeadStatusesComponent {
-
+export class TaskPrioritiesComponent {
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
     drawerPlacement: 'top',
     tableConfig: {
-      apiUrl: 'leads/lead_statuses/',
-      title: 'Lead statuses',
-      pkId: "lead_status_id",
+      apiUrl: 'masters/task_priorities/',
+      title: 'Task Priorities',
+      pkId: "priority_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['lead_status_id', 'status_name']
+        keys: ['priority_id', 'priority_name']
       },
-      cols: [{
-          fieldKey: 'status_name',
-          name: 'Status Name'
-        },
+      cols: [
         {
+          fieldKey: 'priority_name',
+          name: 'Priority Name',
+          sort: true
+        },
+		{
           fieldKey: "code",
           name: "Action",
           type: 'action',
-          actions: [{
+          actions: [
+            {
               type: 'delete',
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
-              apiUrl: 'leads/lead_statuses'
+              apiUrl: 'masters/task_priorities'
             },
             {
               type: 'edit',
@@ -43,21 +45,20 @@ export class LeadStatusesComponent {
       ]
     },
     formConfig: {
-      url: 'leads/lead_statuses/',
-      title: 'Lead status',
-      pkId: "lead_status_id",
-      exParams: [],
+      url: 'masters/task_priorities/',
+      title: 'Task Priorities',
+      pkId: "priority_id",
       fields: [
         {
           fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
           fieldGroup: [
             {
-              key: 'status_name',
+              key: 'priority_name',
               type: 'input',
               className: 'col-6 p-0',
               templateOptions: {
-                label: 'Status Name',
-                placeholder: 'Enter Status Name',
+                label: 'Priority Name',
+                placeholder: 'Enter Name',
                 required: true,
               }
             },

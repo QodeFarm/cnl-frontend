@@ -1,34 +1,32 @@
 <div class="container-fluid pt-3">
-    <div class="employee-banner">
+    <div class="tasks-banner">
         <div class="col-12 px-0" style="display: flex; justify-content: space-between;align-items: center;">
-            <button type="button" class="btn pl-0" >
-                <span *ngIf="EmployeeEditID" class="custom-heading">Update Employee</span>
-                <span *ngIf="!EmployeeEditID" class="custom-heading">Create Employee</span>
+            <button (click)="TasksEditID = null" type="button" class="btn pl-0" style="color: black;">
+                <span *ngIf="TasksEditID" class="custom-heading">Update Tasks</span>
+                <span *ngIf="!TasksEditID" class="custom-heading">Create Tasks</span>
             </button>
-            <button (click)="showEmployeesListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                Employee List
+            <button (click)="showTasksListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tasksListModal">
+                Tasks List
             </button>
         </div>
     </div>
     <div class="row custom-form">
-        <div class="col-12 px-1" *ngIf="showForm">
+        <div>
             <ta-form [options]="formConfig"></ta-form>
         </div>
     </div>
 </div>
 
 
-<!-- Employees Modal -->
-
-<div class="modal fade custom-modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade custom-modal" id="tasksListModal" tabindex="-1" aria-labelledby="tasksListModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl ">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Employee List</h5>
+                <h5 class="modal-title" id="tasksListModalLabel">Edit Tasks List</h5>
                 <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" *ngIf="showEmployeesList">
-                <app-employee-list (edit)="editEmployee($event)" class="custom-list"></app-employee-list>
+            <div class="modal-body" *ngIf="showTasksList">
+                <app-tasks-list (edit)="editTasks($event)" class="custom-list"></app-tasks-list>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>

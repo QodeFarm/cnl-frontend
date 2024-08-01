@@ -1,73 +1,71 @@
-import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Output } from '@angular/core';
-import { Router } from '@angular/router';
-import { TaTableConfig } from '@ta/ta-table';
+import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
-
+import { TaTableConfig } from '@ta/ta-table';
+import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-leads-list',
+  selector: 'app-tasks-list',
   standalone: true,
   imports: [CommonModule, AdminCommmonModule],
-  templateUrl: './leads-list.component.html',
-  styleUrls: ['./leads-list.component.scss']
+  templateUrl: './tasks-list.component.html',
+  styleUrls: ['./tasks-list.component.scss']
 })
-
-export class LeadsListComponent {
+export class TasksListComponent {
 
   @Output('edit') edit = new EventEmitter<void>();
 
   tableConfig: TaTableConfig = {
-    apiUrl: 'leads/leads/',
-    // title: 'Edit Sales Order List',
+    apiUrl: 'tasks/task/',
+    // title: 'Edit Tasks List',
     showCheckbox:true,
-    pkId: "lead_id",
+    pkId: "task_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['lead_id']
+      keys: ['task_id']
     },
     cols: [
       {
-        fieldKey: 'name',
-        name: 'Name',
+        fieldKey: 'title',
+        name: 'Title',
         sort: true
       },
       {
-        fieldKey: 'email',
-        name: 'Email',
-        sort: true
-      },
-      {
-        fieldKey: 'phone',
-        name: 'Phone',
-        sort: true
-      },
-      {
-        fieldKey: 'lead_status',
-        name: 'Lead Status',
+        fieldKey: 'user_id',
+        name: 'User',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.lead_status.status_name}`;
+          return `${row.user.first_name}`;
         },
         sort: true
       },
       {
-        fieldKey: 'score',
-        name: 'Score',
-        sort: true
+        fieldKey: 'description',
+        name: 'Description',
+        sort: false
       },
       {
-        fieldKey: 'sales_rep_id',
-        name: 'Sales Representative',
+        fieldKey: 'priority_id',
+        name: 'priority',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.sales_rep_id}`;
+          return `${row.priority.priority_name}`;
         },
         sort: true
       },
       {
-        fieldKey: '',
-        name: 'Last Interaction Date',
+        fieldKey: 'due_date',
+        name: 'Due Date',
+        sort: false,
+        displayType: "date"
+      },
+      {
+        fieldKey: 'status_id',
+        name: 'Statuses',
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          return `${row.status.status_name}`;
+        },
         sort: true
       },
       {
@@ -80,14 +78,15 @@ export class LeadsListComponent {
             label: 'Delete',
             // confirm: true,
             // confirmMsg: "Sure to delete?",
-            apiUrl: 'leads/leads'
+            apiUrl: 'tasks/task'
           },
           {
             type: 'callBackFn',
             label: 'Edit',
             callBackFn: (row, action) => {
-              this.edit.emit(row.lead_id);
-              // this.router.navigateByUrl('leads/leads/' + row.lead_id);
+              console.log(row);
+              this.edit.emit(row.task_id);
+              // this.router.navigateByUrl('tasks/task/' + row.task_id);
             }
           }
         ]

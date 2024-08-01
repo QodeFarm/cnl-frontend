@@ -34,16 +34,17 @@ const routes: Routes = [
       { path: 'employees', canActivate: [], loadChildren: () => import('./admin/hrms/hrms.module').then(m => m.EmployeeModule) },
       { path: 'leads', canActivate: [], loadChildren: () => import('./admin/leads/leads.module').then(m => m.LeadsModule) },
       { path: 'vendors', canActivate: [], loadChildren: () => import('./admin/vendors/vendors.module').then(m => m.VendorsModule) },
+      { path: 'warehouses', canActivate: [], loadChildren: () => import('./admin/warehouses/warehouses.module').then(m => m.WarehousesModule) },
+      { path: 'quickpacks', canActivate: [], loadChildren: () => import('./admin/quickpacks/quickpacks.module').then(m => m.QuickpacksModule) },
+      { path: 'assets', canActivate: [], loadChildren: () => import('./admin/assets/assets.module').then(m => m.AssetsModule) },
+      { path: 'tasks', canActivate: [], loadChildren: () => import('./admin/tasks/tasks.module').then(m => m.TasksModule) },
       // { path: 'leaves', canActivate: [], loadComponent: () => import('./admin/leave/leave.component').then(m => m.LeaveComponent) },
-      { path: 'master', canActivate: [], loadChildren: () => import('./admin/master/master.module').then(m => m.MasterModule) },
       // { path: 'attendance', canActivate: [], loadChildren: () => import('./admin/attendence/attendence.module').then(m => m.AttendenceModule) },
       { path: 'inventory', canActivate: [], loadChildren: () => import('./admin/inventory/inventory.module').then(m => m.InventoryModule) },
       { path: 'products', canActivate: [], loadChildren: () => import('./admin/products/products.module').then(m => m.ProductsModule) },
-      { path: 'master', canActivate: [], loadChildren: () => import('./admin/master/master.module').then(m => m.MasterModule) },
-      { path: 'purchase', canActivate: [], loadChildren: () => import('./admin/purchase/purchase.module').then(m => m.PurchaseModule) }
+      { path: 'purchase', canActivate: [], loadChildren: () => import('./admin/purchase/purchase.module').then(m => m.PurchaseModule) },
     ]
   }
-
 ];
 
 @NgModule({
