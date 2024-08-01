@@ -70,10 +70,6 @@ export class TasksComponent implements OnInit {
       },
       fields: [
         {
-          template: '<div> <hr> <b>Task</b> </div>',
-          fieldGroupClassName: 'ant-row',
-        },
-        {
           fieldGroupClassName: 'ant-row custom-form-block',
           key: 'task',
           fieldGroup: [
@@ -194,48 +190,39 @@ export class TasksComponent implements OnInit {
 
         // start of task_comments keys
         {
-          template: '<div> <hr> <b>Task Comments</b> </div>',
-          fieldGroupClassName: 'ant-row',
-        },
-        {
           key: 'task_comments',
-          type: 'repeat',
+          type: 'table',
+          className: 'custom-form-list',
           templateOptions: {
-            addText: 'Add Comments'
+            title: 'Task Comments',
+            addText: 'Add Comments',
+            tableCols: [
+              { name: 'user', label: 'User' },
+              { name: 'comment_text', label: 'Comment Text' }
+            ]
           },
           fieldArray: {
-            fieldGroupClassName: 'row',
             fieldGroup: [
               {
                 key: 'user',
                 type: 'select',
-                className: 'col-10',
                 templateOptions: {
-                  label: 'User',
+                  label: 'Select User',
                   dataKey: 'user_id',
                   dataLabel: 'first_name',
+                  options: [],
+                  hideLabel: true,
+                  required: true,
                   lazy: {
                     url: 'users/users_list/',
                     lazyOneTime: true
                   },
-                  required: true
                 },
                 hooks: {
                   onChanges: (field: any) => {
                     field.formControl.valueChanges.subscribe((data: any) => {
                       console.log('user', data);
                       const index = field.parent.key;
-                      
-                      // if (!this.formConfig || !this.formConfig.model) {
-                      //   console.error('Form config or task comments model is not defined.');
-                      //   return;
-                      // }
-
-                      // if (!this.formConfig.model['task_comments']) {
-                      //   console.error('Task comments model is not defined.');
-                      //   this.formConfig.model['task_comments'] = [];
-                      // }
-
                       if (!this.formConfig.model['task_comments'][index]) {
                         console.error(`Task comments at index ${index} is not defined. Initializing...`);
                         this.formConfig.model['task_comments'][index] = {};
@@ -245,14 +232,14 @@ export class TasksComponent implements OnInit {
                     });
                   }
                 }
-              },               
+              }, 
               {
                 key: 'comment_text',
                 type: 'text',
-                className: 'col-8',
                 templateOptions: {
                   label: 'Comment Text',
                   placeholder: 'Enter Comment Text',
+                  hideLabel: true,
                   required: true
                 }
               }
@@ -263,82 +250,42 @@ export class TasksComponent implements OnInit {
 
         // start of task_attachments keys
         {
-          template: '<div> <hr> <b>Task Attachments</b> </div>',
-          fieldGroupClassName: 'ant-row',
-        },
-        // {
-        //   key: 'task_attachments',
-        //   type: 'repeat',
-        //   templateOptions: {
-        //     addText: 'Add Attachment'
-        //   },
-        //   fieldArray: {
-        //     fieldGroupClassName: 'row',
-        //     fieldGroup: [
-        //       {
-        //         key: 'attachment_name',
-        //         type: 'input',
-        //         className: 'col-9',
-        //         templateOptions: {
-        //           label: 'Attachment Name',
-        //           placeholder: 'Enter Attachment Name',
-        //           required: false
-        //         }
-        //       },
-        //       {
-        //         key: 'attachment_path',
-        //         type: 'input',
-        //         className: 'col-9',
-        //         templateOptions: {
-        //           label: 'Attachment Path',
-        //           placeholder: 'Enter Attachment Path',
-        //           required: false
-        //         }
-        //       }
-        //     ]
-        //   }
-        // },
-        {
           key: 'task_attachments',
-          type: 'repeat',
+          type: 'table',
+          className: 'custom-form-list',
           templateOptions: {
-            addText: 'Add Attachment'
+            title: 'Task Attachment',
+            addText: 'Add Attachment',
+            tableCols: [
+              { name: 'attachment_name', label: 'Attachment Name' },
+              { name: 'attachment_path', label: 'Attachment Path' }
+            ]
           },
           fieldArray: {
-            fieldGroupClassName: 'row',
             fieldGroup: [
               {
                 key: 'attachment_name',
                 type: 'input',
-                className: 'col-9',
                 templateOptions: {
                   label: 'Attachment Name',
                   placeholder: 'Enter Attachment Name',
+                  hideLabel: true,
                   required: false
                 }
               },
               {
-                className: 'col-12 custom-form-card-block w-100',
-                fieldGroup:[
-                  {
-                    template: '<div class="custom-form-card-title"> Attachment Path </div>',
-                    fieldGroupClassName: "ant-row",
-                  },
-                  {
-                    key: 'attachment_path',
-                    type: 'file',
-                    className: 'ta-cell col-12 custom-file-attachement',
-                    templateOptions: {
-                      // // required: true
-                      // required: true
-                    }
-                  },
-                ]
+                key: 'attachment_path',
+                type: 'file',
+                className: 'ta-cell col-12 custom-file-attachement',
+                templateOptions: {
+                  label: 'Attachment Path',
+                  hideLabel: true,
+                }
               }
             ]
           }
         },
-        // end of task_attachments keys  
+       // end of task_attachments keys  
       ]
     };
   }

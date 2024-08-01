@@ -364,17 +364,6 @@ export class AdminLayoutComponent {
           },
         ]
       },
-      // {
-      //   label: 'Quick Packs',
-      //   icon: 'fas fa-shopping-cart',
-      //   child: [
-      //     {
-      //       link: '/admin/quickpacks',
-      //       label: 'Quick Packs',
-      //       icon: 'fas fa-user',
-      //     },
-      //   ]
-      // }
     ]
     this.closeMenu();
   }

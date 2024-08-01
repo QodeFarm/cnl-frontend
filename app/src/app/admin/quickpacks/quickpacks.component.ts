@@ -88,31 +88,6 @@ export class QuickpacksComponent implements OnInit {
                 required: true
               }
             },
-            // {
-            //   key: 'customer',
-            //   type: 'select',
-            //   className: 'col-3',
-            //   templateOptions: {
-            //     label: 'Customer',
-            //     dataKey: 'customer_id',
-            //     dataLabel: 'name',
-            //     options: [],
-            //     required: true,
-            //     lazy: {
-            //       url: 'customers/customers/?summary=true',
-            //       lazyOneTime: true
-            //     }
-            //   },
-            //   hooks: {
-            //     onChanges: (field: any) => {
-            //       field.formControl.valueChanges.subscribe((data: any) => {
-            //         if (data && data.customer_id) {
-            //           this.formConfig.model['quick_pack_data']['customer_id'] = data.customer_id;
-            //         }
-            //       });
-            //     }
-            //   }
-            // },
             {
               key: 'active',
               type: 'select',
@@ -151,6 +126,7 @@ export class QuickpacksComponent implements OnInit {
         {
           key: 'quick_pack_data_items',
           type: 'table',
+          className: 'custom-form-list',
           templateOptions: {
             title: 'Products',
             addText: 'Add Product',
@@ -169,6 +145,7 @@ export class QuickpacksComponent implements OnInit {
                   dataKey: 'product_id',
                   dataLabel: 'name',
                   options: [],
+                  hideLabel: true,
                   required: true,
                   lazy: {
                     url: 'products/products/?summary=true',
@@ -193,10 +170,11 @@ export class QuickpacksComponent implements OnInit {
               {
                 type: 'input',
                 key: 'quantity',
-                className: 'col-md-10 pr-md m-10', // Adjusted class to reduce size
+                // className: 'col-md-8 pr-md m-10', // Adjusted class to reduce size
                 templateOptions: {
                   label: 'Quantity',
                   placeholder: 'Enter Quantity',
+                  hideLabel: true,
                   required: true
                 },
               }
