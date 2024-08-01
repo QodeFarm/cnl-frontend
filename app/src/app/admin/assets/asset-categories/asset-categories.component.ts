@@ -7,11 +7,14 @@ import { TaCurdConfig } from '@ta/ta-curd';
   styleUrls: ['./asset-categories.component.scss']
 })
 export class AssetCategoriesComponent {
+  
+  baseUrl: string = 'http://195.35.20.172:8000/api/v1/';
+
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
     drawerPlacement: 'top',
     tableConfig: {
-      apiUrl: 'http://195.35.20.172:8000/api/v1/assets/asset_categories/',
+      apiUrl: this.baseUrl + 'assets/asset_categories/',
       title: 'Asset Categories',
       pkId: "asset_category_id",
       pageSize: 10,
@@ -34,7 +37,7 @@ export class AssetCategoriesComponent {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
-              apiUrl: 'http://195.35.20.172:8000/api/v1/assets/asset_categories'
+              apiUrl: this.baseUrl + 'assets/asset_categories'
             },
             {
               type: 'edit',
@@ -45,7 +48,7 @@ export class AssetCategoriesComponent {
       ]
     },
     formConfig: {
-      url: 'http://195.35.20.172:8000/api/v1/assets/asset_categories/',
+      url: this.baseUrl + 'assets/asset_categories/',
       title: 'Asset Categories',
       pkId: "asset_category_id",
       fields: [

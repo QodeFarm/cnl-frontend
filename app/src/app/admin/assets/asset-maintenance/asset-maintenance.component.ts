@@ -8,6 +8,9 @@ import { TaFormConfig } from '@ta/ta-form';
   styleUrls: ['./asset-maintenance.component.scss']
 })
 export class AssetMaintenanceComponent {
+
+  baseUrl: string = 'http://195.35.20.172:8000/api/v1/';
+  
   showAssetMaintenanceList: boolean = false;
   showForm: boolean = false;
   AssetMaintenanceEditID: any;
@@ -32,7 +35,7 @@ export class AssetMaintenanceComponent {
   editAssetMaintenance(event) {
     console.log('event', event);
     this.AssetMaintenanceEditID = event;
-    this.http.get('http://195.35.20.172:8000/api/v1/assets/asset_maintenance/'  + event).subscribe((res: any) => {
+    this.http.get(this.baseUrl + 'assets/asset_maintenance/'  + event).subscribe((res: any) => {
       if (res) {
         this.formConfig.model = res;
         // Set labels for update
@@ -52,7 +55,7 @@ export class AssetMaintenanceComponent {
 
     setFormConfig() {
       this.formConfig = {
-        url: 'http://195.35.20.172:8000/api/v1/assets/asset_maintenance/',
+        url: this.baseUrl + 'assets/asset_maintenance/',
         // title: 'Asset Maintenance',
         formState: {
           viewMode: false,
@@ -84,7 +87,7 @@ export class AssetMaintenanceComponent {
                   dataLabel: "name",
                   options: [],
                   lazy: {
-                    url: 'http://195.35.20.172:8000/api/v1/assets/assets/',
+                    url: this.baseUrl + 'assets/assets/',
                     lazyOneTime: true
                   },
                   required: true
@@ -107,7 +110,7 @@ export class AssetMaintenanceComponent {
                 className: 'col-3',
                 templateOptions: {
                   label: 'Cost',
-                  required: true,
+                  required: false,
                   placeholder: 'Enter cost',
                 },
                 hooks: {

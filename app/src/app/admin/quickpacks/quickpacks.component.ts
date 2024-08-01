@@ -89,19 +89,6 @@ export class QuickpacksComponent implements OnInit {
               }
             },
             {
-              key: 'active',
-              type: 'select',
-              className: 'col-3',
-              templateOptions: {
-                label: 'Active',
-                options: [
-                  { label: 'Yes', value: 'Y' },
-                  { label: 'No', value: 'N' }
-                ],
-                required: true
-              }
-            },
-            {
               key: 'lot_qty',
               type: 'input',
               className: 'col-3',
@@ -118,9 +105,23 @@ export class QuickpacksComponent implements OnInit {
               templateOptions: {
                 label: 'Description',
                 placeholder: 'Enter Description',
-                required: true
+                required: false
               }
-            }
+            },
+            {
+              key: 'active',
+              type: 'select',
+              className: 'col-3',
+              defaultValue: 'Y',
+              templateOptions: {
+                label: 'Active',
+                options: [
+                  { label: 'Yes', value: 'Y' },
+                  { label: 'No', value: 'N' }
+                ],
+                required: false
+              }
+            },
           ]
         },
         {

@@ -7,11 +7,14 @@ import { TaCurdConfig } from '@ta/ta-curd';
   styleUrls: ['./asset-statuses.component.scss']
 })
 export class AssetStatusesComponent {
+
+  baseUrl: string = 'http://195.35.20.172:8000/api/v1/';
+  
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
     drawerPlacement: 'top',
     tableConfig: {
-      apiUrl: 'http://195.35.20.172:8000/api/v1/assets/asset_statuses/',
+      apiUrl: this.baseUrl + 'assets/asset_statuses/',
       title: 'Asset Statuses',
       pkId: "asset_status_id",
       pageSize: 10,
@@ -34,7 +37,7 @@ export class AssetStatusesComponent {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
-              apiUrl: 'http://195.35.20.172:8000/api/v1/assets/asset_statuses'
+              apiUrl: this.baseUrl + 'assets/asset_statuses'
             },
             {
               type: 'edit',
@@ -45,7 +48,7 @@ export class AssetStatusesComponent {
       ]
     },
     formConfig: {
-      url: 'http://195.35.20.172:8000/api/v1/assets/asset_statuses/',
+      url: this.baseUrl + 'assets/asset_statuses/',
       title: 'Asset Statuses',
       pkId: "asset_status_id",
       fields: [

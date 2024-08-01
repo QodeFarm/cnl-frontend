@@ -8,6 +8,8 @@ import { TaFormConfig } from '@ta/ta-form';
   styleUrls: ['./assets.component.scss']
 })
 export class AssetsComponent{
+  
+  baseUrl: string = 'http://195.35.20.172:8000/api/v1/';
 
   showAssetsList: boolean = false;
   showForm: boolean = false;
@@ -32,7 +34,7 @@ export class AssetsComponent{
   editAssets(event) {
     console.log('event', event);
     this.AssetsEditID = event;
-    this.http.get('http://195.35.20.172:8000/api/v1/assets/assets/' + event).subscribe((res: any) => {
+    this.http.get(this.baseUrl + 'assets/assets/' + event).subscribe((res: any) => {
       if (res) {
         this.formConfig.model = res;
         // Set labels for update
@@ -52,7 +54,7 @@ export class AssetsComponent{
 
     setFormConfig() {
       this.formConfig = {
-        url: 'http://195.35.20.172:8000/api/v1/assets/assets/',
+        url: this.baseUrl + 'assets/assets/',
         // title: 'Assets',
         formState: {
           viewMode: false,
@@ -135,7 +137,7 @@ export class AssetsComponent{
                   dataLabel: "category_name",
                   options: [],
                   lazy: {
-                    url: 'http://195.35.20.172:8000/api/v1/assets/asset_categories/',
+                    url: this.baseUrl + 'assets/asset_categories/',
                     lazyOneTime: true
                   },
                   required: true
@@ -162,7 +164,7 @@ export class AssetsComponent{
                   dataLabel: "status_name",
                   options: [],
                   lazy: {
-                    url: 'http://195.35.20.172:8000/api/v1/assets/asset_statuses/',
+                    url: this.baseUrl + 'assets/asset_statuses/',
                     lazyOneTime: true
                   },
                   required: true
@@ -189,7 +191,7 @@ export class AssetsComponent{
                   dataLabel: "unit_name",
                   options: [],
                   lazy: {
-                    url: 'http://195.35.20.172:8000/api/v1/masters/unit_options/',
+                    url: 'masters/unit_options/',
                     lazyOneTime: true
                   },
                   required: true
@@ -216,7 +218,7 @@ export class AssetsComponent{
                   dataLabel: "location_name",
                   options: [],
                   lazy: {
-                    url: 'http://195.35.20.172:8000/api/v1/assets/locations/',
+                    url: this.baseUrl + 'assets/locations/',
                     lazyOneTime: true
                   },
                   required: true

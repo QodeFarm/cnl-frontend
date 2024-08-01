@@ -249,42 +249,75 @@ export class TasksComponent implements OnInit {
         // end of task_comments keys
 
         // start of task_attachments keys
+
         {
-          key: 'task_attachments',
-          type: 'table',
-          className: 'custom-form-list',
-          templateOptions: {
-            title: 'Task Attachment',
-            addText: 'Add Attachment',
-            tableCols: [
-              { name: 'attachment_name', label: 'Attachment Name' },
-              { name: 'attachment_path', label: 'Attachment Path' }
-            ]
-          },
-          fieldArray: {
-            fieldGroup: [
-              {
-                key: 'attachment_name',
-                type: 'input',
-                templateOptions: {
-                  label: 'Attachment Name',
-                  placeholder: 'Enter Attachment Name',
-                  hideLabel: true,
-                  required: false
-                }
-              },
-              {
-                key: 'attachment_path',
-                type: 'file',
-                className: 'ta-cell col-12 custom-file-attachement',
-                templateOptions: {
-                  label: 'Attachment Path',
-                  hideLabel: true,
-                }
-              }
-            ]
-          }
-        },
+          className: 'col-6 pb-0',
+          fieldGroupClassName: "field-no-bottom-space",
+          fieldGroup: [
+            {
+              fieldGroupClassName: "row col-12 m-0 custom-form-card",
+              fieldGroup: [
+                {
+                  className: 'col-12 custom-form-card-block w-100',
+                  fieldGroup:[
+                    {
+                      template: '<div class="custom-form-card-title"> Task Attachments </div>',
+                      fieldGroupClassName: "ant-row",
+                    },
+                    {
+                      key: 'task_attachments',
+                      type: 'file',
+                      className: 'ta-cell col-12 custom-file-attachement',
+                      templateOptions: {
+                        // label: 'Order Attachments',
+                        // // required: true
+                        // required: true
+                      }
+                    },
+                  ]
+                },
+              ]
+            }
+          ]
+        }
+
+
+        // {
+        //   key: 'task_attachments',
+        //   type: 'table',
+        //   className: 'custom-form-list',
+        //   templateOptions: {
+        //     title: 'Task Attachment',
+        //     addText: 'Add Attachment',
+        //     tableCols: [
+        //       // { name: 'attachment_name', label: 'Attachment Name' },
+        //       { name: 'attachment_path', label: 'Attachment Path' }
+        //     ]
+        //   },
+        //   fieldArray: {
+        //     fieldGroup: [
+        //       {
+        //         key: 'attachment_name',
+        //         type: 'input',
+        //         templateOptions: {
+        //           label: 'Attachment Name',
+        //           placeholder: 'Enter Attachment Name',
+        //           hideLabel: true,
+        //           required: false
+        //         }
+        //       },
+        //       {
+        //         key: 'attachment_path',
+        //         type: 'file',
+        //         className: 'ta-cell col-12 custom-file-attachement',
+        //         templateOptions: {
+        //           label: 'Attachment Path',
+        //           hideLabel: true,
+        //         }
+        //       }
+        //     ]
+        //   }
+        // },
        // end of task_attachments keys  
       ]
     };

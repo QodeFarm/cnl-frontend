@@ -77,11 +77,6 @@ export class WarehousesComponent {
           type: 'script',
           value: 'data.country.country_id'
         },
-        {
-          key: 'customer_id',
-          type: 'script',
-          value: 'data.customer.customer_id'
-        },
       ],	  
       submit: {
         label: 'Submit',
@@ -269,27 +264,6 @@ export class WarehousesComponent {
               templateOptions: {
                 label: 'Latitude',
                 required: false,
-              },
-              hooks: {
-                onInit: (field: any) => {
-                  //field.templateOptions.options = this.cs.getRole();
-                }
-              }
-            },
-            {
-              key: 'customer',
-              type: 'select',
-              className: 'col-3 pb-3 ps-0',
-              templateOptions: {
-                label: 'Customer',
-                dataKey: 'customer_id',
-                dataLabel: "name",
-                options: [],
-                lazy: {
-                  url: 'customers/customer/',
-                  lazyOneTime: true
-                },
-                required: false
               },
               hooks: {
                 onInit: (field: any) => {

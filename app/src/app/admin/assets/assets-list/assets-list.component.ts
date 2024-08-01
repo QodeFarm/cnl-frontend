@@ -12,11 +12,13 @@ import { Router } from '@angular/router';
   styleUrls: ['./assets-list.component.scss']
 })
 export class AssetsListComponent {
+  
+  baseUrl: string = 'http://195.35.20.172:8000/api/v1/';
 
   @Output('edit') edit = new EventEmitter<void>();
 
   tableConfig: TaTableConfig = {
-    apiUrl: 'http://195.35.20.172:8000/api/v1/assets/assets/',
+    apiUrl: this.baseUrl + 'assets/assets/',
     // title: 'Edit Tasks List',
     showCheckbox:true,
     pkId: "asset_id",
@@ -87,7 +89,7 @@ export class AssetsListComponent {
             label: 'Delete',
             // confirm: true,
             // confirmMsg: "Sure to delete?",
-            apiUrl: 'http://195.35.20.172:8000/api/v1/assets/assets'
+            apiUrl: this.baseUrl + 'assets/assets'
           },
           {
             type: 'callBackFn',

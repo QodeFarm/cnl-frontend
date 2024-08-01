@@ -7,11 +7,14 @@ import { TaCurdConfig } from '@ta/ta-curd';
   styleUrls: ['./locations.component.scss']
 })
 export class LocationsComponent {
+
+  baseUrl: string = 'http://195.35.20.172:8000/api/v1/';
+  
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
     drawerPlacement: 'top',
     tableConfig: {
-      apiUrl: 'http://195.35.20.172:8000/api/v1/assets/locations/',
+      apiUrl: this.baseUrl + 'assets/locations/',
       title: 'Locations',
       pkId: "location_id",
       pageSize: 10,
@@ -39,7 +42,7 @@ export class LocationsComponent {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
-              apiUrl: 'http://195.35.20.172:8000/api/v1/assets/locations'
+              apiUrl: this.baseUrl + 'assets/locations'
             },
             {
               type: 'edit',
@@ -50,7 +53,7 @@ export class LocationsComponent {
       ]
     },
     formConfig: {
-      url: 'http://195.35.20.172:8000/api/v1/assets/locations/',
+      url: this.baseUrl + 'assets/locations/',
       title: 'Locations',
       pkId: "location_id",
       fields: [

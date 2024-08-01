@@ -30,28 +30,20 @@ export class QuickpacksListComponent {
         sort: true
       },
       {
-        fieldKey: 'description',
-        name: 'Description',
-        sort: true
-      },
-      {
-        fieldKey: 'active',
-        name: 'Active',
-        sort: true,
-      },
-      {
         fieldKey: 'lot_qty',
         name: 'Lot Quantity',
         sort: true,
       },
-      // {
-      //   fieldKey: 'customer_id',
-      //   name: 'Customer',
-      //   sort: true,
-      //   mapFn: (currentValue: any, row: any, col: any) => {
-      //     return row.customer_id.name ;
-      //   }
-      // },
+      {
+        fieldKey: 'description',
+        name: 'Description',
+        sort: false
+      },
+      {
+        fieldKey: 'active',
+        name: 'Active',
+        sort: false,
+      },
       {
         fieldKey: "code",
         name: "Action",

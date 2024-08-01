@@ -12,11 +12,13 @@ import { Router } from '@angular/router';
   styleUrls: ['./asset-maintenance-list.component.scss']
 })
 export class AssetMaintenanceListComponent {
+  
+  baseUrl: string = 'http://195.35.20.172:8000/api/v1/';
 
   @Output('edit') edit = new EventEmitter<void>();
 
   tableConfig: TaTableConfig = {
-    apiUrl: 'http://195.35.20.172:8000/api/v1/assets/asset_maintenance/',
+    apiUrl: this.baseUrl + 'assets/asset_maintenance/',
     // title: 'Edit Tasks List',
     showCheckbox:true,
     pkId: "asset_maintenance_id",
@@ -37,12 +39,12 @@ export class AssetMaintenanceListComponent {
       {
         fieldKey: 'cost', 
         name: 'Cost',
-        sort: true
+        sort: false
       },
       {
         fieldKey: 'maintenance_date',
         name: 'Maintenance Date',
-        sort: true
+        sort: false
       },
       {
         fieldKey: 'maintenance_description',
@@ -59,7 +61,7 @@ export class AssetMaintenanceListComponent {
             label: 'Delete',
             // confirm: true,
             // confirmMsg: "Sure to delete?",
-            apiUrl: 'http://195.35.20.172:8000/api/v1/assets/asset_maintenance'
+            apiUrl: this.baseUrl + 'assets/asset_maintenance'
           },
           {
             type: 'callBackFn',
