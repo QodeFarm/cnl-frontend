@@ -35,8 +35,13 @@ export class LeadsComponent {
     this.setFormConfig();
     this.set_default_status_id(); // lead_status_id = 'Open'
     this.formConfig.fields[0].fieldGroup[4].hide = true; // Leads[lead_status_id]   hide = true
-    this.formConfig.fields[1].hide = true; // assignments   hide = true
-    this.formConfig.fields[2].hide = true; // Interaction hide = ture
+    // this.formConfig.fields[1].hide = true; // assignments   hide = true
+    // this.formConfig.fields[2].hide = true; // Interaction hide = true    
+    this.formConfig.fields[0].fieldGroup[5].hide = true; 
+    this.formConfig.fields[0].fieldGroup[6].hide = true; 
+    this.formConfig.fields[0].fieldGroup[7].hide = true; 
+    this.formConfig.fields[0].fieldGroup[8].hide = true; 
+    // this.formConfig.fields[1].hide = true; // Interaction hide = ture
   }
 
   formConfig: TaFormConfig = {};
@@ -59,8 +64,13 @@ export class LeadsComponent {
         this.formConfig.model['lead_id'] = this.LeadsEditID;
         this.showForm = true;
         this.formConfig.fields[0].fieldGroup[4].hide = false; // Leads[lead_status_id]   hide = false
-        this.formConfig.fields[1].hide = false; // assignments   hide = false
-        this.formConfig.fields[2].hide = false; // Interaction hide = false
+        // this.formConfig.fields[1].hide = false; // assignments   hide = false
+        // this.formConfig.fields[2].hide = false; // Interaction hide = false
+        this.formConfig.fields[0].fieldGroup[5].hide = false; 
+        this.formConfig.fields[0].fieldGroup[6].hide = false; 
+        this.formConfig.fields[0].fieldGroup[7].hide = false; 
+        this.formConfig.fields[0].fieldGroup[8].hide = false; 
+
       }
     })
     this.hide();
@@ -92,6 +102,12 @@ export class LeadsComponent {
         interaction: {},
       },
       fields: [
+
+        // {
+        //   fieldGroupClassName: 'row col-12 p-0 m-0 custom-form field-no-bottom-space',
+        //   className: 'ta-cell pr-md col-md-10 col-12',
+        //   fieldGroup: [
+
         //-----------------------------------------L E A D S -----------------------------------//
         {
           fieldGroupClassName: "ant-row custom-form-block",
@@ -170,48 +186,39 @@ export class LeadsComponent {
                   });
                 }
               }
-            }
-          ]
-        },
-        // end of lead
-        //-----------------------------------------A S S I G N M E N T -----------------------------------//
-        {
-          fieldGroupClassName: "ant-row custom-form-block",
-          key: 'assignment',
-          fieldGroup: [{
-            key: 'sales_rep',
-            type: 'select',
-            className: 'col-3',
-            templateOptions: {
-              label: 'Sales Representative',
-              dataKey: 'employee_id',
-              dataLabel: "name",
-              options: [],
-              lazy: {
-                url: 'hrms/employees/',
-                lazyOneTime: true
-              },
-              required: false
             },
-            hooks: {
-              onChanges: (field: any) => {
-                field.formControl.valueChanges.subscribe((data: any) => {
-                  if (this.formConfig && this.formConfig.model && this.formConfig.model['assignment']) {
-                    this.formConfig.model['assignment']['sales_rep_id'] = data.employee_id;
-                  } else {
-                    console.error('Form config or vendor data model is not defined.');
+            {
+              // fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
+              // key: 'assignment',
+              // fieldGroup: [{
+                key: 'sales_rep',
+                type: 'select',
+                className: 'col-3',
+                templateOptions: {
+                  label: 'Sales Representative',
+                  dataKey: 'employee_id',
+                  dataLabel: "name",
+                  options: [],
+                  lazy: {
+                    url: 'hrms/employees/',
+                    lazyOneTime: true
+                  },
+                  required: false
+                },
+                hooks: {
+                  onChanges: (field: any) => {
+                    field.formControl.valueChanges.subscribe((data: any) => {
+                      if (this.formConfig && this.formConfig.model && this.formConfig.model['assignment']) {
+                        this.formConfig.model['assignment']['sales_rep_id'] = data.employee_id;
+                      } else {
+                        console.error('Form config or vendor data model is not defined.');
+                      }
+                    });
                   }
-                });
-              }
-            }
-          }]
-        },
-        // end of assignment
-        //----------------------------------------- I N T E R A C T I O N  -----------------------------------//
-        {
-          fieldGroupClassName: "ant-row custom-form-block",
-          key: 'interaction',
-          fieldGroup: [{
+                }
+              // }]
+            },
+            {
               key: 'interaction_type',
               type: 'select',
               className: 'col-3',
@@ -254,15 +261,112 @@ export class LeadsComponent {
               type: 'textarea',
               className: 'col-3',
               templateOptions: {
-                type: 'input',
                 label: 'Notes',
-                // placeholder: 'Select Oder Date',
-                required: false
+                required: false,
+                placeholder: 'Enter Notes',
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  //field.templateOptions.options = this.cs.getRole();
+                }
               }
-            }
+            },
           ]
         },
+        // end of lead
+        //-----------------------------------------A S S I G N M E N T -----------------------------------//
+        // {
+        //   // fieldGroupClassName: "ant-row",
+        //   key: 'assignment',
+        //   fieldGroup: [{
+        //     key: 'sales_rep',
+        //     type: 'select',
+        //     className: 'col-3',
+        //     templateOptions: {
+        //       label: 'Sales Representative',
+        //       dataKey: 'employee_id',
+        //       dataLabel: "name",
+        //       options: [],
+        //       lazy: {
+        //         url: 'hrms/employees/',
+        //         lazyOneTime: true
+        //       },
+        //       required: false
+        //     },
+        //     hooks: {
+        //       onChanges: (field: any) => {
+        //         field.formControl.valueChanges.subscribe((data: any) => {
+        //           if (this.formConfig && this.formConfig.model && this.formConfig.model['assignment']) {
+        //             this.formConfig.model['assignment']['sales_rep_id'] = data.employee_id;
+        //           } else {
+        //             console.error('Form config or vendor data model is not defined.');
+        //           }
+        //         });
+        //       }
+        //     }
+        //   }]
+        // },
+        // end of assignment
+        //----------------------------------------- I N T E R A C T I O N  -----------------------------------//
+        // {
+        //   // fieldGroupClassName: "ant-row custom-form-block",
+        //   key: 'interaction',
+        //   fieldGroup: [{
+        //       key: 'interaction_type',
+        //       type: 'select',
+        //       className: 'col-3',
+        //       templateOptions: {
+        //         label: 'Interaction Type',
+        //         dataKey: 'interaction_type_id',
+        //         dataLabel: "interaction_type",
+        //         options: [],
+        //         lazy: {
+        //           url: 'leads/interaction_types/',
+        //           lazyOneTime: true
+        //         },
+        //         required: false
+        //       },
+        //       hooks: {
+        //         onChanges: (field: any) => {
+        //           field.formControl.valueChanges.subscribe((data: any) => {
+        //             if (this.formConfig && this.formConfig.model && this.formConfig.model['interaction']) {
+        //               this.formConfig.model['interaction']['interaction_type_id'] = data.interaction_type_id;
+        //             } else {
+        //               console.error('Form config or lead_status data model is not defined.');
+        //             }
+        //           });
+        //         }
+        //       }
+        //     },
+        //     {
+        //       key: 'interaction_date',
+        //       type: 'input',
+        //       className: 'col-3',
+        //       templateOptions: {
+        //         type: 'datetime-local',
+        //         label: 'Interaction date',
+        //         placeholder: 'Select interaction date',
+        //         required: false
+        //       }
+        //     },
+        //     {
+        //       key: 'notes',
+        //       type: 'textarea',
+        //       className: 'col-3',
+        //       templateOptions: {
+        //         type: 'input',
+        //         label: 'Notes',
+        //         // placeholder: 'Select Oder Date',
+        //         required: false
+        //       }
+        //     }
+        //   ]
+        // },
         // end of interaction
+    //   ]
+    // }
+
+
       ]
     }
   }
