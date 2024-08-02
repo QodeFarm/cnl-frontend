@@ -102,12 +102,6 @@ export class LeadsComponent {
         interaction: {},
       },
       fields: [
-
-        // {
-        //   fieldGroupClassName: 'row col-12 p-0 m-0 custom-form field-no-bottom-space',
-        //   className: 'ta-cell pr-md col-md-10 col-12',
-        //   fieldGroup: [
-
         //-----------------------------------------L E A D S -----------------------------------//
         {
           fieldGroupClassName: "ant-row custom-form-block",
@@ -262,21 +256,18 @@ export class LeadsComponent {
               className: 'col-3',
               templateOptions: {
                 label: 'Notes',
-                required: false,
                 placeholder: 'Enter Notes',
-              },
-              hooks: {
-                onInit: (field: any) => {
-                  //field.templateOptions.options = this.cs.getRole();
-                }
+                required: false,
               }
             },
           ]
         },
         // end of lead
-        //-----------------------------------------A S S I G N M E N T -----------------------------------//
+
+
+        // -----------------------------------------A S S I G N M E N T -----------------------------------//
         // {
-        //   // fieldGroupClassName: "ant-row",
+        //   fieldGroupClassName: "ant-row",
         //   key: 'assignment',
         //   fieldGroup: [{
         //     key: 'sales_rep',
@@ -307,7 +298,7 @@ export class LeadsComponent {
         //   }]
         // },
         // end of assignment
-        //----------------------------------------- I N T E R A C T I O N  -----------------------------------//
+        // ----------------------------------------- I N T E R A C T I O N  -----------------------------------//
         // {
         //   // fieldGroupClassName: "ant-row custom-form-block",
         //   key: 'interaction',
@@ -363,9 +354,6 @@ export class LeadsComponent {
         //   ]
         // },
         // end of interaction
-    //   ]
-    // }
-
 
       ]
     }
