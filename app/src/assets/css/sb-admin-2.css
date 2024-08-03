@@ -17,7 +17,7 @@
     justify-content: flex-start;
     align-items: stretch;
     flex-wrap: nowrap;
-    padding: 10px;
+    padding: 0px;
 }
 
 .ta-cell {
@@ -4276,7 +4276,7 @@ input[type="button"].btn-block {
 }
 
 .nav-tabs {
-    border-bottom: 1px solid #dddfeb;
+    border-bottom: 1px solid #142768;
 }
 
 .nav-tabs .nav-link {
@@ -4288,7 +4288,7 @@ input[type="button"].btn-block {
 
 .nav-tabs .nav-link:hover,
 .nav-tabs .nav-link:focus {
-    border-color: #eaecf4 #eaecf4 #dddfeb;
+    border-color: #142768 #142768 #fff;
 }
 
 .nav-tabs .nav-link.disabled {

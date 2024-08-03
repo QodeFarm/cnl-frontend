@@ -10,7 +10,7 @@ import { TaTableConfig } from '@ta/ta-table';
 export class VendorCategoryComponent {
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
-    drawerPlacement: 'right',
+    drawerPlacement: 'top',
     tableConfig: {
       apiUrl: 'vendors/vendor_category/',
       title: 'Vendor Category List',
@@ -63,9 +63,12 @@ export class VendorCategoryComponent {
       ],
       fields: [
         {
+        fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
+        fieldGroup: [
+        {
           key: 'code',
-          type: 'textarea',
-          className: 'ta-cell pr-md',
+          type: 'input',
+          className: 'col-6 ps-0',
           templateOptions: {
             label: 'Code',
             placeholder: 'Enter Code',
@@ -74,8 +77,8 @@ export class VendorCategoryComponent {
         },
 		    {
           key: 'name',
-          type: 'textarea',
-          className: 'ta-cell pr-md',
+          type: 'input',
+          className: 'col-6 pe-0',
           templateOptions: {
             label: 'Name',
             placeholder: 'Enter Name',
@@ -83,6 +86,9 @@ export class VendorCategoryComponent {
           }
         },
       ]
+    }
+      ]
+   
     }
 
   }

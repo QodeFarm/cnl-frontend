@@ -9,7 +9,7 @@ import { TaCurdConfig } from '@ta/ta-curd';
 export class FirmStatusesComponent {
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
-    drawerPlacement: 'right',
+    drawerPlacement: 'top',
     tableConfig: {
       apiUrl: 'masters/firm_statuses/',
       title: 'Firm Statuses',
@@ -57,16 +57,21 @@ export class FirmStatusesComponent {
       exParams: [
       ],
       fields: [
+        {
+          fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
+          fieldGroup: [
 		{
           key: 'name',
-          type: 'textarea',
-          className: 'ta-cell pr-md',
+          type: 'input',
+          className: 'col-6 p-0',
           templateOptions: {
             label: 'Name',
             placeholder: 'Enter name',
             required: true,
           }
         },
+      ]
+    }
       ]
     }
 

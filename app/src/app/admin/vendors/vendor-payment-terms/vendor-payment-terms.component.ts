@@ -9,7 +9,7 @@ import { TaCurdConfig } from '@ta/ta-curd';
 export class VendorPaymentTermsComponent {
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
-    drawerPlacement: 'right',
+    drawerPlacement: 'top',
     tableConfig: {
       apiUrl: 'vendors/vendor_payment_terms/',
       title: 'Vendor Payment Terms List',
@@ -34,6 +34,10 @@ export class VendorPaymentTermsComponent {
 		    {
           fieldKey: 'no_of_fixed_days',
           name: 'No of fixed days'
+        },
+        {
+          fieldKey: 'payment_cycle',
+          name: 'Payment Cycle'
         },
 		    {
           fieldKey: 'run_on',
@@ -72,11 +76,14 @@ export class VendorPaymentTermsComponent {
       pkId: "payment_term_id",
       exParams: [
       ],
-      fields: [
+      fields: [ 
+        {
+          fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
+          fieldGroup: [
 	     {
           key: 'name',
-          type: 'textarea',
-          className: 'ta-cell pr-md',
+          type: 'input',
+          className: 'col-6 pb-3 ps-0',
           templateOptions: {
             label: 'Name',
             placeholder: 'Enter Name',
@@ -85,8 +92,8 @@ export class VendorPaymentTermsComponent {
         },
         {
           key: 'code',
-          type: 'textarea',
-          className: 'ta-cell pr-md',
+          type: 'input',
+          className: 'col-6 pb-3 pe-0',
           templateOptions: {
             label: 'Code',
             placeholder: 'Enter Code',
@@ -95,8 +102,8 @@ export class VendorPaymentTermsComponent {
         },
 		    {
           key: 'fixed_days',
-          type: 'textarea',
-          className: 'ta-cell pr-md',
+          type: 'input',
+          className: 'col-6 pb-3 ps-0',
           templateOptions: {
             label: 'Fixed Days',
             placeholder: 'Enter fixed days',
@@ -105,8 +112,8 @@ export class VendorPaymentTermsComponent {
         },
 		    {
           key: 'no_of_fixed_days',
-          type: 'textarea',
-          className: 'ta-cell pr-md',
+          type: 'input',
+          className: 'col-6 pb-3 pe-0',
           templateOptions: {
             label: 'No of fixed days',
             placeholder: 'Enter no of fixed days',
@@ -115,8 +122,8 @@ export class VendorPaymentTermsComponent {
         },
 		    {
           key: 'payment_cycle',
-          type: 'textarea',
-          className: 'ta-cell pr-md',
+          type: 'input',
+          className: 'col-6 ps-0',
           templateOptions: {
             label: 'Payment Cycle',
             placeholder: 'Enter payment cycle',
@@ -125,14 +132,16 @@ export class VendorPaymentTermsComponent {
         },
 		    {
           key: 'run_on',
-          type: 'textarea',
-          className: 'ta-cell pr-md',
+          type: 'input',
+          className: 'col-6 pe-0',
           templateOptions: {
             label: 'Run on',
             placeholder: 'Enter run on',
             required: true,
           }
         }
+      ]
+    }
       ]
     }
 
