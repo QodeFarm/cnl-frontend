@@ -5,3 +5,51 @@
         </div>
     </div>
 </div>
+
+<!-- Config Modal -->
+
+<div class="modal fade custom-modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Role Config</h5>
+                <button (click)="ngOninit()" type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Modal body start -->
+                <div class="container mt-2">
+                    <h2>{{ selectedRow?.role_name}}</h2>
+                    <div style=" height: 390px; overflow: scroll;">
+                        <div *ngFor="let module of moduleList">
+                            <div>
+                                <input type="checkbox" [(ngModel)]="module.selected"
+                                    (change)="toggleModule(module, module.selected)">
+                                {{module.module_name}}
+                            </div>
+                            <div style="margin-left: 20px;" *ngFor="let section of module.module_sections">
+                                <div>
+                                    <input type="checkbox" [(ngModel)]="section.selected"
+                                        (change)="toggleSection(module, section, section.selected)">
+                                    {{section.section_name}}
+                                </div>
+                                <div style="margin-left: 20px;" *ngFor="let action of section.actions">
+                                    <input type="checkbox" [(ngModel)]="action.selected"
+                                        (change)="toggleAction(module, section, action, action.selected)">
+                                    {{action.action_name}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal body end -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" (click)="ngOninit()" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" (click)="saveActions()">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
