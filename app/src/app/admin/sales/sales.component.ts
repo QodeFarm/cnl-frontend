@@ -189,10 +189,8 @@ export class SalesComponent {
                     console.log("customer", data);
                     if (data && data.customer_id) {
                       this.formConfig.model['sale_order']['customer_id'] = data.customer_id;
-                      alert(data.customer_id);
                     }
                   //   if (field.form && field.form.controls && field.form.controls.customer_id) {
-                  //     alert("Hi")
                   //     field.form.controls.customer_id.setValue(data.customer_id)
                   //   }
                   //   if (field.form && field.form.controls && field.form.controls.customer_address_id) {
@@ -390,7 +388,7 @@ export class SalesComponent {
                         field.form.controls.code.setValue(data.code)
                       }
                       if (field.form && field.form.controls && field.form.controls.sales_rate && data && data.mrp) {
-                        field.form.controls.sales_rate.setValue(data.mrp)
+                        field.form.controls.sales_rate.setValue(field.form.controls.sales_rate.value || data.mrp)
                       }
                       if (field.form && field.form.controls && field.form.controls.discount && data && data.dis_amount) {
                         field.form.controls.discount.setValue(data.dis_amount)
