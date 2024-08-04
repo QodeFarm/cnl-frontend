@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
-import { TaFormConfig } from '@ta/ta-form';
+import { Component, ViewChild } from '@angular/core';
+import { FormlyFieldConfig } from '@ngx-formly/core';
+import { TaFormComponent, TaFormConfig } from '@ta/ta-form';
 import { distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
@@ -9,6 +10,7 @@ import { distinctUntilChanged } from 'rxjs/operators';
   styleUrls: ['./sales.component.scss']
 })
 export class SalesComponent {
+  @ViewChild('salesForm', { static: false }) salesForm: TaFormComponent | undefined;
   orderNumber: any;
   showSaleOrderList: boolean = false;
   showForm: boolean = false;
@@ -19,6 +21,7 @@ export class SalesComponent {
   }
 
   ngOnInit() {
+
     this.showSaleOrderList = false;
     this.showForm = false;
     this.SaleOrderEditID = null;
@@ -33,6 +36,7 @@ export class SalesComponent {
     // to get SaleOrder number for save
     this.getOrderNo();
   }
+
 
   formConfig: TaFormConfig = {};
 
@@ -86,6 +90,9 @@ export class SalesComponent {
 
   setFormConfig() {
     this.formConfig = {
+      valueChangeFn: (res) => {
+        // this.totalAmountCal();
+      },
       url: "sales/sale_order/",
       title: '',
       formState: {
@@ -96,7 +103,7 @@ export class SalesComponent {
           key: 'sale_order_items',
           type: 'script',
           value: 'data.sale_order_items.map(m=> {m.product_id = m.product.product_id; if(m.product.unit_options){m.unit_options_id = m.product.unit_options.unit_options_id};  if(m.unit_options){m.unit_options_id = m.unit_options.unit_options_id};  return m ;})'
-        },
+        }
         // {
         //   key: 'order_attachments',
         //   type: 'script',
@@ -109,7 +116,9 @@ export class SalesComponent {
         submittedFn: () => this.ngOnInit()
       },
       reset: {
-
+        resetFn: () => {
+          this.ngOnInit();
+        }
       },
       model: {
         sale_order: {},
@@ -133,7 +142,12 @@ export class SalesComponent {
                 // disabled: true
               },
               hooks: {
-                onInit: (field: any) => {
+                onInit: (field: FormlyFieldConfig) => {
+                  // this.totalAmountCal();
+                  // this.form.form.valueChanges.subscribe(res => {
+                  //   this.totalAmountCal();
+                  // });
+
                   // field.form.controls.order_no.setValue(this.orderNumber)
                   // field.form.controls.order_no.value = this.orderNumber;
                 }
@@ -159,13 +173,16 @@ export class SalesComponent {
                 }
               },
               hooks: {
-                onChanges: (field: any) => {
+                onInit: (field: any) => {
                   field.formControl.valueChanges.subscribe(data => {
                     console.log("sale_type", data);
                     if (data && data.sale_type_id) {
                       this.formConfig.model['sale_order']['sale_type_id'] = data.sale_type_id;
                     }
                   });
+                },
+                onChanges: (field: any) => {
+
                 }
               }
             },
@@ -377,12 +394,6 @@ export class SalesComponent {
                 hooks: {
                   onInit: (field: any) => {
                     field.formControl.valueChanges.subscribe(data => {
-                      // field.templateOptions.options = data;
-                    });
-                    // field.templateOptions.options = this.productOptions;
-                  },
-                  onChanges: (field: any) => {
-                    field.formControl.valueChanges.subscribe(data => {
                       console.log("products data", data);
                       this.productOptions = data;
                       // default value for new product
@@ -398,10 +409,8 @@ export class SalesComponent {
                       if (field.form && field.form.controls && field.form.controls.discount && data && data.dis_amount) {
                         field.form.controls.discount.setValue(data.dis_amount)
                       }
-                      if (field.form && field.form.controls && field.form.controls.unit && data && data.unit_options && data.unit_options.unit_name) {
-                        if (data.unit_options && data.unit_options.unit_name) {
-                          field.form.controls.unit.setValue(data.unit_options.unit_name)
-                        }
+                      if (field.form && field.form.controls && field.form.controls.unit_options && data && data.unit_options && data.unit_options.unit_name) {
+                        field.form.controls.unit_options.setValue(data.unit_options)
                       }
                       if (field.form && field.form.controls && field.form.controls.print_name && data && data.print_name) {
                         field.form.controls.print_name.setValue(data.print_name)
@@ -409,6 +418,7 @@ export class SalesComponent {
                       if (field.form && field.form.controls && field.form.controls.discount && data && data.dis_amount) {
                         field.form.controls.discount.setValue(data.dis_amount)
                       }
+                      this.totalAmountCal();
                     });
                     // field.templateOptions.options = this.cs.getRole();
                   }
@@ -440,39 +450,50 @@ export class SalesComponent {
                 },
               },
               {
-                type: 'input',
-                key: 'unit',
-                // defaultValue: 1000,
+                type: 'select',
+                key: 'unit_options',
                 templateOptions: {
                   label: 'Unit',
-                  placeholder: 'Enter Unit',
+                  placeholder: 'Select Unit',
                   hideLabel: true,
-                  // // required: true
+                  dataLabel: 'unit_name',
+                  dataKey: 'unit_options_id',
+                  lazy: {
+                    url: 'masters/unit_options',
+                    lazyOneTime: true
+                  }
                 },
               },
               // quantity amount rate dsc
               {
                 type: 'input',
                 key: 'quantity',
-                // defaultValue: 1,
+                defaultValue: 1,
                 templateOptions: {
+                  type: 'number',
                   label: 'Qty',
                   placeholder: 'Enter Qty',
+                  min: 1,
                   hideLabel: true,
                   required: true
                 },
                 hooks: {
-                  onChanges: (field: any) => {
+                  onInit: (field: any) => {
                     field.formControl.valueChanges.subscribe(data => {
                       // this.formConfig.model['productQuantity'] = data;
+
                       if (field.form && field.form.controls && field.form.controls.rate && data) {
                         const rate = field.form.controls.rate.value;
                         const quantity = data;
                         if (rate && quantity) {
                           field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity));
                         }
+
                       }
                     })
+                  },
+                  onChanges: (field: any) => {
+
                   }
                 }
               },
@@ -489,15 +510,17 @@ export class SalesComponent {
                   // // required: true
                 },
                 hooks: {
-                  onChanges: (field: any) => {
+                  onInit: (field: any) => {
                     field.formControl.valueChanges.subscribe(data => {
                       // this.formConfig.model['productQuantity'] = data;
+
                       if (field.form && field.form.controls && field.form.controls.quantity && data) {
                         const quantity = field.form.controls.quantity.value;
                         const rate = data;
                         if (rate && quantity) {
                           field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity));
                         }
+                        // this.totalAmountCal();
                       }
                     })
                   }
@@ -514,8 +537,9 @@ export class SalesComponent {
                   hideLabel: true,
                 },
                 hooks: {
-                  onChanges: (field: any) => {
+                  onInit: (field: any) => {
                     field.formControl.valueChanges.subscribe(data => {
+                      // this.totalAmountCal();
                       // this.formConfig.model['productDiscount'] = data;
                     })
                   }
@@ -560,16 +584,17 @@ export class SalesComponent {
                   // // required: true
                 },
                 hooks: {
+                  onInit: (field: any) => {
+                    field.formControl.valueChanges.subscribe(data => {
+                      this.totalAmountCal();
+                      // this.formConfig.model['productDiscount'] = data;
+                    })
+                  }
                   // onInit: (field: any) => {
                   //   field.form.get('quantity').valueChanges.pipe(
                   //     distinctUntilChanged()
                   //   ).subscribe((data: any) => {
-                  //     const dt = data[0];
-                  //     // if (dt['quantity'] && dt['amount']) {
-                  //     //   field.formControl.setValue(parseInt(dt['quantity']) * parseInt(dt['amount']));
-                  //     // } else {
-                  //     //   field.formControl.setValue(0);
-                  //     // }
+                  //     this.totalAmountCal();
                   //   });
                   // }
                 }
@@ -668,7 +693,15 @@ export class SalesComponent {
                       templateOptions: {
                         label: 'Shipping Mode',
                         placeholder: 'Select Shipping Mode',
-                      }
+                        // required: true,
+                        dataKey: 'shipping_mode_id',
+                        dataLabel: "name",
+                        bindId: true,
+                        lazy: {
+                          url: 'masters/shipping_modes',
+                          lazyOneTime: true
+                        }
+                      },
                     },
                     {
                       key: 'port_of_discharge',
@@ -681,11 +714,19 @@ export class SalesComponent {
                     },
                     {
                       key: 'shipping_company_id',
-                      type: 'input',
+                      type: 'select',
                       className: 'col-6',
                       templateOptions: {
                         label: 'Shipping Company',
                         placeholder: 'Select Shipping Company',
+                        // required: true,
+                        dataKey: 'shipping_company_id',
+                        dataLabel: "name",
+                        bindId: true,
+                        lazy: {
+                          url: 'masters/shipping_companies',
+                          lazyOneTime: true
+                        }
                       }
                     },
                     {
@@ -707,7 +748,7 @@ export class SalesComponent {
                       }
                     },
                     {
-                      key: 'order_shipments.shipping_tracking_no',
+                      key: 'shipping_tracking_no',
                       type: 'input',
                       className: 'col-6',
                       templateOptions: {
@@ -716,16 +757,16 @@ export class SalesComponent {
                       }
                     },
                     {
-                      key: 'order_shipments.shipping_date',
+                      key: 'shipping_date',
                       type: 'date',
                       className: 'col-6',
                       templateOptions: {
                         label: 'Shipping Date',
-                        // placeholder: 'Enter Shipping Tracking No.',
+                        defaultValue: new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate(),
                       }
                     },
                     {
-                      key: 'order_shipments.shipping_charges',
+                      key: 'shipping_charges',
                       type: 'input',
                       className: 'col-6',
                       templateOptions: {
@@ -812,18 +853,24 @@ export class SalesComponent {
                                 placeholder: 'Enter Cess amount',
                                 // required: true
                               },
-                              hooks:{
-                                onChanges: (field: any) => {
+                              hooks: {
+                                onInit: (field: any) => {
                                   field.formControl.valueChanges.subscribe(data => {
-                                    // this.formConfig.model['productQuantity'] = data;
-                                    if (field.form && field.form.controls && field.form.controls.doc_amount && data) {
-                                      const doc_amount = field.form.controls.doc_amount.value;
-                                      const cess_amount = data;
-                                      if (cess_amount && doc_amount) {
-                                        field.form.controls.doc_amount.setValue(parseInt(doc_amount) - parseInt(cess_amount) );
-                                      }
-                                    }
+                                    this.totalAmountCal();
+                                    // this.formConfig.model['productDiscount'] = data;
                                   })
+                                },
+                                onChanges: (field: any) => {
+                                  // field.formControl.valueChanges.subscribe(data => {
+                                  //   // this.formConfig.model['productQuantity'] = data;
+                                  //   if (field.form && field.form.controls && field.form.controls.doc_amount && data) {
+                                  //     const doc_amount = field.form.controls.doc_amount.value;
+                                  //     const cess_amount = data;
+                                  //     if (cess_amount && doc_amount) {
+                                  //       field.form.controls.doc_amount.setValue(parseInt(doc_amount) - parseInt(cess_amount));
+                                  //     }
+                                  //   }
+                                  // })
                                 }
                               }
                             },
@@ -862,17 +909,23 @@ export class SalesComponent {
                                 placeholder: 'Enter Tax amount',
                                 // required: true
                               },
-                              hooks:{
-                                onChanges: (field: any) => {
+                              hooks: {
+                                onInit: (field: any) => {
                                   field.formControl.valueChanges.subscribe(data => {
-                                    if (field.form && field.form.controls && field.form.controls.doc_amount && data) {
-                                      const doc_amount = field.form.controls.doc_amount.value;
-                                      const tax_amount = data;
-                                      if (tax_amount && doc_amount) {
-                                        field.form.controls.doc_amount.setValue(parseInt(doc_amount) - parseInt(tax_amount) );
-                                      }
-                                    }
+                                    this.totalAmountCal();
+                                    // this.formConfig.model['productDiscount'] = data;
                                   })
+                                },
+                                onChanges: (field: any) => {
+                                  // field.formControl.valueChanges.subscribe(data => {
+                                  //   if (field.form && field.form.controls && field.form.controls.doc_amount && data) {
+                                  //     const doc_amount = field.form.controls.doc_amount.value;
+                                  //     const tax_amount = data;
+                                  //     if (tax_amount && doc_amount) {
+                                  //       field.form.controls.doc_amount.setValue(parseInt(doc_amount) - parseInt(tax_amount));
+                                  //     }
+                                  //   }
+                                  // })
                                 }
                               }
                             },
@@ -971,7 +1024,6 @@ export class SalesComponent {
                             {
                               key: 'order_status',
                               type: 'select',
-                              defaultValue: '085266c9-5020-41b3-ab58-1e4d88f4ff19',
                               className: 'col-4',
                               templateOptions: {
                                 label: 'Order status Type',
@@ -984,9 +1036,12 @@ export class SalesComponent {
                                   lazyOneTime: true
                                 }
                               },
+                              expressions: {
+                                hide: '!model.sale_order_id',
+                              },
                               hooks: {
                                 onInit: (field: any) => {
-                                  field.hide = this.SaleOrderEditID ? true : false;
+                                  // field.hide = this.SaleOrderEditID ? true : false;
                                   // field.formControl.valueChanges.subscribe(data => {
                                   //   console.log("order_status", data);
                                   //   if (data && data.order_status_id) {
@@ -1009,18 +1064,18 @@ export class SalesComponent {
                               },
                               hooks: {
                                 onInit: (field: any) => {
-                                  field.parent.form.get('sale_order_items').valueChanges.pipe(
-                                    distinctUntilChanged()
-                                  ).subscribe((data: any) => {
-                                    let sum = 0;
-                                    data.forEach(d => {
-                                      if (d.amount) {
-                                        sum += parseInt(d.amount);
-                                      }
-                                    });
-                                    // console.log('sum - ',sum);
-                                    field.formControl.setValue(sum);
-                                  });
+                                  // field.parent.form.get('sale_order_items').valueChanges.pipe(
+                                  //   distinctUntilChanged()
+                                  // ).subscribe((data: any) => {
+                                  //   let sum = 0;
+                                  //   data.forEach(d => {
+                                  //     if (d.amount) {
+                                  //       sum += parseInt(d.amount);
+                                  //     }
+                                  //   });
+                                  //   // console.log('sum - ',sum);
+                                  //   field.formControl.setValue(sum);
+                                  // });
                                 }
                               }
                             },
@@ -1037,18 +1092,18 @@ export class SalesComponent {
                               },
                               hooks: {
                                 onInit: (field: any) => {
-                                  field.parent.form.get('sale_order_items').valueChanges.pipe(
-                                    distinctUntilChanged()
-                                  ).subscribe((data: any) => {
-                                    let totalDiscount = 0;
-                                    data.forEach(d => {
-                                      if (d.discount) {
-                                        totalDiscount += parseInt(d.discount);
-                                      }
-                                    });
-                                    // console.log('totalDiscount - ',totalDiscount);
-                                    field.formControl.setValue(totalDiscount);
-                                  });
+                                  // field.parent.form.get('sale_order_items').valueChanges.pipe(
+                                  //   distinctUntilChanged()
+                                  // ).subscribe((data: any) => {
+                                  //   let totalDiscount = 0;
+                                  //   data.forEach(d => {
+                                  //     if (d.discount) {
+                                  //       totalDiscount += parseInt(d.discount);
+                                  //     }
+                                  //   });
+                                  //   // console.log('totalDiscount - ',totalDiscount);
+                                  //   field.formControl.setValue(totalDiscount);
+                                  // });
                                 }
                               }
                             },
@@ -1065,22 +1120,22 @@ export class SalesComponent {
                               },
                               hooks: {
                                 onInit: (field: any) => {
-                                  field.parent.form.get('sale_order_items').valueChanges.pipe(
-                                    distinctUntilChanged()
-                                  ).subscribe((data: any) => {
-                                    let totalItemsValue = parseInt(field.form.controls.item_value.value) ;
-                                    let totalDiscount = 0;
-                                    data.forEach(d => {
-                                      if (d.discount) {
-                                        totalDiscount += parseInt(d.discount);
-                                      }
-                                    });
-                                    const cess_tax_amount = parseInt(field.form.controls.cess_amount.value) + parseInt(field.form.controls.tax_amount.value);
-                                    // console.log('totalDiscount - ',totalDiscount);
-                                    // console.log('totalItemsValue - ', totalItemsValue);
-                                    field.formControl.setValue(totalItemsValue - totalDiscount);
-                                    // this.formConfig.model['total_doc_amount'] = field.formControl.value;
-                                  });
+                                  // field.parent.form.get('sale_order_items').valueChanges.pipe(
+                                  //   distinctUntilChanged()
+                                  // ).subscribe((data: any) => {
+                                  //   let totalItemsValue = parseInt(field.form.controls.item_value.value);
+                                  //   let totalDiscount = 0;
+                                  //   data.forEach(d => {
+                                  //     if (d.discount) {
+                                  //       totalDiscount += parseInt(d.discount);
+                                  //     }
+                                  //   });
+                                  //   const cess_tax_amount = parseInt(field.form.controls.cess_amount.value) + parseInt(field.form.controls.tax_amount.value);
+                                  //   // console.log('totalDiscount - ',totalDiscount);
+                                  //   // console.log('totalItemsValue - ', totalItemsValue);
+                                  //   field.formControl.setValue(totalItemsValue - totalDiscount);
+                                  //   // this.formConfig.model['total_doc_amount'] = field.formControl.value;
+                                  // });
 
                                 }
                               }
@@ -1125,6 +1180,45 @@ export class SalesComponent {
         //   "charge_type": "best",
         //   "document_through": "mail"
       ]
+    }
+  }
+
+  totalAmountCal() {
+    const data = this.formConfig.model;
+    console.log('data', data);
+    if (data) {
+      const products = data.sale_order_items || [];
+      let totalAmount = 0;
+      let totalDiscount = 0;
+      let totalRate = 0;
+      let doc_amount = 0;
+      if (products) {
+        products.forEach(product => {
+          if (product) {
+            if (product.amount)
+              totalAmount += parseFloat(product.amount || 0);
+            if (product.discount)
+              totalDiscount += parseFloat(product.discount || 0);
+          }
+          // totalRate += parseFloat(product.rate) * parseFloat(product.quantity || 0);
+        });
+      }
+
+
+      if (this.salesForm && this.salesForm.form && this.salesForm.form.controls) {
+        const controls: any = this.salesForm.form.controls;
+        controls.sale_order.controls.item_value.setValue(totalAmount);
+        controls.sale_order.controls.dis_amt.setValue(totalDiscount);
+        const doc_amount = (totalAmount + parseFloat(data.sale_order.cess_amount || 0) + parseFloat(data.sale_order.tax_amount || 0)) - totalDiscount;
+        controls.sale_order.controls.doc_amount.setValue(doc_amount);
+
+      }
+      //const 
+
+      // const cess_amount = data;
+      // if (cess_amount && doc_amount) {
+      //   field.form.controls.doc_amount.setValue(parseInt(doc_amount) - parseInt(cess_amount));
+      // }
     }
   }
 

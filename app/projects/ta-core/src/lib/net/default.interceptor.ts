@@ -44,7 +44,7 @@ export class DefaultInterceptor implements HttpInterceptor {
   private refreshToking = false;
   private refreshToken$: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
-  constructor(private injector: Injector,private siteConfig:SiteConfigService) {
+  constructor(private injector: Injector, private siteConfig: SiteConfigService) {
     if (this.refreshTokenType === 'auth-refresh') {
       //this.buildAuthRefresh();
     }
@@ -68,6 +68,11 @@ export class DefaultInterceptor implements HttpInterceptor {
 
   private checkStatus(ev: HttpErrorResponse): void {
     let errorMsg = ev.error.message || `Request error ${ev.status}: ${ev.url}`;
+    if (ev.status == 400) {
+      const errortext = CODEMESSAGE[ev.status] || ev.statusText;
+      this.notification.error('', errortext);
+      return;
+    }
     if ((ev.status >= 200 && ev.status < 300) || ev.status === 401) {
       return;
     }
@@ -184,6 +189,7 @@ export class DefaultInterceptor implements HttpInterceptor {
     //Business processing: some common operations
     switch (ev.status) {
       case 200:
+      case 400:
         // 业务层级错误处理，以下是假定restful有一套统一输出格式（指不管成功与否都有相应的数据格式）情况下进行处理
         // 例如响应内容：
         //  错误内容：{ status: 1, msg: '非法参数' }
@@ -233,7 +239,7 @@ export class DefaultInterceptor implements HttpInterceptor {
 
   private getAdditionalHeaders(headers?: HttpHeaders): { [name: string]: string } {
     const res: { [name: string]: string } = {};
-   // const lang = this.injector.get(ALAIN_I18N_TOKEN).currentLang;
+    // const lang = this.injector.get(ALAIN_I18N_TOKEN).currentLang;
     // if (!headers?.has('Accept-Language') && lang) {
     //   res['Accept-Language'] = lang;
     // }
@@ -248,7 +254,7 @@ export class DefaultInterceptor implements HttpInterceptor {
     let url = req.url;
     if (!url.startsWith('https://') && !url.startsWith('http://') && !url.startsWith('assets')) {
       const baseUrl = this.siteConfig.CONFIG.baseUrl;
-      url = baseUrl+url//environment.api.baseUrl + url;
+      url = baseUrl + url//environment.api.baseUrl + url;
     }
     // alert(url);
 

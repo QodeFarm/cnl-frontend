@@ -119,6 +119,11 @@ export class TaFormComponent implements OnInit {
         //this.fields = [{type:'field-builder',props:{fields:this.options.fields}}];
       }
     }
+    if (this.options.valueChangeFn) {
+      this.form.valueChanges.subscribe(res => {
+        this.options.valueChangeFn(this.options.model);
+      })
+    }
 
 
     if (this.options.formState) {

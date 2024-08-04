@@ -81,7 +81,12 @@ export class UserComponent {
         {
           key: 'status_id',
           type: 'script',
-          value: '"f8edc445-7017-4ae1-819e-280c8c061484"'
+          value: 'data.status.status_id'
+        },
+        {
+          key: 'branch_id',
+          type: 'script',
+          value: 'data.brach.branch_id'
         }
       ],
       fields: [
@@ -98,7 +103,7 @@ export class UserComponent {
                 label: 'Profile Pic',
                 multiple: false,
                 placeholder: 'Enter Profile Pic',
-                required: true,
+                required: false,
               }
             },
             {
@@ -226,7 +231,7 @@ export class UserComponent {
               }
             },
             {
-              key: 'brachId',
+              key: 'brach',
               type: 'select',
               className: 'ta-cell pr-md col-md-6 col-12',
               templateOptions: {
