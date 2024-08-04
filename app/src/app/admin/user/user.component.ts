@@ -9,14 +9,14 @@ import { TaCurdConfig } from '@ta/ta-curd';
 export class UserComponent {
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
-    drawerPlacement: 'right',
+    drawerPlacement: 'top',
     tableConfig: {
-      apiUrl: 'users/userdata/',
+      apiUrl: 'users/users_list/',
       title: 'Users',
       pkId: "first_name",
       pageSize: 10,
       "globalSearch": {
-        keys: ['id', 'name']
+        keys: ['username', 'email']
       },
       cols: [
         {
@@ -88,6 +88,19 @@ export class UserComponent {
         {
           fieldGroupClassName: 'row',
           fieldGroup: [
+            {
+              key: 'profile_picture_url',
+              type: 'file',
+              className: "col-4",
+              props: {
+                displayStyle: 'avatar',
+                storeFolder: "profile",
+                label: 'Profile Pic',
+                multiple: false,
+                placeholder: 'Enter Profile Pic',
+                required: true,
+              }
+            },
             {
               key: 'username',
               type: 'text',

@@ -6,18 +6,20 @@ import { TaActionService } from './services/ta-action.service';
 import { ScriptService } from './services/script.service';
 import { TaImgPipe } from './pipe/ta-img.pipe';
 import { ConcatPipe } from './pipe/concat.pipe';
+import { ImageDirective } from './directives/image.directive';
 @NgModule({
   declarations: [
     TaCoreComponent,
     TaImgPipe,
-    ConcatPipe
+    ConcatPipe,
+    ImageDirective
   ],
   imports: [
     NzNotificationModule
   ],
-  providers: [TaCoreService, TaActionService,ScriptService],
+  providers: [TaCoreService, TaActionService, ScriptService],
   exports: [
-    TaCoreComponent,TaImgPipe,ConcatPipe
+    TaCoreComponent, TaImgPipe, ConcatPipe, ImageDirective
   ]
 })
 export class TaCoreModule { }

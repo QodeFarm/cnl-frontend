@@ -1,30 +1,35 @@
-<nz-upload nzType="drag" class="avatar-uploader" [nzAction]="options.url" nzName="files" nzListType="text" [nzShowUploadList]="true" [nzMultiple]="options.multiple" [nzBeforeUpload]="beforeUpload" [nzFileList]="fileList" (nzChange)="handleChange($event)">
+<!-- [nzBeforeUpload]="beforeUpload" -->
+<nz-upload nzType="drag" [ngClass]="{'avatar-uploader': options.displayStyle=='avatar'}" [nzBeforeUpload]="beforeUpload" [nzShowUploadList]="showUploadList" [nzRemove]="removeFile" [nzLimit]="options.limit" [nzFileType]="options.allowedType" [nzAction]="options.url"
+    nzName="files" [nzListType]="listType" [nzMultiple]="options.multiple" [nzDisabled]="!(options.limit ==0 || (options.limit > options.fileList.length))" [(nzFileList)]="options.fileList" (nzChange)="handleChange($event)">
     <ng-containe [ngSwitch]="options.displayStyle">
         <div *ngSwitchCase="'icon'">
             <i class='bx bx-cloud-upload'></i>
         </div>
-        <div *ngSwitchCase="'button'" class="ant-upload-drag-container">
-
-            <p class="ant-upload-drag-icon">
-                <span nz-icon nzType="inbox"></span>
-            </p>
-            <p class="ant-upload-text">Click or drag file to this area to upload</p>
-            <p class="ant-upload-hint">
+        <div *ngSwitchCase="'avatar'" class="ant-upload">
+            <ng-container *ngIf="!(options.fileList && options.fileList[0] && options.fileList[0].attachment_path)">
+                <span class="upload-icon" nz-icon [nzType]="loading ? 'loading' : 'plus'"></span>
+                <div class="ant-upload-text">Upload</div>
+            </ng-container>
+            <img *ngIf="options.fileList && options.fileList[0] && options.fileList[0].attachment_path" [src]="options.fileList[0].attachment_path | taImg" style="width: 100%" />
+        </div>
+        <ng-container *ngSwitchDefault>
+            <div class="ant-upload-drag-container">
+                <p class="ant-upload-drag-icon">
+                    <span nz-icon nzType="inbox"></span>
+                </p>
+                <p class="ant-upload-text">Click or drag file to this area to upload</p>
+                <p class="ant-upload-hint">
+                    Support for a single or bulk upload. Strictly prohibit from uploading company data or other band files
+                </p>
+                <!-- <p class="ant-upload-hint">
                 Support for a single or bulk upload. Strictly prohibit from uploading company data or other band files
-            </p>
-            <!-- <button class="btn" type="button">
+            </p> -->
+                <!-- <button class="btn" type="button">
               <span ></span>
               Click to Upload
             </button> -->
-        </div>
-        <div *ngSwitchDefault>
-            <ng-container *ngIf="!avatarUrl">
-                <!-- <span class="upload-icon" nz-icon [nzType]="loading ? 'loading' : 'plus'"></span> -->
-                <div class="ant-upload-text">Upload</div>
-            </ng-container>
-            testing
-            <img *ngIf="avatarUrl" [src]="avatarUrl" style="width: 100%" />
-        </div>
+            </div>
+        </ng-container>
     </ng-containe>
 
 
