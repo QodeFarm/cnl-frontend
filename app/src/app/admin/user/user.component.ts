@@ -226,6 +226,54 @@ export class UserComponent {
               }
             },
             {
+              key: 'brachId',
+              type: 'select',
+              className: 'ta-cell pr-md col-md-6 col-12',
+              templateOptions: {
+                label: 'Branch',
+                dataKey: 'branch_id',
+                dataLabel: "name",
+                options: [],
+                required: true,
+                lazy: {
+                  url: 'company/branches/',
+                  lazyOneTime: true
+                }
+              }
+            },
+            {
+              key: 'status',
+              type: 'select',
+              className: 'ta-cell pr-md col-md-6 col-12',
+              templateOptions: {
+                label: 'Status',
+                dataKey: 'status_id',
+                dataLabel: "status_name",
+                options: [],
+                // required: true,
+                lazy: {
+                  url: 'masters/statuses/',
+                  lazyOneTime: true
+                }
+              }
+            },
+            {
+              key: 'isActive',
+              type: 'boolean',
+              className: 'ta-cell pr-md col-md-6 col-12',
+              templateOptions: {
+                label: 'Is Active',
+                dataKey: 'name',
+                dataLabel: "name",
+                options: [],
+                // required: true,
+                // lazy: {
+                //   url: 'masters/sale_types/',
+                //   lazyOneTime: true
+                // }
+              }
+            },
+            {
               key: 'password',
               type: 'text',
               className: 'ta-cell pr-md col-md-6 col-12',
@@ -258,7 +306,7 @@ export class UserComponent {
             {
               key: 'bio',
               type: 'textarea',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ta-cell pr-md col-12',
               templateOptions: {
                 label: 'Comments',
                 placeholder: 'Enter comments',

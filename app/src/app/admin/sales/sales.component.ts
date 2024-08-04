@@ -385,7 +385,10 @@ export class SalesComponent {
                     field.formControl.valueChanges.subscribe(data => {
                       console.log("products data", data);
                       this.productOptions = data;
+                      // default value for new product
+                      field.form.controls.quantity.setValue(field.form.controls.quantity.value || 1);
 
+                      // binding selected product data 
                       if (field.form && field.form.controls && field.form.controls.code && data && data.code) {
                         field.form.controls.code.setValue(data.code)
                       }
@@ -451,7 +454,7 @@ export class SalesComponent {
               {
                 type: 'input',
                 key: 'quantity',
-                // defaultValue: 1000,
+                // defaultValue: 1,
                 templateOptions: {
                   label: 'Qty',
                   placeholder: 'Enter Qty',
@@ -801,13 +804,27 @@ export class SalesComponent {
                             {
                               key: 'cess_amount',
                               type: 'input',
-                              // defaultValue: "7777700",
+                              defaultValue: "0",
                               className: 'col-4',
                               templateOptions: {
                                 type: 'input',
                                 label: 'Cess amount',
                                 placeholder: 'Enter Cess amount',
                                 // required: true
+                              },
+                              hooks:{
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    // this.formConfig.model['productQuantity'] = data;
+                                    if (field.form && field.form.controls && field.form.controls.doc_amount && data) {
+                                      const doc_amount = field.form.controls.doc_amount.value;
+                                      const cess_amount = data;
+                                      if (cess_amount && doc_amount) {
+                                        field.form.controls.doc_amount.setValue(parseInt(doc_amount) - parseInt(cess_amount) );
+                                      }
+                                    }
+                                  })
+                                }
                               }
                             },
                             {
@@ -837,13 +854,26 @@ export class SalesComponent {
                             {
                               key: 'tax_amount',
                               type: 'input',
-                              // defaultValue: "777770",
+                              defaultValue: "0",
                               className: 'col-4',
                               templateOptions: {
                                 type: 'input',
                                 label: 'Tax amount',
                                 placeholder: 'Enter Tax amount',
                                 // required: true
+                              },
+                              hooks:{
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    if (field.form && field.form.controls && field.form.controls.doc_amount && data) {
+                                      const doc_amount = field.form.controls.doc_amount.value;
+                                      const tax_amount = data;
+                                      if (tax_amount && doc_amount) {
+                                        field.form.controls.doc_amount.setValue(parseInt(doc_amount) - parseInt(tax_amount) );
+                                      }
+                                    }
+                                  })
+                                }
                               }
                             },
                             // {
@@ -941,7 +971,7 @@ export class SalesComponent {
                             {
                               key: 'order_status',
                               type: 'select',
-                              // defaultValue: '0d790583-50b3-4bb7-930c-c99f2d2fe526',
+                              defaultValue: '085266c9-5020-41b3-ab58-1e4d88f4ff19',
                               className: 'col-4',
                               templateOptions: {
                                 label: 'Order status Type',
@@ -955,13 +985,14 @@ export class SalesComponent {
                                 }
                               },
                               hooks: {
-                                onChanges: (field: any) => {
-                                  field.formControl.valueChanges.subscribe(data => {
-                                    console.log("order_status", data);
-                                    if (data && data.order_status_id) {
-                                      this.formConfig.model['sale_order']['order_status_id'] = data.order_status_id;
-                                    }
-                                  });
+                                onInit: (field: any) => {
+                                  field.hide = this.SaleOrderEditID ? true : false;
+                                  // field.formControl.valueChanges.subscribe(data => {
+                                  //   console.log("order_status", data);
+                                  //   if (data && data.order_status_id) {
+                                  //     field.setValue()
+                                  //   }
+                                  // });
                                 }
                               }
                             },
@@ -1024,7 +1055,7 @@ export class SalesComponent {
                             {
                               key: 'doc_amount',
                               type: 'input',
-                              // defaultValue: "12",
+                              defaultValue: "0",
                               className: 'col-4',
                               templateOptions: {
                                 type: 'input',
@@ -1037,17 +1068,18 @@ export class SalesComponent {
                                   field.parent.form.get('sale_order_items').valueChanges.pipe(
                                     distinctUntilChanged()
                                   ).subscribe((data: any) => {
-                                    let totalItemsValue = field.form.controls.item_value.value;
+                                    let totalItemsValue = parseInt(field.form.controls.item_value.value) ;
                                     let totalDiscount = 0;
                                     data.forEach(d => {
                                       if (d.discount) {
                                         totalDiscount += parseInt(d.discount);
                                       }
                                     });
+                                    const cess_tax_amount = parseInt(field.form.controls.cess_amount.value) + parseInt(field.form.controls.tax_amount.value);
                                     // console.log('totalDiscount - ',totalDiscount);
                                     // console.log('totalItemsValue - ', totalItemsValue);
                                     field.formControl.setValue(totalItemsValue - totalDiscount);
-
+                                    // this.formConfig.model['total_doc_amount'] = field.formControl.value;
                                   });
 
                                 }
