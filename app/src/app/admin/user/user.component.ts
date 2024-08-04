@@ -9,7 +9,7 @@ import { TaCurdConfig } from '@ta/ta-curd';
 export class UserComponent {
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
-    drawerPlacement: 'right',
+    drawerPlacement: 'top',
     tableConfig: {
       apiUrl: 'users/userdata/',
       title: 'Users',
@@ -86,8 +86,8 @@ export class UserComponent {
       ],
       fields: [
         {
-          fieldGroupClassName: 'row',
-          fieldGroup: [
+          fieldGroupClassName: "row col-12 p-0 m-0 custom-form",
+        fieldGroup: [
             {
               key: 'username',
               type: 'text',
