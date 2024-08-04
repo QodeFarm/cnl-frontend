@@ -61,7 +61,8 @@ export class RolesComponent {
                 this.selectedRow = row;
                 this.showConfig();
               },
-              label: 'Config'
+              // label: 'Config',
+              icon: 'fas fa-cog fa-fw'
             },
           ]
         }
@@ -176,8 +177,8 @@ export class RolesComponent {
   }
 
   showConfig() {
-    
-    this.http.get('users/role_permissions/'+ this.selectedRow?.role_id).subscribe((res: any) => {
+
+    this.http.get('users/role_permissions/' + this.selectedRow?.role_id).subscribe((res: any) => {
       console.log('get config', res.data);
       this.setConfig(res.data);
     });
@@ -188,23 +189,23 @@ export class RolesComponent {
 
   }
 
-  setConfig(resData){
+  setConfig(resData) {
     this.moduleList.forEach(moduleStep => {
       resData.forEach(res => {
-        if(moduleStep.module_id == res.module_id){
+        if (moduleStep.module_id == res.module_id) {
 
           moduleStep.module_sections.forEach(moduleSectionStep => {
-            if(moduleSectionStep.section_id == res.section_id){
+            if (moduleSectionStep.section_id == res.section_id) {
 
               moduleSectionStep.actions.forEach(actionStep => {
-                if(actionStep.action_id == res.action_id){
+                if (actionStep.action_id == res.action_id) {
                   actionStep['selected'] = true;
                 }
-                
-                if(moduleSectionStep.actions.every( a => a.selected == true)) { 
+
+                if (moduleSectionStep.actions.every(a => a.selected == true)) {
                   moduleSectionStep['selected'] = true;
                 }
-                if(moduleStep.module_sections.every( b => b.selected == true)) { 
+                if (moduleStep.module_sections.every(b => b.selected == true)) {
                   moduleStep['selected'] = true;
                 }
               })
@@ -239,7 +240,7 @@ export class RolesComponent {
     module.selected = module.module_sections.every((sec: any) => sec.selected);
   }
 
-  saveActions(){
+  saveActions() {
     let selectedList = [];
     this.moduleList.forEach(module => {
       module.module_sections.forEach(section => {
@@ -249,7 +250,7 @@ export class RolesComponent {
               module_id: module.module_id,
               section_id: section.section_id,
               action_id: action.action_id,
-              role_id : this.selectedRow.role_id
+              role_id: this.selectedRow.role_id
             });
           }
         });
@@ -264,8 +265,8 @@ export class RolesComponent {
       document.getElementById('modalClose').click();
     })
 
-    
-    
+
+
   }
 
 }
