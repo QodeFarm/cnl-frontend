@@ -157,7 +157,7 @@ export class RolesComponent {
 
   }
 
-  ngOninit() {
+  ngOnInit(): void {
 
     // action list
     this.http.get('users/actions/').subscribe((res: any) => {
