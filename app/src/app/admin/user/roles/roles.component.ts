@@ -14,7 +14,7 @@ export class RolesComponent {
 
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
-    drawerPlacement: 'right',
+    drawerPlacement: 'top',
     tableConfig: {
       apiUrl: 'users/role/',
       title: 'User Roles',
@@ -76,9 +76,12 @@ export class RolesComponent {
       ],
       fields: [
         {
+          fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
+        fieldGroup: [
+        {
           key: 'role_name',
           type: 'input',
-          className: 'ta-cell pr-md',
+          className: 'col-md-6 col-12',
           templateOptions: {
             label: 'Role Nmae',
             placeholder: 'Enter Role Name',
@@ -88,13 +91,15 @@ export class RolesComponent {
         {
           key: 'description',
           type: 'textarea',
-          className: 'ta-cell pr-md',
+          className: 'col-md-6 col-12',
           templateOptions: {
             label: 'Description',
             placeholder: 'Enter description',
             required: true,
           }
         }
+      ]
+    }
 
       ]
     }
