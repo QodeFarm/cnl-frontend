@@ -262,7 +262,8 @@ export class SaleReturnsComponent {
                 lazy: {
                   url: 'sales/sale_invoice_order/?summary=true',
                   lazyOneTime: true
-                }
+                },
+                required: true,
               },
               hooks: {
                 onChanges: (field: any) => {
@@ -301,7 +302,7 @@ export class SaleReturnsComponent {
               }
             },
             {
-              key: 'customer_address_id',
+              key: 'customer_address',
               type: 'select',
               className: 'col-2',
               templateOptions: {
@@ -326,7 +327,7 @@ export class SaleReturnsComponent {
               }
             },
             {
-              key: 'payment_link_type_id',
+              key: 'payment_link_type',
               type: 'select',
               className: 'col-2',
               templateOptions: {
@@ -370,7 +371,7 @@ export class SaleReturnsComponent {
             {
               key: 'remarks',
               type: 'textarea',
-              className: 'col-2',
+              className: 'col-3',
               templateOptions: {
                 label: 'Remarks',
                 placeholder: 'Enter Remarks',
@@ -379,7 +380,7 @@ export class SaleReturnsComponent {
             {
               key: 'return_reason',
               type: 'textarea',
-              className: 'col-2',
+              className: 'col-3',
               templateOptions: {
                 label: 'Return Reason',
                 placeholder: 'Enter Return Reason',
@@ -388,7 +389,7 @@ export class SaleReturnsComponent {
             {
               key: 'billing_address',
               type: 'textarea',
-              className: 'col-3',
+              className: 'col-6',
               templateOptions: {
                 label: 'Billing Address',
                 placeholder: 'Enter Billing Address',
@@ -397,7 +398,7 @@ export class SaleReturnsComponent {
             {
               key: 'shipping_address',
               type: 'textarea',
-              className: 'col-3',
+              className: 'col-6',
               templateOptions: {
                 label: 'Shipping Address',
                 placeholder: 'Enter Shipping Address',
@@ -826,70 +827,6 @@ export class SaleReturnsComponent {
                   key: 'sale_return_order',
                   fieldGroup: [
                     {
-                      key: 'total_boxes',
-                      type: 'input',
-                      className: 'col-4',
-                      templateOptions: {
-                        type: 'input',
-                        label: 'Total Boxes',
-                        placeholder: 'Enter Total Boxes',
-                      }
-                    },
-                    {
-                      key: 'cess_amount',
-                      type: 'input',
-                      className: 'col-4',
-                      templateOptions: {
-                        type: 'input',
-                        label: 'Cess Amount',
-                        placeholder: 'Enter Cess Amount',
-                      }
-                    },
-                    {
-                      key: 'advance_amount',
-                      type: 'input',
-                      className: 'col-4',
-                      templateOptions: {
-                        type: 'input',
-                        label: 'Advance Amount',
-                        placeholder: 'Enter Advance Amount',
-                      }
-                    },
-                    {
-                      key: 'taxable',
-                      type: 'input',
-                      className: 'col-4',
-                      templateOptions: {
-                        type: 'input',
-                        label: 'Taxable',
-                        placeholder: 'Enter Taxable',
-                      }
-                    },
-                    // {
-                    //   type: 'input',
-                    //   key: 'print_name',
-                    //   // defaultValue: 1000,
-                    //   templateOptions: {
-                    //     label: 'Print name',
-                    //     placeholder: 'Enter Product Print name',
-                    //     hideLabel: true,
-                    //     // type: 'number',
-                    //     // // required: true mrp tax 
-                    //   },
-                    // },
-                    {
-                      key: 'tax_amount',
-                      type: 'input',
-                      // defaultValue: "777770",
-                      className: 'col-4',
-                      templateOptions: {
-                        type: 'input',
-                        label: 'Tax amount',
-                        placeholder: 'Enter Tax amount',
-                        // required: true
-                      }
-                    },
-                    {
                       key: 'gst_type',
                       type: 'select',
                       className: 'col-4',
@@ -936,32 +873,6 @@ export class SaleReturnsComponent {
                         }
                       }
                     },
-                    // {
-                    //   key: 'ledger_account',
-                    //   type: 'select',
-                    //   className: 'ant-col-6 pr-md m-3',
-                    //   templateOptions: {
-                    //     label: 'Ledger Account',
-                    //     placeholder: 'Select Ledger Account',
-                    //     dataKey: 'name',
-                    //     dataLabel: "name",
-                    //     lazy: {
-                    //       url: 'customers/ledger_accounts/',
-                    //       lazyOneTime: true
-                    //     }
-                    //   },
-                    //   hooks: {
-                    //     onChanges: (field: any) => {
-                    //       field.formControl.valueChanges.subscribe((data: any) => {
-                    //         if (this.formConfig && this.formConfig.model && this.formConfig.model['purchase_return_orders']) {
-                    //           this.formConfig.model['purchase_return_orders']['ledger_account_id'] = data.ledger_account_id;
-                    //         } else {
-                    //           console.error('Form config or vendor data model is not defined.');
-                    //         }
-                    //       });
-                    //     }
-                    //   }
-                    // },
                     {
                       key: 'order_status',
                       type: 'select',
@@ -985,6 +896,90 @@ export class SaleReturnsComponent {
                             }
                           });
                         }
+                      }
+                    },
+                    {
+                      key: 'total_boxes',
+                      type: 'input',
+                      className: 'col-4',
+                      templateOptions: {
+                        type: 'input',
+                        label: 'Total Boxes',
+                        placeholder: 'Enter Total Boxes',
+                      }
+                    },
+                    {
+                      key: 'cess_amount',
+                      type: 'input',
+                      className: 'col-4',
+                      templateOptions: {
+                        type: 'input',
+                        label: 'Cess Amount',
+                        placeholder: 'Enter Cess Amount',
+                      }
+                    },
+                    {
+                      key: 'advance_amount',
+                      type: 'input',
+                      className: 'col-4',
+                      templateOptions: {
+                        type: 'input',
+                        label: 'Advance Amount',
+                        placeholder: 'Enter Advance Amount',
+                      }
+                    },
+                    {
+                      key: 'taxable',
+                      type: 'input',
+                      className: 'col-4',
+                      templateOptions: {
+                        type: 'input',
+                        label: 'Taxable',
+                        placeholder: 'Enter Taxable',
+                      }
+                    },
+                    {
+                      key: 'transport_charges',
+                      type: 'input',
+                      className: 'col-4',
+                      templateOptions: {
+                        type: 'input',
+                        label: 'Transport Charges',
+                        placeholder: 'Enter Transport Charges',
+                      }
+                    },
+                    {
+                      key: 'round_off',
+                      type: 'input',
+                      className: 'col-4',
+                      templateOptions: {
+                        type: 'input',
+                        label: 'Round Off',
+                        placeholder: 'Enter Round Off',
+                      }
+                    },
+                    // {
+                    //   type: 'input',
+                    //   key: 'print_name',
+                    //   // defaultValue: 1000,
+                    //   templateOptions: {
+                    //     label: 'Print name',
+                    //     placeholder: 'Enter Product Print name',
+                    //     hideLabel: true,
+                    //     // type: 'number',
+                    //     // // required: true mrp tax 
+                    //   },
+                    // },
+                    {
+                      key: 'tax_amount',
+                      type: 'input',
+                      // defaultValue: "777770",
+                      className: 'col-4',
+                      templateOptions: {
+                        type: 'input',
+                        label: 'Tax amount',
+                        placeholder: 'Enter Tax amount',
+                        // required: true
                       }
                     },
                     {
@@ -1075,26 +1070,6 @@ export class SaleReturnsComponent {
                         }
                       }
                     },
-                    {
-                      key: 'transport_charges',
-                      type: 'input',
-                      className: 'ant-col-6 pr-md m-3',
-                      templateOptions: {
-                        type: 'input',
-                        label: 'Transport Charges',
-                        placeholder: 'Enter Transport Charges',
-                      }
-                    },
-                    {
-                      key: 'round_off',
-                      type: 'input',
-                      className: 'ant-col-6 pr-md m-3',
-                      templateOptions: {
-                        type: 'input',
-                        label: 'Round Off',
-                        placeholder: 'Enter Round Off',
-                      }
-                    }
                   ]
                 },
               ]
