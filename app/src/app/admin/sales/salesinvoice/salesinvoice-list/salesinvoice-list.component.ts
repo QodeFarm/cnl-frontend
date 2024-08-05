@@ -18,6 +18,7 @@ export class SalesInvoiceListComponent {
   tableConfig: TaTableConfig = {
     apiUrl: 'sales/sale_invoice_order/',
     pkId: "sale_invoice_id",
+    showCheckbox: true,
     pageSize: 10,
     globalSearch: {
       keys: []
@@ -83,10 +84,12 @@ export class SalesInvoiceListComponent {
           },
           {
             type: 'callBackFn',
-            label: 'Edit',
+            icon: 'fa fa-pen',
+            label: '',
             callBackFn: (row, action) => {
               console.log(row);
-              this.edit.emit(row.sale_invoice_id);
+              this.edit.emit(row.sale_order_id);
+              // this.router.navigateByUrl('/admin/sales/edit/' + row.sale_order_id);
             }
           }
         ]
