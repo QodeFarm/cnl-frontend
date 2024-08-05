@@ -401,7 +401,7 @@ export class SalesComponent {
                       console.log("products data", data);
                       this.productOptions = data;
                       // default value for new product
-                      field.form.controls.quantity.setValue(field.form.controls.quantity.value || 1);
+                      // field.form.controls.quantity.setValue(parseFloat(field.form.controls.quantity.value) || 1);
 
                       // binding selected product data 
                       if (field.form && field.form.controls && field.form.controls.code && data && data.code) {
@@ -411,7 +411,7 @@ export class SalesComponent {
                         field.form.controls.rate.setValue(field.form.controls.rate.value || data.sales_rate)
                       }
                       if (field.form && field.form.controls && field.form.controls.discount && data && data.dis_amount) {
-                        field.form.controls.discount.setValue(data.dis_amount)
+                        field.form.controls.discount.setValue(parseFloat(data.dis_amount))
                       }
                       if (field.form && field.form.controls && field.form.controls.unit_options && data && data.unit_options && data.unit_options.unit_name) {
                         field.form.controls.unit_options.setValue(data.unit_options)
@@ -447,6 +447,7 @@ export class SalesComponent {
                 key: 'total_boxes',
                 // defaultValue: 1000,
                 templateOptions: {
+                  type: 'number',
                   label: 'Total Boxes',
                   placeholder: 'Enter Total Boxes',
                   hideLabel: true,
@@ -507,6 +508,7 @@ export class SalesComponent {
                 key: 'rate',
                 // defaultValue: 1000,
                 templateOptions: {
+                  type: 'number',
                   label: 'Rate',
                   placeholder: 'Enter Rate',
                   hideLabel: true,
@@ -535,6 +537,7 @@ export class SalesComponent {
                 key: 'discount',
                 // defaultValue: 90,
                 templateOptions: {
+                  type: 'number',
                   placeholder: 'Enter Disc',
                   // type: 'number',
                   label: 'Disc',
@@ -581,9 +584,11 @@ export class SalesComponent {
                 type: 'input',
                 key: 'amount',
                 templateOptions: {
+                  type: 'number',
                   label: 'Amount',
                   placeholder: 'Enter Amount',
                   hideLabel: true,
+                  disabled: true
                   // type: 'number',
                   // // required: true
                 },
@@ -608,6 +613,7 @@ export class SalesComponent {
                 key: 'tax',
                 // defaultValue: 1000,
                 templateOptions: {
+                  type: "number",
                   label: 'Tax',
                   placeholder: 'Tax',
                   hideLabel: true,
@@ -738,6 +744,7 @@ export class SalesComponent {
                       type: 'input',
                       className: 'col-6',
                       templateOptions: {
+                        type: "number",
                         label: 'No. of Packets',
                         placeholder: 'Select No. of Packets',
                       }
@@ -747,6 +754,7 @@ export class SalesComponent {
                       type: 'input',
                       className: 'col-6',
                       templateOptions: {
+                        type: "number",
                         label: 'Weight',
                         placeholder: 'Enter Weight',
                       }
@@ -774,6 +782,7 @@ export class SalesComponent {
                       type: 'input',
                       className: 'col-6',
                       templateOptions: {
+                        type: "number",
                         label: 'Shipping Charges.',
                         placeholder: 'Enter Shipping Charges',
                       }
@@ -840,7 +849,7 @@ export class SalesComponent {
                               // defaultValue: 77777,
                               className: 'col-4',
                               templateOptions: {
-                                type: 'input',
+                                type: 'number',
                                 label: 'Total boxes',
                                 placeholder: 'Enter Total boxes',
                                 // required: true
@@ -852,7 +861,7 @@ export class SalesComponent {
                               defaultValue: "0",
                               className: 'col-4',
                               templateOptions: {
-                                type: 'input',
+                                type: 'number',
                                 label: 'Cess amount',
                                 placeholder: 'Enter Cess amount',
                                 // required: true
@@ -908,7 +917,7 @@ export class SalesComponent {
                               defaultValue: "0",
                               className: 'col-4',
                               templateOptions: {
-                                type: 'input',
+                                type: 'number',
                                 label: 'Tax amount',
                                 placeholder: 'Enter Tax amount',
                                 // required: true
