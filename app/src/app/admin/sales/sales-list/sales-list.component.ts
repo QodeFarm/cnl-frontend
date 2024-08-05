@@ -62,7 +62,7 @@ export class SalesListComponent {
         sort: true
       },
       {
-        fieldKey: 'phone',
+        fieldKey: 'tax',
         name: 'Tax',
         sort: true
       },

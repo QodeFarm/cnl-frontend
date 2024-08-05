@@ -139,6 +139,7 @@ export class SalesComponent {
                 label: 'Order no',
                 placeholder: 'Enter Order No',
                 required: true,
+                readonly: true
                 // disabled: true
               },
               hooks: {
@@ -245,6 +246,7 @@ export class SalesComponent {
               templateOptions: {
                 type: 'date',
                 label: 'Delivery date',
+                readonly: true,
                 // placeholder: 'Select Oder Date',
                 required: true
               }
@@ -257,6 +259,7 @@ export class SalesComponent {
               templateOptions: {
                 type: 'date',
                 label: 'Order date',
+                readonly: true,
                 // placeholder: 'Select Order Date',
                 required: true
               }
@@ -282,6 +285,7 @@ export class SalesComponent {
                 type: 'date',
                 label: 'Ref date',
                 placeholder: 'Select Ref date',
+                readonly: true
                 // required: true
               }
             },
@@ -774,15 +778,15 @@ export class SalesComponent {
                         placeholder: 'Enter Shipping Charges',
                       }
                     },
-                    {
-                      key: 'shipping_company_address',
-                      type: 'textarea',
-                      className: 'col-6',
-                      templateOptions: {
-                        label: 'Shipping Company Address',
-                        placeholder: 'Enter Shipping Company Address',
-                      }
-                    },
+                    // {
+                    //   key: 'shipping_company_address',
+                    //   type: 'textarea',
+                    //   className: 'col-6',
+                    //   templateOptions: {
+                    //     label: 'Shipping Company Address',
+                    //     placeholder: 'Enter Shipping Company Address',
+                    //   }
+                    // },
                   ]
                 },
               ]
@@ -1060,6 +1064,7 @@ export class SalesComponent {
                                 type: 'input',
                                 label: 'Items value',
                                 placeholder: 'Enter Item value',
+                                readonly: true
                                 // required: true
                               },
                               hooks: {
@@ -1088,6 +1093,7 @@ export class SalesComponent {
                                 type: 'input',
                                 label: 'Discount amount',
                                 placeholder: 'Enter Discount amount',
+                                readonly: true
                                 // required: true
                               },
                               hooks: {
@@ -1116,6 +1122,7 @@ export class SalesComponent {
                                 type: 'input',
                                 label: 'Total amount',
                                 placeholder: 'Enter Total amount',
+                                readonly: true
                                 // required: true
                               },
                               hooks: {

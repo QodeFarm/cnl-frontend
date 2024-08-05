@@ -35,7 +35,7 @@ export class UserComponent {
           sort: true,
           displayType: "map",
           mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.role.role_name}`;
+            return `${row.role?.role_name || '--'}`;
           },
         },
         {
@@ -68,35 +68,35 @@ export class UserComponent {
       title: 'User',
       pkId: "user_id",
       exParams: [
-        {
-          key: 'company_id',
-          type: 'script',
-          value: 'data.company.company_id'
-        },
-        {
-          key: 'role_id',
-          type: 'script',
-          value: 'data.role.role_id'
-        },
-        {
-          key: 'status_id',
-          type: 'script',
-          value: 'data.status.status_id'
-        },
-        {
-          key: 'branch_id',
-          type: 'script',
-          value: 'data.brach.branch_id'
-        }
+        // {
+        //   key: 'company_id',
+        //   type: 'script',
+        //   value: 'data.company.company_id'
+        // },
+        // {
+        //   key: 'role_id',
+        //   type: 'script',
+        //   value: 'data.role.role_id'
+        // },
+        // {
+        //   key: 'status_id',
+        //   type: 'script',
+        //   value: 'data.status.status_id'
+        // },
+        // {
+        //   key: 'branch_id',
+        //   type: 'script',
+        //   value: 'data.brach.branch_id'
+        // }
       ],
       fields: [
         {
           fieldGroupClassName: "row col-12 p-0 m-0 custom-form",
-        fieldGroup: [
+          fieldGroup: [
             {
               key: 'profile_picture_url',
               type: 'file',
-              className: "col-4",
+              className: "ta-cell pr-md col-md-6 col-12",
               props: {
                 displayStyle: 'avatar',
                 storeFolder: "profile",
@@ -171,7 +171,7 @@ export class UserComponent {
               }
             },
             {
-              key: 'role',
+              key: 'role_id',
               type: 'select',
               className: 'ta-cell pr-md col-md-6 col-12',
               templateOptions: {
@@ -179,6 +179,7 @@ export class UserComponent {
                 dataKey: 'role_name',
                 dataLabel: "role_name",
                 options: [],
+                bindId: true,
                 lazy: {
                   url: 'users/role/',
                   lazyOneTime: true
@@ -192,7 +193,7 @@ export class UserComponent {
               }
             },
             {
-              key: 'company',
+              key: 'company_id',
               type: 'select',
               className: 'ta-cell pr-md col-md-6 col-12',
               templateOptions: {
@@ -200,6 +201,7 @@ export class UserComponent {
                 dataKey: 'company_id',
                 dataLabel: "name",
                 options: [],
+                bindId: true,
                 lazy: {
                   url: 'company/companies/',
                   lazyOneTime: true
@@ -231,13 +233,14 @@ export class UserComponent {
               }
             },
             {
-              key: 'brach',
+              key: 'branch_id',
               type: 'select',
               className: 'ta-cell pr-md col-md-6 col-12',
               templateOptions: {
                 label: 'Branch',
                 dataKey: 'branch_id',
                 dataLabel: "name",
+                bindId: true,
                 options: [],
                 required: true,
                 lazy: {
@@ -247,11 +250,12 @@ export class UserComponent {
               }
             },
             {
-              key: 'status',
+              key: 'status_id',
               type: 'select',
               className: 'ta-cell pr-md col-md-6 col-12',
               templateOptions: {
                 label: 'Status',
+                bindId: true,
                 dataKey: 'status_id',
                 dataLabel: "status_name",
                 options: [],
@@ -287,6 +291,9 @@ export class UserComponent {
                 label: 'Password',
                 required: true
               },
+              expressions: {
+                hide: "model.user_id"
+              },
               hooks: {
                 onInit: (field: any) => {
                   //field.templateOptions.options = this.cs.getRole();
@@ -301,6 +308,9 @@ export class UserComponent {
                 type: 'password',
                 label: 'Re Password',
                 required: true
+              },
+              expressions: {
+                hide: "model.user_id"
               },
               hooks: {
                 onInit: (field: any) => {
