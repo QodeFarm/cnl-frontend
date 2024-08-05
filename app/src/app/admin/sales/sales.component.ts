@@ -1156,38 +1156,23 @@ export class SalesComponent {
                       },
                       {
                         className: 'col-12 custom-form-card-block w-100',
-                        fieldGroup:[
+                        fieldGroup: [
                           {
                             template: '<div class="custom-form-card-title"> Order Attachments </div>',
                             fieldGroupClassName: "ant-row",
                           },
                           {
-                            fieldGroupClassName: "ant-row",
                             key: 'order_attachments',
-                            fieldGroup: [
-                              {
-                                key: 'attachment_name',
-                                type: 'input',
-                                // defaultValue: "777770",
-                                className: 'col-4',
-                                templateOptions: {
-                                  type: 'input',
-                                  label: 'Attachment name',
-                                  placeholder: 'Attachment name',
-                                  // required: true
-                                },
-                              },
-                              {
-                                key: 'attachment_path',
-                                type: 'file',
-                                className: 'ta-cell col-12 custom-file-attachement',
-                                templateOptions: {
-                                  label: 'Order Attachments',
-                                  // required: true
-                                }
-                              },
-                            ]
-                          }
+                            type: 'file',
+                            className: 'ta-cell col-12 custom-file-attachement',
+                            props: {
+                              "displayStyle": "files",
+                              "multiple": true
+                              // label: 'Order Attachments',
+                              // // required: true
+                              // required: true
+                            }
+                          },
                         ]
                       }
                    
@@ -1199,9 +1184,6 @@ export class SalesComponent {
             }
           ]
         },
-
-      
-
         //   "vehicle_vessel": "Lorry",
         //   "charge_type": "best",
         //   "document_through": "mail"
