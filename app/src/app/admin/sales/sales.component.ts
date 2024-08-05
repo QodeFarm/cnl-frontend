@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
+import { Observable } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
@@ -14,13 +15,23 @@ export class SalesComponent {
   showForm: boolean = false;
   SaleOrderEditID: any;
   productOptions: any;
+  // invoiceData: any;
+
+  // private apiUrl = 'sales/sale_invoice_order_get/'
 
   constructor(private http: HttpClient) {
   }
 
+  // Function to create a sale invoice
+  createSaleInvoice(invoiceData: any): Observable<any> {
+    console.log("Sale invoice test: ")
+    return this.http.post('sales/sale_invoice_order/', invoiceData);
+  } 
+
   ngOnInit() {
     this.showSaleOrderList = false;
     this.showForm = false;
+    // this.invoiceData = null
     // set form config
     this.setFormConfig();
     console.log('this.formConfig', this.formConfig);
@@ -44,21 +55,20 @@ export class SalesComponent {
     this.http.get('sales/sale_order/' + event).subscribe((res: any) => {
       console.log('--------> res ', res);
       if (res && res.data) {
-
+  
         this.formConfig.model = res.data;
         // set sale_order default value
         this.formConfig.model['sale_order']['order_type'] = 'sale_order';
         // set labels for update
-        this.formConfig.submit.label = 'Update';
         // show form after setting form values
-
-        // this.formConfig.url= "sales/sale_order/" + this.SaleOrderEditID;
+  
+        // this.formConfig.url = "sales/sale_order/" + this.SaleOrderEditID;
         this.formConfig.pkId = 'sale_order_id';
-
+        this.formConfig.submit.label = 'Update';
         this.formConfig.model['sale_order_id'] = this.SaleOrderEditID;
         this.showForm = true;
       }
-    })
+    });
     this.hide();
   }
 
@@ -547,7 +557,7 @@ export class SalesComponent {
               },
               {
                 type: 'input',
-                key: 'totalAmount',
+                key: 'total_amount',
                 templateOptions: {
                   label: 'Amount',
                   placeholder: 'Enter Amount',
@@ -703,7 +713,7 @@ export class SalesComponent {
                       }
                     },
                     {
-                      key: 'order_shipments.shipping_tracking_no',
+                      key: 'shipping_tracking_no',
                       type: 'input',
                       className: 'col-6',
                       templateOptions: {
@@ -712,7 +722,7 @@ export class SalesComponent {
                       }
                     },
                     {
-                      key: 'order_shipments.shipping_date',
+                      key: 'shipping_date',
                       type: 'date',
                       className: 'col-6',
                       templateOptions: {
@@ -721,7 +731,7 @@ export class SalesComponent {
                       }
                     },
                     {
-                      key: 'order_shipments.shipping_charges',
+                      key: 'shipping_charges',
                       type: 'input',
                       className: 'col-6',
                       templateOptions: {
@@ -940,14 +950,12 @@ export class SalesComponent {
                               {
                                 key: 'order_status',
                                 type: 'select',
-                                // defaultValue: '0d790583-50b3-4bb7-930c-c99f2d2fe526',
                                 className: 'col-4',
                                 templateOptions: {
-                                  label: 'Order status Type',
-                                  dataKey: 'status_name',
-                                  dataLabel: "status_name",
+                                  label: 'Order status',
+                                  dataKey: 'order_status_id',
+                                  dataLabel: 'status_name',
                                   placeholder: 'Select Order status type',
-                                  // required: true,
                                   lazy: {
                                     url: 'masters/order_status/',
                                     lazyOneTime: true
@@ -959,11 +967,101 @@ export class SalesComponent {
                                       console.log("order_status", data);
                                       if (data && data.order_status_id) {
                                         this.formConfig.model['sale_order']['order_status_id'] = data.order_status_id;
+                              
+                                        const saleOrder = this.formConfig.model['sale_order'];
+                                        if (saleOrder.order_status && saleOrder.order_status.status_name === 'Confirmed') {
+                                          console.log("processing salesInvoice:");
+                                          const saleOrderItems = this.formConfig.model['sale_order_items'];
+                                          const orderAttachments = this.formConfig.model['order_attachments'] 
+                                          const orderShipments = this.formConfig.model['order_shipments']
+                              
+                                          const invoiceData = {
+                                            sale_invoice_order: {
+                                              bill_type: saleOrder.bill_type || 'CASH',
+                                              sale_order_id: saleOrder.sale_order_id,
+                                              invoice_date: saleOrder.invoice_date || new Date().toISOString().split('T')[0],
+                                              email: saleOrder.email,
+                                              ref_no: saleOrder.ref_no,
+                                              ref_date: saleOrder.ref_date || new Date().toISOString().split('T')[0],
+                                              tax: saleOrder.tax || 'Inclusive',
+                                              due_date: saleOrder.due_date,
+                                              remarks: saleOrder.remarks,
+                                              advance_amount: saleOrder.advance_amount,
+                                              item_value: saleOrder.item_value,
+                                              discount: saleOrder.discount,
+                                              dis_amt: saleOrder.dis_amt,
+                                              taxable: saleOrder.taxable,
+                                              tax_amount: saleOrder.tax_amount,
+                                              cess_amount: saleOrder.cess_amount,
+                                              transport_charges: saleOrder.transport_charges,
+                                              round_off: saleOrder.round_off,
+                                              total_amount: saleOrder.total_amount,
+                                              vehicle_name: saleOrder.vehicle_name,
+                                              total_boxes: saleOrder.total_boxes,
+                                              shipping_address: saleOrder.shipping_address,
+                                              billing_address: saleOrder.billing_address,
+                                              customer_id: saleOrder.customer_id,
+                                              gst_type_id: saleOrder.gst_type_id,
+                                              order_type: saleOrder.order_type || 'sale_invoice',
+                                              order_salesman_id: saleOrder.order_salesman_id,
+                                              customer_address_id: saleOrder.customer_address_id,
+                                              payment_term_id: saleOrder.payment_term_id,
+                                              payment_link_type_id: saleOrder.payment_link_type_id,
+                                              ledger_account_id: saleOrder.ledger_account_id,
+                                              order_status_id: saleOrder.order_status_id
+                                            },
+                                            sale_invoice_items: saleOrderItems.map(item => ({
+                                              quantity: item.quantity,
+                                              unit_price: item.unit_price,
+                                              rate: item.rate,
+                                              amount: item.amount,
+                                              discount_percentage: item.discount_percentage,
+                                              discount: item.discount,
+                                              dis_amt: item.dis_amt,
+                                              tax_code: item.tax_code,
+                                              tax_rate: item.tax_rate,
+                                              unit_options_id: item.unit_options_id,
+                                              product_id: item.product_id
+                                            })),
+                                            order_attachments: [{
+                                              attachment_name: orderAttachments.attachment_name,
+                                              attachment_path: orderAttachments.attachment_path
+                                            },],
+                                            order_shipments: {
+                                              destination: orderShipments.destination,
+                                              // shipping_tracking_no: orderShipments.shipping_tracking_no,
+                                              shipping_date: orderShipments.shipping_date,
+                                              shipping_charges: orderShipments.shipping_charges,
+                                              vehicle_vessel: orderShipments.vehicle_vessel,
+                                              charge_type: orderShipments.charge_type,
+                                              document_through: orderShipments.document_through,
+                                              port_of_landing: orderShipments.port_of_landing,
+                                              port_of_discharge: orderShipments.port_of_discharge,
+                                              no_of_packets: orderShipments.no_of_packets,
+                                              weight: orderShipments.weight,
+                                              shipping_mode_id: orderShipments.shipping_mode_id,
+                                              shipping_company_id: orderShipments.shipping_company_id
+                                            }
+                                            // order_attachments: saleOrder.order_attachments || [],
+                                            // order_shipments: saleOrder.order_shipments || {}
+                                          };
+                              
+                                          console.log("Invoice data to be sent:", invoiceData);
+                              
+                                          this.createSaleInvoice(invoiceData).subscribe(
+                                            response => {
+                                              console.log('Sale invoice created successfully', response);
+                                            },
+                                            error => {
+                                              console.error('Error creating sale invoice', error);
+                                            }
+                                          );
+                                        }
                                       }
                                     });
                                   }
                                 }
-                              },
+                              },                              
                               {
                                 key: 'item_value',
                                 type: 'input',
@@ -1064,15 +1162,32 @@ export class SalesComponent {
                             fieldGroupClassName: "ant-row",
                           },
                           {
+                            fieldGroupClassName: "ant-row",
                             key: 'order_attachments',
-                            type: 'file',
-                            className: 'ta-cell col-12 custom-file-attachement',
-                            templateOptions: {
-                              // label: 'Order Attachments',
-                              // // required: true
-                              // required: true
-                            }
-                          },
+                            fieldGroup: [
+                              {
+                                key: 'attachment_name',
+                                type: 'input',
+                                // defaultValue: "777770",
+                                className: 'col-4',
+                                templateOptions: {
+                                  type: 'input',
+                                  label: 'Attachment name',
+                                  placeholder: 'Attachment name',
+                                  // required: true
+                                },
+                              },
+                              {
+                                key: 'attachment_path',
+                                type: 'file',
+                                className: 'ta-cell col-12 custom-file-attachement',
+                                templateOptions: {
+                                  label: 'Order Attachments',
+                                  // required: true
+                                }
+                              },
+                            ]
+                          }
                         ]
                       }
                    

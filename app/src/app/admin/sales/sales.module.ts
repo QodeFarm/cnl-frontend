@@ -8,18 +8,22 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { SalesListComponent } from './sales-list/sales-list.component';
 import { SaleReturnsComponent } from './sale-returns/sale-returns.component';
 import { SaleReturnsListComponent } from './sale-returns/sale-returns-list/sale-returns-list.component';
+import { SalesInvoiceListComponent } from './salesinvoice/salesinvoice-list/salesinvoice-list.component';
+import { SalesinvoiceComponent } from './salesinvoice/salesinvoice.component';
 
 @NgModule({
   declarations: [
     SalesComponent,
-    SaleReturnsComponent
+    SaleReturnsComponent,
+    SalesinvoiceComponent
   ],
   imports: [
     CommonModule,
     AdminCommmonModule,
     SalesRoutingModule,
     SalesListComponent,
-    SaleReturnsListComponent
+    SaleReturnsListComponent,
+    SalesInvoiceListComponent
     
   ]
 })

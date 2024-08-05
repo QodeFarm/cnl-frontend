@@ -106,8 +106,8 @@ export class SalesListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            confirm: true,
-            confirmMsg: "Sure to delete?",
+            // confirm: true,
+            // confirmMsg: "Sure to delete?",
             apiUrl: 'sales/sale_order'
           },
           {
