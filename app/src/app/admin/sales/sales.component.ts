@@ -58,7 +58,6 @@ export class SalesComponent {
   }
 
   editSaleOrder(event) {
-    console.log('event', event);
     this.SaleOrderEditID = event;
     this.http.get('sales/sale_order/' + event).subscribe((res: any) => {
       if (res && res.data) {
@@ -68,8 +67,6 @@ export class SalesComponent {
         this.formConfig.model['sale_order']['order_type'] = 'sale_order';
         // set labels for update
         // show form after setting form values
-
-        // this.formConfig.url = "sales/sale_order/" + this.SaleOrderEditID;
         this.formConfig.pkId = 'sale_order_id';
         this.formConfig.submit.label = 'Update';
         this.formConfig.model['sale_order_id'] = this.SaleOrderEditID;
@@ -178,7 +175,7 @@ export class SalesComponent {
               key: 'customer',
               type: 'select',
               className: 'col-2',
-              templateOptions: {
+              props: {
                 label: 'Customer',
                 dataKey: 'customer_id',
                 dataLabel: "name",
@@ -187,17 +184,19 @@ export class SalesComponent {
                   url: 'customers/customers/?summary=true',
                   lazyOneTime: true
                 },
-                required: true,
-
+                required: true
               },
               hooks: {
                 onChanges: (field: any) => {
+                  console.log('ng change', field);
+                },
+                onInit: (field: any) => {
                   field.formControl.valueChanges.subscribe(data => {
                     console.log("customer", data);
                     if (data && data.customer_id) {
                       this.formConfig.model['sale_order']['customer_id'] = data.customer_id;
                     }
-                    if (field.form && field.form.controls && field.form.controls.customer_id) {
+                    if (data.customer_id) {
                       field.form.controls.customer_id.setValue(data.customer_id)
                     }
                     if (data.customer_addresses && data.customer_addresses.billing_address) {
@@ -206,7 +205,7 @@ export class SalesComponent {
                     if (data.customer_addresses && data.customer_addresses.shipping_address) {
                       field.form.controls.shipping_address.setValue(data.customer_addresses.shipping_address)
                     }
-                    if (field.form && field.form.controls && field.form.controls.email) {
+                    if (data.email) {
                       field.form.controls.email.setValue(data.email)
                     }
                   });
@@ -1044,7 +1043,6 @@ export class SalesComponent {
 
   totalAmountCal() {
     const data = this.formConfig.model;
-    console.log('data', data);
     if (data) {
       const products = data.sale_order_items || [];
       let totalAmount = 0;
