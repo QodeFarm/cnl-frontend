@@ -305,6 +305,7 @@
                     &.collapse.show {
                         display: block !important;
                     }
+                   
                 }
             }
         }
@@ -332,6 +333,18 @@
             }
         }
     }
+    .sub-menu-items{
+        .collapse-item{
+                margin-left: 54px !important;
+                padding: 0.25rem !important;
+                &:hover,
+                &.active{
+                   background-color: transparent !important;
+                   color: #142768 !important;
+                }
+        }
+    }
+ 
 }
 
 .dashboard-card {
@@ -371,6 +384,8 @@
         background-color: #f1f1f1;
         border-bottom-left-radius: 14px;
         border-bottom-right-radius: 14px;
+        padding-bottom: 5px;
+
         h5 {
             font-size: 26px;
             font-weight: 500;
@@ -742,8 +757,8 @@ ta-form {
                     color: #142768;
                 }
                 &.active{
-                    color: #142768;
-                    background-color: #fff;
+                   color: #fff;
+                    background-color: #142768;
                     border-color: #142768 #142768 #fff;
                 }
             }
@@ -756,5 +771,57 @@ ta-form {
         border-top: 0;
         border-bottom-left-radius: 0.35rem;
         border-bottom-right-radius: 0.35rem;
+    }
+}
+
+.master-menu-list{
+    list-style: circle;
+    padding-left: 20px;
+    li{
+        margin: 5px 0;
+        a{
+            color: #000;
+            font-size: 14px;
+            // font-weight: 500;
+            &:hover{
+                color: #142768;
+            }
+        }
+    }
+}
+.custom-sub-heading{
+    font-size: 16px;
+    font-weight: 500;
+    color: #142768;
+}
+.custom-menu-card{
+    background-color: #fff;
+    border: 1px solid #142768;
+    border-radius: 5px;
+    height: 100%;
+    .custom-sub-heading{
+        background-color: #142768;
+        color: #fff;
+        padding: 8px;
+
+    }
+    .master-menu-list{
+        padding: 0px 10px 0px 30px;
+    }
+}
+.custom-header-drop-list{
+    list-style: none;
+    padding: 10px 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    li{
+        padding: 5px 2px;
+        width: 50%;
+        a{
+            color: #000;
+            &:hover{
+                color: #142768;
+            }
+        }
     }
 }

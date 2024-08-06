@@ -9,6 +9,7 @@ export interface TaFormConfig {
   model?: any;
   formState?: FormState;
   showActionBtn?: boolean;
+  valueChangeFn?: (res: any) => any;
   exParams?: any;
   submit?: {
     label?: string,

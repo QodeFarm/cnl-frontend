@@ -19,7 +19,7 @@ export class SalesListComponent {
   tableConfig: TaTableConfig = {
     apiUrl: 'sales/sale_order/',
     // title: 'Edit Sales Order List',
-    showCheckbox:true,
+    showCheckbox: true,
     pkId: "sale_order_id",
     pageSize: 10,
     "globalSearch": {
@@ -62,7 +62,7 @@ export class SalesListComponent {
         sort: true
       },
       {
-        fieldKey: 'phone',
+        fieldKey: 'tax',
         name: 'Tax',
         sort: true
       },
@@ -106,13 +106,14 @@ export class SalesListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            confirm: true,
-            confirmMsg: "Sure to delete?",
+            // confirm: true,
+            // confirmMsg: "Sure to delete?",
             apiUrl: 'sales/sale_order'
           },
           {
             type: 'callBackFn',
-            label: 'Edit',
+            icon: 'fa fa-pen',
+            label: '',
             callBackFn: (row, action) => {
               console.log(row);
               this.edit.emit(row.sale_order_id);
