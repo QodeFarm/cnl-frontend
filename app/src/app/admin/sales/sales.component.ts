@@ -909,7 +909,7 @@ export class SalesComponent {
                               // defaultValue: "77777.00",
                               className: 'col-4',
                               templateOptions: {
-                                type: 'input',
+                                type: 'number',
                                 label: 'Advance amount',
                                 placeholder: 'Enter Advance amount',
                                 // required: true
