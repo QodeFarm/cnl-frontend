@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, ViewChild } from '@angular/core';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { TaFormComponent, TaFormConfig } from '@ta/ta-form';
+import { Observable } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
@@ -23,11 +24,11 @@ export class SalesComponent {
   constructor(private http: HttpClient) {
   }
 
-  // // Function to create a sale invoice
-  // createSaleInvoice(invoiceData: any): Observable<any> {
-  //   console.log("Sale invoice test: ")
-  //   return this.http.post('sales/sale_invoice_order/', invoiceData);
-  // } 
+  // Function to create a sale invoice
+  createSaleInvoice(invoiceData: any): Observable<any> {
+    console.log("Sale invoice test: ")
+    return this.http.post('sales/sale_invoice_order/', invoiceData);
+  } 
 
   ngOnInit() {
 
@@ -1042,33 +1043,151 @@ export class SalesComponent {
                                 }
                               }
                             },
+                            // {
+                            //   key: 'order_status',
+                            //   type: 'select',
+                            //   className: 'col-4',
+                            //   templateOptions: {
+                            //     label: 'Order status Type',
+                            //     dataKey: 'status_name',
+                            //     dataLabel: "status_name",
+                            //     placeholder: 'Select Order status type',
+                            //     // required: true,
+                            //     lazy: {
+                            //       url: 'masters/order_status/',
+                            //       lazyOneTime: true
+                            //     }
+                            //   },
+                            //   expressions: {
+                            //     hide: '!model.sale_order_id',
+                            //   },
+                            //   hooks: {
+                            //     onInit: (field: any) => {
+                            //       // field.hide = this.SaleOrderEditID ? true : false;
+                            //       // field.formControl.valueChanges.subscribe(data => {
+                            //       //   console.log("order_status", data);
+                            //       //   if (data && data.order_status_id) {
+                            //       //     field.setValue()
+                            //       //   }
+                            //       // });
+                            //     }
+                            //   }
+                            // },
                             {
                               key: 'order_status',
                               type: 'select',
                               className: 'col-4',
                               templateOptions: {
-                                label: 'Order status Type',
-                                dataKey: 'status_name',
-                                dataLabel: "status_name",
+                                label: 'Order status',
+                                dataKey: 'order_status_id',
+                                dataLabel: 'status_name',
                                 placeholder: 'Select Order status type',
-                                // required: true,
                                 lazy: {
                                   url: 'masters/order_status/',
                                   lazyOneTime: true
-                                }
-                              },
-                              expressions: {
-                                hide: '!model.sale_order_id',
+                                },
+                                expressions: {
+                                  hide: '!model.sale_order_id',
+                                },
                               },
                               hooks: {
-                                onInit: (field: any) => {
-                                  // field.hide = this.SaleOrderEditID ? true : false;
-                                  // field.formControl.valueChanges.subscribe(data => {
-                                  //   console.log("order_status", data);
-                                  //   if (data && data.order_status_id) {
-                                  //     field.setValue()
-                                  //   }
-                                  // });
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    console.log("order_status", data);
+                                    if (data && data.order_status_id) {
+                                      this.formConfig.model['sale_order']['order_status_id'] = data.order_status_id;
+                            
+                                      const saleOrder = this.formConfig.model['sale_order'];
+                                      if (saleOrder.order_status && saleOrder.order_status.status_name === 'Confirmed') {
+                                        console.log("processing salesInvoice:");
+                                        const saleOrderItems = this.formConfig.model['sale_order_items'];
+                                        const orderAttachments = this.formConfig.model['order_attachments'] 
+                                        const orderShipments = this.formConfig.model['order_shipments']
+                            
+                                        const invoiceData = {
+                                          sale_invoice_order: {
+                                            bill_type: saleOrder.bill_type || 'CASH',
+                                            sale_order_id: saleOrder.sale_order_id,
+                                            invoice_date: saleOrder.invoice_date || new Date().toISOString().split('T')[0],
+                                            email: saleOrder.email,
+                                            ref_no: saleOrder.ref_no,
+                                            ref_date: saleOrder.ref_date || new Date().toISOString().split('T')[0],
+                                            tax: saleOrder.tax || 'Inclusive',
+                                            due_date: saleOrder.due_date,
+                                            remarks: saleOrder.remarks,
+                                            advance_amount: saleOrder.advance_amount,
+                                            item_value: saleOrder.item_value,
+                                            discount: saleOrder.discount,
+                                            dis_amt: saleOrder.dis_amt,
+                                            taxable: saleOrder.taxable,
+                                            tax_amount: saleOrder.tax_amount,
+                                            cess_amount: saleOrder.cess_amount,
+                                            transport_charges: saleOrder.transport_charges,
+                                            round_off: saleOrder.round_off,
+                                            total_amount: saleOrder.doc_amount,
+                                            vehicle_name: saleOrder.vehicle_name,
+                                            total_boxes: saleOrder.total_boxes,
+                                            shipping_address: saleOrder.shipping_address,
+                                            billing_address: saleOrder.billing_address,
+                                            customer_id: saleOrder.customer_id,
+                                            gst_type_id: saleOrder.gst_type_id,
+                                            order_type: saleOrder.order_type || 'sale_invoice',
+                                            order_salesman_id: saleOrder.order_salesman_id,
+                                            customer_address_id: saleOrder.customer_address_id,
+                                            payment_term_id: saleOrder.payment_term_id,
+                                            payment_link_type_id: saleOrder.payment_link_type_id,
+                                            ledger_account_id: saleOrder.ledger_account_id,
+                                            order_status_id: saleOrder.order_status_id
+                                          },
+                                          sale_invoice_items: saleOrderItems.map(item => ({
+                                            quantity: item.quantity || 1,
+                                            unit_price: item.unit_price || 0,
+                                            rate: item.rate || 0,
+                                            amount: item.amount || 0,
+                                            discount_percentage: item.discount_percentage || 0,
+                                            discount: item.discount || 0,
+                                            dis_amt: item.dis_amt || 0,
+                                            tax_code: item.tax_code || '',
+                                            tax_rate: item.tax_rate || 0,
+                                            unit_options_id: item.unit_options_id || null,
+                                            product_id: item.product_id || null
+                                          })),
+                                          order_attachments: orderAttachments.map(attachment => ({
+                                            attachment_name: attachment.attachment_name,
+                                            attachment_path: attachment.attachment_path
+                                          })),
+                                          order_shipments: {
+                                            destination: orderShipments.destination,
+                                            shipping_tracking_no: orderShipments.shipping_tracking_no,
+                                            shipping_date: orderShipments.shipping_date,
+                                            shipping_charges: orderShipments.shipping_charges,
+                                            vehicle_vessel: orderShipments.vehicle_vessel,
+                                            charge_type: orderShipments.charge_type,
+                                            document_through: orderShipments.document_through,
+                                            port_of_landing: orderShipments.port_of_landing,
+                                            port_of_discharge: orderShipments.port_of_discharge,
+                                            no_of_packets: orderShipments.no_of_packets,
+                                            weight: orderShipments.weight,
+                                            shipping_mode_id: orderShipments.shipping_mode_id,
+                                            shipping_company_id: orderShipments.shipping_company_id
+                                          }
+                                          // order_attachments: saleOrder.order_attachments || [],
+                                          // order_shipments: saleOrder.order_shipments || {}
+                                        };
+                            
+                                        console.log("Invoice data to be sent:", invoiceData);
+                            
+                                        this.createSaleInvoice(invoiceData).subscribe(
+                                          response => {
+                                            console.log('Sale invoice created successfully', response);
+                                          },
+                                          error => {
+                                            console.error('Error creating sale invoice', error);
+                                          }
+                                        );
+                                      }
+                                    }
+                                  });
                                 }
                               }
                             },

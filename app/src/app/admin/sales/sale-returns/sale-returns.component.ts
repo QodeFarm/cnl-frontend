@@ -822,15 +822,6 @@ export class SaleReturnsComponent {
                         placeholder: 'Enter Shipping Charges',
                       }
                     },
-                    {
-                      key: 'shipping_company_address',
-                      type: 'textarea',
-                      className: 'col-6',
-                      templateOptions: {
-                        label: 'Shipping Company Address',
-                        placeholder: 'Enter Shipping Company Address',
-                      }
-                    },
                   ]
                 },
               ]
@@ -908,12 +899,15 @@ export class SaleReturnsComponent {
                       templateOptions: {
                         label: 'Order Status Type',
                         placeholder: 'Select Order Status Type',
-                        dataKey: 'status_name',
+                        dataKey: 'order_status_id',
                         dataLabel: "status_name",
                         lazy: {
                           url: 'masters/order_status/',
                           lazyOneTime: true
-                        }
+                        },
+                        expressions: {
+                          hide: '!model.sale_return_id',
+                        },
                       },
                       hooks: {
                         onChanges: (field: any) => {

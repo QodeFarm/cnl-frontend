@@ -180,7 +180,7 @@ export class SalesinvoiceComponent {
               }
             },
             {
-              key: 'order_salesman',
+              key: 'orders_salesman',
               type: 'select',
               className: 'col-2',
               templateOptions: {
@@ -197,7 +197,7 @@ export class SalesinvoiceComponent {
               hooks: {
                 onChanges: (field: any) => {
                   field.formControl.valueChanges.subscribe(data => {
-                    if (data && data.customer_id) {
+                    if (data && data.order_salesman_id) {
                       this.formConfig.model['sale_invoice_order']['order_salesman_id'] = data.order_salesman_id;
                     }
                   });
@@ -307,18 +307,44 @@ export class SalesinvoiceComponent {
           key: 'sale_invoice_items',
           type: 'table',
           className: 'custom-form-list',
+          // defaultValue: [],
+          // fieldGroupClassName: 'table-field pr-md',
           templateOptions: {
             title: 'Products',
             addText: 'Add Product',
             tableCols: [
-              { name: 'product', label: 'Product' },
-              { name: 'code', label: 'Code' },
-              { name: 'unit', label: 'Unit' },
-              { name: 'total_boxes', label: 'Total Boxes' },
-              { name: 'quantity', label: 'Quantity' },
-              { name: 'amount', label: 'Price' },
-              { name: 'rate', label: 'Rate' },
-              { name: 'discount', label: 'Discount' }
+              {
+                name: 'product',
+                label: 'Product'
+              },
+              {
+                name: 'code',
+                label: 'Code'
+              },
+              {
+                name: 'unit',
+                label: 'Unit'
+              },
+              {
+                name: 'total_boxes',
+                label: 'Total Boxes'
+              },
+              {
+                name: 'quantity',
+                label: 'Quantity'
+              },
+              {
+                name: 'amount',
+                label: 'Price'
+              },
+              {
+                name: 'rate',
+                label: 'Rate'
+              },
+              {
+                name: 'discount',
+                label: 'Discount'
+              }
             ]
           },
           fieldArray: {
@@ -345,7 +371,7 @@ export class SalesinvoiceComponent {
                       console.log("products data", data);
                       this.productOptions = data;
                       // default value for new product
-                      field.form.controls.quantity.setValue(field.form.controls.quantity.value || 1);
+                      // field.form.controls.quantity.setValue(parseFloat(field.form.controls.quantity.value) || 1);
 
                       // binding selected product data 
                       if (field.form && field.form.controls && field.form.controls.code && data && data.code) {
@@ -355,7 +381,7 @@ export class SalesinvoiceComponent {
                         field.form.controls.rate.setValue(field.form.controls.rate.value || data.sales_rate)
                       }
                       if (field.form && field.form.controls && field.form.controls.discount && data && data.dis_amount) {
-                        field.form.controls.discount.setValue(data.dis_amount)
+                        field.form.controls.discount.setValue(parseFloat(data.dis_amount))
                       }
                       if (field.form && field.form.controls && field.form.controls.unit_options && data && data.unit_options && data.unit_options.unit_name) {
                         field.form.controls.unit_options.setValue(data.unit_options)
@@ -391,6 +417,7 @@ export class SalesinvoiceComponent {
                 key: 'total_boxes',
                 // defaultValue: 1000,
                 templateOptions: {
+                  type: 'number',
                   label: 'Total Boxes',
                   placeholder: 'Enter Total Boxes',
                   hideLabel: true,
@@ -451,6 +478,7 @@ export class SalesinvoiceComponent {
                 key: 'rate',
                 // defaultValue: 1000,
                 templateOptions: {
+                  type: 'number',
                   label: 'Rate',
                   placeholder: 'Enter Rate',
                   hideLabel: true,
@@ -479,6 +507,7 @@ export class SalesinvoiceComponent {
                 key: 'discount',
                 // defaultValue: 90,
                 templateOptions: {
+                  type: 'number',
                   placeholder: 'Enter Disc',
                   // type: 'number',
                   label: 'Disc',
@@ -525,9 +554,11 @@ export class SalesinvoiceComponent {
                 type: 'input',
                 key: 'amount',
                 templateOptions: {
+                  type: 'number',
                   label: 'Amount',
                   placeholder: 'Enter Amount',
                   hideLabel: true,
+                  disabled: true
                   // type: 'number',
                   // // required: true
                 },
@@ -552,6 +583,7 @@ export class SalesinvoiceComponent {
                 key: 'tax',
                 // defaultValue: 1000,
                 templateOptions: {
+                  type: "number",
                   label: 'Tax',
                   placeholder: 'Tax',
                   hideLabel: true,
@@ -720,15 +752,6 @@ export class SalesinvoiceComponent {
                       templateOptions: {
                         label: 'Shipping Charges.',
                         placeholder: 'Enter Shipping Charges',
-                      }
-                    },
-                    {
-                      key: 'shipping_company_address',
-                      type: 'textarea',
-                      className: 'col-6',
-                      templateOptions: {
-                        label: 'Shipping Company Address',
-                        placeholder: 'Enter Shipping Company Address',
                       }
                     },
                   ]
@@ -995,12 +1018,15 @@ export class SalesinvoiceComponent {
                               templateOptions: {
                                 label: 'Order Status Type',
                                 placeholder: 'Select Order Status Type',
-                                dataKey: 'status_name',
+                                dataKey: 'order_status_id',
                                 dataLabel: "status_name",
                                 lazy: {
                                   url: 'masters/order_status/',
                                   lazyOneTime: true
-                                }
+                                },
+                                expressions: {
+                                  hide: '!model.sale_invoice_id',
+                                },
                               },
                               hooks: {
                                 onChanges: (field: any) => {
