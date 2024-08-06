@@ -34,11 +34,6 @@ export class RolesComponent {
           sort: true
         },
         {
-          fieldKey: 'created_at',
-          name: 'Created TS',
-          sort: true
-        },
-        {
           fieldKey: "code",
           name: "Action",
           type: 'action',
@@ -77,29 +72,29 @@ export class RolesComponent {
       fields: [
         {
           fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
-        fieldGroup: [
-        {
-          key: 'role_name',
-          type: 'input',
-          className: 'col-md-6 col-12',
-          templateOptions: {
-            label: 'Role Nmae',
-            placeholder: 'Enter Role Name',
-            required: true,
-          }
-        },
-        {
-          key: 'description',
-          type: 'textarea',
-          className: 'col-md-6 col-12',
-          templateOptions: {
-            label: 'Description',
-            placeholder: 'Enter description',
-            required: true,
-          }
+          fieldGroup: [
+            {
+              key: 'role_name',
+              type: 'input',
+              className: 'col-md-6 col-12',
+              templateOptions: {
+                label: 'Role Nmae',
+                placeholder: 'Enter Role Name',
+                required: true,
+              }
+            },
+            {
+              key: 'description',
+              type: 'textarea',
+              className: 'col-md-6 col-12',
+              templateOptions: {
+                label: 'Description',
+                placeholder: 'Enter description',
+                required: true,
+              }
+            }
+          ]
         }
-      ]
-    }
 
       ]
     }
