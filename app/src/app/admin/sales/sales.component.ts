@@ -187,17 +187,11 @@ export class SalesComponent {
                 required: true
               },
               hooks: {
-                onChanges: (field: any) => {
-                  console.log('ng change', field);
-                },
                 onInit: (field: any) => {
                   field.formControl.valueChanges.subscribe(data => {
                     console.log("customer", data);
                     if (data && data.customer_id) {
                       this.formConfig.model['sale_order']['customer_id'] = data.customer_id;
-                    }
-                    if (data.customer_id) {
-                      field.form.controls.customer_id.setValue(data.customer_id)
                     }
                     if (data.customer_addresses && data.customer_addresses.billing_address) {
                       field.form.controls.billing_address.setValue(data.customer_addresses.billing_address)
