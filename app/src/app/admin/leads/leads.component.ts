@@ -182,35 +182,31 @@ export class LeadsComponent {
               }
             },
             {
-              // fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
-              // key: 'assignment',
-              // fieldGroup: [{
-                key: 'sales_rep',
-                type: 'select',
-                className: 'col-3',
-                templateOptions: {
-                  label: 'Sales Representative',
-                  dataKey: 'employee_id',
-                  dataLabel: "name",
-                  options: [],
-                  lazy: {
-                    url: 'hrms/employees/',
-                    lazyOneTime: true
-                  },
-                  required: false
+              key: 'sales_rep',
+              type: 'select',
+              className: 'col-3',
+              templateOptions: {
+                label: 'Sales Representative',
+                dataKey: 'employee_id',
+                dataLabel: "name",
+                options: [],
+                lazy: {
+                  url: 'hrms/employees/',
+                  lazyOneTime: true
                 },
-                hooks: {
-                  onChanges: (field: any) => {
-                    field.formControl.valueChanges.subscribe((data: any) => {
-                      if (this.formConfig && this.formConfig.model && this.formConfig.model['assignment']) {
-                        this.formConfig.model['assignment']['sales_rep_id'] = data.employee_id;
-                      } else {
-                        console.error('Form config or vendor data model is not defined.');
-                      }
-                    });
-                  }
+                required: false
+              },
+              hooks: {
+                onChanges: (field: any) => {
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['assignment']) {
+                      this.formConfig.model['assignment']['sales_rep_id'] = data.employee_id;
+                    } else {
+                      console.error('Form config or vendor data model is not defined.');
+                    }
+                  });
                 }
-              // }]
+              }
             },
             {
               key: 'interaction_type',
@@ -262,7 +258,6 @@ export class LeadsComponent {
             },
           ]
         },
-        // end of lead
      ]
     }
   }
