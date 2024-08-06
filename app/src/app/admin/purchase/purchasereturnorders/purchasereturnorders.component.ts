@@ -67,6 +67,17 @@ export class PurchasereturnordersComponent {
     this.showPurchaseReturnOrderList = true;
   }
 
+  downloadExcel(): void {
+    this.http.get('purchase/purchase_return_order/download/excel/', { responseType: 'blob' }).subscribe((blob: Blob) => {
+      const a = document.createElement('a');
+      const objectUrl = URL.createObjectURL(blob);
+      a.href = objectUrl;
+      a.download = 'purchase_return_order.xlsx';
+      a.click();
+      URL.revokeObjectURL(objectUrl);
+    });
+  };
+
   setFormConfig() {
     this.formConfig = {
       url: "purchase/purchase_return_order/",

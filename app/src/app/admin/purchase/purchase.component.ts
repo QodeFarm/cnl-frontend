@@ -81,6 +81,31 @@ export class PurchaseComponent {
     this.showPurchaseOrderList = true;
   }
 
+  downloadExcel(): void {
+    let currentUrl = window.location.href;
+
+    // Remove trailing slash if it exists to avoid double slashes
+    // if (currentUrl.endsWith('/')) {
+    //   currentUrl = currentUrl.slice(0, -1);
+    // }
+
+    // // Append the new path
+    // currentUrl = `${currentUrl}/download/excel/`;
+
+    // console.log(currentUrl);
+    currentUrl = `purchase/purchase_order/download/excel/`;
+    
+    
+    this.http.get(currentUrl, { responseType: 'blob' }).subscribe((blob: Blob) => {
+      const a = document.createElement('a');
+      const objectUrl = URL.createObjectURL(blob);
+      a.href = objectUrl;
+      a.download = 'purchase_order.xlsx';
+      a.click();
+      URL.revokeObjectURL(objectUrl);
+    });
+  };
+
   setFormConfig() {
     this.formConfig = {
       url: "purchase/purchase_order/",

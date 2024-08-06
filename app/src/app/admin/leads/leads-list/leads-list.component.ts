@@ -57,17 +57,23 @@ export class LeadsListComponent {
         sort: true
       },
       {
-        fieldKey: 'sales_rep_id',
+        fieldKey: 'assignee',
         name: 'Sales Representative',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.sales_rep_id}`;
+          console.log("row",row)
+          return `${row.assignee.name}`;
         },
         sort: true
       },
       {
-        fieldKey: '',
-        name: 'Last Interaction Date',
+        fieldKey: 'interaction',
+        name: 'Assigned Date',
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          console.log("row",row)
+          return `${row.interaction}`;
+        },
         sort: true
       },
       {
