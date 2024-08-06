@@ -40,6 +40,11 @@ export class AdminLayoutComponent {
         icon: 'fas fa-tachometer-alt',
       },
       {
+        link: '/admin/voiceassistant',
+        label: 'voiceassistant',
+        icon: 'fas fa-tachometer-alt',
+      },
+      {
         label: 'User Management',
         icon: 'fas fa-user',
         child: [

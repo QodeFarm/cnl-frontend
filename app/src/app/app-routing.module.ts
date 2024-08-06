@@ -43,6 +43,7 @@ const routes: Routes = [
       { path: 'inventory', canActivate: [], loadChildren: () => import('./admin/inventory/inventory.module').then(m => m.InventoryModule) },
       { path: 'products', canActivate: [], loadChildren: () => import('./admin/products/products.module').then(m => m.ProductsModule) },
       { path: 'purchase', canActivate: [], loadChildren: () => import('./admin/purchase/purchase.module').then(m => m.PurchaseModule) },
+      { path: 'voiceassistant', canActivate: [], loadChildren: () => import('./admin/voiceassistant/voiceassistant.module').then(m => m.VoiceassistantModule) },
     ]
   }
 ];
