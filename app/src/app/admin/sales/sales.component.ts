@@ -223,10 +223,10 @@ export class SalesComponent {
                     if (field.form && field.form.controls && field.form.controls.customer_id) {
                       field.form.controls.customer_id.setValue(data.customer_id)
                     }
-                    if (data.customer_addresses.billing_address) {
+                    if (data.customer_addresses && data.customer_addresses.billing_address) {
                       field.form.controls.billing_address.setValue(data.customer_addresses.billing_address)
                     }
-                    if (data.customer_addresses.shipping_address) {
+                    if (data.customer_addresses && data.customer_addresses.shipping_address) {
                       field.form.controls.shipping_address.setValue(data.customer_addresses.shipping_address)
                     }
                     if (field.form && field.form.controls && field.form.controls.email) {
