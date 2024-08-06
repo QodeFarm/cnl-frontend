@@ -17,6 +17,9 @@ export class SalesComponent {
   showForm: boolean = false;
   SaleOrderEditID: any;
   productOptions: any;
+  nowDate = () => {
+    return new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate();
+  }
   // invoiceData: any;
 
   // private apiUrl = 'sales/sale_invoice_order_get/'
@@ -28,7 +31,7 @@ export class SalesComponent {
   createSaleInvoice(invoiceData: any): Observable<any> {
     console.log("Sale invoice test: ")
     return this.http.post('sales/sale_invoice_order/', invoiceData);
-  } 
+  }
 
   ngOnInit() {
 
@@ -58,15 +61,14 @@ export class SalesComponent {
     console.log('event', event);
     this.SaleOrderEditID = event;
     this.http.get('sales/sale_order/' + event).subscribe((res: any) => {
-      console.log('--------> res ', res);
       if (res && res.data) {
-  
+
         this.formConfig.model = res.data;
         // set sale_order default value
         this.formConfig.model['sale_order']['order_type'] = 'sale_order';
         // set labels for update
         // show form after setting form values
-  
+
         // this.formConfig.url = "sales/sale_order/" + this.SaleOrderEditID;
         this.formConfig.pkId = 'sale_order_id';
         this.formConfig.submit.label = 'Update';
@@ -78,19 +80,18 @@ export class SalesComponent {
   }
 
   getOrderNo() {
-    // this.formConfig.reset()
     this.orderNumber = null;
-    this.http.get('masters/generate_order_no/?type=SO').subscribe((res: any) => {
-      console.log(res);
+    this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
       if (res && res.data && res.data.order_number) {
-        this.formConfig.model['sale_order']['order_no'] = res.data.order_number;
-        this.orderNumber = res.data.order_number;
-        console.log("get SaleOrder number called");
-
-        // set sale_order default value
-        // this.formConfig.model['sale_order']['order_type'] = 'sale_order';
+        this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
+        this.http.get('masters/generate_order_no/?type=SO').subscribe((res: any) => {
+          if (res && res.data && res.data.order_number) {
+            this.formConfig.model['sale_order']['order_no'] = res.data.order_number;
+            this.orderNumber = res.data.order_number;
+          }
+        });;
       }
-    })
+    });
   }
 
   showSaleOrderListFn() {
@@ -219,15 +220,18 @@ export class SalesComponent {
                     if (data && data.customer_id) {
                       this.formConfig.model['sale_order']['customer_id'] = data.customer_id;
                     }
-                    //   if (field.form && field.form.controls && field.form.controls.customer_id) {
-                    //     field.form.controls.customer_id.setValue(data.customer_id)
-                    //   }
-                    //   if (field.form && field.form.controls && field.form.controls.customer_address_id) {
-                    //     field.form.controls.customer_address_id.setValue(data.customer_category_id)
-                    //   }
-                    //   if (field.form && field.form.controls && field.form.controls.email) {
-                    //     field.form.controls.email.setValue(data.email)
-                    //   }
+                    if (field.form && field.form.controls && field.form.controls.customer_id) {
+                      field.form.controls.customer_id.setValue(data.customer_id)
+                    }
+                    if (data.customer_addresses.billing_address) {
+                      field.form.controls.billing_address.setValue(data.customer_addresses.billing_address)
+                    }
+                    if (data.customer_addresses.shipping_address) {
+                      field.form.controls.shipping_address.setValue(data.customer_addresses.shipping_address)
+                    }
+                    if (field.form && field.form.controls && field.form.controls.email) {
+                      field.form.controls.email.setValue(data.email)
+                    }
                   });
                 }
               }
@@ -250,7 +254,7 @@ export class SalesComponent {
             {
               key: 'delivery_date',
               type: 'date',
-              defaultValue: new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate(),
+              defaultValue: this.nowDate(),
               className: 'col-2',
               templateOptions: {
                 type: 'date',
@@ -263,7 +267,7 @@ export class SalesComponent {
             {
               key: 'order_date',
               type: 'date',
-              defaultValue: new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate(),
+              defaultValue: this.nowDate(),
               className: 'col-2',
               templateOptions: {
                 type: 'date',
@@ -288,7 +292,7 @@ export class SalesComponent {
             {
               key: 'ref_date',
               type: 'date',
-              defaultValue: new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate(),
+              defaultValue: this.nowDate(),
               className: 'col-2',
               templateOptions: {
                 type: 'date',
@@ -430,6 +434,9 @@ export class SalesComponent {
                       }
                       if (field.form && field.form.controls && field.form.controls.discount && data && data.dis_amount) {
                         field.form.controls.discount.setValue(data.dis_amount)
+                      }
+                      if (field.form && field.form.controls && field.form.controls.mrp && data && data.mrp) {
+                        field.form.controls.mrp.setValue(data.mrp)
                       }
                       this.totalAmountCal();
                     });
@@ -724,7 +731,7 @@ export class SalesComponent {
                     },
                     {
                       key: 'port_of_discharge',
-                      type: 'select',
+                      type: 'input',
                       className: 'col-6',
                       templateOptions: {
                         label: 'Port of Discharge',
@@ -775,6 +782,7 @@ export class SalesComponent {
                       templateOptions: {
                         label: 'Shipping Tracking No.',
                         placeholder: 'Enter Shipping Tracking No.',
+                        readonly: true
                       }
                     },
                     {
@@ -782,8 +790,7 @@ export class SalesComponent {
                       type: 'date',
                       className: 'col-6',
                       templateOptions: {
-                        label: 'Shipping Date',
-                        defaultValue: new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate(),
+                        label: 'Shipping Date'
                       }
                     },
                     {
@@ -1096,14 +1103,14 @@ export class SalesComponent {
                                     console.log("order_status", data);
                                     if (data && data.order_status_id) {
                                       this.formConfig.model['sale_order']['order_status_id'] = data.order_status_id;
-                            
+
                                       const saleOrder = this.formConfig.model['sale_order'];
                                       if (saleOrder.order_status && saleOrder.order_status.status_name === 'Confirmed') {
                                         console.log("processing salesInvoice:");
                                         const saleOrderItems = this.formConfig.model['sale_order_items'];
-                                        const orderAttachments = this.formConfig.model['order_attachments'] 
+                                        const orderAttachments = this.formConfig.model['order_attachments']
                                         const orderShipments = this.formConfig.model['order_shipments']
-                            
+
                                         const invoiceData = {
                                           sale_invoice_order: {
                                             bill_type: saleOrder.bill_type || 'CASH',
@@ -1174,9 +1181,9 @@ export class SalesComponent {
                                           // order_attachments: saleOrder.order_attachments || [],
                                           // order_shipments: saleOrder.order_shipments || {}
                                         };
-                            
+
                                         console.log("Invoice data to be sent:", invoiceData);
-                            
+
                                         this.createSaleInvoice(invoiceData).subscribe(
                                           response => {
                                             console.log('Sale invoice created successfully', response);
