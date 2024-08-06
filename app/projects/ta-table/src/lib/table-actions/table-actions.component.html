@@ -1,6 +1,14 @@
 <ng-container *ngFor="let a of actions;let isLast = last;">
     <ng-container *ngIf="checkCondition(a)">
-        <a nzType="link" [class.ant-btn-dangerous]="a.type=='delete'" nz-popconfirm [nzCondition]="(a.confirm)?false:true" [nzPopconfirmTitle]="a.confirmMsg" (nzOnConfirm)="action(a)">{{a.label}}</a>
+        <a nzType="link" [class.ant-btn-dangerous]="a.type=='delete'" nz-popconfirm [nzCondition]="(a.confirm)?false:true" [nzPopconfirmTitle]="a.confirmMsg" (nzOnConfirm)="action(a)">
+            <i *ngIf="a.icon" [ngClass]="a.icon"></i>
+            <ng-container [ngSwitch]="a.type">
+                <i *ngSwitchCase="'edit'" class="fa fa-pen"></i>
+                <i *ngSwitchCase="'delete'" class="fa fa-trash"></i>
+                <span *ngSwitchDefault>{{a.label}}</span>
+            </ng-container>
+
+        </a>
         <nz-divider *ngIf="!isLast" nzType="vertical"></nz-divider>
     </ng-container>
 

@@ -1,7 +1,7 @@
 <div class="container-fluid pt-3">
     <div class="sales-banner">
         <div class="col-12 px-0" style="display: flex; justify-content: space-between;align-items: center;">
-            <button type="button" class="btn pl-0" >
+            <button type="button" class="btn pl-0">
                 <span *ngIf="SaleOrderEditID" class="custom-heading">Update Sales Order</span>
                 <span *ngIf="!SaleOrderEditID" class="custom-heading">Create Sales Order</span>
             </button>
@@ -13,7 +13,7 @@
 
     <div class="row custom-form">
         <div class="col-12 px-1" *ngIf="orderNumber || showForm">
-            <ta-form #salesinvoiceForm [options]="formConfig"></ta-form>
+            <ta-form #salesForm [options]="formConfig"></ta-form>
         </div>
     </div>
 </div>

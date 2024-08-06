@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
-import { TaFormConfig } from '@ta/ta-form';
+import { Component, ViewChild } from '@angular/core';
+import { TaFormComponent, TaFormConfig } from '@ta/ta-form';
 import { distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
@@ -9,6 +9,7 @@ import { distinctUntilChanged } from 'rxjs/operators';
   styleUrls: ['./sale-returns.component.scss']
 })
 export class SaleReturnsComponent {
+  @ViewChild('salereturnForm', { static: false }) salereturnForm: TaFormComponent | undefined;
   returnNumber: any;
   showSaleReturnOrderList: boolean = false;
   showForm: boolean = false;
@@ -100,6 +101,25 @@ export class SaleReturnsComponent {
           key: 'sale_return_order',
           fieldGroup: [
             {
+              key: 'return_no',
+              type: 'input',
+              className: 'col-2',
+              templateOptions: {
+                label: 'Return No',
+                placeholder: 'Enter Return No',
+                required: true,
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  // field.form.controls.order_no.setValue(this.orderNumber)
+                  // field.form.controls.order_no.value = this.orderNumber;
+                }
+              },
+              // expressionProperties: {
+              //   'templateOptions.disabled': this.SaleOrderEditID ? 'true' : 'fa'
+              // }
+            },
+            {
               key: 'bill_type',
               type: 'select',
               // defaultValue: 'Exclusive',
@@ -119,23 +139,92 @@ export class SaleReturnsComponent {
               }
             },
             {
-              key: 'return_no',
-              type: 'input',
+              key: 'customer',
+              type: 'select',
               className: 'col-2',
               templateOptions: {
-                label: 'Return No',
-                placeholder: 'Enter Return No',
+                label: 'Customer',
+                dataKey: 'customer_id',
+                dataLabel: "name",
+                options: [],
+                lazy: {
+                  url: 'customers/customers/?summary=true',
+                  lazyOneTime: true
+                },
                 required: true,
+
               },
               hooks: {
-                onInit: (field: any) => {
-                  // field.form.controls.order_no.setValue(this.orderNumber)
-                  // field.form.controls.order_no.value = this.orderNumber;
+                onChanges: (field: any) => {
+                  field.formControl.valueChanges.subscribe(data => {
+                    // console.log("vendors", data);
+                    if (data && data.customer_id) {
+                      this.formConfig.model['sale_return_order']['customer_id'] = data.customer_id;
+                    }
+
+                    // if (field.form && field.form.controls && field.form.controls.customer_id) {
+                    //   field.form.controls.customer_id.setValue(data.customer_id)
+                    // }
+                    // if (field.form && field.form.controls && field.form.controls.customer_address_id) {
+                    //   field.form.controls.customer_address_id.setValue(data.customer_category_id)
+                    // }
+                    // if (field.form && field.form.controls && field.form.controls.email) {
+                    //   field.form.controls.email.setValue(data.email)
+                    // }
+                  });
+                }
+              }
+            },
+            {
+              key: 'sale_invoice',
+              type: 'select',
+              className: 'col-2',
+              templateOptions: {
+                label: 'Sale invoice',
+                dataKey: 'sale_invoice_id',
+                dataLabel: "invoice_no",
+                options: [],
+                lazy: {
+                  url: 'sales/sale_invoice_order/?summary=true',
+                  lazyOneTime: true
+                },
+                // required: true,
+              },
+              hooks: {
+                onChanges: (field: any) => {
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    // console.log("order_type", data);
+                    if (data && data.sale_invoice_id) {
+                      this.formConfig.model['sale_return_order']['sale_invoice_id'] = data.sale_invoice_id;
+                    }
+                  });
+                }
+              }
+            },
+            {
+              key: 'orders_salesman',
+              type: 'select',
+              className: 'col-2',
+              templateOptions: {
+                label: 'Order Salesman',
+                dataKey: 'order_salesman_id',
+                dataLabel: "name",
+                options: [],
+                lazy: {
+                  url: 'masters/orders_salesman/',
+                  lazyOneTime: true
                 }
               },
-              // expressionProperties: {
-              //   'templateOptions.disabled': this.SaleOrderEditID ? 'true' : 'fa'
-              // }
+              hooks: {
+                onChanges: (field: any) => {
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    // console.log("order_type", data);
+                    if (data && data.order_salesman_id) {
+                      this.formConfig.model['sale_return_order']['order_salesman_id'] = data.order_salesman_id;
+                    }
+                  });
+                }
+              }
             },
             {
               key: 'email',
@@ -214,101 +303,13 @@ export class SaleReturnsComponent {
               }
             },
             {
-              key: 'customer',
-              type: 'select',
-              className: 'col-2',
-              templateOptions: {
-                label: 'Customer',
-                dataKey: 'customer_id',
-                dataLabel: "name",
-                options: [],
-                lazy: {
-                  url: 'customers/customers/?summary=true',
-                  lazyOneTime: true
-                },
-                required: true,
-
-              },
-              hooks: {
-                onChanges: (field: any) => {
-                  field.formControl.valueChanges.subscribe(data => {
-                    // console.log("vendors", data);
-                    if (data && data.customer_id) {
-                      this.formConfig.model['sale_return_order']['customer_id'] = data.customer_id;
-                    }
-
-                    // if (field.form && field.form.controls && field.form.controls.customer_id) {
-                    //   field.form.controls.customer_id.setValue(data.customer_id)
-                    // }
-                    // if (field.form && field.form.controls && field.form.controls.customer_address_id) {
-                    //   field.form.controls.customer_address_id.setValue(data.customer_category_id)
-                    // }
-                    // if (field.form && field.form.controls && field.form.controls.email) {
-                    //   field.form.controls.email.setValue(data.email)
-                    // }
-                  });
-                }
-              }
-            },
-            {
-              key: 'sale_invoice',
-              type: 'select',
-              className: 'col-2',
-              templateOptions: {
-                label: 'Sale invoice',
-                dataKey: 'sale_invoice_id',
-                dataLabel: "invoice_no",
-                options: [],
-                lazy: {
-                  url: 'sales/sale_invoice_order/?summary=true',
-                  lazyOneTime: true
-                },
-                required: true,
-              },
-              hooks: {
-                onChanges: (field: any) => {
-                  field.formControl.valueChanges.subscribe((data: any) => {
-                    // console.log("order_type", data);
-                    if (data && data.sale_invoice_id) {
-                      this.formConfig.model['sale_return_order']['sale_invoice_id'] = data.sale_invoice_id;
-                    }
-                  });
-                }
-              }
-            },
-            {
-              key: 'order_salesman',
-              type: 'select',
-              className: 'col-2',
-              templateOptions: {
-                label: 'Order Salesman',
-                dataKey: 'order_salesman_id',
-                dataLabel: "name",
-                options: [],
-                lazy: {
-                  url: 'masters/orders_salesman/',
-                  lazyOneTime: true
-                }
-              },
-              hooks: {
-                onChanges: (field: any) => {
-                  field.formControl.valueChanges.subscribe((data: any) => {
-                    // console.log("order_type", data);
-                    if (data && data.order_salesman_id) {
-                      this.formConfig.model['sale_return_order']['order_salesman_id'] = data.order_salesman_id;
-                    }
-                  });
-                }
-              }
-            },
-            {
               key: 'customer_address',
               type: 'select',
               className: 'col-2',
               templateOptions: {
                 label: 'Customer addresses',
                 dataKey: 'customer_address_id',
-                dataLabel: "address",
+                dataLabel: "customer_id",
                 options: [],
                 lazy: {
                   url: 'customers/customers_addresses/',
@@ -443,30 +444,25 @@ export class SaleReturnsComponent {
                   }
                 },
                 hooks: {
-                  onInit:(field: any)=>{
-                    field.formControl.valueChanges.subscribe(data => {
-                      // field.templateOptions.options = data;
-                    });
-                    // field.templateOptions.options = this.productOptions;
-                  },
-                  onChanges: (field: any) => {
+                  onInit: (field: any) => {
                     field.formControl.valueChanges.subscribe(data => {
                       console.log("products data", data);
                       this.productOptions = data;
+                      // default value for new product
+                      field.form.controls.quantity.setValue(field.form.controls.quantity.value || 1);
 
+                      // binding selected product data 
                       if (field.form && field.form.controls && field.form.controls.code && data && data.code) {
                         field.form.controls.code.setValue(data.code)
                       }
-                      if (field.form && field.form.controls && field.form.controls.sales_rate && data && data.mrp) {
-                        field.form.controls.sales_rate.setValue(data.mrp)
+                      if (field.form && field.form.controls && field.form.controls.rate && data && data.mrp) {
+                        field.form.controls.rate.setValue(field.form.controls.rate.value || data.sales_rate)
                       }
                       if (field.form && field.form.controls && field.form.controls.discount && data && data.dis_amount) {
                         field.form.controls.discount.setValue(data.dis_amount)
                       }
-                      if (field.form && field.form.controls && field.form.controls.unit && data && data.unit_options && data.unit_options.unit_name) {
-                        if (data.unit_options && data.unit_options.unit_name) {
-                          field.form.controls.unit.setValue(data.unit_options.unit_name)
-                        }
+                      if (field.form && field.form.controls && field.form.controls.unit_options && data && data.unit_options && data.unit_options.unit_name) {
+                        field.form.controls.unit_options.setValue(data.unit_options)
                       }
                       if (field.form && field.form.controls && field.form.controls.print_name && data && data.print_name) {
                         field.form.controls.print_name.setValue(data.print_name)
@@ -474,6 +470,7 @@ export class SaleReturnsComponent {
                       if (field.form && field.form.controls && field.form.controls.discount && data && data.dis_amount) {
                         field.form.controls.discount.setValue(data.dis_amount)
                       }
+                      this.totalAmountCal();
                     });
                     // field.templateOptions.options = this.cs.getRole();
                   }
@@ -505,46 +502,57 @@ export class SaleReturnsComponent {
                 },
               },
               {
-                type: 'input',
-                key: 'unit',
-                // defaultValue: 1000,
+                type: 'select',
+                key: 'unit_options',
                 templateOptions: {
                   label: 'Unit',
-                  placeholder: 'Enter Unit',
+                  placeholder: 'Select Unit',
                   hideLabel: true,
-                  // // required: true
+                  dataLabel: 'unit_name',
+                  dataKey: 'unit_options_id',
+                  lazy: {
+                    url: 'masters/unit_options',
+                    lazyOneTime: true
+                  }
                 },
               },
               // quantity amount rate dsc
               {
                 type: 'input',
                 key: 'quantity',
-                // defaultValue: 1000,
+                defaultValue: 1,
                 templateOptions: {
+                  type: 'number',
                   label: 'Qty',
                   placeholder: 'Enter Qty',
+                  min: 1,
                   hideLabel: true,
                   required: true
                 },
                 hooks: {
-                  onChanges: (field: any) => {
+                  onInit: (field: any) => {
                     field.formControl.valueChanges.subscribe(data => {
                       // this.formConfig.model['productQuantity'] = data;
-                      if (field.form && field.form.controls && field.form.controls.sales_rate && data) {
-                        const rate = field.form.controls.sales_rate.value;
+
+                      if (field.form && field.form.controls && field.form.controls.rate && data) {
+                        const rate = field.form.controls.rate.value;
                         const quantity = data;
                         if (rate && quantity) {
-                          field.form.controls.totalAmount.setValue(parseInt(rate) * parseInt(quantity));
-                        } 
+                          field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity));
+                        }
+
                       }
                     })
+                  },
+                  onChanges: (field: any) => {
+
                   }
                 }
               },
 
               {
                 type: 'input',
-                key: 'sales_rate',
+                key: 'rate',
                 // defaultValue: 1000,
                 templateOptions: {
                   label: 'Rate',
@@ -554,15 +562,17 @@ export class SaleReturnsComponent {
                   // // required: true
                 },
                 hooks: {
-                  onChanges: (field: any) => {
+                  onInit: (field: any) => {
                     field.formControl.valueChanges.subscribe(data => {
                       // this.formConfig.model['productQuantity'] = data;
+
                       if (field.form && field.form.controls && field.form.controls.quantity && data) {
                         const quantity = field.form.controls.quantity.value;
                         const rate = data;
                         if (rate && quantity) {
-                          field.form.controls.totalAmount.setValue(parseInt(rate) * parseInt(quantity));
+                          field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity));
                         }
+                        // this.totalAmountCal();
                       }
                     })
                   }
@@ -573,14 +583,15 @@ export class SaleReturnsComponent {
                 key: 'discount',
                 // defaultValue: 90,
                 templateOptions: {
-                  placeholder: 'Enter Discount',
+                  placeholder: 'Enter Disc',
                   // type: 'number',
-                  label: 'Discount',
+                  label: 'Disc',
                   hideLabel: true,
                 },
                 hooks: {
-                  onChanges: (field: any) => {
+                  onInit: (field: any) => {
                     field.formControl.valueChanges.subscribe(data => {
+                      // this.totalAmountCal();
                       // this.formConfig.model['productDiscount'] = data;
                     })
                   }
@@ -609,14 +620,14 @@ export class SaleReturnsComponent {
                   label: 'Mrp',
                   placeholder: 'Mrp',
                   hideLabel: true,
-                  disabled:true
+                  disabled: true
                   // type: 'number',
                   // // required: true mrp tax 
                 },
               },
               {
                 type: 'input',
-                key: 'totalAmount',
+                key: 'amount',
                 templateOptions: {
                   label: 'Amount',
                   placeholder: 'Enter Amount',
@@ -625,16 +636,17 @@ export class SaleReturnsComponent {
                   // // required: true
                 },
                 hooks: {
+                  onInit: (field: any) => {
+                    field.formControl.valueChanges.subscribe(data => {
+                      this.totalAmountCal();
+                      // this.formConfig.model['productDiscount'] = data;
+                    })
+                  }
                   // onInit: (field: any) => {
                   //   field.form.get('quantity').valueChanges.pipe(
                   //     distinctUntilChanged()
                   //   ).subscribe((data: any) => {
-                  //     const dt = data[0];
-                  //     // if (dt['quantity'] && dt['amount']) {
-                  //     //   field.formControl.setValue(parseInt(dt['quantity']) * parseInt(dt['amount']));
-                  //     // } else {
-                  //     //   field.formControl.setValue(0);
-                  //     // }
+                  //     this.totalAmountCal();
                   //   });
                   // }
                 }
@@ -695,7 +707,7 @@ export class SaleReturnsComponent {
           fieldGroup: [
             {
               className: 'col-6 custom-form-card-block',
-              fieldGroup:[
+              fieldGroup: [
                 {
                   template: '<div class="custom-form-card-title">  Shipping Details </div>',
                   fieldGroupClassName: "ant-row",
@@ -729,11 +741,19 @@ export class SaleReturnsComponent {
                       templateOptions: {
                         label: 'Shipping Mode',
                         placeholder: 'Select Shipping Mode',
-                      }
+                        // required: true,
+                        dataKey: 'shipping_mode_id',
+                        dataLabel: "name",
+                        bindId: true,
+                        lazy: {
+                          url: 'masters/shipping_modes',
+                          lazyOneTime: true
+                        }
+                      },
                     },
                     {
                       key: 'port_of_discharge',
-                      type: 'select',
+                      type: 'input',
                       className: 'col-6',
                       templateOptions: {
                         label: 'Port of Discharge',
@@ -742,11 +762,19 @@ export class SaleReturnsComponent {
                     },
                     {
                       key: 'shipping_company_id',
-                      type: 'input',
+                      type: 'select',
                       className: 'col-6',
                       templateOptions: {
                         label: 'Shipping Company',
                         placeholder: 'Select Shipping Company',
+                        // required: true,
+                        dataKey: 'shipping_company_id',
+                        dataLabel: "name",
+                        bindId: true,
+                        lazy: {
+                          url: 'masters/shipping_companies',
+                          lazyOneTime: true
+                        }
                       }
                     },
                     {
@@ -768,7 +796,7 @@ export class SaleReturnsComponent {
                       }
                     },
                     {
-                      key: 'order_shipments.shipping_tracking_no',
+                      key: 'shipping_tracking_no',
                       type: 'input',
                       className: 'col-6',
                       templateOptions: {
@@ -777,16 +805,16 @@ export class SaleReturnsComponent {
                       }
                     },
                     {
-                      key: 'order_shipments.shipping_date',
+                      key: 'shipping_date',
                       type: 'date',
                       className: 'col-6',
                       templateOptions: {
                         label: 'Shipping Date',
-                        // placeholder: 'Enter Shipping Tracking No.',
+                        defaultValue: new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate(),
                       }
                     },
                     {
-                      key: 'order_shipments.shipping_charges',
+                      key: 'shipping_charges',
                       type: 'input',
                       className: 'col-6',
                       templateOptions: {
@@ -898,6 +926,36 @@ export class SaleReturnsComponent {
                         }
                       }
                     },
+                    // {
+                    //   key: 'order_status',
+                    //   type: 'select',
+                    //   className: 'col-4',
+                    //   templateOptions: {
+                    //     label: 'Order status Type',
+                    //     dataKey: 'order_status_id',
+                    //     dataLabel: "status_name",
+                    //     placeholder: 'Select Order status type',
+                    //     // required: true,
+                    //     lazy: {
+                    //       url: 'masters/order_status/',
+                    //       lazyOneTime: true
+                    //     }
+                    //   },
+                    //   // expressions: {
+                    //   //   hide: '!model.sale_order_id',
+                    //   // },
+                    //   hooks: {
+                    //     onInit: (field: any) => {
+                    //       // field.hide = this.SaleOrderEditID ? true : false;
+                    //       // field.formControl.valueChanges.subscribe(data => {
+                    //       //   console.log("order_status", data);
+                    //       //   if (data && data.order_status_id) {
+                    //       //     field.setValue()
+                    //       //   }
+                    //       // });
+                    //     }
+                    //   }
+                    // },
                     {
                       key: 'total_boxes',
                       type: 'input',
@@ -911,21 +969,23 @@ export class SaleReturnsComponent {
                     {
                       key: 'cess_amount',
                       type: 'input',
+                      defaultValue: "0",
                       className: 'col-4',
                       templateOptions: {
                         type: 'input',
-                        label: 'Cess Amount',
-                        placeholder: 'Enter Cess Amount',
-                      }
-                    },
-                    {
-                      key: 'advance_amount',
-                      type: 'input',
-                      className: 'col-4',
-                      templateOptions: {
-                        type: 'input',
-                        label: 'Advance Amount',
-                        placeholder: 'Enter Advance Amount',
+                        label: 'Cess amount',
+                        placeholder: 'Enter Cess amount',
+                        // required: true
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          field.formControl.valueChanges.subscribe(data => {
+                            this.totalAmountCal();
+                            // this.formConfig.model['productDiscount'] = data;
+                          })
+                        },
+                        onChanges: (field: any) => {
+                        }
                       }
                     },
                     {
@@ -938,26 +998,26 @@ export class SaleReturnsComponent {
                         placeholder: 'Enter Taxable',
                       }
                     },
-                    {
-                      key: 'transport_charges',
-                      type: 'input',
-                      className: 'col-4',
-                      templateOptions: {
-                        type: 'input',
-                        label: 'Transport Charges',
-                        placeholder: 'Enter Transport Charges',
-                      }
-                    },
-                    {
-                      key: 'round_off',
-                      type: 'input',
-                      className: 'col-4',
-                      templateOptions: {
-                        type: 'input',
-                        label: 'Round Off',
-                        placeholder: 'Enter Round Off',
-                      }
-                    },
+                    // {
+                    //   key: 'transport_charges',
+                    //   type: 'input',
+                    //   className: 'col-4',
+                    //   templateOptions: {
+                    //     type: 'input',
+                    //     label: 'Transport Charges',
+                    //     placeholder: 'Enter Transport Charges',
+                    //   }
+                    // },
+                    // {
+                    //   key: 'round_off',
+                    //   type: 'input',
+                    //   className: 'col-4',
+                    //   templateOptions: {
+                    //     type: 'input',
+                    //     label: 'Round Off',
+                    //     placeholder: 'Enter Round Off',
+                    //   }
+                    // },
                     // {
                     //   type: 'input',
                     //   key: 'print_name',
@@ -973,13 +1033,23 @@ export class SaleReturnsComponent {
                     {
                       key: 'tax_amount',
                       type: 'input',
-                      // defaultValue: "777770",
+                      defaultValue: "0",
                       className: 'col-4',
                       templateOptions: {
                         type: 'input',
                         label: 'Tax amount',
                         placeholder: 'Enter Tax amount',
                         // required: true
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          field.formControl.valueChanges.subscribe(data => {
+                            this.totalAmountCal();
+                            // this.formConfig.model['productDiscount'] = data;
+                          })
+                        },
+                        onChanges: (field: any) => {
+                        }
                       }
                     },
                     {
@@ -995,18 +1065,6 @@ export class SaleReturnsComponent {
                       },
                       hooks: {
                         onInit: (field: any) => {
-                          field.parent.form.get('sale_return_items').valueChanges.pipe(
-                            distinctUntilChanged()
-                          ).subscribe((data: any) => {
-                            let sum = 0;
-                            data.forEach( d => {
-                              if (d.totalAmount){
-                                sum += parseInt(d.totalAmount);
-                              }
-                            });
-                            // console.log('sum - ',sum);
-                            field.formControl.setValue(sum);
-                          });
                         }
                       }
                     },
@@ -1023,25 +1081,13 @@ export class SaleReturnsComponent {
                       },
                       hooks: {
                         onInit: (field: any) => {
-                          field.parent.form.get('sale_return_items').valueChanges.pipe(
-                            distinctUntilChanged()
-                          ).subscribe((data: any) => {
-                            let totalDiscount = 0;
-                            data.forEach( d => {
-                              if (d.discount){
-                                totalDiscount += parseInt(d.discount);
-                              }
-                            });
-                            // console.log('totalDiscount - ',totalDiscount);
-                            field.formControl.setValue(totalDiscount);
-                          });
                         }
                       }
                     },
                     {
                       key: 'total_amount',
                       type: 'input',
-                      // defaultValue: "12",
+                      defaultValue: "0",
                       className: 'col-4',
                       templateOptions: {
                         type: 'input',
@@ -1051,78 +1097,85 @@ export class SaleReturnsComponent {
                       },
                       hooks: {
                         onInit: (field: any) => {
-                          field.parent.form.get('sale_return_items').valueChanges.pipe(
-                            distinctUntilChanged()
-                          ).subscribe((data: any) => {
-                            let totalItemsValue = field.form.controls.item_value.value;
-                            let totalDiscount = 0;
-                            data.forEach( d => {
-                              if (d.discount){
-                                totalDiscount += parseInt(d.discount);
-                              }
-                            });
-                            // console.log('totalDiscount - ',totalDiscount);
-                            // console.log('totalItemsValue - ', totalItemsValue);
-                            field.formControl.setValue(totalItemsValue - totalDiscount );
-                            
-                          });
-        
                         }
                       }
                     },
                   ]
                 },
               ]
+            },
+            {
+              className: 'col-12 custom-form-card-block w-100',
+              fieldGroup: [
+                {
+                  template: '<div class="custom-form-card-title"> Order Attachments </div>',
+                  fieldGroupClassName: "ant-row",
+                },
+                {
+                  key: 'order_attachments',
+                  type: 'file',
+                  className: 'ta-cell col-12 custom-file-attachement',
+                  props: {
+                    "displayStyle": "files",
+                    "multiple": true
+                    // label: 'Order Attachments',
+                    // // required: true
+                    // required: true
+                  }
+                },
+              ]
             }
           ]
         },
-        {
-          className: 'col-12 custom-form-card-block w-100',
-          fieldGroup:[
-            {
-              template: '<div class="custom-form-card-title"> Order Attachments </div>',
-              fieldGroupClassName: "ant-row",
-            // {
-            //   key: 'order_shipments.shipping_tracking_no',
-            //   type: 'input',
-            //   className: 'ant-col-3 pr-md m-3',
-            //   templateOptions: {
-            //     label: 'Shipping Tracking No.',
-            //     placeholder: 'Enter Shipping Tracking No.',
-            //   }
-            // },
-            // {
-            //   key: 'order_shipments.shipping_date',
-            //   type: 'date',
-            //   className: 'ant-col-3 pr-md m-3',
-            //   templateOptions: {
-            //     label: 'Shipping Date',
-            //   }
-            // },
-            // {
-            //   key: 'order_shipments.shipping_charges',
-            //   type: 'input',
-            //   className: 'ant-col-3 pr-md m-3',
-            //   templateOptions: {
-            //     label: 'Shipping Charges',
-            //     placeholder: 'Enter Shipping Charges',
-            //   }
-            },
-            {
-              key: 'order_attachments',
-              type: 'file',
-              className: 'ta-cell col-12 custom-file-attachement',
-              templateOptions: {
-                // label: 'Order Attachments',
-              }
-            },
-          ]
-            }
-          ]
-        },
-      ]
+        ]
         }
       ]
-    };
+    },
+  ]
   }
+}
+totalAmountCal() {
+  const data = this.formConfig.model;
+  console.log('data', data);
+  if (data) {
+    const products = data.sale_return_items || [];
+    let totalAmount = 0;
+    let totalDiscount = 0;
+    let totalRate = 0;
+    let total_amount = 0;
+    if (products) {
+      products.forEach(product => {
+        if (product) {
+          if (product.amount)
+            totalAmount += parseFloat(product.amount || 0);
+          if (product.discount)
+            totalDiscount += parseFloat(product.discount || 0);
+        }
+        // totalRate += parseFloat(product.rate) * parseFloat(product.quantity || 0);
+      });
+    }
+
+
+    if (this.salereturnForm && this.salereturnForm.form && this.salereturnForm.form.controls) {
+      const controls: any = this.salereturnForm.form.controls;
+      controls.sale_return_order.controls.item_value.setValue(totalAmount);
+      controls.sale_return_order.controls.dis_amt.setValue(totalDiscount);
+      // const doc_amount = (totalAmount + parseFloat(data.sale_invoice_order.cess_amount || 0) + parseFloat(data.sale_invoice_order.tax_amount || 0)) - totalDiscount;
+      // controls.sale_invoice_order.controls.doc_amount.setValue(doc_amount);
+      const cessAmount = parseFloat(data.sale_return_order.cess_amount || 0);
+      const taxAmount = parseFloat(data.sale_return_order.tax_amount || 0);
+      // const advanceAmount = parseFloat(data.sale_return_order.advance_amount || 0);
+
+      const total_amount = (totalAmount + cessAmount + taxAmount) - totalDiscount;
+      controls.sale_return_order.controls.total_amount.setValue(total_amount);
+
+    }
+    //const 
+
+    // const cess_amount = data;
+    // if (cess_amount && doc_amount) {
+    //   field.form.controls.doc_amount.setValue(parseInt(doc_amount) - parseInt(cess_amount));
+    // }
+  }
+}
 }

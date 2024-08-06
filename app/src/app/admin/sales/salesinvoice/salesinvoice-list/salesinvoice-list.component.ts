@@ -61,9 +61,9 @@ export class SalesInvoiceListComponent {
       {
         fieldKey: 'order_status',
         name: 'Status',
-        displayType: 'map',
+        displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return row.order_status ? row.order_status.status_name : 'N/A';
+          return `${row.order_status.status_name}`;
         },
         sort: true
       },
@@ -88,8 +88,7 @@ export class SalesInvoiceListComponent {
             label: '',
             callBackFn: (row, action) => {
               console.log(row);
-              this.edit.emit(row.sale_order_id);
-              // this.router.navigateByUrl('/admin/sales/edit/' + row.sale_order_id);
+              this.edit.emit(row.sale_invoice_id);
             }
           }
         ]

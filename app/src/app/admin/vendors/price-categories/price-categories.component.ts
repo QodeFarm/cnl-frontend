@@ -66,7 +66,7 @@ export class PriceCategoriesComponent {
           fieldGroup: [
 		    {
           key: 'name',
-          type: 'textarea',
+          type: 'input',
           className: 'col-6 ps-0',
           templateOptions: {
             label: 'Name',
@@ -76,7 +76,7 @@ export class PriceCategoriesComponent {
         },
 		    {
           key: 'code',
-          type: 'textarea',
+          type: 'input',
           className: 'col-6 pe-0',
           templateOptions: {
             label: 'Code',

@@ -53,7 +53,7 @@ tableConfig: TaTableConfig = {
       sort: true
     },
     {
-      fieldKey: 'order_status',
+      fieldKey: 'order_status_id',
       name: 'Status',
       displayType: "map",
       mapFn: (currentValue: any, row: any, col: any) => {
@@ -103,8 +103,10 @@ tableConfig: TaTableConfig = {
         },
         {
           type: 'callBackFn',
-          label: 'Edit',
+          icon: 'fa fa-pen',
+          label: '',
           callBackFn: (row, action) => {
+            console.log(row);
             this.edit.emit(row.sale_return_id);
           }
         }

@@ -35,6 +35,10 @@ export class VendorPaymentTermsComponent {
           fieldKey: 'no_of_fixed_days',
           name: 'No of fixed days'
         },
+        {
+          fieldKey: 'payment_cycle',
+          name: 'Payment Cycle'
+        },
 		    {
           fieldKey: 'run_on',
           name: 'Run On'
@@ -78,7 +82,7 @@ export class VendorPaymentTermsComponent {
           fieldGroup: [
 	     {
           key: 'name',
-          type: 'textarea',
+          type: 'input',
           className: 'col-6 pb-3 ps-0',
           templateOptions: {
             label: 'Name',
@@ -88,7 +92,7 @@ export class VendorPaymentTermsComponent {
         },
         {
           key: 'code',
-          type: 'textarea',
+          type: 'input',
           className: 'col-6 pb-3 pe-0',
           templateOptions: {
             label: 'Code',
@@ -98,7 +102,7 @@ export class VendorPaymentTermsComponent {
         },
 		    {
           key: 'fixed_days',
-          type: 'textarea',
+          type: 'input',
           className: 'col-6 pb-3 ps-0',
           templateOptions: {
             label: 'Fixed Days',
@@ -108,7 +112,7 @@ export class VendorPaymentTermsComponent {
         },
 		    {
           key: 'no_of_fixed_days',
-          type: 'textarea',
+          type: 'input',
           className: 'col-6 pb-3 pe-0',
           templateOptions: {
             label: 'No of fixed days',
@@ -118,7 +122,7 @@ export class VendorPaymentTermsComponent {
         },
 		    {
           key: 'payment_cycle',
-          type: 'textarea',
+          type: 'input',
           className: 'col-6 ps-0',
           templateOptions: {
             label: 'Payment Cycle',
@@ -128,7 +132,7 @@ export class VendorPaymentTermsComponent {
         },
 		    {
           key: 'run_on',
-          type: 'textarea',
+          type: 'input',
           className: 'col-6 pe-0',
           templateOptions: {
             label: 'Run on',

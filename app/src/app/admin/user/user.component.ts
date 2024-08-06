@@ -9,14 +9,14 @@ import { TaCurdConfig } from '@ta/ta-curd';
 export class UserComponent {
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
-    drawerPlacement: 'right',
+    drawerPlacement: 'top',
     tableConfig: {
-      apiUrl: 'users/userdata/',
+      apiUrl: 'users/users_list/',
       title: 'Users',
       pkId: "first_name",
       pageSize: 10,
       "globalSearch": {
-        keys: ['id', 'name']
+        keys: ['username', 'email']
       },
       cols: [
         {
@@ -81,13 +81,31 @@ export class UserComponent {
         {
           key: 'status_id',
           type: 'script',
-          value: '"f8edc445-7017-4ae1-819e-280c8c061484"'
+          value: 'data.status.status_id'
+        },
+        {
+          key: 'branch_id',
+          type: 'script',
+          value: 'data.brach.branch_id'
         }
       ],
       fields: [
         {
-          fieldGroupClassName: 'row',
-          fieldGroup: [
+          fieldGroupClassName: "row col-12 p-0 m-0 custom-form",
+        fieldGroup: [
+            {
+              key: 'profile_picture_url',
+              type: 'file',
+              className: "col-4",
+              props: {
+                displayStyle: 'avatar',
+                storeFolder: "profile",
+                label: 'Profile Pic',
+                multiple: false,
+                placeholder: 'Enter Profile Pic',
+                required: false,
+              }
+            },
             {
               key: 'username',
               type: 'text',
@@ -213,6 +231,54 @@ export class UserComponent {
               }
             },
             {
+              key: 'brach',
+              type: 'select',
+              className: 'ta-cell pr-md col-md-6 col-12',
+              templateOptions: {
+                label: 'Branch',
+                dataKey: 'branch_id',
+                dataLabel: "name",
+                options: [],
+                required: true,
+                lazy: {
+                  url: 'company/branches/',
+                  lazyOneTime: true
+                }
+              }
+            },
+            {
+              key: 'status',
+              type: 'select',
+              className: 'ta-cell pr-md col-md-6 col-12',
+              templateOptions: {
+                label: 'Status',
+                dataKey: 'status_id',
+                dataLabel: "status_name",
+                options: [],
+                // required: true,
+                lazy: {
+                  url: 'masters/statuses/',
+                  lazyOneTime: true
+                }
+              }
+            },
+            {
+              key: 'isActive',
+              type: 'boolean',
+              className: 'ta-cell pr-md col-md-6 col-12',
+              templateOptions: {
+                label: 'Is Active',
+                dataKey: 'name',
+                dataLabel: "name",
+                options: [],
+                // required: true,
+                // lazy: {
+                //   url: 'masters/sale_types/',
+                //   lazyOneTime: true
+                // }
+              }
+            },
+            {
               key: 'password',
               type: 'text',
               className: 'ta-cell pr-md col-md-6 col-12',
@@ -245,7 +311,7 @@ export class UserComponent {
             {
               key: 'bio',
               type: 'textarea',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ta-cell pr-md col-12',
               templateOptions: {
                 label: 'Comments',
                 placeholder: 'Enter comments',

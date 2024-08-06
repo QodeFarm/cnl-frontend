@@ -9,7 +9,7 @@ import { distinctUntilChanged } from 'rxjs/operators';
   styleUrls: ['./salesinvoice.component.scss']
 })
 export class SalesinvoiceComponent {
-  @ViewChild('salesinvoiceForm', { static: false }) salesinvoiceForm: TaFormComponent | undefined;
+  @ViewChild('saleinvoiceForm', { static: false }) saleinvoiceForm: TaFormComponent | undefined;
   invoiceNumber: any;
   showSaleInvoiceList: boolean = false;
   showForm: boolean = false;
@@ -832,6 +832,25 @@ export class SalesinvoiceComponent {
                                 label: 'Advance amount',
                                 placeholder: 'Enter Advance amount',
                                 // required: true
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    this.totalAmountCal();
+                                    // this.formConfig.model['productDiscount'] = data;
+                                  })
+                                },
+                                onChanges: (field: any) => {
+                                  // field.formControl.valueChanges.subscribe(data => {
+                                  //   if (field.form && field.form.controls && field.form.controls.doc_amount && data) {
+                                  //     const doc_amount = field.form.controls.doc_amount.value;
+                                  //     const tax_amount = data;
+                                  //     if (tax_amount && doc_amount) {
+                                  //       field.form.controls.doc_amount.setValue(parseInt(doc_amount) - parseInt(tax_amount));
+                                  //     }
+                                  //   }
+                                  // })
+                                }
                               }
                             },
                             {
@@ -974,28 +993,23 @@ export class SalesinvoiceComponent {
                               type: 'select',
                               className: 'col-4',
                               templateOptions: {
-                                label: 'Order status Type',
+                                label: 'Order Status Type',
+                                placeholder: 'Select Order Status Type',
                                 dataKey: 'status_name',
                                 dataLabel: "status_name",
-                                placeholder: 'Select Order status type',
-                                // required: true,
                                 lazy: {
                                   url: 'masters/order_status/',
                                   lazyOneTime: true
                                 }
                               },
-                              // expressions: {
-                              //   hide: '!model.sale_order_id',
-                              // },
                               hooks: {
-                                onInit: (field: any) => {
-                                  // field.hide = this.SaleOrderEditID ? true : false;
-                                  // field.formControl.valueChanges.subscribe(data => {
-                                  //   console.log("order_status", data);
-                                  //   if (data && data.order_status_id) {
-                                  //     field.setValue()
-                                  //   }
-                                  // });
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    console.log("order_status", data);
+                                    if (data && data.order_status_id) {
+                                      this.formConfig.model['sale_invoice_order']['order_status_id'] = data.order_status_id;
+                                    }
+                                  });
                                 }
                               }
                             },
@@ -1056,7 +1070,7 @@ export class SalesinvoiceComponent {
                               }
                             },
                             {
-                              key: 'doc_amount',
+                              key: 'total_amount',
                               type: 'input',
                               defaultValue: "0",
                               className: 'col-4',
@@ -1139,7 +1153,7 @@ export class SalesinvoiceComponent {
       let totalAmount = 0;
       let totalDiscount = 0;
       let totalRate = 0;
-      let doc_amount = 0;
+      let total_amount = 0;
       if (products) {
         products.forEach(product => {
           if (product) {
@@ -1153,12 +1167,18 @@ export class SalesinvoiceComponent {
       }
 
 
-      if (this.salesinvoiceForm && this.salesinvoiceForm.form && this.salesinvoiceForm.form.controls) {
-        const controls: any = this.salesinvoiceForm.form.controls;
+      if (this.saleinvoiceForm && this.saleinvoiceForm.form && this.saleinvoiceForm.form.controls) {
+        const controls: any = this.saleinvoiceForm.form.controls;
         controls.sale_invoice_order.controls.item_value.setValue(totalAmount);
         controls.sale_invoice_order.controls.dis_amt.setValue(totalDiscount);
-        const doc_amount = (totalAmount + parseFloat(data.sale_invoice_order.cess_amount || 0) + parseFloat(data.sale_invoice_order.tax_amount || 0)) - totalDiscount;
-        controls.sale_invoice_order.controls.doc_amount.setValue(doc_amount);
+        // const doc_amount = (totalAmount + parseFloat(data.sale_invoice_order.cess_amount || 0) + parseFloat(data.sale_invoice_order.tax_amount || 0)) - totalDiscount;
+        // controls.sale_invoice_order.controls.doc_amount.setValue(doc_amount);
+        const cessAmount = parseFloat(data.sale_invoice_order.cess_amount || 0);
+        const taxAmount = parseFloat(data.sale_invoice_order.tax_amount || 0);
+        const advanceAmount = parseFloat(data.sale_invoice_order.advance_amount || 0);
+
+        const total_amount = (totalAmount + cessAmount + taxAmount) - totalDiscount - advanceAmount;
+        controls.sale_invoice_order.controls.total_amount.setValue(total_amount);
 
       }
       //const 
