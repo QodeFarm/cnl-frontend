@@ -69,7 +69,7 @@ export class PurchaseListComponent {
         sort: true
       },
       {
-        fieldKey: 'order_status',
+        fieldKey: 'order_status_id',
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
