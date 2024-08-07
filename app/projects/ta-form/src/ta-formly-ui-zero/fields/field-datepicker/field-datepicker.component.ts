@@ -17,6 +17,11 @@ export class FieldDatepickerComponent extends FieldType implements OnInit {
   }
   ngOnInit(): void {
     this.dateValue = this.formControl.value;
+    this.formControl.valueChanges.subscribe(res => {
+      if (this.formControl.value) {
+        this.dateValue = this.datepipe.transform(this.formControl.value, 'yyyy-MM-dd');
+      }
+    })
   }
   onChange(result: Date): void {
     // debugger

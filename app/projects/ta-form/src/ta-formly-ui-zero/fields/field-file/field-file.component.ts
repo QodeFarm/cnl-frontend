@@ -36,6 +36,7 @@ export class FieldFileComponent extends FieldType {
       if (this.formControl.value) {
         const _fList = this.formControl.value || [];
         this.config.fileList = _fList.map(res => {
+          res.uid = res.attachment_id
           res.url = this.siteC.CONFIG.cdnPath + res.attachment_path;
           res.name = res.attachment_name;
           return res;

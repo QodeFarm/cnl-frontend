@@ -1,6 +1,18 @@
-<nz-input-group [nzAddOnBeforeIcon]="to.addonLeftIcon" [nzAddOnAfterIcon]="to.addonRightIcon">
-    <input *ngIf="to.type !== 'number'; else numberTmp" nz-input [formControl]="formControl" [type]="to.type || 'text'" [formlyAttributes]="field" />
-</nz-input-group>
+<ng-container [ngSwitch]="to.type">
+    <ng-container *ngSwitchCase="'password'">
+        <nz-input-group [nzSuffix]="passwordTemplate" [nzAddOnBeforeIcon]="to.addonLeftIcon" [nzAddOnAfterIcon]="to.addonRightIcon">
+            <input [type]="passwordVisible ? 'text' : 'password'" nz-input [formControl]="formControl" [formlyAttributes]="field" />
+        </nz-input-group>
+
+    </ng-container>
+    <ng-container *ngSwitchDefault>
+        <nz-input-group [nzAddOnBeforeIcon]="to.addonLeftIcon" [nzAddOnAfterIcon]="to.addonRightIcon">
+            <input *ngIf="to.type !== 'number'; else numberTmp" nz-input [formControl]="formControl" [type]="to.type || 'text'" [formlyAttributes]="field" />
+        </nz-input-group>
+    </ng-container>
+</ng-container>
+
+
 <ng-template #numberTmp>
     <nz-input-number nzPrecisionMode="cut" [nzPrecision]="precision" [formControl]="formControl" [formlyAttributes]="field"></nz-input-number>
 </ng-template>
@@ -18,4 +30,8 @@
         <i nz-icon nzType="to.addonRight.icon" *ngIf="to.addonRight.icon"></i>
         <span *ngIf="to.addonRight.text">{{to.addonLeft.text}}</span>
     </ng-container>
+</ng-template>
+
+<ng-template #passwordTemplate>
+    <span nz-icon [nzType]="passwordVisible ? 'eye-invisible' : 'eye'" (click)="passwordVisible = !passwordVisible"></span>
 </ng-template>
