@@ -115,26 +115,6 @@ export class PurchaseInvoiceComponent {
           key: 'purchase_invoice_orders',
           fieldGroup: [
             {
-              key: 'invoice_no',
-              type: 'input',
-              className: 'col-2',
-              templateOptions: {
-                label: 'Invoice no',
-                placeholder: 'Enter Invoice No',
-                required: true,
-                disabled: true
-              },
-              hooks: {
-                onInit: (field: any) => {
-                  // field.form.controls.order_no.setValue(this.orderNumber)
-                  // field.form.controls.order_no.value = this.orderNumber;
-                }
-              },
-              // expressionProperties: {
-              //   'templateOptions.disabled': this.PurchaseOrderEditID ? 'true' : 'fa'
-              // }
-            },
-            {
               key: 'purchase_type',
               type: 'select',
               className: 'col-2',
@@ -196,6 +176,26 @@ export class PurchaseInvoiceComponent {
                   });
                 }
               }
+            },
+            {
+              key: 'invoice_no',
+              type: 'input',
+              className: 'col-2',
+              templateOptions: {
+                label: 'Invoice no',
+                placeholder: 'Enter Invoice No',
+                required: true,
+                readonly: true
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  // field.form.controls.order_no.setValue(this.orderNumber)
+                  // field.form.controls.order_no.value = this.orderNumber;
+                }
+              },
+              // expressionProperties: {
+              //   'templateOptions.disabled': this.PurchaseOrderEditID ? 'true' : 'fa'
+              // }
             },
             {
               key: 'email',

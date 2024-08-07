@@ -741,6 +741,13 @@ export class SalesComponent {
                                 type: 'number',
                                 label: 'Advance amount',
                                 placeholder: 'Enter Advance amount'
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    this.totalAmountCal();
+                                  })
+                                }
                               }
                             },
                             {
@@ -992,7 +999,7 @@ export class SalesComponent {
                               }
                             },
                             {
-                              key: 'doc_amount',
+                              key: 'total_amount',
                               type: 'input',
                               defaultValue: "0",
                               className: 'col-4',
@@ -1042,7 +1049,7 @@ export class SalesComponent {
       let totalAmount = 0;
       let totalDiscount = 0;
       let totalRate = 0;
-      let doc_amount = 0;
+      let total_amount = 0;
       if (products) {
         products.forEach(product => {
           if (product) {
@@ -1060,8 +1067,14 @@ export class SalesComponent {
         const controls: any = this.salesForm.form.controls;
         controls.sale_order.controls.item_value.setValue(totalAmount);
         controls.sale_order.controls.dis_amt.setValue(totalDiscount);
-        const doc_amount = (totalAmount + parseFloat(data.sale_order.cess_amount || 0) + parseFloat(data.sale_order.tax_amount || 0)) - totalDiscount;
-        controls.sale_order.controls.doc_amount.setValue(doc_amount);
+        // const doc_amount = (totalAmount + parseFloat(data.sale_order.cess_amount || 0) + parseFloat(data.sale_order.tax_amount || 0)) - totalDiscount;
+        // controls.sale_order.controls.doc_amount.setValue(doc_amount);
+        const cessAmount = parseFloat(data.sale_order.cess_amount || 0);
+        const taxAmount = parseFloat(data.sale_order.tax_amount || 0);
+        const advanceAmount = parseFloat(data.sale_order.advance_amount || 0);
+
+        const total_amount = (totalAmount + cessAmount + taxAmount) - totalDiscount - advanceAmount;
+        controls.sale_order.controls.total_amount.setValue(total_amount);
 
       }
       //const 

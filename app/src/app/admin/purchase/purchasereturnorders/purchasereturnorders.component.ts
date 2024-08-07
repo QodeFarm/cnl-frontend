@@ -106,22 +106,6 @@ export class PurchasereturnordersComponent {
           key: 'purchase_return_orders',
           fieldGroup: [
             {
-              key: 'return_no',
-              type: 'input',
-              className: 'col-2',
-              templateOptions: {
-                label: 'Return No',
-                placeholder: 'Enter Return No',
-                readonly: true,
-                disabled: true,
-                required: true,
-              },
-              hooks: {
-                onInit: (field: any) => {
-                }
-              },
-            },
-            {
               key: 'purchase_type',
               type: 'select',
               className: 'col-2',
@@ -181,7 +165,23 @@ export class PurchasereturnordersComponent {
                   });
                 }
               }
-            },        
+            },  
+            {
+              key: 'return_no',
+              type: 'input',
+              className: 'col-2',
+              templateOptions: {
+                label: 'Return No',
+                placeholder: 'Enter Return No',
+                readonly: true,
+                // disabled: true,
+                required: true,
+              },
+              hooks: {
+                onInit: (field: any) => {
+                }
+              },
+            },      
             {
               key: 'email',
               type: 'input',
@@ -681,6 +681,7 @@ export class PurchasereturnordersComponent {
                       templateOptions: {
                         label: 'No. of Packets',
                         placeholder: 'Select No. of Packets',
+                        type: 'number'
                       }
                     },
                     {
@@ -690,6 +691,7 @@ export class PurchasereturnordersComponent {
                       templateOptions: {
                         label: 'Weight',
                         placeholder: 'Enter Weight',
+                        type: 'number'
                       }
                     },
                     {
@@ -815,14 +817,16 @@ export class PurchasereturnordersComponent {
                       }
                     },
                     {
-                      key: 'total_boxes',
                       type: 'input',
+                      key: 'total_boxes',
                       className: 'col-4',
                       templateOptions: {
-                        type: 'input',
+                        type: 'number',
                         label: 'Total Boxes',
                         placeholder: 'Enter Total Boxes',
-                      }
+                        // hideLabel: true,
+                        // // required: true
+                      },
                     },
                     {
                       key: 'taxable',

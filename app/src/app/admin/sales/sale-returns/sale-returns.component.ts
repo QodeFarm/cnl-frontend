@@ -107,18 +107,6 @@ export class SaleReturnsComponent {
           key: 'sale_return_order',
           fieldGroup: [
             {
-              key: 'return_no',
-              type: 'input',
-              className: 'col-2',
-              templateOptions: {
-                label: 'Return No',
-                placeholder: 'Enter Return No',
-                required: true,
-                readonly: true,
-                disabled: true
-              },
-            },
-            {
               key: 'bill_type',
               type: 'select',
               // defaultValue: 'Exclusive',
@@ -172,6 +160,18 @@ export class SaleReturnsComponent {
                   });
                 }
               }
+            },
+            {
+              key: 'return_no',
+              type: 'input',
+              className: 'col-2',
+              templateOptions: {
+                label: 'Return No',
+                placeholder: 'Enter Return No',
+                required: true,
+                readonly: true,
+                // disabled: true
+              },
             },
             {
               key: 'sale_invoice',
@@ -497,6 +497,7 @@ export class SaleReturnsComponent {
                 // defaultValue: 1000,
                 templateOptions: {
                   label: 'Total Boxes',
+                  type: "number",
                   placeholder: 'Enter Total Boxes',
                   hideLabel: true,
                   // // required: true
@@ -658,6 +659,7 @@ export class SaleReturnsComponent {
                 // defaultValue: 1000,
                 templateOptions: {
                   label: 'Tax',
+                  type: "number",
                   placeholder: 'Tax',
                   hideLabel: true,
                   // type: 'number',
@@ -927,9 +929,9 @@ export class SaleReturnsComponent {
                       type: 'input',
                       className: 'col-4',
                       templateOptions: {
-                        type: 'input',
-                        label: 'Total Boxes',
-                        placeholder: 'Enter Total Boxes',
+                        type: 'number',
+                        label: 'Total boxes',
+                        placeholder: 'Enter Total boxes'
                       }
                     },
                     {

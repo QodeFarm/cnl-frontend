@@ -228,7 +228,7 @@ export class PurchaseComponent {
                 label: 'Order no',
                 placeholder: 'Enter Order No',
                 required: true,
-                disabled: true
+                readonly: true
               },
               hooks: {
                 onInit: (field: any) => {}
@@ -581,7 +581,7 @@ export class PurchaseComponent {
                 type: 'input',
                 key: 'tax',
                 templateOptions: {
-                type: "number",
+                  type: "number",
                   label: 'Tax',
                   placeholder: 'Tax',
                   hideLabel: true,
@@ -771,19 +771,27 @@ export class PurchaseComponent {
                             fieldGroupClassName: "ant-row",
                             key: 'purchase_order_data',
                             fieldGroup: [
-
-
                               {
-                                key: 'total_boxes',
                                 type: 'input',
-                                // defaultValue: 77777,
+                                key: 'total_boxes',
                                 className: 'col-4',
                                 templateOptions: {
-                                  type: 'number',
+                                  type: "number",
                                   label: 'Total boxes',
-                                  placeholder: 'Enter Total boxes'
-                                }
+                                  placeholder: 'Enter Total boxes',
+                                  // hideLabel: true,
+                                },
                               },
+                              // {
+                              //   key: 'total_boxes',
+                              //   type: 'input',
+                              //   className: 'col-4',
+                              //   templateOptions: {
+                              //     type: 'number',
+                              //     label: 'Total boxes',
+                              //     placeholder: 'Enter Total boxes'
+                              //   }
+                              // },
                               {
                                 key: 'cess_amount',
                                 type: 'input',
@@ -1005,18 +1013,18 @@ export class PurchaseComponent {
                         }
                       }
                     },
-                    {
-                      key: 'discount',
-                      type: 'input',
-                      // defaultValue: "777770",
-                      className: 'col-4',
-                      templateOptions: {
-                        type: 'input',
-                        label: 'Discount',
-                        placeholder: 'Enter Discount',
-                        // required: true
-                      }
-                    },
+                    // {
+                    //   key: 'discount',
+                    //   type: 'input',
+                    //   // defaultValue: "777770",
+                    //   className: 'col-4',
+                    //   templateOptions: {
+                    //     type: 'input',
+                    //     label: 'Discount',
+                    //     placeholder: 'Enter Discount',
+                    //     // required: true
+                    //   }
+                    // },
                     {
                       key: 'dis_amt',
                       type: 'input',
@@ -1024,7 +1032,7 @@ export class PurchaseComponent {
                       className: 'col-4',
                       templateOptions: {
                         type: 'input',
-                        label: 'Disc Amt',
+                        label: 'Discount Amt',
                         readonly: true,
                         placeholder: 'Enter Discount Amt',
                         // required: true
@@ -1043,16 +1051,16 @@ export class PurchaseComponent {
                         readonly: true
                       }
                     },
-                    {
-                      key: 'round_off',
-                      type: 'input',
-                      className: 'col-4',
-                      templateOptions: {
-                        type: 'input',
-                        label: 'Round Off',
-                        placeholder: 'Enter Round Off',
-                      }
-                    }
+                    // {
+                    //   key: 'round_off',
+                    //   type: 'input',
+                    //   className: 'col-4',
+                    //   templateOptions: {
+                    //     type: 'input',
+                    //     label: 'Round Off',
+                    //     placeholder: 'Enter Round Off',
+                    //   }
+                    // }
                   ]
                 },
               ]

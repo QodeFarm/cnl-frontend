@@ -90,11 +90,11 @@ export class SalesListComponent {
       //   sort: true
       // },
       {
-        fieldKey: 'status',
+        fieldKey: 'order_status_id',
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          // return `${row.job_code_id.job_code}`;
+          return `${row.order_status.status_name}`;
         },
         sort: true
       },
