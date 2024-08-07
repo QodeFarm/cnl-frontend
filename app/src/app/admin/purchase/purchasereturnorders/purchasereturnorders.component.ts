@@ -743,26 +743,6 @@ export class PurchasereturnordersComponent {
                   key: 'purchase_return_orders',
                   fieldGroup: [
                     {
-                      key: 'total_boxes',
-                      type: 'input',
-                      className: 'col-4',
-                      templateOptions: {
-                        type: 'input',
-                        label: 'Total Boxes',
-                        placeholder: 'Enter Total Boxes',
-                      }
-                    },
-                    {
-                      key: 'taxable',
-                      type: 'input',
-                      className: 'col-4',
-                      templateOptions: {
-                        type: 'input',
-                        label: 'Taxable',
-                        placeholder: 'Enter Taxable',
-                      }
-                    },
-                    {
                       key: 'gst_type',
                       type: 'select',
                       className: 'col-4',
@@ -832,6 +812,26 @@ export class PurchasereturnordersComponent {
                             }
                           });
                         }
+                      }
+                    },
+                    {
+                      key: 'total_boxes',
+                      type: 'input',
+                      className: 'col-4',
+                      templateOptions: {
+                        type: 'input',
+                        label: 'Total Boxes',
+                        placeholder: 'Enter Total Boxes',
+                      }
+                    },
+                    {
+                      key: 'taxable',
+                      type: 'input',
+                      className: 'col-4',
+                      templateOptions: {
+                        type: 'input',
+                        label: 'Taxable',
+                        placeholder: 'Enter Taxable',
                       }
                     },
                     {
@@ -982,9 +982,6 @@ export class PurchasereturnordersComponent {
                   props: {
                     "displayStyle": "files",
                     "multiple": true
-                    // label: 'Order Attachments',
-                    // // required: true
-                    // required: true
                   }
                 },
               ]

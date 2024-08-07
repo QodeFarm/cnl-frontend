@@ -99,6 +99,8 @@ tableConfig: TaTableConfig = {
         {
           type: 'delete',
           label: 'Delete',
+          confirm: true,
+          confirmMsg: "Sure to delete?",
           apiUrl: 'sales/sale_return_order'
         },
         {
