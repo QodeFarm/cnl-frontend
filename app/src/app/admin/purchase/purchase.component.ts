@@ -410,9 +410,11 @@ export class PurchaseComponent {
                     onInit: (field: any) => {
                       field.formControl.valueChanges.subscribe(data => {
                         console.log("products data", data);
+                        // console.log("products data", data.code);
                         this.productOptions = data;
                         if (field.form && field.form.controls && field.form.controls.code && data && data.code) {
                           field.form.controls.code.setValue(data.code)
+                          // console.log("code : ", data.code)
                         }
                         if (field.form && field.form.controls && field.form.controls.rate && data && data.mrp) {
                           field.form.controls.rate.setValue(field.form.controls.rate.value || data.sales_rate)
@@ -851,234 +853,234 @@ export class PurchaseComponent {
                                   }
                                 }
                               },
-                    // {
-                    //   key: 'round_off',
-                    //   type: 'input',
-                    //   // defaultValue: "7777700",
-                    //   className: 'col-4',
-                    //   templateOptions: {
-                    //     type: 'input',
-                    //     label: 'Round off',
-                    //     placeholder: 'Enter Round off',
-                    //     // required: true
-                    //   }
-                    // },
-                    {
-                      key: 'gst_type',
-                      type: 'select',
-                      className: 'col-4',
-                      templateOptions: {
-                        label: 'Gst type',
-                        placeholder: 'Select Gst type',
-                        dataKey: 'name',
-                        dataLabel: "name",
-                        lazy: {
-                          url: 'masters/gst_types/',
-                          lazyOneTime: true
-                        }
-                      },
-                      hooks: {
-                        onChanges: (field: any) => {
-                          field.formControl.valueChanges.subscribe(data => {
-                            console.log("gst_type", data);
-                            if (data && data.gst_type_id) {
-                              this.formConfig.model['purchase_order_data']['gst_type_id'] = data.gst_type_id;
-                            }
-                          });
-                        }
-                      }
-                    },
-                    {
-                      key: 'payment_term',
-                      type: 'select',
-                      className: 'col-4',
-                      templateOptions: {
-                        label: 'Payment term',
-                        placeholder: 'Select Payment term',
-                        dataKey: 'name',
-                        dataLabel: "name",
-                        lazy: {
-                          url: 'vendors/vendor_payment_terms/',
-                          lazyOneTime: true
-                        }
-                      },
-                      hooks: {
-                        onChanges: (field: any) => {
-                          field.formControl.valueChanges.subscribe(data => {
-                            console.log("payment_term", data);
-                            if (data && data.payment_term_id) {
-                              this.formConfig.model['purchase_order_data']['payment_term_id'] = data.payment_term_id;
-                            }
-                          });
-                        }
-                      }
-                    },
-                    {
-                      key: 'ledger_account',
-                      type: 'select',
-                      className: 'col-4',
-                      templateOptions: {
-                        dataKey: 'name',
-                        dataLabel: "name",
-                        label: 'Ledger account',
-                        placeholder: 'Select Ledger account',
-                        lazy: {
-                          url: 'customers/ledger_accounts/',
-                          lazyOneTime: true
-                        }
-                      },
-                      hooks: {
-                        onChanges: (field: any) => {
-                          field.formControl.valueChanges.subscribe(data => {
-                            console.log("ledger_account", data);
-                            if (data && data.ledger_account_id) {
-                              this.formConfig.model['purchase_order_data']['ledger_account_id'] = data.ledger_account_id;
-                            }
-                          });
-                        }
-                      }
-                    },
-                    {
-                      key: 'order_status',
-                      type: 'select',
-                      className: 'col-4',
-                      templateOptions: {
-                        label: 'Order status Type',
-                        dataKey: 'order_status_id',
-                        dataLabel: 'status_name',
-                        placeholder: 'Select Order status type',
-                        lazy: {
-                          url: 'masters/order_status/',
-                          lazyOneTime: true
+                            // {
+                            //   key: 'round_off',
+                            //   type: 'input',
+                            //   // defaultValue: "7777700",
+                            //   className: 'col-4',
+                            //   templateOptions: {
+                            //     type: 'input',
+                            //     label: 'Round off',
+                            //     placeholder: 'Enter Round off',
+                            //     // required: true
+                            //   }
+                            // },
+                            {
+                              key: 'gst_type',
+                              type: 'select',
+                              className: 'col-4',
+                              templateOptions: {
+                                label: 'Gst type',
+                                placeholder: 'Select Gst type',
+                                dataKey: 'name',
+                                dataLabel: "name",
+                                lazy: {
+                                  url: 'masters/gst_types/',
+                                  lazyOneTime: true
+                                }
+                              },
+                              hooks: {
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    console.log("gst_type", data);
+                                    if (data && data.gst_type_id) {
+                                      this.formConfig.model['purchase_order_data']['gst_type_id'] = data.gst_type_id;
+                                    }
+                                  });
+                                }
+                              }
+                            },
+                            {
+                              key: 'payment_term',
+                              type: 'select',
+                              className: 'col-4',
+                              templateOptions: {
+                                label: 'Payment term',
+                                placeholder: 'Select Payment term',
+                                dataKey: 'name',
+                                dataLabel: "name",
+                                lazy: {
+                                  url: 'vendors/vendor_payment_terms/',
+                                  lazyOneTime: true
+                                }
+                              },
+                              hooks: {
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    console.log("payment_term", data);
+                                    if (data && data.payment_term_id) {
+                                      this.formConfig.model['purchase_order_data']['payment_term_id'] = data.payment_term_id;
+                                    }
+                                  });
+                                }
+                              }
+                            },
+                            {
+                              key: 'ledger_account',
+                              type: 'select',
+                              className: 'col-4',
+                              templateOptions: {
+                                dataKey: 'name',
+                                dataLabel: "name",
+                                label: 'Ledger account',
+                                placeholder: 'Select Ledger account',
+                                lazy: {
+                                  url: 'customers/ledger_accounts/',
+                                  lazyOneTime: true
+                                }
+                              },
+                              hooks: {
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    console.log("ledger_account", data);
+                                    if (data && data.ledger_account_id) {
+                                      this.formConfig.model['purchase_order_data']['ledger_account_id'] = data.ledger_account_id;
+                                    }
+                                  });
+                                }
+                              }
+                            },
+                            {
+                              key: 'order_status',
+                              type: 'select',
+                              className: 'col-4',
+                              templateOptions: {
+                                label: 'Order status Type',
+                                dataKey: 'order_status_id',
+                                dataLabel: 'status_name',
+                                placeholder: 'Select Order status type',
+                                lazy: {
+                                  url: 'masters/order_status/',
+                                  lazyOneTime: true
+                                },
+                                expressions: {
+                                  hide: '!model.purchase_order_id'
+                                },
+                              },
+                              hooks: {
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    console.log("order_status", data);
+                                    if (data && data.order_status_id) {
+                                      this.formConfig.model['purchase_order_data']['order_status_id'] = data.order_status_id;
+                                    }
+                                  });
+                                }
+                              }
+                            },
+                            {
+                              key: 'item_value',
+                              type: 'input',
+                              defaultValue: "0",
+                              className: 'col-4',
+                              templateOptions: {
+                                type: 'input',
+                                label: 'Items value',
+                                placeholder: 'Enter Item value',
+                                readonly: true
+                                // required: true
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  // field.parent.form.get('purchase_order_items').valueChanges.pipe(
+                                  //   distinctUntilChanged()
+                                  // ).subscribe((data: any) => {
+                                  //   let sum = 0;
+                                  //   data.forEach( d => {
+                                  //     if (d.totalAmount){
+                                  //       sum += parseInt(d.totalAmount);
+                                  //     }
+                                  //   });
+                                  //   // console.log('sum - ',sum);
+                                  //   field.formControl.setValue(sum);
+                                  // }); 
+                                }
+                              }
+                            },
+                            // {
+                            //   key: 'discount',
+                            //   type: 'input',
+                            //   // defaultValue: "777770",
+                            //   className: 'col-4',
+                            //   templateOptions: {
+                            //     type: 'input',
+                            //     label: 'Discount',
+                            //     placeholder: 'Enter Discount',
+                            //     // required: true
+                            //   }
+                            // },
+                            {
+                              key: 'dis_amt',
+                              type: 'input',
+                              // defaultValue: "777770",
+                              className: 'col-4',
+                              templateOptions: {
+                                type: 'input',
+                                label: 'Discount Amt',
+                                readonly: true,
+                                placeholder: 'Enter Discount Amt',
+                                // required: true
+                              
+                              }
+                            },
+                            {
+                              key: 'total_amount',
+                              type: 'input',
+                              defaultValue: "0",
+                              className: 'col-4',
+                              templateOptions: {
+                                type: 'input',
+                                label: 'Total amount',
+                                placeholder: 'Enter Total amount',
+                                readonly: true
+                              }
+                            },
+                            // {
+                            //   key: 'round_off',
+                            //   type: 'input',
+                            //   className: 'col-4',
+                            //   templateOptions: {
+                            //     type: 'input',
+                            //     label: 'Round Off',
+                            //     placeholder: 'Enter Round Off',
+                            //   }
+                            // }
+                          ]
                         },
-                        expressions: {
-                          hide: '!model.purchase_order_id',
-                        },
+                      ]
+                    },
+                {
+                    className: 'col-12 custom-form-card-block w-100',
+                    fieldGroup: [
+                      {
+                        template: '<div class="custom-form-card-title"> Order Attachments </div>',
+                        fieldGroupClassName: "ant-row",
                       },
-                      hooks: {
-                        onChanges: (field: any) => {
-                          field.formControl.valueChanges.subscribe(data => {
-                            console.log("order_status", data);
-                            if (data && data.order_status_id) {
-                              this.formConfig.model['purchase_order_data']['order_status_id'] = data.order_status_id;
-                            }
-                          });
+                      {
+                        key: 'order_attachments',
+                        type: 'file',
+                        className: 'ta-cell col-12 custom-file-attachement',
+                        props: {
+                          "displayStyle": "files",
+                          "multiple": true
+                          // label: 'Order Attachments',
+                          // // required: true
+                          // required: true
                         }
-                      }
-                    },
-                    {
-                      key: 'item_value',
-                      type: 'input',
-                      defaultValue: "0",
-                      className: 'col-4',
-                      templateOptions: {
-                        type: 'input',
-                        label: 'Items value',
-                        placeholder: 'Enter Item value',
-                        readonly: true
-                        // required: true
                       },
-                      hooks: {
-                        onInit: (field: any) => {
-                          // field.parent.form.get('purchase_order_items').valueChanges.pipe(
-                          //   distinctUntilChanged()
-                          // ).subscribe((data: any) => {
-                          //   let sum = 0;
-                          //   data.forEach( d => {
-                          //     if (d.totalAmount){
-                          //       sum += parseInt(d.totalAmount);
-                          //     }
-                          //   });
-                          //   // console.log('sum - ',sum);
-                          //   field.formControl.setValue(sum);
-                          // }); 
-                        }
-                      }
-                    },
-                    // {
-                    //   key: 'discount',
-                    //   type: 'input',
-                    //   // defaultValue: "777770",
-                    //   className: 'col-4',
-                    //   templateOptions: {
-                    //     type: 'input',
-                    //     label: 'Discount',
-                    //     placeholder: 'Enter Discount',
-                    //     // required: true
-                    //   }
-                    // },
-                    {
-                      key: 'dis_amt',
-                      type: 'input',
-                      // defaultValue: "777770",
-                      className: 'col-4',
-                      templateOptions: {
-                        type: 'input',
-                        label: 'Discount Amt',
-                        readonly: true,
-                        placeholder: 'Enter Discount Amt',
-                        // required: true
-                      
-                      }
-                    },
-                    {
-                      key: 'total_amount',
-                      type: 'input',
-                      defaultValue: "0",
-                      className: 'col-4',
-                      templateOptions: {
-                        type: 'input',
-                        label: 'Total amount',
-                        placeholder: 'Enter Total amount',
-                        readonly: true
-                      }
-                    },
-                    // {
-                    //   key: 'round_off',
-                    //   type: 'input',
-                    //   className: 'col-4',
-                    //   templateOptions: {
-                    //     type: 'input',
-                    //     label: 'Round Off',
-                    //     placeholder: 'Enter Round Off',
-                    //   }
-                    // }
-                  ]
-                },
-              ]
-            },
-        {
-            className: 'col-12 custom-form-card-block w-100',
-            fieldGroup: [
-              {
-                template: '<div class="custom-form-card-title"> Order Attachments </div>',
-                fieldGroupClassName: "ant-row",
+                    ]
+                  }
+                ]
               },
-              {
-                key: 'order_attachments',
-                type: 'file',
-                className: 'ta-cell col-12 custom-file-attachement',
-                props: {
-                  "displayStyle": "files",
-                  "multiple": true
-                  // label: 'Order Attachments',
-                  // // required: true
-                  // required: true
-                }
-              },
+
             ]
+
           }
         ]
-      },
-
-    ]
-
-  }
-]
-}
-]
-}
-}
+        }
+        ]
+        }
+        }
 
 totalAmountCal() {
 
