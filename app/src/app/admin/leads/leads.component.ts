@@ -34,14 +34,8 @@ export class LeadsComponent {
     // set form config
     this.setFormConfig();
     this.set_default_status_id(); // lead_status_id = 'Open'
-    this.formConfig.fields[0].fieldGroup[4].hide = true; // Leads[lead_status_id]   hide = true
-    // this.formConfig.fields[1].hide = true; // assignments   hide = true
-    // this.formConfig.fields[2].hide = true; // Interaction hide = true    
-    this.formConfig.fields[0].fieldGroup[5].hide = true; 
-    this.formConfig.fields[0].fieldGroup[6].hide = true; 
-    this.formConfig.fields[0].fieldGroup[7].hide = true; 
-    this.formConfig.fields[0].fieldGroup[8].hide = true; 
-    // this.formConfig.fields[1].hide = true; // Interaction hide = ture
+    this.formConfig.fields[0].fieldGroup[5].hide = true; // Leads[lead_status_id]   hide = true
+    this.formConfig.fields[1].hide = true; // Interaction hide = ture
   }
 
   formConfig: TaFormConfig = {};
@@ -54,23 +48,14 @@ export class LeadsComponent {
     this.LeadsEditID = event;
     this.http.get('leads/leads/' + event).subscribe((res: any) => {
       if (res && res.data) {
-        console.log('-------------------------------')
-        console.log('model :',this.formConfig.model);
-        console.log('data :',res.data);
         this.formConfig.model = res.data;
         // set labels for update
         this.formConfig.submit.label = 'Update';
         this.formConfig.pkId = 'lead_id';
         this.formConfig.model['lead_id'] = this.LeadsEditID;
         this.showForm = true;
-        this.formConfig.fields[0].fieldGroup[4].hide = false; // Leads[lead_status_id]   hide = false
-        // this.formConfig.fields[1].hide = false; // assignments   hide = false
-        // this.formConfig.fields[2].hide = false; // Interaction hide = false
-        this.formConfig.fields[0].fieldGroup[5].hide = false; 
-        this.formConfig.fields[0].fieldGroup[6].hide = false; 
-        this.formConfig.fields[0].fieldGroup[7].hide = false; 
-        this.formConfig.fields[0].fieldGroup[8].hide = false; 
-
+        this.formConfig.fields[0].fieldGroup[5].hide = false; // Leads[lead_status_id]   hide = true
+        this.formConfig.fields[1].hide = false; // Interaction hide = ture
       }
     })
     this.hide();
@@ -97,8 +82,6 @@ export class LeadsComponent {
       reset: {},
       model: {
         lead: {},
-        assignment: {},
-        assignment_history: [{}],
         interaction: {},
       },
       fields: [
@@ -112,7 +95,7 @@ export class LeadsComponent {
               className: 'col-3',
               templateOptions: {
                 label: 'Name',
-                placeholder: 'Enter name',
+                placeholder: 'Enter Name',
                 required: true,
                 // disabled: true
               },
@@ -128,7 +111,7 @@ export class LeadsComponent {
                 type: 'input',
                 label: 'Email',
                 placeholder: 'Enter Email',
-                // required: true
+                required: true
               },
               hooks: {
                 onInit: (field: any) => {}
@@ -140,8 +123,8 @@ export class LeadsComponent {
               className: 'col-3',
               templateOptions: {
                 label: 'Phone',
-                placeholder: 'Enter number',
-                required: false,
+                placeholder: 'Enter Number',
+                required: true,
               }
             },
             {
@@ -150,8 +133,35 @@ export class LeadsComponent {
               className: 'col-3',
               templateOptions: {
                 label: 'Score',
-                placeholder: 'Enter score',
+                placeholder: 'Enter Score',
                 // required: true,
+              }
+            },
+            {
+              key: 'assignee',
+              type: 'select',
+              className: 'col-3',
+              templateOptions: {
+                label: 'Assigned',
+                dataKey: 'employee_id',
+                dataLabel: "name",
+                options: [],
+                required: true,
+                lazy: {
+                  url: 'hrms/employees/',
+                  lazyOneTime: true
+                }
+              },
+              hooks: {
+                onChanges: (field: any) => {
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['lead']) {
+                      this.formConfig.model['lead']['assignee_id'] = data.employee_id;
+                    } else {
+                      console.error('Form config or lead_status data model is not defined.');
+                    }
+                  });
+                }
               }
             },
             {
@@ -180,83 +190,78 @@ export class LeadsComponent {
                   });
                 }
               }
-            },
-            {
-              key: 'sales_rep',
-              type: 'select',
-              className: 'col-3',
-              templateOptions: {
-                label: 'Sales Representative',
-                dataKey: 'employee_id',
-                dataLabel: "name",
-                options: [],
-                lazy: {
-                  url: 'hrms/employees/',
-                  lazyOneTime: true
-                },
-                required: false
-              },
-              hooks: {
-                onChanges: (field: any) => {
-                  field.formControl.valueChanges.subscribe((data: any) => {
-                    if (this.formConfig && this.formConfig.model && this.formConfig.model['assignment']) {
-                      this.formConfig.model['assignment']['sales_rep_id'] = data.employee_id;
-                    } else {
-                      console.error('Form config or vendor data model is not defined.');
-                    }
-                  });
-                }
-              }
-            },
-            {
-              key: 'interaction_type',
-              type: 'select',
-              className: 'col-3',
-              templateOptions: {
-                label: 'Interaction Type',
-                dataKey: 'interaction_type_id',
-                dataLabel: "interaction_type",
-                options: [],
-                lazy: {
-                  url: 'leads/interaction_types/',
-                  lazyOneTime: true
-                },
-                required: false
-              },
-              hooks: {
-                onChanges: (field: any) => {
-                  field.formControl.valueChanges.subscribe((data: any) => {
-                    if (this.formConfig && this.formConfig.model && this.formConfig.model['interaction']) {
-                      this.formConfig.model['interaction']['interaction_type_id'] = data.interaction_type_id;
-                    } else {
-                      console.error('Form config or lead_status data model is not defined.');
-                    }
-                  });
-                }
-              }
-            },
-            {
-              key: 'interaction_date',
-              type: 'input',
-              className: 'col-3',
-              templateOptions: {
-                type: 'datetime-local',
-                label: 'Interaction date',
-                placeholder: 'Select interaction date',
-                required: false
-              }
-            },
-            {
-              key: 'notes',
-              type: 'textarea',
-              className: 'col-3',
-              templateOptions: {
-                label: 'Notes',
-                placeholder: 'Enter Notes',
-                required: false,
-              }
-            },
+            }
           ]
+        },
+        // end of lead
+        //----------------------------------------- I N T E R A C T I O N  -----------------------------------//
+        {
+          key: 'interaction',
+          type: 'table',
+          className: 'custom-form-list',
+          templateOptions: {
+            title: 'Task Interactions',
+            addText: 'Add Interaction Notes',
+            tableCols: [
+              { name: 'interaction_type_id', label: 'Interaction Type' },
+              { name: 'interaction_date', label: 'Interaction Date' },
+              { name: 'notes', label: 'Notes' },
+            ]
+          },
+          fieldArray: {
+            fieldGroup: [
+              {
+                key: 'interaction_type',
+                type: 'select',
+                templateOptions: {
+                  label: 'Interaction Type',
+                  dataKey: 'interaction_type_id',
+                  dataLabel: 'interaction_type',
+                  options: [],
+                  hideLabel: true,
+                  required: true,
+                  lazy: {
+                    url: 'leads/interaction_types/',
+                    lazyOneTime: true
+                  },
+                },
+                hooks: {
+                  onChanges: (field: any) => {
+                    field.formControl.valueChanges.subscribe((data: any) => {
+                      console.log('user', data);
+                      const index = field.parent.key;
+                      if (!this.formConfig.model['interaction'][index]) {
+                        console.error(`Task comments at index ${index} is not defined. Initializing...`);
+                        this.formConfig.model['interaction'][index] = {};
+                      }
+
+                      this.formConfig.model['interaction'][index]['interaction_type_id'] = data.interaction_type_id;
+                    });
+                  }
+                }
+              },
+              {
+                key: 'interaction_date',
+                type: 'date',
+                templateOptions: {
+                  label: 'Interaction Date',
+                  // placeholder: 'Enter Notes',
+                  hideLabel: true,
+                  required: true
+                }
+              },
+              {
+                key: 'notes',
+                type: 'text',
+                templateOptions: {
+                  label: 'Notes',
+                  placeholder: 'Enter Notes',
+                  hideLabel: true,
+                  required: true
+                }
+              }
+            ]
+          }
         },
      ]
     }
