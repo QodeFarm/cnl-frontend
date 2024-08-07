@@ -76,7 +76,8 @@ export class FieldSelectComponent extends FieldType implements OnInit {
       const q = getListParamsQuery({ globalSearch: globalSearch, fixedFilters: this.props.lazy.fixedFilters, pageSize: pageSize });
 
       return this.http
-        .get(`${this.props.lazy.url}?` + q)
+        //.get(`${this.props.lazy.url}?` + q)
+        .get(`${this.props.lazy.url}`)
         .pipe(
           catchError(() => of({ results: [] })),
           map((res: any) => res.data || res || [])

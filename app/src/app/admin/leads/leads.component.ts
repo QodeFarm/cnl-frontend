@@ -263,8 +263,7 @@ export class LeadsComponent {
             ]
           }
         },
-        // end of interaction
-      ]
+     ]
     }
   }
 }
