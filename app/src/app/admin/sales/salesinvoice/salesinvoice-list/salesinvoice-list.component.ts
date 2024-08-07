@@ -80,6 +80,8 @@ export class SalesInvoiceListComponent {
           {
             type: 'delete',
             label: 'Delete',
+            confirm: true,
+            confirmMsg: "Sure to delete?",
             apiUrl: 'sales/sale_invoice_order'
           },
           {

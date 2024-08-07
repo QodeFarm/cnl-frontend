@@ -34,6 +34,8 @@ export class SalesinvoiceComponent {
 
     // to get SaleInvoice number for save
     this.getInvoiceNo();
+    this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[8].hide =true;
+    // console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
   }
 
   formConfig: TaFormConfig = {};
@@ -60,6 +62,7 @@ export class SalesinvoiceComponent {
 
         this.formConfig.model['sale_invoice_id'] = this.SaleInvoiceEditID;
         this.showForm = true;
+        this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[8].hide = false;
       }
     });
     this.hide();

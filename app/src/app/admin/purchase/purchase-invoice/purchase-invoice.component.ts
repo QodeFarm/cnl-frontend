@@ -35,6 +35,8 @@ export class PurchaseInvoiceComponent {
 
     // to get PurchaseOrder number for save
     this.getInvoiceNo();
+    this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[7].hide =true; //Hiding order status in create field
+
   }
   formConfig: TaFormConfig = {};
 
@@ -55,7 +57,9 @@ export class PurchaseInvoiceComponent {
         // show form after setting form values
         this.formConfig.pkId = 'purchase_invoice_id';
         this.formConfig.model['purchase_invoice_id'] = this.PurchaseInvoiceEditID;
+        this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[7].hide =false;
         this.showForm = true;
+        
       }
     })
     this.hide();
@@ -763,18 +767,6 @@ export class PurchaseInvoiceComponent {
                           fieldGroupClassName: "ant-row",
                           key: 'purchase_invoice_orders',
                           fieldGroup: [
-                            {
-                              key: 'total_boxes',
-                              type: 'input',
-                              // defaultValue: 77777,
-                              className: 'col-4',
-                              templateOptions: {
-                                type: 'input',
-                                label: 'Total boxes',
-                                placeholder: 'Enter Total boxes',
-                                // required: true
-                              }
-                            },
                             {
                               key: 'cess_amount',
                               type: 'input',

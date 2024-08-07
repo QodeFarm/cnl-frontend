@@ -30,6 +30,8 @@ export class PurchasereturnordersComponent {
     this.formConfig.model['purchase_return_orders']['order_type'] = 'purchase_return';
 
     this.getOrderNo();
+    this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[2].hide =true;
+    // console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
   }
 
   formConfig: TaFormConfig = {};
@@ -48,6 +50,7 @@ export class PurchasereturnordersComponent {
         this.formConfig.submit.label = 'Update';
         this.formConfig.model['purchase_return_id'] = this.PurchaseReturnOrderEditID;
         this.showForm = true;
+        this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[2].hide = false;
       }
     });
     this.hide();
@@ -815,18 +818,6 @@ export class PurchasereturnordersComponent {
                           });
                         }
                       }
-                    },
-                    {
-                      type: 'input',
-                      key: 'total_boxes',
-                      className: 'col-4',
-                      templateOptions: {
-                        type: 'number',
-                        label: 'Total Boxes',
-                        placeholder: 'Enter Total Boxes',
-                        // hideLabel: true,
-                        // // required: true
-                      },
                     },
                     {
                       key: 'taxable',

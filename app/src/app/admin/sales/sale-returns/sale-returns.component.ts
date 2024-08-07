@@ -30,6 +30,8 @@ export class SaleReturnsComponent {
     this.formConfig.model['sale_return_order']['order_type'] = 'sale_return';
 
     this.getReturnNo();
+    this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[2].hide =true;
+    // console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
   }
 
   formConfig: TaFormConfig = {};
@@ -49,6 +51,7 @@ export class SaleReturnsComponent {
         this.formConfig.submit.label = 'Update';
         this.formConfig.model['sale_return_id'] = this.SaleReturnOrderEditID;
         this.showForm = true;
+        this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[2].hide = false;
       }
     });
     this.hide();

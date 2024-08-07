@@ -48,6 +48,8 @@ export class SalesComponent {
 
     // to get SaleOrder number for save
     this.getOrderNo();
+    this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[8].hide =true;
+    // console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
   }
 
 
@@ -71,6 +73,7 @@ export class SalesComponent {
         this.formConfig.submit.label = 'Update';
         this.formConfig.model['sale_order_id'] = this.SaleOrderEditID;
         this.showForm = true;
+        this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[8].hide = false;
       }
     });
     this.hide();
@@ -879,7 +882,7 @@ export class SalesComponent {
                                       this.formConfig.model['sale_order']['order_status_id'] = data.order_status_id;
 
                                       const saleOrder = this.formConfig.model['sale_order'];
-                                      if (saleOrder.order_status && saleOrder.order_status.status_name === 'Confirmed') {
+                                      if (saleOrder.order_status && saleOrder.order_status.status_name === 'Approved') {
                                         console.log("processing salesInvoice:");
                                         const saleOrderItems = this.formConfig.model['sale_order_items'];
                                         const orderAttachments = this.formConfig.model['order_attachments']
@@ -905,7 +908,7 @@ export class SalesComponent {
                                             cess_amount: saleOrder.cess_amount,
                                             transport_charges: saleOrder.transport_charges,
                                             round_off: saleOrder.round_off,
-                                            total_amount: saleOrder.doc_amount,
+                                            total_amount: saleOrder.total_amount,
                                             vehicle_name: saleOrder.vehicle_name,
                                             total_boxes: saleOrder.total_boxes,
                                             shipping_address: saleOrder.shipping_address,

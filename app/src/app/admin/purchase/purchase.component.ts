@@ -34,6 +34,8 @@ export class PurchaseComponent {
 
     // to get PurchaseOrder number for save
     this.getOrderNo();
+    this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[7].hide =true;
+    // console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
   }
   formConfig: TaFormConfig = {};
 
@@ -60,6 +62,7 @@ export class PurchaseComponent {
 
         this.formConfig.model['purchase_order_id'] = this.PurchaseOrderEditID;
         this.showForm = true;
+        this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[7].hide = false;
       }
     })
     this.hide();
@@ -771,27 +774,6 @@ export class PurchaseComponent {
                             fieldGroupClassName: "ant-row",
                             key: 'purchase_order_data',
                             fieldGroup: [
-                              {
-                                type: 'input',
-                                key: 'total_boxes',
-                                className: 'col-4',
-                                templateOptions: {
-                                  type: "number",
-                                  label: 'Total boxes',
-                                  placeholder: 'Enter Total boxes',
-                                  // hideLabel: true,
-                                },
-                              },
-                              // {
-                              //   key: 'total_boxes',
-                              //   type: 'input',
-                              //   className: 'col-4',
-                              //   templateOptions: {
-                              //     type: 'number',
-                              //     label: 'Total boxes',
-                              //     placeholder: 'Enter Total boxes'
-                              //   }
-                              // },
                               {
                                 key: 'cess_amount',
                                 type: 'input',
