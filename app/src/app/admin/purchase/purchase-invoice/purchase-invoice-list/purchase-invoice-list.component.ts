@@ -17,13 +17,22 @@ export class PurchaseInvoiceListComponent {
   
   tableConfig: TaTableConfig = {
     apiUrl: 'purchase/purchase_invoice_order/',
-    // showCheckbox:true,
+    showCheckbox:true,
     pkId: "purchase_invoice_id",
     pageSize: 10,
     "globalSearch": {
       keys: ['id', 'first_name', 'last_name']
     },
     cols: [
+      {
+        fieldKey: 'vendor',
+        name: 'Vendor',
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          return `${row.vendor.name}`;
+        },
+        sort: true
+      },
       {
         fieldKey: 'purchase_type',
         name: 'Purchase Type',
@@ -70,15 +79,6 @@ export class PurchaseInvoiceListComponent {
         sort: false
       },
       {
-        fieldKey: 'vendor',
-        name: 'Vendor',
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.vendor.name}`;
-        },
-        sort: true
-      },
-      {
         fieldKey: 'order_status',
         name: 'Status',
         displayType: "map",
@@ -100,13 +100,14 @@ export class PurchaseInvoiceListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            // confirm: true,
-            // confirmMsg: "Sure to delete?",
-            apiUrl: 'purchase/purchase_invoice_orders_get'
+            confirm: true,
+            confirmMsg: "Sure to delete?",
+            apiUrl: 'purchase/purchase_invoice_order'
           },
           {
             type: 'callBackFn',
-            label: 'Edit',
+            icon: 'fa fa-pen',
+            label: '',
             callBackFn: (row, action) => {
               console.log(row);
               this.edit.emit(row.purchase_invoice_id);
