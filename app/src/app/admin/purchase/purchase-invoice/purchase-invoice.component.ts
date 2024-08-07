@@ -15,12 +15,17 @@ export class PurchaseInvoiceComponent {
   showForm: boolean = false;
   PurchaseInvoiceEditID: any;
   productOptions: any;
+  nowDate = () => {
+    return new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate();
+  }
+
 
   constructor(private http: HttpClient) {
   }
   ngOnInit() {
     this.showPurchaseInvoiceList = false;
-    this.showForm = true;
+    this.showForm = false;
+    this.PurchaseInvoiceEditID = null;
     // set form config
     this.setFormConfig();
     console.log('this.formConfig', this.formConfig);
@@ -38,10 +43,8 @@ export class PurchaseInvoiceComponent {
   }
 
   editPurchaseInvoice(event) {
-    console.log('event', event);
     this.PurchaseInvoiceEditID = event;
     this.http.get('purchase/purchase_invoice_order/' + event).subscribe((res: any) => {
-      console.log('--------> res ', res);
       if (res && res.data) {
 
         this.formConfig.model = res.data;
@@ -50,9 +53,7 @@ export class PurchaseInvoiceComponent {
         // set labels for update
         this.formConfig.submit.label = 'Update';
         // show form after setting form values
-
         this.formConfig.pkId = 'purchase_invoice_id';
-
         this.formConfig.model['purchase_invoice_id'] = this.PurchaseInvoiceEditID;
         this.showForm = true;
       }
@@ -60,20 +61,20 @@ export class PurchaseInvoiceComponent {
     this.hide();
   }
 
+
   getInvoiceNo() {
     this.invoiceNumber = null;
-    this.http.get('masters/generate_order_no/?type=PO-INV').subscribe((res: any) => {
-      console.log(res);
+    this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
       if (res && res.data && res.data.order_number) {
-        this.formConfig.model['purchase_invoice_orders']['invoice_no'] = res.data.order_number;
-        this.invoiceNumber = res.data.order_number;
-        console.log("PurchaseInvoice NO: ", this.invoiceNumber);
-        console.log("get PurchaseInvoice number called");
-
-        // set purchase_order default value
-        // this.formConfig.model['purchase_order']['order_type'] = 'purchase_order';
+        this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
+        this.http.get('masters/generate_order_no/?type=SO').subscribe((res: any) => {
+          if (res && res.data && res.data.order_number) {
+            this.formConfig.model['purchase_invoice_orders']['invoice_no'] = res.data.order_number;
+            this.invoiceNumber = res.data.order_number;
+          }
+        });;
       }
-    })
+    });
   }
 
   showPurchaseInvoiceListFn() {
@@ -95,7 +96,6 @@ export class PurchaseInvoiceComponent {
 
       ],
       submit: {
-        // label:'Submit',
         submittedFn: () => this.ngOnInit()
       },
       reset: {
@@ -122,7 +122,7 @@ export class PurchaseInvoiceComponent {
                 label: 'Invoice no',
                 placeholder: 'Enter Invoice No',
                 required: true,
-                // disabled: true
+                disabled: true
               },
               hooks: {
                 onInit: (field: any) => {
@@ -184,16 +184,15 @@ export class PurchaseInvoiceComponent {
                     if (data && data.vendor_id) {
                       this.formConfig.model['purchase_invoice_orders']['vendor_id'] = data.vendor_id;
                     }
-
-                    // if (field.form && field.form.controls && field.form.controls.customer_id) {
-                    //   field.form.controls.customer_id.setValue(data.customer_id)
-                    // }
-                    // if (field.form && field.form.controls && field.form.controls.customer_address_id) {
-                    //   field.form.controls.customer_address_id.setValue(data.customer_category_id)
-                    // }
-                    // if (field.form && field.form.controls && field.form.controls.email) {
-                    //   field.form.controls.email.setValue(data.email)
-                    // }
+                    if (data.vendor_addresses && data.vendor_addresses.billing_address) {
+                      field.form.controls.billing_address.setValue(data.vendor_addresses.billing_address)
+                    }
+                    if (data.vendor_addresses && data.vendor_addresses.shipping_address) {
+                      field.form.controls.shipping_address.setValue(data.vendor_addresses.shipping_address)
+                    }
+                    if (data.email) {
+                      field.form.controls.email.setValue(data.email)
+                    }
                   });
                 }
               }
@@ -201,7 +200,6 @@ export class PurchaseInvoiceComponent {
             {
               key: 'email',
               type: 'input',
-              // defaultValue: "testing@example.com",
               className: 'col-2',
               templateOptions: {
                 type: 'input',
@@ -216,34 +214,35 @@ export class PurchaseInvoiceComponent {
             {
               key: 'invoice_date',
               type: 'date',
-              defaultValue: new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate(),
+              defaultValue: this.nowDate(),
               className: 'col-2',
               templateOptions: {
                 type: 'date',
                 label: 'Invoice date',
-                // placeholder: 'Select Order Date',
+                readonly: true,
                 required: true
               }
             },
             {
               key: 'delivery_date',
               type: 'date',
-              defaultValue: new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate(),
+              defaultValue: this.nowDate(),
               className: 'col-2',
               templateOptions: {
                 type: 'date',
                 label: 'Delivery date',
-                // placeholder: 'Select Oder Date',
+                // readonly: true,
                 required: true
               }
             },
             {
               key: 'due_date',
               type: 'date',
-              defaultValue: new Date().toISOString().split('T')[0],
+              defaultValue: this.nowDate(),
               className: 'col-2',
               templateOptions: {
                 label: 'Due Date',
+                readonly: true,
                 //required: true
               }
             },
@@ -613,30 +612,6 @@ export class PurchaseInvoiceComponent {
                   // // required: true mrp tax 
                 },
               },
-              // {
-              //   type: 'input',
-              //   key: 'tax',
-              //   // defaultValue: 1000,
-              //   templateOptions: {
-              //     label: 'HSN',
-              //     placeholder: 'Tax',
-              //     hideLabel: true,
-              //     // type: 'number',
-              //     // // required: true mrp tax 
-              //   },
-              // },
-              // {
-              //   type: 'input',
-              //   key: 'tax',
-              //   // defaultValue: 1000,
-              //   templateOptions: {
-              //     label: 'Barcode',
-              //     placeholder: 'Barcode',
-              //     hideLabel: true,
-              //     // type: 'number',
-              //     // // required: true mrp tax 
-              //   },
-              // },
             ]
           },
         },
@@ -744,6 +719,7 @@ export class PurchaseInvoiceComponent {
                       templateOptions: {
                         label: 'Shipping Tracking No.',
                         placeholder: 'Enter Shipping Tracking No.',
+                        disabled: true
                       }
                     },
                     {
@@ -752,7 +728,6 @@ export class PurchaseInvoiceComponent {
                       className: 'col-6',
                       templateOptions: {
                         label: 'Shipping Date',
-                        defaultValue: new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate(),
                       }
                     },
                     {
@@ -1041,11 +1016,11 @@ export class PurchaseInvoiceComponent {
                                 placeholder: 'Enter Total amount',
                                 // required: true
                               },
-                              hooks: {
-                                onInit: (field: any) => {
+                              // hooks: {
+                              //   onInit: (field: any) => {
 
-                                }
-                              }
+                              //   }
+                              // }
                             },
                           ]
                         },
@@ -1065,9 +1040,6 @@ export class PurchaseInvoiceComponent {
                           props: {
                             "displayStyle": "files",
                             "multiple": true
-                            // label: 'Order Attachments',
-                            // // required: true
-                            // required: true
                           }
                         },
                       ]
@@ -1080,19 +1052,12 @@ export class PurchaseInvoiceComponent {
             }
           ]
         },
-
-
-
-        //   "vehicle_vessel": "Lorry",
-        //   "charge_type": "best",
-        //   "document_through": "mail"
       ]
     }
   }
 
   totalAmountCal() {
     const data = this.formConfig.model;
-    console.log('data', data);
     if (data) {
       const products = data.purchase_invoice_items || [];
       let totalAmount = 0;
@@ -1124,12 +1089,6 @@ export class PurchaseInvoiceComponent {
         controls.purchase_invoice_orders.controls.total_amount.setValue(total_amount);
 
       }
-      //const 
-
-      // const cess_amount = data;
-      // if (cess_amount && doc_amount) {
-      //   field.form.controls.doc_amount.setValue(parseInt(doc_amount) - parseInt(cess_amount));
-      // }
     }
   }
 
