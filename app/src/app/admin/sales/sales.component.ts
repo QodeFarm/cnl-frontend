@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { TaFormComponent, TaFormConfig } from '@ta/ta-form';
 import { distinctUntilChanged } from 'rxjs/operators';
-
+import { Observable, forkJoin } from 'rxjs';
+import { tap, switchMap } from 'rxjs/operators';
 @Component({
   selector: 'app-sales',
   templateUrl: './sales.component.html',
@@ -11,12 +12,18 @@ import { distinctUntilChanged } from 'rxjs/operators';
 })
 export class SalesComponent {
   @ViewChild('salesForm', { static: false }) salesForm: TaFormComponent | undefined;
+  @ViewChild('ordersModal', { static: true }) ordersModal: ElementRef;
   orderNumber: any;
   showSaleOrderList: boolean = false;
   showForm: boolean = false;
   SaleOrderEditID: any;
   productOptions: any;
-
+  customerDetails: Object;
+  customerOrders: any[] = []; 
+  showOrderListModal = false;
+  selectedOrder: any;
+  noOrdersMessage: string;
+  
   constructor(private http: HttpClient) {
   }
 
@@ -87,6 +94,109 @@ export class SalesComponent {
   showSaleOrderListFn() {
     this.showSaleOrderList = true;
   }
+
+  showOrdersList() {
+    const selectedCustomerId = this.formConfig.model.sale_order.customer_id;
+    this.noOrdersMessage = 'Please select a customer.';
+  
+    if (!selectedCustomerId) {
+      // alert('Please select a customer first.');
+      this.showOrderListModal = true;
+      return;
+    }
+  
+    this.customerOrders = [];
+    this.noOrdersMessage = '';
+  
+    this.getOrdersByCustomer(selectedCustomerId).pipe(
+      switchMap(orders => {
+        if (orders.count === 0) {
+          this.noOrdersMessage = 'No records for the selected customer.';
+          this.showOrderListModal = true; // Set to true to show the message in the modal
+          return [];
+        }
+  
+        const detailedOrderRequests = orders.data.map(order =>
+          this.getOrderDetails(order.sale_order_id).pipe(
+            tap(orderDetails => {
+              order.productsList = orderDetails.data.sale_order_items.map(item => ({
+                product_name: item.product?.name ?? 'Unknown Product',
+                quantity: item.quantity
+              }));
+            })
+          )
+        );
+  
+        return forkJoin(detailedOrderRequests).pipe(
+          tap(() => {
+            this.customerOrders = orders.data;
+            this.showOrderListModal = true;
+          })
+        );
+      })
+    ).subscribe();
+  }
+  
+  
+
+  getOrdersByCustomer(customerId: string): Observable<any> {
+    const url = `http://195.35.20.172:8000/api/v1/sales/sale_order_search/?customer_id=${customerId}`;
+    return this.http.get<any>(url);
+  }
+
+  getOrderDetails(orderId: string): Observable<any> {
+    const url = `http://195.35.20.172:8000/api/v1/sales/sale_order/${orderId}/`;
+    return this.http.get<any>(url);
+  }
+
+  selectOrder(order: any) {
+    console.log('Selected Order:', order);
+    this.handleOrderSelected(order); // Handle order selection
+  }
+
+  handleOrderSelected(order: any) {
+    this.selectedOrder = order;
+    this.editSaleOrder(order.sale_order_id); // Navigate to edit view
+    this.hideModal(); // Close modal
+  }
+
+  loadOrderDetails(orderId: string) {
+    this.getOrderDetails(orderId).subscribe(
+      (res: any) => {
+        if (res && res.data) {
+          this.formConfig.model = res.data;
+          this.formConfig.model['sale_order']['order_type'] = 'sale_order';
+          this.formConfig.pkId = 'sale_order_id';
+          this.formConfig.model['sale_order_id'] = orderId;
+          console.log('Order details loaded:', this.formConfig.model);
+        }
+      },
+      (error) => {
+        console.error('Error fetching order details:', error);
+      }
+    );
+  }
+
+  closeModal() {
+    this.hideModal(); // Use the hideModal method to remove the modal elements
+  }
+
+  hideModal() {
+    const modalBackdrop = document.querySelector('.modal-backdrop');
+    if (modalBackdrop) {
+      modalBackdrop.remove();
+    }
+    this.ordersModal.nativeElement.classList.remove('show');
+    this.ordersModal.nativeElement.style.display = 'none';
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+  }
+
+  ngOnDestroy() {
+    // Ensure modals are disposed of correctly
+    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+  }
+
 
   setFormConfig() {
     this.formConfig = {
