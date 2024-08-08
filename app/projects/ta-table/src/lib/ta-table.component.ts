@@ -14,6 +14,7 @@ import { TaParamsConfig, TaTableConfig } from './ta-table-config';
 import { TaTableService } from './ta-table.service';
 import moment from 'moment';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'ta-table',
@@ -55,6 +56,7 @@ export class TaTableComponent implements OnDestroy {
   selectedQuickPeriod: string | null = null;
   fromDate: Date | null = null;
   toDate: Date | null = null;
+  isButtonVisible = false;
   
 
   quickPeriodOptions = [
@@ -151,6 +153,7 @@ export class TaTableComponent implements OnDestroy {
             console.error('Error executing URL:', `${full_path}${queryString}`, error);
         }
     );
+    return queryString;
 }
 
 clearFilters() {
@@ -220,22 +223,20 @@ downloadData(event: any) {
     apiUrl: this.options.apiUrl,
     pageIndex: this.pageIndex,
     pageSize: this.pageSize,
-    filters: this.filters,
-    fixedFilters: this.options.fixedFilters
   }
 
   this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
     this.loading = false;
-    this.rows = data.data || data;
-
     const full_path = this.options.apiUrl
     const name_of_file = full_path.split('/')[1]
+    let fullUrl = `${this.options.apiUrl}`;
+    const query = this.applyFilters()
+    if (query.length > 1) {
+      fullUrl = `${fullUrl}${query}/`
+    }
 
-    const fullUrl = `${this.options.apiUrl}download/excel/`;
-
-    this.http.get(fullUrl, {
-      responseType: 'blob'
-    }).subscribe((blob: Blob) => {
+    const download_url = `${fullUrl}download/excel/`
+    this.http.get(download_url, { responseType: 'blob' }).subscribe((blob: Blob) => {
       const a = document.createElement('a');
       const objectUrl = URL.createObjectURL(blob);
       a.href = objectUrl;
@@ -265,7 +266,8 @@ downloadData(event: any) {
 
   constructor(
     public taTableS: TaTableService,
-    private http: HttpClient
+    private http: HttpClient,
+    private router: Router
   ) {
     this.actionObservable$ = this.taTableS.actionObserval().subscribe((res: any) => {
       if (res && res.action && res.action.type === 'delete') {
@@ -294,6 +296,16 @@ downloadData(event: any) {
     if (!this.options.paginationPosition)
       this.options.paginationPosition = 'bottom';
     // this.loadDataFromServer();
+    const currentUrl = this.router.url;
+    // console.log('Current URL:', currentUrl); 
+    this.isButtonVisible = [
+      '/admin/purchase',
+      '/admin/purchase/invoice',
+      '/admin/purchase/purchasereturns',
+      '/admin/sales',
+      '/admin/sales/salesinvoice',
+      '/admin/sales/sale-returns',
+    ].includes(currentUrl);
   }
   loadDataFromServer(startIntial?: boolean): void {
 

@@ -5,7 +5,7 @@
     <div class="ta-cell">
         <div class="ta-row p-0 justify-content-end flex-nowrap">
             <!-- Quick Period Dropdown -->
-            <div class="filter-group" style="margin-right: 10px;">
+            <div class="filter-group" style="margin-right: 10px;" *ngIf="isButtonVisible">
                 <nz-select id="quickPeriod" [(ngModel)]="selectedQuickPeriod" 
                            (ngModelChange)="onQuickPeriodChange()" 
                            nzPlaceHolder="Quick Period" 
@@ -16,39 +16,35 @@
             </div>
 
             <!-- From Date Picker -->
-            <div class="filter-group" style="margin-right: 10px;">
+            <div class="filter-group" style="margin-right: 10px;" *ngIf="isButtonVisible">
                 <nz-date-picker id="fromDate" [(ngModel)]="fromDate" class="date-picker" style="width: 180px;"></nz-date-picker>
             </div>
 
             <!-- To Date Picker -->
-            <div class="filter-group" style="margin-right: 10px;">
+            <div class="filter-group" style="margin-right: 10px;" *ngIf="isButtonVisible">
                 <nz-date-picker id="toDate" [(ngModel)]="toDate" class="date-picker" style="width: 180px;"></nz-date-picker>
             </div>
 
             <!-- Apply Filters OK Button -->
-            <div class="filter-group" style="margin-right: 10px;">
+            <div class="filter-group" style="margin-right: 10px;" *ngIf="isButtonVisible">
                 <button nz-button nzType="primary" (click)="applyFilters()" class="apply-filters-button">
-                    <i nz-icon nzType="check"></i>
-                    OK
+                    Ok
                 </button>
             </div>
 
             <!-- Apply Filters Clear Button -->
-            <div class="filter-group" style="margin-right: 10px;">
-                <button nz-button nzType="default" (click)="clearFilters()" class="clear-filters-button">
-                    <i nz-icon nzType="close"></i> 
-                    Clear
+            <div class="filter-group" style="margin-right: 10px;" *ngIf="isButtonVisible">
+                <button nz-button nzType="primary" (click)="clearFilters()" class="clear-filters-button">
+                    <i nzTheme="outline"></i>Clear
                 </button>
             </div>
-
+            
             <!-- Download Button -->
-            <div class="ta-cell">
-                <div class="filter-group" style="margin-right: 40px;">
-                    <button nz-button (click)="downloadData($event)">
-                        <i nz-icon nzType="download" nzTheme="outline"></i>
-                    </button>
-                </div>
-            </div>
+            <div class="filter-group" style="margin-right: 40px;" *ngIf="isButtonVisible">
+                <button nz-button nzType="primary" (click)="downloadData($event)">
+                    <i nz-icon nzType="download" nzTheme="outline"></i>
+                </button>
+            </div>       
         </div>
     </div>
 
