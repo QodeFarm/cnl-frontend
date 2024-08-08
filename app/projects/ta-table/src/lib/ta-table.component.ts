@@ -13,6 +13,7 @@ import { Observable, Subscription } from 'rxjs';
 import { TaParamsConfig, TaTableConfig } from './ta-table-config';
 import { TaTableService } from './ta-table.service';
 import moment from 'moment';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'ta-table',
@@ -51,6 +52,200 @@ export class TaTableComponent implements OnDestroy {
   @ViewChild('taTable') taTable!: NzTableComponent<any> | any;
 
 
+  selectedQuickPeriod: string | null = null;
+  fromDate: Date | null = null;
+  toDate: Date | null = null;
+  
+
+  quickPeriodOptions = [
+    { value: 'today', label: 'Today' },
+    { value: 'yesterday', label: 'Yesterday' },
+    { value: 'last_week', label: 'Last Week' },
+    { value: 'current_month', label: 'Current Month' },
+    { value: 'last_month', label: 'Last Month' },
+    { value: 'last_six_months', label: 'Last Six Months' },
+    { value: 'current_quarter', label: 'Current Quarter' },
+    { value: 'year_to_date', label: 'Year to Date' },
+    { value: 'last_year', label: 'Last Year' }
+  ];
+  formConfig: any;
+
+  onQuickPeriodChange() {
+    const today = new Date();
+    let startDate: Date | null = null;
+    let endDate: Date | null = today;
+  
+    switch (this.selectedQuickPeriod) {
+      case 'today':
+        startDate = endDate;
+        break;
+      case 'yesterday':
+        startDate = new Date(today.setDate(today.getDate() - 1));
+        endDate = startDate;
+        break;
+      case 'last_week':
+        startDate = new Date(today.setDate(today.getDate() - today.getDay() - 6));
+        endDate = new Date(today.setDate(startDate.getDate() + 6));
+        break;
+      case 'current_month':
+        startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+        break;
+      case 'last_month':
+        startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        endDate = new Date(today.getFullYear(), today.getMonth(), 0);
+        break;
+      case 'last_six_months':
+        startDate = new Date(today);
+        startDate.setMonth(startDate.getMonth() - 6);
+        // Set the day to the start of the month for consistency
+        startDate.setDate(1);
+        break;
+      case 'current_quarter':
+        const currentMonth = today.getMonth();
+        const quarterStartMonth = currentMonth - (currentMonth % 3);
+        startDate = new Date(today.getFullYear(), quarterStartMonth, 1);
+        break;
+      case 'year_to_date':
+        startDate = new Date(today.getFullYear(), 3, 1); // Assuming fiscal year starts in April
+        break;
+      case 'last_year':
+        startDate = new Date(today.getFullYear() - 1, 3, 1);
+        endDate = new Date(today.getFullYear(), 2, 31);
+        break;
+    }
+  
+    this.fromDate = startDate;
+    this.toDate = endDate;
+  }
+  
+  applyFilters() {
+    // Construct the filters object
+    const filters = {
+        quickPeriod: this.selectedQuickPeriod,
+        fromDate: this.fromDate,
+        toDate: this.toDate,
+    };
+    
+    // Generate query string from filters
+    const queryString = this.generateQueryString(filters);
+
+    const tableParamConfig: TaParamsConfig = {
+      apiUrl: this.options.apiUrl,
+      pageIndex: this.pageIndex,
+      pageSize: this.pageSize,
+      filters: this.filters,
+      fixedFilters: this.options.fixedFilters
+    }
+
+    const full_path = this.options.apiUrl;
+
+    const url = `${full_path}${queryString}`;
+    this.http.get(url).subscribe(
+        response => {
+            this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
+                this.loading = false;
+                this.rows = response['data'] || data;
+            });
+        },
+        error => {
+            console.error('Error executing URL:', `${full_path}${queryString}`, error);
+        }
+    );
+}
+
+clearFilters() {
+    // Reset all filter values
+    this.selectedQuickPeriod = null;
+    this.fromDate = null;
+    this.toDate = null;
+
+    // Optionally, you might want to clear other filters or reset pagination if necessary
+    this.pageIndex = 1;
+
+    // Re-fetch data without any filters
+    const tableParamConfig: TaParamsConfig = {
+      apiUrl: this.options.apiUrl,
+      pageIndex: this.pageIndex,
+      pageSize: this.pageSize,
+      // filters: {}, // Clear all filters
+      fixedFilters: this.options.fixedFilters
+    }
+
+    const url = this.options.apiUrl; // Base URL without any filters
+    this.http.get(url).subscribe(
+        response => {
+            this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
+                this.loading = false;
+                this.rows = response['data'] || data;
+            });
+        },
+        error => {
+            console.error('Error executing URL:', url, error);
+        }
+    );
+}
+
+
+generateQueryString(filters: { quickPeriod: string, fromDate: Date, toDate: Date }): string {
+    const queryParts: string[] = [];
+
+    if (filters.quickPeriod) {
+        // Add quickPeriod to query string if needed
+        // queryParts.push(`quick_period=${encodeURIComponent(filters.quickPeriod)}`);
+        queryParts.push(`period_name=${encodeURIComponent(filters.quickPeriod)}`);
+    }
+
+    if (filters.fromDate) {
+        const fromDateStr = this.formatDate(filters.fromDate);
+        queryParts.push(`created_at_after=${encodeURIComponent(fromDateStr)}`);
+    }
+
+    if (filters.toDate) {
+        const toDateStr = this.formatDate(filters.toDate);
+        queryParts.push(`created_at_before=${encodeURIComponent(toDateStr)}`);
+    }
+
+    return '?' + queryParts.join('&');
+}
+formatDate(date: Date): string {
+    // Format date as 'yyyy-MM-dd'
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+downloadData(event: any) {
+  const tableParamConfig: TaParamsConfig = {
+    apiUrl: this.options.apiUrl,
+    pageIndex: this.pageIndex,
+    pageSize: this.pageSize,
+    filters: this.filters,
+    fixedFilters: this.options.fixedFilters
+  }
+
+  this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
+    this.loading = false;
+    this.rows = data.data || data;
+
+    const full_path = this.options.apiUrl
+    const name_of_file = full_path.split('/')[1]
+
+    const fullUrl = `${this.options.apiUrl}download/excel/`;
+
+    this.http.get(fullUrl, {
+      responseType: 'blob'
+    }).subscribe((blob: Blob) => {
+      const a = document.createElement('a');
+      const objectUrl = URL.createObjectURL(blob);
+      a.href = objectUrl;
+      a.download = `${name_of_file}.xlsx`
+      a.click();
+      URL.revokeObjectURL(objectUrl);
+    });
+  })
+};
+
   searchValue = '';
   visible = false;
   total = 1;
@@ -68,7 +263,10 @@ export class TaTableComponent implements OnDestroy {
   actionObservable$: Subscription = new Subscription();
   filtersObservable$: Subscription = new Subscription();
 
-  constructor(public taTableS: TaTableService) {
+  constructor(
+    public taTableS: TaTableService,
+    private http: HttpClient
+  ) {
     this.actionObservable$ = this.taTableS.actionObserval().subscribe((res: any) => {
       if (res && res.action && res.action.type === 'delete') {
         this.deleteRow(res);
