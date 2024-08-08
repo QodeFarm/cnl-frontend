@@ -8,6 +8,10 @@
     height: 128px;
 }
 
+.ant-upload.ant-upload-drag .ant-upload {
+    padding: 0px !important;
+}
+
 .ant-upload {
     padding: 0px !important;
 }
