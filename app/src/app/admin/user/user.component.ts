@@ -11,9 +11,9 @@ export class UserComponent {
     drawerSize: 500,
     drawerPlacement: 'top',
     tableConfig: {
-      apiUrl: 'users/users_list/',
+      apiUrl: 'users/user/',
       title: 'Users',
-      pkId: "first_name",
+      pkId: "user_id",
       pageSize: 10,
       "globalSearch": {
         keys: ['username', 'email']
@@ -53,7 +53,7 @@ export class UserComponent {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
-              apiUrl: 'leaves/employeeleaves'
+              apiUrl: 'users/user'
             },
             {
               type: 'edit',
