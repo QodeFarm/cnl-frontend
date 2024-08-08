@@ -28,10 +28,9 @@ interface SpeechRecognitionEvent extends Event {
 export class VoiceassistantComponent {
   private recognition: SpeechRecognitionEvent | null = null;
 
-  constructor(private router: Router) {
-    this.initializeSpeechRecognition();
-  }
+  constructor(private router: Router) {}
 
+  // Method to initialize speech recognition
   private initializeSpeechRecognition(): void {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
@@ -42,9 +41,9 @@ export class VoiceassistantComponent {
       this.recognition.maxAlternatives = 1;
 
       this.recognition.onresult = (event: SpeechRecognitionEvent) => {
-        const speechResult = event.results[0][0].transcript.toLowerCase();
-        console.log('Result received: ' + speechResult);
-        this.processSpeech(speechResult);
+        let speechResult = event.results[0][0].transcript.toLowerCase();
+        console.log('Result received: ' + speechResult);       
+        this.processSpeech(speechResult);       
       };
 
       this.recognition.onerror = (event: Event) => {
@@ -54,14 +53,14 @@ export class VoiceassistantComponent {
       this.recognition.onend = () => {
         console.log('Speech recognition service disconnected');
       };
-
-      this.startRecognition();
     } else {
       console.warn('Speech recognition not supported in this browser.');
     }
   }
 
-  private startRecognition(): void {
+  // Method to start speech recognition
+  public startSpeechRecognition(): void {
+    this.initializeSpeechRecognition();
     if (this.recognition) {
       this.recognition.start();
       setTimeout(() => {
@@ -72,13 +71,18 @@ export class VoiceassistantComponent {
 
   private processSpeech(speech: string): void {
     const pages: { [key: string]: string } = {
-      'sales order': '/sales-order',
-      'product': '/products-page',
-      'vendor': '/vendors-page',
-      'home': '/home'
-    };
+      'dashboard': '/admin/dashboard',
+      'users': 'admin/users',
+      'company':'/admin/company',
+      'sales' : '/admin/sales',
+      'roles': 'users/roles',
+      'inventory':'admin/inventory',
+      'master': 'admin/master',
+      'product-groups':'products/product-groups',
+      'vendors':'admin/vendors'
 
-    const page = Object.keys(pages).find(page => speech.includes('go to ' + page + '.'));
+    };
+    const page = Object.keys(pages).find(page => speech.includes('go to ' + page));
     if (page) {
       this.router.navigate([pages[page]]);
     } else {
