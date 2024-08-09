@@ -158,6 +158,20 @@
                     <h6 class="dropdown-header">
                         Configuration
                     </h6>
+                    <ul class="custom-header-drop-list">
+                        <li>
+                            <a [routerLink]="['/admin/company']"><i class="fa fa-building "></i> Company</a>
+                        </li>
+                        <li>
+                            <a [routerLink]="['/admin/company/branches']"><i class="fa fa-sitemap"></i> Branches</a>
+                        </li>
+                        <li>
+                            <a [routerLink]="['/admin/users']"><i class="fa fa-user"></i> Users</a>
+                        </li>
+                        <li>
+                            <a [routerLink]="['/admin/users/roles']"><i class="fa fa-shield-alt"></i> User Roles</a>
+                        </li>
+                    </ul>
                 </div>
             </li>
             <!-- Nav Item - Favourite -->
@@ -170,7 +184,23 @@
                 <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="configDropdown">
                     <h6 class="dropdown-header">
                         Favourite
-                    </h6>
+                    </h6>                      
+                    <ul class="custom-header-drop-list">
+                    No Favourites Added 
+                    <!-- Enable the below for the future use -->
+                        <!-- <li>
+                            <a href="javascript:;">Favourite 1</a>
+                        </li>
+                        <li>
+                            <a href="javascript:;">Favourite 2</a>
+                        </li>
+                        <li>
+                            <a href="javascript:;">Favourite 3</a>
+                        </li>
+                        <li>
+                            <a href="javascript:;">Favourite 4</a>
+                        </li> -->
+                    </ul>
                 </div>
             </li>
 

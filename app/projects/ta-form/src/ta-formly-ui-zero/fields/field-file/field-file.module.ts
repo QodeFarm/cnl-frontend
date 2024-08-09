@@ -5,6 +5,7 @@ import { FieldFileComponent } from './field-file.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormlyModule } from '@ngx-formly/core';
 import { TaFileUploadComponent } from './ta-file-upload/ta-file-upload.component';
+import { TaCoreModule } from '@ta/ta-core';
 
 
 
@@ -12,7 +13,7 @@ import { TaFileUploadComponent } from './ta-file-upload/ta-file-upload.component
   declarations: [
     FieldFileComponent
   ],
-  imports: [CommonModule, ReactiveFormsModule, TaFileUploadComponent, FormlyModule.forChild({
+  imports: [CommonModule, ReactiveFormsModule, TaFileUploadComponent, TaCoreModule, FormlyModule.forChild({
     extras: {
       checkExpressionOn: 'changeDetectionCheck'
     },

@@ -20,7 +20,6 @@ export class AuthguardGuard implements CanActivate {
 
       if (url === '/login') {
         this.goNavUrl(currentUser);
-        // this.router.navigate(['/studio']);
         return false;
       }
       if (currentUser) {

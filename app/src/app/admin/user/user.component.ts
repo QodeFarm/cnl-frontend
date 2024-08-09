@@ -9,14 +9,14 @@ import { TaCurdConfig } from '@ta/ta-curd';
 export class UserComponent {
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
-    drawerPlacement: 'right',
+    drawerPlacement: 'top',
     tableConfig: {
-      apiUrl: 'users/userdata/',
+      apiUrl: 'users/users_list/',
       title: 'Users',
       pkId: "first_name",
       pageSize: 10,
       "globalSearch": {
-        keys: ['id', 'name']
+        keys: ['username', 'email']
       },
       cols: [
         {
@@ -35,7 +35,7 @@ export class UserComponent {
           sort: true,
           displayType: "map",
           mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.role.role_name}`;
+            return `${row.role?.role_name || '--'}`;
           },
         },
         {
@@ -68,26 +68,44 @@ export class UserComponent {
       title: 'User',
       pkId: "user_id",
       exParams: [
-        {
-          key: 'company_id',
-          type: 'script',
-          value: 'data.company.company_id'
-        },
-        {
-          key: 'role_id',
-          type: 'script',
-          value: 'data.role.role_id'
-        },
-        {
-          key: 'status_id',
-          type: 'script',
-          value: '"f8edc445-7017-4ae1-819e-280c8c061484"'
-        }
+        // {
+        //   key: 'company_id',
+        //   type: 'script',
+        //   value: 'data.company.company_id'
+        // },
+        // {
+        //   key: 'role_id',
+        //   type: 'script',
+        //   value: 'data.role.role_id'
+        // },
+        // {
+        //   key: 'status_id',
+        //   type: 'script',
+        //   value: 'data.status.status_id'
+        // },
+        // {
+        //   key: 'branch_id',
+        //   type: 'script',
+        //   value: 'data.brach.branch_id'
+        // }
       ],
       fields: [
         {
-          fieldGroupClassName: 'row',
+          fieldGroupClassName: "row col-12 p-0 m-0 custom-form",
           fieldGroup: [
+            {
+              key: 'profile_picture_url',
+              type: 'file',
+              className: "ta-cell pr-md col-md-6 col-12",
+              props: {
+                displayStyle: 'avatar',
+                storeFolder: "profile",
+                label: 'Profile Pic',
+                multiple: false,
+                placeholder: 'Enter Profile Pic',
+                required: false,
+              }
+            },
             {
               key: 'username',
               type: 'text',
@@ -153,14 +171,15 @@ export class UserComponent {
               }
             },
             {
-              key: 'role',
+              key: 'role_id',
               type: 'select',
               className: 'ta-cell pr-md col-md-6 col-12',
               templateOptions: {
                 label: 'User Role',
-                dataKey: 'role_name',
+                dataKey: 'role_id',
                 dataLabel: "role_name",
                 options: [],
+                bindId: true,
                 lazy: {
                   url: 'users/role/',
                   lazyOneTime: true
@@ -174,7 +193,7 @@ export class UserComponent {
               }
             },
             {
-              key: 'company',
+              key: 'company_id',
               type: 'select',
               className: 'ta-cell pr-md col-md-6 col-12',
               templateOptions: {
@@ -182,6 +201,7 @@ export class UserComponent {
                 dataKey: 'company_id',
                 dataLabel: "name",
                 options: [],
+                bindId: true,
                 lazy: {
                   url: 'company/companies/',
                   lazyOneTime: true
@@ -213,6 +233,56 @@ export class UserComponent {
               }
             },
             {
+              key: 'branch_id',
+              type: 'select',
+              className: 'ta-cell pr-md col-md-6 col-12',
+              templateOptions: {
+                label: 'Branch',
+                dataKey: 'branch_id',
+                dataLabel: "name",
+                bindId: true,
+                options: [],
+                required: true,
+                lazy: {
+                  url: 'company/branches/',
+                  lazyOneTime: true
+                }
+              }
+            },
+            {
+              key: 'status_id',
+              type: 'select',
+              className: 'ta-cell pr-md col-md-6 col-12',
+              templateOptions: {
+                label: 'Status',
+                bindId: true,
+                dataKey: 'status_id',
+                dataLabel: "status_name",
+                options: [],
+                // required: true,
+                lazy: {
+                  url: 'masters/statuses/',
+                  lazyOneTime: true
+                }
+              }
+            },
+            {
+              key: 'isActive',
+              type: 'boolean',
+              className: 'ta-cell pr-md col-md-6 col-12',
+              templateOptions: {
+                label: 'Is Active',
+                dataKey: 'name',
+                dataLabel: "name",
+                options: [],
+                // required: true,
+                // lazy: {
+                //   url: 'masters/sale_types/',
+                //   lazyOneTime: true
+                // }
+              }
+            },
+            {
               key: 'password',
               type: 'text',
               className: 'ta-cell pr-md col-md-6 col-12',
@@ -220,6 +290,9 @@ export class UserComponent {
                 type: 'password',
                 label: 'Password',
                 required: true
+              },
+              expressions: {
+                hide: "model.user_id"
               },
               hooks: {
                 onInit: (field: any) => {
@@ -236,6 +309,9 @@ export class UserComponent {
                 label: 'Re Password',
                 required: true
               },
+              expressions: {
+                hide: "model.user_id"
+              },
               hooks: {
                 onInit: (field: any) => {
                   //field.templateOptions.options = this.cs.getRole();
@@ -245,7 +321,7 @@ export class UserComponent {
             {
               key: 'bio',
               type: 'textarea',
-              className: 'ta-cell pr-md col-md-6 col-12',
+              className: 'ta-cell pr-md col-12',
               templateOptions: {
                 label: 'Comments',
                 placeholder: 'Enter comments',

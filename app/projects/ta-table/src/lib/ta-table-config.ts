@@ -18,7 +18,7 @@ export interface TaTableConfig {
   bordered?: boolean;
   tableLayout?: 'fixed' | 'auto';
   pageSizeOptions?: number[];
-  showCheckbox?:boolean;
+  showCheckbox?: boolean;
 }
 
 export interface Export {
@@ -53,6 +53,7 @@ interface Action {
   label?: string;
   confirm?: boolean;
   confirmMsg?: string;
+  icon?: string;
   apiUrl?: string;
   callBackFn?: (row: any, action: any) => any; // if type == 'callBackFn'
   conditionFn?: (row: any, action: any) => any;

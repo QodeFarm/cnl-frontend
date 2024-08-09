@@ -3,6 +3,19 @@
     height: 128px;
   } */
 
+ :host ::ng-deep .avatar-uploader>.ant-upload {
+    width: 128px;
+    height: 128px;
+}
+
+.ant-upload.ant-upload-drag .ant-upload {
+    padding: 0px !important;
+}
+
+.ant-upload {
+    padding: 0px !important;
+}
+
 .ant-upload {
     box-sizing: border-box;
     margin: 0;
@@ -81,9 +94,10 @@
     transition: border-color .3s
 }
 
-.ant-upload.ant-upload-drag .ant-upload {
+
+/* .ant-upload.ant-upload-drag .ant-upload {
     padding: 16px 0
-}
+} */
 
 .ant-upload.ant-upload-drag.ant-upload-drag-hover:not(.ant-upload-disabled) {
     border-color: var(--ant-primary-7)

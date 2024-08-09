@@ -53,7 +53,7 @@ export class FieldSelectComponent extends FieldType implements OnInit {
     templateOptions: { options: [] },
   };
   compareFn = (o1: any, o2: any) => {
-    if (this.props.dataKey && o1 && o2) {
+    if (this.props.dataKey && o1 && o2 && !this.props.bindId) {
       return o1[this.props.dataKey] === o2[this.props.dataKey];
     } else {
       return o1 === o2;
@@ -76,7 +76,8 @@ export class FieldSelectComponent extends FieldType implements OnInit {
       const q = getListParamsQuery({ globalSearch: globalSearch, fixedFilters: this.props.lazy.fixedFilters, pageSize: pageSize });
 
       return this.http
-        .get(`${this.props.lazy.url}?` + q)
+        //.get(`${this.props.lazy.url}?` + q)
+        .get(`${this.props.lazy.url}`)
         .pipe(
           catchError(() => of({ results: [] })),
           map((res: any) => res.data || res || [])
@@ -108,6 +109,15 @@ export class FieldSelectComponent extends FieldType implements OnInit {
     if (this.props.labelMapFn) {
       label = this.props.labelMapFn(item);
     }
-    return { label: label, value: item }
+    let dataKey = 'id';
+    if (this.props.dataKey) {
+      dataKey = item[this.props.dataKey];
+    }
+    if (this.props.bindId) {
+      return { label: label, value: dataKey }
+    } else {
+      return { label: label, value: item }
+    }
+
   }
 }

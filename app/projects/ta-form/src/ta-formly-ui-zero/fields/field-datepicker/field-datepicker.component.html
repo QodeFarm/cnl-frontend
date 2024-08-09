@@ -1,2 +1,2 @@
 <!-- <nz-date-picker [formControl]="formControl" [nzDisabledDate]="disabledDate"></nz-date-picker> -->
-<nz-date-picker [(ngModel)]="dateValue" (ngModelChange)="onChange($event)"></nz-date-picker>
+<nz-date-picker [(ngModel)]="dateValue" (ngModelChange)="onChange($event)" [nzInputReadOnly]="props.inputReadonly" [nzDisabled]="props.readonly"></nz-date-picker>

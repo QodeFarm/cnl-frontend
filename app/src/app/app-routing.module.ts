@@ -20,7 +20,7 @@ const routes: Routes = [
   },
   {
     path: 'admin',
-    //canActivate: [AuthguardGuard],
+    // canActivate: [AuthguardGuard],
     component: AdminLayoutComponent,
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
@@ -28,13 +28,24 @@ const routes: Routes = [
       { path: 'dashboard', canActivate: [], loadComponent: () => import('./admin/dashboard/dashboard.component').then(m => m.DashboardComponent) },
       { path: 'users', canActivate: [], loadChildren: () => import('./admin/user/user.module').then(m => m.UserModule) },
       { path: 'sales', canActivate: [], loadChildren: () => import('./admin/sales/sales.module').then(m => m.SalesModule) },
-      { path: 'employee', canActivate: [], loadChildren: () => import('./admin/employee/employee.module').then(m => m.EmployeeModule) },
+      // { path: 'employee', canActivate: [], loadChildren: () => import('./admin/employee/employee.module').then(m => m.EmployeeModule) },
       { path: 'master', canActivate: [], loadChildren: () => import('./admin/master/master.module').then(m => m.MasterModule) },
       { path: 'customers', canActivate: [], loadChildren: () => import('./admin/customers/customers.module').then(m => m.CustomersModule) },
+      { path: 'company', canActivate: [], loadChildren: () => import('./admin/company/company.module').then(m => m.CompanyModule) },
+      { path: 'employees', canActivate: [], loadChildren: () => import('./admin/hrms/hrms.module').then(m => m.EmployeeModule) },
+      { path: 'leads', canActivate: [], loadChildren: () => import('./admin/leads/leads.module').then(m => m.LeadsModule) },
       { path: 'vendors', canActivate: [], loadChildren: () => import('./admin/vendors/vendors.module').then(m => m.VendorsModule) },
+      { path: 'warehouses', canActivate: [], loadChildren: () => import('./admin/warehouses/warehouses.module').then(m => m.WarehousesModule) },
+      { path: 'quickpacks', canActivate: [], loadChildren: () => import('./admin/quickpacks/quickpacks.module').then(m => m.QuickpacksModule) },
+      { path: 'assets', canActivate: [], loadChildren: () => import('./admin/assets/assets.module').then(m => m.AssetsModule) },
+      { path: 'tasks', canActivate: [], loadChildren: () => import('./admin/tasks/tasks.module').then(m => m.TasksModule) },
+      // { path: 'leaves', canActivate: [], loadComponent: () => import('./admin/leave/leave.component').then(m => m.LeaveComponent) },
+      // { path: 'attendance', canActivate: [], loadChildren: () => import('./admin/attendence/attendence.module').then(m => m.AttendenceModule) },
+      { path: 'inventory', canActivate: [], loadChildren: () => import('./admin/inventory/inventory.module').then(m => m.InventoryModule) },
+      { path: 'products', canActivate: [], loadChildren: () => import('./admin/products/products.module').then(m => m.ProductsModule) },
+      { path: 'purchase', canActivate: [], loadChildren: () => import('./admin/purchase/purchase.module').then(m => m.PurchaseModule) },
     ]
   }
-
 ];
 
 @NgModule({

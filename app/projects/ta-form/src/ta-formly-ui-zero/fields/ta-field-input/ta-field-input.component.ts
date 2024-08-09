@@ -9,6 +9,7 @@ import { FieldType } from '@ngx-formly/core';
 })
 export class TaFieldInputComponent extends FieldType implements OnInit {
   precision = 2;
+  passwordVisible = false;
   // @Input() options:any;
   ngOnInit(): void {
     // console.log(this.options);
