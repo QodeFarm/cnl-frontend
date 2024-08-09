@@ -30,7 +30,8 @@ const routes: Routes = [
       { path: 'sales', canActivate: [], loadChildren: () => import('./admin/sales/sales.module').then(m => m.SalesModule) },
       { path: 'employee', canActivate: [], loadChildren: () => import('./admin/employee/employee.module').then(m => m.EmployeeModule) },
       { path: 'master', canActivate: [], loadChildren: () => import('./admin/master/master.module').then(m => m.MasterModule) },
-      { path: 'customers', canActivate: [], loadChildren: () => import('./admin/customers/customers.module').then(m => m.CustomersModule) }
+      { path: 'customers', canActivate: [], loadChildren: () => import('./admin/customers/customers.module').then(m => m.CustomersModule) },
+      { path: 'vendors', canActivate: [], loadChildren: () => import('./admin/vendors/vendors.module').then(m => m.VendorsModule) },
     ]
   }
 

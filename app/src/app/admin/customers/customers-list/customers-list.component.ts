@@ -18,7 +18,7 @@ export class CustomersListComponent {
   @Output('edit') edit = new EventEmitter<void>();
 
   tableConfig: TaTableConfig = {
-    apiUrl: 'customers/customers/',
+    apiUrl: 'customers/customers/?summary=true&summary=true&page=1&limit=10&sort[0]=name,DESC',
     showCheckbox:true,
     pkId: "customer_id",
     pageSize: 10,
@@ -56,12 +56,12 @@ export class CustomersListComponent {
         },
       },
       {
-        fieldKey: 'ledger_account',
+        fieldKey: 'ledger_account_id',
         name: 'Ledger Account',
         sort: false,
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
-          return row.ledger_account.name;
+          return row.ledger_account_id.name;
         },
       },
       {

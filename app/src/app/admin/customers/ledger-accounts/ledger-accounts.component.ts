@@ -9,10 +9,11 @@ import { TaCurdConfig } from '@ta/ta-curd';
 export class LedgerAccountsComponent {
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
-    drawerPlacement: 'right',
+    drawerPlacement: 'top',
     tableConfig: {
       apiUrl: 'customers/ledger_accounts/',
       title: 'Ledger Accounts',
+      showCheckbox:true,
       pkId: "ledger_account_id",
       pageSize: 10,
       "globalSearch": {
@@ -126,152 +127,163 @@ export class LedgerAccountsComponent {
       ],
       fields: [
         {
-          key: 'name',
-          type: 'input',
-          className: 'ta-cell pr-md col-md-6',
-          templateOptions: {
-            label: 'Name',
-            placeholder: 'Enter Name',
-            required: true,
-          }
-        },
-        {
-          key: 'code',
-          type: 'input',
-          className: 'ta-cell pr-md col-md-6',
-          templateOptions: {
-            label: 'Code',
-            placeholder: 'Enter Code',
-            required: true,
-          }
-        },
-        {
-          key: 'is_subledger',
-          type: 'checkbox',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'Is Subledger'
-          }
-        },
-        {
-          key: 'inactive',
-          type: 'checkbox',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'Inactive'
-          }
-        },
-		{
-          key: 'type',
-          type: 'input',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'Type',
-          },
-          hooks: {
-            onInit: (field: any) => {
-              //field.templateOptions.options = this.cs.getRole();
-            }
-          }
-        },
-        {
-          key: 'account_no',
-          type: 'input',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'Account No',
-            type: 'password'
-          }
-        },
-        {
-          key: 'rtgs_ifsc_code',
-          type: 'input',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'RTGS IFSC Code',
-          },
-          hooks: {
-            onInit: (field: any) => {
-              //field.templateOptions.options = this.cs.getRole();
-            }
-          }
-        },
-        {
-          key: 'classification',
-          type: 'input',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'Classification',
-          },
-          hooks: {
-            onInit: (field: any) => {
-              //field.templateOptions.options = this.cs.getRole();
-            }
-          }
-        },
-        {
-          key: 'is_loan_account',
-          type: 'checkbox',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'Is Loan Account'
-          }
-        },
-        {
-          key: 'tds_applicable',
-          type: 'checkbox',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'TDS Applicable'
-          }
-        },
-		{
-          key: 'address',
-          type: 'text',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'Address',
-          },
-          hooks: {
-            onInit: (field: any) => {
-              //field.templateOptions.options = this.cs.getRole();
-            }
-          }
-        },
-		{
-          key: 'pan',
-          type: 'input',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'PAN',
-          },
-          hooks: {
-            onInit: (field: any) => {
-              //field.templateOptions.options = this.cs.getRole();
-            }
-          }
-        },
-        {
-          key: 'ledger_group',
-          type: 'select',
-          className: 'ta-cell pr-md col-md-6 col-12',
-          templateOptions: {
-            label: 'Ledger Group',
-            dataKey: 'ledger_group_id',
-            dataLabel: "name",
-            options: [],
-            lazy: {
-              url: 'masters/ledger_groups/',
-              lazyOneTime: true
+          className: 'col-9 p-0',
+          fieldGroupClassName: "ant-row",
+          fieldGroup:[
+            {
+              key: 'name',
+              type: 'input',
+              className: 'col-6',
+              templateOptions: {
+                label: 'Name',
+                placeholder: 'Enter Name',
+                required: true,
+              }
             },
-            required: true
-          },
-          hooks: {
-            onInit: (field: any) => {
-              //field.templateOptions.options = this.cs.getRole();
-            }
-          }
-        },
+            {
+              key: 'code',
+              type: 'input',
+              className: 'col-6',
+              templateOptions: {
+                label: 'Code',
+                placeholder: 'Enter Code',
+                required: true,
+              }
+            },
+            {
+              key: 'type',
+              type: 'select',
+              className: 'col-6',
+              templateOptions: {
+                label: 'Type',
+                options: [
+                  { value: 'customer', label: 'Customer' },
+                  { value: 'Bank', label: 'Bank' },
+                  { value: 'cash', label: 'cash' }
+                ],
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  //field.templateOptions.options = this.cs.getRole();
+                }
+              }
+            },
+            {
+              key: 'account_no',
+              type: 'input',
+              className: 'col-6',
+              templateOptions: {
+                label: 'Account No',
+                type: 'password'
+              }
+            },
+            {
+              key: 'rtgs_ifsc_code',
+              type: 'input',
+              className: 'col-6',
+              templateOptions: {
+                label: 'RTGS IFSC Code',
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  //field.templateOptions.options = this.cs.getRole();
+                }
+              }
+            },
+            {
+              key: 'classification',
+              type: 'input',
+              className: 'col-6',
+              templateOptions: {
+                label: 'Classification',
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  //field.templateOptions.options = this.cs.getRole();
+                }
+              }
+            },
+        {
+              key: 'address',
+              type: 'text',
+              className: 'col-6',
+              templateOptions: {
+                label: 'Address',
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  //field.templateOptions.options = this.cs.getRole();
+                }
+              }
+            },
+        {
+              key: 'pan',
+              type: 'input',
+              className: 'col-6',
+              templateOptions: {
+                label: 'PAN',
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  //field.templateOptions.options = this.cs.getRole();
+                }
+              }
+            },
+            {
+              key: 'ledger_group',
+              type: 'select',
+              className: 'col-6',
+              templateOptions: {
+                label: 'Ledger Group',
+                dataKey: 'ledger_group_id',
+                dataLabel: "name",
+                options: [],
+                lazy: {
+                  url: 'masters/ledger_groups/',
+                  lazyOneTime: true
+                },
+                required: true
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  //field.templateOptions.options = this.cs.getRole();
+                }
+              }
+            },
+            {
+              key: 'tds_applicable',
+              type: 'checkbox',
+              className: 'col-6',
+              templateOptions: {
+                label: 'TDS Applicable'
+              }
+            },
+            {
+              key: 'is_subledger',
+              type: 'checkbox',
+              className: 'col-6',
+              templateOptions: {
+                label: 'Is Subledger'
+              }
+            },
+            {
+              key: 'inactive',
+              type: 'checkbox',
+              className: 'col-6',
+              templateOptions: {
+                label: 'Inactive'
+              }
+            },
+            {
+              key: 'is_loan_account',
+              type: 'checkbox',
+              className: 'col-6',
+              templateOptions: {
+                label: 'Is Loan Account'
+              }
+            },
+          ]
+        }
       ]
     }
 

@@ -1,25 +1,33 @@
 <div class="login-page">
-    <div class="container">
+    <div class="container-fluid p-0 h-100">
         <!-- Outer Row -->
-        <div class="row login-block justify-content-center">
-            <div class="col-md-7 p-0 login-left-block">
-                <div class="p-5">
+        <div class="row m-0 login-block justify-content-center h-100">
+            <div class="login-left-block h-100">
+                <!-- <div class="p-4 text-center"> -->
                     <!-- <h1 class="text-center mb-5">Logo</h1> -->
-                    <div class="text-center mb-4">
+                    <!-- <div class="text-center mb-4">
                         <img style="width: 7rem;" src="assets/img/logo.png" />
-                    </div>
+                    </div> -->
 
                     <img src="assets/img/login-logo.png" />
-                </div>
+                <!-- </div> -->
             </div>
-            <div class="col-md-5 pr-0 login-right-block">
+            <div class="login-right-block h-100">
 
 
-                <div class="row">
+                <div class="row m-0">
                     <!-- <div class="col-lg-6 d-none d-lg-block bg-login-image"></div> -->
                     <div class="col-lg-12">
-                        <div class="p-5 login-form">
-                            <h1 class="mb-5">Login</h1>
+                        <div class="p-2 login-form">
+                            <!-- <div class="text-center mb-4">
+                                <img style="width: 70%;" src="assets/img/logo.png" />
+                            </div> -->
+                            <div class="logo-design-block mb-4">
+                                <h1 class="">C&L</h1>
+                                <span>Accounts Book</span>
+                            </div>
+                            <div class="login-form-block">
+                            <!-- <h1 class="mb-4">Login</h1> -->
                             <ta-form [options]="options"></ta-form>
                             <!-- <form class="user">
                                 <div class="form-group position-relative mb-5">
@@ -40,12 +48,13 @@
 
                             </form> -->
 
-                            <div class="text-center">
+                            <!-- <div class="text-center">
                                 <a class="signup-link m-2" [routerLink]="['/create-account']" routerLinkActive="router-link-active">Create Account  Signup ?</a>
-                            </div>
+                            </div> -->
                             <div class="text-center">
                                 <a class="signup-link m-2" [routerLink]="['/forgot-password']" routerLinkActive="router-link-active">Forgot Password</a>
                             </div>
+                        </div>
                         </div>
                     </div>
                 </div>

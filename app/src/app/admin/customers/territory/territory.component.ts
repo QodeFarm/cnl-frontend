@@ -9,10 +9,11 @@ import { TaCurdConfig } from '@ta/ta-curd';
 export class TerritoryComponent {
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
-    drawerPlacement: 'right',
+    drawerPlacement: 'top',
     tableConfig: {
       apiUrl: 'masters/territory/',
       title: 'Territory',
+      showCheckbox: true,
       pkId: "territory_id",
       pageSize: 10,
       "globalSearch": {
@@ -55,25 +56,31 @@ export class TerritoryComponent {
       pkId: "territory_id",
       fields: [
         {
-          key: 'name',
-          type: 'input',
-          className: 'ta-cell pr-md col-md-6',
-          templateOptions: {
-            label: 'Name',
-            placeholder: 'Enter Name',
-            required: true,
-          }
-        },
-        {
-          key: 'code',
-          type: 'input',
-          className: 'ta-cell pr-md col-md-6',
-          templateOptions: {
-            label: 'Code',
-            placeholder: 'Enter Code',
-            required: true,
-          }
-        },
+          className: 'col-9 p-0',
+          fieldGroupClassName: "ant-row",
+          fieldGroup:[
+            {
+              key: 'name',
+              type: 'input',
+              className: 'col-6',
+              templateOptions: {
+                label: 'Name',
+                placeholder: 'Enter Name',
+                required: true,
+              }
+            },
+            {
+              key: 'code',
+              type: 'input',
+              className: 'col-6',
+              templateOptions: {
+                label: 'Code',
+                placeholder: 'Enter Code',
+                required: true,
+              }
+            },
+          ]
+        }
       ]
     }
 

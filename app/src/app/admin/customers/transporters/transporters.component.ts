@@ -9,10 +9,11 @@ import { TaCurdConfig } from '@ta/ta-curd';
 export class TransportersComponent {
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
-    drawerPlacement: 'right',
+    drawerPlacement: 'top',
     tableConfig: {
       apiUrl: 'masters/transporters/',
       title: 'Transporters',
+      showCheckbox: true,
       pkId: "transporter_id",
       pageSize: 10,
       "globalSearch": {
@@ -67,43 +68,49 @@ export class TransportersComponent {
       ],
       fields: [
         {
-          key: 'name',
-          type: 'input',
-          className: 'ta-cell pr-md col-md-6',
-          templateOptions: {
-            label: 'Name',
-            placeholder: 'Enter Name',
-            required: true,
-          }
-        },
-        {
-          key: 'code',
-          type: 'input',
-          className: 'ta-cell pr-md col-md-6',
-          templateOptions: {
-            label: 'Code',
-            placeholder: 'Enter Code',
-            required: true,
-          }
-        },
-        {
-          key: 'gst_no',
-          type: 'input',
-          className: 'ta-cell pr-md col-md-6',
-          templateOptions: {
-            label: 'GST',
-            placeholder: 'Enter GST',
-          }
-        },
-        {
-          key: 'website_url',
-          type: 'input',
-          className: 'ta-cell pr-md col-md-6',
-          templateOptions: {
-            label: 'Website url',
-            placeholder: 'Enter website url',
-          }
-        },
+          className: 'col-9 p-0',
+          fieldGroupClassName: "ant-row",
+          fieldGroup:[
+            {
+              key: 'name',
+              type: 'input',
+              className: 'col-6',
+              templateOptions: {
+                label: 'Name',
+                placeholder: 'Enter Name',
+                required: true,
+              }
+            },
+            {
+              key: 'code',
+              type: 'input',
+              className: 'col-6',
+              templateOptions: {
+                label: 'Code',
+                placeholder: 'Enter Code',
+                required: true,
+              }
+            },
+            {
+              key: 'gst_no',
+              type: 'input',
+              className: 'col-6',
+              templateOptions: {
+                label: 'GST',
+                placeholder: 'Enter GST',
+              }
+            },
+            {
+              key: 'website_url',
+              type: 'input',
+              className: 'col-6',
+              templateOptions: {
+                label: 'Website url',
+                placeholder: 'Enter website url',
+              }
+            },
+          ]
+        }
       ]
     }
 

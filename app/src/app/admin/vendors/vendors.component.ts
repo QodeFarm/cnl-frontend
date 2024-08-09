@@ -1,58 +1,63 @@
-import { Component } from '@angular/core';
-import { TaFormConfig } from '@ta/ta-form';
 import { HttpClient } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
+import { TaFormConfig } from '@ta/ta-form';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-customers',
-  templateUrl: './customers.component.html',
-  styleUrls: ['./customers.component.scss']
+  selector: 'app-vendors',
+  templateUrl: './vendors.component.html',
+  styleUrls: ['./vendors.component.scss']
 })
-export class CustomersComponent {
-  showCustomerList: boolean = false;
+export class VendorsComponent implements OnInit {
+  showVendorList: boolean = false;
   showForm: boolean = false;
-  CustomerEditID: any;
+  VendorEditID: any;
 
-  constructor(private http: HttpClient) {}
+  formConfig: TaFormConfig = {};
+
+  constructor(private http: HttpClient, private router: Router) {}
 
   ngOnInit() {
-    this.showCustomerList = false;
-    this.showForm = true;  //temporary change 'true'
+    this.showVendorList = false;
+    this.showForm = true;
     // Set form config
     this.setFormConfig();
     console.log('this.formConfig', this.formConfig);
   }
 
-  formConfig: TaFormConfig = {};
-
   hide() {
-    document.getElementById('modalClose').click();
+    const modalCloseButton = document.getElementById('modalClose');
+    if (modalCloseButton) {
+      modalCloseButton.click();
+    }
   }
 
-  editCustomer(event) {
-    this.CustomerEditID = event;
-    this.http.get('customers/customers/' + event).subscribe((res: any) => {
+  editVendor(event: any) {
+    console.log('event', event);
+    this.VendorEditID = event;
+    this.http.get('vendors/vendors/' + event).subscribe((res: any) => {
+      console.log('--------> res ', res);
       if (res && res.data) {
         this.formConfig.model = res.data;
         // Set labels for update
         this.formConfig.submit.label = 'Update';
         // Show form after setting form values
-        this.formConfig.pkId = 'customer_id';
-        this.formConfig.model['customer_id'] = this.CustomerEditID;
+        this.formConfig.pkId = 'vendor_id';
+        this.formConfig.model['vendor_id'] = this.VendorEditID;
         this.showForm = true;
       }
     });
     this.hide();
   }
 
-  showCustomerListFn() {
-    this.showCustomerList = true;
+  showVendorListFn() {
+    this.showVendorList = true;
   }
 
   setFormConfig() {
     this.formConfig = {
-      url: "customers/customers/",
-      title: 'Customers',
+      url: "vendors/vendors/",
+      title: 'Vendor',
       formState: {
         viewMode: false
       },
@@ -62,14 +67,14 @@ export class CustomersComponent {
       },
       reset: {},
       model: {
-        customer_data: {},
-		    customer_attachments: [],
-        customer_addresses: [],
+        vendor_data: {},
+        vendor_attachments: [],
+        vendor_addresses: []
       },
       fields: [
         {
           fieldGroupClassName: "ant-row custom-form-block",
-          key: 'customer_data',
+          key: 'vendor_data',
           fieldGroup: [
             // First row: Basic Information
             {
@@ -135,10 +140,10 @@ export class CustomersComponent {
                 onChanges: (field: any) => {
                   field.formControl.valueChanges.subscribe((data: any) => {
                     console.log('ledger_account', data);
-                    if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
-                      this.formConfig.model['customer_data']['ledger_account_id'] = data.ledger_account_id;
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['vendor_data']) {
+                      this.formConfig.model['vendor_data']['ledger_account_id'] = data.ledger_account_id;
                     } else {
-                      console.error('Form config or Customer data model is not defined.');
+                      console.error('Form config or vendor data model is not defined.');
                     }
                   });
                 }
@@ -161,8 +166,8 @@ export class CustomersComponent {
               hooks: {
                 onChanges: (field: any) => {
                   field.formControl.valueChanges.subscribe((data: any) => {
-                    if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
-                      this.formConfig.model['customer_data']['firm_status_id'] = data.firm_status_id;
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['vendor_data']) {
+                      this.formConfig.model['vendor_data']['firm_status_id'] = data.firm_status_id;
                     } else {
                       console.error('Form config or vendor data model is not defined.');
                     }
@@ -187,10 +192,10 @@ export class CustomersComponent {
               hooks: {
                 onChanges: (field: any) => {
                   field.formControl.valueChanges.subscribe((data: any) => {
-                    if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
-                      this.formConfig.model['customer_data']['territory_id'] = data.territory_id;
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['vendor_data']) {
+                      this.formConfig.model['vendor_data']['territory_id'] = data.territory_id;
                     } else {
-                      console.error('Form config or Customer data model is not defined.');
+                      console.error('Form config or vendor data model is not defined.');
                     }
                   });
                 }
@@ -198,25 +203,25 @@ export class CustomersComponent {
             },
             {
               className: 'col-3',
-              key: 'customer_category',
+              key: 'vendor_category',
               type: 'select',
               templateOptions: {
-                label: 'Customer Category',
-                dataKey: 'customer_category_id',
+                label: 'Vendor Category',
+                dataKey: 'vendor_category_id',
                 dataLabel: 'name',
                 options: [],
                 lazy: {
-                  url: 'masters/customer_categories/',
+                  url: 'vendors/vendor_category/',
                   lazyOneTime: true
                 }
               },
               hooks: {
                 onChanges: (field: any) => {
                   field.formControl.valueChanges.subscribe((data: any) => {
-                    if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
-                      this.formConfig.model['customer_data']['customer_category_id'] = data.customer_category_id;
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['vendor_data']) {
+                      this.formConfig.model['vendor_data']['vendor_category_id'] = data.vendor_category_id;
                     } else {
-                      console.error('Form config or Customer data model is not defined.');
+                      console.error('Form config or vendor data model is not defined.');
                     }
                   });
                 }
@@ -240,10 +245,10 @@ export class CustomersComponent {
               hooks: {
                 onChanges: (field: any) => {
                   field.formControl.valueChanges.subscribe((data: any) => {
-                    if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
-                      this.formConfig.model['customer_data']['gst_category_id'] = data.gst_category_id;
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['vendor_data']) {
+                      this.formConfig.model['vendor_data']['gst_category_id'] = data.gst_category_id;
                     } else {
-                      console.error('Form config or Customer data model is not defined.');
+                      console.error('Form config or vendor data model is not defined.');
                     }
                   });
                 }
@@ -317,10 +322,10 @@ export class CustomersComponent {
           hooks: {
             onChanges: (field: any) => {
               field.formControl.valueChanges.subscribe((data: any) => {
-                if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
-                  this.formConfig.model['customer_data']['transporter_id'] = data.transporter_id;
+                if (this.formConfig && this.formConfig.model && this.formConfig.model['vendor_data']) {
+                  this.formConfig.model['vendor_data']['transporter_id'] = data.transporter_id;
                 } else {
-                  console.error('Form config or Customer data model is not defined.');
+                  console.error('Form config or vendor data model is not defined.');
                 }
               });
             }
@@ -420,17 +425,17 @@ export class CustomersComponent {
                       dataLabel: 'name',
                       options: [],
                       lazy: {
-                        url: 'masters/customer_payment_terms/',
+                        url: 'vendors/vendor_payment_terms/',
                         lazyOneTime: true
                       }
                     },
                     hooks: {
                       onChanges: (field: any) => {
                         field.formControl.valueChanges.subscribe((data: any) => {
-                          if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
-                            this.formConfig.model['customer_data']['payment_term_id'] = data.payment_term_id;
+                          if (this.formConfig && this.formConfig.model && this.formConfig.model['vendor_data']) {
+                            this.formConfig.model['vendor_data']['payment_term_id'] = data.payment_term_id;
                           } else {
-                            console.error('Form config or Customer data model is not defined.');
+                            console.error('Form config or vendor data model is not defined.');
                           }
                         });
                       }
@@ -453,16 +458,42 @@ export class CustomersComponent {
                     hooks: {
                       onChanges: (field: any) => {
                         field.formControl.valueChanges.subscribe((data: any) => {
-                          if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
-                            this.formConfig.model['customer_data']['price_category_id'] = data.price_category_id;
+                          if (this.formConfig && this.formConfig.model && this.formConfig.model['vendor_data']) {
+                            this.formConfig.model['vendor_data']['price_category_id'] = data.price_category_id;
                           } else {
-                            console.error('Form config or Customer data model is not defined.');
+                            console.error('Form config or vendor data model is not defined.');
                           }
                         });
                       }
                     }
                   },
                   // Seventh row: Agents and Transport
+                  {
+                    className: 'col-2',
+                    key: 'vendor_agent',
+                    type: 'select',
+                    templateOptions: {
+                      label: 'Vendor Agent',
+                      dataKey: 'vendor_agent_id',
+                      dataLabel: 'name',
+                      options: [],
+                      lazy: {
+                        url: 'vendors/vendor_agent/',
+                        lazyOneTime: true
+                      }
+                    },
+                    hooks: {
+                      onChanges: (field: any) => {
+                        field.formControl.valueChanges.subscribe((data: any) => {
+                          if (this.formConfig && this.formConfig.model && this.formConfig.model['vendor_data']) {
+                            this.formConfig.model['vendor_data']['vendor_agent_id'] = data.vendor_agent_id;
+                          } else {
+                            console.error('Form config or vendor data model is not defined.');
+                          }
+                        });
+                      }
+                    }
+                  },
         {
           className: 'col-2',
           key: 'distance',
@@ -568,23 +599,239 @@ export class CustomersComponent {
             },
             {
               className: 'col-4',
-              key: 'customer_common_for_sales_purchase',
+              key: 'vendor_common_for_sales_purchase',
               type: 'checkbox',
               templateOptions: {
-                label: 'Customer common for Sales and Purchase',
+                label: 'Vendor common for Sales and Purchase',
               }
             },
             {
               className: 'col-3',
-              key: 'is_sub_customer',
+              key: 'is_sub_vendor',
               type: 'checkbox',
               templateOptions: {
-                label: 'Is Sub Customer',
+                label: 'Is Sub Vendor',
               }
             }
           ]
         },
-            // start of customer_addresses keys
+        // {
+        //   key: 'vendor_attachments',
+        //   type: 'repeat',
+        //   className: 'custom-form-list',
+        //   templateOptions: {
+        //     addText: 'Add Attachment',
+        //   },
+        //   fieldArray: {
+        //     fieldGroupClassName: 'row',
+        //     fieldGroup: [
+        //       {
+        //         className: 'col-10 p-0',
+        //         key: 'attachment_name',
+        //         type: 'input',
+        //         templateOptions: {
+        //           label: 'Attachment Name',
+        //           placeholder: 'Enter Attachment Name',
+        //           required: true,
+        //         }
+        //       },
+        //       {
+        //         key: 'attachment_path',
+        //         type: 'input',
+        //         className: 'col-10 p-0',
+        //         templateOptions: {
+        //           label: 'Attachment Path',
+        //           placeholder: 'Enter Attachment Path',
+        //           required: true,
+        //         }
+        //       }
+        //     ]
+        //   }
+        // },
+        // {
+        //   key: 'vendor_addresses',
+        //   type: 'repeat',
+        //   className: 'custom-form-list',
+        //   templateOptions: {
+        //     addText: 'Add Address',
+        //   },
+        //   fieldArray: {
+        //     fieldGroupClassName: 'row',
+        //     fieldGroup: [
+        //       {
+        //         className: 'col',
+        //         key: 'address_type',
+        //         type: 'input',
+        //         templateOptions: {
+        //           type: 'hidden',
+        //         },
+        //         defaultValue: 'Billing', // Default to 'Billing' for the first address, 'Shipping' for subsequent addresses
+        //         expressionProperties: {
+        //           'model.address_type': (model, formState, field) => {
+        //             const index = field.parent.parent.model.indexOf(model);
+        //             return index === 0 ? 'Billing' : 'Shipping';
+        //           },
+        //           'templateOptions.hidden': 'true'
+        //         }
+        //       },
+        //       {
+        //         key: 'address',
+        //         type: 'textarea',
+        //         className: 'col',
+        //         templateOptions: {
+        //           label: 'Address',
+        //           placeholder: 'Enter Address',
+        //         }
+        //       },
+        //       {
+        //         className: 'col',
+        //         key: 'city',
+        //         type: 'select',
+        //         templateOptions: {
+        //           dataKey: 'city_id',
+        //           dataLabel: 'city_name',
+        //           label: 'City',
+        //           placeholder: 'City',
+        //           required: true,
+        //           lazy: {
+        //             url: 'masters/city/',
+        //             lazyOneTime: true
+        //           }
+        //         },
+        //         hooks: {
+        //           onChanges: (field: any) => {
+        //             field.formControl.valueChanges.subscribe((data: any) => {
+        //               console.log('city', data);
+        //               // const index = field.parent.parent.model.indexOf(field.parent.model);
+        //               const index = field.parent.key;
+        //               if (this.formConfig && this.formConfig.model) {
+        //                 this.formConfig.model['vendor_addresses'][index]['city_id'] = data.city_id;
+        //               } else {
+        //                 console.error('Form config or vendor addresses model is not defined.');
+        //               }
+        //             });
+        //           }
+        //         }
+        //       },
+        //       {
+        //         key: 'state',
+        //         type: 'select',
+        //         className: 'col',
+        //         templateOptions: {
+        //           dataKey: 'state_id',
+        //           dataLabel: 'state_name',
+        //           label: 'State',
+        //           placeholder: 'State',
+        //           required: true,
+        //           lazy: {
+        //             url: 'masters/state/',
+        //             lazyOneTime: true
+        //           }
+        //         },
+        //         hooks: {
+        //           onChanges: (field: any) => {
+        //             field.formControl.valueChanges.subscribe((data: any) => {
+        //               console.log('state', data);
+        //               // const index = field.parent.parent.model.indexOf(field.parent.model);
+        //               const index = field.parent.key;
+        //               if (this.formConfig && this.formConfig.model) {
+        //                 this.formConfig.model['vendor_addresses'][index]['state_id'] = data.state_id;
+        //               } else {
+        //                 console.error('Form config or vendor addresses model is not defined.');
+        //               }
+        //             });
+        //           }
+        //         }
+        //       },
+        //       {
+        //         key: 'country',
+        //         type: 'select',
+        //         className: 'col',
+        //         templateOptions: {
+        //           dataKey: 'country_id',
+        //           dataLabel: 'country_name',
+        //           label: 'Country',
+        //           placeholder: 'Select Country',
+        //           lazy: {
+        //             url: 'masters/country/',
+        //             lazyOneTime: true
+        //           }
+        //         },
+        //         hooks: {
+        //           onChanges: (field: any) => {
+        //             field.formControl.valueChanges.subscribe((data: any) => {
+        //               console.log('country', data);
+        //               // const index = field.parent.parent.model.indexOf(field.parent.model);
+        //               const index = field.parent.key;
+        //               if (this.formConfig && this.formConfig.model) {
+        //                 this.formConfig.model['vendor_addresses'][index]['country_id'] = data.country_id;
+        //               } else {
+        //                 console.error('Form config or vendor addresses model is not defined.');
+        //               }
+        //             });
+        //           }
+        //         }
+        //       },
+        //       {
+        //         key: 'pin_code',
+        //         type: 'input',
+        //         className: 'col',
+        //         templateOptions: {
+        //           label: 'Pin Code',
+        //           placeholder: 'Enter Pin Code',
+        //         }
+        //       },
+        //       {
+        //         key: 'phone',
+        //         type: 'input',
+        //         className: 'col',
+        //         templateOptions: {
+        //           label: 'Phone',
+        //           placeholder: 'Enter Phone',
+        //         }
+        //       },
+        //       {
+        //         key: 'email',
+        //         type: 'input',
+        //         className: 'col',
+        //         templateOptions: {
+        //           label: 'Email',
+        //           placeholder: 'Enter Email',
+        //         }
+        //       },
+        //       {
+        //         key: 'longitude',
+        //         type: 'input',
+        //         className: 'col',
+        //         templateOptions: {
+        //           label: 'Longitude',
+        //           placeholder: 'Enter Longitude',
+        //           type: 'number',
+        //         }
+        //       },
+        //       {
+        //         key: 'latitude',
+        //         type: 'input',
+        //         className: 'col',
+        //         templateOptions: {
+        //           label: 'Latitude',
+        //           placeholder: 'Enter Latitude',
+        //           type: 'number',
+        //         }
+        //       },
+        //       {
+        //         key: 'route_map',
+        //         type: 'input',
+        //         className: 'col',
+        //         templateOptions: {
+        //           label: 'Route Map',
+        //           placeholder: 'Enter Route Map URL',
+        //         }
+        //       }
+        //     ]
+        //   }
+        // }
+            // start of order_shipments keys
         
             {
               fieldGroupClassName: "row col-12 m-0 custom-form-card",
@@ -598,7 +845,7 @@ export class CustomersComponent {
                     },
                     {
                       fieldGroupClassName: "ant-row",
-                      key: 'customer_addresses',
+                      key: 'order_shipments',
                       fieldGroup: [
                              {
                                 key: 'address',
@@ -631,9 +878,9 @@ export class CustomersComponent {
                                       // const index = field.parent.parent.model.indexOf(field.parent.model);
                                       const index = field.parent.key;
                                       if (this.formConfig && this.formConfig.model) {
-                                        this.formConfig.model['customer_addresses'][index]['city_id'] = data.city_id;
+                                        this.formConfig.model['vendor_addresses'][index]['city_id'] = data.city_id;
                                       } else {
-                                        console.error('Form config or Customer addresses model is not defined.');
+                                        console.error('Form config or vendor addresses model is not defined.');
                                       }
                                     });
                                   }
@@ -661,9 +908,9 @@ export class CustomersComponent {
                                       // const index = field.parent.parent.model.indexOf(field.parent.model);
                                       const index = field.parent.key;
                                       if (this.formConfig && this.formConfig.model) {
-                                        this.formConfig.model['customer_addresses'][index]['state_id'] = data.state_id;
+                                        this.formConfig.model['vendor_addresses'][index]['state_id'] = data.state_id;
                                       } else {
-                                        console.error('Form config or Customer addresses model is not defined.');
+                                        console.error('Form config or vendor addresses model is not defined.');
                                       }
                                     });
                                   }
@@ -690,9 +937,9 @@ export class CustomersComponent {
                                       // const index = field.parent.parent.model.indexOf(field.parent.model);
                                       const index = field.parent.key;
                                       if (this.formConfig && this.formConfig.model) {
-                                        this.formConfig.model['customer_addresses'][index]['country_id'] = data.country_id;
+                                        this.formConfig.model['vendor_addresses'][index]['country_id'] = data.country_id;
                                       } else {
-                                        console.error('Form config or Customer addresses model is not defined.');
+                                        console.error('Form config or vendor addresses model is not defined.');
                                       }
                                     });
                                   }
@@ -768,14 +1015,14 @@ export class CustomersComponent {
                           {
                             className: 'col-12 mb-3 custom-form-card-block w-100',
                             fieldGroup:[
-                              // start of customer_addresses keys
+                              // start of sale_order keys
                               {
                                 template: '<div class="custom-form-card-title"> Billing Details </div>',
                                 fieldGroupClassName: "ant-row",
                               },
                               {
                                 fieldGroupClassName: "ant-row",
-                                key: 'customer_addresses',
+                                key: 'sale_order',
                                 fieldGroup: [
                                   {
                                      key: 'address',
@@ -808,9 +1055,9 @@ export class CustomersComponent {
                                            // const index = field.parent.parent.model.indexOf(field.parent.model);
                                            const index = field.parent.key;
                                            if (this.formConfig && this.formConfig.model) {
-                                             this.formConfig.model['customer_addresses'][index]['city_id'] = data.city_id;
+                                             this.formConfig.model['vendor_addresses'][index]['city_id'] = data.city_id;
                                            } else {
-                                             console.error('Form config or customer addresses model is not defined.');
+                                             console.error('Form config or vendor addresses model is not defined.');
                                            }
                                          });
                                        }
@@ -838,9 +1085,9 @@ export class CustomersComponent {
                                            // const index = field.parent.parent.model.indexOf(field.parent.model);
                                            const index = field.parent.key;
                                            if (this.formConfig && this.formConfig.model) {
-                                             this.formConfig.model['customer_addresses'][index]['state_id'] = data.state_id;
+                                             this.formConfig.model['vendor_addresses'][index]['state_id'] = data.state_id;
                                            } else {
-                                             console.error('Form config or Customer addresses model is not defined.');
+                                             console.error('Form config or vendor addresses model is not defined.');
                                            }
                                          });
                                        }
@@ -867,9 +1114,9 @@ export class CustomersComponent {
                                            // const index = field.parent.parent.model.indexOf(field.parent.model);
                                            const index = field.parent.key;
                                            if (this.formConfig && this.formConfig.model) {
-                                             this.formConfig.model['customer_addresses'][index]['country_id'] = data.country_id;
+                                             this.formConfig.model['vendor_addresses'][index]['country_id'] = data.country_id;
                                            } else {
-                                             console.error('Form config or customer addresses model is not defined.');
+                                             console.error('Form config or vendor addresses model is not defined.');
                                            }
                                          });
                                        }
@@ -931,7 +1178,7 @@ export class CustomersComponent {
                                        placeholder: 'Enter Route Map URL',
                                      }
                                    }
-                                ]
+                           ]
                               },
                             ]
                           },

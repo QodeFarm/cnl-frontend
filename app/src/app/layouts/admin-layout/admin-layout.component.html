@@ -1,10 +1,13 @@
 <header>
     <!-- Topbar -->
     <nav class="navbar navbar-expand navbar-light topbar static-top ">
-        <a class="sidebar-brand d-flex align-items-center justify-content-center" [routerLink]="['/admin/dashboard']">
-            <img style="width: 2.2rem;" src="assets/img/logo.png" /> </a>
+        <a class="sidebar-brand layout-logo-design" [routerLink]="['/admin/dashboard']">
+            <!-- <img style="width: 2.2rem;" src="assets/img/logo.png" />  -->
+            <h3>C&L</h3>
+            <span>Accounts Book</span>
+        </a>
         <!-- Sidebar Toggle (Topbar) -->
-        <button id="sidebarToggleTop" (click)="menuToggle()" class="btn bar-toggle ml-2 mr-2">
+        <button id="sidebarToggleTop" (click)="menuToggle()" class="btn bar-toggle ml-3 mr-2">
          <i class="fa fa-bars"></i>
      </button>
 
@@ -222,15 +225,15 @@
         <!-- <div class="sidebar-brand-text mx-3">cnl Admin</div> -->
         <!-- </a> -->
 
-        <li class="nav-item" *ngFor="let m of menulList" [ngClass]="{'sub-menu': (m.child && m.child.length > 0)}">
+        <li class="nav-item" *ngFor="let m of menulList; let i = index" [ngClass]="{'sub-menu': (m.child && m.child.length > 0)}">
             <a *ngIf="!(m.child && m.child.length > 0)" class="nav-link" [routerLink]="[m.link]" routerLinkActive="active" (click)="closeMenu()">
                 <i class="" [ngClass]="m.icon"></i><span>{{m.label}}</span>
             </a>
-            <a *ngIf="m.child && m.child.length > 0" class="nav-link collapsed" [attr.data-bs-toggle]="'collapse'" [attr.data-bs-target]="'#collapseMenu'+index" [attr.aria-expanded]="'true'" [attr.aria-controls]="'collapseMenu'+index">
+            <a *ngIf="m.child && m.child.length > 0" class="nav-link collapsed" [attr.data-bs-toggle]="'collapse'" [attr.data-bs-target]="'#collapseMenu'+i" [attr.aria-expanded]="'true'" [attr.aria-controls]="'collapseMenu'+i">
                 <i [ngClass]="m.icon"></i>
                 <span>{{m.label}}</span>
             </a>
-            <div *ngIf="m.child && m.child.length > 0" id="collapseMenu{{index}}" class="collapse sub-menu-items" [attr.aria-labelledby]="'heading'+index" [attr.data-parent]="'#accordionSidebar'">
+            <div *ngIf="m.child && m.child.length > 0" id="collapseMenu{{i}}" class="collapse sub-menu-items" [attr.aria-labelledby]="'heading'+i" [attr.data-parent]="'#accordionSidebar'">
                 <div class="bg-white py-2 collapse-inner rounded">
                     <!-- <h6 class="collapse-header">{{m.label}}:</h6> -->
                     <a (click)="closeMenu()" class="collapse-item" *ngFor="let sm of m.child" [routerLink]="[sm.link]" routerLinkActive="active">{{sm.label}}</a>
