@@ -93,12 +93,16 @@ export class PurchasereturnordersListComponent {
           {
             type: 'delete',
             label: 'Delete',
+            confirm: true,
+            confirmMsg: "Sure to delete?",
             apiUrl: 'purchase/purchase_return_order'
           },
           {
             type: 'callBackFn',
-            label: 'Edit',
+            icon: 'fa fa-pen',
+            label: '',
             callBackFn: (row, action) => {
+              console.log(row);
               this.edit.emit(row.purchase_return_id);
             }
           }

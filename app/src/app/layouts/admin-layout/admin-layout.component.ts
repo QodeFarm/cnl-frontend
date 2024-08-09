@@ -40,22 +40,6 @@ export class AdminLayoutComponent {
         icon: 'fas fa-tachometer-alt',
       },
       {
-        label: 'User Management',
-        icon: 'fas fa-user',
-        child: [
-          {
-            link: '/admin/users',
-            label: 'Users',
-            icon: 'fas fa-user',
-          },
-          {
-            link: '/admin/users/roles',
-            label: 'Roles',
-            icon: 'fas fa-user',
-          }
-        ]
-      },
-      {
         label: 'Sales',
         icon: 'fas fa-file-invoice-dollar',
         child: [
@@ -301,22 +285,6 @@ export class AdminLayoutComponent {
             label: 'Products',
           },
         ],
-      },
-      {
-        label: 'Company',
-        icon: 'fas fa-building',
-        child: [
-          {
-            link: '/admin/company',
-            label: 'Company',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/company/branches',
-            label: 'Branches',
-            icon: 'fas fa-tachometer-alt',
-          },
-        ]
       },
       {
         label: 'Vendors',

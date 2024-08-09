@@ -836,3 +836,7 @@ ta-form {
 .cdk-overlay-container {
     z-index: 1060 !important;
 }
+
+.ant-upload.ant-upload-drag .ant-upload {
+    padding: 0 0 !important;
+}
