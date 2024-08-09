@@ -69,7 +69,7 @@ export class PurchaseListComponent {
         sort: true
       },
       {
-        fieldKey: 'order_status',
+        fieldKey: 'order_status_id',
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
@@ -90,13 +90,14 @@ export class PurchaseListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            // confirm: true,
-            // confirmMsg: "Sure to delete?",
+            confirm: true,
+            confirmMsg: "Sure to delete?",
             apiUrl: 'purchase/purchase_order'
           },
           {
             type: 'callBackFn',
-            label: 'Edit',
+            icon: 'fa fa-pen',
+            label: '',
             callBackFn: (row, action) => {
               console.log(row);
               this.edit.emit(row.purchase_order_id);

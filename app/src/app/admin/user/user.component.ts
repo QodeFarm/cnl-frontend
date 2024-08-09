@@ -176,7 +176,7 @@ export class UserComponent {
               className: 'ta-cell pr-md col-md-6 col-12',
               templateOptions: {
                 label: 'User Role',
-                dataKey: 'role_name',
+                dataKey: 'role_id',
                 dataLabel: "role_name",
                 options: [],
                 bindId: true,

@@ -13,7 +13,7 @@
 
     <div class="row custom-form">
         <div class="col-12 px-1" *ngIf="invoiceNumber">
-            <ta-form [options]="formConfig"></ta-form>
+            <ta-form #purchaseinvoiceForm [options]="formConfig"></ta-form>
         </div>
     </div>
 </div>
@@ -27,7 +27,7 @@
                 <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" *ngIf="showPurchaseInvoiceList">
-                <app-purchase-invoice-list (edit)="editPurchaseInvoice($event)" ></app-purchase-invoice-list>
+                <app-purchase-invoice-list (edit)="editPurchaseInvoice($event)" class="custom-list" ></app-purchase-invoice-list>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>

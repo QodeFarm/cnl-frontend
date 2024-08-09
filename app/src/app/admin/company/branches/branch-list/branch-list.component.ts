@@ -52,7 +52,7 @@ export class BranchListComponent {
       },
       {
         fieldKey: 'city_id',
-        name: 'Department',
+        name: 'City',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
           return `${row.city.city_name}`;
@@ -61,7 +61,7 @@ export class BranchListComponent {
       },
       {
         fieldKey: 'state_id',
-        name: 'Designation',
+        name: 'State',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
           return `${row.state.state_name}`;
@@ -70,10 +70,10 @@ export class BranchListComponent {
       },
       {
         fieldKey: 'status_id',
-        name: 'Designation',
+        name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.status.state_name}`;
+          return `${row.status.status_name}`;
         },
         sort: true
       },
