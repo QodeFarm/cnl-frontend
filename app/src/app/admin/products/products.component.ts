@@ -13,11 +13,13 @@ export class ProductsComponent implements OnInit {
   ProductEditID: any;
   formConfig: TaFormConfig = {};
 
+
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
     this.showProductsList = false;
     this.showForm = true;
+    this.ProductEditID = null;
     // Set form config
     this.setFormConfig();
     console.log('this.formConfig', this.formConfig);
@@ -38,9 +40,9 @@ export class ProductsComponent implements OnInit {
       if (res) {
         this.formConfig.model = res;
         // Set labels for update
+        this.formConfig.pkId = 'product_id';
         this.formConfig.submit.label = 'Update';
         // Show form after setting form values
-        this.formConfig.pkId = 'product_id';
         this.formConfig.model['product_id'] = this.ProductEditID;
         this.showForm = true;
       }
@@ -237,7 +239,7 @@ export class ProductsComponent implements OnInit {
                     dataKey: 'unit_options_id',
                     dataLabel: 'unit_name',
                     options: [],
-                    required: true,
+                    // required: true,
                     lazy: {
                       url: 'masters/unit_options/',
                       lazyOneTime: true,
@@ -300,35 +302,6 @@ export class ProductsComponent implements OnInit {
                       lazyOneTime: true
                     },
                     required: true
-                  }
-                },
-                {
-                  className: 'col-3',
-                  key: 'mrp',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'MRP',
-                    placeholder: 'Enter MRP',
-                    required: true
-                  }
-                },
-                {
-                  className: 'col-3',
-                  key: 'sales_rate',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'Sales Rate',
-                    placeholder: 'Enter Sales Rate',
-                    required: true
-                  }
-                },
-                {
-                  className: 'col-3',
-                  key: 'wholesale_rate',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'Wholesale Rate',
-                    placeholder: 'Enter Wholesale Rate'
                   }
                 },
                 {
@@ -438,25 +411,8 @@ export class ProductsComponent implements OnInit {
                     }
                   }
                 },
-              ]
-            },
-            // Right side for the picture and additional fields
-            {
-              className: 'col-3 p-0',
-              fieldGroup: [
                 {
-                  key: 'picture',
-                  type: 'file',
-                  className: 'ta-cell col-12',
-                  templateOptions: {
-                    label: 'Picture',
-                    placeholder: 'Upload Picture',
-                    // required: true
-                  }
-                },
-                // Additional fields below picture
-                {
-                  className: 'col-12 mt-4',
+                  className: 'col-3',
                   key: 'gst_classification',
                   type: 'select',
                   templateOptions: {
@@ -471,7 +427,7 @@ export class ProductsComponent implements OnInit {
                   }
                 },
                 {
-                  className: 'col-12',
+                  className: 'col-3',
                   key: 'minimum_price',
                   type: 'input',
                   templateOptions: {
@@ -480,7 +436,7 @@ export class ProductsComponent implements OnInit {
                   }
                 },
                 {
-                  className: 'col-12',
+                  className: 'col-3',
                   key: 'rate_factor',
                   type: 'input',
                   templateOptions: {
@@ -488,38 +444,102 @@ export class ProductsComponent implements OnInit {
                     placeholder: 'Enter Rate Factor'
                   }
                 },
-                // {
-                //   className: 'col-12 mt-4',
-                //   key: 'wholesale_rate',
-                //   type: 'input',
-                //   templateOptions: {
-                //     label: 'Wholesale Rate',
-                //     placeholder: 'Enter Wholesale Rate'
-                //   }
-                // },
-                // {
-                //   className: 'col-12',
-                //   key: 'discount',
-                //   type: 'input',
-                //   templateOptions: {
-                //     label: 'Discount',
-                //     placeholder: 'Enter Discount'
-                //   }
-                // },
-                // {
-                //   className: 'col-12',
-                //   key: 'dealer_rate',
-                //   type: 'input',
-                //   templateOptions: {
-                //     label: 'Dealer Rate',
-                //     placeholder: 'Enter Dealer Rate'
-                //   }
-                // }
               ]
-            }
+            },
+            {
+              className: 'col-3 p-0',
+              fieldGroup:[
+                {
+                  key: 'picture',
+                  type: 'file',
+                  className: 'ta-cell pr-md col-12',
+                  templateOptions: {
+                    label: 'Picture',
+                    required: true
+                  }
+                },
+                {
+                  className: 'col-3',
+                  key: 'mrp',
+                  type: 'input',
+                  templateOptions: {
+                    label: 'MRP',
+                    placeholder: 'Enter MRP',
+                    required: true
+                  }
+                },
+                {
+                  className: 'col-3',
+                  key: 'sales_rate',
+                  type: 'input',
+                  templateOptions: {
+                    label: 'Sales Rate',
+                    placeholder: 'Enter Sales Rate',
+                    required: true
+                  }
+                },
+                {
+                  className: 'col-3',
+                  key: 'wholesale_rate',
+                  type: 'input',
+                  templateOptions: {
+                    label: 'Wholesale Rate',
+                    placeholder: 'Enter Wholesale Rate'
+                  }
+                },
+              ]
+            },
+            // Right side for the picture and additional fields
+            // {
+            //   className: 'col-3',
+            //   fieldGroup: [
+            //     {
+            //       key: 'picture',
+            //       type: 'file',
+            //       className: "ta-cell pr-md col-md-6 col-12",
+            //       props: {
+            //         displayStyle: 'avatar',
+            //         storeFolder: "products",
+            //         label: 'Product Picture',
+            //         multiple: false,
+            //         placeholder: 'Upload Product Picture',
+            //         required: false,
+            //       }
+            //     },                
+            //     // Additional fields below picture
+            //     // {
+            //     //   className: 'col-12 mt-4',
+            //     //   key: 'wholesale_rate',
+            //     //   type: 'input',
+            //     //   templateOptions: {
+            //     //     label: 'Wholesale Rate',
+            //     //     placeholder: 'Enter Wholesale Rate'
+            //     //   }
+            //     // },
+            //     // {
+            //     //   className: 'col-12',
+            //     //   key: 'discount',
+            //     //   type: 'input',
+            //     //   templateOptions: {
+            //     //     label: 'Discount',
+            //     //     placeholder: 'Enter Discount'
+            //     //   }
+            //     // },
+            //     // {
+            //     //   className: 'col-12',
+            //     //   key: 'dealer_rate',
+            //     //   type: 'input',
+            //     //   templateOptions: {
+            //     //     label: 'Dealer Rate',
+            //     //     placeholder: 'Enter Dealer Rate'
+            //     //   }
+            //     // }
+            //   ]
+            // }
           ]
         }
       ]
     };
   }
+
 }

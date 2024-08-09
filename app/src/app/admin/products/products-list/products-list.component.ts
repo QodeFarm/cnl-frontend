@@ -17,7 +17,11 @@ export class ProductsListComponent {
   @Output('edit') edit = new EventEmitter<void>();
 
   tableConfig: TaTableConfig = {
-    apiUrl: 'products/products/?summary=true&summary=true&page=1&limit=10&sort[0]=name,DESC',
+    apiUrl: 'products/products/',
+    showCheckbox: true,
+    summary: true,
+    page: 1, // Page number
+    sort: { 0: 'name,DESC' }, // Sorting parameters,
     title: 'Products',
     pkId: "product_id",
     pageSize: 10,
@@ -36,8 +40,8 @@ export class ProductsListComponent {
         sort: false
       },
       {
-        fieldKey: 'unit_options.unit_name',
-        name: 'Unit Name',
+        fieldKey: 'unit_options',
+        name: 'Unit',
         sort: false,
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
@@ -46,7 +50,17 @@ export class ProductsListComponent {
       },
       {
         fieldKey: 'sales_rate',
-        name: 'Sales Rate',
+        name: 'Sale Rate',
+        sort: false
+      },
+      {
+        fieldKey: 'wholesale_rate',
+        name: 'Wholesale',
+        sort: false
+      },
+      {
+        fieldKey: 'dealer_rate',
+        name: 'Dealer',
         sort: false
       },
       {
@@ -56,12 +70,12 @@ export class ProductsListComponent {
       },
       {
         fieldKey: 'dis_amount',
-        name: 'Dis Amount',
+        name: 'Disc',
         sort: false
       },
       {
         fieldKey: 'product_balance',
-        name: 'Product Balance',
+        name: 'Bal',
         sort: false
       },
       {
@@ -71,7 +85,7 @@ export class ProductsListComponent {
       },
       {
         fieldKey: 'hsn_code',
-        name: 'HSN Code',
+        name: 'HSN',
         sort: false
       },
       {
@@ -87,13 +101,14 @@ export class ProductsListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            // confirm: true,
-            // confirmMsg: "are you sure to delete?",
+            confirm: true,
+            confirmMsg: "are you sure to delete?",
             apiUrl: 'products/products'
           },
           {
             type: 'callBackFn',
-            label: 'Edit',
+            icon: 'fa fa-pen',
+            label: '',
             callBackFn: (row, action) => {
               console.log(row);
               this.edit.emit(row.product_id);
