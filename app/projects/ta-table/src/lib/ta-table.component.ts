@@ -192,12 +192,6 @@ clearFilters() {
 generateQueryString(filters: { quickPeriod: string, fromDate: Date, toDate: Date }): string {
     const queryParts: string[] = [];
 
-    if (filters.quickPeriod) {
-        // Add quickPeriod to query string if needed
-        // queryParts.push(`quick_period=${encodeURIComponent(filters.quickPeriod)}`);
-        queryParts.push(`period_name=${encodeURIComponent(filters.quickPeriod)}`);
-    }
-
     if (filters.fromDate) {
         const fromDateStr = this.formatDate(filters.fromDate);
         queryParts.push(`created_at_after=${encodeURIComponent(fromDateStr)}`);

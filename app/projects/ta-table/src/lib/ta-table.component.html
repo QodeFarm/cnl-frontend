@@ -1,7 +1,5 @@
 <div class="ta-row p-0 justify-content-end">
-    <div class="ta-cell">
-        <div class="h2">{{options.title}}</div>
-    </div>
+
     <div class="ta-cell">
         <div class="ta-row p-0 justify-content-end flex-nowrap">
             <!-- Quick Period Dropdown -->
@@ -40,7 +38,7 @@
             </div>
             
             <!-- Download Button -->
-            <div class="filter-group" style="margin-right: 40px;" *ngIf="isButtonVisible">
+            <div class="filter-group" style="margin-right: 10px;" *ngIf="isButtonVisible">
                 <button nz-button nzType="primary" (click)="downloadData($event)">
                     <i nz-icon nzType="download" nzTheme="outline"></i>
                 </button>
