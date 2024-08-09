@@ -9,9 +9,14 @@ import { Router } from '@angular/router';
   styleUrls: ['./vendors.component.scss']
 })
 export class VendorsComponent implements OnInit {
+
+  nowDate = () => {
+    return new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate();
+  }
   showVendorList: boolean = false;
   showForm: boolean = false;
   VendorEditID: any;
+  private observer: MutationObserver;
 
   formConfig: TaFormConfig = {};
 
@@ -23,7 +28,60 @@ export class VendorsComponent implements OnInit {
     // Set form config
     this.setFormConfig();
     console.log('this.formConfig', this.formConfig);
+    console.log("---------",this.formConfig)
   }
+
+  ngAfterViewInit() {
+    const containerSelector = '.vendors-component'; // Scoped to this component
+    this.applyDomManipulations(containerSelector);
+
+    // Use MutationObserver to monitor changes and re-apply manipulations
+    const container = document.querySelector(containerSelector);
+    if (container) {
+      this.observer = new MutationObserver(() => {
+        this.applyDomManipulations(containerSelector);
+      });
+
+      this.observer.observe(container, {
+        childList: true,
+        subtree: true,
+      });
+    }
+  }
+
+  applyDomManipulations(containerSelector: string) {
+    const container = document.querySelector(containerSelector);
+    if (!container) return;
+
+    // Hide Actions Column
+    const actionHeaders = Array.from(container.querySelectorAll('.custom-form-list .table th'));
+    actionHeaders.forEach((header: HTMLElement) => {
+      if (header.innerText.trim() === 'Actions') {
+        header.style.display = 'none';
+        const index = Array.from(header.parentElement?.children || []).indexOf(header);
+        const rows = container.querySelectorAll('.custom-form-list .table tbody tr');
+        rows.forEach(row => {
+          const cells = row.children;
+          if (cells[index]) {
+            (cells[index] as HTMLElement).style.display = 'none';
+          }
+        });
+      }
+    });
+
+    // Remove Button
+    const button = container.querySelector('.custom-form-list .ant-card-head button');
+    if (button) {
+      button.remove();
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.observer) {
+      this.observer.disconnect();
+    }
+  }
+
 
   hide() {
     const modalCloseButton = document.getElementById('modalClose');
@@ -238,7 +296,7 @@ export class VendorsComponent implements OnInit {
                 onChanges: (field: any) => {
                   field.formControl.valueChanges.subscribe(data => {
                     console.log("vendor_category", data);
-                    if (data && data.territory_id) {
+                    if (data && data.vendor_category_id) {
                       this.formConfig.model['vendor_data']['vendor_category_id'] = data.vendor_category_id;
                     }
                   });
@@ -297,7 +355,8 @@ export class VendorsComponent implements OnInit {
             {
               className: 'col-3',
               key: 'registration_date',
-              type: 'input',
+              type: 'date',
+              defaultValue: this.nowDate(),
               templateOptions: {
                 label: 'Registration Date',
                 placeholder: 'Enter Registration Date',
@@ -311,15 +370,14 @@ export class VendorsComponent implements OnInit {
         {
           className: 'col-3 p-0',
           fieldGroup:[
-            // {
-            //   key: 'picture',
-            //   type: 'file',
-            //   className: 'ta-cell pr-md col-12',
-            //   templateOptions: {
-            //     label: 'Picture',
-            //     required: true
-            //   }
-            // },
+            {
+              key: 'picture',
+              type: 'file',
+              className: 'ta-cell pr-md col-12',
+              templateOptions: {
+                label: 'Picture',
+              }
+            },
           ]
         },
         {
@@ -357,15 +415,15 @@ export class VendorsComponent implements OnInit {
                       placeholder: 'Enter Contact Person',
                     }
                   },
-                  {
-                    className: 'col-2',
-                    key: 'picture',
-                    type: 'input',
-                    templateOptions: {
-                      label: 'Picture',
-                      placeholder: 'Enter Picture URL',
-                    }
-                  },
+                  // {
+                  //   className: 'col-2',
+                  //   key: 'picture',
+                  //   type: 'input',
+                  //   templateOptions: {
+                  //     label: 'Picture',
+                  //     placeholder: 'Enter Picture URL',
+                  //   }
+                  // },
                   {
                     className: 'col-2',
                     key: 'cin',
@@ -663,7 +721,7 @@ export class VendorsComponent implements OnInit {
               className: 'custom-form-list',
               templateOptions: {
                 title: 'Vendor Addresses',
-                addText: 'Add Addresses',
+                // addText: 'Add Addresses',
                 tableCols: [
                   {
                     name: 'address',
@@ -804,7 +862,7 @@ export class VendorsComponent implements OnInit {
                     templateOptions: {
                       label: 'Pin Code',
                       hideLabel: true,
-                      placeholder: 'Pin Code',
+                      placeholder: 'Enter Pin Code',
                     }
                   },
                   {
@@ -813,7 +871,7 @@ export class VendorsComponent implements OnInit {
                     templateOptions: {
                       label: 'Phone',
                       hideLabel: true,
-                      placeholder: 'Phone',
+                      placeholder: 'Enter Phone',
                     }
                   },
                   {
@@ -822,7 +880,7 @@ export class VendorsComponent implements OnInit {
                     templateOptions: {
                       label: 'Email',
                       hideLabel: true,
-                      placeholder: 'email',
+                      placeholder: 'Enter email',
                     }
                   },
                   {
@@ -831,7 +889,7 @@ export class VendorsComponent implements OnInit {
                     templateOptions: {
                       label: 'Route Map',
                       hideLabel: true,
-                      placeholder: 'Route Map'
+                      placeholder: 'Enter Route Map URL'
                     }
                   },
                   {
@@ -840,7 +898,7 @@ export class VendorsComponent implements OnInit {
                     templateOptions: {
                       label: 'Longitude',
                       hideLabel: true,
-                      placeholder: 'Enter',
+                      placeholder: 'Enter Longitude',
                     }
                   },
                   {
@@ -849,7 +907,7 @@ export class VendorsComponent implements OnInit {
                     templateOptions: {
                       label: 'Latitude',
                       hideLabel: true,
-                      placeholder: '',
+                      placeholder: 'Enter Latitude',
                     }
                   },
                   {

@@ -16,8 +16,8 @@ export class VendorsListComponent {
   @Output('edit') edit = new EventEmitter<void>();
 
   tableConfig: TaTableConfig = {
-    // apiUrl: 'vendors/vendors/?summary=true&summary=true&page=1&limit=10&sort[0]=name,DESC',
-    apiUrl: 'vendors/vendors/',
+    apiUrl: 'vendors/vendors/?summary=true&summary=true&page=1&limit=10&sort[0]=name,DESC',
+    // apiUrl: 'vendors/vendors/',
     title: 'Vendors',
     showCheckbox:true,
     pkId: "vendor_id",
@@ -40,19 +40,11 @@ export class VendorsListComponent {
         fieldKey: 'email',
         name: 'Email',
         sort: false,
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.email}`;
-        },
       },
       {
         fieldKey: 'phone',
         name: 'Phone',
         sort: false,
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.phone}`;
-        },
       },
       {
         fieldKey: 'vendor_category_id.name',
