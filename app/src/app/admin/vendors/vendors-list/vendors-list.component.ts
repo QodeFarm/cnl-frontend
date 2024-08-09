@@ -16,7 +16,8 @@ export class VendorsListComponent {
   @Output('edit') edit = new EventEmitter<void>();
 
   tableConfig: TaTableConfig = {
-    apiUrl: 'vendors/vendors/?summary=true&summary=true&page=1&limit=10&sort[0]=name,DESC',
+    // apiUrl: 'vendors/vendors/?summary=true&summary=true&page=1&limit=10&sort[0]=name,DESC',
+    apiUrl: 'vendors/vendors/',
     title: 'Vendors',
     showCheckbox:true,
     pkId: "vendor_id",
@@ -94,13 +95,13 @@ export class VendorsListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            // confirm: true,
-            // confirmMsg: "Sure to delete!!!!!",
+            confirm: true,
+            confirmMsg: "Sure to delete?",
             apiUrl: 'vendors/vendors'
           },
           {
             type: 'callBackFn',
-            label: 'Edit',
+            icon: 'fa fa-pen',
             callBackFn: (row, action) => {
               console.log(`vendor ID: ${row.vendor_id}`);
               this.edit.emit(row.vendor_id);

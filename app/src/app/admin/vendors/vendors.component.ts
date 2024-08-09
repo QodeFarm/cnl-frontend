@@ -39,6 +39,7 @@ export class VendorsComponent implements OnInit {
       console.log('--------> res ', res);
       if (res && res.data) {
         this.formConfig.model = res.data;
+        console.log("vendors data",res.data)
         // Set labels for update
         this.formConfig.submit.label = 'Update';
         // Show form after setting form values
@@ -61,17 +62,39 @@ export class VendorsComponent implements OnInit {
       formState: {
         viewMode: false
       },
-      exParams: [],
+      exParams: [
+        {
+          key: 'city_id',
+          type: 'script',
+          value: 'data.city.city_id'
+        },
+        {
+          key: 'state_id',
+          type: 'script',
+          value: 'data.state.state_id'
+        },
+        {
+          key: 'country_id',
+          type: 'script',
+          value: 'data.country.country_id'
+        }
+      ],
       submit: {
         submittedFn: () => this.ngOnInit()
       },
       reset: {},
       model: {
         vendor_data: {},
-        vendor_attachments: [],
-        vendor_addresses: []
+        vendor_addresses: [{
+          address_type: 'Billing',
+        },
+        {
+          address_type: 'Shipping',
+        }],
+        vendor_attachments: [{}],
       },
-      fields: [
+      fields: 
+      [
         {
           fieldGroupClassName: "ant-row custom-form-block",
           key: 'vendor_data',
@@ -126,11 +149,11 @@ export class VendorsComponent implements OnInit {
               type: 'select',
               className: 'col-3',
               templateOptions: {
-                dataKey: 'ledger_account_id',
-                dataLabel: 'name',
-                label: 'Ledger Account',
-                placeholder: 'Ledger Account',
+                dataKey: 'name',
+                dataLabel: "name",
+                label: 'Ledger account',
                 required: true,
+                // placeholder: 'Select Ledger account',
                 lazy: {
                   url: 'customers/ledger_accounts/',
                   lazyOneTime: true
@@ -138,12 +161,10 @@ export class VendorsComponent implements OnInit {
               },
               hooks: {
                 onChanges: (field: any) => {
-                  field.formControl.valueChanges.subscribe((data: any) => {
-                    console.log('ledger_account', data);
-                    if (this.formConfig && this.formConfig.model && this.formConfig.model['vendor_data']) {
+                  field.formControl.valueChanges.subscribe(data => {
+                    console.log("ledger_account", data);
+                    if (data && data.ledger_account_id) {
                       this.formConfig.model['vendor_data']['ledger_account_id'] = data.ledger_account_id;
-                    } else {
-                      console.error('Form config or vendor data model is not defined.');
                     }
                   });
                 }
@@ -165,11 +186,10 @@ export class VendorsComponent implements OnInit {
               },
               hooks: {
                 onChanges: (field: any) => {
-                  field.formControl.valueChanges.subscribe((data: any) => {
-                    if (this.formConfig && this.formConfig.model && this.formConfig.model['vendor_data']) {
+                  field.formControl.valueChanges.subscribe(data => {
+                    console.log("firm_status", data);
+                    if (data && data.firm_status_id) {
                       this.formConfig.model['vendor_data']['firm_status_id'] = data.firm_status_id;
-                    } else {
-                      console.error('Form config or vendor data model is not defined.');
                     }
                   });
                 }
@@ -191,11 +211,10 @@ export class VendorsComponent implements OnInit {
               },
               hooks: {
                 onChanges: (field: any) => {
-                  field.formControl.valueChanges.subscribe((data: any) => {
-                    if (this.formConfig && this.formConfig.model && this.formConfig.model['vendor_data']) {
+                  field.formControl.valueChanges.subscribe(data => {
+                    console.log("territory", data);
+                    if (data && data.territory_id) {
                       this.formConfig.model['vendor_data']['territory_id'] = data.territory_id;
-                    } else {
-                      console.error('Form config or vendor data model is not defined.');
                     }
                   });
                 }
@@ -217,11 +236,10 @@ export class VendorsComponent implements OnInit {
               },
               hooks: {
                 onChanges: (field: any) => {
-                  field.formControl.valueChanges.subscribe((data: any) => {
-                    if (this.formConfig && this.formConfig.model && this.formConfig.model['vendor_data']) {
+                  field.formControl.valueChanges.subscribe(data => {
+                    console.log("vendor_category", data);
+                    if (data && data.territory_id) {
                       this.formConfig.model['vendor_data']['vendor_category_id'] = data.vendor_category_id;
-                    } else {
-                      console.error('Form config or vendor data model is not defined.');
                     }
                   });
                 }
@@ -244,11 +262,10 @@ export class VendorsComponent implements OnInit {
               },
               hooks: {
                 onChanges: (field: any) => {
-                  field.formControl.valueChanges.subscribe((data: any) => {
-                    if (this.formConfig && this.formConfig.model && this.formConfig.model['vendor_data']) {
+                  field.formControl.valueChanges.subscribe(data => {
+                    console.log("gst_category", data);
+                    if (data && data.gst_category_id) {
                       this.formConfig.model['vendor_data']['gst_category_id'] = data.gst_category_id;
-                    } else {
-                      console.error('Form config or vendor data model is not defined.');
                     }
                   });
                 }
@@ -270,11 +287,11 @@ export class VendorsComponent implements OnInit {
             },
             {
               className: 'col-3',
-              key: 'gst',
+              key: 'gst_no',
               type: 'input',
               templateOptions: {
                 label: 'GST No',
-                placeholder: 'Enter GST',
+                placeholder: 'Enter GST No',
               }
             },
             {
@@ -294,15 +311,15 @@ export class VendorsComponent implements OnInit {
         {
           className: 'col-3 p-0',
           fieldGroup:[
-            {
-              key: 'picture',
-              type: 'file',
-              className: 'ta-cell pr-md col-12',
-              templateOptions: {
-                label: 'Picture',
-                required: true
-              }
-            },
+            // {
+            //   key: 'picture',
+            //   type: 'file',
+            //   className: 'ta-cell pr-md col-12',
+            //   templateOptions: {
+            //     label: 'Picture',
+            //     required: true
+            //   }
+            // },
           ]
         },
         {
@@ -321,11 +338,10 @@ export class VendorsComponent implements OnInit {
           },
           hooks: {
             onChanges: (field: any) => {
-              field.formControl.valueChanges.subscribe((data: any) => {
-                if (this.formConfig && this.formConfig.model && this.formConfig.model['vendor_data']) {
+              field.formControl.valueChanges.subscribe(data => {
+                console.log("gst_category", data);
+                if (data && data.transporter_id) {
                   this.formConfig.model['vendor_data']['transporter_id'] = data.transporter_id;
-                } else {
-                  console.error('Form config or vendor data model is not defined.');
                 }
               });
             }
@@ -431,11 +447,10 @@ export class VendorsComponent implements OnInit {
                     },
                     hooks: {
                       onChanges: (field: any) => {
-                        field.formControl.valueChanges.subscribe((data: any) => {
-                          if (this.formConfig && this.formConfig.model && this.formConfig.model['vendor_data']) {
+                        field.formControl.valueChanges.subscribe(data => {
+                          console.log("gst_category", data);
+                          if (data && data.payment_term_id) {
                             this.formConfig.model['vendor_data']['payment_term_id'] = data.payment_term_id;
-                          } else {
-                            console.error('Form config or vendor data model is not defined.');
                           }
                         });
                       }
@@ -457,11 +472,10 @@ export class VendorsComponent implements OnInit {
                     },
                     hooks: {
                       onChanges: (field: any) => {
-                        field.formControl.valueChanges.subscribe((data: any) => {
-                          if (this.formConfig && this.formConfig.model && this.formConfig.model['vendor_data']) {
+                        field.formControl.valueChanges.subscribe(data => {
+                          console.log("price_category", data);
+                          if (data && data.price_category_id) {
                             this.formConfig.model['vendor_data']['price_category_id'] = data.price_category_id;
-                          } else {
-                            console.error('Form config or vendor data model is not defined.');
                           }
                         });
                       }
@@ -484,11 +498,10 @@ export class VendorsComponent implements OnInit {
                     },
                     hooks: {
                       onChanges: (field: any) => {
-                        field.formControl.valueChanges.subscribe((data: any) => {
-                          if (this.formConfig && this.formConfig.model && this.formConfig.model['vendor_data']) {
+                        field.formControl.valueChanges.subscribe(data => {
+                          console.log("vendor_agent", data);
+                          if (data && data.vendor_agent_id) {
                             this.formConfig.model['vendor_data']['vendor_agent_id'] = data.vendor_agent_id;
-                          } else {
-                            console.error('Form config or vendor data model is not defined.');
                           }
                         });
                       }
@@ -547,7 +560,7 @@ export class VendorsComponent implements OnInit {
             },
             {
               className: 'col-2',
-              key: 'account_number',
+              key: 'accounts_number',
               type: 'input',
               templateOptions: {
                 label: 'Account Number',
@@ -574,6 +587,15 @@ export class VendorsComponent implements OnInit {
             },
             // Tenth row: Checkboxes
             {
+              className: 'col-2',
+              key: 'gst',
+              type: 'input',
+              templateOptions: {
+                label: 'GST',
+                placeholder: 'Enter GST',
+              }
+            },
+            {
               className: 'col-2 d-flex align-items-center',
               key: 'gst_suspend',
               type: 'checkbox',
@@ -582,7 +604,7 @@ export class VendorsComponent implements OnInit {
               }
             },
             {
-              className: 'col-3 d-flex align-items-center',
+              className: 'col-2 d-flex align-items-center',
               key: 'tds_on_gst_applicable',
               type: 'checkbox',
               templateOptions: {
@@ -590,7 +612,7 @@ export class VendorsComponent implements OnInit {
               }
             },
             {
-              className: 'col-2',
+              className: 'col-2 d-flex align-items-center',
               key: 'tds_applicable',
               type: 'checkbox',
               templateOptions: {
@@ -598,619 +620,252 @@ export class VendorsComponent implements OnInit {
               }
             },
             {
-              className: 'col-4',
+              className: 'col-2 d-flex align-items-center',
+              key: 'is_sub_vendor',
+              type: 'checkbox',
+              templateOptions: {
+                label: 'Is Sub Vendor',
+              }
+            },
+            {
+              className: 'col-2 d-flex align-items-center',
               key: 'vendor_common_for_sales_purchase',
               type: 'checkbox',
               templateOptions: {
                 label: 'Vendor common for Sales and Purchase',
               }
             },
+          ]
+        },
+        {
+          className: 'row col-6 m-0 custom-form-card',
+          fieldGroup: [
             {
-              className: 'col-3',
-              key: 'is_sub_vendor',
-              type: 'checkbox',
-              templateOptions: {
-                label: 'Is Sub Vendor',
+              template: '<div class="custom-form-card-title">Vendor Attachments</div>',
+              fieldGroupClassName: "ant-row",
+            },
+            {
+              key: 'vendor_attachments',
+              type: 'file',
+              className: 'ta-cell col-16 custom-file-attachement',
+              props: {
+                "displayStyle": "files",
+                "multiple": true
               }
             }
           ]
         },
-        // {
-        //   key: 'vendor_attachments',
-        //   type: 'repeat',
-        //   className: 'custom-form-list',
-        //   templateOptions: {
-        //     addText: 'Add Attachment',
-        //   },
-        //   fieldArray: {
-        //     fieldGroupClassName: 'row',
-        //     fieldGroup: [
-        //       {
-        //         className: 'col-10 p-0',
-        //         key: 'attachment_name',
-        //         type: 'input',
-        //         templateOptions: {
-        //           label: 'Attachment Name',
-        //           placeholder: 'Enter Attachment Name',
-        //           required: true,
-        //         }
-        //       },
-        //       {
-        //         key: 'attachment_path',
-        //         type: 'input',
-        //         className: 'col-10 p-0',
-        //         templateOptions: {
-        //           label: 'Attachment Path',
-        //           placeholder: 'Enter Attachment Path',
-        //           required: true,
-        //         }
-        //       }
-        //     ]
-        //   }
-        // },
-        // {
-        //   key: 'vendor_addresses',
-        //   type: 'repeat',
-        //   className: 'custom-form-list',
-        //   templateOptions: {
-        //     addText: 'Add Address',
-        //   },
-        //   fieldArray: {
-        //     fieldGroupClassName: 'row',
-        //     fieldGroup: [
-        //       {
-        //         className: 'col',
-        //         key: 'address_type',
-        //         type: 'input',
-        //         templateOptions: {
-        //           type: 'hidden',
-        //         },
-        //         defaultValue: 'Billing', // Default to 'Billing' for the first address, 'Shipping' for subsequent addresses
-        //         expressionProperties: {
-        //           'model.address_type': (model, formState, field) => {
-        //             const index = field.parent.parent.model.indexOf(model);
-        //             return index === 0 ? 'Billing' : 'Shipping';
-        //           },
-        //           'templateOptions.hidden': 'true'
-        //         }
-        //       },
-        //       {
-        //         key: 'address',
-        //         type: 'textarea',
-        //         className: 'col',
-        //         templateOptions: {
-        //           label: 'Address',
-        //           placeholder: 'Enter Address',
-        //         }
-        //       },
-        //       {
-        //         className: 'col',
-        //         key: 'city',
-        //         type: 'select',
-        //         templateOptions: {
-        //           dataKey: 'city_id',
-        //           dataLabel: 'city_name',
-        //           label: 'City',
-        //           placeholder: 'City',
-        //           required: true,
-        //           lazy: {
-        //             url: 'masters/city/',
-        //             lazyOneTime: true
-        //           }
-        //         },
-        //         hooks: {
-        //           onChanges: (field: any) => {
-        //             field.formControl.valueChanges.subscribe((data: any) => {
-        //               console.log('city', data);
-        //               // const index = field.parent.parent.model.indexOf(field.parent.model);
-        //               const index = field.parent.key;
-        //               if (this.formConfig && this.formConfig.model) {
-        //                 this.formConfig.model['vendor_addresses'][index]['city_id'] = data.city_id;
-        //               } else {
-        //                 console.error('Form config or vendor addresses model is not defined.');
-        //               }
-        //             });
-        //           }
-        //         }
-        //       },
-        //       {
-        //         key: 'state',
-        //         type: 'select',
-        //         className: 'col',
-        //         templateOptions: {
-        //           dataKey: 'state_id',
-        //           dataLabel: 'state_name',
-        //           label: 'State',
-        //           placeholder: 'State',
-        //           required: true,
-        //           lazy: {
-        //             url: 'masters/state/',
-        //             lazyOneTime: true
-        //           }
-        //         },
-        //         hooks: {
-        //           onChanges: (field: any) => {
-        //             field.formControl.valueChanges.subscribe((data: any) => {
-        //               console.log('state', data);
-        //               // const index = field.parent.parent.model.indexOf(field.parent.model);
-        //               const index = field.parent.key;
-        //               if (this.formConfig && this.formConfig.model) {
-        //                 this.formConfig.model['vendor_addresses'][index]['state_id'] = data.state_id;
-        //               } else {
-        //                 console.error('Form config or vendor addresses model is not defined.');
-        //               }
-        //             });
-        //           }
-        //         }
-        //       },
-        //       {
-        //         key: 'country',
-        //         type: 'select',
-        //         className: 'col',
-        //         templateOptions: {
-        //           dataKey: 'country_id',
-        //           dataLabel: 'country_name',
-        //           label: 'Country',
-        //           placeholder: 'Select Country',
-        //           lazy: {
-        //             url: 'masters/country/',
-        //             lazyOneTime: true
-        //           }
-        //         },
-        //         hooks: {
-        //           onChanges: (field: any) => {
-        //             field.formControl.valueChanges.subscribe((data: any) => {
-        //               console.log('country', data);
-        //               // const index = field.parent.parent.model.indexOf(field.parent.model);
-        //               const index = field.parent.key;
-        //               if (this.formConfig && this.formConfig.model) {
-        //                 this.formConfig.model['vendor_addresses'][index]['country_id'] = data.country_id;
-        //               } else {
-        //                 console.error('Form config or vendor addresses model is not defined.');
-        //               }
-        //             });
-        //           }
-        //         }
-        //       },
-        //       {
-        //         key: 'pin_code',
-        //         type: 'input',
-        //         className: 'col',
-        //         templateOptions: {
-        //           label: 'Pin Code',
-        //           placeholder: 'Enter Pin Code',
-        //         }
-        //       },
-        //       {
-        //         key: 'phone',
-        //         type: 'input',
-        //         className: 'col',
-        //         templateOptions: {
-        //           label: 'Phone',
-        //           placeholder: 'Enter Phone',
-        //         }
-        //       },
-        //       {
-        //         key: 'email',
-        //         type: 'input',
-        //         className: 'col',
-        //         templateOptions: {
-        //           label: 'Email',
-        //           placeholder: 'Enter Email',
-        //         }
-        //       },
-        //       {
-        //         key: 'longitude',
-        //         type: 'input',
-        //         className: 'col',
-        //         templateOptions: {
-        //           label: 'Longitude',
-        //           placeholder: 'Enter Longitude',
-        //           type: 'number',
-        //         }
-        //       },
-        //       {
-        //         key: 'latitude',
-        //         type: 'input',
-        //         className: 'col',
-        //         templateOptions: {
-        //           label: 'Latitude',
-        //           placeholder: 'Enter Latitude',
-        //           type: 'number',
-        //         }
-        //       },
-        //       {
-        //         key: 'route_map',
-        //         type: 'input',
-        //         className: 'col',
-        //         templateOptions: {
-        //           label: 'Route Map',
-        //           placeholder: 'Enter Route Map URL',
-        //         }
-        //       }
-        //     ]
-        //   }
-        // }
             // start of order_shipments keys
         
             {
-              fieldGroupClassName: "row col-12 m-0 custom-form-card",
-              fieldGroup: [
-                {
-                  className: 'col-6 custom-form-card-block',
-                  fieldGroup:[
-                    {
-                      template: '<div class="custom-form-card-title">  Shipping Details </div>',
-                      fieldGroupClassName: "ant-row",
+              key: 'vendor_addresses',
+              type: 'table',
+              className: 'custom-form-list',
+              templateOptions: {
+                title: 'Vendor Addresses',
+                addText: 'Add Addresses',
+                tableCols: [
+                  {
+                    name: 'address',
+                    label: 'Address'
+                  },
+                  {
+                    name: 'city',
+                    label: 'City'
+                  },
+                  {
+                    name: 'state',
+                    label: 'State'
+                  },
+                  {
+                    name: 'country',
+                    label: 'Country'
+                  },
+                  {
+                    name: 'pin_code',
+                    label: 'Pin Code'
+                  },
+                  {
+                    name: 'phone',
+                    label: 'Phone'
+                  },
+                  {
+                    name: 'email',
+                    label: 'Email'
+                  },
+                  {
+                    name: 'route_map',
+                    label: 'Route Map'
+                  },
+                  {
+                    name: 'longitude',
+                    label: 'Longitude'
+                  },
+                  {
+                    name: 'latitude',
+                    label: 'Latitude'
+                  }
+                ]
+              },
+              fieldArray: {
+                fieldGroup: [
+                  {
+                    key: 'city',
+                    type: 'select',
+                    templateOptions: {
+                      dataKey: 'city_id',
+                      dataLabel: 'city_name',
+                      label: 'City',
+                      placeholder: 'select',
+                      hideLabel: true,
+                      required: true,
+                      lazy: {
+                      url: 'masters/city/',
+                      lazyOneTime: true
+                      }
+                    },
+                    hooks: {
+                      onChanges: (field: any) => {
+                      field.formControl.valueChanges.subscribe((data: any) => {
+                        console.log('city', data);
+                        // const index = field.parent.parent.model.indexOf(field.parent.model);
+                        const index = field.parent.key;
+                        if (this.formConfig && this.formConfig.model) {
+                        this.formConfig.model['vendor_addresses'][index]['city_id'] = data.city_id;
+                        } else {
+                        console.error('Form config or Customer addresses model is not defined.');
+                        }
+                      });
+                      }
+                    }
                     },
                     {
-                      fieldGroupClassName: "ant-row",
-                      key: 'order_shipments',
-                      fieldGroup: [
-                             {
-                                key: 'address',
-                                type: 'textarea',
-                                className: 'col-6',
-                                templateOptions: {
-                                  label: 'Address',
-                                  placeholder: 'Enter Address',
-                                }
-                              },
-                              {
-                                className: 'col-6',
-                                key: 'city',
-                                type: 'select',
-                                templateOptions: {
-                                  dataKey: 'city_id',
-                                  dataLabel: 'city_name',
-                                  label: 'City',
-                                  placeholder: 'City',
-                                  required: true,
-                                  lazy: {
-                                    url: 'masters/city/',
-                                    lazyOneTime: true
-                                  }
-                                },
-                                hooks: {
-                                  onChanges: (field: any) => {
-                                    field.formControl.valueChanges.subscribe((data: any) => {
-                                      console.log('city', data);
-                                      // const index = field.parent.parent.model.indexOf(field.parent.model);
-                                      const index = field.parent.key;
-                                      if (this.formConfig && this.formConfig.model) {
-                                        this.formConfig.model['vendor_addresses'][index]['city_id'] = data.city_id;
-                                      } else {
-                                        console.error('Form config or vendor addresses model is not defined.');
-                                      }
-                                    });
-                                  }
-                                }
-                              },
-                              {
-                                key: 'state',
-                                type: 'select',
-                                className: 'col-6',
-                                templateOptions: {
-                                  dataKey: 'state_id',
-                                  dataLabel: 'state_name',
-                                  label: 'State',
-                                  placeholder: 'State',
-                                  required: true,
-                                  lazy: {
-                                    url: 'masters/state/',
-                                    lazyOneTime: true
-                                  }
-                                },
-                                hooks: {
-                                  onChanges: (field: any) => {
-                                    field.formControl.valueChanges.subscribe((data: any) => {
-                                      console.log('state', data);
-                                      // const index = field.parent.parent.model.indexOf(field.parent.model);
-                                      const index = field.parent.key;
-                                      if (this.formConfig && this.formConfig.model) {
-                                        this.formConfig.model['vendor_addresses'][index]['state_id'] = data.state_id;
-                                      } else {
-                                        console.error('Form config or vendor addresses model is not defined.');
-                                      }
-                                    });
-                                  }
-                                }
-                              },
-                              {
-                                key: 'country',
-                                type: 'select',
-                                className: 'col-6',
-                                templateOptions: {
-                                  dataKey: 'country_id',
-                                  dataLabel: 'country_name',
-                                  label: 'Country',
-                                  placeholder: 'Select Country',
-                                  lazy: {
-                                    url: 'masters/country/',
-                                    lazyOneTime: true
-                                  }
-                                },
-                                hooks: {
-                                  onChanges: (field: any) => {
-                                    field.formControl.valueChanges.subscribe((data: any) => {
-                                      console.log('country', data);
-                                      // const index = field.parent.parent.model.indexOf(field.parent.model);
-                                      const index = field.parent.key;
-                                      if (this.formConfig && this.formConfig.model) {
-                                        this.formConfig.model['vendor_addresses'][index]['country_id'] = data.country_id;
-                                      } else {
-                                        console.error('Form config or vendor addresses model is not defined.');
-                                      }
-                                    });
-                                  }
-                                }
-                              },
-                              {
-                                key: 'pin_code',
-                                type: 'input',
-                                className: 'col-6',
-                                templateOptions: {
-                                  label: 'Pin Code',
-                                  placeholder: 'Enter Pin Code',
-                                }
-                              },
-                              {
-                                key: 'phone',
-                                type: 'input',
-                                className: 'col-6',
-                                templateOptions: {
-                                  label: 'Phone',
-                                  placeholder: 'Enter Phone',
-                                }
-                              },
-                              {
-                                key: 'email',
-                                type: 'input',
-                                className: 'col-6',
-                                templateOptions: {
-                                  label: 'Email',
-                                  placeholder: 'Enter Email',
-                                }
-                              },
-                              {
-                                key: 'longitude',
-                                type: 'input',
-                                className: 'col-6',
-                                templateOptions: {
-                                  label: 'Longitude',
-                                  placeholder: 'Enter Longitude',
-                                  type: 'number',
-                                }
-                              },
-                              {
-                                key: 'latitude',
-                                type: 'input',
-                                className: 'col-6',
-                                templateOptions: {
-                                  label: 'Latitude',
-                                  placeholder: 'Enter Latitude',
-                                  type: 'number',
-                                }
-                              },
-                              {
-                                key: 'route_map',
-                                type: 'input',
-                                className: 'col-6',
-                                templateOptions: {
-                                  label: 'Route Map',
-                                  placeholder: 'Enter Route Map URL',
-                                }
-                              }
-                      ]
-                    },
-                  ]
-                },
-                {
-                  className: 'col-6 pb-0',
-                  fieldGroupClassName: "field-no-bottom-space",
-                  fieldGroup: [
-                    {
-                      fieldGroupClassName: "",
-                      fieldGroup: [
-                          {
-                            className: 'col-12 mb-3 custom-form-card-block w-100',
-                            fieldGroup:[
-                              // start of sale_order keys
-                              {
-                                template: '<div class="custom-form-card-title"> Billing Details </div>',
-                                fieldGroupClassName: "ant-row",
-                              },
-                              {
-                                fieldGroupClassName: "ant-row",
-                                key: 'sale_order',
-                                fieldGroup: [
-                                  {
-                                     key: 'address',
-                                     type: 'textarea',
-                                     className: 'col-8',
-                                     templateOptions: {
-                                       label: 'Address',
-                                       placeholder: 'Enter Address',
-                                     }
-                                   },
-                                   {
-                                     className: 'col-4',
-                                     key: 'city',
-                                     type: 'select',
-                                     templateOptions: {
-                                       dataKey: 'city_id',
-                                       dataLabel: 'city_name',
-                                       label: 'City',
-                                       placeholder: 'City',
-                                       required: true,
-                                       lazy: {
-                                         url: 'masters/city/',
-                                         lazyOneTime: true
-                                       }
-                                     },
-                                     hooks: {
-                                       onChanges: (field: any) => {
-                                         field.formControl.valueChanges.subscribe((data: any) => {
-                                           console.log('city', data);
-                                           // const index = field.parent.parent.model.indexOf(field.parent.model);
-                                           const index = field.parent.key;
-                                           if (this.formConfig && this.formConfig.model) {
-                                             this.formConfig.model['vendor_addresses'][index]['city_id'] = data.city_id;
-                                           } else {
-                                             console.error('Form config or vendor addresses model is not defined.');
-                                           }
-                                         });
-                                       }
-                                     }
-                                   },
-                                   {
-                                     key: 'state',
-                                     type: 'select',
-                                     className: 'col-4',
-                                     templateOptions: {
-                                       dataKey: 'state_id',
-                                       dataLabel: 'state_name',
-                                       label: 'State',
-                                       placeholder: 'State',
-                                       required: true,
-                                       lazy: {
-                                         url: 'masters/state/',
-                                         lazyOneTime: true
-                                       }
-                                     },
-                                     hooks: {
-                                       onChanges: (field: any) => {
-                                         field.formControl.valueChanges.subscribe((data: any) => {
-                                           console.log('state', data);
-                                           // const index = field.parent.parent.model.indexOf(field.parent.model);
-                                           const index = field.parent.key;
-                                           if (this.formConfig && this.formConfig.model) {
-                                             this.formConfig.model['vendor_addresses'][index]['state_id'] = data.state_id;
-                                           } else {
-                                             console.error('Form config or vendor addresses model is not defined.');
-                                           }
-                                         });
-                                       }
-                                     }
-                                   },
-                                   {
-                                     key: 'country',
-                                     type: 'select',
-                                     className: 'col-4',
-                                     templateOptions: {
-                                       dataKey: 'country_id',
-                                       dataLabel: 'country_name',
-                                       label: 'Country',
-                                       placeholder: 'Select Country',
-                                       lazy: {
-                                         url: 'masters/country/',
-                                         lazyOneTime: true
-                                       }
-                                     },
-                                     hooks: {
-                                       onChanges: (field: any) => {
-                                         field.formControl.valueChanges.subscribe((data: any) => {
-                                           console.log('country', data);
-                                           // const index = field.parent.parent.model.indexOf(field.parent.model);
-                                           const index = field.parent.key;
-                                           if (this.formConfig && this.formConfig.model) {
-                                             this.formConfig.model['vendor_addresses'][index]['country_id'] = data.country_id;
-                                           } else {
-                                             console.error('Form config or vendor addresses model is not defined.');
-                                           }
-                                         });
-                                       }
-                                     }
-                                   },
-                                   {
-                                     key: 'pin_code',
-                                     type: 'input',
-                                     className: 'col-4',
-                                     templateOptions: {
-                                       label: 'Pin Code',
-                                       placeholder: 'Enter Pin Code',
-                                     }
-                                   },
-                                   {
-                                     key: 'phone',
-                                     type: 'input',
-                                     className: 'col-4',
-                                     templateOptions: {
-                                       label: 'Phone',
-                                       placeholder: 'Enter Phone',
-                                     }
-                                   },
-                                   {
-                                     key: 'email',
-                                     type: 'input',
-                                     className: 'col-4',
-                                     templateOptions: {
-                                       label: 'Email',
-                                       placeholder: 'Enter Email',
-                                     }
-                                   },
-                                   {
-                                     key: 'longitude',
-                                     type: 'input',
-                                     className: 'col-4',
-                                     templateOptions: {
-                                       label: 'Longitude',
-                                       placeholder: 'Enter Longitude',
-                                       type: 'number',
-                                     }
-                                   },
-                                   {
-                                     key: 'latitude',
-                                     type: 'input',
-                                     className: 'col-4',
-                                     templateOptions: {
-                                       label: 'Latitude',
-                                       placeholder: 'Enter Latitude',
-                                       type: 'number',
-                                     }
-                                   },
-                                   {
-                                     key: 'route_map',
-                                     type: 'input',
-                                     className: 'col-4',
-                                     templateOptions: {
-                                       label: 'Route Map',
-                                       placeholder: 'Enter Route Map URL',
-                                     }
-                                   }
-                           ]
-                              },
-                            ]
-                          },
-                          {
-                            className: 'col-12 custom-form-card-block w-100',
-                            fieldGroup:[
-                              {
-                                template: '<div class="custom-form-card-title"> Order Attachments </div>',
-                                fieldGroupClassName: "ant-row",
-                              },
-                              {
-                                key: 'order_attachments',
-                                type: 'file',
-                                className: 'ta-cell col-12 custom-file-attachement',
-                                templateOptions: {
-                                  // label: 'Order Attachments',
-                                  // // required: true
-                                  // required: true
-                                }
-                              },
-                            ]
+                      key: 'state',
+                      type: 'select',
+                      templateOptions: {
+                        dataKey: 'state_id',
+                        dataLabel: 'state_name',
+                        label: 'State',
+                        placeholder: 'select',
+                        hideLabel: true,
+                        required: true,
+                        lazy: {
+                        url: 'masters/state/',
+                        lazyOneTime: true
+                        }
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                        field.formControl.valueChanges.subscribe((data: any) => {
+                          console.log('state', data);
+                          // const index = field.parent.parent.model.indexOf(field.parent.model);
+                          const index = field.parent.key;
+                          if (this.formConfig && this.formConfig.model) {
+                          this.formConfig.model['vendor_addresses'][index]['state_id'] = data.state_id;
+                          } else {
+                          console.error('Form config or Customer addresses model is not defined.');
                           }
-                       
-                      ]
-                    },
-                    
-                  ]
-                 
-                }
-              ]
+                        });
+                        }
+                      }
+                      },
+                      {
+                      key: 'country',
+                      type: 'select',
+                      templateOptions: {
+                        dataKey: 'country_id',
+                        dataLabel: 'country_name',
+                        label: 'Country',
+                        hideLabel: true,
+                        placeholder: 'select',
+                        lazy: {
+                        url: 'masters/country/',
+                        lazyOneTime: true
+                        }
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                        field.formControl.valueChanges.subscribe((data: any) => {
+                          console.log('country', data);
+                          // const index = field.parent.parent.model.indexOf(field.parent.model);
+                          const index = field.parent.key;
+                          if (this.formConfig && this.formConfig.model) {
+                          this.formConfig.model['vendor_addresses'][index]['country_id'] = data.country_id;
+                          } else {
+                          console.error('Form config or Customer addresses model is not defined.');
+                          }
+                        });
+                        }
+                      }
+                      },
+                  {
+                    type: 'input',
+                    key: 'pin_code',
+                    templateOptions: {
+                      label: 'Pin Code',
+                      hideLabel: true,
+                      placeholder: 'Pin Code',
+                    }
+                  },
+                  {
+                    type: 'input',
+                    key: 'phone',
+                    templateOptions: {
+                      label: 'Phone',
+                      hideLabel: true,
+                      placeholder: 'Phone',
+                    }
+                  },
+                  {
+                    type: 'input',
+                    key: 'email',
+                    templateOptions: {
+                      label: 'Email',
+                      hideLabel: true,
+                      placeholder: 'email',
+                    }
+                  },
+                  {
+                    type: 'input',
+                    key: 'route_map',
+                    templateOptions: {
+                      label: 'Route Map',
+                      hideLabel: true,
+                      placeholder: 'Route Map'
+                    }
+                  },
+                  {
+                    type: 'input',
+                    key: 'longitude',
+                    templateOptions: {
+                      label: 'Longitude',
+                      hideLabel: true,
+                      placeholder: 'Enter',
+                    }
+                  },
+                  {
+                    type: 'input',
+                    key: 'latitude',
+                    templateOptions: {
+                      label: 'Latitude',
+                      hideLabel: true,
+                      placeholder: '',
+                    }
+                  },
+                  {
+                    type: 'textarea',
+                    key: 'address',
+                    templateOptions: {
+                      label: 'Address',
+                      hideLabel: true,
+                      placeholder: 'Enter Address',
+                    }
+                  }
+                ]
+              }
             },
-      ]
-    };
-  }
-}
+          ]
+        }
+      }
+    }
+    
