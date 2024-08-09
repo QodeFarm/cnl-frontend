@@ -19,9 +19,6 @@ export class ProductsListComponent {
   tableConfig: TaTableConfig = {
     apiUrl: 'products/products/',
     showCheckbox: true,
-    summary: true,
-    page: 1, // Page number
-    sort: { 0: 'name,DESC' }, // Sorting parameters,
     title: 'Products',
     pkId: "product_id",
     pageSize: 10,
