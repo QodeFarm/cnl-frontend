@@ -35,7 +35,7 @@ export class FieldFileComponent extends FieldType {
     this.formControl.valueChanges.subscribe(res => {
       if (this.formControl.value) {
         const _fList = this.formControl.value || [];
-        debugger;
+        // debugger;
         this.config.fileList = _fList.map(res => {
           res.uid = res.attachment_id || res.uid
           res.url = this.siteC.CONFIG.cdnPath + res.attachment_path;

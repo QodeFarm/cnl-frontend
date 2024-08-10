@@ -13,7 +13,7 @@ export class ProductsComponent implements OnInit {
   ProductEditID: any;
   formConfig: TaFormConfig = {};
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   ngOnInit() {
     this.showProductsList = false;
@@ -37,6 +37,7 @@ export class ProductsComponent implements OnInit {
       console.log('--------> res ', res);
       if (res) {
         this.formConfig.model = res;
+        this.formConfig.showActionBtn = true;
         // Set labels for update
         this.formConfig.submit.label = 'Update';
         // Show form after setting form values
@@ -59,10 +60,12 @@ export class ProductsComponent implements OnInit {
   }
 
   setFormConfig() {
+    this.ProductEditID = null;
     this.formConfig = {
       url: 'products/products/',
       title: 'Products',
       pkId: "product_id",
+      showActionBtn: true,
       exParams: [
         {
           key: 'product_group_id',
@@ -111,9 +114,12 @@ export class ProductsComponent implements OnInit {
         },
       ],
       submit: {
+        label: 'submit',
         submittedFn: () => this.ngOnInit()
       },
-      reset: {},
+      reset: {
+        resetFn: () => { this.ngOnInit() }
+      },
       fields: [
         {
           fieldGroupClassName: "ant-row custom-form-block",
@@ -456,7 +462,7 @@ export class ProductsComponent implements OnInit {
                 },
                 // Additional fields below picture
                 {
-                  className: 'col-12 mt-4',
+                  className: 'col-12 mt-',
                   key: 'gst_classification',
                   type: 'select',
                   templateOptions: {
