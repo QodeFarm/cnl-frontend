@@ -149,7 +149,7 @@ export class VendorsComponent implements OnInit {
         {
           address_type: 'Shipping',
         }],
-        vendor_attachments: [{}],
+        vendor_attachments: [],
       },
       fields: 
       [
