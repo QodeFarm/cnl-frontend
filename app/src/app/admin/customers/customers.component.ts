@@ -106,6 +106,9 @@ export class CustomersComponent {
 
   setFormConfig() {
     this.formConfig = {
+      valueChangeFn: (res) => {
+        // this.totalAmountCal();
+      },
       url: "customers/customers/",
       title: 'Customers',
       formState: {
@@ -113,6 +116,7 @@ export class CustomersComponent {
       },
       exParams: [],
       submit: {
+        label: 'submit',
         submittedFn: () => this.ngOnInit()
       },
       reset: {

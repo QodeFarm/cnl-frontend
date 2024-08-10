@@ -18,9 +18,15 @@ export class CustomersListComponent {
   @Output('edit') edit = new EventEmitter<void>();
 
   tableConfig: TaTableConfig = {
-    apiUrl: 'customers/customers/',
+    apiUrl: 'customers/customers/?summary=true',
     showCheckbox:true,
     pkId: "customer_id",
+    fixedFilters: [
+      {
+        key: 'summary',
+        value: 'true'
+      }
+    ],
     pageSize: 10,
     "globalSearch": {
       keys: ['customer_id', 'name']
