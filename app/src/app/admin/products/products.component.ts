@@ -115,7 +115,11 @@ export class ProductsComponent implements OnInit {
       submit: {
         submittedFn: () => this.ngOnInit()
       },
-      reset: {},
+      reset: {
+        resetFn: () => {
+          this.ngOnInit();
+        }
+      },
       fields: [
         {
           fieldGroupClassName: "ant-row custom-form-block",
