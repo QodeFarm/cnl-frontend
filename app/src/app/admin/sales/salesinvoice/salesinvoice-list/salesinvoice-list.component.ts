@@ -16,31 +16,37 @@ export class SalesInvoiceListComponent {
   @Output('edit') edit = new EventEmitter<void>();
 
   tableConfig: TaTableConfig = {
-    apiUrl: 'sales/sale_invoice_order/',
-    pkId: "sale_invoice_id",
+    apiUrl: 'sales/sale_invoice_order/?summary=true',
     showCheckbox: true,
+    pkId: "sale_invoice_id",
+    fixedFilters: [
+      {
+        key: 'summary',
+        value: 'true'
+      }
+    ],
     pageSize: 10,
-    globalSearch: {
-      keys: []
+    "globalSearch": {
+      keys: ['sale_invoice_id']
     },
     cols: [
       {
-        fieldKey: 'customer',
+        fieldKey: 'customer_id',
         name: 'Customer',
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.customer.name}`;
+          return `${row.customer_id.name}`;
         },
-        sort: true
-      },
-      {
-        fieldKey: 'invoice_date',
-        name: 'Invoice Date',
         sort: true
       },
       {
         fieldKey: 'invoice_no',
         name: 'Invoice No',
+        sort: true
+      },
+      {
+        fieldKey: 'invoice_date',
+        name: 'Invoice Date',
         sort: true
       },
       {
@@ -56,14 +62,14 @@ export class SalesInvoiceListComponent {
       {
         fieldKey: 'advance_amount',
         name: 'Advance Amount',
-        sort: false
+        sort: true
       },
       {
-        fieldKey: 'order_status',
+        fieldKey: 'order_status_id',
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.order_status.status_name}`;
+          return `${row.order_status_id.status_name}`;
         },
         sort: true
       },
@@ -73,7 +79,7 @@ export class SalesInvoiceListComponent {
         sort: false
       },
       {
-        fieldKey: "action",
+        fieldKey: "code",
         name: "Action",
         type: 'action',
         actions: [
