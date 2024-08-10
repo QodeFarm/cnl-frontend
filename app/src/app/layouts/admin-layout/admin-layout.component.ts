@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, HostListener, ElementRef, Renderer2 } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { LocalStorageService } from '@ta/ta-core';
+import { AdminCommonService } from 'src/app/services/admin-common.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -13,7 +14,11 @@ import { LocalStorageService } from '@ta/ta-core';
 export class AdminLayoutComponent {
   menulList = <any>[];
   userName: any;
-  constructor(private elementRef: ElementRef, private renderer: Renderer2, private router: Router, private taLoacal: LocalStorageService) { }
+  constructor(private elementRef: ElementRef, private renderer: Renderer2, private router: Router, private taLoacal: LocalStorageService, private aS: AdminCommonService) {
+    this.aS.action$.subscribe(res => {
+      console.log(res);
+    })
+  }
 
   @HostListener('window:resize', ['$event'])
   onResize(event: Event) {
@@ -117,7 +122,7 @@ export class AdminLayoutComponent {
             link: '/admin/inventory',
             label: 'Inventory',
             icon: 'fas fa-boxes',
-          },           
+          },
           {
             link: '/admin/warehouses',
             label: 'Warehouses',
@@ -140,7 +145,7 @@ export class AdminLayoutComponent {
             icon: 'fas fa-tachometer-alt',
           },
           {
-            link: '/admin/tasks/task_priorities', 
+            link: '/admin/tasks/task_priorities',
             label: 'Task Priorities',
             icon: 'fas fa-tachometer-alt',
           },

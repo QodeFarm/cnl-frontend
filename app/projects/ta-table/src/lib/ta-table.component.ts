@@ -70,10 +70,10 @@ export class TaTableComponent implements OnDestroy {
 
   constructor(public taTableS: TaTableService) {
     this.actionObservable$ = this.taTableS.actionObserval().subscribe((res: any) => {
-      if (res && res.action && res.action.type === 'delete') {
-        this.deleteRow(res);
-      }
-      this.doAction.emit(res);
+      // if (res && res.action && res.action.type === 'delete') {
+      //   this.deleteRow(res);
+      // }
+      // this.doAction.emit(res);
     });
     this.filtersObservable$ = this.taTableS.filterObserval().subscribe((res: any) => {
       // // console.log('res', res);
@@ -130,7 +130,7 @@ export class TaTableComponent implements OnDestroy {
     // { this.pageSize, this.pageIndex, this.sort, this.filters } = params;
     this.pageSize = params.pageSize;
     this.pageIndex = params.pageIndex;
-    // this.filters = params.filter;
+    //this.filters = params.filter;
     const sort = params.sort;
     const currentSort = sort.find((item) => item.value !== null);
     const sortField = (currentSort && currentSort.key) || null;
@@ -244,6 +244,12 @@ export class TaTableComponent implements OnDestroy {
     // getValue()
     // const tableElementref:ElementRef = this.taTable.elementRef as ElementRef;
     // this.taTableS.exportTableAsExcelFile(tableElementref.nativeElement,'test');
+  }
+  actionClick(event) {
+    if (event && event.action && event.action.type === 'delete') {
+      this.deleteRow(event);
+    }
+    this.doAction.emit(event);
   }
 
   ngOnDestroy() {

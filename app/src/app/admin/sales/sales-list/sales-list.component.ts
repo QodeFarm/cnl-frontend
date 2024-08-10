@@ -17,10 +17,16 @@ export class SalesListComponent {
 
 
   tableConfig: TaTableConfig = {
-    apiUrl: 'sales/sale_order/',
+    apiUrl: 'sales/sale_order/?summary=true',
     // title: 'Edit Sales Order List',
     showCheckbox: true,
     pkId: "sale_order_id",
+    fixedFilters: [
+      {
+        key: 'summary',
+        value: 'true'
+      }
+    ],
     pageSize: 10,
     "globalSearch": {
       keys: ['id', 'first_name', 'last_name']
