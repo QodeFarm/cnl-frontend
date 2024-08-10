@@ -37,11 +37,11 @@ export class AdminLayoutComponent {
       {
         link: '/admin/dashboard',
         label: 'Dashboard',
-        icon: 'fas fa-tachometer-alt',
+        icon: 'icon icon-dashboard',
       },
       {
         label: 'Sales',
-        icon: 'fas fa-file-invoice-dollar',
+        icon: 'icon icon-sales',
         child: [
           // {
           //   link: '/admin/employee',
@@ -83,7 +83,7 @@ export class AdminLayoutComponent {
       {
         // link: '/admin/purchase/purchase',
         label: 'Purchase',
-        icon: 'fas fa-hand-holding-usd',
+        icon: 'icon icon-purchase',
         child: [
           {
             link: '/admin/purchase',
@@ -105,13 +105,13 @@ export class AdminLayoutComponent {
       {
         link: '/admin/dashboard',
         label: 'Finance',
-        icon: 'fas fa-chart-line',
+        icon: 'icon icon-finance',
       },
       {
         // link: '/admin/dashboard',
         // link: '/admin/inventory',
         label: 'Inventory',
-        icon: 'fas fa-boxes',
+        icon: 'icon icon-inventory',
         child: [
           {
             link: '/admin/inventory',
@@ -132,7 +132,7 @@ export class AdminLayoutComponent {
       },
       {
         label: 'TASKS',
-        icon: 'fas fa-tasks',
+        icon: 'icon icon-tasks',
         child: [
           {
             link: '/admin/tasks/',
@@ -148,7 +148,7 @@ export class AdminLayoutComponent {
       },
       {
         label: 'LEADS',
-        icon: 'fas fa-star fa-fw',
+        icon: 'icon icon-leads',
         child: [
           {
             link: '/admin/leads',
@@ -169,7 +169,7 @@ export class AdminLayoutComponent {
       },
       {
         label: 'Assets',
-        icon: 'fas fa-box',
+        icon: 'icon icon-assets',
         child: [
           {
             link: '/admin/assets/assets',
@@ -200,7 +200,7 @@ export class AdminLayoutComponent {
       },
       {
         label: 'HRMS',
-        icon: 'fas fa-heading',
+        icon: 'icon icon-hrms',
         child: [
           {
             link: '/admin/employees',
@@ -222,11 +222,11 @@ export class AdminLayoutComponent {
       {
         link: '/admin/master',
         label: 'Master',
-        icon: 'fas fa-cog',
+        icon: 'icon icon-masters',
       },
       {
         label: 'Product Masters',
-        icon: 'fas fa-database',
+        icon: 'icon icon-production',
         child: [
           {
             link: '/admin/products/product-groups',

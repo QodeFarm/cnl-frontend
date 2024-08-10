@@ -36,6 +36,7 @@
     }
     .login-block {
         background-color: #142768;
+        padding: 6px;
         .login-left-block {
             background-color: #efefef;
             width: 63%;
@@ -44,6 +45,7 @@
             justify-content: center;
             flex-direction: column;
             padding: 30px;
+            border-radius: 10px;
             h1 {
                 font-weight: 400;
             }
@@ -66,7 +68,7 @@
             }
             .login-form {
                 max-width: 450px;
-                margin: 0 auto;
+                margin: 0 auto 50px;
                 @media(max-width: 1400px) {
                     max-width: 400px;
                 }
@@ -192,7 +194,8 @@
                     }
                 }
                 i {
-                    background-color: #dbdeeb;
+                    background-color: #142768;
+                    color: #fff;
                 }
             }
             &.sub-menu {
@@ -277,6 +280,7 @@
                 }
                 i {
                     background-color: transparent;
+                    color: #142768;
                 }
             }
             &.sub-menu {
@@ -316,6 +320,7 @@
         }
     }
     .nav-link {
+        align-items: flex-start;
         span {
             display: flex !important;
             transition: all 0.3s;
@@ -334,12 +339,19 @@
     }
     .sub-menu-items {
         .collapse-item {
-            margin-left: 54px !important;
+            margin-left: 42px !important;
             padding: 0.25rem !important;
             &:hover,
             &.active {
                 background-color: transparent !important;
                 color: #142768 !important;
+            }
+            &::before {
+                content: "\f105";
+                font-family: "Font Awesome 5 Free";
+                font-weight: 600;
+                color: #5e5e5e;
+                padding-right: 5px;
             }
         }
     }
@@ -532,13 +544,13 @@ ta-form {
 
 .sidebar-brand.layout-logo-design {
     h3 {
-        font-size: 45px;
+        font-size: 42px;
         color: #fff;
         margin: 0;
         line-height: 30px;
     }
     span {
-        font-size: 12px;
+        font-size: 11px;
         color: #fff;
         line-height: 12px;
         display: block;
@@ -716,7 +728,7 @@ ta-form {
     .modal-header {
         background-color: #142768;
         color: #fff;
-        padding: 12px 18px;
+        padding: 8px 18px;
         .modal-title {
             color: #fff;
             font-size: 18px;
@@ -726,7 +738,9 @@ ta-form {
             background-color: #fff;
             opacity: 1;
             border-radius: 50px;
-            margin-top: 0px;
+            margin-top: 2px;
+            padding: 5px;
+            font-size: 12px;
         }
     }
 }
@@ -837,6 +851,12 @@ ta-form {
     z-index: 1060 !important;
 }
 
-.ant-upload.ant-upload-drag .ant-upload {
-    padding: 0 0 !important;
-}
+.ant-upload.ant-upload-drag{
+    background: transparent;
+    .ant-upload {
+        padding: 0 0 !important;
+    }
+    p.ant-upload-text{
+        margin: 10px 0 4px;
+    }
+} 
