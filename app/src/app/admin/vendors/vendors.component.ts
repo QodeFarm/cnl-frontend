@@ -98,10 +98,11 @@ export class VendorsComponent implements OnInit {
       if (res && res.data) {
         this.formConfig.model = res.data;
         console.log("vendors data", res.data)
+        this.formConfig.pkId = 'vendor_id';
         // Set labels for update
         this.formConfig.submit.label = 'Update';
         // Show form after setting form values
-        this.formConfig.pkId = 'vendor_id';
+        
         this.formConfig.model['vendor_id'] = this.VendorEditID;
         this.showForm = true;
       }

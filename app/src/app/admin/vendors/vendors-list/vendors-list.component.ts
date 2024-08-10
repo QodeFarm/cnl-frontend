@@ -71,12 +71,12 @@ export class VendorsListComponent {
         },
       },
       {
-        fieldKey: 'city.city_name',
+        fieldKey: 'city_id',
         name: 'City Name',
         sort: false,
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
-          return row.city_id.city_name;
+          return row.city.city_name;
         },
       },
       {
