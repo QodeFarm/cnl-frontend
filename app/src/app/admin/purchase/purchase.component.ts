@@ -24,7 +24,7 @@ export class PurchaseComponent {
   ngOnInit() {
     this.showPurchaseOrderList = false;
     this.showForm = true;
-    // this.PurchaseOrderEditID = null;
+    this.PurchaseOrderEditID = null;
     // set form config
     this.setFormConfig();
     console.log('this.formConfig', this.formConfig);
@@ -53,18 +53,19 @@ export class PurchaseComponent {
         this.formConfig.model = res.data;
         // set purchase_order default value
         this.formConfig.model['purchase_order_data']['order_type'] = 'purchase_order';
+        this.formConfig.pkId = 'purchase_order_id';
         // set labels for update
         this.formConfig.submit.label = 'Update';
         // show form after setting form values
 
         // this.formConfig.url= "sales/purchase_order/" + this.PurchaseOrderEditID;
-        this.formConfig.pkId = 'purchase_order_id';
+        
 
         this.formConfig.model['purchase_order_id'] = this.PurchaseOrderEditID;
         this.showForm = true;
         this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[7].hide = false;
       }
-    })
+    });
     this.hide();
   }
 
@@ -91,6 +92,11 @@ export class PurchaseComponent {
 
   setFormConfig() {
     this.formConfig = {
+
+      valueChangeFn: (res) => {
+        // this.totalAmountCal();
+      },
+
       url: "purchase/purchase_order/",
       title: '',
       formState: {
@@ -105,6 +111,7 @@ export class PurchaseComponent {
 
       ],
       submit: {
+        label: 'submit',
         submittedFn: () => this.ngOnInit()
       },
       reset: {
@@ -400,7 +407,7 @@ export class PurchaseComponent {
                   hideLabel: true,
                   dataLabel: 'name',
                   options: [],
-                  required: true,
+                  required: false,
                   lazy: {
                     url: 'products/products/?summary=true',
                     lazyOneTime: true
@@ -422,8 +429,8 @@ export class PurchaseComponent {
                         if (field.form && field.form.controls && field.form.controls.discount && data && data.dis_amount) {
                           field.form.controls.discount.setValue(parseFloat(data.dis_amount))
                         }
-                        if (field.form && field.form.controls && field.form.controls.unit_options && data && data.unit_options && data.unit_options.unit_name) {
-                          field.form.controls.unit_options.setValue(data.unit_options)
+                        if (field.form && field.form.controls && field.form.controls.unit_options_id && data && data.unit_options && data.unit_options.unit_name) {
+                          field.form.controls.unit_options_id.setValue(data.unit_options.unit_options_id)
                         }
                         if (field.form && field.form.controls && field.form.controls.print_name && data && data.print_name) {
                           field.form.controls.print_name.setValue(data.print_name)
@@ -460,13 +467,14 @@ export class PurchaseComponent {
               },
               {
                 type: 'select',
-                key: 'unit_options',
+                key: 'unit_options_id',
                 templateOptions: {
                   label: 'Unit',
                   placeholder: 'Select Unit',
                   hideLabel: true,
                   dataLabel: 'unit_name',
                   dataKey: 'unit_options_id',
+                  bindId: true,
                   lazy: {
                     url: 'masters/unit_options',
                     lazyOneTime: true
@@ -589,7 +597,7 @@ export class PurchaseComponent {
                   type: "number",
                   label: 'Tax',
                   placeholder: 'Tax',
-                  hideLabel: true,
+                  hideLabel: true
                 },
               },
               {
@@ -739,8 +747,10 @@ export class PurchaseComponent {
                     {
                         key: 'shipping_date',
                         type: 'date',
+                        defaultValue: this.nowDate(),
                         className: 'col-6',
                         templateOptions: {
+                          type: 'date',
                           label: 'Shipping Date'
                         }
                       },
@@ -776,6 +786,16 @@ export class PurchaseComponent {
                             fieldGroupClassName: "ant-row",
                             key: 'purchase_order_data',
                             fieldGroup: [
+                            // {
+                            //   key: 'total_boxes',
+                            //   type: 'input',
+                            //   className: 'col-4',
+                            //   templateOptions: {
+                            //     type: 'number',
+                            //     label: 'Total boxes',
+                            //     placeholder: 'Enter Total boxes'
+                            //   }
+                            // },
                               {
                                 key: 'cess_amount',
                                 type: 'input',
@@ -800,7 +820,7 @@ export class PurchaseComponent {
                                 type: 'input',
                                 className: 'col-4',
                                 templateOptions: {
-                                  type: 'input',
+                                  type: 'number',
                                   label: 'Advance amount',
                                   placeholder: 'Enter Advance amount'
                                 },

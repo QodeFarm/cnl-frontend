@@ -77,6 +77,9 @@ export class PurchasereturnordersComponent {
 
   setFormConfig() {
     this.formConfig = {
+      valueChangeFn: (res) => {
+        // this.totalAmountCal();
+      },
       url: "purchase/purchase_return_order/",
       title: '',
       formState: {
@@ -90,6 +93,7 @@ export class PurchasereturnordersComponent {
         }
       ],
       submit: {
+        label: 'submit',
         submittedFn: () => this.ngOnInit()
       },
       reset: {
@@ -124,7 +128,7 @@ export class PurchasereturnordersComponent {
               },
               hooks: {
                 onChanges: (field: any) => {
-                  field.formControl.valueChanges.subscribe((data: any) => {
+                  field.formControl.valueChanges.subscribe(data => {
                     console.log("purchase_type", data);
                     if (data && data.purchase_type_id) {
                       this.formConfig.model['purchase_return_orders']['purchase_type_id'] = data.purchase_type_id;
@@ -137,7 +141,7 @@ export class PurchasereturnordersComponent {
               key: 'vendor',
               type: 'select',
               className: 'col-2',
-              templateOptions: {
+              props: {
                 label: 'Vendor',
                 dataKey: 'vendor_id',
                 dataLabel: "name",
@@ -146,11 +150,11 @@ export class PurchasereturnordersComponent {
                   url: 'vendors/vendors/?summary=true',
                   lazyOneTime: true
                 },
-                required: true,
+                required: true
 
               },
               hooks: {
-                onChanges: (field: any) => {
+                onInit: (field: any) => {
                   field.formControl.valueChanges.subscribe(data => {
                     // console.log("vendors", data);
                     if (data && data.vendor_id) {
@@ -192,7 +196,7 @@ export class PurchasereturnordersComponent {
               templateOptions: {
                 type: 'input',
                 label: 'Email',
-                placeholder: 'Enter Email',
+                placeholder: 'Enter Email'
               },hooks: {
                 onInit: (field: any) => { }
               }
@@ -253,19 +257,19 @@ export class PurchasereturnordersComponent {
                 options: [
                   { 'label': "Inclusive", value: 'Inclusive' },
                   { 'label': "Exclusive", value: 'Exclusive' }
-                ],
+                ]
               },
               hooks: {
                 onInit: (field: any) => {
                 }
               }
-              
             },
             {
               key: 'remarks',
               type: 'textarea',
               className: 'col-3',
               templateOptions: {
+                type: 'input',
                 label: 'Remarks',
                 placeholder: 'Enter Remarks',
               }
@@ -303,8 +307,6 @@ export class PurchasereturnordersComponent {
           key: 'purchase_return_items',
           type: 'table',
           className: 'custom-form-list',
-          // defaultValue: [],
-          // fieldGroupClassName: 'table-field pr-md',
           templateOptions: {
             title: 'Products',
             addText: 'Add Product',
@@ -355,7 +357,7 @@ export class PurchasereturnordersComponent {
                   dataLabel: 'name',
                   // options: this.productOptions,
                   options: [],
-                  required: true,
+                  required: false,
                   lazy: {
                     url: 'products/products/?summary=true',
                     lazyOneTime: true
@@ -379,14 +381,17 @@ export class PurchasereturnordersComponent {
                       if (field.form && field.form.controls && field.form.controls.discount && data && data.dis_amount) {
                         field.form.controls.discount.setValue(parseFloat(data.dis_amount))
                       }
-                      if (field.form && field.form.controls && field.form.controls.unit_options && data && data.unit_options && data.unit_options.unit_name) {
-                        field.form.controls.unit_options.setValue(data.unit_options)
+                      if (field.form && field.form.controls && field.form.controls.unit_options_id && data && data.unit_options && data.unit_options.unit_name) {
+                        field.form.controls.unit_options_id.setValue(data.unit_options.unit_options_id)
                       }
                       if (field.form && field.form.controls && field.form.controls.print_name && data && data.print_name) {
                         field.form.controls.print_name.setValue(data.print_name)
                       }
                       if (field.form && field.form.controls && field.form.controls.discount && data && data.dis_amount) {
                         field.form.controls.discount.setValue(data.dis_amount)
+                      }
+                      if (field.form && field.form.controls && field.form.controls.mrp && data && data.mrp) {
+                        field.form.controls.mrp.setValue(data.mrp)
                       }
                       this.totalAmountCal();
                     });
@@ -422,13 +427,14 @@ export class PurchasereturnordersComponent {
               },
               {
                 type: 'select',
-                key: 'unit_options',
+                key: 'unit_options_id',
                 templateOptions: {
                   label: 'Unit',
                   placeholder: 'Select Unit',
                   hideLabel: true,
                   dataLabel: 'unit_name',
                   dataKey: 'unit_options_id',
+                  bindId: true,
                   lazy: {
                     url: 'masters/unit_options',
                     lazyOneTime: true
@@ -802,11 +808,15 @@ export class PurchasereturnordersComponent {
                         label: 'Order Status Type',
                         placeholder: 'Select Order Status Type',
                         dataKey: 'order_status_id',
-                        dataLabel: "status_name",
+                        dataLabel: 'status_name',
                         lazy: {
                           url: 'masters/order_status/',
                           lazyOneTime: true
-                        }
+                        },
+                        
+                        expressions: {
+                          hide: '!model.purchase_return_id'
+                        },
                       },
                       hooks: {
                         onChanges: (field: any) => {
@@ -820,13 +830,13 @@ export class PurchasereturnordersComponent {
                       }
                     },
                     {
-                      key: 'taxable',
+                      key: 'total_boxes',
                       type: 'input',
                       className: 'col-4',
                       templateOptions: {
                         type: 'input',
-                        label: 'Taxable',
-                        placeholder: 'Enter Taxable',
+                        label: 'Total Boxes',
+                        placeholder: 'Enter total boxes',
                       }
                     },
                     {
