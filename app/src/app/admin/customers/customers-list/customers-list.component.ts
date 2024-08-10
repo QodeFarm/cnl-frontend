@@ -18,7 +18,7 @@ export class CustomersListComponent {
   @Output('edit') edit = new EventEmitter<void>();
 
   tableConfig: TaTableConfig = {
-    apiUrl: 'customers/customers/?summary=true&summary=true&page=1&limit=10&sort[0]=name,DESC',
+    apiUrl: 'customers/customers/',
     showCheckbox:true,
     pkId: "customer_id",
     pageSize: 10,
@@ -78,8 +78,8 @@ export class CustomersListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            // confirm: true,
-            // confirmMsg: "are you Sure to delete?",
+            confirm: true,
+            confirmMsg: "are you Sure to delete?",
             apiUrl: 'customers/customers'
           },
           {
