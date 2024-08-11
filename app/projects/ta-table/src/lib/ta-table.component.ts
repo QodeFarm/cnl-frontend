@@ -226,7 +226,7 @@ downloadData(event: any) {
     let fullUrl = `${this.options.apiUrl}`;
     const query = this.applyFilters()
     if (query.length > 1) {
-      fullUrl = `${fullUrl}${query}/`
+      fullUrl = `${fullUrl}${query}&`
     }
 
     const download_url = `${fullUrl}download/excel/`
