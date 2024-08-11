@@ -16,10 +16,17 @@ export class VendorsListComponent {
   @Output('edit') edit = new EventEmitter<void>();
 
   tableConfig: TaTableConfig = {
-    apiUrl: 'vendors/vendors/?summary=true&summary=true&page=1&limit=10&sort[0]=name,DESC',
+    // apiUrl: 'vendors/vendors/?summary=true&summary=true&page=1&limit=10&sort[0]=name,DESC',
+    apiUrl: 'vendors/vendors/?summary=true',
     title: 'Vendors',
     showCheckbox:true,
     pkId: "vendor_id",
+    fixedFilters: [
+      {
+        key: 'summary',
+        value: 'true'
+      }
+    ],
     pageSize: 10,
     globalSearch: {
       keys: ['id', 'name']
@@ -39,19 +46,11 @@ export class VendorsListComponent {
         fieldKey: 'email',
         name: 'Email',
         sort: false,
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.email}`;
-        },
       },
       {
         fieldKey: 'phone',
         name: 'Phone',
         sort: false,
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.phone}`;
-        },
       },
       {
         fieldKey: 'vendor_category_id.name',
@@ -72,7 +71,7 @@ export class VendorsListComponent {
         },
       },
       {
-        fieldKey: 'city.city_name',
+        fieldKey: 'city_id',
         name: 'City Name',
         sort: false,
         displayType: 'map',
@@ -94,13 +93,13 @@ export class VendorsListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            // confirm: true,
-            // confirmMsg: "Sure to delete!!!!!",
+            confirm: true,
+            confirmMsg: "Sure to delete?",
             apiUrl: 'vendors/vendors'
           },
           {
             type: 'callBackFn',
-            label: 'Edit',
+            icon: 'fa fa-pen',
             callBackFn: (row, action) => {
               console.log(`vendor ID: ${row.vendor_id}`);
               this.edit.emit(row.vendor_id);

@@ -16,9 +16,15 @@ export class PurchaseInvoiceListComponent {
   @Output('edit') edit = new EventEmitter<void>();
   
   tableConfig: TaTableConfig = {
-    apiUrl: 'purchase/purchase_invoice_order/',
+    apiUrl: 'purchase/purchase_invoice_order/?summary=true',
     showCheckbox:true,
     pkId: "purchase_invoice_id",
+    fixedFilters: [
+      {
+        key: 'summary',
+        value: 'true'
+      }
+    ],
     pageSize: 10,
     "globalSearch": {
       keys: ['id', 'first_name', 'last_name']
@@ -29,7 +35,7 @@ export class PurchaseInvoiceListComponent {
         name: 'Vendor',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.vendor.name}`;
+          return `${row.vendor_id.name}`;
         },
         sort: true
       },
@@ -40,7 +46,7 @@ export class PurchaseInvoiceListComponent {
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
           // console.log("-->", currentValue);
-          return `${currentValue?.name}`;
+          return `${row.purchase_type_id.name}`;
         },
       },
       {
@@ -83,7 +89,7 @@ export class PurchaseInvoiceListComponent {
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.order_status.status_name}`;
+          return `${row.order_status_id.status_name}`;
         },
         sort: true
       },

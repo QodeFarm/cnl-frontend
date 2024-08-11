@@ -20,8 +20,9 @@ export class TaTableService {
   getTableData(arg: TaParamsConfig): Observable<any> {
 
     let queryString: string = this.getParamsQuery(arg);
+    const expKey = arg.apiUrl.includes('?') ? '&' : '?';
     return this.http
-      .get<{ results: any[] }>(`${arg.apiUrl}?${queryString}`);
+      .get<{ results: any[] }>(`${arg.apiUrl}${expKey}${queryString}`);
   }
   deleterow(apiUrl: string, row: any, options?: any) {
     if (row[options.pkId]) {

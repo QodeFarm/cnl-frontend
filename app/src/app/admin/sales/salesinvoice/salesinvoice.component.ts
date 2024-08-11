@@ -25,7 +25,7 @@ export class SalesinvoiceComponent {
   ngOnInit() {
     this.showSaleInvoiceList = false;
     this.showForm = true;
-    // set form config
+    this.SaleInvoiceEditID = null;
     this.setFormConfig();
     console.log('this.formConfig', this.formConfig);
 
@@ -54,12 +54,9 @@ export class SalesinvoiceComponent {
         this.formConfig.model = res.data;
         // set sale_order default value
         this.formConfig.model['sale_invoice_order']['order_type'] = 'sale_invoice';
-        // set labels for update
+        this.formConfig.pkId = 'sale_invoice_id';
         this.formConfig.submit.label = 'Update';
         // show form after setting form values
-
-        this.formConfig.pkId = 'sale_invoice_id';
-
         this.formConfig.model['sale_invoice_id'] = this.SaleInvoiceEditID;
         this.showForm = true;
         this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[8].hide = false;
@@ -103,10 +100,11 @@ export class SalesinvoiceComponent {
         {
           key: 'sale_invoice_items',
           type: 'script',
-          value: 'data.sale_invoice_items.map(m=> {m.product_id = m.product.product_id; if(m.product.unit_options){m.unit_options_id = m.product.unit_options.unit_options_id};  if(m.unit_options){m.unit_options_id = m.unit_options.unit_options_id};  return m ;})'
+          value: 'data.sale_invoice_items.map(m=> {m.product_id = m.product.product_id;  return m ;})'
         },
       ],
       submit: {
+        label: 'submit',
         submittedFn: () => this.ngOnInit()
       },
       reset: {
@@ -387,7 +385,7 @@ export class SalesinvoiceComponent {
                   hideLabel: true,
                   dataLabel: 'name',
                   options: [],
-                  required: true,
+                  required: false,
                   lazy: {
                     url: 'products/products/?summary=true',
                     lazyOneTime: true
@@ -407,8 +405,8 @@ export class SalesinvoiceComponent {
                       if (field.form && field.form.controls && field.form.controls.discount && data && data.dis_amount) {
                         field.form.controls.discount.setValue(parseFloat(data.dis_amount))
                       }
-                      if (field.form && field.form.controls && field.form.controls.unit_options && data && data.unit_options && data.unit_options.unit_name) {
-                        field.form.controls.unit_options.setValue(data.unit_options)
+                      if (field.form && field.form.controls && field.form.controls.unit_options_id && data && data.unit_options && data.unit_options.unit_name) {
+                        field.form.controls.unit_options_id.setValue(data.unit_options.unit_options_id)
                       }
                       if (field.form && field.form.controls && field.form.controls.print_name && data && data.print_name) {
                         field.form.controls.print_name.setValue(data.print_name)
@@ -445,13 +443,14 @@ export class SalesinvoiceComponent {
               },
               {
                 type: 'select',
-                key: 'unit_options',
+                key: 'unit_options_id',
                 templateOptions: {
                   label: 'Unit',
                   placeholder: 'Select Unit',
                   hideLabel: true,
                   dataLabel: 'unit_name',
                   dataKey: 'unit_options_id',
+                  bindId: true,
                   lazy: {
                     url: 'masters/unit_options',
                     lazyOneTime: true
@@ -575,7 +574,7 @@ export class SalesinvoiceComponent {
                   type: "number",
                   label: 'Tax',
                   placeholder: 'Tax',
-                  hideLabel: true,
+                  hideLabel: true
                 },
               },
               {
@@ -587,7 +586,7 @@ export class SalesinvoiceComponent {
                   hideLabel: true
                 },
               },
-              
+
             ]
           },
         },
@@ -599,7 +598,7 @@ export class SalesinvoiceComponent {
               className: 'col-6 custom-form-card-block',
               fieldGroup: [
                 {
-                  template: '<div class="custom-form-card-title">  Shipping Details </div>',
+                  template: '<div class="custom-form-card-title"> Shipping Details </div>',
                   fieldGroupClassName: "ant-row",
                 },
                 {
@@ -735,8 +734,6 @@ export class SalesinvoiceComponent {
                           fieldGroupClassName: "ant-row",
                           key: 'sale_invoice_order',
                           fieldGroup: [
-
-                            
                             {
                               key: 'total_boxes',
                               type: 'input',
@@ -780,19 +777,7 @@ export class SalesinvoiceComponent {
                                 onInit: (field: any) => {
                                   field.formControl.valueChanges.subscribe(data => {
                                     this.totalAmountCal();
-                                    // this.formConfig.model['productDiscount'] = data;
                                   })
-                                },
-                                onChanges: (field: any) => {
-                                  // field.formControl.valueChanges.subscribe(data => {
-                                  //   if (field.form && field.form.controls && field.form.controls.doc_amount && data) {
-                                  //     const doc_amount = field.form.controls.doc_amount.value;
-                                  //     const tax_amount = data;
-                                  //     if (tax_amount && doc_amount) {
-                                  //       field.form.controls.doc_amount.setValue(parseInt(doc_amount) - parseInt(tax_amount));
-                                  //     }
-                                  //   }
-                                  // })
                                 }
                               }
                             },
@@ -996,12 +981,6 @@ export class SalesinvoiceComponent {
             }
           ]
         },
-
-
-
-        //   "vehicle_vessel": "Lorry",
-        //   "charge_type": "best",
-        //   "document_through": "mail"
       ]
     }
   }
@@ -1032,8 +1011,6 @@ export class SalesinvoiceComponent {
         const controls: any = this.saleinvoiceForm.form.controls;
         controls.sale_invoice_order.controls.item_value.setValue(totalAmount);
         controls.sale_invoice_order.controls.dis_amt.setValue(totalDiscount);
-        // const doc_amount = (totalAmount + parseFloat(data.sale_invoice_order.cess_amount || 0) + parseFloat(data.sale_invoice_order.tax_amount || 0)) - totalDiscount;
-        // controls.sale_invoice_order.controls.doc_amount.setValue(doc_amount);
         const cessAmount = parseFloat(data.sale_invoice_order.cess_amount || 0);
         const taxAmount = parseFloat(data.sale_invoice_order.tax_amount || 0);
         const advanceAmount = parseFloat(data.sale_invoice_order.advance_amount || 0);
@@ -1042,12 +1019,6 @@ export class SalesinvoiceComponent {
         controls.sale_invoice_order.controls.total_amount.setValue(total_amount);
 
       }
-      //const 
-
-      // const cess_amount = data;
-      // if (cess_amount && doc_amount) {
-      //   field.form.controls.doc_amount.setValue(parseInt(doc_amount) - parseInt(cess_amount));
-      // }
     }
   }
 
