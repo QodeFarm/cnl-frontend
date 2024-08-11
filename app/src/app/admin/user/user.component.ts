@@ -107,14 +107,16 @@ export class UserComponent {
               }
             },
             {
-              key: 'username',
-              type: 'text',
+              key: 'title',
+              type: 'select',
               className: 'ta-cell pr-md col-md-6 col-12',
               templateOptions: {
-                label: 'User Name',
-                dataKey: 'user',
-                dataLabel: "user",
-                required: true
+                label: 'Title',
+                required: true,
+                options: [
+                  { 'label': "Mr.", value: 'Mr.' },
+                  { 'label': "Ms.", value: 'Ms.' }
+                ]
               },
               hooks: {
                 onInit: (field: any) => {
@@ -193,28 +195,6 @@ export class UserComponent {
               }
             },
             {
-              key: 'company_id',
-              type: 'select',
-              className: 'ta-cell pr-md col-md-6 col-12',
-              templateOptions: {
-                label: 'Company',
-                dataKey: 'company_id',
-                dataLabel: "name",
-                options: [],
-                bindId: true,
-                lazy: {
-                  url: 'company/companies/',
-                  lazyOneTime: true
-                },
-                required: true
-              },
-              hooks: {
-                onInit: (field: any) => {
-                  //field.templateOptions.options = this.cs.getRole();
-                }
-              }
-            },
-            {
               key: 'gender',
               type: 'select',
               className: 'ta-cell pr-md col-md-6 col-12',
@@ -233,20 +213,13 @@ export class UserComponent {
               }
             },
             {
-              key: 'branch_id',
-              type: 'select',
+              key: 'date_of_birth',
+              type: 'date',
               className: 'ta-cell pr-md col-md-6 col-12',
               templateOptions: {
-                label: 'Branch',
-                dataKey: 'branch_id',
-                dataLabel: "name",
-                bindId: true,
-                options: [],
+                label: 'Date Of Birth',
+                placeholder: 'Enter Birth Date',
                 required: true,
-                lazy: {
-                  url: 'company/branches/',
-                  lazyOneTime: true
-                }
               }
             },
             {
@@ -266,20 +239,21 @@ export class UserComponent {
                 }
               }
             },
+            
             {
-              key: 'isActive',
-              type: 'boolean',
+              key: 'username',
+              type: 'text',
               className: 'ta-cell pr-md col-md-6 col-12',
               templateOptions: {
-                label: 'Is Active',
-                dataKey: 'name',
-                dataLabel: "name",
-                options: [],
-                // required: true,
-                // lazy: {
-                //   url: 'masters/sale_types/',
-                //   lazyOneTime: true
-                // }
+                label: 'User Name',
+                dataKey: 'user',
+                dataLabel: "user",
+                required: true
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  //field.templateOptions.options = this.cs.getRole();
+                }
               }
             },
             {
@@ -318,16 +292,7 @@ export class UserComponent {
                 }
               }
             },
-            {
-              key: 'bio',
-              type: 'textarea',
-              className: 'ta-cell pr-md col-12',
-              templateOptions: {
-                label: 'Comments',
-                placeholder: 'Enter comments',
-                required: true,
-              }
-            }
+            
           ]
         }
       ]
