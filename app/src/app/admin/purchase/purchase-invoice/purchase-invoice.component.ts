@@ -52,16 +52,16 @@ export class PurchaseInvoiceComponent {
         this.formConfig.model = res.data;
         // set purchase_order default value
         this.formConfig.model['purchase_invoice_orders']['order_type'] = 'purchase_invoice';
+        this.formConfig.pkId = 'purchase_invoice_id';
         // set labels for update
         this.formConfig.submit.label = 'Update';
         // show form after setting form values
-        this.formConfig.pkId = 'purchase_invoice_id';
         this.formConfig.model['purchase_invoice_id'] = this.PurchaseInvoiceEditID;
         this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[7].hide =false;
         this.showForm = true;
         
       }
-    })
+    });
     this.hide();
   }
 
@@ -86,6 +86,9 @@ export class PurchaseInvoiceComponent {
   }
   setFormConfig() {
     this.formConfig = {
+      valueChangeFn: (res) => {
+        // this.totalAmountCal();
+      },
       url: "purchase/purchase_invoice_order/",
       title: '',
       formState: {
@@ -100,6 +103,7 @@ export class PurchaseInvoiceComponent {
 
       ],
       submit: {
+        label: 'submit',
         submittedFn: () => this.ngOnInit()
       },
       reset: {
@@ -149,7 +153,7 @@ export class PurchaseInvoiceComponent {
               key: 'vendor',
               type: 'select',
               className: 'col-2',
-              templateOptions: {
+              props: {
                 label: 'Vendor',
                 dataKey: 'vendor_id',
                 dataLabel: "name",
@@ -158,7 +162,7 @@ export class PurchaseInvoiceComponent {
                   url: 'vendors/vendors/?summary=true',
                   lazyOneTime: true
                 },
-                required: true,
+                required: true
 
               },
               hooks: {
@@ -288,8 +292,12 @@ export class PurchaseInvoiceComponent {
               type: 'textarea',
               className: 'col-4',
               templateOptions: {
+                type: 'input',
                 label: 'Remarks',
                 placeholder: 'Enter Remarks',
+              },
+              hooks: {
+                onInit: (field: any) => { }
               }
             },
             {
@@ -372,7 +380,7 @@ export class PurchaseInvoiceComponent {
                   dataLabel: 'name',
                   // options: this.productOptions,
                   options: [],
-                  required: true,
+                  required: false,
                   lazy: {
                     url: 'products/products/?summary=true',
                     lazyOneTime: true
@@ -405,47 +413,43 @@ export class PurchaseInvoiceComponent {
                       if (field.form && field.form.controls && field.form.controls.discount && data && data.dis_amount) {
                         field.form.controls.discount.setValue(data.dis_amount)
                       }
+                      if (field.form && field.form.controls && field.form.controls.mrp && data && data.mrp) {
+                        field.form.controls.mrp.setValue(data.mrp)
+                      }
                       this.totalAmountCal();
                     });
-                    // field.templateOptions.options = this.cs.getRole();
                   }
                 }
               },
               {
                 type: 'input',
                 key: 'code',
-                // defaultValue: 0,
                 templateOptions: {
                   label: 'Code',
                   placeholder: 'Enter code',
                   hideLabel: true,
-                  // // required: true
-                },
-                expressionProperties: {
-                  // 'templateOptions.disabled': (model) => (model.item && model.item.sale_price) ? false : true
                 }
               },
               {
                 type: 'input',
                 key: 'total_boxes',
-                // defaultValue: 1000,
                 templateOptions: {
                   type: 'number',
                   label: 'Total Boxes',
                   placeholder: 'Enter Total Boxes',
-                  hideLabel: true,
-                  // // required: true
+                  hideLabel: true
                 },
               },
               {
                 type: 'select',
-                key: 'unit_options',
+                key: 'unit_options_id',
                 templateOptions: {
                   label: 'Unit',
                   placeholder: 'Select Unit',
                   hideLabel: true,
                   dataLabel: 'unit_name',
                   dataKey: 'unit_options_id',
+                  bindId: true,
                   lazy: {
                     url: 'masters/unit_options',
                     lazyOneTime: true
@@ -485,23 +489,18 @@ export class PurchaseInvoiceComponent {
                   }
                 }
               },
-
               {
                 type: 'input',
                 key: 'rate',
-                // defaultValue: 1000,
                 templateOptions: {
                   type: 'number',
                   label: 'Rate',
                   placeholder: 'Enter Rate',
                   hideLabel: true,
-                  // type: 'number',
-                  // // required: true
                 },
                 hooks: {
                   onInit: (field: any) => {
                     field.formControl.valueChanges.subscribe(data => {
-                      // this.formConfig.model['productQuantity'] = data;
 
                       if (field.form && field.form.controls && field.form.controls.quantity && data) {
                         const quantity = field.form.controls.quantity.value;
@@ -509,7 +508,6 @@ export class PurchaseInvoiceComponent {
                         if (rate && quantity) {
                           field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity));
                         }
-                        // this.totalAmountCal();
                       }
                     })
                   }
@@ -518,49 +516,38 @@ export class PurchaseInvoiceComponent {
               {
                 type: 'input',
                 key: 'discount',
-                // defaultValue: 90,
                 templateOptions: {
                   type: 'number',
                   placeholder: 'Enter Disc',
-                  // type: 'number',
                   label: 'Disc',
                   hideLabel: true,
                 },
                 hooks: {
                   onInit: (field: any) => {
                     field.formControl.valueChanges.subscribe(data => {
-                      // this.totalAmountCal();
-                      // this.formConfig.model['productDiscount'] = data;
                     })
                   }
                 },
                 expressionProperties: {
-                  // 'templateOption6s.disabled': (model) => (model.item && model.item.sale_price) ? false : true
                 }
               },
               {
                 type: 'input',
                 key: 'print_name',
-                // defaultValue: 1000,
                 templateOptions: {
                   label: 'Print name',
                   placeholder: 'Enter Product Print name',
-                  hideLabel: true,
-                  // type: 'number',
-                  // // required: true mrp tax 
+                  hideLabel: true
                 },
               },
               {
                 type: 'input',
                 key: 'mrp',
-                // defaultValue: 1000,
                 templateOptions: {
                   label: 'Mrp',
                   placeholder: 'Mrp',
                   hideLabel: true,
                   disabled: true
-                  // type: 'number',
-                  // // required: true mrp tax 
                 },
               },
               {
@@ -572,48 +559,32 @@ export class PurchaseInvoiceComponent {
                   placeholder: 'Enter Amount',
                   hideLabel: true,
                   disabled: true
-                  // type: 'number',
-                  // // required: true
                 },
                 hooks: {
                   onInit: (field: any) => {
                     field.formControl.valueChanges.subscribe(data => {
                       this.totalAmountCal();
-                      // this.formConfig.model['productDiscount'] = data;
                     })
                   }
-                  // onInit: (field: any) => {
-                  //   field.form.get('quantity').valueChanges.pipe(
-                  //     distinctUntilChanged()
-                  //   ).subscribe((data: any) => {
-                  //     this.totalAmountCal();
-                  //   });
-                  // }
                 }
               },
               {
                 type: 'input',
                 key: 'tax',
-                // defaultValue: 1000,
                 templateOptions: {
                   type: "number",
                   label: 'Tax',
                   placeholder: 'Tax',
-                  hideLabel: true,
-                  // type: 'number',
-                  // // required: true mrp tax 
+                  hideLabel: true
                 },
               },
               {
                 type: 'input',
                 key: 'remarks',
-                // defaultValue: 1000,
                 templateOptions: {
                   label: 'Remarks',
                   placeholder: 'Enter Remarks',
-                  hideLabel: true,
-                  // type: 'number',
-                  // // required: true mrp tax 
+                  hideLabel: true
                 },
               },
             ]
@@ -662,7 +633,6 @@ export class PurchaseInvoiceComponent {
                       templateOptions: {
                         label: 'Shipping Mode',
                         placeholder: 'Select Shipping Mode',
-                        // required: true,
                         dataKey: 'shipping_mode_id',
                         dataLabel: "name",
                         bindId: true,
@@ -688,7 +658,6 @@ export class PurchaseInvoiceComponent {
                       templateOptions: {
                         label: 'Shipping Company',
                         placeholder: 'Select Shipping Company',
-                        // required: true,
                         dataKey: 'shipping_company_id',
                         dataLabel: "name",
                         bindId: true,
@@ -703,6 +672,7 @@ export class PurchaseInvoiceComponent {
                       type: 'input',
                       className: 'col-6',
                       templateOptions: {
+                        type: "number",
                         label: 'No. of Packets',
                         placeholder: 'Select No. of Packets',
                       }
@@ -712,6 +682,7 @@ export class PurchaseInvoiceComponent {
                       type: 'input',
                       className: 'col-6',
                       templateOptions: {
+                        type: "number",
                         label: 'Weight',
                         placeholder: 'Enter Weight',
                       }
@@ -729,8 +700,10 @@ export class PurchaseInvoiceComponent {
                     {
                       key: 'shipping_date',
                       type: 'date',
+                      defaultValue: this.nowDate(),
                       className: 'col-6',
                       templateOptions: {
+                        type: 'date',
                         label: 'Shipping Date',
                       }
                     },
@@ -742,12 +715,11 @@ export class PurchaseInvoiceComponent {
                         label: 'Shipping Charges.',
                         placeholder: 'Enter Shipping Charges',
                       }
-                    },
+                    }
                   ]
                 },
               ]
             },
-             //purchase_invoice_orders
              {
               className: 'col-6 pb-0',
               fieldGroupClassName: "field-no-bottom-space",
@@ -758,7 +730,6 @@ export class PurchaseInvoiceComponent {
                     {
                       className: 'col-12 mb-3 custom-form-card-block w-100',
                       fieldGroup: [
-                        // start of sale_invoice_order keys
                         {
                           template: '<div class="custom-form-card-title"> Billing Details </div>',
                           fieldGroupClassName: "ant-row",
@@ -773,32 +744,27 @@ export class PurchaseInvoiceComponent {
                               defaultValue: "0",
                               className: 'col-4',
                               templateOptions: {
-                                type: 'input',
+                                type: 'number',
                                 label: 'Cess amount',
-                                placeholder: 'Enter Cess amount',
-                                // required: true
+                                placeholder: 'Enter Cess amount'
                               },
                               hooks: {
                                 onInit: (field: any) => {
                                   field.formControl.valueChanges.subscribe(data => {
                                     this.totalAmountCal();
-                                    // this.formConfig.model['productDiscount'] = data;
+                                    
                                   })
-                                },
-                                onChanges: (field: any) => {
                                 }
                               }
                             },
                             {
                               key: 'advance_amount',
                               type: 'input',
-                              // defaultValue: "77777.00",
                               className: 'col-4',
                               templateOptions: {
-                                type: 'input',
+                                type: 'number',
                                 label: 'Advance amount',
-                                placeholder: 'Enter Advance amount',
-                                // required: true
+                                placeholder: 'Enter Advance amount'
                               },
                               hooks: {
                                 onInit: (field: any) => {
@@ -814,13 +780,11 @@ export class PurchaseInvoiceComponent {
                             {
                               key: 'taxable',
                               type: 'input',
-                              // defaultValue: "777770",
                               className: 'col-4',
                               templateOptions: {
                                 type: 'input',
                                 label: 'Taxable',
-                                placeholder: 'Enter Taxable',
-                                // required: true
+                                placeholder: 'Enter Taxable'
                               }
                             },
                             {
@@ -829,19 +793,16 @@ export class PurchaseInvoiceComponent {
                               defaultValue: "0",
                               className: 'col-4',
                               templateOptions: {
-                                type: 'input',
+                                type: 'number',
                                 label: 'Tax amount',
                                 placeholder: 'Enter Tax amount',
-                                // required: true
                               },
                               hooks: {
                                 onInit: (field: any) => {
                                   field.formControl.valueChanges.subscribe(data => {
                                     this.totalAmountCal();
-                                    // this.formConfig.model['productDiscount'] = data;
+
                                   })
-                                },
-                                onChanges: (field: any) => {
                                 }
                               }
                             },
@@ -860,12 +821,10 @@ export class PurchaseInvoiceComponent {
                             {
                               key: 'gst_type',
                               type: 'select',
-                              // defaultValue: "888ddb1b-5d74-4051-903f-171e2b4f9aab",
                               className: 'col-4',
                               templateOptions: {
                                 label: 'Gst type',
                                 placeholder: 'Select Gst type',
-                                // required: true,
                                 dataKey: 'name',
                                 dataLabel: "name",
                                 lazy: {
@@ -888,11 +847,9 @@ export class PurchaseInvoiceComponent {
                               key: 'payment_term',
                               type: 'select',
                               className: 'col-4',
-                              // defaultValue: '3b4cc23d-6dc3-42e9-9894-02624fdf9934',
                               templateOptions: {
                                 label: 'Payment term',
                                 placeholder: 'Select Payment term',
-                                // required: true,
                                 dataKey: 'name',
                                 dataLabel: "name",
                                 lazy: {
@@ -920,7 +877,6 @@ export class PurchaseInvoiceComponent {
                                 dataLabel: "name",
                                 label: 'Ledger account',
                                 placeholder: 'Select Ledger account',
-                                // required: true,
                                 lazy: {
                                   url: 'customers/ledger_accounts/',
                                   lazyOneTime: true
@@ -943,9 +899,9 @@ export class PurchaseInvoiceComponent {
                               className: 'col-4',
                               templateOptions: {
                                 label: 'Order Status Type',
-                                placeholder: 'Select Order Status Type',
                                 dataKey: 'order_status_id',
-                                dataLabel: "status_name",
+                                dataLabel: 'status_name',
+                                placeholder: 'Select Order status type',
                                 lazy: {
                                   url: 'masters/order_status/',
                                   lazyOneTime: true
@@ -988,13 +944,10 @@ export class PurchaseInvoiceComponent {
                               className: 'col-4',
                               templateOptions: {
                                 type: 'input',
-                                label: 'Discount amount',
-                                placeholder: 'Enter Discount amount',
+                                label: 'Discount Amt',
+                                placeholder: 'Enter Discount Amt',
                                 // required: true
-                              },
-                              hooks: {
-                                onInit: (field: any) => {
-                                }
+                             
                               }
                             },
                             {
@@ -1006,7 +959,6 @@ export class PurchaseInvoiceComponent {
                                 type: 'input',
                                 label: 'Total amount',
                                 placeholder: 'Enter Total amount',
-                                // required: true
                               },
                               // hooks: {
                               //   onInit: (field: any) => {
