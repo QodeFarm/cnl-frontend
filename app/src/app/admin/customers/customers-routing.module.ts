@@ -19,10 +19,10 @@ const routes: Routes = [
     path : 'ledger_groups',
     component : LedgerGroupsComponent
   },
-  {
-    path : 'territory',
-    component : TerritoryComponent
-  },
+  // {
+  //   path : 'territory',
+  //   component : TerritoryComponent
+  // },
   {
     path : 'transporters',
     component : TransportersComponent

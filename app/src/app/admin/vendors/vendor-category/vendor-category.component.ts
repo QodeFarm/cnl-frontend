@@ -14,6 +14,7 @@ export class VendorCategoryComponent {
     tableConfig: {
       apiUrl: 'vendors/vendor_category/',
       title: 'Vendor Category List',
+      showCheckbox: true,
       pkId: "vendor_category_id",
       pageSize: 10,
       "globalSearch": {

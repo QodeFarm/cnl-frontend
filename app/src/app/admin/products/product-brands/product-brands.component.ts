@@ -15,6 +15,7 @@ export class ProductBrandsComponent {
     tableConfig: {
       apiUrl: 'masters/product_brands/',
       title: 'Product Brands',
+      showCheckbox: true,
       pkId: "brand_id",
       pageSize: 10,
       "globalSearch": {

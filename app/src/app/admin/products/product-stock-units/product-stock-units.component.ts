@@ -13,6 +13,7 @@ export class ProductStockUnitsComponent {
     tableConfig: {
       apiUrl: 'products/product_stock_units/',
       title: 'Product Stock Units',
+      showCheckbox: true,
       pkId: "stock_unit_id",
       pageSize: 10,
       "globalSearch": {

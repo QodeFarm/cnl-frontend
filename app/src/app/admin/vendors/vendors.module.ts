@@ -28,6 +28,14 @@ import { VendorsListComponent } from './vendors-list/vendors-list.component';
     VendorsRoutingModule,
     AdminCommmonModule,
     VendorsListComponent,
+  ],
+  exports:[
+    VendorCategoryComponent,
+    VendorPaymentTermsComponent,
+    VendorAgentComponent,
+    FirmStatusesComponent,
+    GstCategoriesComponent,
+    PriceCategoriesComponent,
   ]
 })
 export class VendorsModule { }

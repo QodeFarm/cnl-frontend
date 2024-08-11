@@ -7,6 +7,9 @@
             <a class="nav-link" data-bs-toggle="tab" href="#users">Users</a>
         </li>
         <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#vendors">Vendors</a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link" data-bs-toggle="tab" href="#products">Products</a>
         </li>
         <li class="nav-item">
@@ -22,30 +25,34 @@
             <div class="row">
                 <div class="col-md-3">
                     <div class="custom-menu-card">
-                        <h6 class="custom-sub-heading">Product Master</h6>
+                        <h6 class="custom-sub-heading">Masters Data</h6>
                         <ul class="master-menu-list">
-                            <li><a [routerLink]="['/admin/master/product-sales-gl']">Product sales gl</a></li>
-                            <li><a [routerLink]="['/admin/master/product-types']">Product Types</a></li>
-                            <li><a [routerLink]="['/admin/master/product-brands']">Product Brands</a></li>
-                            <li><a [routerLink]="['/admin/master/payment-transactions']">payment_transactions</a></li>
-                            <li><a [routerLink]="['/admin/master/sale_invoice_items']">sale_invoice_items</a></li>
-                            <li><a [routerLink]="['/admin/master/sale_return_orders']">sale_return_orders</a></li>
-                            <li><a [routerLink]="['/admin/master/sale_return_items']">sale_return_items</a></li>
+                            <li><a [routerLink]="['/admin/master/territory']">Territory</a></li>
+                            <li><a [routerLink]="['/admin/master/transporters']">Transporters</a></li>
+                            <li><a [routerLink]="['/admin/master/firm-statuses']">Firm status</a></li>
+                            <li><a [routerLink]="['/admin/master/gst-categories']">GST categories</a></li>
+                            <li><a [routerLink]="['/admin/master/price-categories']">Price categories</a></li>
                         </ul>
                     </div>
                 </div>
                 <div class="col-md-9">
                     <ng-container [ngSwitch]="code">
-                        <ng-container *ngSwitchCase="'product-sales-gl'">
-                            <app-product-sales-gl></app-product-sales-gl>
+                        <ng-container *ngSwitchCase="'territory'">
+                            <app-territory></app-territory>
                         </ng-container>
-                        <ng-container *ngSwitchCase="'product-types'">
-                            <app-product-types></app-product-types>
+                        <ng-container *ngSwitchCase="'transporters'">
+                            <app-transporters></app-transporters>
                         </ng-container>
-                        <ng-container *ngSwitchCase="'product-brands'">
-                            <app-product-brands></app-product-brands>
+                        <ng-container *ngSwitchCase="'firm-statuses'">
+                            <app-firm-statuses></app-firm-statuses>
                         </ng-container>
-                        <div *ngSwitchDefault>output2</div>
+                        <ng-container *ngSwitchCase="'gst-categories'">
+                            <app-gst-categories></app-gst-categories>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'price-categories'">
+                            <app-price-categories></app-price-categories>
+                        </ng-container>
+                        <!-- <div *ngSwitchDefault>output2</div> -->
                     </ng-container>
 
                 </div>
@@ -79,9 +86,95 @@
             <!-- Content for Users tab -->
             <p>Users content...</p>
         </div>
+        <div class="tab-pane  fade" id="vendors">
+            <!-- Content for Products tab -->
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="custom-menu-card">
+                        <h6 class="custom-sub-heading">Vendors Data</h6>
+                        <ul class="master-menu-list">
+                            <li><a [routerLink]="['/admin/master/vendor-agent']">vendor agent</a></li>
+                            <li><a [routerLink]="['/admin/master/vendor-category']">Vendor categories</a></li>
+                            <li><a [routerLink]="['/admin/master/vendor-payment-terms']">Vendor payments terms</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <ng-container [ngSwitch]="code">
+                        <ng-container *ngSwitchCase="'vendor-agent'">
+                            <app-vendor-agent></app-vendor-agent>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'vendor-category'">
+                            <app-vendor-category></app-vendor-category>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'vendor-payment-terms'">
+                            <app-vendor-payment-terms></app-vendor-payment-terms>
+                        </ng-container>
+                    </ng-container>
+
+                </div>
+            </div>
+        </div>
         <div class="tab-pane  fade" id="products">
             <!-- Content for Products tab -->
-            <p>Products content...</p>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="custom-menu-card">
+                        <h6 class="custom-sub-heading">Products Data</h6>
+                        <ul class="master-menu-list">
+                            <li><a [routerLink]="['/admin/master/product-sales-gl']">Product sales gl</a></li>
+                            <li><a [routerLink]="['/admin/master/product-types']">Product types</a></li>
+                            <li><a [routerLink]="['/admin/master/product-brands']">Product brands</a></li>
+                            <li><a [routerLink]="['/admin/master/product-categories']">Prdouct categories</a></li>
+                            <li><a [routerLink]="['/admin/master/product-groups']">Product groups</a></li>
+                            <li><a [routerLink]="['/admin/master/product-gst-classifications']">Product gst calssifications</a></li>
+                            <li><a [routerLink]="['/admin/master/product-item-type']">Product item types</a></li>
+                            <li><a [routerLink]="['/admin/master/product-purchase-gl']">Product purchase gl</a></li>
+                            <li><a [routerLink]="['/admin/master/product-stock-units']">Product stock units</a></li>
+                            <li><a [routerLink]="['/admin/master/product-unique-quantity-codes']">Products unique quantity codes</a></li>
+                            <li><a [routerLink]="['/admin/master/unit-options']">Unit Options</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <ng-container [ngSwitch]="code">
+                        <ng-container *ngSwitchCase="'product-stock-units'">
+                            <app-product-stock-units></app-product-stock-units>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'product-unique-quantity-codes'">
+                            <app-product-unique-quantity-codes></app-product-unique-quantity-codes>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'product-types'">
+                            <app-product-types></app-product-types>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'product-brands'"> 
+                            <app-product-brands></app-product-brands>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'product-categories'"> 
+                            <app-product-categories></app-product-categories>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'product-groups'"> 
+                            <app-product-groups></app-product-groups>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'product-gst-classifications'"> 
+                            <app-product-gst-classifications></app-product-gst-classifications>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'product-item-type'"> 
+                            <app-product-item-type></app-product-item-type>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'product-sales-gl'">
+                            <app-product-sales-gl></app-product-sales-gl>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'product-purchase-gl'"> 
+                            <app-product-purchase-gl></app-product-purchase-gl>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'unit-options'">
+                            <app-unit-options></app-unit-options>
+                        </ng-container>
+                    </ng-container>
+
+                </div>
+            </div>
         </div>
         <div class="tab-pane  fade" id="sales">
             <!-- Content for Sales tab -->

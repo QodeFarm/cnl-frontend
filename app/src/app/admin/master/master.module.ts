@@ -9,6 +9,9 @@ import { DepartmentsComponent } from './departments/departments.component';
 import { ShiftsComponent } from './shifts/shifts.component';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { LeaveSettingsComponent } from './leave-settings/leave-settings.component';
+import { LedgerAccountsComponent } from '../customers/ledger-accounts/ledger-accounts.component';
+import { CustomersModule } from '../customers/customers.module';
+import { TerritoryComponent } from '../customers/territory/territory.component';
 
 
 @NgModule({
@@ -18,7 +21,7 @@ import { LeaveSettingsComponent } from './leave-settings/leave-settings.componen
     JobCodesComponent,
     DepartmentsComponent,
     ShiftsComponent,
-    LeaveSettingsComponent
+    LeaveSettingsComponent,
   ],
   imports: [
     CommonModule,
