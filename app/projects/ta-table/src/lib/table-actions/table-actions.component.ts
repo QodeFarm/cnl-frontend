@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { TaTableService } from '../ta-table.service';
 import { TaActionService } from '@ta/ta-core';
 
@@ -10,6 +10,7 @@ import { TaActionService } from '@ta/ta-core';
 export class TableActionsComponent implements OnInit {
   @Input() row: any;
   @Input() actions: any[] = [];
+  @Output() clickAction: EventEmitter<any> = new EventEmitter();
   constructor(private tableS: TaTableService, private ta: TaActionService) { }
 
   ngOnInit(): void {
@@ -20,6 +21,7 @@ export class TableActionsComponent implements OnInit {
       return action.callBackFn(this.row, action);
     }
     // window['$this']=this.row;
+    this.clickAction.emit({ action: action, data: this.row })
     this.ta.doAction(action, { row: this.row, $this: this.row });
     this.tableS.actionChange({ action: action, data: this.row });
   }

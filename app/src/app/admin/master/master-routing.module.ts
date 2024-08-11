@@ -8,8 +8,7 @@ import { ShiftsComponent } from './shifts/shifts.component';
 import { LeaveSettingsComponent } from './leave-settings/leave-settings.component';
 
 const routes: Routes = [
-  { path: '', canActivate: [], loadComponent: () => import('./master-list/master-list.component').then(m => m.MasterListComponent) },
-  { path: ':code', canActivate: [], loadComponent: () => import('./master-details/master-details.component').then(m => m.MasterDetailsComponent) },
+  { path: ':code', canActivate: [], loadComponent: () => import('./master-list/master-list.component').then(m => m.MasterListComponent) },
   {
     path: 'job-type',
     component: JobTypesComponent

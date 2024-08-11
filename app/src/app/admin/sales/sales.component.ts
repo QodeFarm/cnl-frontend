@@ -55,7 +55,7 @@ export class SalesComponent {
 
     // to get SaleOrder number for save
     this.getOrderNo();
-    this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[8].hide =true;
+    this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[8].hide = true;
     // console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
   }
 
@@ -222,7 +222,7 @@ export class SalesComponent {
         {
           key: 'sale_order_items',
           type: 'script',
-          value: 'data.sale_order_items.map(m=> {m.product_id = m.product.product_id; if(m.product.unit_options){m.unit_options_id = m.product.unit_options.unit_options_id};  if(m.unit_options){m.unit_options_id = m.unit_options.unit_options_id};  return m ;})'
+          value: 'data.sale_order_items.map(m=> {m.product_id = m.product.product_id;  return m ;})'
         }
       ],
       submit: {
@@ -235,7 +235,7 @@ export class SalesComponent {
       },
       model: {
         sale_order: {},
-        sale_order_items: [{}],
+        sale_order_items: [{}, {}, {}, {}, {}],
         order_attachments: [],
         order_shipments: {}
       },
@@ -467,7 +467,7 @@ export class SalesComponent {
                   hideLabel: true,
                   dataLabel: 'name',
                   options: [],
-                  required: true,
+                  required: false,
                   lazy: {
                     url: 'products/products/?summary=true',
                     lazyOneTime: true
@@ -487,8 +487,8 @@ export class SalesComponent {
                       if (field.form && field.form.controls && field.form.controls.discount && data && data.dis_amount) {
                         field.form.controls.discount.setValue(parseFloat(data.dis_amount))
                       }
-                      if (field.form && field.form.controls && field.form.controls.unit_options && data && data.unit_options && data.unit_options.unit_name) {
-                        field.form.controls.unit_options.setValue(data.unit_options)
+                      if (field.form && field.form.controls && field.form.controls.unit_options_id && data && data.unit_options && data.unit_options.unit_name) {
+                        field.form.controls.unit_options_id.setValue(data.unit_options.unit_options_id)
                       }
                       if (field.form && field.form.controls && field.form.controls.print_name && data && data.print_name) {
                         field.form.controls.print_name.setValue(data.print_name)
@@ -525,13 +525,14 @@ export class SalesComponent {
               },
               {
                 type: 'select',
-                key: 'unit_options',
+                key: 'unit_options_id',
                 templateOptions: {
                   label: 'Unit',
                   placeholder: 'Select Unit',
                   hideLabel: true,
                   dataLabel: 'unit_name',
                   dataKey: 'unit_options_id',
+                  bindId: true,
                   lazy: {
                     url: 'masters/unit_options',
                     lazyOneTime: true
