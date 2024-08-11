@@ -78,6 +78,9 @@ export class SaleReturnsComponent {
 
   setFormConfig() {
     this.formConfig = {
+      valueChangeFn: (res) => {
+        // this.totalAmountCal();
+      },
       url: "sales/sale_return_order/",
       title: '',
       formState: {
@@ -87,10 +90,11 @@ export class SaleReturnsComponent {
         {
           key: 'sale_return_items',
           type: 'script',
-          value: 'data.sale_return_items.map(m=> {m.product_id = m.product.product_id; if(m.product.unit_options){m.unit_options_id = m.product.unit_options.unit_options_id};  if(m.unit_options){m.unit_options_id = m.unit_options.unit_options_id};  return m ;})'
+          value: 'data.sale_return_items.map(m=> {m.product_id = m.product.product_id;  return m ;})'
         }
       ],
       submit: {
+        label: 'submit',
         submittedFn: () => this.ngOnInit()
       },
       reset: {
@@ -439,9 +443,8 @@ export class SaleReturnsComponent {
                   dataKey: 'product_id',
                   hideLabel: true,
                   dataLabel: 'name',
-                  // options: this.productOptions,
                   options: [],
-                  required: true,
+                  required: false,
                   lazy: {
                     url: 'products/products/?summary=true',
                     lazyOneTime: true
@@ -452,10 +455,6 @@ export class SaleReturnsComponent {
                     field.formControl.valueChanges.subscribe(data => {
                       console.log("products data", data);
                       this.productOptions = data;
-                      // default value for new product
-                      field.form.controls.quantity.setValue(field.form.controls.quantity.value || 1);
-
-                      // binding selected product data 
                       if (field.form && field.form.controls && field.form.controls.code && data && data.code) {
                         field.form.controls.code.setValue(data.code)
                       }
@@ -463,10 +462,10 @@ export class SaleReturnsComponent {
                         field.form.controls.rate.setValue(field.form.controls.rate.value || data.sales_rate)
                       }
                       if (field.form && field.form.controls && field.form.controls.discount && data && data.dis_amount) {
-                        field.form.controls.discount.setValue(data.dis_amount)
+                        field.form.controls.discount.setValue(parseFloat(data.dis_amount))
                       }
-                      if (field.form && field.form.controls && field.form.controls.unit_options && data && data.unit_options && data.unit_options.unit_name) {
-                        field.form.controls.unit_options.setValue(data.unit_options)
+                      if (field.form && field.form.controls && field.form.controls.unit_options_id && data && data.unit_options && data.unit_options.unit_name) {
+                        field.form.controls.unit_options_id.setValue(data.unit_options.unit_options_id)
                       }
                       if (field.form && field.form.controls && field.form.controls.print_name && data && data.print_name) {
                         field.form.controls.print_name.setValue(data.print_name)
@@ -474,54 +473,49 @@ export class SaleReturnsComponent {
                       if (field.form && field.form.controls && field.form.controls.discount && data && data.dis_amount) {
                         field.form.controls.discount.setValue(data.dis_amount)
                       }
+                      if (field.form && field.form.controls && field.form.controls.mrp && data && data.mrp) {
+                        field.form.controls.mrp.setValue(data.mrp)
+                      }
                       this.totalAmountCal();
                     });
-                    // field.templateOptions.options = this.cs.getRole();
                   }
                 }
               },
               {
                 type: 'input',
                 key: 'code',
-                // defaultValue: 0,
                 templateOptions: {
                   label: 'Code',
                   placeholder: 'Enter code',
                   hideLabel: true,
-                  // // required: true
-                },
-                expressionProperties: {
-                  // 'templateOptions.disabled': (model) => (model.item && model.item.sale_price) ? false : true
                 }
               },
               {
                 type: 'input',
                 key: 'total_boxes',
-                // defaultValue: 1000,
                 templateOptions: {
+                  type: 'number',
                   label: 'Total Boxes',
-                  type: "number",
                   placeholder: 'Enter Total Boxes',
-                  hideLabel: true,
-                  // // required: true
+                  hideLabel: true
                 },
               },
               {
                 type: 'select',
-                key: 'unit_options',
+                key: 'unit_options_id',
                 templateOptions: {
                   label: 'Unit',
                   placeholder: 'Select Unit',
                   hideLabel: true,
                   dataLabel: 'unit_name',
                   dataKey: 'unit_options_id',
+                  bindId: true,
                   lazy: {
                     url: 'masters/unit_options',
                     lazyOneTime: true
                   }
                 },
               },
-              // quantity amount rate dsc
               {
                 type: 'input',
                 key: 'quantity',
@@ -537,8 +531,6 @@ export class SaleReturnsComponent {
                 hooks: {
                   onInit: (field: any) => {
                     field.formControl.valueChanges.subscribe(data => {
-                      // this.formConfig.model['productQuantity'] = data;
-
                       if (field.form && field.form.controls && field.form.controls.rate && data) {
                         const rate = field.form.controls.rate.value;
                         const quantity = data;
@@ -558,18 +550,15 @@ export class SaleReturnsComponent {
               {
                 type: 'input',
                 key: 'rate',
-                // defaultValue: 1000,
                 templateOptions: {
+                  type: 'number',
                   label: 'Rate',
                   placeholder: 'Enter Rate',
                   hideLabel: true,
-                  // type: 'number',
-                  // // required: true
                 },
                 hooks: {
                   onInit: (field: any) => {
                     field.formControl.valueChanges.subscribe(data => {
-                      // this.formConfig.model['productQuantity'] = data;
 
                       if (field.form && field.form.controls && field.form.controls.quantity && data) {
                         const quantity = field.form.controls.quantity.value;
@@ -577,7 +566,6 @@ export class SaleReturnsComponent {
                         if (rate && quantity) {
                           field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity));
                         }
-                        // this.totalAmountCal();
                       }
                     })
                   }
@@ -586,125 +574,78 @@ export class SaleReturnsComponent {
               {
                 type: 'input',
                 key: 'discount',
-                // defaultValue: 90,
                 templateOptions: {
+                  type: 'number',
                   placeholder: 'Enter Disc',
-                  // type: 'number',
                   label: 'Disc',
                   hideLabel: true,
                 },
                 hooks: {
                   onInit: (field: any) => {
                     field.formControl.valueChanges.subscribe(data => {
-                      // this.totalAmountCal();
-                      // this.formConfig.model['productDiscount'] = data;
                     })
                   }
                 },
                 expressionProperties: {
-                  // 'templateOption6s.disabled': (model) => (model.item && model.item.sale_price) ? false : true
                 }
               },
               {
                 type: 'input',
                 key: 'print_name',
-                // defaultValue: 1000,
                 templateOptions: {
                   label: 'Print name',
                   placeholder: 'Enter Product Print name',
-                  hideLabel: true,
-                  // type: 'number',
-                  // // required: true mrp tax 
+                  hideLabel: true
                 },
               },
               {
                 type: 'input',
                 key: 'mrp',
-                // defaultValue: 1000,
                 templateOptions: {
                   label: 'Mrp',
                   placeholder: 'Mrp',
                   hideLabel: true,
                   disabled: true
-                  // type: 'number',
-                  // // required: true mrp tax 
                 },
               },
               {
                 type: 'input',
                 key: 'amount',
                 templateOptions: {
+                  type: 'number',
                   label: 'Amount',
                   placeholder: 'Enter Amount',
                   hideLabel: true,
-                  // type: 'number',
-                  // // required: true
+                  disabled: true
                 },
                 hooks: {
                   onInit: (field: any) => {
                     field.formControl.valueChanges.subscribe(data => {
                       this.totalAmountCal();
-                      // this.formConfig.model['productDiscount'] = data;
                     })
                   }
-                  // onInit: (field: any) => {
-                  //   field.form.get('quantity').valueChanges.pipe(
-                  //     distinctUntilChanged()
-                  //   ).subscribe((data: any) => {
-                  //     this.totalAmountCal();
-                  //   });
-                  // }
                 }
               },
               {
                 type: 'input',
                 key: 'tax',
-                // defaultValue: 1000,
                 templateOptions: {
-                  label: 'Tax',
                   type: "number",
+                  label: 'Tax',
                   placeholder: 'Tax',
-                  hideLabel: true,
-                  // type: 'number',
-                  // // required: true mrp tax 
+                  hideLabel: true
                 },
               },
               {
                 type: 'input',
                 key: 'remarks',
-                // defaultValue: 1000,
                 templateOptions: {
                   label: 'Remarks',
                   placeholder: 'Enter Remarks',
-                  hideLabel: true,
-                  // type: 'number',
-                  // // required: true mrp tax 
+                  hideLabel: true
                 },
               },
-              // {
-              //   type: 'input',
-              //   key: 'tax',
-              //   // defaultValue: 1000,
-              //   templateOptions: {
-              //     label: 'HSN',
-              //     placeholder: 'Tax',
-              //     hideLabel: true,
-              //     // type: 'number',
-              //     // // required: true mrp tax 
-              //   },
-              // },
-              // {
-              //   type: 'input',
-              //   key: 'tax',
-              //   // defaultValue: 1000,
-              //   templateOptions: {
-              //     label: 'Barcode',
-              //     placeholder: 'Barcode',
-              //     hideLabel: true,
-              //     // type: 'number',
-              //     // // required: true mrp tax 
-              //   },
-              // },
+
             ]
           },
         },
@@ -1077,64 +1018,53 @@ export class SaleReturnsComponent {
                   props: {
                     "displayStyle": "files",
                     "multiple": true
-                    // label: 'Order Attachments',
-                    // // required: true
-                    // required: true
                   }
-                },
+                }
               ]
             }
           ]
-        },
-        ]
         }
       ]
-    },
+    }
   ]
   }
-}
-totalAmountCal() {
-  const data = this.formConfig.model;
-  console.log('data', data);
-  if (data) {
-    const products = data.sale_return_items || [];
-    let totalAmount = 0;
-    let totalDiscount = 0;
-    let totalRate = 0;
-    let total_amount = 0;
-    if (products) {
-      products.forEach(product => {
-        if (product) {
-          if (product.amount)
-            totalAmount += parseFloat(product.amount || 0);
-          if (product.discount)
-            totalDiscount += parseFloat(product.discount || 0);
-        }
-        // totalRate += parseFloat(product.rate) * parseFloat(product.quantity || 0);
-      });
-    }
-
-
-    if (this.salereturnForm && this.salereturnForm.form && this.salereturnForm.form.controls) {
-      const controls: any = this.salereturnForm.form.controls;
-      controls.sale_return_order.controls.item_value.setValue(totalAmount);
-      controls.sale_return_order.controls.dis_amt.setValue(totalDiscount);
-      // const doc_amount = (totalAmount + parseFloat(data.sale_invoice_order.cess_amount || 0) + parseFloat(data.sale_invoice_order.tax_amount || 0)) - totalDiscount;
-      // controls.sale_invoice_order.controls.doc_amount.setValue(doc_amount);
-      const cessAmount = parseFloat(data.sale_return_order.cess_amount || 0);
-      const taxAmount = parseFloat(data.sale_return_order.tax_amount || 0);
-      // const advanceAmount = parseFloat(data.sale_return_order.advance_amount || 0);
-
-      const total_amount = (totalAmount + cessAmount + taxAmount) - totalDiscount;
-      controls.sale_return_order.controls.total_amount.setValue(total_amount);
-
-    }
-    //const 
-
-    // const cess_amount = data;
-    // if (cess_amount && doc_amount) {
-    //   field.form.controls.doc_amount.setValue(parseInt(doc_amount) - parseInt(cess_amount));
-    // }
+  ]
   }
-}
+  }
+  totalAmountCal() {
+    const data = this.formConfig.model;
+    console.log('data', data);
+    if (data) {
+      const products = data.sale_return_items || [];
+      let totalAmount = 0;
+      let totalDiscount = 0;
+      let totalRate = 0;
+      let total_amount = 0;
+      if (products) {
+        products.forEach(product => {
+          if (product) {
+            if (product.amount)
+              totalAmount += parseFloat(product.amount || 0);
+            if (product.discount)
+              totalDiscount += parseFloat(product.discount || 0);
+          }
+          // totalRate += parseFloat(product.rate) * parseFloat(product.quantity || 0);
+        });
+      }
+
+
+      if (this.salereturnForm && this.salereturnForm.form && this.salereturnForm.form.controls) {
+        const controls: any = this.salereturnForm.form.controls;
+        controls.sale_return_order.controls.item_value.setValue(totalAmount);
+        controls.sale_return_order.controls.dis_amt.setValue(totalDiscount);
+        const cessAmount = parseFloat(data.sale_return_order.cess_amount || 0);
+        const taxAmount = parseFloat(data.sale_return_order.tax_amount || 0);
+        // const advanceAmount = parseFloat(data.sale_return_order.advance_amount || 0);
+
+        const total_amount = (totalAmount + cessAmount + taxAmount) - totalDiscount;
+        controls.sale_return_order.controls.total_amount.setValue(total_amount);
+
+      }
+    }
+  }
 }

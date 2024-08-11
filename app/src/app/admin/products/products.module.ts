@@ -43,6 +43,22 @@ import { ProductsListComponent } from './products-list/products-list.component';
     ProductsRoutingModule,
     AdminCommmonModule,
     ProductsListComponent
+  ],
+  exports: [
+    ProductsComponent,
+    ProductTypesComponent,
+    ProductGroupsComponent,
+    ProductCategoriesComponent,
+    ProductStockUnitsComponent,
+    ProductGstClassificationsComponent,
+    ProductSalesGlComponent,
+    ProductPurchaseGlComponent,
+    ProductUniqueQuantityCodesComponent,
+    UnitOptionsComponent,
+    ProductDrugTypesComponent,
+    ProductItemTypeComponent,
+    BrandSalesmanComponent,
+    ProductBrandsComponent,
   ]
 })
 export class ProductsModule { }

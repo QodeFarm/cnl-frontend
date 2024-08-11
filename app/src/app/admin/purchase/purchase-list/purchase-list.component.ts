@@ -16,9 +16,15 @@ export class PurchaseListComponent {
   @Output('edit') edit = new EventEmitter<void>();
   
   tableConfig: TaTableConfig = {
-    apiUrl: 'purchase/purchase_order/',
+    apiUrl: 'purchase/purchase_order/?summary=true',
     showCheckbox:true,
     pkId: "purchase_order_id",
+    fixedFilters: [
+      {
+        key: 'summary',
+        value: 'true'
+      }
+    ],
     pageSize: 10,
     "globalSearch": {
       keys: ['id', 'first_name', 'last_name']
@@ -64,16 +70,16 @@ export class PurchaseListComponent {
         name: 'Vendor',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.vendor.name}`;
+          return `${row.vendor_id.name}`;
         },
         sort: true
       },
       {
-        fieldKey: 'order_status_id',
+        fieldKey: 'order_status',
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.order_status.status_name}`;
+          return `${row.order_status_id.status_name}`;
         },
         sort: true
       },
