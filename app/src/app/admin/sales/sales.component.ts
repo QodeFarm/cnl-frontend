@@ -48,6 +48,8 @@ export class SalesComponent {
 
     // to get SaleOrder number for save
     this.getOrderNo();
+    this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[8].hide = true;
+    // console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
   }
 
 
@@ -71,6 +73,7 @@ export class SalesComponent {
         this.formConfig.submit.label = 'Update';
         this.formConfig.model['sale_order_id'] = this.SaleOrderEditID;
         this.showForm = true;
+        this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[8].hide = false;
       }
     });
     this.hide();
@@ -109,7 +112,7 @@ export class SalesComponent {
         {
           key: 'sale_order_items',
           type: 'script',
-          value: 'data.sale_order_items.map(m=> {m.product_id = m.product.product_id; if(m.product.unit_options){m.unit_options_id = m.product.unit_options.unit_options_id};  if(m.unit_options){m.unit_options_id = m.unit_options.unit_options_id};  return m ;})'
+          value: 'data.sale_order_items.map(m=> {m.product_id = m.product.product_id;  return m ;})'
         }
       ],
       submit: {
@@ -122,7 +125,7 @@ export class SalesComponent {
       },
       model: {
         sale_order: {},
-        sale_order_items: [{}],
+        sale_order_items: [{}, {}, {}, {}, {}],
         order_attachments: [],
         order_shipments: {}
       },
@@ -354,7 +357,7 @@ export class SalesComponent {
                   hideLabel: true,
                   dataLabel: 'name',
                   options: [],
-                  required: true,
+                  required: false,
                   lazy: {
                     url: 'products/products/?summary=true',
                     lazyOneTime: true
@@ -374,8 +377,8 @@ export class SalesComponent {
                       if (field.form && field.form.controls && field.form.controls.discount && data && data.dis_amount) {
                         field.form.controls.discount.setValue(parseFloat(data.dis_amount))
                       }
-                      if (field.form && field.form.controls && field.form.controls.unit_options && data && data.unit_options && data.unit_options.unit_name) {
-                        field.form.controls.unit_options.setValue(data.unit_options)
+                      if (field.form && field.form.controls && field.form.controls.unit_options_id && data && data.unit_options && data.unit_options.unit_name) {
+                        field.form.controls.unit_options_id.setValue(data.unit_options.unit_options_id)
                       }
                       if (field.form && field.form.controls && field.form.controls.print_name && data && data.print_name) {
                         field.form.controls.print_name.setValue(data.print_name)
@@ -412,13 +415,14 @@ export class SalesComponent {
               },
               {
                 type: 'select',
-                key: 'unit_options',
+                key: 'unit_options_id',
                 templateOptions: {
                   label: 'Unit',
                   placeholder: 'Select Unit',
                   hideLabel: true,
                   dataLabel: 'unit_name',
                   dataKey: 'unit_options_id',
+                  bindId: true,
                   lazy: {
                     url: 'masters/unit_options',
                     lazyOneTime: true
@@ -741,6 +745,13 @@ export class SalesComponent {
                                 type: 'number',
                                 label: 'Advance amount',
                                 placeholder: 'Enter Advance amount'
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    this.totalAmountCal();
+                                  })
+                                }
                               }
                             },
                             {
@@ -872,7 +883,7 @@ export class SalesComponent {
                                       this.formConfig.model['sale_order']['order_status_id'] = data.order_status_id;
 
                                       const saleOrder = this.formConfig.model['sale_order'];
-                                      if (saleOrder.order_status && saleOrder.order_status.status_name === 'Confirmed') {
+                                      if (saleOrder.order_status && saleOrder.order_status.status_name === 'Approved') {
                                         console.log("processing salesInvoice:");
                                         const saleOrderItems = this.formConfig.model['sale_order_items'];
                                         const orderAttachments = this.formConfig.model['order_attachments']
@@ -898,7 +909,7 @@ export class SalesComponent {
                                             cess_amount: saleOrder.cess_amount,
                                             transport_charges: saleOrder.transport_charges,
                                             round_off: saleOrder.round_off,
-                                            total_amount: saleOrder.doc_amount,
+                                            total_amount: saleOrder.total_amount,
                                             vehicle_name: saleOrder.vehicle_name,
                                             total_boxes: saleOrder.total_boxes,
                                             shipping_address: saleOrder.shipping_address,
@@ -992,7 +1003,7 @@ export class SalesComponent {
                               }
                             },
                             {
-                              key: 'doc_amount',
+                              key: 'total_amount',
                               type: 'input',
                               defaultValue: "0",
                               className: 'col-4',
@@ -1042,7 +1053,7 @@ export class SalesComponent {
       let totalAmount = 0;
       let totalDiscount = 0;
       let totalRate = 0;
-      let doc_amount = 0;
+      let total_amount = 0;
       if (products) {
         products.forEach(product => {
           if (product) {
@@ -1060,8 +1071,14 @@ export class SalesComponent {
         const controls: any = this.salesForm.form.controls;
         controls.sale_order.controls.item_value.setValue(totalAmount);
         controls.sale_order.controls.dis_amt.setValue(totalDiscount);
-        const doc_amount = (totalAmount + parseFloat(data.sale_order.cess_amount || 0) + parseFloat(data.sale_order.tax_amount || 0)) - totalDiscount;
-        controls.sale_order.controls.doc_amount.setValue(doc_amount);
+        // const doc_amount = (totalAmount + parseFloat(data.sale_order.cess_amount || 0) + parseFloat(data.sale_order.tax_amount || 0)) - totalDiscount;
+        // controls.sale_order.controls.doc_amount.setValue(doc_amount);
+        const cessAmount = parseFloat(data.sale_order.cess_amount || 0);
+        const taxAmount = parseFloat(data.sale_order.tax_amount || 0);
+        const advanceAmount = parseFloat(data.sale_order.advance_amount || 0);
+
+        const total_amount = (totalAmount + cessAmount + taxAmount) - totalDiscount - advanceAmount;
+        controls.sale_order.controls.total_amount.setValue(total_amount);
 
       }
       //const 

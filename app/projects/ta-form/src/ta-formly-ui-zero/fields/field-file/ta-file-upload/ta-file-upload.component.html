@@ -7,8 +7,10 @@
         </div>
         <div *ngSwitchCase="'avatar'" class="ant-upload">
             <ng-container *ngIf="!(options.fileList && options.fileList[0] && options.fileList[0].attachment_path)">
-                <span class="upload-icon" nz-icon [nzType]="loading ? 'loading' : 'plus'"></span>
-                <div class="ant-upload-text">Upload</div>
+                <span class="upload-icon" nz-icon [nzType]="'loading'" *ngIf="loading"> </span>
+                <img style="width: auto;height: 130px;" *ngIf="!loading" loading="lazy" src="assets/img/default_avatar.png" />
+                <!-- <span class="upload-icon" nz-icon [nzType]="loading ? 'loading' : 'user'"></span>
+                <div class="ant-upload-text">Upload</div> -->
             </ng-container>
             <img *ngIf="options.fileList && options.fileList[0] && options.fileList[0].attachment_path" [src]="options.fileList[0].attachment_path | taImg" style="width: 100%" />
         </div>

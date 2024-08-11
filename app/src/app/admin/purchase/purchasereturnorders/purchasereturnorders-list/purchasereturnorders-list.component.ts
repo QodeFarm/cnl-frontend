@@ -15,9 +15,15 @@ export class PurchasereturnordersListComponent {
   @Output('edit') edit = new EventEmitter<void>();
 
   tableConfig: TaTableConfig = {
-    apiUrl: 'purchase/purchase_return_order/',
+    apiUrl: 'purchase/purchase_return_order/?summary=true',
     showCheckbox: true,
     pkId: "purchase_return_id",
+    fixedFilters: [
+      {
+        key: 'summary',
+        value: 'true'
+      }
+    ],
     pageSize: 10,
     globalSearch: {
       keys: []
@@ -28,7 +34,7 @@ export class PurchasereturnordersListComponent {
         name: 'Purchase Type',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.purchase_type.name}`;
+          return `${row.purchase_type_id.name}`;
         },
         sort: true
       },
@@ -67,7 +73,7 @@ export class PurchasereturnordersListComponent {
         name: 'Vendor',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.vendor.name}`;
+          return `${row.vendor_id.name}`;
         },
         sort: true
       },
@@ -76,7 +82,7 @@ export class PurchasereturnordersListComponent {
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.order_status.status_name}`;
+          return `${row.order_status_id.status_name}`;
         },
         sort: true
       },
@@ -93,12 +99,16 @@ export class PurchasereturnordersListComponent {
           {
             type: 'delete',
             label: 'Delete',
+            confirm: true,
+            confirmMsg: "Sure to delete?",
             apiUrl: 'purchase/purchase_return_order'
           },
           {
             type: 'callBackFn',
-            label: 'Edit',
+            icon: 'fa fa-pen',
+            label: '',
             callBackFn: (row, action) => {
+              console.log(row);
               this.edit.emit(row.purchase_return_id);
             }
           }

@@ -14,10 +14,11 @@ export class ProductsComponent implements OnInit {
   formConfig: TaFormConfig = {};
 
   constructor(private http: HttpClient) {}
-
+  
   ngOnInit() {
     this.showProductsList = false;
     this.showForm = true;
+    this.ProductEditID = null;
     // Set form config
     this.setFormConfig();
     console.log('this.formConfig', this.formConfig);
@@ -37,10 +38,11 @@ export class ProductsComponent implements OnInit {
       console.log('--------> res ', res);
       if (res) {
         this.formConfig.model = res;
+        this.formConfig.showActionBtn = true;
         // Set labels for update
+        this.formConfig.pkId = 'product_id';
         this.formConfig.submit.label = 'Update';
         // Show form after setting form values
-        this.formConfig.pkId = 'product_id';
         this.formConfig.model['product_id'] = this.ProductEditID;
         this.showForm = true;
       }
@@ -59,10 +61,12 @@ export class ProductsComponent implements OnInit {
   }
 
   setFormConfig() {
+    this.ProductEditID = null;
     this.formConfig = {
       url: 'products/products/',
       title: 'Products',
       pkId: "product_id",
+      showActionBtn: true,
       exParams: [
         {
           key: 'product_group_id',
@@ -111,9 +115,14 @@ export class ProductsComponent implements OnInit {
         },
       ],
       submit: {
+        label: 'submit',
         submittedFn: () => this.ngOnInit()
       },
-      reset: {},
+      reset: {
+        resetFn: () => {
+          this.ngOnInit();
+        }
+      },
       fields: [
         {
           fieldGroupClassName: "ant-row custom-form-block",
@@ -456,7 +465,7 @@ export class ProductsComponent implements OnInit {
                 },
                 // Additional fields below picture
                 {
-                  className: 'col-12 mt-4',
+                  className: 'col-12 mt-',
                   key: 'gst_classification',
                   type: 'select',
                   templateOptions: {
@@ -487,34 +496,7 @@ export class ProductsComponent implements OnInit {
                     label: 'Rate Factor',
                     placeholder: 'Enter Rate Factor'
                   }
-                },
-                // {
-                //   className: 'col-12 mt-4',
-                //   key: 'wholesale_rate',
-                //   type: 'input',
-                //   templateOptions: {
-                //     label: 'Wholesale Rate',
-                //     placeholder: 'Enter Wholesale Rate'
-                //   }
-                // },
-                // {
-                //   className: 'col-12',
-                //   key: 'discount',
-                //   type: 'input',
-                //   templateOptions: {
-                //     label: 'Discount',
-                //     placeholder: 'Enter Discount'
-                //   }
-                // },
-                // {
-                //   className: 'col-12',
-                //   key: 'dealer_rate',
-                //   type: 'input',
-                //   templateOptions: {
-                //     label: 'Dealer Rate',
-                //     placeholder: 'Enter Dealer Rate'
-                //   }
-                // }
+                }
               ]
             }
           ]

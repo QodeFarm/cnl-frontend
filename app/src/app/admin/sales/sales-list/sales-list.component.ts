@@ -17,10 +17,16 @@ export class SalesListComponent {
 
 
   tableConfig: TaTableConfig = {
-    apiUrl: 'sales/sale_order/',
+    apiUrl: 'sales/sale_order/?summary=true',
     // title: 'Edit Sales Order List',
     showCheckbox: true,
     pkId: "sale_order_id",
+    fixedFilters: [
+      {
+        key: 'summary',
+        value: 'true'
+      }
+    ],
     pageSize: 10,
     "globalSearch": {
       keys: ['id', 'first_name', 'last_name']
@@ -90,11 +96,11 @@ export class SalesListComponent {
       //   sort: true
       // },
       {
-        fieldKey: 'status',
+        fieldKey: 'order_status_id',
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          // return `${row.job_code_id.job_code}`;
+          return `${row.order_status.status_name}`;
         },
         sort: true
       },

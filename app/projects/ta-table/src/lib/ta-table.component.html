@@ -1,16 +1,58 @@
 <div class="ta-row p-0 justify-content-end">
-    <div class="ta-cell">
-        <div class="h2">{{options.title}}</div>
-    </div>
+
     <div class="ta-cell">
         <div class="ta-row p-0 justify-content-end flex-nowrap">
+            <!-- Quick Period Dropdown -->
+            <div class="filter-group" style="margin-right: 10px;" *ngIf="isButtonVisible">
+                <nz-select id="quickPeriod" [(ngModel)]="selectedQuickPeriod" 
+                           (ngModelChange)="onQuickPeriodChange()" 
+                           nzPlaceHolder="Quick Period" 
+                           class="quick-period-select"
+                           style="width: 180px;">
+                    <nz-option *ngFor="let period of quickPeriodOptions" [nzValue]="period.value" [nzLabel]="period.label"></nz-option>
+                </nz-select>
+            </div>
+
+            <!-- From Date Picker -->
+            <div class="filter-group" style="margin-right: 10px;" *ngIf="isButtonVisible">
+                <nz-date-picker id="fromDate" [(ngModel)]="fromDate" class="date-picker" style="width: 180px;"></nz-date-picker>
+            </div>
+
+            <!-- To Date Picker -->
+            <div class="filter-group" style="margin-right: 10px;" *ngIf="isButtonVisible">
+                <nz-date-picker id="toDate" [(ngModel)]="toDate" class="date-picker" style="width: 180px;"></nz-date-picker>
+            </div>
+
+            <!-- Apply Filters OK Button -->
+            <div class="filter-group" style="margin-right: 10px;" *ngIf="isButtonVisible">
+                <button nz-button nzType="primary" (click)="applyFilters()" class="apply-filters-button">
+                    Ok
+                </button>
+            </div>
+
+            <!-- Apply Filters Clear Button -->
+            <div class="filter-group" style="margin-right: 10px;" *ngIf="isButtonVisible">
+                <button nz-button nzType="primary" (click)="clearFilters()" class="clear-filters-button">
+                    <i nzTheme="outline"></i>Clear
+                </button>
+            </div>
+            
+            <!-- Download Button -->
+            <div class="filter-group" style="margin-right: 10px;" *ngIf="isButtonVisible">
+                <button nz-button nzType="primary" (click)="downloadData($event)">
+                    <i nz-icon nzType="download" nzTheme="outline"></i>
+                </button>
+            </div>       
+        </div>
+    </div>
+
+     <div class="ta-cell">
+        <div class="ta-row p-0 justify-content-end flex-nowrap">
             <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton">
-                <input type="text" nz-input placeholder="Search" [(ngModel)]="globalSearchValue"
-                    (keyup.enter)="globalSearch()" />
+                <input type="text" nz-input placeholder="Search" [(ngModel)]="globalSearchValue" (keyup.enter)="globalSearch()" />
             </nz-input-group>
             <ng-template #suffixIconButton>
-                <i nz-icon class="ant-input-clear-icon" nzTheme="fill" nzType="close-circle" *ngIf="globalSearchValue"
-                    (click)="globalSearchClear()"></i>
+                <i nz-icon class="ant-input-clear-icon" nzTheme="fill" nzType="close-circle" *ngIf="globalSearchValue" (click)="globalSearchClear()"></i>
                 <button nz-button nzType="primary" nzSearch (click)="globalSearch()"><i nz-icon
                         nzType="search"></i></button>
             </ng-template>
@@ -23,22 +65,16 @@
 </div>
 
 <!-- [nzTitle]="options.title"  (nzQueryParams)="onQueryParamsChange($event)"-->
-<nz-table #taTable nzShowSizeChanger [nzPageSizeOptions]="options.pageSizeOptions" [nzTableLayout]="options.tableLayout"
-    [nzBordered]="options.bordered" [nzScroll]="{ x: options.scrollX, y: options.scrollY }" [nzData]="rows"
-    [nzFrontPagination]="true" [nzShowTotal]="totalTemplate" [nzLoading]="loading" [nzTotal]="total"
-    [nzPageSize]="options.pageSize" (nzQueryParams)="onQueryParamsChange($event)" [nzPageIndex]="pageIndex"
-    [nzPaginationPosition]="options.paginationPosition">
+<nz-table #taTable nzShowSizeChanger [nzPageSizeOptions]="options.pageSizeOptions" [nzTableLayout]="options.tableLayout" [nzBordered]="options.bordered" [nzScroll]="{ x: options.scrollX, y: options.scrollY }" [nzData]="rows" [nzFrontPagination]="true"
+    [nzShowTotal]="totalTemplate" [nzLoading]="loading" [nzTotal]="total" [nzPageSize]="options.pageSize" (nzQueryParams)="onQueryParamsChange($event)" [nzPageIndex]="pageIndex" [nzPaginationPosition]="options.paginationPosition">
     <thead>
         <tr>
             <th *ngIf="options.showCheckbox" style="width: 50px;" [nzChecked]="false" nzLabel="Select all"></th>
 
             <ng-container *ngFor="let c of options.cols">
 
-                <th (nzSortOrderChange)="nzSortOrderChange($event)" [nzColumnKey]="c.sortKey || c.fieldKey"
-                    [nzFilterFn]="false" [nzSortDirections]="(c.sort)?[]:[null]" [nzSortOrder]="c.sortOrder"
-                    [nzSortFn]="c.sort" [nzWidth]="c.width" nzCustomFilter>{{c.name}} 
-                    <nz-filter-trigger *ngIf="c.filter" [(nzVisible)]="c.visible"
-                        [nzActive]="c.filterValue && c.filterValue.length > 0" [nzDropdownMenu]="menu">
+                <th (nzSortOrderChange)="nzSortOrderChange($event)" [nzColumnKey]="c.sortKey || c.fieldKey" [nzFilterFn]="false" [nzSortDirections]="(c.sort)?[]:[null]" [nzSortOrder]="c.sortOrder" [nzSortFn]="c.sort" [nzWidth]="c.width" nzCustomFilter>{{c.name}}
+                    <nz-filter-trigger *ngIf="c.filter" [(nzVisible)]="c.visible" [nzActive]="c.filterValue && c.filterValue.length > 0" [nzDropdownMenu]="menu">
                         <i nz-icon nzType="filter"></i>
                     </nz-filter-trigger>
 
@@ -60,8 +96,7 @@
     </thead>
     <tbody>
         <tr *ngFor="let data of rows">
-            <td *ngIf="options.showCheckbox" style="width: 50px;" [nzChecked]="false" 
-            [nzDisabled]="false" [nzLabel]="data.name"></td>
+            <td *ngIf="options.showCheckbox" style="width: 50px;" [nzChecked]="false" [nzDisabled]="false" [nzLabel]="data.name"></td>
 
             <td [ngClass]="c.tdClassName" *ngFor="let c of options.cols" [nzEllipsis]="c.ellipsis">
                 <label class="col-name">{{c.name}} :</label>
@@ -95,5 +130,5 @@
 
 </ng-template>
 <ng-template #actions let-col="col" let-row="row">
-    <ta-table-actions [actions]="col.actions" [row]="row"></ta-table-actions>
+    <ta-table-actions [actions]="col.actions" [row]="row" (clickAction)="actionClick($event)"></ta-table-actions>
 </ng-template>

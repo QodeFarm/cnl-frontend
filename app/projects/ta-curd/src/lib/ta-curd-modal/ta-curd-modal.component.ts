@@ -29,7 +29,7 @@ export class TaCurdModalComponent implements OnInit {
     }
   }
   tableAction(action: any) {
-    // console.log('event', action);
+    console.log('event', action);
 
     if (action) {
       if (action.action && action.action.type === 'edit') {
@@ -67,5 +67,6 @@ export class TaCurdModalComponent implements OnInit {
     this.options.formConfig.model = {};
     this.visible = true;
   }
+
 
 }
