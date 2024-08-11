@@ -104,6 +104,7 @@ export class SalesComponent {
   showSaleOrderListFn() {
     this.showSaleOrderList = true;
   }
+  
 
   showOrdersList() {
     const selectedCustomerId = this.formConfig.model.sale_order.customer_id;
@@ -150,12 +151,12 @@ export class SalesComponent {
   
 
   getOrdersByCustomer(customerId: string): Observable<any> {
-    const url = `http://195.35.20.172:8000/api/v1/sales/sale_order_search/?customer_id=${customerId}`;
+    const url = `sales/sale_order_search/?customer_id=${customerId}`;
     return this.http.get<any>(url);
   }
 
   getOrderDetails(orderId: string): Observable<any> {
-    const url = `http://195.35.20.172:8000/api/v1/sales/sale_order/${orderId}/`;
+    const url = `sales/sale_order/${orderId}/`;
     return this.http.get<any>(url);
   }
 
@@ -235,7 +236,7 @@ export class SalesComponent {
       },
       model: {
         sale_order: {},
-        sale_order_items: [{}, {}, {}, {}, {}],
+        sale_order_items: [{}],
         order_attachments: [],
         order_shipments: {}
       },
