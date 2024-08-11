@@ -13,6 +13,7 @@ export class ProductGroupsComponent   {
   tableConfig: {
     apiUrl: 'products/product_groups/',
     title: 'Product Groups',
+    showCheckbox: true,
     pkId: "product_group_id",
     pageSize: 10,
     "globalSearch": {

@@ -8,12 +8,20 @@ import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { AdminCommonService } from 'src/app/services/admin-common.service';
 import { CustomersModule } from '../../customers/customers.module';
+<<<<<<< HEAD
+=======
+import { VendorsModule } from '../../vendors/vendors.module';
+>>>>>>> 90468cd0e9a98a1a0cedcd0b260819287a28ae70
 
 
 @Component({
   selector: 'app-master-list',
   standalone: true,
+<<<<<<< HEAD
   imports: [CommonModule, AdminCommmonModule, ProductsModule, CustomersModule],
+=======
+  imports: [CommonModule, AdminCommmonModule, ProductsModule, CustomersModule, VendorsModule],
+>>>>>>> 90468cd0e9a98a1a0cedcd0b260819287a28ae70
   templateUrl: './master-list.component.html',
   styleUrls: ['./master-list.component.scss']
 })

@@ -15,6 +15,7 @@ export class ProductTypesComponent {
     tableConfig: {
       apiUrl: 'masters/product_types/',
       title: 'Product Types',
+      showCheckbox: true,
       pkId: "type_id",
       pageSize: 10,
       "globalSearch": {
