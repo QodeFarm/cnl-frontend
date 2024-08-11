@@ -91,6 +91,11 @@ export class AdminLayoutComponent {
         icon: 'icon icon-purchase',
         child: [
           {
+            link: '/admin/vendors',
+            label: 'Vendors',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
             link: '/admin/purchase',
             label: 'Purchase',
             icon: 'fas fa-tachometer-alt',
