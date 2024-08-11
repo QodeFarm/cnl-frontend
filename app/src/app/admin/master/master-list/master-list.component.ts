@@ -7,12 +7,13 @@ import { Router, NavigationEnd, Event } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { AdminCommonService } from 'src/app/services/admin-common.service';
+import { CustomersModule } from '../../customers/customers.module';
 
 
 @Component({
   selector: 'app-master-list',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, ProductsModule],
+  imports: [CommonModule, AdminCommmonModule, ProductsModule, CustomersModule],
   templateUrl: './master-list.component.html',
   styleUrls: ['./master-list.component.scss']
 })

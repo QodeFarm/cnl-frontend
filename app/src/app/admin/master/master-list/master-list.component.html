@@ -7,6 +7,9 @@
             <a class="nav-link" data-bs-toggle="tab" href="#users">Users</a>
         </li>
         <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#customers">Customers</a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link" data-bs-toggle="tab" href="#products">Products</a>
         </li>
         <li class="nav-item">
@@ -78,6 +81,35 @@
         <div class="tab-pane  fade" id="users">
             <!-- Content for Users tab -->
             <p>Users content...</p>
+        </div>
+        <div class="tab-pane  fade" id="customers">
+            <!-- Content for General tab -->
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="custom-menu-card">
+                        <h6 class="custom-sub-heading">Customers Data</h6>
+                        <ul class="master-menu-list">
+                            <li><a [routerLink]="['/admin/master/ledger-accounts']">Ledger Accounts</a></li>
+                            <li><a [routerLink]="['/admin/master/ledger-groups']">Ledger Groups</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <ng-container [ngSwitch]="code">
+                        <ng-container *ngSwitchCase="'ledger-accounts'">
+                            <app-ledger-accounts></app-ledger-accounts>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'ledger-groups'">
+                            <app-ledger-groups></app-ledger-groups>
+                        </ng-container>
+                        <div *ngSwitchDefault>
+                            <!-- <p>Component not found for this code: {{ code }}</p> -->
+                          </div>
+                    </ng-container>
+
+                </div>
+            </div>
+                
         </div>
         <div class="tab-pane  fade" id="products">
             <!-- Content for Products tab -->

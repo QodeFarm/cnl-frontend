@@ -25,6 +25,12 @@ import { CustomersListComponent } from './customers-list/customers-list.componen
     AdminCommmonModule,
     CustomersRoutingModule,
     CustomersListComponent
+  ],
+  exports:[
+    LedgerAccountsComponent,
+    LedgerGroupsComponent,
+    TerritoryComponent,
+    TransportersComponent,
   ]
 })
 export class CustomersModule { }
