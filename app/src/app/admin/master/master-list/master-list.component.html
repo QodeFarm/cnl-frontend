@@ -7,11 +7,11 @@
             <a class="nav-link" data-bs-toggle="tab" href="#users">Users</a>
         </li>
         <li class="nav-item">
-<<<<<<< HEAD
             <a class="nav-link" data-bs-toggle="tab" href="#customers">Customers</a>
-=======
+        </li>
+        
+        <li class="nav-item">
             <a class="nav-link" data-bs-toggle="tab" href="#vendors">Vendors</a>
->>>>>>> 90468cd0e9a98a1a0cedcd0b260819287a28ae70
         </li>
         <li class="nav-item">
             <a class="nav-link" data-bs-toggle="tab" href="#products">Products</a>
@@ -90,7 +90,6 @@
             <!-- Content for Users tab -->
             <p>Users content...</p>
         </div>
-<<<<<<< HEAD
         <div class="tab-pane  fade" id="customers">
             <!-- Content for General tab -->
             <div class="row">
@@ -100,7 +99,22 @@
                         <ul class="master-menu-list">
                             <li><a [routerLink]="['/admin/master/ledger-accounts']">Ledger Accounts</a></li>
                             <li><a [routerLink]="['/admin/master/ledger-groups']">Ledger Groups</a></li>
-=======
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <ng-container [ngSwitch]="code">
+                            <ng-container *ngSwitchCase="'ledger-accounts'">
+                                <app-ledger-accounts></app-ledger-accounts>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'ledger-groups'">
+                                <app-ledger-groups></app-ledger-groups>
+                            </ng-container>
+                            <!-- <div *ngSwitchDefault> -->
+                            </ng-container>
+                        </div>
+                </div>  
+         </div>
         <div class="tab-pane  fade" id="vendors">
             <!-- Content for Products tab -->
             <div class="row">
@@ -111,23 +125,11 @@
                             <li><a [routerLink]="['/admin/master/vendor-agent']">vendor agent</a></li>
                             <li><a [routerLink]="['/admin/master/vendor-category']">Vendor categories</a></li>
                             <li><a [routerLink]="['/admin/master/vendor-payment-terms']">Vendor payments terms</a></li>
->>>>>>> 90468cd0e9a98a1a0cedcd0b260819287a28ae70
                         </ul>
                     </div>
                 </div>
                 <div class="col-md-9">
                     <ng-container [ngSwitch]="code">
-<<<<<<< HEAD
-                        <ng-container *ngSwitchCase="'ledger-accounts'">
-                            <app-ledger-accounts></app-ledger-accounts>
-                        </ng-container>
-                        <ng-container *ngSwitchCase="'ledger-groups'">
-                            <app-ledger-groups></app-ledger-groups>
-                        </ng-container>
-                        <div *ngSwitchDefault>
-                            <!-- <p>Component not found for this code: {{ code }}</p> -->
-                          </div>
-=======
                         <ng-container *ngSwitchCase="'vendor-agent'">
                             <app-vendor-agent></app-vendor-agent>
                         </ng-container>
@@ -137,15 +139,11 @@
                         <ng-container *ngSwitchCase="'vendor-payment-terms'">
                             <app-vendor-payment-terms></app-vendor-payment-terms>
                         </ng-container>
->>>>>>> 90468cd0e9a98a1a0cedcd0b260819287a28ae70
                     </ng-container>
 
                 </div>
             </div>
-<<<<<<< HEAD
                 
-=======
->>>>>>> 90468cd0e9a98a1a0cedcd0b260819287a28ae70
         </div>
         <div class="tab-pane  fade" id="products">
             <!-- Content for Products tab -->

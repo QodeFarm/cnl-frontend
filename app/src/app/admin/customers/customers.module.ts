@@ -25,19 +25,11 @@ import { CustomersListComponent } from './customers-list/customers-list.componen
     CustomersRoutingModule,
     CustomersListComponent
   ],
-<<<<<<< HEAD
-  exports:[
-    LedgerAccountsComponent,
-    LedgerGroupsComponent,
-    TerritoryComponent,
-    TransportersComponent,
-=======
   exports: [
     LedgerAccountsComponent,
     LedgerGroupsComponent,
     TerritoryComponent,
     TransportersComponent
->>>>>>> 90468cd0e9a98a1a0cedcd0b260819287a28ae70
   ]
 })
 export class CustomersModule { }
