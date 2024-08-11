@@ -5,47 +5,32 @@ import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 @Component({
-  selector: 'app-purchase-invoice-list',
+  selector: 'app-salesinvoice-list',
   standalone: true,
   imports: [CommonModule, AdminCommmonModule],
-  templateUrl: './purchase-invoice-list.component.html',
-  styleUrls: ['./purchase-invoice-list.component.scss']
+  templateUrl: './salesinvoice-list.component.html',
+  styleUrls: ['./salesinvoice-list.component.scss']
 })
-export class PurchaseInvoiceListComponent {
-  
+export class SalesInvoiceListComponent {
+
   @Output('edit') edit = new EventEmitter<void>();
-  
+
   tableConfig: TaTableConfig = {
-    apiUrl: 'purchase/purchase_invoice_order/',
-    showCheckbox:true,
-    pkId: "purchase_invoice_id",
+    apiUrl: 'sales/sale_invoice_order/',
+    pkId: "sale_invoice_id",
+    showCheckbox: true,
     pageSize: 10,
-    "globalSearch": {
-      keys: ['id', 'first_name', 'last_name']
+    globalSearch: {
+      keys: []
     },
     cols: [
       {
-        fieldKey: 'vendor',
-        name: 'Vendor',
-        displayType: "map",
+        fieldKey: 'customer',
+        name: 'Customer',
+        displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.vendor.name}`;
+          return `${row.customer.name}`;
         },
-        sort: true
-      },
-      {
-        fieldKey: 'purchase_type',
-        name: 'Purchase Type',
-        sort: true,
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          // console.log("-->", currentValue);
-          return `${currentValue?.name}`;
-        },
-      },
-      {
-        fieldKey: 'invoice_no',
-        name: 'Invoice No',
         sort: true
       },
       {
@@ -54,23 +39,18 @@ export class PurchaseInvoiceListComponent {
         sort: true
       },
       {
-        fieldKey: 'supplier_invoice_no',
-        name: 'Supplier invoice no',
-        sort: false
-      },
-      {
-        fieldKey: 'tax',
-        name: 'Tax',
-        sort: false
+        fieldKey: 'invoice_no',
+        name: 'Invoice No',
+        sort: true
       },
       {
         fieldKey: 'total_amount',
-        name: 'Total amount',
-        sort: false
+        name: 'Total Amount',
+        sort: true
       },
       {
         fieldKey: 'tax_amount',
-        name: 'Tax amount',
+        name: 'Tax Amount',
         sort: false
       },
       {
@@ -93,7 +73,7 @@ export class PurchaseInvoiceListComponent {
         sort: false
       },
       {
-        fieldKey: "code",
+        fieldKey: "action",
         name: "Action",
         type: 'action',
         actions: [
@@ -102,7 +82,7 @@ export class PurchaseInvoiceListComponent {
             label: 'Delete',
             confirm: true,
             confirmMsg: "Sure to delete?",
-            apiUrl: 'purchase/purchase_invoice_order'
+            apiUrl: 'sales/sale_invoice_order'
           },
           {
             type: 'callBackFn',
@@ -110,7 +90,7 @@ export class PurchaseInvoiceListComponent {
             label: '',
             callBackFn: (row, action) => {
               console.log(row);
-              this.edit.emit(row.purchase_invoice_id);
+              this.edit.emit(row.sale_invoice_id);
             }
           }
         ]
@@ -118,7 +98,5 @@ export class PurchaseInvoiceListComponent {
     ]
   };
 
-  constructor(private router: Router) {
-
-  }
+  constructor(private router: Router) { }
 }

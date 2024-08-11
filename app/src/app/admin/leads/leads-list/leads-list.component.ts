@@ -57,17 +57,33 @@ export class LeadsListComponent {
         sort: true
       },
       {
-        fieldKey: 'sales_rep_id',
-        name: 'Sales Representative',
+        fieldKey: 'assignee',
+        name: 'Assigned',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.sales_rep_id}`;
+          return `${row.assignee.name}`;
         },
         sort: true
       },
       {
-        fieldKey: '',
-        name: 'Last Interaction Date',
+        fieldKey: 'interaction',
+        name: 'Interaction Date',
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          const interactionDate = row.interaction[0].interaction_date;
+          const [date, time] = interactionDate.split('T');
+          return `${date}<br>${time}`;
+        },
+        sort: true
+      },
+      {
+        fieldKey: 'interaction',
+        name: 'Notes',
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          console.log("row",row)
+          return `${row.interaction[0].notes}`;
+        },
         sort: true
       },
       {
