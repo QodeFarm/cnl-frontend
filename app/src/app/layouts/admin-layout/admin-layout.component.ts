@@ -230,6 +230,37 @@ export class AdminLayoutComponent {
         icon: 'fas fa-cog',
       },
       {
+        label: 'Customers',
+        icon: 'fas fa-user',
+        child: [
+          {
+            link: '/admin/customers',
+            label: 'Customers',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/customers/ledger_accounts',
+            label: 'Ledger Accounts',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/customers/ledger_groups', 
+            label: 'Ledger Groups',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/customers/transporters',
+            label: 'Transporters',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/customers/territory', 
+            label: 'Territory',
+            icon: 'fas fa-tachometer-alt',
+          },
+        ],
+        },
+        {
         label: 'Product Masters',
         icon: 'fas fa-database',
         child: [

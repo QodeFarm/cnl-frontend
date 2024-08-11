@@ -1,0 +1,30 @@
+.custom-form-list {
+    .table {
+        th.actions-column, // Replace with actual class or ID
+        td.actions-column {
+            display: none !important;
+        }
+    }
+  }
+  .custom-form-list {
+    .table {
+        th {
+            &:contains("Actions"),
+            &.actions-column {
+                display: none !important;
+            }
+        }
+        td {
+            &.actions-column {
+                display: none !important;
+            }
+        }
+    }
+  }
+  .custom-form-list {
+    .ant-card-head {
+        button:first-child {
+            display: none !important;
+        }
+    }
+  }
