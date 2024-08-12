@@ -98,7 +98,7 @@ export class AdminLayoutComponent {
         ]
       },
       {
-        link: '/admin/dashboard',
+        link: '/admin/finance',
         label: 'Finance',
         icon: 'icon icon-finance',
       },
