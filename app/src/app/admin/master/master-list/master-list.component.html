@@ -20,6 +20,18 @@
             <a class="nav-link" data-bs-toggle="tab" href="#sales">Sales</a>
         </li>
         <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#hrms">HRMS</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#leads">Leads</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#assets">Assets</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#tasks">Tasks</a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link" data-bs-toggle="tab" href="#finance">Finance</a>
         </li>
     </ul>
@@ -232,9 +244,114 @@
                 </div>
             </div>
         </div>
+        <div class="tab-pane  fade" id="hrms">
+            <!-- Content for Products tab -->
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="custom-menu-card">
+                        <h6 class="custom-sub-heading">HRMS Data</h6>
+                        <ul class="master-menu-list">
+                            <li><a [routerLink]="['/admin/master/departments']">Departments</a></li>
+                            <li><a [routerLink]="['/admin/master/designations']">Designations</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <ng-container [ngSwitch]="code">
+                        <ng-container *ngSwitchCase="'departments'">
+                            <app-departments></app-departments>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'designations'">
+                            <app-designations></app-designations>
+                        </ng-container>
+                    </ng-container>
+
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane  fade" id="tasks">
+            <!-- Content for Products tab -->
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="custom-menu-card">
+                        <h6 class="custom-sub-heading">Tasks Data</h6>
+                        <ul class="master-menu-list">
+                            <li><a [routerLink]="['/admin/master/priorities']">Task Priorities</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <ng-container [ngSwitch]="code">
+                        <ng-container *ngSwitchCase="'priorities'">
+                            <app-task-priorities></app-task-priorities>
+                        </ng-container>
+                    </ng-container>
+
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane  fade" id="assets">
+            <!-- Content for Products tab -->
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="custom-menu-card">
+                        <h6 class="custom-sub-heading">Assets Data</h6>
+                        <ul class="master-menu-list">
+                            <li><a [routerLink]="['/admin/master/asset-categories']">Asset categories</a></li>
+                            <!-- <li><a [routerLink]="['/admin/master/asset-maintenance']">Asset maintenance</a></li> -->
+                            <li><a [routerLink]="['/admin/master/asset-statuses']">Asset statuses</a></li>
+                            <li><a [routerLink]="['/admin/master/locations']">Locations</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <ng-container [ngSwitch]="code">
+                        <ng-container *ngSwitchCase="'asset-categories'">
+                            <app-asset-categories></app-asset-categories>
+                        </ng-container>
+                        <!-- <ng-container *ngSwitchCase="'asset-maintenance'">
+                            <app-asset-maintenance></app-asset-maintenance>
+                        </ng-container> -->
+                        <ng-container *ngSwitchCase="'asset-statuses'">
+                            <app-asset-statuses></app-asset-statuses>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'locations'"> 
+                            <app-locations></app-locations>
+                        </ng-container>
+                    </ng-container>
+
+                </div>
+            </div>
+        </div>
+        
         <div class="tab-pane  fade" id="finance">
             <!-- Content for Finance tab -->
             <p>Finance content...</p>
+        </div>
+        <div class="tab-pane  fade" id="leads">
+            <!-- Content for Products tab -->
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="custom-menu-card">
+                        <h6 class="custom-sub-heading">Leads Data</h6>
+                        <ul class="master-menu-list">
+                            <li><a [routerLink]="['/admin/master/lead-statuses']">Lead statuses</a></li>
+                            <li><a [routerLink]="['/admin/master/interaction-types']">Interaction types</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <ng-container [ngSwitch]="code">
+                        <ng-container *ngSwitchCase="'lead-statuses'">
+                            <app-lead-statuses></app-lead-statuses>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'interaction-types'">
+                            <app-interaction-types></app-interaction-types>
+                        </ng-container>
+                    </ng-container>
+
+                </div>
+            </div>
         </div>
     </div>
 </div>

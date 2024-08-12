@@ -141,11 +141,11 @@ export class AdminLayoutComponent {
             label: 'Tasks',
             icon: 'fas fa-tachometer-alt',
           },
-          {
-            link: '/admin/tasks/task_priorities',
-            label: 'Task Priorities',
-            icon: 'fas fa-tachometer-alt',
-          },
+          // {
+          //   link: '/admin/tasks/task_priorities',
+          //   label: 'Task Priorities',
+          //   icon: 'fas fa-tachometer-alt',
+          // },
         ]
       },
       {
@@ -157,16 +157,16 @@ export class AdminLayoutComponent {
             label: 'Leads',
             icon: 'fas fa-tachometer-alt',
           },
-          {
-            link: '/admin/leads/lead_statuses',
-            label: 'Lead statuses',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/leads/interaction_types',
-            label: 'Interaction types',
-            icon: 'fas fa-tachometer-alt',
-          }
+          // {
+          //   link: '/admin/leads/lead_statuses',
+          //   label: 'Lead statuses',
+          //   icon: 'fas fa-tachometer-alt',
+          // },
+          // {
+          //   link: '/admin/leads/interaction_types',
+          //   label: 'Interaction types',
+          //   icon: 'fas fa-tachometer-alt',
+          // }
         ]
       },
       {
@@ -178,21 +178,21 @@ export class AdminLayoutComponent {
             label: 'Assets',
             icon: 'fas fa-tachometer-alt',
           },
-          {
-            link: '/admin/assets/asset_statuses',
-            label: 'Asset Statuses',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/assets/asset_categories',
-            label: 'Asset Categories',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/assets/locations',
-            label: 'Locations',
-            icon: 'fas fa-tachometer-alt',
-          },
+          // {
+          //   link: '/admin/assets/asset_statuses',
+          //   label: 'Asset Statuses',
+          //   icon: 'fas fa-tachometer-alt',
+          // },
+          // {
+          //   link: '/admin/assets/asset_categories',
+          //   label: 'Asset Categories',
+          //   icon: 'fas fa-tachometer-alt',
+          // },
+          // {
+          //   link: '/admin/assets/locations',
+          //   label: 'Locations',
+          //   icon: 'fas fa-tachometer-alt',
+          // },
           {
             link: '/admin/assets/asset_maintenance',
             label: 'Asset Maintenance',
@@ -209,16 +209,16 @@ export class AdminLayoutComponent {
             label: 'Employees',
             icon: 'fas fa-tachometer-alt',
           },
-          {
-            link: '/admin/employees/designations',
-            label: 'Designations',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/employees/departments',
-            label: 'Departments',
-            icon: 'fas fa-tachometer-alt',
-          }
+          // {
+          //   link: '/admin/employees/designations',
+          //   label: 'Designations',
+          //   icon: 'fas fa-tachometer-alt',
+          // },
+          // {
+          //   link: '/admin/employees/departments',
+          //   label: 'Departments',
+          //   icon: 'fas fa-tachometer-alt',
+          // }
         ]
       },
       {
