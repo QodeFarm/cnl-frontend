@@ -246,18 +246,6 @@ export class SalesComponent {
           key: 'sale_order',
           fieldGroup: [
             {
-              key: 'order_no',
-              type: 'input',
-              className: 'col-2',
-              templateOptions: {
-                label: 'Order no',
-                placeholder: 'Enter Order No',
-                required: true,
-                readonly: true
-                // disabled: true
-              }
-            },
-            {
               key: 'sale_type',
               type: 'select',
               className: 'col-2',
@@ -334,6 +322,18 @@ export class SalesComponent {
               }
             },
             {
+              key: 'order_no',
+              type: 'input',
+              className: 'col-2',
+              templateOptions: {
+                label: 'Order no',
+                placeholder: 'Enter Order No',
+                required: true,
+                readonly: true
+                // disabled: true
+              }
+            },
+            {
               key: 'delivery_date',
               type: 'date',
               defaultValue: this.nowDate(),
@@ -396,9 +396,18 @@ export class SalesComponent {
               }
             },
             {
+              key: 'remarks',
+              type: 'textarea',
+              className: 'col-6',
+              templateOptions: {
+                label: 'Remarks',
+                placeholder: 'Enter Remarks',
+              }
+            },
+            {
               key: 'billing_address',
               type: 'textarea',
-              className: 'col-3',
+              className: 'col-6',
               templateOptions: {
                 label: 'Billing address',
                 placeholder: 'Enter Billing address'
@@ -407,7 +416,7 @@ export class SalesComponent {
             {
               key: 'shipping_address',
               type: 'textarea',
-              className: 'col-3',
+              className: 'col-6',
               templateOptions: {
                 label: 'Shipping address',
                 placeholder: 'Enter Shipping address'

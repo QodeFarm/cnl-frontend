@@ -15,7 +15,7 @@ export class TerritoryComponent {
     tableConfig: {
       apiUrl: 'masters/territory/',
       title: 'Territory',
-      showCheckbox: true,
+      
       pkId: "territory_id",
       pageSize: 10,
       "globalSearch": {

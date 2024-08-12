@@ -14,7 +14,7 @@ export class ProductItemTypeComponent {
     tableConfig: {
       apiUrl: 'masters/product_item_type/',
       title: 'Product Item Type',
-      showCheckbox: true,
+      
       pkId: "item_type_id",
       pageSize: 10,
       "globalSearch": {
@@ -34,7 +34,7 @@ export class ProductItemTypeComponent {
               type: 'delete',
               label: 'Delete',
               confirm: true,
-              confirmMsg: "are you Sure to delete?",
+              confirmMsg: "Sure to delete?",
               apiUrl: 'masters/product_item_type'
             },
             {
