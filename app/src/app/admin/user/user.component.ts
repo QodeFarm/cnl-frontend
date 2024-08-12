@@ -219,7 +219,7 @@ export class UserComponent {
               templateOptions: {
                 label: 'Date Of Birth',
                 placeholder: 'Enter Birth Date',
-                required: true,
+                required: false,
               }
             },
             {
