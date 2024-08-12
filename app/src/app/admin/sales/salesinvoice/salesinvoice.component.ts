@@ -187,6 +187,19 @@ export class SalesinvoiceComponent {
               }
             },
             {
+              key: 'email',
+              type: 'input',
+              className: 'col-2',
+              templateOptions: {
+                type: 'email',
+                label: 'Email',
+                placeholder: 'Enter Email',
+              },
+              hooks: {
+                onInit: (field: any) => {}
+              }
+            },
+            {
               key: 'orders_salesman',
               type: 'select',
               className: 'col-2',
@@ -222,19 +235,6 @@ export class SalesinvoiceComponent {
                 readonly: true,
                 disabled: true
                 
-              },
-              hooks: {
-                onInit: (field: any) => {}
-              }
-            },
-            {
-              key: 'email',
-              type: 'input',
-              className: 'col-2',
-              templateOptions: {
-                type: 'email',
-                label: 'Email',
-                placeholder: 'Enter Email',
               },
               hooks: {
                 onInit: (field: any) => {}
@@ -697,9 +697,11 @@ export class SalesinvoiceComponent {
                     {
                       key: 'shipping_date',
                       type: 'date',
+                      defaultValue: this.nowDate(),
                       className: 'col-6',
                       templateOptions: {
-                        label: 'Shipping Date'
+                        label: 'Shipping Date',
+                        required: true
                       }
                     },
                     {
@@ -710,6 +712,7 @@ export class SalesinvoiceComponent {
                         type: "number",
                         label: 'Shipping Charges.',
                         placeholder: 'Enter Shipping Charges',
+                        required: true
                       }
                     }
                   ]

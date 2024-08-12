@@ -791,7 +791,8 @@ export class SalesComponent {
                       type: 'date',
                       className: 'col-6',
                       templateOptions: {
-                        label: 'Shipping Date'
+                        label: 'Shipping Date',
+                        required: true
                       }
                     },
                     {
@@ -802,6 +803,7 @@ export class SalesComponent {
                         type: "number",
                         label: 'Shipping Charges.',
                         placeholder: 'Enter Shipping Charges',
+                        required: true
                       }
                     }
                   ]
