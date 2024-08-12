@@ -4,9 +4,6 @@
             <a class="nav-link active" data-bs-toggle="tab" href="#general">General</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="tab" href="#users">Users</a>
-        </li>
-        <li class="nav-item">
             <a class="nav-link" data-bs-toggle="tab" href="#customers">Customers</a>
         </li>
         
@@ -15,9 +12,6 @@
         </li>
         <li class="nav-item">
             <a class="nav-link" data-bs-toggle="tab" href="#products">Products</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="tab" href="#sales">Sales</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" data-bs-toggle="tab" href="#hrms">HRMS</a>
@@ -30,9 +24,6 @@
         </li>
         <li class="nav-item">
             <a class="nav-link" data-bs-toggle="tab" href="#tasks">Tasks</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="tab" href="#finance">Finance</a>
         </li>
     </ul>
     <div class="tab-content">
@@ -68,39 +59,9 @@
                         <ng-container *ngSwitchCase="'price-categories'">
                             <app-price-categories></app-price-categories>
                         </ng-container>
-                        <!-- <div *ngSwitchDefault>output2</div> -->
                     </ng-container>
-
                 </div>
-                <!-- <div class="col-md-3">
-                    <h6>FAQ</h6>
-                    <ul class="list-unstyled">
-                        <li><a href="#">FAQ Classic</a></li>
-                        <li><a href="#">FAQ Extended</a></li>
-                    </ul>
-                    <h6>Blog</h6>
-                    <ul class="list-unstyled">
-                        <li><a href="#">Blog Home</a></li>
-                        <li><a href="#">Blog Post</a></li>
-                    </ul>
-                </div> -->
-                <!-- <div class="col-md-3">
-                    <h6>Careers</h6>
-                    <ul class="list-unstyled">
-                        <li><a href="#">Careers List</a></li>
-                        <li><a href="#">Careers Apply</a></li>
-                    </ul>
-                    <h6>Pricing</h6>
-                    <ul class="list-unstyled">
-                        <li><a href="#">Column Pricing</a></li>
-                        <li><a href="#">Table Pricing</a></li>
-                    </ul>
-                </div> -->
             </div>
-        </div>
-        <div class="tab-pane  fade" id="users">
-            <!-- Content for Users tab -->
-            <p>Users content...</p>
         </div>
         <div class="tab-pane  fade" id="customers">
             <!-- Content for General tab -->
@@ -134,7 +95,7 @@
                     <div class="custom-menu-card">
                         <h6 class="custom-sub-heading">Vendors Data</h6>
                         <ul class="master-menu-list">
-                            <li><a [routerLink]="['/admin/master/vendor-agent']">vendor agent</a></li>
+                            <li><a [routerLink]="['/admin/master/vendor-agent']">Vendor agent</a></li>
                             <li><a [routerLink]="['/admin/master/vendor-category']">Vendor categories</a></li>
                             <li><a [routerLink]="['/admin/master/vendor-payment-terms']">Vendor payments terms</a></li>
                         </ul>
@@ -174,7 +135,7 @@
                             <li><a [routerLink]="['/admin/master/product-purchase-gl']">Product purchase gl</a></li>
                             <li><a [routerLink]="['/admin/master/product-stock-units']">Product stock units</a></li>
                             <li><a [routerLink]="['/admin/master/product-unique-quantity-codes']">Products unique quantity codes</a></li>
-                            <li><a [routerLink]="['/admin/master/unit-options']">Unit Options</a></li>
+                            <li><a [routerLink]="['/admin/master/unit-options']">Unit options</a></li>
                         </ul>
                     </div>
                 </div>
@@ -214,32 +175,6 @@
                             <app-unit-options></app-unit-options>
                         </ng-container>
                     </ng-container>
-
-                </div>
-            </div>
-        </div>
-        <div class="tab-pane  fade" id="sales">
-            <!-- Content for Sales tab -->
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="custom-menu-card">
-                        <h6 class="custom-sub-heading">Sales Master</h6>
-                        <ul class="master-menu-list">
-                            <li><a [routerLink]="['/admin/master/sales-price-list']">Price List</a></li>
-                            <li><a [routerLink]="['/admin/master/sale-order-items']">Order Items</a></li>
-                            <li><a [routerLink]="['/admin/master/sale-invoice-order']">Invoice Order</a></li>
-                            <li><a [routerLink]="['/admin/master/payment-transactions']">payment_transactions</a></li>
-                            <li><a [routerLink]="['/admin/master/sale_invoice_items']">sale_invoice_items</a></li>
-                            <li><a [routerLink]="['/admin/master/sale_return_orders']">sale_return_orders</a></li>
-                            <li><a [routerLink]="['/admin/master/sale_return_items']">sale_return_items</a></li>
-                            <li>
-                                <a [routerLink]="['/admin/master/sale_return_items']"></a>
-                            </li>
-                        </ul>
-                    </div>
-
-                </div>
-                <div class="col-md-9">
 
                 </div>
             </div>
@@ -298,7 +233,6 @@
                         <h6 class="custom-sub-heading">Assets Data</h6>
                         <ul class="master-menu-list">
                             <li><a [routerLink]="['/admin/master/asset-categories']">Asset categories</a></li>
-                            <!-- <li><a [routerLink]="['/admin/master/asset-maintenance']">Asset maintenance</a></li> -->
                             <li><a [routerLink]="['/admin/master/asset-statuses']">Asset statuses</a></li>
                             <li><a [routerLink]="['/admin/master/locations']">Locations</a></li>
                         </ul>
@@ -309,9 +243,6 @@
                         <ng-container *ngSwitchCase="'asset-categories'">
                             <app-asset-categories></app-asset-categories>
                         </ng-container>
-                        <!-- <ng-container *ngSwitchCase="'asset-maintenance'">
-                            <app-asset-maintenance></app-asset-maintenance>
-                        </ng-container> -->
                         <ng-container *ngSwitchCase="'asset-statuses'">
                             <app-asset-statuses></app-asset-statuses>
                         </ng-container>
@@ -322,11 +253,6 @@
 
                 </div>
             </div>
-        </div>
-        
-        <div class="tab-pane  fade" id="finance">
-            <!-- Content for Finance tab -->
-            <p>Finance content...</p>
         </div>
         <div class="tab-pane  fade" id="leads">
             <!-- Content for Products tab -->
