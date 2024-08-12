@@ -133,7 +133,7 @@ export class AdminLayoutComponent {
         ]
       },
       {
-        label: 'TASKS',
+        label: 'Tasks',
         icon: 'icon icon-tasks',
         child: [
           {
@@ -149,7 +149,7 @@ export class AdminLayoutComponent {
         ]
       },
       {
-        label: 'LEADS',
+        label: 'Leads',
         icon: 'icon icon-leads',
         child: [
           {
@@ -201,7 +201,7 @@ export class AdminLayoutComponent {
         ]
       },
       {
-        label: 'HRMS',
+        label: 'HR',
         icon: 'icon icon-hrms',
         child: [
           {
