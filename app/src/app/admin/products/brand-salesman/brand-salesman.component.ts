@@ -14,6 +14,7 @@ export class BrandSalesmanComponent {
     tableConfig: {
       apiUrl: 'masters/brand_salesman/',
       title: 'Brand Salesman',
+      showCheckbox: true,
       pkId: "brand_salesman_id",
       pageSize: 10,
       "globalSearch": {

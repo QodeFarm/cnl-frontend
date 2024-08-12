@@ -5,7 +5,6 @@ import { LedgerAccountsComponent } from './ledger-accounts/ledger-accounts.compo
 import { LedgerGroupsComponent } from './ledger-groups/ledger-groups.component';
 import { TerritoryComponent } from './territory/territory.component';
 import { TransportersComponent } from './transporters/transporters.component';
-import { CustomersListComponent } from './customers-list/customers-list.component';
 
 const routes: Routes = [
   {
@@ -20,10 +19,10 @@ const routes: Routes = [
     path : 'ledger_groups',
     component : LedgerGroupsComponent
   },
-  {
-    path : 'territory',
-    component : TerritoryComponent
-  },
+  // {
+  //   path : 'territory',
+  //   component : TerritoryComponent
+  // },
   {
     path : 'transporters',
     component : TransportersComponent

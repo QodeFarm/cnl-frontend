@@ -31,13 +31,13 @@ export class PurchaseListComponent {
     },
     cols: [
       {
-        fieldKey: 'purchase_type',
+        fieldKey: 'purchase_type_id',
         name: 'Purchase Type',
         sort: true,
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
           // console.log("-->", currentValue);
-          return `${currentValue?.name}`;
+          return `${row.purchase_type_id.name}`;
         },
       },
       {

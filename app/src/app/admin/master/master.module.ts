@@ -11,6 +11,9 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { LeaveSettingsComponent } from './leave-settings/leave-settings.component';
 import { ShippingModesComponent } from './shipping-modes/shipping-modes.component';
 import { ShippingCompaniesComponent } from './shipping-companies/shipping-companies.component';
+import { LedgerAccountsComponent } from '../customers/ledger-accounts/ledger-accounts.component';
+import { CustomersModule } from '../customers/customers.module';
+import { TerritoryComponent } from '../customers/territory/territory.component';
 
 
 @NgModule({
@@ -28,6 +31,10 @@ import { ShippingCompaniesComponent } from './shipping-companies/shipping-compan
     CommonModule,
     AdminCommmonModule,
     MasterRoutingModule
+  ],
+  exports: [
+    ShippingModesComponent,
+    ShippingCompaniesComponent
   ]
 })
 export class MasterModule { }

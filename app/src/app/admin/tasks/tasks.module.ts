@@ -19,6 +19,9 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
     AdminCommmonModule,
     TasksRoutingModule,
     TasksListComponent
+  ],
+  exports:[
+    TaskPrioritiesComponent
   ]
 })
 export class TasksModule { }

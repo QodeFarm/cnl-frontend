@@ -9,6 +9,7 @@ import { TerritoryComponent } from './territory/territory.component';
 import { TransportersComponent } from './transporters/transporters.component';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { CustomersListComponent } from './customers-list/customers-list.component';
+import { CustomerPaymentTermsComponent } from './customer-payment-terms/customer-payment-terms.component';
 
 
 @NgModule({
@@ -18,13 +19,20 @@ import { CustomersListComponent } from './customers-list/customers-list.componen
     LedgerGroupsComponent,
     TerritoryComponent,
     TransportersComponent,
-    // CustomersListComponent
+    CustomerPaymentTermsComponent,
   ],
   imports: [
     CommonModule,
     AdminCommmonModule,
     CustomersRoutingModule,
     CustomersListComponent
+  ],
+  exports: [
+    LedgerAccountsComponent,
+    LedgerGroupsComponent,
+    TerritoryComponent,
+    TransportersComponent,
+    CustomerPaymentTermsComponent
   ]
 })
 export class CustomersModule { }

@@ -14,6 +14,7 @@ export class UnitOptionsComponent {
     tableConfig: {
       apiUrl: 'masters/unit_options/',
       title: 'Unit Options',
+      showCheckbox: true,
       pkId: "unit_options_id",
       pageSize: 10,
       "globalSearch": {

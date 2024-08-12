@@ -21,6 +21,10 @@ import { InteractionTypesComponent } from './interaction-types/interaction-types
     AdminCommmonModule,
     LeadsRoutingModule,
     LeadsListComponent
+  ],
+  exports:[
+    LeadStatusesComponent,
+    InteractionTypesComponent
   ]
 })
 export class LeadsModule { }

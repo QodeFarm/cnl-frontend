@@ -4,16 +4,26 @@
             <a class="nav-link active" data-bs-toggle="tab" href="#general">General</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="tab" href="#users">Users</a>
+            <a class="nav-link" data-bs-toggle="tab" href="#customers">Customers</a>
+        </li>
+        
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#vendors">Vendors</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" data-bs-toggle="tab" href="#products">Products</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="tab" href="#sales">Sales</a>
+            <a class="nav-link" data-bs-toggle="tab" href="#hrms">HRMS</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="tab" href="#finance">Finance</a>
+            <a class="nav-link" data-bs-toggle="tab" href="#leads">Leads</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#assets">Assets</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#tasks">Tasks</a>
         </li>
     </ul>
     <div class="tab-content">
@@ -22,96 +32,264 @@
             <div class="row">
                 <div class="col-md-3">
                     <div class="custom-menu-card">
-                        <h6 class="custom-sub-heading">Product Master</h6>
+                        <h6 class="custom-sub-heading">Masters Data</h6>
                         <ul class="master-menu-list">
-                            <li><a [routerLink]="['/admin/master/product-sales-gl']">Product sales gl</a></li>
-                            <li><a [routerLink]="['/admin/master/product-types']">Product Types</a></li>
-                            <li><a [routerLink]="['/admin/master/product-brands']">Product Brands</a></li>
-                            <li><a [routerLink]="['/admin/master/payment-transactions']">payment_transactions</a></li>
-                            <li><a [routerLink]="['/admin/master/sale_invoice_items']">sale_invoice_items</a></li>
-                            <li><a [routerLink]="['/admin/master/sale_return_orders']">sale_return_orders</a></li>
-                            <li><a [routerLink]="['/admin/master/sale_return_items']">sale_return_items</a></li>
+                            <li><a [routerLink]="['/admin/master/territory']">Territory</a></li>
+                            <li><a [routerLink]="['/admin/master/transporters']">Transporters</a></li>
+                            <li><a [routerLink]="['/admin/master/firm-statuses']">Firm status</a></li>
+                            <li><a [routerLink]="['/admin/master/gst-categories']">GST categories</a></li>
+                            <li><a [routerLink]="['/admin/master/price-categories']">Price categories</a></li>
+                            <li><a [routerLink]="['/admin/master/shipping-modes']">Shipping modes</a></li>
+                            <li><a [routerLink]="['/admin/master/shipping-companies']">Shipping companies</a></li>
                         </ul>
                     </div>
                 </div>
                 <div class="col-md-9">
                     <ng-container [ngSwitch]="code">
-                        <ng-container *ngSwitchCase="'product-sales-gl'">
-                            <app-product-sales-gl></app-product-sales-gl>
+                        <ng-container *ngSwitchCase="'territory'">
+                            <app-territory></app-territory>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'transporters'">
+                            <app-transporters></app-transporters>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'firm-statuses'">
+                            <app-firm-statuses></app-firm-statuses>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'gst-categories'">
+                            <app-gst-categories></app-gst-categories>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'price-categories'">
+                            <app-price-categories></app-price-categories>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'shipping-modes'">
+                            <app-shipping-modes></app-shipping-modes>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'shipping-companies'">
+                            <app-shipping-companies></app-shipping-companies>
+                        </ng-container>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane  fade" id="customers">
+            <!-- Content for General tab -->
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="custom-menu-card">
+                        <h6 class="custom-sub-heading">Customers Data</h6>
+                        <ul class="master-menu-list">
+                            <li><a [routerLink]="['/admin/master/ledger-accounts']">Ledger accounts</a></li>
+                            <li><a [routerLink]="['/admin/master/ledger-groups']">Ledger groups</a></li>
+                            <li><a [routerLink]="['/admin/master/customer-payment-terms']">Customer payment terms</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <ng-container [ngSwitch]="code">
+                            <ng-container *ngSwitchCase="'ledger-accounts'">
+                                <app-ledger-accounts></app-ledger-accounts>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'ledger-groups'">
+                                <app-ledger-groups></app-ledger-groups>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'customer-payment-terms'">
+                                <app-customer-payment-terms></app-customer-payment-terms>
+                            </ng-container>
+                            <!-- <div *ngSwitchDefault> -->
+                            </ng-container>
+                        </div>
+                </div>  
+         </div>
+        <div class="tab-pane  fade" id="vendors">
+            <!-- Content for Products tab -->
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="custom-menu-card">
+                        <h6 class="custom-sub-heading">Vendors Data</h6>
+                        <ul class="master-menu-list">
+                            <li><a [routerLink]="['/admin/master/vendor-agent']">Vendor agent</a></li>
+                            <li><a [routerLink]="['/admin/master/vendor-category']">Vendor categories</a></li>
+                            <li><a [routerLink]="['/admin/master/vendor-payment-terms']">Vendor payments terms</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <ng-container [ngSwitch]="code">
+                        <ng-container *ngSwitchCase="'vendor-agent'">
+                            <app-vendor-agent></app-vendor-agent>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'vendor-category'">
+                            <app-vendor-category></app-vendor-category>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'vendor-payment-terms'">
+                            <app-vendor-payment-terms></app-vendor-payment-terms>
+                        </ng-container>
+                    </ng-container>
+
+                </div>
+            </div>
+                
+        </div>
+        <div class="tab-pane  fade" id="products">
+            <!-- Content for Products tab -->
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="custom-menu-card">
+                        <h6 class="custom-sub-heading">Products Data</h6>
+                        <ul class="master-menu-list">
+                            <li><a [routerLink]="['/admin/master/product-sales-gl']">Product sales gl</a></li>
+                            <li><a [routerLink]="['/admin/master/product-types']">Product types</a></li>
+                            <li><a [routerLink]="['/admin/master/product-brands']">Product brands</a></li>
+                            <li><a [routerLink]="['/admin/master/product-categories']">Prdouct categories</a></li>
+                            <li><a [routerLink]="['/admin/master/product-groups']">Product groups</a></li>
+                            <li><a [routerLink]="['/admin/master/product-gst-classifications']">Product gst calssifications</a></li>
+                            <li><a [routerLink]="['/admin/master/product-item-type']">Product item types</a></li>
+                            <li><a [routerLink]="['/admin/master/product-purchase-gl']">Product purchase gl</a></li>
+                            <li><a [routerLink]="['/admin/master/product-stock-units']">Product stock units</a></li>
+                            <li><a [routerLink]="['/admin/master/product-unique-quantity-codes']">Products unique quantity codes</a></li>
+                            <li><a [routerLink]="['/admin/master/unit-options']">Unit options</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <ng-container [ngSwitch]="code">
+                        <ng-container *ngSwitchCase="'product-stock-units'">
+                            <app-product-stock-units></app-product-stock-units>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'product-unique-quantity-codes'">
+                            <app-product-unique-quantity-codes></app-product-unique-quantity-codes>
                         </ng-container>
                         <ng-container *ngSwitchCase="'product-types'">
                             <app-product-types></app-product-types>
                         </ng-container>
-                        <ng-container *ngSwitchCase="'product-brands'">
+                        <ng-container *ngSwitchCase="'product-brands'"> 
                             <app-product-brands></app-product-brands>
                         </ng-container>
-                        <div *ngSwitchDefault>output2</div>
+                        <ng-container *ngSwitchCase="'product-categories'"> 
+                            <app-product-categories></app-product-categories>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'product-groups'"> 
+                            <app-product-groups></app-product-groups>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'product-gst-classifications'"> 
+                            <app-product-gst-classifications></app-product-gst-classifications>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'product-item-type'"> 
+                            <app-product-item-type></app-product-item-type>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'product-sales-gl'">
+                            <app-product-sales-gl></app-product-sales-gl>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'product-purchase-gl'"> 
+                            <app-product-purchase-gl></app-product-purchase-gl>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'unit-options'">
+                            <app-unit-options></app-unit-options>
+                        </ng-container>
                     </ng-container>
 
                 </div>
-                <!-- <div class="col-md-3">
-                    <h6>FAQ</h6>
-                    <ul class="list-unstyled">
-                        <li><a href="#">FAQ Classic</a></li>
-                        <li><a href="#">FAQ Extended</a></li>
-                    </ul>
-                    <h6>Blog</h6>
-                    <ul class="list-unstyled">
-                        <li><a href="#">Blog Home</a></li>
-                        <li><a href="#">Blog Post</a></li>
-                    </ul>
-                </div> -->
-                <!-- <div class="col-md-3">
-                    <h6>Careers</h6>
-                    <ul class="list-unstyled">
-                        <li><a href="#">Careers List</a></li>
-                        <li><a href="#">Careers Apply</a></li>
-                    </ul>
-                    <h6>Pricing</h6>
-                    <ul class="list-unstyled">
-                        <li><a href="#">Column Pricing</a></li>
-                        <li><a href="#">Table Pricing</a></li>
-                    </ul>
-                </div> -->
             </div>
         </div>
-        <div class="tab-pane  fade" id="users">
-            <!-- Content for Users tab -->
-            <p>Users content...</p>
-        </div>
-        <div class="tab-pane  fade" id="products">
+        <div class="tab-pane  fade" id="hrms">
             <!-- Content for Products tab -->
-            <p>Products content...</p>
-        </div>
-        <div class="tab-pane  fade" id="sales">
-            <!-- Content for Sales tab -->
             <div class="row">
                 <div class="col-md-3">
                     <div class="custom-menu-card">
-                        <h6 class="custom-sub-heading">Sales Master</h6>
+                        <h6 class="custom-sub-heading">HRMS Data</h6>
                         <ul class="master-menu-list">
-                            <li><a [routerLink]="['/admin/master/sales-price-list']">Price List</a></li>
-                            <li><a [routerLink]="['/admin/master/sale-order-items']">Order Items</a></li>
-                            <li><a [routerLink]="['/admin/master/sale-invoice-order']">Invoice Order</a></li>
-                            <li><a [routerLink]="['/admin/master/payment-transactions']">payment_transactions</a></li>
-                            <li><a [routerLink]="['/admin/master/sale_invoice_items']">sale_invoice_items</a></li>
-                            <li><a [routerLink]="['/admin/master/sale_return_orders']">sale_return_orders</a></li>
-                            <li><a [routerLink]="['/admin/master/sale_return_items']">sale_return_items</a></li>
-                            <li>
-                                <a [routerLink]="['/admin/master/sale_return_items']"></a>
-                            </li>
+                            <li><a [routerLink]="['/admin/master/departments']">Departments</a></li>
+                            <li><a [routerLink]="['/admin/master/designations']">Designations</a></li>
                         </ul>
                     </div>
-
                 </div>
                 <div class="col-md-9">
+                    <ng-container [ngSwitch]="code">
+                        <ng-container *ngSwitchCase="'departments'">
+                            <app-departments></app-departments>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'designations'">
+                            <app-designations></app-designations>
+                        </ng-container>
+                    </ng-container>
 
                 </div>
             </div>
         </div>
-        <div class="tab-pane  fade" id="finance">
-            <!-- Content for Finance tab -->
-            <p>Finance content...</p>
+        <div class="tab-pane  fade" id="tasks">
+            <!-- Content for Products tab -->
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="custom-menu-card">
+                        <h6 class="custom-sub-heading">Tasks Data</h6>
+                        <ul class="master-menu-list">
+                            <li><a [routerLink]="['/admin/master/priorities']">Task Priorities</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <ng-container [ngSwitch]="code">
+                        <ng-container *ngSwitchCase="'priorities'">
+                            <app-task-priorities></app-task-priorities>
+                        </ng-container>
+                    </ng-container>
+
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane  fade" id="assets">
+            <!-- Content for Products tab -->
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="custom-menu-card">
+                        <h6 class="custom-sub-heading">Assets Data</h6>
+                        <ul class="master-menu-list">
+                            <li><a [routerLink]="['/admin/master/asset-categories']">Asset categories</a></li>
+                            <li><a [routerLink]="['/admin/master/asset-statuses']">Asset statuses</a></li>
+                            <li><a [routerLink]="['/admin/master/locations']">Locations</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <ng-container [ngSwitch]="code">
+                        <ng-container *ngSwitchCase="'asset-categories'">
+                            <app-asset-categories></app-asset-categories>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'asset-statuses'">
+                            <app-asset-statuses></app-asset-statuses>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'locations'"> 
+                            <app-locations></app-locations>
+                        </ng-container>
+                    </ng-container>
+
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane  fade" id="leads">
+            <!-- Content for Products tab -->
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="custom-menu-card">
+                        <h6 class="custom-sub-heading">Leads Data</h6>
+                        <ul class="master-menu-list">
+                            <li><a [routerLink]="['/admin/master/lead-statuses']">Lead statuses</a></li>
+                            <li><a [routerLink]="['/admin/master/interaction-types']">Interaction types</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <ng-container [ngSwitch]="code">
+                        <ng-container *ngSwitchCase="'lead-statuses'">
+                            <app-lead-statuses></app-lead-statuses>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'interaction-types'">
+                            <app-interaction-types></app-interaction-types>
+                        </ng-container>
+                    </ng-container>
+
+                </div>
+            </div>
         </div>
     </div>
 </div>

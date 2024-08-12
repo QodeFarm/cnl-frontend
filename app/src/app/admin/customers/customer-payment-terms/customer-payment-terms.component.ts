@@ -2,22 +2,22 @@ import { Component } from '@angular/core';
 import { TaCurdConfig } from '@ta/ta-curd';
 
 @Component({
-  selector: 'app-shipping-companies',
-  templateUrl: './shipping-companies.component.html',
-  styleUrls: ['./shipping-companies.component.scss']
+  selector: 'app-customer-payment-terms',
+  templateUrl: './customer-payment-terms.component.html',
+  styleUrls: ['./customer-payment-terms.component.scss']
 })
-export class ShippingCompaniesComponent {
+export class CustomerPaymentTermsComponent {
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
     drawerPlacement: 'top',
     tableConfig: {
-      apiUrl: 'masters/shipping_companies/',
-      title: 'Shipping companies',
+      apiUrl: 'masters/customer_payment_terms/',
+      title: 'Customer Payment Terms',
       // showCheckbox: true,
-      pkId: "shipping_company_id",
+      pkId: "payment_term_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['shipping_company_id', 'name']
+        keys: ['payment_term_id', 'name']
       },
       cols: [
         {
@@ -31,13 +31,24 @@ export class ShippingCompaniesComponent {
           sort: true
         },
         {
-          fieldKey: 'gst_no', 
-          name: 'GST',
+          fieldKey: 'fixed_days', 
+          name: 'Fixed days',
+          type: 'number',
           sort: false
         },
         {
-          fieldKey: 'website_url', 
-          name: 'Website URL',
+          fieldKey: 'no_of_fixed_days', 
+          name: 'No.of.fixed days',
+          sort: false
+        },
+        {
+          fieldKey: 'payment_cycle', 
+          name: 'Payment Cycle',
+          sort: false
+        },
+        {
+          fieldKey: 'run_on', 
+          name: 'Run on',
           sort: false
         },
         {
@@ -50,7 +61,7 @@ export class ShippingCompaniesComponent {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
-              apiUrl: 'masters/shipping_companies'
+              apiUrl: 'masters/customer_payment_terms/'
             },
             {
               type: 'edit',
@@ -61,9 +72,9 @@ export class ShippingCompaniesComponent {
       ]
     },
     formConfig: {
-      url: 'masters/shipping_companies/',
-      title: 'Shipping companies',
-      pkId: "shipping_company_id",
+      url: 'masters/customer_payment_terms/',
+      title: 'Customer Payment Terms',
+      pkId: "payment_term_id",
       fields: [
         {
           className: 'col-9 p-0',
@@ -90,22 +101,43 @@ export class ShippingCompaniesComponent {
               }
             },
             {
-              key: 'gst_no',
+              key: 'fixed_days',
               type: 'input',
               className: 'col-6',
               templateOptions: {
-                label: 'GST',
-                placeholder: 'Enter GST',
+                label: 'Fixed days',
+                type: 'number',
+                placeholder: 'Enter Fixed days',
+                required: false,
+              }
+            },
+            {
+              key: 'no_of_fixed_days',
+              type: 'input',
+              className: 'col-6',
+              templateOptions: {
+                label: 'no.of.Fixed days',
+                type: 'number',
+                placeholder: 'Enter no.of.Fixed days',
                 required: false,
               }
             },
             {
               className: 'col-6',
-              key: 'website_url',
+              key: 'payment_cycle',
               type: 'input',
               templateOptions: {
-                label: 'Website',
-                placeholder: 'Enter Website URL',
+                label: 'Payment cycle',
+                placeholder: 'Enter payment cycle',
+              }
+            },
+            {
+              className: 'col-6',
+              key: 'run_on',
+              type: 'input',
+              templateOptions: {
+                label: 'Run on',
+                placeholder: 'Enter Run on',
               }
             },
           ]

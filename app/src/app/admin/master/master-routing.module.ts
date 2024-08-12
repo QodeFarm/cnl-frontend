@@ -34,10 +34,6 @@ const routes: Routes = [
     path: 'leave-settings',
     component: LeaveSettingsComponent
   },
-  {
-    path: 'shipping_modes',
-    component: ShippingModesComponent
-  }
 ];
 
 @NgModule({
