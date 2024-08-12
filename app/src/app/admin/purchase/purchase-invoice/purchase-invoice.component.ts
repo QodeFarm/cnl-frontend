@@ -85,15 +85,14 @@ export class PurchaseInvoiceComponent {
     this.showPurchaseInvoiceList = true;
   }
   setFormConfig() {
+    this.PurchaseInvoiceEditID = null;
     this.formConfig = {
-      valueChangeFn: (res) => {
-        // this.totalAmountCal();
-      },
       url: "purchase/purchase_invoice_order/",
       title: '',
       formState: {
         viewMode: false
       },
+      showActionBtn: true,
       exParams: [
         {
           key: 'purchase_invoice_items',

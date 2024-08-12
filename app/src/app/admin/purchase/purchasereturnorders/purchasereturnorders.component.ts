@@ -76,15 +76,14 @@ export class PurchasereturnordersComponent {
   }
 
   setFormConfig() {
+    this.PurchaseReturnOrderEditID = null;
     this.formConfig = {
-      valueChangeFn: (res) => {
-        // this.totalAmountCal();
-      },
       url: "purchase/purchase_return_order/",
       title: '',
       formState: {
         viewMode: false
       },
+      showActionBtn: true,
       exParams: [
         {
           key: 'purchase_return_items',

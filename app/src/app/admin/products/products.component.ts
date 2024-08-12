@@ -460,7 +460,7 @@ export class ProductsComponent implements OnInit {
                   templateOptions: {
                     label: 'Picture',
                     placeholder: 'Upload Picture',
-                    // required: true
+                    required: true
                   }
                 },
                 // Additional fields below picture

@@ -91,17 +91,14 @@ export class PurchaseComponent {
   }
 
   setFormConfig() {
+    this.PurchaseOrderEditID = null;
     this.formConfig = {
-
-      valueChangeFn: (res) => {
-        // this.totalAmountCal();
-      },
-
       url: "purchase/purchase_order/",
       title: '',
       formState: {
         viewMode: false
       },
+      showActionBtn: true,
       exParams: [
         {
           key: 'purchase_order_items',

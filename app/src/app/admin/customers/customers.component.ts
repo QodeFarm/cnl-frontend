@@ -364,7 +364,7 @@ export class CustomersComponent {
                     className: 'ta-cell pr-md col-12',
                     templateOptions: {
                       label: 'Picture',
-                      // required: true
+                      required: true
                     }
                   },
                 ]
