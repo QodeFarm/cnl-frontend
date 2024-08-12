@@ -42,6 +42,8 @@
                             <li><a [routerLink]="['/admin/master/firm-statuses']">Firm status</a></li>
                             <li><a [routerLink]="['/admin/master/gst-categories']">GST categories</a></li>
                             <li><a [routerLink]="['/admin/master/price-categories']">Price categories</a></li>
+                            <li><a [routerLink]="['/admin/master/shipping-modes']">Shipping modes</a></li>
+                            <li><a [routerLink]="['/admin/master/shipping-companies']">Shipping companies</a></li>
                         </ul>
                     </div>
                 </div>
@@ -62,6 +64,12 @@
                         <ng-container *ngSwitchCase="'price-categories'">
                             <app-price-categories></app-price-categories>
                         </ng-container>
+                        <ng-container *ngSwitchCase="'shipping-modes'">
+                            <app-shipping-modes></app-shipping-modes>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'shipping-companies'">
+                            <app-shipping-companies></app-shipping-companies>
+                        </ng-container>
                     </ng-container>
                 </div>
             </div>
@@ -73,8 +81,9 @@
                     <div class="custom-menu-card">
                         <h6 class="custom-sub-heading">Customers Data</h6>
                         <ul class="master-menu-list">
-                            <li><a [routerLink]="['/admin/master/ledger-accounts']">Ledger Accounts</a></li>
-                            <li><a [routerLink]="['/admin/master/ledger-groups']">Ledger Groups</a></li>
+                            <li><a [routerLink]="['/admin/master/ledger-accounts']">Ledger accounts</a></li>
+                            <li><a [routerLink]="['/admin/master/ledger-groups']">Ledger groups</a></li>
+                            <li><a [routerLink]="['/admin/master/customer-payment-terms']">Customer payment terms</a></li>
                         </ul>
                     </div>
                 </div>
@@ -85,6 +94,9 @@
                             </ng-container>
                             <ng-container *ngSwitchCase="'ledger-groups'">
                                 <app-ledger-groups></app-ledger-groups>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'customer-payment-terms'">
+                                <app-customer-payment-terms></app-customer-payment-terms>
                             </ng-container>
                             <!-- <div *ngSwitchDefault> -->
                             </ng-container>
