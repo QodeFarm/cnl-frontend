@@ -20,6 +20,10 @@ import { EmployeeListComponent } from './employee-list/employee-list.component';
     HrmsRoutingModule,
     AdminCommmonModule,
     EmployeeListComponent
+  ],
+  exports:[
+    DepartmentsComponent,
+    DesignationsComponent,
   ]
 })
 export class EmployeeModule {};

@@ -15,6 +15,7 @@ export class ProductDrugTypesComponent {
     tableConfig: {
       apiUrl: 'masters/product_drug_types/',
       title: 'Product Drug Types',
+      
       pkId: "drug_type_id",
       pageSize: 10,
       "globalSearch": {
@@ -34,7 +35,7 @@ export class ProductDrugTypesComponent {
               type: 'delete',
               label: 'Delete',
               confirm: true,
-              confirmMsg: "are you Sure to delete?",
+              confirmMsg: "Sure to delete?",
               apiUrl: 'masters/product_drug_types'
             },
             {

@@ -9,6 +9,11 @@ import { DepartmentsComponent } from './departments/departments.component';
 import { ShiftsComponent } from './shifts/shifts.component';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { LeaveSettingsComponent } from './leave-settings/leave-settings.component';
+import { ShippingModesComponent } from './shipping-modes/shipping-modes.component';
+import { ShippingCompaniesComponent } from './shipping-companies/shipping-companies.component';
+import { LedgerAccountsComponent } from '../customers/ledger-accounts/ledger-accounts.component';
+import { CustomersModule } from '../customers/customers.module';
+import { TerritoryComponent } from '../customers/territory/territory.component';
 
 
 @NgModule({
@@ -18,12 +23,18 @@ import { LeaveSettingsComponent } from './leave-settings/leave-settings.componen
     JobCodesComponent,
     DepartmentsComponent,
     ShiftsComponent,
-    LeaveSettingsComponent
+    LeaveSettingsComponent,
+    ShippingModesComponent,
+    ShippingCompaniesComponent
   ],
   imports: [
     CommonModule,
     AdminCommmonModule,
     MasterRoutingModule
+  ],
+  exports: [
+    ShippingModesComponent,
+    ShippingCompaniesComponent
   ]
 })
 export class MasterModule { }

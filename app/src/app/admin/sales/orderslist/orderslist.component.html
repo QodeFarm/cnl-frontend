@@ -1,0 +1,33 @@
+<table class="table table-striped table-hover">
+  <thead class="table-header">
+    <tr>
+      <th>Sale Type</th>
+      <th>Order No</th>
+      <th>Customer</th>
+      <th>Order Date</th>
+      <th>Products</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngIf="!customerOrders.length">
+      <td colspan="6" class="text-center" style="font-size: 1.2em;">{{ noOrdersMessage }}</td>
+    </tr>    
+    <tr *ngFor="let order of customerOrders">
+      <td>{{ order.sale_type?.name ?? 'N/A' }}</td>
+      <td>{{ order.order_no ?? 'N/A' }}</td>
+      <td>{{ order.customer?.name ?? 'N/A' }}</td>
+      <td>{{ order.order_date ?? 'N/A' }}</td>
+      <td>
+        <ul>
+          <li *ngFor="let product of order.productsList">
+            {{ product.product_name ?? 'Unknown Product' }} (Qty: {{ product.quantity ?? 'N/A' }})
+          </li>
+        </ul>
+      </td>
+      <td>
+        <button class="btn btn-primary btn-sm" (click)="selectOrder(order)">Select</button>
+      </td>
+    </tr>
+  </tbody>
+</table>

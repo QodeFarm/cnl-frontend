@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { Router } from '@angular/router';
 
@@ -8,23 +8,22 @@ import { Router } from '@angular/router';
   templateUrl: './vendors.component.html',
   styleUrls: ['./vendors.component.scss']
 })
-export class VendorsComponent implements OnInit {
-
-  nowDate = () => {
-    return new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate();
-  }
+export class VendorsComponent{
   showVendorList: boolean = false;
   showForm: boolean = false;
   VendorEditID: any;
+  nowDate = () => {
+    return new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate();
+  }
+
   private observer: MutationObserver;
 
-  formConfig: TaFormConfig = {};
-
-  constructor(private http: HttpClient, private router: Router) { }
+  constructor(private http: HttpClient) {}
 
   ngOnInit() {
     this.showVendorList = false;
     this.showForm = true;
+    this.VendorEditID = null;
     // Set form config
     this.setFormConfig();
     console.log('this.formConfig', this.formConfig);
@@ -81,28 +80,21 @@ export class VendorsComponent implements OnInit {
       this.observer.disconnect();
     }
   }
-
+  formConfig: TaFormConfig = {};
 
   hide() {
-    const modalCloseButton = document.getElementById('modalClose');
-    if (modalCloseButton) {
-      modalCloseButton.click();
-    }
+    document.getElementById('modalClose').click();
   }
 
-  editVendor(event: any) {
-    console.log('event', event);
+  editVendor(event) {
     this.VendorEditID = event;
     this.http.get('vendors/vendors/' + event).subscribe((res: any) => {
-      console.log('--------> res ', res);
       if (res && res.data) {
         this.formConfig.model = res.data;
-        console.log("vendors data", res.data)
-        this.formConfig.pkId = 'vendor_id';
         // Set labels for update
         this.formConfig.submit.label = 'Update';
         // Show form after setting form values
-        
+        this.formConfig.pkId = 'vendor_id';
         this.formConfig.model['vendor_id'] = this.VendorEditID;
         this.showForm = true;
       }
@@ -115,33 +107,40 @@ export class VendorsComponent implements OnInit {
   }
 
   setFormConfig() {
+    this.VendorEditID = null;
     this.formConfig = {
       url: "vendors/vendors/",
       title: 'Vendor',
       formState: {
         viewMode: false
       },
+      showActionBtn: true,
       exParams: [
-        {
-          key: 'city_id',
-          type: 'script',
-          value: 'data.city.city_id'
-        },
-        {
-          key: 'state_id',
-          type: 'script',
-          value: 'data.state.state_id'
-        },
-        {
-          key: 'country_id',
-          type: 'script',
-          value: 'data.country.country_id'
-        }
+        //  {
+        //   key: 'city_id',
+        //   type: 'script',
+        //   value: 'data.city.city_id'
+        // },
+        // {
+        //   key: 'state_id',
+        //   type: 'script',
+        //   value: 'data.state.state_id'
+        // },
+        // {
+        //   key: 'country_id',
+        //   type: 'script',
+        //   value: 'data.country.country_id'
+        // } 
       ],
       submit: {
+        label: 'submit',
         submittedFn: () => this.ngOnInit()
       },
-      reset: {},
+      reset: {
+        resetFn: () => {
+          this.ngOnInit();
+        }
+      },
       model: {
         vendor_data: {},
         vendor_addresses: [{
@@ -208,8 +207,8 @@ export class VendorsComponent implements OnInit {
                     type: 'select',
                     className: 'col-3',
                     templateOptions: {
-                      dataKey: 'name',
-                      dataLabel: "name",
+                      dataKey: 'ledger_account_id',
+                      dataLabel: 'name',
                       label: 'Ledger account',
                       required: true,
                       // placeholder: 'Select Ledger account',
@@ -220,10 +219,12 @@ export class VendorsComponent implements OnInit {
                     },
                     hooks: {
                       onChanges: (field: any) => {
-                        field.formControl.valueChanges.subscribe(data => {
-                          console.log("ledger_account", data);
-                          if (data && data.ledger_account_id) {
+                        field.formControl.valueChanges.subscribe((data: any) => {
+                          console.log('ledger_account', data);
+                          if (this.formConfig && this.formConfig.model && this.formConfig.model['vendor_data']) {
                             this.formConfig.model['vendor_data']['ledger_account_id'] = data.ledger_account_id;
+                          } else {
+                            console.error('Form config or vendor data model is not defined.');
                           }
                         });
                       }
@@ -245,10 +246,11 @@ export class VendorsComponent implements OnInit {
                     },
                     hooks: {
                       onChanges: (field: any) => {
-                        field.formControl.valueChanges.subscribe(data => {
-                          console.log("firm_status", data);
-                          if (data && data.firm_status_id) {
+                        field.formControl.valueChanges.subscribe((data: any) => {
+                          if (this.formConfig && this.formConfig.model && this.formConfig.model['vendor_data']) {
                             this.formConfig.model['vendor_data']['firm_status_id'] = data.firm_status_id;
+                          } else {
+                            console.error('Form config or vendor data model is not defined.');
                           }
                         });
                       }
@@ -270,10 +272,11 @@ export class VendorsComponent implements OnInit {
                     },
                     hooks: {
                       onChanges: (field: any) => {
-                        field.formControl.valueChanges.subscribe(data => {
-                          console.log("territory", data);
-                          if (data && data.territory_id) {
+                        field.formControl.valueChanges.subscribe((data: any) => {
+                          if (this.formConfig && this.formConfig.model && this.formConfig.model['vendor_data']) {
                             this.formConfig.model['vendor_data']['territory_id'] = data.territory_id;
+                          } else {
+                            console.error('Form config or vendor data model is not defined.');
                           }
                         });
                       }
@@ -295,10 +298,11 @@ export class VendorsComponent implements OnInit {
                     },
                     hooks: {
                       onChanges: (field: any) => {
-                        field.formControl.valueChanges.subscribe(data => {
-                          console.log("vendor_category", data);
-                          if (data && data.vendor_category_id) {
+                        field.formControl.valueChanges.subscribe((data: any) => {
+                          if (this.formConfig && this.formConfig.model && this.formConfig.model['vendor_data']) {
                             this.formConfig.model['vendor_data']['vendor_category_id'] = data.vendor_category_id;
+                          } else {
+                            console.error('Form config or vendor data model is not defined.');
                           }
                         });
                       }
@@ -321,10 +325,11 @@ export class VendorsComponent implements OnInit {
                     },
                     hooks: {
                       onChanges: (field: any) => {
-                        field.formControl.valueChanges.subscribe(data => {
-                          console.log("gst_category", data);
-                          if (data && data.gst_category_id) {
+                        field.formControl.valueChanges.subscribe((data: any) => {
+                          if (this.formConfig && this.formConfig.model && this.formConfig.model['vendor_data']) {
                             this.formConfig.model['vendor_data']['gst_category_id'] = data.gst_category_id;
+                          } else {
+                            console.error('Form config or vendor data model is not defined.');
                           }
                         });
                       }
@@ -397,10 +402,11 @@ export class VendorsComponent implements OnInit {
                 },
                 hooks: {
                   onChanges: (field: any) => {
-                    field.formControl.valueChanges.subscribe(data => {
-                      console.log("gst_category", data);
-                      if (data && data.transporter_id) {
+                    field.formControl.valueChanges.subscribe((data: any) => {
+                      if (this.formConfig && this.formConfig.model && this.formConfig.model['vendor_data']) {
                         this.formConfig.model['vendor_data']['transporter_id'] = data.transporter_id;
+                      } else {
+                        console.error('Form config or vendor data model is not defined.');
                       }
                     });
                   }
@@ -506,10 +512,11 @@ export class VendorsComponent implements OnInit {
                 },
                 hooks: {
                   onChanges: (field: any) => {
-                    field.formControl.valueChanges.subscribe(data => {
-                      console.log("gst_category", data);
-                      if (data && data.payment_term_id) {
+                    field.formControl.valueChanges.subscribe((data: any) => {
+                      if (this.formConfig && this.formConfig.model && this.formConfig.model['vendor_data']) {
                         this.formConfig.model['vendor_data']['payment_term_id'] = data.payment_term_id;
+                      } else {
+                        console.error('Form config or vendor data model is not defined.');
                       }
                     });
                   }
@@ -531,10 +538,11 @@ export class VendorsComponent implements OnInit {
                 },
                 hooks: {
                   onChanges: (field: any) => {
-                    field.formControl.valueChanges.subscribe(data => {
-                      console.log("price_category", data);
-                      if (data && data.price_category_id) {
+                    field.formControl.valueChanges.subscribe((data: any) => {
+                      if (this.formConfig && this.formConfig.model && this.formConfig.model['vendor_data']) {
                         this.formConfig.model['vendor_data']['price_category_id'] = data.price_category_id;
+                      } else {
+                        console.error('Form config or vendor data model is not defined.');
                       }
                     });
                   }
@@ -557,10 +565,11 @@ export class VendorsComponent implements OnInit {
                 },
                 hooks: {
                   onChanges: (field: any) => {
-                    field.formControl.valueChanges.subscribe(data => {
-                      console.log("vendor_agent", data);
-                      if (data && data.vendor_agent_id) {
+                    field.formControl.valueChanges.subscribe((data: any) => {
+                      if (this.formConfig && this.formConfig.model && this.formConfig.model['vendor_data']) {
                         this.formConfig.model['vendor_data']['vendor_agent_id'] = data.vendor_agent_id;
+                      } else {
+                        console.error('Form config or vendor data model is not defined.');
                       }
                     });
                   }
@@ -696,24 +705,6 @@ export class VendorsComponent implements OnInit {
               },
             ]
           },
-          {
-            className: 'row col-6 m-0 custom-form-card',
-            fieldGroup: [
-              {
-                template: '<div class="custom-form-card-title">Vendor Attachments</div>',
-                fieldGroupClassName: "ant-row",
-              },
-              {
-                key: 'vendor_attachments',
-                type: 'file',
-                className: 'ta-cell col-16 custom-file-attachement',
-                props: {
-                  "displayStyle": "files",
-                  "multiple": true
-                }
-              }
-            ]
-          },
           // start of order_shipments keys
 
           {
@@ -792,7 +783,7 @@ export class VendorsComponent implements OnInit {
                         if (this.formConfig && this.formConfig.model) {
                           this.formConfig.model['vendor_addresses'][index]['city_id'] = data.city_id;
                         } else {
-                          console.error('Form config or Customer addresses model is not defined.');
+                          console.error('Form config or vendor addresses model is not defined.');
                         }
                       });
                     }
@@ -822,7 +813,7 @@ export class VendorsComponent implements OnInit {
                         if (this.formConfig && this.formConfig.model) {
                           this.formConfig.model['vendor_addresses'][index]['state_id'] = data.state_id;
                         } else {
-                          console.error('Form config or Customer addresses model is not defined.');
+                          console.error('Form config or vendor addresses model is not defined.');
                         }
                       });
                     }
@@ -851,7 +842,7 @@ export class VendorsComponent implements OnInit {
                         if (this.formConfig && this.formConfig.model) {
                           this.formConfig.model['vendor_addresses'][index]['country_id'] = data.country_id;
                         } else {
-                          console.error('Form config or Customer addresses model is not defined.');
+                          console.error('Form config or vendor addresses model is not defined.');
                         }
                       });
                     }
@@ -922,6 +913,24 @@ export class VendorsComponent implements OnInit {
                 }
               ]
             }
+          },
+          {
+            className: 'row col-6 m-0 custom-form-card',//'row col-6 m-0 custom-form-card',
+            fieldGroup: [
+              {
+                template: '<div class="custom-form-card-title">Vendor Attachments</div>',
+                fieldGroupClassName: "ant-row",
+              },
+              {
+                key: 'vendor_attachments',
+                type: 'file',
+                className: 'ta-cell col-16 custom-file-attachement',
+                props: {
+                  "displayStyle": "files",
+                  "multiple": true
+                }
+              }
+            ]
           },
         ]
     }

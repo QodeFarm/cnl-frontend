@@ -18,13 +18,9 @@ import { ProductsListComponent } from './products-list/products-list.component';
 
 const routes: Routes = [
   {
-    path : 'products',
+    path : '',
     component: ProductsComponent
   },
-  // {
-  //   path : 'products-list',
-  //   component: ProductsListComponent
-  // },
   {
     path : 'product-groups',
     component: ProductGroupsComponent

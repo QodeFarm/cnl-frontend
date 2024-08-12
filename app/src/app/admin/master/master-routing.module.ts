@@ -6,6 +6,7 @@ import { JobCodesComponent } from './job-codes/job-codes.component';
 import { DepartmentsComponent } from './departments/departments.component';
 import { ShiftsComponent } from './shifts/shifts.component';
 import { LeaveSettingsComponent } from './leave-settings/leave-settings.component';
+import { ShippingModesComponent } from './shipping-modes/shipping-modes.component';
 
 const routes: Routes = [
   { path: ':code', canActivate: [], loadComponent: () => import('./master-list/master-list.component').then(m => m.MasterListComponent) },
@@ -32,7 +33,7 @@ const routes: Routes = [
   {
     path: 'leave-settings',
     component: LeaveSettingsComponent
-  }
+  },
 ];
 
 @NgModule({

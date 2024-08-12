@@ -14,6 +14,7 @@ export class UnitOptionsComponent {
     tableConfig: {
       apiUrl: 'masters/unit_options/',
       title: 'Unit Options',
+      
       pkId: "unit_options_id",
       pageSize: 10,
       "globalSearch": {
@@ -33,7 +34,7 @@ export class UnitOptionsComponent {
               type: 'delete',
               label: 'Delete',
               confirm: true,
-              confirmMsg: "are you Sure to delete?",
+              confirmMsg: "Sure to delete?",
               apiUrl: 'masters/unit_options'
             },
             {

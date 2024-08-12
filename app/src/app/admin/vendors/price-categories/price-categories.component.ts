@@ -13,6 +13,7 @@ export class PriceCategoriesComponent {
     tableConfig: {
       apiUrl: 'masters/price_categories/',
       title: 'Price Categories',
+      
       pkId: "price_category_id",
       pageSize: 10,
       "globalSearch": {

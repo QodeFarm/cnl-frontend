@@ -13,6 +13,7 @@ export class ProductCategoriesComponent  {
   tableConfig: {
     apiUrl: 'products/product_categories/',
     title: 'Product Categories',
+    
     pkId: "category_id",
     pageSize: 10,
     "globalSearch": {
@@ -39,7 +40,7 @@ export class ProductCategoriesComponent  {
             type: 'delete',
             label: 'Delete',
             confirm: true,
-            confirmMsg: "are you Sure to delete?",
+            confirmMsg: "Sure to delete?",
             apiUrl: 'products/product_categories'
           },
           {

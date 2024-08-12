@@ -1,5 +1,7 @@
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { TaCurdConfig } from '@ta/ta-curd';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 @Component({
   selector: 'app-territory',
@@ -13,7 +15,7 @@ export class TerritoryComponent {
     tableConfig: {
       apiUrl: 'masters/territory/',
       title: 'Territory',
-      showCheckbox: true,
+      
       pkId: "territory_id",
       pageSize: 10,
       "globalSearch": {

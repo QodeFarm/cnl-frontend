@@ -13,6 +13,7 @@ export class VendorPaymentTermsComponent {
     tableConfig: {
       apiUrl: 'vendors/vendor_payment_terms/',
       title: 'Vendor Payment Terms List',
+      
       pkId: "payment_term_id",
       pageSize: 10,
       "globalSearch": {

@@ -13,6 +13,7 @@ export class ProductStockUnitsComponent {
     tableConfig: {
       apiUrl: 'products/product_stock_units/',
       title: 'Product Stock Units',
+      
       pkId: "stock_unit_id",
       pageSize: 10,
       "globalSearch": {
@@ -48,7 +49,7 @@ export class ProductStockUnitsComponent {
               type: 'delete',
               label: 'Delete',
               confirm: true,
-              confirmMsg: "are you Sure to delete?",
+              confirmMsg: "Sure to delete?",
               apiUrl: 'products/product_stock_units'
             },
             {

@@ -13,6 +13,7 @@ export class ProductSalesGlComponent {
     tableConfig: {
       apiUrl: 'products/product_sales_gl/',
       title: 'Product Sales GL',
+      
       pkId: "sales_gl_id",
       pageSize: 10,
       "globalSearch": {
@@ -34,12 +35,12 @@ export class ProductSalesGlComponent {
           name: 'Code',
           sort: true,
         },
-        {
-          fieldKey: 'is_subledger',
-          name: 'Is Subledger',
-          sort: false,
-          type: 'boolean'
-        },
+        // {
+        //   fieldKey: 'is_subledger',
+        //   name: 'Is Subledger',
+        //   sort: false,
+        //   type: 'boolean'
+        // },
         {
           fieldKey: 'inactive',
           name: 'Inactive',
@@ -57,28 +58,28 @@ export class ProductSalesGlComponent {
 		  sort: false,
 		  isEncrypted: true
 		},
-        {
-          fieldKey: 'rtgs_ifsc_code', 
-          name: 'RTGS IFSC Code',
-          sort: false
-        },
-        {
-          fieldKey: 'classification', 
-          name: 'Classification',
-          sort: false
-        },
+        // {
+        //   fieldKey: 'rtgs_ifsc_code', 
+        //   name: 'RTGS IFSC Code',
+        //   sort: false
+        // },
+        // {
+        //   fieldKey: 'classification', 
+        //   name: 'Classification',
+        //   sort: false
+        // },
         {
           fieldKey: 'is_loan_account', 
           name: 'Is Loan Account',
           sort: false,
-		  type: 'boolean'
+		      type: 'boolean'
         },
-        {
-          fieldKey: 'tds_applicable', 
-          name: 'TDS Applicable',
-          sort: false,
-		  type: 'boolean'
-        },
+        // {
+        //   fieldKey: 'tds_applicable', 
+        //   name: 'TDS Applicable',
+        //   sort: false,
+		    //   type: 'boolean'
+        // },
         {
           fieldKey: 'address', 
           name: 'Address',
@@ -88,7 +89,7 @@ export class ProductSalesGlComponent {
           fieldKey: 'employee', 
           name: 'Employee',
           sort: false,
-		  type: 'boolean'
+		      type: 'boolean'
         },
         {
           fieldKey: 'pan', 
@@ -104,7 +105,7 @@ export class ProductSalesGlComponent {
               type: 'delete',
               label: 'Delete',
               confirm: true,
-              confirmMsg: "are you Sure to delete?",
+              confirmMsg: "Sure to delete?",
               apiUrl: 'products/product_sales_gl'
             },
             {

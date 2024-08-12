@@ -13,6 +13,7 @@ export class GstCategoriesComponent {
       tableConfig: {
         apiUrl: 'masters/gst_categories/',
         title: 'Gst Categories',
+        
         pkId: "gst_category_id",
         pageSize: 10,
         "globalSearch": {

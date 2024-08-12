@@ -29,7 +29,7 @@ const routes: Routes = [
       { path: 'users', canActivate: [], loadChildren: () => import('./admin/user/user.module').then(m => m.UserModule) },
       { path: 'sales', canActivate: [], loadChildren: () => import('./admin/sales/sales.module').then(m => m.SalesModule) },
       // { path: 'employee', canActivate: [], loadChildren: () => import('./admin/employee/employee.module').then(m => m.EmployeeModule) },
-      { path: 'master', pathMatch: 'full', redirectTo: 'master/product-sales-gl' },
+      { path: 'master', pathMatch: 'full', redirectTo: 'master/master' },
       { path: 'master', canActivate: [], loadChildren: () => import('./admin/master/master.module').then(m => m.MasterModule) },
       { path: 'customers', canActivate: [], loadChildren: () => import('./admin/customers/customers.module').then(m => m.CustomersModule) },
       { path: 'company', canActivate: [], loadChildren: () => import('./admin/company/company.module').then(m => m.CompanyModule) },
