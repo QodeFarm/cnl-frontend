@@ -5,6 +5,7 @@ import { SaleReturnsComponent } from './sale-returns/sale-returns.component';
 // import { SalesinvoiceComponent } from './salesinvoice/salesinvoice.component';
 import { SalesinvoiceModule } from './salesinvoice/salesinvoice.module';
 import { SalesinvoiceComponent } from './salesinvoice/salesinvoice.component';
+import { CustomersComponent } from '../customers/customers.component';
 
 const routes: Routes = [
   {

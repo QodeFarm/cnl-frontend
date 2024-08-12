@@ -15,6 +15,7 @@ export class ProductUniqueQuantityCodesComponent {
     tableConfig: {
       apiUrl: 'masters/product_unique_quantity_codes/',
       title: 'Product Unique Quantity Codes',
+      showCheckbox: true,
       pkId: "quantity_code_id",
       pageSize: 10,
       "globalSearch": {

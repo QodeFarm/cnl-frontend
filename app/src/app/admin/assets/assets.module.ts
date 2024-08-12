@@ -27,6 +27,12 @@ import { AssetMaintenanceListComponent } from './asset-maintenance/asset-mainten
     AssetsRoutingModule,
     AssetsListComponent,
     AssetMaintenanceListComponent
+  ],
+  exports:[
+    AssetStatusesComponent,
+    AssetCategoriesComponent,
+    LocationsComponent,
+    AssetMaintenanceComponent
   ]
 })
 export class AssetsModule { }
