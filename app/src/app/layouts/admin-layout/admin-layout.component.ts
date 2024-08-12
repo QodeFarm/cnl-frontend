@@ -48,16 +48,11 @@ export class AdminLayoutComponent {
         label: 'Sales',
         icon: 'icon icon-sales',
         child: [
-          // {
-          //   link: '/admin/employee',
-          //   label: 'Sales Price List',
-          //   icon: 'fas fa-tachometer-alt',
-          // },
-          // {
-          //   link: '/admin/employee',
-          //   label: 'Estimate',
-          //   icon: 'fas fa-tachometer-alt',
-          // },
+          {
+            link: '/admin/customers',
+            label: 'Customer',
+            icon: 'fas fa-tachometer-alt',
+          },
           {
             link: '/admin/sales',
             label: 'Sale Order',
@@ -73,16 +68,6 @@ export class AdminLayoutComponent {
             label: 'Sale Return',
             icon: 'fas fa-tachometer-alt',
           },
-          {
-            link: '/admin/employee',
-            label: 'Customer',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/employee',
-            label: 'Order Shipment',
-            icon: 'fas fa-tachometer-alt',
-          },
         ]
       },
       {
@@ -90,6 +75,11 @@ export class AdminLayoutComponent {
         label: 'Purchase',
         icon: 'icon icon-purchase',
         child: [
+          {
+            link: '/admin/vendors',
+            label: 'Vendors',
+            icon: 'fas fa-tachometer-alt',
+          },
           {
             link: '/admin/purchase',
             label: 'Purchase',
@@ -108,13 +98,16 @@ export class AdminLayoutComponent {
         ]
       },
       {
-        link: '/admin/dashboard',
+        link: '/admin/finance',
         label: 'Finance',
         icon: 'icon icon-finance',
       },
       {
-        // link: '/admin/dashboard',
-        // link: '/admin/inventory',
+        label: 'Production',
+        icon: 'icon icon-production',
+        child: []
+      },
+      {
         label: 'Inventory',
         icon: 'icon icon-inventory',
         child: [
@@ -122,6 +115,10 @@ export class AdminLayoutComponent {
             link: '/admin/inventory',
             label: 'Inventory',
             icon: 'fas fa-boxes',
+          },
+          {
+            link: '/admin/products',
+            label: 'Products',
           },
           {
             link: '/admin/warehouses',
@@ -144,11 +141,11 @@ export class AdminLayoutComponent {
             label: 'Tasks',
             icon: 'fas fa-tachometer-alt',
           },
-          {
-            link: '/admin/tasks/task_priorities',
-            label: 'Task Priorities',
-            icon: 'fas fa-tachometer-alt',
-          },
+          // {
+          //   link: '/admin/tasks/task_priorities',
+          //   label: 'Task Priorities',
+          //   icon: 'fas fa-tachometer-alt',
+          // },
         ]
       },
       {
@@ -160,16 +157,16 @@ export class AdminLayoutComponent {
             label: 'Leads',
             icon: 'fas fa-tachometer-alt',
           },
-          {
-            link: '/admin/leads/lead_statuses',
-            label: 'Lead statuses',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/leads/interaction_types',
-            label: 'Interaction types',
-            icon: 'fas fa-tachometer-alt',
-          }
+          // {
+          //   link: '/admin/leads/lead_statuses',
+          //   label: 'Lead statuses',
+          //   icon: 'fas fa-tachometer-alt',
+          // },
+          // {
+          //   link: '/admin/leads/interaction_types',
+          //   label: 'Interaction types',
+          //   icon: 'fas fa-tachometer-alt',
+          // }
         ]
       },
       {
@@ -181,21 +178,21 @@ export class AdminLayoutComponent {
             label: 'Assets',
             icon: 'fas fa-tachometer-alt',
           },
-          {
-            link: '/admin/assets/asset_statuses',
-            label: 'Asset Statuses',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/assets/asset_categories',
-            label: 'Asset Categories',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/assets/locations',
-            label: 'Locations',
-            icon: 'fas fa-tachometer-alt',
-          },
+          // {
+          //   link: '/admin/assets/asset_statuses',
+          //   label: 'Asset Statuses',
+          //   icon: 'fas fa-tachometer-alt',
+          // },
+          // {
+          //   link: '/admin/assets/asset_categories',
+          //   label: 'Asset Categories',
+          //   icon: 'fas fa-tachometer-alt',
+          // },
+          // {
+          //   link: '/admin/assets/locations',
+          //   label: 'Locations',
+          //   icon: 'fas fa-tachometer-alt',
+          // },
           {
             link: '/admin/assets/asset_maintenance',
             label: 'Asset Maintenance',
@@ -212,161 +209,22 @@ export class AdminLayoutComponent {
             label: 'Employees',
             icon: 'fas fa-tachometer-alt',
           },
-          {
-            link: '/admin/employees/designations',
-            label: 'Designations',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/employees/departments',
-            label: 'Departments',
-            icon: 'fas fa-tachometer-alt',
-          }
+          // {
+          //   link: '/admin/employees/designations',
+          //   label: 'Designations',
+          //   icon: 'fas fa-tachometer-alt',
+          // },
+          // {
+          //   link: '/admin/employees/departments',
+          //   label: 'Departments',
+          //   icon: 'fas fa-tachometer-alt',
+          // }
         ]
       },
       {
         link: '/admin/master',
         label: 'Master',
         icon: 'icon icon-masters',
-      },
-      {
-        label: 'Customers',
-        icon: 'fas fa-user',
-        child: [
-          {
-            link: '/admin/customers',
-            label: 'Customers',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/customers/ledger_accounts',
-            label: 'Ledger Accounts',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/customers/ledger_groups', 
-            label: 'Ledger Groups',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/customers/transporters',
-            label: 'Transporters',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/customers/territory', 
-            label: 'Territory',
-            icon: 'fas fa-tachometer-alt',
-          },
-        ],
-        },
-        {
-        label: 'Product Masters',
-        icon: 'icon icon-production',
-        child: [
-          {
-            link: '/admin/products/product-groups',
-            label: 'Product Groups'
-          },
-          {
-            link: '/admin/products/product-categories',
-            label: 'Product Categories'
-          },
-          {
-            link: '/admin/products/product-stock-units',
-            label: 'Product Stock Units'
-          },
-          {
-            link: '/admin/products/product-gst-classifications',
-            label: 'Product GST Classifications'
-          },
-          {
-            link: '/admin/products/product-sales-gl',
-            label: 'Product Sales GL'
-          },
-          {
-            link: '/admin/products/product-purchase-gl',
-            label: 'Product Purchase GL'
-          },
-          {
-            link: '/admin/products/product-unique-quantity-codes',
-            label: 'Product Unique Quantity Codes'
-          },
-          {
-            link: '/admin/products/unit-options',
-            label: 'Unit Options'
-          },
-          {
-            link: '/admin/products/product-drug-types',
-            label: 'Product Drug Types'
-          },
-          {
-            link: '/admin/products/product-types',
-            label: 'Product Types'
-          },
-          {
-            link: '/admin/products/product-item-type',
-            label: 'Product Item Type'
-          },
-          {
-            link: '/admin/products/brand-salesman',
-            label: 'Brand Salesman'
-          },
-          {
-            link: '/admin/products/product-brands',
-            label: 'Product Brands'
-          },
-          {
-            link: '/admin/products/products',
-            label: 'Products',
-          },
-        ],
-      },
-      {
-        label: 'Vendors',
-        icon: 'fas fa-shopping-bag',
-        child: [
-          {
-            link: '/admin/vendors/',
-            label: 'Vendors',
-            icon: 'fas fa-user',
-          },
-          // {
-          //   link: '/admin/vendors/vendors-list',
-          //   label: 'vendors list',
-          //   icon: 'fas fa-user',
-          // },
-          {
-            link: '/admin/vendors/vendor-category',
-            label: 'Vendor Category',
-            icon: 'fas fa-user',
-          },
-          {
-            link: '/admin/vendors/vendor-payment-terms',
-            label: 'Vendor Payment Terms',
-            icon: 'fas fa-user',
-          },
-          {
-            link: '/admin/vendors/vendor-agent',
-            label: 'Vendor Agent',
-            icon: 'fas fa-user',
-          },
-          {
-            link: '/admin/vendors/firm-statuses',
-            label: 'Firm Statuses',
-            icon: 'fas fa-user',
-          },
-          {
-            link: '/admin/vendors/gst-categories',
-            label: 'Gst Categories',
-            icon: 'fas fa-user',
-          },
-          {
-            link: '/admin/vendors/price-categories',
-            label: 'Price Categories',
-            icon: 'fas fa-user',
-          },
-        ]
       },
     ]
     this.closeMenu();
@@ -389,6 +247,9 @@ export class AdminLayoutComponent {
     collapses.forEach((collapse: HTMLElement) => {
       collapse.classList.remove('show');
     });
+  }
+  isActive(parentLink: string, children: any[]): boolean {
+    return children.some(child => this.router.isActive(child.link, true));
   }
 
   menuToggle() {

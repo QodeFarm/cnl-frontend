@@ -18,13 +18,18 @@ import { CustomersListComponent } from './customers-list/customers-list.componen
     LedgerGroupsComponent,
     TerritoryComponent,
     TransportersComponent,
-    // CustomersListComponent
   ],
   imports: [
     CommonModule,
     AdminCommmonModule,
     CustomersRoutingModule,
     CustomersListComponent
+  ],
+  exports: [
+    LedgerAccountsComponent,
+    LedgerGroupsComponent,
+    TerritoryComponent,
+    TransportersComponent
   ]
 })
 export class CustomersModule { }

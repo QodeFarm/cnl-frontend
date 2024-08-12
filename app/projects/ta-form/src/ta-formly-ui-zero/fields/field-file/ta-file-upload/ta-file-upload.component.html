@@ -12,7 +12,7 @@
                 <!-- <span class="upload-icon" nz-icon [nzType]="loading ? 'loading' : 'user'"></span>
                 <div class="ant-upload-text">Upload</div> -->
             </ng-container>
-            <img *ngIf="options.fileList && options.fileList[0] && options.fileList[0].attachment_path" [src]="options.fileList[0].attachment_path | taImg" style="width: 100%" />
+            <img *ngIf="options.fileList && options.fileList[0] && options.fileList[0].attachment_path" [src]="options.fileList[0].attachment_path | taImg" style="width: 100%;max-height: 130px ;" />
         </div>
         <ng-container *ngSwitchDefault>
             <div class="ant-upload-drag-container">

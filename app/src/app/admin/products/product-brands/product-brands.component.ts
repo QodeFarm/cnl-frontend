@@ -15,6 +15,7 @@ export class ProductBrandsComponent {
     tableConfig: {
       apiUrl: 'masters/product_brands/',
       title: 'Product Brands',
+      showCheckbox: true,
       pkId: "brand_id",
       pageSize: 10,
       "globalSearch": {
@@ -31,11 +32,11 @@ export class ProductBrandsComponent {
           name: 'Code',
           sort: true
         },
-        {
-          fieldKey: 'picture',
-          name: 'Picture',
-          sort: true
-        },
+        // {
+        //   fieldKey: 'picture',
+        //   name: 'Picture',
+        //   sort: true
+        // },
         {
           fieldKey: 'brand_salesman',
           name: 'Brand Salesman',

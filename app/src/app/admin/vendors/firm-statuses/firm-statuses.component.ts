@@ -13,6 +13,7 @@ export class FirmStatusesComponent {
     tableConfig: {
       apiUrl: 'masters/firm_statuses/',
       title: 'Firm Statuses',
+      showCheckbox: true,
       pkId: "firm_status_id",
       pageSize: 10,
       "globalSearch": {

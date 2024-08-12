@@ -13,6 +13,7 @@ export class VendorAgentComponent {
     tableConfig: {
       apiUrl: 'vendors/vendor_agent/',
       title: 'Vendor Agent List',
+      showCheckbox: true,
       pkId: "vendor_agent_id",
       pageSize: 10,
       "globalSearch": {
