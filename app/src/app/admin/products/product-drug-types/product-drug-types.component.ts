@@ -35,7 +35,7 @@ export class ProductDrugTypesComponent {
               type: 'delete',
               label: 'Delete',
               confirm: true,
-              confirmMsg: "are you Sure to delete?",
+              confirmMsg: "Sure to delete?",
               apiUrl: 'masters/product_drug_types'
             },
             {
