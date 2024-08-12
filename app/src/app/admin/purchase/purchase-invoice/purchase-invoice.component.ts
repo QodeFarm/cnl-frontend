@@ -16,7 +16,8 @@ export class PurchaseInvoiceComponent {
   PurchaseInvoiceEditID: any;
   productOptions: any;
   nowDate = () => {
-    return new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate();
+    const date = new Date();
+    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   }
 
 
@@ -704,6 +705,7 @@ export class PurchaseInvoiceComponent {
                       templateOptions: {
                         type: 'date',
                         label: 'Shipping Date',
+                        required: true
                       }
                     },
                     {
@@ -713,6 +715,7 @@ export class PurchaseInvoiceComponent {
                       templateOptions: {
                         label: 'Shipping Charges.',
                         placeholder: 'Enter Shipping Charges',
+                        required: true
                       }
                     }
                   ]

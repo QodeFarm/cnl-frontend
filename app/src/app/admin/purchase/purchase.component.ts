@@ -15,9 +15,14 @@ export class PurchaseComponent {
   showForm: boolean = false;
   PurchaseOrderEditID: any;
   productOptions: any;
+  // nowDate = () => {
+  //   return new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate();
+  // }
   nowDate = () => {
-    return new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate();
+    const date = new Date();
+    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   }
+  
 
   constructor(private http: HttpClient) {
   }
@@ -748,7 +753,8 @@ export class PurchaseComponent {
                         className: 'col-6',
                         templateOptions: {
                           type: 'date',
-                          label: 'Shipping Date'
+                          label: 'Shipping Date',
+                          required: true
                         }
                       },
                       {
@@ -759,6 +765,7 @@ export class PurchaseComponent {
                           type: "number",
                           label: 'Shipping Charges.',
                           placeholder: 'Enter Shipping Charges',
+                          required: true
                         }
                       }
                   ]

@@ -16,7 +16,8 @@ export class PurchasereturnordersComponent {
   PurchaseReturnOrderEditID: any;
   productOptions: any;
   nowDate = () => {
-    return new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate();
+    const date = new Date();
+    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   }
 
   constructor(private http: HttpClient) {}
@@ -717,7 +718,9 @@ export class PurchasereturnordersComponent {
                       type: 'date',
                       className: 'col-6',
                       templateOptions: {
+                        type: 'date',
                         label: 'Shipping Date',
+                        required: true
                       }
                     },
                     {
@@ -727,6 +730,7 @@ export class PurchasereturnordersComponent {
                       templateOptions: {
                         label: 'Shipping Charges.',
                         placeholder: 'Enter Shipping Charges',
+                        required: true
                       }
                     },
                   ]

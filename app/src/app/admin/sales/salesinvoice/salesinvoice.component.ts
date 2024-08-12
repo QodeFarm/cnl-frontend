@@ -16,7 +16,8 @@ export class SalesinvoiceComponent {
   SaleInvoiceEditID: any;
   productOptions: any;
   nowDate = () => {
-    return new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate();
+    const date = new Date();
+    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   }
 
   constructor(private http: HttpClient) {
@@ -699,7 +700,9 @@ export class SalesinvoiceComponent {
                       type: 'date',
                       className: 'col-6',
                       templateOptions: {
-                        label: 'Shipping Date'
+                        type: 'date',
+                        label: 'Shipping Date',
+                        required: true
                       }
                     },
                     {
@@ -710,6 +713,7 @@ export class SalesinvoiceComponent {
                         type: "number",
                         label: 'Shipping Charges.',
                         placeholder: 'Enter Shipping Charges',
+                        required: true
                       }
                     }
                   ]
