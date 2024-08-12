@@ -390,6 +390,9 @@ export class AdminLayoutComponent {
       collapse.classList.remove('show');
     });
   }
+  isActive(parentLink: string, children: any[]): boolean {
+    return children.some(child => this.router.isActive(child.link, true));
+  }
 
   menuToggle() {
 
