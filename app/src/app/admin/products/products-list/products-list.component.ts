@@ -18,7 +18,7 @@ export class ProductsListComponent {
 
   tableConfig: TaTableConfig = {
     apiUrl: 'products/products/',
-    showCheckbox: true,
+    
     title: 'Products',
     pkId: "product_id",
     pageSize: 10,
@@ -99,7 +99,7 @@ export class ProductsListComponent {
             type: 'delete',
             label: 'Delete',
             confirm: true,
-            confirmMsg: "are you sure to delete?",
+            confirmMsg: "Sure to delete?",
             apiUrl: 'products/products'
           },
           {

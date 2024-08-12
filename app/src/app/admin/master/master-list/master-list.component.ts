@@ -13,12 +13,14 @@ import { EmployeeModule } from '../../hrms/hrms.module';
 import { TasksModule } from '../../tasks/tasks.module';
 import { AssetsModule } from '../../assets/assets.module';
 import { LeadsModule } from '../../leads/leads.module';
+import { OrdersModule } from '../../orders/orders.module';
+import { MasterModule } from '../master.module';
 
 
 @Component({
   selector: 'app-master-list',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, ProductsModule, CustomersModule, VendorsModule, EmployeeModule, TasksModule, AssetsModule, LeadsModule],
+  imports: [CommonModule, AdminCommmonModule, ProductsModule, CustomersModule, VendorsModule, EmployeeModule, TasksModule, AssetsModule, LeadsModule, MasterModule, OrdersModule],
   templateUrl: './master-list.component.html',
   styleUrls: ['./master-list.component.scss']
 })

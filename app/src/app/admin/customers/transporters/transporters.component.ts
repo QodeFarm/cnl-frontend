@@ -13,7 +13,7 @@ export class TransportersComponent {
     tableConfig: {
       apiUrl: 'masters/transporters/',
       title: 'Transporters',
-      showCheckbox: true,
+      
       pkId: "transporter_id",
       pageSize: 10,
       "globalSearch": {

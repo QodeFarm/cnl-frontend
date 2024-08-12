@@ -13,7 +13,6 @@ export class LedgerGroupsComponent {
     tableConfig: {
       apiUrl: 'masters/ledger_groups/',
       title: 'Ledger Groups',
-      showCheckbox:true,
       pkId: "ledger_group_id",
       pageSize: 10,
       "globalSearch": {

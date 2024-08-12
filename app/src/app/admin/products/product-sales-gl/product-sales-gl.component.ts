@@ -13,7 +13,7 @@ export class ProductSalesGlComponent {
     tableConfig: {
       apiUrl: 'products/product_sales_gl/',
       title: 'Product Sales GL',
-      showCheckbox: true,
+      
       pkId: "sales_gl_id",
       pageSize: 10,
       "globalSearch": {
@@ -105,7 +105,7 @@ export class ProductSalesGlComponent {
               type: 'delete',
               label: 'Delete',
               confirm: true,
-              confirmMsg: "are you Sure to delete?",
+              confirmMsg: "Sure to delete?",
               apiUrl: 'products/product_sales_gl'
             },
             {
