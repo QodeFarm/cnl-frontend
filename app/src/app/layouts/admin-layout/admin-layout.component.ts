@@ -108,7 +108,7 @@ export class AdminLayoutComponent {
         ]
       },
       {
-        link: '/admin/dashboard',
+        link: '/admin/finance',
         label: 'Finance',
         icon: 'icon icon-finance',
       },
@@ -244,7 +244,7 @@ export class AdminLayoutComponent {
             icon: 'fas fa-tachometer-alt',
           },
           {
-            link: '/admin/customers/ledger_groups', 
+            link: '/admin/customers/ledger_groups',
             label: 'Ledger Groups',
             icon: 'fas fa-tachometer-alt',
           },
@@ -254,13 +254,13 @@ export class AdminLayoutComponent {
             icon: 'fas fa-tachometer-alt',
           },
           {
-            link: '/admin/customers/territory', 
+            link: '/admin/customers/territory',
             label: 'Territory',
             icon: 'fas fa-tachometer-alt',
           },
         ],
-        },
-        {
+      },
+      {
         label: 'Product Masters',
         icon: 'icon icon-production',
         child: [
