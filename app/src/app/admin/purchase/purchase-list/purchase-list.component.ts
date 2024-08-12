@@ -37,7 +37,7 @@ export class PurchaseListComponent {
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
           // console.log("-->", currentValue);
-          return `${row.purchase_type.name}`;
+          return `${row.purchase_type_id.name}`;
         },
       },
       {
