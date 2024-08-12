@@ -30,12 +30,12 @@ export class LedgerAccountsComponent {
           name: 'Code',
           sort: true
         },
-        {
-          fieldKey: 'is_subledger',
-          name: 'Is Subledger',
-          sort: false,
-          type: 'boolean'
-        },
+        // {
+        //   fieldKey: 'is_subledger',
+        //   name: 'Is Subledger',
+        //   sort: false,
+        //   type: 'boolean'
+        // },
         {
           fieldKey: 'inactive',
           name: 'Inactive',
@@ -53,28 +53,28 @@ export class LedgerAccountsComponent {
           sort: false,
           isEncrypted: true
         },
-        {
-          fieldKey: 'rtgs_ifsc_code', 
-          name: 'RTGS-IFSC',
-          sort: false
-        },
-        {
-          fieldKey: 'classification',
-          name: 'Classification',
-          sort: false,
-        },
+        // {
+        //   fieldKey: 'rtgs_ifsc_code', 
+        //   name: 'RTGS-IFSC',
+        //   sort: false
+        // },
+        // {
+        //   fieldKey: 'classification',
+        //   name: 'Classification',
+        //   sort: false,
+        // },
         {
           fieldKey: 'is_loan_account',
           name: 'Loan Account',
           sort: false,
           type: 'boolean'
         },
-        {
-          fieldKey: 'tds_applicable',
-          name: 'TDS',
-          sort: false,
-          type: 'boolean'
-        },
+        // {
+        //   fieldKey: 'tds_applicable',
+        //   name: 'TDS',
+        //   sort: false,
+        //   type: 'boolean'
+        // },
         {
           fieldKey: 'address', 
           name: 'Address',

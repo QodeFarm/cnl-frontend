@@ -32,11 +32,11 @@ export class ProductBrandsComponent {
           name: 'Code',
           sort: true
         },
-        {
-          fieldKey: 'picture',
-          name: 'Picture',
-          sort: true
-        },
+        // {
+        //   fieldKey: 'picture',
+        //   name: 'Picture',
+        //   sort: true
+        // },
         {
           fieldKey: 'brand_salesman',
           name: 'Brand Salesman',
