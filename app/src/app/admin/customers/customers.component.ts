@@ -22,6 +22,7 @@ export class CustomersComponent {
   ngOnInit() {
     this.showCustomerList = false;
     this.showForm = true;  //temporary change 'true'
+    this.CustomerEditID = null;
     // Set form config
     this.setFormConfig();
     console.log('this.formConfig', this.formConfig);
@@ -90,9 +91,9 @@ export class CustomersComponent {
       if (res && res.data) {
         this.formConfig.model = res.data;
         // Set labels for update
+        this.formConfig.pkId = 'customer_id';
         this.formConfig.submit.label = 'Update';
         // Show form after setting form values
-        this.formConfig.pkId = 'customer_id';
         this.formConfig.model['customer_id'] = this.CustomerEditID;
         this.showForm = true;
       }
@@ -105,15 +106,14 @@ export class CustomersComponent {
   }
 
   setFormConfig() {
+    this.CustomerEditID = null;
     this.formConfig = {
-      valueChangeFn: (res) => {
-        // this.totalAmountCal();
-      },
       url: "customers/customers/",
       title: 'Customers',
       formState: {
         viewMode: false
       },
+      showActionBtn: true,
       exParams: [],
       submit: {
         label: 'submit',
