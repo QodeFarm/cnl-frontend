@@ -13,7 +13,7 @@ export class ProductGstClassificationsComponent {
     tableConfig: {
       apiUrl: 'products/product_gst_classifications/',
       title: 'Product GST Classifications',
-      showCheckbox: true,
+      
       pkId: "gst_classification_id",
       pageSize: 10,
       "globalSearch": {

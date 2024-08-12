@@ -13,7 +13,7 @@ export class ProductSalesGlComponent {
     tableConfig: {
       apiUrl: 'products/product_sales_gl/',
       title: 'Product Sales GL',
-      showCheckbox: true,
+      
       pkId: "sales_gl_id",
       pageSize: 10,
       "globalSearch": {

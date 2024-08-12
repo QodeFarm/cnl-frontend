@@ -23,6 +23,7 @@ export class VendorsComponent{
   ngOnInit() {
     this.showVendorList = false;
     this.showForm = true;
+    this.VendorEditID = null;
     // Set form config
     this.setFormConfig();
     console.log('this.formConfig', this.formConfig);
@@ -106,15 +107,14 @@ export class VendorsComponent{
   }
 
   setFormConfig() {
+    this.VendorEditID = null;
     this.formConfig = {
-        valueChangeFn: (res) => {
-            // this.totalAmountCal();
-          },
       url: "vendors/vendors/",
       title: 'Vendor',
       formState: {
         viewMode: false
       },
+      showActionBtn: true,
       exParams: [
         //  {
         //   key: 'city_id',

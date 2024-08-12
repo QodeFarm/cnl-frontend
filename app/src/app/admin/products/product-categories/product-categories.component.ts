@@ -13,7 +13,7 @@ export class ProductCategoriesComponent  {
   tableConfig: {
     apiUrl: 'products/product_categories/',
     title: 'Product Categories',
-    showCheckbox: true,
+    
     pkId: "category_id",
     pageSize: 10,
     "globalSearch": {

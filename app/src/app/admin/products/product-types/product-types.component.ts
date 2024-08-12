@@ -15,7 +15,7 @@ export class ProductTypesComponent {
     tableConfig: {
       apiUrl: 'masters/product_types/',
       title: 'Product Types',
-      showCheckbox: true,
+      
       pkId: "type_id",
       pageSize: 10,
       "globalSearch": {
@@ -60,13 +60,14 @@ export class ProductTypesComponent {
       exParams: [
       ],
       fields: 
-    [ 
-      {
+      [ 
+        {
         fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
         fieldGroup: 
-      [
-       {
-          type: 'text',
+        [
+         {
+          key: 'type_name',
+          type: 'input',
           className: 'col-6 pb-3 ps-0',
           templateOptions: {
             label: 'Type Name',
@@ -105,7 +106,7 @@ export class ProductTypesComponent {
             label: 'Delete',
             confirm: true,
             confirmMsg: "Sure to delete?",
-            apiUrl: 'api/masters/product_types/'
+            apiUrl: 'api/masters/product_types'
           },
           {
             type: 'callBackFn',

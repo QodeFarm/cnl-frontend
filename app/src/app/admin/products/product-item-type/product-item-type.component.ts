@@ -14,7 +14,7 @@ export class ProductItemTypeComponent {
     tableConfig: {
       apiUrl: 'masters/product_item_type/',
       title: 'Product Item Type',
-      showCheckbox: true,
+      
       pkId: "item_type_id",
       pageSize: 10,
       "globalSearch": {

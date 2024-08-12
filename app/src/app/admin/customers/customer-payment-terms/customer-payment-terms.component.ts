@@ -13,7 +13,7 @@ export class CustomerPaymentTermsComponent {
     tableConfig: {
       apiUrl: 'masters/customer_payment_terms/',
       title: 'Customer Payment Terms',
-      // showCheckbox: true,
+      // 
       pkId: "payment_term_id",
       pageSize: 10,
       "globalSearch": {

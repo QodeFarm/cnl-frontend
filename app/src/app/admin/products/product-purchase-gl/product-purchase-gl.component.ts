@@ -13,7 +13,7 @@ export class ProductPurchaseGlComponent {
     tableConfig: {
       apiUrl: 'products/product_purchase_gl/',
       title: 'Product Purchase GL',
-      showCheckbox: true,
+      
       pkId: "purchase_gl_id",
       pageSize: 10,
       "globalSearch": {
