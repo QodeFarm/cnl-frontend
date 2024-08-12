@@ -149,6 +149,7 @@
                             <li><a [routerLink]="['/admin/master/product-item-type']">Product item types</a></li>
                             <li><a [routerLink]="['/admin/master/product-purchase-gl']">Product purchase gl</a></li>
                             <li><a [routerLink]="['/admin/master/product-stock-units']">Product stock units</a></li>
+                            <li><a [routerLink]="['/admin/master/product-item-balance']">Product item balence</a></li>
                             <li><a [routerLink]="['/admin/master/product-unique-quantity-codes']">Products unique quantity codes</a></li>
                             <li><a [routerLink]="['/admin/master/unit-options']">Unit options</a></li>
                         </ul>
@@ -182,6 +183,9 @@
                         </ng-container>
                         <ng-container *ngSwitchCase="'product-sales-gl'">
                             <app-product-sales-gl></app-product-sales-gl>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'product-item-balance'">
+                            <app-product-item-balance></app-product-item-balance>
                         </ng-container>
                         <ng-container *ngSwitchCase="'product-purchase-gl'"> 
                             <app-product-purchase-gl></app-product-purchase-gl>

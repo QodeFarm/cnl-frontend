@@ -16,7 +16,8 @@ export class SalesinvoiceComponent {
   SaleInvoiceEditID: any;
   productOptions: any;
   nowDate = () => {
-    return new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate();
+    const date = new Date();
+    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   }
 
   constructor(private http: HttpClient) {
@@ -700,6 +701,7 @@ export class SalesinvoiceComponent {
                       defaultValue: this.nowDate(),
                       className: 'col-6',
                       templateOptions: {
+                        type: 'date',
                         label: 'Shipping Date',
                         required: true
                       }
