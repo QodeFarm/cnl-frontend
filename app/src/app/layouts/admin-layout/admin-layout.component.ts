@@ -320,17 +320,20 @@ export class AdminLayoutComponent {
 
   }
   //===============================SpeechRecognition========================================
-    // Method to start speech recognition
-  public startSpeechRecognition(duration: number = 10000): void { // Default duration is 10 seconds
+ 
+  // Method to start speech recognition
+  public startSpeechRecognition(duration: number = 10000, shouldRestart: boolean = false): void { // Default duration is 10 seconds
     this.initializeSpeechRecognition(); // Initialize the recognition if not already done
     if (this.recognition) {
       this.recognition.start(); // Start speech recognition
 
-      // Restart recognition if it ends before the timeout
-      this.recognition.onend = () => {
-        console.log('Speech recognition service ended, restarting...');
-        this.recognition?.start(); // Restart speech recognition
-      };
+      if (shouldRestart) {
+        // Restart recognition if it ends before the timeout only for specific actions
+        this.recognition.onend = () => {
+          console.log('Speech recognition service ended, restarting...');
+          this.recognition?.start(); // Restart speech recognition
+        };
+      }
 
       // Stop recognition after specified duration
       setTimeout(() => {
@@ -379,13 +382,19 @@ export class AdminLayoutComponent {
   // Method to handle API-related speech commands
   private handleApiCommands(speech: string): void {
     // Regular expression to match "create new role for <role_name> and description is <role_description>"
-    const roleMatch = speech.match(/create new role for (.+?) and description is (.+)/);
+    let roleMatch = speech.match(/create new role for (.+?) and description is (.+)/);
+    
+    if (!roleMatch) {
+      // Check for "each" and replace with "is" in the role description
+      speech = speech.replace(/ and description each /g, ' and description is ');
+      roleMatch = speech.match(/create new role for (.+?) and description is (.+)/);
+    }
 
     if (roleMatch && roleMatch[1]) {
       const roleName = roleMatch[1].trim(); // Capture the role name and trim any leading/trailing whitespace
       const roleDescription = roleMatch[2]?.trim() || ''; // Capture the role description or set it as an empty string if not provided
       this.createRole(roleName, roleDescription); // Call the method to create a role
-      this.startSpeechRecognition(10000); // Mic active for 10 seconds
+      this.startSpeechRecognition(10000, false); // Mic active for 10 seconds without restart
       return;
     }
 
@@ -395,7 +404,7 @@ export class AdminLayoutComponent {
       const endpoint = oneFieldMatch[1].trim(); // Capture the endpoint and trim any leading/trailing whitespace
       const name = oneFieldMatch[2].trim(); // Capture the name and trim any leading/trailing whitespace
       this.createOneFieldData(endpoint, name); // Call the method to create the data
-      this.startSpeechRecognition(10000); // Mic active for 10 seconds
+      this.startSpeechRecognition(10000, false); // Mic active for 10 seconds without restart
       return;
     }
 
@@ -419,10 +428,10 @@ export class AdminLayoutComponent {
     const page = Object.keys(pages).find(page => speech.includes('go to ' + page));
     if (page) {
       this.router.navigate([pages[page]]);
-      this.startSpeechRecognition(1000); // Mic active for 3 seconds for navigation
+      this.startSpeechRecognition(3000, false); // Mic active for 3 seconds for navigation without restart
     } else if (this.router.url.includes('admin/sales') && speech.includes('start filling form')) {
       this.startSalesOrderForm(); // Start the sales order form process if on the sales page
-      this.startSpeechRecognition(60000); // Mic active for 60 seconds while filling the form
+      this.startSpeechRecognition(60000, true); // Mic active for 60 seconds while filling the form with restart
     } else {
       console.log('Speech not recognized for navigation or form actions');
     }
@@ -499,7 +508,7 @@ export class AdminLayoutComponent {
       const value = parts[1].trim();
 
       // Update the form data if the key matches the expected fields
-      if (['sale_type', 'customer', 'ref_number', 'tax', 'remarks'].includes(key)) {
+      if (['sale type', 'customer', 'ref_number', 'tax', 'remarks'].includes(key)) {
         formData[key] = value; // Update form data with the recognized speech
       }
     });
