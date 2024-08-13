@@ -16,7 +16,8 @@ export class PurchasereturnordersComponent {
   PurchaseReturnOrderEditID: any;
   productOptions: any;
   nowDate = () => {
-    return new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate();
+    const date = new Date();
+    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   }
 
   constructor(private http: HttpClient) {}
@@ -76,15 +77,14 @@ export class PurchasereturnordersComponent {
   }
 
   setFormConfig() {
+    this.PurchaseReturnOrderEditID = null;
     this.formConfig = {
-      valueChangeFn: (res) => {
-        // this.totalAmountCal();
-      },
       url: "purchase/purchase_return_order/",
       title: '',
       formState: {
         viewMode: false
       },
+      showActionBtn: true,
       exParams: [
         {
           key: 'purchase_return_items',
@@ -357,7 +357,7 @@ export class PurchasereturnordersComponent {
                   dataLabel: 'name',
                   // options: this.productOptions,
                   options: [],
-                  required: false,
+                  required: true,
                   lazy: {
                     url: 'products/products/?summary=true',
                     lazyOneTime: true
@@ -718,7 +718,9 @@ export class PurchasereturnordersComponent {
                       type: 'date',
                       className: 'col-6',
                       templateOptions: {
+                        type: 'date',
                         label: 'Shipping Date',
+                        required: true
                       }
                     },
                     {
@@ -728,6 +730,7 @@ export class PurchasereturnordersComponent {
                       templateOptions: {
                         label: 'Shipping Charges.',
                         placeholder: 'Enter Shipping Charges',
+                        required: true
                       }
                     },
                   ]

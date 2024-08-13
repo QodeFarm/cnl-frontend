@@ -91,7 +91,8 @@ export class BranchListComponent {
           },
           {
             type: 'callBackFn',
-            label: 'Edit',
+            icon: 'fa fa-pen',
+            label: '',
             callBackFn: (row, action) => {
               this.edit.emit(row.branch_id);
               // this.router.navigateByUrl('company/branches' + row.branch_id);

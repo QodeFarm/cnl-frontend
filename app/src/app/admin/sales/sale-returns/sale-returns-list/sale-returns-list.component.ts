@@ -35,7 +35,7 @@ tableConfig: TaTableConfig = {
       name: 'Customer',
       displayType: "map",
       mapFn: (currentValue: any, row: any, col: any) => {
-        return `${row.customer_id.name}`;
+        return `${row.customer.name}`;
       },
       sort: true
     },
@@ -54,7 +54,7 @@ tableConfig: TaTableConfig = {
       name: 'Status',
       displayType: "map",
       mapFn: (currentValue: any, row: any, col: any) => {
-        return `${row.order_status_id.status_name}`;
+        return `${row.order_status.status_name}`;
       },
       sort: true
     },

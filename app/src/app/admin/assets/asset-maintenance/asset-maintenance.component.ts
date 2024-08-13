@@ -21,6 +21,7 @@ export class AssetMaintenanceComponent {
   ngOnInit() {
     this.showAssetMaintenanceList = false;
     this.showForm = true;
+    this.AssetMaintenanceEditID =null;
     // set form config
     this.setFormConfig();
     console.log('this.formConfig', this.formConfig);
@@ -38,10 +39,11 @@ export class AssetMaintenanceComponent {
     this.http.get(this.baseUrl + 'assets/asset_maintenance/'  + event).subscribe((res: any) => {
       if (res) {
         this.formConfig.model = res;
+        this.formConfig.showActionBtn = true;
+        this.formConfig.pkId = 'asset_maintenance_id';
         // Set labels for update
         this.formConfig.submit.label = 'Update';
         // Show form after setting form values
-        this.formConfig.pkId = 'asset_maintenance_id';
         this.formConfig.model['asset_maintenance_id'] = this.AssetMaintenanceEditID;
         this.showForm = true;
       }
@@ -50,6 +52,7 @@ export class AssetMaintenanceComponent {
   }
 
   showAssetMaintenanceListFn() {
+    this.AssetMaintenanceEditID = null;
     this.showAssetMaintenanceList = true;
   };
 
@@ -60,6 +63,7 @@ export class AssetMaintenanceComponent {
         formState: {
           viewMode: false,
         },
+        showActionBtn: true,
         exParams: [
           {
             key: 'asset_id',
@@ -68,10 +72,14 @@ export class AssetMaintenanceComponent {
           },
         ],
         submit: {
-          label: 'Submit',
+          label: 'submit',
           submittedFn: () => this.ngOnInit()
         },
-        reset: {},
+        reset: {
+          resetFn: () => {
+            this.ngOnInit();
+          }
+        },
         model:{},
         fields: [
           {

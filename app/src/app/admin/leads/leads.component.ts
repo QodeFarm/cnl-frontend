@@ -31,6 +31,7 @@ export class LeadsComponent {
   ngOnInit() {
     this.showLeadsList = false;
     this.showForm = false;
+    this.LeadsEditID = null;
     // set form config
     this.setFormConfig();
     this.set_default_status_id(); // lead_status_id = 'Open'
@@ -49,9 +50,10 @@ export class LeadsComponent {
     this.http.get('leads/leads/' + event).subscribe((res: any) => {
       if (res && res.data) {
         this.formConfig.model = res.data;
+        this.formConfig.showActionBtn = true;
+        this.formConfig.pkId = 'lead_id';
         // set labels for update
         this.formConfig.submit.label = 'Update';
-        this.formConfig.pkId = 'lead_id';
         this.formConfig.model['lead_id'] = this.LeadsEditID;
         this.showForm = true;
         this.formConfig.fields[0].fieldGroup[5].hide = false; // Leads[lead_status_id]   hide = true
@@ -67,6 +69,7 @@ export class LeadsComponent {
   };
 
   setFormConfig() {
+    this.LeadsEditID =null
     this.formConfig = {
       url: "leads/leads/",
       // title: 'leads',
@@ -74,12 +77,17 @@ export class LeadsComponent {
         viewMode: false,
         // isEdit: false,
       },
+      showActionBtn: true,
       exParams: [],
       submit: {
-        label: 'Submit',
+        label: 'submit',
         submittedFn: () => this.ngOnInit()
       },
-      reset: {},
+      reset: {
+        resetFn: () => {
+          this.ngOnInit();
+        }
+      },
       model: {
         lead: {},
         interaction: {},

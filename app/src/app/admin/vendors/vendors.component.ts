@@ -13,7 +13,8 @@ export class VendorsComponent{
   showForm: boolean = false;
   VendorEditID: any;
   nowDate = () => {
-    return new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate();
+    const date = new Date();
+    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   }
 
   private observer: MutationObserver;
