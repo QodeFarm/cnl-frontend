@@ -53,21 +53,21 @@ export class VendorsListComponent {
         sort: false,
       },
       {
-        fieldKey: 'vendor_category_id.name',
+        fieldKey: 'vendor_category_id',
         name: 'Vendor Category',
         sort: false,
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
-          return row.vendor_category_id.name;
+          return row.vendor_category.name;
         },
       },
       {
-        fieldKey: 'ledger_account_id.name',
-        name: 'Account Name',
+        fieldKey: 'ledger_account',
+        name: 'Ledger Account',
         sort: false,
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
-          return row.ledger_account_id.name;
+          return row.ledger_account.name;
         },
       },
       {

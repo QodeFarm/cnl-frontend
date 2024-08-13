@@ -67,7 +67,7 @@ export class CustomersListComponent {
         sort: false,
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
-          return row.ledger_account_id.name;
+          return row.ledger_account.name;
         },
       },
       {

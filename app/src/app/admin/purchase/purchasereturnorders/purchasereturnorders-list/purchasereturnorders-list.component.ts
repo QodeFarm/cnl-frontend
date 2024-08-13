@@ -34,7 +34,7 @@ export class PurchasereturnordersListComponent {
         name: 'Purchase Type',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.purchase_type_id.name}`;
+          return `${row.purchase_type.name}`;
         },
         sort: true
       },
@@ -73,7 +73,7 @@ export class PurchasereturnordersListComponent {
         name: 'Vendor',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.vendor_id.name}`;
+          return `${row.vendor.name}`;
         },
         sort: true
       },
@@ -82,7 +82,7 @@ export class PurchasereturnordersListComponent {
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.order_status_id.status_name}`;
+          return `${row.order_status.status_name}`;
         },
         sort: true
       },

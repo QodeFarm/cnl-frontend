@@ -25,7 +25,8 @@ export class SalesComponent {
   noOrdersMessage: string;
   
   nowDate = () => {
-    return new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate();
+    const date = new Date();
+    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   }
   // invoiceData: any;
 
@@ -790,8 +791,11 @@ export class SalesComponent {
                       key: 'shipping_date',
                       type: 'date',
                       className: 'col-6',
+                      defaultValue: this.nowDate(),
                       templateOptions: {
-                        label: 'Shipping Date'
+                        type: 'date',
+                        label: 'Shipping Date',
+                        required: true
                       }
                     },
                     {
@@ -802,6 +806,7 @@ export class SalesComponent {
                         type: "number",
                         label: 'Shipping Charges.',
                         placeholder: 'Enter Shipping Charges',
+                        required: true
                       }
                     }
                   ]
