@@ -93,7 +93,7 @@ export class PurchasereturnordersComponent {
         }
       ],
       submit: {
-        label: 'submit',
+        label: 'Submit',
         submittedFn: () => this.ngOnInit()
       },
       reset: {
