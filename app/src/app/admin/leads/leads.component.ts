@@ -80,7 +80,7 @@ export class LeadsComponent {
       showActionBtn: true,
       exParams: [],
       submit: {
-        label: 'submit',
+        label: 'Submit',
         submittedFn: () => this.ngOnInit()
       },
       reset: {
