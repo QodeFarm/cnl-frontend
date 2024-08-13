@@ -222,15 +222,14 @@ export class SalesComponent {
 
 
   setFormConfig() {
+    this.SaleOrderEditID = null;
     this.formConfig = {
-      valueChangeFn: (res) => {
-        // this.totalAmountCal();
-      },
       url: "sales/sale_order/",
       title: '',
       formState: {
         viewMode: false
       },
+      showActionBtn: true,
       exParams: [
         {
           key: 'sale_order_items',
@@ -239,6 +238,7 @@ export class SalesComponent {
         }
       ],
       submit: {
+        label: 'Submit',
         submittedFn: () => this.ngOnInit()
       },
       reset: {
@@ -1058,7 +1058,7 @@ export class SalesComponent {
                                             payment_term_id: saleOrder.payment_term_id,
                                             payment_link_type_id: saleOrder.payment_link_type_id,
                                             ledger_account_id: saleOrder.ledger_account_id,
-                                            order_status_id: saleOrder.order_status_id
+                                            order_status_id: saleOrder.order_status_id['In Progress']//saleOrder.order_status_id
                                           },
                                           sale_invoice_items: saleOrderItems.map(item => ({
                                             quantity: item.quantity || 1,

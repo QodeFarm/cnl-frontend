@@ -72,7 +72,7 @@ export class AssetMaintenanceComponent {
           },
         ],
         submit: {
-          label: 'submit',
+          label: 'Submit',
           submittedFn: () => this.ngOnInit()
         },
         reset: {
