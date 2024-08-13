@@ -43,7 +43,7 @@ export class RolesComponent {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
-              apiUrl: 'users/role/'
+              apiUrl: 'users/role'
             },
             {
               type: 'edit',

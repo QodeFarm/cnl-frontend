@@ -17,10 +17,16 @@ export class ProductsListComponent {
   @Output('edit') edit = new EventEmitter<void>();
 
   tableConfig: TaTableConfig = {
-    apiUrl: 'products/products/',
-    showCheckbox: true,
+    apiUrl: 'products/products/?summary=true',
+    
     title: 'Products',
     pkId: "product_id",
+    fixedFilters: [
+      {
+        key: 'summary',
+        value: 'true'
+      }
+    ],
     pageSize: 10,
     globalSearch: {
       keys: ['product_id', 'name']
@@ -50,16 +56,16 @@ export class ProductsListComponent {
         name: 'Sale Rate',
         sort: false
       },
-      {
-        fieldKey: 'wholesale_rate',
-        name: 'Wholesale',
-        sort: false
-      },
-      {
-        fieldKey: 'dealer_rate',
-        name: 'Dealer',
-        sort: false
-      },
+      // {
+      //   fieldKey: 'wholesale_rate',
+      //   name: 'Wholesale',
+      //   sort: false
+      // },
+      // {
+      //   fieldKey: 'dealer_rate',
+      //   name: 'Dealer',
+      //   sort: false
+      // },
       {
         fieldKey: 'mrp',
         name: 'MRP',
@@ -99,7 +105,7 @@ export class ProductsListComponent {
             type: 'delete',
             label: 'Delete',
             confirm: true,
-            confirmMsg: "are you sure to delete?",
+            confirmMsg: "Sure to delete?",
             apiUrl: 'products/products'
           },
           {

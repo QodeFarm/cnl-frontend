@@ -13,7 +13,6 @@ export class LedgerAccountsComponent {
     tableConfig: {
       apiUrl: 'customers/ledger_accounts/',
       title: 'Ledger Accounts',
-      showCheckbox:true,
       pkId: "ledger_account_id",
       pageSize: 10,
       "globalSearch": {

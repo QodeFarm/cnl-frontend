@@ -31,13 +31,13 @@ export class PurchaseListComponent {
     },
     cols: [
       {
-        fieldKey: 'purchase_type',
+        fieldKey: 'purchase_type_id',
         name: 'Purchase Type',
         sort: true,
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
           // console.log("-->", currentValue);
-          return `${currentValue?.name}`;
+          return `${row.purchase_type.name}`;
         },
       },
       {
@@ -66,11 +66,11 @@ export class PurchaseListComponent {
         sort: false
       },
       {
-        fieldKey: 'vendor',
+        fieldKey: 'vendor_id',
         name: 'Vendor',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.vendor_id.name}`;
+          return `${row.vendor.name}`;
         },
         sort: true
       },
@@ -79,7 +79,7 @@ export class PurchaseListComponent {
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.order_status_id.status_name}`;
+          return `${row.order_status.status_name}`;
         },
         sort: true
       },

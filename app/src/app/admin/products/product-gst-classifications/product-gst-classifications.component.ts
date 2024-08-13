@@ -13,7 +13,7 @@ export class ProductGstClassificationsComponent {
     tableConfig: {
       apiUrl: 'products/product_gst_classifications/',
       title: 'Product GST Classifications',
-      showCheckbox: true,
+      
       pkId: "gst_classification_id",
       pageSize: 10,
       "globalSearch": {
@@ -49,7 +49,7 @@ export class ProductGstClassificationsComponent {
               type: 'delete',
               label: 'Delete',
               confirm: true,
-              confirmMsg: "are you Sure to delete?",
+              confirmMsg: "Sure to delete?",
               apiUrl: 'products/product_gst_classifications'
             },
             {

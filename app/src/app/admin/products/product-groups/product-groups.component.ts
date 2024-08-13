@@ -13,7 +13,7 @@ export class ProductGroupsComponent   {
   tableConfig: {
     apiUrl: 'products/product_groups/',
     title: 'Product Groups',
-    showCheckbox: true,
+    
     pkId: "product_group_id",
     pageSize: 10,
     "globalSearch": {
@@ -40,7 +40,7 @@ export class ProductGroupsComponent   {
             type: 'delete',
             label: 'Delete',
             confirm: true,
-            confirmMsg: "are you Sure to delete?",
+            confirmMsg: "Sure to delete?",
             apiUrl: 'products/product_groups'
           },
           {

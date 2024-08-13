@@ -14,6 +14,9 @@
             <a class="nav-link" data-bs-toggle="tab" href="#products">Products</a>
         </li>
         <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#orders">Orders</a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link" data-bs-toggle="tab" href="#hrms">HRMS</a>
         </li>
         <li class="nav-item">
@@ -39,6 +42,8 @@
                             <li><a [routerLink]="['/admin/master/firm-statuses']">Firm status</a></li>
                             <li><a [routerLink]="['/admin/master/gst-categories']">GST categories</a></li>
                             <li><a [routerLink]="['/admin/master/price-categories']">Price categories</a></li>
+                            <li><a [routerLink]="['/admin/master/shipping-modes']">Shipping modes</a></li>
+                            <li><a [routerLink]="['/admin/master/shipping-companies']">Shipping companies</a></li>
                         </ul>
                     </div>
                 </div>
@@ -59,6 +64,12 @@
                         <ng-container *ngSwitchCase="'price-categories'">
                             <app-price-categories></app-price-categories>
                         </ng-container>
+                        <ng-container *ngSwitchCase="'shipping-modes'">
+                            <app-shipping-modes></app-shipping-modes>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'shipping-companies'">
+                            <app-shipping-companies></app-shipping-companies>
+                        </ng-container>
                     </ng-container>
                 </div>
             </div>
@@ -70,8 +81,9 @@
                     <div class="custom-menu-card">
                         <h6 class="custom-sub-heading">Customers Data</h6>
                         <ul class="master-menu-list">
-                            <li><a [routerLink]="['/admin/master/ledger-accounts']">Ledger Accounts</a></li>
-                            <li><a [routerLink]="['/admin/master/ledger-groups']">Ledger Groups</a></li>
+                            <li><a [routerLink]="['/admin/master/ledger-accounts']">Ledger accounts</a></li>
+                            <li><a [routerLink]="['/admin/master/ledger-groups']">Ledger groups</a></li>
+                            <li><a [routerLink]="['/admin/master/customer-payment-terms']">Customer payment terms</a></li>
                         </ul>
                     </div>
                 </div>
@@ -82,6 +94,9 @@
                             </ng-container>
                             <ng-container *ngSwitchCase="'ledger-groups'">
                                 <app-ledger-groups></app-ledger-groups>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'customer-payment-terms'">
+                                <app-customer-payment-terms></app-customer-payment-terms>
                             </ng-container>
                             <!-- <div *ngSwitchDefault> -->
                             </ng-container>
@@ -134,6 +149,7 @@
                             <li><a [routerLink]="['/admin/master/product-item-type']">Product item types</a></li>
                             <li><a [routerLink]="['/admin/master/product-purchase-gl']">Product purchase gl</a></li>
                             <li><a [routerLink]="['/admin/master/product-stock-units']">Product stock units</a></li>
+                            <li><a [routerLink]="['/admin/master/product-item-balance']">Product item balence</a></li>
                             <li><a [routerLink]="['/admin/master/product-unique-quantity-codes']">Products unique quantity codes</a></li>
                             <li><a [routerLink]="['/admin/master/unit-options']">Unit options</a></li>
                         </ul>
@@ -167,6 +183,9 @@
                         </ng-container>
                         <ng-container *ngSwitchCase="'product-sales-gl'">
                             <app-product-sales-gl></app-product-sales-gl>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'product-item-balance'">
+                            <app-product-item-balance></app-product-item-balance>
                         </ng-container>
                         <ng-container *ngSwitchCase="'product-purchase-gl'"> 
                             <app-product-purchase-gl></app-product-purchase-gl>
@@ -273,6 +292,51 @@
                         </ng-container>
                         <ng-container *ngSwitchCase="'interaction-types'">
                             <app-interaction-types></app-interaction-types>
+                        </ng-container>
+                    </ng-container>
+
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane  fade" id="orders">
+            <!-- Content for Products tab -->
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="custom-menu-card">
+                        <h6 class="custom-sub-heading">Leads Data</h6>
+                        <ul class="master-menu-list">
+                            <li><a [routerLink]="['/admin/master/statuses']">Statuses</a></li>
+                            <li><a [routerLink]="['/admin/master/order-statuses']">Order statuses</a></li>
+                            <li><a [routerLink]="['/admin/master/order-types']">Order types</a></li>
+                            <li><a [routerLink]="['/admin/master/purchase-types']">Purchase types</a></li>
+                            <li><a [routerLink]="['/admin/master/sale-types']">Sale types</a></li>
+                            <li><a [routerLink]="['/admin/master/gst-types']">Gst types</a></li>
+                            <li><a [routerLink]="['/admin/master/payment-link-type']">Payment link type</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <ng-container [ngSwitch]="code">
+                        <ng-container *ngSwitchCase="'gst-types'">
+                            <app-gst-types></app-gst-types>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'order-statuses'">
+                            <app-order-statuses></app-order-statuses>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'order-types'">
+                            <app-order-types></app-order-types>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'purchase-types'">
+                            <app-purchase-types></app-purchase-types>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'sale-types'">
+                            <app-sale-types></app-sale-types>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'statuses'">
+                            <app-statuses></app-statuses>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'payment-link-type'">
+                            <app-payment-link-type></app-payment-link-type>
                         </ng-container>
                     </ng-container>
 

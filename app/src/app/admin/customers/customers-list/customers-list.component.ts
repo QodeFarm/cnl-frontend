@@ -67,7 +67,7 @@ export class CustomersListComponent {
         sort: false,
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
-          return row.ledger_account_id.name;
+          return row.ledger_account.name;
         },
       },
       {
@@ -85,7 +85,7 @@ export class CustomersListComponent {
             type: 'delete',
             label: 'Delete',
             confirm: true,
-            confirmMsg: "are you Sure to delete?",
+            confirmMsg: "Sure to delete?",
             apiUrl: 'customers/customers'
           },
           {

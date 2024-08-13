@@ -14,7 +14,7 @@ export class BrandSalesmanComponent {
     tableConfig: {
       apiUrl: 'masters/brand_salesman/',
       title: 'Brand Salesman',
-      showCheckbox: true,
+      
       pkId: "brand_salesman_id",
       pageSize: 10,
       "globalSearch": {
@@ -46,7 +46,7 @@ export class BrandSalesmanComponent {
               type: 'delete',
               label: 'Delete',
               confirm: true,
-              confirmMsg: "are you Sure to delete?",
+              confirmMsg: "Sure to delete?",
               apiUrl: 'masters/brand_salesman'
             },
             {

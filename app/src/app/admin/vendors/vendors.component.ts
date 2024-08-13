@@ -13,18 +13,18 @@ export class VendorsComponent{
   showForm: boolean = false;
   VendorEditID: any;
   nowDate = () => {
-    return new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate();
+    const date = new Date();
+    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   }
 
   private observer: MutationObserver;
 
-  formConfig: TaFormConfig = {};
-
-  constructor(private http: HttpClient, private router: Router) { }
+  constructor(private http: HttpClient) {}
 
   ngOnInit() {
     this.showVendorList = false;
     this.showForm = true;
+    this.VendorEditID = null;
     // Set form config
     this.setFormConfig();
     console.log('this.formConfig', this.formConfig);
@@ -81,27 +81,21 @@ export class VendorsComponent{
       this.observer.disconnect();
     }
   }
+  formConfig: TaFormConfig = {};
+
   hide() {
-    const modalCloseButton = document.getElementById('modalClose');
-    if (modalCloseButton) {
-      modalCloseButton.click();
-    }
+    document.getElementById('modalClose').click();
   }
 
   editVendor(event) {
-    console.log('event', event);
     this.VendorEditID = event;
     this.http.get('vendors/vendors/' + event).subscribe((res: any) => {
-      console.log('--------> res ', res);
       if (res && res.data) {
         this.formConfig.model = res.data;
-        console.log("vendors data", res.data)
-        
         // Set labels for update
         this.formConfig.submit.label = 'Update';
-        this.formConfig.pkId = 'vendor_id';
         // Show form after setting form values
-        
+        this.formConfig.pkId = 'vendor_id';
         this.formConfig.model['vendor_id'] = this.VendorEditID;
         this.showForm = true;
       }
@@ -114,28 +108,30 @@ export class VendorsComponent{
   }
 
   setFormConfig() {
+    this.VendorEditID = null;
     this.formConfig = {
       url: "vendors/vendors/",
       title: 'Vendor',
       formState: {
         viewMode: false
       },
+      showActionBtn: true,
       exParams: [
-        {
-          key: 'city_id',
-          type: 'script',
-          value: 'data.city.city_id'
-        },
-        {
-          key: 'state_id',
-          type: 'script',
-          value: 'data.state.state_id'
-        },
-        {
-          key: 'country_id',
-          type: 'script',
-          value: 'data.country.country_id'
-        }
+        //  {
+        //   key: 'city_id',
+        //   type: 'script',
+        //   value: 'data.city.city_id'
+        // },
+        // {
+        //   key: 'state_id',
+        //   type: 'script',
+        //   value: 'data.state.state_id'
+        // },
+        // {
+        //   key: 'country_id',
+        //   type: 'script',
+        //   value: 'data.country.country_id'
+        // } 
       ],
       submit: {
         label: 'submit',
