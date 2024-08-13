@@ -113,7 +113,7 @@ export class PurchaseComponent {
 
       ],
       submit: {
-        label: 'submit',
+        label: 'Submit',
         submittedFn: () => this.ngOnInit()
       },
       reset: {

@@ -134,7 +134,7 @@ export class VendorsComponent{
         // } 
       ],
       submit: {
-        label: 'submit',
+        label: 'Submit',
         submittedFn: () => this.ngOnInit()
       },
       reset: {
@@ -383,6 +383,7 @@ export class VendorsComponent{
                     className: 'ta-cell pr-md col-12',
                     templateOptions: {
                       label: 'Picture',
+                      required: true
                     }
                   },
                 ]

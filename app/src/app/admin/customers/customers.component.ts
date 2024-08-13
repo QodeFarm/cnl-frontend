@@ -117,7 +117,7 @@ export class CustomersComponent {
       showActionBtn: true,
       exParams: [],
       submit: {
-        label: 'submit',
+        label: 'Submit',
         submittedFn: () => this.ngOnInit()
       },
       reset: {

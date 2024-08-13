@@ -115,7 +115,7 @@ export class ProductsComponent implements OnInit {
         },
       ],
       submit: {
-        label: 'submit',
+        label: 'Submit',
         submittedFn: () => this.ngOnInit()
       },
       reset: {
