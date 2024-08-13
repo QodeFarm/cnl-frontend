@@ -65,11 +65,11 @@ export class AdminLayoutComponent {
         label: 'Dashboard',
         icon: 'icon icon-dashboard',
       },
-      {
-        link: '/admin/voiceassistant',
-        label: 'voiceassistant',
-        icon: 'fas fa-microphone',
-      },
+      // {
+      //   link: '/admin/voiceassistant',
+      //   label: 'voiceassistant',
+      //   icon: 'fas fa-microphone',
+      // },
       {
         label: 'User Management',
         icon: 'fas fa-user',
