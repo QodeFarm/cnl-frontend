@@ -202,7 +202,7 @@ generateQueryString(filters: { quickPeriod: string, fromDate: Date, toDate: Date
         queryParts.push(`created_at_before=${encodeURIComponent(toDateStr)}`);
     }
 
-    return '?' + queryParts.join('&');
+    return '?&' + queryParts.join('&');
 }
 formatDate(date: Date): string {
     // Format date as 'yyyy-MM-dd'

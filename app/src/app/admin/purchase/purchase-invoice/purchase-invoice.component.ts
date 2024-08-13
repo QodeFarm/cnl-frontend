@@ -380,11 +380,11 @@ export class PurchaseInvoiceComponent {
                   dataLabel: 'name',
                   // options: this.productOptions,
                   options: [],
-                  required: false,
+                  required: true,
                   lazy: {
                     url: 'products/products/?summary=true',
                     lazyOneTime: true
-                  }
+                  },
                 },
                 hooks: {
                   onInit: (field: any) => {

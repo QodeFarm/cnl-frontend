@@ -109,11 +109,12 @@ export class SalesComponent {
 
   showOrdersList() {
     const selectedCustomerId = this.formConfig.model.sale_order.customer_id;
-    this.noOrdersMessage = 'Please select a customer.';
+    const selectedCustomerName = this.formConfig.model.sale_order.customer?.name; // Assuming customer name is nested
   
     if (!selectedCustomerId) {
-      // alert('Please select a customer first.');
-      this.showOrderListModal = true;
+      this.noOrdersMessage = 'Please select a customer.'; // Set message for missing customer
+      this.customerOrders = []; // Clear any previous orders
+      this.openModal(); // Open modal to display the message
       return;
     }
   
@@ -123,8 +124,9 @@ export class SalesComponent {
     this.getOrdersByCustomer(selectedCustomerId).pipe(
       switchMap(orders => {
         if (orders.count === 0) {
-          this.noOrdersMessage = 'No Past orders for the selected customer.';
-          this.showOrderListModal = true; // Set to true to show the message in the modal
+          this.noOrdersMessage = `No Past orders for ${selectedCustomerName}.`; // Set message for no orders
+          this.customerOrders = []; // Ensure orders are cleared
+          this.openModal(); // Open modal to display the message
           return [];
         }
   
@@ -142,12 +144,21 @@ export class SalesComponent {
         return forkJoin(detailedOrderRequests).pipe(
           tap(() => {
             this.customerOrders = orders.data;
-            this.showOrderListModal = true;
+            this.openModal(); // Open modal with the orders list
           })
         );
       })
     ).subscribe();
   }
+  
+  openModal() {
+    this.ordersModal.nativeElement.classList.add('show');
+    this.ordersModal.nativeElement.style.display = 'block';
+    document.body.classList.add('modal-open');
+    document.body.style.overflow = 'hidden';
+  }
+  
+
   
   
 
@@ -478,7 +489,7 @@ export class SalesComponent {
                   hideLabel: true,
                   dataLabel: 'name',
                   options: [],
-                  required: false,
+                  required: true,
                   lazy: {
                     url: 'products/products/?summary=true',
                     lazyOneTime: true
