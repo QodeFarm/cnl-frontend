@@ -19,6 +19,7 @@ export class TasksComponent implements OnInit {
   ngOnInit() {
     this.showTasksList = false;
     this.showForm = false;
+    this.TasksEditID = null;
     // Set form config
     this.setFormConfig();
     console.log('this.formConfig', this.formConfig);
@@ -35,10 +36,11 @@ export class TasksComponent implements OnInit {
       console.log('--------> res ', res);
       if (res && res.data) {
         this.formConfig.model = res.data;
+        this.formConfig.showActionBtn = true;
+        this.formConfig.pkId = 'task_id';
         // Set labels for update
         this.formConfig.submit.label = 'Update';
         // Show form after setting form values
-        this.formConfig.pkId = 'task_id';
         this.formConfig.model['task_id'] = this.TasksEditID;
         this.showForm = true;
       }
@@ -51,20 +53,26 @@ export class TasksComponent implements OnInit {
   }
 
   setFormConfig() {
+    this.TasksEditID = null
     this.formConfig = {
       url: 'tasks/task/',
       formState: {
         viewMode: false
       },
+      showActionBtn: true,
       exParams: [],
       submit: {
         label: 'Submit',
         submittedFn: () => this.ngOnInit()
       },
-      reset: {},
+      reset: {
+        resetFn: () => {
+          this.ngOnInit();
+        }
+      },
       model: {
         task: {},
-        task_comments: [],
+        task_comments: [{}],
         task_attachments: [],
         task_history: {}
       },
@@ -83,7 +91,7 @@ export class TasksComponent implements OnInit {
                 dataLabel: 'first_name',
                 options: [],
                 lazy: {
-                  url: 'users/users_list/',
+                  url: 'users/user/',
                   lazyOneTime: true
                 },
                 required: true
@@ -214,7 +222,7 @@ export class TasksComponent implements OnInit {
                   hideLabel: true,
                   required: true,
                   lazy: {
-                    url: 'users/users_list/',
+                    url: 'users/user',
                     lazyOneTime: true
                   },
                 },
@@ -269,6 +277,8 @@ export class TasksComponent implements OnInit {
                       type: 'file',
                       className: 'ta-cell col-12 custom-file-attachement',
                       templateOptions: {
+                        "displayStyle": "files",
+                        "multiple": true
                         // label: 'Order Attachments',
                         // // required: true
                         // required: true
