@@ -78,15 +78,14 @@ export class SaleReturnsComponent {
   }
 
   setFormConfig() {
+    this.SaleReturnOrderEditID = null;
     this.formConfig = {
-      valueChangeFn: (res) => {
-        // this.totalAmountCal();
-      },
       url: "sales/sale_return_order/",
       title: '',
       formState: {
         viewMode: false
       },
+      showActionBtn: true,
       exParams: [
         {
           key: 'sale_return_items',
@@ -95,7 +94,7 @@ export class SaleReturnsComponent {
         }
       ],
       submit: {
-        label: 'submit',
+        label: 'Submit',
         submittedFn: () => this.ngOnInit()
       },
       reset: {

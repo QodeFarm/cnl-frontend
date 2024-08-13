@@ -103,7 +103,7 @@ export class PurchaseInvoiceComponent {
 
       ],
       submit: {
-        label: 'submit',
+        label: 'Submit',
         submittedFn: () => this.ngOnInit()
       },
       reset: {

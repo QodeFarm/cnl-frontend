@@ -88,15 +88,14 @@ export class SalesinvoiceComponent {
   }
 
   setFormConfig() {
+    this.SaleInvoiceEditID = null;
     this.formConfig = {
-        valueChangeFn: (res) => {
-            // this.totalAmountCal();
-          },
       url: "sales/sale_invoice_order/",
       title: '',
       formState: {
         viewMode: false
       },
+      showActionBtn: true,
       exParams: [
         {
           key: 'sale_invoice_items',
@@ -105,7 +104,7 @@ export class SalesinvoiceComponent {
         },
       ],
       submit: {
-        label: 'submit',
+        label: 'Submit',
         submittedFn: () => this.ngOnInit()
       },
       reset: {
