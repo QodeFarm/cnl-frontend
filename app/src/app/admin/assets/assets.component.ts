@@ -20,6 +20,7 @@ export class AssetsComponent{
   ngOnInit() {
     this.showAssetsList = false;
     this.showForm = true;
+    this.AssetsEditID= null;
     // Set form config
     this.setFormConfig();
     console.log('this.formConfig', this.formConfig);
@@ -37,10 +38,11 @@ export class AssetsComponent{
     this.http.get(this.baseUrl + 'assets/assets/' + event).subscribe((res: any) => {
       if (res) {
         this.formConfig.model = res;
+        this.formConfig.showActionBtn = true;
+        this.formConfig.pkId = 'asset_id';
         // Set labels for update
         this.formConfig.submit.label = 'Update';
         // Show form after setting form values
-        this.formConfig.pkId = 'asset_id';
         this.formConfig.model['asset_id'] = this.AssetsEditID;
         this.showForm = true;
       }
@@ -49,7 +51,8 @@ export class AssetsComponent{
   }
 
   showAssetsListFn() {
-        this.showAssetsList = true;
+    this.AssetsEditID = null;
+    this.showAssetsList = true;
     }
 
     setFormConfig() {
@@ -59,6 +62,7 @@ export class AssetsComponent{
         formState: {
           viewMode: false,
         },
+        showActionBtn: true,
         exParams: [
           {
             key: 'asset_category_id',
@@ -82,10 +86,14 @@ export class AssetsComponent{
           },
         ],
         submit: {
-          label: 'Submit',
+          label: 'submit',
           submittedFn: () => this.ngOnInit()
         },
-        reset: {},
+        reset: {
+          resetFn: () => {
+            this.ngOnInit();
+          }
+        },
         model:{},
         fields: [
           {

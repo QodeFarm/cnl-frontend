@@ -49,7 +49,7 @@ export class SalesListComponent {
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
           // console.log("-->", currentValue);
-          return `${row.sale_type_id.name}`;
+          return `${row.sale_type.name}`;
         },
       },
 
@@ -58,12 +58,12 @@ export class SalesListComponent {
         name: 'Customer',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.customer_id.name}`;
+          return `${row.customer.name}`;
         },
         sort: true
       },
       {
-        fieldKey: 'item_value',
+        fieldKey: 'amount',
         name: 'Amount',
         sort: true
       },
@@ -100,7 +100,7 @@ export class SalesListComponent {
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.order_status_id.status_name}`;
+          return `${row.order_status.status_name}`;
         },
         sort: true
       },

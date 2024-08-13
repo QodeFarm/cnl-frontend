@@ -18,6 +18,7 @@ import { ProductItemTypeComponent } from './product-item-type/product-item-type.
 import { BrandSalesmanComponent } from './brand-salesman/brand-salesman.component';
 import { ProductBrandsComponent } from './product-brands/product-brands.component';
 import { ProductsListComponent } from './products-list/products-list.component';
+import { ProductItemBalanceComponent } from './product-item-balance/product-item-balance.component';
 
 
 @NgModule({
@@ -36,6 +37,8 @@ import { ProductsListComponent } from './products-list/products-list.component';
     ProductItemTypeComponent,
     BrandSalesmanComponent,
     ProductBrandsComponent,
+    ProductItemBalanceComponent,
+    ProductItemBalanceComponent
     // ProductsListComponent
   ],
   imports: [
@@ -59,6 +62,7 @@ import { ProductsListComponent } from './products-list/products-list.component';
     ProductItemTypeComponent,
     BrandSalesmanComponent,
     ProductBrandsComponent,
+    ProductItemBalanceComponent
   ]
 })
 export class ProductsModule { }

@@ -1,12 +1,13 @@
-<div class="container-fluid">
-    <nav aria-label="breadcrumb"></nav>
-    <div class="card">
-        <div class="card-header" >
+<div class="container-fluid pt-3">
+    <div class="company-banner">
+        <div class="col-12 px-0" style="display: flex; justify-content: space-between;align-items: center;">
             <button  type="button" class="btn pl-0" style="color: black;">
-                <span  class="custom-heading">Setup Company</span>
-              </button>
+                <span  class="custom-heading">Company</span>
+              </button>        
         </div>
-        <div class="card-body" *ngIf="showForm">
+    </div>
+    <div class="row custom-form">
+        <div>
             <ta-form [options]="formConfig"></ta-form>
         </div>
     </div>

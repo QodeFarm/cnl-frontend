@@ -16,7 +16,8 @@ export class SaleReturnsComponent {
   SaleReturnOrderEditID: any;
   productOptions: any;
   nowDate = () => {
-    return new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate();
+    const date = new Date();
+    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   }
 
   constructor(private http: HttpClient) {}
@@ -169,6 +170,18 @@ export class SaleReturnsComponent {
               }
             },
             {
+              key: 'email',
+              type: 'input',
+              className: 'col-2',
+              templateOptions: {
+                type: 'input',
+                label: 'Email',
+                placeholder: 'Enter Email',
+              },hooks: {
+                onInit: (field: any) => { }
+              }
+            },
+            {
               key: 'return_no',
               type: 'input',
               className: 'col-2',
@@ -180,32 +193,32 @@ export class SaleReturnsComponent {
                 // disabled: true
               },
             },
-            {
-              key: 'sale_invoice',
-              type: 'select',
-              className: 'col-2',
-              templateOptions: {
-                label: 'Sale invoice',
-                dataKey: 'sale_invoice_id',
-                dataLabel: "invoice_no",
-                options: [],
-                lazy: {
-                  url: 'sales/sale_invoice_order/?summary=true',
-                  lazyOneTime: true
-                },
-                // required: true,
-              },
-              hooks: {
-                onChanges: (field: any) => {
-                  field.formControl.valueChanges.subscribe((data: any) => {
-                    // console.log("order_type", data);
-                    if (data && data.sale_invoice_id) {
-                      this.formConfig.model['sale_return_order']['sale_invoice_id'] = data.sale_invoice_id;
-                    }
-                  });
-                }
-              }
-            },
+            // {
+            //   key: 'sale_invoice',
+            //   type: 'select',
+            //   className: 'col-2',
+            //   templateOptions: {
+            //     label: 'Sale invoice',
+            //     dataKey: 'sale_invoice_id',
+            //     dataLabel: "invoice_no",
+            //     options: [],
+            //     lazy: {
+            //       url: 'sales/sale_invoice_order/?summary=true',
+            //       lazyOneTime: true
+            //     },
+            //     // required: true,
+            //   },
+            //   hooks: {
+            //     onChanges: (field: any) => {
+            //       field.formControl.valueChanges.subscribe((data: any) => {
+            //         // console.log("order_type", data);
+            //         if (data && data.sale_invoice_id) {
+            //           this.formConfig.model['sale_return_order']['sale_invoice_id'] = data.sale_invoice_id;
+            //         }
+            //       });
+            //     }
+            //   }
+            // },
             {
               key: 'orders_salesman',
               type: 'select',
@@ -229,18 +242,6 @@ export class SaleReturnsComponent {
                     }
                   });
                 }
-              }
-            },
-            {
-              key: 'email',
-              type: 'input',
-              className: 'col-2',
-              templateOptions: {
-                type: 'input',
-                label: 'Email',
-                placeholder: 'Enter Email',
-              },hooks: {
-                onInit: (field: any) => { }
               }
             },
             {
@@ -389,7 +390,7 @@ export class SaleReturnsComponent {
             {
               key: 'return_reason',
               type: 'textarea',
-              className: 'col-4',
+              className: 'col-6',
               templateOptions: {
                 label: 'Return Reason',
                 placeholder: 'Enter Return Reason',
@@ -444,7 +445,7 @@ export class SaleReturnsComponent {
                   hideLabel: true,
                   dataLabel: 'name',
                   options: [],
-                  required: false,
+                  required: true,
                   lazy: {
                     url: 'products/products/?summary=true',
                     lazyOneTime: true
@@ -755,9 +756,12 @@ export class SaleReturnsComponent {
                     {
                       key: 'shipping_date',
                       type: 'date',
+                      defaultValue: this.nowDate(),
                       className: 'col-6',
                       templateOptions: {
-                        label: 'Shipping Date'
+                        type: 'date',
+                        label: 'Shipping Date',
+                        required: true
                       }
                     },
                     {
@@ -768,6 +772,7 @@ export class SaleReturnsComponent {
                         type: "number",
                         label: 'Shipping Charges.',
                         placeholder: 'Enter Shipping Charges',
+                        required: true
                       }
                     }
                   ]

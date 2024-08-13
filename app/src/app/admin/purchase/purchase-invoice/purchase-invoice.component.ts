@@ -16,7 +16,8 @@ export class PurchaseInvoiceComponent {
   PurchaseInvoiceEditID: any;
   productOptions: any;
   nowDate = () => {
-    return new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate();
+    const date = new Date();
+    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   }
 
 
@@ -85,15 +86,14 @@ export class PurchaseInvoiceComponent {
     this.showPurchaseInvoiceList = true;
   }
   setFormConfig() {
+    this.PurchaseInvoiceEditID = null;
     this.formConfig = {
-      valueChangeFn: (res) => {
-        // this.totalAmountCal();
-      },
       url: "purchase/purchase_invoice_order/",
       title: '',
       formState: {
         viewMode: false
       },
+      showActionBtn: true,
       exParams: [
         {
           key: 'purchase_invoice_items',
@@ -380,11 +380,11 @@ export class PurchaseInvoiceComponent {
                   dataLabel: 'name',
                   // options: this.productOptions,
                   options: [],
-                  required: false,
+                  required: true,
                   lazy: {
                     url: 'products/products/?summary=true',
                     lazyOneTime: true
-                  }
+                  },
                 },
                 hooks: {
                   onInit: (field: any) => {
@@ -705,6 +705,7 @@ export class PurchaseInvoiceComponent {
                       templateOptions: {
                         type: 'date',
                         label: 'Shipping Date',
+                        required: true
                       }
                     },
                     {
@@ -714,6 +715,7 @@ export class PurchaseInvoiceComponent {
                       templateOptions: {
                         label: 'Shipping Charges.',
                         placeholder: 'Enter Shipping Charges',
+                        required: true
                       }
                     }
                   ]
