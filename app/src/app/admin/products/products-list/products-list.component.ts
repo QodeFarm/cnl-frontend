@@ -48,7 +48,7 @@ export class ProductsListComponent {
         sort: false,
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
-          return row.stock_unit.stock_unit_name;
+          return row.unit_options.unit_name;
         },
       },
       {
