@@ -153,11 +153,30 @@ export class ProductsComponent implements OnInit {
                       }
                     },
                     {
-                      className: 'col-3 d-flex align-items-center',
-                      key: 'print_barcode',
-                      type: 'checkbox',
+                      key: 'brand',
+                      type: 'select',
+                      className: 'col-3',
                       templateOptions: {
-                        label: 'Print Barcode'
+                        label: 'Brand',
+                        dataKey: 'brand_id',
+                        dataLabel: "brand_name",
+                        options: [],
+                        required: false,
+                        lazy: {
+                          url: 'masters/product_brands/',
+                          lazyOneTime: true
+                        }
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          field.formControl.valueChanges.subscribe((data: any) => {
+                            if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                              this.formConfig.model['products']['brand_id'] = data.brand_id;
+                            } else {
+                              console.error('Form config or brand_id data model is not defined.');
+                            }
+                          });
+                        }
                       }
                     },
                     {
@@ -296,15 +315,6 @@ export class ProductsComponent implements OnInit {
                       templateOptions: {
                         label: 'Maximum Level',
                         placeholder: 'Enter Maximum Level'
-                      }
-                    },
-                    {
-                      className: 'col-3',
-                      key: 'salt_composition',
-                      type: 'text',
-                      templateOptions: {
-                        label: 'Salt Composition',
-                        placeholder: 'Enter Salt Composition'
                       }
                     },
                     {
@@ -578,32 +588,13 @@ export class ProductsComponent implements OnInit {
                       }
                     },
                     {
-                      key: 'brand',
-                      type: 'select',
-                      className: 'col-3',
+                      className: 'col-3 d-flex align-items-center',
+                      key: 'print_barcode',
+                      type: 'checkbox',
                       templateOptions: {
-                        label: 'Brand',
-                        dataKey: 'brand_id',
-                        dataLabel: "brand_name",
-                        options: [],
-                        required: false,
-                        lazy: {
-                          url: 'masters/product_brands/',
-                          lazyOneTime: true
-                        }
-                      },
-                      hooks: {
-                        onChanges: (field: any) => {
-                          field.formControl.valueChanges.subscribe((data: any) => {
-                            if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
-                              this.formConfig.model['products']['brand_id'] = data.brand_id;
-                            } else {
-                              console.error('Form config or brand_id data model is not defined.');
-                            }
-                          });
-                        }
+                        label: 'Print Barcode'
                       }
-                    },
+                    }
                    ]
                 },
                 {
@@ -676,6 +667,15 @@ export class ProductsComponent implements OnInit {
                         label: 'HSN',
                         placeholder: 'Enter HSN Code',
                         required: false
+                      }
+                    },
+                    {
+                      className: 'col-12',
+                      key: 'salt_composition',
+                      type: 'text',
+                      templateOptions: {
+                        label: 'Salt Composition',
+                        placeholder: 'Enter Salt Composition'
                       }
                     },
                   ]
