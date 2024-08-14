@@ -58,21 +58,6 @@ export class InventoryComponent   {
         sort: true
       },
       {
-        fieldKey: 'product_group_id',
-        name: 'Product Group',
-        sort: true,
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.product_group.group_name}`;
-        },
-      },
-  
-      {
-        fieldKey: 'sales_description', 
-        name: 'Sales Description',
-        sort: true
-      },
-      {
         fieldKey: 'purchase_rate',
         name: 'Purchase Rate',
         sort: true
@@ -82,7 +67,6 @@ export class InventoryComponent   {
         name: 'Sales Rate',
         sort: true
       },
-  
       {
         fieldKey: 'wholesale_rate',
         name: 'Wholesale Rate',
@@ -94,32 +78,32 @@ export class InventoryComponent   {
         sort: true
       },
       {
-        fieldKey: 'stock_unit_id',
-        name: 'Stock Unit',
+        fieldKey: 'product_bal',
+        name: 'Warehouse Name',
         sort: true,
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.stock_unit.stock_unit_name}`;
+          return `${row.product_bal[0].location.location_name}`;
         },
       },
-  
       {
-        fieldKey: "code",
-        name: "Action",
-        type: 'action',
-        actions: [
-          {
-            type: 'delete',
-            label: 'Delete',
-            confirm: true,
-            confirmMsg: "Sure to delete?",
-            apiUrl: 'products/products'
-          },
-          {
-            type: 'edit',
-            label: 'Edit'
-          }
-        ]
+        fieldKey: 'product_bal',
+        name: 'Location Name',
+        sort: true,
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          return `${row.product_bal[0].location.location_name}`;
+        },
+      },
+      {
+        fieldKey: 'total_product_balance', 
+        name: 'Balance',
+        sort: true
+      },
+      {
+        fieldKey: 'updated_at',
+        name: 'Updated at',
+        sort: true
       }
     ]
   },
