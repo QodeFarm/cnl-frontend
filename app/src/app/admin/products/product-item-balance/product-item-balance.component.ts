@@ -7,6 +7,8 @@ import { TaCurdConfig } from '@ta/ta-curd';
   styleUrls: ['./product-item-balance.component.scss']
 })
 export class ProductItemBalanceComponent {
+  baseUrl: string = 'http://195.35.20.172:8000/api/v1/';
+
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
     drawerPlacement: 'top',
@@ -25,11 +27,15 @@ export class ProductItemBalanceComponent {
           name: 'Balence',
           sort: true
         },
-        {
-          fieldKey: 'location_id',
-          name: 'Location',
-          sort: true
-        },
+        // {
+        //   fieldKey: 'location',
+        //   name: 'Location',
+        //   sort: true,
+        //   displayType: "map",
+        //   mapFn: (currentValue: any, row: any, col: any) => {
+        //     return `${row.location.name}`;
+        //   },
+        // },
         {
           fieldKey: 'product',
           name: 'Product',
@@ -95,22 +101,39 @@ export class ProductItemBalanceComponent {
           type: 'input',
           className: 'col-6 pb-3 ps-0',
           templateOptions: {
-            label: 'Balence',
+            label: 'Balance',
             type: 'number',
-            placeholder: 'Enter Balence',
+            placeholder: 'Enter Balance',
             required: true,
           }
         },
-        {
-          key: 'location_id',
-          type: 'input',
-          className: 'col-6 pb-3 pe-0',
-          templateOptions: {
-            label: 'Location',
-            placeholder: 'Enter Location',
-            required: true,
-          }
-        },
+        // {
+        //   key: 'location',
+        //   type: 'select',
+        //   className: 'col-6 pb-3 ps-0',
+        //   templateOptions: {
+        //     label: 'Location',
+        //     placeholder: 'Enter Location',
+        //     datakey : 'location_name',
+        //     datalabel : 'location_name',
+        //     required: false,
+        //     lazy: {
+        //       url: this.baseUrl +'inventory/warehouse_locations/',
+        //       lazyOneTime: true
+        //     },
+        //   },
+        //   hooks: {
+        //     onInit: (field: any) => {
+        //       field.formControl.valueChanges.subscribe((data: any) => {
+        //         if (form.field && this.formConfig.model && this.formConfig.model['location_id']) {
+        //           this.formConfig.model['location_id'] = data.location_id
+        //         } else {
+        //           console.error('Form config or location data model is not defined.');
+        //         }
+        //       });
+        //   },
+        // }
+        // },
         {
           key: 'product',
           type: 'select',

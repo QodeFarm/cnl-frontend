@@ -18,6 +18,7 @@ export class WarehousesComponent {
   ngOnInit() {
     this.showWarehousesList = false;
     this.showForm = true;
+    this.WarehousesEditID = null;
     // set form config
     this.setFormConfig();
     console.log('this.formConfig', this.formConfig);
@@ -35,9 +36,10 @@ export class WarehousesComponent {
     this.http.get('inventory/warehouses/' + event).subscribe((res: any) => {
       if (res) {
         this.formConfig.model = res;
+        this.formConfig.showActionBtn = true;
+        this.formConfig.pkId = 'warehouse_id';
         //set labels for update
         this.formConfig.submit.label = 'Update';
-        this.formConfig.pkId = 'warehouse_id';
         this.showForm = true;
       }
     })
@@ -50,12 +52,14 @@ export class WarehousesComponent {
   };
 
   setFormConfig() {
+    this.WarehousesEditID = null;
     this.formConfig = {
       url: "inventory/warehouses/",
       // title: 'warehouses',
       formState: {
         viewMode: false,
       },
+      showActionBtn: true,
       exParams: [
         {
           key: 'item_type_id',
@@ -82,7 +86,11 @@ export class WarehousesComponent {
         label: 'Submit',
         submittedFn: () => this.ngOnInit()
       },
-      reset: {},
+      reset: {
+        resetFn: () => {
+          this.ngOnInit();
+        }
+      },
       model:{},	  
       fields: [
         {

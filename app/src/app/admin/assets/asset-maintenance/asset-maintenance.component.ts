@@ -52,11 +52,11 @@ export class AssetMaintenanceComponent {
   }
 
   showAssetMaintenanceListFn() {
-    this.AssetMaintenanceEditID = null;
     this.showAssetMaintenanceList = true;
   };
 
     setFormConfig() {
+      this.AssetMaintenanceEditID = null;
       this.formConfig = {
         url: this.baseUrl + 'assets/asset_maintenance/',
         // title: 'Asset Maintenance',

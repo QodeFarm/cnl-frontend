@@ -71,7 +71,8 @@ export class WarehousesListComponent {
           },
           {
             type: 'callBackFn',
-            label: 'Edit',
+            icon: 'fa fa-pen',
+            label: '',
             callBackFn: (row, action) => {
               console.log(row);
               this.edit.emit(row.warehouse_id);
