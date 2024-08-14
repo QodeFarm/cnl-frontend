@@ -352,8 +352,195 @@ export class CustomersComponent {
                 readonly: true
               }
             },
-     
-           
+            {
+              className: 'col-3',
+              key: 'transporter',
+              type: 'select',
+              templateOptions: {
+                label: 'Transporter',
+                dataKey: 'transporter_id',
+                dataLabel: 'name',
+                options: [],
+                lazy: {
+                  url: 'masters/transporters/',
+                  lazyOneTime: true
+                }
+              },
+              hooks: {
+                onChanges: (field: any) => {
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
+                      this.formConfig.model['customer_data']['transporter_id'] = data.transporter_id;
+                    } else {
+                      console.error('Form config or Customer data model is not defined.');
+                    }
+                  });
+                }
+              }
+            },
+                      // Fourth row: Contact Information
+            {
+              className: 'col-3',
+              key: 'contact_person',
+              type: 'input',
+              templateOptions: {
+                label: 'Contact Person',
+                placeholder: 'Enter Contact Person',
+              }
+            },
+            // {
+            //   className: 'col-2',
+            //   key: 'picture',
+            //   type: 'input',
+            //   templateOptions: {
+            //     label: 'Picture',
+            //     placeholder: 'Enter Picture URL',
+            //   }
+            // },
+            {
+              className: 'col-3',
+              key: 'cin',
+              type: 'input',
+              templateOptions: {
+                label: 'CIN',
+                placeholder: 'Enter CIN',
+              }
+            },
+            {
+              className: 'col-3',
+              key: 'pan',
+              type: 'input',
+              templateOptions: {
+                label: 'PAN',
+                placeholder: 'Enter PAN',
+              }
+            },
+            {
+              className: 'col-3',
+              key: 'facebook',
+              type: 'input',
+              templateOptions: {
+                label: 'Facebook',
+                placeholder: 'Enter Facebook URL',
+              }
+            },
+            {
+              className: 'col-3',
+              key: 'skype',
+              type: 'input',
+              templateOptions: {
+                label: 'Skype',
+                placeholder: 'Enter Skype ID',
+              }
+            },
+            {
+              className: 'col-3',
+              key: 'twitter',
+              type: 'input',
+              templateOptions: {
+                label: 'Twitter',
+                placeholder: 'Enter Twitter URL',
+              }
+            },
+            {
+              className: 'col-3',
+              key: 'linked_in',
+              type: 'input',
+              templateOptions: {
+                label: 'LinkedIn',
+                placeholder: 'Enter LinkedIn URL',
+              }
+            },
+            {
+              className: 'col-3',
+              key: 'price_category',
+              type: 'select',
+              templateOptions: {
+                label: 'Price Category',
+                dataKey: 'price_category_id',
+                dataLabel: 'name',
+                options: [],
+                lazy: {
+                  url: 'masters/price_categories/',
+                  lazyOneTime: true
+                }
+              },
+              hooks: {
+                onChanges: (field: any) => {
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
+                      this.formConfig.model['customer_data']['price_category_id'] = data.price_category_id;
+                    } else {
+                      console.error('Form config or Customer data model is not defined.');
+                    }
+                  });
+                }
+              }
+            },
+                // Seventh row: Agents and Transport
+          {
+            className: 'col-3',
+            key: 'distance',
+            type: 'input',
+            templateOptions: {
+              label: 'Distance',
+              placeholder: 'Enter Distance',
+              type: 'number',
+            }
+          },
+              // Eighth row: Credit
+              {
+                className: 'col-3',
+                key: 'credit_limit',
+                type: 'input',
+                templateOptions: {
+                  label: 'Credit Limit',
+                  placeholder: 'Enter Credit Limit',
+                  type: 'number',
+                }
+              },
+              {
+                className: 'col-3',
+                key: 'max_credit_days',
+                type: 'input',
+                templateOptions: {
+                  label: 'Max Credit Days',
+                  placeholder: 'Enter Max Credit Days',
+                  type: 'number',
+                }
+              },
+              {
+                className: 'col-3',
+                key: 'gst_suspend',
+                type: 'checkbox',
+                templateOptions: {
+                  label: 'GST Suspend',
+                }
+              },
+              {
+                className: 'col-3',
+                key: 'tds_on_gst_applicable',
+                type: 'checkbox',
+                templateOptions: {
+                  label: 'TDS on GST Applicable',
+                }
+              },
+              {
+                className: 'col-3',
+                key: 'tds_applicable',
+                type: 'checkbox',
+                templateOptions: {
+                  label: 'TDS Applicable',
+                }
+              },
+              {
+                className: 'col-3',
+                key: 'is_sub_customer',
+                type: 'checkbox',
+                templateOptions: {
+                  label: 'Is Sub Customer',
+                }
+              },
           ]
               },
               {
@@ -368,252 +555,61 @@ export class CustomersComponent {
                       required: true
                     }
                   },
+                  {
+                    className: 'ta-cell pr-md col-12',
+                    key: 'website',
+                    type: 'input',
+                    templateOptions: {
+                      label: 'Website',
+                      placeholder: 'Enter Website URL',
+                    }
+                  },
+                  {
+                    className: 'ta-cell pr-md col-12',
+                    key: 'payment_term',
+                    type: 'select',
+                    templateOptions: {
+                      label: 'Payment Term',
+                      dataKey: 'payment_term_id',
+                      dataLabel: 'name',
+                      options: [],
+                      lazy: {
+                        url: 'masters/customer_payment_terms/',
+                        lazyOneTime: true
+                      }
+                    },
+                    hooks: {
+                      onChanges: (field: any) => {
+                        field.formControl.valueChanges.subscribe((data: any) => {
+                          if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
+                            this.formConfig.model['customer_data']['payment_term_id'] = data.payment_term_id;
+                          } else {
+                            console.error('Form config or Customer data model is not defined.');
+                          }
+                        });
+                      }
+                    }
+                  },
+                  {
+                    className: 'ta-cell pr-md col-12',
+                    key: 'interest_rate_yearly',
+                    type: 'input',
+                    templateOptions: {
+                      label: 'Interest Rate Yearly',
+                      placeholder: 'Enter Interest Rate Yearly',
+                      type: 'number',
+                    }
+                  },
+                  {
+                    className: 'ta-cell pr-md col-12',
+                    key: 'customer_common_for_sales_purchase',
+                    type: 'checkbox',
+                    templateOptions: {
+                      label: 'Customer common for Sales and Purchase',
+                    }
+                  }
                 ]
-              },
-              {
-                className: 'col-2',
-                key: 'transporter',
-                type: 'select',
-                templateOptions: {
-                  label: 'Transporter',
-                  dataKey: 'transporter_id',
-                  dataLabel: 'name',
-                  options: [],
-                  lazy: {
-                    url: 'masters/transporters/',
-                    lazyOneTime: true
-                  }
-                },
-                hooks: {
-                  onChanges: (field: any) => {
-                    field.formControl.valueChanges.subscribe((data: any) => {
-                      if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
-                        this.formConfig.model['customer_data']['transporter_id'] = data.transporter_id;
-                      } else {
-                        console.error('Form config or Customer data model is not defined.');
-                      }
-                    });
-                  }
-                }
-              },
-                        // Fourth row: Contact Information
-              {
-                className: 'col-2',
-                key: 'contact_person',
-                type: 'input',
-                templateOptions: {
-                  label: 'Contact Person',
-                  placeholder: 'Enter Contact Person',
-                }
-              },
-              // {
-              //   className: 'col-2',
-              //   key: 'picture',
-              //   type: 'input',
-              //   templateOptions: {
-              //     label: 'Picture',
-              //     placeholder: 'Enter Picture URL',
-              //   }
-              // },
-              {
-                className: 'col-2',
-                key: 'cin',
-                type: 'input',
-                templateOptions: {
-                  label: 'CIN',
-                  placeholder: 'Enter CIN',
-                }
-              },
-              {
-                className: 'col-2',
-                key: 'pan',
-                type: 'input',
-                templateOptions: {
-                  label: 'PAN',
-                  placeholder: 'Enter PAN',
-                }
-              },
-              // Fifth row: website links
-              {
-                className: 'col-2',
-                key: 'website',
-                type: 'input',
-                templateOptions: {
-                  label: 'Website',
-                  placeholder: 'Enter Website URL',
-                }
-              },
-              {
-                className: 'col-2',
-                key: 'facebook',
-                type: 'input',
-                templateOptions: {
-                  label: 'Facebook',
-                  placeholder: 'Enter Facebook URL',
-                }
-              },
-              {
-                className: 'col-2',
-                key: 'skype',
-                type: 'input',
-                templateOptions: {
-                  label: 'Skype',
-                  placeholder: 'Enter Skype ID',
-                }
-              },
-              {
-                className: 'col-2',
-                key: 'twitter',
-                type: 'input',
-                templateOptions: {
-                  label: 'Twitter',
-                  placeholder: 'Enter Twitter URL',
-                }
-              },
-              {
-                className: 'col-2',
-                key: 'linked_in',
-                type: 'input',
-                templateOptions: {
-                  label: 'LinkedIn',
-                  placeholder: 'Enter LinkedIn URL',
-                }
-              },
-              // Sixth row: Terms and Categories
-              {
-                className: 'col-2',
-                key: 'payment_term',
-                type: 'select',
-                templateOptions: {
-                  label: 'Payment Term',
-                  dataKey: 'payment_term_id',
-                  dataLabel: 'name',
-                  options: [],
-                  lazy: {
-                    url: 'masters/customer_payment_terms/',
-                    lazyOneTime: true
-                  }
-                },
-                hooks: {
-                  onChanges: (field: any) => {
-                    field.formControl.valueChanges.subscribe((data: any) => {
-                      if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
-                        this.formConfig.model['customer_data']['payment_term_id'] = data.payment_term_id;
-                      } else {
-                        console.error('Form config or Customer data model is not defined.');
-                      }
-                    });
-                  }
-                }
-              },
-              {
-                className: 'col-2',
-                key: 'price_category',
-                type: 'select',
-                templateOptions: {
-                  label: 'Price Category',
-                  dataKey: 'price_category_id',
-                  dataLabel: 'name',
-                  options: [],
-                  lazy: {
-                    url: 'masters/price_categories/',
-                    lazyOneTime: true
-                  }
-                },
-                hooks: {
-                  onChanges: (field: any) => {
-                    field.formControl.valueChanges.subscribe((data: any) => {
-                      if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
-                        this.formConfig.model['customer_data']['price_category_id'] = data.price_category_id;
-                      } else {
-                        console.error('Form config or Customer data model is not defined.');
-                      }
-                    });
-                  }
-                }
-              },
-                  // Seventh row: Agents and Transport
-            {
-              className: 'col-2',
-              key: 'distance',
-              type: 'input',
-              templateOptions: {
-                label: 'Distance',
-                placeholder: 'Enter Distance',
-                type: 'number',
               }
-            },
-                // Eighth row: Credit
-                {
-                  className: 'col-2',
-                  key: 'credit_limit',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'Credit Limit',
-                    placeholder: 'Enter Credit Limit',
-                    type: 'number',
-                  }
-                },
-                {
-                  className: 'col-2',
-                  key: 'max_credit_days',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'Max Credit Days',
-                    placeholder: 'Enter Max Credit Days',
-                    type: 'number',
-                  }
-                },
-                {
-                  className: 'col-2',
-                  key: 'interest_rate_yearly',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'Interest Rate Yearly',
-                    placeholder: 'Enter Interest Rate Yearly',
-                    type: 'number',
-                  }
-                },
-                {
-                  className: 'col-2 d-flex align-items-center',
-                  key: 'gst_suspend',
-                  type: 'checkbox',
-                  templateOptions: {
-                    label: 'GST Suspend',
-                  }
-                },
-                {
-                  className: 'col-3 d-flex align-items-center',
-                  key: 'tds_on_gst_applicable',
-                  type: 'checkbox',
-                  templateOptions: {
-                    label: 'TDS on GST Applicable',
-                  }
-                },
-                {
-                  className: 'col-2 d-flex align-items-center',
-                  key: 'tds_applicable',
-                  type: 'checkbox',
-                  templateOptions: {
-                    label: 'TDS Applicable',
-                  }
-                },
-                {
-                  className: 'col-2 d-flex align-items-center',
-                  key: 'is_sub_customer',
-                  type: 'checkbox',
-                  templateOptions: {
-                    label: 'Is Sub Customer',
-                  }
-                },
-                {
-                  className: 'col-4',
-                  key: 'customer_common_for_sales_purchase',
-                  type: 'checkbox',
-                  templateOptions: {
-                    label: 'Customer common for Sales and Purchase',
-                  }
-                },
           ]
         },
             // start of order_shipments keys
@@ -625,6 +621,10 @@ export class CustomersComponent {
             title: 'Customer Addresses',
             addText: 'Add Addresses',
             tableCols: [
+              {
+                name: 'address_type',
+                label: 'Address Type'  // New column for Address Type
+              },
               {
                 name: 'address',
                 label: 'Address'
@@ -669,6 +669,21 @@ export class CustomersComponent {
           },
           fieldArray: {
             fieldGroup: [
+              {
+                key: 'address_type',
+                type: 'input',
+                className: 'custom-select-bold',
+                templateOptions: {
+                  label: 'Address Type',
+                  hideLabel: true,
+                  readonly: true,
+                  required: true,
+                  value: 'Billing',  // Set to 'Billing'
+                  attributes: {
+                    style: 'font-weight: bold; border: none; background-color: transparent; margin-bottom: 10px;' // Bold text, no border, transparent background
+                  }
+                }
+              },
               {
                 key: 'city',
                 type: 'select',
@@ -737,6 +752,7 @@ export class CustomersComponent {
                     dataLabel: 'country_name',
                     label: 'Country',
                     hideLabel: true,
+                    required: true,
                     placeholder: 'select',
                     lazy: {
                     url: 'masters/country/',

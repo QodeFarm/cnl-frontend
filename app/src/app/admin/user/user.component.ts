@@ -73,16 +73,16 @@ export class UserComponent {
         //   type: 'script',
         //   value: 'data.company.company_id'
         // },
-        // {
-        //   key: 'role_id',
-        //   type: 'script',
-        //   value: 'data.role.role_id'
-        // },
-        // {
-        //   key: 'status_id',
-        //   type: 'script',
-        //   value: 'data.status.status_id'
-        // },
+        {
+          key: 'role_id',
+          type: 'script',
+          value: 'data.role.role_id'
+        },
+        {
+          key: 'status_id',
+          type: 'script',
+          value: 'data.status.status_id'
+        },
         // {
         //   key: 'branch_id',
         //   type: 'script',
@@ -103,7 +103,7 @@ export class UserComponent {
                 label: 'Profile Pic',
                 multiple: false,
                 placeholder: 'Enter Profile Pic',
-                required: false,
+                required: true,
               }
             },
             {
@@ -173,15 +173,15 @@ export class UserComponent {
               }
             },
             {
-              key: 'role_id',
+              key: 'role',
               type: 'select',
               className: 'ta-cell pr-md col-md-6 col-12',
               templateOptions: {
                 label: 'User Role',
-                dataKey: 'role_id',
+                dataKey: 'role_name',
                 dataLabel: "role_name",
                 options: [],
-                bindId: true,
+                // bindId: true,
                 lazy: {
                   url: 'users/role/',
                   lazyOneTime: true
@@ -223,13 +223,13 @@ export class UserComponent {
               }
             },
             {
-              key: 'status_id',
+              key: 'status',
               type: 'select',
               className: 'ta-cell pr-md col-md-6 col-12',
               templateOptions: {
                 label: 'Status',
-                bindId: true,
-                dataKey: 'status_id',
+                // bindId: true,
+                dataKey: 'status_name',
                 dataLabel: "status_name",
                 options: [],
                 // required: true,
