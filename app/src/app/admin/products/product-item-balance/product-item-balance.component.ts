@@ -119,11 +119,6 @@ export class ProductItemBalanceComponent {
               field.formControl.valueChanges.subscribe(data => {
                 console.log("Location data:", data); // Debug log
               });
-        
-              // Fetch and bind the options manually (optional)
-              // this.http.get('inventory/warehouse_locations/').subscribe((response: any) => {
-              //   field.templateOptions.options = response.data; // Adjust based on your API response structure
-              // });
             }
           }
         },
