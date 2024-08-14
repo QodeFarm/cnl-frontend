@@ -22,13 +22,17 @@ export class ProductItemBalanceComponent {
       cols: [
         {
           fieldKey: 'balance',
-          name: 'Balence',
+          name: 'Balance',
           sort: true
-        },
+        },     
         {
-          fieldKey: 'location_id',
+          fieldKey: 'location',
           name: 'Location',
-          sort: true
+          sort: true,
+          displayType: "map",
+          mapFn: (currentValue: any, row: any, col: any) => {
+            return `${row.location.location_name}`;
+          },
         },
         {
           fieldKey: 'product',
@@ -37,15 +41,6 @@ export class ProductItemBalanceComponent {
           displayType: "map",
           mapFn: (currentValue: any, row: any, col: any) => {
             return `${row.product.name}`;
-          },
-        },
-        {
-          fieldKey: 'warehouse',
-          name: 'Warehouse',
-          sort: true,
-          displayType: "map",
-          mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.warehouse.name}`;
           },
         },
         {
@@ -79,9 +74,9 @@ export class ProductItemBalanceComponent {
           value: 'data.product.product_id'
         },
         {
-          key: 'warehouse_id',
+          key: 'location_id',
           type: 'script',
-          value: 'data.warehouse.warehouse_id'
+          value: 'data.location.location_id'
         },
       ],
       fields: 
@@ -95,20 +90,36 @@ export class ProductItemBalanceComponent {
           type: 'input',
           className: 'col-6 pb-3 ps-0',
           templateOptions: {
-            label: 'Balence',
+            label: 'Balance',
             type: 'number',
-            placeholder: 'Enter Balence',
+            placeholder: 'Enter Balance',
             required: true,
           }
         },
         {
-          key: 'location_id',
-          type: 'input',
-          className: 'col-6 pb-3 pe-0',
+          key: 'location',
+          type: 'select',
+          className: 'col-6 pb-3 ps-0',
           templateOptions: {
             label: 'Location',
             placeholder: 'Enter Location',
-            required: true,
+            dataKey: 'location_id',
+            dataLabel: 'location_name',
+            required: true, // Consider setting required to true if necessary
+            lazy: {
+              url: 'inventory/warehouse_locations/',
+              lazyOneTime: true
+            },
+          },
+          hooks: {
+            onInit: (field: any) => {
+              field.templateOptions.options = []; // Initialize options as empty
+        
+              // Subscribe to formControl value changes if needed, or simply set the options once
+              field.formControl.valueChanges.subscribe(data => {
+                console.log("Location data:", data); // Debug log
+              });
+            }
           }
         },
         {
@@ -132,32 +143,8 @@ export class ProductItemBalanceComponent {
             }
           }
         },
-        {
-          key: 'warehouse',
-          type: 'select',
-          className: 'col-6 pb-3 ps-0',
-          templateOptions: {
-            label: 'Warehouses',
-            dataKey: 'warehouse_id',
-            dataLabel: "name",
-            options: [],
-            lazy: {
-              url: 'inventory/warehouses/',
-              lazyOneTime: true
-            },
-            // required: true
-          },
-          hooks: {
-            onInit: (field: any) => {
-              //field.templateOptions.options = this.cs.getRole();
-            }
-          }
-        },
       ]
-    }
-      ]
-    }
- 
-  }
+    }]
+  }}
 }
  

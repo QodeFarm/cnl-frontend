@@ -61,7 +61,7 @@ export class CustomerPaymentTermsComponent {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
-              apiUrl: 'masters/customer_payment_terms/'
+              apiUrl: 'masters/customer_payment_terms'
             },
             {
               type: 'edit',
