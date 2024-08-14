@@ -18,7 +18,7 @@ export class ProductsListComponent {
 
   tableConfig: TaTableConfig = {
     apiUrl: 'products/products/?summary=true',
-    
+    showCheckbox: true,
     title: 'Products',
     pkId: "product_id",
     fixedFilters: [

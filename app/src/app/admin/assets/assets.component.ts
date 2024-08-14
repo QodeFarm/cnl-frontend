@@ -51,11 +51,11 @@ export class AssetsComponent{
   }
 
   showAssetsListFn() {
-    this.AssetsEditID = null;
     this.showAssetsList = true;
     }
 
     setFormConfig() {
+      this.AssetsEditID = null;
       this.formConfig = {
         url: this.baseUrl + 'assets/assets/',
         // title: 'Assets',
