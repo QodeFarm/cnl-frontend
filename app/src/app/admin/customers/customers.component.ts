@@ -574,44 +574,6 @@ export class CustomersComponent {
                     type: 'number',
                   }
                 },
-                // Ninth row: Bank Information
-                {
-                  className: 'col-2',
-                  key: 'rtgs_ifsc_code',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'RTGS IFSC Code',
-                    placeholder: 'Enter RTGS IFSC Code',
-                  }
-                },
-                {
-                  className: 'col-2',
-                  key: 'account_number',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'Account Number',
-                    placeholder: 'Enter Account Number',
-                  }
-                },
-                {
-                  className: 'col-2',
-                  key: 'bank_name',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'Bank Name',
-                    placeholder: 'Enter Bank Name',
-                  }
-                },
-                {
-                  className: 'col-2',
-                  key: 'branch',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'Branch',
-                    placeholder: 'Enter Branch',
-                  }
-                },
-                // Tenth row: Checkboxes
                 {
                   className: 'col-2 d-flex align-items-center',
                   key: 'gst_suspend',

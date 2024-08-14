@@ -7,6 +7,7 @@ import { TaFormConfig } from '@ta/ta-form';
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.scss']
 })
+
 export class ProductsComponent implements OnInit {
   showProductsList: boolean = false;
   showForm: boolean = false;
@@ -37,7 +38,7 @@ export class ProductsComponent implements OnInit {
     this.http.get('products/products/' + event).subscribe((res: any) => {
       console.log('--------> res ', res);
       if (res) {
-        this.formConfig.model = res;
+        this.formConfig.model = res.data;
         this.formConfig.showActionBtn = true;
         // Set labels for update
         this.formConfig.pkId = 'product_id';
@@ -61,59 +62,16 @@ export class ProductsComponent implements OnInit {
   }
 
   setFormConfig() {
-    this.ProductEditID = null;
+    this.ProductEditID =null
     this.formConfig = {
-      url: 'products/products/',
-      title: 'Products',
-      pkId: "product_id",
+      url: "products/products/",
+      // title: 'leads',
+      formState: {
+        viewMode: false,
+        // isEdit: false,
+      },
       showActionBtn: true,
-      exParams: [
-        {
-          key: 'product_group_id',
-          type: 'script',
-          value: 'data.product_group.product_group_id'
-        },
-        {
-          key: 'category_id',
-          type: 'script',
-          value: 'data.category.category_id'
-        },
-        {
-          key: 'type_id',
-          type: 'script',
-          value: 'data.type.type_id'
-        },
-        {
-          key: 'unit_options_id',
-          type: 'script',
-          value: 'data.unit_options.unit_options_id'
-        },
-        {
-          key: 'stock_unit_id',
-          type: 'script',
-          value: 'data.stock_unit.stock_unit_id'
-        },
-        {
-          key: 'gst_classification_id',
-          type: 'script',
-          value: 'data.gst_classification.gst_classification_id'
-        },
-        {
-          key: 'sales_gl_id',
-          type: 'script',
-          value: 'data.sales_gl.sales_gl_id'
-        },
-        {
-          key: 'purchase_gl_id',
-          type: 'script',
-          value: 'data.purchase_gl.purchase_gl_id'
-        },
-        {
-          key: 'brand_id',
-          type: 'script',
-          value: 'data.brand.brand_id'
-        },
-      ],
+      exParams: [],
       submit: {
         label: 'Submit',
         submittedFn: () => this.ngOnInit()
@@ -123,385 +81,706 @@ export class ProductsComponent implements OnInit {
           this.ngOnInit();
         }
       },
+      model: {
+        products: {},
+		    product_item_balance:[],
+        warehouse_locations: [],
+      },
       fields: [
+        //-----------------------------------------products -----------------------------------//
         {
           fieldGroupClassName: "ant-row custom-form-block",
+          key: 'products',
           fieldGroup: [
-            // Left side fields
             {
-              className: 'col-9 p-0',
-              fieldGroupClassName: "ant-row",
+              fieldGroupClassName: "ant-row custom-form-block",
               fieldGroup: [
+                // Left side fields
                 {
-                  className: 'col-3',
-                  key: 'name',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'Name',
-                    placeholder: 'Enter Name',
-                    required: true,
-                  }
-                },
-                {
-                  className: 'col-3',
-                  key: 'product_group',
-                  type: 'select',
-                  templateOptions: {
-                    label: 'Product Group',
-                    dataKey: 'product_group_id',
-                    dataLabel: 'group_name',
-                    options: [],
-                    lazy: {
-                      url: 'products/product_groups/',
-                      lazyOneTime: true
+                  className: 'col-9 p-0',
+                  fieldGroupClassName: "ant-row",
+                  fieldGroup: [
+                    {
+                      key: 'name',
+                      type: 'input',
+                      className: 'col-3',
+                      templateOptions: {
+                        label: 'Name',
+                        placeholder: 'Enter Name',
+                        required: true,
+                        // disabled: true
+                      },
+                      hooks: {
+                        onInit: (field: any) => {}
+                      },
                     },
-                    required: true
-                  }
-                },
-                {
-                  className: 'col-3',
-                  key: 'category',
-                  type: 'select',
-                  templateOptions: {
-                    label: 'Category',
-                    dataKey: 'category_id',
-                    dataLabel: 'category_name',
-                    options: [],
-                    lazy: {
-                      url: 'products/product_categories/',
-                      lazyOneTime: true
-                    }
-                  }
-                },
-                {
-                  className: 'col-3',
-                  key: 'type',
-                  type: 'select',
-                  templateOptions: {
-                    label: 'Type',
-                    dataKey: 'type_id',
-                    dataLabel: 'type_name',
-                    options: [],
-                    lazy: {
-                      url: 'masters/product_types/',
-                      lazyOneTime: true
-                    }
-                  }
-                },
-                {
-                  className: 'col-3',
-                  key: 'code',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'Code',
-                    placeholder: 'Enter Code',
-                    required: true
-                  },
-                  hooks: {
-                    onInit: (field: any) => {
-                      this.http.get('masters/generate_order_no/?type=prd').subscribe((res: any) => {
-                        if (res && res.data && res.data.order_number) {
-                          field.formControl.setValue(res.data.order_number);
+                    {
+                      className: 'col-3',
+                      key: 'code',
+                      type: 'input',
+                      templateOptions: {
+                        label: 'Code',
+                        placeholder: 'Enter Code',
+                        required: true
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          this.http.get('masters/generate_order_no/?type=prd').subscribe((res: any) => {
+                            if (res && res.data && res.data.order_number) {
+                              field.formControl.setValue(res.data.order_number);
+                            }
+                          });
                         }
-                      });
-                    }
-                  }
-                },
-                {
-                  className: 'col-3',
-                  key: 'print_name',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'Print Name',
-                    placeholder: 'Enter Print Name',
-                    required: true
-                  }
-                },
-                {
-                  className: 'col-3',
-                  key: 'hsn_code',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'HSN',
-                    placeholder: 'Enter HSN Code',
-                    required: true
-                  }
-                },
-                {
-                  className: 'col-3',
-                  key: 'barcode',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'Barcode',
-                    placeholder: 'Enter Barcode',
-                    required: true
-                  }
-                },
-                {
-                  className: 'col-3',
-                  key: 'unit_options',
-                  type: 'select',
-                  templateOptions: {
-                    label: 'Unit Options',
-                    dataKey: 'unit_options_id',
-                    dataLabel: 'unit_name',
-                    options: [],
-                    required: true,
-                    lazy: {
-                      url: 'masters/unit_options/',
-                      lazyOneTime: true,
+                      }
                     },
-                  }
-                },
-                {
-                  className: 'col-3',
-                  key: 'gst_input',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'GST Input',
-                    placeholder: 'Enter GST Input'
-                  }
-                },
-                {
-                  className: 'col-3',
-                  key: 'stock_unit',
-                  type: 'select',
-                  templateOptions: {
-                    label: 'Stock Unit',
-                    dataKey: 'stock_unit_id',
-                    dataLabel: 'stock_unit_name',
-                    options: [],
-                    lazy: {
-                      url: 'products/product_stock_units/',
-                      lazyOneTime: true
+                    {
+                      className: 'col-3',
+                      key: 'barcode',
+                      type: 'input',
+                      templateOptions: {
+                        label: 'Barcode',
+                        placeholder: 'Enter Barcode',
+                        required: false
+                      }
                     },
-                    required: true
-                  }
-                },
-                {
-                  className: 'col-3 d-flex align-items-center',
-                  key: 'print_barcode',
-                  type: 'checkbox',
-                  templateOptions: {
-                    label: 'Print Barcode'
-                  }
-                },
-                {
-                  className: 'col-3',
-                  key: 'sales_description',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'Sales Description',
-                    placeholder: 'Enter Sales Description'
-                  }
-                },
-                {
-                  className: 'col-3',
-                  key: 'sales_gl',
-                  type: 'select',
-                  templateOptions: {
-                    label: 'Sales GL',
-                    dataKey: 'sales_gl_id',
-                    dataLabel: 'name',
-                    options: [],
-                    lazy: {
-                      url: 'products/product_sales_gl/',
-                      lazyOneTime: true
+                    {
+                      className: 'col-3',
+                      key: 'gst_input',
+                      type: 'input',
+                      templateOptions: {
+                        label: 'GST Input',
+                        placeholder: 'Enter GST Input'
+                      }
                     },
-                    required: true
-                  }
-                },
-                {
-                  className: 'col-3',
-                  key: 'mrp',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'MRP',
-                    placeholder: 'Enter MRP',
-                    required: true
-                  }
-                },
-                {
-                  className: 'col-3',
-                  key: 'sales_rate',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'Sales Rate',
-                    placeholder: 'Enter Sales Rate',
-                    required: true
-                  }
-                },
-                {
-                  className: 'col-3',
-                  key: 'wholesale_rate',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'Wholesale Rate',
-                    placeholder: 'Enter Wholesale Rate'
-                  }
-                },
-                {
-                  className: 'col-3',
-                  key: 'dealer_rate',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'Dealer Rate',
-                    placeholder: 'Enter Dealer Rate'
-                  }
-                },
-                {
-                  className: 'col-3',
-                  key: 'discount',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'Discount',
-                    placeholder: 'Enter Discount'
-                  }
-                },
-                {
-                  className: 'col-3',
-                  key: 'dis_amount',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'Disc Amt',
-                    placeholder: 'Enter Disc Amt',
-                    required: true
-                  }
-                },
-                {
-                  className: 'col-3',
-                  key: 'purchase_description',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'Purchase Description',
-                    placeholder: 'Enter Purchase Description'
-                  }
-                },
-                {
-                  className: 'col-3',
-                  key: 'purchase_rate',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'Purchase Rate',
-                    placeholder: 'Enter Purchase Rate'
-                  }
-                },
-                {
-                  className: 'col-3',
-                  key: 'purchase_rate_factor',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'Purchase Rate Factor',
-                    placeholder: 'Enter Purchase Rate Factor'
-                  }
-                },
-                {
-                  className: 'col-3',
-                  key: 'purchase_discount',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'Purchase Discount',
-                    placeholder: 'Enter Purchase Discount'
-                  }
-                },
-                {
-                  className: 'col-3',
-                  key: 'status',
-                  type: 'select',
-                  templateOptions: {
-                    label: 'Status',
-                    options: [
-                      { value: 'Active', label: 'Active' },
-                      { value: 'Inactive', label: 'Inactive' }
-                    ]
-                  }
-                },
-                {
-                  className: 'col-3',
-                  key: 'purchase_gl',
-                  type: 'select',
-                  templateOptions: {
-                    label: 'Purchase GL',
-                    dataKey: 'purchase_gl_id',
-                    dataLabel: 'name',
-                    options: [],
-                    lazy: {
-                      url: 'products/product_purchase_gl/',
-                      lazyOneTime: true
+                    {
+                      className: 'col-3 d-flex align-items-center',
+                      key: 'print_barcode',
+                      type: 'checkbox',
+                      templateOptions: {
+                        label: 'Print Barcode'
+                      }
                     },
-                    required: true
-                  }
-                },
-                {
-                  className: 'col-3',
-                  key: 'brand',
-                  type: 'select',
-                  templateOptions: {
-                    label: 'Brand',
-                    dataKey: 'brand_id',
-                    dataLabel: 'brand_name',
-                    options: [],
-                    lazy: {
-                      url: 'masters/product_brands/',
-                      lazyOneTime: true
-                    }
-                  }
-                },
-              ]
-            },
-            // Right side for the picture and additional fields
-            {
-              className: 'col-3 p-0',
-              fieldGroup: [
-                {
-                  key: 'picture',
-                  type: 'file',
-                  className: 'ta-cell col-12',
-                  templateOptions: {
-                    label: 'Picture',
-                    placeholder: 'Upload Picture',
-                    required: true
-                  }
-                },
-                // Additional fields below picture
-                {
-                  className: 'col-12 mt-',
-                  key: 'gst_classification',
-                  type: 'select',
-                  templateOptions: {
-                    label: 'GST Classification',
-                    dataKey: 'gst_classification_id',
-                    dataLabel: 'type',
-                    options: [],
-                    lazy: {
-                      url: 'products/product_gst_classifications/',
-                      lazyOneTime: true
+                    {
+                      className: 'col-3',
+                      key: 'sales_description',
+                      type: 'input',
+                      templateOptions: {
+                        label: 'Sales Description',
+                        placeholder: 'Enter Sales Description'
+                      }
                     },
-                  }
+                    {
+                      className: 'col-3',
+                      key: 'mrp',
+                      type: 'input',
+                      templateOptions: {
+                        label: 'MRP',
+                        placeholder: 'Enter MRP',
+                        required: false
+                      }
+                    },
+                    {
+                      className: 'col-3',
+                      key: 'minimum_price',
+                      type: 'input',
+                      templateOptions: {
+                        label: 'Min Price',
+                        placeholder: 'Enter Minimum Price'
+                      }
+                    },
+                    {
+                      className: 'col-3',
+                      key: 'sales_rate',
+                      type: 'input',
+                      templateOptions: {
+                        label: 'Sales Rate',
+                        placeholder: 'Enter Sales Rate',
+                        required: false
+                      }
+                    },
+                    {
+                      className: 'col-3',
+                      key: 'wholesale_rate',
+                      type: 'input',
+                      templateOptions: {
+                        label: 'Wholesale Rate',
+                        placeholder: 'Enter Wholesale Rate'
+                      }
+                    },
+                    {
+                      className: 'col-3',
+                      key: 'dealer_rate',
+                      type: 'input',
+                      templateOptions: {
+                        label: 'Dealer Rate',
+                        placeholder: 'Enter Dealer Rate'
+                      }
+                    },
+                    {
+                      className: 'col-3',
+                      key: 'rate_factor',
+                      type: 'input',
+                      templateOptions: {
+                        label: 'Rate Factor',
+                        placeholder: 'Enter Rate Factor'
+                      }
+                    },
+                    {
+                      className: 'col-3',
+                      key: 'discount',
+                      type: 'input',
+                      templateOptions: {
+                        label: 'Discount',
+                        placeholder: 'Enter Discount'
+                      }
+                    },
+                    {
+                      className: 'col-3',
+                      key: 'dis_amount',
+                      type: 'input',
+                      templateOptions: {
+                        label: 'Disc Amt',
+                        placeholder: 'Enter Disc Amt',
+                        required: false
+                      }
+                    },
+                    {
+                      className: 'col-3',
+                      key: 'purchase_description',
+                      type: 'input',
+                      templateOptions: {
+                        label: 'Purchase Description',
+                        placeholder: 'Enter Purchase Description'
+                      }
+                    },
+                    {
+                      className: 'col-3',
+                      key: 'purchase_rate',
+                      type: 'input',
+                      templateOptions: {
+                        label: 'Purchase Rate',
+                        placeholder: 'Enter Purchase Rate'
+                      }
+                    },
+                    {
+                      className: 'col-3',
+                      key: 'purchase_rate_factor',
+                      type: 'input',
+                      templateOptions: {
+                        label: 'Purchase Rate Factor',
+                        placeholder: 'Enter Purchase Rate Factor'
+                      }
+                    },
+                    {
+                      className: 'col-3',
+                      key: 'purchase_discount',
+                      type: 'input',
+                      templateOptions: {
+                        label: 'Purchase Discount',
+                        placeholder: 'Enter Purchase Discount'
+                      }
+                    },
+                    {
+                      className: 'col-3',
+                      key: 'minimum_level',
+                      type: 'input',
+                      templateOptions: {
+                        label: 'Minimum Level',
+                        placeholder: 'Enter Minimum Level'
+                      }
+                    },
+                    {
+                      className: 'col-3',
+                      key: 'maximum_level',
+                      type: 'input',
+                      templateOptions: {
+                        label: 'Maximum Level',
+                        placeholder: 'Enter Maximum Level'
+                      }
+                    },
+                    {
+                      className: 'col-3',
+                      key: 'salt_composition',
+                      type: 'text',
+                      templateOptions: {
+                        label: 'Salt Composition',
+                        placeholder: 'Enter Salt Composition'
+                      }
+                    },
+                    {
+                      className: 'col-3',
+                      key: 'weighscale_mapping_code',
+                      type: 'text',
+                      templateOptions: {
+                        label: 'Weighscale Mapping Code',
+                        placeholder: 'Enter Weighscale Mapping Code'
+                      }
+                    },
+                    {
+                      className: 'col-3',
+                      key: 'purchase_warranty_months',
+                      type: 'text',
+                      templateOptions: {
+                        label: 'Purchase Warranty Months',
+                        placeholder: 'Enter Purchase Warranty Months'
+                      }
+                    },
+                    {
+                      className: 'col-3',
+                      key: 'sales_warranty_months',
+                      type: 'text',
+                      templateOptions: {
+                        label: 'Sales Warranty Months',
+                        placeholder: 'Enter Sales Warranty Months'
+                      }
+                    },
+                    {
+                      key: 'type',
+                      type: 'select',
+                      className: 'col-3',
+                      templateOptions: {
+                        label: 'Type',
+                        dataKey: 'type_id',
+                        dataLabel: "type_name",
+                        options: [],
+                        required: false,
+                        lazy: {
+                          url: 'masters/product_types/',
+                          lazyOneTime: true
+                        }
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          field.formControl.valueChanges.subscribe((data: any) => {
+                            if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                              this.formConfig.model['products']['type_id'] = data.type_id;
+                            } else {
+                              console.error('Form config or type_id data model is not defined.');
+                            }
+                          });
+                        }
+                      }
+                    },
+                    {
+                      key: 'unit_options',
+                      type: 'select',
+                      className: 'col-3',
+                      templateOptions: {
+                        label: 'Unit Options',
+                        dataKey: 'unit_options_id',
+                        dataLabel: "unit_name",
+                        options: [],
+                        required: false,
+                        lazy: {
+                          url: 'masters/unit_options/',
+                          lazyOneTime: true
+                        }
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          field.formControl.valueChanges.subscribe((data: any) => {
+                            if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                              this.formConfig.model['products']['unit_options_id'] = data.unit_options_id;
+                            } else {
+                              console.error('Form config or unit_options_id data model is not defined.');
+                            }
+                          });
+                        }
+                      }
+                    },
+                    {
+                      key: 'product_group',
+                      type: 'select',
+                      className: 'col-3',
+                      templateOptions: {
+                        label: 'Product Group',
+                        dataKey: 'product_group_id',
+                        dataLabel: "group_name",
+                        options: [],
+                        required: true,
+                        lazy: {
+                          url: 'products/product_groups/',
+                          lazyOneTime: true
+                        }
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          field.formControl.valueChanges.subscribe((data: any) => {
+                            if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                              this.formConfig.model['products']['product_group_id'] = data.product_group_id;
+                            } else {
+                              console.error('Form config or lead_status data model is not defined.');
+                            }
+                          });
+                        }
+                      }
+                    },
+                    {
+                      key: 'category',
+                      type: 'select',
+                      className: 'col-3',
+                      templateOptions: {
+                        label: 'Category',
+                        dataKey: 'category_id',
+                        dataLabel: "category_name",
+                        options: [],
+                        required: false,
+                        lazy: {
+                          url: 'products/product_categories/',
+                          lazyOneTime: true
+                        }
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          field.formControl.valueChanges.subscribe((data: any) => {
+                            if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                              this.formConfig.model['products']['category_id'] = data.category_id;
+                            } else {
+                              console.error('Form config or lead_status data model is not defined.');
+                            }
+                          });
+                        }
+                      }
+                    },
+                    {
+                      key: 'stock_unit',
+                      type: 'select',
+                      className: 'col-3',
+                      templateOptions: {
+                        label: 'Stock Unit',
+                        dataKey: 'stock_unit_id',
+                        dataLabel: "stock_unit_name",
+                        options: [],
+                        required: true,
+                        lazy: {
+                          url: 'products/product_stock_units/',
+                          lazyOneTime: true
+                        }
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          field.formControl.valueChanges.subscribe((data: any) => {
+                            if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                              this.formConfig.model['products']['stock_unit_id'] = data.stock_unit_id;
+                            } else {
+                              console.error('Form config or lead_status data model is not defined.');
+                            }
+                          });
+                        }
+                      }
+                    },
+                    {
+                      key: 'sales_gl',
+                      type: 'select',
+                      className: 'col-3',
+                      templateOptions: {
+                        label: 'Sales GL',
+                        dataKey: 'sales_gl_id',
+                        dataLabel: "name",
+                        options: [],
+                        required: true,
+                        lazy: {
+                          url: 'products/product_sales_gl/',
+                          lazyOneTime: true
+                        }
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          field.formControl.valueChanges.subscribe((data: any) => {
+                            if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                              this.formConfig.model['products']['sales_gl_id'] = data.sales_gl_id;
+                            } else {
+                              console.error('Form config or lead_status data model is not defined.');
+                            }
+                          });
+                        }
+                      }
+                    },
+                    {
+                      key: 'purchase_gl',
+                      type: 'select',
+                      className: 'col-3',
+                      templateOptions: {
+                        label: 'Purchase GL',
+                        dataKey: 'purchase_gl_id',
+                        dataLabel: "name",
+                        options: [],
+                        required: true,
+                        lazy: {
+                          url: 'products/product_purchase_gl/',
+                          lazyOneTime: true
+                        }
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          field.formControl.valueChanges.subscribe((data: any) => {
+                            if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                              this.formConfig.model['products']['purchase_gl_id'] = data.purchase_gl_id;
+                            } else {
+                              console.error('Form config or lead_status data model is not defined.');
+                            }
+                          });
+                        }
+                      }
+                    },
+                    {
+                      key: 'item_type',
+                      type: 'select',
+                      className: 'col-3',
+                      templateOptions: {
+                        label: 'Item Type',
+                        dataKey: 'item_type_id',
+                        dataLabel: "item_name",
+                        options: [],
+                        required: false,
+                        lazy: {
+                          url: 'masters/product_item_type/',
+                          lazyOneTime: true
+                        }
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          field.formControl.valueChanges.subscribe((data: any) => {
+                            if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                              this.formConfig.model['products']['item_type_id'] = data.item_type_id;
+                            } else {
+                              console.error('Form config or lead_status data model is not defined.');
+                            }
+                          });
+                        }
+                      }
+                    },
+                    {
+                      key: 'drug_type',
+                      type: 'select',
+                      className: 'col-3',
+                      templateOptions: {
+                        label: 'Drug Type',
+                        dataKey: 'drug_type_id',
+                        dataLabel: "drug_type_name",
+                        options: [],
+                        required: false,
+                        lazy: {
+                          url: 'masters/product_drug_types/',
+                          lazyOneTime: true
+                        }
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          field.formControl.valueChanges.subscribe((data: any) => {
+                            if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                              this.formConfig.model['products']['drug_type_id'] = data.drug_type_id;
+                            } else {
+                              console.error('Form config or lead_status data model is not defined.');
+                            }
+                          });
+                        }
+                      }
+                    },
+                    {
+                      key: 'brand',
+                      type: 'select',
+                      className: 'col-3',
+                      templateOptions: {
+                        label: 'Brand',
+                        dataKey: 'brand_id',
+                        dataLabel: "brand_name",
+                        options: [],
+                        required: false,
+                        lazy: {
+                          url: 'masters/product_brands/',
+                          lazyOneTime: true
+                        }
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          field.formControl.valueChanges.subscribe((data: any) => {
+                            if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                              this.formConfig.model['products']['brand_id'] = data.brand_id;
+                            } else {
+                              console.error('Form config or brand_id data model is not defined.');
+                            }
+                          });
+                        }
+                      }
+                    },
+                   ]
                 },
                 {
-                  className: 'col-12',
-                  key: 'minimum_price',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'Min Price',
-                    placeholder: 'Enter Minimum Price'
-                  }
-                },
-                {
-                  className: 'col-12',
-                  key: 'rate_factor',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'Rate Factor',
-                    placeholder: 'Enter Rate Factor'
-                  }
+                  className: 'col-3 p-0',
+                  fieldGroup: [
+                    {
+                      key: 'picture',
+                      type: 'file',
+                      className: 'ta-cell col-12',
+                      templateOptions: {
+                        label: 'Picture',
+                        placeholder: 'Upload Picture',
+                        required: false
+                      }
+                    },
+                    {
+                      key: 'gst_classification',
+                      type: 'select',
+                      className: 'col-12 mt-',
+                      templateOptions: {
+                        label: 'GST Classification',
+                        dataKey: 'gst_classification_id',
+                        dataLabel: "type",
+                        options: [],
+                        required: false,
+                        lazy: {
+                          url: 'products/product_gst_classifications/',
+                          lazyOneTime: true
+                        }
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          field.formControl.valueChanges.subscribe((data: any) => {
+                            if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                              this.formConfig.model['products']['gst_classification_id'] = data.gst_classification_id;
+                            } else {
+                              console.error('Form config or gst_classification_id data model is not defined.');
+                            }
+                          });
+                        }
+                      }
+                    },
+                    {
+                      className: 'col-12',
+                      key: 'status',
+                      type: 'select',
+                      templateOptions: {
+                        label: 'Status',
+                        options: [
+                          { value: 'Active', label: 'Active' },
+                          { value: 'Inactive', label: 'Inactive' }
+                        ]
+                      }
+                    },
+                    {
+                      className: 'col-12',
+                      key: 'print_name',
+                      type: 'input',
+                      templateOptions: {
+                        label: 'Print Name',
+                        placeholder: 'Enter Print Name',
+                        required: true
+                      }
+                    },
+                    {
+                      className: 'col-12',
+                      key: 'hsn_code',
+                      type: 'input',
+                      templateOptions: {
+                        label: 'HSN',
+                        placeholder: 'Enter HSN Code',
+                        required: false
+                      }
+                    },
+                  ]
                 }
               ]
-            }
+            },
+            
           ]
+        },
+        //----------------------------------------- product_item_balance  -----------------------------------//
+        {
+          key: 'product_item_balance',
+          type: 'table',
+          className: 'custom-form-list',
+          templateOptions: {
+            title: 'Product Item Balance',
+            addText: 'Add Balance',
+            tableCols: [
+              { name: 'balance', label: 'Balance' }
+            ]
+          },
+          fieldArray: {
+            fieldGroup: [
+              {
+                key: 'balance',
+                type: 'input',
+                templateOptions: {
+                  label: 'Balance',
+                  placeholder: 'Enter Balance',
+                  hideLabel: true,
+                  required: true
+                }
+              }
+            ]
+          }
+        },
+		//-----------------------------------warehouse_locations-------------------------------------
+		    {
+          key: 'warehouse_locations',
+          type: 'table',
+          className: 'custom-form-list',
+          templateOptions: {
+            title: 'Warehouse Locations',
+            addText: 'Add Warehouse Locations',
+            tableCols: [
+              { name: 'location_name', label: 'Location Name' },
+              { name: 'description', label: 'Description' },
+              { name: 'warehouse_id', label: 'Warehouse ID' },
+            ]
+          },
+          fieldArray: {
+            fieldGroup: [
+              {
+                key: 'warehouse',
+                type: 'select',
+                templateOptions: {
+                  label: 'Warehouse',
+                  dataKey: 'warehouse_id',
+                  dataLabel: 'name',
+                  options: [],
+                  hideLabel: true,
+                  required: false,
+                  lazy: {
+                    url: 'inventory/warehouses/',
+                    lazyOneTime: true
+                  },
+                },
+                hooks: {
+                  onChanges: (field: any) => {
+                    field.formControl.valueChanges.subscribe((data: any) => {
+                      const index = field.parent.key;
+                      if (!this.formConfig.model['warehouse_locations'][index]) {
+                        console.error(`Task comments at index ${index} is not defined. Initializing...`);
+                        this.formConfig.model['warehouse_locations'][index] = {};
+                      }
+                      this.formConfig.model['warehouse_locations'][index]['warehouse_id'] = data.warehouse_id;
+                    });
+                  }
+                }
+              },
+              {
+                key: 'location_name',
+                type: 'input',
+                templateOptions: {
+                  // label: 'Location Name',
+                  placeholder: 'Enter Location Name',
+                  hideLabel: false,
+                  required: true
+                }
+              },
+              {
+                key: 'description',
+                type: 'text',
+                templateOptions: {
+                  // label: 'Description',
+                  placeholder: 'Enter Description',
+                  hideLabel: false,
+                  required: false
+                }
+              }
+            ]
+          }
         }
-      ]
-    };
+     ]
+    }
   }
+
 }
