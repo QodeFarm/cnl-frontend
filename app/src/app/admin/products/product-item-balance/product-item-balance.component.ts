@@ -7,8 +7,6 @@ import { TaCurdConfig } from '@ta/ta-curd';
   styleUrls: ['./product-item-balance.component.scss']
 })
 export class ProductItemBalanceComponent {
-  baseUrl: string = 'http://195.35.20.172:8000/api/v1/';
-
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
     drawerPlacement: 'top',
@@ -24,18 +22,18 @@ export class ProductItemBalanceComponent {
       cols: [
         {
           fieldKey: 'balance',
-          name: 'Balence',
+          name: 'Balance',
           sort: true
+        },     
+        {
+          fieldKey: 'location',
+          name: 'Location',
+          sort: true,
+          displayType: "map",
+          mapFn: (currentValue: any, row: any, col: any) => {
+            return `${row.location.location_name}`;
+          },
         },
-        // {
-        //   fieldKey: 'location',
-        //   name: 'Location',
-        //   sort: true,
-        //   displayType: "map",
-        //   mapFn: (currentValue: any, row: any, col: any) => {
-        //     return `${row.location.name}`;
-        //   },
-        // },
         {
           fieldKey: 'product',
           name: 'Product',
@@ -43,15 +41,6 @@ export class ProductItemBalanceComponent {
           displayType: "map",
           mapFn: (currentValue: any, row: any, col: any) => {
             return `${row.product.name}`;
-          },
-        },
-        {
-          fieldKey: 'warehouse',
-          name: 'Warehouse',
-          sort: true,
-          displayType: "map",
-          mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.warehouse.name}`;
           },
         },
         {
@@ -85,9 +74,9 @@ export class ProductItemBalanceComponent {
           value: 'data.product.product_id'
         },
         {
-          key: 'warehouse_id',
+          key: 'location_id',
           type: 'script',
-          value: 'data.warehouse.warehouse_id'
+          value: 'data.location.location_id'
         },
       ],
       fields: 
@@ -107,33 +96,37 @@ export class ProductItemBalanceComponent {
             required: true,
           }
         },
-        // {
-        //   key: 'location',
-        //   type: 'select',
-        //   className: 'col-6 pb-3 ps-0',
-        //   templateOptions: {
-        //     label: 'Location',
-        //     placeholder: 'Enter Location',
-        //     datakey : 'location_name',
-        //     datalabel : 'location_name',
-        //     required: false,
-        //     lazy: {
-        //       url: this.baseUrl +'inventory/warehouse_locations/',
-        //       lazyOneTime: true
-        //     },
-        //   },
-        //   hooks: {
-        //     onInit: (field: any) => {
-        //       field.formControl.valueChanges.subscribe((data: any) => {
-        //         if (form.field && this.formConfig.model && this.formConfig.model['location_id']) {
-        //           this.formConfig.model['location_id'] = data.location_id
-        //         } else {
-        //           console.error('Form config or location data model is not defined.');
-        //         }
-        //       });
-        //   },
-        // }
-        // },
+        {
+          key: 'location',
+          type: 'select',
+          className: 'col-6 pb-3 ps-0',
+          templateOptions: {
+            label: 'Location',
+            placeholder: 'Enter Location',
+            dataKey: 'location_id',
+            dataLabel: 'location_name',
+            required: true, // Consider setting required to true if necessary
+            lazy: {
+              url: 'inventory/warehouse_locations/',
+              lazyOneTime: true
+            },
+          },
+          hooks: {
+            onInit: (field: any) => {
+              field.templateOptions.options = []; // Initialize options as empty
+        
+              // Subscribe to formControl value changes if needed, or simply set the options once
+              field.formControl.valueChanges.subscribe(data => {
+                console.log("Location data:", data); // Debug log
+              });
+        
+              // Fetch and bind the options manually (optional)
+              // this.http.get('inventory/warehouse_locations/').subscribe((response: any) => {
+              //   field.templateOptions.options = response.data; // Adjust based on your API response structure
+              // });
+            }
+          }
+        },
         {
           key: 'product',
           type: 'select',
@@ -155,32 +148,8 @@ export class ProductItemBalanceComponent {
             }
           }
         },
-        {
-          key: 'warehouse',
-          type: 'select',
-          className: 'col-6 pb-3 ps-0',
-          templateOptions: {
-            label: 'Warehouses',
-            dataKey: 'warehouse_id',
-            dataLabel: "name",
-            options: [],
-            lazy: {
-              url: 'inventory/warehouses/',
-              lazyOneTime: true
-            },
-            // required: true
-          },
-          hooks: {
-            onInit: (field: any) => {
-              //field.templateOptions.options = this.cs.getRole();
-            }
-          }
-        },
       ]
-    }
-      ]
-    }
- 
-  }
+    }]
+  }}
 }
  
