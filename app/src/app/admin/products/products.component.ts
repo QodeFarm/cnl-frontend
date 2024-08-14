@@ -83,8 +83,8 @@ export class ProductsComponent implements OnInit {
       },
       model: {
         products: {},
-		    product_item_balance:[],
-        warehouse_locations: [],
+		    product_item_balance:[{}],
+        warehouse_locations: [{}],
       },
       fields: [
         //-----------------------------------------products -----------------------------------//
