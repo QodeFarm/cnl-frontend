@@ -83,8 +83,8 @@ export class ProductsComponent implements OnInit {
       },
       model: {
         products: {},
-		    product_item_balance:[],
-        warehouse_locations: [],
+		    product_item_balance:[{}],
+        warehouse_locations: [{}],
       },
       fields: [
         //-----------------------------------------products -----------------------------------//
@@ -760,9 +760,9 @@ export class ProductsComponent implements OnInit {
                 key: 'location_name',
                 type: 'input',
                 templateOptions: {
-                  // label: 'Location Name',
+                  label: 'Location Name',
                   placeholder: 'Enter Location Name',
-                  hideLabel: false,
+                  hideLabel: true,
                   required: true
                 }
               },
@@ -770,9 +770,9 @@ export class ProductsComponent implements OnInit {
                 key: 'description',
                 type: 'text',
                 templateOptions: {
-                  // label: 'Description',
+                  label: 'Description',
                   placeholder: 'Enter Description',
-                  hideLabel: false,
+                  hideLabel: true,
                   required: false
                 }
               }
