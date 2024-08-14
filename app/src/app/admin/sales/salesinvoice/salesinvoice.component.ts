@@ -126,29 +126,19 @@ export class SalesinvoiceComponent {
             {
               key: 'bill_type',
               type: 'select',
+              // defaultValue: 'Exclusive',
               className: 'col-2',
               templateOptions: {
-                label: 'Bill Type',
-                dataKey: 'bill_type',
-                dataLabel: "name",
+                label: 'Bill type',
                 options: [
-                  { label: 'Cash', value: 'CASH' },
-                  { label: 'Credit', value: 'CREDIT' },
-                  { label: 'Others', value: 'OTHERS' }
+                  { 'label': "Cash", value: 'CASH' },
+                  { 'label': "Credit", value: 'CREDIT' },
+                  { 'label': "Others", value: 'OTHERS' }
                 ],
                 required: true
               },
               hooks: {
-                onChanges: (field: any) => {
-                  field.formControl.valueChanges.subscribe(data => {
-                    console.log("bill_type", data);
-                    if (data) {
-                      this.formConfig.model['sale_invoice_order']['bill_type'] = data;
-                    }
-                  });
-                },
                 onInit: (field: any) => {
-
                 }
               }
             },
