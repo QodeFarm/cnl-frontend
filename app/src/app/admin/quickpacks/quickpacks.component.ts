@@ -18,6 +18,7 @@ export class QuickpacksComponent implements OnInit {
   ngOnInit() {
     this.showQuickPackList = false;
     this.showForm = true;
+    this.quickPackID = null;
     this.setFormConfig();
     console.log('this.formConfig', this.formConfig);
   }
@@ -35,6 +36,7 @@ export class QuickpacksComponent implements OnInit {
       console.log('--------> res ', res);
       if (res && res.data) {
         this.formConfig.model = res.data;
+        this.formConfig.showActionBtn = true;
         this.formConfig.submit.label = 'Update';
         this.formConfig.pkId = 'quick_pack_id';
         this.formConfig.model['quick_pack_id'] = this.quickPackID;
@@ -49,12 +51,14 @@ export class QuickpacksComponent implements OnInit {
   }
 
   setFormConfig() {
+    this.quickPackID = null;
     this.formConfig = {
       url: "sales/quick_pack/",
       title: '',
       formState: {
         viewMode: false
       },
+      showActionBtn: true,
       exParams: [
         {
           key: 'quick_pack_data_items',
@@ -63,11 +67,13 @@ export class QuickpacksComponent implements OnInit {
         }
       ],
       submit: {
-        // label:'Submit',
+        label:'Submit',
         submittedFn: () => this.ngOnInit()
       },
       reset: {
-        label: 'Reset'
+        resetFn: () => {
+          this.ngOnInit();
+        }
       },
       model: {
         quick_pack_data: {},
@@ -99,16 +105,6 @@ export class QuickpacksComponent implements OnInit {
               }
             },
             {
-              key: 'description',
-              type: 'textarea',
-              className: 'col-3',
-              templateOptions: {
-                label: 'Description',
-                placeholder: 'Enter Description',
-                required: false
-              }
-            },
-            {
               key: 'active',
               type: 'select',
               className: 'col-3',
@@ -119,6 +115,16 @@ export class QuickpacksComponent implements OnInit {
                   { label: 'Yes', value: 'Y' },
                   { label: 'No', value: 'N' }
                 ],
+                required: false
+              }
+            },
+            {
+              key: 'description',
+              type: 'textarea',
+              className: 'col-3',
+              templateOptions: {
+                label: 'Description',
+                placeholder: 'Enter Description',
                 required: false
               }
             },

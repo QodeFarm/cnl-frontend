@@ -19,6 +19,7 @@ export class EmployeesComponent {
   ngOnInit() {
     this.showEmployeesList = false;
     this.showForm = true;
+    this.EmployeeEditID = null;
     // set form config
     this.setFormConfig();
     console.log('this.formConfig', this.formConfig);
@@ -37,9 +38,10 @@ export class EmployeesComponent {
     this.http.get('hrms/employees/' + event).subscribe((res: any) => {
       if (res) {
         this.formConfig.model = res;
+        this.formConfig.showActionBtn = true;
+        this.formConfig.pkId = 'employee_id';
         //set labels for update
         this.formConfig.submit.label = 'Update';
-        this.formConfig.pkId = 'employee_id';
         this.showForm = true;
       }
     })
@@ -52,12 +54,14 @@ export class EmployeesComponent {
   };
 
   setFormConfig() {
+    this.EmployeeEditID = null;
     this.formConfig = {
       url: "hrms/employees/",
       // title: 'leads',
       formState: {
         viewMode: false,
       },
+      showActionBtn : true,
       exParams: [
         {
           key: 'department_id',
@@ -74,7 +78,11 @@ export class EmployeesComponent {
         label: 'Submit',
         submittedFn: () => this.ngOnInit()
       },
-      reset: {},
+      reset: {
+        resetFn: () => {
+          this.ngOnInit();
+        }
+      },
       model:{},
       fields: [
         {

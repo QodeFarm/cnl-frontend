@@ -63,7 +63,7 @@ export class CompanyComponent {
                 className: 'col-3',
                 templateOptions: {
                   label: 'Print name',
-                  placeholder: 'Enter name',
+                  placeholder: 'Enter print name',
                   required: true,
                 }
               },
@@ -73,7 +73,7 @@ export class CompanyComponent {
                 className: 'col-3',
                 templateOptions: {
                   label: 'Short name',
-                  placeholder: 'Enter name',
+                  placeholder: 'Enter short name',
                   required: false,
                 }
               },
@@ -246,7 +246,7 @@ export class CompanyComponent {
                 className: 'col-3',
                 templateOptions: {
                   label: 'PAN',
-                  placeholder: 'Enter Name',
+                  placeholder: 'Enter pan',
                   required: false,
                 }
               },
@@ -256,7 +256,7 @@ export class CompanyComponent {
                 className: 'col-3',
                 templateOptions: {
                   label: 'TAN',
-                  placeholder: 'Enter Name',
+                  placeholder: 'Enter tan',
                   required: false,
                 }
               },
@@ -266,7 +266,7 @@ export class CompanyComponent {
                 className: 'col-3',
                 templateOptions: {
                   label: 'CIN',
-                  placeholder: 'Enter Name',
+                  placeholder: 'Enter cin',
                   required: false,
                 }
               },
@@ -276,7 +276,7 @@ export class CompanyComponent {
                 className: 'col-3',
                 templateOptions: {
                   label: 'GST TIN',
-                  placeholder: 'Enter Name',
+                  placeholder: 'Enter gst tin',
                   required: false,
                 }
               },
@@ -286,7 +286,7 @@ export class CompanyComponent {
                   className: 'col-3',
                   templateOptions: {
                     label: 'ESI no',
-                    placeholder: 'Enter Name',
+                    placeholder: 'Enter number',
                     required: false,
                   }
                 },
@@ -296,7 +296,7 @@ export class CompanyComponent {
                   className: 'col-3',
                   templateOptions: {
                     label: 'PF no',
-                    placeholder: 'Enter Name',
+                    placeholder: 'Enter number',
                     required: false,
                   }
                 },
@@ -306,7 +306,7 @@ export class CompanyComponent {
                   className: 'col-3',
                   templateOptions: {
                     label: 'Authorized person',
-                    placeholder: 'Enter Name',
+                    placeholder: 'Enter name',
                     required: false,
                   }
                 },
@@ -316,7 +316,7 @@ export class CompanyComponent {
                   className: 'col-3',
                   templateOptions: {
                     label: 'IEC code',
-                    placeholder: 'Enter Name',
+                    placeholder: 'Enter IEC code',
                     required: false,
                   }
                 },
@@ -326,7 +326,7 @@ export class CompanyComponent {
                   className: 'col-3',
                   templateOptions: {
                     label: 'E-Way Username',
-                    placeholder: 'Enter Name',
+                    placeholder: 'Enter name',
                     required: false,
                   }
                 },
@@ -336,7 +336,7 @@ export class CompanyComponent {
                   className: 'col-3',
                   templateOptions: {
                     label: 'E-Way password',
-                    placeholder: 'Enter Name',
+                    placeholder: 'Enter password',
                     required: false,
                   }
                 },
@@ -346,7 +346,7 @@ export class CompanyComponent {
                   className: 'col-3',
                   templateOptions: {
                     label: 'GSTN Username',
-                    placeholder: 'Enter Name',
+                    placeholder: 'Enter name',
                     required: false,
                   }
                 },
@@ -356,7 +356,7 @@ export class CompanyComponent {
                   className: 'col-3',
                   templateOptions: {
                     label: 'GSTN password',
-                    placeholder: 'Enter Name',
+                    placeholder: 'Enter password',
                     required: false,
                   }
                 },
@@ -396,7 +396,7 @@ export class CompanyComponent {
                   className: 'col-3',
                   templateOptions: {
                     label: 'Marketplace URL',
-                    placeholder: 'Enter Name',
+                    placeholder: 'Enter URL',
                     required: false,
                   }
                 },
@@ -406,7 +406,7 @@ export class CompanyComponent {
                   className: 'col-3',
                   templateOptions: {
                     label: 'Drug license no',
-                    placeholder: 'Enter Name',
+                    placeholder: 'Enter number',
                     required: false,
                   }
                 },
@@ -493,7 +493,7 @@ export class CompanyComponent {
                   className: 'col-12 mt-',
                   templateOptions: {
                     label: 'Establishment code',
-                    placeholder: 'Enter Name',
+                    placeholder: 'Enter code',
                     required: false,
                   }
                 },
@@ -523,7 +523,7 @@ export class CompanyComponent {
                   className: 'col-12 mt-',
                   templateOptions: {
                     label: 'Other license 1',
-                    placeholder: 'Enter Name',
+                    placeholder: 'Enter license',
                     required: false,
                   }
                 },
@@ -533,7 +533,7 @@ export class CompanyComponent {
                   className: 'col-12 mt-',
                   templateOptions: {
                     label: 'Other license 2',
-                    placeholder: 'Enter Name',
+                    placeholder: 'Enter license',
                     required: false,
                   }
                 },

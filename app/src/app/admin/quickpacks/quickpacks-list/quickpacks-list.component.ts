@@ -58,7 +58,8 @@ export class QuickpacksListComponent {
           },
           {
             type: 'callBackFn',
-            label: 'Edit',
+            icon: 'fa fa-pen',
+            label: '',
             callBackFn: (row, action) => {
               console.log(row);
               this.edit.emit(row.quick_pack_id);

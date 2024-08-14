@@ -83,7 +83,7 @@ export class InventoryComponent   {
         sort: true,
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.product_bal[0].location.location_name}`;
+          return `${row.product_bal[0].location.warehouse.name}`;
         },
       },
       {
