@@ -635,6 +635,7 @@ export class VendorsComponent{
                 templateOptions: {
                   label: 'Account Number',
                   placeholder: 'Enter Account Number',
+                  type: 'password'
                 }
               },
               {
