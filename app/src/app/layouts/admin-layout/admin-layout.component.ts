@@ -411,21 +411,93 @@ export class AdminLayoutComponent {
     console.log('Speech not recognized for API creation commands');
   }
 
-  // Method to handle page navigation based on recognized speech
   private handlePageNavigation(speech: string): void {
     const pages: { [key: string]: string } = {
       'dashboard': '/admin/dashboard',
       'users': 'admin/users',
       'company': '/admin/company',
-      'sales': '/admin/sales',
-      'roles': 'users/roles',
-      'inventory': 'admin/inventory',
-      'master': 'admin/master',
-      'product-groups': 'products/product-groups',
-      'vendors': 'admin/vendors'
-    };
 
-    const page = Object.keys(pages).find(page => speech.includes('go to ' + page));
+      //sales
+      'sales': '/admin/sales',
+      'customers': '/admin/customers',
+      'sales invoice': '/admin/sales/salesinvoice',
+      'sales returns': '/admin/sales/sale-returns',
+
+      //purchase
+      'purchase' : '/admin/purchase',
+      'vendors': 'admin/vendors',
+      'purchase invoice' : 'admin/purchase/invoice',
+      'purchase returns' : 'admin/purchase/purchasereturns',
+
+      //inventory
+      'inventory': 'admin/inventory',
+      'products': 'admin/products',
+      'warehouse' : 'admin/warehouses',
+      'quickpacks' : 'admin/quickpacks',
+
+      //tasks
+      'tasks' : 'admin/tasks',
+
+      //leads
+      'leads' : 'admin/leads',
+
+      //assets
+      'assets' : 'admin/assets/assets',
+      'asset maintenance' : 'admin/assets/asset_maintenance',
+
+      //HRMS
+      'employees' : 'admin/employees',
+
+      //masters
+      'master': 'admin/master',
+      'gst categories': '/admin/master/gst-categories',
+      'shipping modes': '/admin/master/shipping-modes',
+      'price categories': '/admin/master/price-categories',
+      'transporters': '/admin/master/transporters',
+      'orders status' : '/admin/master/statuses',
+      'product groups': '/admin/master/product-groups',
+      'territory': 'admin/master/territory',
+      'shipping companies': '/admin/master/shipping-companies',
+
+      'departments':'admin/master/departments',
+      'designations':'/hrms/designations/',
+      
+      'firm status':'/admin/master/firm-statuses',
+      'ledgeraccounts':'/admin/master/ledger-accounts',
+      'ledger groups':'/admin/master/ledger-groups',
+      'customer payment-terms':'/admin/master/customer-payment-terms',
+      'vendor agent':'/admin/master/vendor-agent',
+      'vendor category':'/admin/master/vendor-category',
+      'vendor payment-terms':'/admin/master/vendor-payment-terms',
+      'product sales gl':'/admin/master/product-sales-gl',
+      'product types':'/admin/master/product-types',
+      'product brands':'/admin/master/product-brands',
+      'product categories':'/admin/master/product-categories',
+      'product gst-classifications':'/admin/master/product-gst-classifications',
+      'product item-type':'/admin/master/product-item-type',
+      'product purchase-gl':'/admin/master/product-purchase-gl',
+      'product stock-units':'/admin/master/product-stock-units',
+      'product item-balance':'/admin/master/product-item-balance',
+      'product unique-quantity-codes':'/admin/master/product-unique-quantity-codes',
+      'unit options':'/admin/master/unit-options',
+      'order statuses':'/admin/master/order-statuses',
+      'order types':'/admin/master/order-types',
+      'purchase types':'/admin/master/purchase-types',
+      'sale types':'/admin/master/sale-types',
+      'gst types':'/admin/master/gst-types',
+      'payment link type':'/admin/master/payment-link-type',
+      'lead statuses':'/admin/master/lead-statuses',
+      'interaction-types':'/admin/master/interaction-types',
+      'priorities':'/admin/master/priorities',
+      'asset categories':'/admin/master/asset-categories',
+      'asset statuses':'/admin/master/asset-statuses',
+      'locations':'/admin/master/locations'
+    };
+  
+    // Ensure the longest matches are checked first by sorting keys by length
+    const sortedPages = Object.keys(pages).sort((a, b) => b.length - a.length);
+  
+    const page = sortedPages.find(page => speech.includes('go to ' + page));
     if (page) {
       this.router.navigate([pages[page]]);
       this.startSpeechRecognition(3000, false); // Mic active for 3 seconds for navigation without restart
