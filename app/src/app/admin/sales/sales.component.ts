@@ -555,6 +555,7 @@ export class SalesComponent {
                   dataLabel: 'unit_name',
                   dataKey: 'unit_options_id',
                   bindId: true,
+                  required: true,
                   lazy: {
                     url: 'masters/unit_options',
                     lazyOneTime: true
