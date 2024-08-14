@@ -222,6 +222,11 @@ export class AdminLayoutComponent {
         ]
       },
       {
+        link: '/admin/reports',
+        label: 'Reports',
+        icon: 'icon icon-reports',
+      },
+      {
         link: '/admin/master',
         label: 'Master',
         icon: 'icon icon-masters',
