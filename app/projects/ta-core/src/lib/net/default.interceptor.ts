@@ -67,7 +67,7 @@ export class DefaultInterceptor implements HttpInterceptor {
   }
 
   private checkStatus(ev: HttpErrorResponse): void {
-    let errorMsg = ev.error.message || `Request error ${ev.status}: ${ev.url}`;
+    let errorMsg =`Request error ${ev.status}: `;
     if (ev.status == 400) {
       const errortext = CODEMESSAGE[ev.status] || ev.statusText;
       this.notification.error('', errortext);
@@ -77,7 +77,7 @@ export class DefaultInterceptor implements HttpInterceptor {
       return;
     }
 
-    const errortext = CODEMESSAGE[ev.status] || ev.statusText;
+    const errortext = "Username or Password is not valid" //CODEMESSAGE[ev.status] || ev.statusText;
     this.notification.error(errorMsg, errortext);
   }
 

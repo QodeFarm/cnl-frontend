@@ -163,13 +163,13 @@ export class TaFormComponent implements OnInit {
             this.notification.success(msg, '');
             this.formlyOptions.resetModel();
           } else {
-            if (res.error && res.error.message) {
-              this.notification.error(res.error.message, '')
-            } else if (res.message) {
-              this.notification.error(res.message, '')
-            } else {
-              this.notification.error('Failure Error', '')
-            }
+            // if (res.error && res.error.message) {
+            //   this.notification.error(res.error.message, '')
+            // } else if (res.message) {
+            //   this.notification.error(res.message, '')
+            // } else {
+            //   this.notification.error('Failure Error', '')
+            // }
           }
 
           // this.form.reset();
@@ -182,13 +182,13 @@ export class TaFormComponent implements OnInit {
             if (e) {
               e.forEach(er => {
                 if (erors[er] && erors[er][0]) {
-                  this.notification.error(erors[er][0], '');
+                  // this.notification.error(erors[er][0], '');
                 }
               });
             }
           }
 
-          this.notification.error('Failure Error', '')
+          // this.notification.error('Failure Error', '')
 
         });
       } else {
