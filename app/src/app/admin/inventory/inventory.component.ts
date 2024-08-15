@@ -45,7 +45,7 @@ export class InventoryComponent   {
       },
       {
         fieldKey: 'stock_unit',
-        name: 'Stock Unit Name',
+        name: 'Unit',
         sort: true,
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
@@ -79,7 +79,7 @@ export class InventoryComponent   {
       },
       {
         fieldKey: 'product_bal',
-        name: 'Warehouse Name',
+        name: 'Warehouse',
         sort: true,
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
@@ -88,7 +88,7 @@ export class InventoryComponent   {
       },
       {
         fieldKey: 'product_bal',
-        name: 'Location Name',
+        name: 'Location',
         sort: true,
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
@@ -98,13 +98,24 @@ export class InventoryComponent   {
       {
         fieldKey: 'total_product_balance', 
         name: 'Balance',
-        sort: true
+        sort: true,
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          const val = row.total_product_balance;
+          return `${val}`;
+        }
       },
       {
         fieldKey: 'updated_at',
-        name: 'Updated at',
-        sort: true
-      }
+        name: 'Last Updated',
+        sort: true,
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          const updated_at = row.updated_at;
+          const date = updated_at.split('T')[0]; // Extracts the date part
+          return `${date}`;
+        }
+      },
     ]
   },
   formConfig: {
