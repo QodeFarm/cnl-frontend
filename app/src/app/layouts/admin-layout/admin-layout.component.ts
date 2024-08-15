@@ -70,22 +70,22 @@ export class AdminLayoutComponent {
       //   label: 'voiceassistant',
       //   icon: 'fas fa-microphone',
       // },
-      {
-        label: 'User Management',
-        icon: 'fas fa-user',
-        child: [
-          {
-            link: '/admin/users',
-            label: 'Users',
-            icon: 'fas fa-user',
-          },
-          {
-            link: '/admin/users/roles',
-            label: 'Roles',
-            icon: 'fas fa-user',
-          }
-        ]
-      },
+      // {
+      //   label: 'User Management',
+      //   icon: 'fas fa-user',
+      //   child: [
+      //     // {
+      //     //   link: '/admin/users',
+      //     //   label: 'Users',
+      //     //   icon: 'fas fa-user',
+      //     // },
+      //     {
+      //       link: '/admin/users/roles',
+      //       label: 'Roles',
+      //       icon: 'fas fa-user',
+      //     }
+      //   ]
+      // },
       {
         label: 'Sales',
         icon: 'icon icon-sales',
