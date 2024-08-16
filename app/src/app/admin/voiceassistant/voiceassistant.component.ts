@@ -139,7 +139,7 @@ public startSpeechRecognition(): void {
       description: roleDescription // Set the role description in the payload
     };
 
-    this.http.post('http://127.0.0.1:8000/api/v1/users/role/', payload)
+    this.http.post('http://195.35.20.172:8000/api/v1/users/role/', payload)
       .subscribe(
         response => console.log('Role created:', response),
         error => console.error('Error creating role:', error)
@@ -151,7 +151,7 @@ public startSpeechRecognition(): void {
     endpoint = endpoint.replace(/\s+/g, '_'); // Convert endpoint name to snake_case
     const payload = { name: name }; // Set the name in the payload
 
-    this.http.post(`http://127.0.0.1:8000/api/v1/products/${endpoint}/`, payload)
+    this.http.post(`http://195.35.20.172:8000/api/v1/products/${endpoint}/`, payload)
       .subscribe(
         response => console.log('Data Created:', response),
         error => console.error('Error creating item:', error)
