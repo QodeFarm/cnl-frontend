@@ -159,7 +159,7 @@ export class SalesinvoiceComponent {
   }
 
   getPendingOrdersByCustomer(customerId: string): Observable<any> {
-    const url = `sales/sale_order_search/?customer_id=${customerId}&order_status_id=085266c9-5020-41b3-ab58-1e4d88f4ff19`;
+    const url = `sales/sale_order_search/?customer_id=${customerId}&status_name=Pending`;
     return this.http.get<any>(url);
   }
 
@@ -168,11 +168,6 @@ export class SalesinvoiceComponent {
     return this.http.get<any>(url);
   }
 
-  // handleOrderSelected(order: any) {
-  //   this.selectedOrder = order;
-  //   this.editSaleInvoice(order.sale_invoice_id);
-  //   this.hideModal();
-  // }
   selectOrder(order: any) {
     console.log('Selected Order:', order);
     this.handleOrderSelected(order); // Handle order selection
