@@ -6,6 +6,7 @@ import { SalesinvoiceComponent } from './salesinvoice.component';
 
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { SalesInvoiceListComponent } from './salesinvoice-list/salesinvoice-list.component';
+import { OrderslistComponent } from '../orderslist/orderslist.component';
 
 
 @NgModule({
@@ -16,6 +17,7 @@ import { SalesInvoiceListComponent } from './salesinvoice-list/salesinvoice-list
     CommonModule,
     SalesinvoiceRoutingModule,
     AdminCommmonModule,
+    OrderslistComponent,
     SalesInvoiceListComponent
   ]
 })
