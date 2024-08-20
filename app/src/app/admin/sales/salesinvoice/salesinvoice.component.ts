@@ -1,7 +1,8 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormComponent, TaFormConfig } from '@ta/ta-form';
-import { distinctUntilChanged } from 'rxjs/operators';
+import { tap, switchMap } from 'rxjs/operators';
+import { forkJoin, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-salesinvoice',
@@ -10,11 +11,18 @@ import { distinctUntilChanged } from 'rxjs/operators';
 })
 export class SalesinvoiceComponent {
   @ViewChild('saleinvoiceForm', { static: false }) saleinvoiceForm: TaFormComponent | undefined;
+  @ViewChild('ordersModal', { static: false }) ordersModal!: ElementRef;
   invoiceNumber: any;
   showSaleInvoiceList: boolean = false;
   showForm: boolean = false;
   SaleInvoiceEditID: any;
   productOptions: any;
+  customerOrders: any[] = [];
+  noOrdersMessage: string = '';
+  selectedOrder: any;
+  // noOrdersMessage: string;
+  // customerOrders: any[] = []; 
+
   nowDate = () => {
     const date = new Date();
     return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
@@ -86,6 +94,100 @@ export class SalesinvoiceComponent {
   showSaleInvoiceListFn() {
     this.showSaleInvoiceList = true;
   }
+
+  showPendingOrdersList() {
+    console.log("We are selecting customer here : ");
+    const selectedCustomerId = this.formConfig.model.sale_invoice_order.customer_id;
+    const selectedCustomerName = this.formConfig.model.sale_invoice_order.customer?.name;
+
+    if (!selectedCustomerId) {
+      this.noOrdersMessage = 'Please select a customer.';
+      this.customerOrders = [];
+      this.openModal();
+      return;
+    }
+
+    this.customerOrders = [];
+    this.noOrdersMessage = '';
+
+    this.getPendingOrdersByCustomer(selectedCustomerId).pipe(
+      switchMap(orders => {
+        if (orders.count === 0) {
+          this.noOrdersMessage = `No Pending orders for ${selectedCustomerName}.`;
+          this.customerOrders = [];
+          this.openModal();
+          return [];
+        }
+
+        const detailedOrderRequests = orders.data.map(order =>
+          this.getOrderDetails(order.sale_order_id).pipe(
+            tap(orderDetails => {
+              order.productsList = orderDetails.data.sale_order_items.map(item => ({
+                product_name: item.product?.name ?? 'Unknown Product',
+                quantity: item.quantity
+              }));
+            })
+          )
+        );
+
+        return forkJoin(detailedOrderRequests).pipe(
+          tap(() => {
+            this.customerOrders = orders.data;
+            this.openModal();
+          })
+        );
+      })
+    ).subscribe();
+  }
+
+  openModal() {
+    this.ordersModal.nativeElement.classList.add('show');
+    this.ordersModal.nativeElement.style.display = 'block';
+    document.body.classList.add('modal-open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  hideModal() {
+    const modalBackdrop = document.querySelector('.modal-backdrop');
+    if (modalBackdrop) {
+      modalBackdrop.remove();
+    }
+    this.ordersModal.nativeElement.classList.remove('show');
+    this.ordersModal.nativeElement.style.display = 'none';
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+  }
+
+  getPendingOrdersByCustomer(customerId: string): Observable<any> {
+    const url = `sales/sale_order_search/?customer_id=${customerId}&status_name=Pending`;
+    return this.http.get<any>(url);
+  }
+
+  getOrderDetails(orderId: string): Observable<any> {
+    const url = `sales/sale_order/${orderId}/`;
+    return this.http.get<any>(url);
+  }
+
+  selectOrder(order: any) {
+    console.log('Selected Order:', order);
+    this.handleOrderSelected(order); // Handle order selection
+  }
+
+  handleOrderSelected(order: any) {
+    this.selectedOrder = order;
+    this.editSaleInvoice(order.sale_order_id); // Navigate to edit view
+    this.hideModal(); // Close modal
+  }
+
+  closeModal() {
+    this.hideModal();
+  }
+
+  ngOnDestroy() {
+    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+  } 
+
+
 
   setFormConfig() {
     this.SaleInvoiceEditID = null;
