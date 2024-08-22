@@ -83,8 +83,8 @@ export class ProductsComponent implements OnInit {
       },
       model: {
         products: {},
-		    product_item_balance:[{}],
-        warehouse_locations: [{}],
+		    product_variations:{},
+        product_item_balance: [],
       },
       fields: [
         //-----------------------------------------products -----------------------------------//
@@ -685,61 +685,113 @@ export class ProductsComponent implements OnInit {
             
           ]
         },
-        //----------------------------------------- product_item_balance  -----------------------------------//
+        //----------------------------------------- product_variations  -----------------------------------//
         {
+          fieldGroupClassName: "row col-12 m-0 custom-form-card",
+          key: 'product_variations',
+          fieldGroup: [
+        {
+          className: 'row col-12 ant-row custom-form-block',
+          fieldGroup: [
+            {
+              template: '<div class="custom-form-card-title"> Variations </div>',
+              fieldGroupClassName: "ant-row",
+            },
+            {
+              fieldGroupClassName: "ant-row",
+              fieldGroup: [
+                {
+                  key: 'size_id',
+                  type: 'select',
+                  className: 'col-2',
+                  templateOptions: {
+                    label: 'Size',
+                    placeholder: 'Select Size',
+                    dataKey: 'size_id',
+                    dataLabel: 'size_name',
+                    bindId: true,
+                    lazy: {
+                      url: 'products/sizes/',
+                      lazyOneTime: true
+                    }
+                  },
+                },
+                {
+                  key: 'color_id',
+                  type: 'select',
+                  className: 'col-2',
+                  templateOptions: {
+                    label: 'Color',
+                    placeholder: 'Select Color',
+                    dataKey: 'color_id',
+                    dataLabel: "color_name",
+                    bindId: true,
+                    lazy: {
+                      url: 'products/colors/',
+                      lazyOneTime: true
+                    }
+                  }
+                },
+                {
+                  key: 'sku',
+                  type: 'input',
+                  className: 'col-2',
+                  templateOptions: {
+                    label: 'SKU',
+                    placeholder: 'Enter SKU',
+                  }
+                },
+                {
+                  key: 'price',
+                  type: 'input',
+                  className: 'col-2',
+                  templateOptions: {
+                    label: 'Price',
+                    placeholder: 'Enter Price',
+                  }
+                },
+                {
+                  key: 'quantity',
+                  type: 'input',
+                  className: 'col-3',
+                  templateOptions: {
+                    label: 'Quantity',
+                    placeholder: 'Enter Quantity',
+                  }
+                }
+              ]
+            },
+          ]
+        }
+          ]
+        },
+		    //-----------------------------------product_item_balance-------------------------------------
+		    {
           key: 'product_item_balance',
           type: 'table',
           className: 'custom-form-list',
           templateOptions: {
-            title: 'Product Item Balance',
-            addText: 'Add Balance',
-            tableCols: [
-              { name: 'balance', label: 'Balance' }
-            ]
-          },
-          fieldArray: {
-            fieldGroup: [
-              {
-                key: 'balance',
-                type: 'input',
-                templateOptions: {
-                  label: 'Balance',
-                  placeholder: 'Enter Balance',
-                  hideLabel: true,
-                  required: true
-                }
-              }
-            ]
-          }
-        },
-		//-----------------------------------warehouse_locations-------------------------------------
-		    {
-          key: 'warehouse_locations',
-          type: 'table',
-          className: 'custom-form-list',
-          templateOptions: {
-            title: 'Warehouse Locations',
+            title: 'Product Balance',
             addText: 'Add Warehouse Locations',
             tableCols: [
-              { name: 'location_name', label: 'Location Name' },
-              { name: 'description', label: 'Description' },
-              { name: 'warehouse_id', label: 'Warehouse ID' },
+              { name: 'warehouse_location_id', label: 'Warehouse Location' },
+              { name: 'quantity', label: 'Quantity' },
             ]
           },
           fieldArray: {
             fieldGroup: [
               {
-                key: 'warehouse',
+                key: 'warehouse_location',
                 type: 'select',
                 templateOptions: {
-                  label: 'Warehouse',
-                  dataKey: 'warehouse_id',
-                  dataLabel: 'name',
+                  label: 'Location',
+                  dataKey: 'warehouse_location_id',
+                  dataLabel: 'location_name',
                   options: [],
                   hideLabel: true,
                   required: false,
                   lazy: {
-                    url: 'inventory/warehouses/',
+                    url: 'inventory/warehouse_locations/',
                     lazyOneTime: true
                   },
                 },
@@ -747,33 +799,23 @@ export class ProductsComponent implements OnInit {
                   onChanges: (field: any) => {
                     field.formControl.valueChanges.subscribe((data: any) => {
                       const index = field.parent.key;
-                      if (!this.formConfig.model['warehouse_locations'][index]) {
+                      if (!this.formConfig.model['product_item_balance'][index]) {
                         console.error(`Task comments at index ${index} is not defined. Initializing...`);
-                        this.formConfig.model['warehouse_locations'][index] = {};
+                        this.formConfig.model['product_item_balance'][index] = {};
                       }
-                      this.formConfig.model['warehouse_locations'][index]['warehouse_id'] = data.warehouse_id;
+                      this.formConfig.model['product_item_balance'][index]['warehouse_location_id'] = data.location_id;
                     });
                   }
                 }
               },
               {
-                key: 'location_name',
+                key: 'quantity',
                 type: 'input',
                 templateOptions: {
-                  label: 'Location Name',
-                  placeholder: 'Enter Location Name',
+                  label: 'Quantity',
+                  placeholder: 'Enter Quantity',
                   hideLabel: true,
                   required: true
-                }
-              },
-              {
-                key: 'description',
-                type: 'text',
-                templateOptions: {
-                  label: 'Description',
-                  placeholder: 'Enter Description',
-                  hideLabel: true,
-                  required: false
                 }
               }
             ]
