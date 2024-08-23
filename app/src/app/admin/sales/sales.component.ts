@@ -939,11 +939,11 @@ export class SalesComponent {
                       key: 'shipping_date',
                       type: 'date',
                       className: 'col-6',
-                      defaultValue: this.nowDate(),
+                      // defaultValue: this.nowDate(),
                       templateOptions: {
                         type: 'date',
                         label: 'Shipping Date',
-                        required: true
+                        // required: true
                       }
                     },
                     {
@@ -954,7 +954,7 @@ export class SalesComponent {
                         type: "number",
                         label: 'Shipping Charges.',
                         placeholder: 'Enter Shipping Charges',
-                        required: true
+                        // required: true
                       }
                     }
                   ]
