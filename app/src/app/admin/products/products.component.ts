@@ -83,8 +83,7 @@ export class ProductsComponent implements OnInit {
       },
       model: {
         products: {},
-		    product_variations:{},
-        product_item_balance: [],
+        product_variations: [{}],
       },
       fields: [
         //-----------------------------------------products -----------------------------------//
@@ -685,94 +684,14 @@ export class ProductsComponent implements OnInit {
             
           ]
         },
-        //----------------------------------------- product_variations  -----------------------------------//
-        {
-          fieldGroupClassName: "row col-12 m-0 custom-form-card",
-          key: 'product_variations',
-          fieldGroup: [
-        {
-          className: 'row col-12 ant-row custom-form-block',
-          fieldGroup: [
-            {
-              template: '<div class="custom-form-card-title"> Variations </div>',
-              fieldGroupClassName: "ant-row",
-            },
-            {
-              fieldGroupClassName: "ant-row",
-              fieldGroup: [
-                {
-                  key: 'size_id',
-                  type: 'select',
-                  className: 'col-2',
-                  templateOptions: {
-                    label: 'Size',
-                    placeholder: 'Select Size',
-                    dataKey: 'size_id',
-                    dataLabel: 'size_name',
-                    bindId: true,
-                    lazy: {
-                      url: 'products/sizes/',
-                      lazyOneTime: true
-                    }
-                  },
-                },
-                {
-                  key: 'color_id',
-                  type: 'select',
-                  className: 'col-2',
-                  templateOptions: {
-                    label: 'Color',
-                    placeholder: 'Select Color',
-                    dataKey: 'color_id',
-                    dataLabel: "color_name",
-                    bindId: true,
-                    lazy: {
-                      url: 'products/colors/',
-                      lazyOneTime: true
-                    }
-                  }
-                },
-                {
-                  key: 'sku',
-                  type: 'input',
-                  className: 'col-2',
-                  templateOptions: {
-                    label: 'SKU',
-                    placeholder: 'Enter SKU',
-                  }
-                },
-                {
-                  key: 'price',
-                  type: 'input',
-                  className: 'col-2',
-                  templateOptions: {
-                    label: 'Price',
-                    placeholder: 'Enter Price',
-                  }
-                },
-                {
-                  key: 'quantity',
-                  type: 'input',
-                  className: 'col-3',
-                  templateOptions: {
-                    label: 'Quantity',
-                    placeholder: 'Enter Quantity',
-                  }
-                }
-              ]
-            },
-          ]
-        }
-          ]
-        },
-		    //-----------------------------------product_item_balance-------------------------------------
+		    //-----------------------------------product_variations-------------------------------------
 		    {
-          key: 'product_item_balance',
+          key: 'product_variations',
           type: 'table',
           className: 'custom-form-list',
           templateOptions: {
-            title: 'Product Balance',
-            addText: 'Add Warehouse Locations',
+            title: 'Product Variations',
+            addText: 'Add New Variations',
             tableCols: [
               { name: 'warehouse_location_id', label: 'Warehouse Location' },
               { name: 'quantity', label: 'Quantity' },
@@ -781,31 +700,53 @@ export class ProductsComponent implements OnInit {
           fieldArray: {
             fieldGroup: [
               {
-                key: 'warehouse_location',
+                key: 'size_id',
                 type: 'select',
                 templateOptions: {
-                  label: 'Location',
-                  dataKey: 'warehouse_location_id',
-                  dataLabel: 'location_name',
-                  options: [],
+                  label: 'Size',
+                  placeholder: 'Select Size',
+                  dataKey: 'size_id',
+                  dataLabel: 'size_name',
+                  bindId: true,
                   hideLabel: true,
-                  required: false,
                   lazy: {
-                    url: 'inventory/warehouse_locations/',
+                    url: 'products/sizes/',
                     lazyOneTime: true
-                  },
-                },
-                hooks: {
-                  onChanges: (field: any) => {
-                    field.formControl.valueChanges.subscribe((data: any) => {
-                      const index = field.parent.key;
-                      if (!this.formConfig.model['product_item_balance'][index]) {
-                        console.error(`Task comments at index ${index} is not defined. Initializing...`);
-                        this.formConfig.model['product_item_balance'][index] = {};
-                      }
-                      this.formConfig.model['product_item_balance'][index]['warehouse_location_id'] = data.location_id;
-                    });
                   }
+                },
+              },
+              {
+                key: 'color_id',
+                type: 'select',
+                templateOptions: {
+                  label: 'Color',
+                  placeholder: 'Select Color',
+                  dataKey: 'color_id',
+                  dataLabel: "color_name",
+                  bindId: true,
+                  hideLabel: true,
+                  lazy: {
+                    url: 'products/colors/',
+                    lazyOneTime: true
+                  }
+                }
+              },
+              {
+                key: 'sku',
+                type: 'input',
+                templateOptions: {
+                  label: 'SKU',
+                  hideLabel: true,
+                  placeholder: 'Enter SKU',
+                }
+              },
+              {
+                key: 'price',
+                type: 'input',
+                templateOptions: {
+                  label: 'Price',
+                  hideLabel: true,
+                  placeholder: 'Enter Price',
                 }
               },
               {
@@ -813,9 +754,8 @@ export class ProductsComponent implements OnInit {
                 type: 'input',
                 templateOptions: {
                   label: 'Quantity',
-                  placeholder: 'Enter Quantity',
                   hideLabel: true,
-                  required: true
+                  placeholder: 'Enter Quantity',
                 }
               }
             ]
