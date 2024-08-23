@@ -52,13 +52,14 @@ export class TaTableComponent implements OnDestroy {
   @Output() doAction: EventEmitter<any> = new EventEmitter();
   @ViewChild('taTable') taTable!: NzTableComponent<any> | any;
 
-
+  selectedStatus: string | null = null;
   selectedQuickPeriod: string | null = null;
   fromDate: Date | null = null;
   toDate: Date | null = null;
   isButtonVisible = false;
-  
 
+  statusOptions: Array<{ value: string, label: string }> = []; // Store the statuses here
+  
   quickPeriodOptions = [
     { value: 'today', label: 'Today' },
     { value: 'yesterday', label: 'Yesterday' },
@@ -119,6 +120,30 @@ export class TaTableComponent implements OnDestroy {
     this.fromDate = startDate;
     this.toDate = endDate;
   }
+;
+  loadStatuses() {
+    const url = 'masters/order_status/';
+    
+    this.http.get<any>(url).subscribe(
+      (response) => {
+        if (response && response.data && response.data.length > 0) {
+          this.statusOptions = response.data.map(status => ({
+            value: status.status_name,  // Use status_name as value
+            label: status.status_name   // Use status_name as label
+          }));
+        } else {
+          console.warn('No statuses found in the API response.');
+        }
+      },
+      (error) => {
+        console.error('Error fetching statuses:', error);
+      }
+    );
+  }
+onStatusChange(status: string) {
+  this.selectedStatus = status;
+  // this.applyFilters();
+}
   
   applyFilters() {
     // Construct the filters object
@@ -126,6 +151,7 @@ export class TaTableComponent implements OnDestroy {
         quickPeriod: this.selectedQuickPeriod,
         fromDate: this.fromDate,
         toDate: this.toDate,
+        status: this.selectedStatus,
     };
     
     // Generate query string from filters
@@ -161,6 +187,7 @@ clearFilters() {
     this.selectedQuickPeriod = null;
     this.fromDate = null;
     this.toDate = null;
+    this.selectedStatus = null;
 
     // Optionally, you might want to clear other filters or reset pagination if necessary
     this.pageIndex = 1;
@@ -189,7 +216,7 @@ clearFilters() {
 }
 
 
-generateQueryString(filters: { quickPeriod: string, fromDate: Date, toDate: Date }): string {
+generateQueryString(filters: { quickPeriod: string, fromDate: Date, toDate: Date, status: string}): string {
     const queryParts: string[] = [];
 
     if (filters.fromDate) {
@@ -200,6 +227,10 @@ generateQueryString(filters: { quickPeriod: string, fromDate: Date, toDate: Date
     if (filters.toDate) {
         const toDateStr = this.formatDate(filters.toDate);
         queryParts.push(`created_at_before=${encodeURIComponent(toDateStr)}`);
+    }
+
+    if (filters.status) {
+      queryParts.push(`status_name=${encodeURIComponent(filters.status)}`);
     }
 
     return '?&' + queryParts.join('&');
@@ -300,6 +331,7 @@ downloadData(event: any) {
       '/admin/sales/salesinvoice',
       '/admin/sales/sale-returns',
     ].includes(currentUrl);
+    this.loadStatuses();
   }
   loadDataFromServer(startIntial?: boolean): void {
 
