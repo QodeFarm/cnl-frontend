@@ -1,68 +1,61 @@
 <div class="container-fluid pt-3">
-    <div class="sales-banner">
-        <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;">
-        <button type="button" class="btn pl-0">
-          <span *ngIf="SaleOrderEditID" class="custom-heading">Update Sales Order</span>
-          <span *ngIf="!SaleOrderEditID" class="custom-heading">Create Sales Order</span>
+  <div class="sales-banner">
+    <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;">
+      <button type="button" class="btn pl-0">
+        <span *ngIf="SaleOrderEditID" class="custom-heading">Update Sales Order</span>
+        <span *ngIf="!SaleOrderEditID" class="custom-heading">Create Sales Order</span>
+      </button>
+      <div style="display: flex; gap: 10px;">
+        <button (click)="showOrdersList()" type="button" class="btn btn-primary">Past orders</button>
+        <button (click)="showSaleOrderListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+          Sales Order List
         </button>
-        <div style="display: flex; gap: 10px;">
-          <button (click)="showOrdersList()" type="button" class="btn btn-primary">
-            Past orders
-          </button>
-          <button (click)="showSaleOrderListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-            Sales Order List
-          </button>
-        </div>
-      </div>
-    </div>
-  
-    <div class="row custom-form">
-      <div class="col-12 px-1" *ngIf="orderNumber || showForm">
-        <ta-form #salesForm [options]="formConfig"></ta-form>
       </div>
     </div>
   </div>
 
-
-<!-- Sales List Modal -->
-
-<div class="modal fade custom-modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl ">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Sales Order List</h5>
-                <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" *ngIf="showSaleOrderList">
-                <app-sales-list (edit)="editSaleOrder($event)" class="custom-list"></app-sales-list>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-                <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
-            </div>
-        </div>
+  <div class="row custom-form">
+    <div class="col-12 px-1" *ngIf="orderNumber || showForm">
+      <ta-form #salesForm [options]="formConfig"></ta-form>
     </div>
+  </div>
 </div>
 
-<div #ordersModal class="modal fade custom-modal" id="ordersListModal" tabindex="-1" aria-labelledby="ordersListModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="ordersListModalLabel">Past Orders List</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="hideModal()"></button>
-        </div>
-        <div class="modal-body">
-        <app-orderslist 
-            [customerOrders]="customerOrders" 
-            (orderSelected)="handleOrderSelected($event)"
-            [noOrdersMessage]="noOrdersMessage"
-            (modalClosed)="closeModal()">
-        </app-orderslist>
-  
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-danger" (click)="hideModal()">Close</button>
-        </div>
+<!-- Sales List Modal -->
+<div class="modal fade custom-modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl ">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Sales Order List</h5>
+        <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" *ngIf="showSaleOrderList">
+        <app-sales-list (edit)="editSaleOrder($event)" class="custom-list"></app-sales-list>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
+</div>
+
+<!-- Past Orders List Modal -->
+<div #ordersModal class="modal fade custom-modal" id="ordersListModal" tabindex="-1" aria-labelledby="ordersListModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="ordersListModalLabel">Past Orders List</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="hideModal()"></button>
+      </div>
+      <div class="modal-body">
+        <app-orderslist 
+          [customerOrders]="customerOrders" 
+          (orderSelected)="handleOrderSelected($event)"
+          [noOrdersMessage]="noOrdersMessage"
+          (productsPulled)="handleProductPull($event)"
+          (modalClosed)="closeModal()">
+        </app-orderslist>
+      </div>
+    </div>
+  </div>
+</div>
