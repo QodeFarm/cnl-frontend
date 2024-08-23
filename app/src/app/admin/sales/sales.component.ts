@@ -43,7 +43,7 @@ export class SalesComponent {
 
   // Function to create a sale invoice
   createSaleInvoice(invoiceData: any): Observable<any> {
-    console.log("Sale invoice test: ")
+    //console.log("Sale invoice test: ")
     return this.http.post('sales/sale_invoice_order/', invoiceData);
   }
 
@@ -55,7 +55,7 @@ export class SalesComponent {
 
     // set form config
     this.setFormConfig();
-    console.log('this.formConfig', this.formConfig);
+    //console.log('this.formConfig', this.formConfig);
 
     // set sale_order default value
     this.formConfig.model['sale_order']['order_type'] = 'sale_order';
@@ -63,7 +63,7 @@ export class SalesComponent {
     // to get SaleOrder number for save 
     this.getOrderNo();
     this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[8].hide = true;
-    // console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
+    // //console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
   }
 
   formConfig: TaFormConfig = {};
@@ -124,8 +124,8 @@ export class SalesComponent {
     const selectedCustomerId = this.formConfig.model.sale_order.customer_id;
     const selectedCustomerName = this.formConfig.model.sale_order.customer?.name;
     // Debugging logs to ensure customer_id is correctly set
-    console.log("Selected Customer ID:", selectedCustomerId);
-    console.log("Selected Customer Name:", selectedCustomerName);
+    //console.log("Selected Customer ID:", selectedCustomerId);
+    //console.log("Selected Customer Name:", selectedCustomerName);
   
     if (!selectedCustomerId) {
       this.noOrdersMessage = 'Please select a customer.';
@@ -186,9 +186,9 @@ export class SalesComponent {
 
   // Fetch orders by customer ID
   getOrdersByCustomer(customerId: string): Observable<any> {
-    console.log("customer id",customerId)
+    //console.log("customer id",customerId)
     const url = `sales/sale_order_search/?customer_id=${customerId}`;
-    console.log("customer ids",customerId)
+    //console.log("customer ids",customerId)
     return this.http.get<any>(url);
   }
 
@@ -200,7 +200,7 @@ export class SalesComponent {
 
   // Handles the selection of an order from the list
   selectOrder(order: any) {
-    console.log('Selected Order:', order);
+    //console.log('Selected Order:', order);
     this.handleOrderSelected(order); // Handle order selection
   }
 
@@ -338,7 +338,7 @@ export class SalesComponent {
     // Trigger UI update
     this.cdRef.detectChanges();
 
-    console.log("Final Products List:", this.formConfig.model['sale_order_items']);
+    //console.log("Final Products List:", this.formConfig.model['sale_order_items']);
 }
 
   hideModal() {
@@ -410,7 +410,7 @@ export class SalesComponent {
               hooks: {
                 onInit: (field: any) => {
                   field.formControl.valueChanges.subscribe(data => {
-                    console.log("sale_type", data);
+                    //console.log("sale_type", data);
                     if (data && data.sale_type_id) {
                       this.formConfig.model['sale_order']['sale_type_id'] = data.sale_type_id;
                     }
@@ -439,7 +439,7 @@ export class SalesComponent {
               hooks: {
                 onInit: (field: any) => {
                   field.formControl.valueChanges.subscribe(data => {
-                    console.log("customer", data);
+                    //console.log("customer", data);
                     if (data && data.customer_id) {
                       this.formConfig.model['sale_order']['customer_id'] = data.customer_id;
                     }
@@ -634,7 +634,7 @@ export class SalesComponent {
                 hooks: {
                   onInit: (field: any) => {
                     field.formControl.valueChanges.subscribe(data => {
-                      console.log("products data", data);
+                      //console.log("products data", data);
                       this.productOptions = data;
                       if (field.form && field.form.controls && field.form.controls.code && data && data.code) {
                         field.form.controls.code.setValue(data.code)
@@ -1073,7 +1073,7 @@ export class SalesComponent {
                               hooks: {
                                 onChanges: (field: any) => {
                                   field.formControl.valueChanges.subscribe(data => {
-                                    console.log("gst_type", data);
+                                    //console.log("gst_type", data);
                                     if (data && data.gst_type_id) {
                                       this.formConfig.model['sale_order']['gst_type_id'] = data.gst_type_id;
                                     }
@@ -1098,7 +1098,7 @@ export class SalesComponent {
                               hooks: {
                                 onChanges: (field: any) => {
                                   field.formControl.valueChanges.subscribe(data => {
-                                    console.log("payment_term", data);
+                                    //console.log("payment_term", data);
                                     if (data && data.payment_term_id) {
                                       this.formConfig.model['sale_order']['payment_term_id'] = data.payment_term_id;
                                     }
@@ -1123,7 +1123,7 @@ export class SalesComponent {
                               hooks: {
                                 onChanges: (field: any) => {
                                   field.formControl.valueChanges.subscribe(data => {
-                                    console.log("ledger_account", data);
+                                    //console.log("ledger_account", data);
                                     if (data && data.ledger_account_id) {
                                       this.formConfig.model['sale_order']['ledger_account_id'] = data.ledger_account_id;
                                     }
@@ -1151,13 +1151,13 @@ export class SalesComponent {
                               hooks: {
                                 onChanges: (field: any) => {
                                   field.formControl.valueChanges.subscribe(data => {
-                                    console.log("order_status", data);
+                                    //console.log("order_status", data);
                                     if (data && data.order_status_id) {
                                       this.formConfig.model['sale_order']['order_status_id'] = data.order_status_id;
 
                                       const saleOrder = this.formConfig.model['sale_order'];
                                       if (saleOrder.order_status && saleOrder.order_status.status_name === 'Approved') {
-                                        console.log("processing salesInvoice:");
+                                        //console.log("processing salesInvoice:");
                                         const saleOrderItems = this.formConfig.model['sale_order_items'];
                                         const orderAttachments = this.formConfig.model['order_attachments']
                                         const orderShipments = this.formConfig.model['order_shipments']
@@ -1233,11 +1233,11 @@ export class SalesComponent {
                                           // order_shipments: saleOrder.order_shipments || {}
                                         };
 
-                                        console.log("Invoice data to be sent:", invoiceData);
+                                        //console.log("Invoice data to be sent:", invoiceData);
 
                                         this.createSaleInvoice(invoiceData).subscribe(
                                           response => {
-                                            console.log('Sale invoice created successfully', response);
+                                            //console.log('Sale invoice created successfully', response);
                                           },
                                           error => {
                                             console.error('Error creating sale invoice', error);

@@ -35,18 +35,18 @@ export class OrderslistComponent {
       // If unchecked, remove the product from the selectedProducts array
       this.selectedProducts = this.selectedProducts.filter(p => p !== product);
     }
-    console.log("Selected products:", this.selectedProducts);
+    //console.log("Selected products:", this.selectedProducts);
     this.selectedOrder = order;
   }
 
   // Handles the selection of the entire order (when "Select" button is clicked)
   selectOrder(order: any) {
-    console.log("Order selected:", order);
+    //console.log("Order selected:", order);
 
     if (order && order.sale_order_id) {
       // Emit the order object to the parent component
       this.orderSelected.emit(order.sale_order_id);
-      console.log("Emitted order ID:", order.sale_order_id);
+      //console.log("Emitted order ID:", order.sale_order_id);
     } else {
       console.warn("Order missing sale order ID:", order);
     }
@@ -56,7 +56,7 @@ export class OrderslistComponent {
 
   // Function to pull the selected products from the selected order
   pullOrder() {
-    console.log('Attempting to pull order:', this.selectedOrder);
+    //console.log('Attempting to pull order:', this.selectedOrder);
   
     if (this.selectedOrder && this.selectedOrder.sale_order_id) {
       const saleOrderId = this.selectedOrder.sale_order_id;
@@ -88,7 +88,7 @@ export class OrderslistComponent {
             };
           });
   
-          console.log('Filtered Products to Emit:', fullProducts);
+          //console.log('Filtered Products to Emit:', fullProducts);
           
           // Emit the selected products with full details back to the parent component
           this.productsPulled.emit(fullProducts);
