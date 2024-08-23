@@ -8,32 +8,47 @@
                            (ngModelChange)="onQuickPeriodChange()" 
                            nzPlaceHolder="Quick Period" 
                            class="quick-period-select"
-                           style="width: 180px;">
+                           style="width: 160px;">
                     <nz-option *ngFor="let period of quickPeriodOptions" [nzValue]="period.value" [nzLabel]="period.label"></nz-option>
                 </nz-select>
             </div>
 
             <!-- From Date Picker -->
             <div class="filter-group" style="margin-right: 10px;" *ngIf="isButtonVisible">
-                <nz-date-picker id="fromDate" [(ngModel)]="fromDate" class="date-picker" style="width: 180px;"></nz-date-picker>
+                <nz-date-picker id="fromDate" [(ngModel)]="fromDate" nzPlaceHolder="From date" class="date-picker" style="width: 130px;"></nz-date-picker>
             </div>
 
             <!-- To Date Picker -->
             <div class="filter-group" style="margin-right: 10px;" *ngIf="isButtonVisible">
-                <nz-date-picker id="toDate" [(ngModel)]="toDate" class="date-picker" style="width: 180px;"></nz-date-picker>
+                <nz-date-picker id="toDate" [(ngModel)]="toDate" nzPlaceHolder="To date" class="date-picker" style="width: 130px;"></nz-date-picker>
             </div>
 
+            <!-- Apply Filters status DropDown -->            
+            <div class="filter-group" style="margin-right: 10px;" *ngIf="isButtonVisible">
+                <nz-select 
+                    [(ngModel)]="selectedStatus" 
+                    nzPlaceHolder="Select Status" 
+                    style="width: 185px" 
+                    (ngModelChange)="onStatusChange($event)">
+                    <nz-option 
+                        *ngFor="let status of statusOptions" 
+                        [nzValue]="status.value" 
+                        [nzLabel]="status.label">
+                    </nz-option>
+                </nz-select>
+            </div>
+            
             <!-- Apply Filters OK Button -->
             <div class="filter-group" style="margin-right: 10px;" *ngIf="isButtonVisible">
                 <button nz-button nzType="primary" (click)="applyFilters()" class="apply-filters-button">
-                    Ok
+                    <i nz-icon nzType="check" nzTheme="outline"></i>
                 </button>
             </div>
 
             <!-- Apply Filters Clear Button -->
             <div class="filter-group" style="margin-right: 10px;" *ngIf="isButtonVisible">
                 <button nz-button nzType="primary" (click)="clearFilters()" class="clear-filters-button">
-                    <i nzTheme="outline"></i>Clear
+                    <i nz-icon nzType="close" nzTheme="outline"></i>
                 </button>
             </div>
             
@@ -46,7 +61,7 @@
         </div>
     </div>
 
-     <div class="ta-cell">
+    <div class="ta-cell">
         <div class="ta-row p-0 justify-content-end flex-nowrap">
             <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton">
                 <input type="text" nz-input placeholder="Search" [(ngModel)]="globalSearchValue" (keyup.enter)="globalSearch()" />
