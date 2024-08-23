@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, ElementRef, Renderer2 } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { Component, HostListener, ElementRef, Renderer2, ChangeDetectorRef } from '@angular/core';
+import { ActivatedRoute, Route, Router, RouterModule, RoutesRecognized, NavigationEnd } from '@angular/router';
 import { LocalStorageService } from '@ta/ta-core';
 import { AdminCommonService } from 'src/app/services/admin-common.service';
 import { HttpClient } from '@angular/common/http';
+import { filter, map, mergeMap } from 'rxjs/operators';
 
 interface SpeechRecognitionResult {
   transcript: string; // Holds the recognized speech as text
@@ -23,6 +24,14 @@ interface SpeechRecognitionEvent extends Event {
   stop(): unknown; // Method to stop recognition
   results: SpeechRecognitionResultList; // Array of recognition results
 }
+export interface Tab {
+  name: string;
+  component?: any;
+  active: boolean;
+  route?: Route;
+  key?: string;
+  url?: string;
+}
 
 @Component({
   selector: 'app-admin-layout',
@@ -34,11 +43,30 @@ interface SpeechRecognitionEvent extends Event {
 export class AdminLayoutComponent {
   menulList = <any>[];
   userName: any;
+  public currentHoverTabKey: string;
+  public tabs: Tab[] = [];
   private recognition: SpeechRecognitionEvent | null = null;
-  constructor(private elementRef: ElementRef,  private http: HttpClient,private renderer: Renderer2, private router: Router, private taLoacal: LocalStorageService, private aS: AdminCommonService) {
+  constructor(private activatedRoute: ActivatedRoute, private cd: ChangeDetectorRef, private elementRef: ElementRef, private http: HttpClient, private renderer: Renderer2, private router: Router, private taLoacal: LocalStorageService, private aS: AdminCommonService) {
     this.aS.action$.subscribe(res => {
       console.log(res);
-    })
+    });
+    let currentUrl: any;
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      map(() => this.activatedRoute),
+      map(() => {
+        let route = this.activatedRoute;
+        while (route.firstChild) route = route.firstChild;  // Navigate to the deepest child route
+        return route;
+      }),
+      map(route => {
+        currentUrl = this.router.url;  // Get the current URL
+        return route.snapshot.data;  // Get the route's data (like title)
+      })
+    ).subscribe(data => {
+      this.checkAndAddRouteTab({ name: data.title, url: this.router.url, active: true });
+      console.log('data', data.title, this.router.url);
+    });
   }
 
   @HostListener('window:resize', ['$event'])
@@ -175,7 +203,7 @@ export class AdminLayoutComponent {
         ]
       },
       {
-        label: 'TASKS',
+        label: 'Tasks',
         icon: 'icon icon-tasks',
         child: [
           {
@@ -191,7 +219,7 @@ export class AdminLayoutComponent {
         ]
       },
       {
-        label: 'LEADS',
+        label: 'Leads',
         icon: 'icon icon-leads',
         child: [
           {
@@ -243,7 +271,7 @@ export class AdminLayoutComponent {
         ]
       },
       {
-        label: 'HRMS',
+        label: 'HR',
         icon: 'icon icon-hrms',
         child: [
           {
@@ -276,6 +304,7 @@ export class AdminLayoutComponent {
     ]
     this.closeMenu();
   }
+
   closeMenu() {
     const windowWidth = window.innerWidth;
 
@@ -325,7 +354,7 @@ export class AdminLayoutComponent {
 
   }
   //===============================SpeechRecognition========================================
- 
+
   // Method to start speech recognition
   public startSpeechRecognition(duration: number = 10000, shouldRestart: boolean = false): void { // Default duration is 10 seconds
     this.initializeSpeechRecognition(); // Initialize the recognition if not already done
@@ -388,7 +417,7 @@ export class AdminLayoutComponent {
   private handleApiCommands(speech: string): void {
     // Regular expression to match "create new role for <role_name> and description is <role_description>"
     let roleMatch = speech.match(/create new role for (.+?) and description is (.+)/);
-    
+
     if (!roleMatch) {
       // Check for "each" and replace with "is" in the role description
       speech = speech.replace(/ and description each /g, ' and description is ');
@@ -429,29 +458,29 @@ export class AdminLayoutComponent {
       'sales returns': '/admin/sales/sale-returns',
 
       //purchase
-      'purchase' : '/admin/purchase',
+      'purchase': '/admin/purchase',
       'vendors': 'admin/vendors',
-      'purchase invoice' : 'admin/purchase/invoice',
-      'purchase returns' : 'admin/purchase/purchasereturns',
+      'purchase invoice': 'admin/purchase/invoice',
+      'purchase returns': 'admin/purchase/purchasereturns',
 
       //inventory
       'inventory': 'admin/inventory',
       'products': 'admin/products',
-      'warehouse' : 'admin/warehouses',
-      'quickpacks' : 'admin/quickpacks',
+      'warehouse': 'admin/warehouses',
+      'quickpacks': 'admin/quickpacks',
 
       //tasks
-      'tasks' : 'admin/tasks',
+      'tasks': 'admin/tasks',
 
       //leads
-      'leads' : 'admin/leads',
+      'leads': 'admin/leads',
 
       //assets
-      'assets' : 'admin/assets/assets',
-      'asset maintenance' : 'admin/assets/asset_maintenance',
+      'assets': 'admin/assets/assets',
+      'asset maintenance': 'admin/assets/asset_maintenance',
 
       //HRMS
-      'employees' : 'admin/employees',
+      'employees': 'admin/employees',
 
       //masters
       'master': 'admin/master',
@@ -459,49 +488,49 @@ export class AdminLayoutComponent {
       'shipping modes': '/admin/master/shipping-modes',
       'price categories': '/admin/master/price-categories',
       'transporters': '/admin/master/transporters',
-      'orders status' : '/admin/master/statuses',
+      'orders status': '/admin/master/statuses',
       'product groups': '/admin/master/product-groups',
       'territory': 'admin/master/territory',
       'shipping companies': '/admin/master/shipping-companies',
 
-      'departments':'admin/master/departments',
-      'designations':'/hrms/designations/',
-      
-      'firm status':'/admin/master/firm-statuses',
-      'ledgeraccounts':'/admin/master/ledger-accounts',
-      'ledger groups':'/admin/master/ledger-groups',
-      'customer payment-terms':'/admin/master/customer-payment-terms',
-      'vendor agent':'/admin/master/vendor-agent',
-      'vendor category':'/admin/master/vendor-category',
-      'vendor payment-terms':'/admin/master/vendor-payment-terms',
-      'product sales gl':'/admin/master/product-sales-gl',
-      'product types':'/admin/master/product-types',
-      'product brands':'/admin/master/product-brands',
-      'product categories':'/admin/master/product-categories',
-      'product gst-classifications':'/admin/master/product-gst-classifications',
-      'product item-type':'/admin/master/product-item-type',
-      'product purchase-gl':'/admin/master/product-purchase-gl',
-      'product stock-units':'/admin/master/product-stock-units',
-      'product item-balance':'/admin/master/product-item-balance',
-      'product unique-quantity-codes':'/admin/master/product-unique-quantity-codes',
-      'unit options':'/admin/master/unit-options',
-      'order statuses':'/admin/master/order-statuses',
-      'order types':'/admin/master/order-types',
-      'purchase types':'/admin/master/purchase-types',
-      'sale types':'/admin/master/sale-types',
-      'gst types':'/admin/master/gst-types',
-      'payment link type':'/admin/master/payment-link-type',
-      'lead statuses':'/admin/master/lead-statuses',
-      'interaction-types':'/admin/master/interaction-types',
-      'priorities':'/admin/master/priorities',
-      'asset categories':'/admin/master/asset-categories',
-      'asset statuses':'/admin/master/asset-statuses',
-      'locations':'/admin/master/locations'
+      'departments': 'admin/master/departments',
+      'designations': '/hrms/designations/',
+
+      'firm status': '/admin/master/firm-statuses',
+      'ledgeraccounts': '/admin/master/ledger-accounts',
+      'ledger groups': '/admin/master/ledger-groups',
+      'customer payment-terms': '/admin/master/customer-payment-terms',
+      'vendor agent': '/admin/master/vendor-agent',
+      'vendor category': '/admin/master/vendor-category',
+      'vendor payment-terms': '/admin/master/vendor-payment-terms',
+      'product sales gl': '/admin/master/product-sales-gl',
+      'product types': '/admin/master/product-types',
+      'product brands': '/admin/master/product-brands',
+      'product categories': '/admin/master/product-categories',
+      'product gst-classifications': '/admin/master/product-gst-classifications',
+      'product item-type': '/admin/master/product-item-type',
+      'product purchase-gl': '/admin/master/product-purchase-gl',
+      'product stock-units': '/admin/master/product-stock-units',
+      'product item-balance': '/admin/master/product-item-balance',
+      'product unique-quantity-codes': '/admin/master/product-unique-quantity-codes',
+      'unit options': '/admin/master/unit-options',
+      'order statuses': '/admin/master/order-statuses',
+      'order types': '/admin/master/order-types',
+      'purchase types': '/admin/master/purchase-types',
+      'sale types': '/admin/master/sale-types',
+      'gst types': '/admin/master/gst-types',
+      'payment link type': '/admin/master/payment-link-type',
+      'lead statuses': '/admin/master/lead-statuses',
+      'interaction-types': '/admin/master/interaction-types',
+      'priorities': '/admin/master/priorities',
+      'asset categories': '/admin/master/asset-categories',
+      'asset statuses': '/admin/master/asset-statuses',
+      'locations': '/admin/master/locations'
     };
-  
+
     // Ensure the longest matches are checked first by sorting keys by length
     const sortedPages = Object.keys(pages).sort((a, b) => b.length - a.length);
-  
+
     const page = sortedPages.find(page => speech.includes('go to ' + page));
     if (page) {
       this.router.navigate([pages[page]]);
@@ -590,5 +619,55 @@ export class AdminLayoutComponent {
       }
     });
     console.log('Form Data:', formData);
+  }
+  // tabs based on routing
+  disposeTab(tab: Tab) {
+    if (this.tabs.length > 1) {
+      this.tabs = this.tabs.filter(item => item.url !== tab.url);
+
+      if (tab.active) {
+        // deactivate all tabs
+        this.deactivateTabs();
+        this.router.navigateByUrl(this.tabs[this.tabs.length - 1].url);
+      }
+    }
+  }
+
+  mouseOverTab(tab: Tab) {
+    this.currentHoverTabKey = tab ? tab.key : null;
+  }
+
+  checkAndAddRouteTab(tab: Tab) {
+
+    this.deactivateTabs();
+
+    // check if the tab to be activated is already existing
+    if (this.tabs.find(t => t.url == tab.url) == null) {
+
+      // if not, push it into the tab array
+      // this.tabs.push({
+      //   name: comp["name"],
+      //   component: comp,
+      //   key: comp["name"],
+      //   active: true,
+      //   route: val.state.root.firstChild.routeConfig
+      // });
+      if (!tab.name) { tab.name = 'Untitle-' + this.tabs.length + 1 }
+
+      this.tabs.push(tab);
+
+    } else {
+      // if the tab exists, activate it
+      const tabToActivate = this.tabs.find(t => t.url == tab.url);
+      if (tabToActivate) {
+        tabToActivate.active = true;
+      }
+    }
+
+    this.cd.markForCheck();
+  }
+
+  deactivateTabs() {
+    this.tabs.forEach(tab => (tab.active = false));
   }
 }
