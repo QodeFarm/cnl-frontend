@@ -14,13 +14,15 @@ const routes: Routes = [
   },
   {
     path: 'sale-returns',
+    data: { title: 'Sales Returns' },
     component: SaleReturnsComponent
   },
   {
     path: 'salesinvoice',
+    data: { title: 'Sales Invoice' },
     component: SalesinvoiceComponent
   }
-  
+
 ];
 
 @NgModule({

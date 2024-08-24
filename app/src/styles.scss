@@ -851,12 +851,16 @@ ta-form {
     z-index: 1060 !important;
 }
 
-.ant-upload.ant-upload-drag{
+.ant-upload.ant-upload-drag {
     background: transparent;
     .ant-upload {
         padding: 0 0 !important;
     }
-    p.ant-upload-text{
+    p.ant-upload-text {
         margin: 10px 0 4px;
     }
-} 
+}
+
+.cursor-pointer {
+    cursor: pointer
+}

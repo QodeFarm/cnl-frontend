@@ -5964,7 +5964,6 @@ a.close.disabled {
 .modal-open .modal {
     overflow-x: hidden;
     overflow-y: auto;
-    background-color: rgba(0, 0, 0, 0.5);
 }
 
 .modal {
@@ -6061,7 +6060,7 @@ a.close.disabled {
     pointer-events: auto;
     background-color: #fff;
     background-clip: padding-box;
-    border: 1.5px solid rgb(215 215 215);
+    border: 1px solid rgba(0, 0, 0, 0.2);
     border-radius: 0.3rem;
     outline: 0;
 }
@@ -6115,7 +6114,7 @@ a.close.disabled {
     flex-wrap: wrap;
     align-items: center;
     justify-content: flex-end;
-    padding: 0.25rem 0.75rem;
+    padding: 0.75rem;
     border-top: 1px solid #e3e6f0;
     border-bottom-right-radius: calc(0.3rem - 1px);
     border-bottom-left-radius: calc(0.3rem - 1px);
@@ -10543,8 +10542,8 @@ a:focus {
 
 .sidebar .nav-item .nav-link .img-profile,
 .topbar .nav-item .nav-link .img-profile {
-    height: 2.4rem;
-    width: 2.4rem;
+    height: 2rem;
+    width: 2rem;
 }
 
 .topbar {
@@ -10991,7 +10990,6 @@ a:focus {
         border: 0;
         font-weight: 900;
         content: '\f107';
-        top: 5px;
         font-family: 'Font Awesome 5 Free';
         position: absolute;
         right: 7px;
@@ -11028,7 +11026,7 @@ a:focus {
     .sidebar.toggled .nav-item .collapse .collapse-inner {
         box-shadow: none;
         border-radius: 0 !important;
-        background-color: #f0f3ff !important;
+        background-color: #f7f7f7 !important
     }
     .sidebar.toggled .nav-item .collapsing {
         display: none;
