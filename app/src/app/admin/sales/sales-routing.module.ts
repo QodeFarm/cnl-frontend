@@ -10,16 +10,17 @@ import { CustomersComponent } from '../customers/customers.component';
 const routes: Routes = [
   {
     path: '',
+    data: { title: 'Sales', moduleName: "sales" },
     component: SalesComponent
   },
   {
     path: 'sale-returns',
-    data: { title: 'Sales Returns' },
+    data: { title: 'Sales Returns', moduleName: "sales-return" },
     component: SaleReturnsComponent
   },
   {
     path: 'salesinvoice',
-    data: { title: 'Sales Invoice' },
+    data: { title: 'Sales Invoice', moduleName: "sales-invoice" },
     component: SalesinvoiceComponent
   }
 

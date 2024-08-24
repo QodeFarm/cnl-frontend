@@ -64,7 +64,7 @@ export class AdminLayoutComponent {
         return route.snapshot.data;  // Get the route's data (like title)
       })
     ).subscribe(data => {
-      this.checkAndAddRouteTab({ name: data.title, url: this.router.url, active: true });
+      this.checkAndAddRouteTab({ name: data.title, key: data.moduleName, url: this.router.url, active: true });
       console.log('data', data.title, this.router.url);
     });
   }
@@ -642,7 +642,7 @@ export class AdminLayoutComponent {
     this.deactivateTabs();
 
     // check if the tab to be activated is already existing
-    if (this.tabs.find(t => t.url == tab.url) == null) {
+    if (this.tabs.find(t => t.key == tab.key) == null) {
 
       // if not, push it into the tab array
       // this.tabs.push({
@@ -658,7 +658,7 @@ export class AdminLayoutComponent {
 
     } else {
       // if the tab exists, activate it
-      const tabToActivate = this.tabs.find(t => t.url == tab.url);
+      const tabToActivate = this.tabs.find(t => t.key == tab.key);
       if (tabToActivate) {
         tabToActivate.active = true;
       }
