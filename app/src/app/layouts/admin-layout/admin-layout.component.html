@@ -242,6 +242,7 @@
 
         </ul>
 
+
     </nav>
     <!-- End of Topbar -->
 </header>
@@ -297,7 +298,13 @@
                     </div>
                 </li>
             </ul>
-
+            <!-- <div class="tab-content p-3 border-left border-right flex-fill">
+                <ng-container *ngFor="let tab of tabs">
+                    <div class="tab-pane fade {{tab.name}}" [class.show]="tab.active" [class.active]="tab.active" [id]="tab.name" role="tabpanel">
+                        <ng-container *ngComponentOutlet="tab.component;"></ng-container>
+                    </div>
+                </ng-container>
+            </div> -->
             <router-outlet></router-outlet>
 
             <!-- </div> -->
