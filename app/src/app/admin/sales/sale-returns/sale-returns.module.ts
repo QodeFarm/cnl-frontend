@@ -5,6 +5,7 @@ import { SaleReturnsRoutingModule } from './sale-returns-routing.module';
 import { SaleReturnsComponent } from './sale-returns.component';
 import { SaleReturnsListComponent } from './sale-returns-list/sale-returns-list.component';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { SaleinvoiceorderlistComponent } from '../saleinvoiceorderlist/saleinvoiceorderlist.component';
 
 
 @NgModule({
@@ -16,6 +17,7 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
     CommonModule,
     AdminCommmonModule,
     SaleReturnsRoutingModule,
+    SaleinvoiceorderlistComponent
     // SaleReturnsListComponent
   ]
 })
