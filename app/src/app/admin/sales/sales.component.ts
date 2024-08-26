@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, ViewChild, ElementRef } from '@angular/core';
+import { Component, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { TaFormComponent, TaFormConfig } from '@ta/ta-form';
 import { distinctUntilChanged } from 'rxjs/operators';
@@ -23,6 +23,7 @@ export class SalesComponent {
   showOrderListModal = false;
   selectedOrder: any;
   noOrdersMessage: string;
+  shippingTrackingNumber: any;
   
   nowDate = () => {
     const date = new Date();
@@ -32,12 +33,17 @@ export class SalesComponent {
 
   // private apiUrl = 'sales/sale_invoice_order_get/'
 
-  constructor(private http: HttpClient) {
-  }
+  // constructor(private http: HttpClient, private cdRef: ChangeDetectorRef) { }
+
+  constructor(
+    private http: HttpClient,
+    private cdRef: ChangeDetectorRef // Inject ChangeDetectorRef
+  ) { }
+  
 
   // Function to create a sale invoice
   createSaleInvoice(invoiceData: any): Observable<any> {
-    console.log("Sale invoice test: ")
+    //console.log("Sale invoice test: ")
     return this.http.post('sales/sale_invoice_order/', invoiceData);
   }
 
@@ -49,17 +55,16 @@ export class SalesComponent {
 
     // set form config
     this.setFormConfig();
-    console.log('this.formConfig', this.formConfig);
+    //console.log('this.formConfig', this.formConfig);
 
     // set sale_order default value
     this.formConfig.model['sale_order']['order_type'] = 'sale_order';
 
-    // to get SaleOrder number for save
+    // to get SaleOrder number for save 
     this.getOrderNo();
     this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[8].hide = true;
-    // console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
+    // //console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
   }
-
 
   formConfig: TaFormConfig = {};
 
@@ -87,46 +92,56 @@ export class SalesComponent {
     this.hide();
   }
 
+  // Function to get a new order number and a shipping tracking number
   getOrderNo() {
     this.orderNumber = null;
+    this.shippingTrackingNumber = null; // Separate variable for Shipping Tracking No.
+  
+    // Generate Shipping Tracking Number
     this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
       if (res && res.data && res.data.order_number) {
-        this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
+        this.shippingTrackingNumber = res.data.order_number;
+        this.formConfig.model['order_shipments']['shipping_tracking_no'] = this.shippingTrackingNumber;
+  
+        // Generate Sales Order Number
         this.http.get('masters/generate_order_no/?type=SO').subscribe((res: any) => {
           if (res && res.data && res.data.order_number) {
-            this.formConfig.model['sale_order']['order_no'] = res.data.order_number;
             this.orderNumber = res.data.order_number;
+            this.formConfig.model['sale_order']['order_no'] = this.orderNumber;
           }
-        });;
+        });
       }
     });
   }
-
+  // Displays the sales order list modal
   showSaleOrderListFn() {
     this.showSaleOrderList = true;
   }
   
-
+  // Shows the past orders list modal and fetches orders based on the selected customer
   showOrdersList() {
+    // Ensure customer is selected
     const selectedCustomerId = this.formConfig.model.sale_order.customer_id;
-    const selectedCustomerName = this.formConfig.model.sale_order.customer?.name; // Assuming customer name is nested
+    const selectedCustomerName = this.formConfig.model.sale_order.customer?.name;
+    // Debugging logs to ensure customer_id is correctly set
+    //console.log("Selected Customer ID:", selectedCustomerId);
+    //console.log("Selected Customer Name:", selectedCustomerName);
   
     if (!selectedCustomerId) {
-      this.noOrdersMessage = 'Please select a customer.'; // Set message for missing customer
-      this.customerOrders = []; // Clear any previous orders
-      this.openModal(); // Open modal to display the message
+      this.noOrdersMessage = 'Please select a customer.';
+      this.customerOrders = [];
+      this.openModal();
       return;
     }
-  
     this.customerOrders = [];
     this.noOrdersMessage = '';
-  
+    // Fetch orders by customer ID and process the order details
     this.getOrdersByCustomer(selectedCustomerId).pipe(
       switchMap(orders => {
         if (orders.count === 0) {
-          this.noOrdersMessage = `No Past orders for ${selectedCustomerName}.`; // Set message for no orders
-          this.customerOrders = []; // Ensure orders are cleared
-          this.openModal(); // Open modal to display the message
+          this.noOrdersMessage = `No past orders for ${selectedCustomerName}.`;
+          this.customerOrders = [];
+          this.openModal();
           return [];
         }
   
@@ -134,17 +149,28 @@ export class SalesComponent {
           this.getOrderDetails(order.sale_order_id).pipe(
             tap(orderDetails => {
               order.productsList = orderDetails.data.sale_order_items.map(item => ({
+                product_id: item.product.product_id,
                 product_name: item.product?.name ?? 'Unknown Product',
-                quantity: item.quantity
+                quantity: item.quantity,
+                code: item.product.code,
+                unit_options_id: item.unit_options.unit_options_id,
+                total_boxes: item.total_boxes,
+                rate: item.rate,
+                discount: item.discount,
+                print_name: item.print_name,
+                amount: item.amount,
+                tax: item.tax,
+                remarks: item.remarks,
               }));
             })
           )
         );
-  
+        
+        // Wait for all detailed order requests to complete before updating the UI
         return forkJoin(detailedOrderRequests).pipe(
           tap(() => {
-            this.customerOrders = orders.data;
-            this.openModal(); // Open modal with the orders list
+            this.customerOrders = orders.data; // Update the customer orders list
+            this.openModal();
           })
         );
       })
@@ -157,52 +183,163 @@ export class SalesComponent {
     document.body.classList.add('modal-open');
     document.body.style.overflow = 'hidden';
   }
-  
 
-  
-  
-
+  // Fetch orders by customer ID
   getOrdersByCustomer(customerId: string): Observable<any> {
+    //console.log("customer id",customerId)
     const url = `sales/sale_order_search/?customer_id=${customerId}`;
+    //console.log("customer ids",customerId)
     return this.http.get<any>(url);
   }
 
+  // Fetch detailed information about an order by its ID
   getOrderDetails(orderId: string): Observable<any> {
     const url = `sales/sale_order/${orderId}/`;
     return this.http.get<any>(url);
   }
 
+  // Handles the selection of an order from the list
   selectOrder(order: any) {
-    console.log('Selected Order:', order);
+    //console.log('Selected Order:', order);
     this.handleOrderSelected(order); // Handle order selection
   }
 
-  handleOrderSelected(order: any) {
-    this.selectedOrder = order;
-    this.editSaleOrder(order.sale_order_id); // Navigate to edit view
-    this.hideModal(); // Close modal
-  }
+  // Handles the order selection process and updates the form model with the order details
+  handleOrderSelected(orderId: any) {
+    this.SaleOrderEditID = null;
+    this.http.get('sales/sale_order/' + orderId).subscribe((res: any) => {
+      if (res && res.data) {
+        this.formConfig.model = res.data; // Update the form model with the selected order details
 
-  loadOrderDetails(orderId: string) {
-    this.getOrderDetails(orderId).subscribe(
-      (res: any) => {
-        if (res && res.data) {
-          this.formConfig.model = res.data;
-          this.formConfig.model['sale_order']['order_type'] = 'sale_order';
-          this.formConfig.pkId = 'sale_order_id';
-          this.formConfig.model['sale_order_id'] = orderId;
-          console.log('Order details loaded:', this.formConfig.model);
+        // Ensure the order type is always 'sale_order'
+        if (!this.formConfig.model['sale_order']['order_type']) {
+          this.formConfig.model['sale_order']['order_type'] = 'sale_order'; // Set default order type
         }
-      },
-      (error) => {
-        console.error('Error fetching order details:', error);
+
+        // Do not override the order number if one was already generated
+        // Ensure new orders start with a blank order number unless one was already generated
+        if (!this.orderNumber) {
+          this.formConfig.model['sale_order']['order_no'] = ''; // Ensure new order starts blank
+        } else {
+          this.formConfig.model['sale_order']['order_no'] = this.orderNumber; // Retain the initial order number
+        }
+        
+        if (!this.shippingTrackingNumber) {
+          this.formConfig.model['order_shipments']['shipping_tracking_no'] = ''; // Ensure new order starts blank
+        } else {
+          this.formConfig.model['order_shipments']['shipping_tracking_no'] = this.shippingTrackingNumber; // Retain the initial tracking number
+        }
+        
+
+        // Set default dates for the new order
+        this.formConfig.model['sale_order']['delivery_date'] = this.nowDate();
+        this.formConfig.model['sale_order']['order_date'] = this.nowDate();
+        this.formConfig.model['sale_order']['ref_date'] = this.nowDate();
+        // this.formConfig.model['order_shipments']['shipping_tracking_no'] = '';
+        this.formConfig.model['order_shipments']['shipping_date'] = this.nowDate();
+
+        // Set form button label to 'Create'
+        // this.formConfig.submit.label = 'Create';
+
+        // Display the form
+        this.showForm = true;
+
+        // Trigger change detection to update the form
+        this.cdRef.detectChanges();
       }
-    );
+    }, (error) => {
+      console.error('Error fetching order details:', error);
+    });
+
+    this.hideModal();
   }
 
+  // Closes the modal and removes the modal backdrop
   closeModal() {
     this.hideModal(); // Use the hideModal method to remove the modal elements
   }
+
+  // Handles the selected products and updates the form model with them
+  handleProductPull(selectedProducts: any[]) {
+    let existingProducts = this.formConfig.model['sale_order_items'] || [];
+
+    // Clean up existing products by filtering out any undefined, null, or empty entries
+    existingProducts = existingProducts.filter((product: any) => product?.code && product.code.trim() !== "");
+
+    if (existingProducts.length === 0) {
+        // Initialize the product list if no products exist
+        this.formConfig.model['sale_order_items'] = selectedProducts.map(product => ({
+            product: {
+                product_id: product.product_id || null,
+                name: product.product_name || '',  // Ensure the actual product name is set
+                code: product.code || '',
+            },
+            product_id: product.product_id || null,
+            code: product.code || '',
+            total_boxes: product.total_boxes || 0,
+            unit_options_id: product.unit_options_id || null,
+            quantity: product.quantity || 1,
+            rate: product.rate || 0,
+            discount: product.discount || 0,
+            print_name: product.print_name || product.product_name || '', // Use print_name only if necessary
+            amount: product.amount || 0,
+            tax: product.tax || 0,
+            remarks: product.remarks || ''
+        }));
+    } else {
+        // Update existing products or add new products
+        selectedProducts.forEach(newProduct => {
+            const existingProductIndex = existingProducts.findIndex((product: any) => 
+                product.product_id === newProduct.product_id || product.code === newProduct.code
+            );
+
+            if (existingProductIndex === -1) {
+                // Add the product if it doesn't exist in the list
+                existingProducts.push({
+                    product: {
+                        product_id: newProduct.product_id || null,
+                        name: newProduct.product_name || '',  // Ensure the actual product name is set
+                        code: newProduct.code || '',
+                    },
+                    product_id: newProduct.product_id || null,
+                    code: newProduct.code || '',
+                    total_boxes: newProduct.total_boxes || 0,
+                    unit_options_id: newProduct.unit_options_id || null,
+                    quantity: newProduct.quantity || 1,
+                    rate: newProduct.rate || 0,
+                    discount: newProduct.discount || 0,
+                    print_name: newProduct.print_name || newProduct.product_name || '', // Use print_name only if necessary
+                    amount: newProduct.amount || 0,
+                    tax: newProduct.tax || 0,
+                    remarks: newProduct.remarks || ''
+                });
+            } else {
+                // Update the existing product
+                existingProducts[existingProductIndex] = {
+                    ...existingProducts[existingProductIndex],
+                    ...newProduct,
+                    product: {
+                        product_id: newProduct.product_id || existingProducts[existingProductIndex].product.product_id,
+                        name: newProduct.product_name || existingProducts[existingProductIndex].product.name, // Ensure correct name is set
+                        code: newProduct.code || existingProducts[existingProductIndex].product.code,
+                    },
+                    print_name: newProduct.print_name || newProduct.product_name || existingProducts[existingProductIndex].product.name, // Ensure correct name is shown
+                };
+            }
+        });
+
+        // Assign the updated product list back to the model
+        this.formConfig.model['sale_order_items'] = [...existingProducts];
+    }
+
+    // Re-render the form
+    this.formConfig.model = { ...this.formConfig.model };
+
+    // Trigger UI update
+    this.cdRef.detectChanges();
+
+    //console.log("Final Products List:", this.formConfig.model['sale_order_items']);
+}
 
   hideModal() {
     const modalBackdrop = document.querySelector('.modal-backdrop');
@@ -219,7 +356,6 @@ export class SalesComponent {
     // Ensure modals are disposed of correctly
     document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
   }
-
 
   setFormConfig() {
     this.SaleOrderEditID = null;
@@ -274,7 +410,7 @@ export class SalesComponent {
               hooks: {
                 onInit: (field: any) => {
                   field.formControl.valueChanges.subscribe(data => {
-                    console.log("sale_type", data);
+                    //console.log("sale_type", data);
                     if (data && data.sale_type_id) {
                       this.formConfig.model['sale_order']['sale_type_id'] = data.sale_type_id;
                     }
@@ -303,7 +439,7 @@ export class SalesComponent {
               hooks: {
                 onInit: (field: any) => {
                   field.formControl.valueChanges.subscribe(data => {
-                    console.log("customer", data);
+                    //console.log("customer", data);
                     if (data && data.customer_id) {
                       this.formConfig.model['sale_order']['customer_id'] = data.customer_id;
                     }
@@ -341,7 +477,7 @@ export class SalesComponent {
                 label: 'Order no',
                 placeholder: 'Enter Order No',
                 required: true,
-                readonly: true
+                // readonly: true
                 // disabled: true
               }
             },
@@ -498,7 +634,7 @@ export class SalesComponent {
                 hooks: {
                   onInit: (field: any) => {
                     field.formControl.valueChanges.subscribe(data => {
-                      console.log("products data", data);
+                      //console.log("products data", data);
                       this.productOptions = data;
                       if (field.form && field.form.controls && field.form.controls.code && data && data.code) {
                         field.form.controls.code.setValue(data.code)
@@ -565,7 +701,7 @@ export class SalesComponent {
               {
                 type: 'input',
                 key: 'quantity',
-                defaultValue: 1,
+                // defaultValue: 1,
                 templateOptions: {
                   type: 'number',
                   label: 'Qty',
@@ -651,7 +787,7 @@ export class SalesComponent {
                   label: 'Mrp',
                   placeholder: 'Mrp',
                   hideLabel: true,
-                  disabled: true
+                  disabled: false
                 },
               },
               {
@@ -796,18 +932,18 @@ export class SalesComponent {
                       templateOptions: {
                         label: 'Shipping Tracking No.',
                         placeholder: 'Enter Shipping Tracking No.',
-                        readonly: true
+                        // readonly: true
                       }
                     },
                     {
                       key: 'shipping_date',
                       type: 'date',
                       className: 'col-6',
-                      defaultValue: this.nowDate(),
+                      // defaultValue: this.nowDate(),
                       templateOptions: {
                         type: 'date',
                         label: 'Shipping Date',
-                        required: true
+                        // required: true
                       }
                     },
                     {
@@ -818,7 +954,7 @@ export class SalesComponent {
                         type: "number",
                         label: 'Shipping Charges.',
                         placeholder: 'Enter Shipping Charges',
-                        required: true
+                        // required: true
                       }
                     }
                   ]
@@ -937,7 +1073,7 @@ export class SalesComponent {
                               hooks: {
                                 onChanges: (field: any) => {
                                   field.formControl.valueChanges.subscribe(data => {
-                                    console.log("gst_type", data);
+                                    //console.log("gst_type", data);
                                     if (data && data.gst_type_id) {
                                       this.formConfig.model['sale_order']['gst_type_id'] = data.gst_type_id;
                                     }
@@ -962,7 +1098,7 @@ export class SalesComponent {
                               hooks: {
                                 onChanges: (field: any) => {
                                   field.formControl.valueChanges.subscribe(data => {
-                                    console.log("payment_term", data);
+                                    //console.log("payment_term", data);
                                     if (data && data.payment_term_id) {
                                       this.formConfig.model['sale_order']['payment_term_id'] = data.payment_term_id;
                                     }
@@ -987,7 +1123,7 @@ export class SalesComponent {
                               hooks: {
                                 onChanges: (field: any) => {
                                   field.formControl.valueChanges.subscribe(data => {
-                                    console.log("ledger_account", data);
+                                    //console.log("ledger_account", data);
                                     if (data && data.ledger_account_id) {
                                       this.formConfig.model['sale_order']['ledger_account_id'] = data.ledger_account_id;
                                     }
@@ -1015,13 +1151,13 @@ export class SalesComponent {
                               hooks: {
                                 onChanges: (field: any) => {
                                   field.formControl.valueChanges.subscribe(data => {
-                                    console.log("order_status", data);
+                                    //console.log("order_status", data);
                                     if (data && data.order_status_id) {
                                       this.formConfig.model['sale_order']['order_status_id'] = data.order_status_id;
 
                                       const saleOrder = this.formConfig.model['sale_order'];
                                       if (saleOrder.order_status && saleOrder.order_status.status_name === 'Approved') {
-                                        console.log("processing salesInvoice:");
+                                        //console.log("processing salesInvoice:");
                                         const saleOrderItems = this.formConfig.model['sale_order_items'];
                                         const orderAttachments = this.formConfig.model['order_attachments']
                                         const orderShipments = this.formConfig.model['order_shipments']
@@ -1097,11 +1233,11 @@ export class SalesComponent {
                                           // order_shipments: saleOrder.order_shipments || {}
                                         };
 
-                                        console.log("Invoice data to be sent:", invoiceData);
+                                        //console.log("Invoice data to be sent:", invoiceData);
 
                                         this.createSaleInvoice(invoiceData).subscribe(
                                           response => {
-                                            console.log('Sale invoice created successfully', response);
+                                            //console.log('Sale invoice created successfully', response);
                                           },
                                           error => {
                                             console.error('Error creating sale invoice', error);

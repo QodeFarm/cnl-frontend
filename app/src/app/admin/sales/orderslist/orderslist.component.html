@@ -1,4 +1,5 @@
 <table class="table table-striped table-hover">
+  <!-- Table header to define column names -->
   <thead class="table-header">
     <tr>
       <th>Sale Type</th>
@@ -10,9 +11,11 @@
     </tr>
   </thead>
   <tbody>
+    <!-- Row to display a message if no orders are available -->
     <tr *ngIf="!customerOrders.length">
       <td colspan="6" class="text-center" style="font-size: 1.2em;">{{ noOrdersMessage }}</td>
-    </tr>    
+    </tr>   
+     <!-- Loop through each customer order and create a table row for each --> 
     <tr *ngFor="let order of customerOrders">
       <td>{{ order.sale_type?.name ?? 'N/A' }}</td>
       <td>{{ order.order_no ?? 'N/A' }}</td>
@@ -20,7 +23,9 @@
       <td>{{ order.order_date ?? 'N/A' }}</td>
       <td>
         <ul>
+          <!-- Loop through products in the order and display a checkbox, product name, and quantity -->
           <li *ngFor="let product of order.productsList">
+            <input type="checkbox" [(ngModel)]="product.selected" (change)="selectProduct(order, product, $event)" />
             {{ product.product_name ?? 'Unknown Product' }} (Qty: {{ product.quantity ?? 'N/A' }})
           </li>
         </ul>
@@ -31,3 +36,7 @@
     </tr>
   </tbody>
 </table>
+<div class="modal-footer">
+  <button type="button" class="btn btn-success" (click)="pullOrder()">Pull selected products</button>
+  <button type="button" class="btn btn-danger" (click)="hideModal()">Close</button>
+</div>
