@@ -1,7 +1,10 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { TaFormComponent, TaFormConfig } from '@ta/ta-form';
+import { forkJoin, Observable } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
+import { tap, switchMap } from 'rxjs/operators';
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-sale-returns',
@@ -10,17 +13,27 @@ import { distinctUntilChanged } from 'rxjs/operators';
 })
 export class SaleReturnsComponent {
   @ViewChild('salereturnForm', { static: false }) salereturnForm: TaFormComponent | undefined;
+  @ViewChild('saleinvoiceordersModal', { static: true }) ordersModal: ElementRef;
   returnNumber: any;
   showSaleReturnOrderList: boolean = false;
   showForm: boolean = false;
   SaleReturnOrderEditID: any;
+  SaleInvoiceEditID: any;
   productOptions: any;
+  invoiceNumber: any;
+  shippingTrackingNumber: any;
+  customerDetails: Object;
+  customerOrders: any[] = []; 
+  showOrderListModal = false;
+  selectedOrder: any;
+  noOrdersMessage: string;
   nowDate = () => {
     const date = new Date();
     return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   }
 
-  constructor(private http: HttpClient) {}
+  // constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private cdRef: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.showSaleReturnOrderList = false;
@@ -75,6 +88,258 @@ export class SaleReturnsComponent {
 
   showSalesReturnOrderListFn() {
     this.showSaleReturnOrderList = true;
+  }
+
+  
+  showInvoiceOrdersList() {
+    const selectedCustomerId = this.formConfig.model.sale_return_order.customer_id;
+    const selectedCustomerName = this.formConfig.model.sale_return_order.customer?.name; // Assuming customer name is nested
+  
+    if (!selectedCustomerId) {
+      this.noOrdersMessage = 'Please select a customer.'; // Set message for missing customer
+      this.customerOrders = []; // Clear any previous orders
+      this.openModal(); // Open modal to display the message
+      return;
+    }
+  
+    this.customerOrders = [];
+    this.noOrdersMessage = '';
+  
+    this.getOrdersByCustomer(selectedCustomerId).pipe(
+      switchMap(orders => {
+        if (orders.count === 0) {
+          this.noOrdersMessage = `No Past orders for ${selectedCustomerName}.`; // Set message for no orders
+          this.customerOrders = []; // Ensure orders are cleared
+          this.openModal(); // Open modal to display the message
+          return [];
+        }
+  
+        const detailedOrderRequests = orders.data.map(order =>
+          this.getOrderDetails(order.sale_invoice_id).pipe(
+            tap(orderDetails => {
+              order.productsList = orderDetails.data.sale_invoice_items.map(item => ({
+                product_id: item.product?.product_id,
+                product_name: item.product?.name ?? 'Unknown Product',
+                quantity: item.quantity,
+                code: item.product?.code,
+                total_boxes: item.total_boxes,
+                unit_options_id: item.unit_options_id,
+                rate: item.rate,
+                discount: item.discount,
+                amount: item.amount,
+                tax: item.tax,
+                remarks: item.remarks
+              }));
+            })
+          )
+        );
+  
+        return forkJoin(detailedOrderRequests).pipe(
+          tap(() => {
+            this.customerOrders = orders.data;
+            this.openModal(); // Open modal with the orders list
+          })
+        );
+      })
+    ).subscribe();
+  }
+
+  openModal() {
+    this.ordersModal.nativeElement.classList.add('show');
+    this.ordersModal.nativeElement.style.display = 'block';
+    document.body.classList.add('modal-open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  getOrdersByCustomer(customerId: string): Observable<any> {
+    const url = `sales/sale_invoice_order/?customer_id=${customerId}`;
+    return this.http.get<any>(url);
+  }
+
+  getOrderDetails(invoiceId: string): Observable<any> {
+    const url = `sales/sale_invoice_order/${invoiceId}/`;
+    return this.http.get<any>(url);
+  }
+  selectInvoiceOrder(order: any) {
+    console.log('Selected Order:', order);
+    this.handleInvoiceOrderSelected(order); // Handle order selection
+  }
+
+  // handleInvoiceOrderSelected(order: any) {
+  //   this.selectedOrder = order;
+  //   this.hideModal(); // Close modal
+  // }
+  handleInvoiceOrderSelected(order: any) {
+    const saleInvoiceId = order.sale_invoice_id;  // Extract sale_invoice_id from the emitted order
+    if (!saleInvoiceId) {
+        console.error('Invalid sale_invoice_id:', saleInvoiceId);
+        return;
+    }
+
+    console.log('Selected Sale Invoice ID:', saleInvoiceId);
+
+    // Fetch sale invoice details using the saleInvoiceId
+    this.http.get(`sales/sale_invoice_order/${saleInvoiceId}`).subscribe((res: any) => {
+        if (res && res.data) {
+            const invoiceData = res.data.sale_invoice_order;
+            console.log("Inovice data : ",invoiceData);
+            const invoiceItems = res.data.sale_invoice_items;
+            console.log("Inovice Items : ",invoiceItems);
+            // const invoiceShipments = res.data.order_shipments;
+
+            // Map sale_invoice_order fields to sale_return_order fields
+            this.formConfig.model = {
+                sale_return_order: {
+                    bill_type: invoiceData.bill_type,
+                    order_type: this.formConfig.model.sale_return_order.order_type || 'sale_return',
+                    return_date: this.nowDate(),
+                    return_no: this.formConfig.model.sale_return_order.return_no,
+                    ref_no: invoiceData.ref_no,
+                    ref_date: invoiceData.ref_date,
+                    tax: invoiceData.tax,
+                    remarks: invoiceData.remarks,
+                    item_value: invoiceData.item_value,
+                    discount: invoiceData.discount,
+                    dis_amt: invoiceData.dis_amt,
+                    taxable: invoiceData.taxable,
+                    tax_amount: invoiceData.tax_amount,
+                    cess_amount: invoiceData.cess_amount,
+                    transport_charges: invoiceData.transport_charges,
+                    round_off: invoiceData.round_off,
+                    total_amount: invoiceData.total_amount,
+                    vehicle_name: invoiceData.vehicle_name,
+                    total_boxes: invoiceData.total_boxes,
+                    gst_type: {
+                      gst_type_id: invoiceData.gst_type?.gst_type_id,
+                      name: invoiceData.gst_type?.name
+                    },
+                    payment_term: {
+                      payment_term_id: invoiceData.payment_term?.payment_term_id,
+                      name: invoiceData.payment_term?.name,
+                      code: invoiceData.payment_term?.code,
+                    },
+                    customer: {
+                      customer_id: invoiceData.customer?.customer_id,
+                      name: invoiceData.customer?.name
+                    },
+                    email: invoiceData.email,
+                    billing_address: invoiceData.billing_address,
+                    shipping_address: invoiceData.shipping_address,
+                },
+                sale_return_items: invoiceItems,
+                order_attachments: res.data.order_attachments,
+                order_shipments: res.data.order_shipments
+            };
+
+            // Display the form
+            this.showForm = true;
+
+            // Trigger change detection to update the form
+            this.cdRef.detectChanges();
+        }
+    }, (error) => {
+        console.error('Error fetching order details:', error);
+    });
+
+    // Hide the modal
+    this.hideModal();
+}
+
+
+ 
+
+  closeModal() {
+    this.hideModal(); // Use the hideModal method to remove the modal elements
+  }
+  
+  handleProductsPulled(products: any[]) {
+    let existingProducts = this.formConfig.model['sale_return_items'] || [];
+  
+    existingProducts = existingProducts.filter((product: any) => product?.code && product.code.trim() !== "");
+    console.log("Products received for pulling:", products);
+  
+    if (existingProducts.length === 0) {
+      this.formConfig.model['sale_return_items'] = products.map(product => ({
+        product: {
+          product_id: product.product_id || null,
+          name: product.name || '',
+          code: product.code || '',
+        },
+        product_id: product.product_id || null,
+        code: product.code || '',
+        total_boxes: product.total_boxes || 0,
+        unit_options_id: product.unit_options_id,
+        quantity: product.quantity || 1,
+        rate: product.rate || 0,
+        discount: product.discount || 0,
+        print_name: product.print_name || product.name || '',
+        amount: product.amount || 0,
+        tax: product.tax || 0,
+        remarks: product.remarks || ''
+      }));
+    } else {
+      products.forEach(newProduct => {
+        const existingProductIndex = existingProducts.findIndex((product: any) => product?.code === newProduct?.code);
+  
+        if (existingProductIndex === -1) {
+          existingProducts.push({
+            product: {
+              product_id: newProduct.product_id || null,
+              name: newProduct.name || '',
+              code: newProduct.code || '',
+            },
+            product_id: newProduct.product_id || null,
+            code: newProduct.code || '',
+            total_boxes: newProduct.total_boxes || 0,
+            unit_options_id: newProduct.unit_options_id,
+            quantity: newProduct.quantity || 1,
+            rate: newProduct.rate || 0,
+            discount: newProduct.discount || 0,
+            print_name: newProduct.print_name || newProduct.name || '',
+            amount: newProduct.amount || 0,
+            tax: newProduct.tax || 0,
+            remarks: newProduct.remarks || ''
+          });
+        } else {
+          existingProducts[existingProductIndex] = {
+            ...existingProducts[existingProductIndex],
+            ...newProduct,
+            product: {
+              product_id: newProduct.product_id || existingProducts[existingProductIndex].product.product_id,
+              name: newProduct.name || existingProducts[existingProductIndex].product.name,
+              code: newProduct.code || existingProducts[existingProductIndex].product.code,
+            }
+          };
+        }
+      });
+  
+      this.formConfig.model['sale_return_items'] = [...existingProducts];
+    }
+  
+    this.formConfig.model = { ...this.formConfig.model };
+  
+    this.cdRef.detectChanges();
+  
+    console.log("Final Products List:", this.formConfig.model['sale_return_items']);
+    this.hideModal();
+  }
+  
+  
+
+  hideModal() {
+    const modalBackdrop = document.querySelector('.modal-backdrop');
+    if (modalBackdrop) {
+      modalBackdrop.remove();
+    }
+    this.ordersModal.nativeElement.classList.remove('show');
+    this.ordersModal.nativeElement.style.display = 'none';
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+  }
+
+  ngOnDestroy() {
+    // Ensure modals are disposed of correctly
+    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
   }
 
   setFormConfig() {
@@ -453,7 +718,6 @@ export class SaleReturnsComponent {
                 hooks: {
                   onInit: (field: any) => {
                     field.formControl.valueChanges.subscribe(data => {
-                      console.log("products data", data);
                       this.productOptions = data;
                       if (field.form && field.form.controls && field.form.controls.code && data && data.code) {
                         field.form.controls.code.setValue(data.code)
@@ -520,7 +784,7 @@ export class SaleReturnsComponent {
               {
                 type: 'input',
                 key: 'quantity',
-                defaultValue: 1,
+                // defaultValue: 1,
                 templateOptions: {
                   type: 'number',
                   label: 'Qty',

@@ -11,6 +11,7 @@ import { SaleReturnsComponent } from './sale-returns/sale-returns.component';
 import { SaleReturnsListComponent } from './sale-returns/sale-returns-list/sale-returns-list.component';
 import { CustomersComponent } from '../customers/customers.component';
 import { CustomersListComponent } from '../customers/customers-list/customers-list.component';
+import { SaleinvoiceorderlistComponent } from './saleinvoiceorderlist/saleinvoiceorderlist.component';
 // import { SalesInvoiceListComponent } from './salesinvoice/salesinvoice-list/salesinvoice-list.component';
 // import { SalesinvoiceComponent } from './salesinvoice/salesinvoice.component';
 
@@ -18,6 +19,7 @@ import { CustomersListComponent } from '../customers/customers-list/customers-li
   declarations: [
     SalesComponent,
     SaleReturnsComponent,
+    // SaleinvoiceorderlistComponent,
 
   ],
   imports: [
@@ -27,6 +29,7 @@ import { CustomersListComponent } from '../customers/customers-list/customers-li
     SalesListComponent,
     OrderslistComponent,
     SaleReturnsListComponent,
+    SaleinvoiceorderlistComponent
     
   ]
 })

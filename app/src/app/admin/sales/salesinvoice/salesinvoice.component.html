@@ -54,12 +54,10 @@
         <app-orderslist 
           [customerOrders]="customerOrders" 
           (orderSelected)="handleOrderSelected($event)"
+          (productsPulled)="handleProductPull($event)"
           [noOrdersMessage]="noOrdersMessage"
           (modalClosed)="closeModal()">
         </app-orderslist>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger" (click)="hideModal()">Close</button>
       </div>
     </div>
   </div>

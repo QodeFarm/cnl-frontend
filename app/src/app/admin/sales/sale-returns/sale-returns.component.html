@@ -5,9 +5,14 @@
           <span *ngIf="SaleReturnOrderEditID" class="custom-heading">Update Sale Returns</span>
           <span *ngIf="!SaleReturnOrderEditID" class="custom-heading">Create Sale Returns</span>
         </button>
-        <button (click)="showSalesReturnOrderListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-          Sale Return List
-        </button>
+        <div style="display: flex; gap: 10px;">
+          <button (click)="showInvoiceOrdersList()" type="button" class="btn btn-primary">
+            Sale Invoice List
+          </button>
+          <button (click)="showSalesReturnOrderListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            Sale Return List
+          </button>
+      </div>
       </div>
     </div>
   
@@ -34,3 +39,27 @@
       </div>
     </div>
   </div>
+
+
+  <div #saleinvoiceordersModal class="modal fade custom-modal" id="saleinvoiceordersListModal" tabindex="-1" aria-labelledby="saleinvoiceordersListModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="saleinvoiceordersListModalLabel">Sale Invoice List</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="hideModal()"></button>
+        </div>
+        <div class="modal-body">
+          <app-saleinvoiceorderlist 
+          [customerOrders]="customerOrders" 
+          (orderSelected)="handleInvoiceOrderSelected($event)"
+          (productsPulled)="handleProductsPulled($event)"
+          [noOrdersMessage]="noOrdersMessage"
+          (modalClosed)="closeModal()">
+      </app-saleinvoiceorderlist>
+  
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- (orderSelected)="handleOrderSelected($event)" -->
