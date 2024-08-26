@@ -176,7 +176,31 @@ export class AdminLayoutComponent {
       {
         label: 'Production',
         icon: 'icon icon-production',
-        child: []
+        child: [
+          {
+            link: '/admin/production/billofmaterials',
+            label: 'Bill Of Materials',
+          },
+          {
+            link: '/admin/production/workorders',
+            label: 'Work Orders',
+          },
+          {
+            link: '/admin/production/inventory',
+            label: 'Inventory',
+          },
+          {
+            link: '/admin/production/machines',
+            label: 'Machines',
+          },
+          {
+            link: '/admin/production/labor',
+            label: 'Labor',
+          },          {
+            link: '/admin/production/productionstatuses',
+            label: 'Production Statuses',
+          }
+        ]
       },
       {
         label: 'Inventory',

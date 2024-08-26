@@ -22,7 +22,6 @@ export class ProductsComponent implements OnInit {
     this.ProductEditID = null;
     // Set form config
     this.setFormConfig();
-    console.log('this.formConfig', this.formConfig);
   }
 
   hide() {
@@ -36,7 +35,6 @@ export class ProductsComponent implements OnInit {
     console.log('event', event);
     this.ProductEditID = event;
     this.http.get('products/products/' + event).subscribe((res: any) => {
-      console.log('--------> res ', res);
       if (res) {
         this.formConfig.model = res.data;
         this.formConfig.showActionBtn = true;
