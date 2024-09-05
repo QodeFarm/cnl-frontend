@@ -1,102 +1,41 @@
-<!-- <div *ngIf="saleOrders.length; else loading">
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Customer</th>
-          <th>Order No</th>
-          <th>Products</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let order of saleOrders">
-          <td>{{ order.customer?.name ?? 'N/A' }}</td>
-          <td>{{ order.order_no ?? 'N/A' }}</td>
-          <td>{{ order.product?.name ?? 'N/A' }}</td>
-          <td>
-            <button class="btn btn-primary" (click)="viewDetails(order.sale_order_id)">YES</button>
-            <button class="btn btn-primary" (click)="viewDetails(order.sale_order_id)">NO</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+<div class="container-fluid pt-3">
+  <div class="row">
+    <div class="col-12 px-2 py-1">
+      <table class="table table-striped custom-table">
+        <thead class="table-header">
+          <tr>
+            <th>Customer</th>
+            <th>Order No</th>
+            <th>Products</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let order of saleOrders">
+            <td>{{ order.customer?.name ?? 'N/A' }}</td>
+            <td>{{ order.order_no ?? 'N/A' }}</td>
+            <td>
+              <!-- Display products if they exist -->
+              <ul *ngIf="order.sale_order_items?.length; else noProducts">
+                <li *ngFor="let item of order.sale_order_items">
+                  {{ item.product?.name ?? 'N/A' }} - qty ({{ item.quantity ?? 'N/A' }})
+                </li>
+              </ul>
+              <ng-template #noProducts>
+                <p>No products available</p>
+              </ng-template>
+            </td>
+            <td>
+              <button class="btn btn-primary" (click)="onActionClick('yes', order.sale_order_id)">Done</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
-  
-  <ng-template #loading>
-    <p>Loading sale orders...</p>
-  </ng-template>
-   -->
-<!-- <div *ngIf="saleOrders.length; else loading">
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Customer</th>
-          <th>Order No</th>
-          <th>Products</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let order of saleOrders">
-          <td>{{ order.customer?.name ?? 'N/A' }}</td>
-          <td>{{ order.order_no ?? 'N/A' }}</td>
-          <td>
-            <ul *ngIf="order.sale_order_items?.length; else noProducts">
-              <li *ngFor="let item of order.sale_order_items">
-                {{ item.product.name }}
-              </li>
-            </ul>
-            <ng-template #noProducts>
-              <p>No products available</p>
-            </ng-template>
-          </td>
-          <td>
-            <button class="btn btn-primary" (click)="viewDetails(order.sale_order_id)">YES</button>
-            <button class="btn btn-primary" (click)="viewDetails(order.sale_order_id)">NO</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  
-  <ng-template #loading>
-    <p>Loading sale orders...</p>
-  </ng-template>
-   -->
-<div *ngIf="!isLoading && saleOrders.length; else noData">
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Customer</th>
-          <th>Order No</th>
-          <th>Products</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let order of saleOrders">
-          <td>{{ order.customer?.name ?? 'N/A' }}</td>
-          <td>{{ order.order_no ?? 'N/A' }}</td>
-          <td>
-            <!-- Display products if they exist -->
-            <ul *ngIf="order.sale_order_items?.length; else noProducts">
-              <li *ngFor="let item of order.sale_order_items">
-                {{ item.product?.name ?? 'N/A' }} - qty ({{ item.quantity ?? 'N/A' }})
-              </li>
-            </ul>
-            <ng-template #noProducts>
-              <p>No products available</p>
-            </ng-template>
-          </td>
-          <td>
-            <button class="btn btn-primary" (click)="onActionClick('yes', order.sale_order_id)">Done</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  
-  <ng-template #noData>
-    <p *ngIf="isLoading">Loading sale orders...</p>
-    <p *ngIf="!isLoading && !saleOrders.length">No sale orders found.</p>
-  </ng-template>
+</div>
+
+<ng-template #noData>
+  <p *ngIf="isLoading">Loading sale orders...</p>
+  <p *ngIf="!isLoading && !saleOrders.length">No sale orders found.</p>
+</ng-template>

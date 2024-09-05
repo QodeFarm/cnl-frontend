@@ -30,7 +30,6 @@ export class SaleReceiptComponent {
     document.getElementById('modalClose').click();
   }
 
-
   editReceipt(event) {
     console.log("receiptEditID : ", event);
     this.receiptEditID = event;
@@ -46,15 +45,22 @@ export class SaleReceiptComponent {
         this.formConfig.submit.label = 'Update';
         this.formConfig.model['sale_receipt_id'] = this.receiptEditID;
   
-        // Set customer ID to preselect the customer and load corresponding invoices
-        const customerId = res.sale_invoice?.customer?.customer_id;
-        console.log("Customer_id : ", customerId);
-        if (customerId) {
-          this.formConfig.model['customer'] = customerId; // Preselect the customer
+        // Extract the customer data from the sale invoice and prepopulate the form
+        const customer = res.sale_invoice?.customer;
+        const customerId = customer?.customer_id;
+        const customerName = customer?.name;
+        console.log("Customer_id : ", customerId, "Customer_name: ", customerName);
+  
+        if (customerId && customerName) {
+          // Prepopulate the customer select field with both id and label
+          this.formConfig.model['customer'] = { customer_id: customerId, name: customerName };
+  
           this.loadSaleInvoices(customerId); // Load invoices for the customer
   
           // Set the selected sale invoice
           this.formConfig.model['sale_invoice_id'] = res.sale_invoice_id;
+        } else {
+          console.warn('No customer data found in the sale invoice');
         }
   
         this.showForm = true;
@@ -63,8 +69,7 @@ export class SaleReceiptComponent {
   
     this.hide();
   }
-   
-
+  
   showReceiptListFn() {
     this.showreceiptList = true;
   };
@@ -160,21 +165,6 @@ export class SaleReceiptComponent {
                 "multiple": true
               }
             }
-            // {
-            //   key: 'receipt_path',
-            //   type: 'file',
-            //   className: 'ta-cell col-12 custom-file-attachement',
-            //   templateOptions: {
-            //     "displayStyle": "files",
-            //     "multiple": true,
-            //     'label': 'Upload Receipt',
-            //     // placeholder: 'Enter description',
-            //   },
-            //   // props: {
-            //   //   "displayStyle": "files",
-            //   //   "multiple": true
-            //   // }
-            // },
           ]
         }
       ]
