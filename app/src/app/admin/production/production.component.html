@@ -1,1 +1,35 @@
-<p>production works!</p>
+<div class="container-fluid pt-3">
+    <div class="workorder-banner">
+        <div class="col-12 px-0" style="display: flex; justify-content: space-between;align-items: center;">
+            <button (click)="WorkOrdrEditID = null" type="button" class="btn pl-0" style="color: black;">
+                <span *ngIf="WorkOrdrEditID" class="custom-heading">Update Work Order</span>
+                <span *ngIf="!WorkOrdrEditID" class="custom-heading">Create Work Order</span>
+            </button>
+            <button (click)="showWorkorderListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productionModal">Work Order List
+            </button>
+        </div>
+    </div>
+
+    <div class="row custom-form">
+        <div class="col-12 px-1" *ngIf="WorkOrdrEditID || showForm">
+            <ta-form [options]="formConfig"></ta-form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade custom-modal" id="productionModal" tabindex="-1" aria-labelledby="productionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+       <div class="modal-content">
+          <div class="modal-header">
+             <h5 class="modal-title" id="productModalLabel">Edit Work Order List</h5>
+             <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" *ngIf="showWorkorderList">
+             <app-work-order-list (edit)="editWorkorder($event)" class="custom-list"></app-work-order-list>
+          </div>
+          <div class="modal-footer">
+             <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+          </div>
+       </div>
+    </div>
+ </div>
