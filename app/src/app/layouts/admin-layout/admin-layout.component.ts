@@ -60,7 +60,7 @@ export class AdminLayoutComponent {
         return route;
       }),
       map(route => {
-        debugger;
+        // debugger;
         currentUrl = this.router.url;  // Get the current URL
         return { data: route.snapshot.data, component: route.component };  // Get the route's data (like title)
       })

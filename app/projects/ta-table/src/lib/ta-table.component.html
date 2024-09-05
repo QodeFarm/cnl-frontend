@@ -124,6 +124,17 @@
     </tbody>
 </nz-table>
 
+<ng-template #totalTemplate let-total>
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" id="pdfDropdown" aria-haspopup="true" aria-expanded="false" (click)="toggleDropdown()">
+          <i class="fas fa-file-pdf"></i>
+        </button>
+        <div class="dropdown-menu" [ngClass]="{'show': dropdownOpen}" aria-labelledby="pdfDropdown">
+            <a class="dropdown-item" href="#" (click)="onEmailPdf()">Email PDF</a>
+            <a class="dropdown-item" href="#" (click)="onWhatsAppPdf()">WhatsApp PDF</a>
+        </div>
+      </div>
+</ng-template>
 
 <ng-template #totalTemplate let-total>
     Total Records - {{total}}

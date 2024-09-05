@@ -57,6 +57,7 @@ export class TaTableComponent implements OnDestroy {
   fromDate: Date | null = null;
   toDate: Date | null = null;
   isButtonVisible = false;
+  dropdownOpen = false;
 
   statusOptions: Array<{ value: string, label: string }> = []; // Store the statuses here
   
@@ -72,6 +73,49 @@ export class TaTableComponent implements OnDestroy {
     { value: 'last_year', label: 'Last Year' }
   ];
   formConfig: any;
+
+    
+  toggleDropdown() {
+    this.dropdownOpen = !this.dropdownOpen;
+  }
+
+  onEmailPdf() {
+    console.log('Email PDF clicked');
+    this.sendPdf('email');
+    // You can add logic for what happens when "Email PDF" is clicked here
+  }
+
+  onWhatsAppPdf() {
+    console.log('WhatsApp PDF clicked');
+    this.sendPdf('whatsapp');
+    // You can add logic for what happens when "WhatsApp PDF" is clicked here
+  }
+
+  sendPdf(destination: string) {
+    const pdfData = {
+      filters: this.getFilterData(),
+      // Include any other data that needs to be passed with the PDF request
+    };
+    console.log("======>", this.filters)
+    const url = `http://127.0.0.1:8000/api/v1/sales/sale_order_pdf/${destination}`; // Replace with your actual API endpoint
+    this.http.post(url, pdfData).subscribe(
+      (response: any) => {
+        console.log(`PDF sent to ${destination}:`, response);
+      },
+      (error: any) => {
+        console.error(`Error sending PDF to ${destination}:`, error);
+      }
+    );
+  }
+
+  getFilterData() {
+    return {
+      quickPeriod: this.selectedQuickPeriod,
+      fromDate: this.fromDate,
+      toDate: this.toDate,
+      status: this.selectedStatus,
+    };
+  }
 
   onQuickPeriodChange() {
     const today = new Date();
