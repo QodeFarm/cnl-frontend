@@ -41,6 +41,7 @@ const routes: Routes = [
       { path: 'quickpacks', data: { title: 'quickpacks', moduleName: 'quickpacks' }, canActivate: [], loadChildren: () => import('./admin/quickpacks/quickpacks.module').then(m => m.QuickpacksModule) },
       { path: 'assets', data: { title: 'assets', moduleName: 'assets' }, canActivate: [], loadChildren: () => import('./admin/assets/assets.module').then(m => m.AssetsModule) },
       { path: 'tasks', data: { title: 'tasks', moduleName: 'tasks' }, canActivate: [], loadChildren: () => import('./admin/tasks/tasks.module').then(m => m.TasksModule) },
+      { path: 'workflow', data: { title: 'workflow', moduleName: 'workflow' }, canActivate: [], loadChildren: () => import('./admin/workflow/workflow.module').then(m => m.WorkflowModule) },
       // { path: 'leaves', canActivate: [], loadComponent: () => import('./admin/leave/leave.component').then(m => m.LeaveComponent) },
       // { path: 'attendance', canActivate: [], loadChildren: () => import('./admin/attendence/attendence.module').then(m => m.AttendenceModule) },
       { path: 'inventory', data: { title: 'inventory', moduleName: 'inventory' }, canActivate: [], loadChildren: () => import('./admin/inventory/inventory.module').then(m => m.InventoryModule) },
