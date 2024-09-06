@@ -12,6 +12,8 @@ import { SaleReturnsListComponent } from './sale-returns/sale-returns-list/sale-
 import { CustomersComponent } from '../customers/customers.component';
 import { CustomersListComponent } from '../customers/customers-list/customers-list.component';
 import { SaleinvoiceorderlistComponent } from './saleinvoiceorderlist/saleinvoiceorderlist.component';
+import { SalesDispatchComponent } from './sales-dispatch/sales-dispatch.component';
+// import { SalesReceiptComponent } from './sales-receipt/sales-receipt.component';
 // import { SalesInvoiceListComponent } from './salesinvoice/salesinvoice-list/salesinvoice-list.component';
 // import { SalesinvoiceComponent } from './salesinvoice/salesinvoice.component';
 
@@ -19,7 +21,6 @@ import { SaleinvoiceorderlistComponent } from './saleinvoiceorderlist/saleinvoic
   declarations: [
     SalesComponent,
     SaleReturnsComponent,
-    // SaleinvoiceorderlistComponent,
 
   ],
   imports: [
@@ -29,8 +30,15 @@ import { SaleinvoiceorderlistComponent } from './saleinvoiceorderlist/saleinvoic
     SalesListComponent,
     OrderslistComponent,
     SaleReturnsListComponent,
-    SaleinvoiceorderlistComponent
+    SaleinvoiceorderlistComponent,
+    SalesDispatchComponent,
+    // SalesReceiptComponent
+
     
+  ],
+  exports:[
+    SalesDispatchComponent,
+    // SalesReceiptComponent
   ]
 })
 export class SalesModule { }
