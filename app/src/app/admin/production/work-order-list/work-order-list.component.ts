@@ -45,6 +45,15 @@ export class WorkOrderListComponent {
         sort: true
       },
       {
+        fieldKey: 'status_id',
+        name: 'Status',
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          return `${row.status.status_name}`;
+        },
+        sort: true
+      },
+      {
         fieldKey: 'start_date',
         name: 'Start Date',
         sort: true

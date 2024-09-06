@@ -22,7 +22,7 @@ export class ProductionComponent implements OnInit {
     this.WorkOrdrEditID = null;
     // Set form config
     this.setFormConfig();
-    this.formConfig.fields[0].fieldGroup[2].hide = true
+    // this.formConfig.fields[0].fieldGroup[2].hide = true
   }
 
   hide() {
@@ -45,7 +45,7 @@ export class ProductionComponent implements OnInit {
         // Show form after setting form values
         this.formConfig.model['work_order_id'] = this.WorkOrdrEditID;
         this.showForm = true;
-        this.formConfig.fields[0].fieldGroup[2].hide = false
+        // this.formConfig.fields[0].fieldGroup[2].hide = false
       }
     });
     this.hide();
@@ -87,17 +87,6 @@ export class ProductionComponent implements OnInit {
           key: 'work_order',
           fieldGroup: [
             {
-              key: 'quantity',
-              type: 'input',
-              className: 'col-2',
-              templateOptions: {
-                label: 'Quantity',
-                placeholder: 'Enter Quantity',
-                type: 'number',
-                min: 0,
-              },
-            },
-            {
               key: 'product_id',
               type: 'select',
               className: 'col-2',
@@ -106,11 +95,25 @@ export class ProductionComponent implements OnInit {
                 placeholder: 'Select Product',
                 dataKey: 'product_id',
                 dataLabel: 'name',
+                required: true,
                 bindId: true,
                 lazy: {
-                  url: 'products/products_get/?type_name=Finished',
+                  // url: 'products/products_get/?type_name=Finished',
+                  url: 'products/products_get/',
                   lazyOneTime: true
                 }
+              },
+            },
+            {
+              key: 'quantity',
+              type: 'input',
+              className: 'col-2',
+              templateOptions: {
+                label: 'Quantity',
+                required: true,
+                placeholder: 'Enter Quantity',
+                // type: 'number',
+                // min: 0,
               },
             },
             {
@@ -178,9 +181,11 @@ export class ProductionComponent implements OnInit {
                   dataKey: 'product_id',
                   dataLabel: 'name',
                   hideLabel: true,
+                  required: true,
                   bindId: true,
                   lazy: {
-                    url: 'products/products_get/?type_name=Unfinished',
+                    // url: 'products/products_get/?type_name=Unfinished',
+                    url: 'products/products_get/',
                     lazyOneTime: true
                   }
                 },
@@ -236,7 +241,7 @@ export class ProductionComponent implements OnInit {
                     dataLabel: 'machine_name',
                     options: [],
                     hideLabel: true,
-                    required: false,
+                    required: true,
                     lazy: {
                       url: 'production/machines/',
                       lazyOneTime: true
@@ -348,7 +353,7 @@ export class ProductionComponent implements OnInit {
                   label: 'Description',
                   placeholder: 'Enter Description',
                   hideLabel: true,
-                  required: true
+                  required: false
                 }
               },
               {
@@ -368,7 +373,7 @@ export class ProductionComponent implements OnInit {
                   label: 'Stage End Date',
                   placeholder: 'Enter End Date',
                   hideLabel: true,
-                  required: true
+                  required: false
                 }
               },
               {
@@ -378,7 +383,7 @@ export class ProductionComponent implements OnInit {
                   label: 'Notes',
                   placeholder: 'Enter Notes',
                   hideLabel: true,
-                  required: true
+                  required: false
                 }
               }
             ]
