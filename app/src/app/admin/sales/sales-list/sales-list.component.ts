@@ -105,6 +105,11 @@ export class SalesListComponent {
         sort: true
       },
       {
+        fieldKey: 'flow_status',
+        name: 'Flow Status',
+        sort: true
+      },
+      {
         fieldKey: "code",
         name: "Action",
         type: 'action',

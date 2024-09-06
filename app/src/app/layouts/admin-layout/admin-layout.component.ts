@@ -139,6 +139,16 @@ export class AdminLayoutComponent {
             label: 'Sale Return',
             icon: 'fas fa-tachometer-alt',
           },
+          {
+            link: '/admin/sales/sales-dispatch',
+            label: 'Sale Dispatch',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/sale-receipt',
+            label: 'Sale Receipt',
+            icon: 'fas fa-tachometer-alt',
+          },
         ]
       },
       {
