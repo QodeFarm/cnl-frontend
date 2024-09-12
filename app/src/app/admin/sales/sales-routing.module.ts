@@ -6,6 +6,8 @@ import { SaleReturnsComponent } from './sale-returns/sale-returns.component';
 import { SalesinvoiceModule } from './salesinvoice/salesinvoice.module';
 import { SalesinvoiceComponent } from './salesinvoice/salesinvoice.component';
 import { CustomersComponent } from '../customers/customers.component';
+import { SalesDispatchComponent } from './sales-dispatch/sales-dispatch.component';
+// import { SalesReceiptComponent } from './sales-receipt/sales-receipt.component';
 
 const routes: Routes = [
   {
@@ -22,7 +24,17 @@ const routes: Routes = [
     path: 'salesinvoice',
     data: { title: 'Sales Invoice', moduleName: "sales-invoice" },
     component: SalesinvoiceComponent
-  }
+  },
+  {
+    path: 'sales-dispatch',
+    data: { title: 'Sale Dispatch', moduleName: "sales-dispatch" },
+    component: SalesDispatchComponent
+  },
+  // {
+  //   path: 'sales-receipt',
+  //   data: { title: 'Sale Receipt', moduleName: "sales-receipt" },
+  //   component: SalesReceiptComponent
+  // }
 
 ];
 

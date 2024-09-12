@@ -139,6 +139,16 @@ export class AdminLayoutComponent {
             label: 'Sale Return',
             icon: 'fas fa-tachometer-alt',
           },
+          {
+            link: '/admin/sales/sales-dispatch',
+            label: 'Sale Dispatch',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/sale-receipt',
+            label: 'Sale Receipt',
+            icon: 'fas fa-tachometer-alt',
+          },
         ]
       },
       {
@@ -178,25 +188,14 @@ export class AdminLayoutComponent {
         icon: 'icon icon-production',
         child: [
           {
-            link: '/admin/production/billofmaterials',
-            label: 'Bill Of Materials',
-          },
-          {
-            link: '/admin/production/workorders',
-            label: 'Work Orders',
-          },
-          {
-            link: '/admin/production/inventory',
-            label: 'Inventory',
+            link: '/admin/production',
+            label: 'Work Order',
           },
           {
             link: '/admin/production/machines',
             label: 'Machines',
-          },
+          },         
           {
-            link: '/admin/production/labor',
-            label: 'Labor',
-          },          {
             link: '/admin/production/productionstatuses',
             label: 'Production Statuses',
           }
