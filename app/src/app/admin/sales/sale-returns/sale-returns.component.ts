@@ -48,10 +48,21 @@ export class SaleReturnsComponent {
     // console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
   }
 
+
+  getWorkflowId() {
+    return this.http.get('http://195.35.20.172:8000/api/v1/sales/workflows/');
+  }
+  
+
   formConfig: TaFormConfig = {};
 
   hide() {
     document.getElementById('modalClose').click();
+  }
+
+  // Function to create a sale Order
+  createSaleOrder(saleorderData: any): Observable<any> {
+    return this.http.post('sales/sale_order/', saleorderData);
   }
 
   editSaleReturnOrder(event) {
@@ -165,10 +176,6 @@ export class SaleReturnsComponent {
     this.handleInvoiceOrderSelected(order); // Handle order selection
   }
 
-  // handleInvoiceOrderSelected(order: any) {
-  //   this.selectedOrder = order;
-  //   this.hideModal(); // Close modal
-  // }
   handleInvoiceOrderSelected(order: any) {
     const saleInvoiceId = order.sale_invoice_id;  // Extract sale_invoice_id from the emitted order
     if (!saleInvoiceId) {
@@ -244,9 +251,6 @@ export class SaleReturnsComponent {
     // Hide the modal
     this.hideModal();
 }
-
-
- 
 
   closeModal() {
     this.hideModal(); // Use the hideModal method to remove the modal elements
@@ -457,32 +461,6 @@ export class SaleReturnsComponent {
                 // disabled: true
               },
             },
-            // {
-            //   key: 'sale_invoice',
-            //   type: 'select',
-            //   className: 'col-2',
-            //   templateOptions: {
-            //     label: 'Sale invoice',
-            //     dataKey: 'sale_invoice_id',
-            //     dataLabel: "invoice_no",
-            //     options: [],
-            //     lazy: {
-            //       url: 'sales/sale_invoice_order/?summary=true',
-            //       lazyOneTime: true
-            //     },
-            //     // required: true,
-            //   },
-            //   hooks: {
-            //     onChanges: (field: any) => {
-            //       field.formControl.valueChanges.subscribe((data: any) => {
-            //         // console.log("order_type", data);
-            //         if (data && data.sale_invoice_id) {
-            //           this.formConfig.model['sale_return_order']['sale_invoice_id'] = data.sale_invoice_id;
-            //         }
-            //       });
-            //     }
-            //   }
-            // },
             {
               key: 'orders_salesman',
               type: 'select',
@@ -575,31 +553,6 @@ export class SaleReturnsComponent {
                 readonly: true
               }
             },
-            // {
-            //   key: 'customer_address',
-            //   type: 'select',
-            //   className: 'col-2',
-            //   templateOptions: {
-            //     label: 'Customer addresses',
-            //     dataKey: 'customer_address_id',
-            //     dataLabel: "customer_id",
-            //     options: [],
-            //     lazy: {
-            //       url: 'customers/customers_addresses/',
-            //       lazyOneTime: true
-            //     }
-            //   },
-            //   hooks: {
-            //     onChanges: (field: any) => {
-            //       field.formControl.valueChanges.subscribe((data: any) => {
-            //         // console.log("order_type", data);
-            //         if (data && data.customer_address_id) {
-            //           this.formConfig.model['sale_return_order']['customer_address_id'] = data.customer_address_id;
-            //         }
-            //       });
-            //     }
-            //   }
-            // },
             {
               key: 'payment_link_type',
               type: 'select',
@@ -643,9 +596,125 @@ export class SaleReturnsComponent {
               
             },
             {
+              key: 'return_option',
+              type: 'select',
+              className: 'col-4',
+              templateOptions: {
+                label: 'Return Option',
+                dataKey: 'return_option_id',
+                dataLabel: 'name',
+                options: [],
+                lazy: {
+                  url: 'masters/return_options/',
+                  lazyOneTime: true
+                }
+              },
+              hooks: {
+                onChanges: (field: any) => {
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (data && data.return_option_id) {
+                      this.formConfig.model['sale_return_order']['return_option_id'] = data.return_option_id;
+            
+                      const salereturnOrder = this.formConfig.model['sale_return_order'];
+                      const salereturnOrderItems = this.formConfig.model['sale_return_items'];
+                      const orderAttachments = this.formConfig.model['order_attachments'];
+                      const orderShipments = this.formConfig.model['order_shipments'];
+            
+                      if (salereturnOrder.return_option?.name === 'Sale Order') {
+                        // Fetch workflow ID from API
+                        this.getWorkflowId().subscribe(
+                          (response: any) => {
+                            console.log('Workflow response:', response);
+            
+                            // Check if the response contains workflow data
+                            const workflowData = response?.data;
+                            if (workflowData && workflowData.length > 0) {
+                              const workflow_id = workflowData[0].workflow_id; // Get the workflow_id from the first item
+                              console.log('Workflow_id from fields: ', workflow_id);
+            
+                              if (workflow_id) {
+                                // Prepare the sale order data with workflow_id
+            
+                                const saleorderData = {
+                                  sale_order: {
+                                    email: salereturnOrder.email,
+                                    order_type: salereturnOrder.order_type || 'sale_order',
+                                    delivery_date: this.nowDate(),
+                                    order_date: this.nowDate(),
+                                    ref_no: salereturnOrder.ref_no,
+                                    ref_date: salereturnOrder.ref_date || this.nowDate(),
+                                    tax: salereturnOrder.tax || 'Inclusive',
+                                    remarks: salereturnOrder.remarks,
+                                    advance_amount: salereturnOrder.advance_amount,
+                                    item_value: salereturnOrder.item_value,
+                                    discount: salereturnOrder.discount,
+                                    dis_amt: salereturnOrder.dis_amt,
+                                    taxable: salereturnOrder.taxable,
+                                    tax_amount: salereturnOrder.tax_amount,
+                                    cess_amount: salereturnOrder.cess_amount,
+                                    transport_charges: salereturnOrder.transport_charges,
+                                    round_off: salereturnOrder.round_off,
+                                    total_amount: salereturnOrder.total_amount,
+                                    vehicle_name: salereturnOrder.vehicle_name,
+                                    total_boxes: salereturnOrder.total_boxes,
+                                    shipping_address: salereturnOrder.shipping_address,
+                                    billing_address: salereturnOrder.billing_address,
+                                    customer_id: salereturnOrder.customer_id,
+                                    gst_type_id: salereturnOrder.gst_type_id,
+                                    payment_term_id: salereturnOrder.payment_term_id,
+                                    payment_link_type_id: salereturnOrder.payment_link_type_id,
+                                    workflow_id: workflow_id,
+                                  },
+                                  sale_order_items: salereturnOrderItems.map(item => ({
+                                    quantity: item.quantity || 1,
+                                    unit_price: item.unit_price || 0,
+                                    rate: item.rate || 0,
+                                    amount: item.amount || 0,
+                                    total_boxes: item.total_boxes,
+                                    discount_percentage: item.discount_percentage || 0,
+                                    discount: item.discount || 0,
+                                    dis_amt: item.dis_amt || 0,
+                                    tax: item.tax || '',
+                                    print_name: item.print_name,
+                                    remarks: item.remarks,
+                                    tax_rate: item.tax_rate || 0,
+                                    unit_options_id: item.unit_options_id || null,
+                                    product_id: item.product_id || null
+                                  })),
+                                  order_attachments: orderAttachments,
+                                  order_shipments: orderShipments
+                                };
+            
+                                // Submit sale order data
+                                this.createSaleOrder(saleorderData).subscribe(
+                                  (response) => {
+                                    console.log('Sale order created successfully', response);
+                                  },
+                                  (error) => {
+                                    console.error('Error creating sale order:', error);
+                                  }
+                                );
+                              } else {
+                                console.error('No workflow_id found in the API response.');
+                              }
+                            } else {
+                              console.error('No workflow data returned from the API.');
+                            }
+                          },
+                          (error) => {
+                            console.error('Error fetching workflow_id:', error);
+                          }
+                        );
+                      }
+                    }
+                  });
+                }
+              }
+            },                       
+            {
               key: 'remarks',
               type: 'textarea',
-              className: 'col-4',
+              className: 'col-6',
               templateOptions: {
                 label: 'Remarks',
                 placeholder: 'Enter Remarks',
@@ -654,7 +723,7 @@ export class SaleReturnsComponent {
             {
               key: 'return_reason',
               type: 'textarea',
-              className: 'col-6',
+              className: 'col-12',
               templateOptions: {
                 label: 'Return Reason',
                 placeholder: 'Enter Return Reason',
