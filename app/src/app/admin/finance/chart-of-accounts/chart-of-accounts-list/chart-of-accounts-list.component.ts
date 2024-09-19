@@ -5,67 +5,57 @@ import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-tasks-list',
+  selector: 'app-chart-of-accounts-list',
   standalone: true,
   imports: [CommonModule, AdminCommmonModule],
-  templateUrl: './tasks-list.component.html',
-  styleUrls: ['./tasks-list.component.scss']
+  templateUrl: './chart-of-accounts-list.component.html',
+  styleUrls: ['./chart-of-accounts-list.component.scss']
 })
-export class TasksListComponent {
+export class ChartOfAccountsListComponent {
 
   @Output('edit') edit = new EventEmitter<void>();
 
   tableConfig: TaTableConfig = {
-    apiUrl: 'tasks/task/',
+    apiUrl: 'finance/chart_of_accounts/',
     showCheckbox:true,
-    pkId: "task_id",
+    pkId: "account_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['task_id']
+      keys: ['account_id']
     },
     cols: [
       {
-        fieldKey: 'title',
-        name: 'Title',
+        fieldKey: 'account_code',
+        name: 'Account Code',
         sort: true
       },
       {
-        fieldKey: 'user_id',
-        name: 'User',
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.user.first_name}`;
-        },
+        fieldKey: 'account_name',
+        name: 'Account Name',
         sort: true
       },
       {
-        fieldKey: 'description',
-        name: 'Description',
+        fieldKey: 'account_type', 
+        name: 'Account Type',
         sort: false
       },
       {
-        fieldKey: 'priority_id',
-        name: 'priority',
+        fieldKey: 'parent_account_id',
+        name: 'Parent Account',
+        sort: true,
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.priority.priority_name}`;
+          return `${row.parent_account.account_name}`;
         },
-        sort: true
       },
       {
-        fieldKey: 'due_date',
-        name: 'Due Date',
-        sort: false,
-        displayType: "date"
-      },
-      {
-        fieldKey: 'status_id',
-        name: 'Statuses',
+        fieldKey: 'bank_account_id',
+        name: 'Bank Account',
+        sort: true,
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.status.status_name}`;
+          return `${row.bank_account.bank_name}`;
         },
-        sort: true
       },
       {
         fieldKey: "code",
@@ -75,7 +65,9 @@ export class TasksListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            apiUrl: 'tasks/task'
+            apiUrl: 'finance/chart_of_accounts',
+            confirm: true,
+            confirmMsg: "Sure to delete?",
           },
           {
             type: 'callBackFn',
@@ -83,13 +75,12 @@ export class TasksListComponent {
             label: '',
             callBackFn: (row, action) => {
               console.log(row);
-              this.edit.emit(row.task_id);
+              this.edit.emit(row.account_id);
             }
           }
         ]
       }
     ]
   };
-
   constructor(private router: Router) {}
 }

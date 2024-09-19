@@ -19,7 +19,6 @@ export class AssetsListComponent {
 
   tableConfig: TaTableConfig = {
     apiUrl: this.baseUrl + 'assets/assets/',
-    // title: 'Edit Tasks List',
     showCheckbox:true,
     pkId: "asset_id",
     pageSize: 10,
@@ -87,8 +86,6 @@ export class AssetsListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            // confirm: true,
-            // confirmMsg: "Sure to delete?",
             apiUrl: this.baseUrl + 'assets/assets'
           },
           {
@@ -98,7 +95,6 @@ export class AssetsListComponent {
             callBackFn: (row, action) => {
               console.log(row);
               this.edit.emit(row.asset_id);
-              // this.router.navigateByUrl('assets/assets/' + row.asset_id);
             }
           }
         ]
