@@ -1,0 +1,37 @@
+<div class="container-fluid pt-3">
+    <div class="Tax Configuration-banner">
+        <div class="col-12 px-0" style="display: flex; justify-content: space-between;align-items: center;">
+            <button (click)="TaxConfigurationEditID = null" type="button" class="btn pl-0" style="color: black;">
+                <span *ngIf="TaxConfigurationEditID" class="custom-heading">Update Tax Configuration</span>
+                <span *ngIf="!TaxConfigurationEditID" class="custom-heading">Create Tax Configuration</span>
+            </button>
+            <button (click)="showTaxConfigurationListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#TaxConfigurationListModal">
+                Tax Configuration List
+            </button>
+        </div>
+    </div>
+    <div class="row  custom-form">
+        <div class="col-12 px-1" *ngIf="showForm">   <!--removed show form -->
+            <ta-form [options]="formConfig"></ta-form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade custom-modal" id="TaxConfigurationListModal" tabindex="-1" aria-labelledby="TaxConfigurationListModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="TaxConfigurationListModalLabel">Edit TaxConfiguration List</h5>
+                <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" *ngIf="showTaxConfigurationList">
+                <app-tax-configuration-list (edit)="editTaxConfiguration($event)" class="custom-list"></app-tax-configuration-list>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+            </div>
+        </div>
+    </div>
+</div>

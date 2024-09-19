@@ -1,0 +1,69 @@
+import { Component, EventEmitter, Output } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { TaTableConfig } from '@ta/ta-table';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-financial-report-list',
+  standalone: true,
+  imports: [CommonModule, AdminCommmonModule],
+  templateUrl: './financial-report-list.component.html',
+  styleUrls: ['./financial-report-list.component.scss']
+})
+export class FinancialReportListComponent {
+
+  @Output('edit') edit = new EventEmitter<void>();
+
+  tableConfig: TaTableConfig = {
+    apiUrl: 'finance/financial_reports/',
+    // title: 'Edit Tasks List',
+    showCheckbox:true,
+    pkId: "report_id",
+    pageSize: 10,
+    "globalSearch": {
+      keys: ['report_id']
+    },
+    cols: [
+      {
+        fieldKey: 'report_name',
+        name: 'Account Code',
+        sort: true
+      },
+      {
+        fieldKey: 'report_type',
+        name: 'Report Type',
+        sort: true
+      },
+      {
+        fieldKey: 'generated_at', 
+        name: 'Generated At',
+        sort: false
+      },         
+      {
+        fieldKey: "code",
+        name: "Action",
+        type: 'action',
+        actions: [
+          {
+            type: 'delete',
+            label: 'Delete',
+            // confirm: true,
+            // confirmMsg: "Sure to delete?",
+            apiUrl: 'finance/financial_reports'
+          },
+          {
+            type: 'callBackFn',
+            icon: 'fa fa-pen',
+            label: '',
+            callBackFn: (row, action) => {
+              console.log(row);
+              this.edit.emit(row.report_id);
+            }
+          }
+        ]
+      }
+    ]
+  };
+  constructor(private router: Router) {}
+}

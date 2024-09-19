@@ -1,0 +1,36 @@
+<div class="container-fluid pt-3">
+    <div class="bank-account-banner">
+        <div class="col-12 px-0" style="display: flex; justify-content: space-between;align-items: center;">
+            <button (click)="ChartOfAccountsEditID = null" type="button" class="btn pl-0" style="color: black;">
+                <span *ngIf="ChartOfAccountsEditID" class="custom-heading">Update Chart Of Accounts</span>
+                <span *ngIf="!ChartOfAccountsEditID" class="custom-heading">Create Chart Of Accounts</span>
+            </button>
+            <button (click)="showChartOfAccountsListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                Chart Of Accounts List
+            </button>
+        </div>
+    </div>
+    <div class="row  custom-form">
+        <div class="col-12 px-1" *ngIf="showForm">   <!--removed show form -->
+            <ta-form [options]="formConfig"></ta-form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade custom-modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit Chart Of Accounts List</h5>
+                <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" *ngIf="showChartOfAccountsList">
+                <app-chart-of-accounts-list (edit)="editChartOfAccounts($event)" class="custom-list"></app-chart-of-accounts-list>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+            </div>
+        </div>
+    </div>
+</div>
