@@ -17,7 +17,6 @@ export class BudgetListComponent {
 
   tableConfig: TaTableConfig = {
     apiUrl: 'finance/budgets/',
-    // title: 'Edit Tasks List',
     showCheckbox:true,
     pkId: "budget_id",
     pageSize: 10,
@@ -57,8 +56,6 @@ export class BudgetListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            // confirm: true,
-            // confirmMsg: "Sure to delete?",
             apiUrl: 'finance/budgets'
           },
           {
@@ -68,7 +65,6 @@ export class BudgetListComponent {
             callBackFn: (row, action) => {
               console.log(row);
               this.edit.emit(row.budget_id);
-              // this.router.navigateByUrl('inventory/warehouses/' + row.warehouse_id);
             }
           }
         ]

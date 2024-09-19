@@ -15,7 +15,6 @@ export class TaxConfigurationListComponent {
   @Output('edit') edit = new EventEmitter<void>();
   tableConfig: TaTableConfig = {
     apiUrl: 'finance/tax_configurations/',
-    // title: 'Edit Tasks List',
     showCheckbox:true,
     pkId: "tax_id",
     pageSize: 10,
@@ -51,8 +50,6 @@ export class TaxConfigurationListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            // confirm: true,
-            // confirmMsg: "Sure to delete?",
             apiUrl: 'finance/tax_configurations'
           },
           {

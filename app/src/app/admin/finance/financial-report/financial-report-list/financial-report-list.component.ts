@@ -17,7 +17,6 @@ export class FinancialReportListComponent {
 
   tableConfig: TaTableConfig = {
     apiUrl: 'finance/financial_reports/',
-    // title: 'Edit Tasks List',
     showCheckbox:true,
     pkId: "report_id",
     pageSize: 10,
@@ -48,8 +47,6 @@ export class FinancialReportListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            // confirm: true,
-            // confirmMsg: "Sure to delete?",
             apiUrl: 'finance/financial_reports'
           },
           {

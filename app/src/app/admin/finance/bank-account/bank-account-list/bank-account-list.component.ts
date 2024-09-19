@@ -18,7 +18,6 @@ export class BankAccountListComponent {
 
   tableConfig: TaTableConfig = {
     apiUrl: 'finance/bank_accounts/',
-    // title: 'Edit Tasks List',
     showCheckbox:true,
     pkId: "bank_account_id",
     pageSize: 10,
@@ -59,8 +58,6 @@ export class BankAccountListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            // confirm: true,
-            // confirmMsg: "Sure to delete?",
             apiUrl: 'finance/bank_accounts'
           },
           {
@@ -70,7 +67,6 @@ export class BankAccountListComponent {
             callBackFn: (row, action) => {
               console.log(row);
               this.edit.emit(row.bank_account_id);
-              // this.router.navigateByUrl('inventory/warehouses/' + row.warehouse_id);
             }
           }
         ]

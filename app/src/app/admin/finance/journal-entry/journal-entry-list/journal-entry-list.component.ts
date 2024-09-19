@@ -17,7 +17,6 @@ export class JournalEntryListComponent {
 
   tableConfig: TaTableConfig = {
     apiUrl: 'finance/journal_entries/',
-    // title: 'Edit Tasks List',
     showCheckbox:true,
     pkId: "journal_entry_id",
     pageSize: 10,
@@ -48,8 +47,6 @@ export class JournalEntryListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            // confirm: true,
-            // confirmMsg: "Sure to delete?",
             apiUrl: 'finance/journal_entries'
           },
           {

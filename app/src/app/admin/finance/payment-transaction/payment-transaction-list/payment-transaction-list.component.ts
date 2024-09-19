@@ -17,7 +17,6 @@ export class PaymentTransactionListComponent {
 
   tableConfig: TaTableConfig = {
     apiUrl: 'finance/payment_transactions/',
-    // title: 'Edit Tasks List',
     showCheckbox:true,
     pkId: "payment_id",
     pageSize: 10,
@@ -83,8 +82,6 @@ export class PaymentTransactionListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            // confirm: true,
-            // confirmMsg: "Sure to delete?",
             apiUrl: 'finance/payment_transactions'
           },
           {

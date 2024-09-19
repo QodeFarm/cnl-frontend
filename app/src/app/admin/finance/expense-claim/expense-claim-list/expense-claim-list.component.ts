@@ -17,7 +17,6 @@ export class ExpenseClaimListComponent {
 
   tableConfig: TaTableConfig = {
     apiUrl: 'finance/expense_claims/',
-    // title: 'Edit Tasks List',
     showCheckbox:true,
     pkId: "expense_claim_id",
     pageSize: 10,
@@ -62,8 +61,6 @@ export class ExpenseClaimListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            // confirm: true,
-            // confirmMsg: "Sure to delete?",
             apiUrl: 'finance/expense_claims'
           },
           {
@@ -73,7 +70,6 @@ export class ExpenseClaimListComponent {
             callBackFn: (row, action) => {
               console.log(row);
               this.edit.emit(row.expense_claim_id);
-              // this.router.navigateByUrl('inventory/warehouses/' + row.warehouse_id);
             }
           }
         ]

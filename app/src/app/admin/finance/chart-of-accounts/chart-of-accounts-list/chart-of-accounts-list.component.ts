@@ -17,7 +17,6 @@ export class ChartOfAccountsListComponent {
 
   tableConfig: TaTableConfig = {
     apiUrl: 'finance/chart_of_accounts/',
-    // title: 'Edit Tasks List',
     showCheckbox:true,
     pkId: "account_id",
     pageSize: 10,
@@ -66,8 +65,6 @@ export class ChartOfAccountsListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            // confirm: true,
-            // confirmMsg: "Sure to delete?",
             apiUrl: 'finance/chart_of_accounts'
           },
           {
@@ -77,7 +74,6 @@ export class ChartOfAccountsListComponent {
             callBackFn: (row, action) => {
               console.log(row);
               this.edit.emit(row.account_id);
-              // this.router.navigateByUrl('inventory/warehouses/' + row.warehouse_id);
             }
           }
         ]

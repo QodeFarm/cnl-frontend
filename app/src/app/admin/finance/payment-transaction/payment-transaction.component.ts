@@ -42,11 +42,6 @@ export class PaymentTransactionComponent {
           label: invoice.invoice_no
         }));
   
-        console.log("Updated invoiceOptions: ", this.invoiceOptions);
-  
-        // Ensure formConfig is defined and fields are set
-        console.log("FormConfig Fields: ", this.formConfig.fields);
-  
         // Trigger change detection to refresh the dropdown
         invoiceField.templateOptions.options = this.invoiceOptions;
         this.cd.detectChanges();
