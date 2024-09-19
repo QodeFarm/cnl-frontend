@@ -47,7 +47,9 @@ export class JournalEntryListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            apiUrl: 'finance/journal_entries'
+            apiUrl: 'finance/journal_entries',
+            confirm: true,
+            confirmMsg: "Sure to delete?",
           },
           {
             type: 'callBackFn',

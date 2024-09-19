@@ -50,7 +50,9 @@ export class TaxConfigurationListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            apiUrl: 'finance/tax_configurations'
+            apiUrl: 'finance/tax_configurations',
+            confirm: true,
+            confirmMsg: "Sure to delete?",
           },
           {
             type: 'callBackFn',

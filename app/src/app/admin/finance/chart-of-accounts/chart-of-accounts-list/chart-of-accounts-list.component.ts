@@ -65,7 +65,9 @@ export class ChartOfAccountsListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            apiUrl: 'finance/chart_of_accounts'
+            apiUrl: 'finance/chart_of_accounts',
+            confirm: true,
+            confirmMsg: "Sure to delete?",
           },
           {
             type: 'callBackFn',

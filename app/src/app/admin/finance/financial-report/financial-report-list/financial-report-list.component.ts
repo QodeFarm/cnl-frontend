@@ -47,7 +47,9 @@ export class FinancialReportListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            apiUrl: 'finance/financial_reports'
+            apiUrl: 'finance/financial_reports',
+            confirm: true,
+            confirmMsg: "Sure to delete?",
           },
           {
             type: 'callBackFn',

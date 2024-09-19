@@ -94,8 +94,8 @@ export class LeadsListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            // confirm: true,
-            // confirmMsg: "Sure to delete?",
+            confirm: true,
+            confirmMsg: "Sure to delete?",
             apiUrl: 'leads/leads'
           },
           {

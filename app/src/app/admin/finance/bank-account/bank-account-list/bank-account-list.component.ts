@@ -58,7 +58,9 @@ export class BankAccountListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            apiUrl: 'finance/bank_accounts'
+            apiUrl: 'finance/bank_accounts',
+            confirm: true,
+            confirmMsg: "Sure to delete?",
           },
           {
             type: 'callBackFn',

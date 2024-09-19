@@ -82,7 +82,9 @@ export class PaymentTransactionListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            apiUrl: 'finance/payment_transactions'
+            apiUrl: 'finance/payment_transactions',
+            confirm: true,
+            confirmMsg: "Sure to delete?",
           },
           {
             type: 'callBackFn',

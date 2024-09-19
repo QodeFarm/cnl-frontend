@@ -56,7 +56,9 @@ export class BudgetListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            apiUrl: 'finance/budgets'
+            apiUrl: 'finance/budgets',
+            confirm: true,
+            confirmMsg: "Sure to delete?",
           },
           {
             type: 'callBackFn',

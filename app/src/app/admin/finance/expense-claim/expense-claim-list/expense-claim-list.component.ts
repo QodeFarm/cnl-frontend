@@ -61,7 +61,9 @@ export class ExpenseClaimListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            apiUrl: 'finance/expense_claims'
+            apiUrl: 'finance/expense_claims',
+            confirm: true,
+            confirmMsg: "Sure to delete?",
           },
           {
             type: 'callBackFn',
