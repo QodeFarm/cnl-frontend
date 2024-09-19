@@ -17,7 +17,19 @@ export class PaymentTransactionComponent {
   constructor(private http: HttpClient, private cd: ChangeDetectorRef) {}
 
   loadInvoices(order_type: string) {
-    this.http.get<any>(`finance/invoices/?order_type=${order_type}`).subscribe(response => {
+    // Determine the URL based on the order_type
+    let url = '';
+    if (order_type === 'Sale') {
+      url = 'sales/sale_invoice_order_get/';
+    } else if (order_type === 'Purchase') {
+      url = 'purchase/purchase_invoice_orders_get/';
+    } else {
+      console.error('Invalid order_type provided');
+      return;
+    }
+  
+    // Make the HTTP request to the determined URL
+    this.http.get<any>(url).subscribe(response => {
       // Access the 'data' array from the response
       const invoices = response.data;
   
@@ -29,21 +41,20 @@ export class PaymentTransactionComponent {
           value: invoice.invoice_no,
           label: invoice.invoice_no
         }));
-
+  
         console.log("Updated invoiceOptions: ", this.invoiceOptions);
   
         // Ensure formConfig is defined and fields are set
         console.log("FormConfig Fields: ", this.formConfig.fields);
-    
+  
         // Trigger change detection to refresh the dropdown
         invoiceField.templateOptions.options = this.invoiceOptions;
         this.cd.detectChanges();
-
       }
     }, error => {
       console.log('Error fetching invoices:', error);
     });
-  }
+  };
 
   ngOnInit() {
     this.showPaymentTransactionList = false;
