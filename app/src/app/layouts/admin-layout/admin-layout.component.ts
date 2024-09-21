@@ -179,9 +179,42 @@ export class AdminLayoutComponent {
         ]
       },
       {
-        link: '/admin/finance',
         label: 'Finance',
         icon: 'icon icon-finance',
+        child: [
+          {
+            link: '/admin/finance/bank-account',
+            label: 'Bank Account',
+          },
+          {
+            link: '/admin/finance/chart-of-accounts',
+            label: 'Chart Of Accounts',
+          },
+          {
+            link: '/admin/finance/journal-entry',
+            label: 'Journal Entry',
+          },
+          {
+            link: '/admin/finance/payment-transaction',
+            label: 'Payment Transaction',
+          },
+          {
+            link: '/admin/finance/tax-configurationt',
+            label: 'Tax Configuration',
+          },
+          {
+            link: '/admin/finance/budget',
+            label: 'Budget',
+          },
+          {
+            link: '/admin/finance/expense-claim',
+            label: 'Expense Claim',
+          },
+          {
+            link: '/admin/finance/financial-report',
+            label: 'Financial Report',
+          },
+        ]
       },
       {
         label: 'Production',

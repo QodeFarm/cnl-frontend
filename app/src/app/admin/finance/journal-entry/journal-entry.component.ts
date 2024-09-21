@@ -1,0 +1,204 @@
+import { HttpClient } from '@angular/common/http';
+import { Component } from '@angular/core';
+import { TaFormConfig } from '@ta/ta-form';
+
+@Component({
+  selector: 'app-journal-entry',
+  templateUrl: './journal-entry.component.html',
+  styleUrls: ['./journal-entry.component.scss']
+})
+export class JournalEntryComponent {
+  showJournalEntryList: boolean = false;
+  showForm: boolean = false;
+  JournalEntryEditID: any;
+
+  constructor(private http: HttpClient) {};
+
+  ngOnInit() {
+    this.showJournalEntryList = false;
+    this.showForm = false;
+    this.JournalEntryEditID = null;
+    // set form config
+    this.setFormConfig();
+  }
+
+  formConfig: TaFormConfig = {};
+
+  hide() {
+    document.getElementById('modalClose').click();
+  }
+
+  editJournalEntry(event) {
+    this.JournalEntryEditID = event;
+    this.http.get('finance/journal_entries/' + event).subscribe((res: any) => {
+      if (res && res.data) {
+        this.formConfig.model = res.data;
+        this.formConfig.showActionBtn = true;
+        this.formConfig.pkId = 'journal_entry_id';
+        // set labels for update
+        this.formConfig.submit.label = 'Update';
+        this.formConfig.model['journal_entry_id'] = this.JournalEntryEditID;
+        this.showForm = true;
+      }
+    })
+    this.hide();
+  };
+
+
+  showJournalEntryListFn() {
+    this.showJournalEntryList = true;
+  };
+
+  setFormConfig() {
+    this.JournalEntryEditID =null
+    this.formConfig = {
+      url: "finance/journal_entries/",
+      // title: 'leads',
+      formState: {
+        viewMode: false,
+        // isEdit: false,
+      },
+      showActionBtn: true,
+      exParams: [],
+      submit: {
+        label: 'Submit',
+        submittedFn: () => this.ngOnInit()
+      },
+      reset: {
+        resetFn: () => {
+          this.ngOnInit();
+        }
+      },
+      model: {
+        journal_entry: {},
+        journal_entry_lines: [{}],
+      },
+      fields: [
+        //-----------------------------------------journal_entry-----------------------------------//
+        {
+          fieldGroupClassName: "ant-row custom-form-block",
+          key: 'journal_entry',
+          fieldGroup: [{
+              key: 'entry_date',
+              type: 'date',
+              className: 'col-3',
+              templateOptions: {
+                label: 'Entry Date',
+                placeholder: 'Select date',
+                required: true,
+                // disabled: true
+              },
+              hooks: {
+                onInit: (field: any) => {}
+              },
+            },
+            {
+              key: 'reference',
+              type: 'input',
+              className: 'col-3',
+              templateOptions: {
+                type: 'input',
+                label: 'Reference',
+                placeholder: 'Enter Reference',
+                required: false
+              },
+              hooks: {
+                onInit: (field: any) => {}
+              }
+            },
+            {
+              key: 'description',
+              type: 'textarea',
+              className: 'col-3',
+              templateOptions: {
+                label: 'Description',
+                placeholder: 'Enter Description',
+                required: false,
+              }
+            }
+          ]
+        },
+        //----------------------------------------- journal_entry_lines  -----------------------------------//
+        {
+          key: 'journal_entry_lines',
+          type: 'table',
+          className: 'custom-form-list',
+          templateOptions: {
+            title: 'Journal Entry Lines',
+            addText: 'Add Journal Entry Line',
+            tableCols: [
+              { name: 'debit', label: 'Debit' },
+              { name: 'credit', label: 'Credit' },
+              { name: 'description', label: 'Description' },
+              { name: 'account_id', label: 'Account' }
+            ]
+          },
+          fieldArray: {
+            fieldGroup: [
+              {
+                key: 'debit',
+                type: 'input',
+                templateOptions: {
+                  label: 'Debit',
+                  placeholder: 'Enter Debit',
+                  hideLabel: true,
+                  required: false
+                }
+              },
+              {
+                key: 'credit',
+                type: 'input',
+                templateOptions: {
+                  label: 'Credit',
+                  placeholder: 'Enter Credit',
+                  hideLabel: true,
+                  required: false
+                }
+              },
+              {
+                key: 'description',
+                type: 'text',
+                templateOptions: {
+                  label: 'Description',
+                  placeholder: 'Enter Description',
+                  hideLabel: true,
+                  required: false
+                }
+              },
+              {
+                key: 'account',
+                type: 'select',
+                templateOptions: {
+                  label: 'Account',
+                  dataKey: 'account_id',
+                  dataLabel: 'account_name',
+                  options: [],
+                  hideLabel: true,
+                  required: false,
+                  lazy: {
+                    url: 'finance/chart_of_accounts/',
+                    lazyOneTime: true
+                  },
+                },
+                hooks: {
+                  onChanges: (field: any) => {
+                    field.formControl.valueChanges.subscribe((data: any) => {
+                      console.log('user', data);
+                      const index = field.parent.key;
+                      if (!this.formConfig.model['journal_entry_lines'][index]) {
+                        console.error(`account_id at index ${index} is not defined. Initializing...`);
+                        this.formConfig.model['journal_entry_lines'][index] = {};
+                      }
+
+                      this.formConfig.model['journal_entry_lines'][index]['account_id'] = data.account_id;
+                    });
+                  }
+                }
+              },
+            ]
+          }
+        }
+     ]
+    }
+  }
+}

@@ -1,0 +1,35 @@
+<div class="container-fluid pt-3">
+    <div class="bank-account-banner">
+        <div class="col-12 px-0" style="display: flex; justify-content: space-between;align-items: center;">
+            <button (click)="ExpenseClaimEditID = null" type="button" class="btn pl-0" style="color: black;">
+            <span *ngIf="ExpenseClaimEditID" class="custom-heading">Update Expense Claim</span>
+            <span *ngIf="!ExpenseClaimEditID" class="custom-heading">Create Expense Claim</span>
+            </button>
+            <button (click)="showExpenseClaimListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            Expense Claim List
+            </button>
+        </div>
+    </div>
+    <div class="row  custom-form">
+        <div class="col-12 px-1" *ngIf="showForm">
+            <ta-form [options]="formConfig"></ta-form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade custom-modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+   <div class="modal-dialog modal-xl ">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Edit Expense Claim List</h5>
+            <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+         </div>
+         <div class="modal-body" *ngIf="showExpenseClaimList">
+            <app-expense-claim-list (edit)="editExpenseClaim($event)" class="custom-list"></app-expense-claim-list>
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+         </div>
+      </div>
+   </div>
+</div>

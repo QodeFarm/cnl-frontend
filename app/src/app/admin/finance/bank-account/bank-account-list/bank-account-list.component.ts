@@ -5,49 +5,49 @@ import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-asset-maintenance-list',
+  selector: 'app-bank-account-list',
   standalone: true,
   imports: [CommonModule, AdminCommmonModule],
-  templateUrl: './asset-maintenance-list.component.html',
-  styleUrls: ['./asset-maintenance-list.component.scss']
+  templateUrl: './bank-account-list.component.html',
+  styleUrls: ['./bank-account-list.component.scss'],
+
 })
-export class AssetMaintenanceListComponent {
-  
-  baseUrl: string = 'http://195.35.20.172:8000/api/v1/';
+export class BankAccountListComponent {
 
   @Output('edit') edit = new EventEmitter<void>();
 
   tableConfig: TaTableConfig = {
-    apiUrl: this.baseUrl + 'assets/asset_maintenance/',
+    apiUrl: 'finance/bank_accounts/',
     showCheckbox:true,
-    pkId: "asset_maintenance_id",
+    pkId: "bank_account_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['asset_maintenance_id']
+      keys: ['bank_account_id']
     },
     cols: [
       {
-        fieldKey: 'asset_id',
-        name: 'Asset',
-        sort: true,
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.asset.name}`;
-        },
+        fieldKey: 'account_name',
+        name: 'Account Name',
+        sort: true
       },
       {
-        fieldKey: 'cost', 
-        name: 'Cost',
+        fieldKey: 'account_number',
+        name: 'Account Number',
+        sort: true
+      },
+      {
+        fieldKey: 'bank_name', 
+        name: 'Bank Name',
         sort: false
       },
       {
-        fieldKey: 'maintenance_date',
-        name: 'Maintenance Date',
+        fieldKey: 'branch_name', 
+        name: 'Branch Name',
         sort: false
       },
       {
-        fieldKey: 'maintenance_description',
-        name: 'Maintenance Description',
+        fieldKey: 'account_type', 
+        name: 'Account Type',
         sort: false
       },
       {
@@ -58,7 +58,9 @@ export class AssetMaintenanceListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            apiUrl: this.baseUrl + 'assets/asset_maintenance'
+            apiUrl: 'finance/bank_accounts',
+            confirm: true,
+            confirmMsg: "Sure to delete?",
           },
           {
             type: 'callBackFn',
@@ -66,13 +68,13 @@ export class AssetMaintenanceListComponent {
             label: '',
             callBackFn: (row, action) => {
               console.log(row);
-              this.edit.emit(row.asset_maintenance_id);
+              this.edit.emit(row.bank_account_id);
             }
           }
         ]
       }
     ]
   };
-
   constructor(private router: Router) {}
 }
+

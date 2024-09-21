@@ -16,7 +16,6 @@ export class WarehousesListComponent {
 
   tableConfig: TaTableConfig = {
     apiUrl: 'inventory/warehouses/',
-    // title: 'Edit Tasks List',
     showCheckbox:true,
     pkId: "warehouse_id",
     pageSize: 10,
@@ -65,8 +64,6 @@ export class WarehousesListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            // confirm: true,
-            // confirmMsg: "Sure to delete?",
             apiUrl: 'inventory/warehouses'
           },
           {
@@ -76,7 +73,6 @@ export class WarehousesListComponent {
             callBackFn: (row, action) => {
               console.log(row);
               this.edit.emit(row.warehouse_id);
-              // this.router.navigateByUrl('inventory/warehouses/' + row.warehouse_id);
             }
           }
         ]
