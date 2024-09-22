@@ -5,7 +5,7 @@ import { LocalStorageService } from '@ta/ta-core';
 import { AdminCommonService } from 'src/app/services/admin-common.service';
 import { HttpClient } from '@angular/common/http';
 import { filter, map, mergeMap } from 'rxjs/operators';
-
+import { NzTabsModule } from 'ng-zorro-antd/tabs';
 interface SpeechRecognitionResult {
   transcript: string; // Holds the recognized speech as text
 }
@@ -38,7 +38,7 @@ export interface Tab {
   templateUrl: './admin-layout.component.html',
   styleUrls: ['./admin-layout.component.scss'],
   standalone: true,
-  imports: [CommonModule, RouterModule]
+  imports: [CommonModule, RouterModule, NzTabsModule]
 })
 export class AdminLayoutComponent {
   menulList = <any>[];
@@ -65,6 +65,7 @@ export class AdminLayoutComponent {
         return { data: route.snapshot.data, component: route.component };  // Get the route's data (like title)
       })
     ).subscribe(route => {
+      debugger;
       this.checkAndAddRouteTab({ name: route.data.title, component: route.component, key: route.data.moduleName, url: this.router.url, active: true });
       console.log('data', route.data.title, this.router.url);
     });
@@ -227,7 +228,7 @@ export class AdminLayoutComponent {
           {
             link: '/admin/production/machines',
             label: 'Machines',
-          },         
+          },
           {
             link: '/admin/production/productionstatuses',
             label: 'Production Statuses',
@@ -677,6 +678,7 @@ export class AdminLayoutComponent {
     });
     console.log('Form Data:', formData);
   }
+  selectedTabIndex = 0;
   // tabs based on routing
   disposeTab(tab: Tab) {
     if (this.tabs.length > 1) {
@@ -688,6 +690,11 @@ export class AdminLayoutComponent {
         this.router.navigateByUrl(this.tabs[this.tabs.length - 1].url);
       }
     }
+  }
+  removeTab(index) {
+    debugger;
+    this.tabs.splice(index.index, 1);
+    this.router.navigateByUrl(this.tabs[this.tabs.length - 1].url);
   }
 
   mouseOverTab(tab: Tab) {
@@ -712,13 +719,14 @@ export class AdminLayoutComponent {
       if (!tab.name) { tab.name = 'Untitle-' + this.tabs.length + 1 }
 
       this.tabs.push(tab);
-
+      this.selectedTabIndex = this.tabs.length;
     } else {
       // if the tab exists, activate it
       const tabToActivate = this.tabs.find(t => t.key == tab.key);
       if (tabToActivate) {
         tabToActivate.active = true;
       }
+      this.selectedTabIndex = this.tabs.findIndex(t => t.key == tab.key);
     }
 
     this.cd.markForCheck();

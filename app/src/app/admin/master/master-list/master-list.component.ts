@@ -14,13 +14,12 @@ import { TasksModule } from '../../tasks/tasks.module';
 import { AssetsModule } from '../../assets/assets.module';
 import { LeadsModule } from '../../leads/leads.module';
 import { OrdersModule } from '../../orders/orders.module';
-import { MasterModule } from '../master.module';
 
 
 @Component({
   selector: 'app-master-list',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, ProductsModule, CustomersModule, VendorsModule, EmployeeModule, TasksModule, AssetsModule, LeadsModule, MasterModule, OrdersModule],
+  imports: [CommonModule, AdminCommmonModule, ProductsModule, CustomersModule, VendorsModule, EmployeeModule, TasksModule, AssetsModule, LeadsModule, OrdersModule],
   templateUrl: './master-list.component.html',
   styleUrls: ['./master-list.component.scss']
 })
@@ -32,12 +31,22 @@ export class MasterListComponent {
       .pipe(
         filter((event: Event): event is NavigationEnd => event instanceof NavigationEnd)
       ).subscribe((event: NavigationEnd) => {
-        this.code = this.activeRoute.snapshot.params.code;
+        debugger;
+        this.code = this.getCode();
         // this.acs.setAction('clickMic', {});
       });
   }
   ngOnInit(): void {
-    this.code = this.activeRoute.snapshot.params.code;
+    if (this.router.url) {
+      this.code = this.getCode();
+    }
+    //this.code = this.activeRoute.snapshot.params.code;
+  }
+  getCode() {
+    const url = this.router.url;
+    const parts = url.split('/');
+    const lastPart = parts[parts.length - 1];
+    return lastPart;
   }
 
 
