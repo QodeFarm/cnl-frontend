@@ -35,6 +35,7 @@ const routes: Routes = [
         data: { title: 'Sales Returns', moduleName: "sales-return" },
         loadComponent: () => import('./admin/sales/sale-returns/sale-returns.component').then(m => m.SaleReturnsComponent)
       },
+
       {
         path: 'sales/salesinvoice',
         data: { title: 'Sales Invoice', moduleName: "sales-invoice" },
@@ -45,12 +46,14 @@ const routes: Routes = [
         data: { title: 'Sale Dispatch', moduleName: "sales-dispatch" },
         loadComponent: () => import('./admin/sales/sales-dispatch/sales-dispatch.component').then(m => m.SalesDispatchComponent)
       },
+
       { path: 'sale-receipt', data: { title: 'SaleReceipt', moduleName: 'sale-receipt' }, canActivate: [], loadComponent: () => import('./admin/sales/sale-receipt/sale-receipt.component').then(m => m.SaleReceiptComponent) },
 
 
       { path: 'customers', data: { title: 'Customers', moduleName: 'customers' }, canActivate: [], loadComponent: () => import('./admin/customers/customers.component').then(m => m.CustomersComponent) },
 
       // { path: 'employee', canActivate: [], loadChildren: () => import('./admin/employee/employee.module').then(m => m.EmployeeModule) },
+
       { path: 'master', data: { title: 'Master', moduleName: 'master' }, pathMatch: 'full', redirectTo: 'master/master' },
       { path: 'master/:code', data: { title: 'Master', moduleName: 'master' }, canActivate: [], loadComponent: () => import('./admin/master/master-list/master-list.component').then(m => m.MasterListComponent) },
       { path: 'company', data: { title: 'Company', moduleName: 'company' }, canActivate: [], loadChildren: () => import('./admin/company/company.module').then(m => m.CompanyModule) },
