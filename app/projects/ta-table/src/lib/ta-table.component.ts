@@ -82,28 +82,28 @@ export class TaTableComponent implements OnDestroy {
   onEmailPdf() {
     console.log('Email PDF clicked');
     this.sendPdf('email');
-    // You can add logic for what happens when "Email PDF" is clicked here
-  }
+   }
 
   onWhatsAppPdf() {
     console.log('WhatsApp PDF clicked');
     this.sendPdf('whatsapp');
-    // You can add logic for what happens when "WhatsApp PDF" is clicked here
   }
 
-  sendPdf(destination: string) {
+  sendPdf(flag: string) {
     const pdfData = {
-      filters: this.getFilterData(),
-      // Include any other data that needs to be passed with the PDF request
+      flag: flag // Include the flag in the data sent to the server
     };
-    console.log("======>", this.filters)
-    const url = `http://127.0.0.1:8000/api/v1/sales/sale_order_pdf/${destination}`; // Replace with your actual API endpoint
-    this.http.post(url, pdfData).subscribe(
+    const url = `http://127.0.0.1:8000/api/v1/masters/document_generator/8a209411-9aa5-46c4-9b07-26bc691d913c/purchase_order/`; // Replace with your actual API endpoint
+    this.http.post(url, pdfData,{ observe: 'response' }).subscribe(
       (response: any) => {
-        console.log(`PDF sent to ${destination}:`, response);
+        console.log("response.status" ,response.status)
+        if (response.status === 200) { // Check for success response code
+          window.alert("Email sent successfully!"); // Notify the user
+        }
+        console.log(response);
       },
       (error: any) => {
-        console.error(`Error sending PDF to ${destination}:`, error);
+        console.error(error);
       }
     );
   }
