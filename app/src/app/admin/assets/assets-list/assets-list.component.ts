@@ -34,7 +34,7 @@ export class AssetsListComponent {
       {
           fieldKey: 'price', 
           name: 'Price',
-          sort: false
+          sort: true
       },
       {
         fieldKey: 'asset_category_id',
@@ -57,7 +57,7 @@ export class AssetsListComponent {
       {
         fieldKey: 'purchase_date', 
         name: 'Purchase Date',
-        sort: false,
+        sort: true,
         displayType: "date"
       },
       {

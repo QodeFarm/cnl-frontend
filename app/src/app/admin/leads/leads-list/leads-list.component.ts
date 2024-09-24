@@ -74,7 +74,7 @@ export class LeadsListComponent {
           const [date, time] = interactionDate.split('T');
           return `${date}<br>${time}`;
         },
-        sort: true
+        sort: false
       },
       {
         fieldKey: 'notes',
@@ -84,7 +84,7 @@ export class LeadsListComponent {
           console.log("row",row)
           return `${row.interaction[0].notes}`;
         },
-        sort: true
+        sort: false
       },
       {
         fieldKey: "code",

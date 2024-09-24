@@ -36,7 +36,7 @@ export class WarehousesListComponent {
       {
         fieldKey: 'phone', 
         name: 'Phone',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'city_id',

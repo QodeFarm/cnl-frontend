@@ -55,7 +55,7 @@ export class VendorsListComponent {
       {
         fieldKey: 'vendor_category_id',
         name: 'Vendor Category',
-        sort: false,
+        sort: true,
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
           return row.vendor_category.name;
@@ -64,7 +64,7 @@ export class VendorsListComponent {
       {
         fieldKey: 'ledger_account',
         name: 'Ledger Account',
-        sort: false,
+        sort: true,
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
           return row.ledger_account.name;
@@ -82,7 +82,7 @@ export class VendorsListComponent {
       {
         fieldKey: 'created_at',
         name: 'Created At',
-        sort: false,
+        sort: true,
         displayType: "date"
       },
       {

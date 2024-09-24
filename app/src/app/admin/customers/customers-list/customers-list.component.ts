@@ -50,7 +50,7 @@ export class CustomersListComponent {
       {
         fieldKey: 'gst',
         name: 'GST',
-        sort: false,
+        sort: true,
       },
       {
         fieldKey: 'city_id',
@@ -64,7 +64,7 @@ export class CustomersListComponent {
       {
         fieldKey: 'ledger_account_id',
         name: 'Ledger Account',
-        sort: false,
+        sort: true,
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
           return row.ledger_account.name;
@@ -73,7 +73,7 @@ export class CustomersListComponent {
       {
         fieldKey: 'created_at',
         name: 'Created At',
-        sort: false,
+        sort: true,
         displayType: "date"
       },      
       {

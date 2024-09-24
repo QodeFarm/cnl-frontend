@@ -22,7 +22,7 @@ export class SaleReceiptListComponent {
     pkId: "sale_receipt_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['sale_receipt_id']
+      keys: ['sale_invoice_id','sale_invoice','receipt_name','description']
     },
     cols: [
       {
@@ -35,7 +35,7 @@ export class SaleReceiptListComponent {
         sort: true
       },
       {
-        fieldKey: 'sale_invoice_id',
+        fieldKey: 'sale_invoice',
         name: 'Sale invoice',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
@@ -46,12 +46,12 @@ export class SaleReceiptListComponent {
       {
         fieldKey: 'receipt_name',
         name: 'Receipt name',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'description',
         name: 'Description',
-        sort: false
+        sort: true
       },
       {
         fieldKey: "code",

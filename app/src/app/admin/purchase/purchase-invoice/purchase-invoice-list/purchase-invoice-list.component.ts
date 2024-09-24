@@ -62,27 +62,27 @@ export class PurchaseInvoiceListComponent {
       {
         fieldKey: 'supplier_invoice_no',
         name: 'Supplier invoice no',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'tax',
         name: 'Tax',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'total_amount',
         name: 'Total amount',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'tax_amount',
         name: 'Tax amount',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'advance_amount',
         name: 'Advance Amount',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'status_name',
@@ -96,7 +96,7 @@ export class PurchaseInvoiceListComponent {
       {
         fieldKey: 'remarks',
         name: 'Remarks',
-        sort: false
+        sort: true
       },
       {
         fieldKey: "code",

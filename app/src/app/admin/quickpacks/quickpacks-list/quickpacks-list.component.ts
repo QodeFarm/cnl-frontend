@@ -37,7 +37,7 @@ export class QuickpacksListComponent {
       {
         fieldKey: 'description',
         name: 'Description',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'active',

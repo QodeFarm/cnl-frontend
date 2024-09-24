@@ -27,11 +27,11 @@ tableConfig: TaTableConfig = {
   ],
   pageSize: 10,
   "globalSearch": {
-    keys: ['customer_id','return_no','return_date','status_name','tax','return_reason','due_date','tax_amount','total_amount','remarks']
+    keys: ['customer','return_no','return_date','status_name','tax','return_reason','due_date','tax_amount','total_amount','remarks']
   },
   cols: [
     {
-      fieldKey: 'customer_id',
+      fieldKey: 'customer',
       name: 'Customer',
       displayType: "map",
       mapFn: (currentValue: any, row: any, col: any) => {

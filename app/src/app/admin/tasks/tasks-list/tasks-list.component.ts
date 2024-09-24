@@ -41,7 +41,7 @@ export class TasksListComponent {
       {
         fieldKey: 'description',
         name: 'Description',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'priority_id',
@@ -55,7 +55,7 @@ export class TasksListComponent {
       {
         fieldKey: 'due_date',
         name: 'Due Date',
-        sort: false,
+        sort: true,
         displayType: "date"
       },
       {

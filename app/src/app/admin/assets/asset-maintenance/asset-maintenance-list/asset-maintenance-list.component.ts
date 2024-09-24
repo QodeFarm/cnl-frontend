@@ -38,17 +38,17 @@ export class AssetMaintenanceListComponent {
       {
         fieldKey: 'cost', 
         name: 'Cost',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'maintenance_date',
         name: 'Maintenance Date',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'maintenance_description',
         name: 'Maintenance Description',
-        sort: false
+        sort: true
       },
       {
         fieldKey: "code",

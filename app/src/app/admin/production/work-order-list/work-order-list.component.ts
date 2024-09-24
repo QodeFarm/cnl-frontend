@@ -33,7 +33,7 @@ export class WorkOrderListComponent {
       {
         fieldKey: 'product',
         name: 'Product',
-        sort: false,
+        sort: true,
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
           return row.product.name;
@@ -61,7 +61,7 @@ export class WorkOrderListComponent {
       {
         fieldKey: 'end_date',
         name: 'End Date',
-        sort: false
+        sort: true
       },
       {
         fieldKey: "code",

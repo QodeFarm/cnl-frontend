@@ -21,7 +21,7 @@ export class PaymentTransactionListComponent {
     pkId: "payment_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['payment_id']
+      keys: ['invoice_id','order_type','payment_date','payment_method','payment_status','amount','reference_number','currency','transaction_type','notes']
     },
     cols: [
       {
@@ -57,12 +57,12 @@ export class PaymentTransactionListComponent {
       {
         fieldKey: 'reference_number', 
         name: 'Reference Number',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'currency', 
         name: 'Currency',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'transaction_type', 
@@ -72,7 +72,7 @@ export class PaymentTransactionListComponent {
       {
         fieldKey: 'notes', 
         name: 'Notes',
-        sort: false
+        sort: true
       },
       {
         fieldKey: "code",
