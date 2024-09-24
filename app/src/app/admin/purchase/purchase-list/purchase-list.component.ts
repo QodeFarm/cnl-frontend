@@ -27,7 +27,7 @@ export class PurchaseListComponent {
     ],
     pageSize: 10,
     "globalSearch": {
-      keys: ['id', 'first_name', 'last_name']
+      keys: ['purchase_type_id','order_date','order_no','tax','tax_amount','total_amount','vendor_id','status_name','remarks']
     },
     cols: [
       {
@@ -53,7 +53,7 @@ export class PurchaseListComponent {
       {
         fieldKey: 'tax',
         name: 'Tax',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'tax_amount',
@@ -75,7 +75,7 @@ export class PurchaseListComponent {
         sort: true
       },
       {
-        fieldKey: 'order_status',
+        fieldKey: 'status_name',
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {

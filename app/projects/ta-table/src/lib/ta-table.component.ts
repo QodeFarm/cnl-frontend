@@ -157,6 +157,10 @@ onStatusChange(status: string) {
     // Generate query string from filters
     const queryString = this.generateQueryString(filters);
 
+    // Add page and limit parameters
+    const page = this.pageIndex;
+    const limit = this.pageSize;
+
     const tableParamConfig: TaParamsConfig = {
       apiUrl: this.options.apiUrl,
       pageIndex: this.pageIndex,
@@ -165,9 +169,15 @@ onStatusChange(status: string) {
       fixedFilters: this.options.fixedFilters
     }
 
-    const full_path = this.options.apiUrl;
+    // Append page and limit to the query string
+    const finalQueryString = `${queryString}&page=${page}&limit=${limit}`;
 
-    const url = `${full_path}${queryString}`;
+    const full_path = this.options.apiUrl;
+    const url = `${full_path}${finalQueryString}`;
+
+    // const full_path = this.options.apiUrl;
+
+    // const url = `${full_path}${queryString}`;
     this.http.get(url).subscribe(
         response => {
             this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
@@ -179,7 +189,8 @@ onStatusChange(status: string) {
             console.error('Error executing URL:', `${full_path}${queryString}`, error);
         }
     );
-    return queryString;
+    // return queryString;
+    return finalQueryString;
 }
 
 clearFilters() {
@@ -201,7 +212,11 @@ clearFilters() {
       fixedFilters: this.options.fixedFilters
     }
 
-    const url = this.options.apiUrl; // Base URL without any filters
+    const url = `${this.options.apiUrl}&page=${this.pageIndex}&limit=${this.pageSize}`;
+  
+    console.log('API URL:', url); // Debugging log
+
+    // const url = this.options.apiUrl; // Base URL without any filters
     this.http.get(url).subscribe(
         response => {
             this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
@@ -233,7 +248,7 @@ generateQueryString(filters: { quickPeriod: string, fromDate: Date, toDate: Date
       queryParts.push(`status_name=${encodeURIComponent(filters.status)}`);
     }
 
-    return '?&' + queryParts.join('&');
+    return '&' + queryParts.join('&');
 }
 formatDate(date: Date): string {
     // Format date as 'yyyy-MM-dd'

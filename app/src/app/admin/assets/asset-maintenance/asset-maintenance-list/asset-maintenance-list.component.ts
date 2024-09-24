@@ -24,7 +24,7 @@ export class AssetMaintenanceListComponent {
     pkId: "asset_maintenance_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['asset_maintenance_id']
+      keys: ['asset_id','cost','maintenance_date','maintenance_description']
     },
     cols: [
       {

@@ -24,7 +24,7 @@ export class AssetsListComponent {
     pkId: "asset_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['asset_id']
+      keys: ['name','price','asset_category_id','unit_options_id','purchase_date','location_id','asset_status_id']
     },
     cols: [
       {

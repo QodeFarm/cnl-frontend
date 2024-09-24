@@ -21,7 +21,7 @@ export class QuickpacksListComponent {
     pkId: "quick_pack_id",
     pageSize: 10,
     globalSearch: {
-      keys: ['id', 'name', 'description']
+      keys: ['name','lot_qty','description','active']
     },
     cols: [
       {
@@ -42,7 +42,7 @@ export class QuickpacksListComponent {
       {
         fieldKey: 'active',
         name: 'Active',
-        sort: false,
+        sort: true,
       },
       {
         fieldKey: "code",

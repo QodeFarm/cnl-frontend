@@ -27,7 +27,7 @@ export class SalesInvoiceListComponent {
     ],
     pageSize: 10,
     "globalSearch": {
-      keys: ['sale_invoice_id']
+      keys: ['customer_id','invoice_no','invoice_date','total_amount','tax_amount','advance_amount','status_name','remarks']
     },
     cols: [
       {
@@ -65,7 +65,7 @@ export class SalesInvoiceListComponent {
         sort: true
       },
       {
-        fieldKey: 'order_status_id',
+        fieldKey: 'status_name',
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {

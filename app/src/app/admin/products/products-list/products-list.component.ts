@@ -29,7 +29,7 @@ export class ProductsListComponent {
     ],
     pageSize: 10,
     globalSearch: {
-      keys: ['product_id', 'name']
+      keys: ['name','code','unit_options','sales_rate','mrp','dis_amount','print_name','hsn_code','barcode']
     },
     cols: [
       {

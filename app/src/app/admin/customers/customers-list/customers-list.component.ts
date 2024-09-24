@@ -29,7 +29,7 @@ export class CustomersListComponent {
     ],
     pageSize: 10,
     "globalSearch": {
-      keys: ['customer_id', 'name']
+      keys: ['name','email','phone','gst','city_id','ledger_account_id','created_at']
     },
     cols: [
       {
@@ -40,7 +40,7 @@ export class CustomersListComponent {
       {
         fieldKey: 'email',
         name: 'Email',
-        sort: true
+        sort: false,
       },
       {
         fieldKey: 'phone',
@@ -53,7 +53,7 @@ export class CustomersListComponent {
         sort: false,
       },
       {
-        fieldKey: 'city.name',
+        fieldKey: 'city_id',
         name: 'City Name',
         sort: false,
         displayType: 'map',

@@ -29,7 +29,7 @@ export class VendorsListComponent {
     ],
     pageSize: 10,
     globalSearch: {
-      keys: ['id', 'name']
+      keys: ['name','gst_no','email','phone','vendor_category_id','ledger_account','city_id','created_at']
     },
     cols: [
       {

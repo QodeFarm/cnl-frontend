@@ -27,7 +27,7 @@ export class PurchaseInvoiceListComponent {
     ],
     pageSize: 10,
     "globalSearch": {
-      keys: ['id', 'first_name', 'last_name']
+      keys: ['vendor','purchase_type','invoice_no','invoice_date','supplier_invoice_no','tax','total_amount','tax_amount','advance_amount','status_name','remarks']
     },
     cols: [
       {
@@ -85,7 +85,7 @@ export class PurchaseInvoiceListComponent {
         sort: false
       },
       {
-        fieldKey: 'order_status',
+        fieldKey: 'status_name',
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
