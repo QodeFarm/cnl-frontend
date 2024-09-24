@@ -17,7 +17,6 @@ export class TasksListComponent {
 
   tableConfig: TaTableConfig = {
     apiUrl: 'tasks/task/',
-    // title: 'Edit Tasks List',
     showCheckbox:true,
     pkId: "task_id",
     pageSize: 10,
@@ -76,8 +75,6 @@ export class TasksListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            // confirm: true,
-            // confirmMsg: "Sure to delete?",
             apiUrl: 'tasks/task'
           },
           {
@@ -87,7 +84,6 @@ export class TasksListComponent {
             callBackFn: (row, action) => {
               console.log(row);
               this.edit.emit(row.task_id);
-              // this.router.navigateByUrl('tasks/task/' + row.task_id);
             }
           }
         ]

@@ -5,57 +5,40 @@ import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-warehouses-list',
+  selector: 'app-financial-report-list',
   standalone: true,
   imports: [CommonModule, AdminCommmonModule],
-  templateUrl: './warehouses-list.component.html',
-  styleUrls: ['./warehouses-list.component.scss']
+  templateUrl: './financial-report-list.component.html',
+  styleUrls: ['./financial-report-list.component.scss']
 })
-export class WarehousesListComponent {
+export class FinancialReportListComponent {
+
   @Output('edit') edit = new EventEmitter<void>();
 
   tableConfig: TaTableConfig = {
-    apiUrl: 'inventory/warehouses/',
+    apiUrl: 'finance/financial_reports/',
     showCheckbox:true,
-    pkId: "warehouse_id",
+    pkId: "report_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['name','code','phone','city_id','state_id']
+      keys: ['report_id']
     },
     cols: [
       {
-        fieldKey: 'name',
-        name: 'Name',
+        fieldKey: 'report_name',
+        name: 'Account Code',
         sort: true
       },
       {
-        fieldKey: 'code',
-        name: 'Code',
+        fieldKey: 'report_type',
+        name: 'Report Type',
         sort: true
       },
       {
-        fieldKey: 'phone', 
-        name: 'Phone',
+        fieldKey: 'generated_at', 
+        name: 'Generated At',
         sort: false
-      },
-      {
-        fieldKey: 'city_id',
-        name: 'City',
-        sort: true,
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.city.city_name}`;
-        },
-      },
-      {
-        fieldKey: 'state_id',
-        name: 'State',
-        sort: true,
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.state.state_name}`;
-        },
-      },
+      },         
       {
         fieldKey: "code",
         name: "Action",
@@ -64,7 +47,9 @@ export class WarehousesListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            apiUrl: 'inventory/warehouses'
+            apiUrl: 'finance/financial_reports',
+            confirm: true,
+            confirmMsg: "Sure to delete?",
           },
           {
             type: 'callBackFn',
@@ -72,13 +57,12 @@ export class WarehousesListComponent {
             label: '',
             callBackFn: (row, action) => {
               console.log(row);
-              this.edit.emit(row.warehouse_id);
+              this.edit.emit(row.report_id);
             }
           }
         ]
       }
     ]
   };
-
   constructor(private router: Router) {}
 }

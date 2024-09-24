@@ -19,7 +19,6 @@ export class AssetMaintenanceListComponent {
 
   tableConfig: TaTableConfig = {
     apiUrl: this.baseUrl + 'assets/asset_maintenance/',
-    // title: 'Edit Tasks List',
     showCheckbox:true,
     pkId: "asset_maintenance_id",
     pageSize: 10,
@@ -59,8 +58,6 @@ export class AssetMaintenanceListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            // confirm: true,
-            // confirmMsg: "Sure to delete?",
             apiUrl: this.baseUrl + 'assets/asset_maintenance'
           },
           {
@@ -70,7 +67,6 @@ export class AssetMaintenanceListComponent {
             callBackFn: (row, action) => {
               console.log(row);
               this.edit.emit(row.asset_maintenance_id);
-              // this.router.navigateByUrl('assets/asset_maintenance/' + row.asset_maintenance_id);
             }
           }
         ]

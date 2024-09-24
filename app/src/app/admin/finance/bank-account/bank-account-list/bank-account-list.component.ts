@@ -5,56 +5,50 @@ import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-warehouses-list',
+  selector: 'app-bank-account-list',
   standalone: true,
   imports: [CommonModule, AdminCommmonModule],
-  templateUrl: './warehouses-list.component.html',
-  styleUrls: ['./warehouses-list.component.scss']
+  templateUrl: './bank-account-list.component.html',
+  styleUrls: ['./bank-account-list.component.scss'],
+
 })
-export class WarehousesListComponent {
+export class BankAccountListComponent {
+
   @Output('edit') edit = new EventEmitter<void>();
 
   tableConfig: TaTableConfig = {
-    apiUrl: 'inventory/warehouses/',
+    apiUrl: 'finance/bank_accounts/',
     showCheckbox:true,
-    pkId: "warehouse_id",
+    pkId: "bank_account_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['name','code','phone','city_id','state_id']
+      keys: ['bank_account_id']
     },
     cols: [
       {
-        fieldKey: 'name',
-        name: 'Name',
+        fieldKey: 'account_name',
+        name: 'Account Name',
         sort: true
       },
       {
-        fieldKey: 'code',
-        name: 'Code',
+        fieldKey: 'account_number',
+        name: 'Account Number',
         sort: true
       },
       {
-        fieldKey: 'phone', 
-        name: 'Phone',
+        fieldKey: 'bank_name', 
+        name: 'Bank Name',
         sort: false
       },
       {
-        fieldKey: 'city_id',
-        name: 'City',
-        sort: true,
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.city.city_name}`;
-        },
+        fieldKey: 'branch_name', 
+        name: 'Branch Name',
+        sort: false
       },
       {
-        fieldKey: 'state_id',
-        name: 'State',
-        sort: true,
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.state.state_name}`;
-        },
+        fieldKey: 'account_type', 
+        name: 'Account Type',
+        sort: false
       },
       {
         fieldKey: "code",
@@ -64,7 +58,9 @@ export class WarehousesListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            apiUrl: 'inventory/warehouses'
+            apiUrl: 'finance/bank_accounts',
+            confirm: true,
+            confirmMsg: "Sure to delete?",
           },
           {
             type: 'callBackFn',
@@ -72,13 +68,13 @@ export class WarehousesListComponent {
             label: '',
             callBackFn: (row, action) => {
               console.log(row);
-              this.edit.emit(row.warehouse_id);
+              this.edit.emit(row.bank_account_id);
             }
           }
         ]
       }
     ]
   };
-
   constructor(private router: Router) {}
 }
+

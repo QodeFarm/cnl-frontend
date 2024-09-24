@@ -5,56 +5,53 @@ import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-warehouses-list',
+  selector: 'app-expense-claim-list',
   standalone: true,
   imports: [CommonModule, AdminCommmonModule],
-  templateUrl: './warehouses-list.component.html',
-  styleUrls: ['./warehouses-list.component.scss']
+  templateUrl: './expense-claim-list.component.html',
+  styleUrls: ['./expense-claim-list.component.scss']
 })
-export class WarehousesListComponent {
+export class ExpenseClaimListComponent {
+
   @Output('edit') edit = new EventEmitter<void>();
 
   tableConfig: TaTableConfig = {
-    apiUrl: 'inventory/warehouses/',
+    apiUrl: 'finance/expense_claims/',
     showCheckbox:true,
-    pkId: "warehouse_id",
+    pkId: "expense_claim_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['name','code','phone','city_id','state_id']
+      keys: ['expense_claim_id']
     },
     cols: [
       {
-        fieldKey: 'name',
-        name: 'Name',
+        fieldKey: 'employee_id',
+        name: 'Employee',
+        sort: true,
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          return `${row.employee.name}`;
+        },
+      },
+      {
+        fieldKey: 'claim_date',
+        name: 'Claim Date',
         sort: true
       },
       {
-        fieldKey: 'code',
-        name: 'Code',
-        sort: true
-      },
-      {
-        fieldKey: 'phone', 
-        name: 'Phone',
+        fieldKey: 'description', 
+        name: 'Description',
         sort: false
       },
       {
-        fieldKey: 'city_id',
-        name: 'City',
-        sort: true,
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.city.city_name}`;
-        },
+        fieldKey: 'total_amount', 
+        name: 'Total Amount',
+        sort: false
       },
       {
-        fieldKey: 'state_id',
-        name: 'State',
-        sort: true,
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.state.state_name}`;
-        },
+        fieldKey: 'status', 
+        name: 'Status',
+        sort: false
       },
       {
         fieldKey: "code",
@@ -64,7 +61,9 @@ export class WarehousesListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            apiUrl: 'inventory/warehouses'
+            apiUrl: 'finance/expense_claims',
+            confirm: true,
+            confirmMsg: "Sure to delete?",
           },
           {
             type: 'callBackFn',
@@ -72,13 +71,14 @@ export class WarehousesListComponent {
             label: '',
             callBackFn: (row, action) => {
               console.log(row);
-              this.edit.emit(row.warehouse_id);
+              this.edit.emit(row.expense_claim_id);
             }
           }
         ]
       }
     ]
   };
-
   constructor(private router: Router) {}
 }
+
+

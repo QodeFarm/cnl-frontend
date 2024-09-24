@@ -1,60 +1,46 @@
-import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-warehouses-list',
   standalone: true,
   imports: [CommonModule, AdminCommmonModule],
-  templateUrl: './warehouses-list.component.html',
-  styleUrls: ['./warehouses-list.component.scss']
+  selector: 'app-tax-configuration-list',
+  templateUrl: './tax-configuration-list.component.html',
+  styleUrls: ['./tax-configuration-list.component.scss']
 })
-export class WarehousesListComponent {
+export class TaxConfigurationListComponent {
   @Output('edit') edit = new EventEmitter<void>();
-
   tableConfig: TaTableConfig = {
-    apiUrl: 'inventory/warehouses/',
+    apiUrl: 'finance/tax_configurations/',
     showCheckbox:true,
-    pkId: "warehouse_id",
+    pkId: "tax_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['name','code','phone','city_id','state_id']
+      keys: ['tax_id']
     },
     cols: [
       {
-        fieldKey: 'name',
-        name: 'Name',
+        fieldKey: 'tax_name',
+        name: 'Tax Name',
         sort: true
       },
       {
-        fieldKey: 'code',
-        name: 'Code',
+        fieldKey: 'tax_rate',
+        name: 'Tax Rate',
         sort: true
       },
       {
-        fieldKey: 'phone', 
-        name: 'Phone',
+        fieldKey: 'tax_type', 
+        name: 'Tax Type',
         sort: false
       },
       {
-        fieldKey: 'city_id',
-        name: 'City',
-        sort: true,
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.city.city_name}`;
-        },
-      },
-      {
-        fieldKey: 'state_id',
-        name: 'State',
-        sort: true,
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.state.state_name}`;
-        },
+        fieldKey: 'is_active', 
+        name: 'Is Active',
+        sort: false
       },
       {
         fieldKey: "code",
@@ -64,7 +50,9 @@ export class WarehousesListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            apiUrl: 'inventory/warehouses'
+            apiUrl: 'finance/tax_configurations',
+            confirm: true,
+            confirmMsg: "Sure to delete?",
           },
           {
             type: 'callBackFn',
@@ -72,13 +60,12 @@ export class WarehousesListComponent {
             label: '',
             callBackFn: (row, action) => {
               console.log(row);
-              this.edit.emit(row.warehouse_id);
+              this.edit.emit(row.tax_id);
             }
           }
         ]
       }
     ]
   };
-
   constructor(private router: Router) {}
 }
