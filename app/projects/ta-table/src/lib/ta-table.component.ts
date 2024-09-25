@@ -60,6 +60,7 @@ export class TaTableComponent implements OnDestroy {
 
   statusOptions: Array<{ value: string, label: string }> = []; // Store the statuses here
   
+ // List of quick period options like 'Today', 'Last Week', etc.
   quickPeriodOptions = [
     { value: 'today', label: 'Today' },
     { value: 'yesterday', label: 'Yesterday' },
@@ -145,6 +146,8 @@ onStatusChange(status: string) {
   // this.applyFilters();
 }
   
+  // Apply filters like quick period, date range, and status to fetch filtered data
+
   applyFilters() {
     // Construct the filters object
     const filters = {
@@ -157,6 +160,10 @@ onStatusChange(status: string) {
     // Generate query string from filters
     const queryString = this.generateQueryString(filters);
 
+    // Add page and limit parameters
+    const page = this.pageIndex;
+    const limit = this.pageSize;
+
     const tableParamConfig: TaParamsConfig = {
       apiUrl: this.options.apiUrl,
       pageIndex: this.pageIndex,
@@ -165,9 +172,14 @@ onStatusChange(status: string) {
       fixedFilters: this.options.fixedFilters
     }
 
-    const full_path = this.options.apiUrl;
+    // Append page and limit to the query string
+    // Construct final URL with filters and pagination
+    const finalQueryString = `${queryString}&page=${page}&limit=${limit}`;
 
-    const url = `${full_path}${queryString}`;
+    const full_path = this.options.apiUrl;
+    const url = `${full_path}${finalQueryString}`;
+
+    // Fetch filtered data from the server using the constructed URL
     this.http.get(url).subscribe(
         response => {
             this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
@@ -179,9 +191,11 @@ onStatusChange(status: string) {
             console.error('Error executing URL:', `${full_path}${queryString}`, error);
         }
     );
-    return queryString;
+    // return queryString;
+    return finalQueryString;
 }
 
+// Clear all filters like quick period, date range, and status
 clearFilters() {
     // Reset all filter values
     this.selectedQuickPeriod = null;
@@ -201,7 +215,11 @@ clearFilters() {
       fixedFilters: this.options.fixedFilters
     }
 
-    const url = this.options.apiUrl; // Base URL without any filters
+    const url = `${this.options.apiUrl}&page=${this.pageIndex}&limit=${this.pageSize}`;
+  
+    console.log('API URL:', url); // Debugging log
+
+    // const url = this.options.apiUrl; // Base URL without any filters
     this.http.get(url).subscribe(
         response => {
             this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
@@ -215,25 +233,29 @@ clearFilters() {
     );
 }
 
-
+// Generate query string for the API call based on the applied filters
 generateQueryString(filters: { quickPeriod: string, fromDate: Date, toDate: Date, status: string}): string {
     const queryParts: string[] = [];
 
+    // Add filter for 'fromDate' if available
     if (filters.fromDate) {
         const fromDateStr = this.formatDate(filters.fromDate);
         queryParts.push(`created_at_after=${encodeURIComponent(fromDateStr)}`);
     }
 
+    // Add filter for 'toDate' if available
     if (filters.toDate) {
         const toDateStr = this.formatDate(filters.toDate);
         queryParts.push(`created_at_before=${encodeURIComponent(toDateStr)}`);
     }
 
+    // Add filter for status if available
     if (filters.status) {
       queryParts.push(`status_name=${encodeURIComponent(filters.status)}`);
     }
 
-    return '?&' + queryParts.join('&');
+    // Return the query string by joining all the filters
+    return '&' + queryParts.join('&');
 }
 formatDate(date: Date): string {
     // Format date as 'yyyy-MM-dd'

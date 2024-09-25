@@ -21,7 +21,7 @@ export class JournalEntryListComponent {
     pkId: "journal_entry_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['journal_entry_id']
+      keys: ['entry_date','reference','description']
     },
     cols: [
       {
@@ -37,7 +37,7 @@ export class JournalEntryListComponent {
       {
         fieldKey: 'description', 
         name: 'Description',
-        sort: false
+        sort: true
       },         
       {
         fieldKey: "code",

@@ -24,7 +24,7 @@ export class LeadsListComponent {
     pkId: "lead_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['lead_id']
+      keys: ['name','email','phone','lead_status','score','assignee','interaction_date','notes']
     },
     cols: [
       {
@@ -66,7 +66,7 @@ export class LeadsListComponent {
         sort: true
       },
       {
-        fieldKey: 'interaction',
+        fieldKey: 'interaction_date',
         name: 'Interaction Date',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
@@ -74,17 +74,17 @@ export class LeadsListComponent {
           const [date, time] = interactionDate.split('T');
           return `${date}<br>${time}`;
         },
-        sort: true
+        sort: false
       },
       {
-        fieldKey: 'interaction',
+        fieldKey: 'notes',
         name: 'Notes',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
           console.log("row",row)
           return `${row.interaction[0].notes}`;
         },
-        sort: true
+        sort: false
       },
       {
         fieldKey: "code",

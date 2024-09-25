@@ -27,11 +27,11 @@ export class SalesInvoiceListComponent {
     ],
     pageSize: 10,
     "globalSearch": {
-      keys: ['sale_invoice_id']
+      keys: ['customer','invoice_no','invoice_date','total_amount','tax_amount','advance_amount','status_name','remarks']
     },
     cols: [
       {
-        fieldKey: 'customer_id',
+        fieldKey: 'customer',
         name: 'Customer',
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
@@ -57,7 +57,7 @@ export class SalesInvoiceListComponent {
       {
         fieldKey: 'tax_amount',
         name: 'Tax Amount',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'advance_amount',
@@ -65,7 +65,7 @@ export class SalesInvoiceListComponent {
         sort: true
       },
       {
-        fieldKey: 'order_status_id',
+        fieldKey: 'status_name',
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
@@ -76,7 +76,7 @@ export class SalesInvoiceListComponent {
       {
         fieldKey: 'remarks',
         name: 'Remarks',
-        sort: false
+        sort: true
       },
       {
         fieldKey: "code",

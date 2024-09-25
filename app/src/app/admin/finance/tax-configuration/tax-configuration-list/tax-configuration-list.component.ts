@@ -19,7 +19,7 @@ export class TaxConfigurationListComponent {
     pkId: "tax_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['tax_id']
+      keys: ['tax_name','tax_rate','tax_type','is_active']
     },
     cols: [
       {
@@ -35,12 +35,12 @@ export class TaxConfigurationListComponent {
       {
         fieldKey: 'tax_type', 
         name: 'Tax Type',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'is_active', 
         name: 'Is Active',
-        sort: false
+        sort: true
       },
       {
         fieldKey: "code",

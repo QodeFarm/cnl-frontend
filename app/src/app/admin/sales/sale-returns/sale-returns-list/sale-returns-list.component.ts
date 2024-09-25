@@ -27,11 +27,11 @@ tableConfig: TaTableConfig = {
   ],
   pageSize: 10,
   "globalSearch": {
-    keys: []
+    keys: ['customer','return_no','return_date','status_name','tax','return_reason','due_date','tax_amount','total_amount','remarks']
   },
   cols: [
     {
-      fieldKey: 'customer_id',
+      fieldKey: 'customer',
       name: 'Customer',
       displayType: "map",
       mapFn: (currentValue: any, row: any, col: any) => {
@@ -50,7 +50,7 @@ tableConfig: TaTableConfig = {
       sort: true
     },
     {
-      fieldKey: 'order_status_id',
+      fieldKey: 'status_name',
       name: 'Status',
       displayType: "map",
       mapFn: (currentValue: any, row: any, col: any) => {

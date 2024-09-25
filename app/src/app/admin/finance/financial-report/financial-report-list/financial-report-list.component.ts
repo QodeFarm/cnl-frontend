@@ -21,7 +21,7 @@ export class FinancialReportListComponent {
     pkId: "report_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['report_id']
+      keys: ['report_name','report_type','generated_at']
     },
     cols: [
       {
@@ -37,7 +37,7 @@ export class FinancialReportListComponent {
       {
         fieldKey: 'generated_at', 
         name: 'Generated At',
-        sort: false
+        sort: true
       },         
       {
         fieldKey: "code",

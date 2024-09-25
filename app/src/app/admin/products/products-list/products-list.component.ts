@@ -29,7 +29,7 @@ export class ProductsListComponent {
     ],
     pageSize: 10,
     globalSearch: {
-      keys: ['product_id', 'name']
+      keys: ['name','code','unit_options','sales_rate','mrp','dis_amount','print_name','hsn_code','barcode']
     },
     cols: [
       {
@@ -40,12 +40,12 @@ export class ProductsListComponent {
       {
         fieldKey: 'code',
         name: 'Code',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'unit_options',
         name: 'Unit',
-        sort: false,
+        sort: true,
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
           return row.unit_options.unit_name;
@@ -54,7 +54,7 @@ export class ProductsListComponent {
       {
         fieldKey: 'sales_rate',
         name: 'Sale Rate',
-        sort: false
+        sort: true
       },
       // {
       //   fieldKey: 'wholesale_rate',
@@ -69,12 +69,12 @@ export class ProductsListComponent {
       {
         fieldKey: 'mrp',
         name: 'MRP',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'dis_amount',
         name: 'Disc',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'product_balance',
@@ -89,12 +89,12 @@ export class ProductsListComponent {
       {
         fieldKey: 'hsn_code',
         name: 'HSN',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'barcode',
         name: 'Barcode',
-        sort: false
+        sort: true
       },
       {
         fieldKey: "code",

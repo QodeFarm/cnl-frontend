@@ -27,13 +27,13 @@ export class WorkOrderListComponent {
     ],
     pageSize: 10,
     globalSearch: {
-      keys: ['work_order_id']
+      keys: ['product','quantity','status_id','start_date','end_date']
     },
     cols: [
       {
         fieldKey: 'product',
         name: 'Product',
-        sort: false,
+        sort: true,
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
           return row.product.name;
@@ -61,7 +61,7 @@ export class WorkOrderListComponent {
       {
         fieldKey: 'end_date',
         name: 'End Date',
-        sort: false
+        sort: true
       },
       {
         fieldKey: "code",
