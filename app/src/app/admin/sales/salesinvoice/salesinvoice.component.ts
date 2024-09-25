@@ -3,9 +3,15 @@ import { HttpClient } from '@angular/common/http';
 import { TaFormComponent, TaFormConfig } from '@ta/ta-form';
 import { tap, switchMap } from 'rxjs/operators';
 import { forkJoin, Observable } from 'rxjs';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { OrderslistComponent } from '../orderslist/orderslist.component';
+import { SalesInvoiceListComponent } from './salesinvoice-list/salesinvoice-list.component';
 
 @Component({
   selector: 'app-salesinvoice',
+  standalone: true,
+  imports: [AdminCommmonModule, OrderslistComponent,
+    SalesInvoiceListComponent],
   templateUrl: './salesinvoice.component.html',
   styleUrls: ['./salesinvoice.component.scss']
 })
@@ -28,7 +34,7 @@ export class SalesinvoiceComponent {
     return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   }
 
-  constructor(private http: HttpClient, private cdRef: ChangeDetectorRef) {}
+  constructor(private http: HttpClient, private cdRef: ChangeDetectorRef) { }
 
   ngOnInit() {
     this.showSaleInvoiceList = false;
@@ -42,7 +48,7 @@ export class SalesinvoiceComponent {
 
     // to get SaleInvoice number for save
     this.getInvoiceNo();
-    this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[8].hide =true;
+    this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[8].hide = true;
     // console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
   }
 
@@ -76,17 +82,17 @@ export class SalesinvoiceComponent {
   getInvoiceNo() {
     this.invoiceNumber = null;
     this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
-        if (res && res.data && res.data.order_number) {
-            this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
-    this.http.get('masters/generate_order_no/?type=SO-INV').subscribe((res: any) => {
       if (res && res.data && res.data.order_number) {
-        this.formConfig.model['sale_invoice_order']['invoice_no'] = res.data.order_number;
-        this.invoiceNumber = res.data.order_number;
-        console.log("SaleInvoice NO: ", this.invoiceNumber);
-        console.log("get SaleInvoice number called");
+        this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
+        this.http.get('masters/generate_order_no/?type=SO-INV').subscribe((res: any) => {
+          if (res && res.data && res.data.order_number) {
+            this.formConfig.model['sale_invoice_order']['invoice_no'] = res.data.order_number;
+            this.invoiceNumber = res.data.order_number;
+            console.log("SaleInvoice NO: ", this.invoiceNumber);
+            console.log("get SaleInvoice number called");
+          }
+        });
       }
-    });
-    }
     });
   }
 
@@ -190,66 +196,66 @@ export class SalesinvoiceComponent {
     // }
     // Fetch sale invoice details using the saleInvoiceId
     this.http.get(`sales/sale_order/${saleOrderId}`).subscribe((res: any) => {
-        if (res && res.data) {
-            const orderData = res.data.sale_order;
-            const orderItems = res.data.sale_order_items;
-            // const invoiceShipments = res.data.order_shipments;
+      if (res && res.data) {
+        const orderData = res.data.sale_order;
+        const orderItems = res.data.sale_order_items;
+        // const invoiceShipments = res.data.order_shipments;
 
-            // Map sale_invoice_order fields to sale_return_order fields
-            this.formConfig.model = {
-                sale_invoice_order: {
-                    order_type: this.formConfig.model.sale_invoice_order.order_type || 'sale_invoice',
-                    invoice_date: this.nowDate(),
-                    invoice_no: this.formConfig.model.sale_invoice_order.invoice_no,
-                    ref_no: orderData.ref_no,
-                    ref_date: orderData.ref_date,
-                    tax: orderData.tax,
-                    remarks: orderData.remarks,
-                    item_value: orderData.item_value,
-                    discount: orderData.discount,
-                    dis_amt: orderData.dis_amt,
-                    taxable: orderData.taxable,
-                    tax_amount: orderData.tax_amount,
-                    cess_amount: orderData.cess_amount,
-                    transport_charges: orderData.transport_charges,
-                    round_off: orderData.round_off,
-                    total_amount: orderData.total_amount,
-                    total_boxes: orderData.total_boxes,
-                    gst_type: {
-                      gst_type_id: orderData.gst_type?.gst_type_id,
-                      name: orderData.gst_type?.name
-                    },
-                    payment_term: {
-                      payment_term_id: orderData.payment_term?.payment_term_id,
-                      name: orderData.payment_term?.name,
-                      code: orderData.payment_term?.code,
-                    },
-                    ledger_account: {
-                      ledger_account_id: orderData.ledger_account?.ledger_account_id,
-                      name: orderData.ledger_account?.name,
-                      code: orderData.ledger_account?.code,
-                    },
-                    customer: {
-                      customer_id: orderData.customer?.customer_id,
-                      name: orderData.customer?.name
-                    },
-                    email: orderData.email,
-                    billing_address: orderData.billing_address,
-                    shipping_address: orderData.shipping_address,
-                },
-                sale_invoice_items: orderItems,
-                order_attachments: res.data.order_attachments,
-                order_shipments: res.data.order_shipments
-            };
+        // Map sale_invoice_order fields to sale_return_order fields
+        this.formConfig.model = {
+          sale_invoice_order: {
+            order_type: this.formConfig.model.sale_invoice_order.order_type || 'sale_invoice',
+            invoice_date: this.nowDate(),
+            invoice_no: this.formConfig.model.sale_invoice_order.invoice_no,
+            ref_no: orderData.ref_no,
+            ref_date: orderData.ref_date,
+            tax: orderData.tax,
+            remarks: orderData.remarks,
+            item_value: orderData.item_value,
+            discount: orderData.discount,
+            dis_amt: orderData.dis_amt,
+            taxable: orderData.taxable,
+            tax_amount: orderData.tax_amount,
+            cess_amount: orderData.cess_amount,
+            transport_charges: orderData.transport_charges,
+            round_off: orderData.round_off,
+            total_amount: orderData.total_amount,
+            total_boxes: orderData.total_boxes,
+            gst_type: {
+              gst_type_id: orderData.gst_type?.gst_type_id,
+              name: orderData.gst_type?.name
+            },
+            payment_term: {
+              payment_term_id: orderData.payment_term?.payment_term_id,
+              name: orderData.payment_term?.name,
+              code: orderData.payment_term?.code,
+            },
+            ledger_account: {
+              ledger_account_id: orderData.ledger_account?.ledger_account_id,
+              name: orderData.ledger_account?.name,
+              code: orderData.ledger_account?.code,
+            },
+            customer: {
+              customer_id: orderData.customer?.customer_id,
+              name: orderData.customer?.name
+            },
+            email: orderData.email,
+            billing_address: orderData.billing_address,
+            shipping_address: orderData.shipping_address,
+          },
+          sale_invoice_items: orderItems,
+          order_attachments: res.data.order_attachments,
+          order_shipments: res.data.order_shipments
+        };
 
-            // Display the form
-            this.showForm = true;
+        // Display the form
+        this.showForm = true;
 
-            // Trigger change detection to update the form
-            this.cdRef.detectChanges();
-        }
+        // Trigger change detection to update the form
+        this.cdRef.detectChanges();
+      }
     }, (error) => {
-        console.error('Error fetching order details:', error);
+      console.error('Error fetching order details:', error);
     });
 
     // Hide the modal
@@ -267,69 +273,69 @@ export class SalesinvoiceComponent {
     existingProducts = existingProducts.filter((product: any) => product?.code && product.code.trim() !== "");
 
     if (existingProducts.length === 0) {
-        // Initialize the product list if no products exist
-        this.formConfig.model['sale_invoice_items'] = selectedProducts.map(product => ({
-            product: {
-                product_id: product.product_id || null,
-                name: product.product_name || '',  // Ensure the actual product name is set
-                code: product.code || '',
-            },
-            product_id: product.product_id || null,
-            code: product.code || '',
-            total_boxes: product.total_boxes || 0,
-            unit_options_id: product.unit_options_id || null,
-            quantity: product.quantity || 1,
-            rate: product.rate || 0,
-            discount: product.discount || 0,
-            print_name: product.print_name || product.product_name || '', // Use print_name only if necessary
-            amount: product.amount || 0,
-            tax: product.tax || 0,
-            remarks: product.remarks || ''
-        }));
+      // Initialize the product list if no products exist
+      this.formConfig.model['sale_invoice_items'] = selectedProducts.map(product => ({
+        product: {
+          product_id: product.product_id || null,
+          name: product.product_name || '',  // Ensure the actual product name is set
+          code: product.code || '',
+        },
+        product_id: product.product_id || null,
+        code: product.code || '',
+        total_boxes: product.total_boxes || 0,
+        unit_options_id: product.unit_options_id || null,
+        quantity: product.quantity || 1,
+        rate: product.rate || 0,
+        discount: product.discount || 0,
+        print_name: product.print_name || product.product_name || '', // Use print_name only if necessary
+        amount: product.amount || 0,
+        tax: product.tax || 0,
+        remarks: product.remarks || ''
+      }));
     } else {
-        // Update existing products or add new products
-        selectedProducts.forEach(newProduct => {
-            const existingProductIndex = existingProducts.findIndex((product: any) => 
-                product.product_id === newProduct.product_id || product.code === newProduct.code
-            );
+      // Update existing products or add new products
+      selectedProducts.forEach(newProduct => {
+        const existingProductIndex = existingProducts.findIndex((product: any) =>
+          product.product_id === newProduct.product_id || product.code === newProduct.code
+        );
 
-            if (existingProductIndex === -1) {
-                // Add the product if it doesn't exist in the list
-                existingProducts.push({
-                    product: {
-                        product_id: newProduct.product_id || null,
-                        name: newProduct.product_name || '',  // Ensure the actual product name is set
-                        code: newProduct.code || '',
-                    },
-                    product_id: newProduct.product_id || null,
-                    code: newProduct.code || '',
-                    total_boxes: newProduct.total_boxes || 0,
-                    unit_options_id: newProduct.unit_options_id || null,
-                    quantity: newProduct.quantity || 1,
-                    rate: newProduct.rate || 0,
-                    discount: newProduct.discount || 0,
-                    print_name: newProduct.print_name || newProduct.product_name || '', // Use print_name only if necessary
-                    amount: newProduct.amount || 0,
-                    tax: newProduct.tax || 0,
-                    remarks: newProduct.remarks || ''
-                });
-            } else {
-                // Update the existing product
-                existingProducts[existingProductIndex] = {
-                    ...existingProducts[existingProductIndex],
-                    ...newProduct,
-                    product: {
-                        product_id: newProduct.product_id || existingProducts[existingProductIndex].product.product_id,
-                        name: newProduct.product_name || existingProducts[existingProductIndex].product.name, // Ensure correct name is set
-                        code: newProduct.code || existingProducts[existingProductIndex].product.code,
-                    },
-                    print_name: newProduct.print_name || newProduct.product_name || existingProducts[existingProductIndex].product.name, // Ensure correct name is shown
-                };
-            }
-        });
+        if (existingProductIndex === -1) {
+          // Add the product if it doesn't exist in the list
+          existingProducts.push({
+            product: {
+              product_id: newProduct.product_id || null,
+              name: newProduct.product_name || '',  // Ensure the actual product name is set
+              code: newProduct.code || '',
+            },
+            product_id: newProduct.product_id || null,
+            code: newProduct.code || '',
+            total_boxes: newProduct.total_boxes || 0,
+            unit_options_id: newProduct.unit_options_id || null,
+            quantity: newProduct.quantity || 1,
+            rate: newProduct.rate || 0,
+            discount: newProduct.discount || 0,
+            print_name: newProduct.print_name || newProduct.product_name || '', // Use print_name only if necessary
+            amount: newProduct.amount || 0,
+            tax: newProduct.tax || 0,
+            remarks: newProduct.remarks || ''
+          });
+        } else {
+          // Update the existing product
+          existingProducts[existingProductIndex] = {
+            ...existingProducts[existingProductIndex],
+            ...newProduct,
+            product: {
+              product_id: newProduct.product_id || existingProducts[existingProductIndex].product.product_id,
+              name: newProduct.product_name || existingProducts[existingProductIndex].product.name, // Ensure correct name is set
+              code: newProduct.code || existingProducts[existingProductIndex].product.code,
+            },
+            print_name: newProduct.print_name || newProduct.product_name || existingProducts[existingProductIndex].product.name, // Ensure correct name is shown
+          };
+        }
+      });
 
-        // Assign the updated product list back to the model
-        this.formConfig.model['sale_invoice_items'] = [...existingProducts];
+      // Assign the updated product list back to the model
+      this.formConfig.model['sale_invoice_items'] = [...existingProducts];
     }
 
     // Re-render the form
@@ -343,7 +349,7 @@ export class SalesinvoiceComponent {
 
   ngOnDestroy() {
     document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
-  } 
+  }
 
   setFormConfig() {
     this.SaleInvoiceEditID = null;
@@ -422,14 +428,14 @@ export class SalesinvoiceComponent {
                       this.formConfig.model['sale_invoice_order']['customer_id'] = data.customer_id;
                     }
                     if (data.customer_addresses && data.customer_addresses.billing_address) {
-                        field.form.controls.billing_address.setValue(data.customer_addresses.billing_address)
+                      field.form.controls.billing_address.setValue(data.customer_addresses.billing_address)
                     }
                     if (data.customer_addresses && data.customer_addresses.shipping_address) {
                       field.form.controls.shipping_address.setValue(data.customer_addresses.shipping_address)
                     }
                     if (data.email) {
                       field.form.controls.email.setValue(data.email)
-                }
+                    }
                   });
                 }
               }
@@ -444,7 +450,7 @@ export class SalesinvoiceComponent {
                 placeholder: 'Enter Email',
               },
               hooks: {
-                onInit: (field: any) => {}
+                onInit: (field: any) => { }
               }
             },
             {
@@ -482,10 +488,10 @@ export class SalesinvoiceComponent {
                 required: true,
                 readonly: true,
                 disabled: true
-                
+
               },
               hooks: {
-                onInit: (field: any) => {}
+                onInit: (field: any) => { }
               }
             },
             {
@@ -547,7 +553,7 @@ export class SalesinvoiceComponent {
                 ]
               },
               hooks: {
-                onInit: (field: any) => {}
+                onInit: (field: any) => { }
               }
             },
             {
@@ -1011,8 +1017,8 @@ export class SalesinvoiceComponent {
                                 onInit: (field: any) => {
                                   field.formControl.valueChanges.subscribe(data => {
                                     this.totalAmountCal();
-            
-                                  })  
+
+                                  })
                                 }
                               }
                             },
@@ -1062,7 +1068,7 @@ export class SalesinvoiceComponent {
                                 }
                               }
                             },
-                            
+
                             {
                               key: 'gst_type',
                               type: 'select',

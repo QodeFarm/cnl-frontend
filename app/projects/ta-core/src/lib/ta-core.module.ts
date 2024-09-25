@@ -7,6 +7,7 @@ import { ScriptService } from './services/script.service';
 import { TaImgPipe } from './pipe/ta-img.pipe';
 import { ConcatPipe } from './pipe/concat.pipe';
 import { ImageDirective } from './directives/image.directive';
+import { LoadingService } from './services/loading.service';
 @NgModule({
   declarations: [
     TaCoreComponent,
@@ -17,7 +18,7 @@ import { ImageDirective } from './directives/image.directive';
   imports: [
     NzNotificationModule
   ],
-  providers: [TaCoreService, TaActionService, ScriptService],
+  providers: [TaCoreService, LoadingService, TaActionService, ScriptService],
   exports: [
     TaCoreComponent, TaImgPipe, ConcatPipe, ImageDirective
   ]
