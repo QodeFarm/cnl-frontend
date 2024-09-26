@@ -1,22 +1,22 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+// import { NgModule } from '@angular/core';
+// import { CommonModule } from '@angular/common';
 
-import { AssetMaintenanceRoutingModule } from './asset-maintenance-routing.module';
-import { AssetMaintenanceListComponent } from './asset-maintenance-list/asset-maintenance-list.component';
-import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+// import { AssetMaintenanceRoutingModule } from './asset-maintenance-routing.module';
+// import { AssetMaintenanceListComponent } from './asset-maintenance-list/asset-maintenance-list.component';
+// import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 
-@NgModule({
-  declarations: [
+// @NgModule({
+//   declarations: [
 
-  ],
-  imports: [
-    CommonModule,
-    AdminCommmonModule,
-    AssetMaintenanceListComponent,
-    AssetMaintenanceRoutingModule
-  ]
-})
-export class AssetMaintenanceModule { }
+//   ],
+//   imports: [
+//     CommonModule,
+//     AdminCommmonModule,
+//     AssetMaintenanceListComponent,
+//     AssetMaintenanceRoutingModule
+//   ]
+// })
+// export class AssetMaintenanceModule { }
 
 

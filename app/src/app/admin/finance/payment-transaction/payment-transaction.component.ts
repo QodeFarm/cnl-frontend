@@ -1,10 +1,15 @@
 import { Component, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
+import { PaymentTransactionListComponent } from './payment-transaction-list/payment-transaction-list.component';
+import { CommonModule } from '@angular/common';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 
 @Component({
   selector: 'app-payment-transaction',
+  standalone: true,
+  imports: [CommonModule, AdminCommmonModule, PaymentTransactionListComponent],
   templateUrl: './payment-transaction.component.html',
   styleUrls: ['./payment-transaction.component.scss']
 })

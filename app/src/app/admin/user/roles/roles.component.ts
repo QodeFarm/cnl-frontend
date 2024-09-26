@@ -1,12 +1,16 @@
+import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { TaCurdConfig } from '@ta/ta-curd';
 import { TaTableConfig } from '@ta/ta-table';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 declare var bootstrap: any;
 
 @Component({
   selector: 'app-roles',
+  standalone: true,
+  imports: [CommonModule,AdminCommmonModule],
   templateUrl: './roles.component.html',
   styleUrls: ['./roles.component.scss']
 })

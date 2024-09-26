@@ -1,9 +1,14 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
+import { BudgetListComponent } from './budget-list/budget-list.component';
+import { CommonModule } from '@angular/common';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 @Component({
   selector: 'app-budget',
+  standalone: true,
+  imports: [CommonModule,AdminCommmonModule, BudgetListComponent],
   templateUrl: './budget.component.html',
   styleUrls: ['./budget.component.scss']
 })

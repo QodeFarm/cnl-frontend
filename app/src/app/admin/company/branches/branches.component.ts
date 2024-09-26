@@ -1,9 +1,14 @@
+import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { BranchListComponent } from './branch-list/branch-list.component';
 
 @Component({
   selector: 'app-branches',
+  standalone: true,
+  imports: [CommonModule,AdminCommmonModule, BranchListComponent],
   templateUrl: './branches.component.html',
   styleUrls: ['./branches.component.scss']
 })

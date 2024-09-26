@@ -2,12 +2,18 @@ import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { Router } from '@angular/router';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { VendorsListComponent } from './vendors-list/vendors-list.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-vendors',
   templateUrl: './vendors.component.html',
+  imports: [CommonModule, AdminCommmonModule, VendorsListComponent],
+  standalone: true,
   styleUrls: ['./vendors.component.scss']
 })
+
 export class VendorsComponent{
   showVendorList: boolean = false;
   showForm: boolean = false;

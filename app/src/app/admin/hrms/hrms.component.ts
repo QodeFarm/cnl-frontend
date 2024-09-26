@@ -1,9 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
+import { EmployeeListComponent } from './employee-list/employee-list.component';
+import { CommonModule } from '@angular/common';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 @Component({
   selector: 'app-hrms',
+  standalone: true,
+  imports: [CommonModule,AdminCommmonModule,EmployeeListComponent],
   templateUrl: './hrms.component.html',
   styleUrls: ['./hrms.component.scss']
 })

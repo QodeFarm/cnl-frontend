@@ -168,7 +168,7 @@ export class AdminLayoutComponent {
             icon: 'fas fa-tachometer-alt',
           },
           {
-            link: '/admin/purchase/invoice',
+            link: '/admin/purchase/purchase-invoice',
             label: 'Purchase Invoice',
             icon: 'fas fa-tachometer-alt',
           },
@@ -200,7 +200,7 @@ export class AdminLayoutComponent {
             label: 'Payment Transaction',
           },
           {
-            link: '/admin/finance/tax-configurationt',
+            link: '/admin/finance/tax-configuration',
             label: 'Tax Configuration',
           },
           {
@@ -302,7 +302,7 @@ export class AdminLayoutComponent {
         icon: 'icon icon-assets',
         child: [
           {
-            link: '/admin/assets/assets',
+            link: '/admin/assets',
             label: 'Assets',
             icon: 'fas fa-tachometer-alt',
           },
@@ -322,7 +322,7 @@ export class AdminLayoutComponent {
           //   icon: 'fas fa-tachometer-alt',
           // },
           {
-            link: '/admin/assets/asset_maintenance',
+            link: '/admin/assets/asset-maintenance',
             label: 'Asset Maintenance',
             icon: 'fas fa-tachometer-alt',
           },
@@ -534,8 +534,8 @@ export class AdminLayoutComponent {
       'leads': 'admin/leads',
 
       //assets
-      'assets': 'admin/assets/assets',
-      'asset maintenance': 'admin/assets/asset_maintenance',
+      'assets': 'admin/assets',
+      'asset maintenance': 'admin/assets/asset-maintenance',
 
       //HRMS
       'employees': 'admin/employees',

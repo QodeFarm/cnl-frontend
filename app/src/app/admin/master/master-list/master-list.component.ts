@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
-import { ProductsModule } from '../../products/products.module';
 import { ActivatedRoute } from '@angular/router';
 import { Router, NavigationEnd, Event } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -11,15 +10,16 @@ import { CustomersModule } from '../../customers/customers.module';
 import { VendorsModule } from '../../vendors/vendors.module';
 import { EmployeeModule } from '../../hrms/hrms.module';
 import { TasksModule } from '../../tasks/tasks.module';
-import { AssetsModule } from '../../assets/assets.module';
 import { LeadsModule } from '../../leads/leads.module';
 import { OrdersModule } from '../../orders/orders.module';
+import { ProductsModule } from '../../products/products.module';
+import { AssetsModule } from '../../assets/assets.module';
 
 
 @Component({
   selector: 'app-master-list',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, ProductsModule, CustomersModule, VendorsModule, EmployeeModule, TasksModule, AssetsModule, LeadsModule, OrdersModule],
+  imports: [CommonModule, AdminCommmonModule, CustomersModule, VendorsModule, EmployeeModule, TasksModule, LeadsModule, OrdersModule, ProductsModule, AssetsModule],//removed ProductsModule, AssetsModule
   templateUrl: './master-list.component.html',
   styleUrls: ['./master-list.component.scss']
 })

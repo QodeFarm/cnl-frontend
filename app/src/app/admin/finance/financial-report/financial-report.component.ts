@@ -1,9 +1,14 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
+import { FinancialReportListComponent } from './financial-report-list/financial-report-list.component';
+import { CommonModule } from '@angular/common';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 @Component({
   selector: 'app-financial-report',
+  standalone: true,
+  imports: [CommonModule, AdminCommmonModule, FinancialReportListComponent],
   templateUrl: './financial-report.component.html',
   styleUrls: ['./financial-report.component.scss']
 })

@@ -8,7 +8,7 @@ import { AssetMaintenanceComponent } from './asset-maintenance/asset-maintenance
 
 const routes: Routes = [
   {
-    path : 'assets',
+    path : '',
     component : AssetsComponent
   },
   {

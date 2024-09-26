@@ -2,9 +2,14 @@ import { Component, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormComponent, TaFormConfig } from '@ta/ta-form';
 import { distinctUntilChanged } from 'rxjs/operators';
+import { CommonModule } from '@angular/common';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { PurchasereturnordersListComponent } from './purchasereturnorders-list/purchasereturnorders-list.component';
 
 @Component({
   selector: 'app-purchasereturnorders',
+  standalone: true,
+  imports: [CommonModule, AdminCommmonModule, PurchasereturnordersListComponent],
   templateUrl: './purchasereturnorders.component.html',
   styleUrls: ['./purchasereturnorders.component.scss']
 })

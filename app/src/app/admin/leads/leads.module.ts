@@ -12,7 +12,7 @@ import { InteractionTypesComponent } from './interaction-types/interaction-types
 
 @NgModule({
   declarations: [
-    LeadsComponent,
+    // LeadsComponent,
     LeadStatusesComponent,
     InteractionTypesComponent
   ],

@@ -1,13 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
+import { CommonModule } from '@angular/common';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { ProductsListComponent } from './products-list/products-list.component';
+
 
 @Component({
   selector: 'app-products',
   templateUrl: './products.component.html',
+  imports: [CommonModule, AdminCommmonModule, ProductsListComponent],
+  standalone: true,
   styleUrls: ['./products.component.scss']
 })
-
 export class ProductsComponent implements OnInit {
   showProductsList: boolean = false;
   showForm: boolean = false;

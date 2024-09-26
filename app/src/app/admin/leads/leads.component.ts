@@ -1,13 +1,18 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
+import { CommonModule } from '@angular/common';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { LeadsListComponent } from './leads-list/leads-list.component';
+
 
 @Component({
   selector: 'app-leads',
+  standalone: true,
+  imports: [CommonModule,AdminCommmonModule,LeadsListComponent],
   templateUrl: './leads.component.html',
   styleUrls: ['./leads.component.scss']
 })
-
 export class LeadsComponent {
   showLeadsList: boolean = false;
   showForm: boolean = false;

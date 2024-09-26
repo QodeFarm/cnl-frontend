@@ -10,7 +10,7 @@ import { SaleinvoiceorderlistComponent } from '../saleinvoiceorderlist/saleinvoi
 
 @NgModule({
   declarations: [
-    SaleReturnsComponent,
+    // SaleReturnsComponent, //commented
     // SaleReturnsListComponent
   ],
   imports: [

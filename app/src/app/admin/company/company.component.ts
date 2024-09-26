@@ -5,9 +5,13 @@ import { TaCurdConfig } from '@ta/ta-curd';
 import { TaFormConfig } from 'projects/ta-form/src/lib/ta-form-config';
 import { switchMap, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { CommonModule } from '@angular/common';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 @Component({
   selector: 'app-company',
+  standalone: true,
+  imports: [CommonModule,AdminCommmonModule],
   templateUrl: './company.component.html',
   styleUrls: ['./company.component.scss']
 })

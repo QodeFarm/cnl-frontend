@@ -9,7 +9,7 @@ import { QuickpacksListComponent } from './quickpacks-list/quickpacks-list.compo
 
 @NgModule({
   declarations: [
-    QuickpacksComponent,
+    // QuickpacksComponent,
   ],
   imports: [
     CommonModule,
