@@ -60,49 +60,14 @@ export class SaleReturnsComponent {
     document.getElementById('modalClose').click();
   }
 
-  // // Function to create a sale Order
-  // createSaleOrder(saleorderData: any): Observable<any> {
-  //   return this.http.post('sales/sale_order/', saleorderData);
-  // }
 
   // Method to handle updating the Sale Return Order
   updateSaleReturnOrder() {
     const saleReturnId = this.formConfig.model.sale_return_order.sale_return_id;
     console.log("Sale return id in edit : ", saleReturnId);
     const saleReturnPayload = {
-      sale_return_order: {
-        sale_return_id: saleReturnId, // Ensure the ID is included for the update,
-        customer_id: this.formConfig.model.sale_return_order.customer_id,
-        total_amount: this.formConfig.model.sale_return_order.total_amount,
-        return_reason: this.formConfig.model.sale_return_order.return_reason,
-        return_option: this.formConfig.model.sale_return_order.return_option.name,  // Sale Order / Credit Note / Debit Note
-        against_bill: this.formConfig.model.sale_return_order.against_bill,  // Sale Order / Credit Note / Debit Note
-        remarks: this.formConfig.model.sale_return_order.remarks,  // Sale Order / Credit Note / Debit Note
-        tax: this.formConfig.model.sale_return_order.tax,
-        return_no: this.formConfig.model.sale_return_order.return_no,
-        return_date: this.formConfig.model.sale_return_order.return_date,
-        bill_type: this.formConfig.model.sale_return_order.bill_type,
-        ref_date: this.formConfig.model.sale_return_order.ref_date,
-        order_type: this.formConfig.model.sale_return_order.order_type || 'sale order',
-        
-      },
-      sale_return_items: this.formConfig.model.sale_return_items.map(item => ({
-        quantity: item.quantity,
-        unit_price: item.unit_price,
-        rate: item.rate,
-        amount: item.amount,
-        total_boxes: item.total_boxes,
-        discount_percentage: item.discount_percentage,
-        discount: item.discount,
-        dis_amt: item.dis_amt0,
-        tax: item.tax,
-        print_name: item.print_name,
-        remarks: item.remarks,
-        tax_rate: item.tax_rate,
-        unit_options_id: item.unit_options_id,
-        product_id: item.product_id
-        // Add other necessary fields here...
-      })),
+      sale_return_order: this.formConfig.model.sale_return_order,
+      sale_return_items: this.formConfig.model.sale_return_items,
       order_attachments: this.formConfig.model.order_attachments,  // Attachments if applicable
       order_shipments: this.formConfig.model.order_shipments,      // Shipment info if applicable
     };
@@ -112,7 +77,7 @@ export class SaleReturnsComponent {
       (response) => {
         console.log('Sale Return Order updated successfully', response);
         // Optionally handle success, e.g., reset the form or navigate
-        this.showForm = false; // Hide form after successful update
+        this.ngOnInit(); // Hide form after successful update
         // this.loadSaleReturnOrders(); // Refresh the list if necessary
       },
       (error) => {
@@ -150,23 +115,6 @@ export class SaleReturnsComponent {
     }
   }
 
-
-  // editSaleReturnOrder(event) {
-  //   this.SaleReturnOrderEditID = event;
-  //   this.http.get('sales/sale_return_order/' + event).subscribe((res: any) => {
-  //     if (res && res.data) {
-  //       this.formConfig.model = res.data;
-  //       console.log("editing starting here", res.data)
-  //       this.formConfig.model['sale_return_order']['order_type'] = 'sale_return';
-  //       this.formConfig.pkId = 'sale_return_id';
-  //       this.formConfig.submit.label = 'Update';
-  //       this.formConfig.model['sale_return_id'] = this.SaleReturnOrderEditID;
-  //       this.showForm = true;
-  //       this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[2].hide = false;
-  //     }
-  //   });
-  //   this.hide();
-  // }
 
   getReturnNo() {
     this.returnNumber = null;
@@ -701,159 +649,6 @@ export class SaleReturnsComponent {
                   field.formControl.valueChanges.subscribe((data: any) => {
                     if (data && data.return_option_id) {
                       this.formConfig.model['sale_return_order']['return_option_id'] = data.return_option_id;
-            
-                    //   const salereturnOrder = this.formConfig.model['sale_return_order'];
-                    //   console.log("Data of salereturn order in return : ", salereturnOrder);
-                    //   const salereturnOrderItems = this.formConfig.model['sale_return_items'];
-                    //   const orderAttachments = this.formConfig.model['order_attachments'];
-                    //   const orderShipments = this.formConfig.model['order_shipments'];
-            
-                    //   // Function to handle Sale Order
-                    //   const createSaleOrder = () => {
-                    //     // Fetch workflow ID from API
-                    //     this.getWorkflowId().subscribe((response: any) => {
-                    //       console.log("Workflow_id data : ", response);
-                    //       const workflowData = response?.data;
-                    //       if (workflowData && workflowData.length > 0) {
-                    //         const workflow_id = workflowData[0].workflow_id;
-                    //         if (workflow_id) {
-                    //           const saleorderData = {
-                    //             sale_order: {
-                    //               email: salereturnOrder.email,
-                    //               sale_return_id: salereturnOrder.sale_return_id,
-                    //               order_type: salereturnOrder.order_type || 'sale_order',
-                    //               delivery_date: this.nowDate(),
-                    //               order_date: this.nowDate(),
-                    //               ref_no: salereturnOrder.ref_no,
-                    //               ref_date: salereturnOrder.ref_date || this.nowDate(),
-                    //               tax: salereturnOrder.tax || 'Inclusive',
-                    //               remarks: salereturnOrder.remarks,
-                    //               advance_amount: salereturnOrder.advance_amount,
-                    //               item_value: salereturnOrder.item_value,
-                    //               discount: salereturnOrder.discount,
-                    //               dis_amt: salereturnOrder.dis_amt,
-                    //               taxable: salereturnOrder.taxable,
-                    //               tax_amount: salereturnOrder.tax_amount,
-                    //               cess_amount: salereturnOrder.cess_amount,
-                    //               transport_charges: salereturnOrder.transport_charges,
-                    //               round_off: salereturnOrder.round_off,
-                    //               total_amount: salereturnOrder.total_amount,
-                    //               vehicle_name: salereturnOrder.vehicle_name,
-                    //               total_boxes: salereturnOrder.total_boxes,
-                    //               shipping_address: salereturnOrder.shipping_address,
-                    //               billing_address: salereturnOrder.billing_address,
-                    //               customer_id: salereturnOrder.customer_id,
-                    //               gst_type_id: salereturnOrder.gst_type_id,
-                    //               payment_term_id: salereturnOrder.payment_term_id,
-                    //               payment_link_type_id: salereturnOrder.payment_link_type_id,
-                    //               workflow_id: workflow_id,
-                    //             },
-                    //             sale_order_items: salereturnOrderItems.map(item => ({
-                    //               quantity: item.quantity || 1,
-                    //               unit_price: item.unit_price || 0,
-                    //               rate: item.rate || 0,
-                    //               amount: item.amount || 0,
-                    //               total_boxes: item.total_boxes,
-                    //               discount_percentage: item.discount_percentage || 0,
-                    //               discount: item.discount || 0,
-                    //               dis_amt: item.dis_amt || 0,
-                    //               tax: item.tax || '',
-                    //               print_name: item.print_name,
-                    //               remarks: item.remarks,
-                    //               tax_rate: item.tax_rate || 0,
-                    //               unit_options_id: item.unit_options_id || null,
-                    //               product_id: item.product_id || null
-                    //             })),
-                    //             order_attachments: orderAttachments,
-                    //             order_shipments: orderShipments
-                    //           };
-            
-                    //           // Call the API with the correct URL for Sale Order
-                    //           this.createSaleOrder(saleorderData).subscribe(
-                    //             (response) => {
-                    //               console.log('Sale order created successfully', response);
-                    //             },
-                    //             (error) => {
-                    //               console.error('Error creating sale order:', error);
-                    //             }
-                    //           );
-                    //         }
-                    //       }
-                    //     });
-                    //   };
-            
-                    //   // Function to handle Credit Note
-                    //   const createCreditNote = () => {
-                    //     const creditNoteData = {
-                    //       sale_credit_note: {
-                    //         customer_id: salereturnOrder.customer_id,
-                    //         sale_invoice_id: salereturnOrder.sale_invoice_id,
-                    //         sale_return_id: salereturnOrder.sale_return_id,
-                    //         total_amount: salereturnOrder.total_amount,
-                    //         reason: salereturnOrder.return_reason,
-                    //         order_status_id: salereturnOrder.order_status_id,
-                    //         credit_date: this.nowDate()
-                    //       },
-                    //       sale_credit_note_items: salereturnOrderItems.map(item => ({
-                    //         quantity: item.quantity || 1,
-                    //         price_per_unit: item.unit_price || 0,
-                    //         rate: item.rate || 0,
-                    //         total_price: item.amount || 0,
-                    //         product_id: item.product_id || null
-                    //       })),
-                    //     };
-            
-                    //     // Call the API with the correct URL for Credit Note
-                    //     this.http.post('sales/sale_credit_notes/', creditNoteData).subscribe(
-                    //       (response) => {
-                    //         console.log('Credit note created successfully', response);
-                    //       },
-                    //       (error) => {
-                    //         console.error('Error creating credit note:', error);
-                    //       }
-                    //     );
-                    //   };
-            
-                    //   // Function to handle Debit Note
-                    //   const createDebitNote = () => {
-                    //     const debitNoteData = {
-                    //       // Define your Debit Note data structure here
-                    //       sale_debit_note: {
-                    //         customer_id: salereturnOrder.customer_id,
-                    //         sale_invoice_id: salereturnOrder.sale_invoice_id,
-                    //         sale_return_id: salereturnOrder.sale_return_id,
-                    //         total_amount: salereturnOrder.total_amount,
-                    //         reason: salereturnOrder.return_reason,
-                    //         order_status_id: salereturnOrder.order_status_id,
-                    //         debit_date: this.nowDate()
-                    //       },
-                    //       sale_debit_note_items: salereturnOrderItems.map(item => ({
-                    //         quantity: item.quantity || 1,
-                    //         price_per_unit: item.rate || 0,
-                    //         total_price: item.amount || 0,
-                    //         product_id: item.product_id || null
-                    //       })),
-                    //     };
-            
-                    //     // Call the API with the correct URL for Debit Note
-                    //     this.http.post('sales/sale_debit_notes/', debitNoteData).subscribe(
-                    //       (response) => {
-                    //         console.log('Debit note created successfully', response);
-                    //       },
-                    //       (error) => {
-                    //         console.error('Error creating debit note:', error);
-                    //       }
-                    //     );
-                    //   };
-            
-                    //   // Switch logic based on return option name
-                    //   if (salereturnOrder.return_option?.name === 'Sale Order') {
-                    //     createSaleOrder();
-                    //   } else if (salereturnOrder.return_option?.name === 'Credit Note') {
-                    //     createCreditNote();
-                    //   } else if (salereturnOrder.return_option?.name === 'Debit Note') {
-                    //     createDebitNote();
-                    //   }
                     }
                   });
                 }
@@ -1396,26 +1191,6 @@ export class SaleReturnsComponent {
                         placeholder: 'Enter Taxable',
                       }
                     },
-                    // {
-                    //   key: 'transport_charges',
-                    //   type: 'input',
-                    //   className: 'col-4',
-                    //   templateOptions: {
-                    //     type: 'input',
-                    //     label: 'Transport Charges',
-                    //     placeholder: 'Enter Transport Charges',
-                    //   }
-                    // },
-                    // {
-                    //   key: 'round_off',
-                    //   type: 'input',
-                    //   className: 'col-4',
-                    //   templateOptions: {
-                    //     type: 'input',
-                    //     label: 'Round Off',
-                    //     placeholder: 'Enter Round Off',
-                    //   }
-                    // },
                     {
                       key: 'tax_amount',
                       type: 'input',
@@ -1512,11 +1287,11 @@ export class SaleReturnsComponent {
         }
       ]
     }
-  ]
-  }
-  ]
-  }
-  }
+    ]
+    }
+    ]
+    }
+    }
   totalAmountCal() {
     const data = this.formConfig.model;
     console.log('data', data);
@@ -1598,70 +1373,6 @@ export class SaleReturnsComponent {
       }
     );
   }
-  
-  // // Function to create Sale Order using the sale_return_id
-  // createSaleOrder(sale_return_id: string) {
-  //   const saleOrderPayload = {
-  //     sale_order: {
-  //       email: this.formConfig.model.sale_return_order.email,
-  //       sale_return_id: this.formConfig.model.sale_return_order.sale_return_id,
-  //       order_type: this.formConfig.model.sale_return_order.order_type || 'sale_order',
-  //       delivery_date: this.nowDate(),
-  //       order_date: this.nowDate(),
-  //       ref_no: this.formConfig.model.sale_return_order.ref_no,
-  //       ref_date: this.formConfig.model.sale_return_order.ref_date || this.nowDate(),
-  //       tax: this.formConfig.model.sale_return_order.tax || 'Inclusive',
-  //       remarks: this.formConfig.model.sale_return_order.remarks,
-  //       advance_amount: this.formConfig.model.sale_return_order.advance_amount,
-  //       item_value: this.formConfig.model.sale_return_order.item_value,
-  //       discount: this.formConfig.model.sale_return_order.discount,
-  //       dis_amt: this.formConfig.model.sale_return_order.dis_amt,
-  //       taxable: this.formConfig.model.sale_return_order.taxable,
-  //       tax_amount: this.formConfig.model.sale_return_order.tax_amount,
-  //       cess_amount: this.formConfig.model.sale_return_order.cess_amount,
-  //       transport_charges: this.formConfig.model.sale_return_order.transport_charges,
-  //       round_off: this.formConfig.model.sale_return_order.round_off,
-  //       total_amount: this.formConfig.model.sale_return_order.total_amount,
-  //       vehicle_name: this.formConfig.model.sale_return_order.vehicle_name,
-  //       total_boxes: this.formConfig.model.sale_return_order.total_boxes,
-  //       shipping_address: this.formConfig.model.sale_return_order.shipping_address,
-  //       billing_address: this.formConfig.model.sale_return_order.billing_address,
-  //       customer_id: this.formConfig.model.sale_return_order.customer_id,
-  //       gst_type_id: this.formConfig.model.sale_return_order.gst_type_id,
-  //       payment_term_id: this.formConfig.model.sale_return_order.payment_term_id,
-  //       payment_link_type_id: this.formConfig.model.sale_return_order.payment_link_type_id,
-  //       // workflow_id: workflow_id,
-  //     },
-  //     sale_order_items: this.formConfig.model.sale_return_items.map(item => ({
-  //       quantity: item.quantity,
-  //       unit_price: item.unit_price0,
-  //       rate: item.rate,
-  //       amount: item.amount,
-  //       total_boxes: item.total_boxes,
-  //       discount_percentage: item.discount_percentage,
-  //       discount: item.discount,
-  //       dis_amt: item.dis_amt,
-  //       tax: item.tax || '',
-  //       print_name: item.print_name,
-  //       remarks: item.remarks,
-  //       tax_rate: item.tax_rate,
-  //       unit_options_id: item.unit_options_id,
-  //       product_id: item.product_id
-  //     })),
-  //     order_attachments: this.formConfig.model.orderAttachments,
-  //     order_shipments: this.formConfig.model.orderShipments
-  //   };
-  
-  //   // POST request to create Sale Order
-  //   this.http.post('sales/sale_order/', saleOrderPayload).subscribe(
-  //     (response) => {
-  //       console.log('Sale Order created successfully');
-  //     },
-  //     (error) => {
-  //       console.error('Error creating Sale Order:', error);
-  //     }
-  //   );
-  // }
 
   // Function to create Sale Order using the sale_return_id
   createSaleOrder(sale_return_id: string) {
@@ -1736,6 +1447,7 @@ export class SaleReturnsComponent {
         }
       );
     });
+    this.ngOnInit();
   }
 
   
@@ -1801,6 +1513,8 @@ export class SaleReturnsComponent {
         console.error('Error creating Debit Note:', error);
       }
     );
+    this.ngOnInit();
   }
+  
   
 }

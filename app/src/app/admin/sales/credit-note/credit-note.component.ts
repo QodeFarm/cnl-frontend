@@ -57,6 +57,28 @@ export class CreditNoteComponent {
     document.getElementById('modalClose').click();
   }
 
+  updateSaleCreditNote() {
+    const saleCreditId = this.formConfig.model.sale_credit_note.credit_note_id;
+    console.log("Sale return id in edit : ", saleCreditId);
+    const saleCreditPayload = {
+      sale_credit_note: this.formConfig.model.sale_credit_note,
+      sale_credit_note_items: this.formConfig.model.sale_credit_note_items
+    };
+
+    // PUT request to update Sale Return Order
+    this.http.put(`sales/sale_credit_notes/${saleCreditId}/`, saleCreditPayload).subscribe(
+      (response) => {
+        console.log('Sale Credit Notes Order updated successfully', response);
+        // Optionally handle success, e.g., reset the form or navigate
+        this.ngOnInit(); // Hide form after successful update
+        // this.loadSaleReturnOrders(); // Refresh the list if necessary
+      },
+      (error) => {
+        console.error('Error updating Sale Return Order:', error);
+        // Optionally handle error
+      }
+    );
+  }
 
   editSaleCreditnote(event) {
     this.SaleCreditnoteEditID = event;
@@ -73,6 +95,15 @@ export class CreditNoteComponent {
       }
     });
     this.hide();
+  }
+
+  // Example for how the form submission might trigger the update
+  onSubmit() {
+    if (this.formConfig.submit.label === 'Update') {
+      this.updateSaleCreditNote(); // Call update on submission
+    } else {
+      this.handleSubmission(); // Otherwise, create a new record
+    }
   }
 
   circleSaleCreditnote(event) {
@@ -120,7 +151,7 @@ export class CreditNoteComponent {
   setFormConfig() {
     this.SaleCreditnoteEditID = null;
     this.formConfig = {
-      url: "sales/sale_credit_notes/",
+      // url: "sales/sale_credit_notes/",
       title: '',
       formState: {
         viewMode: false
@@ -135,7 +166,7 @@ export class CreditNoteComponent {
       ],
       submit: {
         label: 'Submit',
-        submittedFn: () => this.ngOnInit()
+        submittedFn: () => this.onSubmit()
       },
       reset: {
         resetFn: () => {
@@ -382,38 +413,69 @@ export class CreditNoteComponent {
     }
   }  
   
+  // Method to calculate total price from sale_credit_note_items
+  calculateTotalPrice(): number {
+    return this.formConfig.model.sale_credit_note_items.reduce((total: number, item: any) => {
+      return total + (item.total_price || 0);
+    }, 0);
+  }
 
-  // loadSaleInvoices(customerId: string) {
-  //   console.log("Loading sale invoices for customer ID:", customerId);
-  //   this.http.get(`sales/sale_invoice_order/?customer_id=${customerId}`).subscribe(
-  //     (res: any) => {
-  //       console.log("Response from API:", res);
-  //       if (res && Array.isArray(res.data)) {
-  //         this.invoiceOptions = res.data.map((invoice: any) => ({
-  //           value: invoice.sale_invoice_id,
-  //           label: invoice.invoice_no
-  //         }));
-  //         console.log("Updated invoiceOptions: ", this.invoiceOptions);
-  
-  //         const invoiceField = this.formConfig.fields.flatMap(field => field.fieldGroup || []).find(field => field.key === 'sale_invoice_id');
-  //         console.log("Invoice Field: ", invoiceField);
-  
-  //         if (invoiceField) {
-  //           invoiceField.templateOptions.options = this.invoiceOptions;
-  //           console.log("Updated Invoice Field Options: ", invoiceField.templateOptions.options);
-  //           this.cdr.detectChanges(); // Trigger change detection if necessary
-  //         } else {
-  //           console.error('Sale invoice field not found in formConfig');
-  //         }
-  //       } else {
-  //         console.error('Unexpected response structure or empty data', res);
-  //       }
-  //     },
-  //     error => {
-  //       console.error('Error fetching sale invoices:', error);
-  //     }
-  //   );
-  // }
+  showDialog() {
+    const dialog = document.getElementById('customDialog');
+    if (dialog) {
+      dialog.style.display = 'flex'; // Show the dialog
+    }
+  }
+
+  // Function to close the custom dialog
+  closeDialog() {
+    const dialog = document.getElementById('customDialog');
+    if (dialog) {
+      dialog.style.display = 'none'; // Hide the dialog
+    }
+  }
+
+  // Method to handle form submission and show disclaimer
+  handleSubmission() {
+    const total_price = this.calculateTotalPrice();
+    const total_amount = this.formConfig.model.sale_credit_note.total_amount || 0;
+
+    // Check if there's a mismatch
+    if (total_amount !== total_price) {
+      this.showDialog();
+    } else {
+      // If total amounts match, create the record directly
+      this.createRecord();
+    }
+  }
+
+  // Method to create the record
+  createRecord() {
+    const recordData = {
+      sale_credit_note: this.formConfig.model.sale_credit_note,
+      sale_credit_note_items: this.formConfig.model.sale_credit_note_items.map(item => ({
+        quantity: item.quantity,
+        price_per_unit: item.price_per_unit,
+        total_price: item.total_price,
+        product_id: item.product?.product_id
+      })),
+    }
+    
+    // Example of using Angular's HttpClient to post data
+    this.http.post('sales/sale_credit_notes/', recordData)
+      .subscribe({
+        next: (response) => {
+          console.log('Record created successfully:', response);
+          this.ngOnInit();  // Optionally reset the form after successful submission
+        },
+        error: (error) => {
+          console.error('Error creating record:', error);
+          alert('An error occurred while creating the record.');
+        }
+      });
+  }
+
+
   loadSaleInvoices(customerId: string) {
     console.log("Loading sale invoices for customer ID:", customerId);
     this.http.get(`sales/sale_invoice_order/?customer_id=${customerId}`).subscribe(
@@ -426,27 +488,13 @@ export class CreditNoteComponent {
           }));
           console.log("Updated invoiceOptions: ", this.invoiceOptions);
   
-          // Find the invoice field in the formConfig and update its options
           const invoiceField = this.formConfig.fields.flatMap(field => field.fieldGroup || []).find(field => field.key === 'sale_invoice_id');
           console.log("Invoice Field: ", invoiceField);
   
           if (invoiceField) {
-            // Update the options in the sale_invoice_id select field
             invoiceField.templateOptions.options = this.invoiceOptions;
-  
-            // Force the form control to reset the value to ensure the UI updates
-            const saleInvoiceFormControl = this.formConfig.model.fields.get('sale_invoice_id');
-            if (saleInvoiceFormControl) {
-              // Reset the form control value to null to ensure the selection is updated properly
-              saleInvoiceFormControl.reset();
-  
-              // Detect changes in case it's not reflecting immediately
-              this.cdr.detectChanges();
-  
-              console.log("Updated Invoice Field Options: ", invoiceField.templateOptions.options);
-            } else {
-              console.error('Form control for sale_invoice_id not found');
-            }
+            console.log("Updated Invoice Field Options: ", invoiceField.templateOptions.options);
+            this.cdr.detectChanges(); // Trigger change detection if necessary
           } else {
             console.error('Sale invoice field not found in formConfig');
           }

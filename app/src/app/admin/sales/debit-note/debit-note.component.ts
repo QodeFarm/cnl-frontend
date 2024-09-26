@@ -57,6 +57,28 @@ export class DebitNoteComponent {
     document.getElementById('modalClose').click();
   }
 
+  updateSaleDebitNote() {
+    const saleDebitId = this.formConfig.model.sale_debit_note.debit_note_id;
+    console.log("Sale return id in edit : ", saleDebitId);
+    const saleCreditPayload = {
+      sale_debit_note: this.formConfig.model.sale_debit_note,
+      sale_debit_note_items: this.formConfig.model.sale_debit_note_items
+    };
+
+    // PUT request to update Sale Return Order
+    this.http.put(`sales/sale_debit_notes/${saleDebitId}/`, saleCreditPayload).subscribe(
+      (response) => {
+        console.log('Sale Debit Notes Order updated successfully', response);
+        // Optionally handle success, e.g., reset the form or navigate
+        this.ngOnInit(); // Hide form after successful update
+        // this.loadSaleReturnOrders(); // Refresh the list if necessary
+      },
+      (error) => {
+        console.error('Error updating Sale Debit Note:', error);
+        // Optionally handle error
+      }
+    );
+  }
 
   editSaleDebitnote(event) {
     this.SaleDebitnoteEditID = event;
@@ -73,6 +95,15 @@ export class DebitNoteComponent {
       }
     });
     this.hide();
+  }
+
+  // Example for how the form submission might trigger the update
+  onSubmit() {
+    if (this.formConfig.submit.label === 'Update') {
+      this.updateSaleDebitNote(); // Call update on submission
+    } else {
+      this.handleSubmission(); // Otherwise, create a new record
+    }
   }
 
   circleSaleDebitnote(event) {
@@ -98,24 +129,6 @@ export class DebitNoteComponent {
       );
   } 
 
-  // circleSaleDebitnote(event) {
-  //   this.SaleDebitnoteEditID = event;
-  //   this.http.patch('sales/sale_debit_notes/' + event + '/', { order_status_id: '68ea000e-ce95-4145-a3c7-96efe6f9ff53' })//'68ea000e-ce95-4145-a3c7-96efe6f9ff53'
-  //     .subscribe(
-  //       (res: any) => {
-  //         if (res && res.success) {
-  //           console.log("Order status updated successfully:", res);
-  //         } else {
-  //           console.error("Error updating order status:", res);
-  //         }
-  //       },
-  //       (error) => {
-  //         console.error("HTTP error:", error);
-  //       }
-  //     );
-  //   this.hide();
-  // }
-
   getOrderNo() {
     this.orderNumber = null;
   
@@ -137,7 +150,7 @@ export class DebitNoteComponent {
   setFormConfig() {
     this.SaleDebitnoteEditID = null;
     this.formConfig = {
-      url: "sales/sale_debit_notes/",
+      // url: "sales/sale_debit_notes/",
       title: '',
       formState: {
         viewMode: false
@@ -152,7 +165,7 @@ export class DebitNoteComponent {
       ],
       submit: {
         label: 'Submit',
-        submittedFn: () =>  this.ngOnInit()
+        submittedFn: () =>  this.onSubmit()
       },
       reset: {
         resetFn: () => {
@@ -408,6 +421,68 @@ export class DebitNoteComponent {
         },
       ]
     }
+  }
+  
+  // Method to calculate total price from sale_credit_note_items
+  calculateTotalPrice(): number {
+    return this.formConfig.model.sale_debit_note_items.reduce((total: number, item: any) => {
+      return total + (item.total_price || 0);
+    }, 0);
+  }
+
+  showDialog() {
+    const dialog = document.getElementById('customDialog');
+    if (dialog) {
+      dialog.style.display = 'flex'; // Show the dialog
+    }
+  }
+
+  // Function to close the custom dialog
+  closeDialog() {
+    const dialog = document.getElementById('customDialog');
+    if (dialog) {
+      dialog.style.display = 'none'; // Hide the dialog
+    }
+  }
+
+  // Method to handle form submission and show disclaimer
+  handleSubmission() {
+    const total_price = this.calculateTotalPrice();
+    const total_amount = this.formConfig.model.sale_debit_note.total_amount || 0;
+
+    // Check if there's a mismatch
+    if (total_amount !== total_price) {
+      this.showDialog();
+    } else {
+      // If total amounts match, create the record directly
+      this.createRecord();
+    }
+  }
+
+  // Method to create the record
+  createRecord() {
+    const recordData = {
+      sale_debit_note: this.formConfig.model.sale_debit_note,
+      sale_debit_note_items: this.formConfig.model.sale_debit_note_items.map(item => ({
+        quantity: item.quantity,
+        price_per_unit: item.price_per_unit,
+        total_price: item.total_price,
+        product_id: item.product?.product_id
+      })),
+    }
+    
+    // Example of using Angular's HttpClient to post data
+    this.http.post('sales/sale_debit_notes/', recordData)
+      .subscribe({
+        next: (response) => {
+          console.log('Record created successfully:', response);
+          this.ngOnInit();  // Optionally reset the form after successful submission
+        },
+        error: (error) => {
+          console.error('Error creating record:', error);
+          alert('An error occurred while creating the record.');
+        }
+      });
   }
 
   loadSaleInvoices(customerId: string) {
