@@ -1,0 +1,45 @@
+<div class="container-fluid pt-3">
+    <div class="sale-debit-banner">
+      <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;">
+        <button type="button" class="btn pl-0">
+          <span *ngIf="SaleDebitnoteEditID" class="custom-heading">Update Sale Debit Note</span>
+          <span *ngIf="!SaleDebitnoteEditID" class="custom-heading">Create Sale Debit Note</span>
+        </button>
+        <div style="display: flex; gap: 10px;">
+          <button (click)="showSaleDebitNoteListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            Sale Debit Note List
+          </button>
+        </div>
+      </div>
+    </div>
+  
+    <div class="row custom-form">
+      <div class="col-12 px-1" *ngIf="orderNumber">
+        <ta-form #salesdebitnoteForm [options]="formConfig"></ta-form>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Sales List Modal -->
+  <div class="modal fade custom-modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl ">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Sale Debit Note List</h5>
+          <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" *ngIf="showSaleDebitnoteList">
+          <app-debit-note-list (edit)="editSaleDebitnote($event)" (circle)="circleSaleDebitnote($event)" class="custom-list"></app-debit-note-list>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div *ngIf="sidebarMessage" class="sidebar-message">
+    <span class="checkmark-circle">✓</span> {{ sidebarMessage }}
+  </div>
+  

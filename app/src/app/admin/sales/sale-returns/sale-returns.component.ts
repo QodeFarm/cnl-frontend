@@ -87,7 +87,7 @@ export class SaleReturnsComponent {
     this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
       if (res && res.data && res.data.order_number) {
         this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
-        this.http.get('masters/generate_order_no/?type=SO').subscribe((res: any) => {
+        this.http.get('masters/generate_order_no/?type=SR').subscribe((res: any) => {
           if (res && res.data && res.data.order_number) {
             this.formConfig.model['sale_return_order']['return_no'] = res.data.order_number;
             this.returnNumber = res.data.order_number;
@@ -197,6 +197,7 @@ export class SaleReturnsComponent {
             // Map sale_invoice_order fields to sale_return_order fields
             this.formConfig.model = {
                 sale_return_order: {
+                    sale_invoice_id: invoiceData.sale_invoice_id,
                     bill_type: invoiceData.bill_type,
                     order_type: this.formConfig.model.sale_return_order.order_type || 'sale_return',
                     return_date: this.nowDate(),
@@ -616,101 +617,162 @@ export class SaleReturnsComponent {
                       this.formConfig.model['sale_return_order']['return_option_id'] = data.return_option_id;
             
                       const salereturnOrder = this.formConfig.model['sale_return_order'];
+                      console.log("Data of salereturn order in return : ", salereturnOrder);
                       const salereturnOrderItems = this.formConfig.model['sale_return_items'];
                       const orderAttachments = this.formConfig.model['order_attachments'];
                       const orderShipments = this.formConfig.model['order_shipments'];
             
-                      if (salereturnOrder.return_option?.name === 'Sale Order') {
+                      // Function to handle Sale Order
+                      const createSaleOrder = () => {
                         // Fetch workflow ID from API
-                        this.getWorkflowId().subscribe(
-                          (response: any) => {
-                            console.log('Workflow response:', response);
+                        this.getWorkflowId().subscribe((response: any) => {
+                          console.log("Workflow_id data : ", response);
+                          const workflowData = response?.data;
+                          if (workflowData && workflowData.length > 0) {
+                            const workflow_id = workflowData[0].workflow_id;
+                            if (workflow_id) {
+                              const saleorderData = {
+                                sale_order: {
+                                  email: salereturnOrder.email,
+                                  sale_return_id: salereturnOrder.sale_return_id,
+                                  order_type: salereturnOrder.order_type || 'sale_order',
+                                  delivery_date: this.nowDate(),
+                                  order_date: this.nowDate(),
+                                  ref_no: salereturnOrder.ref_no,
+                                  ref_date: salereturnOrder.ref_date || this.nowDate(),
+                                  tax: salereturnOrder.tax || 'Inclusive',
+                                  remarks: salereturnOrder.remarks,
+                                  advance_amount: salereturnOrder.advance_amount,
+                                  item_value: salereturnOrder.item_value,
+                                  discount: salereturnOrder.discount,
+                                  dis_amt: salereturnOrder.dis_amt,
+                                  taxable: salereturnOrder.taxable,
+                                  tax_amount: salereturnOrder.tax_amount,
+                                  cess_amount: salereturnOrder.cess_amount,
+                                  transport_charges: salereturnOrder.transport_charges,
+                                  round_off: salereturnOrder.round_off,
+                                  total_amount: salereturnOrder.total_amount,
+                                  vehicle_name: salereturnOrder.vehicle_name,
+                                  total_boxes: salereturnOrder.total_boxes,
+                                  shipping_address: salereturnOrder.shipping_address,
+                                  billing_address: salereturnOrder.billing_address,
+                                  customer_id: salereturnOrder.customer_id,
+                                  gst_type_id: salereturnOrder.gst_type_id,
+                                  payment_term_id: salereturnOrder.payment_term_id,
+                                  payment_link_type_id: salereturnOrder.payment_link_type_id,
+                                  workflow_id: workflow_id,
+                                },
+                                sale_order_items: salereturnOrderItems.map(item => ({
+                                  quantity: item.quantity || 1,
+                                  unit_price: item.unit_price || 0,
+                                  rate: item.rate || 0,
+                                  amount: item.amount || 0,
+                                  total_boxes: item.total_boxes,
+                                  discount_percentage: item.discount_percentage || 0,
+                                  discount: item.discount || 0,
+                                  dis_amt: item.dis_amt || 0,
+                                  tax: item.tax || '',
+                                  print_name: item.print_name,
+                                  remarks: item.remarks,
+                                  tax_rate: item.tax_rate || 0,
+                                  unit_options_id: item.unit_options_id || null,
+                                  product_id: item.product_id || null
+                                })),
+                                order_attachments: orderAttachments,
+                                order_shipments: orderShipments
+                              };
             
-                            // Check if the response contains workflow data
-                            const workflowData = response?.data;
-                            if (workflowData && workflowData.length > 0) {
-                              const workflow_id = workflowData[0].workflow_id; // Get the workflow_id from the first item
-                              console.log('Workflow_id from fields: ', workflow_id);
-            
-                              if (workflow_id) {
-                                // Prepare the sale order data with workflow_id
-            
-                                const saleorderData = {
-                                  sale_order: {
-                                    email: salereturnOrder.email,
-                                    order_type: salereturnOrder.order_type || 'sale_order',
-                                    delivery_date: this.nowDate(),
-                                    order_date: this.nowDate(),
-                                    ref_no: salereturnOrder.ref_no,
-                                    ref_date: salereturnOrder.ref_date || this.nowDate(),
-                                    tax: salereturnOrder.tax || 'Inclusive',
-                                    remarks: salereturnOrder.remarks,
-                                    advance_amount: salereturnOrder.advance_amount,
-                                    item_value: salereturnOrder.item_value,
-                                    discount: salereturnOrder.discount,
-                                    dis_amt: salereturnOrder.dis_amt,
-                                    taxable: salereturnOrder.taxable,
-                                    tax_amount: salereturnOrder.tax_amount,
-                                    cess_amount: salereturnOrder.cess_amount,
-                                    transport_charges: salereturnOrder.transport_charges,
-                                    round_off: salereturnOrder.round_off,
-                                    total_amount: salereturnOrder.total_amount,
-                                    vehicle_name: salereturnOrder.vehicle_name,
-                                    total_boxes: salereturnOrder.total_boxes,
-                                    shipping_address: salereturnOrder.shipping_address,
-                                    billing_address: salereturnOrder.billing_address,
-                                    customer_id: salereturnOrder.customer_id,
-                                    gst_type_id: salereturnOrder.gst_type_id,
-                                    payment_term_id: salereturnOrder.payment_term_id,
-                                    payment_link_type_id: salereturnOrder.payment_link_type_id,
-                                    workflow_id: workflow_id,
-                                  },
-                                  sale_order_items: salereturnOrderItems.map(item => ({
-                                    quantity: item.quantity || 1,
-                                    unit_price: item.unit_price || 0,
-                                    rate: item.rate || 0,
-                                    amount: item.amount || 0,
-                                    total_boxes: item.total_boxes,
-                                    discount_percentage: item.discount_percentage || 0,
-                                    discount: item.discount || 0,
-                                    dis_amt: item.dis_amt || 0,
-                                    tax: item.tax || '',
-                                    print_name: item.print_name,
-                                    remarks: item.remarks,
-                                    tax_rate: item.tax_rate || 0,
-                                    unit_options_id: item.unit_options_id || null,
-                                    product_id: item.product_id || null
-                                  })),
-                                  order_attachments: orderAttachments,
-                                  order_shipments: orderShipments
-                                };
-            
-                                // Submit sale order data
-                                this.createSaleOrder(saleorderData).subscribe(
-                                  (response) => {
-                                    console.log('Sale order created successfully', response);
-                                  },
-                                  (error) => {
-                                    console.error('Error creating sale order:', error);
-                                  }
-                                );
-                              } else {
-                                console.error('No workflow_id found in the API response.');
-                              }
-                            } else {
-                              console.error('No workflow data returned from the API.');
+                              // Call the API with the correct URL for Sale Order
+                              this.createSaleOrder(saleorderData).subscribe(
+                                (response) => {
+                                  console.log('Sale order created successfully', response);
+                                },
+                                (error) => {
+                                  console.error('Error creating sale order:', error);
+                                }
+                              );
                             }
+                          }
+                        });
+                      };
+            
+                      // Function to handle Credit Note
+                      const createCreditNote = () => {
+                        const creditNoteData = {
+                          sale_credit_note: {
+                            customer_id: salereturnOrder.customer_id,
+                            sale_invoice_id: salereturnOrder.sale_invoice_id,
+                            sale_return_id: salereturnOrder.sale_return_id,
+                            total_amount: salereturnOrder.total_amount,
+                            reason: salereturnOrder.return_reason,
+                            order_status_id: salereturnOrder.order_status_id,
+                            credit_date: this.nowDate()
+                          },
+                          sale_credit_note_items: salereturnOrderItems.map(item => ({
+                            quantity: item.quantity || 1,
+                            price_per_unit: item.unit_price || 0,
+                            rate: item.rate || 0,
+                            total_price: item.amount || 0,
+                            product_id: item.product_id || null
+                          })),
+                        };
+            
+                        // Call the API with the correct URL for Credit Note
+                        this.http.post('sales/sale_credit_notes/', creditNoteData).subscribe(
+                          (response) => {
+                            console.log('Credit note created successfully', response);
                           },
                           (error) => {
-                            console.error('Error fetching workflow_id:', error);
+                            console.error('Error creating credit note:', error);
                           }
                         );
+                      };
+            
+                      // Function to handle Debit Note
+                      const createDebitNote = () => {
+                        const debitNoteData = {
+                          // Define your Debit Note data structure here
+                          sale_debit_note: {
+                            customer_id: salereturnOrder.customer_id,
+                            sale_invoice_id: salereturnOrder.sale_invoice_id,
+                            sale_return_id: salereturnOrder.sale_return_id,
+                            total_amount: salereturnOrder.total_amount,
+                            reason: salereturnOrder.return_reason,
+                            order_status_id: salereturnOrder.order_status_id,
+                            debit_date: this.nowDate()
+                          },
+                          sale_debit_note_items: salereturnOrderItems.map(item => ({
+                            quantity: item.quantity || 1,
+                            price_per_unit: item.rate || 0,
+                            total_price: item.amount || 0,
+                            product_id: item.product_id || null
+                          })),
+                        };
+            
+                        // Call the API with the correct URL for Debit Note
+                        this.http.post('sales/sale_debit_notes/', debitNoteData).subscribe(
+                          (response) => {
+                            console.log('Debit note created successfully', response);
+                          },
+                          (error) => {
+                            console.error('Error creating debit note:', error);
+                          }
+                        );
+                      };
+            
+                      // Switch logic based on return option name
+                      if (salereturnOrder.return_option?.name === 'Sale Order') {
+                        createSaleOrder();
+                      } else if (salereturnOrder.return_option?.name === 'Credit Note') {
+                        createCreditNote();
+                      } else if (salereturnOrder.return_option?.name === 'Debit Note') {
+                        createDebitNote();
                       }
                     }
                   });
                 }
               }
-            },                       
+            },                                  
             {
               key: 'remarks',
               type: 'textarea',
@@ -1138,7 +1200,7 @@ export class SaleReturnsComponent {
                       templateOptions: {
                         label: 'Gst Type',
                         placeholder: 'Select Gst Type',
-                        dataKey: 'name',
+                        dataKey: 'gst_type_id',
                         dataLabel: "name",
                         lazy: {
                           url: 'masters/gst_types/',
