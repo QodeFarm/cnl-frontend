@@ -46,10 +46,12 @@ const routes: Routes = [
       { path: 'inventory', data: { title: 'inventory', moduleName: 'inventory' }, canActivate: [], loadChildren: () => import('./admin/inventory/inventory.module').then(m => m.InventoryModule) },
       { path: 'products', data: { title: 'products', moduleName: 'products' }, canActivate: [], loadChildren: () => import('./admin/products/products.module').then(m => m.ProductsModule) },
       { path: 'purchase', data: { title: 'purchase', moduleName: 'purchase' }, canActivate: [], loadChildren: () => import('./admin/purchase/purchase.module').then(m => m.PurchaseModule) },
-      { path: 'sale-receipt', data: { title: 'SaleReceipt', moduleName: 'sale-receipt' }, canActivate: [], loadChildren: () => import('./admin/sales/sale-receipt/sale-receipt.module').then(m => m.SaleReceiptModule) },
+      { path: 'sale-receipt', data: { title: 'Sale Receipt', moduleName: 'sale-receipt' }, canActivate: [], loadChildren: () => import('./admin/sales/sale-receipt/sale-receipt.module').then(m => m.SaleReceiptModule) },
       { path: 'production', data: { title: 'production', moduleName: 'production' }, canActivate: [], loadChildren: () => import('./admin/production/production.module').then(m => m.ProductionModule) },
       { path: 'finance', data: { title: 'finance', moduleName: 'finance' }, canActivate: [], loadChildren: () => import('./admin/finance/finance.module').then(m => m.FinanceModule) },
       // { path: 'voiceassistant', canActivate: [], loadChildren: () => import('./admin/voiceassistant/voiceassistant.module').then(m => m.VoiceassistantModule) },
+      { path: 'credit-note', data: { title: 'Credit Note', moduleName: 'creditnote' }, canActivate: [], loadChildren: () => import('./admin/sales/credit-note/credit-note.module').then(m => m.CreditNoteModule) },
+      { path: 'debit-note', data: { title: 'Debit Note', moduleName: 'debitnote' }, canActivate: [], loadChildren: () => import('./admin/sales/debit-note/debit-note.module').then(m => m.DebitNoteModule) }
     ]
   }
 ];
