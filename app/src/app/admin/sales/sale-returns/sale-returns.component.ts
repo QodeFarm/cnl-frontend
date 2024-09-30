@@ -442,7 +442,7 @@ export class SaleReturnsComponent {
               className: 'col-2',
               templateOptions: {
                 label: 'Customer',
-                dataKey: 'customer_id',
+                dataKey: 'name',
                 dataLabel: "name",
                 options: [],
                 lazy: {
@@ -1339,7 +1339,7 @@ export class SaleReturnsComponent {
       order_attachments: this.formConfig.model.order_attachments,  // Attachments if applicable
       order_shipments: this.formConfig.model.order_shipments,      // Shipment info if applicable
     };
-  
+    console.log("Response of payload in returns : ", saleReturnPayload);
     // First, create the Sale Return record
     this.http.post('sales/sale_return_order/', saleReturnPayload).subscribe(
       (response: any) => {
@@ -1376,6 +1376,11 @@ export class SaleReturnsComponent {
 
   // Function to create Sale Order using the sale_return_id
   createSaleOrder(sale_return_id: string) {
+    const SaleOrderpayload = this.formConfig.model.sale_return_order
+    const SaleOrderItems = this.formConfig.model.sale_return_items
+    const OrderAttachments = this.formConfig.model.order_attachments
+    const OrderShippments = this.formConfig.model.order_shipments
+    console.log("data in sale order customer : ", this.formConfig.model.sale_return_order.customer_id);
     // Fetch workflow ID from API
     this.getWorkflowId().subscribe((response: any) => {
       console.log("Workflow_id data : ", response);
@@ -1385,39 +1390,38 @@ export class SaleReturnsComponent {
       if (workflowData && workflowData.length > 0) {
         workflow_id = workflowData[0].workflow_id; // Get the workflow_id
       }
-
       const saleOrderPayload = {
         sale_order: {
-          email: this.formConfig.model.sale_return_order.email,
+          email: SaleOrderpayload.email,
           sale_return_id: sale_return_id,
-          order_type: this.formConfig.model.sale_return_order.order_type || 'sale_order',
+          order_type: SaleOrderpayload.order_type || 'sale_order',
           delivery_date: this.nowDate(),
           order_date: this.nowDate(),
-          ref_no: this.formConfig.model.sale_return_order.ref_no,
-          ref_date: this.formConfig.model.sale_return_order.ref_date || this.nowDate(),
-          tax: this.formConfig.model.sale_return_order.tax || 'Inclusive',
-          remarks: this.formConfig.model.sale_return_order.remarks,
-          advance_amount: this.formConfig.model.sale_return_order.advance_amount,
-          item_value: this.formConfig.model.sale_return_order.item_value,
-          discount: this.formConfig.model.sale_return_order.discount,
-          dis_amt: this.formConfig.model.sale_return_order.dis_amt,
-          taxable: this.formConfig.model.sale_return_order.taxable,
-          tax_amount: this.formConfig.model.sale_return_order.tax_amount,
-          cess_amount: this.formConfig.model.sale_return_order.cess_amount,
-          transport_charges: this.formConfig.model.sale_return_order.transport_charges,
-          round_off: this.formConfig.model.sale_return_order.round_off,
-          total_amount: this.formConfig.model.sale_return_order.total_amount,
-          vehicle_name: this.formConfig.model.sale_return_order.vehicle_name,
-          total_boxes: this.formConfig.model.sale_return_order.total_boxes,
-          shipping_address: this.formConfig.model.sale_return_order.shipping_address,
-          billing_address: this.formConfig.model.sale_return_order.billing_address,
-          customer_id: this.formConfig.model.sale_return_order.customer_id,
-          gst_type_id: this.formConfig.model.sale_return_order.gst_type_id,
-          payment_term_id: this.formConfig.model.sale_return_order.payment_term_id,
-          payment_link_type_id: this.formConfig.model.sale_return_order.payment_link_type_id,
+          ref_no: SaleOrderpayload.ref_no,
+          ref_date: SaleOrderpayload.ref_date || this.nowDate(),
+          tax: SaleOrderpayload.tax || 'Inclusive',
+          remarks: SaleOrderpayload.remarks,
+          advance_amount: SaleOrderpayload.advance_amount,
+          item_value: SaleOrderpayload.item_value,
+          discount: SaleOrderpayload.discount,
+          dis_amt: SaleOrderpayload.dis_amt,
+          taxable: SaleOrderpayload.taxable,
+          tax_amount: SaleOrderpayload.tax_amount,
+          cess_amount: SaleOrderpayload.cess_amount,
+          transport_charges: SaleOrderpayload.transport_charges,
+          round_off: SaleOrderpayload.round_off,
+          total_amount: SaleOrderpayload.total_amount,
+          vehicle_name: SaleOrderpayload.vehicle_name,
+          total_boxes: SaleOrderpayload.total_boxes,
+          shipping_address: SaleOrderpayload.shipping_address,
+          billing_address: SaleOrderpayload.billing_address,
+          customer_id: SaleOrderpayload.customer_id,
+          gst_type_id: SaleOrderpayload.gst_type_id,
+          payment_term_id: SaleOrderpayload.payment_term_id,
+          payment_link_type_id: SaleOrderpayload.payment_link_type_id,
           workflow_id: workflow_id, // Add workflow_id to payload
         },
-        sale_order_items: this.formConfig.model.sale_return_items.map(item => ({
+        sale_order_items: SaleOrderItems.map(item => ({
           quantity: item.quantity,
           unit_price: item.unit_price0,
           rate: item.rate,
@@ -1433,9 +1437,11 @@ export class SaleReturnsComponent {
           unit_options_id: item.unit_options_id,
           product_id: item.product_id
         })),
-        order_attachments: this.formConfig.model.orderAttachments,
-        order_shipments: this.formConfig.model.orderShipments
+        order_attachments: OrderAttachments,
+        order_shipments: OrderShippments
       };
+
+      console.log("Sale order payload : ", saleOrderPayload);
 
       // POST request to create Sale Order
       this.http.post('sales/sale_order/', saleOrderPayload).subscribe(
@@ -1459,7 +1465,7 @@ export class SaleReturnsComponent {
         sale_invoice_id: this.formConfig.model.sale_return_order.sale_invoice_id,
         sale_return_id: sale_return_id,
         total_amount: this.formConfig.model.sale_return_order.total_amount,
-        reason: this.formConfig.model.sale_return_order.reason,
+        reason: this.formConfig.model.sale_return_order.return_reason,
         order_status_id: this.formConfig.model.sale_return_order.order_status_id,
         credit_date: this.nowDate()
       },
@@ -1492,7 +1498,7 @@ export class SaleReturnsComponent {
         sale_invoice_id: this.formConfig.model.sale_return_order.sale_invoice_id,
         sale_return_id: sale_return_id,
         total_amount: this.formConfig.model.sale_return_order.total_amount,
-        reason: this.formConfig.model.sale_return_order.reason,
+        reason: this.formConfig.model.sale_return_order.return_reason,
         order_status_id: this.formConfig.model.sale_return_order.order_status_id,
         debit_date: this.nowDate()
       },
