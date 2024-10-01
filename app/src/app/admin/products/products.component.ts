@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
 
@@ -13,9 +13,10 @@ export class ProductsComponent implements OnInit {
   showForm: boolean = false;
   ProductEditID: any;
   formConfig: TaFormConfig = {};
+  dialogMessage: string = '';
 
   constructor(private http: HttpClient) {}
-  
+
   ngOnInit() {
     this.showProductsList = false;
     this.showForm = true;
@@ -59,11 +60,118 @@ export class ProductsComponent implements OnInit {
     this.showProductsList = true;
   }
 
+  // Method to create the record
+  createRecord() {
+    const createData = {
+      products: this.formConfig.model.products,
+      product_variations: this.formConfig.model.product_variations,
+      product_item_balance: this.formConfig.model.product_item_balance
+    }
+    
+    // Example of using Angular's HttpClient to post data
+    this.http.post('products/products/', createData)
+      .subscribe({
+        next: (response) => {
+          console.log('Record created successfully:', response);
+          this.ngOnInit();  // Optionally reset the form after successful submission
+        },
+        error: (error) => {
+          console.error('Error creating record:', error);
+          alert('An error occurred while creating the record.');
+        }
+      });
+  };
+
+  updateProducts() {
+    const ProductEditID = this.formConfig.model.products.product_id;
+    const updateData = {
+      products: this.formConfig.model.products,
+      product_variations: this.formConfig.model.product_variations,
+      product_item_balance: this.formConfig.model.product_item_balance
+    };
+
+    // PUT request to update Sale Return Order
+    this.http.put(`products/products/${ProductEditID}/`, updateData).subscribe(
+      (response) => {
+        console.log('Sale Credit Notes Order updated successfully', response);
+        this.ngOnInit();
+      },
+      (error) => {
+        console.error('Error updating Sale Return Order:', error);
+      }
+    );
+  }
+
+  // Method to calculate and verify the balance
+  verifyBalance(): any {
+    console.log('verify balance working');
+    const balance = parseInt(this.formConfig.model.products.balance, 10);
+    let totalItemBalanceQuantity = 0;
+    let totalVariationQuantity = 0;
+
+    // Calculate total quantity for product item balance
+    if (this.formConfig.model.product_item_balance && Array.isArray(this.formConfig.model.product_item_balance)) {
+      this.formConfig.model.product_item_balance.forEach(item => {
+        totalItemBalanceQuantity += item.quantity ? parseInt(item.quantity, 10) : 0;
+      });
+    }
+
+    // Calculate total quantity for product variations
+    if (this.formConfig.model.product_variations && Array.isArray(this.formConfig.model.product_variations)) {
+      this.formConfig.model.product_variations.forEach(item => {
+        totalVariationQuantity += item.quantity ? parseInt(item.quantity, 10) : 0;
+      });
+    }
+
+    // Check if product item balance does not match
+    if (totalItemBalanceQuantity !== balance) {
+      this.showDialog('Product item balance mismatch! Please ensure the total quantity of items equals the balance.');
+    } 
+    // Check if product variations balance does not match
+    else if (totalVariationQuantity !== balance) {
+      this.showDialog('Product variations balance mismatch! Please ensure the total quantity of variations equals the balance.');
+    } 
+    else {
+      return true;
+      // this.createRecord();  // Call createRecord if everything matches
+    }
+  };
+
+  showDialog(message: string): void {
+    this.dialogMessage = message;  // Set the dynamic message
+    const dialog = document.getElementById('customDialog');
+    if (dialog) {
+        dialog.style.display = 'flex';  // Explicitly set display to flex
+    }
+  ;}
+
+
+  // Function to close the custom dialog
+  closeDialog() {
+    const dialog = document.getElementById('customDialog');
+    if (dialog) {
+      dialog.style.display = 'none'; // Hide the dialog
+    }
+  };
+
+  // Example for how the form submission might trigger the update
+  onSubmit() {
+    // Proceed only if verifyBalance() returns true
+    if (this.verifyBalance()) {
+      if (this.formConfig.submit.label === 'Update') {
+        this.updateProducts();
+      }
+      if (this.formConfig.submit.label === 'Submit') {
+        this.createRecord();
+      }
+    }
+  };
+  
+
   setFormConfig() {
     this.ProductEditID =null
     this.formConfig = {
-      url: "products/products/",
-      // title: 'leads',
+      // url: "products/products/",
       formState: {
         viewMode: false,
         // isEdit: false,
@@ -72,7 +180,7 @@ export class ProductsComponent implements OnInit {
       exParams: [],
       submit: {
         label: 'Submit',
-        submittedFn: () => this.ngOnInit()
+        submittedFn: () => this.onSubmit()
       },
       reset: {
         resetFn: () => {
@@ -81,8 +189,8 @@ export class ProductsComponent implements OnInit {
       },
       model: {
         products: {},
-		    product_variations:{},
-        product_item_balance: [],
+		    product_variations:[{}],
+        product_item_balance: [{}]
       },
       fields: [
         //-----------------------------------------products -----------------------------------//
@@ -586,6 +694,15 @@ export class ProductsComponent implements OnInit {
                       }
                     },
                     {
+                      className: 'col-3',
+                      key: 'balance',
+                      type: 'input',
+                      templateOptions: {
+                        label: 'Balance',
+                        required : true
+                      }
+                    },
+                    {
                       className: 'col-3 d-flex align-items-center',
                       key: 'print_barcode',
                       type: 'checkbox',
@@ -682,86 +799,83 @@ export class ProductsComponent implements OnInit {
             },
             
           ]
-        },
+        },       
         //----------------------------------------- product_variations  -----------------------------------//
         {
-          fieldGroupClassName: "row col-12 m-0 custom-form-card",
           key: 'product_variations',
-          fieldGroup: [
-        {
-          className: 'row col-12 ant-row custom-form-block',
-          fieldGroup: [
-            {
-              template: '<div class="custom-form-card-title"> Variations </div>',
-              fieldGroupClassName: "ant-row",
-            },
-            {
-              fieldGroupClassName: "ant-row",
-              fieldGroup: [
-                {
-                  key: 'size_id',
-                  type: 'select',
-                  className: 'col-2',
-                  templateOptions: {
-                    label: 'Size',
-                    placeholder: 'Select Size',
-                    dataKey: 'size_id',
-                    dataLabel: 'size_name',
-                    bindId: true,
-                    lazy: {
-                      url: 'products/sizes/',
-                      lazyOneTime: true
-                    }
-                  },
-                },
-                {
-                  key: 'color_id',
-                  type: 'select',
-                  className: 'col-2',
-                  templateOptions: {
-                    label: 'Color',
-                    placeholder: 'Select Color',
-                    dataKey: 'color_id',
-                    dataLabel: "color_name",
-                    bindId: true,
-                    lazy: {
-                      url: 'products/colors/',
-                      lazyOneTime: true
-                    }
+          type: 'table',
+          className: 'custom-form-list',
+          templateOptions: {
+            title: 'Product Variations',
+            addText: 'Add New Variations',
+            tableCols: [
+              { name: 'warehouse_location_id', label: 'Warehouse Location' },
+              { name: 'quantity', label: 'Quantity' },
+            ]
+          },
+          fieldArray: {
+            fieldGroup: [
+              {
+                key: 'size_id',
+                type: 'select',
+                templateOptions: {
+                  label: 'Size',
+                  placeholder: 'Select Size',
+                  dataKey: 'size_id',
+                  dataLabel: 'size_name',
+                  bindId: true,
+                  hideLabel: true,
+                  lazy: {
+                    url: 'products/sizes/',
+                    lazyOneTime: true
                   }
                 },
-                {
-                  key: 'sku',
-                  type: 'input',
-                  className: 'col-2',
-                  templateOptions: {
-                    label: 'SKU',
-                    placeholder: 'Enter SKU',
-                  }
-                },
-                {
-                  key: 'price',
-                  type: 'input',
-                  className: 'col-2',
-                  templateOptions: {
-                    label: 'Price',
-                    placeholder: 'Enter Price',
-                  }
-                },
-                {
-                  key: 'quantity',
-                  type: 'input',
-                  className: 'col-3',
-                  templateOptions: {
-                    label: 'Quantity',
-                    placeholder: 'Enter Quantity',
+              },
+              {
+                key: 'color_id',
+                type: 'select',
+                templateOptions: {
+                  label: 'Color',
+                  placeholder: 'Select Color',
+                  dataKey: 'color_id',
+                  dataLabel: "color_name",
+                  bindId: true,
+                  hideLabel: true,
+                  lazy: {
+                    url: 'products/colors/',
+                    lazyOneTime: true
                   }
                 }
-              ]
-            },
-          ]
-        }
-          ]
+              },
+              {
+                key: 'sku',
+                type: 'input',
+                templateOptions: {
+                  label: 'SKU',
+                  hideLabel: true,
+                  placeholder: 'Enter SKU',
+                }
+              },
+              {
+                key: 'price',
+                type: 'input',
+                templateOptions: {
+                  label: 'Price',
+                  hideLabel: true,
+                  placeholder: 'Enter Price',
+                }
+              },
+              {
+                key: 'quantity',
+                type: 'input',
+                templateOptions: {
+                  label: 'Quantity',
+                  hideLabel: true,
+                  placeholder: 'Enter Quantity',
+                }
+              }
+            ]
+          }
         },
 		    //-----------------------------------product_item_balance-------------------------------------
 		    {
@@ -783,15 +897,15 @@ export class ProductsComponent implements OnInit {
                 type: 'select',
                 templateOptions: {
                   label: 'Location',
-                  dataKey: 'warehouse_location_id',
+                  dataKey: 'location_id',
                   dataLabel: 'location_name',
-                  options: [],
+                  options: [], // This will be populated dynamically based on the warehouse selected
                   hideLabel: true,
-                  required: false,
+                  required: true,
                   lazy: {
-                    url: 'inventory/warehouse_locations/',
-                    lazyOneTime: true
-                  },
+                    lazyOneTime: true,
+                    url: 'inventory/warehouse_locations/'
+                  }
                 },
                 hooks: {
                   onChanges: (field: any) => {
@@ -805,7 +919,7 @@ export class ProductsComponent implements OnInit {
                     });
                   }
                 }
-              },
+              },                           
               {
                 key: 'quantity',
                 type: 'input',
@@ -822,5 +936,5 @@ export class ProductsComponent implements OnInit {
      ]
     }
   }
-
+  
 }

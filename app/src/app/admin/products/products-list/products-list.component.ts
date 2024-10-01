@@ -17,7 +17,7 @@ export class ProductsListComponent {
   @Output('edit') edit = new EventEmitter<void>();
 
   tableConfig: TaTableConfig = {
-    apiUrl: 'products/products/?summary=true',
+    apiUrl: 'products/products/',
     showCheckbox: true,
     title: 'Products',
     pkId: "product_id",
@@ -77,7 +77,7 @@ export class ProductsListComponent {
         sort: false
       },
       {
-        fieldKey: 'product_balance',
+        fieldKey: 'balance',
         name: 'Bal',
         sort: false
       },

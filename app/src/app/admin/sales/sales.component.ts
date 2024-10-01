@@ -656,7 +656,7 @@ export class SalesComponent {
                   options: [],
                   required: true,
                   lazy: {
-                    url: 'products/products/?summary=true',
+                    url: 'products/products/?summary=true/',
                     lazyOneTime: true
                   }
                 },
