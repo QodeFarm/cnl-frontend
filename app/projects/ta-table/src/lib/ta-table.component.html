@@ -124,27 +124,34 @@
     </tbody>
 </nz-table>
 
+
 <ng-template #totalTemplate let-total>
-    <div class="dropdown">
-        <button class="btn btn-primary dropdown-toggle" type="button" id="pdfDropdown" aria-haspopup="true" aria-expanded="false" (click)="toggleDropdown()">
-          <i class="fas fa-file-pdf"></i>
+    <!-- Move the dropdown button here -->
+    <div class="dropdown" style="display: inline-block; margin-right: 10px;">
+        <button class="btn btn-primary dropdown-toggle" type="button" id="pdfDropdown" aria-haspopup="true"
+            aria-expanded="false" (click)="toggleDropdown()">
+            <i class="fas fa-file-pdf"></i>
         </button>
         <div class="dropdown-menu" [ngClass]="{'show': dropdownOpen}" aria-labelledby="pdfDropdown">
             <a class="dropdown-item" href="#" (click)="onEmailPdf()">Email PDF</a>
             <a class="dropdown-item" href="#" (click)="onWhatsAppPdf()">WhatsApp PDF</a>
         </div>
-      </div>
-</ng-template>
+    </div>
 
-<ng-template #totalTemplate let-total>
     Total Records - {{total}}
-    <button nz-button nzType="default" nzShape="circle" (click)="refresh()"><i nz-icon nzType="sync"></i></button>
+    
+    <button nz-button nzType="default" nzShape="circle" (click)="refresh()">
+        <i nz-icon nzType="sync"></i>
+    </button>
+    
     <div nz-row nzGutter="8">
         <div nz-col nzXs="24" nzSm="12" nzMd="12">
         </div>
     </div>
-    <!-- should be translated -->
 </ng-template>
+
+
+
 <ng-template #datalable let-col="col" let-row="row">
     <!-- <ng-contentainer [ngSwitch]="col.displayType">
         <div *ngSwitchCase="'map'">
