@@ -21,7 +21,7 @@ export class ExpenseClaimListComponent {
     pkId: "expense_claim_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['expense_claim_id']
+      keys: ['employee_id','claim_date','description','total_amount','status']
     },
     cols: [
       {
@@ -41,17 +41,17 @@ export class ExpenseClaimListComponent {
       {
         fieldKey: 'description', 
         name: 'Description',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'total_amount', 
         name: 'Total Amount',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'status', 
         name: 'Status',
-        sort: false
+        sort: true
       },
       {
         fieldKey: "code",

@@ -5,87 +5,70 @@ import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 @Component({
-  selector: 'app-purchase-list',
-  standalone: true,
+  selector: 'app-debit-note-list',
+  standalone: true, 
   imports: [CommonModule, AdminCommmonModule],
-  templateUrl: './purchase-list.component.html',
-  styleUrls: ['./purchase-list.component.scss']
+  templateUrl: './debit-note-list.component.html',
+  styleUrls: ['./debit-note-list.component.scss']
 })
-export class PurchaseListComponent {
-  
+export class DebitNoteListComponent {
   @Output('edit') edit = new EventEmitter<void>();
-  
+  @Output('circle') circle = new EventEmitter<void>();
+
   tableConfig: TaTableConfig = {
-    apiUrl: 'purchase/purchase_order/?summary=true',
-    showCheckbox:true,
-    pkId: "purchase_order_id",
-    fixedFilters: [
-      {
-        key: 'summary',
-        value: 'true'
-      }
-    ],
+    apiUrl: 'sales/sale_debit_notes/',
+    showCheckbox: true,
+    pkId: "debit_note_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['purchase_type_id','order_date','order_no','tax','tax_amount','total_amount','vendor','status_name','remarks']
+      keys: ['debit_note_id']
     },
     cols: [
       {
-        fieldKey: 'purchase_type_id',
-        name: 'Purchase Type',
-        sort: true,
+        fieldKey: 'customer_id',
+        name: 'Customer',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          // console.log("-->", currentValue);
-          return `${row.purchase_type.name}`;
+          return `${row.customer.name}`;
         },
-      },
-      {
-        fieldKey: 'order_date',
-        name: 'Order Date',
         sort: true
       },
       {
-        fieldKey: 'order_no',
-        name: 'Order No',
+        fieldKey: 'sale_invoice_id',
+        name: 'Invoice',
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          return `${row.sale_invoice.invoice_no}`;
+        },
         sort: true
       },
       {
-        fieldKey: 'tax',
-        name: 'Tax',
+        fieldKey: 'debit_note_number',
+        name: 'Debit note no',
         sort: true
       },
       {
-        fieldKey: 'tax_amount',
-        name: 'Tax amount',
+        fieldKey: 'debit_date',
+        name: 'Debit Date',
+        sort: true
+      },
+      {
+        fieldKey: 'reason',
+        name: 'Return Reason',
         sort: true
       },
       {
         fieldKey: 'total_amount',
-        name: 'Total amount',
+        name: 'Total Amount',
         sort: true
       },
       {
-        fieldKey: 'vendor',
-        name: 'Vendor',
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.vendor.name}`;
-        },
-        sort: true
-      },
-      {
-        fieldKey: 'status_name',
+        fieldKey: 'order_status_id',
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
           return `${row.order_status.status_name}`;
         },
-        sort: true
-      },
-      {
-        fieldKey: 'remarks',
-        name: 'Remarks',
         sort: true
       },
       {
@@ -98,7 +81,7 @@ export class PurchaseListComponent {
             label: 'Delete',
             confirm: true,
             confirmMsg: "Sure to delete?",
-            apiUrl: 'purchase/purchase_order'
+            apiUrl: 'sales/sale_debit_notes'
           },
           {
             type: 'callBackFn',
@@ -106,7 +89,17 @@ export class PurchaseListComponent {
             label: '',
             callBackFn: (row, action) => {
               console.log(row);
-              this.edit.emit(row.purchase_order_id);
+              this.edit.emit(row.debit_note_id);
+            }
+          },
+          {
+            type: 'callBackFn',
+            icon: 'fa fa-check-circle',
+            confirm: true,
+            confirmMsg: "Sure to Approve?",
+            callBackFn: (row, action) => {
+              console.log(row);
+              this.circle.emit(row.debit_note_id);
             }
           }
         ]
@@ -114,8 +107,5 @@ export class PurchaseListComponent {
     ]
   };
 
-  constructor(private router: Router) {
-
-  }
+constructor(private router: Router) {}
 }
-

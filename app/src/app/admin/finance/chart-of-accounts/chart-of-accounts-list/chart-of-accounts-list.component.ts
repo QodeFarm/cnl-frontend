@@ -21,7 +21,7 @@ export class ChartOfAccountsListComponent {
     pkId: "account_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['account_id']
+      keys: ['account_code','account_name','account_type','parent_account_id','bank_account_id']
     },
     cols: [
       {
@@ -37,7 +37,7 @@ export class ChartOfAccountsListComponent {
       {
         fieldKey: 'account_type', 
         name: 'Account Type',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'parent_account_id',

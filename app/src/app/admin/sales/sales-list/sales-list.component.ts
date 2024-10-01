@@ -29,7 +29,7 @@ export class SalesListComponent {
     ],
     pageSize: 10,
     "globalSearch": {
-      keys: ['id', 'first_name', 'last_name']
+      keys: ['order_date','order_no','sale_type','customer','amount','tax','advance_amount','status_name','flow_status']
     },
     cols: [
       {
@@ -74,7 +74,7 @@ export class SalesListComponent {
       },
       {
         fieldKey: 'advance_amount',
-        name: 'Advance Amt',
+        name: 'Advance Amt',
         sort: true
       },
       // {
@@ -96,7 +96,7 @@ export class SalesListComponent {
       //   sort: true
       // },
       {
-        fieldKey: 'order_status',
+        fieldKey: 'status_name',
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {

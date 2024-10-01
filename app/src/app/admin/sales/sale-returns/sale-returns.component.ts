@@ -60,34 +60,68 @@ export class SaleReturnsComponent {
     document.getElementById('modalClose').click();
   }
 
-  // Function to create a sale Order
-  createSaleOrder(saleorderData: any): Observable<any> {
-    return this.http.post('sales/sale_order/', saleorderData);
+
+  // Method to handle updating the Sale Return Order
+  updateSaleReturnOrder() {
+    const saleReturnId = this.formConfig.model.sale_return_order.sale_return_id;
+    console.log("Sale return id in edit : ", saleReturnId);
+    const saleReturnPayload = {
+      sale_return_order: this.formConfig.model.sale_return_order,
+      sale_return_items: this.formConfig.model.sale_return_items,
+      order_attachments: this.formConfig.model.order_attachments,  // Attachments if applicable
+      order_shipments: this.formConfig.model.order_shipments,      // Shipment info if applicable
+    };
+
+    // PUT request to update Sale Return Order
+    this.http.put(`sales/sale_return_order/${saleReturnId}/`, saleReturnPayload).subscribe(
+      (response) => {
+        console.log('Sale Return Order updated successfully', response);
+        // Optionally handle success, e.g., reset the form or navigate
+        this.ngOnInit(); // Hide form after successful update
+        // this.loadSaleReturnOrders(); // Refresh the list if necessary
+      },
+      (error) => {
+        console.error('Error updating Sale Return Order:', error);
+        // Optionally handle error
+      }
+    );
   }
 
+  // Modify your edit method to set up the form for editing
   editSaleReturnOrder(event) {
     this.SaleReturnOrderEditID = event;
     this.http.get('sales/sale_return_order/' + event).subscribe((res: any) => {
       if (res && res.data) {
         this.formConfig.model = res.data;
-        console.log("editing starting here", res.data)
+        console.log("Editing starting here", res.data);
         this.formConfig.model['sale_return_order']['order_type'] = 'sale_return';
         this.formConfig.pkId = 'sale_return_id';
         this.formConfig.submit.label = 'Update';
         this.formConfig.model['sale_return_id'] = this.SaleReturnOrderEditID;
-        this.showForm = true;
+        this.showForm = true; // Show form for editing
+        // Show necessary fields for editing
         this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[2].hide = false;
       }
     });
     this.hide();
   }
 
+  // Example for how the form submission might trigger the update
+  onSubmit() {
+    if (this.formConfig.submit.label === 'Update') {
+      this.updateSaleReturnOrder(); // Call update on submission
+    } else {
+      this.submitForm(); // Otherwise, create a new record
+    }
+  }
+
+
   getReturnNo() {
     this.returnNumber = null;
     this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
       if (res && res.data && res.data.order_number) {
         this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
-        this.http.get('masters/generate_order_no/?type=SO').subscribe((res: any) => {
+        this.http.get('masters/generate_order_no/?type=SR').subscribe((res: any) => {
           if (res && res.data && res.data.order_number) {
             this.formConfig.model['sale_return_order']['return_no'] = res.data.order_number;
             this.returnNumber = res.data.order_number;
@@ -197,6 +231,7 @@ export class SaleReturnsComponent {
             // Map sale_invoice_order fields to sale_return_order fields
             this.formConfig.model = {
                 sale_return_order: {
+                    sale_invoice_id: invoiceData.sale_invoice_id,
                     bill_type: invoiceData.bill_type,
                     order_type: this.formConfig.model.sale_return_order.order_type || 'sale_return',
                     return_date: this.nowDate(),
@@ -349,7 +384,7 @@ export class SaleReturnsComponent {
   setFormConfig() {
     this.SaleReturnOrderEditID = null;
     this.formConfig = {
-      url: "sales/sale_return_order/",
+      // url: "sales/sale_return_order/",
       title: '',
       formState: {
         viewMode: false
@@ -364,7 +399,7 @@ export class SaleReturnsComponent {
       ],
       submit: {
         label: 'Submit',
-        submittedFn: () => this.ngOnInit()
+        submittedFn: () => this.onSubmit()
       },
       reset: {
         resetFn: () => {
@@ -407,7 +442,7 @@ export class SaleReturnsComponent {
               className: 'col-2',
               templateOptions: {
                 label: 'Customer',
-                dataKey: 'customer_id',
+                dataKey: 'name',
                 dataLabel: "name",
                 options: [],
                 lazy: {
@@ -614,103 +649,11 @@ export class SaleReturnsComponent {
                   field.formControl.valueChanges.subscribe((data: any) => {
                     if (data && data.return_option_id) {
                       this.formConfig.model['sale_return_order']['return_option_id'] = data.return_option_id;
-            
-                      const salereturnOrder = this.formConfig.model['sale_return_order'];
-                      const salereturnOrderItems = this.formConfig.model['sale_return_items'];
-                      const orderAttachments = this.formConfig.model['order_attachments'];
-                      const orderShipments = this.formConfig.model['order_shipments'];
-            
-                      if (salereturnOrder.return_option?.name === 'Sale Order') {
-                        // Fetch workflow ID from API
-                        this.getWorkflowId().subscribe(
-                          (response: any) => {
-                            console.log('Workflow response:', response);
-            
-                            // Check if the response contains workflow data
-                            const workflowData = response?.data;
-                            if (workflowData && workflowData.length > 0) {
-                              const workflow_id = workflowData[0].workflow_id; // Get the workflow_id from the first item
-                              console.log('Workflow_id from fields: ', workflow_id);
-            
-                              if (workflow_id) {
-                                // Prepare the sale order data with workflow_id
-            
-                                const saleorderData = {
-                                  sale_order: {
-                                    email: salereturnOrder.email,
-                                    order_type: salereturnOrder.order_type || 'sale_order',
-                                    delivery_date: this.nowDate(),
-                                    order_date: this.nowDate(),
-                                    ref_no: salereturnOrder.ref_no,
-                                    ref_date: salereturnOrder.ref_date || this.nowDate(),
-                                    tax: salereturnOrder.tax || 'Inclusive',
-                                    remarks: salereturnOrder.remarks,
-                                    advance_amount: salereturnOrder.advance_amount,
-                                    item_value: salereturnOrder.item_value,
-                                    discount: salereturnOrder.discount,
-                                    dis_amt: salereturnOrder.dis_amt,
-                                    taxable: salereturnOrder.taxable,
-                                    tax_amount: salereturnOrder.tax_amount,
-                                    cess_amount: salereturnOrder.cess_amount,
-                                    transport_charges: salereturnOrder.transport_charges,
-                                    round_off: salereturnOrder.round_off,
-                                    total_amount: salereturnOrder.total_amount,
-                                    vehicle_name: salereturnOrder.vehicle_name,
-                                    total_boxes: salereturnOrder.total_boxes,
-                                    shipping_address: salereturnOrder.shipping_address,
-                                    billing_address: salereturnOrder.billing_address,
-                                    customer_id: salereturnOrder.customer_id,
-                                    gst_type_id: salereturnOrder.gst_type_id,
-                                    payment_term_id: salereturnOrder.payment_term_id,
-                                    payment_link_type_id: salereturnOrder.payment_link_type_id,
-                                    workflow_id: workflow_id,
-                                  },
-                                  sale_order_items: salereturnOrderItems.map(item => ({
-                                    quantity: item.quantity || 1,
-                                    unit_price: item.unit_price || 0,
-                                    rate: item.rate || 0,
-                                    amount: item.amount || 0,
-                                    total_boxes: item.total_boxes,
-                                    discount_percentage: item.discount_percentage || 0,
-                                    discount: item.discount || 0,
-                                    dis_amt: item.dis_amt || 0,
-                                    tax: item.tax || '',
-                                    print_name: item.print_name,
-                                    remarks: item.remarks,
-                                    tax_rate: item.tax_rate || 0,
-                                    unit_options_id: item.unit_options_id || null,
-                                    product_id: item.product_id || null
-                                  })),
-                                  order_attachments: orderAttachments,
-                                  order_shipments: orderShipments
-                                };
-            
-                                // Submit sale order data
-                                this.createSaleOrder(saleorderData).subscribe(
-                                  (response) => {
-                                    console.log('Sale order created successfully', response);
-                                  },
-                                  (error) => {
-                                    console.error('Error creating sale order:', error);
-                                  }
-                                );
-                              } else {
-                                console.error('No workflow_id found in the API response.');
-                              }
-                            } else {
-                              console.error('No workflow data returned from the API.');
-                            }
-                          },
-                          (error) => {
-                            console.error('Error fetching workflow_id:', error);
-                          }
-                        );
-                      }
                     }
                   });
                 }
               }
-            },                       
+            },                                  
             {
               key: 'remarks',
               type: 'textarea',
@@ -1138,7 +1081,7 @@ export class SaleReturnsComponent {
                       templateOptions: {
                         label: 'Gst Type',
                         placeholder: 'Select Gst Type',
-                        dataKey: 'name',
+                        dataKey: 'gst_type_id',
                         dataLabel: "name",
                         lazy: {
                           url: 'masters/gst_types/',
@@ -1248,26 +1191,6 @@ export class SaleReturnsComponent {
                         placeholder: 'Enter Taxable',
                       }
                     },
-                    // {
-                    //   key: 'transport_charges',
-                    //   type: 'input',
-                    //   className: 'col-4',
-                    //   templateOptions: {
-                    //     type: 'input',
-                    //     label: 'Transport Charges',
-                    //     placeholder: 'Enter Transport Charges',
-                    //   }
-                    // },
-                    // {
-                    //   key: 'round_off',
-                    //   type: 'input',
-                    //   className: 'col-4',
-                    //   templateOptions: {
-                    //     type: 'input',
-                    //     label: 'Round Off',
-                    //     placeholder: 'Enter Round Off',
-                    //   }
-                    // },
                     {
                       key: 'tax_amount',
                       type: 'input',
@@ -1364,11 +1287,11 @@ export class SaleReturnsComponent {
         }
       ]
     }
-  ]
-  }
-  ]
-  }
-  }
+    ]
+    }
+    ]
+    }
+    }
   totalAmountCal() {
     const data = this.formConfig.model;
     console.log('data', data);
@@ -1405,4 +1328,199 @@ export class SaleReturnsComponent {
       }
     }
   }
+
+  //========================================
+
+  submitForm() {
+    // Prepare the payload for Sale Return Order creation
+    const saleReturnPayload = {
+      sale_return_order: this.formConfig.model.sale_return_order,
+      sale_return_items: this.formConfig.model.sale_return_items,
+      order_attachments: this.formConfig.model.order_attachments,  // Attachments if applicable
+      order_shipments: this.formConfig.model.order_shipments,      // Shipment info if applicable
+    };
+    console.log("Response of payload in returns : ", saleReturnPayload);
+    // First, create the Sale Return record
+    this.http.post('sales/sale_return_order/', saleReturnPayload).subscribe(
+      (response: any) => {
+        console.log("response in returns : ", response);
+        console.log("sale_return_id_1 in returns : ", response?.data?.sale_return_order?.sale_return_id)
+        const sale_return_id = response?.data?.sale_return_order?.sale_return_id; // Get the sale_return_id from the response
+        console.log("sale_return_id in returns : ", sale_return_id)
+  
+        if (sale_return_id) {
+          console.log('Sale Return created successfully. ID:', sale_return_id);
+  
+          // Now based on the return_option, create the respective entity
+          const returnOption = this.formConfig.model.sale_return_order.return_option.name;
+          console.log("name of the return option : ", returnOption)
+          
+          // Create Sale Order, Credit Note, or Debit Note based on the selection
+          if (returnOption === 'Credit Note') {
+            this.createCreditNote(sale_return_id);
+            // this.createSaleOrder(sale_return_id);
+          } else if (returnOption === 'Sale Order') {
+            this.createSaleOrder(sale_return_id);
+          } else if (returnOption === 'Debit Note') {
+            this.createDebitNote(sale_return_id);
+          } else {
+            console.error('Invalid return_option selected');
+          }
+        }
+      },
+      (error) => {
+        console.error('Error creating Sale Return:', error);
+      }
+    );
+  }
+
+  // Function to create Sale Order using the sale_return_id
+  createSaleOrder(sale_return_id: string) {
+    const SaleOrderpayload = this.formConfig.model.sale_return_order
+    const SaleOrderItems = this.formConfig.model.sale_return_items
+    const OrderAttachments = this.formConfig.model.order_attachments
+    const OrderShippments = this.formConfig.model.order_shipments
+    console.log("data in sale order customer : ", this.formConfig.model.sale_return_order.customer_id);
+    // Fetch workflow ID from API
+    this.getWorkflowId().subscribe((response: any) => {
+      console.log("Workflow_id data : ", response);
+      const workflowData = response?.data;
+      let workflow_id = null; // Initialize workflow_id
+
+      if (workflowData && workflowData.length > 0) {
+        workflow_id = workflowData[0].workflow_id; // Get the workflow_id
+      }
+      const saleOrderPayload = {
+        sale_order: {
+          email: SaleOrderpayload.email,
+          sale_return_id: sale_return_id,
+          order_type: SaleOrderpayload.order_type || 'sale_order',
+          delivery_date: this.nowDate(),
+          order_date: this.nowDate(),
+          ref_no: SaleOrderpayload.ref_no,
+          ref_date: SaleOrderpayload.ref_date || this.nowDate(),
+          tax: SaleOrderpayload.tax || 'Inclusive',
+          remarks: SaleOrderpayload.remarks,
+          advance_amount: SaleOrderpayload.advance_amount,
+          item_value: SaleOrderpayload.item_value,
+          discount: SaleOrderpayload.discount,
+          dis_amt: SaleOrderpayload.dis_amt,
+          taxable: SaleOrderpayload.taxable,
+          tax_amount: SaleOrderpayload.tax_amount,
+          cess_amount: SaleOrderpayload.cess_amount,
+          transport_charges: SaleOrderpayload.transport_charges,
+          round_off: SaleOrderpayload.round_off,
+          total_amount: SaleOrderpayload.total_amount,
+          vehicle_name: SaleOrderpayload.vehicle_name,
+          total_boxes: SaleOrderpayload.total_boxes,
+          shipping_address: SaleOrderpayload.shipping_address,
+          billing_address: SaleOrderpayload.billing_address,
+          customer_id: SaleOrderpayload.customer_id,
+          gst_type_id: SaleOrderpayload.gst_type_id,
+          payment_term_id: SaleOrderpayload.payment_term_id,
+          payment_link_type_id: SaleOrderpayload.payment_link_type_id,
+          workflow_id: workflow_id, // Add workflow_id to payload
+        },
+        sale_order_items: SaleOrderItems.map(item => ({
+          quantity: item.quantity,
+          unit_price: item.unit_price0,
+          rate: item.rate,
+          amount: item.amount,
+          total_boxes: item.total_boxes,
+          discount_percentage: item.discount_percentage,
+          discount: item.discount,
+          dis_amt: item.dis_amt,
+          tax: item.tax || '',
+          print_name: item.print_name,
+          remarks: item.remarks,
+          tax_rate: item.tax_rate,
+          unit_options_id: item.unit_options_id,
+          product_id: item.product_id
+        })),
+        order_attachments: OrderAttachments,
+        order_shipments: OrderShippments
+      };
+
+      console.log("Sale order payload : ", saleOrderPayload);
+
+      // POST request to create Sale Order
+      this.http.post('sales/sale_order/', saleOrderPayload).subscribe(
+        (response) => {
+          console.log('Sale Order created successfully');
+        },
+        (error) => {
+          console.error('Error creating Sale Order:', error);
+        }
+      );
+    });
+    this.ngOnInit();
+  }
+
+  
+  // Function to create Credit Note using the sale_return_id
+  createCreditNote(sale_return_id: string) {
+    const creditNotePayload = {
+      sale_credit_note: {
+        customer_id: this.formConfig.model.sale_return_order.customer_id,
+        sale_invoice_id: this.formConfig.model.sale_return_order.sale_invoice_id,
+        sale_return_id: sale_return_id,
+        total_amount: this.formConfig.model.sale_return_order.total_amount,
+        reason: this.formConfig.model.sale_return_order.return_reason,
+        order_status_id: this.formConfig.model.sale_return_order.order_status_id,
+        credit_date: this.nowDate()
+      },
+      sale_credit_note_items: this.formConfig.model.sale_return_items.map(item => ({
+        quantity: item.quantity,
+        price_per_unit: item.rate,
+        total_price: item.amount,
+        product_id: item.product_id
+      })),
+    };
+  
+    // POST request to create Credit Note
+    this.http.post('sales/sale_credit_notes/', creditNotePayload).subscribe(
+      (response) => {
+        console.log('Credit Note created successfully');
+      },
+      (error) => {
+        console.error('Error creating Credit Note:', error);
+      }
+    );
+
+    this.ngOnInit();
+  }
+  
+  // Function to create Debit Note using the sale_return_id
+  createDebitNote(sale_return_id: string) {
+    const debitNotePayload = {
+      sale_debit_note: {
+        customer_id: this.formConfig.model.sale_return_order.customer_id,
+        sale_invoice_id: this.formConfig.model.sale_return_order.sale_invoice_id,
+        sale_return_id: sale_return_id,
+        total_amount: this.formConfig.model.sale_return_order.total_amount,
+        reason: this.formConfig.model.sale_return_order.return_reason,
+        order_status_id: this.formConfig.model.sale_return_order.order_status_id,
+        debit_date: this.nowDate()
+      },
+      sale_debit_note_items: this.formConfig.model.sale_return_items.map(item => ({
+        quantity: item.quantity,
+        price_per_unit: item.rate,
+        total_price: item.amount,
+        product_id: item.product_id
+      }))
+    };
+  
+    // POST request to create Debit Note
+    this.http.post('sales/sale_debit_notes/', debitNotePayload).subscribe(
+      (response) => {
+        console.log('Debit Note created successfully');
+      },
+      (error) => {
+        console.error('Error creating Debit Note:', error);
+      }
+    );
+    this.ngOnInit();
+  }
+  
+  
 }
