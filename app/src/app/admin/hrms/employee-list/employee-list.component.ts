@@ -23,7 +23,7 @@ export class EmployeeListComponent {
     pkId: "employee_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['employee_id']
+      keys: ['name','email','phone','department_id','designation_id']
     },
     cols: [
       {

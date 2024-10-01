@@ -22,7 +22,7 @@ export class BranchListComponent {
     pkId: "branch_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['branch_id']
+      keys: ['name','code','phone','email','address','city_id','state_id','status_id']
     },
     cols: [
       {

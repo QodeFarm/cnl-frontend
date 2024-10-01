@@ -22,7 +22,7 @@ export class BankAccountListComponent {
     pkId: "bank_account_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['bank_account_id']
+      keys: ['account_name','account_number','bank_name','branch_name','account_type']
     },
     cols: [
       {
@@ -38,17 +38,17 @@ export class BankAccountListComponent {
       {
         fieldKey: 'bank_name', 
         name: 'Bank Name',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'branch_name', 
         name: 'Branch Name',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'account_type', 
         name: 'Account Type',
-        sort: false
+        sort: true
       },
       {
         fieldKey: "code",

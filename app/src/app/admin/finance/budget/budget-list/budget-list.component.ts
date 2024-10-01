@@ -21,7 +21,7 @@ export class BudgetListComponent {
     pkId: "budget_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['budget_id']
+      keys: ['account_id','fiscal_year','allocated_amount','spent_amount']
     },
     cols: [
       {
@@ -41,12 +41,12 @@ export class BudgetListComponent {
       {
         fieldKey: 'allocated_amount', 
         name: 'Allocated Amount',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'spent_amount', 
         name: 'Spent Amount',
-        sort: false
+        sort: true
       },
       {
         fieldKey: "code",

@@ -5,48 +5,62 @@ import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 @Component({
-  selector: 'app-salesinvoice-list',
+  selector: 'app-credit-note-list',
   standalone: true,
   imports: [CommonModule, AdminCommmonModule],
-  templateUrl: './salesinvoice-list.component.html',
-  styleUrls: ['./salesinvoice-list.component.scss']
+  templateUrl: './credit-note-list.component.html',
+  styleUrls: ['./credit-note-list.component.scss']
 })
-export class SalesInvoiceListComponent {
-
+export class CreditNoteListComponent {
   @Output('edit') edit = new EventEmitter<void>();
+  @Output('circle') circle = new EventEmitter<void>();
 
   tableConfig: TaTableConfig = {
-    apiUrl: 'sales/sale_invoice_order/?summary=true',
+    apiUrl: 'sales/sale_credit_notes/',
     showCheckbox: true,
-    pkId: "sale_invoice_id",
-    fixedFilters: [
-      {
-        key: 'summary',
-        value: 'true'
-      }
-    ],
+    pkId: "credit_note_id",
+    // fixedFilters: [
+    //   {
+    //     key: 'summary',
+    //     value: 'true'
+    //   }
+    // ],
     pageSize: 10,
     "globalSearch": {
-      keys: ['customer','invoice_no','invoice_date','total_amount','tax_amount','advance_amount','status_name','remarks']
+      keys: ['credit_note_id']
     },
     cols: [
       {
-        fieldKey: 'customer',
+        fieldKey: 'customer_id',
         name: 'Customer',
-        displayType: 'map',
+        displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
           return `${row.customer.name}`;
         },
         sort: true
       },
       {
-        fieldKey: 'invoice_no',
-        name: 'Invoice No',
+        fieldKey: 'sale_invoice_id',
+        name: 'Invoice',
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          return `${row.sale_invoice.invoice_no}`;
+        },
         sort: true
       },
       {
-        fieldKey: 'invoice_date',
-        name: 'Invoice Date',
+        fieldKey: 'credit_note_number',
+        name: 'Credit note no',
+        sort: true
+      },
+      {
+        fieldKey: 'credit_date',
+        name: 'Credit Date',
+        sort: true
+      },
+      {
+        fieldKey: 'reason',
+        name: 'Return Reason',
         sort: true
       },
       {
@@ -55,27 +69,12 @@ export class SalesInvoiceListComponent {
         sort: true
       },
       {
-        fieldKey: 'tax_amount',
-        name: 'Tax Amount',
-        sort: true
-      },
-      {
-        fieldKey: 'advance_amount',
-        name: 'Advance Amount',
-        sort: true
-      },
-      {
-        fieldKey: 'status_name',
+        fieldKey: 'order_status_id',
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
           return `${row.order_status.status_name}`;
         },
-        sort: true
-      },
-      {
-        fieldKey: 'remarks',
-        name: 'Remarks',
         sort: true
       },
       {
@@ -88,7 +87,7 @@ export class SalesInvoiceListComponent {
             label: 'Delete',
             confirm: true,
             confirmMsg: "Sure to delete?",
-            apiUrl: 'sales/sale_invoice_order'
+            apiUrl: 'sales/sale_credit_notes'
           },
           {
             type: 'callBackFn',
@@ -96,7 +95,18 @@ export class SalesInvoiceListComponent {
             label: '',
             callBackFn: (row, action) => {
               console.log(row);
-              this.edit.emit(row.sale_invoice_id);
+              this.edit.emit(row.credit_note_id);
+              
+            }
+          },
+          {
+            type: 'callBackFn',
+            icon: 'fa fa-check-circle',
+            confirm: true,
+            confirmMsg: "Sure to Approve?",
+            callBackFn: (row, action) => {
+              console.log(row);
+              this.circle.emit(row.credit_note_id);
             }
           }
         ]
@@ -104,5 +114,5 @@ export class SalesInvoiceListComponent {
     ]
   };
 
-  constructor(private router: Router) { }
+constructor(private router: Router) {}
 }

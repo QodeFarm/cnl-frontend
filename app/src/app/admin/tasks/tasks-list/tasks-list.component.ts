@@ -21,7 +21,7 @@ export class TasksListComponent {
     pkId: "task_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['task_id']
+      keys: ['title','user_id','description','priority_id','due_date','status_id']
     },
     cols: [
       {
@@ -41,7 +41,7 @@ export class TasksListComponent {
       {
         fieldKey: 'description',
         name: 'Description',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'priority_id',
@@ -55,7 +55,7 @@ export class TasksListComponent {
       {
         fieldKey: 'due_date',
         name: 'Due Date',
-        sort: false,
+        sort: true,
         displayType: "date"
       },
       {

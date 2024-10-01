@@ -26,7 +26,7 @@ export class PurchasereturnordersListComponent {
     ],
     pageSize: 10,
     globalSearch: {
-      keys: []
+      keys: ['purchase_type','return_no','return_reason','due_date','tax','tax_amount','total_amount','vendor','status_name','remarks']
     },
     cols: [
       {
@@ -78,7 +78,7 @@ export class PurchasereturnordersListComponent {
         sort: true
       },
       {
-        fieldKey: 'order_status',
+        fieldKey: 'status_name',
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {

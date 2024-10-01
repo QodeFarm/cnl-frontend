@@ -23,7 +23,7 @@ export class AssetsListComponent {
     pkId: "asset_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['asset_id']
+      keys: ['name','price','asset_category_id','unit_options_id','purchase_date','location_id','asset_status_id']
     },
     cols: [
       {
@@ -34,7 +34,7 @@ export class AssetsListComponent {
       {
           fieldKey: 'price', 
           name: 'Price',
-          sort: false
+          sort: true
       },
       {
         fieldKey: 'asset_category_id',
@@ -57,7 +57,7 @@ export class AssetsListComponent {
       {
         fieldKey: 'purchase_date', 
         name: 'Purchase Date',
-        sort: false,
+        sort: true,
         displayType: "date"
       },
       {
