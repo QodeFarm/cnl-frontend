@@ -51,7 +51,8 @@ const routes: Routes = [
       { path: 'finance', data: { title: 'finance', moduleName: 'finance' }, canActivate: [], loadChildren: () => import('./admin/finance/finance.module').then(m => m.FinanceModule) },
       // { path: 'voiceassistant', canActivate: [], loadChildren: () => import('./admin/voiceassistant/voiceassistant.module').then(m => m.VoiceassistantModule) },
       { path: 'credit-note', data: { title: 'Credit Note', moduleName: 'creditnote' }, canActivate: [], loadChildren: () => import('./admin/sales/credit-note/credit-note.module').then(m => m.CreditNoteModule) },
-      { path: 'debit-note', data: { title: 'Debit Note', moduleName: 'debitnote' }, canActivate: [], loadChildren: () => import('./admin/sales/debit-note/debit-note.module').then(m => m.DebitNoteModule) }
+      { path: 'debit-note', data: { title: 'Debit Note', moduleName: 'debitnote' }, canActivate: [], loadChildren: () => import('./admin/sales/debit-note/debit-note.module').then(m => m.DebitNoteModule) },
+      { path: 'reminders', data: { title: 'reminders', moduleName: 'reminders' }, canActivate: [], loadChildren: () => import('./admin/reminders/reminders.module').then(m => m.RemindersModule) }
     ]
   }
 ];
