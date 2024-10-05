@@ -17,6 +17,7 @@ import { TaCurdModule } from '@ta/ta-curd';
 import { TaFormComponent, TaFormModule } from '@ta/ta-form';
 import { RouterModule } from '@angular/router';
 const module = [NzListModule,
+  CommonModule,
   RouterModule,
   NzSkeletonModule,
   NzLayoutModule,
@@ -37,7 +38,6 @@ const module = [NzListModule,
 @NgModule({
   declarations: [],
   imports: [
-    CommonModule,
     module
   ],
   exports: [module]

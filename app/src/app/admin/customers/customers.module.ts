@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { CustomersRoutingModule } from './customers-routing.module';
-import { CustomersComponent } from './customers.component';
 import { LedgerAccountsComponent } from './ledger-accounts/ledger-accounts.component';
 import { LedgerGroupsComponent } from './ledger-groups/ledger-groups.component';
 import { TerritoryComponent } from './territory/territory.component';
@@ -14,7 +13,6 @@ import { CustomerPaymentTermsComponent } from './customer-payment-terms/customer
 
 @NgModule({
   declarations: [
-    CustomersComponent,
     LedgerAccountsComponent,
     LedgerGroupsComponent,
     TerritoryComponent,

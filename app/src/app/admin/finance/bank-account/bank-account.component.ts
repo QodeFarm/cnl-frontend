@@ -1,9 +1,14 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
+import { CommonModule } from '@angular/common';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { BankAccountListComponent } from './bank-account-list/bank-account-list.component';
 
 @Component({
   selector: 'app-bank-account',
+  standalone: true,
+  imports: [CommonModule,AdminCommmonModule, BankAccountListComponent],
   templateUrl: './bank-account.component.html',
   styleUrls: ['./bank-account.component.scss']
 })

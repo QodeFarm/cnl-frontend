@@ -11,7 +11,7 @@ import { EmployeeListComponent } from './employee-list/employee-list.component';
 
 @NgModule({
   declarations: [
-    EmployeesComponent,
+    // EmployeesComponent,
     DepartmentsComponent,
     DesignationsComponent,
   ],

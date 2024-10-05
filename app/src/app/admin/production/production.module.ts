@@ -11,10 +11,10 @@ import { WorkOrderListComponent } from './work-order-list/work-order-list.compon
 
 @NgModule({
   declarations: [
-    ProductionComponent,
-    ProductionStatusesComponent,
-    MachinesComponent,
-    WorkOrderListComponent,
+    // ProductionComponent,
+    // ProductionStatusesComponent,
+    // MachinesComponent,
+    // WorkOrderListComponent,
   ],
   imports: [
     CommonModule,

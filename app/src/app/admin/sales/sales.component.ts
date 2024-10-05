@@ -1,12 +1,16 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
-import { FormlyFieldConfig } from '@ngx-formly/core';
 import { TaFormComponent, TaFormConfig } from '@ta/ta-form';
-import { distinctUntilChanged } from 'rxjs/operators';
 import { Observable, forkJoin } from 'rxjs';
 import { tap, switchMap } from 'rxjs/operators';
 import { FormGroup } from '@angular/forms';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { OrderslistComponent } from './orderslist/orderslist.component';
+import { CommonModule } from '@angular/common';
+import { SalesListComponent } from './sales-list/sales-list.component';
 @Component({
+  standalone: true,
+  imports: [CommonModule, AdminCommmonModule, OrderslistComponent, SalesListComponent],
   selector: 'app-sales',
   templateUrl: './sales.component.html',
   styleUrls: ['./sales.component.scss']
@@ -21,12 +25,12 @@ export class SalesComponent {
   SaleOrderEditID: any;
   productOptions: any;
   customerDetails: Object;
-  customerOrders: any[] = []; 
+  customerOrders: any[] = [];
   showOrderListModal = false;
   selectedOrder: any;
   noOrdersMessage: string;
   shippingTrackingNumber: any;
-  
+
   nowDate = () => {
     const date = new Date();
     return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
@@ -97,13 +101,13 @@ export class SalesComponent {
   getOrderNo() {
     this.orderNumber = null;
     this.shippingTrackingNumber = null; // Separate variable for Shipping Tracking No.
-  
+
     // Generate Shipping Tracking Number
     this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
       if (res && res.data && res.data.order_number) {
         this.shippingTrackingNumber = res.data.order_number;
         this.formConfig.model['order_shipments']['shipping_tracking_no'] = this.shippingTrackingNumber;
-  
+
         // Generate Sales Order Number
         this.http.get('masters/generate_order_no/?type=SO').subscribe((res: any) => {
           console.log("RES data in orderno : ", res)
@@ -119,7 +123,7 @@ export class SalesComponent {
   showSaleOrderListFn() {
     this.showSaleOrderList = true;
   }
-  
+
   // Shows the past orders list modal and fetches orders based on the selected customer
   showOrdersList() {
     // Ensure customer is selected
@@ -128,7 +132,7 @@ export class SalesComponent {
     // Debugging logs to ensure customer_id is correctly set
     //console.log("Selected Customer ID:", selectedCustomerId);
     //console.log("Selected Customer Name:", selectedCustomerName);
-  
+
     if (!selectedCustomerId) {
       this.noOrdersMessage = 'Please select a customer.';
       this.customerOrders = [];
@@ -146,7 +150,7 @@ export class SalesComponent {
           this.openModal();
           return [];
         }
-  
+
         const detailedOrderRequests = orders.data.map(order =>
           this.getOrderDetails(order.sale_order_id).pipe(
             tap(orderDetails => {
@@ -167,7 +171,7 @@ export class SalesComponent {
             })
           )
         );
-        
+
         // Wait for all detailed order requests to complete before updating the UI
         return forkJoin(detailedOrderRequests).pipe(
           tap(() => {
@@ -178,7 +182,7 @@ export class SalesComponent {
       })
     ).subscribe();
   }
-  
+
   openModal() {
     this.ordersModal.nativeElement.classList.add('show');
     this.ordersModal.nativeElement.style.display = 'block';
@@ -225,13 +229,13 @@ export class SalesComponent {
         } else {
           this.formConfig.model['sale_order']['order_no'] = this.orderNumber; // Retain the initial order number
         }
-        
+
         if (!this.shippingTrackingNumber) {
           this.formConfig.model['order_shipments']['shipping_tracking_no'] = ''; // Ensure new order starts blank
         } else {
           this.formConfig.model['order_shipments']['shipping_tracking_no'] = this.shippingTrackingNumber; // Retain the initial tracking number
         }
-        
+
 
         // Set default dates for the new order
         this.formConfig.model['sale_order']['delivery_date'] = this.nowDate();
@@ -269,69 +273,69 @@ export class SalesComponent {
     existingProducts = existingProducts.filter((product: any) => product?.code && product.code.trim() !== "");
 
     if (existingProducts.length === 0) {
-        // Initialize the product list if no products exist
-        this.formConfig.model['sale_order_items'] = selectedProducts.map(product => ({
-            product: {
-                product_id: product.product_id || null,
-                name: product.product_name || '',  // Ensure the actual product name is set
-                code: product.code || '',
-            },
-            product_id: product.product_id || null,
-            code: product.code || '',
-            total_boxes: product.total_boxes || 0,
-            unit_options_id: product.unit_options_id || null,
-            quantity: product.quantity || 1,
-            rate: product.rate || 0,
-            discount: product.discount || 0,
-            print_name: product.print_name || product.product_name || '', // Use print_name only if necessary
-            amount: product.amount || 0,
-            tax: product.tax || 0,
-            remarks: product.remarks || ''
-        }));
+      // Initialize the product list if no products exist
+      this.formConfig.model['sale_order_items'] = selectedProducts.map(product => ({
+        product: {
+          product_id: product.product_id || null,
+          name: product.product_name || '',  // Ensure the actual product name is set
+          code: product.code || '',
+        },
+        product_id: product.product_id || null,
+        code: product.code || '',
+        total_boxes: product.total_boxes || 0,
+        unit_options_id: product.unit_options_id || null,
+        quantity: product.quantity || 1,
+        rate: product.rate || 0,
+        discount: product.discount || 0,
+        print_name: product.print_name || product.product_name || '', // Use print_name only if necessary
+        amount: product.amount || 0,
+        tax: product.tax || 0,
+        remarks: product.remarks || ''
+      }));
     } else {
-        // Update existing products or add new products
-        selectedProducts.forEach(newProduct => {
-            const existingProductIndex = existingProducts.findIndex((product: any) => 
-                product.product_id === newProduct.product_id || product.code === newProduct.code
-            );
+      // Update existing products or add new products
+      selectedProducts.forEach(newProduct => {
+        const existingProductIndex = existingProducts.findIndex((product: any) =>
+          product.product_id === newProduct.product_id || product.code === newProduct.code
+        );
 
-            if (existingProductIndex === -1) {
-                // Add the product if it doesn't exist in the list
-                existingProducts.push({
-                    product: {
-                        product_id: newProduct.product_id || null,
-                        name: newProduct.product_name || '',  // Ensure the actual product name is set
-                        code: newProduct.code || '',
-                    },
-                    product_id: newProduct.product_id || null,
-                    code: newProduct.code || '',
-                    total_boxes: newProduct.total_boxes || 0,
-                    unit_options_id: newProduct.unit_options_id || null,
-                    quantity: newProduct.quantity || 1,
-                    rate: newProduct.rate || 0,
-                    discount: newProduct.discount || 0,
-                    print_name: newProduct.print_name || newProduct.product_name || '', // Use print_name only if necessary
-                    amount: newProduct.amount || 0,
-                    tax: newProduct.tax || 0,
-                    remarks: newProduct.remarks || ''
-                });
-            } else {
-                // Update the existing product
-                existingProducts[existingProductIndex] = {
-                    ...existingProducts[existingProductIndex],
-                    ...newProduct,
-                    product: {
-                        product_id: newProduct.product_id || existingProducts[existingProductIndex].product.product_id,
-                        name: newProduct.product_name || existingProducts[existingProductIndex].product.name, // Ensure correct name is set
-                        code: newProduct.code || existingProducts[existingProductIndex].product.code,
-                    },
-                    print_name: newProduct.print_name || newProduct.product_name || existingProducts[existingProductIndex].product.name, // Ensure correct name is shown
-                };
-            }
-        });
+        if (existingProductIndex === -1) {
+          // Add the product if it doesn't exist in the list
+          existingProducts.push({
+            product: {
+              product_id: newProduct.product_id || null,
+              name: newProduct.product_name || '',  // Ensure the actual product name is set
+              code: newProduct.code || '',
+            },
+            product_id: newProduct.product_id || null,
+            code: newProduct.code || '',
+            total_boxes: newProduct.total_boxes || 0,
+            unit_options_id: newProduct.unit_options_id || null,
+            quantity: newProduct.quantity || 1,
+            rate: newProduct.rate || 0,
+            discount: newProduct.discount || 0,
+            print_name: newProduct.print_name || newProduct.product_name || '', // Use print_name only if necessary
+            amount: newProduct.amount || 0,
+            tax: newProduct.tax || 0,
+            remarks: newProduct.remarks || ''
+          });
+        } else {
+          // Update the existing product
+          existingProducts[existingProductIndex] = {
+            ...existingProducts[existingProductIndex],
+            ...newProduct,
+            product: {
+              product_id: newProduct.product_id || existingProducts[existingProductIndex].product.product_id,
+              name: newProduct.product_name || existingProducts[existingProductIndex].product.name, // Ensure correct name is set
+              code: newProduct.code || existingProducts[existingProductIndex].product.code,
+            },
+            print_name: newProduct.print_name || newProduct.product_name || existingProducts[existingProductIndex].product.name, // Ensure correct name is shown
+          };
+        }
+      });
 
-        // Assign the updated product list back to the model
-        this.formConfig.model['sale_order_items'] = [...existingProducts];
+      // Assign the updated product list back to the model
+      this.formConfig.model['sale_order_items'] = [...existingProducts];
     }
 
     // Re-render the form
@@ -341,7 +345,7 @@ export class SalesComponent {
     this.cdRef.detectChanges();
 
     //console.log("Final Products List:", this.formConfig.model['sale_order_items']);
-}
+  }
 
   hideModal() {
     const modalBackdrop = document.querySelector('.modal-backdrop');
@@ -1188,7 +1192,7 @@ export class SalesComponent {
                                   });
                                 }
                               }
-                            },                       
+                            },
                             {
                               key: 'flow_status',
                               type: 'select',
@@ -1199,7 +1203,7 @@ export class SalesComponent {
                                 expressions: {
                                   hide: '!model.sale_order_id',
                                 },
-                                options:[
+                                options: [
                                   { value: 'Invoiced', label: 'Invoiced' },
                                 ]
                               },
@@ -1207,15 +1211,15 @@ export class SalesComponent {
                                 onChanges: (field: any) => {
                                   field.formControl.valueChanges.subscribe(data => {
                                     if (data) {
-                                      this.formConfig.model['sale_order']['flow_status'] = data;  
-                      
+                                      this.formConfig.model['sale_order']['flow_status'] = data;
+
                                       const saleOrder = this.formConfig.model['sale_order'];
                                       console.log("Saleorder : ", saleOrder);
                                       if (saleOrder.flow_status === 'Invoice Ready') {
                                         const saleOrderItems = this.formConfig.model['sale_order_items'];
                                         const orderAttachments = this.formConfig.model['order_attachments'];
                                         const orderShipments = this.formConfig.model['order_shipments'];
-                            
+
                                         const invoiceData = {
                                           sale_invoice_order: {
                                             bill_type: saleOrder.bill_type || 'CASH',
@@ -1266,7 +1270,7 @@ export class SalesComponent {
                                         );
                                       }
                                     }
-                                   });
+                                  });
                                 }
                               }
                             },

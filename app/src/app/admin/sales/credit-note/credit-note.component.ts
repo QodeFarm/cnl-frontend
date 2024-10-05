@@ -1,9 +1,14 @@
+import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { TaFormComponent, TaFormConfig } from '@ta/ta-form';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { CreditNoteListComponent } from './credit-note-list/credit-note-list.component';
 
 @Component({
   selector: 'app-credit-note',
+  standalone: true,
+  imports: [CommonModule, AdminCommmonModule, CreditNoteListComponent],
   templateUrl: './credit-note.component.html',
   styleUrls: ['./credit-note.component.scss']
 })

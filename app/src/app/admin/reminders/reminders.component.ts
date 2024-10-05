@@ -1,9 +1,14 @@
+import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { RemindersListComponent } from './reminders-list/reminders-list.component';
 
 @Component({
   selector: 'app-reminders',
+  standalone: true,
+  imports: [CommonModule,AdminCommmonModule, RemindersListComponent],
   templateUrl: './reminders.component.html',
   styleUrls: ['./reminders.component.scss']
 })

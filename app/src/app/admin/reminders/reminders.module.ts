@@ -13,7 +13,7 @@ import { ReminderSettingsComponent } from './reminder-settings/reminder-settings
 
 @NgModule({
   declarations: [
-    RemindersComponent,
+    // RemindersComponent,
     NotificationMethodsComponent,
     NotificationFrequenciesComponent,
     ReminderTypesComponent,

@@ -1,9 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
+import { JournalEntryListComponent } from './journal-entry-list/journal-entry-list.component';
+import { CommonModule } from '@angular/common';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 @Component({
   selector: 'app-journal-entry',
+  standalone: true,
+  imports: [CommonModule, AdminCommmonModule, JournalEntryListComponent],
   templateUrl: './journal-entry.component.html',
   styleUrls: ['./journal-entry.component.scss']
 })

@@ -179,7 +179,7 @@
                             <a [routerLink]="['/admin/users/roles']"><i class="fa fa-user-cog"></i> User Roles</a>
                         </li>
                         <li>
-                            <a [routerLink]="['/admin/reminders/reminders']"><i class="fa fa-bell"></i> Reminders</a>
+                            <a [routerLink]="['/admin/reminders']"><i class="fa fa-bell"></i> Reminders</a>
                         </li>
                     </ul>
                 </div>
@@ -288,8 +288,16 @@
         <!-- <router-outlet></router-outlet> -->
         <div class="tab  flex-fill h-100 px-0 bg-white border-bottom d-flex flex-column">
 
+            <nz-tabset [(nzSelectedIndex)]="selectedTabIndex" nzType="editable-card" nzHideAdd (nzClose)="removeTab($event)">
+
+                <nz-tab [nzClosable]="true" [nzTitle]="tab.name" *ngFor="let tab of tabs">
+                    <ng-container *ngComponentOutlet="tab.component;"></ng-container>
+                </nz-tab>
+
+            </nz-tabset>
+
             <!-- All tabs -->
-            <ul class="nav nav-tabs bg-light mt-3">
+            <!-- <ul class="nav nav-tabs bg-light mt-3">
                 <li class="nav-item" *ngFor="let tab of tabs; let first = first;" (mouseleave)="mouseOverTab(null)" (mouseenter)="mouseOverTab(tab)">
                     <div class="nav-link" [class.active]="tab.active">
                         <div class="d-flex flex-row cursor-pointer">
@@ -301,14 +309,18 @@
                     </div>
                 </li>
             </ul>
-            <!-- <div class="tab-content p-3 border-left border-right flex-fill">
+            <div class="tab-content p-3 border-left border-right flex-fill">
                 <ng-container *ngFor="let tab of tabs">
                     <div class="tab-pane fade {{tab.name}}" [class.show]="tab.active" [class.active]="tab.active" [id]="tab.name" role="tabpanel">
                         <ng-container *ngComponentOutlet="tab.component;"></ng-container>
                     </div>
                 </ng-container>
             </div> -->
-            <router-outlet></router-outlet>
+
+
+
+
+            <!-- <router-outlet></router-outlet> -->
 
             <!-- </div> -->
             <!-- /.container-fluid -->

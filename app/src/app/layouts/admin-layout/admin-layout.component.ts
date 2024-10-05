@@ -5,7 +5,7 @@ import { LocalStorageService } from '@ta/ta-core';
 import { AdminCommonService } from 'src/app/services/admin-common.service';
 import { HttpClient } from '@angular/common/http';
 import { filter, map, mergeMap } from 'rxjs/operators';
-
+import { NzTabsModule } from 'ng-zorro-antd/tabs';
 interface SpeechRecognitionResult {
   transcript: string; // Holds the recognized speech as text
 }
@@ -38,7 +38,7 @@ export interface Tab {
   templateUrl: './admin-layout.component.html',
   styleUrls: ['./admin-layout.component.scss'],
   standalone: true,
-  imports: [CommonModule, RouterModule]
+  imports: [CommonModule, RouterModule, NzTabsModule]
 })
 export class AdminLayoutComponent {
   menulList = <any>[];
@@ -65,6 +65,7 @@ export class AdminLayoutComponent {
         return { data: route.snapshot.data, component: route.component };  // Get the route's data (like title)
       })
     ).subscribe(route => {
+      debugger;
       this.checkAndAddRouteTab({ name: route.data.title, component: route.component, key: route.data.moduleName, url: this.router.url, active: true });
       console.log('data', route.data.title, this.router.url);
     });
@@ -150,12 +151,12 @@ export class AdminLayoutComponent {
             icon: 'fas fa-tachometer-alt',
           },
           {
-            link: '/admin/credit-note',
+            link: '/admin/sales/credit-note',
             label: 'Sale Credit Note',
             icon: 'fas fa-tachometer-alt',
           },
           {
-            link: '/admin/debit-note',
+            link: '/admin/sales/debit-note',
             label: 'Sale Debit Note',
             icon: 'fas fa-tachometer-alt',
           },
@@ -177,7 +178,7 @@ export class AdminLayoutComponent {
             icon: 'fas fa-tachometer-alt',
           },
           {
-            link: '/admin/purchase/invoice',
+            link: '/admin/purchase/purchase-invoice',
             label: 'Purchase Invoice',
             icon: 'fas fa-tachometer-alt',
           },
@@ -209,7 +210,7 @@ export class AdminLayoutComponent {
             label: 'Payment Transaction',
           },
           {
-            link: '/admin/finance/tax-configurationt',
+            link: '/admin/finance/tax-configuration',
             label: 'Tax Configuration',
           },
           {
@@ -237,7 +238,7 @@ export class AdminLayoutComponent {
           {
             link: '/admin/production/machines',
             label: 'Machines',
-          },         
+          },
           {
             link: '/admin/production/productionstatuses',
             label: 'Production Statuses',
@@ -311,7 +312,7 @@ export class AdminLayoutComponent {
         icon: 'icon icon-assets',
         child: [
           {
-            link: '/admin/assets/assets',
+            link: '/admin/assets',
             label: 'Assets',
             icon: 'fas fa-tachometer-alt',
           },
@@ -331,7 +332,7 @@ export class AdminLayoutComponent {
           //   icon: 'fas fa-tachometer-alt',
           // },
           {
-            link: '/admin/assets/asset_maintenance',
+            link: '/admin/assets/asset-maintenance',
             label: 'Asset Maintenance',
             icon: 'fas fa-tachometer-alt',
           },
@@ -543,8 +544,8 @@ export class AdminLayoutComponent {
       'leads': 'admin/leads',
 
       //assets
-      'assets': 'admin/assets/assets',
-      'asset maintenance': 'admin/assets/asset_maintenance',
+      'assets': 'admin/assets',
+      'asset maintenance': 'admin/assets/asset-maintenance',
 
       //HRMS
       'employees': 'admin/employees',
@@ -687,6 +688,7 @@ export class AdminLayoutComponent {
     });
     console.log('Form Data:', formData);
   }
+  selectedTabIndex = 0;
   // tabs based on routing
   disposeTab(tab: Tab) {
     if (this.tabs.length > 1) {
@@ -698,6 +700,11 @@ export class AdminLayoutComponent {
         this.router.navigateByUrl(this.tabs[this.tabs.length - 1].url);
       }
     }
+  }
+  removeTab(index) {
+    debugger;
+    this.tabs.splice(index.index, 1);
+    this.router.navigateByUrl(this.tabs[this.tabs.length - 1].url);
   }
 
   mouseOverTab(tab: Tab) {
@@ -722,13 +729,14 @@ export class AdminLayoutComponent {
       if (!tab.name) { tab.name = 'Untitle-' + this.tabs.length + 1 }
 
       this.tabs.push(tab);
-
+      this.selectedTabIndex = this.tabs.length;
     } else {
       // if the tab exists, activate it
       const tabToActivate = this.tabs.find(t => t.key == tab.key);
       if (tabToActivate) {
         tabToActivate.active = true;
       }
+      this.selectedTabIndex = this.tabs.findIndex(t => t.key == tab.key);
     }
 
     this.cd.markForCheck();

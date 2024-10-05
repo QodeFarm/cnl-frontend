@@ -14,11 +14,11 @@ import { AssetMaintenanceListComponent } from './asset-maintenance/asset-mainten
 
 @NgModule({
   declarations: [
-    AssetsComponent,
+    // AssetsComponent,
     AssetStatusesComponent,
     AssetCategoriesComponent,
     LocationsComponent,
-    AssetMaintenanceComponent
+    // AssetMaintenanceComponent
 
   ],
   imports: [
@@ -32,7 +32,7 @@ import { AssetMaintenanceListComponent } from './asset-maintenance/asset-mainten
     AssetStatusesComponent,
     AssetCategoriesComponent,
     LocationsComponent,
-    AssetMaintenanceComponent
+    // AssetMaintenanceComponent
   ]
 })
 export class AssetsModule { }
