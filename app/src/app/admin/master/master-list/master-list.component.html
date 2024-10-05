@@ -44,6 +44,10 @@
                             <li><a [routerLink]="['/admin/master/price-categories']">Price categories</a></li>
                             <li><a [routerLink]="['/admin/master/shipping-modes']">Shipping modes</a></li>
                             <li><a [routerLink]="['/admin/master/shipping-companies']">Shipping companies</a></li>
+                            <li><a [routerLink]="['/admin/master/notification-frequencies']">Notification Frequencies</a></li>
+                            <li><a [routerLink]="['/admin/master/notification-methods']">Notification Methods</a></li>
+                            <li><a [routerLink]="['/admin/master/reminder-types']">Reminder Types</a></li> 
+                            <li><a [routerLink]="['/admin/master/reminder-settings']">Reminder Settings</a></li>
                         </ul>
                     </div>
                 </div>
@@ -70,6 +74,18 @@
                         <ng-container *ngSwitchCase="'shipping-companies'">
                             <app-shipping-companies></app-shipping-companies>
                         </ng-container>
+                        <ng-container *ngSwitchCase="'notification-frequencies'">
+                            <app-notification-frequencies></app-notification-frequencies>
+                        </ng-container>  
+                        <ng-container *ngSwitchCase="'notification-methods'">
+                            <app-notification-methods></app-notification-methods>
+                        </ng-container>                         
+                        <ng-container *ngSwitchCase="'reminder-types'">
+                            <app-reminder-types></app-reminder-types>
+                        </ng-container> 
+                        <ng-container *ngSwitchCase="'reminder-settings'">
+                            <app-reminder-settings></app-reminder-settings>
+                        </ng-container> 
                     </ng-container>
                 </div>
             </div>
