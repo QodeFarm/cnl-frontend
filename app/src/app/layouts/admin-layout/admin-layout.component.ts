@@ -150,6 +150,16 @@ export class AdminLayoutComponent {
             label: 'Sale Receipt',
             icon: 'fas fa-tachometer-alt',
           },
+          {
+            link: '/admin/sales/credit-note',
+            label: 'Sale Credit Note',
+            icon: 'fas fa-tachometer-alt',
+          },
+          {
+            link: '/admin/sales/debit-note',
+            label: 'Sale Debit Note',
+            icon: 'fas fa-tachometer-alt',
+          },
         ]
       },
       {

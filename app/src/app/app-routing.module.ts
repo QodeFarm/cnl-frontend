@@ -33,9 +33,11 @@ const routes: Routes = [
       { path: 'sales/sale-returns',data: { title: 'Sales Returns', moduleName: "sales-return" },loadComponent: () => import('./admin/sales/sale-returns/sale-returns.component').then(m => m.SaleReturnsComponent)},
       { path: 'sales/salesinvoice',data: { title: 'Sales Invoice', moduleName: "sales-invoice" },loadComponent: () => import('./admin/sales/salesinvoice/salesinvoice.component').then(m => m.SalesinvoiceComponent)},
       {path: 'sales/sales-dispatch',data: { title: 'Sale Dispatch', moduleName: "sales-dispatch" },loadComponent: () => import('./admin/sales/sales-dispatch/sales-dispatch.component').then(m => m.SalesDispatchComponent)},
-      { path: 'sale-receipt', data: { title: 'SaleReceipt', moduleName: 'sale-receipt' }, canActivate: [], loadComponent: () => import('./admin/sales/sale-receipt/sale-receipt.component').then(m => m.SaleReceiptComponent) },
+      { path: 'sale-receipt', data: { title: 'Sale Receipt', moduleName: 'sale-receipt' }, canActivate: [], loadComponent: () => import('./admin/sales/sale-receipt/sale-receipt.component').then(m => m.SaleReceiptComponent) },
+      { path: 'sales/debit-note', data: { title: 'Sale Debit Note', moduleName: 'debit-note' }, canActivate: [], loadComponent: () => import('./admin/sales/debit-note/debit-note.component').then(m => m.DebitNoteComponent) },
+      { path: 'sales/credit-note', data: { title: 'Sale Credit Note', moduleName: 'credit-note' }, canActivate: [], loadComponent: () => import('./admin/sales/credit-note/credit-note.component').then(m => m.CreditNoteComponent) },
       { path: 'customers', data: { title: 'Customers', moduleName: 'customers' }, canActivate: [], loadComponent: () => import('./admin/customers/customers.component').then(m => m.CustomersComponent) },
-
+      
       //Purchase Module
       { path: 'purchase', data: { title: 'Purchase', moduleName: 'purchase' }, canActivate: [], loadComponent: () => import('./admin/purchase/purchase.component').then(m => m.PurchaseComponent) },
       {path: 'purchase/purchase-invoice',data: { title: 'Purchase Invoice', moduleName: "purchaseinvoice" },loadComponent: () => import('./admin/purchase/purchase-invoice/purchase-invoice.component').then(m => m.PurchaseInvoiceComponent)},
@@ -82,6 +84,11 @@ const routes: Routes = [
       { path: 'company', data: { title: 'Company', moduleName: 'company' }, canActivate: [], loadComponent: () => import('./admin/company/company.component').then(m => m.CompanyComponent) },
       { path: 'company/branches', data: { title: 'Branches', moduleName: 'branches' }, canActivate: [], loadComponent: () => import('./admin/company/branches/branches.component').then(m => m.BranchesComponent) },
 
+      //Company Module
+      { path: 'reminders', data: { title: 'Reminders', moduleName: 'reminders' }, canActivate: [], loadComponent: () => import('./admin/reminders/reminders.component').then(m => m.RemindersComponent) },
+      // { path: 'company/branches', data: { title: 'Branches', moduleName: 'branches' }, canActivate: [], loadComponent: () => import('./admin/company/branches/branches.component').then(m => m.BranchesComponent) },
+
+
       //Users Module
       { path: 'users', data: { title: 'Users', moduleName: 'users' }, canActivate: [], loadComponent: () => import('./admin/user/user.component').then(m => m.UserComponent) },
       { path: 'users/roles', data: { title: 'User Roles', moduleName: 'user roles' }, canActivate: [], loadComponent: () => import('./admin/user/roles/roles.component').then(m => m.RolesComponent) },
@@ -116,7 +123,16 @@ const routes: Routes = [
       
       // { path: 'purchase', data: { title: 'purchase', moduleName: 'purchase' }, canActivate: [], loadChildren: () => import('./admin/purchase/purchase.module').then(m => m.PurchaseModule) },
       
-      // { path: 'voiceassistant', canActivate: [], loadChildren: () => import('./admin/voiceassistant/voiceassistant.module').then(m => m.VoiceassistantModule) },
+      // { path: 'inventory', data: { title: 'inventory', moduleName: 'inventory' }, canActivate: [], loadChildren: () => import('./admin/inventory/inventory.module').then(m => m.InventoryModule) },
+      // { path: 'products', data: { title: 'products', moduleName: 'products' }, canActivate: [], loadChildren: () => import('./admin/products/products.module').then(m => m.ProductsModule) },
+      // { path: 'purchase', data: { title: 'purchase', moduleName: 'purchase' }, canActivate: [], loadChildren: () => import('./admin/purchase/purchase.module').then(m => m.PurchaseModule) },
+      // { path: 'sale-receipt', data: { title: 'Sale Receipt', moduleName: 'sale-receipt' }, canActivate: [], loadChildren: () => import('./admin/sales/sale-receipt/sale-receipt.module').then(m => m.SaleReceiptModule) },
+      // { path: 'production', data: { title: 'production', moduleName: 'production' }, canActivate: [], loadChildren: () => import('./admin/production/production.module').then(m => m.ProductionModule) },
+      // { path: 'finance', data: { title: 'finance', moduleName: 'finance' }, canActivate: [], loadChildren: () => import('./admin/finance/finance.module').then(m => m.FinanceModule) },
+      // // { path: 'voiceassistant', canActivate: [], loadChildren: () => import('./admin/voiceassistant/voiceassistant.module').then(m => m.VoiceassistantModule) },
+      // { path: 'credit-note', data: { title: 'Credit Note', moduleName: 'creditnote' }, canActivate: [], loadChildren: () => import('./admin/sales/credit-note/credit-note.module').then(m => m.CreditNoteModule) },
+      // { path: 'debit-note', data: { title: 'Debit Note', moduleName: 'debitnote' }, canActivate: [], loadChildren: () => import('./admin/sales/debit-note/debit-note.module').then(m => m.DebitNoteModule) },
+      // { path: 'reminders', data: { title: 'reminders', moduleName: 'reminders' }, canActivate: [], loadChildren: () => import('./admin/reminders/reminders.module').then(m => m.RemindersModule) }
     ]
   }
 ];

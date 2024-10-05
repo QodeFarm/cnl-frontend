@@ -110,6 +110,7 @@ export class SalesComponent {
 
         // Generate Sales Order Number
         this.http.get('masters/generate_order_no/?type=SO').subscribe((res: any) => {
+          console.log("RES data in orderno : ", res)
           if (res && res.data && res.data.order_number) {
             this.orderNumber = res.data.order_number;
             this.formConfig.model['sale_order']['order_no'] = this.orderNumber;

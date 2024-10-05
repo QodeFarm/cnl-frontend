@@ -1,12 +1,11 @@
 // import { NgModule } from '@angular/core';
 // import { RouterModule, Routes } from '@angular/router';
-// import { SaleReturnsComponent } from './sale-returns.component';
-// import { SaleReturnsListComponent } from './sale-returns-list/sale-returns-list.component';
+// import { DebitNoteComponent } from './debit-note.component';
 
 // const routes: Routes = [
 //   {
 //     path: '',
-//     component: SaleReturnsListComponent
+//     component: DebitNoteComponent
 //   }
 // ];
 
@@ -14,4 +13,4 @@
 //   imports: [RouterModule.forChild(routes)],
 //   exports: [RouterModule]
 // })
-// export class SaleReturnsRoutingModule { }
+// export class DebitNoteRoutingModule { }
