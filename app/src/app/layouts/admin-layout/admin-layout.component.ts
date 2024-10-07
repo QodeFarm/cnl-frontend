@@ -5,7 +5,7 @@ import { LocalStorageService } from '@ta/ta-core';
 import { AdminCommonService } from 'src/app/services/admin-common.service';
 import { HttpClient } from '@angular/common/http';
 import { filter, map, mergeMap } from 'rxjs/operators';
-
+import { NzTabsModule } from 'ng-zorro-antd/tabs';
 interface SpeechRecognitionResult {
   transcript: string; // Holds the recognized speech as text
 }
@@ -38,7 +38,7 @@ export interface Tab {
   templateUrl: './admin-layout.component.html',
   styleUrls: ['./admin-layout.component.scss'],
   standalone: true,
-  imports: [CommonModule, RouterModule]
+  imports: [CommonModule, RouterModule, NzTabsModule]
 })
 export class AdminLayoutComponent {
   menulList = <any>[];
@@ -65,6 +65,7 @@ export class AdminLayoutComponent {
         return { data: route.snapshot.data, component: route.component };  // Get the route's data (like title)
       })
     ).subscribe(route => {
+      debugger;
       this.checkAndAddRouteTab({ name: route.data.title, component: route.component, key: route.data.moduleName, url: this.router.url, active: true });
       console.log('data', route.data.title, this.router.url);
     });
@@ -86,289 +87,272 @@ export class AdminLayoutComponent {
   }
   ngOnInit() {
     const user = this.taLoacal.getItem('user');
+    this.menulList = [];
     if (user)
-      this.userName = user.username
-    this.menulList = [
-      {
-        link: '/admin/dashboard',
-        label: 'Dashboard',
-        icon: 'icon icon-dashboard',
-      },
-      // {
-      //   link: '/admin/voiceassistant',
-      //   label: 'voiceassistant',
-      //   icon: 'fas fa-microphone',
-      // },
-      // {
-      //   label: 'User Management',
-      //   icon: 'fas fa-user',
-      //   child: [
-      //     // {
-      //     //   link: '/admin/users',
-      //     //   label: 'Users',
-      //     //   icon: 'fas fa-user',
-      //     // },
-      //     {
-      //       link: '/admin/users/roles',
-      //       label: 'Roles',
-      //       icon: 'fas fa-user',
-      //     }
-      //   ]
-      // },
-      {
-        label: 'Sales',
-        icon: 'icon icon-sales',
-        child: [
-          {
-            link: '/admin/customers',
-            label: 'Customer',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/sales',
-            label: 'Sale Order',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/sales/salesinvoice',
-            label: 'Sale Invoice',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/sales/sale-returns',
-            label: 'Sale Return',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/sales/sales-dispatch',
-            label: 'Sale Dispatch',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/sale-receipt',
-            label: 'Sale Receipt',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/credit-note',
-            label: 'Sale Credit Note',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/debit-note',
-            label: 'Sale Debit Note',
-            icon: 'fas fa-tachometer-alt',
-          },
-        ]
-      },
-      {
-        // link: '/admin/purchase/purchase',
-        label: 'Purchase',
-        icon: 'icon icon-purchase',
-        child: [
-          {
-            link: '/admin/vendors',
-            label: 'Vendors',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/purchase',
-            label: 'Purchase',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/purchase/invoice',
-            label: 'Purchase Invoice',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/purchase/purchasereturns',
-            label: 'Purchase Returns',
-            icon: 'fas fa-tachometer-alt',
-          }
-        ]
-      },
-      {
-        label: 'Finance',
-        icon: 'icon icon-finance',
-        child: [
-          {
-            link: '/admin/finance/bank-account',
-            label: 'Bank Account',
-          },
-          {
-            link: '/admin/finance/chart-of-accounts',
-            label: 'Chart Of Accounts',
-          },
-          {
-            link: '/admin/finance/journal-entry',
-            label: 'Journal Entry',
-          },
-          {
-            link: '/admin/finance/payment-transaction',
-            label: 'Payment Transaction',
-          },
-          {
-            link: '/admin/finance/tax-configurationt',
-            label: 'Tax Configuration',
-          },
-          {
-            link: '/admin/finance/budget',
-            label: 'Budget',
-          },
-          {
-            link: '/admin/finance/expense-claim',
-            label: 'Expense Claim',
-          },
-          {
-            link: '/admin/finance/financial-report',
-            label: 'Financial Report',
-          },
-        ]
-      },
-      {
-        label: 'Production',
-        icon: 'icon icon-production',
-        child: [
-          {
-            link: '/admin/production',
-            label: 'Work Order',
-          },
-          {
-            link: '/admin/production/machines',
-            label: 'Machines',
-          },         
-          {
-            link: '/admin/production/productionstatuses',
-            label: 'Production Statuses',
-          }
-        ]
-      },
-      {
-        label: 'Inventory',
-        icon: 'icon icon-inventory',
-        child: [
-          {
-            link: '/admin/inventory',
-            label: 'Inventory',
-            icon: 'fas fa-boxes',
-          },
-          {
-            link: '/admin/products',
-            label: 'Products',
-          },
-          {
-            link: '/admin/warehouses',
-            label: 'Warehouses',
-            icon: 'fas fa-tachometer-alt',
-          },
-          {
-            link: '/admin/quickpacks',
-            label: 'Quick Packs',
-            icon: 'fas fa-user',
-          },
-        ]
-      },
-      {
-        label: 'Tasks',
-        icon: 'icon icon-tasks',
-        child: [
-          {
-            link: '/admin/tasks/',
-            label: 'Tasks',
-            icon: 'fas fa-tachometer-alt',
-          },
-          // {
-          //   link: '/admin/tasks/task_priorities',
-          //   label: 'Task Priorities',
-          //   icon: 'fas fa-tachometer-alt',
-          // },
-        ]
-      },
-      {
-        label: 'Leads',
-        icon: 'icon icon-leads',
-        child: [
-          {
-            link: '/admin/leads',
-            label: 'Leads',
-            icon: 'fas fa-tachometer-alt',
-          },
-          // {
-          //   link: '/admin/leads/lead_statuses',
-          //   label: 'Lead statuses',
-          //   icon: 'fas fa-tachometer-alt',
-          // },
-          // {
-          //   link: '/admin/leads/interaction_types',
-          //   label: 'Interaction types',
-          //   icon: 'fas fa-tachometer-alt',
-          // }
-        ]
-      },
-      {
-        label: 'Assets',
-        icon: 'icon icon-assets',
-        child: [
-          {
-            link: '/admin/assets/assets',
-            label: 'Assets',
-            icon: 'fas fa-tachometer-alt',
-          },
-          // {
-          //   link: '/admin/assets/asset_statuses',
-          //   label: 'Asset Statuses',
-          //   icon: 'fas fa-tachometer-alt',
-          // },
-          // {
-          //   link: '/admin/assets/asset_categories',
-          //   label: 'Asset Categories',
-          //   icon: 'fas fa-tachometer-alt',
-          // },
-          // {
-          //   link: '/admin/assets/locations',
-          //   label: 'Locations',
-          //   icon: 'fas fa-tachometer-alt',
-          // },
-          {
-            link: '/admin/assets/asset_maintenance',
-            label: 'Asset Maintenance',
-            icon: 'fas fa-tachometer-alt',
-          },
-        ]
-      },
-      {
-        label: 'HR',
-        icon: 'icon icon-hrms',
-        child: [
-          {
-            link: '/admin/employees',
-            label: 'Employees',
-            icon: 'fas fa-tachometer-alt',
-          },
-          // {
-          //   link: '/admin/employees/designations',
-          //   label: 'Designations',
-          //   icon: 'fas fa-tachometer-alt',
-          // },
-          // {
-          //   link: '/admin/employees/departments',
-          //   label: 'Departments',
-          //   icon: 'fas fa-tachometer-alt',
-          // }
-        ]
-      },
-      {
-        link: '/admin/reports',
-        label: 'Reports',
-        icon: 'icon icon-reports',
-      },
-      {
-        link: '/admin/master',
-        label: 'Master',
-        icon: 'icon icon-masters',
-      },
-    ]
+      this.userName = user.username;
+    this.http.get('users/user_access/').subscribe((res: any) => {
+      this.menulList = res.data;
+    });
+    // this.menulList = [
+    //   {
+    //     link: '/admin/dashboard',
+    //     label: 'Dashboard',
+    //     icon: 'icon icon-dashboard',
+    //   },
+    //   {
+    //     label: 'Sales',
+    //     icon: 'icon icon-sales',
+    //     child: [
+    //       {
+    //         link: '/admin/customers',
+    //         label: 'Customer',
+    //         icon: 'fas fa-tachometer-alt',
+    //       },
+    //       {
+    //         link: '/admin/sales',
+    //         label: 'Sale Order',
+    //         icon: 'fas fa-tachometer-alt',
+    //       },
+    //       {
+    //         link: '/admin/sales/salesinvoice',
+    //         label: 'Sale Invoice',
+    //         icon: 'fas fa-tachometer-alt',
+    //       },
+    //       {
+    //         link: '/admin/sales/sale-returns',
+    //         label: 'Sale Return',
+    //         icon: 'fas fa-tachometer-alt',
+    //       },
+    //       {
+    //         link: '/admin/sales/sales-dispatch',
+    //         label: 'Sale Dispatch',
+    //         icon: 'fas fa-tachometer-alt',
+    //       },
+    //       {
+    //         link: '/admin/sale-receipt',
+    //         label: 'Sale Receipt',
+    //         icon: 'fas fa-tachometer-alt',
+    //       },
+    //       {
+    //         link: '/admin/sales/credit-note',
+    //         label: 'Sale Credit Note',
+    //         icon: 'fas fa-tachometer-alt',
+    //       },
+    //       {
+    //         link: '/admin/sales/debit-note',
+    //         label: 'Sale Debit Note',
+    //         icon: 'fas fa-tachometer-alt',
+    //       },
+    //     ]
+    //   },
+    //   {
+    //     // link: '/admin/purchase/purchase',
+    //     label: 'Purchase',
+    //     icon: 'icon icon-purchase',
+    //     child: [
+    //       {
+    //         link: '/admin/vendors',
+    //         label: 'Vendors',
+    //         icon: 'fas fa-tachometer-alt',
+    //       },
+    //       {
+    //         link: '/admin/purchase',
+    //         label: 'Purchase',
+    //         icon: 'fas fa-tachometer-alt',
+    //       },
+    //       {
+    //         link: '/admin/purchase/purchase-invoice',
+    //         label: 'Purchase Invoice',
+    //         icon: 'fas fa-tachometer-alt',
+    //       },
+    //       {
+    //         link: '/admin/purchase/purchasereturns',
+    //         label: 'Purchase Returns',
+    //         icon: 'fas fa-tachometer-alt',
+    //       }
+    //     ]
+    //   },
+    //   {
+    //     label: 'Finance',
+    //     icon: 'icon icon-finance',
+    //     child: [
+    //       {
+    //         link: '/admin/finance/bank-account',
+    //         label: 'Bank Account',
+    //       },
+    //       {
+    //         link: '/admin/finance/chart-of-accounts',
+    //         label: 'Chart Of Accounts',
+    //       },
+    //       {
+    //         link: '/admin/finance/journal-entry',
+    //         label: 'Journal Entry',
+    //       },
+    //       {
+    //         link: '/admin/finance/payment-transaction',
+    //         label: 'Payment Transaction',
+    //       },
+    //       {
+    //         link: '/admin/finance/tax-configuration',
+    //         label: 'Tax Configuration',
+    //       },
+    //       {
+    //         link: '/admin/finance/budget',
+    //         label: 'Budget',
+    //       },
+    //       {
+    //         link: '/admin/finance/expense-claim',
+    //         label: 'Expense Claim',
+    //       },
+    //       {
+    //         link: '/admin/finance/financial-report',
+    //         label: 'Financial Report',
+    //       },
+    //     ]
+    //   },
+    //   {
+    //     label: 'Production',
+    //     icon: 'icon icon-production',
+    //     child: [
+    //       {
+    //         link: '/admin/production',
+    //         label: 'Work Order',
+    //       },
+    //       {
+    //         link: '/admin/production/machines',
+    //         label: 'Machines',
+    //       },
+    //       {
+    //         link: '/admin/production/productionstatuses',
+    //         label: 'Production Statuses',
+    //       }
+    //     ]
+    //   },
+    //   {
+    //     label: 'Inventory',
+    //     icon: 'icon icon-inventory',
+    //     child: [
+    //       {
+    //         link: '/admin/inventory',
+    //         label: 'Inventory',
+    //         icon: 'fas fa-boxes',
+    //       },
+    //       {
+    //         link: '/admin/products',
+    //         label: 'Products',
+    //       },
+    //       {
+    //         link: '/admin/warehouses',
+    //         label: 'Warehouses',
+    //         icon: 'fas fa-tachometer-alt',
+    //       },
+    //       {
+    //         link: '/admin/quickpacks',
+    //         label: 'Quick Packs',
+    //         icon: 'fas fa-user',
+    //       },
+    //     ]
+    //   },
+    //   {
+    //     label: 'Tasks',
+    //     icon: 'icon icon-tasks',
+    //     child: [
+    //       {
+    //         link: '/admin/tasks/',
+    //         label: 'Tasks',
+    //         icon: 'fas fa-tachometer-alt',
+    //       },
+    //       // {
+    //       //   link: '/admin/tasks/task_priorities',
+    //       //   label: 'Task Priorities',
+    //       //   icon: 'fas fa-tachometer-alt',
+    //       // },
+    //     ]
+    //   },
+    //   {
+    //     label: 'Leads',
+    //     icon: 'icon icon-leads',
+    //     child: [
+    //       {
+    //         link: '/admin/leads',
+    //         label: 'Leads',
+    //         icon: 'fas fa-tachometer-alt',
+    //       },
+    //       // {
+    //       //   link: '/admin/leads/lead_statuses',
+    //       //   label: 'Lead statuses',
+    //       //   icon: 'fas fa-tachometer-alt',
+    //       // },
+    //       // {
+    //       //   link: '/admin/leads/interaction_types',
+    //       //   label: 'Interaction types',
+    //       //   icon: 'fas fa-tachometer-alt',
+    //       // }
+    //     ]
+    //   },
+    //   {
+    //     label: 'Assets',
+    //     icon: 'icon icon-assets',
+    //     child: [
+    //       {
+    //         link: '/admin/assets',
+    //         label: 'Assets',
+    //         icon: 'fas fa-tachometer-alt',
+    //       },
+    //       // {
+    //       //   link: '/admin/assets/asset_statuses',
+    //       //   label: 'Asset Statuses',
+    //       //   icon: 'fas fa-tachometer-alt',
+    //       // },
+    //       // {
+    //       //   link: '/admin/assets/asset_categories',
+    //       //   label: 'Asset Categories',
+    //       //   icon: 'fas fa-tachometer-alt',
+    //       // },
+    //       // {
+    //       //   link: '/admin/assets/locations',
+    //       //   label: 'Locations',
+    //       //   icon: 'fas fa-tachometer-alt',
+    //       // },
+    //       {
+    //         link: '/admin/assets/asset-maintenance',
+    //         label: 'Asset Maintenance',
+    //         icon: 'fas fa-tachometer-alt',
+    //       },
+    //     ]
+    //   },
+    //   {
+    //     label: 'HR',
+    //     icon: 'icon icon-hrms',
+    //     child: [
+    //       {
+    //         link: '/admin/employees',
+    //         label: 'Employees',
+    //         icon: 'fas fa-tachometer-alt',
+    //       },
+    //       // {
+    //       //   link: '/admin/employees/designations',
+    //       //   label: 'Designations',
+    //       //   icon: 'fas fa-tachometer-alt',
+    //       // },
+    //       // {
+    //       //   link: '/admin/employees/departments',
+    //       //   label: 'Departments',
+    //       //   icon: 'fas fa-tachometer-alt',
+    //       // }
+    //     ]
+    //   },
+    //   {
+    //     link: '/admin/reports',
+    //     label: 'Reports',
+    //     icon: 'icon icon-reports',
+    //   },
+    //   {
+    //     link: '/admin/master',
+    //     label: 'Master',
+    //     icon: 'icon icon-masters',
+    //   },
+    // ]
     this.closeMenu();
   }
 
@@ -543,8 +527,8 @@ export class AdminLayoutComponent {
       'leads': 'admin/leads',
 
       //assets
-      'assets': 'admin/assets/assets',
-      'asset maintenance': 'admin/assets/asset_maintenance',
+      'assets': 'admin/assets',
+      'asset maintenance': 'admin/assets/asset-maintenance',
 
       //HRMS
       'employees': 'admin/employees',
@@ -687,6 +671,7 @@ export class AdminLayoutComponent {
     });
     console.log('Form Data:', formData);
   }
+  selectedTabIndex = 0;
   // tabs based on routing
   disposeTab(tab: Tab) {
     if (this.tabs.length > 1) {
@@ -698,6 +683,11 @@ export class AdminLayoutComponent {
         this.router.navigateByUrl(this.tabs[this.tabs.length - 1].url);
       }
     }
+  }
+  removeTab(index) {
+    debugger;
+    this.tabs.splice(index.index, 1);
+    this.router.navigateByUrl(this.tabs[this.tabs.length - 1].url);
   }
 
   mouseOverTab(tab: Tab) {
@@ -722,13 +712,14 @@ export class AdminLayoutComponent {
       if (!tab.name) { tab.name = 'Untitle-' + this.tabs.length + 1 }
 
       this.tabs.push(tab);
-
+      this.selectedTabIndex = this.tabs.length;
     } else {
       // if the tab exists, activate it
       const tabToActivate = this.tabs.find(t => t.key == tab.key);
       if (tabToActivate) {
         tabToActivate.active = true;
       }
+      this.selectedTabIndex = this.tabs.findIndex(t => t.key == tab.key);
     }
 
     this.cd.markForCheck();

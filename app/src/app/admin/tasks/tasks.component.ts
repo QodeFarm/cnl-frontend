@@ -2,9 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { TasksListComponent } from './tasks-list/tasks-list.component';
 
 @Component({
   selector: 'app-tasks',
+  standalone: true,
+  imports: [CommonModule, AdminCommmonModule, TasksListComponent],
   templateUrl: './tasks.component.html',
   styleUrls: ['./tasks.component.scss']
 })

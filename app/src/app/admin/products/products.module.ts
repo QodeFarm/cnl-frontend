@@ -23,7 +23,7 @@ import { ProductItemBalanceComponent } from './product-item-balance/product-item
 
 @NgModule({
   declarations: [
-    ProductsComponent,
+    // ProductsComponent,
     ProductTypesComponent,
     ProductGroupsComponent,
     ProductCategoriesComponent,
@@ -48,7 +48,7 @@ import { ProductItemBalanceComponent } from './product-item-balance/product-item
     ProductsListComponent
   ],
   exports: [
-    ProductsComponent,
+    // ProductsComponent,
     ProductTypesComponent,
     ProductGroupsComponent,
     ProductCategoriesComponent,

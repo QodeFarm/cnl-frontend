@@ -6,7 +6,7 @@
         <li class="nav-item">
             <a class="nav-link" data-bs-toggle="tab" href="#customers">Customers</a>
         </li>
-        
+
         <li class="nav-item">
             <a class="nav-link" data-bs-toggle="tab" href="#vendors">Vendors</a>
         </li>
@@ -44,6 +44,10 @@
                             <li><a [routerLink]="['/admin/master/price-categories']">Price categories</a></li>
                             <li><a [routerLink]="['/admin/master/shipping-modes']">Shipping modes</a></li>
                             <li><a [routerLink]="['/admin/master/shipping-companies']">Shipping companies</a></li>
+                            <li><a [routerLink]="['/admin/master/notification-frequencies']">Notification Frequencies</a></li>
+                            <li><a [routerLink]="['/admin/master/notification-methods']">Notification Methods</a></li>
+                            <li><a [routerLink]="['/admin/master/reminder-types']">Reminder Types</a></li> 
+                            <li><a [routerLink]="['/admin/master/reminder-settings']">Reminder Settings</a></li>
                         </ul>
                     </div>
                 </div>
@@ -70,6 +74,18 @@
                         <ng-container *ngSwitchCase="'shipping-companies'">
                             <app-shipping-companies></app-shipping-companies>
                         </ng-container>
+                        <ng-container *ngSwitchCase="'notification-frequencies'">
+                            <app-notification-frequencies></app-notification-frequencies>
+                        </ng-container>  
+                        <ng-container *ngSwitchCase="'notification-methods'">
+                            <app-notification-methods></app-notification-methods>
+                        </ng-container>                         
+                        <ng-container *ngSwitchCase="'reminder-types'">
+                            <app-reminder-types></app-reminder-types>
+                        </ng-container> 
+                        <ng-container *ngSwitchCase="'reminder-settings'">
+                            <app-reminder-settings></app-reminder-settings>
+                        </ng-container> 
                     </ng-container>
                 </div>
             </div>
@@ -89,20 +105,20 @@
                 </div>
                 <div class="col-md-9">
                     <ng-container [ngSwitch]="code">
-                            <ng-container *ngSwitchCase="'ledger-accounts'">
-                                <app-ledger-accounts></app-ledger-accounts>
-                            </ng-container>
-                            <ng-container *ngSwitchCase="'ledger-groups'">
-                                <app-ledger-groups></app-ledger-groups>
-                            </ng-container>
-                            <ng-container *ngSwitchCase="'customer-payment-terms'">
-                                <app-customer-payment-terms></app-customer-payment-terms>
-                            </ng-container>
-                            <!-- <div *ngSwitchDefault> -->
-                            </ng-container>
-                        </div>
-                </div>  
-         </div>
+                        <ng-container *ngSwitchCase="'ledger-accounts'">
+                            <app-ledger-accounts></app-ledger-accounts>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'ledger-groups'">
+                            <app-ledger-groups></app-ledger-groups>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'customer-payment-terms'">
+                            <app-customer-payment-terms></app-customer-payment-terms>
+                        </ng-container>
+                        <!-- <div *ngSwitchDefault> -->
+                    </ng-container>
+                </div>
+            </div>
+        </div>
         <div class="tab-pane  fade" id="vendors">
             <!-- Content for Products tab -->
             <div class="row">
@@ -131,7 +147,7 @@
 
                 </div>
             </div>
-                
+
         </div>
         <div class="tab-pane  fade" id="products">
             <!-- Content for Products tab -->
@@ -166,19 +182,19 @@
                         <ng-container *ngSwitchCase="'product-types'">
                             <app-product-types></app-product-types>
                         </ng-container>
-                        <ng-container *ngSwitchCase="'product-brands'"> 
+                        <ng-container *ngSwitchCase="'product-brands'">
                             <app-product-brands></app-product-brands>
                         </ng-container>
-                        <ng-container *ngSwitchCase="'product-categories'"> 
+                        <ng-container *ngSwitchCase="'product-categories'">
                             <app-product-categories></app-product-categories>
                         </ng-container>
-                        <ng-container *ngSwitchCase="'product-groups'"> 
+                        <ng-container *ngSwitchCase="'product-groups'">
                             <app-product-groups></app-product-groups>
                         </ng-container>
-                        <ng-container *ngSwitchCase="'product-gst-classifications'"> 
+                        <ng-container *ngSwitchCase="'product-gst-classifications'">
                             <app-product-gst-classifications></app-product-gst-classifications>
                         </ng-container>
-                        <ng-container *ngSwitchCase="'product-item-type'"> 
+                        <ng-container *ngSwitchCase="'product-item-type'">
                             <app-product-item-type></app-product-item-type>
                         </ng-container>
                         <ng-container *ngSwitchCase="'product-sales-gl'">
@@ -187,7 +203,7 @@
                         <ng-container *ngSwitchCase="'product-item-balance'">
                             <app-product-item-balance></app-product-item-balance>
                         </ng-container>
-                        <ng-container *ngSwitchCase="'product-purchase-gl'"> 
+                        <ng-container *ngSwitchCase="'product-purchase-gl'">
                             <app-product-purchase-gl></app-product-purchase-gl>
                         </ng-container>
                         <ng-container *ngSwitchCase="'unit-options'">
@@ -265,7 +281,7 @@
                         <ng-container *ngSwitchCase="'asset-statuses'">
                             <app-asset-statuses></app-asset-statuses>
                         </ng-container>
-                        <ng-container *ngSwitchCase="'locations'"> 
+                        <ng-container *ngSwitchCase="'locations'">
                             <app-locations></app-locations>
                         </ng-container>
                     </ng-container>

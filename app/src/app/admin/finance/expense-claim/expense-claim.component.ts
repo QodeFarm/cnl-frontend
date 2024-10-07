@@ -1,9 +1,14 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
+import { CommonModule } from '@angular/common';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { ExpenseClaimListComponent } from './expense-claim-list/expense-claim-list.component';
 
 @Component({
   selector: 'app-expense-claim',
+  standalone: true,
+  imports: [CommonModule, AdminCommmonModule, ExpenseClaimListComponent],
   templateUrl: './expense-claim.component.html',
   styleUrls: ['./expense-claim.component.scss']
 })

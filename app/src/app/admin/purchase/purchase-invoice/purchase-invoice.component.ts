@@ -2,12 +2,17 @@ import { HttpClient } from '@angular/common/http';
 import { Component, ViewChild } from '@angular/core';
 import { TaFormComponent, TaFormConfig } from '@ta/ta-form';
 import { distinctUntilChanged } from 'rxjs/operators';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { PurchaseInvoiceListComponent } from './purchase-invoice-list/purchase-invoice-list.component';
 
 @Component({
   selector: 'app-purchase-invoice',
+  standalone: true,
+  imports: [AdminCommmonModule, PurchaseInvoiceListComponent],
   templateUrl: './purchase-invoice.component.html',
   styleUrls: ['./purchase-invoice.component.scss']
 })
+
 export class PurchaseInvoiceComponent {
   @ViewChild('purchaseinvoiceForm', { static: false }) purchaseinvoiceForm: TaFormComponent | undefined;
   invoiceNumber: any;

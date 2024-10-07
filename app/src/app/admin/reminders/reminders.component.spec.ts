@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { JobTypesComponent } from './job-types.component';
+import { RemindersComponent } from './reminders.component';
 
-describe('JobTypesComponent', () => {
-  let component: JobTypesComponent;
-  let fixture: ComponentFixture<JobTypesComponent>;
+describe('RemindersComponent', () => {
+  let component: RemindersComponent;
+  let fixture: ComponentFixture<RemindersComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [JobTypesComponent]
+      declarations: [RemindersComponent]
     });
-    fixture = TestBed.createComponent(JobTypesComponent);
+    fixture = TestBed.createComponent(RemindersComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

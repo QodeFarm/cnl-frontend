@@ -7,6 +7,8 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 @Component({
   selector: 'app-work-order-list',
+  standalone: true,
+  imports: [CommonModule, AdminCommmonModule],
   templateUrl: './work-order-list.component.html',
   styleUrls: ['./work-order-list.component.scss']
 })
