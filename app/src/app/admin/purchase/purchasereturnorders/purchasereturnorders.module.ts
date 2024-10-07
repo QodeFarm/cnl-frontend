@@ -9,7 +9,7 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 @NgModule({
   declarations: [
-    PurchasereturnordersComponent,
+    // PurchasereturnordersComponent,
   ],
   imports: [
     AdminCommmonModule,

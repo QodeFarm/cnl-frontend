@@ -10,8 +10,8 @@ import { RolesComponent } from './roles/roles.component';
 
 @NgModule({
   declarations: [
-    UserComponent,
-    RolesComponent
+    // UserComponent,
+    // RolesComponent
   ],
   imports: [
     CommonModule,

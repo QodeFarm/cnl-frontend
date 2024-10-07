@@ -10,8 +10,8 @@ import { BranchListComponent } from './branches/branch-list/branch-list.componen
 
 @NgModule({
   declarations: [
-    CompanyComponent,
-    BranchesComponent
+    // CompanyComponent,
+    // BranchesComponent
   ],
   imports: [
     CommonModule,

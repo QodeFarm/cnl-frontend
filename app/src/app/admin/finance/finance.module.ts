@@ -23,14 +23,14 @@ import { PaymentTransactionListComponent } from './payment-transaction/payment-t
 
 @NgModule({
   declarations: [
-    BankAccountComponent,
-    ChartOfAccountsComponent,
-    PaymentTransactionComponent,
-    TaxConfigurationComponent,
-    BudgetComponent,
-    ExpenseClaimComponent,
-    FinancialReportComponent,
-    JournalEntryComponent,
+    // BankAccountComponent,
+    // ChartOfAccountsComponent,
+    // PaymentTransactionComponent,
+    // TaxConfigurationComponent,
+    // BudgetComponent,
+    // ExpenseClaimComponent,
+    // FinancialReportComponent,
+    // JournalEntryComponent,
   ],
   imports: [
     CommonModule,

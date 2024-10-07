@@ -1,9 +1,14 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
+import { ChartOfAccountsListComponent } from './chart-of-accounts-list/chart-of-accounts-list.component';
+import { CommonModule } from '@angular/common';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 @Component({
   selector: 'app-chart-of-accounts',
+  standalone: true,
+  imports: [CommonModule, AdminCommmonModule, ChartOfAccountsListComponent],
   templateUrl: './chart-of-accounts.component.html',
   styleUrls: ['./chart-of-accounts.component.scss']
 })

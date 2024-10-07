@@ -1,9 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
+import { TaxConfigurationListComponent } from './tax-configuration-list/tax-configuration-list.component';
+import { CommonModule } from '@angular/common';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 @Component({
   selector: 'app-tax-configuration',
+  standalone: true,
+  imports: [CommonModule, AdminCommmonModule, TaxConfigurationListComponent],
   templateUrl: './tax-configuration.component.html',
   styleUrls: ['./tax-configuration.component.scss']
 })

@@ -1,9 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
+import { CommonModule } from '@angular/common';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { WorkOrderListComponent } from './work-order-list/work-order-list.component';
+
 
 @Component({
   selector: 'app-production',
+  standalone: true,
+  imports: [CommonModule, AdminCommmonModule, WorkOrderListComponent],
   templateUrl: './production.component.html',
   styleUrls: ['./production.component.scss']
 })

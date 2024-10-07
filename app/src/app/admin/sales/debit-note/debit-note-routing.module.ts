@@ -1,16 +1,16 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { DebitNoteComponent } from './debit-note.component';
+// import { NgModule } from '@angular/core';
+// import { RouterModule, Routes } from '@angular/router';
+// import { DebitNoteComponent } from './debit-note.component';
 
-const routes: Routes = [
-  {
-    path: '',
-    component: DebitNoteComponent
-  }
-];
+// const routes: Routes = [
+//   {
+//     path: '',
+//     component: DebitNoteComponent
+//   }
+// ];
 
-@NgModule({
-  imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
-})
-export class DebitNoteRoutingModule { }
+// @NgModule({
+//   imports: [RouterModule.forChild(routes)],
+//   exports: [RouterModule]
+// })
+// export class DebitNoteRoutingModule { }

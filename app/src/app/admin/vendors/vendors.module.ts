@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { VendorsRoutingModule } from './vendors-routing.module';
-import { VendorsComponent } from './vendors.component';
+// import { VendorsComponent } from './vendors.component';
 import { VendorCategoryComponent } from './vendor-category/vendor-category.component';
 import { VendorPaymentTermsComponent } from './vendor-payment-terms/vendor-payment-terms.component';
 import { VendorAgentComponent } from './vendor-agent/vendor-agent.component';
@@ -15,7 +15,7 @@ import { VendorsListComponent } from './vendors-list/vendors-list.component';
 
 @NgModule({
   declarations: [
-    VendorsComponent,
+    // VendorsComponent,
     VendorCategoryComponent,
     VendorPaymentTermsComponent,
     VendorAgentComponent,

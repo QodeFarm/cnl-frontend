@@ -1,8 +1,13 @@
+import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { WarehousesListComponent } from './warehouses-list/warehouses-list.component';
 
 @Component({
+  standalone: true,
+  imports: [CommonModule,AdminCommmonModule,WarehousesListComponent],
   selector: 'app-warehouses',
   templateUrl: './warehouses.component.html',
   styleUrls: ['./warehouses.component.scss']

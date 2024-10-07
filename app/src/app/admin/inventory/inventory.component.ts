@@ -1,7 +1,11 @@
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { TaCurdConfig } from '@ta/ta-curd';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 @Component({
+  standalone: true,
+  imports: [CommonModule,AdminCommmonModule],
   selector: 'app-inventory',
   templateUrl: './inventory.component.html',
   styleUrls: ['./inventory.component.scss']

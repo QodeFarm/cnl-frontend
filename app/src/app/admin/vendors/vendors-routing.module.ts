@@ -11,6 +11,10 @@ import { VendorsListComponent } from './vendors-list/vendors-list.component';
 
 const routes: Routes = [
   {
+    path : '',
+    component: VendorsComponent
+  },
+  {
     path : 'vendor-category',
     component: VendorCategoryComponent
   },
@@ -34,12 +38,8 @@ const routes: Routes = [
     path : 'price-categories',
     component: PriceCategoriesComponent
   },
-  {
-    path : '',
-    component: VendorsComponent
-  },
   // {
-  //   path : 'vendors/vendors_list',
+  //   path : 'vendors/vendors',
   //   component: VendorsComponent
   // },
   // {
