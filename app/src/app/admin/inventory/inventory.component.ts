@@ -15,7 +15,7 @@ export class InventoryComponent   {
   drawerSize: 500,
   drawerPlacement: 'right',
   tableConfig: {
-    apiUrl: 'products/products/',
+    apiUrl: 'products/products_get/',
     title: 'Inventory',
     pkId: "product_id",
     pageSize: 10,
