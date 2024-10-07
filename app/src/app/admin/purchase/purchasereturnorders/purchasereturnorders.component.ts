@@ -90,7 +90,17 @@ export class PurchasereturnordersComponent {
           key: 'purchase_return_items',
           type: 'script',
           value: 'data.purchase_return_items.map(m=> {m.product_id = m.product.product_id; if(m.product.unit_options){m.unit_options_id = m.product.unit_options.unit_options_id};  if(m.unit_options){m.unit_options_id = m.unit_options.unit_options_id};  return m ;})'
-        }
+        },
+        {
+          key: 'purchase_return_items',
+          type: 'script',
+          value: 'data.purchase_return_items.map(m=> {m.size_id = m.size.size_id; return m ;})'
+        },
+        {
+          key: 'purchase_return_items',
+          type: 'script',
+          value: 'data.purchase_return_items.map(m=> {m.color_id = m.color.color_id; return m ;})'
+        },
       ],
       submit: {
         label: 'Submit',
@@ -316,6 +326,14 @@ export class PurchasereturnordersComponent {
                 label: 'Product'
               },
               {
+                name: 'size',
+                label: 'size'
+              },
+              {
+                name: 'color',
+                label: 'color'
+              },
+              {
                 name: 'code',
                 label: 'Code'
               },
@@ -396,6 +414,38 @@ export class PurchasereturnordersComponent {
                       this.totalAmountCal();
                     });
                     // field.templateOptions.options = this.cs.getRole();
+                  }
+                }
+              },
+              {
+                key: 'size',
+                type: 'select',
+                templateOptions: {
+                  label: 'Select Size',
+                  dataKey: 'size_id',
+                  hideLabel: true,
+                  dataLabel: 'size_name',
+                  options: [],
+                  required: true,
+                  lazy: {
+                    url: 'products/sizes/',
+                    lazyOneTime: true
+                  }
+                }
+              },
+              {
+                key: 'color',
+                type: 'select',
+                templateOptions: {
+                  label: 'Select Color',
+                  dataKey: 'color_id',
+                  hideLabel: true,
+                  dataLabel: 'color_name',
+                  options: [],
+                  required: true,
+                  lazy: {
+                    url: 'products/colors/',
+                    lazyOneTime: true
                   }
                 }
               },

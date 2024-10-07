@@ -360,6 +360,16 @@ export class SalesinvoiceComponent {
           type: 'script',
           value: 'data.sale_invoice_items.map(m=> {m.product_id = m.product.product_id;  return m ;})'
         },
+        {
+          key: 'sale_invoice_items',
+          type: 'script',
+          value: 'data.sale_invoice_items.map(m=> {m.size_id = m.size.size_id;  return m ;})'
+        },
+        {
+          key: 'sale_invoice_items',
+          type: 'script',
+          value: 'data.sale_invoice_items.map(m=> {m.color_id = m.color.color_id;  return m ;})'
+        }
       ],
       submit: {
         label: 'Submit',
@@ -597,6 +607,14 @@ export class SalesinvoiceComponent {
                 label: 'Code'
               },
               {
+                name: 'size',
+                label: 'size'
+              },
+              {
+                name: 'color',
+                label: 'color'
+              },
+              {
                 name: 'unit',
                 label: 'Unit'
               },
@@ -669,6 +687,38 @@ export class SalesinvoiceComponent {
                     });
                   }
                 }
+              },
+              {
+                key: 'size',
+                type: 'select',
+                templateOptions: {
+                  label: 'Select Size',
+                  dataKey: 'size_id',
+                  hideLabel: true,
+                  dataLabel: 'size_name',
+                  options: [],
+                  required: true,
+                  lazy: {
+                    url: 'products/sizes/',
+                    lazyOneTime: true
+                  }
+                },
+              },
+              {
+                key: 'color',
+                type: 'select',
+                templateOptions: {
+                  label: 'Select Color',
+                  dataKey: 'color_id',
+                  hideLabel: true,
+                  dataLabel: 'color_name',
+                  options: [],
+                  required: true,
+                  lazy: {
+                    url: 'products/colors/',
+                    lazyOneTime: true
+                  }
+                },
               },
               {
                 type: 'input',
