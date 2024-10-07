@@ -82,32 +82,9 @@ export class InventoryComponent   {
         sort: true
       },
       {
-        fieldKey: 'locations', // Warehouse
-        name: 'Warehouse',
-        sort: true,
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.locations[0].warehouse_location.warehouse.name}`;
-        },
-      },
-      {
-        fieldKey: 'locations', // Location
-        name: 'Location',
-        sort: true,
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.locations[0].warehouse_location.location_name}`;
-        },
-      },
-      {
-        fieldKey: 'total_product_balance', 
+        fieldKey: 'balance',
         name: 'Balance',
-        sort: true,
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          const val = row.total_product_balance;
-          return `${val}`;
-        }
+        sort: true
       },
       {
         fieldKey: 'updated_at',

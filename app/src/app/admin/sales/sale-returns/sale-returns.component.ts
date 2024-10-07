@@ -9,11 +9,12 @@ import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { OrderslistComponent } from '../orderslist/orderslist.component';
 import { SaleinvoiceorderlistComponent } from '../saleinvoiceorderlist/saleinvoiceorderlist.component';
+import { SaleReturnsListComponent } from './sale-returns-list/sale-returns-list.component';
 
 @Component({
   selector: 'app-sale-returns',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, SaleinvoiceorderlistComponent],
+  imports: [CommonModule, AdminCommmonModule, SaleReturnsListComponent],
   templateUrl: './sale-returns.component.html',
   styleUrls: ['./sale-returns.component.scss']
 })
