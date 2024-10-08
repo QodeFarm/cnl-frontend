@@ -3,11 +3,12 @@ import { Component, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/co
 import { TaFormComponent, TaFormConfig } from '@ta/ta-form';
 import { Observable, forkJoin } from 'rxjs';
 import { tap, switchMap } from 'rxjs/operators';
-import { FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { OrderslistComponent } from './orderslist/orderslist.component';
 import { CommonModule } from '@angular/common';
 import { SalesListComponent } from './sales-list/sales-list.component';
+import { Router } from '@angular/router';
 @Component({
   standalone: true,
   imports: [CommonModule, AdminCommmonModule, OrderslistComponent, SalesListComponent],
@@ -31,15 +32,145 @@ export class SalesComponent {
   noOrdersMessage: string;
   shippingTrackingNumber: any;
 
+  //----------------------
+
+  // public formConfig: FormGroup; // Assuming you're using reactive forms
+  
+
+  // // List of all tables
+  // tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return', 'Purchase', 'Purchase Invoice', 'Purchase Return'];
+
+  // // This will store available tables excluding the current one
+  // availableTables: string[] = [];
+
+  // // Selected table from dropdown
+  // selectedTable: string;
+
+  // // Variable to store current table name (example for 'Sale Order')
+  // currentTable: string = 'Sale Order'; // Dynamically change this based on your current module
+
+  // // Method to open the copy modal and populate dropdown
+  // openCopyModal() {
+  //   this.availableTables = this.tables.filter(table => table !== this.currentTable);
+  // }
+
+
+  // copyToTable() {
+  //   const dataToCopy = this.formConfig.model// Get the current form data
+
+  //   // Only navigate based on the selected table without needing breaks
+  //   if (this.selectedTable === 'Sale Order') {
+  //       this.router.navigate(['admin/sales'], { state: { data: dataToCopy } });
+  //   } else if (this.selectedTable === 'Sale Invoice') {
+  //       console.log('inside of sale invoice');
+  //       console.log('Data to copy:', dataToCopy);
+  //       this.router.navigate(['admin/sales/salesinvoice'], { state: { data: dataToCopy } });
+  //   } else if (this.selectedTable === 'Sale Return') {
+  //       this.router.navigate(['admin/sales/sale-return'], { state: { data: dataToCopy } });
+  //   } 
+  //   // Add additional cases as necessary
+  //   else {
+  //       console.error('Unknown table selected');
+  //   }
+  // }
+
+  // constructor(    
+  //   private http: HttpClient,
+  //   private cdRef: ChangeDetectorRef, 
+  //   private fb: FormBuilder, 
+  //   private router: Router) { // Inject Router here
+   
+  // }
+
+  // List of all tables
+  tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return', 'Purchase', 'Purchase Invoice', 'Purchase Return'];
+
+  // This will store available tables excluding the current one
+  availableTables: string[] = [];
+
+  // Selected table from dropdown
+  selectedTable: string;
+
+  // Variable to store current table name (example for 'Sale Order')
+  currentTable: string = 'Sale Order'; // Dynamically change this based on your current module
+
+  // Field mapping for auto population
+  fieldMapping = {
+      'Sale Invoice': {
+          customer_id: 'customer_id', // Assuming the same field name
+          email: 'email',
+          // Add other mappings as needed
+      },
+      'Sale Return': {
+          customer_id: 'customer_id', // Assuming the same field name
+          email: 'email',
+          // Add other mappings as needed
+      },
+      // Add mappings for other tables as needed
+  };
+
+  // Method to open the copy modal and populate dropdown
+  openCopyModal() {
+      this.availableTables = this.tables.filter(table => table !== this.currentTable);
+  }
+
+  copyToTable() {
+      const dataToCopy = this.formConfig.model; // Get the current form data
+      const populatedData = {};
+
+      // Extract only the matching fields based on the selected table
+      if (this.selectedTable && this.fieldMapping[this.selectedTable]) {
+          for (const key in this.fieldMapping[this.selectedTable]) {
+              const sourceField = this.fieldMapping[this.selectedTable][key];
+              console.log("Source data : ", sourceField);
+              populatedData[key] = dataToCopy.sale_order[sourceField];
+              console.log("populatedData : ", populatedData[key]);
+          }
+      }
+
+      // Navigate based on the selected table without needing breaks
+      if (this.selectedTable === 'Sale Order') {
+          this.router.navigate(['admin/sales'], { state: { data: populatedData } });
+      } else if (this.selectedTable === 'Sale Invoice') {
+          console.log('inside of sale invoice');
+          console.log('Data to copy:', populatedData);
+          this.router.navigate(['admin/sales/salesinvoice'], { state: { data: populatedData } });
+      } else if (this.selectedTable === 'Sale Return') {
+          this.router.navigate(['admin/sales/sale-return'], { state: { data: populatedData } });
+      }
+      // Add additional cases as necessary
+      else {
+          console.error('Unknown table selected');
+      }
+  }
+
+  constructor(    
+      private http: HttpClient,
+      private cdRef: ChangeDetectorRef, 
+      private fb: FormBuilder, 
+      private router: Router) { // Inject Router here
+
+  }
+
+  //-------------------------
+
   nowDate = () => {
     const date = new Date();
     return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   }
 
-  constructor(
-    private http: HttpClient,
-    private cdRef: ChangeDetectorRef // Inject ChangeDetectorRef
-  ) { }
+  // constructor(
+  //   private http: HttpClient,
+  //   private cdRef: ChangeDetectorRef, // Inject ChangeDetectorRef,
+  //   private router: Router
+  // ) {
+  //   this.formConfig = this.fb.group({
+  //     field1: [''],
+  //     field2: [''],
+  //     // Add other fields as needed
+  // });
+  //  }
+
 
 
 
