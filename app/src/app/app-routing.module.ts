@@ -93,7 +93,7 @@ const routes: Routes = [
       { path: 'users', data: { title: 'Users', moduleName: 'users' }, canActivate: [], loadComponent: () => import('./admin/user/user.component').then(m => m.UserComponent) },
       { path: 'users/roles', data: { title: 'User Roles', moduleName: 'user roles' }, canActivate: [], loadComponent: () => import('./admin/user/roles/roles.component').then(m => m.RolesComponent) },
 
-
+      { path: 'usergroups', data: { title: 'User Groups', moduleName: 'user groups' }, canActivate: [], loadComponent: () => import('./admin/usergroups/usergroups.component').then(m => m.UsergroupsComponent) },
 
       { path: 'master', data: { title: 'Master', moduleName: 'master' }, pathMatch: 'full', redirectTo: 'master/master' },
       { path: 'master/:code', data: { title: 'Master', moduleName: 'master' }, canActivate: [], loadComponent: () => import('./admin/master/master-list/master-list.component').then(m => m.MasterListComponent) },
