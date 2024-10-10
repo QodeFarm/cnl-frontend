@@ -21,7 +21,7 @@ export class TasksListComponent {
     pkId: "task_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['title','user_id','description','priority_id','due_date','status_id']
+      keys: ['title','user_id','group_id','description','priority_id','due_date','status_id']
     },
     cols: [
       {
@@ -37,6 +37,15 @@ export class TasksListComponent {
           return `${row.user.first_name}`;
         },
         sort: true
+      },
+      {
+        fieldKey: 'group_id',
+        name: 'group',
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          return `${row.group.group_name}`;
+        },
+        sort: false
       },
       {
         fieldKey: 'description',
