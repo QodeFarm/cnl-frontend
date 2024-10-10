@@ -6,7 +6,7 @@
           <span *ngIf="!SaleReturnOrderEditID" class="custom-heading">Create Sale Returns</span>
         </button>
         <div style="display: flex; gap: 10px;">
-          <button (click)="showInvoiceOrdersList()" type="button" class="btn btn-primary">
+          <button (click)="showInvoiceOrdersList()" type="button" class="btn btn-primary" data-bs-toggle="modal">
             Sale Invoice List
           </button>
           <button (click)="showSalesReturnOrderListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
@@ -47,7 +47,7 @@
         <div class="modal-header">
           <h5 class="modal-title" id="saleinvoiceordersListModalLabel">Sale Invoice List</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="hideModal()"></button>
-        <!-- </div>
+        </div>
         <div class="modal-body">
           <app-saleinvoiceorderlist 
           [customerOrders]="customerOrders" 
@@ -57,9 +57,9 @@
           (modalClosed)="closeModal()">
       </app-saleinvoiceorderlist>
   
-        </div> -->
+        </div> 
       </div>
     </div>
   </div>
 
-  <!-- (orderSelected)="handleOrderSelected($event)" -->
+   <!-- (orderSelected)="handleOrderSelected($event)"  -->
