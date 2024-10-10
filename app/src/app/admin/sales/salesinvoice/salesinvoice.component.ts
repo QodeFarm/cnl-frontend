@@ -6,6 +6,8 @@ import { forkJoin, Observable } from 'rxjs';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { OrderslistComponent } from '../orderslist/orderslist.component';
 import { SalesInvoiceListComponent } from './salesinvoice-list/salesinvoice-list.component';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-salesinvoice',
@@ -19,6 +21,7 @@ export class SalesinvoiceComponent {
   @ViewChild('saleinvoiceForm', { static: false }) saleinvoiceForm: TaFormComponent | undefined;
   @ViewChild('ordersModal', { static: false }) ordersModal!: ElementRef;
   invoiceNumber: any;
+  customerName: string = '';
   showSaleInvoiceList: boolean = false;
   showForm: boolean = false;
   SaleInvoiceEditID: any;
@@ -34,23 +37,140 @@ export class SalesinvoiceComponent {
     return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   }
 
-  constructor(private http: HttpClient, private cdRef: ChangeDetectorRef) { }
+  //COPY ---------------------------------
+  // List of all tables
+  tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
+
+  // This will store available tables excluding the current one
+  availableTables: string[] = [];
+
+  // Selected table from dropdown
+  selectedTable: string;
+
+  // Variable to store current table name (example for 'Sale Order')
+  currentTable: string = 'Sale Invoice'; // Dynamically change this based on your current module
+
+  // Field mapping for auto population
+  fieldMapping = {
+      'Sale Order': {
+          customer: 'customer',  // Add this line for customer_id
+          csutomer_id: 'customer_id',
+          email: 'email',
+          billing_address: 'billing_address',
+          shipping_address: 'shipping_address',
+          ref_no: 'ref_no',
+          tax: 'tax',
+          remarks: 'remarks'
+      },
+      'Sale Return': {
+          customer: 'customer', // Assuming the same field name
+          customer_id: 'customer_id',  // Add this line for customer_id
+          email: 'email',
+          shipping_address: 'shipping_address',
+          ref_no: 'ref_no',
+          tax: 'tax',
+          remarks: 'remarks'
+      },
+      // Add mappings for other tables as needed
+  };
+
+  // Method to open the copy modal and populate dropdown
+  openCopyModal() {
+      this.availableTables = this.tables.filter(table => table !== this.currentTable);
+  }
+
+  copyToTable() {
+    const dataToCopy = this.formConfig.model.sale_invoice_order; // Get the current form data
+    const populatedData = {};
+
+    // Extract only the matching fields based on the selected table
+    if (this.selectedTable && this.fieldMapping[this.selectedTable]) {
+        for (const key in this.fieldMapping[this.selectedTable]) {
+            const sourceField = this.fieldMapping[this.selectedTable][key];
+            console.log("Source field : ", sourceField);
+            // Get value from the sales form
+            populatedData[key] = dataToCopy[sourceField];
+        }
+    }
+
+    // Log the populated data for debugging
+    console.log('Data to copy:', populatedData);
+
+    // Navigate based on the selected table without needing breaks
+    if (this.selectedTable === 'Sale Order') {
+        this.router.navigate(['admin/sales'], { state: { data: populatedData } });
+        console.log("populate data of customer : ", populatedData)
+    } else if (this.selectedTable === 'Sale Return') {
+        this.router.navigate(['admin/sales/sale-returns'], { state: { data: populatedData } });
+    }
+    // Add additional cases for other tables if necessary
+    else {
+        console.error('Unknown table selected');
+    }
+  }
+
+  constructor(
+    private http: HttpClient,
+    private cdRef: ChangeDetectorRef,
+    private router: Router,
+    private route: ActivatedRoute,
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  dataToPopulate: any;
+  salesInvoiceForm: FormGroup;
 
   ngOnInit() {
+    this.setFormConfig();
+
+    // Subscribe to the route parameters to get the data from the history state
+    this.route.paramMap.subscribe(params => {
+      this.dataToPopulate = history.state.data; // Retrieve data from history
+      console.log('data retrieved:', this.dataToPopulate);
+
+      // Check if dataToPopulate exists and populate the form
+      console.log("triggering the data : ")
+      if (this.dataToPopulate) {
+        console.log("Custome in data : ", this.dataToPopulate.customer?.customer_id)
+        // Populate the form with the data received
+        this.populateForm(this.dataToPopulate);
+        this.formConfig.model['sale_invoice_order']['customer_id'] = this.dataToPopulate.customer?.customer_id;
+      }
+    });
+
     this.showSaleInvoiceList = false;
     this.showForm = true;
     this.SaleInvoiceEditID = null;
-    this.setFormConfig();
-    console.log('this.formConfig', this.formConfig);
-
-    // set sale_order default value
+    // Set sale_order default value
     this.formConfig.model['sale_invoice_order']['order_type'] = 'sale_invoice';
 
-    // to get SaleInvoice number for save
+    // To get SaleInvoice number for save
     this.getInvoiceNo();
     this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[8].hide = true;
-    // console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
   }
+
+  populateForm(data: any) {
+    console.log("Data in populateform : ", data);
+    this.salesInvoiceForm.patchValue({
+      customer: {
+        customer_id: data.customer?.csutomer_id || '',
+        name: data.customer?.name || ''
+      },
+      customer_id: data.customer?.customer_id || '',  // Handle undefined cases
+      email: data.email || '',
+      ref_no: data.ref_no || '',
+      tax: data.tax || '',
+      remarks: data.remarks || '',
+      billing_address: data.billing_address || '',
+      shipping_address: data.shipping_address || '',
+    });
+
+    // Trigger change detection to update the UI if needed
+    this.cdRef.detectChanges();
+  }
+
+//COPY PART END -------------------------------------------------------------
 
   formConfig: TaFormConfig = {};
 
@@ -350,9 +470,19 @@ export class SalesinvoiceComponent {
   ngOnDestroy() {
     document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
   }
-
+    
   setFormConfig() {
     this.SaleInvoiceEditID = null;
+
+    this.salesInvoiceForm = this.fb.group({
+      customer: [null], // Add the customer field
+      customer_id: [null], // Ensure this is initialized
+      email: [null],
+      billing_address: [null],
+      shipping_address: [null],
+      // Add other fields as necessary
+    });
+
     this.formConfig = {
       url: "sales/sale_invoice_order/",
       title: '',
@@ -387,7 +517,9 @@ export class SalesinvoiceComponent {
         }
       },
       model: {
-        sale_invoice_order: {},
+        sale_invoice_order: {        
+          // customer_id: null,
+        },
         sale_invoice_items: [{}],
         order_attachments: [],
         order_shipments: {}
@@ -415,7 +547,7 @@ export class SalesinvoiceComponent {
                 onInit: (field: any) => {
                 }
               }
-            },
+            },                                             
             {
               key: 'customer',
               type: 'select',
@@ -435,7 +567,8 @@ export class SalesinvoiceComponent {
                 onInit: (field: any) => {
                   field.formControl.valueChanges.subscribe(data => {
                     if (data && data.customer_id) {
-                      this.formConfig.model['sale_invoice_order']['customer_id'] = data.customer_id;
+                      this.formConfig.model['sale_invoice_order']['customer_id'] = data.customer_id; // This should be the ID now
+                      // this.formConfig.model['sale_invoice_order']['customer'] = data.customer?.name; // Set name if needed
                     }
                     if (data.customer_addresses && data.customer_addresses.billing_address) {
                       field.form.controls.billing_address.setValue(data.customer_addresses.billing_address)
@@ -447,9 +580,13 @@ export class SalesinvoiceComponent {
                       field.form.controls.email.setValue(data.email)
                     }
                   });
+                  if (this.dataToPopulate && this.dataToPopulate.customer && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.customer?.customer_id);
+                    
+                  }
                 }
-              }
-            },
+              },
+            },                      
             {
               key: 'email',
               type: 'input',
@@ -460,7 +597,11 @@ export class SalesinvoiceComponent {
                 placeholder: 'Enter Email',
               },
               hooks: {
-                onInit: (field: any) => { }
+                onInit: (field: any) => {
+                  if (this.dataToPopulate && this.dataToPopulate.email && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.email);
+                  }
+                }
               }
             },
             {
@@ -525,6 +666,13 @@ export class SalesinvoiceComponent {
                 label: 'Ref No',
                 placeholder: 'Enter Ref No',
                 required: true,
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  if (this.dataToPopulate && this.dataToPopulate.ref_no && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.ref_no);
+                  }
+                }
               }
             },
             {
@@ -563,8 +711,15 @@ export class SalesinvoiceComponent {
                 ]
               },
               hooks: {
-                onInit: (field: any) => { }
+                onInit: (field: any) => {
+                  if (this.dataToPopulate && this.dataToPopulate.tax && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.tax);
+                  }
+                }
               }
+              // hooks: {
+              //   onInit: (field: any) => { }
+              // }
             },
             {
               key: 'remarks',
@@ -573,6 +728,13 @@ export class SalesinvoiceComponent {
               templateOptions: {
                 label: 'Remarks',
                 placeholder: 'Enter Remarks',
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  if (this.dataToPopulate && this.dataToPopulate.remarks && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.remarks);
+                  }
+                }
               }
             },
             {
@@ -583,6 +745,13 @@ export class SalesinvoiceComponent {
                 label: 'Billing Address',
                 placeholder: 'Enter Billing Address',
 
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  if (this.dataToPopulate && this.dataToPopulate.billing_address && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.billing_address);
+                  }
+                }
               }
             },
             {
@@ -592,6 +761,13 @@ export class SalesinvoiceComponent {
               templateOptions: {
                 label: 'Shipping Address',
                 placeholder: 'Enter Shipping Address',
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  if (this.dataToPopulate && this.dataToPopulate.shipping_address && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.shipping_address);
+                  }
+                }
               }
             },
           ]

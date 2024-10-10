@@ -90,7 +90,7 @@ export class AdminLayoutComponent {
     this.menulList = [];
     if (user)
       this.userName = user.username;
-    this.http.get('users/user_access/').subscribe((res: any) => {
+    this.http.get('users/user_access/05c1bcf5-07c8-437d-92d6-727ff69521e4').subscribe((res: any) => {
       this.menulList = res.data;
     });
     // this.menulList = [

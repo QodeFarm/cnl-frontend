@@ -8,7 +8,8 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { OrderslistComponent } from './orderslist/orderslist.component';
 import { CommonModule } from '@angular/common';
 import { SalesListComponent } from './sales-list/sales-list.component';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { SalesinvoiceComponent } from './salesinvoice/salesinvoice.component';
 @Component({
   standalone: true,
   imports: [CommonModule, AdminCommmonModule, OrderslistComponent, SalesListComponent],
@@ -32,58 +33,9 @@ export class SalesComponent {
   noOrdersMessage: string;
   shippingTrackingNumber: any;
 
-  //----------------------
-
-  // public formConfig: FormGroup; // Assuming you're using reactive forms
-  
-
-  // // List of all tables
-  // tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return', 'Purchase', 'Purchase Invoice', 'Purchase Return'];
-
-  // // This will store available tables excluding the current one
-  // availableTables: string[] = [];
-
-  // // Selected table from dropdown
-  // selectedTable: string;
-
-  // // Variable to store current table name (example for 'Sale Order')
-  // currentTable: string = 'Sale Order'; // Dynamically change this based on your current module
-
-  // // Method to open the copy modal and populate dropdown
-  // openCopyModal() {
-  //   this.availableTables = this.tables.filter(table => table !== this.currentTable);
-  // }
-
-
-  // copyToTable() {
-  //   const dataToCopy = this.formConfig.model// Get the current form data
-
-  //   // Only navigate based on the selected table without needing breaks
-  //   if (this.selectedTable === 'Sale Order') {
-  //       this.router.navigate(['admin/sales'], { state: { data: dataToCopy } });
-  //   } else if (this.selectedTable === 'Sale Invoice') {
-  //       console.log('inside of sale invoice');
-  //       console.log('Data to copy:', dataToCopy);
-  //       this.router.navigate(['admin/sales/salesinvoice'], { state: { data: dataToCopy } });
-  //   } else if (this.selectedTable === 'Sale Return') {
-  //       this.router.navigate(['admin/sales/sale-return'], { state: { data: dataToCopy } });
-  //   } 
-  //   // Add additional cases as necessary
-  //   else {
-  //       console.error('Unknown table selected');
-  //   }
-  // }
-
-  // constructor(    
-  //   private http: HttpClient,
-  //   private cdRef: ChangeDetectorRef, 
-  //   private fb: FormBuilder, 
-  //   private router: Router) { // Inject Router here
-   
-  // }
-
+  //COPY ---------------------------------
   // List of all tables
-  tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return', 'Purchase', 'Purchase Invoice', 'Purchase Return'];
+  tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
 
   // This will store available tables excluding the current one
   availableTables: string[] = [];
@@ -97,14 +49,23 @@ export class SalesComponent {
   // Field mapping for auto population
   fieldMapping = {
       'Sale Invoice': {
-          customer_id: 'customer_id', // Assuming the same field name
+          customer: 'customer',  // Add this line for customer_id
+          csutomer_id: 'customer_id',
           email: 'email',
-          // Add other mappings as needed
+          billing_address: 'billing_address',
+          shipping_address: 'shipping_address',
+          ref_no: 'ref_no',
+          tax: 'tax',
+          remarks: 'remarks'
       },
       'Sale Return': {
-          customer_id: 'customer_id', // Assuming the same field name
+          customer: 'customer', // Assuming the same field name
+          customer_id: 'customer_id',  // Add this line for customer_id
           email: 'email',
-          // Add other mappings as needed
+          shipping_address: 'shipping_address',
+          ref_no: 'ref_no',
+          tax: 'tax',
+          remarks: 'remarks'
       },
       // Add mappings for other tables as needed
   };
@@ -115,74 +76,67 @@ export class SalesComponent {
   }
 
   copyToTable() {
-      const dataToCopy = this.formConfig.model; // Get the current form data
-      const populatedData = {};
+    const dataToCopy = this.formConfig.model.sale_order; // Get the current form data
+    const populatedData = {};
 
-      // Extract only the matching fields based on the selected table
-      if (this.selectedTable && this.fieldMapping[this.selectedTable]) {
-          for (const key in this.fieldMapping[this.selectedTable]) {
-              const sourceField = this.fieldMapping[this.selectedTable][key];
-              console.log("Source data : ", sourceField);
-              populatedData[key] = dataToCopy.sale_order[sourceField];
-              console.log("populatedData : ", populatedData[key]);
-          }
-      }
+    // Extract only the matching fields based on the selected table
+    if (this.selectedTable && this.fieldMapping[this.selectedTable]) {
+        for (const key in this.fieldMapping[this.selectedTable]) {
+            const sourceField = this.fieldMapping[this.selectedTable][key];
+            console.log("Source field : ", sourceField);
+            // Get value from the sales form
+            populatedData[key] = dataToCopy[sourceField];
+        }
+    }
 
-      // Navigate based on the selected table without needing breaks
-      if (this.selectedTable === 'Sale Order') {
-          this.router.navigate(['admin/sales'], { state: { data: populatedData } });
-      } else if (this.selectedTable === 'Sale Invoice') {
-          console.log('inside of sale invoice');
-          console.log('Data to copy:', populatedData);
-          this.router.navigate(['admin/sales/salesinvoice'], { state: { data: populatedData } });
-      } else if (this.selectedTable === 'Sale Return') {
-          this.router.navigate(['admin/sales/sale-return'], { state: { data: populatedData } });
-      }
-      // Add additional cases as necessary
-      else {
-          console.error('Unknown table selected');
-      }
+    // Log the populated data for debugging
+    console.log('Data to copy:', populatedData);
+
+    // Navigate based on the selected table without needing breaks
+    if (this.selectedTable === 'Sale Invoice') {
+        this.router.navigate(['admin/sales/salesinvoice'], { state: { data: populatedData } });
+        console.log("populate data of customer : ", populatedData)
+    } else if (this.selectedTable === 'Sale Return') {
+        this.router.navigate(['admin/sales/sale-returns'], { state: { data: populatedData } });
+    }
+    // Add additional cases for other tables if necessary
+    else {
+        console.error('Unknown table selected');
+    }
   }
 
-  constructor(    
-      private http: HttpClient,
-      private cdRef: ChangeDetectorRef, 
-      private fb: FormBuilder, 
-      private router: Router) { // Inject Router here
+  constructor(
+    private http: HttpClient,
+    private cdRef: ChangeDetectorRef,
+    private router: Router,
+    private route: ActivatedRoute,
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef
+  ) {}
 
-  }
-
-  //-------------------------
-
-  nowDate = () => {
-    const date = new Date();
-    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
-  }
-
-  // constructor(
-  //   private http: HttpClient,
-  //   private cdRef: ChangeDetectorRef, // Inject ChangeDetectorRef,
-  //   private router: Router
-  // ) {
-  //   this.formConfig = this.fb.group({
-  //     field1: [''],
-  //     field2: [''],
-  //     // Add other fields as needed
-  // });
-  //  }
-
-
-
+  dataToPopulate: any;
+  saleForm: FormGroup;
 
   ngOnInit() {
+    // set form config
+    this.setFormConfig();
+    // Subscribe to the route parameters to get the data from the history state
+    this.route.paramMap.subscribe(params => {
+      this.dataToPopulate = history.state.data; // Retrieve data from history
+      console.log('data retrieved:', this.dataToPopulate);
+
+      // Check if dataToPopulate exists and populate the form
+      console.log("triggering the data : ")
+      if (this.dataToPopulate) {
+        console.log("Custome in data : ", this.dataToPopulate.customer?.customer_id)
+        // Populate the form with the data received
+        this.populateForm(this.dataToPopulate);
+      }
+    });
 
     this.showSaleOrderList = false;
     this.showForm = false;
     this.SaleOrderEditID = null;
-
-    // set form config
-    this.setFormConfig();
-    //console.log('this.formConfig', this.formConfig);
 
     // set sale_order default value
     this.formConfig.model['sale_order']['order_type'] = 'sale_order';
@@ -192,6 +146,33 @@ export class SalesComponent {
     this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[8].hide = true;
     this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[9].hide = true;
     // //console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
+  }
+
+  populateForm(data: any) {
+    console.log("Data in populateform : ", data);
+    this.saleForm.patchValue({
+      customer: {
+        customer_id: data.customer?.csutomer_id || '',
+        name: data.customer?.name || ''
+      },
+      customer_id: data.customer?.customer_id || '',  // Handle undefined cases
+      email: data.email || '',
+      ref_no: data.ref_no || '',
+      tax: data.tax || '',
+      remarks: data.remarks || '',
+      billing_address: data.billing_address || '',
+      shipping_address: data.shipping_address || '',
+    });
+
+    // Trigger change detection to update the UI if needed
+    this.cdRef.detectChanges();
+  }
+
+  //COPY - END---------------------------------------------------
+
+  nowDate = () => {
+    const date = new Date();
+    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   }
 
   formConfig: TaFormConfig = {};
@@ -496,6 +477,14 @@ export class SalesComponent {
 
   setFormConfig() {
     this.SaleOrderEditID = null;
+    this.saleForm = this.fb.group({
+      customer: [null], // Add the customer field
+      customer_id: [null], // Ensure this is initialized
+      email: [null],
+      billing_address: [null],
+      shipping_address: [null],
+      // Add other fields as necessary
+    });
     this.formConfig = {
       url: "sales/sale_order/",
       title: '',
@@ -600,6 +589,9 @@ export class SalesComponent {
                       field.form.controls.email.setValue(data.email)
                     }
                   });
+                  if (this.dataToPopulate && this.dataToPopulate.customer && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.customer?.name);
+                  }
                 }
               }
             },
@@ -613,7 +605,11 @@ export class SalesComponent {
                 placeholder: 'Enter Email'
               },
               hooks: {
-                onInit: (field: any) => { }
+                onInit: (field: any) => {
+                  if (this.dataToPopulate && this.dataToPopulate.email && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.email);
+                  }
+                }
               }
             },
             {
@@ -660,6 +656,13 @@ export class SalesComponent {
                 type: 'input',
                 label: 'Ref No',
                 placeholder: 'Enter Ref No'
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  if (this.dataToPopulate && this.dataToPopulate.ref_no && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.ref_no);
+                  }
+                }
               }
             },
             {
@@ -687,6 +690,9 @@ export class SalesComponent {
               },
               hooks: {
                 onInit: (field: any) => {
+                  if (this.dataToPopulate && this.dataToPopulate.tax && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.tax);
+                  }
                 }
               }
             },
@@ -725,6 +731,13 @@ export class SalesComponent {
               templateOptions: {
                 label: 'Remarks',
                 placeholder: 'Enter Remarks',
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  if (this.dataToPopulate && this.dataToPopulate.remarks && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.remarks);
+                  }
+                }
               }
             },
             {
@@ -734,6 +747,13 @@ export class SalesComponent {
               templateOptions: {
                 label: 'Billing address',
                 placeholder: 'Enter Billing address'
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  if (this.dataToPopulate && this.dataToPopulate.billing_address && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.billing_address);
+                  }
+                }
               }
             },
             {
@@ -743,6 +763,13 @@ export class SalesComponent {
               templateOptions: {
                 label: 'Shipping address',
                 placeholder: 'Enter Shipping address'
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  if (this.dataToPopulate && this.dataToPopulate.shipping_address && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.shipping_address);
+                  }
+                }
               }
             }
           ]

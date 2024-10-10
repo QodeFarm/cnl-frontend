@@ -16,6 +16,13 @@ import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { HashLocationStrategy, Location, LocationStrategy } from '@angular/common';
 import { FormlyModule } from '@ngx-formly/core';
+import { RouterModule } from '@angular/router';
+import { SalesComponent } from './admin/sales/sales.component';
+import { SalesinvoiceComponent } from './admin/sales/salesinvoice/salesinvoice.component';
+import { SaleReturnsComponent } from './admin/sales/sale-returns/sale-returns.component';
+import { PurchaseComponent } from './admin/purchase/purchase.component';
+import { PurchaseInvoiceComponent } from './admin/purchase/purchase-invoice/purchase-invoice.component';
+import { PurchasereturnordersComponent } from './admin/purchase/purchasereturnorders/purchasereturnorders.component';
 registerLocaleData(en);
 export function initialConfigLoad(siteS: SiteConfigService) {
   return () => siteS.loadConfig();
@@ -32,7 +39,16 @@ export function initialConfigLoad(siteS: SiteConfigService) {
     BrowserAnimationsModule,
     IconsProviderModule,
     FormlyModule.forRoot(),
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    RouterModule.forRoot([
+      // Define your routes here
+      { path: 'admin/sales', component: SalesComponent },
+      { path: 'admin/sales/salesinvoice', component: SalesinvoiceComponent },
+      { path: 'admin/sales/sale-returns', component: SaleReturnsComponent },
+      { path: 'purchase', component: PurchaseComponent },
+      { path: 'purchase-invoice', component: PurchaseInvoiceComponent },
+      { path: 'purchase-return', component: PurchasereturnordersComponent },
+    ]),
   ],
   providers: [
     {
