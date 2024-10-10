@@ -331,7 +331,6 @@ export class TasksComponent implements OnInit {
         // end of task_comments keys
 
         // start of task_attachments keys
-
         {
           className: 'col-6 pb-0',
           fieldGroupClassName: "field-no-bottom-space",
