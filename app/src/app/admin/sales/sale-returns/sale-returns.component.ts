@@ -445,6 +445,16 @@ export class SaleReturnsComponent {
           key: 'sale_return_items',
           type: 'script',
           value: 'data.sale_return_items.map(m=> {m.product_id = m.product.product_id;  return m ;})'
+        },
+        {
+          key: 'sale_return_items',
+          type: 'script',
+          value: 'data.sale_return_items.map(m=> {m.size_id = m.size.size_id;  return m ;})'
+        },
+        {
+          key: 'sale_return_items',
+          type: 'script',
+          value: 'data.sale_return_items.map(m=> {m.color_id = m.color.color_id;  return m ;})'
         }
       ],
       submit: {
@@ -747,10 +757,18 @@ export class SaleReturnsComponent {
           type: 'table',
           className: 'custom-form-list',
           templateOptions: {
-            title: 'Products',
+            // title: 'Products',
             addText: 'Add Product',
             tableCols: [
               { name: 'product', label: 'Product' },
+              {
+                name: 'size',
+                label: 'size'
+              },
+              {
+                name: 'color',
+                label: 'color'
+              },
               { name: 'code', label: 'Code' },
               { name: 'unit', label: 'Unit' },
               { name: 'total_boxes', label: 'Total Boxes' },
@@ -779,6 +797,45 @@ export class SaleReturnsComponent {
                 },
                 hooks: {
                   onInit: (field: any) => {
+                      const parentArray = field.parent;
+
+                  // Check if parentArray exists and proceed
+                  if (parentArray) {
+                    const currentRowIndex = +parentArray.key; // Simplified number conversion
+                    
+                    // Subscribe to value changes of the field
+                    field.formControl.valueChanges.subscribe(selectedProductId => {
+                      const product = this.formConfig.model.sale_return_items[currentRowIndex]?.product;
+
+                      // Check if a valid product is selected
+                      if (product?.product_id) {
+                        const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
+
+                        if (cardWrapper) {
+                          // Remove existing product info if present
+                          cardWrapper.querySelector('.center-message')?.remove();
+
+                          // Create and insert new product info
+                          const productInfoDiv = document.createElement('div');
+                          productInfoDiv.classList.add('center-message');
+                          productInfoDiv.innerHTML = `
+                            <span style="color: red;">Product Info:</span> 
+                            <span style="color: blue;">${product.name}</span> |                            
+                            <span style="color: red;">Balance:</span> 
+                            <span style="color: blue;">${product.balance}</span> |
+                            <span style="color: red;">Unit:</span> 
+                            <span style="color: blue;">${product.unit_options.unit_name}</span> | &nbsp;`;
+
+                          cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
+
+                        }
+                      } else {
+                        console.log(`No valid product selected for Row ${currentRowIndex}.`);
+                      }
+                    });
+                  } else {
+                    console.error('Parent array is undefined or not accessible');
+                  }
                     field.formControl.valueChanges.subscribe(data => {
                       this.productOptions = data;
                       if (field.form && field.form.controls && field.form.controls.code && data && data.code) {
@@ -806,6 +863,38 @@ export class SaleReturnsComponent {
                     });
                   }
                 }
+              },
+              {
+                key: 'size',
+                type: 'select',
+                templateOptions: {
+                  label: 'Select Size',
+                  dataKey: 'size_id',
+                  hideLabel: true,
+                  dataLabel: 'size_name',
+                  options: [],
+                  required: true,
+                  lazy: {
+                    url: 'products/sizes/',
+                    lazyOneTime: true
+                  }
+                },
+              },
+              {
+                key: 'color',
+                type: 'select',
+                templateOptions: {
+                  label: 'Select Color',
+                  dataKey: 'color_id',
+                  hideLabel: true,
+                  dataLabel: 'color_name',
+                  options: [],
+                  required: true,
+                  lazy: {
+                    url: 'products/colors/',
+                    lazyOneTime: true
+                  }
+                },
               },
               {
                 type: 'input',

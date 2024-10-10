@@ -568,6 +568,7 @@ export class SalesComponent {
                 dataKey: 'workflow_id',
                 dataLabel: "name",
                 options: [],
+                required: true,
                 lazy: {
                   url: 'sales/workflows/',
                   lazyOneTime: true
