@@ -12,4 +12,33 @@
 .button-spacing {
     margin-left: 10px;
   }
-  
+
+// /* Custom modal size */
+// .custom-size {
+//     max-width: 50%; /* Increase the width to 85% of the viewport */
+//     max-height: 85vh; 
+// }
+
+// .modal-body {
+//     max-height: 75vh; /* Set the modal's body height to 75% of the viewport height */
+//     overflow-y: auto; /* Add scrolling if content exceeds the height */
+// }
+
+/* Custom modal size */
+.custom-size {
+    max-width: 65%; /* Increase the width to 85% of the viewport */
+    max-height: 90vh; /* Increase the height to 85% of the viewport height */
+}
+
+/* Ensure modal content takes the full height available */
+.modal-content {
+    height: auto;
+    max-height: 90vh;
+}
+
+/* Adjust the modal body to accommodate the extra height */
+// .modal-body {
+//     height: calc(100% - 120px); /* Adjust the body height to fill modal minus header and footer */
+//     overflow-y: auto; /* Scroll if the content overflows */
+// }
+

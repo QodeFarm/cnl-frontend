@@ -10,6 +10,8 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { OrderslistComponent } from '../orderslist/orderslist.component';
 import { SaleinvoiceorderlistComponent } from '../saleinvoiceorderlist/saleinvoiceorderlist.component';
 import { SaleReturnsListComponent } from './sale-returns-list/sale-returns-list.component';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FormBuilder, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-sale-returns',
@@ -38,11 +40,107 @@ export class SaleReturnsComponent {
     const date = new Date();
     return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   }
+//COPY -------------------------------------------------
+tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
 
-  // constructor(private http: HttpClient) {}
-  constructor(private http: HttpClient, private cdRef: ChangeDetectorRef) { }
+  // This will store available tables excluding the current one
+  availableTables: string[] = [];
+
+  // Selected table from dropdown
+  selectedTable: string;
+
+  // Variable to store current table name (example for 'Sale Order')
+  currentTable: string = 'Sale Return'; // Dynamically change this based on your current module
+
+  // Field mapping for auto population
+  fieldMapping = {
+      'Sale Order': {
+          customer: 'customer',  // Add this line for customer_id
+          csutomer_id: 'customer_id',
+          email: 'email',
+          billing_address: 'billing_address',
+          shipping_address: 'shipping_address',
+          ref_no: 'ref_no',
+          tax: 'tax',
+          remarks: 'remarks'
+      },
+      'Sale Invoice': {
+          customer: 'customer', // Assuming the same field name
+          customer_id: 'customer_id',  // Add this line for customer_id
+          email: 'email',
+          shipping_address: 'shipping_address',
+          ref_no: 'ref_no',
+          bill_type: 'bill_type',
+          tax: 'tax',
+          remarks: 'remarks'
+      },
+      // Add mappings for other tables as needed
+  };
+
+  // Method to open the copy modal and populate dropdown
+  openCopyModal() {
+      this.availableTables = this.tables.filter(table => table !== this.currentTable);
+  }
+
+  copyToTable() {
+    const dataToCopy = this.formConfig.model.sale_return_order; // Get the current form data
+    const populatedData = {};
+
+    // Extract only the matching fields based on the selected table
+    if (this.selectedTable && this.fieldMapping[this.selectedTable]) {
+        for (const key in this.fieldMapping[this.selectedTable]) {
+            const sourceField = this.fieldMapping[this.selectedTable][key];
+            console.log("Source field : ", sourceField);
+            // Get value from the sales form
+            populatedData[key] = dataToCopy[sourceField];
+        }
+    }
+
+    // Log the populated data for debugging
+    console.log('Data to copy:', populatedData);
+
+    // Navigate based on the selected table without needing breaks
+    if (this.selectedTable === 'Sale Order') {
+        this.router.navigate(['admin/sales'], { state: { data: populatedData } });
+        console.log("populate data of customer : ", populatedData)
+    } else if (this.selectedTable === 'Sale Invoice') {
+        this.router.navigate(['admin/sales/salesinvoice'], { state: { data: populatedData } });
+    }
+    // Add additional cases for other tables if necessary
+    else {
+        console.error('Unknown table selected');
+    }
+  }
+  constructor(
+    private http: HttpClient,
+    private cdRef: ChangeDetectorRef,
+    private router: Router,
+    private route: ActivatedRoute,
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  dataToPopulate: any;
+  salesReturnForm: FormGroup;
 
   ngOnInit() {
+    this.setFormConfig();
+
+    // Subscribe to the route parameters to get the data from the history state
+    this.route.paramMap.subscribe(params => {
+      this.dataToPopulate = history.state.data; // Retrieve data from history
+      console.log('data retrieved:', this.dataToPopulate);
+
+      // Check if dataToPopulate exists and populate the form
+      console.log("triggering the data : ")
+      if (this.dataToPopulate) {
+        console.log("Custome in data : ", this.dataToPopulate.customer?.customer_id)
+        // Populate the form with the data received
+        this.populateForm(this.dataToPopulate);
+        this.formConfig.model['sale_invoice_order']['customer_id'] = this.dataToPopulate.customer?.customer_id;
+      }
+    });
+
     this.showSaleReturnOrderList = false;
     this.showForm = false;
     this.SaleReturnOrderEditID = null;
@@ -54,8 +152,27 @@ export class SaleReturnsComponent {
     this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[2].hide = true;
     // console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
   }
+  populateForm(data: any) {
+    console.log("Data in populateform : ", data);
+    this.salesReturnForm.patchValue({
+      customer: {
+        customer_id: data.customer?.csutomer_id || '',
+        name: data.customer?.name || ''
+      },
+      customer_id: data.customer?.customer_id || '',  // Handle undefined cases
+      email: data.email || '',
+      ref_no: data.ref_no || '',
+      tax: data.tax || '',
+      bill_type: data.bill_type || '',
+      remarks: data.remarks || '',
+      billing_address: data.billing_address || '',
+      shipping_address: data.shipping_address || '',
+    });
 
-
+    // Trigger change detection to update the UI if needed
+    this.cdRef.detectChanges();
+  }
+//--------------------------------------------------------
   getWorkflowId() {
     return this.http.get('http://195.35.20.172:8000/api/v1/sales/workflows/');
   }
@@ -433,6 +550,17 @@ export class SaleReturnsComponent {
 
   setFormConfig() {
     this.SaleReturnOrderEditID = null;
+
+    this.salesReturnForm = this.fb.group({
+      customer: [null], // Add the customer field
+      customer_id: [null], // Ensure this is initialized
+      email: [null],
+      bill_type: [null],
+      billing_address: [null],
+      shipping_address: [null],
+      // Add other fields as necessary
+    });
+
     this.formConfig = {
       // url: "sales/sale_return_order/",
       title: '',
@@ -493,6 +621,9 @@ export class SaleReturnsComponent {
               },
               hooks: {
                 onInit: (field: any) => {
+                  if (this.dataToPopulate && this.dataToPopulate.bill_type && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.bill_type);
+                  }
                 }
               }
             },
@@ -529,6 +660,10 @@ export class SaleReturnsComponent {
                       field.form.controls.email.setValue(data.email)
                     }
                   });
+                  if (this.dataToPopulate && this.dataToPopulate.customer && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.customer?.customer_id);
+                    
+                  }
                 }
               }
             },
@@ -540,8 +675,13 @@ export class SaleReturnsComponent {
                 type: 'input',
                 label: 'Email',
                 placeholder: 'Enter Email',
-              }, hooks: {
-                onInit: (field: any) => { }
+              }, 
+              hooks: {
+                onInit: (field: any) => {
+                  if (this.dataToPopulate && this.dataToPopulate.email && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.email);
+                  }
+                }
               }
             },
             {
@@ -578,6 +718,10 @@ export class SaleReturnsComponent {
                       this.formConfig.model['sale_return_order']['order_salesman_id'] = data.order_salesman_id;
                     }
                   });
+                  if (this.dataToPopulate && this.dataToPopulate.order_salesman_id && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.order_salesman_id);
+                    
+                  }
                 }
               }
             },
@@ -601,6 +745,13 @@ export class SaleReturnsComponent {
                 label: 'Ref No',
                 placeholder: 'Enter Ref No',
                 required: true
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  if (this.dataToPopulate && this.dataToPopulate.ref_no && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.ref_no);
+                  }
+                }
               }
             },
             {
@@ -686,9 +837,11 @@ export class SaleReturnsComponent {
               },
               hooks: {
                 onInit: (field: any) => {
+                  if (this.dataToPopulate && this.dataToPopulate.tax && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.tax);
+                  }
                 }
               }
-
             },
             {
               key: 'return_option',
@@ -721,6 +874,13 @@ export class SaleReturnsComponent {
               templateOptions: {
                 label: 'Remarks',
                 placeholder: 'Enter Remarks',
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  if (this.dataToPopulate && this.dataToPopulate.remarks && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.remarks);
+                  }
+                }
               }
             },
             {
@@ -739,6 +899,13 @@ export class SaleReturnsComponent {
               templateOptions: {
                 label: 'Billing Address',
                 placeholder: 'Enter Billing Address',
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  if (this.dataToPopulate && this.dataToPopulate.billing_address && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.billing_address);
+                  }
+                }
               }
             },
             {
@@ -748,6 +915,13 @@ export class SaleReturnsComponent {
               templateOptions: {
                 label: 'Shipping Address',
                 placeholder: 'Enter Shipping Address',
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  if (this.dataToPopulate && this.dataToPopulate.shipping_address && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.shipping_address);
+                  }
+                }
               }
             }
           ]
