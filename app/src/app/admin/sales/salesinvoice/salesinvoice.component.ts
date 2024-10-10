@@ -66,6 +66,7 @@ export class SalesinvoiceComponent {
           customer: 'customer', // Assuming the same field name
           customer_id: 'customer_id',  // Add this line for customer_id
           email: 'email',
+          bill_type: 'bill_type',
           shipping_address: 'shipping_address',
           ref_no: 'ref_no',
           tax: 'tax',
@@ -135,7 +136,6 @@ export class SalesinvoiceComponent {
         console.log("Custome in data : ", this.dataToPopulate.customer?.customer_id)
         // Populate the form with the data received
         this.populateForm(this.dataToPopulate);
-        this.formConfig.model['sale_invoice_order']['customer_id'] = this.dataToPopulate.customer?.customer_id;
       }
     });
 
@@ -159,6 +159,7 @@ export class SalesinvoiceComponent {
       },
       customer_id: data.customer?.customer_id || '',  // Handle undefined cases
       email: data.email || '',
+      bill_type: data.bill_type || '',
       ref_no: data.ref_no || '',
       tax: data.tax || '',
       remarks: data.remarks || '',
@@ -477,6 +478,7 @@ export class SalesinvoiceComponent {
     this.salesInvoiceForm = this.fb.group({
       customer: [null], // Add the customer field
       customer_id: [null], // Ensure this is initialized
+      bill_type: [null],
       email: [null],
       billing_address: [null],
       shipping_address: [null],
@@ -545,6 +547,9 @@ export class SalesinvoiceComponent {
               },
               hooks: {
                 onInit: (field: any) => {
+                  if (this.dataToPopulate && this.dataToPopulate.bill_type && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.bill_type);
+                  }
                 }
               }
             },                                             
