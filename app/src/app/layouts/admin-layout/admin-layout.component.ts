@@ -88,11 +88,16 @@ export class AdminLayoutComponent {
   ngOnInit() {
     const user = this.taLoacal.getItem('user');
     this.menulList = [];
-    if (user)
+
+    if (user) {
       this.userName = user.username;
-    this.http.get('users/user_access/').subscribe((res: any) => {
-      this.menulList = res.data;
-    });
+      const userId = user.user_id; // Extracting the user_id dynamically
+
+      // Using template literals to inject user_id dynamically into the URL
+      this.http.get(`users/user_access/${userId}`).subscribe((res: any) => {
+        this.menulList = res.data;
+      });
+    }
     // this.menulList = [
     //   {
     //     link: '/admin/dashboard',
