@@ -62,7 +62,7 @@ const routes: Routes = [
       { path: 'tasks', data: { title: 'Tasks', moduleName: 'tasks' }, canActivate: [], loadComponent: () => import('./admin/tasks/tasks.component').then(m => m.TasksComponent) },
 
       //Assets Module
-      // { path: 'assets', data: { title: 'Assets', moduleName: 'assets' }, canActivate: [], loadComponent: () => import('./admin/assets/assets.component').then(m => m.AssetsComponent) },
+      { path: 'assets/assets', data: { title: 'Assets', moduleName: 'assets' }, canActivate: [], loadComponent: () => import('./admin/assets/assets.component').then(m => m.AssetsComponent) },
       {path: 'assets/asset-maintenance', data: { title: 'Asset Maintenance', moduleName: "asset-maintenance" },loadComponent: () => import('./admin/assets/asset-maintenance/asset-maintenance.component').then(m => m.AssetMaintenanceComponent)},
 
       //Production Module

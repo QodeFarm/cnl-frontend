@@ -77,8 +77,8 @@ export class ProductsListComponent {
         sort: true
       },
       {
-        fieldKey: 'product_balance',
-        name: 'Bal',
+        fieldKey: 'balance',
+        name: 'Balance',
         sort: false
       },
       {
