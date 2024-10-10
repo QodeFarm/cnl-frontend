@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
 import { Router } from '@angular/router';
@@ -21,12 +21,26 @@ export class TasksComponent implements OnInit {
 
   constructor(private http: HttpClient) {}
 
+  set_default_status_id(): any {
+    return (this.http.get('master/statuses/').subscribe((res: any) => {
+      if (res && res.data) {
+        const key = 'status_name';
+        const value = 'Open';
+        const filteredDataSet = res.data.filter((item: any) => item[key] === value);
+        const status_id = filteredDataSet[0].status_id;
+        this.formConfig.model['task']['status_id'] = status_id; // set default is 'Open'
+      }
+    }));
+  };
+
   ngOnInit() {
     this.showTasksList = false;
     this.showForm = false;
     this.TasksEditID = null;
     // Set form config
     this.setFormConfig();
+    this.set_default_status_id(); // lead_status_id = 'Open'
+    this.formConfig.fields[0].fieldGroup[7].hide = true; 
     console.log('this.formConfig', this.formConfig);
   }
 
@@ -41,6 +55,16 @@ export class TasksComponent implements OnInit {
       console.log('--------> res ', res);
       if (res && res.data) {
         this.formConfig.model = res.data;
+
+      // Check if the task was assigned to a user or a group and set the selectionType
+      if (res.data['task']['user_id']) {
+        this.formConfig.model['task']['selectionType'] = 'user';
+        this.formConfig.model['task']['user_id'] = res.data['task']['user_id'];  // Set user_id
+      } else if (res.data['task']['group_id']) {
+        this.formConfig.model['task']['selectionType'] = 'group';
+        this.formConfig.model['task']['group_id'] = res.data['task']['group_id'];  // Set group_id
+      }
+
         this.formConfig.showActionBtn = true;
         this.formConfig.pkId = 'task_id';
         // Set labels for update
@@ -48,6 +72,8 @@ export class TasksComponent implements OnInit {
         // Show form after setting form values
         this.formConfig.model['task_id'] = this.TasksEditID;
         this.showForm = true;
+        this.formConfig.fields[0].fieldGroup[7].hide = false; 
+
       }
     });
     this.hide();
@@ -77,7 +103,7 @@ export class TasksComponent implements OnInit {
       },
       model: {
         task: {},
-        task_comments: [{}],
+        task_comments: [],
         task_attachments: [],
         task_history: {}
       },
@@ -87,19 +113,44 @@ export class TasksComponent implements OnInit {
           key: 'task',
           fieldGroup: [
             {
+              key: 'title',
+              type: 'input',
+              className: 'col-3',
+              templateOptions: {
+                label: 'Title',
+                placeholder: 'Enter title',
+                required: true
+              }
+            },
+            {
+              key: 'selectionType',
+              type: 'radio',
+              className: 'col-3',
+              defaultValue: 'user', // Set default selection to 'user'
+              templateOptions: {
+                label: 'Assign to',
+                options: [
+                  { label: 'User', value: 'user' },
+                  { label: 'Group', value: 'group' }
+                ],
+                required: true,
+              }
+            },
+            {
               key: 'user',
               type: 'select',
               className: 'col-3',
+              hideExpression: (model) => model.selectionType !== 'user', // Hide if not user selected
               templateOptions: {
                 label: 'User',
                 dataKey: 'user_id',
                 dataLabel: 'first_name',
-                options: [],
+                options: [], // Options will be loaded via lazy
                 lazy: {
                   url: 'users/user/',
                   lazyOneTime: true
                 },
-                required: true
+                required: true // Required only if 'User' is selected
               },
               hooks: {
                 onChanges: (field: any) => {
@@ -114,27 +165,28 @@ export class TasksComponent implements OnInit {
               }
             },
             {
-              key: 'status',
+              key: 'group',
               type: 'select',
               className: 'col-3',
+              hideExpression: (model) => model.selectionType !== 'group', // Hide if not group selected
               templateOptions: {
-                label: 'Statuses',
-                dataKey: 'status_id',
-                dataLabel: 'status_name',
-                options: [],
+                label: 'Group',
+                dataKey: 'group_id',
+                dataLabel: 'group_name',
+                options: [], // Options will be loaded via lazy
                 lazy: {
-                  url: 'masters/statuses/',
+                  url: 'masters/user_groups/',
                   lazyOneTime: true
                 },
-                required: true
+                required: true // Required only if 'Group' is selected
               },
               hooks: {
                 onChanges: (field: any) => {
                   field.formControl.valueChanges.subscribe((data: any) => {
                     if (this.formConfig && this.formConfig.model && this.formConfig.model['task']) {
-                      this.formConfig.model['task']['status_id'] = data.status_id;
+                      this.formConfig.model['task']['group_id'] = data.group_id;
                     } else {
-                      console.error('Form config or statuses data model is not defined.');
+                      console.error('Form config or group data model is not defined.');
                     }
                   });
                 }
@@ -168,16 +220,6 @@ export class TasksComponent implements OnInit {
               }
             },
             {
-              key: 'title',
-              type: 'input',
-              className: 'col-3',
-              templateOptions: {
-                label: 'Title',
-                placeholder: 'Enter title',
-                required: true
-              }
-            },
-            {
               key: 'description',
               type: 'textarea',
               className: 'col-3',
@@ -195,6 +237,33 @@ export class TasksComponent implements OnInit {
                 type: 'date',
                 label: 'Due date',
                 required: false
+              }
+            },
+            {
+              key: 'status',
+              type: 'select',
+              className: 'col-3',
+              templateOptions: {
+                label: 'Statuses',
+                dataKey: 'status_id',
+                dataLabel: 'status_name',
+                options: [],
+                lazy: {
+                  url: 'masters/statuses/',
+                  lazyOneTime: true
+                },
+                required: true
+              },
+              hooks: {
+                onChanges: (field: any) => {
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['task']) {
+                      this.formConfig.model['task']['status_id'] = data.status_id;
+                    } else {
+                      console.error('Form config or statuses data model is not defined.');
+                    }
+                  });
+                }
               }
             }
           ]
@@ -262,7 +331,6 @@ export class TasksComponent implements OnInit {
         // end of task_comments keys
 
         // start of task_attachments keys
-
         {
           className: 'col-6 pb-0',
           fieldGroupClassName: "field-no-bottom-space",
@@ -295,45 +363,6 @@ export class TasksComponent implements OnInit {
             }
           ]
         }
-
-
-        // {
-        //   key: 'task_attachments',
-        //   type: 'table',
-        //   className: 'custom-form-list',
-        //   templateOptions: {
-        //     title: 'Task Attachment',
-        //     addText: 'Add Attachment',
-        //     tableCols: [
-        //       // { name: 'attachment_name', label: 'Attachment Name' },
-        //       { name: 'attachment_path', label: 'Attachment Path' }
-        //     ]
-        //   },
-        //   fieldArray: {
-        //     fieldGroup: [
-        //       {
-        //         key: 'attachment_name',
-        //         type: 'input',
-        //         templateOptions: {
-        //           label: 'Attachment Name',
-        //           placeholder: 'Enter Attachment Name',
-        //           hideLabel: true,
-        //           required: false
-        //         }
-        //       },
-        //       {
-        //         key: 'attachment_path',
-        //         type: 'file',
-        //         className: 'ta-cell col-12 custom-file-attachement',
-        //         templateOptions: {
-        //           label: 'Attachment Path',
-        //           hideLabel: true,
-        //         }
-        //       }
-        //     ]
-        //   }
-        // },
-       // end of task_attachments keys  
       ]
     };
   }

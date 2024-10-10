@@ -48,6 +48,8 @@
                             <li><a [routerLink]="['/admin/master/notification-methods']">Notification Methods</a></li>
                             <li><a [routerLink]="['/admin/master/reminder-types']">Reminder Types</a></li> 
                             <li><a [routerLink]="['/admin/master/reminder-settings']">Reminder Settings</a></li>
+                            <li><a [routerLink]="['/admin/master/user-groups']">User Groups</a></li> 
+                            <li><a [routerLink]="['/admin/master/user-group-members']">User Group Members</a></li>
                         </ul>
                     </div>
                 </div>
@@ -86,6 +88,12 @@
                         <ng-container *ngSwitchCase="'reminder-settings'">
                             <app-reminder-settings></app-reminder-settings>
                         </ng-container> 
+                        <ng-container *ngSwitchCase="'user-groups'">
+                            <app-usergroups></app-usergroups>
+                        </ng-container> 
+                        <ng-container *ngSwitchCase="'user-group-members'">
+                            <app-user-group-members></app-user-group-members>
+                        </ng-container>
                     </ng-container>
                 </div>
             </div>
