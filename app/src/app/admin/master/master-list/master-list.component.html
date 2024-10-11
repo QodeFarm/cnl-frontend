@@ -176,6 +176,9 @@
                             <li><a [routerLink]="['/admin/master/product-item-balance']">Product item balence</a></li>
                             <li><a [routerLink]="['/admin/master/product-unique-quantity-codes']">Products unique quantity codes</a></li>
                             <li><a [routerLink]="['/admin/master/unit-options']">Unit options</a></li>
+                            <li><a [routerLink]="['/admin/master/product-sizes']">Sizes</a></li>
+                            <li><a [routerLink]="['/admin/master/product-colors']">Colors</a></li>
+                            <li><a [routerLink]="['/admin/master/warehouse-locations']">Warehouse Locations</a></li>
                         </ul>
                     </div>
                 </div>
@@ -216,6 +219,15 @@
                         </ng-container>
                         <ng-container *ngSwitchCase="'unit-options'">
                             <app-unit-options></app-unit-options>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'product-sizes'">
+                            <app-size></app-size>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'product-colors'">
+                            <app-color></app-color>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'warehouse-locations'">
+                            <app-warehouse-locations></app-warehouse-locations>
                         </ng-container>
                     </ng-container>
 

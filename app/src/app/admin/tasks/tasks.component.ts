@@ -22,7 +22,7 @@ export class TasksComponent implements OnInit {
   constructor(private http: HttpClient) {}
 
   set_default_status_id(): any {
-    return (this.http.get('master/statuses/').subscribe((res: any) => {
+    return (this.http.get('masters/statuses/').subscribe((res: any) => {
       if (res && res.data) {
         const key = 'status_name';
         const value = 'Open';

@@ -15,6 +15,9 @@ import { ProductItemTypeComponent } from './product-item-type/product-item-type.
 import { BrandSalesmanComponent } from './brand-salesman/brand-salesman.component';
 import { ProductBrandsComponent } from './product-brands/product-brands.component';
 import { ProductsListComponent } from './products-list/products-list.component';
+import { SizeComponent } from './size/size.component';
+import { ColorComponent } from './color/color.component';
+import { WarehouseLocationsComponent } from './warehouse-locations/warehouse-locations.component';
 
 const routes: Routes = [
   {
@@ -73,6 +76,18 @@ const routes: Routes = [
     path : 'product-brands',
     component: ProductBrandsComponent
   },
+  {
+    path : 'product-sizes',
+    component: SizeComponent
+  },
+  {
+    path : 'product-colors',
+    component: ColorComponent
+  },
+  {
+    path : 'warehouse-locations',
+    component: WarehouseLocationsComponent
+  }  
 ];
 
 @NgModule({
