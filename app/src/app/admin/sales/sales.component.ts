@@ -779,7 +779,7 @@ export class SalesComponent {
           type: 'table',
           className: 'custom-form-list',
           templateOptions: {
-            title: 'Products',
+            // title: 'Products',
             addText: 'Add Product',
             tableCols: [
               {
@@ -843,6 +843,46 @@ export class SalesComponent {
                 },
                 hooks: {
                   onInit: (field: any) => {
+                    const parentArray = field.parent;
+
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+                      
+                      // Subscribe to value changes of the field
+                      field.formControl.valueChanges.subscribe(selectedProductId => {
+                        const product = this.formConfig.model.sale_order_items[currentRowIndex]?.product;
+
+                        // Check if a valid product is selected
+                        if (product?.product_id) {
+                          const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
+
+                          if (cardWrapper) {
+                            // Remove existing product info if present
+                            cardWrapper.querySelector('.center-message')?.remove();
+
+                            // Create and insert new product info
+                            const productInfoDiv = document.createElement('div');
+                            productInfoDiv.classList.add('center-message');
+                            productInfoDiv.innerHTML = `
+                              <span style="color: red;">Product Info:</span> 
+                              <span style="color: blue;">${product.name}</span> |                            
+                              <span style="color: red;">Balance:</span> 
+                              <span style="color: blue;">${product.balance}</span> |
+                              <span style="color: red;">Unit:</span> 
+                              <span style="color: blue;">${product.unit_options.unit_name}</span> | &nbsp;`;
+
+                            cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
+
+                          }
+                        } else {
+                          console.log(`No valid product selected for Row ${currentRowIndex}.`);
+                        }
+                      });
+                    } else {
+                      console.error('Parent array is undefined or not accessible');
+                    }
+                    
                     field.formControl.valueChanges.subscribe(data => {
                       //console.log("products data", data);
                       this.productOptions = data;
