@@ -21,6 +21,7 @@ export class SalesComponent {
   @ViewChild('salesForm', { static: false }) salesForm: TaFormComponent | undefined;
   @ViewChild('ordersModal', { static: true }) ordersModal: ElementRef;
   orderNumber: any;
+  invoiceData: any;
   salesReceiptForm: FormGroup;
   showSaleOrderList: boolean = false;
   showForm: boolean = false;
@@ -140,12 +141,33 @@ export class SalesComponent {
 
     // set sale_order default value
     this.formConfig.model['sale_order']['order_type'] = 'sale_order';
+    
+    // Call the method to handle sale invoice creation, this is temporary change, this will be moved to formconfig.
+    
+    this.handleSaleInvoiceCreation();
+
+    //=================================
 
     // to get SaleOrder number for save 
     this.getOrderNo();
     this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[8].hide = true;
     this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[9].hide = true;
     // //console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
+  }
+
+  // New method to handle sale invoice creation
+  private handleSaleInvoiceCreation() {
+    console.log("invoice data in edit: ", this.invoiceData);
+    if (this.invoiceData !== undefined) {
+      this.createSaleInvoice(this.invoiceData).subscribe(
+        response => {
+          console.log('Sale invoice created successfully', response);
+        },
+        error => {
+          console.error('Error creating sale invoice', error);
+        }
+      );
+    }
   }
 
   populateForm(data: any) {
@@ -705,6 +727,7 @@ export class SalesComponent {
                 dataKey: 'workflow_id',
                 dataLabel: "name",
                 options: [],
+                required: true,
                 lazy: {
                   url: 'sales/workflows/',
                   lazyOneTime: true
@@ -1453,70 +1476,78 @@ export class SalesComponent {
                                 },
                                 options: [
                                   { value: 'Invoiced', label: 'Invoiced' },
-                                ]
+                                  // Add other statuses as needed
+                                ],
                               },
                               hooks: {
                                 onChanges: (field: any) => {
-                                  field.formControl.valueChanges.subscribe(data => {
-                                    if (data) {
+                                  // Subscribe to value changes only once
+                                  const valueChangesSubscription = field.formControl.valueChanges.subscribe(data => {
+                                    // Check if data is valid and if it's the first time processing 'Invoiced'
+                                    if (data === 'Invoiced') {
+                                      // Unsubscribe to avoid multiple triggers
+                                      valueChangesSubscription.unsubscribe();
+                            
+                                      // Update the flow status in the model
                                       this.formConfig.model['sale_order']['flow_status'] = data;
-
+                            
                                       const saleOrder = this.formConfig.model['sale_order'];
-                                      console.log("Saleorder : ", saleOrder);
-                                      if (saleOrder.flow_status === 'Invoice Ready') {
-                                        const saleOrderItems = this.formConfig.model['sale_order_items'];
-                                        const orderAttachments = this.formConfig.model['order_attachments'];
-                                        const orderShipments = this.formConfig.model['order_shipments'];
-
-                                        const invoiceData = {
-                                          sale_invoice_order: {
-                                            bill_type: saleOrder.bill_type || 'CASH',
-                                            sale_order_id: saleOrder.sale_order_id,
-                                            invoice_date: saleOrder.invoice_date || new Date().toISOString().split('T')[0],
-                                            email: saleOrder.email,
-                                            ref_no: saleOrder.ref_no,
-                                            ref_date: saleOrder.ref_date || new Date().toISOString().split('T')[0],
-                                            tax: saleOrder.tax || 'Inclusive',
-                                            due_date: saleOrder.due_date,
-                                            remarks: saleOrder.remarks,
-                                            advance_amount: saleOrder.advance_amount,
-                                            item_value: saleOrder.item_value,
-                                            discount: saleOrder.discount,
-                                            dis_amt: saleOrder.dis_amt,
-                                            taxable: saleOrder.taxable,
-                                            tax_amount: saleOrder.tax_amount,
-                                            cess_amount: saleOrder.cess_amount,
-                                            transport_charges: saleOrder.transport_charges,
-                                            round_off: saleOrder.round_off,
-                                            total_amount: saleOrder.total_amount,
-                                            vehicle_name: saleOrder.vehicle_name,
-                                            total_boxes: saleOrder.total_boxes,
-                                            shipping_address: saleOrder.shipping_address,
-                                            billing_address: saleOrder.billing_address,
-                                            customer_id: saleOrder.customer_id,
-                                            gst_type_id: saleOrder.gst_type_id,
-                                            order_type: saleOrder.order_type || 'sale_invoice',
-                                            order_salesman_id: saleOrder.order_salesman_id,
-                                            customer_address_id: saleOrder.customer_address_id,
-                                            payment_term_id: saleOrder.payment_term_id,
-                                            payment_link_type_id: saleOrder.payment_link_type_id,
-                                            ledger_account_id: saleOrder.ledger_account_id,
-                                            flow_status: saleOrder.flow_status // updated to use flow_status
-                                          },
-                                          sale_invoice_items: saleOrderItems,
-                                          order_attachments: orderAttachments,
-                                          order_shipments: orderShipments
-                                        };
-                                        console.log('invoiceData:', invoiceData);
-                                        this.createSaleInvoice(invoiceData).subscribe(
-                                          response => {
-                                            console.log('Sale invoice created successfully', response);
-                                          },
-                                          error => {
-                                            console.error('Error creating sale invoice', error);
-                                          }
-                                        );
-                                      }
+                                      console.log("Sale order: ", saleOrder);
+                            
+                                      // Prepare invoice data
+                                      const saleOrderItems = this.formConfig.model['sale_order_items'];
+                                      const orderAttachments = this.formConfig.model['order_attachments'];
+                                      const orderShipments = this.formConfig.model['order_shipments'];
+                            
+                                      this.invoiceData = {
+                                        sale_invoice_order: {
+                                          bill_type: saleOrder.bill_type || 'CASH',
+                                          sale_order_id: saleOrder.sale_order_id,
+                                          invoice_date: this.nowDate(),
+                                          email: saleOrder.email,
+                                          ref_no: saleOrder.ref_no,
+                                          ref_date: this.nowDate(),
+                                          tax: saleOrder.tax || 'Inclusive',
+                                          due_date: saleOrder.due_date,
+                                          remarks: saleOrder.remarks,
+                                          advance_amount: saleOrder.advance_amount,
+                                          item_value: saleOrder.item_value,
+                                          discount: saleOrder.discount,
+                                          dis_amt: saleOrder.dis_amt,
+                                          taxable: saleOrder.taxable,
+                                          tax_amount: saleOrder.tax_amount,
+                                          cess_amount: saleOrder.cess_amount,
+                                          transport_charges: saleOrder.transport_charges,
+                                          round_off: saleOrder.round_off,
+                                          total_amount: saleOrder.total_amount,
+                                          vehicle_name: saleOrder.vehicle_name,
+                                          total_boxes: saleOrder.total_boxes,
+                                          shipping_address: saleOrder.shipping_address,
+                                          billing_address: saleOrder.billing_address,
+                                          customer_id: saleOrder.customer_id,
+                                          gst_type_id: saleOrder.gst_type_id,
+                                          order_type: saleOrder.order_type || 'sale_invoice',
+                                          order_salesman_id: saleOrder.order_salesman_id,
+                                          customer_address_id: saleOrder.customer_address_id,
+                                          payment_term_id: saleOrder.payment_term_id,
+                                          payment_link_type_id: saleOrder.payment_link_type_id,
+                                          ledger_account_id: saleOrder.ledger_account_id,
+                                          flow_status: saleOrder.flow_status // updated to use flow_status
+                                        },
+                                        sale_invoice_items: saleOrderItems,
+                                        order_attachments: orderAttachments,
+                                        order_shipments: orderShipments
+                                      };
+                            
+                                      console.log('invoiceData:', this.invoiceData);
+                                      // this.createSaleInvoice(invoiceData).subscribe(
+                                      //   response => {
+                                      //     console.log('Sale invoice created successfully', response);
+                                      //   },
+                                      //   error => {
+                                      //     console.error('Error creating sale invoice', error);
+                                      //   }
+                                      // );
                                     }
                                   });
                                 }
