@@ -92,9 +92,10 @@ export class AdminLayoutComponent {
     if (user) {
       this.userName = user.username;
       const userId = user.user_id; // Extracting the user_id dynamically
+      const role_Id = user.role_id
 
       // Using template literals to inject user_id dynamically into the URL
-      this.http.get(`users/user_access/${userId}`).subscribe((res: any) => {
+      this.http.get(`users/user_access/${role_Id}`).subscribe((res: any) => {
         this.menulList = res.data;
       });
     }
