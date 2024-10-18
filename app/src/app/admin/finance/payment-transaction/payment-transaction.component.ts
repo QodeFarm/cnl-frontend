@@ -40,6 +40,7 @@ export class PaymentTransactionComponent {
   
       // Find the invoice field
       const invoiceField = this.formConfig.fields[0].fieldGroup.find(f => f.key === 'invoice_id');
+      console.log('invoiceField :', invoiceField)
       if (invoiceField) {
         // Update options with the fetched invoice data
         this.invoiceOptions = invoices.map(invoice => ({
