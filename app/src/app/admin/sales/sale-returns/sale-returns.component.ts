@@ -41,7 +41,7 @@ export class SaleReturnsComponent {
     return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   }
 //COPY -------------------------------------------------
-tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
+  tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
 
   // This will store available tables excluding the current one
   availableTables: string[] = [];
@@ -54,26 +54,153 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
 
   // Field mapping for auto population
   fieldMapping = {
-      'Sale Order': {
-          customer: 'customer',  // Add this line for customer_id
-          csutomer_id: 'customer_id',
-          email: 'email',
-          billing_address: 'billing_address',
-          shipping_address: 'shipping_address',
-          ref_no: 'ref_no',
-          tax: 'tax',
-          remarks: 'remarks'
+    'Sale Order': {
+      sale_order:{
+        customer: 'customer',
+        bill_type: 'bill_type',
+        email: 'email',
+        ref_no: 'ref_no',
+        ref_date: 'ref_date',
+        tax: 'tax',
+        due_date: 'due_date',
+        remarks: 'remarks',
+        advance_amount: 'advance_amount',
+        item_value: 'item_value',
+        discount: 'discount',
+        dis_amt: 'dis_amt',
+        taxable: 'taxable',
+        tax_amount: 'tax_amount',
+        cess_amount: 'cess_amount',
+        transport_charges: 'transport_charges',
+        round_off: 'round_off',
+        total_amount: 'total_amount',
+        vehicle_name: 'vehicle_name',
+        total_boxes: 'total_boxes',
+        order_type: 'order_type',
+        shipping_address: 'shipping_address',
+        billing_address: 'billing_address',
+        customer_id: 'customer_id',
+        gst_type: 'gst_type',
+        gst_type_id: 'gst_type_id',
+        order_salesman_id: 'order_salesman_id',
+        customer_address_id: 'customer_address_id',
+        payment_term: 'payment_term',
+        payment_term_id: 'payment_term_id',
+        payment_link_type_id: 'payment_link_type_id',
+        ledger_account: 'ledger_account',
+        ledger_account_id: 'ledger_account_id',
+        order_status_id: 'order_status_id'
       },
-      'Sale Invoice': {
-          customer: 'customer', // Assuming the same field name
-          customer_id: 'customer_id',  // Add this line for customer_id
-          email: 'email',
-          shipping_address: 'shipping_address',
-          ref_no: 'ref_no',
-          bill_type: 'bill_type',
+      sale_order_items: [
+        {
+          product: 'product',
+          size: 'size',
+          size_id: 'size_id',
+          color_id: 'color_id',
+          color: 'color',
+          quantity: 'quantity',
+          unit_price: 'unit_price',
+          rate: 'rate',
+          total_boxes: 'total_boxes',
+          amount: 'amount',
+          discount_percentage: 'discount_percentage',
+          discount: 'discount',
+          dis_amt: 'dis_amt',
           tax: 'tax',
-          remarks: 'remarks'
+          remarks: 'remarks',
+        }
+      ],
+      order_attachments: [
+        {
+          attachment_name: 'attachment_name',
+          attachment_path: 'attachment_path'
+        }
+      ],
+      order_shipments: {
+        destination: 'destination',
+        port_of_landing: 'port_of_landing',
+        port_of_discharge: 'port_of_discharge',
+        shipping_tracking_no: 'shipping_tracking_no',
+        shipping_date: 'shipping_date',
+        shipping_charges: 'shipping_charges',
+        weight: 'weight'
+      }
+    },
+    'Sale Invoice': {
+      sale_invoice_order: {
+        customer: 'customer',
+        bill_type: 'bill_type',
+        invoice_date: 'invoice_date',
+        invoice_no: 'invoice_no',
+        email: 'email',
+        ref_no: 'ref_no',
+        ref_date: 'ref_date',
+        tax: 'tax',
+        due_date: 'due_date',
+        remarks: 'remarks',
+        advance_amount: 'advance_amount',
+        item_value: 'item_value',
+        discount: 'discount',
+        dis_amt: 'dis_amt',
+        taxable: 'taxable',
+        tax_amount: 'tax_amount',
+        cess_amount: 'cess_amount',
+        transport_charges: 'transport_charges',
+        round_off: 'round_off',
+        total_amount: 'total_amount',
+        vehicle_name: 'vehicle_name',
+        total_boxes: 'total_boxes',
+        order_type: 'order_type',
+        shipping_address: 'shipping_address',
+        billing_address: 'billing_address',
+        customer_id: 'customer_id',
+        gst_type: 'gst_type',
+        gst_type_id: 'gst_type_id',
+        orders_salesman: 'orders_salesman',
+        order_salesman_id: 'order_salesman_id',
+        customer_address_id: 'customer_address_id',
+        payment_term: 'payment_term',
+        payment_term_id: 'payment_term_id',
+        payment_link_type_id: 'payment_link_type_id',
+        ledger_account: 'ledger_account',
+        ledger_account_id: 'ledger_account_id',
+        order_status_id: 'order_status_id'
       },
+      sale_invoice_items: [
+        {
+          product: 'product',
+          size: 'size',
+          size_id: 'size_id',
+          color_id: 'color_id',
+          color: 'color',
+          quantity: 'quantity',
+          unit_price: 'unit_price',
+          rate: 'rate',
+          total_boxes: 'total_boxes',
+          amount: 'amount',
+          discount_percentage: 'discount_percentage',
+          discount: 'discount',
+          dis_amt: 'dis_amt',
+          tax: 'tax',
+          remarks: 'remarks',
+        }
+      ],
+      order_attachments: [
+        {
+          attachment_name: 'attachment_name',
+          attachment_path: 'attachment_path'
+        }
+      ],
+      order_shipments: {
+        destination: 'destination',
+        port_of_landing: 'port_of_landing',
+        port_of_discharge: 'port_of_discharge',
+        shipping_tracking_no: 'shipping_tracking_no',
+        shipping_date: 'shipping_date',
+        shipping_charges: 'shipping_charges',
+        weight: 'weight'
+      }
+    },
       // Add mappings for other tables as needed
   };
 
@@ -83,17 +210,85 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
   }
 
   copyToTable() {
-    const dataToCopy = this.formConfig.model.sale_return_order; // Get the current form data
+    const dataToCopy = {
+      sale_return_order: this.formConfig.model.sale_return_order,
+      sale_return_items: this.formConfig.model.sale_return_items,
+      order_attachments: this.formConfig.model.order_attachments,
+      order_shipments: this.formConfig.model.order_shipments,
+    };
     const populatedData = {};
 
     // Extract only the matching fields based on the selected table
     if (this.selectedTable && this.fieldMapping[this.selectedTable]) {
-        for (const key in this.fieldMapping[this.selectedTable]) {
-            const sourceField = this.fieldMapping[this.selectedTable][key];
-            console.log("Source field : ", sourceField);
-            // Get value from the sales form
-            populatedData[key] = dataToCopy[sourceField];
+      const tableMapping = this.fieldMapping[this.selectedTable];
+  
+      // Handle sale_invoice_order fields
+      if (tableMapping.sale_invoice_order) {
+        populatedData['sale_invoice_order'] = {};
+        for (const key in tableMapping.sale_invoice_order) {
+          const sourceField = tableMapping.sale_invoice_order[key];
+          populatedData['sale_invoice_order'][key] = dataToCopy.sale_return_order[sourceField] || null;
         }
+      }
+
+      // Handle sale_return_order fields
+      if (tableMapping.sale_order) {
+        populatedData['sale_order'] = {};
+        for (const key in tableMapping.sale_order) {
+          const sourceField = tableMapping.sale_order[key];
+          populatedData['sale_order'][key] = dataToCopy.sale_return_order[sourceField] || null;
+        }
+      }
+  
+      // Handle sale_invoice_items (array)
+      if (tableMapping.sale_invoice_items) {
+        populatedData['sale_invoice_items'] = dataToCopy.sale_return_items?.map(item => {
+          const itemData = {};
+          // Iterate through the mapping for items
+          tableMapping.sale_invoice_items.forEach(fieldMap => {
+            for (const field in fieldMap) {
+              itemData[field] = item[fieldMap[field]] || null; // Ensure you access the correct fields
+            }
+          });
+          return itemData;
+        }) || [];
+      }
+
+      // Handle sale_return_items (array)
+      if (tableMapping.sale_order_items) {
+        populatedData['sale_order_items'] = dataToCopy.sale_return_items?.map(item => {
+          const itemData = {};
+          // Iterate through the mapping for items
+          tableMapping.sale_order_items.forEach(fieldMap => {
+            for (const field in fieldMap) {
+              itemData[field] = item[fieldMap[field]] || null; // Ensure you access the correct fields
+            }
+          });
+          return itemData;
+        }) || [];
+      }
+  
+      // Handle order_attachments (array)
+      if (tableMapping.order_attachments) {
+        populatedData['order_attachments'] = dataToCopy.order_attachments?.map(attachment => {
+          const attachmentData = {};
+          tableMapping.order_attachments.forEach(fieldMap => {
+            for (const field in fieldMap) {
+              attachmentData[field] = attachment[fieldMap[field]] || null;
+            }
+          });
+          return attachmentData;
+        }) || [];
+      }
+  
+      // Handle order_shipments (object)
+      if (tableMapping.order_shipments) {
+        populatedData['order_shipments'] = {};
+        for (const key in tableMapping.order_shipments) {
+          const sourceField = tableMapping.order_shipments[key];
+          populatedData['order_shipments'][key] = dataToCopy.order_shipments[sourceField] || null;
+        }
+      }
     }
 
     // Log the populated data for debugging
@@ -126,21 +321,6 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
   ngOnInit() {
     this.setFormConfig();
 
-    // Subscribe to the route parameters to get the data from the history state
-    this.route.paramMap.subscribe(params => {
-      this.dataToPopulate = history.state.data; // Retrieve data from history
-      console.log('data retrieved:', this.dataToPopulate);
-
-      // Check if dataToPopulate exists and populate the form
-      console.log("triggering the data : ")
-      if (this.dataToPopulate) {
-        console.log("Custome in data : ", this.dataToPopulate.customer?.customer_id)
-        // Populate the form with the data received
-        this.populateForm(this.dataToPopulate);
-        this.formConfig.model['sale_invoice_order']['customer_id'] = this.dataToPopulate.customer?.customer_id;
-      }
-    });
-
     this.showSaleReturnOrderList = false;
     this.showForm = false;
     this.SaleReturnOrderEditID = null;
@@ -151,27 +331,62 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
     this.getReturnNo();
     this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[2].hide = true;
     // console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
+    this.checkAndPopulateData()
   }
-  populateForm(data: any) {
-    console.log("Data in populateform : ", data);
-    this.salesReturnForm.patchValue({
-      customer: {
-        customer_id: data.customer?.csutomer_id || '',
-        name: data.customer?.name || ''
-      },
-      customer_id: data.customer?.customer_id || '',  // Handle undefined cases
-      email: data.email || '',
-      ref_no: data.ref_no || '',
-      tax: data.tax || '',
-      bill_type: data.bill_type || '',
-      remarks: data.remarks || '',
-      billing_address: data.billing_address || '',
-      shipping_address: data.shipping_address || '',
-    });
 
-    // Trigger change detection to update the UI if needed
-    this.cdRef.detectChanges();
-  }
+  checkAndPopulateData() {
+    // Check if data has already been populated
+    if (this.dataToPopulate === undefined) {
+      console.log("Data status checking 1 : ", (this.dataToPopulate === undefined))
+      // Subscribe to route params and history state data
+      this.route.paramMap.subscribe(params => {
+        // Retrieve data from history only if it's the first time populating
+        this.dataToPopulate = history.state.data; 
+        console.log('Data retrieved:', this.dataToPopulate);
+        
+        // Populate the form only if data exists
+        if (this.dataToPopulate) {
+          // Ensure we are handling sale_return_items correctly
+          const saleReturnItems = this.dataToPopulate.sale_return_items || [];
+  
+          // Clear existing sale_return_items to avoid duplicates
+          this.formConfig.model.sale_return_items = [];
+  
+          // Populate form with data, ensuring unique entries
+          saleReturnItems.forEach(item => {
+            const populatedItem = {
+              product_id: item.product.product_id,
+              size_id: item.size.size_id,
+              color_id: item.color.color_id,
+              code: item.code,
+              unit: item.unit,
+              total_boxes: item.total_boxes,
+              quantity: item.quantity,
+              amount: item.amount,
+              rate: item.rate,
+              print_name: item.print_name,
+              discount: item.discount
+            };
+            this.formConfig.model.sale_return_items.push(populatedItem);
+          });
+        }
+      });
+    } else {
+    // Detect if the page was refreshed
+      const wasPageRefreshed = window.performance?.navigation?.type === window.performance?.navigation?.TYPE_RELOAD;
+    
+      // Clear data if the page was refreshed
+      if (wasPageRefreshed) {
+        this.dataToPopulate = undefined;
+        console.log("Page was refreshed, clearing data.");
+        
+        // Ensure the history state is cleared to prevent repopulation
+        history.replaceState(null, '');
+        return; // Stop further execution as we don't want to repopulate the form
+      }
+    }
+  }  
+  
 //--------------------------------------------------------
   getWorkflowId() {
     return this.http.get('http://195.35.20.172:8000/api/v1/sales/workflows/');
@@ -551,16 +766,6 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
   setFormConfig() {
     this.SaleReturnOrderEditID = null;
 
-    this.salesReturnForm = this.fb.group({
-      customer: [null], // Add the customer field
-      customer_id: [null], // Ensure this is initialized
-      email: [null],
-      bill_type: [null],
-      billing_address: [null],
-      shipping_address: [null],
-      // Add other fields as necessary
-    });
-
     this.formConfig = {
       // url: "sales/sale_return_order/",
       title: '',
@@ -621,8 +826,8 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
               },
               hooks: {
                 onInit: (field: any) => {
-                  if (this.dataToPopulate && this.dataToPopulate.bill_type && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.bill_type);
+                  if (this.dataToPopulate && this.dataToPopulate.sale_return_order.bill_type && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.sale_return_order.bill_type);
                   }
                 }
               }
@@ -660,9 +865,9 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                       field.form.controls.email.setValue(data.email)
                     }
                   });
-                  if (this.dataToPopulate && this.dataToPopulate.customer && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.customer?.customer_id);
-                    
+                  // Populate customer from sale_return_order
+                  if (this.dataToPopulate && this.dataToPopulate.sale_return_order?.customer) {
+                    field.formControl.setValue(this.dataToPopulate.sale_return_order.customer);
                   }
                 }
               }
@@ -678,8 +883,8 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
               }, 
               hooks: {
                 onInit: (field: any) => {
-                  if (this.dataToPopulate && this.dataToPopulate.email && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.email);
+                  if (this.dataToPopulate && this.dataToPopulate.sale_return_order.email && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.sale_return_order.email);
                   }
                 }
               }
@@ -718,9 +923,8 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                       this.formConfig.model['sale_return_order']['order_salesman_id'] = data.order_salesman_id;
                     }
                   });
-                  if (this.dataToPopulate && this.dataToPopulate.order_salesman_id && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.order_salesman_id);
-                    
+                  if (this.dataToPopulate && this.dataToPopulate.sale_return_order?.orders_salesman) {
+                    field.formControl.setValue(this.dataToPopulate.sale_return_order.orders_salesman);
                   }
                 }
               }
@@ -748,8 +952,8 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
               },
               hooks: {
                 onInit: (field: any) => {
-                  if (this.dataToPopulate && this.dataToPopulate.ref_no && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.ref_no);
+                  if (this.dataToPopulate && this.dataToPopulate.sale_return_order.ref_no && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.sale_return_order.ref_no);
                   }
                 }
               }
@@ -837,8 +1041,8 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
               },
               hooks: {
                 onInit: (field: any) => {
-                  if (this.dataToPopulate && this.dataToPopulate.tax && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.tax);
+                  if (this.dataToPopulate && this.dataToPopulate.sale_return_order.tax && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.sale_return_order.tax);
                   }
                 }
               }
@@ -877,8 +1081,8 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
               },
               hooks: {
                 onInit: (field: any) => {
-                  if (this.dataToPopulate && this.dataToPopulate.remarks && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.remarks);
+                  if (this.dataToPopulate && this.dataToPopulate.sale_return_order.remarks && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.sale_return_order.remarks);
                   }
                 }
               }
@@ -902,8 +1106,8 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
               },
               hooks: {
                 onInit: (field: any) => {
-                  if (this.dataToPopulate && this.dataToPopulate.billing_address && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.billing_address);
+                  if (this.dataToPopulate && this.dataToPopulate.sale_return_order.billing_address && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.sale_return_order.billing_address);
                   }
                 }
               }
@@ -918,8 +1122,8 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
               },
               hooks: {
                 onInit: (field: any) => {
-                  if (this.dataToPopulate && this.dataToPopulate.shipping_address && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.shipping_address);
+                  if (this.dataToPopulate && this.dataToPopulate.sale_return_order.shipping_address && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.sale_return_order.shipping_address);
                   }
                 }
               }
@@ -976,6 +1180,15 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                   // Check if parentArray exists and proceed
                   if (parentArray) {
                     const currentRowIndex = +parentArray.key; // Simplified number conversion
+                    // Check if there is a product already selected in this row (when data is copied)
+                    if (this.dataToPopulate && this.dataToPopulate.sale_return_items.length > currentRowIndex) {
+                      const existingProduct = this.dataToPopulate.sale_return_items[currentRowIndex].product;
+                      
+                      // Set the full product object instead of just the product_id
+                      if (existingProduct) {
+                        field.formControl.setValue(existingProduct); // Set full product object (not just product_id)
+                      }
+                    }
                     
                     // Subscribe to value changes of the field
                     field.formControl.valueChanges.subscribe(selectedProductId => {
@@ -1038,6 +1251,38 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                   }
                 }
               },
+              // {
+              //   key: 'size',
+              //   type: 'select',
+              //   templateOptions: {
+              //     label: 'Select Size',
+              //     dataKey: 'size_id',
+              //     hideLabel: true,
+              //     dataLabel: 'size_name',
+              //     options: [],
+              //     required: true,
+              //     lazy: {
+              //       url: 'products/sizes/',
+              //       lazyOneTime: true
+              //     }
+              //   },
+              // },
+              // {
+              //   key: 'color',
+              //   type: 'select',
+              //   templateOptions: {
+              //     label: 'Select Color',
+              //     dataKey: 'color_id',
+              //     hideLabel: true,
+              //     dataLabel: 'color_name',
+              //     options: [],
+              //     required: true,
+              //     lazy: {
+              //       url: 'products/colors/',
+              //       lazyOneTime: true
+              //     }
+              //   },
+              // },
               {
                 key: 'size',
                 type: 'select',
@@ -1053,6 +1298,26 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                     lazyOneTime: true
                   }
                 },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_return_items.length > currentRowIndex) {
+                        const existingSize = this.dataToPopulate.sale_return_items[currentRowIndex].size;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingSize && existingSize.size_id) {
+                          field.formControl.setValue(existingSize); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
               },
               {
                 key: 'color',
@@ -1069,7 +1334,27 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                     lazyOneTime: true
                   }
                 },
-              },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_return_items.length > currentRowIndex) {
+                        const existingColor = this.dataToPopulate.sale_return_items[currentRowIndex].color;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingColor) {
+                          field.formControl.setValue(existingColor);
+                        }
+                      }
+                    }
+                  }
+                }
+              },  
               {
                 type: 'input',
                 key: 'code',
@@ -1077,6 +1362,26 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                   label: 'Code',
                   placeholder: 'Enter code',
                   hideLabel: true,
+                },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_return_items.length > currentRowIndex) {
+                        const existingCode = this.dataToPopulate.sale_return_items[currentRowIndex].product?.code;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingCode) {
+                          field.formControl.setValue(existingCode); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
                 }
               },
               {
@@ -1088,6 +1393,26 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                   placeholder: 'Enter Total Boxes',
                   hideLabel: true
                 },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_return_items.length > currentRowIndex) {
+                        const existingBox = this.dataToPopulate.sale_return_items[currentRowIndex].total_boxes;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingBox) {
+                          field.formControl.setValue(existingBox); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }                
               },
               {
                 type: 'select',
@@ -1105,11 +1430,42 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                     lazyOneTime: true
                   }
                 },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_return_items.length > currentRowIndex) {
+                        const existingUnit = this.dataToPopulate.sale_return_items[currentRowIndex].product.unit_options;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingUnit) {
+                          field.formControl.setValue(existingUnit.unit_options_id); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
+                // hooks: {
+                //   onInit: (field: any) => {
+                //     if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > 0) {
+                //       const firstItem = this.dataToPopulate.sale_invoice_items[0];
+                //       // console.log("Unit option name : ", firstItem.product?.unit_options.unit_name)
+                //       if (firstItem.product?.unit_options.unit_options_id) {
+                //         field.formControl.setValue(firstItem.product?.unit_options.unit_options_id);
+                //       }
+                //     }
+                //   }
+                // }
               },
               {
                 type: 'input',
                 key: 'quantity',
-                // defaultValue: 1,
+                defaultValue: 1,
                 templateOptions: {
                   type: 'number',
                   label: 'Qty',
@@ -1120,6 +1476,24 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                 },
                 hooks: {
                   onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_return_items.length > currentRowIndex) {
+                        const existingQuan = this.dataToPopulate.sale_return_items[currentRowIndex].quantity;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingQuan) {
+                          field.formControl.setValue(existingQuan); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+              
+                    // Subscribe to value changes
                     field.formControl.valueChanges.subscribe(data => {
                       if (field.form && field.form.controls && field.form.controls.rate && data) {
                         const rate = field.form.controls.rate.value;
@@ -1127,16 +1501,14 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                         if (rate && quantity) {
                           field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity));
                         }
-
                       }
-                    })
+                    });
                   },
                   onChanges: (field: any) => {
-
+                    // You can handle any changes here if needed
                   }
                 }
-              },
-
+              },              
               {
                 type: 'input',
                 key: 'rate',
@@ -1148,8 +1520,25 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                 },
                 hooks: {
                   onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_return_items.length > currentRowIndex) {
+                        const existingPrice = this.dataToPopulate.sale_return_items[currentRowIndex].rate;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingPrice) {
+                          field.formControl.setValue(existingPrice); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                    
+                    // Subscribe to value changes to update amount
                     field.formControl.valueChanges.subscribe(data => {
-
                       if (field.form && field.form.controls && field.form.controls.quantity && data) {
                         const quantity = field.form.controls.quantity.value;
                         const rate = data;
@@ -1157,7 +1546,7 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                           field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity));
                         }
                       }
-                    })
+                    });
                   }
                 }
               },
@@ -1172,11 +1561,26 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                 },
                 hooks: {
                   onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_return_items.length > currentRowIndex) {
+                        const existingDisc = this.dataToPopulate.sale_return_items[currentRowIndex].discount;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingDisc) {
+                          field.formControl.setValue(existingDisc); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
                     field.formControl.valueChanges.subscribe(data => {
-                    })
+                      // Add any logic needed for when discount changes
+                    });
                   }
-                },
-                expressionProperties: {
                 }
               },
               {
@@ -1187,6 +1591,26 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                   placeholder: 'Enter Product Print name',
                   hideLabel: true
                 },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_return_items.length > currentRowIndex) {
+                        const existingName = this.dataToPopulate.sale_return_items[currentRowIndex].print_name;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingName) {
+                          field.formControl.setValue(existingName); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
               },
               {
                 type: 'input',
@@ -1210,9 +1634,25 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                 },
                 hooks: {
                   onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_return_items.length > currentRowIndex) {
+                        const existingAmount = this.dataToPopulate.sale_return_items[currentRowIndex].amount;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingAmount) {
+                          field.formControl.setValue(existingAmount); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
                     field.formControl.valueChanges.subscribe(data => {
                       this.totalAmountCal();
-                    })
+                    });
                   }
                 }
               },
@@ -1225,6 +1665,26 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                   placeholder: 'Tax',
                   hideLabel: true
                 },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_return_items.length > currentRowIndex) {
+                        const existingtax = this.dataToPopulate.sale_return_items[currentRowIndex].tax;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingtax) {
+                          field.formControl.setValue(existingtax); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
               },
               {
                 type: 'input',
@@ -1234,8 +1694,27 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                   placeholder: 'Enter Remarks',
                   hideLabel: true
                 },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_return_items.length > currentRowIndex) {
+                        const existingRemarks = this.dataToPopulate.sale_return_items[currentRowIndex].remarks;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingRemarks) {
+                          field.formControl.setValue(existingRemarks); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
               },
-
             ]
           },
         },
@@ -1261,6 +1740,13 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                       templateOptions: {
                         label: 'Destination',
                         placeholder: 'Enter Destination',
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.destination && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.destination);
+                          }
+                        }
                       }
                     },
                     {
@@ -1295,6 +1781,13 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                       templateOptions: {
                         label: 'Port of Discharge',
                         placeholder: 'Select Port of Discharge',
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.port_of_discharge && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.port_of_discharge);
+                          }
+                        }
                       }
                     },
                     {
@@ -1321,6 +1814,13 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                         type: "number",
                         label: 'No. of Packets',
                         placeholder: 'Select No. of Packets',
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.no_of_packets && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.no_of_packets);
+                          }
+                        }
                       }
                     },
                     {
@@ -1331,6 +1831,13 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                         type: "number",
                         label: 'Weight',
                         placeholder: 'Enter Weight',
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.weight && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.weight);
+                          }
+                        }
                       }
                     },
                     {
@@ -1363,6 +1870,13 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                         label: 'Shipping Charges.',
                         placeholder: 'Enter Shipping Charges',
                         required: true
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.shipping_charges && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.shipping_charges);
+                          }
+                        }
                       }
                     }
                   ]
@@ -1409,6 +1923,11 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                                       this.formConfig.model['sale_return_order']['gst_type_id'] = data.gst_type_id;
                                     }
                                   });
+                                  // Set the default value for Ledger Account if it exists
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_return_order.gst_type && field.formControl) {
+                                    const GstFiled = this.dataToPopulate.sale_return_order.gst_type
+                                    field.formControl.setValue(GstFiled);
+                                  }
                                 }
                               }
                             },
@@ -1432,6 +1951,11 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                                       this.formConfig.model['sale_return_order']['payment_term_id'] = data.payment_term_id;
                                     }
                                   });
+                                  // Set the default value for Ledger Account if it exists
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_return_order.payment_term && field.formControl) {
+                                    const PaymentField = this.dataToPopulate.sale_return_order.payment_term
+                                    field.formControl.setValue(PaymentField);
+                                  }
                                 }
                               }
                             },
@@ -1473,25 +1997,46 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                                 placeholder: 'Enter Total boxes'
                               }
                             },
+                            // {
+                            //   key: 'cess_amount',
+                            //   type: 'input',
+                            //   defaultValue: "0",
+                            //   className: 'col-4',
+                            //   templateOptions: {
+                            //     type: 'input',
+                            //     label: 'Cess amount',
+                            //     placeholder: 'Enter Cess amount',
+                            //     // required: true
+                            //   },
+                            //   hooks: {
+                            //     onInit: (field: any) => {
+                            //       field.formControl.valueChanges.subscribe(data => {
+                            //         this.totalAmountCal();
+                            //         // this.formConfig.model['productDiscount'] = data;
+                            //       })
+                            //     },
+                            //     onChanges: (field: any) => {
+                            //     }
+                            //   }
+                            // },
                             {
                               key: 'cess_amount',
                               type: 'input',
                               defaultValue: "0",
                               className: 'col-4',
                               templateOptions: {
-                                type: 'input',
+                                type: 'number',
                                 label: 'Cess amount',
-                                placeholder: 'Enter Cess amount',
-                                // required: true
+                                placeholder: 'Enter Cess amount'
                               },
                               hooks: {
                                 onInit: (field: any) => {
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_return_order && this.dataToPopulate.sale_return_order.cess_amount && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.sale_return_order.cess_amount);
+                                  }
                                   field.formControl.valueChanges.subscribe(data => {
                                     this.totalAmountCal();
-                                    // this.formConfig.model['productDiscount'] = data;
-                                  })
-                                },
-                                onChanges: (field: any) => {
+                                  });
                                 }
                               }
                             },
@@ -1505,48 +2050,27 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                                 placeholder: 'Enter Taxable',
                               }
                             },
-                            // {
-                            //   key: 'transport_charges',
-                            //   type: 'input',
-                            //   className: 'col-4',
-                            //   templateOptions: {
-                            //     type: 'input',
-                            //     label: 'Transport Charges',
-                            //     placeholder: 'Enter Transport Charges',
-                            //   }
-                            // },
-                            // {
-                            //   key: 'round_off',
-                            //   type: 'input',
-                            //   className: 'col-4',
-                            //   templateOptions: {
-                            //     type: 'input',
-                            //     label: 'Round Off',
-                            //     placeholder: 'Enter Round Off',
-                            //   }
-                            // },
                             {
                               key: 'tax_amount',
                               type: 'input',
                               defaultValue: "0",
                               className: 'col-4',
                               templateOptions: {
-                                type: 'input',
+                                type: 'number',
                                 label: 'Tax amount',
-                                placeholder: 'Enter Tax amount',
-                                // required: true
+                                placeholder: 'Enter Tax amount'
                               },
                               hooks: {
                                 onInit: (field: any) => {
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_return_order && this.dataToPopulate.sale_return_order.tax_amount && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.sale_return_order.tax_amount);
+                                  }
                                   field.formControl.valueChanges.subscribe(data => {
                                     this.totalAmountCal();
-                                    // this.formConfig.model['productDiscount'] = data;
-                                  })
-                                },
-                                onChanges: (field: any) => {
+                                  });
                                 }
                               }
-                            },
+                            }, 
                             {
                               key: 'item_value',
                               type: 'input',
@@ -1556,10 +2080,15 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                                 type: 'input',
                                 label: 'Items value',
                                 placeholder: 'Enter Item value',
+                                readonly: true
                                 // required: true
                               },
                               hooks: {
                                 onInit: (field: any) => {
+                                  // Set the initial value from dataToPopulate if available
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_return_order && this.dataToPopulate.sale_return_order.item_value && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.sale_return_order.item_value);
+                                  }
                                 }
                               }
                             },
@@ -1572,10 +2101,19 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                                 type: 'input',
                                 label: 'Discount amount',
                                 placeholder: 'Enter Discount amount',
+                                readonly: true
                                 // required: true
                               },
                               hooks: {
                                 onInit: (field: any) => {
+                                  // Set the initial value from dataToPopulate if available
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_return_order && this.dataToPopulate.sale_return_order.dis_amt && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.sale_return_order.dis_amt);
+                                  }
+                                  // Subscribe to value changes for recalculating total amount
+                                  // field.formControl.valueChanges.subscribe(data => {
+                                  //   this.totalAmountCal();
+                                  // });
                                 }
                               }
                             },
@@ -1588,13 +2126,21 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                                 type: 'input',
                                 label: 'Total amount',
                                 placeholder: 'Enter Total amount',
-                                // required: true
+                                readonly: true
                               },
                               hooks: {
                                 onInit: (field: any) => {
+                                  // Set the initial value from dataToPopulate if available
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_return_order && this.dataToPopulate.sale_return_order.total_amount && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.sale_return_order.total_amount);
+                                  }
+                                  // Subscribe to value changes for recalculating total amount
+                                  // field.formControl.valueChanges.subscribe(data => {
+                                  //   this.totalAmountCal();
+                                  // });
                                 }
                               }
-                            },
+                            }   
                           ]
                         },
                       ]
@@ -1611,10 +2157,38 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                           type: 'file',
                           className: 'ta-cell col-12 custom-file-attachement',
                           props: {
-                            "displayStyle": "files",
-                            "multiple": true
+                            displayStyle: 'files',
+                            multiple: true,
+                          },
+                          hooks: {
+                            onInit: (field: any) => {
+                              // Check if there's data to populate
+                              if (this.dataToPopulate && this.dataToPopulate.order_attachments?.length > 0) {
+                                // Map through order_attachments and return objects with file properties
+                                const attachments = this.dataToPopulate.order_attachments.map(attachment => ({
+                                  name: attachment.attachment_name,
+                                  attachment_path: attachment.attachment_path,
+                                  isUploading: false,  // Add any other required properties like 'isUploading'
+                                }));
+                        
+                                // Set the attachments to the form control
+                                field.formControl.setValue(attachments);
+                        
+                                // Optional: log for debugging
+                                console.log("Attachments: ", attachments);
+                              }
+                            }
                           }
-                        }
+                        }   
+                        // {
+                        //   key: 'order_attachments',
+                        //   type: 'file',
+                        //   className: 'ta-cell col-12 custom-file-attachement',
+                        //   props: {
+                        //     "displayStyle": "files",
+                        //     "multiple": true
+                        //   }
+                        // }
                       ]
                     }
                   ]
