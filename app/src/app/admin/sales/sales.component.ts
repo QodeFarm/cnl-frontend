@@ -34,7 +34,7 @@ export class SalesComponent {
   selectedOrder: any;
   noOrdersMessage: string;
   shippingTrackingNumber: any;
-
+  isModalOpen = false;  //Added line to fix past orders modal box correctly
   //COPY ---------------------------------
   // List of all tables
   tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
@@ -262,6 +262,7 @@ export class SalesComponent {
 
   // Shows the past orders list modal and fetches orders based on the selected customer
   showOrdersList() {
+    this.isModalOpen = true;  //Added line to fix past orders modal box correctly
     // Ensure customer is selected
     const selectedCustomerId = this.formConfig.model.sale_order.customer_id;
     const selectedCustomerName = this.formConfig.model.sale_order.customer?.name;
@@ -317,6 +318,7 @@ export class SalesComponent {
         );
       })
     ).subscribe();
+    this.openModal(); //Added line to fix past orders modal box correctly
   }
 
   openModal() {
@@ -484,10 +486,12 @@ export class SalesComponent {
   }
 
   hideModal() {
-    const modalBackdrop = document.querySelector('.modal-backdrop');
-    if (modalBackdrop) {
-      modalBackdrop.remove();
-    }
+    this.isModalOpen = false; //Added line to fix past orders modal box correctly
+    const modalBackdrop = document.querySelectorAll('.modal-backdrop'); //added querySelectorAll (before it is querySelector) to fix past orders modal box correctly
+    modalBackdrop.forEach(backdrop => backdrop.remove()); //Added line to fix past orders modal box correctly
+    // if (modalBackdrop) {      // Removed If block to ensure that the modal box for past orders works correctly 
+    //   modalBackdrop.remove(); 
+    // }
     this.ordersModal.nativeElement.classList.remove('show');
     this.ordersModal.nativeElement.style.display = 'none';
     document.body.classList.remove('modal-open');
