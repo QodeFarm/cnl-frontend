@@ -10,7 +10,7 @@
             <button (click)="openCopyModal()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#copyModal">
                 Copy
             </button>
-                <button (click)="showOrdersList()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ordersListModal">
+                <button (click)="showOrdersList()" type="button" class="btn btn-primary">
           Past orders</button>
                 <button (click)="showSaleOrderListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#saleOrderListModal">
           Sales Order List
@@ -86,3 +86,4 @@
         </div>
     </div>
 </div>
+<div class="modal-backdrop" *ngIf="isModalOpen"></div> <!-- Added line to fix past orders modal box correctly -->
