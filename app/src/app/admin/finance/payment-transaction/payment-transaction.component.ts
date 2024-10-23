@@ -40,7 +40,6 @@ export class PaymentTransactionComponent {
   
       // Find the invoice field
       const invoiceField = this.formConfig.fields[0].fieldGroup.find(f => f.key === 'invoice_id');
-      console.log('invoiceField :', invoiceField)
       if (invoiceField) {
         // Update options with the fetched invoice data
         this.invoiceOptions = invoices.map(invoice => ({
@@ -63,8 +62,6 @@ export class PaymentTransactionComponent {
     this.PaymentTransactionEditID = null;
     // set form config
     this.setFormConfig();
-    console.log('this.formConfig', this.formConfig);
-
   };
   formConfig: TaFormConfig = {};
 
@@ -73,7 +70,6 @@ export class PaymentTransactionComponent {
   };
 
   editPaymentTransaction(event) {
-    console.log('event', event);
     this.PaymentTransactionEditID = event;
     this.http.get('finance/payment_transactions/' + event).subscribe((res: any) => {
       if (res) {

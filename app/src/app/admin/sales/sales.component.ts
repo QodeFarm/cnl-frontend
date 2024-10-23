@@ -915,6 +915,10 @@ export class SalesComponent {
                       // ***Product Info Text when product is selected code***
                       field.formControl.valueChanges.subscribe(selectedProductId => {
                         const product = this.formConfig.model.sale_order_items[currentRowIndex]?.product;
+                        let unit_name = 'NA';
+                        if (product.unit_options) {
+                            unit_name = product.unit_options.unit_name;
+                        }
 
                         // Check if a valid product is selected
                         if (product?.product_id) {
@@ -933,7 +937,7 @@ export class SalesComponent {
                               <span style="color: red;">Balance:</span> 
                               <span style="color: blue;">${product.balance}</span> |
                               <span style="color: red;">Unit:</span> 
-                              <span style="color: blue;">${product.unit_options.unit_name}</span> | &nbsp;`;
+                              <span style="color: blue;">${unit_name}</span> | &nbsp;`;
 
                             cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
 
@@ -984,7 +988,7 @@ export class SalesComponent {
                   hideLabel: true,
                   dataLabel: 'size_name',
                   options: [],
-                  required: true,
+                  required: false,
                   lazy: {
                     lazyOneTime: true
                   }
@@ -995,6 +999,62 @@ export class SalesComponent {
               
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key;
+
+                      // Subscribe to value changes when the form field changes
+                      //**When Size is selected its overall  quantity will be shown in product info text area*/
+                      field.formControl.valueChanges.subscribe(selectedProductId => {
+                        const product = this.formConfig.model.sale_order_items[currentRowIndex]?.product;
+                        const size = this.formConfig.model.sale_order_items[currentRowIndex]?.size;
+            
+                        const product_id = product?.product_id;
+                        const size_id = size?.size_id;
+            
+                        // Check if product_id, size_id, and color_id exist
+                        if (product_id && size_id) {
+                          const url = `products/product_variations/?product_id=${product_id}&size_id=${size_id}`;
+            
+                          // Call the API using HttpClient (this.http.get)
+                          this.http.get(url).subscribe((data: any) => {
+
+                            function sumQuantities(dataObject: any): number {
+                              // First, check if the data object contains the array in the 'data' field
+                              if (dataObject && Array.isArray(dataObject.data)) {
+                                // Now we can safely use reduce on dataObject.data
+                                return dataObject.data.reduce((sum, item) => sum + (item.quantity || 0), 0);
+                              } else {
+                                console.error("Data is not an array:", dataObject);
+                                return 0;
+                              }
+                            }
+                            
+                            const totalBalance = sumQuantities(data);
+            
+                              const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
+                              if (cardWrapper) {
+                                // Remove existing product info if present
+                                cardWrapper.querySelector('.center-message')?.remove();
+            
+                                // Display fetched product variation info
+                                const productInfoDiv = document.createElement('div');
+                                productInfoDiv.classList.add('center-message');
+                                productInfoDiv.innerHTML = `
+                                  <span style="color: red;">Product Info:</span>
+                                  <span style="color: blue;">${data.data[0].product.name}</span> |
+                                  <span style="color: red;">Balance:</span>
+                                  <span style="color: blue;">${totalBalance}</span> |  
+                                `;
+            
+                                cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
+                              }
+                            },
+                            (error) => {
+                              console.error("Error fetching data:", error);
+                            }
+                          );
+                        } else {
+                          console.log(`No valid product, size, or color selected for Row ${currentRowIndex}.`);
+                        }
+                      }); //**End of Size selection part */
               
                       // Subscribe to value changes of the size field
                       field.formControl.valueChanges.subscribe(selectedSizeId => {
@@ -1045,7 +1105,7 @@ export class SalesComponent {
                   hideLabel: true,
                   dataLabel: 'color_name',
                   options: [],
-                  required: true,
+                  required: false,
                   lazy: {
                     lazyOneTime: true
                   }
