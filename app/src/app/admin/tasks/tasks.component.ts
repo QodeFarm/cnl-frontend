@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TasksListComponent } from './tasks-list/tasks-list.component';
+import { UserService } from 'src/app/services/user.service';  // Import the UserService
 
 @Component({
   selector: 'app-tasks',
@@ -19,7 +20,8 @@ export class TasksComponent implements OnInit {
   TasksEditID: any;
   formConfig: TaFormConfig = {};
 
-  constructor(private http: HttpClient) {}
+  // constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private userService: UserService) {}  // Inject UserService
 
   set_default_status_id(): any {
     return (this.http.get('masters/statuses/').subscribe((res: any) => {
@@ -41,6 +43,16 @@ export class TasksComponent implements OnInit {
     this.setFormConfig();
     this.set_default_status_id(); // lead_status_id = 'Open'
     this.formConfig.fields[0].fieldGroup[7].hide = true; 
+
+    // Fetch the logged-in user's ID and auto-fill the task_comments
+    const userId = this.userService.getUserId();  // Fetch user ID here
+    if (userId) {
+      this.formConfig.model['task_comments'] = [{
+        user_id: userId,  // Set user_id in the task_comments
+        comment_text: '',  // Initialize with an empty comment text
+      }];
+    }
+
     console.log('this.formConfig', this.formConfig);
   }
 
@@ -65,6 +77,34 @@ export class TasksComponent implements OnInit {
         this.formConfig.model['task']['group_id'] = res.data['task']['group_id'];  // Set group_id
       }
 
+      // Fetch the logged-in user's ID
+      const userId = this.userService.getUserId();
+
+      if (res.data['task_comments']) {
+        this.formConfig.model['task_comments'] = res.data['task_comments'].map(comment => ({
+          ...comment,
+          comment_text:`By ${comment.user.first_name} ${comment.user.last_name || ''} - ${comment.created_at}
+          ${comment.comment_text}`,
+          isExisting: true, // Mark as existing comments
+        }));
+        
+        // Add the current user's comment (assuming empty comment text for now)
+        if (userId) {
+          this.formConfig.model['task_comments'].push({
+            user_id: userId,
+            comment_text: '' , // Initialize with an empty comment text
+            isExisting: false,  // Mark as a new comment
+          });
+        }
+        } else if (userId) {
+          // If no task_comments exist, initialize with the current user's comment
+          this.formConfig.model['task_comments'] = [{
+            user_id: userId,
+            comment_text: '',  // Initialize with an empty comment text
+            isExisting: false,  // New comment, editable
+          }];
+        }
+     
         this.formConfig.showActionBtn = true;
         this.formConfig.pkId = 'task_id';
         // Set labels for update
@@ -73,7 +113,6 @@ export class TasksComponent implements OnInit {
         this.formConfig.model['task_id'] = this.TasksEditID;
         this.showForm = true;
         this.formConfig.fields[0].fieldGroup[7].hide = false; 
-
       }
     });
     this.hide();
@@ -279,51 +318,32 @@ export class TasksComponent implements OnInit {
             title: 'Task Comments',
             addText: 'Add Comments',
             tableCols: [
-              { name: 'user', label: 'User' },
               { name: 'comment_text', label: 'Comment Text' }
             ]
           },
           fieldArray: {
             fieldGroup: [
               {
-                key: 'user',
-                type: 'select',
-                templateOptions: {
-                  label: 'Select User',
-                  dataKey: 'user_id',
-                  dataLabel: 'first_name',
-                  options: [],
-                  hideLabel: true,
-                  required: true,
-                  lazy: {
-                    url: 'users/user',
-                    lazyOneTime: true
-                  },
-                },
-                hooks: {
-                  onChanges: (field: any) => {
-                    field.formControl.valueChanges.subscribe((data: any) => {
-                      console.log('user', data);
-                      const index = field.parent.key;
-                      if (!this.formConfig.model['task_comments'][index]) {
-                        console.error(`Task comments at index ${index} is not defined. Initializing...`);
-                        this.formConfig.model['task_comments'][index] = {};
-                      }
-
-                      this.formConfig.model['task_comments'][index]['user_id'] = data.user_id;
-                    });
-                  }
-                }
-              }, 
-              {
                 key: 'comment_text',
-                type: 'text',
+                type: 'textarea',
                 templateOptions: {
                   label: 'Comment Text',
                   placeholder: 'Enter Comment Text',
                   hideLabel: true,
-                  required: true
-                }
+                  required: true,
+                  // Leave out the `readonly` field here
+                },
+                defaultValue: '',  // Set the default value to an empty string for new comments
+                expressionProperties: {
+                  'templateOptions.readonly': (model: any, formState: any) => {
+                    // Ensure that model is available and check 'isExisting' field safely
+                    return model && model['isExisting'] === true;
+                  }
+                  //   'type': (model: any, formState: any) => {
+                  //   // Set the input type based on whether the comment is existing
+                  //   return model && model['isExisting'] ? 'text' : 'textarea';
+                  // }
+                },
               }
             ]
           }
