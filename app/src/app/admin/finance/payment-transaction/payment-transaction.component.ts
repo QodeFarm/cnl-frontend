@@ -62,8 +62,6 @@ export class PaymentTransactionComponent {
     this.PaymentTransactionEditID = null;
     // set form config
     this.setFormConfig();
-    console.log('this.formConfig', this.formConfig);
-
   };
   formConfig: TaFormConfig = {};
 
@@ -72,7 +70,6 @@ export class PaymentTransactionComponent {
   };
 
   editPaymentTransaction(event) {
-    console.log('event', event);
     this.PaymentTransactionEditID = event;
     this.http.get('finance/payment_transactions/' + event).subscribe((res: any) => {
       if (res) {

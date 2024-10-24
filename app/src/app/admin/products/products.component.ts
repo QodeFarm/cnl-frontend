@@ -113,34 +113,31 @@ export class ProductsComponent implements OnInit {
     const balance = parseInt(this.formConfig.model.products.balance, 10);
     let totalItemBalanceQuantity = 0;
     let totalVariationQuantity = 0;
-
-    // Calculate total quantity for product item balance
-    if (this.formConfig.model.product_item_balance && Array.isArray(this.formConfig.model.product_item_balance)) {
-      this.formConfig.model.product_item_balance.forEach(item => {
-        totalItemBalanceQuantity += item.quantity ? parseInt(item.quantity, 10) : 0;
-      });
-    }
-
-    // Calculate total quantity for product variations
-    if (this.formConfig.model.product_variations && Array.isArray(this.formConfig.model.product_variations)) {
-      this.formConfig.model.product_variations.forEach(item => {
-        totalVariationQuantity += item.quantity ? parseInt(item.quantity, 10) : 0;
-      });
-    }
-
-    // Check if product item balance does not match
+  
+    // Helper function to calculate total quantity
+    const calculateTotalQuantity = (items) => {
+      return items ? items.reduce((sum, item) => sum + (parseInt(item.quantity, 10) || 0), 0) : 0;
+    };
+  
+    // Calculate total quantities
+    totalItemBalanceQuantity = calculateTotalQuantity(this.formConfig.model.product_item_balance);
+    totalVariationQuantity = calculateTotalQuantity(this.formConfig.model.product_variations);
+  
+    // Check if the item balance matches
     if (totalItemBalanceQuantity !== balance) {
-      this.showDialog('Product item balance mismatch! Please ensure the total quantity of items equals the balance.');
-    } 
-    // Check if product variations balance does not match
-    else if (totalVariationQuantity !== balance) {
-      this.showDialog('Product variations balance mismatch! Please ensure the total quantity of variations equals the balance.');
-    } 
-    else {
-      return true;
-      // this.createRecord();  // Call createRecord if everything matches
+      return this.showDialog(`<b>Product Balance Mismatch !</b>
+        <br>Sum of quantities are not equal to total balance: ${balance}.`);
     }
-  };
+  
+    // Check if variations exist and the total variations match the balance
+    if (this.formConfig.model.product_variations?.length && totalVariationQuantity !== balance) {
+      return this.showDialog(`<b>Product Variations Mismatch !</b>
+        <br>Please ensure the total quantity of variations equals the balance: ${balance}.`);
+    }
+  
+    return true;  // Everything matches, continue with your logic
+  }
+  ;
 
   showDialog(message: string): void {
     this.dialogMessage = message;  // Set the dynamic message
@@ -859,6 +856,7 @@ export class ProductsComponent implements OnInit {
                   label: 'SKU',
                   hideLabel: true,
                   placeholder: 'Enter SKU',
+                  required: true
                 }
               },
               {
@@ -868,6 +866,7 @@ export class ProductsComponent implements OnInit {
                   label: 'Price',
                   hideLabel: true,
                   placeholder: 'Enter Price',
+                  required:true
                 }
               },
               {
@@ -877,6 +876,7 @@ export class ProductsComponent implements OnInit {
                   label: 'Quantity',
                   hideLabel: true,
                   placeholder: 'Enter Quantity',
+                  required:true
                 }
               }
             ]
