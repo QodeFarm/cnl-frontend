@@ -582,6 +582,17 @@ export class ProductsComponent implements OnInit {
                               lazyOneTime: true
                           }
                       },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          field.formControl.valueChanges.subscribe((data: any) => {
+                            if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                              this.formConfig.model['products']['pack_unit_id'] = data.pack_unit_id;
+                            } else {
+                              console.error('Form config or g_pack_unit data model is not defined.');
+                            }
+                          });
+                        }
+                      },
                       hideExpression: (model) => {
                           const unitName = model.unit_options ? model.unit_options.unit_name : undefined;
                           // Hide if the `unitName` is not 'Stock Pack Unit' AND not 'Stock Pack GPack Unit'
@@ -617,6 +628,17 @@ export class ProductsComponent implements OnInit {
                               url: 'masters/g_package_units/',
                               lazyOneTime: true
                           }
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          field.formControl.valueChanges.subscribe((data: any) => {
+                            if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                              this.formConfig.model['products']['g_pack_unit_id'] = data.g_pack_unit_id;
+                            } else {
+                              console.error('Form config or g_pack_unit data model is not defined.');
+                            }
+                          });
+                        }
                       },
                       hideExpression: (model) => {
                         // Check if `unit_options` exists, and check the value of `unit_name`
