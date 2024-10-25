@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 import { SalesListComponent } from './sales-list/sales-list.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SalesinvoiceComponent } from './salesinvoice/salesinvoice.component';
+import { BindingType } from '@angular/compiler';
 @Component({
   standalone: true,
   imports: [CommonModule, AdminCommmonModule, OrderslistComponent, SalesListComponent],
@@ -33,7 +34,7 @@ export class SalesComponent {
   selectedOrder: any;
   noOrdersMessage: string;
   shippingTrackingNumber: any;
-
+  isModalOpen = false;  //Added line to fix past orders modal box correctly
   //COPY ---------------------------------
   // List of all tables
   tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
@@ -70,6 +71,7 @@ export class SalesComponent {
       },
       // Add mappings for other tables as needed
   };
+  sizeOptions: any[] = []; 
 
   // Method to open the copy modal and populate dropdown
   openCopyModal() {
@@ -364,6 +366,7 @@ export class SalesComponent {
 
   // Shows the past orders list modal and fetches orders based on the selected customer
   showOrdersList() {
+    this.isModalOpen = true;  //Added line to fix past orders modal box correctly
     // Ensure customer is selected
     const selectedCustomerId = this.formConfig.model.sale_order.customer_id;
     const selectedCustomerName = this.formConfig.model.sale_order.customer?.name;
@@ -419,6 +422,7 @@ export class SalesComponent {
         );
       })
     ).subscribe();
+    this.openModal(); //Added line to fix past orders modal box correctly
   }
 
   openModal() {
@@ -581,10 +585,12 @@ export class SalesComponent {
   }
 
   hideModal() {
-    const modalBackdrop = document.querySelector('.modal-backdrop');
-    if (modalBackdrop) {
-      modalBackdrop.remove();
-    }
+    this.isModalOpen = false; //Added line to fix past orders modal box correctly
+    const modalBackdrop = document.querySelectorAll('.modal-backdrop'); //added querySelectorAll (before it is querySelector) to fix past orders modal box correctly
+    modalBackdrop.forEach(backdrop => backdrop.remove()); //Added line to fix past orders modal box correctly
+    // if (modalBackdrop) {      // Removed If block to ensure that the modal box for past orders works correctly 
+    //   modalBackdrop.remove(); 
+    // }
     this.ordersModal.nativeElement.classList.remove('show');
     this.ordersModal.nativeElement.style.display = 'none';
     document.body.classList.remove('modal-open');
@@ -594,6 +600,12 @@ export class SalesComponent {
   ngOnDestroy() {
     // Ensure modals are disposed of correctly
     document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+  }
+
+  // API call to fetch available sizes and colors for a selected product
+  fetchProductVariations(productID: string): Observable<any> {
+    const url = `/products/product_variations/?product_name=${productID}`;
+    return this.http.get(url).pipe(((res: any) => res.data));
   }
 
   setFormConfig() {
@@ -947,7 +959,7 @@ export class SalesComponent {
             ]
           },
           fieldArray: {
-            fieldGroup: [
+            fieldGroup: [                         
               {
                 key: 'product',
                 type: 'select',
@@ -971,9 +983,45 @@ export class SalesComponent {
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key; // Simplified number conversion
                       
-                      // Subscribe to value changes of the field
+                      // ***Size dropdown will populate with available sizes when product in selected***
+                      field.formControl.valueChanges.subscribe(selectedSizeId => {
+                        const product = this.formConfig.model.sale_order_items[currentRowIndex]?.product;
+                        
+                        // Make sure product exists before making HTTP request
+                        if (product?.product_id) {
+                          this.http.get(`products/product_variations/?product_id=${product.product_id}`).subscribe((response: any) => {
+                            const availableSizes = response.data.map((variation: any) => {
+                              return {
+                                label: variation.size.size_name,  // Use 'size_name' as the label
+                                value: {
+                                  size_id: variation.size.size_id,
+                                  size_name: variation.size.size_name,
+                                }
+                              };
+                            });
+              
+                            // Use a Set to track seen size_ids to ensure unique sizes
+                            const uniqueArray = availableSizes.filter((item, index, self) =>
+                              index === self.findIndex((t) => t.value.size_id === item.value.size_id)
+                            );
+              
+                            // Now, update the size field for the current row, not globally
+                            const sizeField = parentArray.fieldGroup.find((f: any) => f.key === 'size');
+                            if (sizeField) {
+                              sizeField.templateOptions.options = uniqueArray; // Update the options for the 'size' field of the current row
+                            }
+                          });
+                        } else {
+                          console.error('Product not selected or invalid.');
+                        }
+                      });
+                      // ***Product Info Text when product is selected code***
                       field.formControl.valueChanges.subscribe(selectedProductId => {
                         const product = this.formConfig.model.sale_order_items[currentRowIndex]?.product;
+                        let unit_name = 'NA';
+                        if (product.unit_options) {
+                            unit_name = product.unit_options.unit_name;
+                        }
 
                         // Check if a valid product is selected
                         if (product?.product_id) {
@@ -993,7 +1041,7 @@ export class SalesComponent {
                               <span style="color: red;">Balance:</span> 
                               <span style="color: blue;">${product.balance}</span> |
                               <span style="color: red;">Unit:</span> 
-                              <span style="color: blue;">${product.unit_options.unit_name}</span> | &nbsp;`;
+                              <span style="color: blue;">${unit_name}</span> | &nbsp;`;
 
                             cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
 
@@ -1005,9 +1053,9 @@ export class SalesComponent {
                     } else {
                       console.error('Parent array is undefined or not accessible');
                     }
-                    
+
+                    // ***Product Details Auto Fill Code***
                     field.formControl.valueChanges.subscribe(data => {
-                      //console.log("products data", data);
                       this.productOptions = data;
                       if (field.form && field.form.controls && field.form.controls.code && data && data.code) {
                         field.form.controls.code.setValue(data.code)
@@ -1044,12 +1092,113 @@ export class SalesComponent {
                   hideLabel: true,
                   dataLabel: 'size_name',
                   options: [],
-                  required: true,
+                  required: false,
                   lazy: {
-                    url: 'products/sizes/',
                     lazyOneTime: true
                   }
                 },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key;
+
+                      // Subscribe to value changes when the form field changes
+                      //**When Size is selected its overall  quantity will be shown in product info text area*/
+                      field.formControl.valueChanges.subscribe(selectedProductId => {
+                        const product = this.formConfig.model.sale_order_items[currentRowIndex]?.product;
+                        const size = this.formConfig.model.sale_order_items[currentRowIndex]?.size;
+            
+                        const product_id = product?.product_id;
+                        const size_id = size?.size_id;
+            
+                        // Check if product_id, size_id, and color_id exist
+                        if (product_id && size_id) {
+                          const url = `products/product_variations/?product_id=${product_id}&size_id=${size_id}`;
+            
+                          // Call the API using HttpClient (this.http.get)
+                          this.http.get(url).subscribe((data: any) => {
+
+                            function sumQuantities(dataObject: any): number {
+                              // First, check if the data object contains the array in the 'data' field
+                              if (dataObject && Array.isArray(dataObject.data)) {
+                                // Now we can safely use reduce on dataObject.data
+                                return dataObject.data.reduce((sum, item) => sum + (item.quantity || 0), 0);
+                              } else {
+                                console.error("Data is not an array:", dataObject);
+                                return 0;
+                              }
+                            }
+                            
+                            const totalBalance = sumQuantities(data);
+            
+                              const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
+                              if (cardWrapper) {
+                                // Remove existing product info if present
+                                cardWrapper.querySelector('.center-message')?.remove();
+            
+                                // Display fetched product variation info
+                                const productInfoDiv = document.createElement('div');
+                                productInfoDiv.classList.add('center-message');
+                                productInfoDiv.innerHTML = `
+                                  <span style="color: red;">Product Info:</span>
+                                  <span style="color: blue;">${data.data[0].product.name}</span> |
+                                  <span style="color: red;">Balance:</span>
+                                  <span style="color: blue;">${totalBalance}</span> |  
+                                `;
+            
+                                cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
+                              }
+                            },
+                            (error) => {
+                              console.error("Error fetching data:", error);
+                            }
+                          );
+                        } else {
+                          console.log(`No valid product, size, or color selected for Row ${currentRowIndex}.`);
+                        }
+                      }); //**End of Size selection part */
+              
+                      // Subscribe to value changes of the size field
+                      field.formControl.valueChanges.subscribe(selectedSizeId => {
+                        const product = this.formConfig.model.sale_order_items[currentRowIndex]?.product;
+                        const size = this.formConfig.model.sale_order_items[currentRowIndex]?.size;
+              
+                        // Make sure size exists
+                        if (size?.size_id) {
+                          // Fetch available colors based on the selected size
+                          this.http.get(`products/product_variations/?product_id=${product.product_id}&size_id=${size.size_id}`).subscribe((response: any) => {
+                            const availableColors = response.data.map((variation: any) => {
+                              return {
+                                label: variation.color.color_name,  // Use 'color_name' as the label
+                                value: {
+                                  color_id: variation.color.color_id,
+                                  color_name: variation.color.color_name
+                                }
+                              };
+                            });
+              
+                            // Filter unique colors (optional, if there's a chance of duplicate colors)
+                            const uniqueColors = availableColors.filter((item, index, self) =>
+                              index === self.findIndex((t) => t.value.color_id === item.value.color_id)
+                            );
+              
+                            // Now, update the color field for the current row
+                            const colorField = parentArray.fieldGroup.find((f: any) => f.key === 'color');
+                            if (colorField) {
+                              colorField.templateOptions.options = uniqueColors; // Update the options for the 'color' field
+                            }
+                          });
+                        } else {
+                          console.error('Size not selected or invalid.');
+                        }
+                      });
+                    } else {
+                      console.error('Parent array is undefined or not accessible');
+                    }
+                  }
+                }
               },
               {
                 key: 'color',
@@ -1060,13 +1209,65 @@ export class SalesComponent {
                   hideLabel: true,
                   dataLabel: 'color_name',
                   options: [],
-                  required: true,
+                  required: false,
                   lazy: {
-                    url: 'products/colors/',
                     lazyOneTime: true
                   }
                 },
-              },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key;
+            
+                      // Subscribe to value changes when the form field changes
+                      field.formControl.valueChanges.subscribe(selectedProductId => {
+                        const product = this.formConfig.model.sale_order_items[currentRowIndex]?.product;
+                        const size = this.formConfig.model.sale_order_items[currentRowIndex]?.size;
+                        const color = this.formConfig.model.sale_order_items[currentRowIndex]?.color;
+            
+                        const product_id = product?.product_id;
+                        const size_id = size?.size_id;
+                        const color_id = color?.color_id;
+            
+                        // Check if product_id, size_id, and color_id exist
+                        if (product_id && size_id && color_id) {
+                          const url = `products/product_variations/?product_id=${product_id}&size_id=${size_id}&color_id=${color_id}`;
+            
+                          // Call the API using HttpClient (this.http.get)
+                          this.http.get(url).subscribe(
+                            (data: any) => {
+            
+                              const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
+                              if (cardWrapper) {
+                                // Remove existing product info if present
+                                cardWrapper.querySelector('.center-message')?.remove();
+            
+                                // Display fetched product variation info
+                                const productInfoDiv = document.createElement('div');
+                                productInfoDiv.classList.add('center-message');
+                                productInfoDiv.innerHTML = `
+                                  <span style="color: red;">Product Info:</span>
+                                  <span style="color: blue;">${data.data[0].product.name}</span> |
+                                  <span style="color: red;">Balance:</span>
+                                  <span style="color: blue;">${data.data[0].quantity}</span> |  
+                                `;
+            
+                                cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
+                              }
+                            },
+                            (error) => {
+                              console.error("Error fetching data:", error);
+                            }
+                          );
+                        } else {
+                          console.log(`No valid product, size, or color selected for Row ${currentRowIndex}.`);
+                        }
+                      });
+                    }
+                  }
+                }
+              },                           
               {
                 type: 'input',
                 key: 'code',
