@@ -39,7 +39,7 @@ export class SalesinvoiceComponent {
 
   //COPY ---------------------------------
   // List of all tables
-  tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
+  tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return', 'Purchase Order', 'Purchase Invoice', 'Purchase Return'];
 
   // This will store available tables excluding the current one
   availableTables: string[] = [];
@@ -52,248 +52,129 @@ export class SalesinvoiceComponent {
 
   // Field mapping for auto population
   fieldMapping = {
-      'Sale Order': {
-        sale_order:{
-          customer: 'customer',
-          bill_type: 'bill_type',
-          email: 'email',
-          ref_no: 'ref_no',
-          ref_date: 'ref_date',
-          tax: 'tax',
-          due_date: 'due_date',
-          remarks: 'remarks',
-          advance_amount: 'advance_amount',
-          item_value: 'item_value',
-          discount: 'discount',
-          dis_amt: 'dis_amt',
-          taxable: 'taxable',
-          tax_amount: 'tax_amount',
-          cess_amount: 'cess_amount',
-          transport_charges: 'transport_charges',
-          round_off: 'round_off',
-          total_amount: 'total_amount',
-          vehicle_name: 'vehicle_name',
-          total_boxes: 'total_boxes',
-          order_type: 'order_type',
-          shipping_address: 'shipping_address',
-          billing_address: 'billing_address',
-          customer_id: 'customer_id',
-          gst_type: 'gst_type',
-          gst_type_id: 'gst_type_id',
-          order_salesman_id: 'order_salesman_id',
-          customer_address_id: 'customer_address_id',
-          payment_term: 'payment_term',
-          payment_term_id: 'payment_term_id',
-          payment_link_type_id: 'payment_link_type_id',
-          ledger_account: 'ledger_account',
-          ledger_account_id: 'ledger_account_id',
-          order_status_id: 'order_status_id'
-        },
-        sale_order_items: [
-          {
-            product: 'product',
-            size: 'size',
-            size_id: 'size_id',
-            color_id: 'color_id',
-            color: 'color',
-            quantity: 'quantity',
-            unit_price: 'unit_price',
-            rate: 'rate',
-            total_boxes: 'total_boxes',
-            amount: 'amount',
-            discount_percentage: 'discount_percentage',
-            discount: 'discount',
-            dis_amt: 'dis_amt',
-            tax: 'tax',
-            remarks: 'remarks',
-          }
-        ],
-        order_attachments: [
-          {
-            attachment_name: 'attachment_name',
-            attachment_path: 'attachment_path'
-          }
-        ],
-        order_shipments: {
-          destination: 'destination',
-          port_of_landing: 'port_of_landing',
-          port_of_discharge: 'port_of_discharge',
-          shipping_tracking_no: 'shipping_tracking_no',
-          shipping_date: 'shipping_date',
-          shipping_charges: 'shipping_charges',
-          weight: 'weight'
-        }
-      },
-      'Sale Return': {
-        sale_return_order: {
-          customer: 'customer',
-          bill_type: 'bill_type',
-          email: 'email',
-          ref_no: 'ref_no',
-          tax: 'tax',
-          remarks: 'remarks',
-          item_value: 'item_value',
-          discount: 'discount',
-          dis_amt: 'dis_amt',
-          taxable: 'taxable',
-          tax_amount: 'tax_amount',
-          cess_amount: 'cess_amount',
-          transport_charges: 'transport_charges',
-          round_off: 'round_off',
-          total_amount: 'total_amount',
-          vehicle_name: 'vehicle_name',
-          total_boxes: 'total_boxes',
-          order_type: 'order_type',
-          shipping_address: 'shipping_address',
-          billing_address: 'billing_address',
-          customer_id: 'customer_id',
-          gst_type: 'gst_type',
-          gst_type_id: 'gst_type_id',
-          orders_salesman: 'orders_salesman',
-          order_salesman_id: 'order_salesman_id',
-          customer_address_id: 'customer_address_id',
-          payment_term: 'payment_term',
-          payment_term_id: 'payment_term_id',
-          order_status_id: 'order_status_id'
-        },
-        sale_return_items: [
-          {
-            product: 'product',
-            size: 'size',
-            size_id: 'size_id',
-            color_id: 'color_id',
-            color: 'color',
-            quantity: 'quantity',
-            unit_price: 'unit_price',
-            rate: 'rate',
-            total_boxes: 'total_boxes',
-            amount: 'amount',
-            discount_percentage: 'discount_percentage',
-            discount: 'discount',
-            dis_amt: 'dis_amt',
-            tax: 'tax',
-            remarks: 'remarks',
-          }
-        ],
-        order_attachments: [
-          {
-            attachment_name: 'attachment_name',
-            attachment_path: 'attachment_path'
-          }
-        ],
-        order_shipments: {
-          destination: 'destination',
-          port_of_landing: 'port_of_landing',
-          port_of_discharge: 'port_of_discharge',
-          shipping_tracking_no: 'shipping_tracking_no',
-          shipping_date: 'shipping_date',
-          shipping_charges: 'shipping_charges',
-          weight: 'weight'
-        }
-      },
-      // Add mappings for 'Sale Return' or other tables as needed
-    };
+    'Sale Order': {
+      sourceModel: 'sale_invoice_order',  // Specify the source model
+      targetModel: 'sale_order', // Specify the target model
+      // Indicate nested fields with model mappings
+      nestedModels: {
+        sale_invoice_items: 'sale_order_items',
+        order_attachments: 'order_attachments',
+        order_shipments: 'order_shipments'
+      }
+    },
+    'Sale Return': {
+      sourceModel: 'sale_invoice_order',  // Specify the source model
+      targetModel: 'sale_return_order',  // Specify the target model
+      // Nested mappings
+      nestedModels: {
+        sale_invoice_items: 'sale_return_items',
+        order_attachments: 'order_attachments',
+        order_shipments: 'order_shipments'
+      }
+    },
+    'Purchase Order': {
+      sourceModel: 'sale_invoice_order',
+      targetModel: 'purchase_order_data',
+      nestedModels: {
+        sale_invoice_items: 'purchase_order_items',
+        order_attachments: 'order_attachments',
+        order_shipments: 'order_shipments'
+      }
+    },
+    'Purchase Invoice': {
+      sourceModel: 'sale_invoice_order',
+      targetModel: 'purchase_invoice_orders',
+      nestedModels: {
+        sale_invoice_items: 'purchase_invoice_items',
+        order_attachments: 'order_attachments',
+        order_shipments: 'order_shipments'
+      }
+    },
+    'Purchase Return': {
+      sourceModel: 'sale_invoice_order',
+      targetModel: 'purchase_return_orders',
+      nestedModels: {
+        sale_invoice_items: 'purchase_return_items',
+        order_attachments: 'order_attachments',
+        order_shipments: 'order_shipments'
+      }
+    }
+  };
 
   // Method to open the copy modal and populate dropdown
   openCopyModal() {
       this.availableTables = this.tables.filter(table => table !== this.currentTable);
   }
 
+  // Method to deeply copy fields from dataToCopy based on model structure
+  deepCopyFields(source: any, destination: any, mapping: any) {
+    for (const key in mapping) {
+      if (mapping.hasOwnProperty(key)) {
+        // Check if the field is an object and requires further copying
+        if (typeof mapping[key] === 'object' && !Array.isArray(mapping[key])) {
+          destination[key] = {};
+          this.deepCopyFields(source[key], destination[key], mapping[key]);
+        } else if (Array.isArray(mapping[key])) {
+          // Handle arrays of objects (e.g., items and attachments)
+          destination[key] = source[key]?.map((item: any) => {
+            const newItem: any = {};
+            this.deepCopyFields(item, newItem, mapping[key][0]);
+            return newItem;
+          }) || [];
+        } else {
+          // Direct field copy
+          destination[key] = source[mapping[key]] || null;
+        }
+      }
+    }
+  }
+
   copyToTable() {
-    const dataToCopy = {
-      sale_invoice_order: this.formConfig.model.sale_invoice_order || {},
-      sale_invoice_items: this.formConfig.model.sale_invoice_items || [],
-      order_attachments: this.formConfig.model.order_attachments || {},
-      order_shipments: this.formConfig.model.order_shipments || {},
-    };
-    const populatedData = {};
-    // Extract only the matching fields based on the selected table
-    if (this.selectedTable && this.fieldMapping[this.selectedTable]) {
-      const tableMapping = this.fieldMapping[this.selectedTable];
+    const selectedMapping = this.fieldMapping[this.selectedTable];
+    
+    if (!selectedMapping) {
+      console.error('Mapping not found for selected table:', this.selectedTable);
+      return;
+    }
   
-      // Handle sale_invoice_order fields
-      if (tableMapping.sale_order) {
-        populatedData['sale_order'] = {};
-        for (const key in tableMapping.sale_order) {
-          const sourceField = tableMapping.sale_order[key];
-          populatedData['sale_order'][key] = dataToCopy.sale_invoice_order[sourceField] || null;
-        }
-      }
+    const dataToCopy = this.formConfig.model[selectedMapping.sourceModel] || {};
+    const populatedData = { [selectedMapping.targetModel]: {} };
+  
+    // Copy main fields
+    Object.keys(dataToCopy).forEach(field => {
+      populatedData[selectedMapping.targetModel][field] = dataToCopy[field];
+    });
+  
+    // Copy nested models if they exist
+    if (selectedMapping.nestedModels) {
+      Object.keys(selectedMapping.nestedModels).forEach(sourceNestedModel => {
+        const targetNestedModel = selectedMapping.nestedModels[sourceNestedModel];
+        const nestedData = this.formConfig.model[sourceNestedModel] || [];
+        
+        populatedData[targetNestedModel] = Array.isArray(nestedData)
+          ? nestedData.map(item => ({ ...item }))
+          : { ...nestedData };
+      });
+    }
+  
+    // Log and navigate to the target module with populated data
+    console.log('Populated Data:', populatedData);
+    
+    // Determine the target route based on the selected table
+    const targetRoute = 
+      this.selectedTable === 'Sale Order' ? 'sales' :
+      this.selectedTable === 'Sale Return' ? 'sales/sale-returns' :
+      this.selectedTable === 'Purchase Order' ? 'purchase' :
+      this.selectedTable === 'Purchase Invoice' ? 'purchase/purchase-invoice' :
+      this.selectedTable === 'Purchase Return' ? 'purchase/purchasereturns' :
+      null;
 
-      // Handle sale_return_order fields
-      if (tableMapping.sale_return_order) {
-        populatedData['sale_return_order'] = {};
-        for (const key in tableMapping.sale_return_order) {
-          const sourceField = tableMapping.sale_return_order[key];
-          populatedData['sale_return_order'][key] = dataToCopy.sale_invoice_order[sourceField] || null;
-        }
-      }
-  
-      // Handle sale_invoice_items (array)
-      if (tableMapping.sale_order_items) {
-        populatedData['sale_order_items'] = dataToCopy.sale_invoice_items?.map(item => {
-          const itemData = {};
-          // Iterate through the mapping for items
-          tableMapping.sale_order_items.forEach(fieldMap => {
-            for (const field in fieldMap) {
-              itemData[field] = item[fieldMap[field]] || null; // Ensure you access the correct fields
-            }
-          });
-          return itemData;
-        }) || [];
-      }
-
-      // Handle sale_return_items (array)
-      if (tableMapping.sale_return_items) {
-        populatedData['sale_return_items'] = dataToCopy.sale_invoice_items?.map(item => {
-          const itemData = {};
-          // Iterate through the mapping for items
-          tableMapping.sale_return_items.forEach(fieldMap => {
-            for (const field in fieldMap) {
-              itemData[field] = item[fieldMap[field]] || null; // Ensure you access the correct fields
-            }
-          });
-          return itemData;
-        }) || [];
-      }
-  
-      // Handle order_attachments (array)
-      if (tableMapping.order_attachments) {
-        populatedData['order_attachments'] = dataToCopy.order_attachments?.map(attachment => {
-          const attachmentData = {};
-          tableMapping.order_attachments.forEach(fieldMap => {
-            for (const field in fieldMap) {
-              attachmentData[field] = attachment[fieldMap[field]] || null;
-            }
-          });
-          return attachmentData;
-        }) || [];
-      }
-  
-      // Handle order_shipments (object)
-      if (tableMapping.order_shipments) {
-        populatedData['order_shipments'] = {};
-        for (const key in tableMapping.order_shipments) {
-          const sourceField = tableMapping.order_shipments[key];
-          populatedData['order_shipments'][key] = dataToCopy.order_shipments[sourceField] || null;
-        }
-      }
+    if (!targetRoute) {
+      console.error('No valid route for selected table:', this.selectedTable);
+      return;
     }
 
-    // Log the populated data for debugging
-    console.log('Populated Data for Sale Invoice:', populatedData);
-
-    // Navigate based on the selected table without needing breaks
-    if (this.selectedTable === 'Sale Order') {
-        this.router.navigate(['admin/sales'], { state: { data: populatedData } });
-        console.log("populate data of customer : ", populatedData)
-    } else if (this.selectedTable === 'Sale Return') {
-        this.router.navigate(['admin/sales/sale-returns'], { state: { data: populatedData } });
-    }
-    // Add additional cases for other tables if necessary
-    else {
-        console.error('Unknown table selected');
-    }
+    this.router.navigate([`admin/${targetRoute}`], { state: { data: populatedData } });
   }
 
   constructor(
@@ -803,13 +684,13 @@ export class SalesinvoiceComponent {
                 label: 'Email',
                 placeholder: 'Enter Email',
               },
-              hooks: {
-                onInit: (field: any) => {
-                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.email && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.email);
-                  }
-                }
-              }
+              // hooks: {
+              //   onInit: (field: any) => {
+              //     if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.email && field.formControl) {
+              //       field.formControl.setValue(this.dataToPopulate.sale_invoice_order.email);
+              //     }
+              //   }
+              // }
             },
             {
               key: 'orders_salesman',
@@ -956,13 +837,13 @@ export class SalesinvoiceComponent {
                 placeholder: 'Enter Billing Address',
 
               },
-              hooks: {
-                onInit: (field: any) => {
-                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.billing_address && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.billing_address);
-                  }
-                }
-              }
+              // hooks: {
+              //   onInit: (field: any) => {
+              //     if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.billing_address && field.formControl) {
+              //       field.formControl.setValue(this.dataToPopulate.sale_invoice_order.billing_address);
+              //     }
+              //   }
+              // }
             },
             {
               key: 'shipping_address',
@@ -972,13 +853,13 @@ export class SalesinvoiceComponent {
                 label: 'Shipping Address',
                 placeholder: 'Enter Shipping Address',
               },
-              hooks: {
-                onInit: (field: any) => {
-                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.shipping_address && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.shipping_address);
-                  }
-                }
-              }
+              // hooks: {
+              //   onInit: (field: any) => {
+              //     if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.shipping_address && field.formControl) {
+              //       field.formControl.setValue(this.dataToPopulate.sale_invoice_order.shipping_address);
+              //     }
+              //   }
+              // }
             },
           ]
         },
@@ -1632,6 +1513,13 @@ export class SalesinvoiceComponent {
                           lazyOneTime: true
                         }
                       },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.shipping_mode_id && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.shipping_mode_id);
+                          }
+                        }
+                      }
                     },
                     {
                       key: 'port_of_discharge',
@@ -1662,6 +1550,13 @@ export class SalesinvoiceComponent {
                         lazy: {
                           url: 'masters/shipping_companies',
                           lazyOneTime: true
+                        }
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.shipping_company_id && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.shipping_company_id);
+                          }
                         }
                       }
                     },
@@ -2059,38 +1954,17 @@ export class SalesinvoiceComponent {
                           type: 'file',
                           className: 'ta-cell col-12 custom-file-attachement',
                           props: {
-                            displayStyle: 'files',
-                            multiple: true,
+                            "displayStyle": "files",
+                            "multiple": true
                           },
                           hooks: {
                             onInit: (field: any) => {
-                              // Check if there's data to populate
-                              if (this.dataToPopulate && this.dataToPopulate.order_attachments?.length > 0) {
-                                // Map through order_attachments and return objects with file properties
-                                const attachments = this.dataToPopulate.order_attachments.map(attachment => ({
-                                  name: attachment.attachment_name,
-                                  attachment_path: attachment.attachment_path,
-                                  isUploading: false,  // Add any other required properties like 'isUploading'
-                                }));
-                        
-                                // Set the attachments to the form control
-                                field.formControl.setValue(attachments);
-                        
-                                // Optional: log for debugging
-                                console.log("Attachments: ", attachments);
+                              if (this.dataToPopulate && this.dataToPopulate.order_attachments && field.formControl) {
+                                field.formControl.setValue(this.dataToPopulate.order_attachments);
                               }
                             }
                           }
-                        }                                                                      
-                        // {
-                        //   key: 'order_attachments',
-                        //   type: 'file',
-                        //   className: 'ta-cell col-12 custom-file-attachement',
-                        //   props: {
-                        //     "displayStyle": "files",
-                        //     "multiple": true
-                        //   }
-                        // }
+                        }
                       ]
                     }
                   ]

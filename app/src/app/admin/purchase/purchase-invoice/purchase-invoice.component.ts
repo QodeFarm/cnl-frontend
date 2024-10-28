@@ -1,9 +1,11 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { TaFormComponent, TaFormConfig } from '@ta/ta-form';
 import { distinctUntilChanged } from 'rxjs/operators';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { PurchaseInvoiceListComponent } from './purchase-invoice-list/purchase-invoice-list.component';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FormBuilder } from '@angular/forms';
 
 @Component({
   selector: 'app-purchase-invoice',
@@ -25,10 +27,161 @@ export class PurchaseInvoiceComponent {
     return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   }
 
+//=====================================================================
+  tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return', 'Purchase Order', 'Purchase Invoice', 'Purchase Return'];
 
-  constructor(private http: HttpClient) {
+  // This will store available tables excluding the current one
+  availableTables: string[] = [];
+
+  // Selected table from dropdown
+  selectedTable: string;
+
+  // Variable to store current table name
+  currentTable: string = 'Purchase Invoice';
+
+  fieldMapping = {
+    'Sale Invoice': {
+      sourceModel: 'purchase_invoice_orders',  // Specify the source model
+      targetModel: 'sale_invoice_order', // Specify the target model
+      // Indicate nested fields with model mappings
+      nestedModels: {
+        purchase_invoice_items: 'sale_invoice_items',
+        order_attachments: 'order_attachments',
+        order_shipments: 'order_shipments'
+      }
+    },
+    'Sale Return': {
+      sourceModel: 'purchase_invoice_orders',  // Specify the source model
+      targetModel: 'sale_return_order',  // Specify the target model
+      // Nested mappings
+      nestedModels: {
+        purchase_invoice_items: 'sale_return_items',
+        order_attachments: 'order_attachments',
+        order_shipments: 'order_shipments'
+      }
+    },
+    'Sale Order': {
+      sourceModel: 'purchase_invoice_orders',
+      targetModel: 'sale_order',
+      nestedModels: {
+        purchase_invoice_items: 'sale_order_items',
+        order_attachments: 'order_attachments',
+        order_shipments: 'order_shipments'
+      }
+    },
+    'Purchase Order': {
+      sourceModel: 'purchase_invoice_orders',
+      targetModel: 'purchase_order',
+      nestedModels: {
+        purchase_invoice_items: 'purchase_order_items',
+        order_attachments: 'order_attachments',
+        order_shipments: 'order_shipments'
+      }
+    },
+    'Purchase Return': {
+      sourceModel: 'purchase_invoice_orders',
+      targetModel: 'purchase_return_orders',
+      nestedModels: {
+        purchase_invoice_items: 'purchase_return_items',
+        order_attachments: 'order_attachments',
+        order_shipments: 'order_shipments'
+      }
+    }
+  };
+
+  // Method to deeply copy fields from dataToCopy based on model structure
+  deepCopyFields(source: any, destination: any, mapping: any) {
+    for (const key in mapping) {
+      if (mapping.hasOwnProperty(key)) {
+        // Check if the field is an object and requires further copying
+        if (typeof mapping[key] === 'object' && !Array.isArray(mapping[key])) {
+          destination[key] = {};
+          this.deepCopyFields(source[key], destination[key], mapping[key]);
+        } else if (Array.isArray(mapping[key])) {
+          // Handle arrays of objects (e.g., items and attachments)
+          destination[key] = source[key]?.map((item: any) => {
+            const newItem: any = {};
+            this.deepCopyFields(item, newItem, mapping[key][0]);
+            return newItem;
+          }) || [];
+        } else {
+          // Direct field copy
+          destination[key] = source[mapping[key]] || null;
+        }
+      }
+    }
   }
+
+  copyToTable() {
+    const selectedMapping = this.fieldMapping[this.selectedTable];
+    
+    if (!selectedMapping) {
+      console.error('Mapping not found for selected table:', this.selectedTable);
+      return;
+    }
+
+    const dataToCopy = this.formConfig.model[selectedMapping.sourceModel] || {};
+    const populatedData = { [selectedMapping.targetModel]: {} };
+
+    // Copy main fields
+    Object.keys(dataToCopy).forEach(field => {
+      populatedData[selectedMapping.targetModel][field] = dataToCopy[field];
+    });
+
+    // Copy nested models if they exist
+    if (selectedMapping.nestedModels) {
+      Object.keys(selectedMapping.nestedModels).forEach(sourceNestedModel => {
+        const targetNestedModel = selectedMapping.nestedModels[sourceNestedModel];
+        const nestedData = this.formConfig.model[sourceNestedModel] || [];
+        
+        populatedData[targetNestedModel] = Array.isArray(nestedData)
+          ? nestedData.map(item => ({ ...item }))
+          : { ...nestedData };
+      });
+    }
+
+    // Log and navigate to the target module with populated data
+    console.log('Populated Data:', populatedData);
+    
+    // Determine the target route based on the selected table
+    const targetRoute = 
+      this.selectedTable === 'Sale Invoice' ? 'sales/salesinvoice' :
+      this.selectedTable === 'Sale Return' ? 'sales/sale-returns' :
+      this.selectedTable === 'Sale Order' ? 'sales' :
+      this.selectedTable === 'Purchase Order' ? 'purchase' :
+      this.selectedTable === 'Purchase Return' ? 'purchase/purchasereturns' :
+      null;
+
+    if (!targetRoute) {
+      console.error('No valid route for selected table:', this.selectedTable);
+      return;
+    }
+
+    this.router.navigate([`admin/${targetRoute}`], { state: { data: populatedData } });
+  }
+
+
+  // Initialize the copy modal options dynamically
+  openCopyModal() {
+    this.availableTables = this.tables.filter(table => table !== this.currentTable);
+  }
+
+  constructor(
+    private http: HttpClient,
+    private cdRef: ChangeDetectorRef,
+    private router: Router,
+    private route: ActivatedRoute,
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  dataToPopulate: any;
+  hasDataPopulated: boolean = false;
+  
   ngOnInit() {
+
+    this.checkAndPopulateData();
+
     this.showPurchaseInvoiceList = false;
     this.showForm = false;
     this.PurchaseInvoiceEditID = null;
@@ -44,6 +197,61 @@ export class PurchaseInvoiceComponent {
     this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[7].hide =true; //Hiding order status in create field
 
   }
+
+  checkAndPopulateData() {
+    // Check if data has already been populated
+    if (this.dataToPopulate === undefined) {
+      console.log("Data status checking 1 : ", (this.dataToPopulate === undefined))
+      // Subscribe to route params and history state data
+      this.route.paramMap.subscribe(params => {
+        // Retrieve data from history only if it's the first time populating
+        this.dataToPopulate = history.state.data; 
+        console.log('Data retrieved:', this.dataToPopulate);
+        
+        // Populate the form only if data exists
+        if (this.dataToPopulate) {
+          // Ensure we are handling purchase_invoice_items correctly
+          const purchaseInvoiceItems = this.dataToPopulate.purchase_invoice_items || [];
+  
+          // Clear existing purchase_invoice_items to avoid duplicates
+          this.formConfig.model.purchase_invoice_items = [];
+  
+          // Populate form with data, ensuring unique entries
+          purchaseInvoiceItems.forEach(item => {
+            const populatedItem = {
+              product_id: item.product.product_id,
+              size_id: item.size.size_id,
+              color_id: item.color.color_id,
+              code: item.code,
+              unit: item.unit,
+              total_boxes: item.total_boxes,
+              quantity: item.quantity,
+              amount: item.amount,
+              rate: item.rate,
+              print_name: item.print_name,
+              discount: item.discount
+            };
+            this.formConfig.model.purchase_invoice_items.push(populatedItem);
+          });
+        }
+      });
+    } else {
+    // Detect if the page was refreshed
+      const wasPageRefreshed = window.performance?.navigation?.type === window.performance?.navigation?.TYPE_RELOAD;
+    
+      // Clear data if the page was refreshed
+      if (wasPageRefreshed) {
+        this.dataToPopulate = undefined;
+        console.log("Page was refreshed, clearing data.");
+        
+        // Ensure the history state is cleared to prevent repopulation
+        history.replaceState(null, '');
+        return; // Stop further execution as we don't want to repopulate the form
+      }
+    }
+  }  
+
+//=====================================================================
   formConfig: TaFormConfig = {};
 
   hide() {
@@ -161,6 +369,9 @@ export class PurchaseInvoiceComponent {
                       this.formConfig.model['purchase_invoice_orders']['purchase_type_id'] = data.purchase_type_id;
                     }
                   });
+                  if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders.purchase_type && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.purchase_invoice_orders.purchase_type);
+                  }
                 }
               }
             },
@@ -197,6 +408,9 @@ export class PurchaseInvoiceComponent {
                       field.form.controls.email.setValue(data.email)
                     }
                   });
+                  if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders.vendor && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.purchase_invoice_orders.vendor);
+                  }
                 }
               }
             },
@@ -284,6 +498,10 @@ export class PurchaseInvoiceComponent {
               },
               hooks: {
                 onInit: (field: any) => {
+                  console.log("Tax : ", this.dataToPopulate.purchase_invoice_orders.tax);
+                  if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders.tax && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.purchase_invoice_orders.tax);
+                  }
                 }
               }
             },
@@ -312,7 +530,11 @@ export class PurchaseInvoiceComponent {
                 placeholder: 'Enter Remarks',
               },
               hooks: {
-                onInit: (field: any) => { }
+                onInit: (field: any) => {
+                  if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders.remarks && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.purchase_invoice_orders.remarks);
+                  }
+                }
               }
             },
             {
@@ -416,6 +638,16 @@ export class PurchaseInvoiceComponent {
                   // Check if parentArray exists and proceed
                   if (parentArray) {
                     const currentRowIndex = +parentArray.key; // Simplified number conversion
+
+                    // Check if there is a product already selected in this row (when data is copied)
+                    if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_items.length > currentRowIndex) {
+                      const existingProduct = this.dataToPopulate.purchase_invoice_items[currentRowIndex].product;
+                      console.log("Product : ", existingProduct);
+                      // Set the full product object instead of just the product_id
+                      if (existingProduct) {
+                        field.formControl.setValue(existingProduct); // Set full product object (not just product_id)
+                      }
+                    }
                     
                     // Subscribe to value changes of the field
                     field.formControl.valueChanges.subscribe(selectedProductId => {
@@ -497,6 +729,26 @@ export class PurchaseInvoiceComponent {
                     url: 'products/sizes/',
                     lazyOneTime: true
                   }
+                },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_items.length > currentRowIndex) {
+                        const existingSize = this.dataToPopulate.purchase_invoice_items[currentRowIndex].size;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingSize && existingSize.size_id) {
+                          field.formControl.setValue(existingSize); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
                 }
               },
               {
@@ -513,6 +765,26 @@ export class PurchaseInvoiceComponent {
                     url: 'products/colors/',
                     lazyOneTime: true
                   }
+                },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_items.length > currentRowIndex) {
+                        const existingColor = this.dataToPopulate.purchase_invoice_items[currentRowIndex].color;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingColor) {
+                          field.formControl.setValue(existingColor);
+                        }
+                      }
+                    }
+                  }
                 }
               },              
               {
@@ -522,6 +794,26 @@ export class PurchaseInvoiceComponent {
                   label: 'Code',
                   placeholder: 'Enter code',
                   hideLabel: true,
+                },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_items.length > currentRowIndex) {
+                        const existingCode = this.dataToPopulate.purchase_invoice_items[currentRowIndex].product?.code;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingCode) {
+                          field.formControl.setValue(existingCode); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
                 }
               },
               {
@@ -533,6 +825,26 @@ export class PurchaseInvoiceComponent {
                   placeholder: 'Enter Total Boxes',
                   hideLabel: true
                 },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_items.length > currentRowIndex) {
+                        const existingBox = this.dataToPopulate.purchase_invoice_items[currentRowIndex].total_boxes;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingBox) {
+                          field.formControl.setValue(existingBox); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
               },
               {
                 type: 'select',
@@ -550,6 +862,26 @@ export class PurchaseInvoiceComponent {
                     lazyOneTime: true
                   }
                 },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_items.length > currentRowIndex) {
+                        const existingUnit = this.dataToPopulate.purchase_invoice_items[currentRowIndex].product.unit_options;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingUnit) {
+                          field.formControl.setValue(existingUnit.unit_options_id); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
               },
               // quantity amount rate dsc
               {
@@ -566,21 +898,36 @@ export class PurchaseInvoiceComponent {
                 },
                 hooks: {
                   onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_items.length > currentRowIndex) {
+                        const existingQuan = this.dataToPopulate.purchase_invoice_items[currentRowIndex].quantity;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingQuan) {
+                          field.formControl.setValue(existingQuan); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+              
+                    // Subscribe to value changes
                     field.formControl.valueChanges.subscribe(data => {
-                      // this.formConfig.model['productQuantity'] = data;
-
                       if (field.form && field.form.controls && field.form.controls.rate && data) {
                         const rate = field.form.controls.rate.value;
                         const quantity = data;
                         if (rate && quantity) {
                           field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity));
                         }
-
                       }
-                    })
+                    });
                   },
                   onChanges: (field: any) => {
-
+                    // You can handle any changes here if needed
                   }
                 }
               },
@@ -595,8 +942,25 @@ export class PurchaseInvoiceComponent {
                 },
                 hooks: {
                   onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_items.length > currentRowIndex) {
+                        const existingPrice = this.dataToPopulate.purchase_invoice_items[currentRowIndex].rate;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingPrice) {
+                          field.formControl.setValue(existingPrice); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                    
+                    // Subscribe to value changes to update amount
                     field.formControl.valueChanges.subscribe(data => {
-
                       if (field.form && field.form.controls && field.form.controls.quantity && data) {
                         const quantity = field.form.controls.quantity.value;
                         const rate = data;
@@ -604,7 +968,7 @@ export class PurchaseInvoiceComponent {
                           field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity));
                         }
                       }
-                    })
+                    });
                   }
                 }
               },
@@ -619,8 +983,25 @@ export class PurchaseInvoiceComponent {
                 },
                 hooks: {
                   onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_items.length > currentRowIndex) {
+                        const existingDisc = this.dataToPopulate.purchase_invoice_items[currentRowIndex].discount;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingDisc) {
+                          field.formControl.setValue(existingDisc); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
                     field.formControl.valueChanges.subscribe(data => {
-                    })
+                      // Add any logic needed for when discount changes
+                    });
                   }
                 },
                 expressionProperties: {
@@ -634,6 +1015,26 @@ export class PurchaseInvoiceComponent {
                   placeholder: 'Enter Product Print name',
                   hideLabel: true
                 },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_items.length > currentRowIndex) {
+                        const existingName = this.dataToPopulate.purchase_invoice_items[currentRowIndex].print_name;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingName) {
+                          field.formControl.setValue(existingName); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
               },
               {
                 type: 'input',
@@ -657,9 +1058,25 @@ export class PurchaseInvoiceComponent {
                 },
                 hooks: {
                   onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_items.length > currentRowIndex) {
+                        const existingAmount = this.dataToPopulate.purchase_invoice_items[currentRowIndex].amount;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingAmount) {
+                          field.formControl.setValue(existingAmount); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
                     field.formControl.valueChanges.subscribe(data => {
                       this.totalAmountCal();
-                    })
+                    });
                   }
                 }
               },
@@ -672,6 +1089,26 @@ export class PurchaseInvoiceComponent {
                   placeholder: 'Tax',
                   hideLabel: true
                 },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_items.length > currentRowIndex) {
+                        const existingtax = this.dataToPopulate.purchase_invoice_items[currentRowIndex].tax;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingtax) {
+                          field.formControl.setValue(existingtax); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
               },
               {
                 type: 'input',
@@ -681,6 +1118,26 @@ export class PurchaseInvoiceComponent {
                   placeholder: 'Enter Remarks',
                   hideLabel: true
                 },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_items.length > currentRowIndex) {
+                        const existingRemarks = this.dataToPopulate.purchase_invoice_items[currentRowIndex].remarks;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingRemarks) {
+                          field.formControl.setValue(existingRemarks); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
               },
             ]
           },
@@ -710,6 +1167,13 @@ export class PurchaseInvoiceComponent {
                       templateOptions: {
                         label: 'Destination',
                         placeholder: 'Enter Destination',
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.destination && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.destination);
+                          }
+                        }
                       }
                     },
                     {
@@ -719,6 +1183,13 @@ export class PurchaseInvoiceComponent {
                       templateOptions: {
                         label: 'Port of Landing',
                         placeholder: 'Enter Port of Landing',
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.port_of_landing && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.port_of_landing);
+                          }
+                        }
                       }
                     },
                     {
@@ -736,6 +1207,13 @@ export class PurchaseInvoiceComponent {
                           lazyOneTime: true
                         }
                       },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.shipping_mode_id && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.shipping_mode_id);
+                          }
+                        }
+                      }
                     },
                     {
                       key: 'port_of_discharge',
@@ -744,6 +1222,13 @@ export class PurchaseInvoiceComponent {
                       templateOptions: {
                         label: 'Port of Discharge',
                         placeholder: 'Select Port of Discharge',
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.port_of_discharge && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.port_of_discharge);
+                          }
+                        }
                       }
                     },
                     {
@@ -760,6 +1245,13 @@ export class PurchaseInvoiceComponent {
                           url: 'masters/shipping_companies',
                           lazyOneTime: true
                         }
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.shipping_company_id && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.shipping_company_id);
+                          }
+                        }
                       }
                     },
                     {
@@ -770,6 +1262,13 @@ export class PurchaseInvoiceComponent {
                         type: "number",
                         label: 'No. of Packets',
                         placeholder: 'Select No. of Packets',
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.no_of_packets && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.no_of_packets);
+                          }
+                        }
                       }
                     },
                     {
@@ -780,6 +1279,13 @@ export class PurchaseInvoiceComponent {
                         type: "number",
                         label: 'Weight',
                         placeholder: 'Enter Weight',
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.weight && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.weight);
+                          }
+                        }
                       }
                     },
                     {
@@ -811,6 +1317,13 @@ export class PurchaseInvoiceComponent {
                         label: 'Shipping Charges.',
                         placeholder: 'Enter Shipping Charges',
                         required: true
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.shipping_charges && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.shipping_charges);
+                          }
+                        }
                       }
                     }
                   ]
@@ -847,9 +1360,12 @@ export class PurchaseInvoiceComponent {
                               },
                               hooks: {
                                 onInit: (field: any) => {
+                                  if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders && this.dataToPopulate.purchase_invoice_orders.cess_amount && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.purchase_invoice_orders.cess_amount);
+                                  }
                                   field.formControl.valueChanges.subscribe(data => {
                                     this.totalAmountCal();
-                                    
+
                                   })
                                 }
                               }
@@ -865,12 +1381,12 @@ export class PurchaseInvoiceComponent {
                               },
                               hooks: {
                                 onInit: (field: any) => {
+                                  if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders && this.dataToPopulate.purchase_invoice_orders.advance_amount && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.purchase_invoice_orders.advance_amount);
+                                  }
                                   field.formControl.valueChanges.subscribe(data => {
                                     this.totalAmountCal();
-                                    // this.formConfig.model['productDiscount'] = data;
                                   })
-                                },
-                                onChanges: (field: any) => {
                                 }
                               }
                             },
@@ -882,6 +1398,13 @@ export class PurchaseInvoiceComponent {
                                 type: 'input',
                                 label: 'Taxable',
                                 placeholder: 'Enter Taxable'
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders && this.dataToPopulate.purchase_invoice_orders.taxable && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.purchase_invoice_orders.taxable);
+                                  }
+                                }
                               }
                             },
                             {
@@ -896,25 +1419,15 @@ export class PurchaseInvoiceComponent {
                               },
                               hooks: {
                                 onInit: (field: any) => {
+                                  if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders && this.dataToPopulate.purchase_invoice_orders.tax_amount && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.purchase_invoice_orders.tax_amount);
+                                  }
                                   field.formControl.valueChanges.subscribe(data => {
                                     this.totalAmountCal();
-
                                   })
                                 }
                               }
                             },
-                            // {
-                            //   key: 'round_off',
-                            //   type: 'input',
-                            //   // defaultValue: "7777700",
-                            //   className: 'col-4',
-                            //   templateOptions: {
-                            //     type: 'input',
-                            //     label: 'Round off',
-                            //     placeholder: 'Enter Round off',
-                            //     // required: true
-                            //   }
-                            // },
                             {
                               key: 'gst_type',
                               type: 'select',
@@ -937,6 +1450,11 @@ export class PurchaseInvoiceComponent {
                                       this.formConfig.model['purchase_invoice_orders']['gst_type_id'] = data.gst_type_id;
                                     }
                                   });
+                                  // Set the default value for Ledger Account if it exists
+                                  if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders.gst_type && field.formControl) {
+                                    const GstFiled = this.dataToPopulate.purchase_invoice_orders.gst_type
+                                    field.formControl.setValue(GstFiled);
+                                  }
                                 }
                               }
                             },
@@ -962,6 +1480,11 @@ export class PurchaseInvoiceComponent {
                                       this.formConfig.model['purchase_invoice_orders']['payment_term_id'] = data.payment_term_id;
                                     }
                                   });
+                                  // Set the default value for Ledger Account if it exists
+                                  if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders.payment_term && field.formControl) {
+                                    const PaymentField = this.dataToPopulate.purchase_invoice_orders.payment_term
+                                    field.formControl.setValue(PaymentField);
+                                  }
                                 }
                               }
                             },
@@ -987,6 +1510,11 @@ export class PurchaseInvoiceComponent {
                                       this.formConfig.model['purchase_invoice_orders']['ledger_account_id'] = data.ledger_account_id;
                                     }
                                   });
+                                  // Set the default value for Ledger Account if it exists
+                                  if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders.ledger_account && field.formControl) {
+                                    const LedgerField = this.dataToPopulate.purchase_invoice_orders.ledger_account
+                                    field.formControl.setValue(LedgerField);
+                                  }
                                 }
                               }
                             },
@@ -1031,6 +1559,10 @@ export class PurchaseInvoiceComponent {
                               },
                               hooks: {
                                 onInit: (field: any) => {
+                                  // Set the initial value from dataToPopulate if available
+                                  if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders && this.dataToPopulate.purchase_invoice_orders.item_value && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.purchase_invoice_orders.item_value);
+                                  }
                                 }
                               }
                             },
@@ -1045,6 +1577,14 @@ export class PurchaseInvoiceComponent {
                                 placeholder: 'Enter Discount Amt',
                                 // required: true
                              
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  // Set the initial value from dataToPopulate if available
+                                  if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders && this.dataToPopulate.purchase_invoice_orders.dis_amt && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.purchase_invoice_orders.dis_amt);
+                                  }
+                                }
                               }
                             },
                             {
@@ -1057,11 +1597,14 @@ export class PurchaseInvoiceComponent {
                                 label: 'Total amount',
                                 placeholder: 'Enter Total amount',
                               },
-                              // hooks: {
-                              //   onInit: (field: any) => {
-
-                              //   }
-                              // }
+                              hooks: {
+                                onInit: (field: any) => {
+                                  // Set the initial value from dataToPopulate if available
+                                  if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders && this.dataToPopulate.purchase_invoice_orders.total_amount && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.purchase_invoice_orders.total_amount);
+                                  }
+                                }
+                              }
                             },
                           ]
                         },
@@ -1081,8 +1624,15 @@ export class PurchaseInvoiceComponent {
                           props: {
                             "displayStyle": "files",
                             "multiple": true
+                          },
+                          hooks: {
+                            onInit: (field: any) => {
+                              if (this.dataToPopulate && this.dataToPopulate.order_attachments && field.formControl) {
+                                field.formControl.setValue(this.dataToPopulate.order_attachments);
+                              }
+                            }
                           }
-                        },
+                        }
                       ]
                     }
                   ]
