@@ -45,7 +45,7 @@ export class TasksListComponent {
         mapFn: (currentValue: any, row: any, col: any) => {
           return `${row.group.group_name}`;
         },
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'description',
@@ -84,7 +84,9 @@ export class TasksListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            apiUrl: 'tasks/task'
+            apiUrl: 'tasks/task',
+            confirm: true,
+            confirmMsg: "Sure to delete?",
           },
           {
             type: 'callBackFn',
