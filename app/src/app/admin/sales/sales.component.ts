@@ -1775,10 +1775,6 @@ export class SalesComponent {
                                   expressions: {
                                       hide: '!model.sale_order_id',
                                   },
-                                  options: [
-                                      { value: 'Invoiced', label: 'Invoiced' },
-                                      // Add other statuses as needed
-                                  ],
                               },
                               hooks: {
                                   onChanges: (field: any) => {
