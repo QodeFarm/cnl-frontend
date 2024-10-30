@@ -29,7 +29,7 @@ export class ProductsListComponent {
     ],
     pageSize: 10,
     globalSearch: {
-      keys: ['name','code','unit_options','sales_rate','mrp','dis_amount','print_name','hsn_code','barcode']
+      keys: ['name','code','unit_options','balance','sales_rate','mrp','dis_amount','print_name','hsn_code','barcode']
     },
     cols: [
       {
@@ -79,7 +79,7 @@ export class ProductsListComponent {
       {
         fieldKey: 'balance',
         name: 'Balance',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'print_name',

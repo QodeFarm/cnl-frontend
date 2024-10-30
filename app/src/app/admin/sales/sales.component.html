@@ -15,6 +15,14 @@
                 <button (click)="showSaleOrderListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#saleOrderListModal">
           Sales Order List
         </button>
+        <!-- Invoice Creation Button (Only for Edit and if flow status is "Ready for Invoice") -->
+        <button *ngIf="SaleOrderEditID && formConfig.model.sale_order.flow_status === 'Ready for Invoice'" 
+                (click)="openConfirmationModal()" 
+                type="button" 
+                class="btn btn-primary">
+            Create Invoice
+        </button>
+
             </div>
         </div>
     </div>
@@ -86,4 +94,23 @@
         </div>
     </div>
 </div>
+
+<!-- Confirmation Modal -->
+<div id="customDialog" class="custom-dialog-overlay" *ngIf="isConfirmationModalOpen">
+    <div class="custom-dialog-box">
+        <p>Are you sure you want to create the sale invoice?</p>
+        <button (click)="confirmInvoiceCreation()">OK</button>
+        <button (click)="cancelInvoiceCreation()">Cancel</button>
+    </div>
+</div>
+
+<!-- Success Message at the Top Right -->
+<div *ngIf="isInvoiceCreated" class="toast-message">
+    <div class="tick-circle">
+        <span class="tick-mark">✔</span>
+    </div>
+    <span class="message-text">Invoice Created Successfully!</span>
+</div>
+
 <div class="modal-backdrop" *ngIf="isModalOpen"></div> <!-- Added line to fix past orders modal box correctly -->
+
