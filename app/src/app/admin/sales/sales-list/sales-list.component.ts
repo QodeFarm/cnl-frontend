@@ -49,7 +49,7 @@ export class SalesListComponent {
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
           // console.log("-->", currentValue);
-          return `${row.sale_type.name}`;
+          return `${row.sale_type?.name || ''}`;
         },
       },
 

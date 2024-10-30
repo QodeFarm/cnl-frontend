@@ -28,6 +28,7 @@ export class ProductsComponent implements OnInit {
     this.ProductEditID = null;
     // Set form config
     this.setFormConfig();
+    // this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[8].hide = true;
   }
 
   hide() {
@@ -109,7 +110,6 @@ export class ProductsComponent implements OnInit {
 
   // Method to calculate and verify the balance
   verifyBalance(): any {
-    console.log('verify balance working');
     const balance = parseInt(this.formConfig.model.products.balance, 10);
     let totalItemBalanceQuantity = 0;
     let totalVariationQuantity = 0;
@@ -197,11 +197,8 @@ export class ProductsComponent implements OnInit {
       fields: [
         //-----------------------------------------products -----------------------------------//
         {
-          fieldGroupClassName: "ant-row custom-form-block",
-          key: 'products',
-          fieldGroup: [
-            {
               fieldGroupClassName: "ant-row custom-form-block",
+              key: 'products',
               fieldGroup: [
                 // Left side fields
                 {
@@ -503,9 +500,181 @@ export class ProductsComponent implements OnInit {
                               console.error('Form config or unit_options_id data model is not defined.');
                             }
                           });
+                        },
+                        onInit: (field: any) => {
+                          const url = field.templateOptions.lazy.url;
+                    
+                          // Fetch the data using HttpClient
+                          this.http.get(url).subscribe(
+                            (data: any) => {
+                              
+                              // Map data to ensure each object has both label and value properties
+                              field.templateOptions.options = data.data.map((option: any) => ({
+                                label: option.unit_name,  // Display name in the UI
+                                value: {
+                                  unit_options_id:option.unit_options_id,
+                                  unit_name:option.unit_name,
+                                }
+                              }));
+                    
+                              // Find the default option where unit_name is 'Stock Unit'
+                              const defaultOption = field.templateOptions.options.find(option => option.label === 'Stock Unit');
+                    
+                              if (defaultOption) {
+                                // Set the default value to the unit_options_id of 'Stock Unit'
+                                field.formControl.setValue(defaultOption.value);
+                    
+                                // Update the model if necessary
+                                if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                                  this.formConfig.model['products']['unit_options_id'] = defaultOption.option.unit_options_id;
+                                }
+                              } else {
+                                console.warn('Default "Pack" option not found in options.');
+                              }
+                            },
+                            (error) => {
+                              console.error('Error fetching unit options:', error);
+                            }
+                          );
+                        }
+                      }
+                    },                    
+                    {
+                      key: 'stock_unit',
+                      type: 'select',
+                      className: 'col-3',
+                      templateOptions: {
+                        label: 'Stock Unit',
+                        dataKey: 'stock_unit_id',
+                        dataLabel: "stock_unit_name",
+                        options: [],
+                        required: true,
+                        lazy: {
+                          url: 'products/product_stock_units/',
+                          lazyOneTime: true
+                        }
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          field.formControl.valueChanges.subscribe((data: any) => {
+                            
+                            if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                              this.formConfig.model['products']['stock_unit_id'] = data.stock_unit_id;
+                            } else {
+                              console.error('Form config or lead_status data model is not defined.');
+                            }
+                          });
                         }
                       }
                     },
+                    {
+                      key: 'pack_unit',
+                      type: 'select',
+                      className: 'col-3',
+                      templateOptions: {
+                      label: 'Pack Unit',
+                          dataKey: 'pack_unit_id',
+                          dataLabel: "unit_name",
+                          options: [],
+                          required: true,
+                          lazy: {
+                              url: 'masters/package_units/',
+                              lazyOneTime: true
+                          }
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          field.formControl.valueChanges.subscribe((data: any) => {
+                            if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                              this.formConfig.model['products']['pack_unit_id'] = data.pack_unit_id;
+                            } else {
+                              console.error('Form config or g_pack_unit data model is not defined.');
+                            }
+                          });
+                        }
+                      },
+                      hideExpression: (model) => {
+                          const unitName = model.unit_options ? model.unit_options.unit_name : undefined;
+                          // Hide if the `unitName` is not 'Stock Pack Unit' AND not 'Stock Pack GPack Unit'
+                          return unitName !== 'Stock Pack Unit' && unitName !== 'Stock Pack GPack Unit';
+                      },
+                    },
+                    {
+                      className: 'col-3',
+                      key: 'pack_vs_stock',
+                      type: 'input',
+                      templateOptions: {
+                        label: 'Pack vs Stock',
+                        type: 'number', 
+                        required: false
+                      },
+                      hideExpression: (model) => {
+                        // Check if `unit_options` exists, and check the value of `unit_name`
+                        const unitName = model.unit_options ? model.unit_options.unit_name : undefined;
+                        return unitName !== 'Stock Pack Unit' && unitName !== 'Stock Pack GPack Unit';
+                      }
+                    },
+                    {
+                      key: 'g_pack_unit',
+                      type: 'select',
+                      className: 'col-3',
+                      templateOptions: {
+                      label: 'GPack Unit',
+                          dataKey: 'g_pack_unit_id',
+                          dataLabel: 'unit_name',
+                          options: [],
+                          required: true,
+                          lazy: {
+                              url: 'masters/g_package_units/',
+                              lazyOneTime: true
+                          }
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          field.formControl.valueChanges.subscribe((data: any) => {
+                            if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                              this.formConfig.model['products']['g_pack_unit_id'] = data.g_pack_unit_id;
+                            } else {
+                              console.error('Form config or g_pack_unit data model is not defined.');
+                            }
+                          });
+                        }
+                      },
+                      hideExpression: (model) => {
+                        // Check if `unit_options` exists, and check the value of `unit_name`
+                        const unitName = model.unit_options ? model.unit_options.unit_name : undefined;
+                        return unitName !== 'Stock Pack GPack Unit';  // Hide if it's not 'Stock Pack Unit'
+                      }
+                    },
+                    {
+                      className: 'col-3',
+                      key: 'g_pack_vs_pack',
+                      type: 'input',
+                      templateOptions: {
+                      label: 'GPack vs Stock',
+                      type: 'number', 
+                      required : false
+                      },
+                      hideExpression: (model) => {
+                        // Check if `unit_options` exists, and check the value of `unit_name`
+                        const unitName = model.unit_options ? model.unit_options.unit_name : undefined;
+                        return unitName !== 'Stock Pack GPack Unit';  // Hide if it's not 'Stock Pack Unit'
+                      }
+                    },
+                    {
+                      className: 'col-3',
+                      key: 'packet_barcode',
+                      type: 'input',
+                      templateOptions: {
+                      label: 'Packet Barcode',
+                      required : false,
+                      },
+                      hideExpression: (model) => {
+                        // Check if `unit_options` exists, and check the value of `unit_name`
+                        const unitName = model.unit_options ? model.unit_options.unit_name : undefined;
+                        return unitName !== 'Stock Pack GPack Unit';  // Hide if it's not 'Stock Pack Unit'
+                      }
+                    },                   
                     {
                       key: 'product_group',
                       type: 'select',
@@ -553,33 +722,6 @@ export class ProductsComponent implements OnInit {
                           field.formControl.valueChanges.subscribe((data: any) => {
                             if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
                               this.formConfig.model['products']['category_id'] = data.category_id;
-                            } else {
-                              console.error('Form config or lead_status data model is not defined.');
-                            }
-                          });
-                        }
-                      }
-                    },
-                    {
-                      key: 'stock_unit',
-                      type: 'select',
-                      className: 'col-3',
-                      templateOptions: {
-                        label: 'Stock Unit',
-                        dataKey: 'stock_unit_id',
-                        dataLabel: "stock_unit_name",
-                        options: [],
-                        required: true,
-                        lazy: {
-                          url: 'products/product_stock_units/',
-                          lazyOneTime: true
-                        }
-                      },
-                      hooks: {
-                        onChanges: (field: any) => {
-                          field.formControl.valueChanges.subscribe((data: any) => {
-                            if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
-                              this.formConfig.model['products']['stock_unit_id'] = data.stock_unit_id;
                             } else {
                               console.error('Form config or lead_status data model is not defined.');
                             }
@@ -793,13 +935,10 @@ export class ProductsComponent implements OnInit {
                       templateOptions: {
                         label: 'Salt Composition',
                         placeholder: 'Enter Salt Composition'
-                      }
-                    },
-                  ]
-                }
+                  }
+                },
               ]
-            },
-            
+            }
           ]
         },       
         //----------------------------------------- product_variations  -----------------------------------//

@@ -18,6 +18,8 @@ import { ProductsListComponent } from './products-list/products-list.component';
 import { SizeComponent } from './size/size.component';
 import { ColorComponent } from './color/color.component';
 import { WarehouseLocationsComponent } from './warehouse-locations/warehouse-locations.component';
+import { PackageUnitsComponent } from './package-units/package-units.component';
+import { GPackageUnitsComponent } from './g-package-units/g-package-units.component';
 
 const routes: Routes = [
   {
@@ -87,7 +89,15 @@ const routes: Routes = [
   {
     path : 'warehouse-locations',
     component: WarehouseLocationsComponent
-  }  
+  },
+  {
+    path : 'package-units',
+    component: PackageUnitsComponent
+  },
+  {
+    path : 'g-package-units',
+    component: GPackageUnitsComponent
+  }
 ];
 
 @NgModule({
