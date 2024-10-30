@@ -96,3 +96,12 @@
   background-color: rgba(0, 0, 0, 0.5); // Adjust opacity as needed 
   z-index: 999; //Ensure it's below the modal but above other content 
 }
+
+.custom-dialog-box .custom-select {
+    -webkit-appearance: menulist; /* Ensures dropdown symbol appears across browsers */
+    -moz-appearance: menulist;
+    appearance: menulist;
+    padding-right: 25px; /* Add space for dropdown arrow */
+    background: #fff;//url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns%3D%27http%3A//www.w3.org/2000/svg%27 viewBox%3D%270 0 4 5%27%3E%3Cpath fill%3D%27%23000%27 d%3D%27M2 0L0 2h4z%27/%3E%3C/svg%3E') no-repeat right center;
+    background-size: 8px 8px;
+}

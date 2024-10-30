@@ -607,6 +607,58 @@ export class SalesComponent {
     const url = `/products/product_variations/?product_name=${productID}`;
     return this.http.get(url).pipe(((res: any) => res.data));
   }
+//====================================
+  selectedOption: string = 'sale_order';
+  saleOrderSelected = false;
+  saleEstimateSelected = false;
+
+
+  // Method to create sale order and handle the API call
+  createSaleOrder() {
+    this.http.post('sales/sale_order/', this.formConfig.model)
+      .subscribe(response => {
+          console.log('Record created successfully:', response);
+          this.ngOnInit();  // Reload or reset form after creation
+      }, error => {
+          console.error('Error creating record:', error);
+      });
+  }
+
+  confirmSelection() {
+    // Check the selected option and set sale_estimate accordingly
+    if (this.selectedOption === 'sale_estimate') {
+        this.formConfig.model['sale_order']['sale_estimate'] = 'Yes'; // Update model for sale_estimate
+    } else {
+        this.formConfig.model['sale_order']['sale_estimate'] = 'No'; // Update model for sale_order
+    }
+
+    console.log("Selected option:", this.selectedOption);
+    console.log("Sale estimate:", this.formConfig.model['sale_order']['sale_estimate']);
+    
+    // Proceed with the next steps, like API call
+    this.createSaleOrder(); // or however you're proceeding
+    this.isConfirmationModalOpen = false; // Close modal after selection
+  }
+
+
+  // Function to reset checkbox selections
+  resetCheckboxes() {
+    this.saleOrderSelected = false;
+    this.saleEstimateSelected = false;
+  }
+
+  // Update method specifically for edit actions
+  updateSaleOrder() {
+    // Define logic here for updating the sale order without modal pop-up
+    console.log("Updating sale order:", this.formConfig.model);
+    this.http.put(`sales/sale_order/${this.SaleOrderEditID}/`, this.formConfig.model)
+        .subscribe(response => {
+            console.log('Record updated successfully:', response);
+            this.ngOnInit();  // Reload or reset form after update
+        }, error => {
+            console.error('Error updating record:', error);
+        });
+  }
 
   setFormConfig() {
     this.SaleOrderEditID = null;
@@ -619,7 +671,7 @@ export class SalesComponent {
       // Add other fields as necessary
     });
     this.formConfig = {
-      url: "sales/sale_order/",
+      // url: "sales/sale_order/",
       title: '',
       formState: {
         viewMode: false
@@ -642,9 +694,20 @@ export class SalesComponent {
           value: 'data.sale_order_items.map(m=> {m.color_id = m.color.color_id;  return m ;})'
         }
       ],
+      // submit: {
+      //   label: 'Submit',
+      //   submittedFn: () => this.openConfirmationModal()
+      // },    
       submit: {
         label: 'Submit',
-        submittedFn: () => this.ngOnInit()
+        submittedFn: () => {
+            // Open confirmation modal only if it's a new sale order
+            if (!this.SaleOrderEditID) {
+                this.openConfirmationModal();
+            } else {
+                this.updateSaleOrder(); // Call update method for editing
+            }
+        }
       },
       reset: {
         resetFn: () => {

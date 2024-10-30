@@ -63,6 +63,11 @@ export class SalesListComponent {
         sort: true
       },
       {
+        fieldKey: 'sale_estimate',
+        name: 'Sale Estimate',
+        sort: true
+      },
+      {
         fieldKey: 'amount',
         name: 'Amount',
         sort: true
