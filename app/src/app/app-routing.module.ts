@@ -20,7 +20,7 @@ const routes: Routes = [
   },
   {
     path: 'admin',
-    // canActivate: [AuthguardGuard],
+    canActivate: [AuthguardGuard],
     title: 'Admin',
     component: AdminLayoutComponent,
     children: [
@@ -30,20 +30,20 @@ const routes: Routes = [
       // { path: 'users', data: { title: 'Users', moduleName: 'Users' }, canActivate: [], loadChildren: () => import('./admin/user/user.component').then(m => m.UserComponent) },
       // sales module
       { path: 'sales', data: { title: 'Sales', moduleName: 'Sales' }, canActivate: [], loadComponent: () => import('./admin/sales/sales.component').then(m => m.SalesComponent) },
-      { path: 'sales/sale-returns',data: { title: 'Sales Returns', moduleName: "sales-return" },loadComponent: () => import('./admin/sales/sale-returns/sale-returns.component').then(m => m.SaleReturnsComponent)},
-      { path: 'sales/salesinvoice',data: { title: 'Sales Invoice', moduleName: "sales-invoice" },loadComponent: () => import('./admin/sales/salesinvoice/salesinvoice.component').then(m => m.SalesinvoiceComponent)},
-      {path: 'sales/sales-dispatch',data: { title: 'Sale Dispatch', moduleName: "sales-dispatch" },loadComponent: () => import('./admin/sales/sales-dispatch/sales-dispatch.component').then(m => m.SalesDispatchComponent)},
+      { path: 'sales/sale-returns', data: { title: 'Sales Returns', moduleName: "sales-return" }, loadComponent: () => import('./admin/sales/sale-returns/sale-returns.component').then(m => m.SaleReturnsComponent) },
+      { path: 'sales/salesinvoice', data: { title: 'Sales Invoice', moduleName: "sales-invoice" }, loadComponent: () => import('./admin/sales/salesinvoice/salesinvoice.component').then(m => m.SalesinvoiceComponent) },
+      { path: 'sales/sales-dispatch', data: { title: 'Sale Dispatch', moduleName: "sales-dispatch" }, loadComponent: () => import('./admin/sales/sales-dispatch/sales-dispatch.component').then(m => m.SalesDispatchComponent) },
       { path: 'sale-receipt', data: { title: 'Sale Receipt', moduleName: 'sale-receipt' }, canActivate: [], loadComponent: () => import('./admin/sales/sale-receipt/sale-receipt.component').then(m => m.SaleReceiptComponent) },
       { path: 'sales/debit-note', data: { title: 'Sale Debit Note', moduleName: 'debit-note' }, canActivate: [], loadComponent: () => import('./admin/sales/debit-note/debit-note.component').then(m => m.DebitNoteComponent) },
       { path: 'sales/credit-note', data: { title: 'Sale Credit Note', moduleName: 'credit-note' }, canActivate: [], loadComponent: () => import('./admin/sales/credit-note/credit-note.component').then(m => m.CreditNoteComponent) },
       { path: 'customers', data: { title: 'Customers', moduleName: 'customers' }, canActivate: [], loadComponent: () => import('./admin/customers/customers.component').then(m => m.CustomersComponent) },
-      
+
       //Purchase Module
       { path: 'purchase', data: { title: 'Purchase', moduleName: 'purchase' }, canActivate: [], loadComponent: () => import('./admin/purchase/purchase.component').then(m => m.PurchaseComponent) },
-      {path: 'purchase/purchase-invoice',data: { title: 'Purchase Invoice', moduleName: "purchaseinvoice" },loadComponent: () => import('./admin/purchase/purchase-invoice/purchase-invoice.component').then(m => m.PurchaseInvoiceComponent)},
-      {path: 'purchase/purchasereturns',data: { title: 'Purchase Returns', moduleName: "purchasereturns" },loadComponent: () => import('./admin/purchase/purchasereturnorders/purchasereturnorders.component').then(m => m.PurchasereturnordersComponent)},
+      { path: 'purchase/purchase-invoice', data: { title: 'Purchase Invoice', moduleName: "purchaseinvoice" }, loadComponent: () => import('./admin/purchase/purchase-invoice/purchase-invoice.component').then(m => m.PurchaseInvoiceComponent) },
+      { path: 'purchase/purchasereturns', data: { title: 'Purchase Returns', moduleName: "purchasereturns" }, loadComponent: () => import('./admin/purchase/purchasereturnorders/purchasereturnorders.component').then(m => m.PurchasereturnordersComponent) },
       { path: 'vendors', data: { title: 'Vendors', moduleName: 'vendors' }, canActivate: [], loadComponent: () => import('./admin/vendors/vendors.component').then(m => m.VendorsComponent) },
-      
+
       // { path: 'employee', canActivate: [], loadChildren: () => import('./admin/employee/employee.module').then(m => m.EmployeeModule) },
 
       //Leads Module
@@ -63,7 +63,7 @@ const routes: Routes = [
 
       //Assets Module
       { path: 'assets/assets', data: { title: 'Assets', moduleName: 'assets' }, canActivate: [], loadComponent: () => import('./admin/assets/assets.component').then(m => m.AssetsComponent) },
-      {path: 'assets/asset-maintenance', data: { title: 'Asset Maintenance', moduleName: "asset-maintenance" },loadComponent: () => import('./admin/assets/asset-maintenance/asset-maintenance.component').then(m => m.AssetMaintenanceComponent)},
+      { path: 'assets/asset-maintenance', data: { title: 'Asset Maintenance', moduleName: "asset-maintenance" }, loadComponent: () => import('./admin/assets/asset-maintenance/asset-maintenance.component').then(m => m.AssetMaintenanceComponent) },
 
       //Production Module
       { path: 'production', data: { title: 'Work Order', moduleName: 'production' }, canActivate: [], loadComponent: () => import('./admin/production/production.component').then(m => m.ProductionComponent) },
@@ -111,18 +111,18 @@ const routes: Routes = [
 
 
       // { path: 'employees', data: { title: 'Employees', moduleName: 'employees' }, canActivate: [], loadChildren: () => import('./admin/hrms/hrms.module').then(m => m.EmployeeModule) },
-      
+
       // { path: 'vendors', data: { title: 'vendors', moduleName: 'vendors' }, canActivate: [], loadChildren: () => import('./admin/vendors/vendors.module').then(m => m.VendorsModule) },
       // { path: 'warehouses', data: { title: 'warehouses', moduleName: 'warehouses' }, canActivate: [], loadChildren: () => import('./admin/warehouses/warehouses.module').then(m => m.WarehousesModule) },
       // { path: 'quickpacks', data: { title: 'quickpacks', moduleName: 'quickpacks' }, canActivate: [], loadChildren: () => import('./admin/quickpacks/quickpacks.module').then(m => m.QuickpacksModule) },
-      
+
       // { path: 'tasks', data: { title: 'tasks', moduleName: 'tasks' }, canActivate: [], loadChildren: () => import('./admin/tasks/tasks.module').then(m => m.TasksModule) },
       // { path: 'leaves', canActivate: [], loadComponent: () => import('./admin/leave/leave.component').then(m => m.LeaveComponent) },
       // { path: 'attendance', canActivate: [], loadChildren: () => import('./admin/attendence/attendence.module').then(m => m.AttendenceModule) },
       // { path: 'inventory', data: { title: 'inventory', moduleName: 'inventory' }, canActivate: [], loadChildren: () => import('./admin/inventory/inventory.module').then(m => m.InventoryModule) },
-      
+
       // { path: 'purchase', data: { title: 'purchase', moduleName: 'purchase' }, canActivate: [], loadChildren: () => import('./admin/purchase/purchase.module').then(m => m.PurchaseModule) },
-      
+
       // { path: 'inventory', data: { title: 'inventory', moduleName: 'inventory' }, canActivate: [], loadChildren: () => import('./admin/inventory/inventory.module').then(m => m.InventoryModule) },
       // { path: 'products', data: { title: 'products', moduleName: 'products' }, canActivate: [], loadChildren: () => import('./admin/products/products.module').then(m => m.ProductsModule) },
       // { path: 'purchase', data: { title: 'purchase', moduleName: 'purchase' }, canActivate: [], loadChildren: () => import('./admin/purchase/purchase.module').then(m => m.PurchaseModule) },
