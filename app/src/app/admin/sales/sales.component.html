@@ -161,4 +161,11 @@
     </div>
 </div>
 
+<div id="customToast" class="toast-message" *ngIf="showSuccessToast">
+    <div class="tick-circle">
+      <span class="tick-mark">✔</span>
+    </div>
+    <span class="toast-message-text">{{ toastMessage }}</span>
+    <button class="close-button" (click)="closeToast()">x</button>
+  </div>
 

@@ -607,21 +607,28 @@ export class SalesComponent {
     const url = `/products/product_variations/?product_name=${productID}`;
     return this.http.get(url).pipe(((res: any) => res.data));
   }
-//====================================
+//=====================================================
   selectedOption: string = 'sale_order';
   saleOrderSelected = false;
   saleEstimateSelected = false;
+  showSuccessToast = false;
+  toastMessage = '';
 
-
-  // Method to create sale order and handle the API call
   createSaleOrder() {
     this.http.post('sales/sale_order/', this.formConfig.model)
       .subscribe(response => {
-          console.log('Record created successfully:', response);
-          this.ngOnInit();  // Reload or reset form after creation
+        this.showSuccessToast = true;
+        this.toastMessage = 'Record created successfully';
+        this.ngOnInit();
+        setTimeout(() => {
+          this.showSuccessToast = false;
+        }, 3000); // Hide toast after 3 seconds
       }, error => {
-          console.error('Error creating record:', error);
+        console.error('Error creating record:', error);
       });
+  }
+  closeToast() {
+    this.showSuccessToast = false;
   }
 
   confirmSelection() {
@@ -640,26 +647,24 @@ export class SalesComponent {
     this.isConfirmationModalOpen = false; // Close modal after selection
   }
 
-
-  // Function to reset checkbox selections
-  resetCheckboxes() {
-    this.saleOrderSelected = false;
-    this.saleEstimateSelected = false;
-  }
-
   // Update method specifically for edit actions
   updateSaleOrder() {
     // Define logic here for updating the sale order without modal pop-up
     console.log("Updating sale order:", this.formConfig.model);
     this.http.put(`sales/sale_order/${this.SaleOrderEditID}/`, this.formConfig.model)
         .subscribe(response => {
-            console.log('Record updated successfully:', response);
-            this.ngOnInit();  // Reload or reset form after update
+          this.showSuccessToast = true;
+          this.toastMessage = "Record updated successfully"; // Set the toast message for update
+          this.ngOnInit();
+          setTimeout(() => {
+            this.showSuccessToast = false;
+          }, 3000);
+        
         }, error => {
             console.error('Error updating record:', error);
         });
   }
-
+//=======================================================
   setFormConfig() {
     this.SaleOrderEditID = null;
     this.saleForm = this.fb.group({
