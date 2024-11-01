@@ -97,6 +97,7 @@ export class AdminLayoutComponent {
       // Using template literals to inject user_id dynamically into the URL
       this.http.get(`users/user_access/${role_Id}`).subscribe((res: any) => {
         this.menulList = res.data;
+        this.aS.accessModuleList = this.menulList;
       });
     }
     // this.menulList = [
