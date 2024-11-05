@@ -179,7 +179,13 @@ export class ProductsComponent implements OnInit {
         // isEdit: false,
       },
       showActionBtn: true,
-      exParams: [],
+      exParams: [
+        // {
+        //   key: 'products',
+        //   type: 'script',
+        //   value: 'data.products.map(m=> {m.pack_unit_id = m.pack_unit.stock_unit_id;  return m ;})'
+        // },
+      ],
       submit: {
         label: 'Submit',
         submittedFn: () => this.onSubmit()
@@ -231,8 +237,8 @@ export class ProductsComponent implements OnInit {
                       hooks: {
                         onInit: (field: any) => {
                           this.http.get('masters/generate_order_no/?type=prd').subscribe((res: any) => {
-                            if (res && res.data && res.data.order_number) {
-                              field.formControl.setValue(res.data.order_number);
+                            if (res && res.data && res.data?.order_number) {
+                              field.formControl.setValue(res.data?.order_number);
                             }
                           });
                         }
@@ -276,7 +282,7 @@ export class ProductsComponent implements OnInit {
                         onChanges: (field: any) => {
                           field.formControl.valueChanges.subscribe((data: any) => {
                             if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
-                              this.formConfig.model['products']['brand_id'] = data.brand_id;
+                              this.formConfig.model['products']['brand_id'] = data?.brand_id;
                             } else {
                               console.error('Form config or brand_id data model is not defined.');
                             }
@@ -468,7 +474,7 @@ export class ProductsComponent implements OnInit {
                         onChanges: (field: any) => {
                           field.formControl.valueChanges.subscribe((data: any) => {
                             if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
-                              this.formConfig.model['products']['type_id'] = data.type_id;
+                              this.formConfig.model['products']['type_id'] = data?.type_id;
                             } else {
                               console.error('Form config or type_id data model is not defined.');
                             }
@@ -495,7 +501,7 @@ export class ProductsComponent implements OnInit {
                         onChanges: (field: any) => {
                           field.formControl.valueChanges.subscribe((data: any) => {
                             if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
-                              this.formConfig.model['products']['unit_options_id'] = data.unit_options_id;
+                              this.formConfig.model['products']['unit_options_id'] = data?.unit_options_id;
                             } else {
                               console.error('Form config or unit_options_id data model is not defined.');
                             }
@@ -509,7 +515,7 @@ export class ProductsComponent implements OnInit {
                             (data: any) => {
                               
                               // Map data to ensure each object has both label and value properties
-                              field.templateOptions.options = data.data.map((option: any) => ({
+                              field.templateOptions.options = data?.data?.map((option: any) => ({
                                 label: option.unit_name,  // Display name in the UI
                                 value: {
                                   unit_options_id:option.unit_options_id,
@@ -518,18 +524,19 @@ export class ProductsComponent implements OnInit {
                               }));
                     
                               // Find the default option where unit_name is 'Stock Unit'
-                              const defaultOption = field.templateOptions.options.find(option => option.label === 'Stock Unit');
-                    
+                              const regex = /^stock\s*unit$/i; // Matches "stock unit" with optional whitespace, case insensitive
+                              const defaultOption = field.templateOptions.options.find(option => regex.test(option.label));
+
                               if (defaultOption) {
                                 // Set the default value to the unit_options_id of 'Stock Unit'
                                 field.formControl.setValue(defaultOption.value);
                     
                                 // Update the model if necessary
                                 if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
-                                  this.formConfig.model['products']['unit_options_id'] = defaultOption.option.unit_options_id;
+                                  this.formConfig.model['products']['unit_options_id'] = defaultOption.value.unit_options_id;
                                 }
                               } else {
-                                console.warn('Default "Pack" option not found in options.');
+                                console.warn('Default "Unit Option" option not found in options.');
                               }
                             },
                             (error) => {
@@ -557,9 +564,8 @@ export class ProductsComponent implements OnInit {
                       hooks: {
                         onChanges: (field: any) => {
                           field.formControl.valueChanges.subscribe((data: any) => {
-                            
                             if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
-                              this.formConfig.model['products']['stock_unit_id'] = data.stock_unit_id;
+                              this.formConfig.model['products']['stock_unit_id'] = data?.stock_unit_id;
                             } else {
                               console.error('Form config or lead_status data model is not defined.');
                             }
@@ -573,12 +579,12 @@ export class ProductsComponent implements OnInit {
                       className: 'col-3',
                       templateOptions: {
                       label: 'Pack Unit',
-                          dataKey: 'pack_unit_id',
-                          dataLabel: "unit_name",
+                          dataKey: 'stock_unit_id',
+                          dataLabel: 'stock_unit_name',
                           options: [],
                           required: true,
                           lazy: {
-                              url: 'masters/package_units/',
+                            url: 'products/product_stock_units/',
                               lazyOneTime: true
                           }
                       },
@@ -586,9 +592,9 @@ export class ProductsComponent implements OnInit {
                         onChanges: (field: any) => {
                           field.formControl.valueChanges.subscribe((data: any) => {
                             if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
-                              this.formConfig.model['products']['pack_unit_id'] = data.pack_unit_id;
+                              this.formConfig.model['products']['pack_unit_id'] = data?.stock_unit_id;
                             } else {
-                              console.error('Form config or g_pack_unit data model is not defined.');
+                              console.error('Form config or lead_status data model is not defined.');
                             }
                           });
                         }
@@ -620,20 +626,20 @@ export class ProductsComponent implements OnInit {
                       className: 'col-3',
                       templateOptions: {
                       label: 'GPack Unit',
-                          dataKey: 'g_pack_unit_id',
-                          dataLabel: 'unit_name',
-                          options: [],
-                          required: true,
-                          lazy: {
-                              url: 'masters/g_package_units/',
-                              lazyOneTime: true
-                          }
+                      dataKey: 'stock_unit_id',
+                      dataLabel: 'stock_unit_name',
+                      options: [],
+                      required: true,
+                      lazy: {
+                        url: 'products/product_stock_units/',
+                        lazyOneTime: true
+                      }
                       },
                       hooks: {
                         onChanges: (field: any) => {
                           field.formControl.valueChanges.subscribe((data: any) => {
                             if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
-                              this.formConfig.model['products']['g_pack_unit_id'] = data.g_pack_unit_id;
+                              this.formConfig.model['products']['g_pack_unit_id'] = data?.stock_unit_id;
                             } else {
                               console.error('Form config or g_pack_unit data model is not defined.');
                             }
@@ -694,7 +700,7 @@ export class ProductsComponent implements OnInit {
                         onChanges: (field: any) => {
                           field.formControl.valueChanges.subscribe((data: any) => {
                             if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
-                              this.formConfig.model['products']['product_group_id'] = data.product_group_id;
+                              this.formConfig.model['products']['product_group_id'] = data?.product_group_id;
                             } else {
                               console.error('Form config or lead_status data model is not defined.');
                             }
@@ -721,7 +727,7 @@ export class ProductsComponent implements OnInit {
                         onChanges: (field: any) => {
                           field.formControl.valueChanges.subscribe((data: any) => {
                             if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
-                              this.formConfig.model['products']['category_id'] = data.category_id;
+                              this.formConfig.model['products']['category_id'] = data?.category_id;
                             } else {
                               console.error('Form config or lead_status data model is not defined.');
                             }
@@ -748,7 +754,7 @@ export class ProductsComponent implements OnInit {
                         onChanges: (field: any) => {
                           field.formControl.valueChanges.subscribe((data: any) => {
                             if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
-                              this.formConfig.model['products']['sales_gl_id'] = data.sales_gl_id;
+                              this.formConfig.model['products']['sales_gl_id'] = data?.sales_gl_id;
                             } else {
                               console.error('Form config or lead_status data model is not defined.');
                             }
@@ -775,7 +781,7 @@ export class ProductsComponent implements OnInit {
                         onChanges: (field: any) => {
                           field.formControl.valueChanges.subscribe((data: any) => {
                             if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
-                              this.formConfig.model['products']['purchase_gl_id'] = data.purchase_gl_id;
+                              this.formConfig.model['products']['purchase_gl_id'] = data?.purchase_gl_id;
                             } else {
                               console.error('Form config or lead_status data model is not defined.');
                             }
@@ -802,7 +808,7 @@ export class ProductsComponent implements OnInit {
                         onChanges: (field: any) => {
                           field.formControl.valueChanges.subscribe((data: any) => {
                             if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
-                              this.formConfig.model['products']['item_type_id'] = data.item_type_id;
+                              this.formConfig.model['products']['item_type_id'] = data?.item_type_id;
                             } else {
                               console.error('Form config or lead_status data model is not defined.');
                             }
@@ -829,7 +835,7 @@ export class ProductsComponent implements OnInit {
                         onChanges: (field: any) => {
                           field.formControl.valueChanges.subscribe((data: any) => {
                             if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
-                              this.formConfig.model['products']['drug_type_id'] = data.drug_type_id;
+                              this.formConfig.model['products']['drug_type_id'] = data?.drug_type_id;
                             } else {
                               console.error('Form config or lead_status data model is not defined.');
                             }
@@ -888,7 +894,7 @@ export class ProductsComponent implements OnInit {
                         onChanges: (field: any) => {
                           field.formControl.valueChanges.subscribe((data: any) => {
                             if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
-                              this.formConfig.model['products']['gst_classification_id'] = data.gst_classification_id;
+                              this.formConfig.model['products']['gst_classification_id'] = data?.gst_classification_id;
                             } else {
                               console.error('Form config or gst_classification_id data model is not defined.');
                             }
@@ -1059,7 +1065,7 @@ export class ProductsComponent implements OnInit {
                         console.error(`Task comments at index ${index} is not defined. Initializing...`);
                         this.formConfig.model['product_item_balance'][index] = {};
                       }
-                      this.formConfig.model['product_item_balance'][index]['warehouse_location_id'] = data.location_id;
+                      this.formConfig.model['product_item_balance'][index]['warehouse_location_id'] = data?.location_id;
                     });
                   }
                 }

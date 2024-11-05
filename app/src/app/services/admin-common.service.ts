@@ -9,6 +9,7 @@ interface Action {
   providedIn: 'root'
 })
 export class AdminCommonService {
+  public accessModuleList = <any>[]
   private actionSubject = new BehaviorSubject<Action>(<any>{});
   action$ = this.actionSubject.asObservable();
   constructor() { }
