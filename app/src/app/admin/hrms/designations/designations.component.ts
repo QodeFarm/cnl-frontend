@@ -17,11 +17,16 @@ export class DesignationsComponent {
       pkId: "designation_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['designation_id','designation_name']
+        keys: ['designation_id','designation_name','responsibilities']
       },
-      cols: [{
+      cols: [
+        {
           fieldKey: 'designation_name',
           name: 'Designation Name'
+        },
+        {
+          fieldKey: 'responsibilities',
+          name: 'Responsibilities'
         },
         {
           fieldKey: "code",
@@ -47,19 +52,33 @@ export class DesignationsComponent {
       title: 'Designation',
       pkId: "designation_id",
       exParams: [],
-      fields: [{
-        fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
-        fieldGroup: [{
-          key: 'designation_name',
-          type: 'input',
-          className: 'col-6 p-0',
-          templateOptions: {
-            label: 'Designation Name',
-            placeholder: 'Enter Designation Name',
-            required: true,
-          }
-        }]
-      }]
+      fields: [
+        {
+          fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
+          fieldGroup: [
+            {
+              key: 'designation_name',
+              type: 'input',
+              className: 'col-6 ps-0',
+              templateOptions: {
+                label: 'Designation Name',
+                placeholder: 'Enter Designation Name',
+                required: true,
+              }
+            },
+            {
+              key: 'responsibilities',
+              type: 'input',
+              className: 'col-6 ps-0',
+              templateOptions: {
+                label: 'Responsibilities',
+                placeholder: 'Enter Responsibilities',
+                required: true,
+              }
+            },
+          ]
+        }
+      ]
     }
   }
 };
