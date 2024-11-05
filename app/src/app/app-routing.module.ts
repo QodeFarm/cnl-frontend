@@ -59,7 +59,6 @@ const routes: Routes = [
       { path: 'hrms/attendance', data: { title: 'Attendance', moduleName: 'attendance' }, canActivate: [], loadComponent: () => import('./admin/hrms/attendance/attendance.component').then(m => m.AttendanceComponent) },
       { path: 'hrms/swipes', data: { title: 'Swipes', moduleName: 'swipes' }, canActivate: [], loadComponent: () => import('./admin/hrms/swipes/swipes.component').then(m => m.SwipesComponent) },
 
-
       //Products Module
       { path: 'inventory', data: { title: 'Inventory', moduleName: 'inventory' }, canActivate: [], loadComponent: () => import('./admin/inventory/inventory.component').then(m => m.InventoryComponent) },
       // { path: 'products', data: { title: 'Products', moduleName: 'products' }, canActivate: [], loadComponent: () => import('./admin/products/products.component').then(m => m.ProductsComponent) },
