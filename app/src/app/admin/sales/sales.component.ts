@@ -144,12 +144,6 @@ export class SalesComponent {
 
     // set sale_order default value
     this.formConfig.model['sale_order']['order_type'] = 'sale_order';
-    
-    // // Call the method to handle sale invoice creation, this is temporary change, this will be moved to formconfig.
-    
-    // this.handleSaleInvoiceCreation();
-
-    //=================================
 
     // to get SaleOrder number for save 
     this.getOrderNo();
