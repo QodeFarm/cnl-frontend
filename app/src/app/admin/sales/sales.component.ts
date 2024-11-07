@@ -144,12 +144,6 @@ export class SalesComponent {
 
     // set sale_order default value
     this.formConfig.model['sale_order']['order_type'] = 'sale_order';
-    
-    // // Call the method to handle sale invoice creation, this is temporary change, this will be moved to formconfig.
-    
-    // this.handleSaleInvoiceCreation();
-
-    //=================================
 
     // to get SaleOrder number for save 
     this.getOrderNo();
@@ -158,23 +152,24 @@ export class SalesComponent {
     // //console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
   }
 
-//==============================================
-  isConfirmationModalOpen: boolean = false;
+
+//Sale-invoice ==============================================
+  isConfirmationInvoiceOpen: boolean = false;
   isInvoiceCreated: boolean = false;
 
   // Function to handle opening the confirmation modal
-  openConfirmationModal() {
-      this.isConfirmationModalOpen = true; // Show the confirmation modal
+  openSaleInvoiceModal() {
+      this.isConfirmationInvoiceOpen = true; // Show the confirmation modal
   }
 
   // Function to handle cancelling the invoice creation
   cancelInvoiceCreation() {
-      this.isConfirmationModalOpen = false; // Close the modal
+      this.isConfirmationInvoiceOpen = false; // Close the modal
   }
 
   // Function to handle confirmation of invoice creation
   confirmInvoiceCreation() {
-      this.isConfirmationModalOpen = false; // Close the modal
+      this.isConfirmationInvoiceOpen = false; // Close the modal
       this.invoiceCreationHandler(); // Proceed with the invoice creation logic
   }
 
@@ -233,50 +228,9 @@ export class SalesComponent {
   closeModal() {
     this.hideModal(); // Use the hideModal method to remove the modal elements
   }
-  // isConfirmationModalOpen: boolean = false;
-  // isInvoiceCreated: boolean = false;
-
-  // openConfirmationModal() {
-  //     this.isConfirmationModalOpen = true; // Show the confirmation modal
-  // }
-
-  // cancelInvoiceCreation() {
-  //     this.isConfirmationModalOpen = false; // Close the modal without action
-  // }
-
-  // confirmInvoiceCreation() {
-  //     // this.isConfirmationModalOpen = false; // Close the modal
-  //     this.invoiceCreationHandler(); // Call the existing invoice creation handler
-  // }
-
-  // invoiceCreationHandler() {
-  //   this.handleSaleInvoiceCreation();
-  // }
-  
-  // // New method to show a success message
-  // showInvoiceCreatedMessage() {
-  //   this.isInvoiceCreated = true;
-  //   setTimeout(() => {
-  //     this.isInvoiceCreated = false; // Hide the message after 3 seconds
-  //   }, 3000);
-  // }
-  
-  // private handleSaleInvoiceCreation() {
-  //   console.log("invoice data in edit: ", this.invoiceData);
-  //   if (this.invoiceData !== undefined) {
-  //     this.createSaleInvoice(this.invoiceData).subscribe(
-  //       response => {
-  //         console.log('Sale invoice created successfully', response);
-  //         this.showInvoiceCreatedMessage(); // Show message on successful creation
-  //       },
-  //       error => {
-  //         console.error('Error creating sale invoice', error);
-  //       }
-  //     );
-  //   }
-  // }
 
 //=========================================================
+
   populateForm(data: any) {
     console.log("Data in populateform : ", data);
     this.saleForm.patchValue({
@@ -603,6 +557,18 @@ export class SalesComponent {
     document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
   }
 
+  // API call to fetch available sizes and colors for a selected product
+  fetchProductVariations(productID: string): Observable<any> {
+    const url = `/products/product_variations/?product_name=${productID}`;
+    return this.http.get(url).pipe(((res: any) => res.data));
+  }
+//=====================================================
+  isConfirmationModalOpen: boolean = false;
+  selectedOption: string = 'sale_order';
+  saleOrderSelected = false;
+  saleEstimateSelected = false;
+  showSuccessToast = false;
+  toastMessage = '';
   updateProductInfo(currentRowIndex, product, unitData = '') {
     // Select the card wrapper element
     const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
@@ -660,6 +626,67 @@ export class SalesComponent {
     }
 }
 
+  // openConfirmationModal() {
+  //   this.isConfirmationModalOpen = true; // Set modal to open
+  // }
+  
+
+  createSaleOrder() {
+    this.http.post('sales/sale_order/', this.formConfig.model)
+      .subscribe(response => {
+        this.showSuccessToast = true;
+        this.toastMessage = 'Record created successfully';
+        this.ngOnInit();
+        setTimeout(() => {
+          this.showSuccessToast = false;
+        }, 3000); // Hide toast after 3 seconds
+      }, error => {
+        console.error('Error creating record:', error);
+      });
+  }
+  closeToast() {
+    this.showSuccessToast = false;
+  }
+
+  confirmSelection() {
+    // Check the selected option and set sale_estimate accordingly
+    if (this.selectedOption === 'sale_estimate') {
+        this.formConfig.model['sale_order']['sale_estimate'] = 'Yes'; // Update model for sale_estimate
+    } else {
+        this.formConfig.model['sale_order']['sale_estimate'] = 'No'; // Update model for sale_order
+    }
+
+    console.log("Selected option:", this.selectedOption);
+    console.log("Sale estimate:", this.formConfig.model['sale_order']['sale_estimate']);
+    
+    // Proceed with the next steps, like API call
+    this.createSaleOrder(); // or however you're proceeding
+    this.isConfirmationModalOpen = false; // Close modal after selection
+  }
+
+  // Method to open Sale Order / Sale Estimate modal
+  openSaleOrderEstimateModal() {
+    this.isConfirmationModalOpen = true; // Open the Sale Order / Sale Estimate modal
+  }
+
+  // Update method specifically for edit actions
+  updateSaleOrder() {
+    // Define logic here for updating the sale order without modal pop-up
+    console.log("Updating sale order:", this.formConfig.model);
+    this.http.put(`sales/sale_order/${this.SaleOrderEditID}/`, this.formConfig.model)
+        .subscribe(response => {
+          this.showSuccessToast = true;
+          this.toastMessage = "Record updated successfully"; // Set the toast message for update
+          this.ngOnInit();
+          setTimeout(() => {
+            this.showSuccessToast = false;
+          }, 3000);
+        
+        }, error => {
+            console.error('Error updating record:', error);
+        });
+  }
+//=======================================================
   setFormConfig() {
     this.SaleOrderEditID = null;
     this.saleForm = this.fb.group({
@@ -671,7 +698,7 @@ export class SalesComponent {
       // Add other fields as necessary
     });
     this.formConfig = {
-      url: "sales/sale_order/",
+      // url: "sales/sale_order/",
       title: '',
       formState: {
         viewMode: false
@@ -693,10 +720,17 @@ export class SalesComponent {
           type: 'script',
           value: 'data.sale_order_items.map(m=> {m.color_id = m.color?.color_id || null;  return m ;})'
         }
-      ],
+      ],  
       submit: {
         label: 'Submit',
-        submittedFn: () => this.ngOnInit()
+        submittedFn: () => {
+            // Open confirmation modal only if it's a new sale order
+            if (!this.SaleOrderEditID) {
+                this.openSaleOrderEstimateModal();
+            } else {
+                this.updateSaleOrder(); // Call update method for editing
+            }
+        }
       },
       reset: {
         resetFn: () => {
@@ -978,11 +1012,12 @@ export class SalesComponent {
               {
                 name: 'discount',
                 label: 'Discount'
-              }
+              },
+              // { name: 'select_item', label: 'Select' }
             ]
           },
           fieldArray: {
-            fieldGroup: [                         
+            fieldGroup: [                       
               {
                 key: 'product',
                 type: 'select',
