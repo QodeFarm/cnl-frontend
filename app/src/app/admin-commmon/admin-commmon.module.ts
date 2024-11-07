@@ -16,6 +16,7 @@ import { TaTableModule } from '@ta/ta-table';
 import { TaCurdModule } from '@ta/ta-curd';
 import { TaFormComponent, TaFormModule } from '@ta/ta-form';
 import { RouterModule } from '@angular/router';
+import { HasPermissionDirective } from './permision.directive';
 const module = [NzListModule,
   CommonModule,
   RouterModule,
@@ -36,10 +37,10 @@ const module = [NzListModule,
 ];
 
 @NgModule({
-  declarations: [],
+  declarations: [HasPermissionDirective],
   imports: [
     module
   ],
-  exports: [module]
+  exports: [module, HasPermissionDirective]
 })
 export class AdminCommmonModule { }

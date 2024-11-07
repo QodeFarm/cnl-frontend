@@ -6,13 +6,13 @@
         <span *ngIf="!SaleOrderEditID" class="custom-heading">Create Sales Order</span>
       </button>
             <div style="display: flex; gap: 10px;">
-            <!-- New Copy Button -->
-            <button (click)="openCopyModal()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#copyModal">
+                <!-- New Copy Button -->
+                <button (click)="openCopyModal()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#copyModal">
                 Copy
             </button>
                 <button (click)="showOrdersList()" type="button" class="btn btn-primary">
           Past orders</button>
-                <button (click)="showSaleOrderListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#saleOrderListModal">
+                <button *checkAction="{ moduleName: 'Sales', sectionName: 'Customers', actionName: 'Update' }" (click)="showSaleOrderListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#saleOrderListModal">
           Sales Order List
         </button>
         <!-- Invoice Creation Button (Only for Edit and if flow status is "Ready for Invoice") -->
@@ -32,7 +32,7 @@
         </div>
     </div>
 
-    <div class="row custom-form">
+    <div class="row custom-form" *checkAction="{ moduleName: 'Sales', sectionName: 'Customers', actionName: 'Create' }">
         <div class="col-12 px-1" *ngIf="orderNumber || showForm">
             <ta-form #salesForm [options]="formConfig"></ta-form>
         </div>
@@ -75,7 +75,8 @@
 
 <!-- Copy Modal -->
 <div class="modal fade custom-modal" id="copyModal" tabindex="-1" aria-labelledby="copyModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg custom-size"> <!-- Add custom-size class here -->
+    <div class="modal-dialog modal-lg custom-size">
+        <!-- Add custom-size class here -->
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="copyModalLabel">Copy to Another Table</h5>
@@ -117,5 +118,5 @@
     <span class="message-text">Invoice Created Successfully!</span>
 </div>
 
-<div class="modal-backdrop" *ngIf="isModalOpen"></div> <!-- Added line to fix past orders modal box correctly -->
-
+<div class="modal-backdrop" *ngIf="isModalOpen"></div>
+<!-- Added line to fix past orders modal box correctly -->
