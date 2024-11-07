@@ -990,7 +990,7 @@ export class PurchaseInvoiceComponent {
                       templateOptions: {
                         type: 'date',
                         label: 'Shipping Date',
-                        required: true
+                        // required: true
                       }
                     },
                     {
@@ -1000,7 +1000,7 @@ export class PurchaseInvoiceComponent {
                       templateOptions: {
                         label: 'Shipping Charges.',
                         placeholder: 'Enter Shipping Charges',
-                        required: true
+                        // required: true
                       }
                     }
                   ]

@@ -1531,7 +1531,7 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                       templateOptions: {
                         type: 'date',
                         label: 'Shipping Date',
-                        required: true
+                        // required: true
                       }
                     },
                     {
@@ -1542,7 +1542,7 @@ tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
                         type: "number",
                         label: 'Shipping Charges.',
                         placeholder: 'Enter Shipping Charges',
-                        required: true
+                        // required: true
                       }
                     }
                   ]
