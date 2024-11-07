@@ -1416,7 +1416,7 @@ export class SalesinvoiceComponent {
                       templateOptions: {
                         type: 'date',
                         label: 'Shipping Date',
-                        required: true
+                        // required: true
                       }
                     },
                     {
@@ -1427,7 +1427,7 @@ export class SalesinvoiceComponent {
                         type: "number",
                         label: 'Shipping Charges.',
                         placeholder: 'Enter Shipping Charges',
-                        required: true
+                        // required: true
                       }
                     }
                   ]

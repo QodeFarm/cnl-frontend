@@ -1,0 +1,132 @@
+<div class="work-order-board">
+    <h2>Work Order Board</h2>
+    <ta-table [options]="curdConfig.tableConfig" class="custom-list"></ta-table>
+  
+    <!-- Confirmation Modal -->
+    <!-- Confirmation Modal for "Done" action -->
+    <div *ngIf="showModal" class="custom-dialog-overlay">
+      <div class="custom-dialog-box small-dialog-box"> <!-- Apply small-dialog-box here -->
+        <h5><b>Confirm Work Order Completion</b></h5>
+        <p>Are you sure you want to mark the work order for {{ selectedOrder?.product?.name }} as done?</p>
+        <div class="dialog-actions">
+          <button class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+          <button class="btn btn-primary" (click)="confirmDispatch()">Confirm</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- View Work Order Modal for "View" action -->
+<div *ngIf="showViewModal" class="custom-dialog-overlay">
+  <div class="custom-dialog-box"> <!-- Adding custom-dialog-box here -->
+    <div class="custom-dialog-header">
+      View Work Order Details
+    </div>
+
+    <!-- Product Details Section -->
+    <div class="box-section blue-header">
+      <h6>Product Details</h6>
+      <table>
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Status</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ selectedOrder?.product?.name }}</td>
+            <td>{{ selectedOrder?.quantity }}</td>
+            <td>{{ selectedOrder?.status?.status_name }}</td>
+            <td>{{ selectedOrder?.start_date }}</td>
+            <td>{{ selectedOrder?.end_date }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Materials Section -->
+    <div *ngIf="selectedOrder?.materials?.length" class="box-section blue-header">
+      <h6>Materials</h6>
+      <table>
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Component</th>
+            <th>Quantity</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let material of selectedOrder.materials">
+            <td>{{ material.product.name }}</td>
+            <td>{{ material.component_name }}</td>
+            <td>{{ material.quantity_required }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Machines Section -->
+    <div *ngIf="selectedOrder?.machines?.length" class="box-section blue-header">
+      <h6>Machines</h6>
+      <table>
+        <tbody>
+          <tr *ngFor="let machine of selectedOrder.machines">
+            <td>{{ machine.machineName }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Workers Section -->
+    <div *ngIf="selectedOrder?.workers?.length" class="box-section blue-header">
+      <h6>Workers</h6>
+      <table>
+        <thead>
+          <tr>
+            <th>Worker</th>
+            <th>Hours Worked</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let worker of selectedOrder.workers">
+            <td>{{ worker.workerName }}</td>
+            <td>{{ worker.hoursWorked }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Work Stages Section -->
+    <div *ngIf="selectedOrder?.workStages?.length" class="box-section blue-header">
+      <h6>Work Stages</h6>
+      <table>
+        <thead>
+          <tr>
+            <th>Stage Name</th>
+            <th>Description</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let stage of selectedOrder.workStages">
+            <td>{{ stage.stage_name }}</td>
+            <td>{{ stage.stage_description }}</td>
+            <td>{{ stage.stage_start_date }}</td>
+            <td>{{ stage.stage_end_date }}</td>
+            <td>{{ stage.notes }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Close button at the bottom -->
+    <div class="dialog-actions">
+      <button class="btn btn-secondary" (click)="closeViewModal()">Close</button>
+    </div>
+  </div> <!-- End of custom-dialog-box -->
+</div>

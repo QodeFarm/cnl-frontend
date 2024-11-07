@@ -22,6 +22,8 @@ import { ProductItemBalanceComponent } from './product-item-balance/product-item
 import { SizeComponent } from './size/size.component';
 import { ColorComponent } from './color/color.component';
 import { WarehouseLocationsComponent } from './warehouse-locations/warehouse-locations.component';
+import { PackageUnitsComponent } from './package-units/package-units.component';
+import { GPackageUnitsComponent } from './g-package-units/g-package-units.component';
 
 
 @NgModule({
@@ -44,7 +46,9 @@ import { WarehouseLocationsComponent } from './warehouse-locations/warehouse-loc
     ProductItemBalanceComponent,
     SizeComponent,
     ColorComponent,
-    WarehouseLocationsComponent
+    WarehouseLocationsComponent,
+    PackageUnitsComponent,
+    GPackageUnitsComponent
     // ProductsListComponent
   ],
   imports: [
@@ -71,7 +75,9 @@ import { WarehouseLocationsComponent } from './warehouse-locations/warehouse-loc
     ProductItemBalanceComponent,
     SizeComponent,
     ColorComponent,
-    WarehouseLocationsComponent   
+    WarehouseLocationsComponent,
+    PackageUnitsComponent,
+    GPackageUnitsComponent
   ]
 })
 export class ProductsModule { }

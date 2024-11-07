@@ -1006,7 +1006,7 @@ export class PurchasereturnordersComponent {
                       templateOptions: {
                         type: 'date',
                         label: 'Shipping Date',
-                        required: true
+                        // required: true
                       }
                     },
                     {
@@ -1016,7 +1016,7 @@ export class PurchasereturnordersComponent {
                       templateOptions: {
                         label: 'Shipping Charges.',
                         placeholder: 'Enter Shipping Charges',
-                        required: true
+                        // required: true
                       }
                     },
                   ]

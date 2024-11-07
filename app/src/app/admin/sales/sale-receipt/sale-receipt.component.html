@@ -1,39 +1,21 @@
 <div class="container-fluid pt-3">
-    <div class="sales-receipt-banner">
-        <div class="col-12 px-0" style="display: flex; justify-content: space-between;align-items: center;">
-            <button (click)="receiptEditID = null" type="button" class="btn pl-0" style="color: black;">
-                <span *ngIf="receiptEditID" class="custom-heading">Update Sale Receipt</span>
-                <span *ngIf="!receiptEditID" class="custom-heading">Create Sale Receipt</span>
-            </button>
-            <button (click)="showReceiptListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#salesreceiptListModal">
-              Sale Receipt List
-            </button>
-        </div>
-    </div>
-    <div class="row custom-form">
-        <div>
-            <ta-form [options]="formConfig"></ta-form>
-        </div>
+    <div class="row">
+      <div class="col-12 px-2 py-1">
+        <!-- Use ta-curd-modal with dynamic configuration from curdConfig -->
+        <ta-curd-modal [options]="curdConfig" class="custom-list"></ta-curd-modal>
+      </div>
     </div>
   </div>
   
-  <!-- Leads List Modal -->
-  
-  <div class="modal fade custom-modal" id="salesreceiptListModal" tabindex="-1" aria-labelledby="salesreceiptListModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl ">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="salesreceiptListModalLabel">Edit Sales Receipt List</h5>
-                <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" *ngIf="showreceiptList">
-                <app-sale-receipt-list (edit)="editReceipt($event)" class="custom-list"></app-sale-receipt-list>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-                <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
-            </div>
-        </div>
+  <!-- Confirmation Modal -->
+  <div *ngIf="showModal" class="custom-dialog-overlay">
+    <div class="custom-dialog-box">
+      <h5>Confirm Receipt</h5>
+      <p>Are you sure you want to confirm the receipt for order {{ selectedReceipt?.receipt_no }}?</p>
+      <div class="dialog-actions">
+        <button class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+        <button class="btn btn-primary" (click)="confirmReceipt()">Confirm</button>
+      </div>
     </div>
-  </div> 
+  </div>
   

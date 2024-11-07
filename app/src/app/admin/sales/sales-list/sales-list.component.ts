@@ -49,7 +49,7 @@ export class SalesListComponent {
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
           // console.log("-->", currentValue);
-          return `${row.sale_type.name}`;
+          return `${row.sale_type?.name || ''}`;
         },
       },
 
@@ -115,8 +115,8 @@ export class SalesListComponent {
       //   sort: true
       // },
       {
-        fieldKey: 'flow_status',
-        name: 'Status',
+        fieldKey: 'flow_status_name',
+        name: 'Flow Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
           return `${row.flow_status.flow_status_name}`;

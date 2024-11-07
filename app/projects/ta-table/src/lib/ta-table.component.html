@@ -112,16 +112,39 @@
     <tbody>
         <tr *ngFor="let data of rows">
             <td *ngIf="options.showCheckbox" style="width: 50px;" [nzChecked]="false" [nzDisabled]="false" [nzLabel]="data.name"></td>
-
+    
             <td [ngClass]="c.tdClassName" *ngFor="let c of options.cols" [nzEllipsis]="c.ellipsis">
                 <label class="col-name">{{c.name}} :</label>
-                <ng-container *ngTemplateOutlet="(c.type==='action') ? actions : datalable; context:{col:c,row:data }">
+                
+                <!-- Display selected file name and Replace button -->
+                <!-- New code to handle displayType: 'file' and render file name above Replace button -->
+                <ng-container *ngIf="c.displayType === 'file'; else defaultContent">
+                <div *ngIf="data.selectedFileName; else uploadButton">
+                    <!-- Display the selected file name above the Replace button -->
+                    <div>{{ data.selectedFileName }}</div>
+                    <button *ngFor="let action of c.actions" (click)="performAction(action, data)">
+                        Replace
+                    </button>
+                </div>
+    
+                    <!-- Initial Upload button when no file is selected -->
+                    <ng-template #uploadButton>
+                        <button *ngFor="let action of c.actions" (click)="performAction(action, data)">
+                          {{ action.label }}
+                        </button>
+                    </ng-template>
                 </ng-container>
-
-
+    
+                <!-- Existing content for other column types -->
+                <ng-template #defaultContent>
+                    <ng-container *ngTemplateOutlet="(c.type === 'action') ? actions : datalable; context: { col: c, row: data }">
+                    </ng-container>
+                </ng-template>
             </td>
         </tr>
     </tbody>
+    
+    
 </nz-table>
 
 
