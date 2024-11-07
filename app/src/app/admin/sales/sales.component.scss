@@ -8,11 +8,11 @@
     max-height: 90vh; //Increase the height to 85% of the viewport height 
 }
 
-// Ensure modal content takes the full height available 
-.modal-content {
-    height: auto;
-    max-height: 90vh;
-}
+// Ensure modal content takes the full height available  //commented this code because of this sale order list modal is not displaying as exepected
+// .modal-content {
+//     height: auto;
+//     max-height: 90vh;
+// }
 
 .custom-dialog-overlay {
     position: fixed;

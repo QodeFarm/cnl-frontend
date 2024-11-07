@@ -204,7 +204,7 @@ export class SalesComponent {
 
   // This function triggers the workflow pipeline API call using POST method
   private triggerWorkflowPipeline(saleOrderId: string) {
-    const apiUrl = 'sales/sale_order/{saleOrderId}/workflow_pipeline/';
+    const apiUrl = 'sales/SaleOrder/{saleOrderId}/move_next_stage/'; //correct url
     const url = apiUrl.replace('{saleOrderId}', saleOrderId); // Replace placeholder with saleOrderId
     
     // POST request without any additional payload
@@ -623,6 +623,43 @@ export class SalesComponent {
     }
   };
 
+  //Added this logic for creating workorder from sale order and changing flow status by triggering URL
+  createWorkOrder() {
+    if (this.SaleOrderEditID) {
+        const productDetails = this.formConfig.model.sale_order_items;
+        const saleOrderDetails = this.formConfig.model.sale_order;
+
+        // Check if productDetails and saleOrderDetails have valid data
+        if (productDetails && saleOrderDetails) {
+            const payload = {
+                productDetails: productDetails,
+                saleOrderDetails: saleOrderDetails
+            };
+
+            console.log('Navigating to production with payload:', payload);
+
+            // Trigger the move_next_stage endpoint
+            const nextStageUrl = `sales/SaleOrder/${this.SaleOrderEditID}/move_next_stage/`;
+
+            this.http.post(nextStageUrl, {}).subscribe({
+                next: (response) => {
+                    console.log('Moved to next stage successfully:', response);
+
+                    // Navigate to the production route with the payload
+                    this.router.navigate(['admin/production'], { state: payload });
+                },
+                error: (error) => {
+                    console.error('Error moving to next stage:', error);
+                }
+            });
+        } else {
+            console.warn('Product details or sale order details are missing.');
+        }
+    } else {
+        console.warn('SaleOrderEditID is not set. Unable to create work order.');
+    }
+}
+
   setFormConfig() {
     this.SaleOrderEditID = null;
     this.saleForm = this.fb.group({
@@ -841,35 +878,6 @@ export class SalesComponent {
                   if (this.dataToPopulate && this.dataToPopulate.tax && field.formControl) {
                     field.formControl.setValue(this.dataToPopulate.tax);
                   }
-                }
-              }
-            },
-            {
-              key: 'workflow',
-              type: 'select',
-              className: 'col-2',
-              templateOptions: {
-                label: 'Work flow',
-                dataKey: 'workflow_id',
-                dataLabel: "name",
-                options: [],
-                required: true,
-                lazy: {
-                  url: 'sales/workflows/',
-                  lazyOneTime: true
-                }
-              },
-              hooks: {
-                onInit: (field: any) => {
-                  field.formControl.valueChanges.subscribe(data => {
-                    //console.log("sale_type", data);
-                    if (data && data.workflow_id) {
-                      this.formConfig.model['sale_order']['workflow_id'] = data.workflow_id;
-                    }
-                  });
-                },
-                onChanges: (field: any) => {
-
                 }
               }
             },
@@ -1867,14 +1875,26 @@ export class SalesComponent {
                               type: 'select',
                               className: 'col-4',
                               templateOptions: {
-                                  label: 'Flow Status',
-                                  placeholder: 'Select Flow Status',
-                                  expressions: {
-                                      hide: '!model.sale_order_id',
-                                  },
+                                label: 'Flow status',
+                                dataKey: 'flow_status_id',
+                                dataLabel: 'flow_status_name',
+                                // placeholder: 'Select Order status type',
+                                lazy: {
+                                  url: 'masters/flow_status/',
+                                  lazyOneTime: true
+                                },
+                                // expressions: {
+                                //   hide: '!model.sale_order_id',
+                                // },
                               },
                               hooks: {
                                   onChanges: (field: any) => {
+                                    field.formControl.valueChanges.subscribe(data => {
+                                      //console.log("ledger_account", data);
+                                      if (data && data.flow_status_id) {
+                                        this.formConfig.model['sale_order']['flow_status_id'] = data.flow_status_id;
+                                      }
+                                    });
                                       const valueChangesSubscription = field.formControl.valueChanges.subscribe(data => {
                                           const saleOrder = this.formConfig.model['sale_order'];
                                           console.log("Sale order: ", saleOrder);

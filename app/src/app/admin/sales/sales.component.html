@@ -15,9 +15,17 @@
                 <button *checkAction="{ moduleName: 'Sales', sectionName: 'Customers', actionName: 'Update' }" (click)="showSaleOrderListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#saleOrderListModal">
           Sales Order List
         </button>
-                <!-- Invoice Creation Button (Only for Edit and if flow status is "Ready for Invoice") -->
-                <button *ngIf="SaleOrderEditID && formConfig.model.sale_order.flow_status === 'Ready for Invoice'" (click)="openConfirmationModal()" type="button" class="btn btn-primary">
+        <!-- Invoice Creation Button (Only for Edit and if flow status is "Ready for Invoice") -->
+        <button *ngIf="SaleOrderEditID && formConfig.model.sale_order.flow_status.flow_status_name === 'Ready for Invoice'" 
+                (click)="openConfirmationModal()" 
+                type="button" 
+                class="btn btn-primary">
             Create Invoice
+        </button>
+
+         <!-- Create Work Order Button (Only for Edit) -->
+         <button *ngIf="SaleOrderEditID" (click)="createWorkOrder()" type="button" class="btn btn-primary">
+            Create Work Order
         </button>
 
             </div>
