@@ -16,8 +16,8 @@
           Sales Order List
         </button>
         <!-- Invoice Creation Button (Only for Edit and if flow status is "Ready for Invoice") -->
-        <button *ngIf="SaleOrderEditID && formConfig.model.sale_order.flow_status === 'Ready for Invoice'" 
-                (click)="openConfirmationModal()" 
+        <button *ngIf="SaleOrderEditID && formConfig.model.sale_order.flow_status.flow_status_name === 'Ready for Invoice'" 
+                (click)="openSaleInvoiceModal()" 
                 type="button" 
                 class="btn btn-primary">
             Create Invoice
@@ -96,7 +96,7 @@
 </div>
 
 <!-- Confirmation Modal -->
-<div id="customDialog" class="custom-dialog-overlay" *ngIf="isConfirmationModalOpen">
+<div id="customDialog" class="custom-dialog-overlay" *ngIf="isConfirmationInvoiceOpen">
     <div class="custom-dialog-box">
         <p>Are you sure you want to create the sale invoice?</p>
         <button (click)="confirmInvoiceCreation()">OK</button>
@@ -113,38 +113,6 @@
 </div>
 
 <div class="modal-backdrop" *ngIf="isModalOpen"></div> <!-- Added line to fix past orders modal box correctly -->
-
-<!-- Confirmation Modal -->
-<!-- <div id="customDialog" class="custom-dialog-overlay" *ngIf="isConfirmationModalOpen">
-    <div class="custom-dialog-box">
-        <p>Please select an option:</p>
-        <label>
-            <input type="checkbox" [(ngModel)]="saleOrderSelected" /> Sale Order
-        </label>
-        <br />
-        <label>
-            <input type="checkbox" [(ngModel)]="saleEstimateSelected" /> Sale Estimate
-        </label>
-        <br />
-        <button (click)="confirmSelection()">OK</button>
-    </div>
-</div> -->
-
-<!-- Confirmation Modal -->
-<!-- <div id="customDialog" class="custom-dialog-overlay" *ngIf="isConfirmationModalOpen">
-    <div class="custom-dialog-box">
-        <label>
-            <strong>Select Type:</strong>
-            <br />
-            <select [(ngModel)]="selectedOption">
-                <option value="sale_order">Sale Order</option>
-                <option value="sale_estimate">Sale Estimate</option>
-            </select>
-        </label>
-        <br />
-        <button (click)="confirmSelection()">OK</button>
-    </div>
-</div> -->
 
 <!-- Confirmation Modal -->
 <div id="customDialog" class="custom-dialog-overlay" *ngIf="isConfirmationModalOpen">
@@ -168,4 +136,3 @@
     <span class="toast-message-text">{{ toastMessage }}</span>
     <button class="close-button" (click)="closeToast()">x</button>
   </div>
-

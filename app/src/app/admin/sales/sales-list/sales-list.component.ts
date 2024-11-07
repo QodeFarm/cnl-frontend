@@ -109,9 +109,18 @@ export class SalesListComponent {
         },
         sort: true
       },
+      // {
+      //   fieldKey: 'flow_status',
+      //   name: 'Flow Status',
+      //   sort: true
+      // },
       {
         fieldKey: 'flow_status',
-        name: 'Flow Status',
+        name: 'Status',
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          return `${row.flow_status.flow_status_name}`;
+        },
         sort: true
       },
       {

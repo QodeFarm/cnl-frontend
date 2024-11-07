@@ -157,23 +157,24 @@ export class SalesComponent {
     // //console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
   }
 
-//==============================================
-  isConfirmationModalOpen: boolean = false;
+
+//Sale-invoice ==============================================
+  isConfirmationInvoiceOpen: boolean = false;
   isInvoiceCreated: boolean = false;
 
   // Function to handle opening the confirmation modal
-  openConfirmationModal() {
-      this.isConfirmationModalOpen = true; // Show the confirmation modal
+  openSaleInvoiceModal() {
+      this.isConfirmationInvoiceOpen = true; // Show the confirmation modal
   }
 
   // Function to handle cancelling the invoice creation
   cancelInvoiceCreation() {
-      this.isConfirmationModalOpen = false; // Close the modal
+      this.isConfirmationInvoiceOpen = false; // Close the modal
   }
 
   // Function to handle confirmation of invoice creation
   confirmInvoiceCreation() {
-      this.isConfirmationModalOpen = false; // Close the modal
+      this.isConfirmationInvoiceOpen = false; // Close the modal
       this.invoiceCreationHandler(); // Proceed with the invoice creation logic
   }
 
@@ -232,50 +233,9 @@ export class SalesComponent {
   closeModal() {
     this.hideModal(); // Use the hideModal method to remove the modal elements
   }
-  // isConfirmationModalOpen: boolean = false;
-  // isInvoiceCreated: boolean = false;
-
-  // openConfirmationModal() {
-  //     this.isConfirmationModalOpen = true; // Show the confirmation modal
-  // }
-
-  // cancelInvoiceCreation() {
-  //     this.isConfirmationModalOpen = false; // Close the modal without action
-  // }
-
-  // confirmInvoiceCreation() {
-  //     // this.isConfirmationModalOpen = false; // Close the modal
-  //     this.invoiceCreationHandler(); // Call the existing invoice creation handler
-  // }
-
-  // invoiceCreationHandler() {
-  //   this.handleSaleInvoiceCreation();
-  // }
-  
-  // // New method to show a success message
-  // showInvoiceCreatedMessage() {
-  //   this.isInvoiceCreated = true;
-  //   setTimeout(() => {
-  //     this.isInvoiceCreated = false; // Hide the message after 3 seconds
-  //   }, 3000);
-  // }
-  
-  // private handleSaleInvoiceCreation() {
-  //   console.log("invoice data in edit: ", this.invoiceData);
-  //   if (this.invoiceData !== undefined) {
-  //     this.createSaleInvoice(this.invoiceData).subscribe(
-  //       response => {
-  //         console.log('Sale invoice created successfully', response);
-  //         this.showInvoiceCreatedMessage(); // Show message on successful creation
-  //       },
-  //       error => {
-  //         console.error('Error creating sale invoice', error);
-  //       }
-  //     );
-  //   }
-  // }
 
 //=========================================================
+
   populateForm(data: any) {
     console.log("Data in populateform : ", data);
     this.saleForm.patchValue({
@@ -608,11 +568,17 @@ export class SalesComponent {
     return this.http.get(url).pipe(((res: any) => res.data));
   }
 //=====================================================
+  isConfirmationModalOpen: boolean = false;
   selectedOption: string = 'sale_order';
   saleOrderSelected = false;
   saleEstimateSelected = false;
   showSuccessToast = false;
   toastMessage = '';
+
+  // openConfirmationModal() {
+  //   this.isConfirmationModalOpen = true; // Set modal to open
+  // }
+  
 
   createSaleOrder() {
     this.http.post('sales/sale_order/', this.formConfig.model)
@@ -645,6 +611,11 @@ export class SalesComponent {
     // Proceed with the next steps, like API call
     this.createSaleOrder(); // or however you're proceeding
     this.isConfirmationModalOpen = false; // Close modal after selection
+  }
+
+  // Method to open Sale Order / Sale Estimate modal
+  openSaleOrderEstimateModal() {
+    this.isConfirmationModalOpen = true; // Open the Sale Order / Sale Estimate modal
   }
 
   // Update method specifically for edit actions
@@ -698,17 +669,13 @@ export class SalesComponent {
           type: 'script',
           value: 'data.sale_order_items.map(m=> {m.color_id = m.color.color_id;  return m ;})'
         }
-      ],
-      // submit: {
-      //   label: 'Submit',
-      //   submittedFn: () => this.openConfirmationModal()
-      // },    
+      ],  
       submit: {
         label: 'Submit',
         submittedFn: () => {
             // Open confirmation modal only if it's a new sale order
             if (!this.SaleOrderEditID) {
-                this.openConfirmationModal();
+                this.openSaleOrderEstimateModal();
             } else {
                 this.updateSaleOrder(); // Call update method for editing
             }
@@ -1023,11 +990,12 @@ export class SalesComponent {
               {
                 name: 'discount',
                 label: 'Discount'
-              }
+              },
+              // { name: 'select_item', label: 'Select' }
             ]
           },
           fieldArray: {
-            fieldGroup: [                         
+            fieldGroup: [                       
               {
                 key: 'product',
                 type: 'select',
