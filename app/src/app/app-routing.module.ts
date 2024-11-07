@@ -69,7 +69,7 @@ const routes: Routes = [
       { path: 'production', data: { title: 'Work Order', moduleName: 'production' }, canActivate: [], loadComponent: () => import('./admin/production/production.component').then(m => m.ProductionComponent) },
       { path: 'production/machines', data: { title: 'Machines', moduleName: 'machines' }, canActivate: [], loadComponent: () => import('./admin/production/machines/machines.component').then(m => m.MachinesComponent) },
       { path: 'production/productionstatuses', data: { title: 'Production Statuses', moduleName: 'productionstatuses' }, canActivate: [], loadComponent: () => import('./admin/production/production-statuses/production-statuses.component').then(m => m.ProductionStatusesComponent) },
-
+      { path: 'production/workorderboard', data: { title: 'Work Order Board', moduleName: 'workorderboard' }, canActivate: [], loadComponent: () => import('./admin/production/workorderboard/workorderboard.component').then(m => m.WorkorderboardComponent) },
       //Finance Module
       { path: 'finance/bank-account', data: { title: 'Bank Account', moduleName: 'finance' }, canActivate: [], loadComponent: () => import('./admin/finance/bank-account/bank-account.component').then(m => m.BankAccountComponent) },
       { path: 'finance/chart-of-accounts', data: { title: 'Chart Of Accounts', moduleName: 'chart-of-accounts' }, canActivate: [], loadComponent: () => import('./admin/finance/chart-of-accounts/chart-of-accounts.component').then(m => m.ChartOfAccountsComponent) },
@@ -83,11 +83,13 @@ const routes: Routes = [
       //Company Module
       { path: 'company', data: { title: 'Company', moduleName: 'company' }, canActivate: [], loadComponent: () => import('./admin/company/company.component').then(m => m.CompanyComponent) },
       { path: 'company/branches', data: { title: 'Branches', moduleName: 'branches' }, canActivate: [], loadComponent: () => import('./admin/company/branches/branches.component').then(m => m.BranchesComponent) },
-
+      
       //Company Module
       { path: 'reminders', data: { title: 'Reminders', moduleName: 'reminders' }, canActivate: [], loadComponent: () => import('./admin/reminders/reminders.component').then(m => m.RemindersComponent) },
       // { path: 'company/branches', data: { title: 'Branches', moduleName: 'branches' }, canActivate: [], loadComponent: () => import('./admin/company/branches/branches.component').then(m => m.BranchesComponent) },
 
+      //workflow
+      { path: 'workflow', data: { title: 'Workflow', moduleName: 'Workflow' }, canActivate: [], loadComponent: () => import('./admin/workflow/workflow.component').then(m => m.WorkflowComponent) },
 
       //Users Module
       { path: 'users', data: { title: 'Users', moduleName: 'users' }, canActivate: [], loadComponent: () => import('./admin/user/user.component').then(m => m.UserComponent) },

@@ -1,44 +1,81 @@
 /* Styling for the table */
 .custom-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  .custom-table th, .custom-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-  }
-  
-  /* Add a blue background to the header */
-  .custom-table th {
-    background-color: #170564;
-    color: white;
-    font-weight: normal;
-    text-align: left;
-  }
+  width: 100%;
+  border-collapse: collapse;
+}
 
-  /* Add white background to table rows (records) */
-  .custom-table tr {
-    background-color: white;
- }
-  
-  /* Add striped rows */
-  .custom-table tr:nth-child(even) {
-    background-color: #f2f2f2;
-  }
-  
-  /* Add hover effect */
-  .custom-table tr:hover {
-    background-color: white;
-  }
-  
-  /* Table header specific styles */
-  .table-header th {
-    color:white;
-  }
-  
-  /* Responsive handling */
-  .custom-table td {
-    word-wrap: break-word;
-  }
+.custom-table th, .custom-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+/* Add a blue background to the header */
+.custom-table th {
+  background-color: #170564;
+  color: white;
+  font-weight: normal;
+  text-align: left;
+}
+
+/* Add white background to table rows (records) */
+.custom-table tr {
+  background-color: white;
+}
+
+/* Add striped rows */
+.custom-table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+/* Add hover effect */
+.custom-table tr:hover {
+  background-color: white;
+}
+
+/* Table header specific styles */
+.table-header th {
+  color: white;
+}
+
+/* Responsive handling */
+.custom-table td {
+  word-wrap: break-word;
+}
+
+.custom-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw; /* Full width of the viewport */
+  height: 100vh; /* Full height of the viewport */
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  z-index: 1000;
+}
+
+.custom-dialog-box {
+  position: fixed; /* Position it in relation to the viewport */
+  top: 50%; /* Move it to the center vertically */
+  left: 50%; /* Move it to the center horizontally */
+  transform: translate(-50%, -50%); /* Perfectly center by shifting 50% of its own width and height */
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  min-width: 300px;
+  max-width: 90%; /* Ensure it's responsive on smaller screens */
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: center; /* Center the buttons horizontally */
+  gap: 20px; /* Increased gap between the buttons */
+  margin-top: 15px; /* Adds space between message and buttons */
+}
+
+button {
+  min-width: 80px; /* Ensure consistent button size */
+  padding: 8px 16px; /* Improve button padding */
+  font-size: 14px; /* Make the button text more readable */
+}
