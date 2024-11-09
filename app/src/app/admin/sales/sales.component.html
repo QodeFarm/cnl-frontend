@@ -15,16 +15,13 @@
                 <button *checkAction="{ moduleName: 'Sales', sectionName: 'Customers', actionName: 'Update' }" (click)="showSaleOrderListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#saleOrderListModal">
           Sales Order List
         </button>
-        <!-- Invoice Creation Button (Only for Edit and if flow status is "Ready for Invoice") -->
-        <button *ngIf="SaleOrderEditID && formConfig.model.sale_order.flow_status.flow_status_name === 'Ready for Invoice'" 
-                (click)="openSaleInvoiceModal()" 
-                type="button" 
-                class="btn btn-primary">
+                <!-- Invoice Creation Button (Only for Edit and if flow status is "Ready for Invoice") -->
+                <button *ngIf="SaleOrderEditID && formConfig.model.sale_order.flow_status.flow_status_name === 'Ready for Invoice'" (click)="openSaleInvoiceModal()" type="button" class="btn btn-primary">
             Create Invoice
         </button>
 
-         <!-- Create Work Order Button (Only for Edit) -->
-         <button *ngIf="SaleOrderEditID" (click)="createWorkOrder()" type="button" class="btn btn-primary">
+                <!-- Create Work Order Button (Only for Edit) -->
+                <button *ngIf="SaleOrderEditID" (click)="createWorkOrder()" type="button" class="btn btn-primary">
             Create Work Order
         </button>
 
@@ -32,7 +29,7 @@
         </div>
     </div>
 
-    <div class="row custom-form" *checkAction="{ moduleName: 'Sales', sectionName: 'Customers', actionName: 'Create' }">
+    <div class="row custom-form" *checkAction="{ moduleName: 'Sales', sectionName: 'Sale Order', actionName: 'Create' }">
         <div class="col-12 px-1" *ngIf="orderNumber || showForm">
             <ta-form #salesForm [options]="formConfig"></ta-form>
         </div>
@@ -135,10 +132,11 @@
 
 <div id="customToast" class="toast-message" *ngIf="showSuccessToast">
     <div class="tick-circle">
-      <span class="tick-mark">✔</span>
+        <span class="tick-mark">✔</span>
     </div>
     <span class="toast-message-text">{{ toastMessage }}</span>
     <button class="close-button" (click)="closeToast()">x</button>
-  </div>
+</div>
 
-<div class="modal-backdrop" *ngIf="isModalOpen"></div> <!-- Added line to fix past orders modal box correctly -->
+<div class="modal-backdrop" *ngIf="isModalOpen"></div>
+<!-- Added line to fix past orders modal box correctly -->
