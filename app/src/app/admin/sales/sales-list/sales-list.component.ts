@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
+import { AdminCommonService } from 'src/app/services/admin-common.service';
 
 @Component({
   selector: 'app-sales-list',
@@ -29,7 +30,7 @@ export class SalesListComponent {
     ],
     pageSize: 10,
     "globalSearch": {
-      keys: ['order_date','order_no','sale_type','customer','amount','tax','advance_amount','status_name','flow_status']
+      keys: ['order_date', 'order_no', 'sale_type', 'customer', 'amount', 'tax', 'advance_amount', 'status_name', 'flow_status']
     },
     cols: [
       {
@@ -109,6 +110,10 @@ export class SalesListComponent {
             type: 'delete',
             label: 'Delete',
             confirm: true,
+            conditionFn: () => {
+              // return this.acS.checkPermission('sales', 'sale order', 'delete');
+              return this.acS.checkPermission('sales', 'sale order', 'delete');
+            },
             confirmMsg: "Sure to delete?",
             apiUrl: 'sales/sale_order'
           },
@@ -116,6 +121,9 @@ export class SalesListComponent {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',
+            conditionFn: () => {
+              return this.acS.checkPermission('sales', 'sale order', 'update');
+            },
             callBackFn: (row, action) => {
               console.log(row);
               this.edit.emit(row.sale_order_id);
@@ -127,7 +135,7 @@ export class SalesListComponent {
     ]
   };
 
-  constructor(private router: Router) {
+  constructor(private router: Router, private acS: AdminCommonService) {
 
   }
 }

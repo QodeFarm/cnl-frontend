@@ -51,32 +51,32 @@ export class SalesComponent {
 
   // Field mapping for auto population
   fieldMapping = {
-      'Sale Invoice': {
-          customer: 'customer',  // Add this line for customer_id
-          csutomer_id: 'customer_id',
-          email: 'email',
-          billing_address: 'billing_address',
-          shipping_address: 'shipping_address',
-          ref_no: 'ref_no',
-          tax: 'tax',
-          remarks: 'remarks'
-      },
-      'Sale Return': {
-          customer: 'customer', // Assuming the same field name
-          customer_id: 'customer_id',  // Add this line for customer_id
-          email: 'email',
-          shipping_address: 'shipping_address',
-          ref_no: 'ref_no',
-          tax: 'tax',
-          remarks: 'remarks'
-      },
-      // Add mappings for other tables as needed
+    'Sale Invoice': {
+      customer: 'customer',  // Add this line for customer_id
+      csutomer_id: 'customer_id',
+      email: 'email',
+      billing_address: 'billing_address',
+      shipping_address: 'shipping_address',
+      ref_no: 'ref_no',
+      tax: 'tax',
+      remarks: 'remarks'
+    },
+    'Sale Return': {
+      customer: 'customer', // Assuming the same field name
+      customer_id: 'customer_id',  // Add this line for customer_id
+      email: 'email',
+      shipping_address: 'shipping_address',
+      ref_no: 'ref_no',
+      tax: 'tax',
+      remarks: 'remarks'
+    },
+    // Add mappings for other tables as needed
   };
-  sizeOptions: any[] = []; 
+  sizeOptions: any[] = [];
 
   // Method to open the copy modal and populate dropdown
   openCopyModal() {
-      this.availableTables = this.tables.filter(table => table !== this.currentTable);
+    this.availableTables = this.tables.filter(table => table !== this.currentTable);
   }
 
   copyToTable() {
@@ -85,12 +85,12 @@ export class SalesComponent {
 
     // Extract only the matching fields based on the selected table
     if (this.selectedTable && this.fieldMapping[this.selectedTable]) {
-        for (const key in this.fieldMapping[this.selectedTable]) {
-            const sourceField = this.fieldMapping[this.selectedTable][key];
-            console.log("Source field : ", sourceField);
-            // Get value from the sales form
-            populatedData[key] = dataToCopy[sourceField];
-        }
+      for (const key in this.fieldMapping[this.selectedTable]) {
+        const sourceField = this.fieldMapping[this.selectedTable][key];
+        console.log("Source field : ", sourceField);
+        // Get value from the sales form
+        populatedData[key] = dataToCopy[sourceField];
+      }
     }
 
     // Log the populated data for debugging
@@ -98,14 +98,14 @@ export class SalesComponent {
 
     // Navigate based on the selected table without needing breaks
     if (this.selectedTable === 'Sale Invoice') {
-        this.router.navigate(['admin/sales/salesinvoice'], { state: { data: populatedData } });
-        console.log("populate data of customer : ", populatedData)
+      this.router.navigate(['admin/sales/salesinvoice'], { state: { data: populatedData } });
+      console.log("populate data of customer : ", populatedData)
     } else if (this.selectedTable === 'Sale Return') {
-        this.router.navigate(['admin/sales/sale-returns'], { state: { data: populatedData } });
+      this.router.navigate(['admin/sales/sale-returns'], { state: { data: populatedData } });
     }
     // Add additional cases for other tables if necessary
     else {
-        console.error('Unknown table selected');
+      console.error('Unknown table selected');
     }
   }
 
@@ -116,7 +116,7 @@ export class SalesComponent {
     private route: ActivatedRoute,
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   dataToPopulate: any;
   saleForm: FormGroup;
@@ -153,75 +153,75 @@ export class SalesComponent {
   }
 
 
-//Sale-invoice ==============================================
+  //Sale-invoice ==============================================
   isConfirmationInvoiceOpen: boolean = false;
   isInvoiceCreated: boolean = false;
 
   // Function to handle opening the confirmation modal
   openSaleInvoiceModal() {
-      this.isConfirmationInvoiceOpen = true; // Show the confirmation modal
+    this.isConfirmationInvoiceOpen = true; // Show the confirmation modal
   }
 
   // Function to handle cancelling the invoice creation
   cancelInvoiceCreation() {
-      this.isConfirmationInvoiceOpen = false; // Close the modal
+    this.isConfirmationInvoiceOpen = false; // Close the modal
   }
 
   // Function to handle confirmation of invoice creation
   confirmInvoiceCreation() {
-      this.isConfirmationInvoiceOpen = false; // Close the modal
-      this.invoiceCreationHandler(); // Proceed with the invoice creation logic
+    this.isConfirmationInvoiceOpen = false; // Close the modal
+    this.invoiceCreationHandler(); // Proceed with the invoice creation logic
   }
 
   // Your existing invoice creation logic
   invoiceCreationHandler() {
-      this.handleSaleInvoiceCreation();
+    this.handleSaleInvoiceCreation();
   }
 
   private handleSaleInvoiceCreation() {
-      console.log("invoice data in edit: ", this.invoiceData);
-      if (this.invoiceData) {
-          this.createSaleInvoice(this.invoiceData).subscribe(
-              response => {
-                  console.log('Sale invoice created successfully', response);
-                  this.showInvoiceCreatedMessage(); // Show message on successful creation
-                  // Trigger the next URL to update flow_status
-                  const saleOrderId = this.invoiceData.sale_invoice_order.sale_order_id; // Get the saleOrderId from the invoice data
-                  this.triggerWorkflowPipeline(saleOrderId);
-              },
-              error => {
-                  console.error('Error creating sale invoice', error);
-              }
-          );
-      }
-      this.ngOnInit()
+    console.log("invoice data in edit: ", this.invoiceData);
+    if (this.invoiceData) {
+      this.createSaleInvoice(this.invoiceData).subscribe(
+        response => {
+          console.log('Sale invoice created successfully', response);
+          this.showInvoiceCreatedMessage(); // Show message on successful creation
+          // Trigger the next URL to update flow_status
+          const saleOrderId = this.invoiceData.sale_invoice_order.sale_order_id; // Get the saleOrderId from the invoice data
+          this.triggerWorkflowPipeline(saleOrderId);
+        },
+        error => {
+          console.error('Error creating sale invoice', error);
+        }
+      );
+    }
+    this.ngOnInit()
   }
 
   // This function triggers the workflow pipeline API call using POST method
   private triggerWorkflowPipeline(saleOrderId: string) {
     const apiUrl = 'sales/SaleOrder/{saleOrderId}/move_next_stage/'; //correct url
     const url = apiUrl.replace('{saleOrderId}', saleOrderId); // Replace placeholder with saleOrderId
-    
+
     // POST request without any additional payload
     this.http.post(url, {}).subscribe(
-        response => {
-            console.log('POST request successful:', response);
-        },
-        error => {
-            console.error('Error triggering workflow pipeline:', error);
-        }
+      response => {
+        console.log('POST request successful:', response);
+      },
+      error => {
+        console.error('Error triggering workflow pipeline:', error);
+      }
     );
   }
 
   createSaleInvoice(invoiceData: any): Observable<any> {
-      return this.http.post('sales/sale_invoice_order/', invoiceData);
+    return this.http.post('sales/sale_invoice_order/', invoiceData);
   }
 
   showInvoiceCreatedMessage() {
-      this.isInvoiceCreated = true;
-      setTimeout(() => {
-          this.isInvoiceCreated = false; // Hide the message after 3 seconds
-      }, 3000);
+    this.isInvoiceCreated = true;
+    setTimeout(() => {
+      this.isInvoiceCreated = false; // Hide the message after 3 seconds
+    }, 3000);
   }
 
   // Closes the modal and removes the modal backdrop
@@ -229,7 +229,7 @@ export class SalesComponent {
     this.hideModal(); // Use the hideModal method to remove the modal elements
   }
 
-//=========================================================
+  //=========================================================
 
   populateForm(data: any) {
     console.log("Data in populateform : ", data);
@@ -562,7 +562,7 @@ export class SalesComponent {
     const url = `/products/product_variations/?product_name=${productID}`;
     return this.http.get(url).pipe(((res: any) => res.data));
   }
-//=====================================================
+  //=====================================================
   isConfirmationModalOpen: boolean = false;
   selectedOption: string = 'sale_order';
   saleOrderSelected = false;
@@ -592,44 +592,44 @@ export class SalesComponent {
   //Added this logic for creating workorder from sale order and changing flow status by triggering URL
   createWorkOrder() {
     if (this.SaleOrderEditID) {
-        const productDetails = this.formConfig.model.sale_order_items;
-        const saleOrderDetails = this.formConfig.model.sale_order;
+      const productDetails = this.formConfig.model.sale_order_items;
+      const saleOrderDetails = this.formConfig.model.sale_order;
 
-        // Check if productDetails and saleOrderDetails have valid data
-        if (productDetails && saleOrderDetails) {
-            const payload = {
-                productDetails: productDetails,
-                saleOrderDetails: saleOrderDetails
-            };
+      // Check if productDetails and saleOrderDetails have valid data
+      if (productDetails && saleOrderDetails) {
+        const payload = {
+          productDetails: productDetails,
+          saleOrderDetails: saleOrderDetails
+        };
 
-            console.log('Navigating to production with payload:', payload);
+        console.log('Navigating to production with payload:', payload);
 
-            // Trigger the move_next_stage endpoint
-            const nextStageUrl = `sales/SaleOrder/${this.SaleOrderEditID}/move_next_stage/`;
+        // Trigger the move_next_stage endpoint
+        const nextStageUrl = `sales/SaleOrder/${this.SaleOrderEditID}/move_next_stage/`;
 
-            this.http.post(nextStageUrl, {}).subscribe({
-                next: (response) => {
-                    console.log('Moved to next stage successfully:', response);
+        this.http.post(nextStageUrl, {}).subscribe({
+          next: (response) => {
+            console.log('Moved to next stage successfully:', response);
 
-                    // Navigate to the production route with the payload
-                    this.router.navigate(['admin/production'], { state: payload });
-                },
-                error: (error) => {
-                    console.error('Error moving to next stage:', error);
-                }
-            });
-        } else {
-            console.warn('Product details or sale order details are missing.');
-        }
+            // Navigate to the production route with the payload
+            this.router.navigate(['admin/production'], { state: payload });
+          },
+          error: (error) => {
+            console.error('Error moving to next stage:', error);
+          }
+        });
+      } else {
+        console.warn('Product details or sale order details are missing.');
+      }
     } else {
-        console.warn('SaleOrderEditID is not set. Unable to create work order.');
+      console.warn('SaleOrderEditID is not set. Unable to create work order.');
     }
-}
+  }
 
   // openConfirmationModal() {
   //   this.isConfirmationModalOpen = true; // Set modal to open
   // }
-  
+
 
   createSaleOrder() {
     this.http.post('sales/sale_order/', this.formConfig.model)
@@ -651,14 +651,14 @@ export class SalesComponent {
   confirmSelection() {
     // Check the selected option and set sale_estimate accordingly
     if (this.selectedOption === 'sale_estimate') {
-        this.formConfig.model['sale_order']['sale_estimate'] = 'Yes'; // Update model for sale_estimate
+      this.formConfig.model['sale_order']['sale_estimate'] = 'Yes'; // Update model for sale_estimate
     } else {
-        this.formConfig.model['sale_order']['sale_estimate'] = 'No'; // Update model for sale_order
+      this.formConfig.model['sale_order']['sale_estimate'] = 'No'; // Update model for sale_order
     }
 
     console.log("Selected option:", this.selectedOption);
     console.log("Sale estimate:", this.formConfig.model['sale_order']['sale_estimate']);
-    
+
     // Proceed with the next steps, like API call
     this.createSaleOrder(); // or however you're proceeding
     this.isConfirmationModalOpen = false; // Close modal after selection
@@ -674,19 +674,19 @@ export class SalesComponent {
     // Define logic here for updating the sale order without modal pop-up
     console.log("Updating sale order:", this.formConfig.model);
     this.http.put(`sales/sale_order/${this.SaleOrderEditID}/`, this.formConfig.model)
-        .subscribe(response => {
-          this.showSuccessToast = true;
-          this.toastMessage = "Record updated successfully"; // Set the toast message for update
-          this.ngOnInit();
-          setTimeout(() => {
-            this.showSuccessToast = false;
-          }, 3000);
-        
-        }, error => {
-            console.error('Error updating record:', error);
-        });
+      .subscribe(response => {
+        this.showSuccessToast = true;
+        this.toastMessage = "Record updated successfully"; // Set the toast message for update
+        this.ngOnInit();
+        setTimeout(() => {
+          this.showSuccessToast = false;
+        }, 3000);
+
+      }, error => {
+        console.error('Error updating record:', error);
+      });
   }
-//=======================================================
+  //=======================================================
   setFormConfig() {
     this.SaleOrderEditID = null;
     this.saleForm = this.fb.group({
@@ -720,16 +720,16 @@ export class SalesComponent {
           type: 'script',
           value: 'data.sale_order_items.map(m=> {m.color_id = m.color?.color_id || null;  return m ;})'
         }
-      ],  
+      ],
       submit: {
         label: 'Submit',
         submittedFn: () => {
-            // Open confirmation modal only if it's a new sale order
-            if (!this.SaleOrderEditID) {
-                this.openSaleOrderEstimateModal();
-            } else {
-                this.updateSaleOrder(); // Call update method for editing
-            }
+          // Open confirmation modal only if it's a new sale order
+          if (!this.SaleOrderEditID) {
+            this.openSaleOrderEstimateModal();
+          } else {
+            this.updateSaleOrder(); // Call update method for editing
+          }
         }
       },
       reset: {
@@ -1017,7 +1017,7 @@ export class SalesComponent {
             ]
           },
           fieldArray: {
-            fieldGroup: [                       
+            fieldGroup: [
               {
                 key: 'product',
                 type: 'select',
@@ -1263,34 +1263,34 @@ export class SalesComponent {
                           }
                           // Call the API using HttpClient (this.http.get)
                           this.http.get(url).subscribe((data: any) => {
-                              function sumQuantities(dataObject: any): number {
-                                // First, check if the data object contains the array in the 'data' field
-                                if (dataObject && Array.isArray(dataObject.data)) {
-                                  // Now we can safely use reduce on dataObject.data
-                                  return dataObject.data.reduce((sum, item) => sum + (item.quantity || 0), 0);
-                                } else {
-                                  console.error("Data is not an array:", dataObject);
-                                  return 0;
-                                }
+                            function sumQuantities(dataObject: any): number {
+                              // First, check if the data object contains the array in the 'data' field
+                              if (dataObject && Array.isArray(dataObject.data)) {
+                                // Now we can safely use reduce on dataObject.data
+                                return dataObject.data.reduce((sum, item) => sum + (item.quantity || 0), 0);
+                              } else {
+                                console.error("Data is not an array:", dataObject);
+                                return 0;
                               }
-                              const totalBalance = sumQuantities(data);
-                              const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
-                              if (cardWrapper && data.data[0]) {
-                                // Remove existing product info if present
-                                cardWrapper.querySelector('.center-message')?.remove();
-                                // Display fetched product variation info
-                                const productInfoDiv = document.createElement('div');
-                                productInfoDiv.classList.add('center-message');
-                                productInfoDiv.innerHTML = `
+                            }
+                            const totalBalance = sumQuantities(data);
+                            const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
+                            if (cardWrapper && data.data[0]) {
+                              // Remove existing product info if present
+                              cardWrapper.querySelector('.center-message')?.remove();
+                              // Display fetched product variation info
+                              const productInfoDiv = document.createElement('div');
+                              productInfoDiv.classList.add('center-message');
+                              productInfoDiv.innerHTML = `
                                         <span style="color: red;">Product Info:</span>
-                                        <span style="color: blue;">${data.data[0]?.product.name|| 'NA'}</span> |
+                                        <span style="color: blue;">${data.data[0]?.product.name || 'NA'}</span> |
                                         <span style="color: red;">Balance:</span>
                                         <span style="color: blue;">${totalBalance}</span> |
                                         ${this.unitOptionOfProduct} `;
-                                cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
-                                console.log("Size :  Product Info Updated**")
-                              }
-                            },
+                              cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
+                              console.log("Size :  Product Info Updated**")
+                            }
+                          },
                             (error) => {
                               console.error("Error fetching data:", error);
                             });
@@ -1382,7 +1382,7 @@ export class SalesComponent {
                               console.error("Error fetching data:", error);
                             });
                         } else {
-                          console.log(`No valid Color selected for :${product.name } at Row ${currentRowIndex}.`);
+                          console.log(`No valid Color selected for :${product.name} at Row ${currentRowIndex}.`);
                           console.log({
                             product: product?.name,
                             size: size?.size_name,
@@ -1407,7 +1407,7 @@ export class SalesComponent {
                     });
                   }
                 }
-              },                   
+              },
               {
                 type: 'input',
                 key: 'code',
@@ -1577,16 +1577,20 @@ export class SalesComponent {
             ]
           },
         },
-
         {
-          fieldGroupClassName: "row col-12 m-0 custom-form-card",
+          fieldGroupClassName: "col-6 m-0 custom-form-card",
+          type: 'accordion',
           fieldGroup: [
             {
-              className: 'col-6 custom-form-card-block',
+              className: 'col-12 custom-form-card-block',
+              props: {
+                label: 'Shipping Details'
+              },
               fieldGroup: [
                 {
                   template: '<div class="custom-form-card-title">  Shipping Details </div>',
                   fieldGroupClassName: "ant-row",
+
                 },
                 {
                   fieldGroupClassName: "ant-row",
@@ -1708,8 +1712,11 @@ export class SalesComponent {
               ]
             },
             {
-              className: 'col-6 pb-0',
+              className: 'col-12 pb-0',
               fieldGroupClassName: "field-no-bottom-space",
+              props: {
+                label: 'Billing Details'
+              },
               fieldGroup: [
                 {
                   fieldGroupClassName: "",
@@ -1923,67 +1930,547 @@ export class SalesComponent {
                                 // },
                               },
                               hooks: {
-                                  onChanges: (field: any) => {
-                                    field.formControl.valueChanges.subscribe(data => {
-                                      //console.log("ledger_account", data);
-                                      if (data && data.flow_status_id) {
-                                        this.formConfig.model['sale_order']['flow_status_id'] = data.flow_status_id;
-                                      }
-                                    });
-                                      const valueChangesSubscription = field.formControl.valueChanges.subscribe(data => {
-                                          const saleOrder = this.formConfig.model['sale_order'];
-                                          console.log("Sale order: ", saleOrder);
-                      
-                                          // Prepare invoice data
-                                          const saleOrderItems = this.formConfig.model['sale_order_items'];
-                                          const orderAttachments = this.formConfig.model['order_attachments'];
-                                          const orderShipments = this.formConfig.model['order_shipments'];
-                      
-                                          this.invoiceData = {
-                                              sale_invoice_order: {
-                                                  bill_type: saleOrder.bill_type || 'CASH',
-                                                  sale_order_id: saleOrder.sale_order_id,
-                                                  invoice_date: this.nowDate(),
-                                                  email: saleOrder.email,
-                                                  ref_no: saleOrder.ref_no,
-                                                  ref_date: this.nowDate(),
-                                                  tax: saleOrder.tax || 'Inclusive',
-                                                  due_date: saleOrder.due_date,
-                                                  remarks: saleOrder.remarks,
-                                                  advance_amount: saleOrder.advance_amount,
-                                                  item_value: saleOrder.item_value,
-                                                  discount: saleOrder.discount,
-                                                  dis_amt: saleOrder.dis_amt,
-                                                  taxable: saleOrder.taxable,
-                                                  tax_amount: saleOrder.tax_amount,
-                                                  cess_amount: saleOrder.cess_amount,
-                                                  transport_charges: saleOrder.transport_charges,
-                                                  round_off: saleOrder.round_off,
-                                                  total_amount: saleOrder.total_amount,
-                                                  vehicle_name: saleOrder.vehicle_name,
-                                                  total_boxes: saleOrder.total_boxes,
-                                                  shipping_address: saleOrder.shipping_address,
-                                                  billing_address: saleOrder.billing_address,
-                                                  customer_id: saleOrder.customer_id,
-                                                  gst_type_id: saleOrder.gst_type_id,
-                                                  order_type: saleOrder.order_type || 'sale_invoice',
-                                                  order_salesman_id: saleOrder.order_salesman_id,
-                                                  customer_address_id: saleOrder.customer_address_id,
-                                                  payment_term_id: saleOrder.payment_term_id,
-                                                  payment_link_type_id: saleOrder.payment_link_type_id,
-                                                  ledger_account_id: saleOrder.ledger_account_id,
-                                                  flow_status: saleOrder.flow_status
-                                              },
-                                              sale_invoice_items: saleOrderItems,
-                                              order_attachments: orderAttachments,
-                                              order_shipments: orderShipments
-                                          };
-                      
-                                          console.log('invoiceData:', this.invoiceData);
-                                      });
-                                  }
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    //console.log("ledger_account", data);
+                                    if (data && data.flow_status_id) {
+                                      this.formConfig.model['sale_order']['flow_status_id'] = data.flow_status_id;
+                                    }
+                                  });
+                                  const valueChangesSubscription = field.formControl.valueChanges.subscribe(data => {
+                                    const saleOrder = this.formConfig.model['sale_order'];
+                                    console.log("Sale order: ", saleOrder);
+
+                                    // Prepare invoice data
+                                    const saleOrderItems = this.formConfig.model['sale_order_items'];
+                                    const orderAttachments = this.formConfig.model['order_attachments'];
+                                    const orderShipments = this.formConfig.model['order_shipments'];
+
+                                    this.invoiceData = {
+                                      sale_invoice_order: {
+                                        bill_type: saleOrder.bill_type || 'CASH',
+                                        sale_order_id: saleOrder.sale_order_id,
+                                        invoice_date: this.nowDate(),
+                                        email: saleOrder.email,
+                                        ref_no: saleOrder.ref_no,
+                                        ref_date: this.nowDate(),
+                                        tax: saleOrder.tax || 'Inclusive',
+                                        due_date: saleOrder.due_date,
+                                        remarks: saleOrder.remarks,
+                                        advance_amount: saleOrder.advance_amount,
+                                        item_value: saleOrder.item_value,
+                                        discount: saleOrder.discount,
+                                        dis_amt: saleOrder.dis_amt,
+                                        taxable: saleOrder.taxable,
+                                        tax_amount: saleOrder.tax_amount,
+                                        cess_amount: saleOrder.cess_amount,
+                                        transport_charges: saleOrder.transport_charges,
+                                        round_off: saleOrder.round_off,
+                                        total_amount: saleOrder.total_amount,
+                                        vehicle_name: saleOrder.vehicle_name,
+                                        total_boxes: saleOrder.total_boxes,
+                                        shipping_address: saleOrder.shipping_address,
+                                        billing_address: saleOrder.billing_address,
+                                        customer_id: saleOrder.customer_id,
+                                        gst_type_id: saleOrder.gst_type_id,
+                                        order_type: saleOrder.order_type || 'sale_invoice',
+                                        order_salesman_id: saleOrder.order_salesman_id,
+                                        customer_address_id: saleOrder.customer_address_id,
+                                        payment_term_id: saleOrder.payment_term_id,
+                                        payment_link_type_id: saleOrder.payment_link_type_id,
+                                        ledger_account_id: saleOrder.ledger_account_id,
+                                        flow_status: saleOrder.flow_status
+                                      },
+                                      sale_invoice_items: saleOrderItems,
+                                      order_attachments: orderAttachments,
+                                      order_shipments: orderShipments
+                                    };
+
+                                    console.log('invoiceData:', this.invoiceData);
+                                  });
+                                }
                               }
-                          },
+                            },
+                            {
+                              key: 'item_value',
+                              type: 'input',
+                              defaultValue: "0",
+                              className: 'col-4',
+                              templateOptions: {
+                                type: 'input',
+                                label: 'Items value',
+                                placeholder: 'Enter Item value',
+                                readonly: true
+                                // required: true
+                              }
+                            },
+                            {
+                              key: 'dis_amt',
+                              type: 'input',
+                              // defaultValue: "777770",
+                              className: 'col-4',
+                              templateOptions: {
+                                type: 'input',
+                                label: 'Discount amount',
+                                placeholder: 'Enter Discount amount',
+                                readonly: true
+                                // required: true
+                              }
+                            },
+                            {
+                              key: 'total_amount',
+                              type: 'input',
+                              defaultValue: "0",
+                              className: 'col-4',
+                              templateOptions: {
+                                type: 'input',
+                                label: 'Total amount',
+                                placeholder: 'Enter Total amount',
+                                readonly: true
+                              }
+                            },
+                          ]
+                        },
+                      ]
+                    },
+                    {
+                      className: 'col-12 custom-form-card-block w-100',
+                      fieldGroup: [
+                        {
+                          template: '<div class="custom-form-card-title"> Order Attachments </div>',
+                          fieldGroupClassName: "ant-row",
+                        },
+                        {
+                          key: 'order_attachments',
+                          type: 'file',
+                          className: 'ta-cell col-12 custom-file-attachement',
+                          props: {
+                            "displayStyle": "files",
+                            "multiple": true
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          fieldGroupClassName: "col-6 m-0 custom-form-card",
+          type: 'tabs',
+          fieldGroup: [
+            {
+              className: 'col-12 custom-form-card-block',
+              props: {
+                label: 'Shipping Details'
+              },
+              fieldGroup: [
+                {
+                  template: '<div class="custom-form-card-title">  Shipping Details </div>',
+                  fieldGroupClassName: "ant-row",
+
+                },
+                {
+                  fieldGroupClassName: "ant-row",
+                  key: 'order_shipments',
+                  fieldGroup: [
+                    {
+                      key: 'destination',
+                      type: 'input',
+                      className: 'col-6',
+                      templateOptions: {
+                        label: 'Destination',
+                        placeholder: 'Enter Destination',
+                      }
+                    },
+                    {
+                      key: 'port_of_landing',
+                      type: 'input',
+                      className: 'col-6',
+                      templateOptions: {
+                        label: 'Port of Landing',
+                        placeholder: 'Enter Port of Landing',
+                      }
+                    },
+                    {
+                      key: 'shipping_mode_id',
+                      type: 'select',
+                      className: 'col-6',
+                      templateOptions: {
+                        label: 'Shipping Mode',
+                        placeholder: 'Select Shipping Mode',
+                        dataKey: 'shipping_mode_id',
+                        dataLabel: "name",
+                        bindId: true,
+                        lazy: {
+                          url: 'masters/shipping_modes',
+                          lazyOneTime: true
+                        }
+                      },
+                    },
+                    {
+                      key: 'port_of_discharge',
+                      type: 'input',
+                      className: 'col-6',
+                      templateOptions: {
+                        label: 'Port of Discharge',
+                        placeholder: 'Select Port of Discharge',
+                      }
+                    },
+                    {
+                      key: 'shipping_company_id',
+                      type: 'select',
+                      className: 'col-6',
+                      templateOptions: {
+                        label: 'Shipping Company',
+                        placeholder: 'Select Shipping Company',
+                        dataKey: 'shipping_company_id',
+                        dataLabel: "name",
+                        bindId: true,
+                        lazy: {
+                          url: 'masters/shipping_companies',
+                          lazyOneTime: true
+                        }
+                      }
+                    },
+                    {
+                      key: 'no_of_packets',
+                      type: 'input',
+                      className: 'col-6',
+                      templateOptions: {
+                        type: "number",
+                        label: 'No. of Packets',
+                        placeholder: 'Select No. of Packets',
+                      }
+                    },
+                    {
+                      key: 'weight',
+                      type: 'input',
+                      className: 'col-6',
+                      templateOptions: {
+                        type: "number",
+                        label: 'Weight',
+                        placeholder: 'Enter Weight',
+                      }
+                    },
+                    {
+                      key: 'shipping_tracking_no',
+                      type: 'input',
+                      className: 'col-6',
+                      templateOptions: {
+                        label: 'Shipping Tracking No.',
+                        placeholder: 'Enter Shipping Tracking No.',
+                        // readonly: true
+                      }
+                    },
+                    {
+                      key: 'shipping_date',
+                      type: 'date',
+                      className: 'col-6',
+                      // defaultValue: this.nowDate(),
+                      templateOptions: {
+                        type: 'date',
+                        label: 'Shipping Date',
+                        // required: true
+                      }
+                    },
+                    {
+                      key: 'shipping_charges',
+                      type: 'input',
+                      className: 'col-6',
+                      templateOptions: {
+                        type: "number",
+                        label: 'Shipping Charges.',
+                        placeholder: 'Enter Shipping Charges',
+                        // required: true
+                      }
+                    }
+                  ]
+                },
+              ]
+            },
+            {
+              className: 'col-12 pb-0',
+              fieldGroupClassName: "field-no-bottom-space",
+              props: {
+                label: 'Billing Details'
+              },
+              fieldGroup: [
+                {
+                  fieldGroupClassName: "",
+                  fieldGroup: [
+                    {
+                      className: 'col-12 mb-3 custom-form-card-block w-100',
+                      fieldGroup: [
+                        {
+                          template: '<div class="custom-form-card-title"> Billing Details </div>',
+                          fieldGroupClassName: "ant-row",
+                        },
+                        {
+                          fieldGroupClassName: "ant-row",
+                          key: 'sale_order',
+                          fieldGroup: [
+
+
+                            {
+                              key: 'total_boxes',
+                              type: 'input',
+                              className: 'col-4',
+                              templateOptions: {
+                                type: 'number',
+                                label: 'Total boxes',
+                                placeholder: 'Enter Total boxes'
+                              }
+                            },
+                            {
+                              key: 'cess_amount',
+                              type: 'input',
+                              defaultValue: "0",
+                              className: 'col-4',
+                              templateOptions: {
+                                type: 'number',
+                                label: 'Cess amount',
+                                placeholder: 'Enter Cess amount'
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    this.totalAmountCal();
+
+                                  })
+                                }
+                              }
+                            },
+                            {
+                              key: 'advance_amount',
+                              type: 'input',
+                              className: 'col-4',
+                              templateOptions: {
+                                type: 'number',
+                                label: 'Advance amount',
+                                placeholder: 'Enter Advance amount'
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    this.totalAmountCal();
+                                  })
+                                }
+                              }
+                            },
+                            {
+                              key: 'taxable',
+                              type: 'input',
+                              className: 'col-4',
+                              templateOptions: {
+                                type: 'input',
+                                label: 'Taxable',
+                                placeholder: 'Enter Taxable'
+                              }
+                            },
+                            {
+                              key: 'tax_amount',
+                              type: 'input',
+                              defaultValue: "0",
+                              className: 'col-4',
+                              templateOptions: {
+                                type: 'number',
+                                label: 'Tax amount',
+                                placeholder: 'Enter Tax amount'
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    this.totalAmountCal();
+                                  })
+                                }
+                              }
+                            },
+
+                            {
+                              key: 'gst_type',
+                              type: 'select',
+                              className: 'col-4',
+                              templateOptions: {
+                                label: 'Gst type',
+                                placeholder: 'Select Gst type',
+                                dataKey: 'name',
+                                dataLabel: "name",
+                                lazy: {
+                                  url: 'masters/gst_types/',
+                                  lazyOneTime: true
+                                }
+                              },
+                              hooks: {
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    //console.log("gst_type", data);
+                                    if (data && data.gst_type_id) {
+                                      this.formConfig.model['sale_order']['gst_type_id'] = data.gst_type_id;
+                                    }
+                                  });
+                                }
+                              }
+                            },
+                            {
+                              key: 'payment_term',
+                              type: 'select',
+                              className: 'col-4',
+                              templateOptions: {
+                                label: 'Payment term',
+                                placeholder: 'Select Payment term',
+                                dataKey: 'name',
+                                dataLabel: "name",
+                                lazy: {
+                                  url: 'masters/customer_payment_terms/',
+                                  lazyOneTime: true
+                                }
+                              },
+                              hooks: {
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    //console.log("payment_term", data);
+                                    if (data && data.payment_term_id) {
+                                      this.formConfig.model['sale_order']['payment_term_id'] = data.payment_term_id;
+                                    }
+                                  });
+                                }
+                              }
+                            },
+                            {
+                              key: 'ledger_account',
+                              type: 'select',
+                              className: 'col-4',
+                              templateOptions: {
+                                dataKey: 'name',
+                                dataLabel: "name",
+                                label: 'Ledger account',
+                                placeholder: 'Select Ledger account',
+                                lazy: {
+                                  url: 'customers/ledger_accounts/',
+                                  lazyOneTime: true
+                                }
+                              },
+                              hooks: {
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    //console.log("ledger_account", data);
+                                    if (data && data.ledger_account_id) {
+                                      this.formConfig.model['sale_order']['ledger_account_id'] = data.ledger_account_id;
+                                    }
+                                  });
+                                }
+                              }
+                            },
+                            {
+                              key: 'order_status',
+                              type: 'select',
+                              className: 'col-4',
+                              templateOptions: {
+                                label: 'Order status',
+                                dataKey: 'order_status_id',
+                                dataLabel: 'status_name',
+                                placeholder: 'Select Order status type',
+                                lazy: {
+                                  url: 'masters/order_status/',
+                                  lazyOneTime: true
+                                },
+                                expressions: {
+                                  hide: '!model.sale_order_id',
+                                },
+                              },
+                              hooks: {
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    //console.log("ledger_account", data);
+                                    if (data && data.order_status_id) {
+                                      this.formConfig.model['sale_order']['order_status_id'] = data.order_status_id;
+                                    }
+                                  });
+                                }
+                              }
+                            },
+                            {
+                              key: 'flow_status',
+                              type: 'select',
+                              className: 'col-4',
+                              templateOptions: {
+                                label: 'Flow status',
+                                dataKey: 'flow_status_id',
+                                dataLabel: 'flow_status_name',
+                                // placeholder: 'Select Order status type',
+                                lazy: {
+                                  url: 'masters/flow_status/',
+                                  lazyOneTime: true
+                                },
+                                // expressions: {
+                                //   hide: '!model.sale_order_id',
+                                // },
+                              },
+                              hooks: {
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    //console.log("ledger_account", data);
+                                    if (data && data.flow_status_id) {
+                                      this.formConfig.model['sale_order']['flow_status_id'] = data.flow_status_id;
+                                    }
+                                  });
+                                  const valueChangesSubscription = field.formControl.valueChanges.subscribe(data => {
+                                    const saleOrder = this.formConfig.model['sale_order'];
+                                    console.log("Sale order: ", saleOrder);
+
+                                    // Prepare invoice data
+                                    const saleOrderItems = this.formConfig.model['sale_order_items'];
+                                    const orderAttachments = this.formConfig.model['order_attachments'];
+                                    const orderShipments = this.formConfig.model['order_shipments'];
+
+                                    this.invoiceData = {
+                                      sale_invoice_order: {
+                                        bill_type: saleOrder.bill_type || 'CASH',
+                                        sale_order_id: saleOrder.sale_order_id,
+                                        invoice_date: this.nowDate(),
+                                        email: saleOrder.email,
+                                        ref_no: saleOrder.ref_no,
+                                        ref_date: this.nowDate(),
+                                        tax: saleOrder.tax || 'Inclusive',
+                                        due_date: saleOrder.due_date,
+                                        remarks: saleOrder.remarks,
+                                        advance_amount: saleOrder.advance_amount,
+                                        item_value: saleOrder.item_value,
+                                        discount: saleOrder.discount,
+                                        dis_amt: saleOrder.dis_amt,
+                                        taxable: saleOrder.taxable,
+                                        tax_amount: saleOrder.tax_amount,
+                                        cess_amount: saleOrder.cess_amount,
+                                        transport_charges: saleOrder.transport_charges,
+                                        round_off: saleOrder.round_off,
+                                        total_amount: saleOrder.total_amount,
+                                        vehicle_name: saleOrder.vehicle_name,
+                                        total_boxes: saleOrder.total_boxes,
+                                        shipping_address: saleOrder.shipping_address,
+                                        billing_address: saleOrder.billing_address,
+                                        customer_id: saleOrder.customer_id,
+                                        gst_type_id: saleOrder.gst_type_id,
+                                        order_type: saleOrder.order_type || 'sale_invoice',
+                                        order_salesman_id: saleOrder.order_salesman_id,
+                                        customer_address_id: saleOrder.customer_address_id,
+                                        payment_term_id: saleOrder.payment_term_id,
+                                        payment_link_type_id: saleOrder.payment_link_type_id,
+                                        ledger_account_id: saleOrder.ledger_account_id,
+                                        flow_status: saleOrder.flow_status
+                                      },
+                                      sale_invoice_items: saleOrderItems,
+                                      order_attachments: orderAttachments,
+                                      order_shipments: orderShipments
+                                    };
+
+                                    console.log('invoiceData:', this.invoiceData);
+                                  });
+                                }
+                              }
+                            },
                             {
                               key: 'item_value',
                               type: 'input',
