@@ -4,6 +4,7 @@ import { ProductionStatusesComponent } from './production-statuses/production-st
 import { MachinesComponent } from './machines/machines.component';
 import { ProductionComponent } from './production.component';
 import { WorkorderboardComponent } from './workorderboard/workorderboard.component';
+import { BomComponent } from './bom/bom.component';
 
 
 const routes: Routes = [
@@ -22,6 +23,10 @@ const routes: Routes = [
   {
     path :'workorderboard',
     component: WorkorderboardComponent
+  },
+  {
+    path :'bom',
+    component: BomComponent
   }
 ];
 
