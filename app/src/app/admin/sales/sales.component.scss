@@ -96,3 +96,55 @@
   background-color: rgba(0, 0, 0, 0.5); // Adjust opacity as needed 
   z-index: 999; //Ensure it's below the modal but above other content 
 }
+
+.custom-dialog-box .custom-select {
+    -webkit-appearance: menulist; /* Ensures dropdown symbol appears across browsers */
+    -moz-appearance: menulist;
+    appearance: menulist;
+    padding-right: 25px; /* Add space for dropdown arrow */
+    background: #fff;//url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns%3D%27http%3A//www.w3.org/2000/svg%27 viewBox%3D%270 0 4 5%27%3E%3Cpath fill%3D%27%23000%27 d%3D%27M2 0L0 2h4z%27/%3E%3C/svg%3E') no-repeat right center;
+    background-size: 8px 8px;
+}
+
+.toast-message {
+    /* Existing styles */
+    animation: fadeOut 5s ease-in-out forwards;
+    background-color: #fff;
+    color: #000;
+    border: 1px solid #008044;
+    border-radius: 0;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+  }
+  
+.tick-circle {
+    margin-right: 10px;
+    width: 24px;
+    height: 24px;
+    border: 1px solid #008044;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+.tick-mark {
+    color: #008044;
+    font-size: 16px;
+  }
+  
+.toast-message-text {
+    flex-grow: 1;
+    margin-right: 10px;
+  }
+  
+.close-button {
+    background: none;
+    border: none;
+    color: #000;
+    cursor: pointer;
+    font-size: 16px;
+    margin-left: 5px;
+    padding: 0;
+  }

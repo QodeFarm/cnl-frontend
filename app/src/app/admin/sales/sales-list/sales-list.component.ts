@@ -63,6 +63,11 @@ export class SalesListComponent {
         sort: true
       },
       {
+        fieldKey: 'sale_estimate',
+        name: 'Sale Estimate',
+        sort: true
+      },
+      {
         fieldKey: 'amount',
         name: 'Amount',
         sort: true
@@ -77,24 +82,6 @@ export class SalesListComponent {
         name: 'Advance Amt',
         sort: true
       },
-      // {
-      //   fieldKey: 'job_type_id',
-      //   name: 'Document Status',
-      //   displayType: "map",
-      //   mapFn: (currentValue: any, row: any, col: any) => {
-      //     return `${row.job_type_id.job_type_name}`;
-      //   },
-      //   sort: true
-      // },
-      // {
-      //   fieldKey: 'job_code_id',
-      //   name: 'Print Count',
-      //   displayType: "map",
-      //   mapFn: (currentValue: any, row: any, col: any) => {
-      //     return `${row.job_code_id.job_code}`;
-      //   },
-      //   sort: true
-      // },
       {
         fieldKey: 'status_name',
         name: 'Status',
