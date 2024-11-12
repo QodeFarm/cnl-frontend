@@ -1029,14 +1029,14 @@ export class PurchaseComponent {
                       templateOptions: {
                         label: 'Shipping Tracking No',
                         placeholder: 'Enter Shipping Tracking No',
-                        readonly: true,
-                        disabled: true
+                        // readonly: true,
+                        // disabled: true
                       }
                     },
                     {
                         key: 'shipping_date',
                         type: 'date',
-                        defaultValue: this.nowDate(),
+                        // defaultValue: this.nowDate(),
                         className: 'col-6',
                         templateOptions: {
                           type: 'date',
