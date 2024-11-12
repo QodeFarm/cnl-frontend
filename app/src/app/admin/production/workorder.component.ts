@@ -5,6 +5,9 @@ import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { WorkOrderListComponent } from './work-order-list/work-order-list.component';
 
+import { forkJoin, of } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
+
 
 @Component({
   selector: 'app-production',
@@ -110,10 +113,34 @@ submitWorkOrder() {
 }
 
 populateBom(product_id:any){
-  const url = `production/bill_of_materials/?product_id=${product_id}`
-  this.http.get(url).subscribe((response: any) => {
-    console.log('response ::', response)
-  })
+  if (this.formConfig.model.work_order && !this.formConfig.model.work_order.work_order_id) {
+    const url = `production/bom/?product_id=${product_id}`
+    this.http.get(url).subscribe((response: any) => {
+      let bom_id = null
+      if (response.data[0]){
+        bom_id  = response.data[0].bom_id
+        this.http.get(`production/bom/${bom_id}`).subscribe((data: any) => {
+          const bom = {
+            'work_order':this.formConfig.model.work_order,
+            'bom': data.data.bill_of_material,
+            'work_order_machines': this.formConfig.model.work_order_machines,
+            'workers': this.formConfig.model.workers,
+            'work_order_stages': this.formConfig.model.work_order_stages,
+          }
+          this.formConfig.model = bom
+        });
+      } else {
+        const bom = {
+          'work_order':this.formConfig.model.work_order,
+          'bom': [{}],
+          'work_order_machines': this.formConfig.model.work_order_machines,
+          'workers': this.formConfig.model.workers,
+          'work_order_stages': this.formConfig.model.work_order_stages,
+        }
+        this.formConfig.model = bom
+      }
+    })
+  }
 };
 
 
@@ -169,7 +196,6 @@ populateBom(product_id:any){
               hooks:{
                 onInit:(field:any)=>{
                   field.formControl.valueChanges.subscribe((data: any) => {
-                  console.log('product_id ::',field.formControl.value)
                   const product_id = field.formControl.value
                   this.populateBom(product_id)
                   });
@@ -227,210 +253,6 @@ populateBom(product_id:any){
             
           ]
         },
-		    //-----------------------------------Bill of material-------------------------------------
-        // {
-        //   key: 'bom',
-        //   type: 'table',
-        //   className: 'custom-form-list',
-        //   templateOptions: {
-        //     title: 'Material',
-        //     addText: 'Add Material',
-        //     tableCols: [
-        //       { name: 'product_id', label: 'Material' },
-        //       { name: 'quantity_required', label: 'Quantity Required' },
-        //       { name: 'component_name', label: 'Component Name' },
-        //     ]
-        //   },
-        //   fieldArray: {
-        //     fieldGroup: [
-        //       {
-        //         key: 'product',
-        //         type: 'select',
-        //         templateOptions: {
-        //           label: 'Product',
-        //           dataKey: 'product_id',
-        //           hideLabel: true,
-        //           dataLabel: 'name',
-        //           options: [],
-        //           required: true,
-        //           lazy: {
-        //           url: 'products/products/',
-        //           lazyOneTime: true
-        //           }
-        //         },
-        //         hooks: {
-        //           onChanges: (field: any) => {
-        //             field.formControl.valueChanges.subscribe((data: any) => {
-        //               const index = field.parent.key;
-        //               if (!this.formConfig.model['bill_of_material'][index]) {
-        //                 console.error(`Products at index ${index} is not defined. Initializing...`);
-        //                 this.formConfig.model['bill_of_material'][index] = {};
-        //               }
-        //               this.formConfig.model['bill_of_material'][index]['product_id'] = data.product_id;
-        //             });
-        //           }
-        //         }
-        //       },
-        //       {
-        //         key: 'size',
-        //         type: 'select',
-        //         templateOptions: {
-        //           label: 'Size',
-        //           dataKey: 'size_id',
-        //           hideLabel: true,
-        //           dataLabel: 'size_name',
-        //           options: [],
-        //           required: false,
-        //           lazy: {
-        //             lazyOneTime: true,
-        //             url : 'products/sizes/'
-        //           }
-        //         },
-        //         hooks: {
-        //           onChanges: (field: any) => {
-        //             field.formControl.valueChanges.subscribe((data: any) => {
-        //               const index = field.parent.key;
-        //               if (!this.formConfig.model['bill_of_material'][index]) {
-        //                 console.error(`Products at index ${index} is not defined. Initializing...`);
-        //                 this.formConfig.model['bill_of_material'][index] = {};
-        //               }
-        //               this.formConfig.model['bill_of_material'][index]['size_id'] = data.size_id;
-        //             });
-        //           }
-        //         }
-        //       },
-        //       {
-        //         key: 'color',
-        //         type: 'select',
-        //         templateOptions: {
-        //           label: 'Color',
-        //           dataKey: 'color_id',
-        //           hideLabel: true,
-        //           dataLabel: 'color_name',
-        //           options: [],
-        //           required: false,
-        //           lazy: {
-        //             lazyOneTime: true,
-        //             url : 'products/colors/'
-        //           }
-        //         },
-        //         hooks: {
-        //           onChanges: (field: any) => {
-        //             field.formControl.valueChanges.subscribe((data: any) => {
-        //               const index = field.parent.key;
-        //               if (!this.formConfig.model['bill_of_material'][index]) {
-        //                 console.error(`Products at index ${index} is not defined. Initializing...`);
-        //                 this.formConfig.model['bill_of_material'][index] = {};
-        //               }
-        //               this.formConfig.model['bill_of_material'][index]['color_id'] = data.color_id;
-        //             });
-        //           }
-        //         }
-        //       },
-        //       {
-        //         key: 'quantity',
-        //         type: 'input',
-        //         templateOptions: {
-        //           label: 'Quantity',
-        //           placeholder: 'Enter Quantity',
-        //           hideLabel: true,
-        //           required: true,
-        //           type: 'number'
-        //         }
-        //       },
-        //       {
-        //         key: 'unit_cost',
-        //         type: 'input',
-        //         templateOptions: {
-        //           label: 'Unit Cost',
-        //           placeholder: 'Enter Unit Cost',
-        //           hideLabel: true,
-        //           required: true,
-        //           type: 'number'
-        //         },
-        //         hooks:{
-        //           onInit: (field: any) => {
-        //             field.formControl.valueChanges.subscribe(data => {
-        //               if (field.form && field.form.controls && field.form.controls.quantity && field.form.controls.unit_cost && data) {
-        //                 const quantity = field.form.controls.quantity.value;
-        //                 const unit_cost = field.form.controls.unit_cost.value;
-        //                 if (quantity && unit_cost) {
-        //                   field.form.controls.total_cost.setValue(parseInt(quantity) * parseInt(unit_cost));
-        //                 }
-        //               } else {
-        //                 field.form.controls.total_cost.setValue(0);
-        //               }
-        //             })
-        //           },
-        //         }
-        //       },
-        //       {
-        //         key: 'total_cost',
-        //         type: 'input',
-        //         templateOptions: {
-        //           label: 'Total Cost',
-        //           placeholder: 'Enter Total Cost',
-        //           hideLabel: true,
-        //           required: true,
-        //           disabled: true
-        //         },
-        //       },              
-        //       {
-        //         key: 'notes',
-        //         type: 'text',
-        //         templateOptions: {
-        //           label: 'Notes',
-        //           placeholder: 'Enter Notes',
-        //           hideLabel: true,
-        //           required: false
-        //         }
-        //       },
-        //       // {
-        //       //   key: 'product_id',
-        //       //   type: 'select',
-        //       //   className: 'col',
-        //       //   templateOptions: {
-        //       //     label: 'Product',
-        //       //     placeholder: 'Select Product',
-        //       //     dataKey: 'product_id',
-        //       //     dataLabel: 'name',
-        //       //     hideLabel: true,
-        //       //     required: true,
-        //       //     bindId: true,
-        //       //     lazy: {
-        //       //       // url: 'products/products_get/?type_name=Unfinished',
-        //       //       url: 'products/products_get/',
-        //       //       lazyOneTime: true
-        //       //     }
-        //       //   },
-        //       // },
-        //       // {
-        //       //   key: 'component_name',
-        //       //   type: 'input',
-        //       //   className: 'col',
-        //       //   templateOptions: {
-        //       //     label: 'Component',
-        //       //     placeholder: 'Enter Component Name',
-        //       //     hideLabel: true,
-        //       //     multiple: true,
-        //       //     required: true
-        //       //   }
-        //       // },
-        //       // {
-        //       //   key: 'quantity_required',
-        //       //   type: 'input',
-        //       //   className: 'col',
-        //       //   templateOptions: {
-        //       //     label: 'Quantity',
-        //       //     placeholder: 'Enter Quantity',
-        //       //     hideLabel: true,
-        //       //     multiple: true,
-        //       //     required: true
-        //       //   }
-        //       // }
-        //     ]
-        //   }
-        // },
         {
           key: 'bom',
           type: 'table',
@@ -473,7 +295,7 @@ populateBom(product_id:any){
                         console.error(`Products at index ${index} is not defined. Initializing...`);
                         this.formConfig.model['bom'][index] = {};
                       }
-                      this.formConfig.model['bom'][index]['product_id'] = data.product_id;
+                      this.formConfig.model['bom'][index]['product_id'] = data?.product_id;
                     });
                   }
                 }
@@ -501,7 +323,7 @@ populateBom(product_id:any){
                         console.error(`Products at index ${index} is not defined. Initializing...`);
                         this.formConfig.model['bom'][index] = {};
                       }
-                      this.formConfig.model['bom'][index]['size_id'] = data.size_id;
+                      this.formConfig.model['bom'][index]['size_id'] = data?.size_id;
                     });
                   }
                 }
@@ -529,7 +351,7 @@ populateBom(product_id:any){
                         console.error(`Products at index ${index} is not defined. Initializing...`);
                         this.formConfig.model['bom'][index] = {};
                       }
-                      this.formConfig.model['bom'][index]['color_id'] = data.color_id;
+                      this.formConfig.model['bom'][index]['color_id'] = data?.color_id;
                     });
                   }
                 }
