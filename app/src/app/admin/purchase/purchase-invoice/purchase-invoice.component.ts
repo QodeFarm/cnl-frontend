@@ -745,7 +745,7 @@ export class PurchaseInvoiceComponent {
               {
                 type: 'input',
                 key: 'quantity',
-                defaultValue: 1,
+                //defaultValue: 1,
                 templateOptions: {
                   type: 'number',
                   label: 'Qty',
@@ -979,13 +979,13 @@ export class PurchaseInvoiceComponent {
                       templateOptions: {
                         label: 'Shipping Tracking No.',
                         placeholder: 'Enter Shipping Tracking No.',
-                        disabled: true
+                        // disabled: true
                       }
                     },
                     {
                       key: 'shipping_date',
                       type: 'date',
-                      defaultValue: this.nowDate(),
+                      // defaultValue: this.nowDate(),
                       className: 'col-6',
                       templateOptions: {
                         type: 'date',

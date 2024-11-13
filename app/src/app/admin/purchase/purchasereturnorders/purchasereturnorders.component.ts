@@ -731,7 +731,7 @@ export class PurchasereturnordersComponent {
               {
                 type: 'input',
                 key: 'quantity',
-                defaultValue: 1,
+                //defaultValue: 1,
                 templateOptions: {
                   type: 'number',
                   label: 'Qty',
@@ -996,7 +996,7 @@ export class PurchasereturnordersComponent {
                       templateOptions: {
                         label: 'Shipping Tracking No.',
                         placeholder: 'Enter Shipping Tracking No.',
-                        disabled: true
+                        // disabled: true
                       }
                     },
                     {
