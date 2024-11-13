@@ -7,16 +7,25 @@
       </button>
             <div style="display: flex; gap: 10px;">
                 <!-- New Copy Button -->
-                <button (click)="openCopyModal()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#copyModal">
+            <button (click)="openCopyModal()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#copyModal">
                 Copy
             </button>
-                <button (click)="showOrdersList()" type="button" class="btn btn-primary">
-          Past orders</button>
-                <button *checkAction="{ moduleName: 'Sales', sectionName: 'Customers', actionName: 'Update' }" (click)="showSaleOrderListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#saleOrderListModal">
+
+            <button (click)="showOrdersList()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ordersListModal">
+                Past Orders
+            </button>
+            
+            <button (click)="showSaleOrderListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#saleOrderListModal">
+                Sales Order List
+            </button>
+
+        <!-- <button *checkAction="{ moduleName: 'Sales', sectionName: 'Customers', actionName: 'Update' }" (click)="showSaleOrderListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#saleOrderListModal">
           Sales Order List
-        </button>
+        </button>  Commented this code causing issues(form is not displaying) now pasted old code-->
+
+
                 <!-- Invoice Creation Button (Only for Edit and if flow status is "Ready for Invoice") -->
-                <button *ngIf="SaleOrderEditID && formConfig.model.sale_order.flow_status.flow_status_name === 'Ready for Invoice'" (click)="openSaleInvoiceModal()" type="button" class="btn btn-primary">
+        <button *ngIf="SaleOrderEditID && formConfig.model.sale_order.flow_status.flow_status_name === 'Ready for Invoice'" (click)="openSaleInvoiceModal()" type="button" class="btn btn-primary">
             Create Invoice
         </button>
 
@@ -29,7 +38,7 @@
         </div>
     </div>
 
-    <div class="row custom-form" *checkAction="{ moduleName: 'Sales', sectionName: 'Sale Order', actionName: 'Create' }">
+    <div class="row custom-form"> <!--  removed this commented line because when I refresh the page form is not displaying *checkAction="{ moduleName: 'Sales', sectionName: 'Sale Order', actionName: 'Create' }" -->
         <div class="col-12 px-1" *ngIf="orderNumber || showForm">
             <ta-form #salesForm [options]="formConfig"></ta-form>
         </div>
@@ -60,10 +69,17 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="ordersListModalLabel">Past Orders List</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="hideModal()"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <app-orderslist [customerOrders]="customerOrders" (orderSelected)="handleOrderSelected($event)" [noOrdersMessage]="noOrdersMessage" (productsPulled)="handleProductPull($event)" (modalClosed)="closeModal()">
+                <app-orderslist 
+                    [customerOrders]="customerOrders" 
+                    [noOrdersMessage]="noOrdersMessage"
+                    (orderSelected)="handleOrderSelected($event)"
+                    [selectedCustomerId]="formConfig.model.sale_order.customer_id"
+                    (productsPulled)="handleProductPull($event)" 
+                    (modalClosed)="closeOrdersListModal()" 
+                    class="custom-list">
                 </app-orderslist>
             </div>
         </div>
@@ -137,6 +153,3 @@
     <span class="toast-message-text">{{ toastMessage }}</span>
     <button class="close-button" (click)="closeToast()">x</button>
 </div>
-
-<div class="modal-backdrop" *ngIf="isModalOpen"></div>
-<!-- Added line to fix past orders modal box correctly -->

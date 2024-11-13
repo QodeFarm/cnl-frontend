@@ -51,6 +51,9 @@ export class TaTableComponent implements OnDestroy {
   @Input() options!: TaTableConfig;
   @Output() doAction: EventEmitter<any> = new EventEmitter();
   @ViewChild('taTable') taTable!: NzTableComponent<any> | any;
+  selectedProducts: any[] = []; // This holds the selected products
+  @Output() selectedProductsChange = new EventEmitter<any[]>(); // Event emitter to notify parent component
+  
 
   selectedStatus: string | null = null;
   selectedQuickPeriod: string | null = null;
@@ -522,6 +525,82 @@ export class TaTableComponent implements OnDestroy {
     // Optionally, emit the event to parent if needed
     this.doAction.emit({ action, row });
   }
+
+  onProductCheckboxChange(row: any, product: any, event: Event): void { 
+    const isChecked = (event.target as HTMLInputElement).checked;
+  
+    if (isChecked) {
+        // Fetch sale order for the selected row, specifically for the selected item
+        this.getOrderDetails(row.sale_order_id).then(orderData => {
+            const saleOrderItems = orderData.sale_order_items || [];
+  
+            // Find the specific item within saleOrderItems that matches the selected product
+            const selectedItem = saleOrderItems.find(item => 
+                item.product.product_id === product.product_id && item.quantity === product.quantity
+            );
+  
+            if (selectedItem) {
+                const fullProductDetails = {
+                    ...product,
+                    product_id: selectedItem.product.product_id,
+                    name: selectedItem.product.name,
+                    code: selectedItem.product.code,
+                    discount: selectedItem.discount,
+                    total_boxes: selectedItem.total_boxes,
+                    rate: selectedItem.rate,
+                    tax: selectedItem.tax,
+                    remarks: selectedItem.remarks,
+                    amount: selectedItem.amount,
+                    unit_options_id: selectedItem.unit_options_id,
+                    quantity: selectedItem.quantity,
+                    print_name: selectedItem.print_name || 'N/A',
+                    
+                    // Ensuring "Unspecified" fallback is set consistently
+                    size: {
+                        size_id: selectedItem.size_id || null,
+                        size_name: selectedItem.size?.size_name || null  // Fallback to 'Unspecified'
+                    },
+                    color: {
+                        color_id: selectedItem.color_id || null,
+                        color_name: selectedItem.color?.color_name || null // Fallback to 'Unspecified'
+                    },
+                    size_id: selectedItem.size_id,
+                    color_id: selectedItem.color_id,
+                };
+  
+                // Add the specific item to selectedProducts
+                this.selectedProducts.push(fullProductDetails);
+                
+                // Emit and log the updated list of selected products
+                this.selectedProductsChange.emit(this.selectedProducts);
+                console.log('Pulled selected products with full details:', this.selectedProducts);
+            } else {
+                console.warn('No matching product found for selection:', product);
+            }
+        }).catch(error => {
+            console.error('Error fetching order details:', error);
+        });
+    } else {
+        // Remove product from selected list when unchecked
+        this.selectedProducts = this.selectedProducts.filter(
+            item => item.product_id !== product.product_id || item.order.sale_order_id !== row.sale_order_id
+        );
+        this.selectedProductsChange.emit(this.selectedProducts); // Emit updated list
+    }
+  }
+  
+  // Fetch sale order details including items, sizes, and colors
+  private getOrderDetails(saleOrderId: string): Promise<any> {
+      const url = `sales/sale_order/${saleOrderId}/`;
+  
+      return this.http.get<any>(url)
+          .toPromise()
+          .then(res => {
+              console.log('Fetched sale order details:', res.data);
+              return res.data; // This includes sale_order and sale_order_items
+          });
+  }
+  
   // Additional code for handling action button events in the table(added this code for file upload)(end)
   
   // getFilters(){

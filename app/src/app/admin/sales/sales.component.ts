@@ -20,7 +20,7 @@ import { BindingType } from '@angular/compiler';
 })
 export class SalesComponent {
   @ViewChild('salesForm', { static: false }) salesForm: TaFormComponent | undefined;
-  @ViewChild('ordersModal', { static: true }) ordersModal: ElementRef;
+  @ViewChild('ordersModal', { static: false }) ordersModal: ElementRef;
   orderNumber: any;
   invoiceData: any;
   salesReceiptForm: FormGroup;
@@ -35,7 +35,7 @@ export class SalesComponent {
   noOrdersMessage: string;
   shippingTrackingNumber: any;
   unitOptionOfProduct: any[] | string = []; // Initialize as an array by default
-  isModalOpen = false;  //Added line to fix past orders modal box correctly
+  // isModalOpen = false;  //Added line to fix past orders modal box correctly
   //COPY ---------------------------------
   // List of all tables
   tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
@@ -224,10 +224,6 @@ export class SalesComponent {
       }, 3000);
   }
 
-  // Closes the modal and removes the modal backdrop
-  closeModal() {
-    this.hideModal(); // Use the hideModal method to remove the modal elements
-  }
 
 //=========================================================
 
@@ -321,23 +317,20 @@ export class SalesComponent {
 
   // Shows the past orders list modal and fetches orders based on the selected customer
   showOrdersList() {
-    this.isModalOpen = true;  //Added line to fix past orders modal box correctly
-    // Ensure customer is selected
+    // this.isModalOpen = true;
     const selectedCustomerId = this.formConfig.model.sale_order.customer_id;
     const selectedCustomerName = this.formConfig.model.sale_order.customer?.name;
-    // Debugging logs to ensure customer_id is correctly set
-    //console.log("Selected Customer ID:", selectedCustomerId);
-    //console.log("Selected Customer Name:", selectedCustomerName);
-
+  
     if (!selectedCustomerId) {
       this.noOrdersMessage = 'Please select a customer.';
       this.customerOrders = [];
       this.openModal();
       return;
     }
+  
     this.customerOrders = [];
     this.noOrdersMessage = '';
-    // Fetch orders by customer ID and process the order details
+  
     this.getOrdersByCustomer(selectedCustomerId).pipe(
       switchMap(orders => {
         if (orders.count === 0) {
@@ -346,39 +339,42 @@ export class SalesComponent {
           this.openModal();
           return [];
         }
-
+  
         const detailedOrderRequests = orders.data.map(order =>
           this.getOrderDetails(order.sale_order_id).pipe(
             tap(orderDetails => {
+              // Map the productsList
               order.productsList = orderDetails.data.sale_order_items.map(item => ({
-                product_id: item.product.product_id,
                 product_name: item.product?.name ?? 'Unknown Product',
                 quantity: item.quantity,
-                code: item.product.code,
-                unit_options_id: item.unit_options.unit_options_id,
-                total_boxes: item.total_boxes,
+                code: item.product?.code,
                 rate: item.rate,
-                discount: item.discount,
-                print_name: item.print_name,
                 amount: item.amount,
-                tax: item.tax,
-                remarks: item.remarks,
+                discount: item.discount,
+                unit_name: item.unit_options?.unit_name ?? 'N/A',
+                total_boxes: item.total_boxes ?? 0,
+                size: item.size?.size_name ?? 'N/A', 
+                color: item.color?.color_name ?? 'N/A',
+                remarks: item.remarks ?? '',
+                tax: item.tax ?? 0,
+                print_name: item.print_name ?? item.product?.name ?? 'N/A'
               }));
+              console.log(`Mapped productsList for Order ID: ${order.sale_order_id}`, order.productsList);
             })
           )
         );
-
-        // Wait for all detailed order requests to complete before updating the UI
+  
         return forkJoin(detailedOrderRequests).pipe(
           tap(() => {
-            this.customerOrders = orders.data; // Update the customer orders list
+            this.customerOrders = orders.data;
+            console.log('Orders and their productsList successfully fetched.');
             this.openModal();
           })
         );
       })
     ).subscribe();
-    this.openModal(); //Added line to fix past orders modal box correctly
   }
+  
 
   openModal() {
     this.ordersModal.nativeElement.classList.add('show');
@@ -402,145 +398,200 @@ export class SalesComponent {
   }
 
   // Handles the selection of an order from the list
-  selectOrder(order: any) {
-    //console.log('Selected Order:', order);
-    this.handleOrderSelected(order); // Handle order selection
+selectOrder(order: any) {
+  console.log('Order selected:', order); // Output the order object for debugging
+
+  // Extract the sale_order_id correctly
+  const orderId = typeof order === 'object' && order.sale_order_id ? order.sale_order_id : null;
+
+  if (orderId && typeof orderId === 'string') {
+    console.log('Order ID:', orderId); // Output the extracted ID
+    this.handleOrderSelected(orderId); // Pass the extracted ID
+  } else {
+    console.error('Invalid orderId, expected a string:', order);
   }
-
+}
   // Handles the order selection process and updates the form model with the order details
-  handleOrderSelected(orderId: any) {
-    this.SaleOrderEditID = null;
-    this.http.get('sales/sale_order/' + orderId).subscribe((res: any) => {
-      if (res && res.data) {
-        this.formConfig.model = res.data; // Update the form model with the selected order details
-
-        // Ensure the order type is always 'sale_order'
-        if (!this.formConfig.model['sale_order']['order_type']) {
-          this.formConfig.model['sale_order']['order_type'] = 'sale_order'; // Set default order type
+  handleOrderSelected(order: any) {
+    console.log('Fetching details for Order:', order); // Log the whole order object
+  
+    // Extract the orderId correctly
+    const orderIdStr = order?.sale_order_id || '';
+  
+    // Check if orderId is valid and is a string
+    if (orderIdStr && typeof orderIdStr === 'string') {
+      this.SaleOrderEditID = null; // Ensure this is null to stay in "create" mode.
+  
+      // Fetch the order details using the correct ID
+      this.http.get(`sales/sale_order/${orderIdStr}`).subscribe(
+        (res: any) => {
+          console.log('Order details response:', res); // Added for debugging
+          if (res && res.data) {
+            // Load the form data but do not set the primary ID to ensure it stays in "create" mode
+            const orderData = res.data;
+  
+            // Remove identifiers that mark it as an existing order
+            // delete orderData.sale_order.sale_order_id;
+            // delete orderData.sale_order.id;
+  
+            // Set the model with the order data
+            this.formConfig.model = orderData;
+  
+            // Ensure the order type is always 'sale_order'
+            if (!this.formConfig.model['sale_order']['order_type']) {
+              this.formConfig.model['sale_order']['order_type'] = 'sale_order'; // Set default order type
+            }
+  
+            // Do not override the order number if one was already generated
+            // Ensure new orders start with a blank order number unless one was already generated
+            if (!this.orderNumber) {
+              this.formConfig.model['sale_order']['order_no'] = ''; // Ensure new order starts blank
+            } else {
+              this.formConfig.model['sale_order']['order_no'] = this.orderNumber; // Retain the initial order number
+            }
+  
+            // Handle the shipping tracking number similarly
+            if (!this.shippingTrackingNumber) {
+              this.formConfig.model['order_shipments']['shipping_tracking_no'] = ''; // Ensure new order starts blank
+            } else {
+              this.formConfig.model['order_shipments']['shipping_tracking_no'] = this.shippingTrackingNumber; // Retain the initial tracking number
+            }
+  
+            // Set default dates for the new order
+            this.formConfig.model['sale_order']['delivery_date'] = this.nowDate();
+            this.formConfig.model['sale_order']['order_date'] = this.nowDate();
+            this.formConfig.model['sale_order']['ref_date'] = this.nowDate();
+            // this.formConfig.model['order_shipments']['shipping_date'] = this.nowDate();
+  
+            // Show the form for creating a new order based on this data
+            this.showForm = true;
+            // this.formConfig.submit.label = 'Submit'; // Change the button label to indicate it's a creation.
+            this.cdRef.detectChanges();
+          }
+        },
+        (error) => {
+          console.error('Error fetching order details:', error);
         }
-
-        // Do not override the order number if one was already generated
-        // Ensure new orders start with a blank order number unless one was already generated
-        if (!this.orderNumber) {
-          this.formConfig.model['sale_order']['order_no'] = ''; // Ensure new order starts blank
-        } else {
-          this.formConfig.model['sale_order']['order_no'] = this.orderNumber; // Retain the initial order number
-        }
-
-        if (!this.shippingTrackingNumber) {
-          this.formConfig.model['order_shipments']['shipping_tracking_no'] = ''; // Ensure new order starts blank
-        } else {
-          this.formConfig.model['order_shipments']['shipping_tracking_no'] = this.shippingTrackingNumber; // Retain the initial tracking number
-        }
-
-
-        // Set default dates for the new order
-        this.formConfig.model['sale_order']['delivery_date'] = this.nowDate();
-        this.formConfig.model['sale_order']['order_date'] = this.nowDate();
-        this.formConfig.model['sale_order']['ref_date'] = this.nowDate();
-        // this.formConfig.model['order_shipments']['shipping_tracking_no'] = '';
-        this.formConfig.model['order_shipments']['shipping_date'] = this.nowDate();
-
-        // Set form button label to 'Create'
-        // this.formConfig.submit.label = 'Create';
-
-        // Display the form
-        this.showForm = true;
-
-        // Trigger change detection to update the form
-        this.cdRef.detectChanges();
-      }
-    }, (error) => {
-      console.error('Error fetching order details:', error);
-    });
-
+      );
+    } else {
+      console.error('Invalid orderId, expected a string:', orderIdStr);
+    }
+  
     this.hideModal();
   }
 
-  // Handles the selected products and updates the form model with them
-  handleProductPull(selectedProducts: any[]) {
-    let existingProducts = this.formConfig.model['sale_order_items'] || [];
 
-    // Clean up existing products by filtering out any undefined, null, or empty entries
-    existingProducts = existingProducts.filter((product: any) => product?.code && product.code.trim() !== "");
-
-    if (existingProducts.length === 0) {
-      // Initialize the product list if no products exist
-      this.formConfig.model['sale_order_items'] = selectedProducts.map(product => ({
-        product: {
-          product_id: product.product_id || null,
-          name: product.product_name || '',  // Ensure the actual product name is set
-          code: product.code || '',
-        },
-        product_id: product.product_id || null,
-        code: product.code || '',
-        total_boxes: product.total_boxes || 0,
-        unit_options_id: product.unit_options_id || null,
-        quantity: product.quantity || 1,
-        rate: product.rate || 0,
-        discount: product.discount || 0,
-        print_name: product.print_name || product.product_name || '', // Use print_name only if necessary
-        amount: product.amount || 0,
-        tax: product.tax || 0,
-        remarks: product.remarks || ''
-      }));
-    } else {
-      // Update existing products or add new products
-      selectedProducts.forEach(newProduct => {
-        const existingProductIndex = existingProducts.findIndex((product: any) =>
-          product.product_id === newProduct.product_id || product.code === newProduct.code
-        );
-
-        if (existingProductIndex === -1) {
-          // Add the product if it doesn't exist in the list
-          existingProducts.push({
-            product: {
-              product_id: newProduct.product_id || null,
-              name: newProduct.product_name || '',  // Ensure the actual product name is set
-              code: newProduct.code || '',
-            },
-            product_id: newProduct.product_id || null,
-            code: newProduct.code || '',
-            total_boxes: newProduct.total_boxes || 0,
-            unit_options_id: newProduct.unit_options_id || null,
-            quantity: newProduct.quantity || 1,
-            rate: newProduct.rate || 0,
-            discount: newProduct.discount || 0,
-            print_name: newProduct.print_name || newProduct.product_name || '', // Use print_name only if necessary
-            amount: newProduct.amount || 0,
-            tax: newProduct.tax || 0,
-            remarks: newProduct.remarks || ''
-          });
-        } else {
-          // Update the existing product
-          existingProducts[existingProductIndex] = {
-            ...existingProducts[existingProductIndex],
-            ...newProduct,
-            product: {
-              product_id: newProduct.product_id || existingProducts[existingProductIndex].product.product_id,
-              name: newProduct.product_name || existingProducts[existingProductIndex].product.name, // Ensure correct name is set
-              code: newProduct.code || existingProducts[existingProductIndex].product.code,
-            },
-            print_name: newProduct.print_name || newProduct.product_name || existingProducts[existingProductIndex].product.name, // Ensure correct name is shown
-          };
-        }
-      });
-
-      // Assign the updated product list back to the model
-      this.formConfig.model['sale_order_items'] = [...existingProducts];
+  closeOrdersListModal() {
+    if (!this.ordersModal || !this.ordersModal.nativeElement) {
+        console.warn('ordersModal is not defined. Skipping close operation.');
+        return;
     }
 
-    // Re-render the form
-    this.formConfig.model = { ...this.formConfig.model };
+    // Hide modal and remove modal classes
+    if (this.ordersModal.nativeElement.classList.contains('show')) {
+        this.ordersModal.nativeElement.classList.remove('show');
+        this.ordersModal.nativeElement.style.display = 'none';
+        console.log('Modal hidden successfully.');
+    } else {
+        console.warn('Modal was already hidden.');
+    }
 
-    // Trigger UI update
-    this.cdRef.detectChanges();
+    // Remove backdrop if it exists
+    const backdrops = document.querySelectorAll('.modal-backdrop');
+    if (backdrops.length > 0) {
+        backdrops.forEach(backdrop => backdrop.remove());
+        console.log('Modal backdrops removed.');
+    } else {
+        console.warn('No modal backdrop found.');
+    }
 
-    //console.log("Final Products List:", this.formConfig.model['sale_order_items']);
+    // Reset body overflow styles
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+}
+
+
+
+  // Closes the modal and removes the modal backdrop
+  closeModal() {
+    this.hideModal(); // Use the hideModal method to remove the modal elements
   }
 
+
+  // Handles the selected products and updates the form model with them
+  handleProductPull(selectedProducts: any[]) {
+    console.log('Pulled selected products in OrdersListComponent:', selectedProducts);
+
+    // Initialize sale_order_items if it doesn't exist or if it contains empty entries
+    let existingProducts = this.formConfig.model['sale_order_items'] || [];
+
+    // Remove any empty entries from existing products
+    existingProducts = existingProducts.filter(product => product && product.product_id);
+
+    // Iterate over selectedProducts and add them only if they are not duplicates
+    selectedProducts.forEach(newProduct => {
+        if (!newProduct || !newProduct.product_id || !newProduct.code) {
+            console.warn("Skipped an incomplete or undefined product:", newProduct);
+            return; // Skip if data is incomplete
+        }
+
+        // Check for duplicates by matching all relevant fields
+        const isDuplicate = existingProducts.some(existingProduct => (
+            existingProduct.product?.product_id === newProduct.product_id &&
+            existingProduct.code === newProduct.code &&
+            existingProduct.total_boxes === newProduct.total_boxes &&
+            existingProduct.size?.size_name === newProduct.size?.size_name &&
+            existingProduct.color?.color_name === newProduct.color?.color_name &&
+            existingProduct.quantity === newProduct.quantity
+        ));
+
+        if (!isDuplicate) {
+            existingProducts.push({
+                product: {
+                    product_id: newProduct.product_id,
+                    name: newProduct.name || '',
+                    code: newProduct.code || '',
+                },
+                product_id: newProduct.product_id,
+                code: newProduct.code || '',
+                total_boxes: newProduct.total_boxes || 0,
+                unit_options_id: newProduct.unit_options_id || null,
+                quantity: newProduct.quantity || 1,
+                rate: newProduct.rate || 0,
+                discount: newProduct.discount || 0,
+                print_name: newProduct.print_name || newProduct.name || '',
+                amount: newProduct.amount,
+                tax: newProduct.tax || 0,
+                remarks: newProduct.remarks || '',
+                
+                // Set size and color to "Unspecified" if not provided
+                size: {
+                    size_id: newProduct.size_id || null,
+                    size_name: newProduct.size?.size_name || 'Unspecified'
+                },
+                color: {
+                    color_id: newProduct.color_id || null,
+                    color_name: newProduct.color?.color_name || 'Unspecified'
+                },
+                size_id: newProduct.size_id,
+                color_id: newProduct.color_id
+            });
+        }
+    });
+
+    // Update the model with the final product list without duplicates or empty entries
+    this.formConfig.model['sale_order_items'] = [...existingProducts];
+
+    // Trigger change detection to update the UI
+    this.formConfig.model = { ...this.formConfig.model };
+    this.cdRef.detectChanges();
+
+    console.log("Final Products List after adding size and color:", this.formConfig.model['sale_order_items']);
+}
+
+
   hideModal() {
-    this.isModalOpen = false; //Added line to fix past orders modal box correctly
+    // this.isModalOpen = false; //Added line to fix past orders modal box correctly
     const modalBackdrop = document.querySelectorAll('.modal-backdrop'); //added querySelectorAll (before it is querySelector) to fix past orders modal box correctly
     modalBackdrop.forEach(backdrop => backdrop.remove()); //Added line to fix past orders modal box correctly
     // if (modalBackdrop) {      // Removed If block to ensure that the modal box for past orders works correctly 
@@ -562,6 +613,7 @@ export class SalesComponent {
     const url = `/products/product_variations/?product_name=${productID}`;
     return this.http.get(url).pipe(((res: any) => res.data));
   }
+  
 //=====================================================
   isConfirmationModalOpen: boolean = false;
   selectedOption: string = 'sale_order';
@@ -1678,7 +1730,7 @@ export class SalesComponent {
                       templateOptions: {
                         label: 'Shipping Tracking No.',
                         placeholder: 'Enter Shipping Tracking No.',
-                        // readonly: true
+                        readonly: true
                       }
                     },
                     {
