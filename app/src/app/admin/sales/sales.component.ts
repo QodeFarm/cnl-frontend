@@ -35,7 +35,7 @@ export class SalesComponent {
   noOrdersMessage: string;
   shippingTrackingNumber: any;
   unitOptionOfProduct: any[] | string = []; // Initialize as an array by default
-  // isModalOpen = false;  //Added line to fix past orders modal box correctly
+  isModalOpen = false;  //Added line to fix past orders modal box correctly
   //COPY ---------------------------------
   // List of all tables
   tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
@@ -377,12 +377,30 @@ export class SalesComponent {
   
 
   openModal() {
+    // Ensure any existing backdrops are removed
+    this.removeModalBackdrop();
+  
+    // Add 'show' class and display the modal
     this.ordersModal.nativeElement.classList.add('show');
     this.ordersModal.nativeElement.style.display = 'block';
+  
+    // Add backdrop and prevent body scroll
+    const backdrop = document.createElement('div');
+    backdrop.className = 'modal-backdrop fade show';
+    document.body.appendChild(backdrop);
     document.body.classList.add('modal-open');
     document.body.style.overflow = 'hidden';
   }
-
+  
+  removeModalBackdrop() {
+    // Remove all existing backdrops to prevent leftover overlays
+    document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+  
+    // Reset body styling to ensure the page is fully interactive again
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';  // Reset overflow to allow scrolling
+  }
+  
   // Fetch orders by customer ID
   getOrdersByCustomer(customerId: string): Observable<any> {
     //console.log("customer id",customerId)
@@ -482,32 +500,7 @@ selectOrder(order: any) {
 
 
   closeOrdersListModal() {
-    if (!this.ordersModal || !this.ordersModal.nativeElement) {
-        console.warn('ordersModal is not defined. Skipping close operation.');
-        return;
-    }
-
-    // Hide modal and remove modal classes
-    if (this.ordersModal.nativeElement.classList.contains('show')) {
-        this.ordersModal.nativeElement.classList.remove('show');
-        this.ordersModal.nativeElement.style.display = 'none';
-        console.log('Modal hidden successfully.');
-    } else {
-        console.warn('Modal was already hidden.');
-    }
-
-    // Remove backdrop if it exists
-    const backdrops = document.querySelectorAll('.modal-backdrop');
-    if (backdrops.length > 0) {
-        backdrops.forEach(backdrop => backdrop.remove());
-        console.log('Modal backdrops removed.');
-    } else {
-        console.warn('No modal backdrop found.');
-    }
-
-    // Reset body overflow styles
-    document.body.classList.remove('modal-open');
-    document.body.style.overflow = '';
+    this.hideModal(); 
 }
 
 
@@ -590,18 +583,24 @@ selectOrder(order: any) {
 }
 
 
-  hideModal() {
-    // this.isModalOpen = false; //Added line to fix past orders modal box correctly
-    const modalBackdrop = document.querySelectorAll('.modal-backdrop'); //added querySelectorAll (before it is querySelector) to fix past orders modal box correctly
-    modalBackdrop.forEach(backdrop => backdrop.remove()); //Added line to fix past orders modal box correctly
-    // if (modalBackdrop) {      // Removed If block to ensure that the modal box for past orders works correctly 
-    //   modalBackdrop.remove(); 
-    // }
-    this.ordersModal.nativeElement.classList.remove('show');
-    this.ordersModal.nativeElement.style.display = 'none';
-    document.body.classList.remove('modal-open');
-    document.body.style.overflow = '';
-  }
+hideModal() {
+  console.log('hideModal called'); // Log to check if hideModal is triggered
+
+  // Hide the modal itself
+  this.ordersModal.nativeElement.classList.remove('show');
+  this.ordersModal.nativeElement.style.display = 'none';
+
+  console.log('Modal visibility set to none'); // Confirm modal visibility is set to none
+
+  // Remove the modal backdrop and body styling
+  this.removeModalBackdrop();
+
+  // Log to check the current state of the body
+  console.log('Body classes after hiding modal:', document.body.classList);
+  console.log('Body overflow style after hiding modal:', document.body.style.overflow);
+}
+
+
 
   ngOnDestroy() {
     // Ensure modals are disposed of correctly
@@ -892,7 +891,7 @@ selectOrder(order: any) {
                 placeholder: 'Enter Order No',
                 required: true,
                 // readonly: true
-                // disabled: true
+                disabled: true
               }
             },
             {

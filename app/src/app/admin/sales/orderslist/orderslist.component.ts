@@ -98,21 +98,6 @@ export class OrderslistComponent implements OnChanges {
     console.log('Updated selectedProducts in OrderslistComponent:', this.selectedProducts); // Log for debugging
   }
 
-  // pullSelectedOrders(): void {
-  //   if (this.selectedProducts.length === 0) {
-  //     alert('Please select at least one product to pull.');
-  //     return;
-  //   }
-  
-  //   console.log('Pulled selected products in OrderslistComponent:', this.selectedProducts); // Log for debugging
-  
-  //   // Emit selected products to SalesComponent
-  //   this.productsPulled.emit([...this.selectedProducts]);  // Ensure we’re emitting a copy to prevent reference issues
-    
-  //   // Close modal after pulling products
-  //   this.closeModal.emit();
-  // }
-
   pullSelectedOrders(): void {
     if (this.selectedProducts.length === 0) {
         alert('Please select at least one product to pull.');
@@ -123,7 +108,12 @@ export class OrderslistComponent implements OnChanges {
     this.productsPulled.emit([...this.selectedProducts]);
     
     // Close modal after pulling products
-    this.modalClosed.emit();
+    // this.modalClosed.emit();
+    this.modalClosed.emit()
+}
+closeModal() {
+  console.log('Close button clicked in OrderslistComponent'); // Log for debugging
+  this.modalClosed.emit(); // Emit the close event to the parent component
 }
 
   
