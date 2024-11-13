@@ -1,12 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
-import { CommonModule } from '@angular/common';
+import { CommonModule, formatDate } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { WorkOrderListComponent } from './work-order-list/work-order-list.component';
-
-import { forkJoin, of } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
 
 
 @Component({
@@ -17,7 +14,8 @@ import { catchError, map, switchMap } from 'rxjs/operators';
   styleUrls: ['./workorder.component.scss']
 })
 export class WorkorderComponent implements OnInit {
-
+  showCreateBomButton = false
+  isBomButtonDisabled = false
   showWorkorderList: boolean = false;
   showForm: boolean = true;
   WorkOrdrEditID: any;
@@ -31,12 +29,12 @@ export class WorkorderComponent implements OnInit {
   
     // Check if navigation state contains work order data for editing
     if (history.state && (history.state.productDetails || history.state.saleOrderDetails)) {
-      console.log('Received work order data from navigation:', history.state);
+      // console.log('Received work order data from navigation:', history.state);
       this.populateFormWithData(history.state);
       this.showForm = true; // Ensure the form is displayed
     }
   
-    console.log('FormConfig after population:', this.formConfig);
+    // console.log('FormConfig after population:', this.formConfig);
   }
 
   hide() {
@@ -96,7 +94,7 @@ export class WorkorderComponent implements OnInit {
         };
     }
 
-    console.log('Form model after population:', this.formConfig.model);
+    // console.log('Form model after population:', this.formConfig.model);
 }
 
 
@@ -108,42 +106,81 @@ submitWorkOrder() {
   };
 
   this.http.post('production/work_order/', payload).subscribe(response => {
-      console.log('Work order submitted successfully:', response);
+      // console.log('Work order submitted successfully:', response);
   });
 }
 
 populateBom(product_id:any){
   if (this.formConfig.model.work_order && !this.formConfig.model.work_order.work_order_id) {
-    const url = `production/bom/?product_id=${product_id}`
+    const url = `production/bom/?product_id=${product_id}` // To get 'bom_id', filter by  selected product_id
+    let bom_data = {}
     this.http.get(url).subscribe((response: any) => {
       let bom_id = null
       if (response.data[0]){
-        bom_id  = response.data[0].bom_id
-        this.http.get(`production/bom/${bom_id}`).subscribe((data: any) => {
+        bom_id  = response.data[0].bom_id // fetch 'bom_id'
+        this.http.get(`production/bom/${bom_id}`).subscribe((data: any) => { // go to the URL with fetched 'bom_id' and get the 'data'.
           const bom = {
             'work_order':this.formConfig.model.work_order,
-            'bom': data.data.bill_of_material,
+            'bom': data.data.bill_of_material, // asign fetched 'bill_of_material' to BOM
             'work_order_machines': this.formConfig.model.work_order_machines,
             'workers': this.formConfig.model.workers,
             'work_order_stages': this.formConfig.model.work_order_stages,
           }
-          this.formConfig.model = bom
+          this.showCreateBomButton = false; 
+          // this.isBomButtonDisabled = true;
+          this.formConfig.model = bom // fill the form with data.
         });
-      } else {
+      } else { // "If a user selects products that do not contain a BOM, the BOM will be refreshed with an empty form."
         const bom = {
-          'work_order':this.formConfig.model.work_order,
+          'work_order': this.formConfig.model.work_order,
           'bom': [{}],
           'work_order_machines': this.formConfig.model.work_order_machines,
           'workers': this.formConfig.model.workers,
           'work_order_stages': this.formConfig.model.work_order_stages,
         }
-        this.formConfig.model = bom
+        this.formConfig.model = bom // fill the form with data.
+        
+        this.isBomButtonDisabled = false;
+        if (!this.formConfig.model.work_order.product_id){
+          this.showCreateBomButton = false
+        } else {
+          this.showCreateBomButton = true // No BOM for selected product - show the 'Create BOM' Button.
+        }
       }
     })
   }
 };
 
 
+createBom(){
+  const now = new Date();
+  const json_data = {
+    'bom' : {
+        "bom_name": "Created from Work Order",
+        "quantity": this.formConfig.model.work_order.quantity,
+        "notes": `This BOM Created from WorkOrder on ${formatDate(now, 'dd-MM-yyyy HH:mm', 'en-US')}`,
+        "product_id": this.formConfig.model.work_order.product_id
+    },
+    'bill_of_material':
+      this.formConfig.model.bom
+  }
+
+  this.http.post('production/bom/', json_data)
+  .subscribe({
+    next: (response) => {
+      this.showCreateBomButton = true;  // Ensure the button is still visible
+      this.isBomButtonDisabled = true;  // Disable the button after success
+      alert('BOM created successfully!');
+    },
+    error: (error) => {
+      console.error('Error creating BOM:', error);
+      this.showCreateBomButton = true;  // Ensure the button is still visible
+      this.isBomButtonDisabled = false; // Keep the button enabled if there's an error
+      alert('Error creating BOM. Main Product and Bill of material should be selected.');
+    }
+  });
+
+};
 
   setFormConfig() {
     this.WorkOrdrEditID =null
@@ -189,7 +226,7 @@ populateBom(product_id:any){
                 bindId: true,
                 lazy: {
                   // url: 'products/products_get/?type_name=Finished',
-                  url: 'products/products_get/',
+                  url: 'products/products/',
                   lazyOneTime: true
                 },
               },
@@ -295,7 +332,7 @@ populateBom(product_id:any){
                         console.error(`Products at index ${index} is not defined. Initializing...`);
                         this.formConfig.model['bom'][index] = {};
                       }
-                      this.formConfig.model['bom'][index]['product_id'] = data?.product_id;
+                      this.formConfig.model['bom'][index]['product_id'] = data.product_id;
                     });
                   }
                 }
@@ -351,7 +388,7 @@ populateBom(product_id:any){
                         console.error(`Products at index ${index} is not defined. Initializing...`);
                         this.formConfig.model['bom'][index] = {};
                       }
-                      this.formConfig.model['bom'][index]['color_id'] = data?.color_id;
+                      this.formConfig.model['bom'][index]['color_id'] = data.color_id;
                     });
                   }
                 }
@@ -365,6 +402,21 @@ populateBom(product_id:any){
                   hideLabel: true,
                   required: true,
                   type: 'number'
+                },
+                hooks:{
+                  onInit: (field: any) => {
+                    field.formControl.valueChanges.subscribe(data => {
+                      if (field.form && field.form.controls && field.form.controls.quantity && field.form.controls.unit_cost && data) {
+                        const quantity = field.form.controls.quantity.value;
+                        const unit_cost = field.form.controls.unit_cost.value;
+                        if (quantity && unit_cost) {
+                          field.form.controls.total_cost.setValue((parseFloat(quantity) * parseFloat(unit_cost)).toFixed(2));
+                        }
+                      } else {
+                        field.form.controls.total_cost.setValue(0);
+                      }
+                    })
+                  },
                 }
               },
               {
@@ -384,7 +436,8 @@ populateBom(product_id:any){
                         const quantity = field.form.controls.quantity.value;
                         const unit_cost = field.form.controls.unit_cost.value;
                         if (quantity && unit_cost) {
-                          field.form.controls.total_cost.setValue(parseInt(quantity) * parseInt(unit_cost));
+                          field.form.controls.total_cost.setValue((parseFloat(quantity) * parseFloat(unit_cost)).toFixed(2));
+
                         }
                       } else {
                         field.form.controls.total_cost.setValue(0);
@@ -398,7 +451,7 @@ populateBom(product_id:any){
                 type: 'input',
                 templateOptions: {
                   label: 'Total Cost',
-                  placeholder: 'Enter Total Cost',
+                  // placeholder: 'Enter Total Cost',
                   hideLabel: true,
                   required: true,
                   disabled: true
@@ -452,7 +505,7 @@ populateBom(product_id:any){
                       field.formControl.valueChanges.subscribe((data: any) => {
                         const index = field.parent.key;
                         if (!this.formConfig.model['work_order_machines'][index]) {
-                          console.error(`Task comments at index ${index} is not defined. Initializing...`);
+                          console.error(`Machine at index ${index} is not defined. Initializing...`);
                           this.formConfig.model['work_order_machines'][index] = {};
                         }
                         this.formConfig.model['work_order_machines'][index]['machine_id'] = data.machine_id;
@@ -499,7 +552,7 @@ populateBom(product_id:any){
                     field.formControl.valueChanges.subscribe((data: any) => {
                       const index = field.parent.key;
                       if (!this.formConfig.model['workers'][index]) {
-                        console.error(`Task comments at index ${index} is not defined. Initializing...`);
+                        console.error(`Machine at index ${index} is not defined. Initializing...`);
                         this.formConfig.model['workers'][index] = {};
                       }
                       this.formConfig.model['workers'][index]['employee_id'] = data.employee_id;
@@ -583,7 +636,7 @@ populateBom(product_id:any){
                   label: 'Notes',
                   placeholder: 'Enter Notes',
                   hideLabel: true,
-                  required: false
+                  required: true
                 }
               }
             ]
