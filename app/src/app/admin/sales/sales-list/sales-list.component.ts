@@ -49,7 +49,7 @@ export class SalesListComponent {
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
           // console.log("-->", currentValue);
-          return `${row.sale_type.name}`;
+          return `${row.sale_type?.name || ''}`;
         },
       },
 
@@ -60,6 +60,11 @@ export class SalesListComponent {
         mapFn: (currentValue: any, row: any, col: any) => {
           return `${row.customer.name}`;
         },
+        sort: true
+      },
+      {
+        fieldKey: 'sale_estimate',
+        name: 'Sale Estimate',
         sort: true
       },
       {
@@ -77,24 +82,6 @@ export class SalesListComponent {
         name: 'Advance Amt',
         sort: true
       },
-      // {
-      //   fieldKey: 'job_type_id',
-      //   name: 'Document Status',
-      //   displayType: "map",
-      //   mapFn: (currentValue: any, row: any, col: any) => {
-      //     return `${row.job_type_id.job_type_name}`;
-      //   },
-      //   sort: true
-      // },
-      // {
-      //   fieldKey: 'job_code_id',
-      //   name: 'Print Count',
-      //   displayType: "map",
-      //   mapFn: (currentValue: any, row: any, col: any) => {
-      //     return `${row.job_code_id.job_code}`;
-      //   },
-      //   sort: true
-      // },
       {
         fieldKey: 'status_name',
         name: 'Status',
@@ -105,8 +92,12 @@ export class SalesListComponent {
         sort: true
       },
       {
-        fieldKey: 'flow_status',
+        fieldKey: 'flow_status_name',
         name: 'Flow Status',
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          return `${row.flow_status.flow_status_name}`;
+        },
         sort: true
       },
       {

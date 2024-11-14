@@ -51,6 +51,9 @@ export class TaTableComponent implements OnDestroy {
   @Input() options!: TaTableConfig;
   @Output() doAction: EventEmitter<any> = new EventEmitter();
   @ViewChild('taTable') taTable!: NzTableComponent<any> | any;
+  selectedProducts: any[] = []; // This holds the selected products
+  @Output() selectedProductsChange = new EventEmitter<any[]>(); // Event emitter to notify parent component
+  
 
   selectedStatus: string | null = null;
   selectedQuickPeriod: string | null = null;
@@ -59,8 +62,8 @@ export class TaTableComponent implements OnDestroy {
   isButtonVisible = false;
 
   statusOptions: Array<{ value: string, label: string }> = []; // Store the statuses here
-  
- // List of quick period options like 'Today', 'Last Week', etc.
+
+  // List of quick period options like 'Today', 'Last Week', etc.
   quickPeriodOptions = [
     { value: 'today', label: 'Today' },
     { value: 'yesterday', label: 'Yesterday' },
@@ -78,7 +81,7 @@ export class TaTableComponent implements OnDestroy {
     const today = new Date();
     let startDate: Date | null = null;
     let endDate: Date | null = today;
-  
+
     switch (this.selectedQuickPeriod) {
       case 'today':
         startDate = endDate;
@@ -117,14 +120,14 @@ export class TaTableComponent implements OnDestroy {
         endDate = new Date(today.getFullYear(), 2, 31);
         break;
     }
-  
+
     this.fromDate = startDate;
     this.toDate = endDate;
   }
-;
+  ;
   loadStatuses() {
     const url = 'masters/order_status/';
-    
+
     this.http.get<any>(url).subscribe(
       (response) => {
         if (response && response.data && response.data.length > 0) {
@@ -141,22 +144,22 @@ export class TaTableComponent implements OnDestroy {
       }
     );
   }
-onStatusChange(status: string) {
-  this.selectedStatus = status;
-  // this.applyFilters();
-}
-  
+  onStatusChange(status: string) {
+    this.selectedStatus = status;
+    // this.applyFilters();
+  }
+
   // Apply filters like quick period, date range, and status to fetch filtered data
 
   applyFilters() {
     // Construct the filters object
     const filters = {
-        quickPeriod: this.selectedQuickPeriod,
-        fromDate: this.fromDate,
-        toDate: this.toDate,
-        status: this.selectedStatus,
+      quickPeriod: this.selectedQuickPeriod,
+      fromDate: this.fromDate,
+      toDate: this.toDate,
+      status: this.selectedStatus,
     };
-    
+
     // Generate query string from filters
     const queryString = this.generateQueryString(filters);
 
@@ -181,22 +184,22 @@ onStatusChange(status: string) {
 
     // Fetch filtered data from the server using the constructed URL
     this.http.get(url).subscribe(
-        response => {
-            this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
-                this.loading = false;
-                this.rows = response['data'] || data;
-            });
-        },
-        error => {
-            console.error('Error executing URL:', `${full_path}${queryString}`, error);
-        }
+      response => {
+        this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
+          this.loading = false;
+          this.rows = response['data'] || data;
+        });
+      },
+      error => {
+        console.error('Error executing URL:', `${full_path}${queryString}`, error);
+      }
     );
     // return queryString;
     return finalQueryString;
-}
+  }
 
-// Clear all filters like quick period, date range, and status
-clearFilters() {
+  // Clear all filters like quick period, date range, and status
+  clearFilters() {
     // Reset all filter values
     this.selectedQuickPeriod = null;
     this.fromDate = null;
@@ -216,37 +219,37 @@ clearFilters() {
     }
 
     const url = `${this.options.apiUrl}&page=${this.pageIndex}&limit=${this.pageSize}`;
-  
+
     console.log('API URL:', url); // Debugging log
 
     // const url = this.options.apiUrl; // Base URL without any filters
     this.http.get(url).subscribe(
-        response => {
-            this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
-                this.loading = false;
-                this.rows = response['data'] || data;
-            });
-        },
-        error => {
-            console.error('Error executing URL:', url, error);
-        }
+      response => {
+        this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
+          this.loading = false;
+          this.rows = response['data'] || data;
+        });
+      },
+      error => {
+        console.error('Error executing URL:', url, error);
+      }
     );
-}
+  }
 
-// Generate query string for the API call based on the applied filters
-generateQueryString(filters: { quickPeriod: string, fromDate: Date, toDate: Date, status: string}): string {
+  // Generate query string for the API call based on the applied filters
+  generateQueryString(filters: { quickPeriod: string, fromDate: Date, toDate: Date, status: string }): string {
     const queryParts: string[] = [];
 
     // Add filter for 'fromDate' if available
     if (filters.fromDate) {
-        const fromDateStr = this.formatDate(filters.fromDate);
-        queryParts.push(`created_at_after=${encodeURIComponent(fromDateStr)}`);
+      const fromDateStr = this.formatDate(filters.fromDate);
+      queryParts.push(`created_at_after=${encodeURIComponent(fromDateStr)}`);
     }
 
     // Add filter for 'toDate' if available
     if (filters.toDate) {
-        const toDateStr = this.formatDate(filters.toDate);
-        queryParts.push(`created_at_before=${encodeURIComponent(toDateStr)}`);
+      const toDateStr = this.formatDate(filters.toDate);
+      queryParts.push(`created_at_before=${encodeURIComponent(toDateStr)}`);
     }
 
     // Add filter for status if available
@@ -256,43 +259,43 @@ generateQueryString(filters: { quickPeriod: string, fromDate: Date, toDate: Date
 
     // Return the query string by joining all the filters
     return '&' + queryParts.join('&');
-}
-formatDate(date: Date): string {
+  }
+  formatDate(date: Date): string {
     // Format date as 'yyyy-MM-dd'
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
     return `${year}-${month}-${day}`;
-}
-
-downloadData(event: any) {
-  const tableParamConfig: TaParamsConfig = {
-    apiUrl: this.options.apiUrl,
-    pageIndex: this.pageIndex,
-    pageSize: this.pageSize,
   }
 
-  this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
-    this.loading = false;
-    const full_path = this.options.apiUrl
-    const name_of_file = full_path.split('/')[1]
-    let fullUrl = `${this.options.apiUrl}`;
-    const query = this.applyFilters()
-    if (query.length > 1) {
-      fullUrl = `${fullUrl}${query}&`
+  downloadData(event: any) {
+    const tableParamConfig: TaParamsConfig = {
+      apiUrl: this.options.apiUrl,
+      pageIndex: this.pageIndex,
+      pageSize: this.pageSize,
     }
 
-    const download_url = `${fullUrl}download/excel/`
-    this.http.get(download_url, { responseType: 'blob' }).subscribe((blob: Blob) => {
-      const a = document.createElement('a');
-      const objectUrl = URL.createObjectURL(blob);
-      a.href = objectUrl;
-      a.download = `${name_of_file}.xlsx`
-      a.click();
-      URL.revokeObjectURL(objectUrl);
-    });
-  })
-};
+    this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
+      this.loading = false;
+      const full_path = this.options.apiUrl
+      const name_of_file = full_path.split('/')[1]
+      let fullUrl = `${this.options.apiUrl}`;
+      const query = this.applyFilters()
+      if (query.length > 1) {
+        fullUrl = `${fullUrl}${query}&`
+      }
+
+      const download_url = `${fullUrl}download/excel/`
+      this.http.get(download_url, { responseType: 'blob' }).subscribe((blob: Blob) => {
+        const a = document.createElement('a');
+        const objectUrl = URL.createObjectURL(blob);
+        a.href = objectUrl;
+        a.download = `${name_of_file}.xlsx`
+        a.click();
+        URL.revokeObjectURL(objectUrl);
+      });
+    })
+  };
 
   searchValue = '';
   visible = false;
@@ -374,7 +377,7 @@ downloadData(event: any) {
       this.loading = true;
       this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
         this.loading = false;
-        this.total = data.total; // mock the total data here
+        this.total = data.totalCount; // mock the total data here
         this.rows = data.data || data;
       }, (error) => {
         this.loading = false;
@@ -513,6 +516,93 @@ downloadData(event: any) {
   ngOnDestroy() {
     this.actionObservable$.unsubscribe();
   }
+  // Additional code for handling action button events in the table(added this code for file upload)(start)
+  performAction(action: any, row: any) {
+    if (action && action.type === 'callBackFn' && typeof action.callBackFn === 'function') {
+      action.callBackFn(row); // Execute the callback function with row data
+    }
+
+    // Optionally, emit the event to parent if needed
+    this.doAction.emit({ action, row });
+  }
+
+  onProductCheckboxChange(row: any, product: any, event: Event): void { 
+    const isChecked = (event.target as HTMLInputElement).checked;
+  
+    if (isChecked) {
+        // Fetch sale order for the selected row, specifically for the selected item
+        this.getOrderDetails(row.sale_order_id).then(orderData => {
+            const saleOrderItems = orderData.sale_order_items || [];
+  
+            // Find the specific item within saleOrderItems that matches the selected product
+            const selectedItem = saleOrderItems.find(item => 
+                item.product.product_id === product.product_id && item.quantity === product.quantity
+            );
+  
+            if (selectedItem) {
+                const fullProductDetails = {
+                    ...product,
+                    product_id: selectedItem.product.product_id,
+                    name: selectedItem.product.name,
+                    code: selectedItem.product.code,
+                    discount: selectedItem.discount,
+                    total_boxes: selectedItem.total_boxes,
+                    rate: selectedItem.rate,
+                    tax: selectedItem.tax,
+                    remarks: selectedItem.remarks,
+                    amount: selectedItem.amount,
+                    unit_options_id: selectedItem.unit_options_id,
+                    quantity: selectedItem.quantity,
+                    print_name: selectedItem.print_name || 'N/A',
+                    
+                    // Ensuring "Unspecified" fallback is set consistently
+                    size: {
+                        size_id: selectedItem.size_id || null,
+                        size_name: selectedItem.size?.size_name || null  // Fallback to 'Unspecified'
+                    },
+                    color: {
+                        color_id: selectedItem.color_id || null,
+                        color_name: selectedItem.color?.color_name || null // Fallback to 'Unspecified'
+                    },
+                    size_id: selectedItem.size_id,
+                    color_id: selectedItem.color_id,
+                };
+  
+                // Add the specific item to selectedProducts
+                this.selectedProducts.push(fullProductDetails);
+                
+                // Emit and log the updated list of selected products
+                this.selectedProductsChange.emit(this.selectedProducts);
+                console.log('Pulled selected products with full details:', this.selectedProducts);
+            } else {
+                console.warn('No matching product found for selection:', product);
+            }
+        }).catch(error => {
+            console.error('Error fetching order details:', error);
+        });
+    } else {
+        // Remove product from selected list when unchecked
+        this.selectedProducts = this.selectedProducts.filter(
+            item => item.product_id !== product.product_id || item.order.sale_order_id !== row.sale_order_id
+        );
+        this.selectedProductsChange.emit(this.selectedProducts); // Emit updated list
+    }
+  }
+  
+  // Fetch sale order details including items, sizes, and colors
+  private getOrderDetails(saleOrderId: string): Promise<any> {
+      const url = `sales/sale_order/${saleOrderId}/`;
+  
+      return this.http.get<any>(url)
+          .toPromise()
+          .then(res => {
+              console.log('Fetched sale order details:', res.data);
+              return res.data; // This includes sale_order and sale_order_items
+          });
+  }
+  
+  // Additional code for handling action button events in the table(added this code for file upload)(end)
+  
   // getFilters(){
   //   const filters = this.options.cols.filter((item: { searchValue: any; })=>{
   //     item.searchValue;

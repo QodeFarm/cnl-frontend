@@ -94,29 +94,6 @@ export class PurchaseComponent {
       }
     }
   };
-  
-  // Method to deeply copy fields from dataToCopy based on model structure
-  deepCopyFields(source: any, destination: any, mapping: any) {
-    for (const key in mapping) {
-      if (mapping.hasOwnProperty(key)) {
-        // Check if the field is an object and requires further copying
-        if (typeof mapping[key] === 'object' && !Array.isArray(mapping[key])) {
-          destination[key] = {};
-          this.deepCopyFields(source[key], destination[key], mapping[key]);
-        } else if (Array.isArray(mapping[key])) {
-          // Handle arrays of objects (e.g., items and attachments)
-          destination[key] = source[key]?.map((item: any) => {
-            const newItem: any = {};
-            this.deepCopyFields(item, newItem, mapping[key][0]);
-            return newItem;
-          }) || [];
-        } else {
-          // Direct field copy
-          destination[key] = source[mapping[key]] || null;
-        }
-      }
-    }
-  }
 
   copyToTable() {
     const selectedMapping = this.fieldMapping[this.selectedTable];
@@ -185,15 +162,13 @@ export class PurchaseComponent {
   hasDataPopulated: boolean = false;
 
   ngOnInit() {
-
-    this.checkAndPopulateData();
     
     this.showPurchaseOrderList = false;
     this.showForm = true;
     this.PurchaseOrderEditID = null;
     // set form config
     this.setFormConfig();
-    console.log('this.formConfig', this.formConfig);
+    this.checkAndPopulateData();
 
     // set purchase_order default value
     this.formConfig.model['purchase_order_data']['order_type'] = 'purchase_order';
@@ -226,8 +201,8 @@ export class PurchaseComponent {
           purchaseOrderItems.forEach(item => {
             const populatedItem = {
               product_id: item.product.product_id,
-              size_id: item.size.size_id,
-              color_id: item.color.color_id,
+              size: item.size,
+              color: item.color,
               code: item.code,
               unit: item.unit,
               total_boxes: item.total_boxes,
@@ -675,10 +650,48 @@ export class PurchaseComponent {
                           field.formControl.setValue(existingProduct); // Set full product object (not just product_id)
                         }
                       }
+
+                      // ***Size dropdown will populate with available sizes when product in selected***
+                      field.formControl.valueChanges.subscribe(selectedSizeId => {
+                        const product = this.formConfig.model.purchase_order_items[currentRowIndex]?.product;
+                        
+                        // Make sure product exists before making HTTP request
+                        if (product?.product_id) {
+                          this.http.get(`products/product_variations/?product_id=${product.product_id}`).subscribe((response: any) => {
+                            const availableSizes = response.data.map((variation: any) => {
+                              return {
+                                label: variation.size.size_name,  // Use 'size_name' as the label
+                                value: {
+                                  size_id: variation.size.size_id,
+                                  size_name: variation.size.size_name,
+                                }
+                              };
+                            });
+              
+                            // Use a Set to track seen size_ids to ensure unique sizes
+                            const uniqueArray = availableSizes.filter((item, index, self) =>
+                              index === self.findIndex((t) => t.value.size_id === item.value.size_id)
+                            );
+              
+                            // Now, update the size field for the current row, not globally
+                            const sizeField = parentArray.fieldGroup.find((f: any) => f.key === 'size');
+                            if (sizeField) {
+                              sizeField.templateOptions.options = uniqueArray; // Update the options for the 'size' field of the current row
+                            }
+                          });
+                        } else {
+                          console.error('Product not selected or invalid.');
+                        }
+                      });
                       
                       // Subscribe to value changes of the field
                       field.formControl.valueChanges.subscribe(selectedProductId => {
                         const product = this.formConfig.model.purchase_order_items[currentRowIndex]?.product;
+
+                        let unit_name = 'NA';
+                        if (product.unit_options) {
+                            unit_name = product.unit_options.unit_name;
+                        }
 
                         // Check if a valid product is selected
                         if (product?.product_id) {
@@ -751,7 +764,6 @@ export class PurchaseComponent {
                     options: [],
                     required: true,
                     lazy: {
-                      url: 'products/sizes/',
                       lazyOneTime: true
                     }
                   },
@@ -759,10 +771,9 @@ export class PurchaseComponent {
                     onInit: (field: any) => {
                       const parentArray = field.parent;
                 
-                      // Check if parentArray exists and proceed
                       if (parentArray) {
-                        const currentRowIndex = +parentArray.key; // Simplified number conversion
-                
+                        const currentRowIndex = +parentArray.key;
+
                         // Check if there is a product already selected in this row (when data is copied)
                         if (this.dataToPopulate && this.dataToPopulate.purchase_order_items.length > currentRowIndex) {
                           const existingSize = this.dataToPopulate.purchase_order_items[currentRowIndex].size;
@@ -772,9 +783,102 @@ export class PurchaseComponent {
                             field.formControl.setValue(existingSize); // Set full product object (not just product_id)
                           }
                         }
+
+                        // Subscribe to value changes when the form field changes
+                        //**When Size is selected its overall  quantity will be shown in product info text area*/
+                        field.formControl.valueChanges.subscribe(selectedProductId => {
+                          const product = this.formConfig.model.purchase_order_items[currentRowIndex]?.product;
+                          const size = this.formConfig.model.purchase_order_items[currentRowIndex]?.size;
+              
+                          const product_id = product?.product_id;
+                          const size_id = size?.size_id;
+              
+                          // Check if product_id, size_id, and color_id exist
+                          if (product_id && size_id) {
+                            const url = `products/product_variations/?product_id=${product_id}&size_id=${size_id}`;
+              
+                            // Call the API using HttpClient (this.http.get)
+                            this.http.get(url).subscribe((data: any) => {
+
+                              function sumQuantities(dataObject: any): number {
+                                // First, check if the data object contains the array in the 'data' field
+                                if (dataObject && Array.isArray(dataObject.data)) {
+                                  // Now we can safely use reduce on dataObject.data
+                                  return dataObject.data.reduce((sum, item) => sum + (item.quantity || 0), 0);
+                                } else {
+                                  console.error("Data is not an array:", dataObject);
+                                  return 0;
+                                }
+                              }
+                              
+                              const totalBalance = sumQuantities(data);
+              
+                                const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
+                                if (cardWrapper) {
+                                  // Remove existing product info if present
+                                  cardWrapper.querySelector('.center-message')?.remove();
+              
+                                  // Display fetched product variation info
+                                  const productInfoDiv = document.createElement('div');
+                                  productInfoDiv.classList.add('center-message');
+                                  productInfoDiv.innerHTML = `
+                                    <span style="color: red;">Product Info:</span>
+                                    <span style="color: blue;">${data.data[0].product.name}</span> |
+                                    <span style="color: red;">Balance:</span>
+                                    <span style="color: blue;">${totalBalance}</span> |  
+                                  `;
+              
+                                  cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
+                                }
+                              },
+                              (error) => {
+                                console.error("Error fetching data:", error);
+                              }
+                            );
+                          } else {
+                            console.log(`No valid product, size, or color selected for Row ${currentRowIndex}.`);
+                          }
+                        }); //**End of Size selection part */
+
+                          // Subscribe to value changes of the size field
+                          field.formControl.valueChanges.subscribe(selectedSizeId => {
+                            const product = this.formConfig.model.purchase_order_items[currentRowIndex]?.product;
+                            const size = this.formConfig.model.purchase_order_items[currentRowIndex]?.size;
+                  
+                            // Make sure size exists
+                            if (size?.size_id) {
+                              // Fetch available colors based on the selected size
+                              this.http.get(`products/product_variations/?product_id=${product.product_id}&size_id=${size.size_id}`).subscribe((response: any) => {
+                                const availableColors = response.data.map((variation: any) => {
+                                  return {
+                                    label: variation.color.color_name,  // Use 'color_name' as the label
+                                    value: {
+                                      color_id: variation.color.color_id,
+                                      color_name: variation.color.color_name
+                                    }
+                                  };
+                                });
+                  
+                                // Filter unique colors (optional, if there's a chance of duplicate colors)
+                                const uniqueColors = availableColors.filter((item, index, self) =>
+                                  index === self.findIndex((t) => t.value.color_id === item.value.color_id)
+                                );
+                  
+                                // Now, update the color field for the current row
+                                const colorField = parentArray.fieldGroup.find((f: any) => f.key === 'color');
+                                if (colorField) {
+                                  colorField.templateOptions.options = uniqueColors; // Update the options for the 'color' field
+                                }
+                              });
+                            } else {
+                              console.error('Size not selected or invalid.');
+                            }
+                          });
+                        } else {
+                          console.error('Parent array is undefined or not accessible');
+                        }
                       }
                     }
-                  }
                 },
                 {
                   key: 'color',
@@ -787,18 +891,15 @@ export class PurchaseComponent {
                     options: [],
                     required: true,
                     lazy: {
-                      url: 'products/colors/',
                       lazyOneTime: true
                     }
                   },
                   hooks: {
                     onInit: (field: any) => {
                       const parentArray = field.parent;
-                
-                      // Check if parentArray exists and proceed
                       if (parentArray) {
-                        const currentRowIndex = +parentArray.key; // Simplified number conversion
-                
+                        const currentRowIndex = +parentArray.key;
+
                         // Check if there is a product already selected in this row (when data is copied)
                         if (this.dataToPopulate && this.dataToPopulate.purchase_order_items.length > currentRowIndex) {
                           const existingColor = this.dataToPopulate.purchase_order_items[currentRowIndex].color;
@@ -808,6 +909,51 @@ export class PurchaseComponent {
                             field.formControl.setValue(existingColor);
                           }
                         }
+              
+                        // Subscribe to value changes when the form field changes
+                        field.formControl.valueChanges.subscribe(selectedProductId => {
+                          const product = this.formConfig.model.purchase_order_items[currentRowIndex]?.product;
+                          const size = this.formConfig.model.purchase_order_items[currentRowIndex]?.size;
+                          const color = this.formConfig.model.purchase_order_items[currentRowIndex]?.color;
+              
+                          const product_id = product?.product_id;
+                          const size_id = size?.size_id;
+                          const color_id = color?.color_id;
+              
+                          // Check if product_id, size_id, and color_id exist
+                          if (product_id && size_id && color_id) {
+                            const url = `products/product_variations/?product_id=${product_id}&size_id=${size_id}&color_id=${color_id}`;
+              
+                            // Call the API using HttpClient (this.http.get)
+                            this.http.get(url).subscribe(
+                              (data: any) => {
+              
+                                const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
+                                if (cardWrapper) {
+                                  // Remove existing product info if present
+                                  cardWrapper.querySelector('.center-message')?.remove();
+              
+                                  // Display fetched product variation info
+                                  const productInfoDiv = document.createElement('div');
+                                  productInfoDiv.classList.add('center-message');
+                                  productInfoDiv.innerHTML = `
+                                    <span style="color: red;">Product Info:</span>
+                                    <span style="color: blue;">${data.data[0].product.name}</span> |
+                                    <span style="color: red;">Balance:</span>
+                                    <span style="color: blue;">${data.data[0].quantity}</span> |  
+                                  `;
+              
+                                  cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
+                                }
+                              },
+                              (error) => {
+                                console.error("Error fetching data:", error);
+                              }
+                            );
+                          } else {
+                            console.log(`No valid product, size, or color selected for Row ${currentRowIndex}.`);
+                          }
+                        });
                       }
                     }
                   }
@@ -911,7 +1057,7 @@ export class PurchaseComponent {
               {
                 type: 'input',
                 key: 'quantity',
-                defaultValue: 1,
+                //defaultValue: 1,
                 templateOptions: {
                   type: 'number',
                   label: 'Qty',
@@ -1326,19 +1472,19 @@ export class PurchaseComponent {
                       templateOptions: {
                         label: 'Shipping Tracking No',
                         placeholder: 'Enter Shipping Tracking No',
-                        readonly: true,
-                        disabled: true
+                        // readonly: true,
+                        // disabled: true
                       }
                     },
                     {
                         key: 'shipping_date',
                         type: 'date',
-                        defaultValue: this.nowDate(),
+                        // defaultValue: this.nowDate(),
                         className: 'col-6',
                         templateOptions: {
                           type: 'date',
                           label: 'Shipping Date',
-                          required: true
+                          // required: true
                         }
                       },
                       {
@@ -1357,6 +1503,7 @@ export class PurchaseComponent {
                               field.formControl.setValue(this.dataToPopulate.order_shipments.shipping_charges);
                             }
                           }
+                          // required: true
                         }
                       }
                   ]
