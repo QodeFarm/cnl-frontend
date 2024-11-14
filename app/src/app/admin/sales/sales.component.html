@@ -12,9 +12,13 @@
             </button>
                 <button (click)="showOrdersList()" type="button" class="btn btn-primary">
           Past orders</button>
-                <button *checkAction="{ moduleName: 'Sales', sectionName: 'Customers', actionName: 'Update' }" (click)="showSaleOrderListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#saleOrderListModal">
+
+                <button (click)="showSaleOrderListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#saleOrderListModal">
+            Sales Order List
+          </button>
+                <!-- <button *checkAction="{ moduleName: 'Sales', sectionName: 'Customers', actionName: 'Update' }" (click)="showSaleOrderListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#saleOrderListModal">
           Sales Order List
-        </button>
+        </button> -->
         <!-- Invoice Creation Button (Only for Edit and if flow status is "Ready for Invoice") -->
         <button *ngIf="SaleOrderEditID && formConfig.model.sale_order.flow_status.flow_status_name === 'Ready for Invoice'" 
                 (click)="openSaleInvoiceModal()" 

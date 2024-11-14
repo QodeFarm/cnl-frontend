@@ -122,25 +122,27 @@ export class SalesComponent {
   saleForm: FormGroup;
 
   ngOnInit() {
-    // set form config
-    this.setFormConfig();
     // Subscribe to the route parameters to get the data from the history state
-    this.route.paramMap.subscribe(params => {
-      this.dataToPopulate = history.state.data; // Retrieve data from history
-      console.log('data retrieved:', this.dataToPopulate);
+    // this.route.paramMap.subscribe(params => {
+    //   this.dataToPopulate = history.state.data; // Retrieve data from history
+    //   console.log('data retrieved:', this.dataToPopulate);
 
-      // Check if dataToPopulate exists and populate the form
-      console.log("triggering the data : ")
-      if (this.dataToPopulate) {
-        console.log("Custome in data : ", this.dataToPopulate.customer?.customer_id)
-        // Populate the form with the data received
-        this.populateForm(this.dataToPopulate);
-      }
-    });
+    //   // Check if dataToPopulate exists and populate the form
+    //   console.log("triggering the data : ")
+    //   if (this.dataToPopulate) {
+    //     console.log("Custome in data : ", this.dataToPopulate.customer?.customer_id)
+    //     // Populate the form with the data received
+    //     this.populateForm(this.dataToPopulate);
+    //   }
+    // });
 
     this.showSaleOrderList = false;
     this.showForm = false;
     this.SaleOrderEditID = null;
+    // set form config
+    this.setFormConfig();
+
+    // this.previouslyInvoicedProductIds = new Set(this.loadPreviouslyInvoicedProductIds());
 
     // set sale_order default value
     this.formConfig.model['sale_order']['order_type'] = 'sale_order';
@@ -154,8 +156,11 @@ export class SalesComponent {
 
 
 //Sale-invoice ==============================================
+  saleOrderItems: any[] = []; 
   isConfirmationInvoiceOpen: boolean = false;
   isInvoiceCreated: boolean = false;
+  previouslyInvoicedProductIds: Set<string> = new Set();
+
 
   // Function to handle opening the confirmation modal
   openSaleInvoiceModal() {
@@ -173,28 +178,52 @@ export class SalesComponent {
       this.invoiceCreationHandler(); // Proceed with the invoice creation logic
   }
 
-  // Your existing invoice creation logic
   invoiceCreationHandler() {
-      this.handleSaleInvoiceCreation();
-  }
+    console.log("Invoice Data at handler start:", this.invoiceData);
 
-  private handleSaleInvoiceCreation() {
-      console.log("invoice data in edit: ", this.invoiceData);
-      if (this.invoiceData) {
-          this.createSaleInvoice(this.invoiceData).subscribe(
-              response => {
-                  console.log('Sale invoice created successfully', response);
-                  this.showInvoiceCreatedMessage(); // Show message on successful creation
-                  // Trigger the next URL to update flow_status
-                  const saleOrderId = this.invoiceData.sale_invoice_order.sale_order_id; // Get the saleOrderId from the invoice data
-                  this.triggerWorkflowPipeline(saleOrderId);
-              },
-              error => {
-                  console.error('Error creating sale invoice', error);
-              }
-          );
-      }
-      this.ngOnInit()
+    // Log each item to confirm the checkbox status
+    this.invoiceData.sale_invoice_items.forEach((item, index) => {
+      console.log(`Item ${index}:`, item, "Select Item:", item.selectItem);
+    });
+
+    // Filter for items where selectItem is true (checkbox selected)
+    const selectedItems = this.invoiceData.sale_invoice_items.filter(item => item.selectItem);
+    console.log("Data of sale order items : ", selectedItems);
+
+    // If selectedItems > 0, use selected items; else use all sale_invoice_items
+    const itemsToInvoice = selectedItems.length > 0 ? selectedItems : this.invoiceData.sale_invoice_items;
+    
+    console.log("Items to invoice (selected or all):", itemsToInvoice);
+    
+    const invoiceData = {
+        ...this.invoiceData,
+        sale_invoice_items: itemsToInvoice
+    };
+    console.log("Invoice Data with selected items:", invoiceData);
+
+    // Check if there are items to invoice
+    if (itemsToInvoice.length > 0) {
+        this.createSaleInvoice(invoiceData).subscribe(
+            response => {
+                console.log('Sale invoice created successfully', response);
+                this.showInvoiceCreatedMessage();
+
+                // Add invoiced product IDs to `previouslyInvoicedProductIds` set
+                itemsToInvoice.forEach(item => this.previouslyInvoicedProductIds.add(item.product_id));       
+
+                const saleOrderId = this.invoiceData.sale_invoice_order.sale_order_id;
+                // this.triggerWorkflowPipeline(saleOrderId);
+            },
+            error => {
+                console.error('Error creating sale invoice', error);
+            }
+        );
+    } else {
+        console.warn('No items selected for invoicing');
+    }
+
+    // Re-initialize the form if needed
+    this.ngOnInit();
   }
 
   // This function triggers the workflow pipeline API call using POST method
@@ -287,6 +316,11 @@ export class SalesComponent {
         this.showForm = true;
         this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[8].hide = false;
         this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[9].hide = false;
+        // Load sale_order_items with selected status
+      //   this.saleOrderItems = res.data.sale_order.sale_order_items.map(item => ({
+      //     ...item,
+      //     selected: false
+      // }));
       }
     });
     this.hide();
@@ -973,6 +1007,11 @@ export class SalesComponent {
             // title: 'Products',
             addText: 'Add Product',
             tableCols: [
+              { 
+                name: 'selectItem', 
+                label: '', 
+                type: 'checkbox'
+              }, 
               {
                 name: 'product',
                 label: 'Product'
@@ -1017,7 +1056,35 @@ export class SalesComponent {
             ]
           },
           fieldArray: {
-            fieldGroup: [                       
+            fieldGroup: [  
+              // {
+              //   key: 'selectItem',
+              //   type: 'checkbox',
+              //   defaultValue: false,
+              //   templateOptions: {
+              //     hideLabel: true,
+              //   },
+              //   expressionProperties: {
+              //     'templateOptions.hidden': () => !(this.SaleOrderEditID),
+              //     'templateOptions.disabled': () => !(this.SaleOrderEditID),
+                  
+              //   }
+              // },     
+              {
+                key: 'selectItem',
+                type: 'checkbox',
+                defaultValue: false,
+                templateOptions: {
+                    hideLabel: true,
+                },
+                expressionProperties: {
+                    'templateOptions.hidden': () => !(this.SaleOrderEditID),
+                    'templateOptions.disabled': (model) => {
+                        // Disable the checkbox if the product ID has already been invoiced
+                        return this.previouslyInvoicedProductIds.has(model.product_id) || !this.SaleOrderEditID;
+                    }
+                  }
+              },                                     
               {
                 key: 'product',
                 type: 'select',
@@ -1199,7 +1266,8 @@ export class SalesComponent {
                     });
                   }
                 }
-              }, {
+              }, 
+              {
                 key: 'size',
                 type: 'select',
                 templateOptions: {
