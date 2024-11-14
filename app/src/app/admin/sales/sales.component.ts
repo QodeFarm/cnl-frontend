@@ -96,29 +96,6 @@ export class SalesComponent {
       }
     }
   };
-  
-  // Method to deeply copy fields from dataToCopy based on model structure
-  deepCopyFields(source: any, destination: any, mapping: any) {
-    for (const key in mapping) {
-      if (mapping.hasOwnProperty(key)) {
-        // Check if the field is an object and requires further copying
-        if (typeof mapping[key] === 'object' && !Array.isArray(mapping[key])) {
-          destination[key] = {};
-          this.deepCopyFields(source[key], destination[key], mapping[key]);
-        } else if (Array.isArray(mapping[key])) {
-          // Handle arrays of objects (e.g., items and attachments)
-          destination[key] = source[key]?.map((item: any) => {
-            const newItem: any = {};
-            this.deepCopyFields(item, newItem, mapping[key][0]);
-            return newItem;
-          }) || [];
-        } else {
-          // Direct field copy
-          destination[key] = source[mapping[key]] || null;
-        }
-      }
-    }
-  }
 
   copyToTable() {
     const selectedMapping = this.fieldMapping[this.selectedTable];
@@ -147,12 +124,8 @@ export class SalesComponent {
           : { ...nestedData };
       });
     }
-  
+
     // Log and navigate to the target module with populated data
-    // console.log('Populated Data:', populatedData);
-    // const targetRoute = this.selectedTable === 'Sale Invoice' ? 'salesinvoice' : 'sale-returns';
-    // this.router.navigate([`admin/sales/${targetRoute}`], { state: { data: populatedData } });
-      // Log and navigate to the target module with populated data
     console.log('Populated Data:', populatedData);
     
     // Determine the target route based on the selected table
@@ -193,22 +166,15 @@ export class SalesComponent {
   hasDataPopulated: boolean = false;
 
   ngOnInit() {
-    this.checkAndPopulateData();
-
     this.showSaleOrderList = false;
     this.showForm = false;
     this.SaleOrderEditID = null;
     // set form config
     this.setFormConfig();
+    this.checkAndPopulateData();
     
     // set sale_order default value
     this.formConfig.model['sale_order']['order_type'] = 'sale_order';
-    
-    // Call the method to handle sale invoice creation, this is temporary change, this will be moved to formconfig.
-    
-    this.handleSaleInvoiceCreation();
-    console.log("here refreshing started_2 : ")
-    //=================================
 
     // to get SaleOrder number for save 
     this.getOrderNo();
@@ -218,21 +184,19 @@ export class SalesComponent {
   }
 
   checkAndPopulateData() {
-    // Check if data has already been populated
     if (this.dataToPopulate === undefined) {
-      console.log("Data status checking 1 : ", (this.dataToPopulate === undefined))
-      // Subscribe to route params and history state data
       this.route.paramMap.subscribe(params => {
-        // Retrieve data from history only if it's the first time populating
-        this.dataToPopulate = history.state.data; 
+        this.dataToPopulate = history.state.data;
         console.log('Data retrieved:', this.dataToPopulate);
-        
-        // Populate the form only if data exists
+  
         if (this.dataToPopulate) {
-          // Ensure we are handling sale_order_items correctly
           const saleOrderItems = this.dataToPopulate.sale_order_items || [];
   
-          // Clear existing sale_order_items to avoid duplicates
+          if(!this.formConfig.model) {
+            this.formConfig.model = {}
+          }
+          
+          // Clear existing items to avoid duplicates
           this.formConfig.model.sale_order_items = [];
   
           // Populate form with data, ensuring unique entries
@@ -268,14 +232,12 @@ export class SalesComponent {
         return; // Stop further execution as we don't want to repopulate the form
       }
     }
-  }  
-  
+  } 
 
 //COPY - END---------------------------------------------------
 
   // New method to handle sale invoice creation
   private handleSaleInvoiceCreation() {
-    console.log("invoice data in edit: ", this.invoiceData);
     if (this.invoiceData !== undefined) {
       this.createSaleInvoice(this.invoiceData).subscribe(
         response => {
@@ -340,7 +302,6 @@ export class SalesComponent {
 
         // Generate Sales Order Number
         this.http.get('masters/generate_order_no/?type=SO').subscribe((res: any) => {
-          console.log("RES data in orderno : ", res)
           if (res && res.data && res.data.order_number) {
             this.orderNumber = res.data.order_number;
             this.formConfig.model['sale_order']['order_no'] = this.orderNumber;
@@ -888,7 +849,7 @@ export class SalesComponent {
         },
         {
           key: 'sale_order_items',
-          type: 'table',
+          type: 'repeat',
           className: 'custom-form-list',
           templateOptions: {
             // title: 'Products',

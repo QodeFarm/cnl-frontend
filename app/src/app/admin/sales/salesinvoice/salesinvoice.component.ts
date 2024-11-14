@@ -106,28 +106,6 @@ export class SalesinvoiceComponent {
       this.availableTables = this.tables.filter(table => table !== this.currentTable);
   }
 
-  // Method to deeply copy fields from dataToCopy based on model structure
-  deepCopyFields(source: any, destination: any, mapping: any) {
-    for (const key in mapping) {
-      if (mapping.hasOwnProperty(key)) {
-        // Check if the field is an object and requires further copying
-        if (typeof mapping[key] === 'object' && !Array.isArray(mapping[key])) {
-          destination[key] = {};
-          this.deepCopyFields(source[key], destination[key], mapping[key]);
-        } else if (Array.isArray(mapping[key])) {
-          // Handle arrays of objects (e.g., items and attachments)
-          destination[key] = source[key]?.map((item: any) => {
-            const newItem: any = {};
-            this.deepCopyFields(item, newItem, mapping[key][0]);
-            return newItem;
-          }) || [];
-        } else {
-          // Direct field copy
-          destination[key] = source[mapping[key]] || null;
-        }
-      }
-    }
-  }
 
   copyToTable() {
     const selectedMapping = this.fieldMapping[this.selectedTable];
@@ -189,13 +167,12 @@ export class SalesinvoiceComponent {
   dataToPopulate: any;
   salesInvoiceForm: FormGroup;
 
-  ngOnInit() {
-    this.checkAndPopulateData();
-    
+  ngOnInit() {    
     this.showSaleInvoiceList = false;
     this.showForm = true;
     this.SaleInvoiceEditID = null;
     this.setFormConfig();
+    this.checkAndPopulateData();
     // Set sale_order default value
     this.formConfig.model['sale_invoice_order']['order_type'] = 'sale_invoice';
 
@@ -207,16 +184,12 @@ export class SalesinvoiceComponent {
   checkAndPopulateData() {
     // Check if data has already been populated
     if (this.dataToPopulate === undefined) {
-      console.log("Data status checking 1 : ", (this.dataToPopulate === undefined))
-      // Subscribe to route params and history state data
       this.route.paramMap.subscribe(params => {
-        // Retrieve data from history only if it's the first time populating
         this.dataToPopulate = history.state.data; 
         console.log('Data retrieved:', this.dataToPopulate);
         
         // Populate the form only if data exists
         if (this.dataToPopulate) {
-          // Ensure we are handling sale_invoice_items correctly
           const saleInvoiceItems = this.dataToPopulate.sale_invoice_items || [];
   
           // Clear existing sale_invoice_items to avoid duplicates
