@@ -4,15 +4,38 @@
     {{ noOrdersMessage }}
   </div>
 
+  <!-- Pass customProductTemplate to TaTableComponent -->
   <ta-table *ngIf="customerOrders.length > 0"
             [options]="tableConfig"
-            (selectedProductsChange)="handleSelectedProductsChange($event)">
+            [customProductTemplate]="customProductTemplate">
   </ta-table>
+
+  <!-- Define Custom Product Checkboxes Template -->
+  <ng-template #customProductTemplate let-row>
+    <ng-container *ngIf="row.products && row.products.length > 0; else noProducts">
+      <div *ngFor="let product of row.products; let i = index" style="display: flex; align-items: center;">
+        <input
+          type="checkbox"
+          [id]="'product-checkbox-' + row.sale_order_id + '-' + i"
+          [name]="'product-checkbox-' + row.sale_order_id + '-' + i"
+          [value]="product.product_name"
+          [(ngModel)]="product.checked"
+          (change)="onProductCheckboxChange(row, product, $event)"
+          style="margin-right: 5px;"
+        />
+        <label [for]="'product-checkbox-' + row.sale_order_id + '-' + i">
+          {{ product.product_name }} (Qty: {{ product.quantity }})
+        </label>
+      </div>
+    </ng-container>
+    <ng-template #noProducts>No products available</ng-template>
+  </ng-template>
   
+  
+  
+  <!-- Modal Footer -->
   <div class="modal-footer">
-    <button (click)="pullSelectedOrders()" class="btn btn-primary">
-      Pull Selected Orders
-    </button>
+    <button (click)="pullSelectedOrders()" class="btn btn-primary">Pull Selected Orders</button>
     <button type="button" class="btn btn-primary" (click)="closeModal()">Close</button>
-</div>
+  </div>
 </div>

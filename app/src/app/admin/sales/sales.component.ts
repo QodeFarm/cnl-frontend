@@ -49,6 +49,9 @@ export class SalesComponent {
   // Variable to store current table name (example for 'Sale Order')
   currentTable: string = 'Sale Order'; // Dynamically change this based on your current module
 
+  tempSelectedProducts: any[] = []; // Temporary list for checkbox selections
+
+  // Field mapping for auto population
   fieldMapping = {
     'Sale Invoice': {
       sourceModel: 'sale_order',  // Specify the source model
@@ -380,7 +383,16 @@ export class SalesComponent {
 
   // Shows the past orders list modal and fetches orders based on the selected customer
   showOrdersList() {
-    // this.isModalOpen = true;
+    // Clear temporary selections and reset checkbox states
+    this.tempSelectedProducts = [];
+    
+    // Reset all checkboxes for products in customerOrders
+    this.customerOrders.forEach(order => {
+      order.productsList?.forEach(product => {
+        product.checked = false; // Add a `checked` property to manage checkbox state
+      });
+    });
+  
     const selectedCustomerId = this.formConfig.model.sale_order.customer_id;
     const selectedCustomerName = this.formConfig.model.sale_order.customer?.name;
   
@@ -406,7 +418,6 @@ export class SalesComponent {
         const detailedOrderRequests = orders.data.map(order =>
           this.getOrderDetails(order.sale_order_id).pipe(
             tap(orderDetails => {
-              // Map the productsList
               order.productsList = orderDetails.data.sale_order_items.map(item => ({
                 product_name: item.product?.name ?? 'Unknown Product',
                 quantity: item.quantity,
@@ -420,9 +431,9 @@ export class SalesComponent {
                 color: item.color?.color_name ?? 'N/A',
                 remarks: item.remarks ?? '',
                 tax: item.tax ?? 0,
-                print_name: item.print_name ?? item.product?.name ?? 'N/A'
+                print_name: item.print_name ?? item.product?.name ?? 'N/A',
+                checked: false // Initialize checkbox as unchecked
               }));
-              console.log(`Mapped productsList for Order ID: ${order.sale_order_id}`, order.productsList);
             })
           )
         );
@@ -430,7 +441,6 @@ export class SalesComponent {
         return forkJoin(detailedOrderRequests).pipe(
           tap(() => {
             this.customerOrders = orders.data;
-            console.log('Orders and their productsList successfully fetched.');
             this.openModal();
           })
         );
@@ -438,8 +448,12 @@ export class SalesComponent {
     ).subscribe();
   }
   
+  
 
   openModal() {
+    // Remove aria-hidden from the modal when opening
+    this.ordersModal.nativeElement.setAttribute('aria-hidden', 'false');
+    
     // Ensure any existing backdrops are removed
     this.removeModalBackdrop();
   
@@ -454,6 +468,26 @@ export class SalesComponent {
     document.body.classList.add('modal-open');
     document.body.style.overflow = 'hidden';
   }
+  
+  hideModal() {
+    // console.log('hideModal called');
+  
+    // Set aria-hidden to true when the modal is hidden
+    this.ordersModal.nativeElement.setAttribute('aria-hidden', 'true');
+  
+    // Hide the modal itself
+    this.ordersModal.nativeElement.classList.remove('show');
+    this.ordersModal.nativeElement.style.display = 'none';
+  
+    // console.log('Modal visibility set to none');
+  
+    // Remove the modal backdrop and body styling
+    this.removeModalBackdrop();
+  
+    // console.log('Body classes after hiding modal:', document.body.classList);
+    // console.log('Body overflow style after hiding modal:', document.body.style.overflow);
+  }
+  
   
   removeModalBackdrop() {
     // Remove all existing backdrops to prevent leftover overlays
@@ -574,96 +608,82 @@ selectOrder(order: any) {
   }
 
 
-  // Handles the selected products and updates the form model with them
-  handleProductPull(selectedProducts: any[]) {
-    console.log('Pulled selected products in OrdersListComponent:', selectedProducts);
+// Handles the selected products and updates the form model with them
+handleProductPull(selectedProducts: any[]) {
+  console.log('Pulled selected products in OrdersListComponent:', selectedProducts);
 
-    // Initialize sale_order_items if it doesn't exist or if it contains empty entries
-    let existingProducts = this.formConfig.model['sale_order_items'] || [];
+  // Retrieve or initialize the current sale_order_items list
+  let existingProducts = this.formConfig.model['sale_order_items'] || [];
 
-    // Remove any empty entries from existing products
-    existingProducts = existingProducts.filter(product => product && product.product_id);
+  // Filter out any empty entries from existing products
+  existingProducts = existingProducts.filter(product => product && product.product_id);
 
-    // Iterate over selectedProducts and add them only if they are not duplicates
-    selectedProducts.forEach(newProduct => {
-        if (!newProduct || !newProduct.product_id || !newProduct.code) {
-            console.warn("Skipped an incomplete or undefined product:", newProduct);
-            return; // Skip if data is incomplete
-        }
+  selectedProducts.forEach(newProduct => {
+      if (!newProduct || !newProduct.product_id || !newProduct.code) {
+          console.warn("Skipped an incomplete or undefined product:", newProduct);
+          return; // Skip if data is incomplete
+      }
 
-        // Check for duplicates by matching all relevant fields
-        const isDuplicate = existingProducts.some(existingProduct => (
-            existingProduct.product?.product_id === newProduct.product_id &&
-            existingProduct.code === newProduct.code &&
-            existingProduct.total_boxes === newProduct.total_boxes &&
-            existingProduct.size?.size_name === newProduct.size?.size_name &&
-            existingProduct.color?.color_name === newProduct.color?.color_name &&
-            existingProduct.quantity === newProduct.quantity
-        ));
+      // Check for duplicates by comparing all key fields
+      const isDuplicate = existingProducts.some(existingProduct => (
+          existingProduct.product_id === newProduct.product_id &&
+          existingProduct.code === newProduct.code &&
+          existingProduct.total_boxes === (newProduct.total_boxes || 0) &&
+          existingProduct.unit_options_id === (newProduct.unit_options_id || null) &&
+          existingProduct.quantity === (newProduct.quantity || 1) &&
+          existingProduct.size?.size_name === (newProduct.size?.size_name || 'Unspecified') &&
+          existingProduct.color?.color_name === (newProduct.color?.color_name || 'Unspecified')
+      ));
 
-        if (!isDuplicate) {
-            existingProducts.push({
-                product: {
-                    product_id: newProduct.product_id,
-                    name: newProduct.name || '',
-                    code: newProduct.code || '',
-                },
-                product_id: newProduct.product_id,
-                code: newProduct.code || '',
-                total_boxes: newProduct.total_boxes || 0,
-                unit_options_id: newProduct.unit_options_id || null,
-                quantity: newProduct.quantity || 1,
-                rate: newProduct.rate || 0,
-                discount: newProduct.discount || 0,
-                print_name: newProduct.print_name || newProduct.name || '',
-                amount: newProduct.amount,
-                tax: newProduct.tax || 0,
-                remarks: newProduct.remarks || '',
-                
-                // Set size and color to "Unspecified" if not provided
-                size: {
-                    size_id: newProduct.size_id || null,
-                    size_name: newProduct.size?.size_name || 'Unspecified'
-                },
-                color: {
-                    color_id: newProduct.color_id || null,
-                    color_name: newProduct.color?.color_name || 'Unspecified'
-                },
-                size_id: newProduct.size_id,
-                color_id: newProduct.color_id
-            });
-        }
-    });
+      if (!isDuplicate) {
+          console.log("Adding new product:", newProduct);
 
-    // Update the model with the final product list without duplicates or empty entries
-    this.formConfig.model['sale_order_items'] = [...existingProducts];
+          // Add valid, non-duplicate product to existingProducts list
+          existingProducts.push({
+              product: {
+                  product_id: newProduct.product_id,
+                  name: newProduct.name || '',
+                  code: newProduct.code || '',
+              },
+              product_id: newProduct.product_id,
+              code: newProduct.code || '',
+              total_boxes: newProduct.total_boxes || 0,
+              unit_options_id: newProduct.unit_options_id || null,
+              quantity: newProduct.quantity,
+              rate: parseFloat(newProduct.rate) || 0,
+              discount: parseFloat(newProduct.discount) || 0,
+              print_name: newProduct.print_name || newProduct.name || '',
+              amount: parseFloat(newProduct.amount) || 0, // Ensure amount is a number
+              tax: parseFloat(newProduct.tax) || 0,       // Ensure tax is a number
+              remarks: newProduct.remarks || '',
 
-    // Trigger change detection to update the UI
-    this.formConfig.model = { ...this.formConfig.model };
-    this.cdRef.detectChanges();
+              // Set size and color properties with defaults if not provided
+              size: {
+                  size_id: newProduct.size?.size_id || null,
+                  size_name: newProduct.size?.size_name || 'Unspecified'
+              },
+              color: {
+                  color_id: newProduct.color?.color_id || null,
+                  color_name: newProduct.color?.color_name || 'Unspecified'
+              },
+              size_id: newProduct.size?.size_id || null,
+              color_id: newProduct.color?.color_id || null
+          });
+      } else {
+          console.log("Duplicate detected, skipping product:", newProduct);
+      }
+  });
 
-    console.log("Final Products List after adding size and color:", this.formConfig.model['sale_order_items']);
+  // Update the model with the final product list, ensuring there are no placeholder or duplicate rows
+  this.formConfig.model['sale_order_items'] = [...existingProducts];
+
+  // Trigger change detection to update the UI immediately
+  this.formConfig.model = { ...this.formConfig.model }; // Refresh the formConfig model
+  setTimeout(() => this.cdRef.detectChanges(), 0); // Use async change detection for smooth UI update
+
+  // Log the final products to confirm the update
+  console.log("Final Products List in sale_order_items:", this.formConfig.model['sale_order_items']);
 }
-
-
-hideModal() {
-  console.log('hideModal called'); // Log to check if hideModal is triggered
-
-  // Hide the modal itself
-  this.ordersModal.nativeElement.classList.remove('show');
-  this.ordersModal.nativeElement.style.display = 'none';
-
-  console.log('Modal visibility set to none'); // Confirm modal visibility is set to none
-
-  // Remove the modal backdrop and body styling
-  this.removeModalBackdrop();
-
-  // Log to check the current state of the body
-  console.log('Body classes after hiding modal:', document.body.classList);
-  console.log('Body overflow style after hiding modal:', document.body.style.overflow);
-}
-
-
 
   ngOnDestroy() {
     // Ensure modals are disposed of correctly
