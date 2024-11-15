@@ -188,12 +188,9 @@ export class SalesComponent {
 
     // Filter for items where selectItem is true (checkbox selected)
     const selectedItems = this.invoiceData.sale_invoice_items.filter(item => item.selectItem);
-    console.log("Data of sale order items : ", selectedItems);
 
     // If selectedItems > 0, use selected items; else use all sale_invoice_items
     const itemsToInvoice = selectedItems.length > 0 ? selectedItems : this.invoiceData.sale_invoice_items;
-    
-    console.log("Items to invoice (selected or all):", itemsToInvoice);
     
     const invoiceData = {
         ...this.invoiceData,
@@ -209,10 +206,29 @@ export class SalesComponent {
                 this.showInvoiceCreatedMessage();
 
                 // Add invoiced product IDs to `previouslyInvoicedProductIds` set
-                itemsToInvoice.forEach(item => this.previouslyInvoicedProductIds.add(item.product_id));       
+                // itemsToInvoice.forEach(item => this.previouslyInvoicedProductIds.add(item.product_id)); 
+
+                itemsToInvoice.forEach(item => {
+                  console.log("Item data:", item);
+                  console.log("Invoice data:", this.invoiceData);
+                
+                  if (item.invoiced === 'NO') {
+                    console.log("We are in log...")
+                    item.invoiced = 'YES'; // Update locally
+                    this.updateInvoicedStatusDirectly(item.sale_order_item_id, 'YES'); // Send the HTTP request directly
+                  }
+                });
 
                 const saleOrderId = this.invoiceData.sale_invoice_order.sale_order_id;
                 // this.triggerWorkflowPipeline(saleOrderId);
+                // Check if all products are invoiced
+                const allInvoiced = this.invoiceData.sale_invoice_items.every(item => item.invoiced === 'YES');
+                if (allInvoiced) {
+                  console.log("All products are invoiced, triggering workflow pipeline...");
+                  this.triggerWorkflowPipeline(saleOrderId);
+                } else {
+                  console.log("Some products are still pending, workflow pipeline not triggered.");
+                }
             },
             error => {
                 console.error('Error creating sale invoice', error);
@@ -224,6 +240,21 @@ export class SalesComponent {
 
     // Re-initialize the form if needed
     this.ngOnInit();
+  }
+
+  // Method to update invoiced status using HttpClient
+  updateInvoicedStatusDirectly(itemId: number, status: string) {
+    const apiUrl = `sales/sale_order_items/${itemId}/`;
+    const payload = { invoiced: status };
+    console.log("{ invoiced: status } : ", payload);
+    this.http.patch(apiUrl, payload).subscribe(
+      response => {
+        console.log("Invoiced status updated successfully", response);
+      },
+      error => {
+        console.error("Error updating invoiced status", error);
+      }
+    );
   }
 
   // This function triggers the workflow pipeline API call using POST method
@@ -1056,20 +1087,7 @@ export class SalesComponent {
             ]
           },
           fieldArray: {
-            fieldGroup: [  
-              // {
-              //   key: 'selectItem',
-              //   type: 'checkbox',
-              //   defaultValue: false,
-              //   templateOptions: {
-              //     hideLabel: true,
-              //   },
-              //   expressionProperties: {
-              //     'templateOptions.hidden': () => !(this.SaleOrderEditID),
-              //     'templateOptions.disabled': () => !(this.SaleOrderEditID),
-                  
-              //   }
-              // },     
+            fieldGroup: [      
               {
                 key: 'selectItem',
                 type: 'checkbox',
@@ -1079,10 +1097,7 @@ export class SalesComponent {
                 },
                 expressionProperties: {
                     'templateOptions.hidden': () => !(this.SaleOrderEditID),
-                    'templateOptions.disabled': (model) => {
-                        // Disable the checkbox if the product ID has already been invoiced
-                        return this.previouslyInvoicedProductIds.has(model.product_id) || !this.SaleOrderEditID;
-                    }
+                    'templateOptions.disabled': (model) => model.invoiced === 'YES'
                   }
               },                                     
               {
@@ -1641,7 +1656,20 @@ export class SalesComponent {
                   hideLabel: true
                 },
               },
-
+              {
+                type: 'select',
+                key: 'invoiced',
+                defaultValue: 'NO', // Default value set to 'NO'
+                templateOptions: {
+                    label: 'Invoiced',
+                    options: [
+                        { value: 'YES', label: 'Yes' },
+                        { value: 'NO', label: 'No' }
+                    ],
+                    hideLabel: true,
+                    disabled: true // Make the field read-only in the form
+                },
+              }
             ]
           },
         },
