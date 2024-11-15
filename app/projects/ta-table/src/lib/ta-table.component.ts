@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, Output, ViewChild, EventEmitter, ElementRef } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, Output, ViewChild, EventEmitter, ElementRef, TemplateRef  } from '@angular/core';
 import { getValue } from '@ta/ta-core';
 import { cloneDeep } from 'lodash';
 import {
@@ -51,6 +51,10 @@ export class TaTableComponent implements OnDestroy {
   @Input() options!: TaTableConfig;
   @Output() doAction: EventEmitter<any> = new EventEmitter();
   @ViewChild('taTable') taTable!: NzTableComponent<any> | any;
+  @Input() customProductTemplate!: TemplateRef<any>;
+  // selectedProducts: any[] = []; // This holds the selected products
+  // @Output() selectedProductsChange = new EventEmitter<any[]>(); // Event emitter to notify parent component
+  
 
   selectedStatus: string | null = null;
   selectedQuickPeriod: string | null = null;
@@ -59,8 +63,8 @@ export class TaTableComponent implements OnDestroy {
   isButtonVisible = false;
 
   statusOptions: Array<{ value: string, label: string }> = []; // Store the statuses here
-  
- // List of quick period options like 'Today', 'Last Week', etc.
+
+  // List of quick period options like 'Today', 'Last Week', etc.
   quickPeriodOptions = [
     { value: 'today', label: 'Today' },
     { value: 'yesterday', label: 'Yesterday' },
@@ -78,7 +82,7 @@ export class TaTableComponent implements OnDestroy {
     const today = new Date();
     let startDate: Date | null = null;
     let endDate: Date | null = today;
-  
+
     switch (this.selectedQuickPeriod) {
       case 'today':
         startDate = endDate;
@@ -117,14 +121,14 @@ export class TaTableComponent implements OnDestroy {
         endDate = new Date(today.getFullYear(), 2, 31);
         break;
     }
-  
+
     this.fromDate = startDate;
     this.toDate = endDate;
   }
-;
+  ;
   loadStatuses() {
     const url = 'masters/order_status/';
-    
+
     this.http.get<any>(url).subscribe(
       (response) => {
         if (response && response.data && response.data.length > 0) {
@@ -141,22 +145,22 @@ export class TaTableComponent implements OnDestroy {
       }
     );
   }
-onStatusChange(status: string) {
-  this.selectedStatus = status;
-  // this.applyFilters();
-}
-  
+  onStatusChange(status: string) {
+    this.selectedStatus = status;
+    // this.applyFilters();
+  }
+
   // Apply filters like quick period, date range, and status to fetch filtered data
 
   applyFilters() {
     // Construct the filters object
     const filters = {
-        quickPeriod: this.selectedQuickPeriod,
-        fromDate: this.fromDate,
-        toDate: this.toDate,
-        status: this.selectedStatus,
+      quickPeriod: this.selectedQuickPeriod,
+      fromDate: this.fromDate,
+      toDate: this.toDate,
+      status: this.selectedStatus,
     };
-    
+
     // Generate query string from filters
     const queryString = this.generateQueryString(filters);
 
@@ -181,22 +185,22 @@ onStatusChange(status: string) {
 
     // Fetch filtered data from the server using the constructed URL
     this.http.get(url).subscribe(
-        response => {
-            this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
-                this.loading = false;
-                this.rows = response['data'] || data;
-            });
-        },
-        error => {
-            console.error('Error executing URL:', `${full_path}${queryString}`, error);
-        }
+      response => {
+        this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
+          this.loading = false;
+          this.rows = response['data'] || data;
+        });
+      },
+      error => {
+        console.error('Error executing URL:', `${full_path}${queryString}`, error);
+      }
     );
     // return queryString;
     return finalQueryString;
-}
+  }
 
-// Clear all filters like quick period, date range, and status
-clearFilters() {
+  // Clear all filters like quick period, date range, and status
+  clearFilters() {
     // Reset all filter values
     this.selectedQuickPeriod = null;
     this.fromDate = null;
@@ -216,37 +220,37 @@ clearFilters() {
     }
 
     const url = `${this.options.apiUrl}&page=${this.pageIndex}&limit=${this.pageSize}`;
-  
+
     console.log('API URL:', url); // Debugging log
 
     // const url = this.options.apiUrl; // Base URL without any filters
     this.http.get(url).subscribe(
-        response => {
-            this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
-                this.loading = false;
-                this.rows = response['data'] || data;
-            });
-        },
-        error => {
-            console.error('Error executing URL:', url, error);
-        }
+      response => {
+        this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
+          this.loading = false;
+          this.rows = response['data'] || data;
+        });
+      },
+      error => {
+        console.error('Error executing URL:', url, error);
+      }
     );
-}
+  }
 
-// Generate query string for the API call based on the applied filters
-generateQueryString(filters: { quickPeriod: string, fromDate: Date, toDate: Date, status: string}): string {
+  // Generate query string for the API call based on the applied filters
+  generateQueryString(filters: { quickPeriod: string, fromDate: Date, toDate: Date, status: string }): string {
     const queryParts: string[] = [];
 
     // Add filter for 'fromDate' if available
     if (filters.fromDate) {
-        const fromDateStr = this.formatDate(filters.fromDate);
-        queryParts.push(`created_at_after=${encodeURIComponent(fromDateStr)}`);
+      const fromDateStr = this.formatDate(filters.fromDate);
+      queryParts.push(`created_at_after=${encodeURIComponent(fromDateStr)}`);
     }
 
     // Add filter for 'toDate' if available
     if (filters.toDate) {
-        const toDateStr = this.formatDate(filters.toDate);
-        queryParts.push(`created_at_before=${encodeURIComponent(toDateStr)}`);
+      const toDateStr = this.formatDate(filters.toDate);
+      queryParts.push(`created_at_before=${encodeURIComponent(toDateStr)}`);
     }
 
     // Add filter for status if available
@@ -256,43 +260,43 @@ generateQueryString(filters: { quickPeriod: string, fromDate: Date, toDate: Date
 
     // Return the query string by joining all the filters
     return '&' + queryParts.join('&');
-}
-formatDate(date: Date): string {
+  }
+  formatDate(date: Date): string {
     // Format date as 'yyyy-MM-dd'
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
     return `${year}-${month}-${day}`;
-}
-
-downloadData(event: any) {
-  const tableParamConfig: TaParamsConfig = {
-    apiUrl: this.options.apiUrl,
-    pageIndex: this.pageIndex,
-    pageSize: this.pageSize,
   }
 
-  this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
-    this.loading = false;
-    const full_path = this.options.apiUrl
-    const name_of_file = full_path.split('/')[1]
-    let fullUrl = `${this.options.apiUrl}`;
-    const query = this.applyFilters()
-    if (query.length > 1) {
-      fullUrl = `${fullUrl}${query}&`
+  downloadData(event: any) {
+    const tableParamConfig: TaParamsConfig = {
+      apiUrl: this.options.apiUrl,
+      pageIndex: this.pageIndex,
+      pageSize: this.pageSize,
     }
 
-    const download_url = `${fullUrl}download/excel/`
-    this.http.get(download_url, { responseType: 'blob' }).subscribe((blob: Blob) => {
-      const a = document.createElement('a');
-      const objectUrl = URL.createObjectURL(blob);
-      a.href = objectUrl;
-      a.download = `${name_of_file}.xlsx`
-      a.click();
-      URL.revokeObjectURL(objectUrl);
-    });
-  })
-};
+    this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
+      this.loading = false;
+      const full_path = this.options.apiUrl
+      const name_of_file = full_path.split('/')[1]
+      let fullUrl = `${this.options.apiUrl}`;
+      const query = this.applyFilters()
+      if (query.length > 1) {
+        fullUrl = `${fullUrl}${query}&`
+      }
+
+      const download_url = `${fullUrl}download/excel/`
+      this.http.get(download_url, { responseType: 'blob' }).subscribe((blob: Blob) => {
+        const a = document.createElement('a');
+        const objectUrl = URL.createObjectURL(blob);
+        a.href = objectUrl;
+        a.download = `${name_of_file}.xlsx`
+        a.click();
+        URL.revokeObjectURL(objectUrl);
+      });
+    })
+  };
 
   searchValue = '';
   visible = false;
@@ -374,7 +378,7 @@ downloadData(event: any) {
       this.loading = true;
       this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
         this.loading = false;
-        this.total = data.total; // mock the total data here
+        this.total = data.totalCount; // mock the total data here
         this.rows = data.data || data;
       }, (error) => {
         this.loading = false;
@@ -513,15 +517,16 @@ downloadData(event: any) {
   ngOnDestroy() {
     this.actionObservable$.unsubscribe();
   }
-  // Additional code for handling action button events in the table(added this code for file upload)
+  // Additional code for handling action button events in the table(added this code for file upload)(start)
   performAction(action: any, row: any) {
     if (action && action.type === 'callBackFn' && typeof action.callBackFn === 'function') {
       action.callBackFn(row); // Execute the callback function with row data
     }
-  
+
     // Optionally, emit the event to parent if needed
     this.doAction.emit({ action, row });
   }
+  
   // getFilters(){
   //   const filters = this.options.cols.filter((item: { searchValue: any; })=>{
   //     item.searchValue;

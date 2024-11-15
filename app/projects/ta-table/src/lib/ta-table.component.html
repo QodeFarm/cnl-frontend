@@ -4,11 +4,7 @@
         <div class="ta-row p-0 justify-content-end flex-nowrap">
             <!-- Quick Period Dropdown -->
             <div class="filter-group" style="margin-right: 10px;" *ngIf="isButtonVisible">
-                <nz-select id="quickPeriod" [(ngModel)]="selectedQuickPeriod" 
-                           (ngModelChange)="onQuickPeriodChange()" 
-                           nzPlaceHolder="Quick Period" 
-                           class="quick-period-select"
-                           style="width: 160px;">
+                <nz-select id="quickPeriod" [(ngModel)]="selectedQuickPeriod" (ngModelChange)="onQuickPeriodChange()" nzPlaceHolder="Quick Period" class="quick-period-select" style="width: 160px;">
                     <nz-option *ngFor="let period of quickPeriodOptions" [nzValue]="period.value" [nzLabel]="period.label"></nz-option>
                 </nz-select>
             </div>
@@ -23,21 +19,14 @@
                 <nz-date-picker id="toDate" [(ngModel)]="toDate" nzPlaceHolder="To date" class="date-picker" style="width: 130px;"></nz-date-picker>
             </div>
 
-            <!-- Apply Filters status DropDown -->            
+            <!-- Apply Filters status DropDown -->
             <div class="filter-group" style="margin-right: 10px;" *ngIf="isButtonVisible">
-                <nz-select 
-                    [(ngModel)]="selectedStatus" 
-                    nzPlaceHolder="Select Status" 
-                    style="width: 185px" 
-                    (ngModelChange)="onStatusChange($event)">
-                    <nz-option 
-                        *ngFor="let status of statusOptions" 
-                        [nzValue]="status.value" 
-                        [nzLabel]="status.label">
+                <nz-select [(ngModel)]="selectedStatus" nzPlaceHolder="Select Status" style="width: 185px" (ngModelChange)="onStatusChange($event)">
+                    <nz-option *ngFor="let status of statusOptions" [nzValue]="status.value" [nzLabel]="status.label">
                     </nz-option>
                 </nz-select>
             </div>
-            
+
             <!-- Apply Filters OK Button -->
             <div class="filter-group" style="margin-right: 10px;" *ngIf="isButtonVisible">
                 <button nz-button nzType="primary" (click)="applyFilters()" class="apply-filters-button">
@@ -51,13 +40,13 @@
                     <i nz-icon nzType="close" nzTheme="outline"></i>
                 </button>
             </div>
-            
+
             <!-- Download Button -->
             <div class="filter-group" style="margin-right: 10px;" *ngIf="isButtonVisible">
                 <button nz-button nzType="primary" (click)="downloadData($event)">
                     <i nz-icon nzType="download" nzTheme="outline"></i>
                 </button>
-            </div>       
+            </div>
         </div>
     </div>
 
@@ -80,7 +69,7 @@
 </div>
 
 <!-- [nzTitle]="options.title"  (nzQueryParams)="onQueryParamsChange($event)"-->
-<nz-table #taTable nzShowSizeChanger [nzPageSizeOptions]="options.pageSizeOptions" [nzTableLayout]="options.tableLayout" [nzBordered]="options.bordered" [nzScroll]="{ x: options.scrollX, y: options.scrollY }" [nzData]="rows" [nzFrontPagination]="true"
+<nz-table #taTable nzShowSizeChanger [nzPageSizeOptions]="options.pageSizeOptions" [nzTableLayout]="options.tableLayout" [nzBordered]="options.bordered" [nzScroll]="{ x: options.scrollX, y: options.scrollY }" [nzData]="rows" [nzFrontPagination]="false"
     [nzShowTotal]="totalTemplate" [nzLoading]="loading" [nzTotal]="total" [nzPageSize]="options.pageSize" (nzQueryParams)="onQueryParamsChange($event)" [nzPageIndex]="pageIndex" [nzPaginationPosition]="options.paginationPosition">
     <thead>
         <tr>
@@ -112,21 +101,21 @@
     <tbody>
         <tr *ngFor="let data of rows">
             <td *ngIf="options.showCheckbox" style="width: 50px;" [nzChecked]="false" [nzDisabled]="false" [nzLabel]="data.name"></td>
-    
+
             <td [ngClass]="c.tdClassName" *ngFor="let c of options.cols" [nzEllipsis]="c.ellipsis">
                 <label class="col-name">{{c.name}} :</label>
-                
+
                 <!-- Display selected file name and Replace button -->
                 <!-- New code to handle displayType: 'file' and render file name above Replace button -->
                 <ng-container *ngIf="c.displayType === 'file'; else defaultContent">
-                <div *ngIf="data.selectedFileName; else uploadButton">
-                    <!-- Display the selected file name above the Replace button -->
-                    <div>{{ data.selectedFileName }}</div>
-                    <button *ngFor="let action of c.actions" (click)="performAction(action, data)">
+                    <div *ngIf="data.selectedFileName; else uploadButton">
+                        <!-- Display the selected file name above the Replace button -->
+                        <div>{{ data.selectedFileName }}</div>
+                        <button *ngFor="let action of c.actions" (click)="performAction(action, data)">
                         Replace
                     </button>
-                </div>
-    
+                    </div>
+
                     <!-- Initial Upload button when no file is selected -->
                     <ng-template #uploadButton>
                         <button *ngFor="let action of c.actions" (click)="performAction(action, data)">
@@ -134,7 +123,7 @@
                         </button>
                     </ng-template>
                 </ng-container>
-    
+
                 <!-- Existing content for other column types -->
                 <ng-template #defaultContent>
                     <ng-container *ngTemplateOutlet="(c.type === 'action') ? actions : datalable; context: { col: c, row: data }">
@@ -143,8 +132,8 @@
             </td>
         </tr>
     </tbody>
-    
-    
+
+
 </nz-table>
 
 
@@ -157,16 +146,18 @@
     </div>
     <!-- should be translated -->
 </ng-template>
-<ng-template #datalable let-col="col" let-row="row">
-    <!-- <ng-contentainer [ngSwitch]="col.displayType">
-        <div *ngSwitchCase="'map'">
-           
-        </div>
-        <div *ngSwitchDefault>{{row[col.fieldKey]}}</div>
-    </ng-contentainer> -->
-    <ta-table-cell-dynamic [col]="col" [row]="row" [value]="row[col.fieldKey]"></ta-table-cell-dynamic>
 
+<ng-template #datalable let-col="col" let-row="row">
+    <ng-container *ngIf="col.fieldKey === 'products'">
+        <!-- Use the custom product template for the 'products' column -->
+        <ng-container *ngTemplateOutlet="customProductTemplate; context: { $implicit: row }"></ng-container>
+    </ng-container>
+    <ng-container *ngIf="col.fieldKey !== 'products'">
+        <!-- Default rendering for other columns -->
+        <ta-table-cell-dynamic [col]="col" [row]="row" [value]="row[col.fieldKey]"></ta-table-cell-dynamic>
+    </ng-container>
 </ng-template>
+
 <ng-template #actions let-col="col" let-row="row">
     <ta-table-actions [actions]="col.actions" [row]="row" (clickAction)="actionClick($event)"></ta-table-actions>
 </ng-template>
