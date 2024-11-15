@@ -161,23 +161,3 @@
 <ng-template #actions let-col="col" let-row="row">
     <ta-table-actions [actions]="col.actions" [row]="row" (clickAction)="actionClick($event)"></ta-table-actions>
 </ng-template>
-
-<!-- Custom Product Checkboxes Template -->
-<ng-template #customProductTemplate let-row>
-    <ng-container *ngIf="row.products && row.products.length > 0; else noProducts">
-      <div *ngFor="let product of row.products; let i = index" style="display: flex; align-items: center;">
-        <input
-          type="checkbox"
-          [id]="'product-checkbox-' + row.sale_order_id + '-' + i"
-          [name]="'product-checkbox-' + row.sale_order_id + '-' + i"
-          [value]="product.product_name"
-          (change)="onProductCheckboxChange(row, product, $event)"
-          style="margin-right: 5px;"
-        />
-        <label [for]="'product-checkbox-' + row.sale_order_id + '-' + i">
-          {{ product.product_name }} (Qty: {{ product.quantity }})
-        </label>
-      </div>
-    </ng-container>
-    <ng-template #noProducts>No products available</ng-template>
-  </ng-template>

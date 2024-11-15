@@ -70,10 +70,6 @@ export class TaCurdComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
 
   }
- // Additional code for handling "Upload File" action events (starts)
- uploadFileAction(row: any) {
-  console.log('Upload action triggered for row:', row);
-// Additional code for handling "Upload File" action events (ends)
-}
+
 
 }

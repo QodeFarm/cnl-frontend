@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild, TemplateRef  } from '@angular/core';
 import { TaActionService } from '@ta/ta-core';
 import { TaFormComponent } from '@ta/ta-form';
 import { TaTableComponent } from '@ta/ta-table';
@@ -13,6 +13,7 @@ export class TaCurdModalComponent implements OnInit {
   @Input() options: TaCurdConfig | any;
   @ViewChild('table', { static: true }) table: TaTableComponent | undefined;
   @ViewChild('form', { static: false }) form: TaFormComponent | undefined;
+  @Input() customProductTemplate!: TemplateRef<any>; //Added this customProductTemplate
   visible = false;
   formTitle = "Create";
   constructor(private taAction: TaActionService) { }
