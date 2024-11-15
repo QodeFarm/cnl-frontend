@@ -2,13 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { Component, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { TaFormComponent, TaFormConfig } from '@ta/ta-form';
 import { Observable, forkJoin } from 'rxjs';
-import { tap, switchMap, map } from 'rxjs/operators';
+import { tap, switchMap, map, filter} from 'rxjs/operators';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { OrderslistComponent } from './orderslist/orderslist.component';
 import { CommonModule } from '@angular/common';
 import { SalesListComponent } from './sales-list/sales-list.component';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { SalesinvoiceComponent } from './salesinvoice/salesinvoice.component';
 import { BindingType } from '@angular/compiler';
 @Component({
@@ -38,7 +38,7 @@ export class SalesComponent {
   isModalOpen = false;  //Added line to fix past orders modal box correctly
   //COPY ---------------------------------
   // List of all tables
-  tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
+  tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return', 'Purchase Order', 'Purchase Invoice', 'Purchase Return'];
 
   // This will store available tables excluding the current one
   availableTables: string[] = [];
@@ -49,66 +49,112 @@ export class SalesComponent {
   // Variable to store current table name (example for 'Sale Order')
   currentTable: string = 'Sale Order'; // Dynamically change this based on your current module
 
-    tempSelectedProducts: any[] = []; // Temporary list for checkbox selections
+  tempSelectedProducts: any[] = []; // Temporary list for checkbox selections
 
   // Field mapping for auto population
   fieldMapping = {
-      'Sale Invoice': {
-          customer: 'customer',  // Add this line for customer_id
-          csutomer_id: 'customer_id',
-          email: 'email',
-          billing_address: 'billing_address',
-          shipping_address: 'shipping_address',
-          ref_no: 'ref_no',
-          tax: 'tax',
-          remarks: 'remarks'
-      },
-      'Sale Return': {
-          customer: 'customer', // Assuming the same field name
-          customer_id: 'customer_id',  // Add this line for customer_id
-          email: 'email',
-          shipping_address: 'shipping_address',
-          ref_no: 'ref_no',
-          tax: 'tax',
-          remarks: 'remarks'
-      },
-      // Add mappings for other tables as needed
+    'Sale Invoice': {
+      sourceModel: 'sale_order',  // Specify the source model
+      targetModel: 'sale_invoice_order', // Specify the target model
+      // Indicate nested fields with model mappings
+      nestedModels: {
+        sale_order_items: 'sale_invoice_items',
+        order_attachments: 'order_attachments',
+        order_shipments: 'order_shipments'
+      }
+    },
+    'Sale Return': {
+      sourceModel: 'sale_order',  // Specify the source model
+      targetModel: 'sale_return_order',  // Specify the target model
+      // Nested mappings
+      nestedModels: {
+        sale_order_items: 'sale_return_items',
+        order_attachments: 'order_attachments',
+        order_shipments: 'order_shipments'
+      }
+    },
+    'Purchase Order': {
+      sourceModel: 'sale_order',
+      targetModel: 'purchase_order_data',
+      nestedModels: {
+        sale_order_items: 'purchase_order_items',
+        order_attachments: 'order_attachments',
+        order_shipments: 'order_shipments'
+      }
+    },
+    'Purchase Invoice': {
+      sourceModel: 'sale_order',
+      targetModel: 'purchase_invoice_orders',
+      nestedModels: {
+        sale_order_items: 'purchase_invoice_items',
+        order_attachments: 'order_attachments',
+        order_shipments: 'order_shipments'
+      }
+    },
+    'Purchase Return': {
+      sourceModel: 'sale_order',
+      targetModel: 'purchase_return_orders',
+      nestedModels: {
+        sale_order_items: 'purchase_return_items',
+        order_attachments: 'order_attachments',
+        order_shipments: 'order_shipments'
+      }
+    }
   };
   sizeOptions: any[] = []; 
 
-  // Method to open the copy modal and populate dropdown
-  openCopyModal() {
-      this.availableTables = this.tables.filter(table => table !== this.currentTable);
-  }
-
   copyToTable() {
-    const dataToCopy = this.formConfig.model.sale_order; // Get the current form data
-    const populatedData = {};
-
-    // Extract only the matching fields based on the selected table
-    if (this.selectedTable && this.fieldMapping[this.selectedTable]) {
-        for (const key in this.fieldMapping[this.selectedTable]) {
-            const sourceField = this.fieldMapping[this.selectedTable][key];
-            console.log("Source field : ", sourceField);
-            // Get value from the sales form
-            populatedData[key] = dataToCopy[sourceField];
-        }
+    const selectedMapping = this.fieldMapping[this.selectedTable];
+    
+    if (!selectedMapping) {
+      console.error('Mapping not found for selected table:', this.selectedTable);
+      return;
+    }
+  
+    const dataToCopy = this.formConfig.model[selectedMapping.sourceModel] || {};
+    const populatedData = { [selectedMapping.targetModel]: {} };
+  
+    // Copy main fields
+    Object.keys(dataToCopy).forEach(field => {
+      populatedData[selectedMapping.targetModel][field] = dataToCopy[field];
+    });
+  
+    // Copy nested models if they exist
+    if (selectedMapping.nestedModels) {
+      Object.keys(selectedMapping.nestedModels).forEach(sourceNestedModel => {
+        const targetNestedModel = selectedMapping.nestedModels[sourceNestedModel];
+        const nestedData = this.formConfig.model[sourceNestedModel] || [];
+        
+        populatedData[targetNestedModel] = Array.isArray(nestedData)
+          ? nestedData.map(item => ({ ...item }))
+          : { ...nestedData };
+      });
     }
 
-    // Log the populated data for debugging
-    console.log('Data to copy:', populatedData);
+    // Log and navigate to the target module with populated data
+    console.log('Populated Data:', populatedData);
+    
+    // Determine the target route based on the selected table
+    const targetRoute = 
+      this.selectedTable === 'Sale Invoice' ? 'sales/salesinvoice' :
+      this.selectedTable === 'Sale Return' ? 'sales/sale-returns' :
+      this.selectedTable === 'Purchase Order' ? 'purchase' :
+      this.selectedTable === 'Purchase Invoice' ? 'purchase/purchase-invoice' :
+      this.selectedTable === 'Purchase Return' ? 'purchase/purchasereturns' :
+      null;
 
-    // Navigate based on the selected table without needing breaks
-    if (this.selectedTable === 'Sale Invoice') {
-        this.router.navigate(['admin/sales/salesinvoice'], { state: { data: populatedData } });
-        console.log("populate data of customer : ", populatedData)
-    } else if (this.selectedTable === 'Sale Return') {
-        this.router.navigate(['admin/sales/sale-returns'], { state: { data: populatedData } });
+    if (!targetRoute) {
+      console.error('No valid route for selected table:', this.selectedTable);
+      return;
     }
-    // Add additional cases for other tables if necessary
-    else {
-        console.error('Unknown table selected');
-    }
+
+    this.router.navigate([`admin/${targetRoute}`], { state: { data: populatedData } });
+  }
+  
+
+  // Initialize the copy modal options dynamically
+  openCopyModal() {
+    this.availableTables = this.tables.filter(table => table !== this.currentTable);
   }
 
   constructor(
@@ -123,27 +169,16 @@ export class SalesComponent {
   dataToPopulate: any;
   saleForm: FormGroup;
 
+  hasDataPopulated: boolean = false;
+
   ngOnInit() {
-    // set form config
-    this.setFormConfig();
-    // Subscribe to the route parameters to get the data from the history state
-    this.route.paramMap.subscribe(params => {
-      this.dataToPopulate = history.state.data; // Retrieve data from history
-      console.log('data retrieved:', this.dataToPopulate);
-
-      // Check if dataToPopulate exists and populate the form
-      console.log("triggering the data : ")
-      if (this.dataToPopulate) {
-        console.log("Custome in data : ", this.dataToPopulate.customer?.customer_id)
-        // Populate the form with the data received
-        this.populateForm(this.dataToPopulate);
-      }
-    });
-
     this.showSaleOrderList = false;
     this.showForm = false;
     this.SaleOrderEditID = null;
-
+    // set form config
+    this.setFormConfig();
+    this.checkAndPopulateData();
+    
     // set sale_order default value
     this.formConfig.model['sale_order']['order_type'] = 'sale_order';
 
@@ -153,7 +188,61 @@ export class SalesComponent {
     this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[9].hide = true;
     // //console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
   }
-
+  checkAndPopulateData() {
+    if (this.dataToPopulate === undefined) {
+      console.log("Data status checking 1 : ", (this.dataToPopulate === undefined));
+      this.route.paramMap.subscribe(params => {
+        this.dataToPopulate = history.state.data;
+        console.log('Data retrieved:', this.dataToPopulate);
+  
+        if (this.dataToPopulate) {
+          const saleOrderItems = this.dataToPopulate.sale_order_items || [];
+          console.log("saleOrderItems : ", saleOrderItems);
+  
+          if(!this.formConfig.model) {
+            this.formConfig.model = {}
+          }
+          
+          // Clear existing items to avoid duplicates
+          this.formConfig.model.sale_order_items = [];
+          console.log("checking data status : ", this.formConfig.model.sale_order_items);
+  
+          saleOrderItems.forEach((item, index) => {
+            this.formConfig.model.sale_order_items.push({
+              product_id: item.product.product_id,
+              size: item.size,
+              color: item.color,
+              code: item.code,
+              unit: item.unit,
+              total_boxes: item.total_boxes,
+              quantity: item.quantity,
+              amount: item.amount,
+              rate: item.rate,
+              discount: item.discount
+            });
+            console.log(`Populated row ${index + 1} in sale_order_items`);
+          });
+  
+          // Reassign the array to trigger change detection
+          this.formConfig.model.sale_order_items = [...this.formConfig.model.sale_order_items];
+          console.log("After method : ", this.formConfig.model.sale_order_items)
+          this.cdRef.detectChanges();
+          
+          console.log("Updated formConfig:", this.formConfig.model.sale_order_items);
+        }
+      });
+    } else {
+      const wasPageRefreshed = window.performance?.navigation?.type === window.performance?.navigation?.TYPE_RELOAD;
+  
+      if (wasPageRefreshed) {
+        this.dataToPopulate = undefined;
+        console.log("Page was refreshed, clearing data.");
+        history.replaceState(null, '');
+        return;
+      }
+    }
+  }
+//COPY-End ====================================================
 
 //Sale-invoice ==============================================
   isConfirmationInvoiceOpen: boolean = false;
@@ -225,31 +314,7 @@ export class SalesComponent {
           this.isInvoiceCreated = false; // Hide the message after 3 seconds
       }, 3000);
   }
-
-
-//=========================================================
-
-  populateForm(data: any) {
-    console.log("Data in populateform : ", data);
-    this.saleForm.patchValue({
-      customer: {
-        customer_id: data.customer?.csutomer_id || '',
-        name: data.customer?.name || ''
-      },
-      customer_id: data.customer?.customer_id || '',  // Handle undefined cases
-      email: data.email || '',
-      ref_no: data.ref_no || '',
-      tax: data.tax || '',
-      remarks: data.remarks || '',
-      billing_address: data.billing_address || '',
-      shipping_address: data.shipping_address || '',
-    });
-
-    // Trigger change detection to update the UI if needed
-    this.cdRef.detectChanges();
-  }
-
-  //COPY - END---------------------------------------------------
+//Sale-Invoice =====================================================
 
   nowDate = () => {
     const date = new Date();
@@ -303,7 +368,6 @@ export class SalesComponent {
 
         // Generate Sales Order Number
         this.http.get('masters/generate_order_no/?type=SO').subscribe((res: any) => {
-          console.log("RES data in orderno : ", res)
           if (res && res.data && res.data.order_number) {
             this.orderNumber = res.data.order_number;
             this.formConfig.model['sale_order']['order_no'] = this.orderNumber;
@@ -696,11 +760,6 @@ handleProductPull(selectedProducts: any[]) {
     }
 }
 
-  // openConfirmationModal() {
-  //   this.isConfirmationModalOpen = true; // Set modal to open
-  // }
-  
-
   createSaleOrder() {
     this.http.post('sales/sale_order/', this.formConfig.model)
       .subscribe(response => {
@@ -759,14 +818,7 @@ handleProductPull(selectedProducts: any[]) {
 //=======================================================
   setFormConfig() {
     this.SaleOrderEditID = null;
-    this.saleForm = this.fb.group({
-      customer: [null], // Add the customer field
-      customer_id: [null], // Ensure this is initialized
-      email: [null],
-      billing_address: [null],
-      shipping_address: [null],
-      // Add other fields as necessary
-    });
+    this.dataToPopulate != undefined;
     this.formConfig = {
       // url: "sales/sale_order/",
       title: '',
@@ -801,7 +853,7 @@ handleProductPull(selectedProducts: any[]) {
                 this.updateSaleOrder(); // Call update method for editing
             }
         }
-      },
+      },        
       reset: {
         resetFn: () => {
           this.ngOnInit();
@@ -878,8 +930,8 @@ handleProductPull(selectedProducts: any[]) {
                       field.form.controls.email.setValue(data.email)
                     }
                   });
-                  if (this.dataToPopulate && this.dataToPopulate.customer && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.customer?.customer_id);
+                  if (this.dataToPopulate && this.dataToPopulate.sale_order.customer && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.sale_order.customer);
                   }
                 }
               }
@@ -893,13 +945,13 @@ handleProductPull(selectedProducts: any[]) {
                 label: 'Email',
                 placeholder: 'Enter Email'
               },
-              hooks: {
-                onInit: (field: any) => {
-                  if (this.dataToPopulate && this.dataToPopulate.email && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.email);
-                  }
-                }
-              }
+              // hooks: {
+              //   onInit: (field: any) => {
+              //     if (this.dataToPopulate && this.dataToPopulate.sale_order.email && field.formControl) {
+              //       field.formControl.setValue(this.dataToPopulate.sale_order.email);
+              //     }
+              //   }
+              // }
             },
             {
               key: 'order_no',
@@ -948,8 +1000,8 @@ handleProductPull(selectedProducts: any[]) {
               },
               hooks: {
                 onInit: (field: any) => {
-                  if (this.dataToPopulate && this.dataToPopulate.ref_no && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.ref_no);
+                  if (this.dataToPopulate && this.dataToPopulate.sale_order.ref_no && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.sale_order.ref_no);
                   }
                 }
               }
@@ -979,8 +1031,8 @@ handleProductPull(selectedProducts: any[]) {
               },
               hooks: {
                 onInit: (field: any) => {
-                  if (this.dataToPopulate && this.dataToPopulate.tax && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.tax);
+                  if (this.dataToPopulate && this.dataToPopulate.sale_order.tax && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.sale_order.tax);
                   }
                 }
               }
@@ -995,8 +1047,8 @@ handleProductPull(selectedProducts: any[]) {
               },
               hooks: {
                 onInit: (field: any) => {
-                  if (this.dataToPopulate && this.dataToPopulate.remarks && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.remarks);
+                  if (this.dataToPopulate && this.dataToPopulate.sale_order.remarks && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.sale_order.remarks);
                   }
                 }
               }
@@ -1009,13 +1061,13 @@ handleProductPull(selectedProducts: any[]) {
                 label: 'Billing address',
                 placeholder: 'Enter Billing address'
               },
-              hooks: {
-                onInit: (field: any) => {
-                  if (this.dataToPopulate && this.dataToPopulate.billing_address && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.billing_address);
-                  }
-                }
-              }
+              // hooks: {
+              //   onInit: (field: any) => {
+              //     if (this.dataToPopulate && this.dataToPopulate.sale_order.billing_address && field.formControl) {
+              //       field.formControl.setValue(this.dataToPopulate.sale_order.billing_address);
+              //     }
+              //   }
+              // }
             },
             {
               key: 'shipping_address',
@@ -1025,19 +1077,19 @@ handleProductPull(selectedProducts: any[]) {
                 label: 'Shipping address',
                 placeholder: 'Enter Shipping address'
               },
-              hooks: {
-                onInit: (field: any) => {
-                  if (this.dataToPopulate && this.dataToPopulate.shipping_address && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.shipping_address);
-                  }
-                }
-              }
+              // hooks: {
+              //   onInit: (field: any) => {
+              //     if (this.dataToPopulate && this.dataToPopulate.sale_order.shipping_address && field.formControl) {
+              //       field.formControl.setValue(this.dataToPopulate.sale_order.shipping_address);
+              //     }
+              //   }
+              // }
             }
           ]
         },
         {
           key: 'sale_order_items',
-          type: 'table',
+          type: 'repeat',
           className: 'custom-form-list',
           templateOptions: {
             // title: 'Products',
@@ -1109,6 +1161,18 @@ handleProductPull(selectedProducts: any[]) {
                     // Check if parentArray exists and proceed
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key; // Simplified number conversion
+
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
+                        const existingProduct = this.dataToPopulate.sale_order_items[currentRowIndex].product;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingProduct) {
+                          field.formControl.setValue(existingProduct); // Set full product object (not just product_id)
+                        }
+                      }
+                      
+                      // Subscribe to value changes of the field
                       // ***Size dropdown will populate with available sizes when product in selected***
                       field.formControl.valueChanges.subscribe(selectedProductId => {
                         const product = this.formConfig.model.sale_order_items[currentRowIndex]?.product;
@@ -1269,7 +1333,8 @@ handleProductPull(selectedProducts: any[]) {
                     });
                   }
                 }
-              }, {
+              }, 
+              {
                 key: 'size',
                 type: 'select',
                 templateOptions: {
@@ -1288,6 +1353,17 @@ handleProductPull(selectedProducts: any[]) {
                     const parentArray = field.parent;
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key;
+
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
+                        const existingSize = this.dataToPopulate.sale_order_items[currentRowIndex].size;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingSize && existingSize.size_id) {
+                          field.formControl.setValue(existingSize); // Set full product object (not just product_id)
+                        }
+                      }
+
                       // Subscribe to value changes when the form field changes
                       //**End of Size selection part */
                       // Subscribe to value changes of the size field
@@ -1384,7 +1460,8 @@ handleProductPull(selectedProducts: any[]) {
                     });
                   }
                 }
-              }, {
+              }, 
+              {
                 key: 'color',
                 type: 'select',
                 templateOptions: {
@@ -1403,6 +1480,17 @@ handleProductPull(selectedProducts: any[]) {
                     const parentArray = field.parent;
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key;
+
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
+                        const existingColor = this.dataToPopulate.sale_order_items[currentRowIndex].color;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingColor) {
+                          field.formControl.setValue(existingColor);
+                        }
+                      }
+                      
                       // Subscribe to value changes when the form field changes
                       field.formControl.valueChanges.subscribe(selectedColorId => {
                         const product = this.formConfig.model.sale_order_items[currentRowIndex]?.product;
@@ -1485,6 +1573,26 @@ handleProductPull(selectedProducts: any[]) {
                   label: 'Code',
                   placeholder: 'Enter code',
                   hideLabel: true,
+                },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
+                        const existingCode = this.dataToPopulate.sale_order_items[currentRowIndex].product?.code;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingCode) {
+                          field.formControl.setValue(existingCode); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
                 }
               },
               {
@@ -1496,6 +1604,26 @@ handleProductPull(selectedProducts: any[]) {
                   placeholder: 'Enter Total Boxes',
                   hideLabel: true
                 },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
+                        const existingBox = this.dataToPopulate.sale_order_items[currentRowIndex].total_boxes;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingBox) {
+                          field.formControl.setValue(existingBox); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }                
               },
               {
                 type: 'select',
@@ -1513,11 +1641,31 @@ handleProductPull(selectedProducts: any[]) {
                     lazyOneTime: true
                   }
                 },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
+                        const existingUnit = this.dataToPopulate.sale_order_items[currentRowIndex].product.unit_options;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingUnit) {
+                          field.formControl.setValue(existingUnit.unit_options_id); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
               },
               {
                 type: 'input',
                 key: 'quantity',
-                // defaultValue: 1,
+                defaultValue: 1,
                 templateOptions: {
                   type: 'number',
                   label: 'Qty',
@@ -1528,6 +1676,24 @@ handleProductPull(selectedProducts: any[]) {
                 },
                 hooks: {
                   onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
+                        const existingQuan = this.dataToPopulate.sale_order_items[currentRowIndex].quantity;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingQuan) {
+                          field.formControl.setValue(existingQuan); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+              
+                    // Subscribe to value changes
                     field.formControl.valueChanges.subscribe(data => {
                       if (field.form && field.form.controls && field.form.controls.rate && data) {
                         const rate = field.form.controls.rate.value;
@@ -1535,16 +1701,14 @@ handleProductPull(selectedProducts: any[]) {
                         if (rate && quantity) {
                           field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity));
                         }
-
                       }
-                    })
+                    });
                   },
                   onChanges: (field: any) => {
-
+                    // You can handle any changes here if needed
                   }
                 }
-              },
-
+              },              
               {
                 type: 'input',
                 key: 'rate',
@@ -1556,8 +1720,25 @@ handleProductPull(selectedProducts: any[]) {
                 },
                 hooks: {
                   onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
+                        const existingPrice = this.dataToPopulate.sale_order_items[currentRowIndex].rate;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingPrice) {
+                          field.formControl.setValue(existingPrice); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                    
+                    // Subscribe to value changes to update amount
                     field.formControl.valueChanges.subscribe(data => {
-
                       if (field.form && field.form.controls && field.form.controls.quantity && data) {
                         const quantity = field.form.controls.quantity.value;
                         const rate = data;
@@ -1565,7 +1746,7 @@ handleProductPull(selectedProducts: any[]) {
                           field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity));
                         }
                       }
-                    })
+                    });
                   }
                 }
               },
@@ -1580,11 +1761,26 @@ handleProductPull(selectedProducts: any[]) {
                 },
                 hooks: {
                   onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
+                        const existingDisc = this.dataToPopulate.sale_order_items[currentRowIndex].discount;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingDisc) {
+                          field.formControl.setValue(existingDisc); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
                     field.formControl.valueChanges.subscribe(data => {
-                    })
+                      // Add any logic needed for when discount changes
+                    });
                   }
-                },
-                expressionProperties: {
                 }
               },
               {
@@ -1595,6 +1791,26 @@ handleProductPull(selectedProducts: any[]) {
                   placeholder: 'Enter Product Print name',
                   hideLabel: true
                 },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
+                        const existingName = this.dataToPopulate.sale_order_items[currentRowIndex].print_name;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingName) {
+                          field.formControl.setValue(existingName); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
               },
               {
                 type: 'input',
@@ -1603,7 +1819,7 @@ handleProductPull(selectedProducts: any[]) {
                   label: 'Mrp',
                   placeholder: 'Mrp',
                   hideLabel: true,
-                  disabled: false
+                  disabled: true
                 },
               },
               {
@@ -1618,9 +1834,25 @@ handleProductPull(selectedProducts: any[]) {
                 },
                 hooks: {
                   onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
+                        const existingAmount = this.dataToPopulate.sale_order_items[currentRowIndex].amount;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingAmount) {
+                          field.formControl.setValue(existingAmount); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
                     field.formControl.valueChanges.subscribe(data => {
                       this.totalAmountCal();
-                    })
+                    });
                   }
                 }
               },
@@ -1633,6 +1865,26 @@ handleProductPull(selectedProducts: any[]) {
                   placeholder: 'Tax',
                   hideLabel: true
                 },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
+                        const existingtax = this.dataToPopulate.sale_order_items[currentRowIndex].tax;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingtax) {
+                          field.formControl.setValue(existingtax); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
               },
               {
                 type: 'input',
@@ -1642,6 +1894,26 @@ handleProductPull(selectedProducts: any[]) {
                   placeholder: 'Enter Remarks',
                   hideLabel: true
                 },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
+                        const existingRemarks = this.dataToPopulate.sale_order_items[currentRowIndex].remarks;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingRemarks) {
+                          field.formControl.setValue(existingRemarks); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
               },
 
             ]
@@ -1669,6 +1941,13 @@ handleProductPull(selectedProducts: any[]) {
                       templateOptions: {
                         label: 'Destination',
                         placeholder: 'Enter Destination',
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.destination && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.destination);
+                          }
+                        }
                       }
                     },
                     {
@@ -1678,6 +1957,13 @@ handleProductPull(selectedProducts: any[]) {
                       templateOptions: {
                         label: 'Port of Landing',
                         placeholder: 'Enter Port of Landing',
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.port_of_landing && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.port_of_landing);
+                          }
+                        }
                       }
                     },
                     {
@@ -1695,6 +1981,13 @@ handleProductPull(selectedProducts: any[]) {
                           lazyOneTime: true
                         }
                       },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.shipping_mode_id && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.shipping_mode_id);
+                          }
+                        }
+                      }
                     },
                     {
                       key: 'port_of_discharge',
@@ -1703,6 +1996,13 @@ handleProductPull(selectedProducts: any[]) {
                       templateOptions: {
                         label: 'Port of Discharge',
                         placeholder: 'Select Port of Discharge',
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.port_of_discharge && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.port_of_discharge);
+                          }
+                        }
                       }
                     },
                     {
@@ -1719,6 +2019,13 @@ handleProductPull(selectedProducts: any[]) {
                           url: 'masters/shipping_companies',
                           lazyOneTime: true
                         }
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.shipping_company_id && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.shipping_company_id);
+                          }
+                        }
                       }
                     },
                     {
@@ -1729,6 +2036,13 @@ handleProductPull(selectedProducts: any[]) {
                         type: "number",
                         label: 'No. of Packets',
                         placeholder: 'Select No. of Packets',
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.no_of_packets && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.no_of_packets);
+                          }
+                        }
                       }
                     },
                     {
@@ -1739,6 +2053,13 @@ handleProductPull(selectedProducts: any[]) {
                         type: "number",
                         label: 'Weight',
                         placeholder: 'Enter Weight',
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.weight && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.weight);
+                          }
+                        }
                       }
                     },
                     {
@@ -1754,12 +2075,12 @@ handleProductPull(selectedProducts: any[]) {
                     {
                       key: 'shipping_date',
                       type: 'date',
+                      defaultValue: this.nowDate(),
                       className: 'col-6',
-                      // defaultValue: this.nowDate(),
                       templateOptions: {
                         type: 'date',
                         label: 'Shipping Date',
-                        // required: true
+                        required: true
                       }
                     },
                     {
@@ -1770,7 +2091,14 @@ handleProductPull(selectedProducts: any[]) {
                         type: "number",
                         label: 'Shipping Charges.',
                         placeholder: 'Enter Shipping Charges',
-                        // required: true
+                        required: true
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.shipping_charges && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.shipping_charges);
+                          }
+                        }
                       }
                     }
                   ]
@@ -1795,8 +2123,6 @@ handleProductPull(selectedProducts: any[]) {
                           fieldGroupClassName: "ant-row",
                           key: 'sale_order',
                           fieldGroup: [
-
-
                             {
                               key: 'total_boxes',
                               type: 'input',
@@ -1805,6 +2131,13 @@ handleProductPull(selectedProducts: any[]) {
                                 type: 'number',
                                 label: 'Total boxes',
                                 placeholder: 'Enter Total boxes'
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_order && this.dataToPopulate.sale_order.total_boxes && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.sale_order.total_boxes);
+                                  }
+                                }
                               }
                             },
                             {
@@ -1819,6 +2152,9 @@ handleProductPull(selectedProducts: any[]) {
                               },
                               hooks: {
                                 onInit: (field: any) => {
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_order && this.dataToPopulate.sale_order.cess_amount && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.sale_order.cess_amount);
+                                  }
                                   field.formControl.valueChanges.subscribe(data => {
                                     this.totalAmountCal();
 
@@ -1837,6 +2173,9 @@ handleProductPull(selectedProducts: any[]) {
                               },
                               hooks: {
                                 onInit: (field: any) => {
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_order && this.dataToPopulate.sale_order.advance_amount && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.sale_order.advance_amount);
+                                  }
                                   field.formControl.valueChanges.subscribe(data => {
                                     this.totalAmountCal();
                                   })
@@ -1851,6 +2190,13 @@ handleProductPull(selectedProducts: any[]) {
                                 type: 'input',
                                 label: 'Taxable',
                                 placeholder: 'Enter Taxable'
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_order && this.dataToPopulate.sale_order.taxable && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.sale_order.taxable);
+                                  }
+                                }
                               }
                             },
                             {
@@ -1865,13 +2211,15 @@ handleProductPull(selectedProducts: any[]) {
                               },
                               hooks: {
                                 onInit: (field: any) => {
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_order && this.dataToPopulate.sale_order.tax_amount && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.sale_order.tax_amount);
+                                  }
                                   field.formControl.valueChanges.subscribe(data => {
                                     this.totalAmountCal();
                                   })
                                 }
                               }
                             },
-
                             {
                               key: 'gst_type',
                               type: 'select',
@@ -1879,24 +2227,29 @@ handleProductPull(selectedProducts: any[]) {
                               templateOptions: {
                                 label: 'Gst type',
                                 placeholder: 'Select Gst type',
-                                dataKey: 'name',
+                                dataKey: 'gst_type_id', // Assuming gst_type_id is the key you want to use
                                 dataLabel: "name",
                                 lazy: {
                                   url: 'masters/gst_types/',
                                   lazyOneTime: true
-                                }
+                                },
+                                // required: true // Uncomment if required
                               },
                               hooks: {
-                                onChanges: (field: any) => {
+                                onInit: (field: any) => {
                                   field.formControl.valueChanges.subscribe(data => {
-                                    //console.log("gst_type", data);
                                     if (data && data.gst_type_id) {
                                       this.formConfig.model['sale_order']['gst_type_id'] = data.gst_type_id;
                                     }
                                   });
+                                  // Set the default value for Ledger Account if it exists
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_order.gst_type && field.formControl) {
+                                    const GstFiled = this.dataToPopulate.sale_order.gst_type
+                                    field.formControl.setValue(GstFiled);
+                                  }
                                 }
                               }
-                            },
+                            },                                                                                    
                             {
                               key: 'payment_term',
                               type: 'select',
@@ -1904,49 +2257,58 @@ handleProductPull(selectedProducts: any[]) {
                               templateOptions: {
                                 label: 'Payment term',
                                 placeholder: 'Select Payment term',
-                                dataKey: 'name',
-                                dataLabel: "name",
+                                dataKey: 'payment_term_id', // Assuming payment_term_id is the key for the selected value
+                                dataLabel: 'name',
                                 lazy: {
                                   url: 'masters/customer_payment_terms/',
                                   lazyOneTime: true
-                                }
+                                },
                               },
                               hooks: {
-                                onChanges: (field: any) => {
+                                onInit: (field: any) => {
                                   field.formControl.valueChanges.subscribe(data => {
-                                    //console.log("payment_term", data);
                                     if (data && data.payment_term_id) {
                                       this.formConfig.model['sale_order']['payment_term_id'] = data.payment_term_id;
                                     }
                                   });
+                                  // Set the default value for Ledger Account if it exists
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_order.payment_term && field.formControl) {
+                                    const PaymentField = this.dataToPopulate.sale_order.payment_term
+                                    field.formControl.setValue(PaymentField);
+                                  }
                                 }
                               }
-                            },
+                            },                            
                             {
                               key: 'ledger_account',
                               type: 'select',
                               className: 'col-4',
                               templateOptions: {
-                                dataKey: 'name',
-                                dataLabel: "name",
                                 label: 'Ledger account',
                                 placeholder: 'Select Ledger account',
+                                dataKey: 'ledger_account_id', // Assuming ledger_account_id is the key for the selected value
+                                dataLabel: 'name',
                                 lazy: {
                                   url: 'customers/ledger_accounts/',
                                   lazyOneTime: true
                                 }
                               },
                               hooks: {
-                                onChanges: (field: any) => {
+                                onInit: (field: any) => {                           
+                                  // Subscribe to value changes
                                   field.formControl.valueChanges.subscribe(data => {
-                                    //console.log("ledger_account", data);
                                     if (data && data.ledger_account_id) {
-                                      this.formConfig.model['sale_order']['ledger_account_id'] = data.ledger_account_id;
+                                      this.formConfig.model['sale_order']['ledger_account_id'] = data.ledger_account_id; // Update the model with the selected ledger_account_id
                                     }
                                   });
+                                  // Set the default value for Ledger Account if it exists
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_order.ledger_account && field.formControl) {
+                                    const LedgerField = this.dataToPopulate.sale_order.ledger_account
+                                    field.formControl.setValue(LedgerField);
+                                  }
                                 }
                               }
-                            },
+                            },     
                             {
                               key: 'order_status',
                               type: 'select',
@@ -2065,6 +2427,14 @@ handleProductPull(selectedProducts: any[]) {
                                 placeholder: 'Enter Item value',
                                 readonly: true
                                 // required: true
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  // Set the initial value from dataToPopulate if available
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_order && this.dataToPopulate.sale_order.item_value && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.sale_order.item_value);
+                                  }
+                                }
                               }
                             },
                             {
@@ -2078,6 +2448,14 @@ handleProductPull(selectedProducts: any[]) {
                                 placeholder: 'Enter Discount amount',
                                 readonly: true
                                 // required: true
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  // Set the initial value from dataToPopulate if available
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_order && this.dataToPopulate.sale_order.dis_amt && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.sale_order.dis_amt);
+                                  }
+                                }
                               }
                             },
                             {
@@ -2090,8 +2468,16 @@ handleProductPull(selectedProducts: any[]) {
                                 label: 'Total amount',
                                 placeholder: 'Enter Total amount',
                                 readonly: true
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  // Set the initial value from dataToPopulate if available
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_order && this.dataToPopulate.sale_order.total_amount && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.sale_order.total_amount);
+                                  }
+                                }
                               }
-                            },
+                            }   
                           ]
                         },
                       ]
@@ -2110,6 +2496,13 @@ handleProductPull(selectedProducts: any[]) {
                           props: {
                             "displayStyle": "files",
                             "multiple": true
+                          },
+                          hooks: {
+                            onInit: (field: any) => {
+                              if (this.dataToPopulate && this.dataToPopulate.order_attachments && field.formControl) {
+                                field.formControl.setValue(this.dataToPopulate.order_attachments);
+                              }
+                            }
                           }
                         }
                       ]

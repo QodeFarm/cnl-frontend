@@ -5,9 +5,15 @@
                 <span *ngIf="PurchaseReturnOrderEditID" class="custom-heading">Update Purchase Returns</span>
                 <span *ngIf="!PurchaseReturnOrderEditID" class="custom-heading">Create Purchase Returns</span>
             </button>
+                <div style="display: flex; gap: 10px;">
+                <!-- New Copy Button -->
+                <button (click)="openCopyModal()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#copyModal">
+                    Copy
+                </button>
             <button (click)="showPurchaseReturnOrderListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
                 Purchase Returns List
             </button>
+            </div>
         </div>
     </div>
 
@@ -32,6 +38,34 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
                 <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Copy Modal -->
+<div class="modal fade custom-modal" id="copyModal" tabindex="-1" aria-labelledby="copyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg custom-size"> <!-- Add custom-size class here -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="copyModalLabel">Copy to Another Table</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Modal Form to Select Table -->
+                <form>
+                    <div class="form-group">
+                        <label for="tableSelect">Select Table</label>
+                        <select id="tableSelect" class="form-control" [(ngModel)]="selectedTable" name="selectedTable">
+                            <option *ngFor="let table of availableTables" [value]="table">{{table}}</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" (click)="copyToTable()">OK</button>
             </div>
         </div>
     </div>
