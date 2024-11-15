@@ -71,7 +71,7 @@
   
 <!-- Copy Modal -->
 <div class="modal fade custom-modal" id="copyModal" tabindex="-1" aria-labelledby="copyModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg custom-size"> <!-- Add custom-size class here -->
+  <div class="modal-dialog modal-sm custom-size"> <!-- Add custom-size class here -->
       <div class="modal-content">
           <div class="modal-header">
               <h5 class="modal-title" id="copyModalLabel">Copy to Another Table</h5>
@@ -81,8 +81,8 @@
               <!-- Modal Form to Select Table -->
               <form>
                   <div class="form-group">
-                      <label for="tableSelect">Select Table</label>
-                      <select id="tableSelect" class="form-control" [(ngModel)]="selectedTable" name="selectedTable">
+                      <label for="tableSelect">Copy Form To</label>
+                      <select id="tableSelect" class="form-control form-select" [(ngModel)]="selectedTable" name="selectedTable">
                           <option *ngFor="let table of availableTables" [value]="table">{{table}}</option>
                       </select>
                   </div>

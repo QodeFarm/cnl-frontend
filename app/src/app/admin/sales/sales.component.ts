@@ -1217,7 +1217,7 @@ handleProductPull(selectedProducts: any[]) {
                 },
                 expressionProperties: {
                     'templateOptions.hidden': () => !(this.SaleOrderEditID),
-                    'templateOptions.disabled': (model) => model.invoiced === 'YES'
+                    'templateOptions.disabled': (model) => model.invoiced === 'YES' || !this.SaleOrderEditID
                   }
               },                                     
               {
