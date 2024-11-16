@@ -96,3 +96,8 @@
   background-color: rgba(0, 0, 0, 0.5); // Adjust opacity as needed 
   z-index: 999; //Ensure it's below the modal but above other content 
 }
+
+.modal-dialog.custom-size {
+    max-width: 300px; /* Adjust width as needed */
+}
+
