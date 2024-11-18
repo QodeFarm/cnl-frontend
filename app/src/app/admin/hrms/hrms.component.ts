@@ -294,65 +294,6 @@ export class EmployeesComponent  implements OnInit {
 
         // start of employee_details keys
 
-        // {
-        //   fieldGroupClassName: "ant-row custom-form-block",
-        //   key: 'employee_details',
-        //   fieldGroup: [
-        //     {
-        //       key: 'date_of_birth',
-        //       type: 'input',  // Use 'input' to allow custom types like 'datetime-local'
-        //       className: 'col-3 pb-3 ps-0',
-        //       templateOptions: {
-        //         label: 'Date Of Birth',
-        //         // type: 'datetime-local',  // Use datetime-local for both date and time input
-        //         type: 'date',  // Use date for date-only input
-        //         placeholder: 'Select Date and Time',
-        //         required: true,
-        //       }
-        //     },
-        //     {
-        //       key: 'gender',
-        //       type: 'input',
-        //       className: 'col-3 pb-3 ps-0',
-        //       templateOptions: {
-        //         label: 'Gender',
-        //         placeholder: 'Enter Gender',
-        //         required: false,
-        //       }
-        //     },
-        //     {
-        //       key: 'nationality',
-        //       type: 'input',
-        //       className: 'col-3 pb-3 ps-0',
-        //       templateOptions: {
-        //         label: 'Nationality',
-        //         placeholder: 'Enter Nationality',
-        //         required: false,
-        //       }
-        //     },
-        //     {
-        //       key: 'emergency_contact',
-        //       type: 'input',
-        //       className: 'col-3 pb-3 ps-0',
-        //       templateOptions: {
-        //         label: 'Emergency Contact',
-        //         placeholder: 'Enter Emergency Contact',
-        //         required: false,
-        //       }
-        //     },
-        //     {
-        //       key: 'emergency_contact_relationship',
-        //       type: 'input',
-        //       className: 'col-3 pb-3 ps-0',
-        //       templateOptions: {
-        //         label: 'Emergency Contact Relationship',
-        //         placeholder: 'Enter Name',
-        //         required: false,
-        //       }
-        //     },
-        //   ]
-        // }
-
         {
           fieldGroupClassName: "row col-12 m-0 custom-form-card",
           fieldGroup: [
