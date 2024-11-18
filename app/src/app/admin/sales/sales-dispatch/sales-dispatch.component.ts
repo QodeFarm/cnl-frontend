@@ -1,104 +1,134 @@
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { catchError, forkJoin, map } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
+import { TaCurdConfig } from '@ta/ta-curd';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
-
+import { HttpClient } from '@angular/common/http';
 
 @Component({
-  selector: 'app-sales-dispatch',
   standalone: true,
   imports: [CommonModule, AdminCommmonModule],
+  selector: 'app-sales-dispatch',
   templateUrl: './sales-dispatch.component.html',
   styleUrls: ['./sales-dispatch.component.scss']
 })
 export class SalesDispatchComponent implements OnInit {
-  saleOrders: any[] = []; // Array to hold sale orders
-  isLoading = true; // Loading state for the component
-  showMessage: boolean = false;
-  messageText: string = '';
-  selectedOrderId: string | null = null;
+  isLoading = true;
+  showModal = false;
+  selectedOrder: any = null;
+  
+  // Initial curdConfig setup
+  curdConfig: TaCurdConfig = this.getCurdConfig();
 
-  actions = [
-    {
-      type: 'yes',
-      label: 'YES',
-      confirm: true,
-      confirmMsg: "Are you sure for dispatch ready?",
-      apiUrl: 'sales/sale_order/{saleOrderId}/workflow_pipeline/'
-    },
-    {
-      type: 'no',
-      label: 'NO'
-    }
-  ];
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   ngOnInit() {
-    this.fetchSaleOrders(); // Fetch sale orders on component initialization
+    this.isLoading = false; // Set loading to false once initialized
   }
 
-  fetchSaleOrders() {
-    this.http.get<any>('sales/sale_order/?flow_status=ready').pipe(
-      map(res => res.data), // Extract data from response
-      catchError(error => {
-        console.error('Error fetching sale orders:', error);
-        this.isLoading = false;
-        return [];
-      })
-    ).subscribe(saleOrders => {
-      this.saleOrders = saleOrders; // Update sale orders
-      if (this.saleOrders.length > 0) {
-        this.fetchSaleOrderDetailsForAll(); // Fetch details for each sale order
-      } else {
-        this.isLoading = false;
-      }
-    });
-  }
-
-  fetchSaleOrderDetailsForAll() {
-    const detailRequests = this.saleOrders.map(order =>
-      this.fetchSaleOrderDetails(order.sale_order_id).pipe(
-        map(details => ({ ...order, sale_order_items: details })),
-        catchError(error => {
-          console.error(`Error fetching details for order ${order.sale_order_id}:`, error);
-          return { ...order, sale_order_items: [] }; // Return order with empty items
-        })
-      )
-    );
-
-    forkJoin(detailRequests).subscribe(updatedOrders => {
-      this.saleOrders = updatedOrders; // Update sale orders with detailed data
-      this.isLoading = false;
-    });
-  }
-
-  fetchSaleOrderDetails(saleOrderId: string) {
-    return this.http.get<any>(`sales/sale_order_items/?sale_order_id=${saleOrderId}`).pipe(
-      map(res => res.data) // Extract data from response
-    );
-  }
-
-  onActionClick(actionType: string, saleOrderId: string) {
-    const action = this.actions.find(act => act.type === actionType);
-
-    if (action?.confirm) {
-      if (confirm(action.confirmMsg)) {
-        const url = action.apiUrl.replace('{saleOrderId}', saleOrderId);
-        
-        this.http.post(url, {}).subscribe(
-          response => {
-            console.log('POST request successful:', response);
+  // Helper function to initialize curdConfig
+  getCurdConfig(): TaCurdConfig {
+    return {
+      drawerSize: 500,
+      drawerPlacement: 'right',
+      tableConfig: {
+        apiUrl: 'sales/sale_order/?summary=true&flow_status=dispatch',
+        title: 'Sales Dispatch',
+        pkId: "sale_order_id",
+        pageSize: 10,
+        globalSearch: {
+          keys: ['customer', 'order_no']
+        },
+        cols: [
+          {
+            fieldKey: 'customer',
+            name: 'Customer',
+            displayType: 'map',
+            mapFn: (currentValue: any, row: any) => `${row.customer.name}`,
           },
-          error => {
-            console.error('Error in POST request:', error);
-            alert('Failed to update sale order. Please try again.');
+          {
+            fieldKey: 'order_no',
+            name: 'Order No',
+            sort: true
+          },
+          {
+            fieldKey: 'products',
+            name: 'Products',
+            displayType: 'map',
+            mapFn: (currentValue: any, row: any) => {
+              if (row.products && typeof row.products === 'object') {
+                return Object.values(row.products).map((product: any) => `${product.product_name} (Qty: ${product.quantity})`).join(', ');
+              }
+              return 'No products';
+            }
+          },
+          {
+            fieldKey: 'actions',
+            name: 'Actions',
+            type: 'action',
+            actions: [
+              {
+                type: 'callBackFn',
+                label: 'Confirm Dispatch',
+                callBackFn: (row: any) => this.openModal(row),
+              }
+            ]
           }
-        );
+        ]
+      },
+      formConfig: {
+        url: 'sales/SaleOrder/{saleOrderId}/move_next_stage/',
+        title: 'Sales Dispatch Confirmation',
+        pkId: "sale_order_id",
+        exParams: [],
+        fields: [
+          {
+            key: 'sale_order_id',
+            type: 'text',
+          },
+          {
+            key: 'confirmation',
+            type: 'select',
+            defaultValue: 'yes'
+          }
+        ]
       }
-    } else {
-      console.log(`Action ${actionType} for Sale Order ID: ${saleOrderId}`);
+    };
+  }
+
+  // Open modal for dispatch confirmation
+  openModal(order: any) {
+    this.selectedOrder = order;
+    this.showModal = true;
+  }
+
+  // Close modal without confirmation
+  closeModal() {
+    this.showModal = false;
+    this.selectedOrder = null;
+  }
+
+  // Confirm dispatch and trigger data refresh
+  confirmDispatch() {
+    if (this.selectedOrder) {
+      const saleOrderId = this.selectedOrder.sale_order_id;
+      const url = `sales/SaleOrder/${saleOrderId}/move_next_stage/`;
+
+      this.http.post(url, {}).subscribe(
+        () => {
+          console.log('Dispatch confirmed for order:', saleOrderId);
+          this.closeModal(); // Close the modal after confirmation
+          this.refreshCurdConfig(); // Refresh the data list in curdConfig
+        },
+        error => {
+          console.error('Error in confirming dispatch:', error);
+          alert('Failed to confirm dispatch. Please try again.');
+        }
+      );
     }
   }
- 
+
+  // Refresh the curdConfig object to reload the data in ta-curd-modal
+  refreshCurdConfig() {
+    this.curdConfig = this.getCurdConfig(); // Reset the curdConfig with a fresh configuration
+  }
 }

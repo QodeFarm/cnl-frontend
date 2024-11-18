@@ -1,41 +1,19 @@
 <div class="container-fluid pt-3">
   <div class="row">
     <div class="col-12 px-2 py-1">
-      <table class="table table-striped custom-table">
-        <thead class="table-header">
-          <tr>
-            <th>Customer</th>
-            <th>Order No</th>
-            <th>Products</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let order of saleOrders">
-            <td>{{ order.customer?.name ?? 'N/A' }}</td>
-            <td>{{ order.order_no ?? 'N/A' }}</td>
-            <td>
-              <!-- Display products if they exist -->
-              <ul *ngIf="order.sale_order_items?.length; else noProducts">
-                <li *ngFor="let item of order.sale_order_items">
-                  {{ item.product?.name ?? 'N/A' }} - qty ({{ item.quantity ?? 'N/A' }})
-                </li>
-              </ul>
-              <ng-template #noProducts>
-                <p>No products available</p>
-              </ng-template>
-            </td>
-            <td>
-              <button class="btn btn-primary" (click)="onActionClick('yes', order.sale_order_id)">Done</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <ta-curd-modal [options]="curdConfig" class="custom-list"></ta-curd-modal>
     </div>
   </div>
 </div>
 
-<ng-template #noData>
-  <p *ngIf="isLoading">Loading sale orders...</p>
-  <p *ngIf="!isLoading && !saleOrders.length">No sale orders found.</p>
-</ng-template>
+<!-- Confirmation Modal -->
+<div *ngIf="showModal" class="custom-dialog-overlay">
+  <div class="custom-dialog-box">
+    <h5>Confirm Dispatch</h5>
+    <p>Are you sure you want to confirm dispatch for the order {{ selectedOrder?.order_no }}?</p>
+    <div class="dialog-actions">
+      <button class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+      <button class="btn btn-primary" (click)="confirmDispatch()">Confirm</button>
+    </div>
+  </div>
+</div>

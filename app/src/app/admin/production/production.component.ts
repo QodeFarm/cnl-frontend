@@ -16,19 +16,24 @@ import { WorkOrderListComponent } from './work-order-list/work-order-list.compon
 export class ProductionComponent implements OnInit {
 
   showWorkorderList: boolean = false;
-  showForm: boolean = false;
+  showForm: boolean = true;
   WorkOrdrEditID: any;
+  WorkOrderBoardView: any; //
   formConfig: TaFormConfig = {};
 
   constructor(private http: HttpClient) {}
   
   ngOnInit() {
-    this.showWorkorderList = false;
-    this.showForm = true;
-    this.WorkOrdrEditID = null;
-    // Set form config
     this.setFormConfig();
-    // this.formConfig.fields[0].fieldGroup[2].hide = true
+  
+    // Check if navigation state contains work order data for editing
+    if (history.state && (history.state.productDetails || history.state.saleOrderDetails)) {
+      console.log('Received work order data from navigation:', history.state);
+      this.populateFormWithData(history.state);
+      this.showForm = true; // Ensure the form is displayed
+    }
+  
+    console.log('FormConfig after population:', this.formConfig);
   }
 
   hide() {
@@ -60,6 +65,51 @@ export class ProductionComponent implements OnInit {
   showWorkorderListFn() {
     this.showWorkorderList = true;
   }
+
+   // Method to populate the form with data (when admin wants to create a work order from sale order)
+   populateFormWithData(data: any) {
+    if (data.productDetails && data.productDetails.length > 0) {
+        // Map the Material section (already working as expected)
+        this.formConfig.model['bom'] = data.productDetails.map((product: any) => ({
+            product_id: product.product_id,
+            quantity_required: product.quantity || 0
+        }));
+
+        // Map the main Product and Quantity fields
+        const mainProduct = data.productDetails[0]; // Assuming the first item is the main product
+        this.formConfig.model['work_order']['product_id'] = mainProduct.product_id || null;
+        this.formConfig.model['work_order']['quantity'] = mainProduct.quantity || 0;
+    }
+
+    if (data.saleOrderDetails) {
+        // Map additional details if present
+        this.formConfig.model['work_order'] = {
+            ...this.formConfig.model['work_order'],
+            sale_order_id: data.saleOrderDetails.sale_order_id || null, // Capture sale_order_id
+            product_id: data.saleOrderDetails.product?.product_id || data.saleOrderDetails.product_id || this.formConfig.model['work_order']['product_id'],
+            quantity: data.saleOrderDetails.quantity || this.formConfig.model['work_order']['quantity'],
+            start_date: data.saleOrderDetails.order_date || null,
+            end_date: data.saleOrderDetails.delivery_date || null
+        };
+    }
+
+    console.log('Form model after population:', this.formConfig.model);
+}
+
+
+submitWorkOrder() {
+  // Add the sale_order_id to the payload if available
+  const payload = {
+      ...this.formConfig.model,
+      sale_order_id: this.formConfig.model['work_order']['sale_order_id']
+  };
+
+  this.http.post('production/work_order/', payload).subscribe(response => {
+      console.log('Work order submitted successfully:', response);
+  });
+}
+
+
 
   setFormConfig() {
     this.WorkOrdrEditID =null
