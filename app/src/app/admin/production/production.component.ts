@@ -34,7 +34,29 @@ export class ProductionComponent implements OnInit {
     }
   
     console.log('FormConfig after population:', this.formConfig);
+
   }
+
+  private isInitialized = false; // Flag to ensure ngOnInit runs only once
+
+// ngOnInit() {
+//   if (this.isInitialized) {
+//     return; // Prevent reinitialization
+//   }
+
+//   this.isInitialized = true;
+//   this.setFormConfig();
+
+//   // Check if navigation state contains work order data for editing
+//   if (history.state && (history.state.productDetails || history.state.saleOrderDetails)) {
+//     console.log('Received work order data from navigation:', history.state);
+//     this.populateFormWithData(history.state);
+//     this.showForm = true; // Ensure the form is displayed
+//   }
+
+//   console.log('FormConfig after population:', this.formConfig);
+// }
+
 
   hide() {
     const modalCloseButton = document.getElementById('modalClose');
@@ -66,50 +88,58 @@ export class ProductionComponent implements OnInit {
     this.showWorkorderList = true;
   }
 
-   // Method to populate the form with data (when admin wants to create a work order from sale order)
-   populateFormWithData(data: any) {
-    if (data.productDetails && data.productDetails.length > 0) {
-        // Map the Material section (already working as expected)
-        this.formConfig.model['bom'] = data.productDetails.map((product: any) => ({
-            product_id: product.product_id,
-            quantity_required: product.quantity || 0
-        }));
+// Method to populate the form with data (when admin wants to create a work order from sale order)
+populateFormWithData(data: any) {
+  if (data.productDetails && data.productDetails.length > 0) {
+    const mainProduct = data.productDetails[0]; // First item as the main product
+    this.formConfig.model['work_order'] = {
+      product_id: mainProduct.product_id || null,
+      quantity: mainProduct.quantity || 0,
+      start_date: data.saleOrderDetails?.order_date || null,
+      end_date: data.saleOrderDetails?.delivery_date || null,
+      sale_order_id: data.saleOrderDetails?.sale_order_id || null,
+    };
+  }
 
-        // Map the main Product and Quantity fields
-        const mainProduct = data.productDetails[0]; // Assuming the first item is the main product
-        this.formConfig.model['work_order']['product_id'] = mainProduct.product_id || null;
-        this.formConfig.model['work_order']['quantity'] = mainProduct.quantity || 0;
-    }
+  // Initialize other arrays if missing
+  this.formConfig.model['bom'] = this.formConfig.model['bom'] || [{}]; // Default to an empty material row
+  this.formConfig.model['work_order_machines'] = this.formConfig.model['work_order_machines'] || [{}];
+  this.formConfig.model['work_order_stages'] = this.formConfig.model['work_order_stages'] || [{}];
+  this.formConfig.model['workers'] = this.formConfig.model['workers'] || [{}];
 
-    if (data.saleOrderDetails) {
-        // Map additional details if present
-        this.formConfig.model['work_order'] = {
-            ...this.formConfig.model['work_order'],
-            sale_order_id: data.saleOrderDetails.sale_order_id || null, // Capture sale_order_id
-            product_id: data.saleOrderDetails.product?.product_id || data.saleOrderDetails.product_id || this.formConfig.model['work_order']['product_id'],
-            quantity: data.saleOrderDetails.quantity || this.formConfig.model['work_order']['quantity'],
-            start_date: data.saleOrderDetails.order_date || null,
-            end_date: data.saleOrderDetails.delivery_date || null
-        };
-    }
-
-    console.log('Form model after population:', this.formConfig.model);
+  console.log('Form model after population:', this.formConfig.model);
 }
+
+
 
 
 submitWorkOrder() {
-  // Add the sale_order_id to the payload if available
   const payload = {
-      ...this.formConfig.model,
-      sale_order_id: this.formConfig.model['work_order']['sale_order_id']
+    ...this.formConfig.model,
+    sale_order_id: this.formConfig.model['work_order']['sale_order_id'], // Include sale_order_id
   };
 
-  this.http.post('production/work_order/', payload).subscribe(response => {
-      console.log('Work order submitted successfully:', response);
-  });
+  // Trigger the move_next_stage API call directly
+    const saleOrderId = this.formConfig.model['work_order']['sale_order_id'];
+    if (saleOrderId) {
+      const nextStageUrl = `sales/SaleOrder/${saleOrderId}/move_next_stage/`;
+
+      this.http.post(nextStageUrl, {}).subscribe({
+        next: (res) => {
+          console.log('Moved to the next stage successfully:', res);
+          alert('Moved to the next stage successfully!');
+        },
+        error: (err) => {
+          console.error('Error moving to the next stage:', err);
+
+          // Optional: Show a user-friendly message
+          alert('Failed to move to the next stage. Please try again.');
+        },
+      });
+    } else {
+      console.warn('Sale order ID is missing. Cannot trigger move to next stage.');
+    }
 }
-
-
 
   setFormConfig() {
     this.WorkOrdrEditID =null
@@ -122,7 +152,7 @@ submitWorkOrder() {
       exParams: [],
       submit: {
         label: 'Submit',
-        submittedFn: () => this.ngOnInit()
+        submittedFn: () => this.submitWorkOrder()
       },
       reset: {
         resetFn: () => {

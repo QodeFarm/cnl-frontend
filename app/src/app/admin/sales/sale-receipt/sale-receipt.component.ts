@@ -211,49 +211,52 @@ async confirmReceipt() {
 
     const saleReceiptUrl = 'sales/sale_receipts/';
 
-    // Step 2: Check if a file has been selected for upload
+    // Step 2: Prepare the request payload
+    let receiptPath = []; // Default to an empty array if no file is selected
+
+    // Check if a file has been selected for upload
     if (this.selectedOrder.selectedFile) {
       const selectedFile = this.selectedOrder.selectedFile;
 
       // Prepare file metadata in the required structure for receipt_path
-      const fileMetadata = this.prepareFileMetadata(selectedFile);
-
-      // Step 3: Prepare the request payload with receipt_path including file metadata
-      const payload = {
-        sale_invoice_id: saleInvoiceId,
-        receipt_name: `Receipt for Order ${saleOrderId}`,
-        description: 'Uploaded receipt for order confirmation',
-        receipt_path: [fileMetadata]  // Include the file metadata in an array
-      };
-
-      // Step 4: Send the request to create a SaleReceipt with the structured metadata
-      this.http.post(saleReceiptUrl, payload).subscribe(
-        (response: any) => {
-          console.log('Sale receipt created successfully:', response);
-
-          // Move the order to the next stage
-          const nextStageUrl = `sales/SaleOrder/${saleOrderId}/move_next_stage/`;
-
-          this.http.post(nextStageUrl, {}).subscribe(
-            () => {
-              console.log('Dispatch confirmed for order:', saleOrderId);
-              this.closeModal(); // Close the modal after confirmation
-              this.refreshCurdConfig(); // Refresh data list in curdConfig
-            },
-            error => {
-              console.error('Error in confirming dispatch:', error);
-              alert('Failed to confirm dispatch. Please try again.');
-            }
-          );
-        },
-        error => {
-          console.error('Error in creating sale receipt:', error);
-          alert('Failed to create sale receipt. Please try again.');
-        }
-      );
-    } else {
-      console.warn("No file selected for upload.");
+      receiptPath = [this.prepareFileMetadata(selectedFile)];
     }
+
+    // Step 3: Prepare the payload with receipt_path
+    const payload = {
+      sale_invoice_id: saleInvoiceId,
+      receipt_name: `Receipt for Order ${saleOrderId}`,
+      description: 'Uploaded receipt for order confirmation',
+      receipt_path: receiptPath  // Include the file metadata or empty array
+    };
+
+    // Step 4: Send the request to create a SaleReceipt
+    this.http.post(saleReceiptUrl, payload).subscribe(
+      (response: any) => {
+        console.log('Sale receipt created successfully:', response);
+
+        // Move the order to the next stage
+        const nextStageUrl = `sales/SaleOrder/${saleOrderId}/move_next_stage/`;
+
+        this.http.post(nextStageUrl, {}).subscribe(
+          () => {
+            console.log('Dispatch confirmed for order:', saleOrderId);
+            this.closeModal(); // Close the modal after confirmation
+            this.refreshCurdConfig(); // Refresh data list in curdConfig
+          },
+          error => {
+            console.error('Error in confirming dispatch:', error);
+            alert('Failed to confirm dispatch. Please try again.');
+          }
+        );
+      },
+      error => {
+        console.error('Error in creating sale receipt:', error);
+        alert('Failed to create sale receipt. Please try again.');
+      }
+    );
+  } else {
+    console.warn("No order selected for confirmation.");
   }
 }
 

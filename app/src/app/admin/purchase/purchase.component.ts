@@ -1495,7 +1495,7 @@ export class PurchaseComponent {
                           type: "number",
                           label: 'Shipping Charges.',
                           placeholder: 'Enter Shipping Charges',
-                          required: true
+                          // required: true
                         },
                         hooks: {
                           onInit: (field: any) => {

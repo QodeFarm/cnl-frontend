@@ -407,7 +407,7 @@ export class SalesComponent {
         this.formConfig.model['sale_order_id'] = this.SaleOrderEditID;
         this.showForm = true;
         this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[8].hide = false;
-        this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[9].hide = false;
+        // this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[9].hide = false;
         // Load sale_order_items with selected status
       //   this.saleOrderItems = res.data.sale_order.sale_order_items.map(item => ({
       //     ...item,
@@ -789,41 +789,29 @@ handleProductPull(selectedProducts: any[]) {
   //Added this logic for creating workorder from sale order and changing flow status by triggering URL
   createWorkOrder() {
     if (this.SaleOrderEditID) {
-        const productDetails = this.formConfig.model.sale_order_items;
-        const saleOrderDetails = this.formConfig.model.sale_order;
-
-        // Check if productDetails and saleOrderDetails have valid data
-        if (productDetails && saleOrderDetails) {
-            const payload = {
-                productDetails: productDetails,
-                saleOrderDetails: saleOrderDetails
-            };
-
-            console.log('Navigating to production with payload:', payload);
-
-            // Trigger the move_next_stage endpoint
-            const nextStageUrl = `sales/SaleOrder/${this.SaleOrderEditID}/move_next_stage/`;
-
-            this.http.post(nextStageUrl, {}).subscribe({
-                next: (response) => {
-                    console.log('Moved to next stage successfully:', response);
-
-                    // Navigate to the production route with the payload
-                    this.router.navigate(['admin/production'], { state: payload });
-                },
-                error: (error) => {
-                    console.error('Error moving to next stage:', error);
-                }
-            });
-        } else {
-            console.warn('Product details or sale order details are missing.');
-        }
+      const productDetails = this.formConfig.model.sale_order_items;
+      const saleOrderDetails = this.formConfig.model.sale_order;
+  
+      // Check if productDetails and saleOrderDetails have valid data
+      if (productDetails && saleOrderDetails) {
+        const payload = {
+          productDetails: productDetails,
+          saleOrderDetails: saleOrderDetails,
+        };
+  
+        console.log('Navigating to production with payload:', payload);
+  
+        // Navigate to the Work Order route without triggering the `move_next_stage` endpoint
+        this.router.navigate(['admin/production'], { state: payload });
+      } else {
+        console.warn('Product details or sale order details are missing.');
+      }
     } else {
-        console.warn('SaleOrderEditID is not set. Unable to create work order.');
+      console.warn('SaleOrderEditID is not set. Unable to create work order.');
     }
-}
-
-  createSaleOrder() {
+  }
+  
+createSaleOrder() {
     this.http.post('sales/sale_order/', this.formConfig.model)
       .subscribe(response => {
         this.showSuccessToast = true;
@@ -1028,6 +1016,85 @@ handleProductPull(selectedProducts: any[]) {
                 disabled: true
               }
             },
+            {
+              key: 'flow_status',
+              type: 'select',
+              className: 'col-2',
+              templateOptions: {
+                label: 'Flow status',
+                dataKey: 'flow_status_id',
+                dataLabel: 'flow_status_name',
+                // placeholder: 'Select Order status type',
+                lazy: {
+                  url: 'masters/flow_status/',
+                  lazyOneTime: true
+                },
+                // expressions: {
+                //   hide: '!model.sale_order_id',
+                // },
+              },
+              hooks: {
+                  onChanges: (field: any) => {
+                    field.formControl.valueChanges.subscribe(data => {
+                      //console.log("ledger_account", data);
+                      if (data && data.flow_status_id) {
+                        this.formConfig.model['sale_order']['flow_status_id'] = data.flow_status_id;
+                      }
+                    });
+                      const valueChangesSubscription = field.formControl.valueChanges.subscribe(data => {
+                          const saleOrder = this.formConfig.model['sale_order'];
+                          console.log("Sale order: ", saleOrder);
+      
+                          // Prepare invoice data
+                          const saleOrderItems = this.formConfig.model['sale_order_items'];
+                          const orderAttachments = this.formConfig.model['order_attachments'];
+                          const orderShipments = this.formConfig.model['order_shipments'];
+      
+                          this.invoiceData = {
+                              sale_invoice_order: {
+                                  bill_type: saleOrder.bill_type || 'CASH',
+                                  sale_order_id: saleOrder.sale_order_id,
+                                  invoice_date: this.nowDate(),
+                                  email: saleOrder.email,
+                                  ref_no: saleOrder.ref_no,
+                                  ref_date: this.nowDate(),
+                                  tax: saleOrder.tax || 'Inclusive',
+                                  due_date: saleOrder.due_date,
+                                  remarks: saleOrder.remarks,
+                                  advance_amount: saleOrder.advance_amount,
+                                  item_value: saleOrder.item_value,
+                                  discount: saleOrder.discount,
+                                  dis_amt: saleOrder.dis_amt,
+                                  taxable: saleOrder.taxable,
+                                  tax_amount: saleOrder.tax_amount,
+                                  cess_amount: saleOrder.cess_amount,
+                                  transport_charges: saleOrder.transport_charges,
+                                  round_off: saleOrder.round_off,
+                                  total_amount: saleOrder.total_amount,
+                                  vehicle_name: saleOrder.vehicle_name,
+                                  total_boxes: saleOrder.total_boxes,
+                                  shipping_address: saleOrder.shipping_address,
+                                  billing_address: saleOrder.billing_address,
+                                  customer_id: saleOrder.customer_id,
+                                  gst_type_id: saleOrder.gst_type_id,
+                                  order_type: saleOrder.order_type || 'sale_invoice',
+                                  order_salesman_id: saleOrder.order_salesman_id,
+                                  customer_address_id: saleOrder.customer_address_id,
+                                  payment_term_id: saleOrder.payment_term_id,
+                                  payment_link_type_id: saleOrder.payment_link_type_id,
+                                  ledger_account_id: saleOrder.ledger_account_id,
+                                  flow_status: saleOrder.flow_status
+                              },
+                              sale_invoice_items: saleOrderItems,
+                              order_attachments: orderAttachments,
+                              order_shipments: orderShipments
+                          };
+      
+                          console.log('invoiceData:', this.invoiceData);
+                      });
+                  }
+              }
+          },
             {
               key: 'delivery_date',
               type: 'date',
@@ -1745,7 +1812,7 @@ handleProductPull(selectedProducts: any[]) {
               {
                 type: 'input',
                 key: 'quantity',
-                defaultValue: 1,
+                // defaultValue: 1,
                 templateOptions: {
                   type: 'number',
                   label: 'Qty',
@@ -2168,12 +2235,12 @@ handleProductPull(selectedProducts: any[]) {
                     {
                       key: 'shipping_date',
                       type: 'date',
-                      defaultValue: this.nowDate(),
+                      // defaultValue: this.nowDate(),
                       className: 'col-6',
                       templateOptions: {
                         type: 'date',
                         label: 'Shipping Date',
-                        required: true
+                        // required: true
                       }
                     },
                     {
@@ -2184,7 +2251,7 @@ handleProductPull(selectedProducts: any[]) {
                         type: "number",
                         label: 'Shipping Charges.',
                         placeholder: 'Enter Shipping Charges',
-                        required: true
+                        // required: true
                       },
                       hooks: {
                         onInit: (field: any) => {
@@ -2430,85 +2497,6 @@ handleProductPull(selectedProducts: any[]) {
                                 }
                               }
                             },
-                            {
-                              key: 'flow_status',
-                              type: 'select',
-                              className: 'col-4',
-                              templateOptions: {
-                                label: 'Flow status',
-                                dataKey: 'flow_status_id',
-                                dataLabel: 'flow_status_name',
-                                // placeholder: 'Select Order status type',
-                                lazy: {
-                                  url: 'masters/flow_status/',
-                                  lazyOneTime: true
-                                },
-                                // expressions: {
-                                //   hide: '!model.sale_order_id',
-                                // },
-                              },
-                              hooks: {
-                                  onChanges: (field: any) => {
-                                    field.formControl.valueChanges.subscribe(data => {
-                                      //console.log("ledger_account", data);
-                                      if (data && data.flow_status_id) {
-                                        this.formConfig.model['sale_order']['flow_status_id'] = data.flow_status_id;
-                                      }
-                                    });
-                                      const valueChangesSubscription = field.formControl.valueChanges.subscribe(data => {
-                                          const saleOrder = this.formConfig.model['sale_order'];
-                                          console.log("Sale order: ", saleOrder);
-                      
-                                          // Prepare invoice data
-                                          const saleOrderItems = this.formConfig.model['sale_order_items'];
-                                          const orderAttachments = this.formConfig.model['order_attachments'];
-                                          const orderShipments = this.formConfig.model['order_shipments'];
-                      
-                                          this.invoiceData = {
-                                              sale_invoice_order: {
-                                                  bill_type: saleOrder.bill_type || 'CASH',
-                                                  sale_order_id: saleOrder.sale_order_id,
-                                                  invoice_date: this.nowDate(),
-                                                  email: saleOrder.email,
-                                                  ref_no: saleOrder.ref_no,
-                                                  ref_date: this.nowDate(),
-                                                  tax: saleOrder.tax || 'Inclusive',
-                                                  due_date: saleOrder.due_date,
-                                                  remarks: saleOrder.remarks,
-                                                  advance_amount: saleOrder.advance_amount,
-                                                  item_value: saleOrder.item_value,
-                                                  discount: saleOrder.discount,
-                                                  dis_amt: saleOrder.dis_amt,
-                                                  taxable: saleOrder.taxable,
-                                                  tax_amount: saleOrder.tax_amount,
-                                                  cess_amount: saleOrder.cess_amount,
-                                                  transport_charges: saleOrder.transport_charges,
-                                                  round_off: saleOrder.round_off,
-                                                  total_amount: saleOrder.total_amount,
-                                                  vehicle_name: saleOrder.vehicle_name,
-                                                  total_boxes: saleOrder.total_boxes,
-                                                  shipping_address: saleOrder.shipping_address,
-                                                  billing_address: saleOrder.billing_address,
-                                                  customer_id: saleOrder.customer_id,
-                                                  gst_type_id: saleOrder.gst_type_id,
-                                                  order_type: saleOrder.order_type || 'sale_invoice',
-                                                  order_salesman_id: saleOrder.order_salesman_id,
-                                                  customer_address_id: saleOrder.customer_address_id,
-                                                  payment_term_id: saleOrder.payment_term_id,
-                                                  payment_link_type_id: saleOrder.payment_link_type_id,
-                                                  ledger_account_id: saleOrder.ledger_account_id,
-                                                  flow_status: saleOrder.flow_status
-                                              },
-                                              sale_invoice_items: saleOrderItems,
-                                              order_attachments: orderAttachments,
-                                              order_shipments: orderShipments
-                                          };
-                      
-                                          console.log('invoiceData:', this.invoiceData);
-                                      });
-                                  }
-                              }
-                          },
                             {
                               key: 'item_value',
                               type: 'input',

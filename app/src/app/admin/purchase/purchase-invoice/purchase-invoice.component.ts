@@ -1457,7 +1457,7 @@ export class PurchaseInvoiceComponent {
                       templateOptions: {
                         label: 'Shipping Charges.',
                         placeholder: 'Enter Shipping Charges',
-                        required: true
+                        // required: true
                       },
                       hooks: {
                         onInit: (field: any) => {
