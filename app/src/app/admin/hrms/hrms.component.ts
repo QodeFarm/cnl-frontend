@@ -52,6 +52,7 @@ export class EmployeesComponent  implements OnInit {
         this.formConfig.pkId = 'employee_id';
         //set labels for update
         this.formConfig.submit.label = 'Update';
+        this.formConfig.model['employee_id'] = this.EmployeeEditID;
         this.showForm = true;
       }
     })
