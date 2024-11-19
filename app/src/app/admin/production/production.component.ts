@@ -119,38 +119,26 @@ submitWorkOrder() {
     sale_order_id: this.formConfig.model['work_order']['sale_order_id'], // Include sale_order_id
   };
 
-  this.http.post('production/work_order/', payload).subscribe({
-    next: (response) => {
-      console.log('Work order submitted successfully:', response);
+  // Trigger the move_next_stage API call directly
+    const saleOrderId = this.formConfig.model['work_order']['sale_order_id'];
+    if (saleOrderId) {
+      const nextStageUrl = `sales/SaleOrder/${saleOrderId}/move_next_stage/`;
 
-      // Trigger the move_next_stage API call after successful submission
-      const saleOrderId = this.formConfig.model['work_order']['sale_order_id'];
-      if (saleOrderId) {
-        const nextStageUrl = `sales/SaleOrder/${saleOrderId}/move_next_stage/`;
+      this.http.post(nextStageUrl, {}).subscribe({
+        next: (res) => {
+          console.log('Moved to the next stage successfully:', res);
+          alert('Moved to the next stage successfully!');
+        },
+        error: (err) => {
+          console.error('Error moving to the next stage:', err);
 
-        this.http.post(nextStageUrl, {}).subscribe({
-          next: (res) => {
-            console.log('Moved to the next stage successfully:', res);
-            alert('Work Order created and moved to the next stage successfully!');
-          },
-          error: (err) => {
-            console.error('Error moving to the next stage:', err);
-
-            // Optional: Show a user-friendly message
-            alert('Work Order created, but failed to move to the next stage.');
-          },
-        });
-      } else {
-        console.warn('Sale order ID is missing. Cannot trigger move to next stage.');
-      }
-    },
-    error: (err) => {
-      console.error('Error submitting work order:', err);
-
-      // Optional: Show a user-friendly message
-      alert('Failed to create the work order. Please try again.');
-    },
-  });
+          // Optional: Show a user-friendly message
+          alert('Failed to move to the next stage. Please try again.');
+        },
+      });
+    } else {
+      console.warn('Sale order ID is missing. Cannot trigger move to next stage.');
+    }
 }
 
   setFormConfig() {
