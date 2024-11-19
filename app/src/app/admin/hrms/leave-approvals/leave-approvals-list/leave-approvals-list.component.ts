@@ -49,7 +49,7 @@ export class LeaveApprovalsListComponent {
         sort: true,
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.leave.start_date}`;
+          return `${row.leave.comments}`;
         },
       },
       {
@@ -58,9 +58,12 @@ export class LeaveApprovalsListComponent {
         sort: true,
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.approver.first_name}`;
+          // Concatenate first_name and last_name correctly
+          const firstName = row.approver?.first_name || '';
+          const lastName = row.approver?.last_name || '';
+          return `${firstName} ${lastName}`.trim();
         },
-      },
+      }, 
       {
         fieldKey: "code",
         name: "Action",

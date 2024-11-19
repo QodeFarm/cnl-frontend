@@ -31,9 +31,12 @@ export class AttendanceListComponent {
         sort: true,
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.employee.first_name}`;
+          // Concatenate first_name and last_name correctly
+          const firstName = row.employee?.first_name || '';
+          const lastName = row.employee?.last_name || '';
+          return `${firstName} ${lastName}`.trim();
         },
-      },
+      }, 
       {
         fieldKey: 'attendance_date',
         name: 'Attendance Date',

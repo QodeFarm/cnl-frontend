@@ -13,7 +13,7 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 export class EmployeeListComponent {
 
-
+  
   @Output('edit') edit = new EventEmitter<void>();
 
   tableConfig: TaTableConfig = {
@@ -28,14 +28,16 @@ export class EmployeeListComponent {
     cols: [
       {
         fieldKey: 'first_name',
-        name: 'First Name',
-        sort: true
-      },
-      {
-        fieldKey: 'last_name',
-        name: 'Last Name',
-        sort: true
-      },
+        name: 'Name',
+        sort: true,
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          // Safely access and concatenate first_name and last_name
+          const firstName = row?.first_name || '';
+          const lastName = row?.last_name || '';
+          return `${firstName} ${lastName}`.trim();
+        },
+      }, 
       {
         fieldKey: 'email',
         name: 'Email',
@@ -71,15 +73,6 @@ export class EmployeeListComponent {
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
           return `${row.designation.designation_name}`;
-        },
-        sort: true
-      },
-      {
-        fieldKey: 'job_code_id',
-        name: 'Job Code',
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.job_code.job_code}`;
         },
         sort: true
       },
