@@ -146,7 +146,7 @@ export class LeaveApprovalsComponent {
               templateOptions: {
                 label: 'Leave',
                 dataKey: 'leave_id',
-                dataLabel: "start_date",
+                dataLabel: "comments",
                 options: [],
                 lazy: {
                   url: 'hrms/employee_leaves/',
