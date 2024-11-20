@@ -19,12 +19,6 @@ export class CreditNoteListComponent {
     apiUrl: 'sales/sale_credit_notes/',
     showCheckbox: true,
     pkId: "credit_note_id",
-    // fixedFilters: [
-    //   {
-    //     key: 'summary',
-    //     value: 'true'
-    //   }
-    // ],
     pageSize: 10,
     "globalSearch": {
       keys: ['credit_note_id']

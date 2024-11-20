@@ -370,12 +370,13 @@ export class SalesinvoiceComponent {
   }
 
   handleOrderSelected(order: any) {
-    const saleOrderId = order;
+    const saleOrderId = order.sale_order_id;
+    console.log("saleOrderId : ", saleOrderId)
     console.log("order : ", order);
-    // if (!saleOrderId) {
-    //     console.error('Invalid saleOrderId:', saleOrderId);
-    //     return;
-    // }
+    if (!saleOrderId) {
+        console.error('Invalid saleOrderId:', saleOrderId);
+        return;
+    }
     // Fetch sale invoice details using the saleInvoiceId
     this.http.get(`sales/sale_order/${saleOrderId}`).subscribe((res: any) => {
       if (res && res.data) {
@@ -657,13 +658,6 @@ export class SalesinvoiceComponent {
                 label: 'Email',
                 placeholder: 'Enter Email',
               },
-              // hooks: {
-              //   onInit: (field: any) => {
-              //     if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.email && field.formControl) {
-              //       field.formControl.setValue(this.dataToPopulate.sale_invoice_order.email);
-              //     }
-              //   }
-              // }
             },
             {
               key: 'orders_salesman',
@@ -810,13 +804,6 @@ export class SalesinvoiceComponent {
                 placeholder: 'Enter Billing Address',
 
               },
-              // hooks: {
-              //   onInit: (field: any) => {
-              //     if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.billing_address && field.formControl) {
-              //       field.formControl.setValue(this.dataToPopulate.sale_invoice_order.billing_address);
-              //     }
-              //   }
-              // }
             },
             {
               key: 'shipping_address',
@@ -826,13 +813,6 @@ export class SalesinvoiceComponent {
                 label: 'Shipping Address',
                 placeholder: 'Enter Shipping Address',
               },
-              // hooks: {
-              //   onInit: (field: any) => {
-              //     if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.shipping_address && field.formControl) {
-              //       field.formControl.setValue(this.dataToPopulate.sale_invoice_order.shipping_address);
-              //     }
-              //   }
-              // }
             },
           ]
         },
@@ -1029,7 +1009,7 @@ export class SalesinvoiceComponent {
                   hideLabel: true,
                   dataLabel: 'size_name',
                   options: [],
-                  required: true,
+                  required: false,
                   lazy: {
                     lazyOneTime: true
                   }
@@ -1155,7 +1135,7 @@ export class SalesinvoiceComponent {
                   hideLabel: true,
                   dataLabel: 'color_name',
                   options: [],
-                  required: true,
+                  required: false,
                   lazy: {
                     lazyOneTime: true
                   }
@@ -1319,17 +1299,6 @@ export class SalesinvoiceComponent {
                     }
                   }
                 }
-                // hooks: {
-                //   onInit: (field: any) => {
-                //     if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > 0) {
-                //       const firstItem = this.dataToPopulate.sale_invoice_items[0];
-                //       // console.log("Unit option name : ", firstItem.product?.unit_options.unit_name)
-                //       if (firstItem.product?.unit_options.unit_options_id) {
-                //         field.formControl.setValue(firstItem.product?.unit_options.unit_options_id);
-                //       }
-                //     }
-                //   }
-                // }
               },
               {
                 type: 'input',
@@ -2044,10 +2013,6 @@ export class SalesinvoiceComponent {
                                   if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order && this.dataToPopulate.sale_invoice_order.dis_amt && field.formControl) {
                                     field.formControl.setValue(this.dataToPopulate.sale_invoice_order.dis_amt);
                                   }
-                                  // Subscribe to value changes for recalculating total amount
-                                  // field.formControl.valueChanges.subscribe(data => {
-                                  //   this.totalAmountCal();
-                                  // });
                                 }
                               }
                             },
@@ -2068,10 +2033,6 @@ export class SalesinvoiceComponent {
                                   if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order && this.dataToPopulate.sale_invoice_order.total_amount && field.formControl) {
                                     field.formControl.setValue(this.dataToPopulate.sale_invoice_order.total_amount);
                                   }
-                                  // Subscribe to value changes for recalculating total amount
-                                  // field.formControl.valueChanges.subscribe(data => {
-                                  //   this.totalAmountCal();
-                                  // });
                                 }
                               }
                             }                            
