@@ -185,7 +185,7 @@ export class SalesComponent {
     // to get SaleOrder number for save 
     this.getOrderNo();
     this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[8].hide = true;
-    this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[9].hide = true;
+    // this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[9].hide = true;
     // //console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
   }
   checkAndPopulateData() {
@@ -576,19 +576,19 @@ export class SalesComponent {
   }
 
   // Handles the selection of an order from the list
-selectOrder(order: any) {
-  console.log('Order selected:', order); // Output the order object for debugging
+  selectOrder(order: any) {
+    console.log('Order selected:', order); // Output the order object for debugging
 
-  // Extract the sale_order_id correctly
-  const orderId = typeof order === 'object' && order.sale_order_id ? order.sale_order_id : null;
+    // Extract the sale_order_id correctly
+    const orderId = typeof order === 'object' && order.sale_order_id ? order.sale_order_id : null;
 
-  if (orderId && typeof orderId === 'string') {
-    console.log('Order ID:', orderId); // Output the extracted ID
-    this.handleOrderSelected(orderId); // Pass the extracted ID
-  } else {
-    console.error('Invalid orderId, expected a string:', order);
+    if (orderId && typeof orderId === 'string') {
+      console.log('Order ID:', orderId); // Output the extracted ID
+      this.handleOrderSelected(orderId); // Pass the extracted ID
+    } else {
+      console.error('Invalid orderId, expected a string:', order);
+    }
   }
-}
   // Handles the order selection process and updates the form model with the order details
   handleOrderSelected(order: any) {
     console.log('Fetching details for Order:', order); // Log the whole order object
@@ -811,22 +811,22 @@ handleProductPull(selectedProducts: any[]) {
     }
   }
   
-createSaleOrder() {
-    this.http.post('sales/sale_order/', this.formConfig.model)
-      .subscribe(response => {
-        this.showSuccessToast = true;
-        this.toastMessage = 'Record created successfully';
-        this.ngOnInit();
-        setTimeout(() => {
-          this.showSuccessToast = false;
-        }, 3000); // Hide toast after 3 seconds
-      }, error => {
-        console.error('Error creating record:', error);
-      });
-  }
-  closeToast() {
-    this.showSuccessToast = false;
-  }
+  createSaleOrder() {
+      this.http.post('sales/sale_order/', this.formConfig.model)
+        .subscribe(response => {
+          this.showSuccessToast = true;
+          this.toastMessage = 'Record created successfully';
+          this.ngOnInit();
+          setTimeout(() => {
+            this.showSuccessToast = false;
+          }, 3000); // Hide toast after 3 seconds
+        }, error => {
+          console.error('Error creating record:', error);
+        });
+    }
+    closeToast() {
+      this.showSuccessToast = false;
+    }
 
   confirmSelection() {
     // Check the selected option and set sale_estimate accordingly
@@ -996,13 +996,6 @@ createSaleOrder() {
                 label: 'Email',
                 placeholder: 'Enter Email'
               },
-              // hooks: {
-              //   onInit: (field: any) => {
-              //     if (this.dataToPopulate && this.dataToPopulate.sale_order.email && field.formControl) {
-              //       field.formControl.setValue(this.dataToPopulate.sale_order.email);
-              //     }
-              //   }
-              // }
             },
             {
               key: 'order_no',
@@ -1191,13 +1184,6 @@ createSaleOrder() {
                 label: 'Billing address',
                 placeholder: 'Enter Billing address'
               },
-              // hooks: {
-              //   onInit: (field: any) => {
-              //     if (this.dataToPopulate && this.dataToPopulate.sale_order.billing_address && field.formControl) {
-              //       field.formControl.setValue(this.dataToPopulate.sale_order.billing_address);
-              //     }
-              //   }
-              // }
             },
             {
               key: 'shipping_address',
@@ -1207,13 +1193,6 @@ createSaleOrder() {
                 label: 'Shipping address',
                 placeholder: 'Enter Shipping address'
               },
-              // hooks: {
-              //   onInit: (field: any) => {
-              //     if (this.dataToPopulate && this.dataToPopulate.sale_order.shipping_address && field.formControl) {
-              //       field.formControl.setValue(this.dataToPopulate.sale_order.shipping_address);
-              //     }
-              //   }
-              // }
             }
           ]
         },
@@ -2633,12 +2612,6 @@ createSaleOrder() {
         controls.sale_order.controls.total_amount.setValue(total_amount);
 
       }
-      //const 
-
-      // const cess_amount = data;
-      // if (cess_amount && doc_amount) {
-      //   field.form.controls.doc_amount.setValue(parseInt(doc_amount) - parseInt(cess_amount));
-      // }
     }
   }
 
