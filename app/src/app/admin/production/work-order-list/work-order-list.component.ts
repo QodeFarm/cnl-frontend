@@ -42,8 +42,36 @@ export class WorkOrderListComponent {
         },
       },
       {
+        fieldKey: 'size',
+        name: 'Size',
+        sort: true,
+        displayType: 'map',
+        mapFn: (currentValue: any, row: any, col: any) => {
+          return row.size.size_name;
+        },
+      },
+      {
+        fieldKey: 'color',
+        name: 'Color',
+        sort: true,
+        displayType: 'map',
+        mapFn: (currentValue: any, row: any, col: any) => {
+          return row.color.color_name;
+        },
+      },
+      {
         fieldKey: 'quantity',
         name: 'Quantity',
+        sort: true
+      },
+      {
+        fieldKey: 'completed_qty',
+        name: 'Completed QTY',
+        sort: true
+      },
+      {
+        fieldKey: 'pending_qty',
+        name: 'Pending QTY',
         sort: true
       },
       {

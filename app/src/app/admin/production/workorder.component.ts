@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
-import { CommonModule, formatDate } from '@angular/common';
+import { CommonModule, DatePipe, formatDate } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { WorkOrderListComponent } from './work-order-list/work-order-list.component';
 
@@ -33,9 +33,18 @@ export class WorkorderComponent implements OnInit {
       this.populateFormWithData(history.state);
       this.showForm = true; // Ensure the form is displayed
     }
-  
-    // console.log('FormConfig after population:', this.formConfig);
+    this.hideFields(true); // Hides fields at indexes 5, 4, and 9
   }
+
+  hideFields(hide: boolean): void {
+    // Array of indexes to hide or show
+    const fieldsToToggle = [5, 4, 9];
+  
+    // Loop through the array and toggle the `hide` property based on the argument
+    fieldsToToggle.forEach(index => {
+      this.formConfig.fields[0].fieldGroup[index].hide = hide;
+    });
+  };  
 
   hide() {
     const modalCloseButton = document.getElementById('modalClose');
@@ -45,6 +54,7 @@ export class WorkorderComponent implements OnInit {
   }
 
   editWorkorder(event: any) {
+    this.hideFields(false); // Shows fields at indexes 5, 4, and 9
     console.log('event', event);
     this.WorkOrdrEditID = event;
     this.http.get('production/work_order/' + event).subscribe((res: any) => {
@@ -165,22 +175,94 @@ createBom(){
       this.formConfig.model.bom
   }
 
-  this.http.post('production/bom/', json_data)
+  // this.http.post('production/bom/', json_data)
+  // .subscribe({
+  //   next: (response) => {
+  //     this.showCreateBomButton = true;  // Ensure the button is still visible
+  //     this.isBomButtonDisabled = true;  // Disable the button after success
+  //     alert('BOM created successfully!');
+  //   },
+  //   error: (error) => {
+  //     console.error('Error creating BOM:', error);
+  //     this.showCreateBomButton = true;  // Ensure the button is still visible
+  //     this.isBomButtonDisabled = false; // Keep the button enabled if there's an error
+  //     alert('Error creating BOM. Main Product and Bill of material should be selected.');
+  //   }
+  // });
+
+};
+
+updateInventory() {
+  const data = this.formConfig.model.work_order
+  data['work_order_id'] = this.WorkOrdrEditID
+  // update the work order
+  this.http.put(`production/work_orders_get/${this.WorkOrdrEditID}/`, data || {})
   .subscribe({
     next: (response) => {
-      this.showCreateBomButton = true;  // Ensure the button is still visible
-      this.isBomButtonDisabled = true;  // Disable the button after success
-      alert('BOM created successfully!');
+      alert('Inventory Updated successfully!');
     },
     error: (error) => {
-      console.error('Error creating BOM:', error);
-      this.showCreateBomButton = true;  // Ensure the button is still visible
-      this.isBomButtonDisabled = false; // Keep the button enabled if there's an error
-      alert('Error creating BOM. Main Product and Bill of material should be selected.');
+      console.error('Error Updating the Inventory:', error);
+      alert('Error Updating the Inventory.');
     }
   });
 
-};
+  // update the product balance
+  const product = this.formConfig.model.work_order.product_id
+  const color = this.formConfig.model.work_order.color_id || null
+  const size = this.formConfig.model.work_order.size_id || null
+  const completed_qty = this.formConfig.model.work_order.completed_qty
+
+  // Fetch existing product balance from Products table
+  const product_url = `products/products_get/${product}/`
+  this.http.get(product_url).subscribe((data: any) => {
+    if (data) {
+      const existing_product_balance = data.balance
+
+      // sum the balance by adding existing balance with completed quantity.
+      const total = parseInt(existing_product_balance, 10) + parseInt(completed_qty, 10);  // this.formConfig.model.work_order?.completed_qty
+      console.log('Total product bal :', total)
+      const new_product_balance = { 'balance': total}
+      console.log({'old balance':existing_product_balance, 'new bal': total})
+
+      // Update new product balance
+      this.http.patch(product_url, new_product_balance).subscribe({
+        next: (response) => {
+          console.log('response :', response)
+          alert('Product Balance Updated successfully!');
+        },
+        error: (error) => {
+          console.error('Error Fetching Products:', error);
+          alert('Error Fetching Products.');
+        }
+      });
+    }
+  })
+
+  let variation_url = `products/product_variations/?product_id=${product}&color_id=${color}&size_id=${size}`;
+  this.http.get(variation_url).subscribe((data: any) => {
+    if (data && Array.isArray(data.data) && data.data.length == 1) {
+      const variation_id = data.data[0].product_variation_id
+      const existing_qty = data.data[0].quantity || 0
+      const new_qty = { 'quantity': parseInt(existing_qty, 10) + parseInt(completed_qty, 10)}
+
+      console.log('var-url : ', variation_url)
+
+      this.http.patch(`products/product_variations/${variation_id}/`, new_qty).subscribe({
+        next: (response) => {
+          alert('Product Variation Balance Updated successfully!');
+          console.log('Variation updated : ', response)
+        },
+        error: (error) => {
+          console.error('Error Fetching Product Variation:', error);
+          alert('Error Fetching Product Variation.');
+        }
+      });
+    } else {
+      console.log('NO variations . it is Direct Product ***')
+    }
+  });
+}
 
   setFormConfig() {
     this.WorkOrdrEditID =null
@@ -240,6 +322,62 @@ createBom(){
               }
             },
             {
+              key: 'size',
+              type: 'select',
+              className: 'col-2',
+              templateOptions: {
+                label: 'Size',
+                dataKey: 'size_id',
+                dataLabel: 'size_name',
+                options: [],
+                required: false,
+                lazy: {
+                  lazyOneTime: true,
+                  url : `products/sizes/`
+                }
+              },
+              hooks: {
+                onChanges: (field: any) => {
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    const index = field.parent.key;
+                    if (!this.formConfig.model['work_order']) {
+                      console.error(`Size at index ${index} is not defined. Initializing...`);
+                      this.formConfig.model['work_order'] = {};
+                    }
+                    this.formConfig.model['work_order']['size_id'] = data.size_id;
+                  });
+                }
+              }
+            },
+            {
+              key: 'color',
+              type: 'select',
+              className: 'col-2',
+              templateOptions: {
+                label: 'Color',
+                dataKey: 'color_id',
+                dataLabel: 'color_name',
+                options: [],
+                required: false,
+                lazy: {
+                  lazyOneTime: true,
+                  url : 'products/colors/'
+                }
+              },
+              hooks: {
+                onChanges: (field: any) => {
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    const index = field.parent.key;
+                    if (!this.formConfig.model['work_order'][index]) {
+                      console.error(`Color at index ${index} is not defined. Initializing...`);
+                      this.formConfig.model['work_order'][index] = {};
+                    }
+                    this.formConfig.model['work_order']['color_id'] = data.color_id;
+                  });
+                }
+              }
+            },
+            {
               key: 'quantity',
               type: 'input',
               className: 'col-2',
@@ -249,6 +387,27 @@ createBom(){
                 placeholder: 'Enter Quantity',
                 // type: 'number',
                 // min: 0,
+              },
+            },
+            {
+              key: 'completed_qty',
+              type: 'input',
+              className: 'col-2',
+              templateOptions: {
+                label: 'Completed Quantity',
+                required: false,
+                placeholder: 'Enter Completed Quantity'
+              },
+            },
+            {
+              key: 'pending_qty',
+              type: 'input',
+              className: 'col-2',
+              templateOptions: {
+                label: 'Pending Quantity',
+                required: false,
+                readonly: true,
+                placeholder: 'Pending Quantity'
               },
             },
             {
@@ -271,10 +430,12 @@ createBom(){
               key: 'start_date',
               type: 'date',
               className: 'col-2',
+              defaultValue: new Date().toISOString().split('T')[0],
               templateOptions: {
                 type: 'date',
                 label: 'Start date',
-                required: false
+                required: false,
+                readonly: true
               }
             },
             {
@@ -287,7 +448,15 @@ createBom(){
                 required: false
               }
             },
-            
+            {
+              key: 'sync_qty',
+              type: 'checkbox',
+              className: 'col-3 p-3',
+              templateOptions: {
+                label: 'Sync QTY',
+                required: false
+              }
+            }
           ]
         },
         {
