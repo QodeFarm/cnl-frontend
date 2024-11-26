@@ -8,7 +8,7 @@
             <div style="display: flex; gap: 10px;">
                 <button (click)="showWorkorderListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productionModal">Work Order List
                 </button>
-                <button (click)="updateInventory()" *ngIf="WorkOrdrEditID" type="button" class="btn btn-primary">Update Inventory</button>
+                <!-- <button (click)="updateInventory()" *ngIf="WorkOrdrEditID" type="button" class="btn btn-primary">Update Inventory</button> -->
                 <button (click)="createBom()" *ngIf="showCreateBomButton" type="button" class="btn btn-primary ms-auto" [disabled]="isBomButtonDisabled" data-bs-toggle="modal" data-bs-target="#bomModal">Create BOM
                 </button>
             </div>

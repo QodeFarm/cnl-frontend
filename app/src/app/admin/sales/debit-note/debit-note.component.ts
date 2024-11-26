@@ -72,10 +72,12 @@ export class DebitNoteComponent {
     // PUT request to update Sale Return Order
     this.http.put(`sales/sale_debit_notes/${saleDebitId}/`, saleCreditPayload).subscribe(
       (response) => {
-        console.log('Sale Debit Notes Order updated successfully', response);
-        // Optionally handle success, e.g., reset the form or navigate
-        this.ngOnInit(); // Hide form after successful update
-        // this.loadSaleReturnOrders(); // Refresh the list if necessary
+        this.showSuccessToast = true;
+        this.toastMessage = 'Record Updated successfully';
+        this.ngOnInit();  // Optionally reset the form after successful submission
+        setTimeout(() => {
+          this.showSuccessToast = false;
+        }, 3000);
       },
       (error) => {
         console.error('Error updating Sale Debit Note:', error);
@@ -115,12 +117,10 @@ export class DebitNoteComponent {
     this.http.patch('sales/sale_debit_notes/' + event + '/', { order_status_id: '68ea000e-ce95-4145-a3c7-96efe6f9ff53' })
       .subscribe(
         (res: any) => {
-          console.log("Result in circle:", res);
           // Check if the response contains credit_note_id
           if (res && res.debit_note_id) {
-            console.log("Order status updated successfully:", res);
             // Store the message in localStorage
-            localStorage.setItem('sidebarMessage', 'Order status changed to Approve');
+            localStorage.setItem('sidebarMessage', 'Order status Approved');
             // Reload the page
             window.location.reload();
           } else {
@@ -135,7 +135,6 @@ export class DebitNoteComponent {
 
   getOrderNo() {
     this.orderNumber = null;
-  
         // Generate Sales Order Number
         this.http.get('masters/generate_order_no/?type=DN').subscribe((res: any) => {
           console.log("RES data in orderno : ", res.data.order_number)
@@ -463,6 +462,8 @@ export class DebitNoteComponent {
     }
   }
 
+  toastMessage = '';
+  showSuccessToast = false;
   // Method to create the record
   createRecord() {
     const recordData = {
@@ -479,8 +480,12 @@ export class DebitNoteComponent {
     this.http.post('sales/sale_debit_notes/', recordData)
       .subscribe({
         next: (response) => {
-          console.log('Record created successfully:', response);
+          this.showSuccessToast = true;
+          this.toastMessage = 'Record Created successfully';
           this.ngOnInit();  // Optionally reset the form after successful submission
+          setTimeout(() => {
+            this.showSuccessToast = false;
+          }, 3000);
         },
         error: (error) => {
           console.error('Error creating record:', error);
@@ -491,23 +496,17 @@ export class DebitNoteComponent {
 
   loadSaleInvoices(customerId: string) {
     this.http.get(`sales/sale_invoice_order/?customer_id=${customerId}`).subscribe((res: any) => {
-      console.log("Customer in Sale invoice : ", res);
       if (res && Array.isArray(res.data)) {
         this.invoiceOptions = res.data.map((invoice: any) => ({
           value: invoice.sale_invoice_id,
           label: invoice.invoice_no
         }));
-        console.log("Updated invoiceOptions: ", this.invoiceOptions);
-  
-        // Ensure formConfig is defined and fields are set
-        console.log("FormConfig Fields: ", this.formConfig.fields);
   
         const invoiceField = this.formConfig.fields.flatMap(field => field.fieldGroup || []).find(field => field.key === 'sale_invoice_id');
         console.log("Invoice Field: ", invoiceField);
   
         if (invoiceField) {
           invoiceField.templateOptions.options = this.invoiceOptions;
-          console.log("Updated Invoice Field Options: ", invoiceField.templateOptions.options);
           this.cdr.detectChanges();
         } else {
           console.error('Sale invoice field not found');

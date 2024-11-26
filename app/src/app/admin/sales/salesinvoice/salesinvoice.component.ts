@@ -39,7 +39,7 @@ export class SalesinvoiceComponent {
 
   //COPY ---------------------------------
   // List of all tables
-  tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return'];
+  tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return', 'Purchase Order', 'Purchase Invoice', 'Purchase Return'];
 
   // This will store available tables excluding the current one
   availableTables: string[] = [];
@@ -52,27 +52,53 @@ export class SalesinvoiceComponent {
 
   // Field mapping for auto population
   fieldMapping = {
-      'Sale Order': {
-          customer: 'customer',  // Add this line for customer_id
-          csutomer_id: 'customer_id',
-          email: 'email',
-          billing_address: 'billing_address',
-          shipping_address: 'shipping_address',
-          ref_no: 'ref_no',
-          tax: 'tax',
-          remarks: 'remarks'
-      },
-      'Sale Return': {
-          customer: 'customer', // Assuming the same field name
-          customer_id: 'customer_id',  // Add this line for customer_id
-          email: 'email',
-          bill_type: 'bill_type',
-          shipping_address: 'shipping_address',
-          ref_no: 'ref_no',
-          tax: 'tax',
-          remarks: 'remarks'
-      },
-      // Add mappings for other tables as needed
+    'Sale Order': {
+      sourceModel: 'sale_invoice_order',  // Specify the source model
+      targetModel: 'sale_order', // Specify the target model
+      // Indicate nested fields with model mappings
+      nestedModels: {
+        sale_invoice_items: 'sale_order_items',
+        order_attachments: 'order_attachments',
+        order_shipments: 'order_shipments'
+      }
+    },
+    'Sale Return': {
+      sourceModel: 'sale_invoice_order',  // Specify the source model
+      targetModel: 'sale_return_order',  // Specify the target model
+      // Nested mappings
+      nestedModels: {
+        sale_invoice_items: 'sale_return_items',
+        order_attachments: 'order_attachments',
+        order_shipments: 'order_shipments'
+      }
+    },
+    'Purchase Order': {
+      sourceModel: 'sale_invoice_order',
+      targetModel: 'purchase_order_data',
+      nestedModels: {
+        sale_invoice_items: 'purchase_order_items',
+        order_attachments: 'order_attachments',
+        order_shipments: 'order_shipments'
+      }
+    },
+    'Purchase Invoice': {
+      sourceModel: 'sale_invoice_order',
+      targetModel: 'purchase_invoice_orders',
+      nestedModels: {
+        sale_invoice_items: 'purchase_invoice_items',
+        order_attachments: 'order_attachments',
+        order_shipments: 'order_shipments'
+      }
+    },
+    'Purchase Return': {
+      sourceModel: 'sale_invoice_order',
+      targetModel: 'purchase_return_orders',
+      nestedModels: {
+        sale_invoice_items: 'purchase_return_items',
+        order_attachments: 'order_attachments',
+        order_shipments: 'order_shipments'
+      }
+    }
   };
 
   // Method to open the copy modal and populate dropdown
@@ -80,34 +106,53 @@ export class SalesinvoiceComponent {
       this.availableTables = this.tables.filter(table => table !== this.currentTable);
   }
 
+
   copyToTable() {
-    const dataToCopy = this.formConfig.model.sale_invoice_order; // Get the current form data
-    const populatedData = {};
+    const selectedMapping = this.fieldMapping[this.selectedTable];
+    
+    if (!selectedMapping) {
+      console.error('Mapping not found for selected table:', this.selectedTable);
+      return;
+    }
+  
+    const dataToCopy = this.formConfig.model[selectedMapping.sourceModel] || {};
+    const populatedData = { [selectedMapping.targetModel]: {} };
+  
+    // Copy main fields
+    Object.keys(dataToCopy).forEach(field => {
+      populatedData[selectedMapping.targetModel][field] = dataToCopy[field];
+    });
+  
+    // Copy nested models if they exist
+    if (selectedMapping.nestedModels) {
+      Object.keys(selectedMapping.nestedModels).forEach(sourceNestedModel => {
+        const targetNestedModel = selectedMapping.nestedModels[sourceNestedModel];
+        const nestedData = this.formConfig.model[sourceNestedModel] || [];
+        
+        populatedData[targetNestedModel] = Array.isArray(nestedData)
+          ? nestedData.map(item => ({ ...item }))
+          : { ...nestedData };
+      });
+    }
+  
+    // Log and navigate to the target module with populated data
+    console.log('Populated Data:', populatedData);
+    
+    // Determine the target route based on the selected table
+    const targetRoute = 
+      this.selectedTable === 'Sale Order' ? 'sales' :
+      this.selectedTable === 'Sale Return' ? 'sales/sale-returns' :
+      this.selectedTable === 'Purchase Order' ? 'purchase' :
+      this.selectedTable === 'Purchase Invoice' ? 'purchase/purchase-invoice' :
+      this.selectedTable === 'Purchase Return' ? 'purchase/purchasereturns' :
+      null;
 
-    // Extract only the matching fields based on the selected table
-    if (this.selectedTable && this.fieldMapping[this.selectedTable]) {
-        for (const key in this.fieldMapping[this.selectedTable]) {
-            const sourceField = this.fieldMapping[this.selectedTable][key];
-            console.log("Source field : ", sourceField);
-            // Get value from the sales form
-            populatedData[key] = dataToCopy[sourceField];
-        }
+    if (!targetRoute) {
+      console.error('No valid route for selected table:', this.selectedTable);
+      return;
     }
 
-    // Log the populated data for debugging
-    console.log('Data to copy:', populatedData);
-
-    // Navigate based on the selected table without needing breaks
-    if (this.selectedTable === 'Sale Order') {
-        this.router.navigate(['admin/sales'], { state: { data: populatedData } });
-        console.log("populate data of customer : ", populatedData)
-    } else if (this.selectedTable === 'Sale Return') {
-        this.router.navigate(['admin/sales/sale-returns'], { state: { data: populatedData } });
-    }
-    // Add additional cases for other tables if necessary
-    else {
-        console.error('Unknown table selected');
-    }
+    this.router.navigate([`admin/${targetRoute}`], { state: { data: populatedData } });
   }
 
   constructor(
@@ -122,26 +167,12 @@ export class SalesinvoiceComponent {
   dataToPopulate: any;
   salesInvoiceForm: FormGroup;
 
-  ngOnInit() {
-    this.setFormConfig();
-
-    // Subscribe to the route parameters to get the data from the history state
-    this.route.paramMap.subscribe(params => {
-      this.dataToPopulate = history.state.data; // Retrieve data from history
-      console.log('data retrieved:', this.dataToPopulate);
-
-      // Check if dataToPopulate exists and populate the form
-      console.log("triggering the data : ")
-      if (this.dataToPopulate) {
-        console.log("Custome in data : ", this.dataToPopulate.customer?.customer_id)
-        // Populate the form with the data received
-        this.populateForm(this.dataToPopulate);
-      }
-    });
-
+  ngOnInit() {    
     this.showSaleInvoiceList = false;
     this.showForm = true;
     this.SaleInvoiceEditID = null;
+    this.setFormConfig();
+    this.checkAndPopulateData();
     // Set sale_order default value
     this.formConfig.model['sale_invoice_order']['order_type'] = 'sale_invoice';
 
@@ -150,26 +181,54 @@ export class SalesinvoiceComponent {
     this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[8].hide = true;
   }
 
-  populateForm(data: any) {
-    console.log("Data in populateform : ", data);
-    this.salesInvoiceForm.patchValue({
-      customer: {
-        customer_id: data.customer?.csutomer_id || '',
-        name: data.customer?.name || ''
-      },
-      customer_id: data.customer?.customer_id || '',  // Handle undefined cases
-      email: data.email || '',
-      bill_type: data.bill_type || '',
-      ref_no: data.ref_no || '',
-      tax: data.tax || '',
-      remarks: data.remarks || '',
-      billing_address: data.billing_address || '',
-      shipping_address: data.shipping_address || '',
-    });
-
-    // Trigger change detection to update the UI if needed
-    this.cdRef.detectChanges();
-  }
+  checkAndPopulateData() {
+    // Check if data has already been populated
+    if (this.dataToPopulate === undefined) {
+      this.route.paramMap.subscribe(params => {
+        this.dataToPopulate = history.state.data; 
+        console.log('Data retrieved:', this.dataToPopulate);
+        
+        // Populate the form only if data exists
+        if (this.dataToPopulate) {
+          const saleInvoiceItems = this.dataToPopulate.sale_invoice_items || [];
+  
+          // Clear existing sale_invoice_items to avoid duplicates
+          this.formConfig.model.sale_invoice_items = [];
+  
+          // Populate form with data, ensuring unique entries
+          saleInvoiceItems.forEach(item => {
+            const populatedItem = {
+              product_id: item.product.product_id,
+              size: item.size,
+              color: item.color,
+              code: item.code,
+              unit: item.unit,
+              total_boxes: item.total_boxes,
+              quantity: item.quantity,
+              amount: item.amount,
+              rate: item.rate,
+              print_name: item.print_name,
+              discount: item.discount
+            };
+            this.formConfig.model.sale_invoice_items.push(populatedItem);
+          });
+        }
+      });
+    } else {
+    // Detect if the page was refreshed
+      const wasPageRefreshed = window.performance?.navigation?.type === window.performance?.navigation?.TYPE_RELOAD;
+    
+      // Clear data if the page was refreshed
+      if (wasPageRefreshed) {
+        this.dataToPopulate = undefined;
+        console.log("Page was refreshed, clearing data.");
+        
+        // Ensure the history state is cleared to prevent repopulation
+        history.replaceState(null, '');
+        return; // Stop further execution as we don't want to repopulate the form
+      }
+    }
+  }  
 
 //COPY PART END -------------------------------------------------------------
 
@@ -189,6 +248,8 @@ export class SalesinvoiceComponent {
         this.formConfig.model = res.data;
         // set sale_order default value
         this.formConfig.model['sale_invoice_order']['order_type'] = 'sale_invoice';
+        this.formConfig.model['sale_invoice_order']['ledger_account_id'] = res.data.sale_invoice_order.ledger_account_id
+        console.log("Ledger account id : ", res.data.ledger_account_id)
         this.formConfig.pkId = 'sale_invoice_id';
         this.formConfig.submit.label = 'Update';
         // show form after setting form values
@@ -309,12 +370,13 @@ export class SalesinvoiceComponent {
   }
 
   handleOrderSelected(order: any) {
-    const saleOrderId = order;
+    const saleOrderId = order.sale_order_id;
+    console.log("saleOrderId : ", saleOrderId)
     console.log("order : ", order);
-    // if (!saleOrderId) {
-    //     console.error('Invalid saleOrderId:', saleOrderId);
-    //     return;
-    // }
+    if (!saleOrderId) {
+        console.error('Invalid saleOrderId:', saleOrderId);
+        return;
+    }
     // Fetch sale invoice details using the saleInvoiceId
     this.http.get(`sales/sale_order/${saleOrderId}`).subscribe((res: any) => {
       if (res && res.data) {
@@ -475,16 +537,6 @@ export class SalesinvoiceComponent {
   setFormConfig() {
     this.SaleInvoiceEditID = null;
 
-    this.salesInvoiceForm = this.fb.group({
-      customer: [null], // Add the customer field
-      customer_id: [null], // Ensure this is initialized
-      bill_type: [null],
-      email: [null],
-      billing_address: [null],
-      shipping_address: [null],
-      // Add other fields as necessary
-    });
-
     this.formConfig = {
       url: "sales/sale_invoice_order/",
       title: '',
@@ -547,12 +599,12 @@ export class SalesinvoiceComponent {
               },
               hooks: {
                 onInit: (field: any) => {
-                  if (this.dataToPopulate && this.dataToPopulate.bill_type && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.bill_type);
+                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.bill_type && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.bill_type);
                   }
                 }
               }
-            },                                             
+            },                                                                                          
             {
               key: 'customer',
               type: 'select',
@@ -572,26 +624,31 @@ export class SalesinvoiceComponent {
                 onInit: (field: any) => {
                   field.formControl.valueChanges.subscribe(data => {
                     if (data && data.customer_id) {
-                      this.formConfig.model['sale_invoice_order']['customer_id'] = data.customer_id; // This should be the ID now
-                      // this.formConfig.model['sale_invoice_order']['customer'] = data.customer?.name; // Set name if needed
+                      // Set customer_id in the model
+                      this.formConfig.model['sale_invoice_order']['customer_id'] = data.customer_id;
                     }
+            
+                    // Update billing and shipping addresses
                     if (data.customer_addresses && data.customer_addresses.billing_address) {
-                      field.form.controls.billing_address.setValue(data.customer_addresses.billing_address)
+                      field.form.controls.billing_address.setValue(data.customer_addresses.billing_address);
                     }
                     if (data.customer_addresses && data.customer_addresses.shipping_address) {
-                      field.form.controls.shipping_address.setValue(data.customer_addresses.shipping_address)
+                      field.form.controls.shipping_address.setValue(data.customer_addresses.shipping_address);
                     }
+            
+                    // Update email field
                     if (data.email) {
-                      field.form.controls.email.setValue(data.email)
+                      field.form.controls.email.setValue(data.email);
                     }
                   });
-                  if (this.dataToPopulate && this.dataToPopulate.customer && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.customer?.customer_id);
-                    
+            
+                  // Populate customer from sale_invoice_order
+                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order?.customer) {
+                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.customer);
                   }
                 }
-              },
-            },                      
+              }
+            },                                 
             {
               key: 'email',
               type: 'input',
@@ -601,13 +658,6 @@ export class SalesinvoiceComponent {
                 label: 'Email',
                 placeholder: 'Enter Email',
               },
-              hooks: {
-                onInit: (field: any) => {
-                  if (this.dataToPopulate && this.dataToPopulate.email && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.email);
-                  }
-                }
-              }
             },
             {
               key: 'orders_salesman',
@@ -631,6 +681,9 @@ export class SalesinvoiceComponent {
                       this.formConfig.model['sale_invoice_order']['order_salesman_id'] = data.order_salesman_id;
                     }
                   });
+                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order?.orders_salesman) {
+                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.orders_salesman);
+                  }
                 }
               }
             },
@@ -674,8 +727,8 @@ export class SalesinvoiceComponent {
               },
               hooks: {
                 onInit: (field: any) => {
-                  if (this.dataToPopulate && this.dataToPopulate.ref_no && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.ref_no);
+                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.ref_no && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.ref_no);
                   }
                 }
               }
@@ -717,8 +770,8 @@ export class SalesinvoiceComponent {
               },
               hooks: {
                 onInit: (field: any) => {
-                  if (this.dataToPopulate && this.dataToPopulate.tax && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.tax);
+                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.tax && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.tax);
                   }
                 }
               }
@@ -736,8 +789,8 @@ export class SalesinvoiceComponent {
               },
               hooks: {
                 onInit: (field: any) => {
-                  if (this.dataToPopulate && this.dataToPopulate.remarks && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.remarks);
+                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.remarks && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.remarks);
                   }
                 }
               }
@@ -751,13 +804,6 @@ export class SalesinvoiceComponent {
                 placeholder: 'Enter Billing Address',
 
               },
-              hooks: {
-                onInit: (field: any) => {
-                  if (this.dataToPopulate && this.dataToPopulate.billing_address && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.billing_address);
-                  }
-                }
-              }
             },
             {
               key: 'shipping_address',
@@ -767,19 +813,12 @@ export class SalesinvoiceComponent {
                 label: 'Shipping Address',
                 placeholder: 'Enter Shipping Address',
               },
-              hooks: {
-                onInit: (field: any) => {
-                  if (this.dataToPopulate && this.dataToPopulate.shipping_address && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.shipping_address);
-                  }
-                }
-              }
             },
           ]
         },
         {
           key: 'sale_invoice_items',
-          type: 'table',
+          type: 'repeat',
           className: 'custom-form-list',
           templateOptions: {
             // title: 'Products',
@@ -828,7 +867,7 @@ export class SalesinvoiceComponent {
             ]
           },
           fieldArray: {
-            fieldGroup: [
+            fieldGroup: [ 
               {
                 key: 'product',
                 type: 'select',
@@ -851,6 +890,16 @@ export class SalesinvoiceComponent {
                   // Check if parentArray exists and proceed
                   if (parentArray) {
                     const currentRowIndex = +parentArray.key; // Simplified number conversion
+
+                    // Check if there is a product already selected in this row (when data is copied)
+                    if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
+                      const existingProduct = this.dataToPopulate.sale_invoice_items[currentRowIndex].product;
+                      
+                      // Set the full product object instead of just the product_id
+                      if (existingProduct) {
+                        field.formControl.setValue(existingProduct); // Set full product object (not just product_id)
+                      }
+                    }
 
                     // ***Size dropdown will populate with available sizes when product in selected***
                     field.formControl.valueChanges.subscribe(selectedSizeId => {
@@ -950,7 +999,7 @@ export class SalesinvoiceComponent {
                     });
                   }
                 }
-              },
+              },     
               {
                 key: 'size',
                 type: 'select',
@@ -960,7 +1009,7 @@ export class SalesinvoiceComponent {
                   hideLabel: true,
                   dataLabel: 'size_name',
                   options: [],
-                  required: true,
+                  required: false,
                   lazy: {
                     lazyOneTime: true
                   }
@@ -972,6 +1021,15 @@ export class SalesinvoiceComponent {
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key;
 
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
+                        const existingSize = this.dataToPopulate.sale_invoice_items[currentRowIndex].size;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingSize && existingSize.size_id) {
+                          field.formControl.setValue(existingSize); // Set full product object (not just product_id)
+                        }
+                      }
                       // Subscribe to value changes when the form field changes
                       //**When Size is selected its overall  quantity will be shown in product info text area*/
                       field.formControl.valueChanges.subscribe(selectedProductId => {
@@ -1077,7 +1135,7 @@ export class SalesinvoiceComponent {
                   hideLabel: true,
                   dataLabel: 'color_name',
                   options: [],
-                  required: true,
+                  required: false,
                   lazy: {
                     lazyOneTime: true
                   }
@@ -1087,6 +1145,16 @@ export class SalesinvoiceComponent {
                     const parentArray = field.parent;
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key;
+
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
+                        const existingColor = this.dataToPopulate.sale_invoice_items[currentRowIndex].color;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingColor) {
+                          field.formControl.setValue(existingColor);
+                        }
+                      }
             
                       // Subscribe to value changes when the form field changes
                       field.formControl.valueChanges.subscribe(selectedProductId => {
@@ -1143,6 +1211,26 @@ export class SalesinvoiceComponent {
                   label: 'Code',
                   placeholder: 'Enter code',
                   hideLabel: true,
+                },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
+                        const existingCode = this.dataToPopulate.sale_invoice_items[currentRowIndex].product?.code;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingCode) {
+                          field.formControl.setValue(existingCode); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
                 }
               },
               {
@@ -1154,6 +1242,26 @@ export class SalesinvoiceComponent {
                   placeholder: 'Enter Total Boxes',
                   hideLabel: true
                 },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
+                        const existingBox = this.dataToPopulate.sale_invoice_items[currentRowIndex].total_boxes;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingBox) {
+                          field.formControl.setValue(existingBox); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }                
               },
               {
                 type: 'select',
@@ -1171,11 +1279,31 @@ export class SalesinvoiceComponent {
                     lazyOneTime: true
                   }
                 },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
+                        const existingUnit = this.dataToPopulate.sale_invoice_items[currentRowIndex].product.unit_options;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingUnit) {
+                          field.formControl.setValue(existingUnit.unit_options_id); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
               },
               {
                 type: 'input',
                 key: 'quantity',
-                defaultValue: 1,
+                //defaultValue: 1,
                 templateOptions: {
                   type: 'number',
                   label: 'Qty',
@@ -1186,6 +1314,24 @@ export class SalesinvoiceComponent {
                 },
                 hooks: {
                   onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
+                        const existingQuan = this.dataToPopulate.sale_invoice_items[currentRowIndex].quantity;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingQuan) {
+                          field.formControl.setValue(existingQuan); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+              
+                    // Subscribe to value changes
                     field.formControl.valueChanges.subscribe(data => {
                       if (field.form && field.form.controls && field.form.controls.rate && data) {
                         const rate = field.form.controls.rate.value;
@@ -1193,12 +1339,11 @@ export class SalesinvoiceComponent {
                         if (rate && quantity) {
                           field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity, 10));
                         }
-
                       }
-                    })
+                    });
                   },
                   onChanges: (field: any) => {
-
+                    // You can handle any changes here if needed
                   }
                 }
               },
@@ -1213,8 +1358,25 @@ export class SalesinvoiceComponent {
                 },
                 hooks: {
                   onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
+                        const existingPrice = this.dataToPopulate.sale_invoice_items[currentRowIndex].rate;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingPrice) {
+                          field.formControl.setValue(existingPrice); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                    
+                    // Subscribe to value changes to update amount
                     field.formControl.valueChanges.subscribe(data => {
-
                       if (field.form && field.form.controls && field.form.controls.quantity && data) {
                         const quantity = field.form.controls.quantity.value;
                         const rate = data;
@@ -1222,7 +1384,7 @@ export class SalesinvoiceComponent {
                           field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity));
                         }
                       }
-                    })
+                    });
                   }
                 }
               },
@@ -1237,11 +1399,26 @@ export class SalesinvoiceComponent {
                 },
                 hooks: {
                   onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
+                        const existingDisc = this.dataToPopulate.sale_invoice_items[currentRowIndex].discount;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingDisc) {
+                          field.formControl.setValue(existingDisc); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
                     field.formControl.valueChanges.subscribe(data => {
-                    })
+                      // Add any logic needed for when discount changes
+                    });
                   }
-                },
-                expressionProperties: {
                 }
               },
               {
@@ -1252,6 +1429,26 @@ export class SalesinvoiceComponent {
                   placeholder: 'Enter Product Print name',
                   hideLabel: true
                 },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
+                        const existingName = this.dataToPopulate.sale_invoice_items[currentRowIndex].print_name;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingName) {
+                          field.formControl.setValue(existingName); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
               },
               {
                 type: 'input',
@@ -1275,9 +1472,25 @@ export class SalesinvoiceComponent {
                 },
                 hooks: {
                   onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
+                        const existingAmount = this.dataToPopulate.sale_invoice_items[currentRowIndex].amount;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingAmount) {
+                          field.formControl.setValue(existingAmount); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
                     field.formControl.valueChanges.subscribe(data => {
                       this.totalAmountCal();
-                    })
+                    });
                   }
                 }
               },
@@ -1290,6 +1503,26 @@ export class SalesinvoiceComponent {
                   placeholder: 'Tax',
                   hideLabel: true
                 },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
+                        const existingtax = this.dataToPopulate.sale_invoice_items[currentRowIndex].tax;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingtax) {
+                          field.formControl.setValue(existingtax); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
               },
               {
                 type: 'input',
@@ -1299,8 +1532,27 @@ export class SalesinvoiceComponent {
                   placeholder: 'Enter Remarks',
                   hideLabel: true
                 },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
+                        const existingRemarks = this.dataToPopulate.sale_invoice_items[currentRowIndex].remarks;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingRemarks) {
+                          field.formControl.setValue(existingRemarks); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
               },
-
             ]
           },
         },
@@ -1326,6 +1578,13 @@ export class SalesinvoiceComponent {
                       templateOptions: {
                         label: 'Destination',
                         placeholder: 'Enter Destination',
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.destination && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.destination);
+                          }
+                        }
                       }
                     },
                     {
@@ -1335,6 +1594,13 @@ export class SalesinvoiceComponent {
                       templateOptions: {
                         label: 'Port of Landing',
                         placeholder: 'Enter Port of Landing',
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.port_of_landing && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.port_of_landing);
+                          }
+                        }
                       }
                     },
                     {
@@ -1352,6 +1618,13 @@ export class SalesinvoiceComponent {
                           lazyOneTime: true
                         }
                       },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.shipping_mode_id && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.shipping_mode_id);
+                          }
+                        }
+                      }
                     },
                     {
                       key: 'port_of_discharge',
@@ -1360,6 +1633,13 @@ export class SalesinvoiceComponent {
                       templateOptions: {
                         label: 'Port of Discharge',
                         placeholder: 'Select Port of Discharge',
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.port_of_discharge && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.port_of_discharge);
+                          }
+                        }
                       }
                     },
                     {
@@ -1376,6 +1656,13 @@ export class SalesinvoiceComponent {
                           url: 'masters/shipping_companies',
                           lazyOneTime: true
                         }
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.shipping_company_id && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.shipping_company_id);
+                          }
+                        }
                       }
                     },
                     {
@@ -1386,6 +1673,13 @@ export class SalesinvoiceComponent {
                         type: "number",
                         label: 'No. of Packets',
                         placeholder: 'Select No. of Packets',
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.no_of_packets && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.no_of_packets);
+                          }
+                        }
                       }
                     },
                     {
@@ -1396,6 +1690,13 @@ export class SalesinvoiceComponent {
                         type: "number",
                         label: 'Weight',
                         placeholder: 'Enter Weight',
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.weight && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.weight);
+                          }
+                        }
                       }
                     },
                     {
@@ -1411,7 +1712,7 @@ export class SalesinvoiceComponent {
                     {
                       key: 'shipping_date',
                       type: 'date',
-                      defaultValue: this.nowDate(),
+                      // defaultValue: this.nowDate(),
                       className: 'col-6',
                       templateOptions: {
                         type: 'date',
@@ -1425,8 +1726,16 @@ export class SalesinvoiceComponent {
                       className: 'col-6',
                       templateOptions: {
                         type: "number",
-                        label: 'Shipping Charges.',
+                        label: 'Shipping Charges',
                         placeholder: 'Enter Shipping Charges',
+                        // required: true
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.shipping_charges && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.shipping_charges);
+                          }
+                        }
                         // required: true
                       }
                     }
@@ -1460,6 +1769,13 @@ export class SalesinvoiceComponent {
                                 type: 'number',
                                 label: 'Total boxes',
                                 placeholder: 'Enter Total boxes',
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order && this.dataToPopulate.sale_invoice_order.total_boxes && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.total_boxes);
+                                  }
+                                }
                               }
                             },
                             {
@@ -1474,17 +1790,18 @@ export class SalesinvoiceComponent {
                               },
                               hooks: {
                                 onInit: (field: any) => {
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order && this.dataToPopulate.sale_invoice_order.cess_amount && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.cess_amount);
+                                  }
                                   field.formControl.valueChanges.subscribe(data => {
                                     this.totalAmountCal();
-
-                                  })
+                                  });
                                 }
                               }
                             },
                             {
                               key: 'advance_amount',
                               type: 'input',
-                              // defaultValue: "77777.00",
                               className: 'col-4',
                               templateOptions: {
                                 type: 'number',
@@ -1493,9 +1810,12 @@ export class SalesinvoiceComponent {
                               },
                               hooks: {
                                 onInit: (field: any) => {
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order && this.dataToPopulate.sale_invoice_order.advance_amount && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.advance_amount);
+                                  }
                                   field.formControl.valueChanges.subscribe(data => {
                                     this.totalAmountCal();
-                                  })
+                                  });
                                 }
                               }
                             },
@@ -1507,6 +1827,13 @@ export class SalesinvoiceComponent {
                                 type: 'input',
                                 label: 'Taxable',
                                 placeholder: 'Enter Taxable'
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order && this.dataToPopulate.sale_invoice_order.taxable && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.taxable);
+                                  }
+                                }
                               }
                             },
                             {
@@ -1521,13 +1848,15 @@ export class SalesinvoiceComponent {
                               },
                               hooks: {
                                 onInit: (field: any) => {
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order && this.dataToPopulate.sale_invoice_order.tax_amount && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.tax_amount);
+                                  }
                                   field.formControl.valueChanges.subscribe(data => {
                                     this.totalAmountCal();
-                                  })
+                                  });
                                 }
                               }
-                            },
-
+                            },                            
                             {
                               key: 'gst_type',
                               type: 'select',
@@ -1535,24 +1864,29 @@ export class SalesinvoiceComponent {
                               templateOptions: {
                                 label: 'Gst type',
                                 placeholder: 'Select Gst type',
-                                dataKey: 'name',
+                                dataKey: 'gst_type_id', // Assuming gst_type_id is the key you want to use
                                 dataLabel: "name",
                                 lazy: {
                                   url: 'masters/gst_types/',
                                   lazyOneTime: true
-                                }
+                                },
+                                // required: true // Uncomment if required
                               },
                               hooks: {
-                                onChanges: (field: any) => {
+                                onInit: (field: any) => {
                                   field.formControl.valueChanges.subscribe(data => {
-                                    console.log("gst_type", data);
                                     if (data && data.gst_type_id) {
                                       this.formConfig.model['sale_invoice_order']['gst_type_id'] = data.gst_type_id;
                                     }
                                   });
+                                  // Set the default value for Ledger Account if it exists
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.gst_type && field.formControl) {
+                                    const GstFiled = this.dataToPopulate.sale_invoice_order.gst_type
+                                    field.formControl.setValue(GstFiled);
+                                  }
                                 }
                               }
-                            },
+                            },                                                                                    
                             {
                               key: 'payment_term',
                               type: 'select',
@@ -1560,49 +1894,58 @@ export class SalesinvoiceComponent {
                               templateOptions: {
                                 label: 'Payment term',
                                 placeholder: 'Select Payment term',
-                                dataKey: 'name',
-                                dataLabel: "name",
+                                dataKey: 'payment_term_id', // Assuming payment_term_id is the key for the selected value
+                                dataLabel: 'name',
                                 lazy: {
                                   url: 'masters/customer_payment_terms/',
                                   lazyOneTime: true
-                                }
+                                },
                               },
                               hooks: {
-                                onChanges: (field: any) => {
+                                onInit: (field: any) => {
                                   field.formControl.valueChanges.subscribe(data => {
-                                    console.log("payment_term", data);
                                     if (data && data.payment_term_id) {
                                       this.formConfig.model['sale_invoice_order']['payment_term_id'] = data.payment_term_id;
                                     }
                                   });
+                                  // Set the default value for Ledger Account if it exists
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.payment_term && field.formControl) {
+                                    const PaymentField = this.dataToPopulate.sale_invoice_order.payment_term
+                                    field.formControl.setValue(PaymentField);
+                                  }
                                 }
                               }
-                            },
+                            },                            
                             {
                               key: 'ledger_account',
                               type: 'select',
                               className: 'col-4',
                               templateOptions: {
-                                dataKey: 'name',
-                                dataLabel: "name",
                                 label: 'Ledger account',
                                 placeholder: 'Select Ledger account',
+                                dataKey: 'ledger_account_id', // Assuming ledger_account_id is the key for the selected value
+                                dataLabel: 'name',
                                 lazy: {
                                   url: 'customers/ledger_accounts/',
                                   lazyOneTime: true
                                 }
                               },
                               hooks: {
-                                onChanges: (field: any) => {
+                                onInit: (field: any) => {                           
+                                  // Subscribe to value changes
                                   field.formControl.valueChanges.subscribe(data => {
-                                    console.log("ledger_account", data);
                                     if (data && data.ledger_account_id) {
-                                      this.formConfig.model['sale_invoice_order']['ledger_account_id'] = data.ledger_account_id;
+                                      this.formConfig.model['sale_invoice_order']['ledger_account_id'] = data.ledger_account_id; // Update the model with the selected ledger_account_id
                                     }
                                   });
+                                  // Set the default value for Ledger Account if it exists
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.ledger_account && field.formControl) {
+                                    const LedgerField = this.dataToPopulate.sale_invoice_order.ledger_account
+                                    field.formControl.setValue(LedgerField);
+                                  }
                                 }
                               }
-                            },
+                            },                            
                             {
                               key: 'order_status',
                               type: 'select',
@@ -1642,6 +1985,14 @@ export class SalesinvoiceComponent {
                                 placeholder: 'Enter Item value',
                                 readonly: true
                                 // required: true
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  // Set the initial value from dataToPopulate if available
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order && this.dataToPopulate.sale_invoice_order.item_value && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.item_value);
+                                  }
+                                }
                               }
                             },
                             {
@@ -1655,6 +2006,14 @@ export class SalesinvoiceComponent {
                                 placeholder: 'Enter Discount amount',
                                 readonly: true
                                 // required: true
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  // Set the initial value from dataToPopulate if available
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order && this.dataToPopulate.sale_invoice_order.dis_amt && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.dis_amt);
+                                  }
+                                }
                               }
                             },
                             {
@@ -1667,8 +2026,16 @@ export class SalesinvoiceComponent {
                                 label: 'Total amount',
                                 placeholder: 'Enter Total amount',
                                 readonly: true
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  // Set the initial value from dataToPopulate if available
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order && this.dataToPopulate.sale_invoice_order.total_amount && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.total_amount);
+                                  }
+                                }
                               }
-                            },
+                            }                            
                           ]
                         },
                       ]
@@ -1687,6 +2054,13 @@ export class SalesinvoiceComponent {
                           props: {
                             "displayStyle": "files",
                             "multiple": true
+                          },
+                          hooks: {
+                            onInit: (field: any) => {
+                              if (this.dataToPopulate && this.dataToPopulate.order_attachments && field.formControl) {
+                                field.formControl.setValue(this.dataToPopulate.order_attachments);
+                              }
+                            }
                           }
                         }
                       ]

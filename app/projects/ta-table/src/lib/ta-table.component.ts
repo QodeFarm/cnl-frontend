@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, Output, ViewChild, EventEmitter, ElementRef } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, Output, ViewChild, EventEmitter, ElementRef, TemplateRef  } from '@angular/core';
 import { getValue } from '@ta/ta-core';
 import { cloneDeep } from 'lodash';
 import {
@@ -51,6 +51,10 @@ export class TaTableComponent implements OnDestroy {
   @Input() options!: TaTableConfig;
   @Output() doAction: EventEmitter<any> = new EventEmitter();
   @ViewChild('taTable') taTable!: NzTableComponent<any> | any;
+  @Input() customProductTemplate!: TemplateRef<any>;
+  // selectedProducts: any[] = []; // This holds the selected products
+  // @Output() selectedProductsChange = new EventEmitter<any[]>(); // Event emitter to notify parent component
+  
 
   selectedStatus: string | null = null;
   selectedQuickPeriod: string | null = null;
@@ -513,7 +517,7 @@ export class TaTableComponent implements OnDestroy {
   ngOnDestroy() {
     this.actionObservable$.unsubscribe();
   }
-  // Additional code for handling action button events in the table(added this code for file upload)
+  // Additional code for handling action button events in the table(added this code for file upload)(start)
   performAction(action: any, row: any) {
     if (action && action.type === 'callBackFn' && typeof action.callBackFn === 'function') {
       action.callBackFn(row); // Execute the callback function with row data
@@ -522,6 +526,7 @@ export class TaTableComponent implements OnDestroy {
     // Optionally, emit the event to parent if needed
     this.doAction.emit({ action, row });
   }
+  
   // getFilters(){
   //   const filters = this.options.cols.filter((item: { searchValue: any; })=>{
   //     item.searchValue;

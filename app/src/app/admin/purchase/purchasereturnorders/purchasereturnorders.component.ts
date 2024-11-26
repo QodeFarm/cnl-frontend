@@ -1,10 +1,12 @@
-import { Component, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormComponent, TaFormConfig } from '@ta/ta-form';
 import { distinctUntilChanged } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { PurchasereturnordersListComponent } from './purchasereturnorders-list/purchasereturnorders-list.component';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FormBuilder } from '@angular/forms';
 import { ConstantPool } from '@angular/compiler';
 
 @Component({
@@ -26,13 +28,141 @@ export class PurchasereturnordersComponent {
     return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   }
 
-  constructor(private http: HttpClient) {}
+//=====================================================================
+  tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return', 'Purchase Order', 'Purchase Invoice', 'Purchase Return'];
+
+  // This will store available tables excluding the current one
+  availableTables: string[] = [];
+
+  // Selected table from dropdown
+  selectedTable: string;
+
+  // Variable to store current table name
+  currentTable: string = 'Purchase Return';
+
+  fieldMapping = {
+    'Sale Invoice': {
+      sourceModel: 'purchase_return_orders',  // Specify the source model
+      targetModel: 'sale_invoice_order', // Specify the target model
+      // Indicate nested fields with model mappings
+      nestedModels: {
+        purchase_return_items: 'sale_invoice_items',
+        order_attachments: 'order_attachments',
+        order_shipments: 'order_shipments'
+      }
+    },
+    'Sale Return': {
+      sourceModel: 'purchase_return_orders',  // Specify the source model
+      targetModel: 'sale_return_order',  // Specify the target model
+      // Nested mappings
+      nestedModels: {
+        purchase_return_items: 'sale_return_items',
+        order_attachments: 'order_attachments',
+        order_shipments: 'order_shipments'
+      }
+    },
+    'Sale Order': {
+      sourceModel: 'purchase_return_orders',
+      targetModel: 'sale_order',
+      nestedModels: {
+        purchase_return_items: 'sale_order_items',
+        order_attachments: 'order_attachments',
+        order_shipments: 'order_shipments'
+      }
+    },
+    'Purchase Invoice': {
+      sourceModel: 'purchase_return_orders',
+      targetModel: 'purchase_invoice_orders',
+      nestedModels: {
+        purchase_return_items: 'purchase_invoice_items',
+        order_attachments: 'order_attachments',
+        order_shipments: 'order_shipments'
+      }
+    },
+    'Purchase Order': {
+      sourceModel: 'purchase_return_orders',
+      targetModel: 'purchase_order_data',
+      nestedModels: {
+        purchase_return_items: 'purchase_order_items',
+        order_attachments: 'order_attachments',
+        order_shipments: 'order_shipments'
+      }
+    }
+  };
+
+  copyToTable() {
+    const selectedMapping = this.fieldMapping[this.selectedTable];
+    
+    if (!selectedMapping) {
+      console.error('Mapping not found for selected table:', this.selectedTable);
+      return;
+    }
+
+    const dataToCopy = this.formConfig.model[selectedMapping.sourceModel] || {};
+    const populatedData = { [selectedMapping.targetModel]: {} };
+
+    // Copy main fields
+    Object.keys(dataToCopy).forEach(field => {
+      populatedData[selectedMapping.targetModel][field] = dataToCopy[field];
+    });
+
+    // Copy nested models if they exist
+    if (selectedMapping.nestedModels) {
+      Object.keys(selectedMapping.nestedModels).forEach(sourceNestedModel => {
+        const targetNestedModel = selectedMapping.nestedModels[sourceNestedModel];
+        const nestedData = this.formConfig.model[sourceNestedModel] || [];
+        
+        populatedData[targetNestedModel] = Array.isArray(nestedData)
+          ? nestedData.map(item => ({ ...item }))
+          : { ...nestedData };
+      });
+    }
+
+    // Log and navigate to the target module with populated data
+    console.log('Populated Data:', populatedData);
+    
+    // Determine the target route based on the selected table
+    const targetRoute = 
+      this.selectedTable === 'Sale Invoice' ? 'sales/salesinvoice' :
+      this.selectedTable === 'Sale Return' ? 'sales/sale-returns' :
+      this.selectedTable === 'Sale Order' ? 'sales' :
+      this.selectedTable === 'Purchase Invoice' ? 'purchase/purchase-invoice' :
+      this.selectedTable === 'Purchase Order' ? 'purchase' :
+      null;
+
+    if (!targetRoute) {
+      console.error('No valid route for selected table:', this.selectedTable);
+      return;
+    }
+
+    this.router.navigate([`admin/${targetRoute}`], { state: { data: populatedData } });
+  }
+
+
+  // Initialize the copy modal options dynamically
+  openCopyModal() {
+    this.availableTables = this.tables.filter(table => table !== this.currentTable);
+  }
+
+  constructor(
+    private http: HttpClient,
+    private cdRef: ChangeDetectorRef,
+    private router: Router,
+    private route: ActivatedRoute,
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  dataToPopulate: any;
+  hasDataPopulated: boolean = false;
 
   ngOnInit() {
+
     this.showPurchaseReturnOrderList = false;
     this.showForm = false;
     this.PurchaseReturnOrderEditID = null;
     this.setFormConfig();
+    this.checkAndPopulateData(); 
 
     this.formConfig.model['purchase_return_orders']['order_type'] = 'purchase_return';
 
@@ -41,6 +171,59 @@ export class PurchasereturnordersComponent {
     // console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
   }
 
+  checkAndPopulateData() {
+    // Check if data has already been populated
+    if (this.dataToPopulate === undefined) {
+      console.log("Data status checking 1 : ", (this.dataToPopulate === undefined))
+      // Subscribe to route params and history state data
+      this.route.paramMap.subscribe(params => {
+        // Retrieve data from history only if it's the first time populating
+        this.dataToPopulate = history.state.data; 
+        console.log('Data retrieved:', this.dataToPopulate);
+        
+        // Populate the form only if data exists
+        if (this.dataToPopulate) {
+          // Ensure we are handling purchase_return_items correctly
+          const purchaseReturnItems = this.dataToPopulate.purchase_return_items || [];
+  
+          // Clear existing purchase_return_items to avoid duplicates
+          this.formConfig.model.purchase_return_items = [];
+  
+          // Populate form with data, ensuring unique entries
+          purchaseReturnItems.forEach(item => {
+            const populatedItem = {
+              product_id: item.product.product_id,
+              size: item.size,
+              color: item.color,
+              code: item.code,
+              unit: item.unit,
+              total_boxes: item.total_boxes,
+              quantity: item.quantity,
+              amount: item.amount,
+              rate: item.rate,
+              print_name: item.print_name,
+              discount: item.discount
+            };
+            this.formConfig.model.purchase_return_items.push(populatedItem);
+          });
+        }
+      });
+    } else {
+    // Detect if the page was refreshed
+      const wasPageRefreshed = window.performance?.navigation?.type === window.performance?.navigation?.TYPE_RELOAD;
+    
+      // Clear data if the page was refreshed
+      if (wasPageRefreshed) {
+        this.dataToPopulate = undefined;
+        console.log("Page was refreshed, clearing data.");
+        
+        // Ensure the history state is cleared to prevent repopulation
+        history.replaceState(null, '');
+        return; // Stop further execution as we don't want to repopulate the form
+      }
+    }
+  }  
+//=====================================================================
   formConfig: TaFormConfig = {};
 
   hide() {
@@ -150,6 +333,9 @@ export class PurchasereturnordersComponent {
                       this.formConfig.model['purchase_return_orders']['purchase_type_id'] = data.purchase_type_id;
                     }
                   });
+                  if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders.purchase_type && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.purchase_return_orders.purchase_type);
+                  }
                 }
               }
             },
@@ -186,6 +372,9 @@ export class PurchasereturnordersComponent {
                       field.form.controls.email.setValue(data.email)
                     }
                   });
+                  if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders.vendor && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.purchase_return_orders.vendor);
+                  }
                 }
               }
             },  
@@ -238,6 +427,13 @@ export class PurchasereturnordersComponent {
                 label: 'Ref No',
                 placeholder: 'Enter Ref No',
                 required: true
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders.ref_no && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.purchase_return_orders.ref_no);
+                  }
+                }
               }
             },
             {
@@ -277,6 +473,9 @@ export class PurchasereturnordersComponent {
               },
               hooks: {
                 onInit: (field: any) => {
+                  if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders.tax && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.purchase_return_orders.tax);
+                  }
                 }
               }
             },
@@ -288,6 +487,13 @@ export class PurchasereturnordersComponent {
                 type: 'input',
                 label: 'Remarks',
                 placeholder: 'Enter Remarks',
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders.remarks && field.formControl) {
+                    field.formControl.setValue(this.dataToPopulate.purchase_return_orders.remarks);
+                  }
+                }
               }
             },
             {
@@ -394,6 +600,16 @@ export class PurchasereturnordersComponent {
                   // Check if parentArray exists and proceed
                   if (parentArray) {
                     const currentRowIndex = +parentArray.key; // Simplified number conversion
+
+                    // Check if there is a product already selected in this row (when data is copied)
+                    if (this.dataToPopulate && this.dataToPopulate.purchase_return_items.length > currentRowIndex) {
+                      const existingProduct = this.dataToPopulate.purchase_return_items[currentRowIndex].product;
+                      
+                      // Set the full product object instead of just the product_id
+                      if (existingProduct) {
+                        field.formControl.setValue(existingProduct); // Set full product object (not just product_id)
+                      }
+                    }
 
                     // ***Size dropdown will populate with available sizes when product in selected***
                     field.formControl.valueChanges.subscribe(selectedSizeId => {
@@ -516,8 +732,15 @@ export class PurchasereturnordersComponent {
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key;
 
-
-                      console.log('currentRowIndex :', currentRowIndex)
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_return_items.length > currentRowIndex) {
+                        const existingSize = this.dataToPopulate.purchase_return_items[currentRowIndex].size;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingSize && existingSize.size_id) {
+                          field.formControl.setValue(existingSize); // Set full product object (not just product_id)
+                        }
+                      }
 
                       // Subscribe to value changes when the form field changes
                       //**When Size is selected its overall  quantity will be shown in product info text area*/
@@ -635,6 +858,16 @@ export class PurchasereturnordersComponent {
                     const parentArray = field.parent;
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key;
+
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_return_items.length > currentRowIndex) {
+                        const existingColor = this.dataToPopulate.purchase_return_items[currentRowIndex].color;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingColor) {
+                          field.formControl.setValue(existingColor);
+                        }
+                      }
             
                       // Subscribe to value changes when the form field changes
                       field.formControl.valueChanges.subscribe(selectedProductId => {
@@ -694,8 +927,25 @@ export class PurchasereturnordersComponent {
                   hideLabel: true,
                   // // required: true
                 },
-                expressionProperties: {
-                  // 'templateOptions.disabled': (model) => (model.item && model.item.sale_price) ? false : true
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_return_items.length > currentRowIndex) {
+                        const existingCode = this.dataToPopulate.purchase_return_items[currentRowIndex].product?.code;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingCode) {
+                          field.formControl.setValue(existingCode); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
                 }
               },
               {
@@ -709,6 +959,26 @@ export class PurchasereturnordersComponent {
                   hideLabel: true,
                   // // required: true
                 },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_return_items.length > currentRowIndex) {
+                        const existingBox = this.dataToPopulate.purchase_return_items[currentRowIndex].total_boxes;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingBox) {
+                          field.formControl.setValue(existingBox); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
               },
               {
                 type: 'select',
@@ -726,12 +996,32 @@ export class PurchasereturnordersComponent {
                     lazyOneTime: true
                   }
                 },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_return_items.length > currentRowIndex) {
+                        const existingUnit = this.dataToPopulate.purchase_return_items[currentRowIndex].product.unit_options;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingUnit) {
+                          field.formControl.setValue(existingUnit.unit_options_id); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
               },
               // quantity amount rate dsc
               {
                 type: 'input',
                 key: 'quantity',
-                defaultValue: 1,
+                //defaultValue: 1,
                 templateOptions: {
                   type: 'number',
                   label: 'Qty',
@@ -742,21 +1032,36 @@ export class PurchasereturnordersComponent {
                 },
                 hooks: {
                   onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_return_items.length > currentRowIndex) {
+                        const existingQuan = this.dataToPopulate.purchase_return_items[currentRowIndex].quantity;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingQuan) {
+                          field.formControl.setValue(existingQuan); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+              
+                    // Subscribe to value changes
                     field.formControl.valueChanges.subscribe(data => {
-                      // this.formConfig.model['productQuantity'] = data;
-
                       if (field.form && field.form.controls && field.form.controls.rate && data) {
                         const rate = field.form.controls.rate.value;
                         const quantity = data;
                         if (rate && quantity) {
                           field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity));
                         }
-
                       }
-                    })
+                    });
                   },
                   onChanges: (field: any) => {
-
+                    // You can handle any changes here if needed
                   }
                 }
               },
@@ -775,18 +1080,33 @@ export class PurchasereturnordersComponent {
                 },
                 hooks: {
                   onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_return_items.length > currentRowIndex) {
+                        const existingPrice = this.dataToPopulate.purchase_return_items[currentRowIndex].rate;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingPrice) {
+                          field.formControl.setValue(existingPrice); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                    
+                    // Subscribe to value changes to update amount
                     field.formControl.valueChanges.subscribe(data => {
-                      // this.formConfig.model['productQuantity'] = data;
-
                       if (field.form && field.form.controls && field.form.controls.quantity && data) {
                         const quantity = field.form.controls.quantity.value;
                         const rate = data;
                         if (rate && quantity) {
                           field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity));
                         }
-                        // this.totalAmountCal();
                       }
-                    })
+                    });
                   }
                 }
               },
@@ -803,15 +1123,27 @@ export class PurchasereturnordersComponent {
                 },
                 hooks: {
                   onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_return_items.length > currentRowIndex) {
+                        const existingDisc = this.dataToPopulate.purchase_return_items[currentRowIndex].discount;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingDisc) {
+                          field.formControl.setValue(existingDisc); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
                     field.formControl.valueChanges.subscribe(data => {
-                      // this.totalAmountCal();
-                      // this.formConfig.model['productDiscount'] = data;
-                    })
+                      // Add any logic needed for when discount changes
+                    });
                   }
                 },
-                expressionProperties: {
-                  // 'templateOption6s.disabled': (model) => (model.item && model.item.sale_price) ? false : true
-                }
               },
               {
                 type: 'input',
@@ -824,6 +1156,26 @@ export class PurchasereturnordersComponent {
                   // type: 'number',
                   // // required: true mrp tax 
                 },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_return_items.length > currentRowIndex) {
+                        const existingName = this.dataToPopulate.purchase_return_items[currentRowIndex].print_name;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingName) {
+                          field.formControl.setValue(existingName); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
               },
               {
                 type: 'input',
@@ -852,18 +1204,26 @@ export class PurchasereturnordersComponent {
                 },
                 hooks: {
                   onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_return_items.length > currentRowIndex) {
+                        const existingAmount = this.dataToPopulate.purchase_return_items[currentRowIndex].amount;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingAmount) {
+                          field.formControl.setValue(existingAmount); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
                     field.formControl.valueChanges.subscribe(data => {
                       this.totalAmountCal();
-                      // this.formConfig.model['productDiscount'] = data;
-                    })
+                    });
                   }
-                  // onInit: (field: any) => {
-                  //   field.form.get('quantity').valueChanges.pipe(
-                  //     distinctUntilChanged()
-                  //   ).subscribe((data: any) => {
-                  //     this.totalAmountCal();
-                  //   });
-                  // }
                 }
               },
               {
@@ -878,6 +1238,26 @@ export class PurchasereturnordersComponent {
                   // type: 'number',
                   // // required: true mrp tax 
                 },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_return_items.length > currentRowIndex) {
+                        const existingtax = this.dataToPopulate.purchase_return_items[currentRowIndex].tax;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingtax) {
+                          field.formControl.setValue(existingtax); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
               },
               {
                 type: 'input',
@@ -890,6 +1270,26 @@ export class PurchasereturnordersComponent {
                   // type: 'number',
                   // // required: true mrp tax 
                 },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_return_items.length > currentRowIndex) {
+                        const existingRemarks = this.dataToPopulate.purchase_return_items[currentRowIndex].remarks;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingRemarks) {
+                          field.formControl.setValue(existingRemarks); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
               },
             ]
           },
@@ -915,6 +1315,13 @@ export class PurchasereturnordersComponent {
                       templateOptions: {
                         label: 'Destination',
                         placeholder: 'Enter Destination',
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.destination && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.destination);
+                          }
+                        }
                       }
                     },
                     {
@@ -924,6 +1331,13 @@ export class PurchasereturnordersComponent {
                       templateOptions: {
                         label: 'Port of Landing',
                         placeholder: 'Enter Port of Landing',
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.port_of_landing && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.port_of_landing);
+                          }
+                        }
                       }
                     },
                     {
@@ -942,6 +1356,13 @@ export class PurchasereturnordersComponent {
                           lazyOneTime: true
                         }
                       },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.shipping_mode_id && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.shipping_mode_id);
+                          }
+                        }
+                      }
                     },
                     {
                       key: 'port_of_discharge',
@@ -950,6 +1371,13 @@ export class PurchasereturnordersComponent {
                       templateOptions: {
                         label: 'Port of Discharge',
                         placeholder: 'Select Port of Discharge',
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.port_of_discharge && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.port_of_discharge);
+                          }
+                        }
                       }
                     },
                     {
@@ -967,6 +1395,13 @@ export class PurchasereturnordersComponent {
                           url: 'masters/shipping_companies',
                           lazyOneTime: true
                         }
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.shipping_company_id && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.shipping_company_id);
+                          }
+                        }
                       }
                     },
                     {
@@ -977,6 +1412,13 @@ export class PurchasereturnordersComponent {
                         label: 'No. of Packets',
                         placeholder: 'Select No. of Packets',
                         type: 'number'
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.no_of_packets && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.no_of_packets);
+                          }
+                        }
                       }
                     },
                     {
@@ -987,6 +1429,13 @@ export class PurchasereturnordersComponent {
                         label: 'Weight',
                         placeholder: 'Enter Weight',
                         type: 'number'
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.weight && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.weight);
+                          }
+                        }
                       }
                     },
                     {
@@ -996,7 +1445,7 @@ export class PurchasereturnordersComponent {
                       templateOptions: {
                         label: 'Shipping Tracking No.',
                         placeholder: 'Enter Shipping Tracking No.',
-                        disabled: true
+                        // disabled: true
                       }
                     },
                     {
@@ -1016,6 +1465,14 @@ export class PurchasereturnordersComponent {
                       templateOptions: {
                         label: 'Shipping Charges.',
                         placeholder: 'Enter Shipping Charges',
+                        // required: true
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.shipping_charges && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.shipping_charges);
+                          }
+                        }
                         // required: true
                       }
                     },
@@ -1063,6 +1520,11 @@ export class PurchasereturnordersComponent {
                               this.formConfig.model['purchase_return_orders']['gst_type_id'] = data.gst_type_id;
                             }
                           });
+                          // Set the default value for Ledger Account if it exists
+                          if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders.gst_type && field.formControl) {
+                            const GstFiled = this.dataToPopulate.purchase_return_orders.gst_type
+                            field.formControl.setValue(GstFiled);
+                          }
                         }
                       }
                     },
@@ -1086,6 +1548,11 @@ export class PurchasereturnordersComponent {
                               this.formConfig.model['purchase_return_orders']['payment_term_id'] = data.payment_term_id;
                             }
                           });
+                          // Set the default value for Ledger Account if it exists
+                          if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders.payment_term && field.formControl) {
+                            const PaymentField = this.dataToPopulate.purchase_return_orders.payment_term
+                            field.formControl.setValue(PaymentField);
+                          }
                         }
                       }
                     },
@@ -1141,12 +1608,13 @@ export class PurchasereturnordersComponent {
                       },
                       hooks: {
                         onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders && this.dataToPopulate.purchase_return_orders.cess_amount && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.purchase_return_orders.cess_amount);
+                          }
                           field.formControl.valueChanges.subscribe(data => {
                             this.totalAmountCal();
-                            // this.formConfig.model['productDiscount'] = data;
+
                           })
-                        },
-                        onChanges: (field: any) => {
                         }
                       }
                     },
@@ -1158,40 +1626,15 @@ export class PurchasereturnordersComponent {
                         type: 'input',
                         label: 'Taxable',
                         placeholder: 'Enter Taxable',
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders && this.dataToPopulate.purchase_return_orders.taxable && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.purchase_return_orders.taxable);
+                          }
+                        }
                       }
                     },
-                    // {
-                    //   key: 'transport_charges',
-                    //   type: 'input',
-                    //   className: 'col-4',
-                    //   templateOptions: {
-                    //     type: 'input',
-                    //     label: 'Transport Charges',
-                    //     placeholder: 'Enter Transport Charges',
-                    //   }
-                    // },
-                    // {
-                    //   key: 'round_off',
-                    //   type: 'input',
-                    //   className: 'col-4',
-                    //   templateOptions: {
-                    //     type: 'input',
-                    //     label: 'Round Off',
-                    //     placeholder: 'Enter Round Off',
-                    //   }
-                    // },
-                    // {
-                    //   type: 'input',
-                    //   key: 'print_name',
-                    //   // defaultValue: 1000,
-                    //   templateOptions: {
-                    //     label: 'Print name',
-                    //     placeholder: 'Enter Product Print name',
-                    //     hideLabel: true,
-                    //     // type: 'number',
-                    //     // // required: true mrp tax 
-                    //   },
-                    // },
                     {
                       key: 'tax_amount',
                       type: 'input',
@@ -1205,12 +1648,12 @@ export class PurchasereturnordersComponent {
                       },
                       hooks: {
                         onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders && this.dataToPopulate.purchase_return_orders.tax_amount && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.purchase_return_orders.tax_amount);
+                          }
                           field.formControl.valueChanges.subscribe(data => {
                             this.totalAmountCal();
-                            // this.formConfig.model['productDiscount'] = data;
                           })
-                        },
-                        onChanges: (field: any) => {
                         }
                       }
                     },
@@ -1227,6 +1670,10 @@ export class PurchasereturnordersComponent {
                       },
                       hooks: {
                         onInit: (field: any) => {
+                          // Set the initial value from dataToPopulate if available
+                          if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders && this.dataToPopulate.purchase_return_orders.item_value && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.purchase_return_orders.item_value);
+                          }
                         }
                       }
                     },
@@ -1243,6 +1690,10 @@ export class PurchasereturnordersComponent {
                       },
                       hooks: {
                         onInit: (field: any) => {
+                          // Set the initial value from dataToPopulate if available
+                          if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders && this.dataToPopulate.purchase_return_orders.dis_amt && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.purchase_return_orders.dis_amt);
+                          }
                         }
                       }
                     },
@@ -1256,6 +1707,14 @@ export class PurchasereturnordersComponent {
                         label: 'Total amount',
                         placeholder: 'Enter Total amount',
                         readonly: true
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          // Set the initial value from dataToPopulate if available
+                          if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders && this.dataToPopulate.purchase_return_orders.total_amount && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.purchase_return_orders.total_amount);
+                          }
+                        }
                       }
                     },
                   ]
@@ -1276,8 +1735,15 @@ export class PurchasereturnordersComponent {
                   props: {
                     "displayStyle": "files",
                     "multiple": true
+                  },
+                  hooks: {
+                    onInit: (field: any) => {
+                      if (this.dataToPopulate && this.dataToPopulate.order_attachments && field.formControl) {
+                        field.formControl.setValue(this.dataToPopulate.order_attachments);
+                      }
+                    }
                   }
-                },
+                }
               ]
             }
           ]

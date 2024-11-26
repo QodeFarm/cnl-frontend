@@ -249,18 +249,38 @@
                     <div class="custom-menu-card">
                         <h6 class="custom-sub-heading">HRMS Data</h6>
                         <ul class="master-menu-list">
-                            <li><a [routerLink]="['/admin/master/departments']">Departments</a></li>
+                            <li><a [routerLink]="['/admin/master/job-types']">Job Types</a></li>
                             <li><a [routerLink]="['/admin/master/designations']">Designations</a></li>
+                            <li><a [routerLink]="['/admin/master/job-codes']">Job Codes</a></li>
+                            <li><a [routerLink]="['/admin/master/departments']">Departments</a></li>
+                            <li><a [routerLink]="['/admin/master/shifts']">Shifts</a></li>
+                            <li><a [routerLink]="['/admin/master/salary-components']">Salary Components</a></li>
+                            <li><a [routerLink]="['/admin/master/leave-types']">Leave Types</a></li>
                         </ul>
                     </div>
                 </div>
                 <div class="col-md-9">
                     <ng-container [ngSwitch]="code">
-                        <ng-container *ngSwitchCase="'departments'">
-                            <app-departments></app-departments>
+                        <ng-container *ngSwitchCase="'job-types'">
+                            <app-job-types></app-job-types>
                         </ng-container>
                         <ng-container *ngSwitchCase="'designations'">
                             <app-designations></app-designations>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'job-codes'">
+                            <app-job-codes></app-job-codes>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'departments'">
+                            <app-departments></app-departments>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'shifts'">
+                            <app-shifts></app-shifts>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'salary-components'">
+                            <app-salary-components></app-salary-components>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'leave-types'">
+                            <app-leave-types></app-leave-types>
                         </ng-container>
                     </ng-container>
 

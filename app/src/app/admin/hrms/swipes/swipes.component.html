@@ -1,0 +1,39 @@
+<div class="container-fluid pt-3">
+    <div class="swipes-banner">
+        <div class="col-12 px-0" style="display: flex; justify-content: space-between;align-items: center;">
+            <button type="button" class="btn pl-0" >
+                <span *ngIf="SwipesEditID" class="custom-heading">Update Swipes</span>
+                <span *ngIf="!SwipesEditID" class="custom-heading">Create Swipes</span>
+            </button>
+            <button (click)="showSwipesListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                Swipes List
+            </button>
+        </div>
+    </div>
+    <div class="row custom-form">
+        <div class="col-12 px-1" *ngIf="showForm">
+            <ta-form [options]="formConfig"></ta-form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Swipes Modal -->
+
+<div class="modal fade custom-modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Swipes List</h5>
+                <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" *ngIf="showSwipesList">
+                <app-swipes-list (edit)="editSwipes($event)" class="custom-list"></app-swipes-list>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,11 +1,19 @@
-<div class="container-fluid pt-3">
-    <div class="row">
-      <div class="col-12 px-2 py-1">
-        <!-- Use ta-curd-modal with dynamic configuration from curdConfig -->
-        <ta-curd-modal [options]="curdConfig" class="custom-list"></ta-curd-modal>
+<ta-curd-modal 
+    [options]="curdConfig" 
+    [customProductTemplate]="customProductTemplate"
+    class="custom-list">
+</ta-curd-modal>
+
+<!-- Define Custom Product Template for displaying product details without checkboxes -->
+<ng-template #customProductTemplate let-row>
+    <ng-container *ngIf="row.products && row.products.length > 0; else noProducts">
+      <div *ngFor="let product of row.products" style="display: flex; align-items: center;">
+        {{ product.product_name }} (Qty: {{ product.quantity }})
       </div>
-    </div>
-  </div>
+    </ng-container>
+    <ng-template #noProducts>No products available</ng-template>
+</ng-template>
+
   
   <!-- Confirmation Modal -->
   <div *ngIf="showModal" class="custom-dialog-overlay">

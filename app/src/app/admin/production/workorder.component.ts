@@ -4,6 +4,7 @@ import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule, DatePipe, formatDate } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { WorkOrderListComponent } from './work-order-list/work-order-list.component';
+import { TaCurdConfig } from '@ta/ta-curd';
 
 
 @Component({
@@ -38,7 +39,7 @@ export class WorkorderComponent implements OnInit {
 
   hideFields(hide: boolean): void {
     // Array of indexes to hide or show
-    const fieldsToToggle = [5, 4, 9];
+    const fieldsToToggle = [5, 6, 4, 9];
   
     // Loop through the array and toggle the `hide` property based on the argument
     fieldsToToggle.forEach(index => {
@@ -54,12 +55,14 @@ export class WorkorderComponent implements OnInit {
   }
 
   editWorkorder(event: any) {
+    this.showCreateBomButton = false
     this.hideFields(false); // Shows fields at indexes 5, 4, and 9
     console.log('event', event);
     this.WorkOrdrEditID = event;
     this.http.get('production/work_order/' + event).subscribe((res: any) => {
       if (res) {
         this.formConfig.model = res.data;
+        this.formConfig.model.work_order['completed_qty'] = 0
         this.formConfig.showActionBtn = true;
         // Set labels for update
         this.formConfig.pkId = 'work_order_id';
@@ -175,20 +178,20 @@ createBom(){
       this.formConfig.model.bom
   }
 
-  // this.http.post('production/bom/', json_data)
-  // .subscribe({
-  //   next: (response) => {
-  //     this.showCreateBomButton = true;  // Ensure the button is still visible
-  //     this.isBomButtonDisabled = true;  // Disable the button after success
-  //     alert('BOM created successfully!');
-  //   },
-  //   error: (error) => {
-  //     console.error('Error creating BOM:', error);
-  //     this.showCreateBomButton = true;  // Ensure the button is still visible
-  //     this.isBomButtonDisabled = false; // Keep the button enabled if there's an error
-  //     alert('Error creating BOM. Main Product and Bill of material should be selected.');
-  //   }
-  // });
+  this.http.post('production/bom/', json_data)
+  .subscribe({
+    next: (response) => {
+      this.showCreateBomButton = true;  // Ensure the button is still visible
+      this.isBomButtonDisabled = true;  // Disable the button after success
+      alert('BOM created successfully!');
+    },
+    error: (error) => {
+      console.error('Error creating BOM:', error);
+      this.showCreateBomButton = true;  // Ensure the button is still visible
+      this.isBomButtonDisabled = false; // Keep the button enabled if there's an error
+      alert('Error creating BOM. Main Product and Bill of material should be selected.');
+    }
+  });
 
 };
 
@@ -262,6 +265,47 @@ updateInventory() {
       console.log('NO variations . it is Direct Product ***')
     }
   });
+}
+
+curdConfig: TaCurdConfig = {
+  drawerSize: 500,
+  drawerPlacement: 'top',
+  tableConfig: {
+    apiUrl: 'products/colors/',
+    // title: 'Color',
+    pageSize: 10,
+  },
+  formConfig: {
+    url: 'products/colors/',
+    title: 'BOM',
+    pkId: "bom_id",
+    exParams: [],
+    fields: [{
+      fieldGroupClassName: "row",
+      fieldGroup: [
+        {
+        key: 'bom_name',
+        type: 'input',
+        className: '',
+        templateOptions: {
+          label: 'BOM Name',
+          placeholder: 'Enter BOM Name',
+          required: true,
+        }
+      },
+      {
+        key: 'notes',
+        type: 'textarea',
+        className: '',
+        templateOptions: {
+          label: 'Notes',
+          placeholder: 'Enter Notes',
+          required: true,
+        }
+      }
+    ]
+    }]
+  }
 }
 
   setFormConfig() {

@@ -22,7 +22,8 @@ export class SalesDispatchComponent implements OnInit {
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
-    this.isLoading = false; // Set loading to false once initialized
+    this.isLoading = true; // Set loading to false once initialized
+    this.getCurdConfig()
   }
 
   // Helper function to initialize curdConfig
@@ -77,20 +78,20 @@ export class SalesDispatchComponent implements OnInit {
       },
       formConfig: {
         url: 'sales/SaleOrder/{saleOrderId}/move_next_stage/',
-        title: 'Sales Dispatch Confirmation',
-        pkId: "sale_order_id",
-        exParams: [],
-        fields: [
-          {
-            key: 'sale_order_id',
-            type: 'text',
-          },
-          {
-            key: 'confirmation',
-            type: 'select',
-            defaultValue: 'yes'
-          }
-        ]
+        // title: 'Sales Dispatch Confirmation',
+        // pkId: "sale_order_id",
+        // exParams: [],
+        // fields: [
+        //   {
+        //     key: 'sale_order_id',
+        //     type: 'text',
+        //   },
+        //   {
+        //     key: 'confirmation',
+        //     type: 'select',
+        //     defaultValue: 'yes'
+        //   }
+        // ]
       }
     };
   }
@@ -125,6 +126,7 @@ export class SalesDispatchComponent implements OnInit {
         }
       );
     }
+    this.ngOnInit()
   }
 
   // Refresh the curdConfig object to reload the data in ta-curd-modal

@@ -13,24 +13,31 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 export class EmployeeListComponent {
 
-
+  
   @Output('edit') edit = new EventEmitter<void>();
 
   tableConfig: TaTableConfig = {
-    apiUrl: 'hrms/employees/',
+    apiUrl: 'hrms/employee/',
     // title: 'Edit Sales Order List',
     showCheckbox:true,
     pkId: "employee_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['name','email','phone','department_id','designation_id']
+      keys: ['first_name','last_name','email','phone','address','hire_date','job_type_id','designation_id','job_code_id','department_id','shift_id']
     },
     cols: [
       {
-        fieldKey: 'name',
+        fieldKey: 'first_name',
         name: 'Name',
-        sort: true
-      },
+        sort: true,
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          // Safely access and concatenate first_name and last_name
+          const firstName = row?.first_name || '';
+          const lastName = row?.last_name || '';
+          return `${firstName} ${lastName}`.trim();
+        },
+      }, 
       {
         fieldKey: 'email',
         name: 'Email',
@@ -42,11 +49,21 @@ export class EmployeeListComponent {
         sort: true
       },
       {
-        fieldKey: 'department_id',
-        name: 'Department',
+        fieldKey: 'address',
+        name: 'Address',
+        sort: true
+      },
+      {
+        fieldKey: 'hire_date',
+        name: 'Hire Date',
+        sort: true
+      },
+      {
+        fieldKey: 'job_type_id',
+        name: 'Job Type',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.department.department_name}`;
+          return `${row.job_type.job_type_name}`;
         },
         sort: true
       },
@@ -60,6 +77,24 @@ export class EmployeeListComponent {
         sort: true
       },
       {
+        fieldKey: 'department_id',
+        name: 'Department',
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          return `${row.department.department_name}`;
+        },
+        sort: true
+      },
+      {
+        fieldKey: 'shift_id',
+        name: 'Shift',
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          return `${row.shift.shift_name}`;
+        },
+        sort: true
+      },
+      {
         fieldKey: "code",
         name: "Action",
         type: 'action',
@@ -69,7 +104,7 @@ export class EmployeeListComponent {
             label: 'Delete',
             // confirm: true,
             // confirmMsg: "Sure to delete?",
-            apiUrl: 'hrms/employees'
+            apiUrl: 'hrms/employee'
           },
           {
             type: 'callBackFn',
