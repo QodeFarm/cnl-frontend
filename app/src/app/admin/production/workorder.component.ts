@@ -170,7 +170,6 @@ createBom(){
   const json_data = {
     'bom' : {
         "bom_name": "Created from Work Order",
-        "quantity": this.formConfig.model.work_order.quantity,
         "notes": `This BOM Created from WorkOrder on ${formatDate(now, 'dd-MM-yyyy HH:mm', 'en-US')}`,
         "product_id": this.formConfig.model.work_order.product_id
     },
