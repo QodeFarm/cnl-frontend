@@ -125,20 +125,6 @@ export class BomComponent {
               }
             },
             {
-              key: 'quantity',
-              type: 'input',
-              className: 'col-3',
-              templateOptions: {
-                type: 'input',
-                label: 'Quantity',
-                placeholder: 'Enter Quantity',
-                required: true
-              },
-              hooks: {
-                onInit: (field: any) => {}
-              }
-            },
-            {
               key: 'notes',
               type: 'textarea',
               className: 'col-3',

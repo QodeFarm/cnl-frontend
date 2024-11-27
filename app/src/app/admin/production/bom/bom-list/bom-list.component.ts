@@ -49,11 +49,6 @@ export class BomListComponent {
         sort: true
       },
       {
-        fieldKey: 'quantity',
-        name: 'Quantity',
-        sort: true
-      },
-      {
         fieldKey: 'notes',
         name: 'Notes',
         sort: true
