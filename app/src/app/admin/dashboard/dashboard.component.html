@@ -1,52 +1,97 @@
 <!-- Begin Page Content -->
 <div class="container-fluid pt-3">
     <div class="row">
-        <div class="dashboard-card px-1 h-100">
+        <div class="dashboard-card px-1 h-100" (click)="openSalesModal()">
             <div class="dashboard-card-body">
-                    <div class="dashboard-card-head">Sales</div>
-                    <div class="dashboard-card-content">
-                        <h5>10.5K</h5>
-                        <p>5% from last week</p>
-                    </div>
+                <div class="dashboard-card-head">Sales</div>
+                <div class="dashboard-card-content">
+                    <h5>10.5K</h5>
+                    <p>5% from last week</p>
+                </div>
             </div>
         </div>
-        <div class="dashboard-card px-1 h-100">
+        <div class="dashboard-card px-1 h-100" (click)="openPurchaseModal()">
             <div class="dashboard-card-body">
-                    <div class="dashboard-card-head">Purchase</div>
-                    <div class="dashboard-card-content">
-                        <h5>10.5K</h5>
-                        <p>5% from last week</p>
-                    </div>
+                <div class="dashboard-card-head">Purchase</div>
+                <div class="dashboard-card-content">
+                    <h5>10.5K</h5>
+                    <p>5% from last week</p>
+                </div>
             </div>
         </div>
-        <div class="dashboard-card px-1 h-100">
+        <div class="dashboard-card px-1 h-100" (click)="openReceivablesModal()">
             <div class="dashboard-card-body">
-                    <div class="dashboard-card-head">Receivables</div>
-                    <div class="dashboard-card-content">
-                        <h5>10.5K</h5>
-                        <p>5% from last week</p>
-                    </div>
+                <div class="dashboard-card-head">Receivables</div>
+                <div class="dashboard-card-content">
+                    <h5>10.5K</h5>
+                    <p>5% from last week</p>
+                </div>
             </div>
         </div>
-        <div class="dashboard-card px-1 h-100">
+        <div class="dashboard-card px-1 h-100" (click)="openPayablesModal()">
             <div class="dashboard-card-body">
-                    <div class="dashboard-card-head">Payables</div>
-                    <div class="dashboard-card-content">
-                        <h5>10.5K</h5>
-                        <p>5% from last week</p>
-                    </div>
+                <div class="dashboard-card-head">Payables</div>
+                <div class="dashboard-card-content">
+                    <h5>10.5K</h5>
+                    <p>5% from last week</p>
+                </div>
             </div>
         </div>
-        <div class="dashboard-card px-1 h-100">
+        <div class="dashboard-card px-1 h-100" (click)="openLiquidityModal()">
             <div class="dashboard-card-body">
-                    <div class="dashboard-card-head">cash/ Bank</div>
-                    <div class="dashboard-card-content">
-                        <h5>10.5K</h5>
-                        <p>5% from last week</p>
-                    </div>
+                <div class="dashboard-card-head">cash/ Bank</div>
+                <div class="dashboard-card-content">
+                    <h5>10.5K</h5>
+                    <p>5% from last week</p>
+                </div>
             </div>
         </div>
     </div>
 
 </div>
 <!-- /.container-fluid -->
+
+<!-- Sales Modal -->
+<div *ngIf="isSalesModalOpen" id="salesModal" class="sales-modal">
+    <div class="sales-modal-content">
+        <span class="close" (click)="closeSalesModal()">&times;</span>
+        <p>Sales Over the Last 6 Months</p>
+        <canvas #salesChartCanvas></canvas>
+    </div>
+</div>
+
+<!-- Purchase Modal -->
+<div *ngIf="isPurchaseModalOpen" id="purchaseModal" class="purchase-modal">
+    <div class="purchase-modal-content">
+        <span class="close" (click)="closePurchaseModal()">&times;</span>
+        <p>Purchase Over the Last 6 Months</p>
+        <canvas #purchaseChartCanvas></canvas>
+    </div>
+</div>
+
+<!-- Receivables Modal -->
+<div *ngIf="isReceivablesModalOpen" id="receivablesModal" class="receivables-modal">
+    <div class="receivables-modal-content">
+        <span class="close" (click)="closeReceivablesModal()">&times;</span>
+        <p>Receivables Breakdown</p>
+        <canvas #receivablesChartCanvas></canvas>
+    </div>
+</div>
+
+<!-- Payables Modal -->
+<div *ngIf="isPayablesModalOpen" id="PayablesModal" class="payables-modal">
+    <div class="payables-modal-content">
+        <span class="close" (click)="closePayablesModal()">&times;</span>
+        <p>Payables Breakdown</p>
+        <canvas #payablesChartCanvas></canvas>
+    </div>
+</div>
+
+<!-- liquidity Modal -->
+<div *ngIf="isLiquidityModelOpen" id="LiquidityModal" class="liquidity-modal">
+    <div class="liquidity-modal-content">
+        <span class="close" (click)="closeLiquidityModal()">&times;</span>
+        <p>liquidity In the Banks</p>
+        <canvas #liquidityChartCanvas></canvas>
+    </div>
+</div>
