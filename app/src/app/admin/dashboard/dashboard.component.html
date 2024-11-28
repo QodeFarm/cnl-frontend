@@ -19,7 +19,7 @@
                     </div>
             </div>
         </div>
-        <div class="dashboard-card px-1 h-100">
+        <div class="dashboard-card px-1 h-100" (click)="openReceivablesModal()">
             <div class="dashboard-card-body">
                     <div class="dashboard-card-head">Receivables</div>
                     <div class="dashboard-card-content">
@@ -58,14 +58,22 @@
       <p>Sales Over the Last 6 Months</p>
       <canvas #salesChartCanvas></canvas>
     </div>
-  </div>
+</div>
+
+<!-- Purchase Modal -->
+<div *ngIf="isPurchaseModalOpen" id="purchaseModal" class="purchase-modal">
+<div class="purchase-modal-content">
+    <span class="close" (click)="closePurchaseModal()">&times;</span>
+    <p>Purchase Over the Last 6 Months</p>
+    <canvas #purchaseChartCanvas></canvas>
+</div>
+</div>
   
-  <!-- Purchase Modal -->
-  <div *ngIf="isPurchaseModalOpen" id="purchaseModal" class="purchase-modal">
-    <div class="purchase-modal-content">
-      <span class="close" (click)="closePurchaseModal()">&times;</span>
-      <p>Purchase Over the Last 6 Months</p>
-      <canvas #purchaseChartCanvas></canvas>
+  <!-- Receivables Modal -->
+<div *ngIf="isReceivablesModalOpen" id="receivablesModal" class="receivables-modal">
+    <div class="receivables-modal-content">
+      <span class="close" (click)="closeReceivablesModal()">&times;</span>
+      <p>Receivables Breakdown</p>
+      <canvas #receivablesChartCanvas></canvas>
     </div>
-  </div>
-  
+</div>

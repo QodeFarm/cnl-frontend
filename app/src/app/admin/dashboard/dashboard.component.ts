@@ -12,11 +12,16 @@ import { Chart, ChartTypeRegistry, registerables } from 'chart.js';
 export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   isSalesModalOpen: boolean = false;
   isPurchaseModalOpen: boolean = false;
+  isReceivablesModalOpen: boolean = false; // New state for Receivables modal
+
   salesChart: any;
   purchaseChart: any;
+  receivablesChart: any; // Chart instance for Receivables
+
 
   @ViewChild('salesChartCanvas') salesChartCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('purchaseChartCanvas') purchaseChartCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('receivablesChartCanvas') receivablesChartCanvas!: ElementRef<HTMLCanvasElement>; // New canvas reference
 
   salesData = {
     labels: ['May-2024', 'Jun-2024', 'Jul-2024', 'Aug-2024', 'Sep-2024', 'Oct-2024'],
@@ -39,6 +44,18 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
       borderColor: '#1cc88a',
       borderWidth: 1,
       barThickness: 20,
+    }]
+  };
+
+  receivablesData = {
+    labels: ['Due Soon', 'Overdue', 'Paid'],
+    datasets: [{
+      label: 'Receivables ($)',
+      data: [3000, 1500, 7000],
+      backgroundColor: ['#f6c23e', '#e74a3b', '#1cc88a'],
+      hoverBackgroundColor: ['#f8d45e', '#f56b60', '#2cd697'],
+      borderColor: '#000000',
+      borderWidth: 1,
     }]
   };
 
@@ -65,6 +82,18 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
       );
     }, 100); // Delay to ensure modal and canvas are rendered
   }
+
+  openReceivablesModal() {
+    this.isReceivablesModalOpen = true;
+    setTimeout(() => {
+      this.ensureChartCreatedWithDelay(
+        this.receivablesChartCanvas,
+        this.receivablesData,
+        'pie', // Donut chart type
+        chart => this.receivablesChart = chart
+      );
+    }, 100);
+  }
   
 
   closeSalesModal() {
@@ -77,17 +106,22 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     this.destroyChart(this.purchaseChart, chart => this.purchaseChart = null);
   }
 
+  closeReceivablesModal() {
+    this.isReceivablesModalOpen = false;
+    this.destroyChart(this.receivablesChart, chart => this.receivablesChart = null);
+  }
+
   ensureChartCreatedWithDelay(
     canvasRef: ElementRef<HTMLCanvasElement>,
     data: any,
-    type: keyof ChartTypeRegistry, // Explicitly use keyof ChartTypeRegistry
+    type: keyof ChartTypeRegistry,
     assignChart: (chart: any) => void,
     delay: number = 100
   ) {
     setTimeout(() => {
       if (!canvasRef?.nativeElement) {
         console.error('Canvas element is not available');
-        return; // Safeguard against undefined canvas
+        return;
       }
       const ctx = this.getCanvasContext(canvasRef);
       if (ctx) {
@@ -96,10 +130,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
           data,
           options: {
             responsive: true,
-            scales: {
-              x: { beginAtZero: true },
-              y: { beginAtZero: true }
-            }
+            maintainAspectRatio: true,
           }
         }));
       }
@@ -135,5 +166,6 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnDestroy() {
     this.destroyChart(this.salesChart, chart => this.salesChart = null);
     this.destroyChart(this.purchaseChart, chart => this.purchaseChart = null);
+    this.destroyChart(this.receivablesChart, chart => this.receivablesChart = null);
   }
 }
