@@ -52,8 +52,8 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     datasets: [{
       label: 'Receivables ($)',
       data: [3000, 1500, 7000],
-      backgroundColor: ['#f6c23e', '#e74a3b', '#1cc88a'],
-      hoverBackgroundColor: ['#f8d45e', '#f56b60', '#2cd697'],
+      backgroundColor: ['#87CEEB', '#FF7F50', '#3CB371'],
+      hoverBackgroundColor: ['#4682B4', '#D05E40', '#2E8B57'],
       borderColor: '#000000',
       borderWidth: 1,
     }]
