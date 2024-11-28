@@ -54,7 +54,9 @@
 <!-- Modal HTML -->
 <div *ngIf="isModalOpen" id="myModal" class="sales-modal">
     <div class="sales-modal-content">
-        <span class="close" (click)="closeModal()">&times;</span>
-        <p>Hi, how are you?</p>
+      <span class="close" (click)="closeModal()">&times;</span>
+      <p>Sales Over the Last 6 Months</p>
+      <!-- Canvas for Chart.js -->
+      <canvas #salesChartCanvas></canvas>
     </div>
-</div>
+  </div>

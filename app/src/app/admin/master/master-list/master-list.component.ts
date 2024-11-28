@@ -35,7 +35,7 @@ export class MasterListComponent {
       .pipe(
         filter((event: Event): event is NavigationEnd => event instanceof NavigationEnd)
       ).subscribe((event: NavigationEnd) => {
-        debugger;
+        //debugger;
         this.code = this.getCode();
         // this.acs.setAction('clickMic', {});
       });
