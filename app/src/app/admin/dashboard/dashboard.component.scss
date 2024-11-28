@@ -1,5 +1,5 @@
 /* Modal Styles */
-.sales-modal, .purchase-modal, .receivables-modal {
+.sales-modal, .purchase-modal, .receivables-modal, .payables-modal {
     display: block;
     position: fixed;
     z-index: 1;
@@ -12,7 +12,8 @@
     padding-top: 60px;
 }
 
-.sales-modal-content, .purchase-modal-content, .receivables-modal-content {
+/* Modal Content Styles */
+.sales-modal-content, .purchase-modal-content, .receivables-modal-content, .payables-modal-content {
     background-color: #fefefe;
     margin: 5% auto;
     padding: 20px;
@@ -26,12 +27,14 @@
     position: relative;
 }
 
-.sales-modal-content p, .purchase-modal-content p, .receivables-modal-content p {
+/* Text Style for Modal Content */
+.sales-modal-content p, .purchase-modal-content p, .receivables-modal-content p, .payables-modal-content p {
     font-size: 18px;
     color: #333;
     margin-bottom: 20px;
 }
 
+/* Close Button */
 .close {
     color: #aaa;
     font-size: 28px;
@@ -47,8 +50,8 @@
     cursor: pointer;
 }
 
-/* Canvas size control for receivables-modal */
-.receivables-modal-content canvas {
+/* Canvas size control for all modals with canvas */
+.receivables-modal-content canvas, .payables-modal-content canvas {
     max-width: 100%;
     max-height: 80%;
     width: 400px;

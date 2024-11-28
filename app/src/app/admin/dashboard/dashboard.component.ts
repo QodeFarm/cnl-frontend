@@ -12,16 +12,18 @@ import { Chart, ChartTypeRegistry, registerables } from 'chart.js';
 export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   isSalesModalOpen: boolean = false;
   isPurchaseModalOpen: boolean = false;
-  isReceivablesModalOpen: boolean = false; // New state for Receivables modal
+  isReceivablesModalOpen: boolean = false;
+  isPayablesModalOpen: boolean = false; 
 
   salesChart: any;
   purchaseChart: any;
-  receivablesChart: any; // Chart instance for Receivables
-
+  receivablesChart: any;
+  payablesChart:any;
 
   @ViewChild('salesChartCanvas') salesChartCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('purchaseChartCanvas') purchaseChartCanvas!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('receivablesChartCanvas') receivablesChartCanvas!: ElementRef<HTMLCanvasElement>; // New canvas reference
+  @ViewChild('receivablesChartCanvas') receivablesChartCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('payablesChartCanvas') payablesChartCanvas!: ElementRef<HTMLCanvasElement>; 
 
   salesData = {
     labels: ['May-2024', 'Jun-2024', 'Jul-2024', 'Aug-2024', 'Sep-2024', 'Oct-2024'],
@@ -52,6 +54,18 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     datasets: [{
       label: 'Receivables ($)',
       data: [3000, 1500, 7000],
+      backgroundColor: ['#87CEEB', '#FF7F50', '#3CB371'],
+      hoverBackgroundColor: ['#4682B4', '#D05E40', '#2E8B57'],
+      borderColor: '#000000',
+      borderWidth: 1,
+    }]
+  };
+
+  payablesData = {
+    labels: ['Advance', 'Pending', 'Not Due'],
+    datasets: [{
+      label: 'Payables ($)',
+      data: [5600, 43000, 23000],
       backgroundColor: ['#87CEEB', '#FF7F50', '#3CB371'],
       hoverBackgroundColor: ['#4682B4', '#D05E40', '#2E8B57'],
       borderColor: '#000000',
@@ -94,7 +108,18 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
       );
     }, 100);
   }
-  
+
+  openPayablesModal() {
+    this.isPayablesModalOpen = true;
+    setTimeout(() => {
+      this.ensureChartCreatedWithDelay(
+        this.payablesChartCanvas,
+        this.payablesData,
+        'doughnut', // Donut chart type
+        chart => this.payablesChart = chart
+      );
+    }, 100);
+  }  
 
   closeSalesModal() {
     this.isSalesModalOpen = false;
@@ -109,6 +134,11 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   closeReceivablesModal() {
     this.isReceivablesModalOpen = false;
     this.destroyChart(this.receivablesChart, chart => this.receivablesChart = null);
+  }
+
+  closePayablesModal() {
+    this.isPayablesModalOpen = false;
+    this.destroyChart(this.payablesChart, chart => this.payablesChart = null);
   }
 
   ensureChartCreatedWithDelay(
@@ -167,5 +197,6 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     this.destroyChart(this.salesChart, chart => this.salesChart = null);
     this.destroyChart(this.purchaseChart, chart => this.purchaseChart = null);
     this.destroyChart(this.receivablesChart, chart => this.receivablesChart = null);
+    this.destroyChart(this.payablesChart, chart => this.payablesChart = null);
   }
 }
