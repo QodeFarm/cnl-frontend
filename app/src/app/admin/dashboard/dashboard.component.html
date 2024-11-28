@@ -1,7 +1,7 @@
 <!-- Begin Page Content -->
 <div class="container-fluid pt-3">
     <div class="row">
-        <div class="dashboard-card px-1 h-100" (click)="openModal()">
+        <div class="dashboard-card px-1 h-100" (click)="openSalesModal()">
             <div class="dashboard-card-body">
                     <div class="dashboard-card-head">Sales</div>
                     <div class="dashboard-card-content">
@@ -10,7 +10,7 @@
                     </div>
             </div>
         </div>
-        <div class="dashboard-card px-1 h-100">
+        <div class="dashboard-card px-1 h-100" (click)="openPurchaseModal()">
             <div class="dashboard-card-body">
                     <div class="dashboard-card-head">Purchase</div>
                     <div class="dashboard-card-content">
@@ -51,12 +51,21 @@
 </div>
 <!-- /.container-fluid -->
 
-<!-- Modal HTML -->
-<div *ngIf="isModalOpen" id="myModal" class="sales-modal">
+<!-- Sales Modal -->
+<div *ngIf="isSalesModalOpen" id="salesModal" class="sales-modal">
     <div class="sales-modal-content">
-      <span class="close" (click)="closeModal()">&times;</span>
+      <span class="close" (click)="closeSalesModal()">&times;</span>
       <p>Sales Over the Last 6 Months</p>
-      <!-- Canvas for Chart.js -->
       <canvas #salesChartCanvas></canvas>
     </div>
   </div>
+  
+  <!-- Purchase Modal -->
+  <div *ngIf="isPurchaseModalOpen" id="purchaseModal" class="purchase-modal">
+    <div class="purchase-modal-content">
+      <span class="close" (click)="closePurchaseModal()">&times;</span>
+      <p>Purchase Over the Last 6 Months</p>
+      <canvas #purchaseChartCanvas></canvas>
+    </div>
+  </div>
+  

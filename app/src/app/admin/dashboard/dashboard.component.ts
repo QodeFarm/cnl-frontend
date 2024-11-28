@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Chart, registerables } from 'chart.js';
+import { Chart, ChartTypeRegistry, registerables } from 'chart.js';
 
 @Component({
   selector: 'app-dashboard',
@@ -10,12 +10,14 @@ import { Chart, registerables } from 'chart.js';
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
-  isModalOpen: boolean = false;
-  salesChart: any;  // To hold the chart instance
+  isSalesModalOpen: boolean = false;
+  isPurchaseModalOpen: boolean = false;
+  salesChart: any;
+  purchaseChart: any;
 
   @ViewChild('salesChartCanvas') salesChartCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('purchaseChartCanvas') purchaseChartCanvas!: ElementRef<HTMLCanvasElement>;
 
-  // Dummy sales data for the last 6 months
   salesData = {
     labels: ['May-2024', 'Jun-2024', 'Jul-2024', 'Aug-2024', 'Sep-2024', 'Oct-2024'],
     datasets: [{
@@ -28,75 +30,110 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     }]
   };
 
-  // Function to open the modal
-  openModal() {
-    this.isModalOpen = true;
-    // Create chart after a small delay to ensure the modal and canvas are fully rendered
+  purchaseData = {
+    labels: ['May-2024', 'Jun-2024', 'Jul-2024', 'Aug-2024', 'Sep-2024', 'Oct-2024'],
+    datasets: [{
+      label: 'Purchase ($)',
+      data: [8000, 9500, 8700, 9100, 9700, 10000],
+      backgroundColor: '#1cc88a',
+      borderColor: '#1cc88a',
+      borderWidth: 1,
+      barThickness: 20,
+    }]
+  };
+
+  openSalesModal() {
+    this.isSalesModalOpen = true;
     setTimeout(() => {
-      this.createChart();
-    }, 100);  // 100ms delay to ensure the modal is rendered
+      this.ensureChartCreatedWithDelay(
+        this.salesChartCanvas,
+        this.salesData,
+        'bar',
+        chart => this.salesChart = chart
+      );
+    }, 100); // Delay to ensure modal and canvas are rendered
+  }
+  
+  openPurchaseModal() {
+    this.isPurchaseModalOpen = true;
+    setTimeout(() => {
+      this.ensureChartCreatedWithDelay(
+        this.purchaseChartCanvas,
+        this.purchaseData,
+        'bar',
+        chart => this.purchaseChart = chart
+      );
+    }, 100); // Delay to ensure modal and canvas are rendered
+  }
+  
+
+  closeSalesModal() {
+    this.isSalesModalOpen = false;
+    this.destroyChart(this.salesChart, chart => this.salesChart = null);
   }
 
-  // Function to close the modal
-  closeModal() {
-    this.isModalOpen = false;
-    this.destroyChart(); // Destroy chart instance when modal is closed
+  closePurchaseModal() {
+    this.isPurchaseModalOpen = false;
+    this.destroyChart(this.purchaseChart, chart => this.purchaseChart = null);
   }
 
-  // Function to create the chart
-  createChart() {
-    // Check if the chart already exists and destroy it if necessary
-    if (this.salesChart) {
-      this.salesChart.destroy(); // Destroy existing chart to avoid multiple instances
-    }
-
-    // Ensure the canvas element exists before accessing it
-    const canvasElement = this.salesChartCanvas?.nativeElement;
-    if (canvasElement) {
-      const ctx = canvasElement.getContext('2d');
+  ensureChartCreatedWithDelay(
+    canvasRef: ElementRef<HTMLCanvasElement>,
+    data: any,
+    type: keyof ChartTypeRegistry, // Explicitly use keyof ChartTypeRegistry
+    assignChart: (chart: any) => void,
+    delay: number = 100
+  ) {
+    setTimeout(() => {
+      if (!canvasRef?.nativeElement) {
+        console.error('Canvas element is not available');
+        return; // Safeguard against undefined canvas
+      }
+      const ctx = this.getCanvasContext(canvasRef);
       if (ctx) {
-        this.salesChart = new Chart(ctx, {
-          type: 'bar',
-          data: this.salesData,
+        assignChart(new Chart(ctx, {
+          type,
+          data,
           options: {
             responsive: true,
             scales: {
-              x: {
-                beginAtZero: true
-              },
-              y: {
-                beginAtZero: true
-              }
+              x: { beginAtZero: true },
+              y: { beginAtZero: true }
             }
           }
-       });
-      } else {
-        console.error('Failed to get the canvas context');
+        }));
       }
-    } else {
-      console.error('Canvas element is not available');
+    }, delay);
+  }
+
+  destroyChart(chartInstance: any, resetChartRef: (chart: null) => void) {
+    if (chartInstance) {
+      chartInstance.destroy();
+      resetChartRef(null);
     }
   }
 
-  // Function to destroy the chart
-  destroyChart() {
-    if (this.salesChart) {
-      this.salesChart.destroy();
+  private getCanvasContext(canvasRef: ElementRef<HTMLCanvasElement>): CanvasRenderingContext2D | null {
+    const canvasElement = canvasRef?.nativeElement;
+    if (!canvasElement) {
+      console.error('Canvas element is not available');
+      return null;
     }
+    const ctx = canvasElement.getContext('2d');
+    if (!ctx) {
+      console.error('Failed to get the canvas context');
+    }
+    return ctx;
   }
 
   ngOnInit() {
-    Chart.register(...registerables); // Register all the required Chart.js components
+    Chart.register(...registerables);
   }
 
-  ngAfterViewInit() {
-    // Ensure that the chart is created after view initialization, but only when modal is open
-    if (this.isModalOpen && this.salesChartCanvas?.nativeElement) {
-      this.createChart();
-    }
-  }
+  ngAfterViewInit() {}
 
   ngOnDestroy() {
-    this.destroyChart(); // Clean up the chart when component is destroyed
+    this.destroyChart(this.salesChart, chart => this.salesChart = null);
+    this.destroyChart(this.purchaseChart, chart => this.purchaseChart = null);
   }
 }
