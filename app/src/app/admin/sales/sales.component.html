@@ -1,3 +1,24 @@
+<div class="quickpack-container d-flex align-items-center">
+    <div class="dropdown-container">
+        <select 
+          class="dropdown-select" 
+          [(ngModel)]="selectedQuickpack">
+          <option value="" disabled>Select Quickpack values</option>
+          <option *ngFor="let quickpack of quickpackOptions" 
+                  [value]="quickpack.quick_pack_id">
+            {{ quickpack.name }}
+          </option>
+        </select>
+      </div>
+      
+    <!-- Buttons -->
+    <button class="btn btn-primary ml-2" (click)="loadQuickpackProducts()">Ok</button>
+    <button class="btn btn-icon ml-1" (click)="onAdditionalAction()">
+      <i class="fas fa-plus"></i> <!-- Replace with the correct icon library -->
+    </button>
+  </div>
+  
+
 <div class="container-fluid pt-3">
     <div class="sales-banner">
         <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;">
