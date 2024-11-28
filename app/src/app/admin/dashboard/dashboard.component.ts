@@ -13,23 +13,26 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   isSalesModalOpen: boolean = false;
   isPurchaseModalOpen: boolean = false;
   isReceivablesModalOpen: boolean = false;
-  isPayablesModalOpen: boolean = false; 
+  isPayablesModalOpen: boolean = false;
+  isLiquidityModelOpen: boolean = false; // For Cash/Bank 
 
   salesChart: any;
   purchaseChart: any;
   receivablesChart: any;
   payablesChart:any;
+  liquidityChart:any;
 
   @ViewChild('salesChartCanvas') salesChartCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('purchaseChartCanvas') purchaseChartCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('receivablesChartCanvas') receivablesChartCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('payablesChartCanvas') payablesChartCanvas!: ElementRef<HTMLCanvasElement>; 
+  @ViewChild('liquidityChartCanvas') liquidityChartCanvas!: ElementRef<HTMLCanvasElement>; 
 
   salesData = {
     labels: ['May-2024', 'Jun-2024', 'Jul-2024', 'Aug-2024', 'Sep-2024', 'Oct-2024'],
     datasets: [{
       label: 'Sales ($)',
-      data: [10500, 12000, 9500, 11000, 11500, 13000],
+      data: [10500, 12000, 9500, -11000, 11500, 13000],
       backgroundColor: '#4e73df',
       borderColor: '#4e73df',
       borderWidth: 1,
@@ -70,6 +73,18 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
       hoverBackgroundColor: ['#4682B4', '#D05E40', '#2E8B57'],
       borderColor: '#000000',
       borderWidth: 1,
+    }]
+  };
+
+  liquidityData = {
+    labels: ['SBI Bank', 'CBI Bank', 'Punjab Bank', 'Axis Bank', 'HDFC Bank'],
+    datasets: [{
+      label: 'Liquidity ($)',
+      data: [692700, 729400, 437900, -243544, 549000],
+      backgroundColor: '#00FFFF',
+      borderColor: '#008B8B',
+      borderWidth: 1,
+      barThickness: 20,
     }]
   };
 
@@ -121,6 +136,18 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     }, 100);
   }  
 
+  openLiquidityModal() {
+    this.isLiquidityModelOpen = true;
+    setTimeout(() => {
+      this.ensureChartCreatedWithDelay(
+        this.liquidityChartCanvas,
+        this.liquidityData,
+        'bar',
+        chart => this.liquidityChart = chart
+      );
+    }, 100); // Delay to ensure modal and canvas are rendered
+  }
+
   closeSalesModal() {
     this.isSalesModalOpen = false;
     this.destroyChart(this.salesChart, chart => this.salesChart = null);
@@ -139,6 +166,11 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   closePayablesModal() {
     this.isPayablesModalOpen = false;
     this.destroyChart(this.payablesChart, chart => this.payablesChart = null);
+  }
+
+  closeLiquidityModal() {
+    this.isLiquidityModelOpen = false;
+    this.destroyChart(this.liquidityChart, chart => this.liquidityChart = null);
   }
 
   ensureChartCreatedWithDelay(
@@ -198,5 +230,6 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     this.destroyChart(this.purchaseChart, chart => this.purchaseChart = null);
     this.destroyChart(this.receivablesChart, chart => this.receivablesChart = null);
     this.destroyChart(this.payablesChart, chart => this.payablesChart = null);
+    this.destroyChart(this.liquidityChart, chart => this.liquidityChart = null);
   }
 }

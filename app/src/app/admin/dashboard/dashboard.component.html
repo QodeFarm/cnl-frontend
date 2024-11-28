@@ -37,7 +37,7 @@
                 </div>
             </div>
         </div>
-        <div class="dashboard-card px-1 h-100">
+        <div class="dashboard-card px-1 h-100" (click)="openLiquidityModal()">
             <div class="dashboard-card-body">
                 <div class="dashboard-card-head">cash/ Bank</div>
                 <div class="dashboard-card-content">
@@ -84,5 +84,14 @@
         <span class="close" (click)="closePayablesModal()">&times;</span>
         <p>Payables Breakdown</p>
         <canvas #payablesChartCanvas></canvas>
+    </div>
+</div>
+
+<!-- liquidity Modal -->
+<div *ngIf="isLiquidityModelOpen" id="LiquidityModal" class="liquidity-modal">
+    <div class="liquidity-modal-content">
+        <span class="close" (click)="closeLiquidityModal()">&times;</span>
+        <p>liquidity In the Banks</p>
+        <canvas #liquidityChartCanvas></canvas>
     </div>
 </div>
