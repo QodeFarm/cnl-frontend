@@ -66,7 +66,8 @@
     height: 400px;
 }
 
-.cont-f {
+// second-row CSS 
+.second-row {
     padding: 15px;
     display: flex;
     gap: 10px;  /* Reduced gap between columns */
@@ -75,20 +76,26 @@
 
 /* Chart Container */
 .chart-container {
-    background-color: #070000;
+    background-color: #f1f1f1;
     border-radius: 8px;
     position: relative;
-    width: 245px;
-    padding: 10px;  /* Reduced padding */
-    margin-top: 20px; /* Adjust space from the top of the container */
+    width: 245px; /* Maintain fixed width */
+    height: 220px; /* Explicit height to prevent uncontrolled scaling */
+    padding: 10px; /* Padding inside the container */
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center; /* Center-align the chart */
 }
 
 /* Chart Title */
 .chart-title {
-    font-size: 13px;
-    color: #02f7ff;
+    font-size: 12px;
+    color: rgb(201, 197, 190);
     text-align: center;
     margin-bottom: 1px;
+    font: bold;
 }
 
 /* Responsive Design */
