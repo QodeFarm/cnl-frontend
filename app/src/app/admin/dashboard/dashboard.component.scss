@@ -65,3 +65,61 @@
     width: 400px;
     height: 400px;
 }
+
+// second-row CSS 
+.second-row {
+    padding: 15px;
+    display: flex;
+    gap: 10px;  /* Reduced gap between columns */
+    padding-top: 1px;
+}
+
+/* Chart Container */
+.chart-container {
+    background-color: #f1f1f1;
+    border-radius: 8px;
+    position: relative;
+    width: 245px; /* Maintain fixed width */
+    height: 220px; /* Explicit height to prevent uncontrolled scaling */
+    padding: 10px; /* Padding inside the container */
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center; /* Center-align the chart */
+}
+
+/* Chart Title */
+.chart-title {
+    font-size: 12px;
+    color: rgb(201, 197, 190);
+    text-align: center;
+    margin-bottom: 1px;
+    font: bold;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+    .row {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .col-md-4 {
+        flex: 1;
+        min-width: 100%; /* Ensures full-width for smaller screens */
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .chart-title {
+        font-size: 14px;
+    }
+
+    .chart-container {
+        padding: 15px;
+    }
+}
+
+
+
