@@ -59,65 +59,90 @@
 </div>
 <!-- /.container-fluid -->
 
-<!-- Sales Modal -->
-<div *ngIf="isSalesModalOpen" id="salesModal" class="sales-modal">
-    <div class="sales-modal-content">
-        <span class="close" (click)="closeSalesModal()">&times;</span>
-        <p>Sales Over the Last 6 Months</p>
-        <canvas #salesChartCanvas></canvas>
+<div>
+    <!-- Sales Modal -->
+    <div *ngIf="isSalesModalOpen" id="salesModal" class="sales-modal">
+        <div class="sales-modal-content">
+            <span class="close" (click)="closeSalesModal()">&times;</span>
+            <p>Sales Over the Last 6 Months</p>
+            <canvas #salesChartCanvas></canvas>
+        </div>
     </div>
-</div>
 
-<!-- Purchase Modal -->
-<div *ngIf="isPurchaseModalOpen" id="purchaseModal" class="purchase-modal">
-    <div class="purchase-modal-content">
-        <span class="close" (click)="closePurchaseModal()">&times;</span>
-        <p>Purchase Over the Last 6 Months</p>
-        <canvas #purchaseChartCanvas></canvas>
+    <!-- Purchase Modal -->
+    <div *ngIf="isPurchaseModalOpen" id="purchaseModal" class="purchase-modal">
+        <div class="purchase-modal-content">
+            <span class="close" (click)="closePurchaseModal()">&times;</span>
+            <p>Purchase Over the Last 6 Months</p>
+            <canvas #purchaseChartCanvas></canvas>
+        </div>
     </div>
-</div>
 
-<!-- Receivables Modal -->
-<div *ngIf="isReceivablesModalOpen" id="receivablesModal" class="receivables-modal">
-    <div class="receivables-modal-content">
-        <span class="close" (click)="closeReceivablesModal()">&times;</span>
-        <p>Receivables Breakdown</p>
-        <canvas #receivablesChartCanvas></canvas>
+    <!-- Receivables Modal -->
+    <div *ngIf="isReceivablesModalOpen" id="receivablesModal" class="receivables-modal">
+        <div class="receivables-modal-content">
+            <span class="close" (click)="closeReceivablesModal()">&times;</span>
+            <p>Receivables Breakdown</p>
+            <canvas #receivablesChartCanvas></canvas>
+        </div>
     </div>
-</div>
 
-<!-- Payables Modal -->
-<div *ngIf="isPayablesModalOpen" id="PayablesModal" class="payables-modal">
-    <div class="payables-modal-content">
-        <span class="close" (click)="closePayablesModal()">&times;</span>
-        <p>Payables Breakdown</p>
-        <canvas #payablesChartCanvas></canvas>
+    <!-- Payables Modal -->
+    <div *ngIf="isPayablesModalOpen" id="PayablesModal" class="payables-modal">
+        <div class="payables-modal-content">
+            <span class="close" (click)="closePayablesModal()">&times;</span>
+            <p>Payables Breakdown</p>
+            <canvas #payablesChartCanvas></canvas>
+        </div>
     </div>
-</div>
 
-<!-- Liquidity Modal -->
-<div *ngIf="isLiquidityModelOpen" id="LiquidityModal" class="liquidity-modal">
-    <div class="liquidity-modal-content">
-        <span class="close" (click)="closeLiquidityModal()">&times;</span>
-        <p>Liquidity In the Banks</p>
-        <canvas #liquidityChartCanvas></canvas>
+    <!-- Liquidity Modal -->
+    <div *ngIf="isLiquidityModelOpen" id="LiquidityModal" class="liquidity-modal">
+        <div class="liquidity-modal-content">
+            <span class="close" (click)="closeLiquidityModal()">&times;</span>
+            <p>Liquidity In the Banks</p>
+            <canvas #liquidityChartCanvas></canvas>
+        </div>
     </div>
 </div>
 
 <!-- second-row -->
-<div class="second-row">
-    <div class="chart-container">
-        <canvas #chartTop6Items></canvas>
-        <p class="chart-title">Top 6 Items Sold in 30 Days</p>
+<div class="second-main-row">
+    <div class="left-container">
+        <div class="first-row">
+            <div class="chart-container">
+                <canvas #chartTop6Items></canvas>
+            </div>
+
+            <div class="chart-container">
+                <canvas #chartDirectExpenses></canvas>
+            </div>
+
+            <div class="chart-container">
+                <canvas #chartOperationalExpenses></canvas>
+            </div>
+        </div>
+
+        <div class="second-row">
+            <div class="second-chart-container">
+                <canvas #chartTop6ItemsIn6MonthsCanvas></canvas>
+            </div>
+
+            <div class="second-chart-container">
+                <canvas #chartTop6ProfitMakingItemsCanvas></canvas>
+            </div>
+
+            <div class="second-chart-container">
+                <canvas #chartOperatiorenalExpenses></canvas>
+                <p>Amazon/Flipkart/Meesho</p>
+            </div>
+        </div>
     </div>
 
-    <div class="chart-container">
-        <canvas #chartDirectExpenses></canvas>
-        <p class="chart-title">Last 6 Months Direct Expenses</p>
-    </div>
-
-    <div class="chart-container">
-        <canvas #chartOperationalExpenses></canvas>
-        <p class="chart-title">Last 6 Months Operational Expenses</p>
+    <div class="right-container">
+        <!-- New Div Covering the Entire Empty Space -->
+        <div class="right-side-chart">
+            <canvas #chartLast6MonthsCashflowCanvas></canvas>
+        </div>
     </div>
 </div>

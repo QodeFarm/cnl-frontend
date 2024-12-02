@@ -22,11 +22,6 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   payablesChart: any;
   liquidityChart: any;
 
-  // For 2nd row charts 
-  top6ItemsChart: any;
-  directExpensesChart: any;
-  operationalExpensesChart: any;
-
   @ViewChild('salesChartCanvas') salesChartCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('purchaseChartCanvas') purchaseChartCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('receivablesChartCanvas') receivablesChartCanvas!: ElementRef<HTMLCanvasElement>;
@@ -37,6 +32,14 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('chartTop6Items') chartTop6ItemsCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('chartDirectExpenses') chartDirectExpensesCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('chartOperationalExpenses') chartOperationalExpensesCanvas!: ElementRef<HTMLCanvasElement>;
+
+  //3rd row
+  @ViewChild('chartTop6ItemsIn6MonthsCanvas') chartTop6ItemsIn6MonthsCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('chartTop6ProfitMakingItemsCanvas') chartTop6ProfitMakingItemsCanvas!: ElementRef<HTMLCanvasElement>;
+
+  //2nd-row Right-side-chart
+  @ViewChild('chartLast6MonthsCashflowCanvas') chartLast6MonthsCashflowCanvas!: ElementRef<HTMLCanvasElement>;
+
 
   salesData = {
     labels: ['May-2024', 'Jun-2024', 'Jul-2024', 'Aug-2024', 'Sep-2024', 'Oct-2024'],
@@ -185,7 +188,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
       this.ensureChartCreatedWithDelay(
         this.receivablesChartCanvas,
         this.receivablesData,
-        'pie', // Donut chart type
+        'pie',
         chart => this.receivablesChart = chart
       );
     }, 100);
@@ -214,6 +217,54 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
       );
     }, 100); // Delay to ensure modal and canvas are rendered
   }
+
+  //2nd row Row Charts
+  //Data for Top 6 Items Groups sales in Last 6 Months
+  top6ItemsIn6MonthsData = {
+    chart_title : 'wq',
+    labels: ['Food Containers', 'Print Buckets', 'Plates', 'Cups', 'Boxes', 'Others'], // Labels
+    datasets: [{
+      label: 'Sales (in $)',
+      data: [90 , 78, 30, 28, 20, 15],
+      backgroundColor: '#4e73df',
+      borderColor: '#4e73df',
+      borderWidth: 1,
+      barThickness: 20,
+    }]
+  };
+
+  //Data for Top 6 Profit making Items In last FY
+  top6ProfitMakingItemsData = {
+    labels: ['1000ML Container', 'Vishnu Wine 3.6', 'Lunch Box', 'Wrap', 'Tumbler', 'Jar'],    // Labels
+    datasets: [{
+      label: 'Profit (in $)',
+      data: [10, 9.5, 9, 8.5, 8, 7.5],
+      backgroundColor: '#1cc88a',
+      borderColor: '#1cc88a',
+      borderWidth: 1,
+      barThickness: 20,
+    }]
+  };
+
+  Last6MonthsCashflowData = {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], // Labels
+    datasets: [{
+      label: 'Inflow',
+      data: [90 , 78, 30, 28, 20, 15],
+      backgroundColor: '#4e73df',
+      borderColor: '#4e73df',
+      borderWidth: 1,
+      barThickness: 20,
+    },
+    {
+      label: 'Outflow',
+      data: [78 , 92, 46, 19, 38, 27],
+      backgroundColor: '#ff5e94',
+      borderColor: '#4e73df',
+      borderWidth: 1,
+      barThickness: 20,
+    }]
+  };
 
   closeSalesModal() {
     this.isSalesModalOpen = false;
@@ -293,9 +344,14 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   // For 2nd row charts 
   ngAfterViewInit() {
     // Initialize all three charts after view is rendered
-    this.top6ItemsChart = this.initializeChart(this.chartTop6ItemsCanvas, this.top6ItemsData, 'pie');
-    this.directExpensesChart = this.initializeChart(this.chartDirectExpensesCanvas, this.directExpensesData, 'pie');
-    this.operationalExpensesChart = this.initializeChart(this.chartOperationalExpensesCanvas, this.operationalExpensesData, 'pie');
+    this.initializeChart(this.chartTop6ItemsCanvas, this.top6ItemsData, 'pie','Top 6 Items Sold in 30 Days');
+    this.initializeChart(this.chartDirectExpensesCanvas, this.directExpensesData, 'pie' ,'Last 6 Months Direct Expenses');
+    this.initializeChart(this.chartOperationalExpensesCanvas, this.operationalExpensesData, 'pie' ,'Last 6 Months Operational Expenses');
+    
+    // 3rd charts charts  Last6MonthsCashflowData
+    this.initializeChart(this.chartTop6ItemsIn6MonthsCanvas, this.top6ItemsIn6MonthsData, 'bar', 'Top 6 Item Grp Sales(Last 6 Months)'); // Top 6 Items in 6 Months
+    this.initializeChart(this.chartTop6ProfitMakingItemsCanvas, this.top6ProfitMakingItemsData, 'bar', 'Top 6 Profit making Items In last FY'); // Top 6 Profit Making Items
+    this.initializeChart(this.chartLast6MonthsCashflowCanvas, this.Last6MonthsCashflowData, 'bar', "Last 6 Month's Cashflow"); // Top 6 Profit Making Items
   }
 
   ngOnDestroy() {
@@ -305,37 +361,55 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     this.destroyChart(this.payablesChart, chart => this.payablesChart = null);
     this.destroyChart(this.liquidityChart, chart => this.liquidityChart = null);
 
-    // Clean up charts
-    if (this.top6ItemsChart) this.top6ItemsChart.destroy();
-    if (this.directExpensesChart) this.directExpensesChart.destroy();
-    if (this.operationalExpensesChart) this.operationalExpensesChart.destroy();
   }
   
-  // For 2nd row charts 
-  private initializeChart(canvas: ElementRef<HTMLCanvasElement>, data: any, type: keyof ChartTypeRegistry): Chart | null {
+  // For 2nd & 3rd row charts 
+  private initializeChart(canvas: ElementRef<HTMLCanvasElement>, data: any, type: keyof ChartTypeRegistry, chart_title: string  ): Chart | null {
     const ctx = canvas?.nativeElement?.getContext('2d');
     if (!ctx) {
       console.error('Canvas context not found for chart.');
       return null;
+    }  
+    const chartOptions: any = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false, // Hide legend
+        },
+        tooltip: {
+          enabled: true, // Enable tooltips
+        },
+        title: {
+          display: true,
+          text: chart_title,
+          color: '#2c2e35',  
+          font: {
+            size: 12,
+            family: 'tahoma',
+            weight: 'bold',
+          },
+        }
+      },
+    };  
+    // Conditionally apply the scales option only when the chart type is 'bar'
+    if (type === 'bar') {
+      chartOptions.scales = {
+        x: {
+          ticks: {
+            display: false, // Hide labels on the X-axis
+          },
+          grid: {
+            display: false, // Hide grid lines on X-axis
+          },
+        },
+      };
     }
-
+  
     return new Chart(ctx, {
       type,
       data,
-      options:
-      {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins:
-        {
-          legend: {
-            display: false, // Hide legend
-          },
-          tooltip: {
-            enabled: true, // Enable tooltips
-          },
-        },
-      },
+      options: chartOptions,
     });
   }
 }
