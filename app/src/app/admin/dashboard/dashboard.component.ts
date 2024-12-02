@@ -37,6 +37,10 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('chartTop6ItemsIn6MonthsCanvas') chartTop6ItemsIn6MonthsCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('chartTop6ProfitMakingItemsCanvas') chartTop6ProfitMakingItemsCanvas!: ElementRef<HTMLCanvasElement>;
 
+  //2nd-row Right-side-chart
+  @ViewChild('chartLast6MonthsCashflowCanvas') chartLast6MonthsCashflowCanvas!: ElementRef<HTMLCanvasElement>;
+
+
   salesData = {
     labels: ['May-2024', 'Jun-2024', 'Jul-2024', 'Aug-2024', 'Sep-2024', 'Oct-2024'],
     datasets: [{
@@ -214,7 +218,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     }, 100); // Delay to ensure modal and canvas are rendered
   }
 
-  //3rd Row Charts
+  //2nd row Row Charts
   //Data for Top 6 Items Groups sales in Last 6 Months
   top6ItemsIn6MonthsData = {
     labels: ['Food Containers', 'Print Buckets', 'Plates', 'Cups', 'Boxes', 'Others'], // Labels
@@ -236,6 +240,26 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
       data: [10, 9.5, 9, 8.5, 8, 7.5],
       backgroundColor: '#1cc88a',
       borderColor: '#1cc88a',
+      borderWidth: 1,
+      barThickness: 20,
+    }]
+  };
+
+  Last6MonthsCashflowData = {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], // Labels
+    datasets: [{
+      label: 'Inflow',
+      data: [90 , 78, 30, 28, 20, 15],
+      backgroundColor: '#4e73df',
+      borderColor: '#4e73df',
+      borderWidth: 1,
+      barThickness: 20,
+    },
+    {
+      label: 'Outflow',
+      data: [78 , 92, 46, 19, 38, 27],
+      backgroundColor: '#ff5e94',
+      borderColor: '#4e73df',
       borderWidth: 1,
       barThickness: 20,
     }]
@@ -323,9 +347,10 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     this.initializeChart(this.chartDirectExpensesCanvas, this.directExpensesData, 'pie');
     this.initializeChart(this.chartOperationalExpensesCanvas, this.operationalExpensesData, 'pie');
     
-    // 3rd charts charts
+    // 3rd charts charts  Last6MonthsCashflowData
     this.initializeChart(this.chartTop6ItemsIn6MonthsCanvas, this.top6ItemsIn6MonthsData, 'bar'); // Top 6 Items in 6 Months
     this.initializeChart(this.chartTop6ProfitMakingItemsCanvas, this.top6ProfitMakingItemsData, 'bar'); // Top 6 Profit Making Items
+    this.initializeChart(this.chartLast6MonthsCashflowCanvas, this.Last6MonthsCashflowData, 'bar'); // Top 6 Profit Making Items
   }
 
   ngOnDestroy() {
