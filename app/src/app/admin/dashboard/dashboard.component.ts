@@ -22,11 +22,6 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   payablesChart: any;
   liquidityChart: any;
 
-  // For 2nd row charts 
-  top6ItemsChart: any;
-  directExpensesChart: any;
-  operationalExpensesChart: any;
-
   @ViewChild('salesChartCanvas') salesChartCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('purchaseChartCanvas') purchaseChartCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('receivablesChartCanvas') receivablesChartCanvas!: ElementRef<HTMLCanvasElement>;
@@ -39,8 +34,8 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('chartOperationalExpenses') chartOperationalExpensesCanvas!: ElementRef<HTMLCanvasElement>;
 
   //3rd row
-  @ViewChild('chartTop6ItemsIn6MonthsCanvas') chartTop6ItemsIn6MonthsCanvas!: ElementRef<HTMLCanvasElement>; // Reference for Top 6 Items in 6 Months
-  @ViewChild('chartTop6ProfitMakingItemsCanvas') chartTop6ProfitMakingItemsCanvas!: ElementRef<HTMLCanvasElement>; // Reference for Top 6 Profit Making Items
+  @ViewChild('chartTop6ItemsIn6MonthsCanvas') chartTop6ItemsIn6MonthsCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('chartTop6ProfitMakingItemsCanvas') chartTop6ProfitMakingItemsCanvas!: ElementRef<HTMLCanvasElement>;
 
   salesData = {
     labels: ['May-2024', 'Jun-2024', 'Jul-2024', 'Aug-2024', 'Sep-2024', 'Oct-2024'],
@@ -189,7 +184,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
       this.ensureChartCreatedWithDelay(
         this.receivablesChartCanvas,
         this.receivablesData,
-        'pie', // Donut chart type
+        'pie',
         chart => this.receivablesChart = chart
       );
     }, 100);
@@ -225,7 +220,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     labels: ['Food Containers', 'Print Buckets', 'Plates', 'Cups', 'Boxes', 'Others'], // Labels
     datasets: [{
       label: 'Sales (in $)',
-      data: [90 , 78, 30, 28, 20, 15], // Dummy data
+      data: [90 , 78, 30, 28, 20, 15],
       backgroundColor: '#4e73df',
       borderColor: '#4e73df',
       borderWidth: 1,
@@ -238,14 +233,14 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     labels: ['1000ML Container', 'Vishnu Wine 3.6', 'Lunch Box', 'Wrap', 'Tumbler', 'Jar'],    // Labels
     datasets: [{
       label: 'Profit (in $)',
-      data: [10, 9.5, 9, 8.5, 8, 7.5], // Dummy data
+      data: [10, 9.5, 9, 8.5, 8, 7.5],
       backgroundColor: '#1cc88a',
       borderColor: '#1cc88a',
       borderWidth: 1,
       barThickness: 20,
     }]
   };
-  
+
   closeSalesModal() {
     this.isSalesModalOpen = false;
     this.destroyChart(this.salesChart, chart => this.salesChart = null);
@@ -324,9 +319,9 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   // For 2nd row charts 
   ngAfterViewInit() {
     // Initialize all three charts after view is rendered
-    this.top6ItemsChart = this.initializeChart(this.chartTop6ItemsCanvas, this.top6ItemsData, 'pie');
-    this.directExpensesChart = this.initializeChart(this.chartDirectExpensesCanvas, this.directExpensesData, 'pie');
-    this.operationalExpensesChart = this.initializeChart(this.chartOperationalExpensesCanvas, this.operationalExpensesData, 'pie');
+    this.initializeChart(this.chartTop6ItemsCanvas, this.top6ItemsData, 'pie');
+    this.initializeChart(this.chartDirectExpensesCanvas, this.directExpensesData, 'pie');
+    this.initializeChart(this.chartOperationalExpensesCanvas, this.operationalExpensesData, 'pie');
     
     // 3rd charts charts
     this.initializeChart(this.chartTop6ItemsIn6MonthsCanvas, this.top6ItemsIn6MonthsData, 'bar'); // Top 6 Items in 6 Months
@@ -340,13 +335,9 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     this.destroyChart(this.payablesChart, chart => this.payablesChart = null);
     this.destroyChart(this.liquidityChart, chart => this.liquidityChart = null);
 
-    // Clean up charts
-    if (this.top6ItemsChart) this.top6ItemsChart.destroy();
-    if (this.directExpensesChart) this.directExpensesChart.destroy();
-    if (this.operationalExpensesChart) this.operationalExpensesChart.destroy();
   }
   
-  // For 2nd row charts 
+  // For 2nd & 3rd row charts 
   private initializeChart(canvas: ElementRef<HTMLCanvasElement>, data: any, type: keyof ChartTypeRegistry): Chart | null {
     const ctx = canvas?.nativeElement?.getContext('2d');
     if (!ctx) {

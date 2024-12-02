@@ -14,7 +14,7 @@
 
 /* Modal Content Styles */
 .sales-modal-content, .purchase-modal-content, .receivables-modal-content, .payables-modal-content, .liquidity-modal-content {
-    background-color: #fefefe;
+    background-color: #f3f3f3;
     margin: 5% auto;
     padding: 20px;
     border: 1px solid #888;
@@ -66,8 +66,8 @@
     height: 400px;
 }
 
-// second & third row CSS 
-.second-row, .third-row  {
+// first & third row CSS 
+.first-row, .third-row  {
     padding: 15px;
     display: flex;
     gap: 10px;  /* Reduced gap between columns */
