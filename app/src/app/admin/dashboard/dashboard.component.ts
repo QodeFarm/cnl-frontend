@@ -221,6 +221,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   //2nd row Row Charts
   //Data for Top 6 Items Groups sales in Last 6 Months
   top6ItemsIn6MonthsData = {
+    chart_title : 'wq',
     labels: ['Food Containers', 'Print Buckets', 'Plates', 'Cups', 'Boxes', 'Others'], // Labels
     datasets: [{
       label: 'Sales (in $)',
@@ -343,14 +344,14 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   // For 2nd row charts 
   ngAfterViewInit() {
     // Initialize all three charts after view is rendered
-    this.initializeChart(this.chartTop6ItemsCanvas, this.top6ItemsData, 'pie');
-    this.initializeChart(this.chartDirectExpensesCanvas, this.directExpensesData, 'pie');
-    this.initializeChart(this.chartOperationalExpensesCanvas, this.operationalExpensesData, 'pie');
+    this.initializeChart(this.chartTop6ItemsCanvas, this.top6ItemsData, 'pie','Top 6 Items Sold in 30 Days');
+    this.initializeChart(this.chartDirectExpensesCanvas, this.directExpensesData, 'pie' ,'Last 6 Months Direct Expenses');
+    this.initializeChart(this.chartOperationalExpensesCanvas, this.operationalExpensesData, 'pie' ,'Last 6 Months Operational Expenses');
     
     // 3rd charts charts  Last6MonthsCashflowData
-    this.initializeChart(this.chartTop6ItemsIn6MonthsCanvas, this.top6ItemsIn6MonthsData, 'bar'); // Top 6 Items in 6 Months
-    this.initializeChart(this.chartTop6ProfitMakingItemsCanvas, this.top6ProfitMakingItemsData, 'bar'); // Top 6 Profit Making Items
-    this.initializeChart(this.chartLast6MonthsCashflowCanvas, this.Last6MonthsCashflowData, 'bar'); // Top 6 Profit Making Items
+    this.initializeChart(this.chartTop6ItemsIn6MonthsCanvas, this.top6ItemsIn6MonthsData, 'bar', 'Top 6 Item Grp Sales(Last 6 Months)'); // Top 6 Items in 6 Months
+    this.initializeChart(this.chartTop6ProfitMakingItemsCanvas, this.top6ProfitMakingItemsData, 'bar', 'Top 6 Profit making Items In last FY'); // Top 6 Profit Making Items
+    this.initializeChart(this.chartLast6MonthsCashflowCanvas, this.Last6MonthsCashflowData, 'bar', "Last 6 Month's Cashflow"); // Top 6 Profit Making Items
   }
 
   ngOnDestroy() {
@@ -363,7 +364,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   
   // For 2nd & 3rd row charts 
-  private initializeChart(canvas: ElementRef<HTMLCanvasElement>, data: any, type: keyof ChartTypeRegistry): Chart | null {
+  private initializeChart(canvas: ElementRef<HTMLCanvasElement>, data: any, type: keyof ChartTypeRegistry, chart_title: string  ): Chart | null {
     const ctx = canvas?.nativeElement?.getContext('2d');
     if (!ctx) {
       console.error('Canvas context not found for chart.');
@@ -379,6 +380,16 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
         tooltip: {
           enabled: true, // Enable tooltips
         },
+        title: {
+          display: true,
+          text: chart_title,
+          color: '#2c2e35',  
+          font: {
+            size: 12,
+            family: 'tahoma',
+            weight: 'bold',
+          },
+        }
       },
     };  
     // Conditionally apply the scales option only when the chart type is 'bar'
