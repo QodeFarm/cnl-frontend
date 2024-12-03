@@ -73,7 +73,7 @@ const routes: Routes = [
       { path: 'assets/asset-maintenance', data: { title: 'Asset Maintenance', moduleName: "asset-maintenance" }, loadComponent: () => import('./admin/assets/asset-maintenance/asset-maintenance.component').then(m => m.AssetMaintenanceComponent) },
 
       //Production Module
-      { path: 'production', data: { title: 'Work Order', moduleName: 'production' }, canActivate: [], loadComponent: () => import('./admin/production/production.component').then(m => m.ProductionComponent) },
+      { path: 'production', data: { title: 'Work Order', moduleName: 'production' }, canActivate: [], loadComponent: () => import('./admin/production/workorder.component').then(m => m.WorkorderComponent) },
       { path: 'production/bom', data: { title: 'BOM', moduleName: 'bom' }, canActivate: [], loadComponent: () => import('./admin/production/bom/bom.component').then(m => m.BomComponent) },
       { path: 'production/machines', data: { title: 'Machines', moduleName: 'machines' }, canActivate: [], loadComponent: () => import('./admin/production/machines/machines.component').then(m => m.MachinesComponent) },
       { path: 'production/productionstatuses', data: { title: 'Production Statuses', moduleName: 'productionstatuses' }, canActivate: [], loadComponent: () => import('./admin/production/production-statuses/production-statuses.component').then(m => m.ProductionStatusesComponent) },

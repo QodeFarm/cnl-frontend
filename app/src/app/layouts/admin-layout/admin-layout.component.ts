@@ -60,12 +60,12 @@ export class AdminLayoutComponent {
         return route;
       }),
       map(route => {
-        debugger;
+        //debugger;
         currentUrl = this.router.url;  // Get the current URL
         return { data: route.snapshot.data, component: route.component };  // Get the route's data (like title)
       })
     ).subscribe(route => {
-      debugger;
+      //debugger;
       this.checkAndAddRouteTab({ name: route.data.title, component: route.component, key: route.data.moduleName, url: this.router.url, active: true });
       console.log('data', route.data.title, this.router.url);
     });
@@ -692,7 +692,7 @@ export class AdminLayoutComponent {
     }
   }
   removeTab(index) {
-    debugger;
+    //debugger;
     this.tabs.splice(index.index, 1);
     this.router.navigateByUrl(this.tabs[this.tabs.length - 1].url);
   }
