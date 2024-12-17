@@ -290,7 +290,9 @@
     <!-- End of Sidebar -->
 
     <!-- Content Wrapper -->
-    <div id="content-wrapper" class="d-flex flex-column">
+    <!-- <div id="content-wrapper" class="d-flex flex-column"> -->
+        <div id="content-wrapper" class="d-flex flex-column" *ngIf="showContain">
+
 
         <!-- Main Content -->
 
@@ -307,7 +309,7 @@
 
             <nz-tabset [(nzSelectedIndex)]="selectedTabIndex" nzType="editable-card" nzHideAdd (nzClose)="removeTab($event)">
 
-                <nz-tab [nzClosable]="true" [nzTitle]="tab.name" *ngFor="let tab of tabs">
+                <nz-tab (nzSelect)="onTabSelect(tab)" [nzClosable]="true" [nzTitle]="tab.name" *ngFor="let tab of tabs">
                     <ng-container *ngComponentOutlet="tab.component;"></ng-container>
                 </nz-tab>
 
