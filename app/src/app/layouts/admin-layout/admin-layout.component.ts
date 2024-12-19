@@ -45,6 +45,7 @@ export class AdminLayoutComponent {
   userName: any;
   public currentHoverTabKey: string;
   public tabs: Tab[] = [];
+  showContain = false;
   private recognition: SpeechRecognitionEvent | null = null;
   constructor(private activatedRoute: ActivatedRoute, private cd: ChangeDetectorRef, private elementRef: ElementRef, private http: HttpClient, private renderer: Renderer2, private router: Router, private taLoacal: LocalStorageService, private aS: AdminCommonService) {
     this.aS.action$.subscribe(res => {
@@ -60,12 +61,12 @@ export class AdminLayoutComponent {
         return route;
       }),
       map(route => {
-        debugger;
+        //debugger;
         currentUrl = this.router.url;  // Get the current URL
         return { data: route.snapshot.data, component: route.component };  // Get the route's data (like title)
       })
     ).subscribe(route => {
-      debugger;
+      //debugger;
       this.checkAndAddRouteTab({ name: route.data.title, component: route.component, key: route.data.moduleName, url: this.router.url, active: true });
       console.log('data', route.data.title, this.router.url);
     });
@@ -85,6 +86,10 @@ export class AdminLayoutComponent {
       this.hideSidebarCollapse();
     }
   }
+  @HostListener('window:beforeunload', ['$event'])
+  unloadNotification($event: any): void {
+    $event.returnValue = true;
+  }
   ngOnInit() {
     const user = this.taLoacal.getItem('user');
     this.menulList = [];
@@ -98,6 +103,7 @@ export class AdminLayoutComponent {
       this.http.get(`users/user_access/${role_Id}`).subscribe((res: any) => {
         this.menulList = res.data;
         this.aS.accessModuleList = this.menulList;
+        this.showContain = true;
       });
     }
     // this.menulList = [
@@ -693,11 +699,13 @@ export class AdminLayoutComponent {
     }
   }
   removeTab(index) {
-    debugger;
+    //debugger;
     this.tabs.splice(index.index, 1);
     this.router.navigateByUrl(this.tabs[this.tabs.length - 1].url);
   }
-
+  onTabSelect(tab) {
+    this.router.navigateByUrl(tab.url);
+  }
   mouseOverTab(tab: Tab) {
     this.currentHoverTabKey = tab ? tab.key : null;
   }

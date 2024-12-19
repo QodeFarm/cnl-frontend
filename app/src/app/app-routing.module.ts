@@ -112,7 +112,8 @@ const routes: Routes = [
       { path: 'products', data: { title: 'Products', moduleName: 'products' }, canActivate: [], loadChildren: () => import('./admin/products/products.module').then(m => m.ProductsModule) },
       { path: 'assets', data: { title: 'Assets', moduleName: 'assets' }, canActivate: [], loadChildren: () => import('./admin/assets/assets.module').then(m => m.AssetsModule) },
 
-
+      //Reporting Tool
+      { path: 'reports/custome-reports', data: { title: 'Reports', moduleName: 'reports' }, canActivate: [], loadComponent: () => import('./admin/reports/reports.component').then(m => m.ReportsComponent) },
 
 
       // { path: 'production', data: { title: 'production', moduleName: 'production' }, canActivate: [], loadChildren: () => import('./admin/production/production.module').then(m => m.ProductionModule) },
