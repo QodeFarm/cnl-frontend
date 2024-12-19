@@ -67,20 +67,72 @@ export class DefaultInterceptor implements HttpInterceptor {
     setTimeout(() => this.injector.get(Router).navigateByUrl(url));
   }
 
+  // private checkStatus(ev: HttpErrorResponse): void {
+  //   let errorMsg = `Request error ${ev.status}: `;
+  //   if (ev.status == 400) {
+  //     const errortext = CODEMESSAGE[ev.status] || ev.statusText;
+  //     this.notification.error('', errortext);
+  //     return;
+  //   }
+  //   if ((ev.status >= 200 && ev.status < 300) || ev.status === 401) {
+  //     return;
+  //   }
+
+  //   const errortext = "Username or Password is not valid" //CODEMESSAGE[ev.status] || ev.statusText;
+  //   this.notification.error(errorMsg, errortext);
+  // }
+
   private checkStatus(ev: HttpErrorResponse): void {
     let errorMsg = `Request error ${ev.status}: `;
+    
     if (ev.status == 400) {
-      const errortext = CODEMESSAGE[ev.status] || ev.statusText;
-      this.notification.error('', errortext);
-      return;
-    }
-    if ((ev.status >= 200 && ev.status < 300) || ev.status === 401) {
-      return;
-    }
+      const responseBody = ev.error;  // Assuming response is in `ev.error` (adjust as necessary)
 
-    const errortext = "Username or Password is not valid" //CODEMESSAGE[ev.status] || ev.statusText;
-    this.notification.error(errorMsg, errortext);
-  }
+      // Case 1: If the message is available, show it directly
+      if (responseBody && responseBody.message && responseBody.data.length === 0 ) {
+        // If only message is present (no detailed error data)
+        const errortext = responseBody.message;
+        console.log('errortext : ', errortext)
+        this.notification.error(
+          `<div style="font-size: 12px; color: #333;">${errortext}</div>`,
+          '',
+          { nzDuration: 5000, nzStyle: { backgroundColor: '#fff9f9', border: '1px solid #ffa39e', maxWidth: '800px' } }
+        );
+        return;
+      }
+  
+      // Case 2: If detailed validation errors are present in `data`
+      if (responseBody && responseBody.data && Object.keys(responseBody.data).length > 0) {
+        let detailedError = '';
+        for (const [key, message] of Object.entries(responseBody.data)) {
+          // For each validation error, format it as "KEY: Error message"
+          detailedError += `<strong>${key.toUpperCase()}:</strong> ${message}<br>`;
+
+        }
+        this.notification.error(
+          `${detailedError}`,
+          '',
+          { 
+            nzDuration: 5000, 
+            nzStyle: { 
+              backgroundColor: '#fff9f9', 
+              border: '1px solid #ffa39e', 
+              maxWidth: '1000px'
+            } 
+          }
+        );        
+        return;
+      }
+    }
+    
+    // Fallback for other HTTP status codes
+    const errortext = "An error occurred. Please try again.";
+    this.notification.error(
+      errorMsg,
+      errortext,
+      { nzDuration: 5000, nzStyle: { backgroundColor: '#fff9f9', border: '1px solid #ffa39e', maxWidth: '600px' } }
+    );
+  }    
 
   /**
    * 刷新 Token 请求
