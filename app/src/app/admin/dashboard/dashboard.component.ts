@@ -1,6 +1,8 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Chart, ChartTypeRegistry, registerables } from 'chart.js';
+import { HttpClient } from '@angular/common/http'; // Import HttpClient
+
 
 @Component({
   selector: 'app-dashboard',
@@ -41,11 +43,27 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('chartLast6MonthsCashflowCanvas') chartLast6MonthsCashflowCanvas!: ElementRef<HTMLCanvasElement>;
 
 
+  constructor(private http: HttpClient) {} // Inject HttpClient
+  private fetchDataAndInitializeChart(
+    endpoint: string,
+    dataConfig: { labelsTarget: string[]; dataTarget: number[]; labelField: string; dataField: string }) {
+    const apiUrl = `http://127.0.0.1:8000/api/v1/dashboard/${endpoint}/`; // Replace with your API endpoint
+    this.http.get(apiUrl).subscribe((response: any) => {
+      // Update labels and data using provided field names and response data
+      dataConfig.labelsTarget.length = 0; // Clear existing data
+      dataConfig.dataTarget.length = 0;
+      response.forEach((item: any) => {
+        dataConfig.labelsTarget.push(item[dataConfig.labelField]);
+        dataConfig.dataTarget.push(item[dataConfig.dataField]);
+      });
+    });
+  }
+
   salesData = {
-    labels: ['May-2024', 'Jun-2024', 'Jul-2024', 'Aug-2024', 'Sep-2024', 'Oct-2024'],
+    labels: [],
     datasets: [{
       label: 'Sales ($)',
-      data: [10500, 12000, 9500, -11000, 11500, 13000],
+      data: [],
       backgroundColor: '#4e73df',
       borderColor: '#4e73df',
       borderWidth: 1,
@@ -54,10 +72,10 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   };
 
   purchaseData = {
-    labels: ['May-2024', 'Jun-2024', 'Jul-2024', 'Aug-2024', 'Sep-2024', 'Oct-2024'],
+    labels: [],
     datasets: [{
       label: 'Purchase ($)',
-      data: [8000, 9500, 8700, 9100, 9700, 10000],
+      data: [],
       backgroundColor: '#1cc88a',
       borderColor: '#1cc88a',
       borderWidth: 1,
@@ -352,6 +370,41 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     this.initializeChart(this.chartTop6ItemsIn6MonthsCanvas, this.top6ItemsIn6MonthsData, 'bar', 'Top 6 Item Grp Sales(Last 6 Months)'); // Top 6 Items in 6 Months
     this.initializeChart(this.chartTop6ProfitMakingItemsCanvas, this.top6ProfitMakingItemsData, 'bar', 'Top 6 Profit making Items In last FY'); // Top 6 Profit Making Items
     this.initializeChart(this.chartLast6MonthsCashflowCanvas, this.Last6MonthsCashflowData, 'bar', "Last 6 Month's Cashflow"); // Top 6 Profit Making Items
+
+    this.fetchDataAndInitializeChart('Sales_Over_the_Last_12_Months',{
+      labelsTarget: this.salesData.labels,
+      dataTarget: this.salesData.datasets[0].data,
+      labelField: 'month_year',
+      dataField: 'total_sales',
+    });
+    this.fetchDataAndInitializeChart('Purchase_Over_the_Last_12_Months',{
+      labelsTarget: this.purchaseData.labels,
+      dataTarget: this.purchaseData.datasets[0].data,
+      labelField: 'month_year',
+      dataField: 'monthly_purchases',
+    });  
+
+    this.fetchDataAndInitializeChart('Top_10_Itmes_Sold_In_Last_30_Days',{
+        labelsTarget: this.top6ItemsData.labels,
+        dataTarget: this.top6ItemsData.datasets[0].data,
+        labelField: 'product_name',
+        dataField: 'total_sold_quantity',
+      });
+    
+    this.fetchDataAndInitializeChart('Top_6_Items_Groups_In_Last_6_Months',{
+      labelsTarget: this.top6ItemsIn6MonthsData.labels,
+      dataTarget: this.top6ItemsIn6MonthsData.datasets[0].data,
+      labelField: 'month_year',
+      dataField: 'monthly_sales',
+    });
+    
+    this.fetchDataAndInitializeChart('Top_6_Sold_Items_In_Current_FY',{
+      labelsTarget: this.top6ProfitMakingItemsData.labels,
+      dataTarget: this.top6ProfitMakingItemsData.datasets[0].data,
+      labelField: 'item_name',
+      dataField: 'total_amount',
+    });
+
   }
 
   ngOnDestroy() {
@@ -362,7 +415,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     this.destroyChart(this.liquidityChart, chart => this.liquidityChart = null);
 
   }
-  
+
   // For 2nd & 3rd row charts 
   private initializeChart(canvas: ElementRef<HTMLCanvasElement>, data: any, type: keyof ChartTypeRegistry, chart_title: string  ): Chart | null {
     const ctx = canvas?.nativeElement?.getContext('2d');
