@@ -153,3 +153,15 @@
     </div>
     <span class="toast-message-text">{{ toastMessage }}</span>
 </div>
+
+<!-- code for workorder modalbox in sales  -->
+<div *ngIf="showModal" class="custom-dialog-overlay">
+    <div class="custom-dialog-box">
+      <h5>Confirm Work Order Creation</h5>
+      <p>Are you sure you want to create a work order for the selected products?</p>
+      <div class="dialog-actions">
+        <button class="btn btn-secondary" (click)="closeModalworkorder()">Cancel</button>
+        <button class="btn btn-primary" (click)="confirmWorkOrder()">Confirm</button>
+      </div>
+    </div>
+  </div>

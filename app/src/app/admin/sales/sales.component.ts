@@ -36,6 +36,7 @@ export class SalesComponent {
   shippingTrackingNumber: any;
   unitOptionOfProduct: any[] | string = []; // Initialize as an array by default
   isModalOpen = false;  //Added line to fix past orders modal box correctly
+  showModal = false;
   //COPY ---------------------------------
   // List of all tables
   tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return', 'Purchase Order', 'Purchase Invoice', 'Purchase Return'];
@@ -787,29 +788,29 @@ handleProductPull(selectedProducts: any[]) {
   };
 
   //Added this logic for creating workorder from sale order and changing flow status by triggering URL
-  createWorkOrder() {
-    if (this.SaleOrderEditID) {
-      const productDetails = this.formConfig.model.sale_order_items;
-      const saleOrderDetails = this.formConfig.model.sale_order;
+  // createWorkOrder() {
+  //   if (this.SaleOrderEditID) {
+  //     const productDetails = this.formConfig.model.sale_order_items;
+  //     const saleOrderDetails = this.formConfig.model.sale_order;
   
-      // Check if productDetails and saleOrderDetails have valid data
-      if (productDetails && saleOrderDetails) {
-        const payload = {
-          productDetails: productDetails,
-          saleOrderDetails: saleOrderDetails,
-        };
+  //     // Check if productDetails and saleOrderDetails have valid data
+  //     if (productDetails && saleOrderDetails) {
+  //       const payload = {
+  //         productDetails: productDetails,
+  //         saleOrderDetails: saleOrderDetails,
+  //       };
   
-        console.log('Navigating to production with payload:', payload);
+  //       console.log('Navigating to production with payload:', payload);
   
-        // Navigate to the Work Order route without triggering the `move_next_stage` endpoint
-        this.router.navigate(['admin/production'], { state: payload });
-      } else {
-        console.warn('Product details or sale order details are missing.');
-      }
-    } else {
-      console.warn('SaleOrderEditID is not set. Unable to create work order.');
-    }
-  }
+  //       // Navigate to the Work Order route without triggering the `move_next_stage` endpoint
+  //       this.router.navigate(['admin/production'], { state: payload });
+  //     } else {
+  //       console.warn('Product details or sale order details are missing.');
+  //     }
+  //   } else {
+  //     console.warn('SaleOrderEditID is not set. Unable to create work order.');
+  //   }
+  // }
   
   createSaleOrder() {
       this.http.post('sales/sale_order/', this.formConfig.model)
@@ -866,6 +867,168 @@ handleProductPull(selectedProducts: any[]) {
             console.error('Error updating record:', error);
         });
   }
+  //=======================================================
+createWorkOrder() {
+  // console.log("dataa1",this.SaleOrderEditID)
+  if (this.SaleOrderEditID) {
+    // **1. Filtering Selected Items**: Check if `selectItem` exists and is `true`
+    const selectedProducts = this.formConfig.model.sale_order_items.filter(item => item.selectItem);
+
+    // Log the filtered selected products
+    console.log("Filtered Selected Products:", selectedProducts);
+
+    const saleOrderDetails = this.formConfig.model.sale_order;
+    const saleOrderItemsDetails = this.formConfig.model.sale_order_items
+    const orderAttachmentsDetails = this.formConfig.model.order_attachments
+    const orderShipmentsDetails = this.formConfig.model.order_shipments
+
+
+    // **2. Proceed Only if Data is Valid**: Ensure selected products and sale order details exist
+    if (selectedProducts.length > 0 && saleOrderDetails && orderAttachmentsDetails && orderShipmentsDetails) {
+      this.selectedOrder = {
+        productDetails: selectedProducts, // Only include selected products
+        saleOrderDetails: saleOrderDetails,
+        orderAttachments : orderAttachmentsDetails,
+        orderShipments : orderShipmentsDetails
+      };
+
+      // Show the modal for confirmation
+      this.showModal = true;
+    } else {
+      // Warn if conditions for creating a work order are not met
+      console.warn('No products selected or sale order details are missing.');
+    }
+  } else {
+    // Warn if `SaleOrderEditID` is not set
+    console.warn('SaleOrderEditID is not set. Unable to create work order.');
+  }
+}
+
+closeModalworkorder() {
+  this.showModal = false;
+  this.selectedOrder = null;
+}
+
+confirmWorkOrder() {
+  console.log("data1",this.selectedOrder)
+  if (this.selectedOrder) {
+    const { productDetails, saleOrderDetails, orderAttachments, orderShipments} = this.selectedOrder;
+
+    const parentOrderNo = saleOrderDetails.order_no; // Parent order number
+    let childOrderCounter = 1; // Counter for child sale orders
+
+    const processProductRequests = productDetails.map((product) => {
+      const childOrderNo = `${parentOrderNo}-${childOrderCounter++}`; // Generate child order number
+      console.log("saleorderdetailsdata",saleOrderDetails)
+
+      // Step 1: Construct the payload for the child sale order
+      const childSaleOrderPayload = {
+        sale_order: 
+        {
+          order_no: childOrderNo,
+          customer_id: saleOrderDetails.customer.customer_id,
+          order_date: saleOrderDetails.order_date,
+          ref_date: saleOrderDetails.ref_date,
+          delivery_date: saleOrderDetails.delivery_date,
+          order_type: 'sale_order',
+          sale_estimate: saleOrderDetails.sale_estimate || 'No',
+          flow_status: { flow_status_name: 'Production' },
+          billing_address: saleOrderDetails.billing_address,
+          shipping_address: saleOrderDetails.shipping_address,
+          email: saleOrderDetails.email,
+          remarks: saleOrderDetails.remarks || null
+        },
+        sale_order_items: productDetails,
+        // [
+          // {
+          //   product_id: product.product_id,
+          //   unit_options_id: product.unit_options_id,
+          //   quantity: product.quantity || 0,
+          //   rate: product.rate,
+          //   amount: product.amount,
+          //   print_name: product.print_name,
+          //   size_id: product.size?.size_id || null,
+          //   color_id: product.color?.color_id || null
+          // }
+        // ],
+        order_attachments: orderAttachments,
+        // .map((attachment) => ({
+        //   attachment_name: attachment.attachment_name,
+        //   attachment_path: attachment.attachment_path,
+        //   order_type_id: attachment.order_type_id
+        // })) || [],
+        order_shipments: orderShipments
+          // ? {
+          //     shipping_mode_id: saleOrderDetails.order_shipments.shipping_mode?.shipping_mode_id || null,
+          //     shipping_company_id: saleOrderDetails.order_shipments.shipping_company?.shipping_company_id || null,
+          //     destination: saleOrderDetails.order_shipments.destination,
+          //     shipping_tracking_no: `${saleOrderDetails.order_shipments.shipping_tracking_no}-${childOrderCounter}`,
+          //     shipping_date: saleOrderDetails.order_shipments.shipping_date,
+          //     shipping_charges: saleOrderDetails.order_shipments.shipping_charges || null,
+          //     port_of_landing: saleOrderDetails.order_shipments.port_of_landing || null,
+          //     port_of_discharge: saleOrderDetails.order_shipments.port_of_discharge || null,
+          //     no_of_packets: saleOrderDetails.order_shipments.no_of_packets || null,
+          //     weight: saleOrderDetails.order_shipments.weight || null
+          //   }
+          // : {}
+      };
+
+      console.log('Payload for child sale order:', childSaleOrderPayload);
+
+      // Step 2: Post the child sale order
+      return this.http.post('sales/sale_order/', childSaleOrderPayload).pipe(
+        tap((childSaleOrderResponse: any) => {
+          console.log(`Child Sale Order ${childOrderNo} created:`, childSaleOrderResponse);
+
+          // Step 3: Construct and post the Work Order payload
+          const workOrderPayload = {
+            work_order: {
+              product_id: product.product_id,
+              quantity: product.quantity || 0,
+              completed_qty: 0, // Initialize as 0
+              pending_qty: product.quantity || 0, // Pending is the same as the total quantity
+              start_date: saleOrderDetails.order_date || new Date().toISOString().split('T')[0],
+              // end_date: saleOrderDetails.delivery_date || new Date().toISOString().split('T')[0],
+              sync_qty: true, // As per the example payload
+              size_id: product.size?.size_id || null,
+              color_id: product.color?.color_id || null,
+              status_id: '', // Set as empty if not provided
+              sale_order_id: childSaleOrderResponse.data.sale_order.sale_order_id // Link the sale order ID
+            },
+            bom: [], // Empty for now
+            work_order_machines: [], // Empty for now
+            workers: [], // Empty for now
+            work_order_stages: [] // Empty for now
+          };
+
+          console.log('Work Order Payload:', workOrderPayload);
+
+          this.http.post('production/work_order/', workOrderPayload).subscribe({
+            next: (workOrderResponse) => {
+              console.log('Work Order created:', workOrderResponse);
+            },
+            error: (err) => {
+              console.error('Error creating Work Order:', err);
+            }
+          });
+        })
+      );
+    });
+
+    // Process all requests
+    forkJoin(processProductRequests).subscribe({
+      next: () => {
+        this.closeModalworkorder();
+        alert('Child Sale Orders and Work Orders created successfully!');
+      },
+      error: (err) => {
+        console.error('Error processing products:', err);
+        alert('Failed to create Child Sale Orders or Work Orders. Please try again.');
+      }
+    });
+  }
+}
+
 //=======================================================
   setFormConfig() {
     this.SaleOrderEditID = null;
