@@ -529,6 +529,7 @@ export class AdminLayoutComponent {
 
       //inventory
       'inventory': 'admin/inventory',
+      'stockjournal': 'admin/stockjournal',
       'products': 'admin/products',
       'warehouse': 'admin/warehouses',
       'quickpacks': 'admin/quickpacks',
