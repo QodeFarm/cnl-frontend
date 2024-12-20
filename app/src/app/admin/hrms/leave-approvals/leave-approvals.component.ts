@@ -1,71 +1,150 @@
-import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
-import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule } from '@angular/common';
+// import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
+import { TaCurdConfig } from '@ta/ta-curd';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
-import { LeaveApprovalsListComponent } from './leave-approvals-list/leave-approvals-list.component';
+import { HttpClient } from '@angular/common/http';
 
 
 @Component({
   selector: 'app-leave-approvals',
   standalone: true,
-  imports: [CommonModule,AdminCommmonModule,LeaveApprovalsListComponent],
+  imports: [CommonModule,AdminCommmonModule],
   templateUrl: './leave-approvals.component.html',
   styleUrls: ['./leave-approvals.component.scss']
 })
 export class LeaveApprovalsComponent {
-  showLeaveApprovalsList: boolean = false;
-  showForm: boolean = false;
-  LeaveApprovalsEditID: any; 
+  @Output('edit') edit = new EventEmitter<void>();
+  @Output('circle') circle = new EventEmitter<void>();
 
-  constructor(private http: HttpClient) {
-  }
-
-  ngOnInit() {
-    this.showLeaveApprovalsList = false;
-    this.showForm = true;
-    this.LeaveApprovalsEditID = null;
-    // set form config
-    this.setFormConfig();
-    console.log('this.formConfig', this.formConfig);
-
-  };
-
-  formConfig: TaFormConfig = {};
-
-  hide() {
-    document.getElementById('modalClose').click();
-  };
-
-  editLeaveApprovals(event) {
-    console.log('event', event);
-    this.LeaveApprovalsEditID = event;
-    this.http.get('hrms/leave_approvals/' + event).subscribe((res: any) => {
-      if (res) {
-        this.formConfig.model = res;
-        this.formConfig.showActionBtn = true;
-        this.formConfig.pkId = 'approval_id';
-        //set labels for update
-        this.formConfig.submit.label = 'Update';
-        this.showForm = true;
-      }
-    })
-    this.hide();
-  };
-
-  showLeaveApprovalsListFn() {
-    this.showLeaveApprovalsList = true;
-  };
-
-  setFormConfig() {
-    this.LeaveApprovalsEditID = null;
-    this.formConfig = {
-      url: "hrms/leave_approvals/",
-      // title: 'leads',
-      formState: {
-        viewMode: false,
+    curdConfig: TaCurdConfig = {
+    drawerSize: 500,
+    drawerPlacement: 'right',
+    tableConfig: {
+      apiUrl: 'hrms/leave_approvals/',
+      title: 'Leave Approvals',
+      pkId: "approval_id",
+      pageSize: 10,
+      "globalSearch": {
+        keys: ['approval_id', 'name']
       },
-      showActionBtn : true,
+      cols: [
+        {
+          fieldKey: 'leave_id',
+          name: 'Employee',
+          sort: true,
+          displayType: "map",
+          mapFn: (currentValue: any, row: any, col: any) => {
+            // Concatenate first_name and last_name correctly
+            const firstName = row.leave.employee?.first_name || '';
+            const lastName = row.leave.employee?.last_name || '';
+            return `${firstName} ${lastName}`.trim();
+          },
+        }, 
+        {
+          fieldKey: 'leave_id',
+          name: 'Leave Type',
+          sort: true,
+          displayType: "map",
+          mapFn: (currentValue: any, row: any, col: any) => {
+            return `${row.leave.leave_type.leave_type_name}`;
+          },
+        },
+        {
+          fieldKey: 'leave_id',
+          name: 'Start Date',
+          sort: true,
+          displayType: "map",
+          mapFn: (currentValue: any, row: any, col: any) => {
+            return `${row.leave.start_date}`;
+          },
+        },
+        {
+          fieldKey: 'leave_id',
+          name: 'End Date',
+          sort: true,
+          displayType: "map",
+          mapFn: (currentValue: any, row: any, col: any) => {
+            return `${row.leave.end_date}`;
+          },
+        },
+        {
+          fieldKey: 'status_id',
+          name: 'Status',
+          sort: true,
+          displayType: "map",
+          mapFn: (currentValue: any, row: any, col: any) => {
+            return `${row.status.status_name}`;
+          },
+        },
+        {
+          fieldKey: 'approval_date',
+          name: 'Approval Date',
+          sort: true
+        },
+        // {
+        //   fieldKey: 'comments', 
+        //   name: 'Comments',
+        //   sort: true
+        // }, 
+        {
+          fieldKey: 'approver',
+          name: 'Approver',
+          sort: true,
+          displayType: "map",
+          mapFn: (currentValue: any, row: any, col: any) => {
+            // Concatenate first_name and last_name correctly
+            const firstName = row.approver?.first_name || '';
+            const lastName = row.approver?.last_name || '';
+            return `${firstName} ${lastName}`.trim();
+          },
+        },
+        {
+          fieldKey: "code",
+          name: "Action",
+          type: 'action',
+          actions: [
+            // {
+            //   type: 'delete',
+            //   label: 'Delete',
+            //   confirm: true,
+            //   confirmMsg: "Sure to delete?",
+            //   apiUrl: 'hrms/leave_approvals'
+            // },
+            // {
+            //   type: 'edit',
+            //   label: 'Edit'
+            // },
+            {
+              type: 'callBackFn',
+              icon: 'fa fa-check-circle',
+              confirm: true,
+              confirmMsg: "Sure to Approve?",
+              callBackFn: (row, action) => {
+                console.log(row);
+                this.circleLeaveApprovals(row.approval_id);  // Call the method for approval
+                this.circle.emit(row.approval_id);
+              }
+            },
+            {
+              type: 'callBackFn',
+              icon: 'fa fa-times-circle', // Change to a reject icon
+              confirm: true,
+              confirmMsg: "Are you sure to Reject?", // Updated confirmation message
+              callBackFn: (row, action) => {
+                console.log(row);
+                this.circleLeaveRejections(row.approval_id);  // Call the method for reject
+                this.circle.emit(row.approval_id); // Adjust emit for rejection
+              }
+            }
+          ]
+        },
+      ]
+    },
+    formConfig: {
+      url: 'hrms/leave_approvals/',
+      title: 'Leave Approvals',
+      pkId: "approval_id",
       exParams: [
         {
           key: 'status_id',
@@ -83,108 +162,68 @@ export class LeaveApprovalsComponent {
           value: 'data.approver.employee_id'
         }
       ],
-      submit: {
-        label: 'Submit',
-        submittedFn: () => this.ngOnInit()
-      },
-      reset: {
-        resetFn: () => {
-          this.ngOnInit();
-        }
-      },
-      model:{},
-
-      fields: [
-        {
-          fieldGroupClassName: "ant-row custom-form-block",
-          fieldGroup: [
-            {
-              key: 'approval_date',
-              type: 'input',  // Use 'input' to allow custom types like 'datetime-local'
-              className: 'col-3 pb-3 ps-0',
-              templateOptions: {
-                label: 'Approval Date',
-                type: 'datetime-local',  // Use datetime-local for both date and time input
-                placeholder: 'Select Approval Date and Time',
-                required: false,
-              }
-            },
-            {
-              key: 'comments',
-              type: 'textarea',
-              className: 'col-3 pb-3 ps-0',
-              templateOptions: {
-                label: 'Comments',
-                placeholder: 'Enter Comments',
-                required: false,
-              }
-            },            {
-              key: 'status',
-              type: 'select',
-              className: 'col-3 pb-3 ps-0',
-              templateOptions: {
-                label: 'Status',
-                dataKey: 'status_id',
-                dataLabel: "status_name",
-                options: [],
-                lazy: {
-                  url: 'masters/statuses/',
-                  lazyOneTime: true
-                },
-                required: true
-              },
-              hooks: {
-                onInit: (field: any) => {
-                  //field.templateOptions.options = this.cs.getRole();
-                }
-              }
-            },
-            {
-              key: 'leave',
-              type: 'select',
-              className: 'col-3 pb-3 ps-0',
-              templateOptions: {
-                label: 'Leave',
-                dataKey: 'leave_id',
-                dataLabel: "comments",
-                options: [],
-                lazy: {
-                  url: 'hrms/employee_leaves/',
-                  lazyOneTime: true
-                },
-                required: true
-              },
-              hooks: {
-                onInit: (field: any) => {
-                  //field.templateOptions.options = this.cs.getRole();
-                }
-              }
-            },
-            {
-              key: 'approver',
-              type: 'select',
-              className: 'col-3 pb-3 ps-0',
-              templateOptions: {
-                label: 'Approver',
-                dataKey: 'employee_id',
-                dataLabel: "first_name",
-                options: [],
-                lazy: {
-                  url: 'hrms/employees/',
-                  lazyOneTime: true
-                },
-                required: true
-              },
-              hooks: {
-                onInit: (field: any) => {
-                  //field.templateOptions.options = this.cs.getRole();
-                }
-              }
-            }
-          ]
-        }
-      ]
+      fields: [ ]
     }
   }
-}
 
+  constructor(private http: HttpClient) {};
+
+  circleLeaveApprovals(event: any) {
+    console.log("we are in this method");
+    // Construct the URL for the patch request
+    const url = `hrms/leave_approvals/${event}/`;
+    // Prepare the payload with the updated status
+    const payload = { status_id: 'c2898235-4568-49ee-a68d-451b3ac703e5' }; // Approved status
+      
+    // Send the patch request to update the status
+    this.http.patch(url, payload).subscribe(
+      (res: any) => {
+          console.log("Response:", res);
+
+          // Check if the response contains approval_id
+          if (res && res.data.approval_id) {
+              // Store the success message in localStorage
+              // localStorage.setItem('sidebarMessage', 'Leave status Approved');
+
+              // Reload the page to reflect changes
+              window.location.reload();
+          } else {
+              // Handle the case when no approval_id is returned
+              console.error("Error: Approval ID not found in response:", res);
+          }
+      },
+      (error) => {
+          // Handle any HTTP error and log the error message
+          console.error("HTTP error:", error);
+          alert("An error occurred while updating the leave status.");
+      }
+    );
+  }
+
+  circleLeaveRejections(event: any) {
+    console.log("we are in the rejection method");
+    // Construct the URL for the patch request
+    const url = `hrms/leave_approvals/${event}/`;
+    // Prepare the payload with the updated rejection status
+    const payload = { status_id: '349fb6e4-6e48-4121-9573-57275ae85a37' }; // Rejected status
+
+    // Send the patch request to update the status
+    this.http.patch(url, payload).subscribe(
+      (res: any) => {
+          console.log("Response:", res);
+
+          // Check if the response contains approval_id
+          if (res && res.data.approval_id) {
+              // Reload the page to reflect changes
+              window.location.reload();
+          } else {
+              console.error("Error: Approval ID not found in response:", res);
+          }
+      },
+      (error) => {
+          console.error("HTTP error:", error);
+          alert("An error occurred while updating the leave status.");
+      }
+    );
+  }
+}

@@ -14,6 +14,7 @@ import { EmployeeLeaveBalanceComponent } from './employee-leave-balance/employee
 import { AttendanceComponent } from './attendance/attendance.component';
 import { SwipesComponent } from './swipes/swipes.component';
 import { EmployeeSalaryComponent } from './employee-salary/employee-salary.component';
+import { EmployeeAttendanceComponent } from './employee-attendance/employee-attendance.component';
 
 const routes: Routes = [
   {
@@ -71,6 +72,10 @@ const routes: Routes = [
   {
     path: 'attendance',
     component: AttendanceComponent
+  },
+  {
+    path: 'employee-attendance',
+    component: EmployeeAttendanceComponent
   },
   {
     path: 'swipes',

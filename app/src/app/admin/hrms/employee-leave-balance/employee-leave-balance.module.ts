@@ -9,8 +9,8 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 @NgModule({
   declarations: [
-    EmployeeLeaveBalanceComponent,
-    EmployeeLeaveBalanceListComponent
+    // EmployeeLeaveBalanceComponent,
+    // EmployeeLeaveBalanceListComponent
   ],
   imports: [
     CommonModule,
