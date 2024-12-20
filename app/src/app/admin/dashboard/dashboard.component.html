@@ -146,3 +146,51 @@
         </div>
     </div>
 </div>
+
+<!-- Task and Work Order tables Div -->
+<div class="task-workOrder-row">
+    <div class="left-task-container">
+        <h4>Task</h4>
+        <table class="task-table">
+            <thead>
+                <tr>
+                    <th>Assigned To</th>
+                    <th>Title</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let task of taskList">
+                    <td>{{ task.name }}</td>
+                    <td>{{ task.title }}</td>
+                    <td>{{ task.status }}</td>
+                    <td>{{ task.priority }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="right-task-container">
+        <h4>Work Orders</h4>
+        <table class="task-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Completed</th>
+                    <th>Pending</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let order of workOrders">
+                    <td>{{ order.name }}</td>
+                    <td>{{ order.quantity }}</td>
+                    <td>{{ order.completed_qty }}</td>
+                    <td>{{ order.pending_qty }}</td>
+                    <td>{{ order.status_name }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

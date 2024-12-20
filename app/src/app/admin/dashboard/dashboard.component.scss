@@ -79,7 +79,7 @@
   height: 400px;
 }
 
-.second-main-row {
+.second-main-row, .task-workOrder-row {
   display: flex;
 }
 
@@ -158,4 +158,89 @@
   .chart-container {
     padding: 15px;
   }
+}
+
+/* General styles for the table container */
+.left-task-container {
+  padding-left: 20px;
+  max-width: 100%; /* Ensures the table can adjust to the screen size */
+  overflow-x: auto; /* Makes the table scrollable horizontally on small screens */
+  height: 300px; /* Set the fixed height for the container */
+  overflow-y: auto; /* Adds vertical scroll if the content exceeds the set height */
+  display: flex;
+  flex-direction: column; /* Ensure children are stacked vertically */
+}
+
+h4 {
+  background-color: #394c8f; /* Blue background */
+  color: white; /* White text color */
+  padding: 10px 20px; /* Padding inside the header */
+  border-radius: 10px; /* Curved edges */
+  font-size: 18px; /* Font size for the header */
+  text-align: center; /* Center the text */
+}
+
+
+.right-task-container {
+  padding-left: 5px;
+  padding-right: 18px;
+  max-width: 100%; /* Ensures the table can adjust to the screen size */
+  overflow-x: auto; /* Makes the table scrollable horizontally on small screens */
+  height: 300px; /* Set the fixed height for the container */
+  overflow-y: auto; /* Adds vertical scroll if the content exceeds the set height */
+  display: flex;
+  flex-direction: column; /* Ensure children are stacked vertically */
+}
+
+.task-table-wrapper {
+  overflow-y: auto; /* Adds vertical scroll if the content exceeds the set height */
+  flex-grow: 1; /* Ensures this wrapper grows to take available space */
+}
+
+/* Styles for the table */
+.task-table {
+  width: 100%; /* Table takes up the full width of the container */
+  border-collapse: collapse; /* Ensures borders are collapsed to a single line */
+  margin: 1px 0; /* Adds margin on top and bottom of the table */
+  padding: 10px; /* Padding inside the table cells */
+  box-sizing: border-box; /* Ensures padding is included in the width */
+  border-radius: 10px; /* Rounded corners for the whole table */
+  border: 1px solid #ddd; /* Light border around the table */
+}
+
+/* Styles for table headings */
+.task-table th {
+  background-color: #394c8f; /* Dark blue background for headings */
+  color: white; /* White text color for the headings */
+  padding: 10px 13px; /* Adjust the padding (top/bottom, left/right) */
+  text-align: center; /* Align text to the left in the heading */
+  border: 1px solid #ddd; /* Light border around the table header cells */
+  font-size: 15px; /* Font size for the headings */
+  position: sticky; /* Fix the header to the top */
+  top: 0; /* Keeps the header on top */
+  z-index: 2; /* Ensures header is above table data */
+}
+
+/* Styles for table cells */
+.task-table td {
+  padding: 10px 15px; /* Padding inside the table data cells */
+  text-align: center; /* Align text to the left in table data cells */
+  border: 1px solid #ddd; /* Light border around the table cells */
+  font-size: 14px; /* Font size for the data cells */
+}
+
+/* Adjust table row on hover for better user experience */
+.task-table tr:hover {
+  background-color: #f2f2f2; /* Light gray background when hovering over a row */
+}
+
+/* Optional: Adjust the width of the columns if needed */
+.task-table th, .task-table td {
+  width: 25%; /* Adjust the column width (for each column) */
+}
+
+/* Adjust the size of the whole table */
+.task-table {
+  max-width: 100%; /* Ensures table width is responsive */
+  table-layout: fixed; /* Ensures columns have equal widths and adjust based on content */
 }
