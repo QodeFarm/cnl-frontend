@@ -13,6 +13,12 @@ import { HttpClient } from '@angular/common/http'; // Import HttpClient
 })
 export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   
+  ngOnInit() {
+    Chart.register(...registerables);
+    this.fetchTasks();
+    this.fetchWorkOrders();
+  }
+
   baseUrl: string = 'http://195.35.20.172:8000/api/v1/'; 
 
   isSalesModalOpen: boolean = false;
@@ -26,6 +32,12 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   receivablesChart: any;
   payablesChart: any;
   liquidityChart: any;
+
+  //Task Related
+  taskList: Array<any> = []; // Store processed task data
+  
+  //Work Order
+  workOrders: Array<any> = []; // Store processed work order data
 
   @ViewChild('salesChartCanvas') salesChartCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('purchaseChartCanvas') purchaseChartCanvas!: ElementRef<HTMLCanvasElement>;
@@ -364,9 +376,6 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     return ctx;
   }
 
-  ngOnInit() {
-    Chart.register(...registerables);
-  }
 
   // For 2nd row charts 
   ngAfterViewInit() {
@@ -478,5 +487,44 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
       data,
       options: chartOptions,
     });
+  }
+
+  fetchTasks(): void {
+    const apiUrl = `${this.baseUrl}tasks/task/`;
+    this.http.get(apiUrl).subscribe(
+      (response: any) => {
+        if (response?.data) {
+          this.taskList = response.data.map((task: any) => ({
+            name: task.group?.group_name || `${task.user?.first_name || ''} ${task.user?.last_name || ''}`.trim(),
+            title: task.title,
+            status: task.status.status_name,
+            priority: task.priority.priority_name,
+          }));
+        }
+      },
+      (error) => {
+        alert('Error fetching tasks');
+      }
+    );
+  }
+  
+  fetchWorkOrders(): void {
+    const apiUrl = `${this.baseUrl}production/work_order/`;
+    this.http.get(apiUrl).subscribe(
+      (response: any) => {
+        if (response?.data) {
+          this.workOrders = response.data.map((workOrder: any) => ({
+            name: workOrder.product?.name || 'Unknown Product',
+            quantity: workOrder.quantity || 0,
+            completed_qty: workOrder.completed_qty || 0,
+            pending_qty: workOrder.pending_qty || 0,
+            status_name: workOrder.status?.status_name || 'Unknown Status',
+          }));
+        }
+      },
+      (error) => {
+        console.error('Error fetching work orders:', error);
+      }
+    );
   }
 }
