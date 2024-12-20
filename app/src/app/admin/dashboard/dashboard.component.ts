@@ -13,7 +13,7 @@ import { HttpClient } from '@angular/common/http'; // Import HttpClient
 })
 export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   
-  baseUrl: string = 'http://127.0.0.1:8000/api/v1/';
+  baseUrl: string = 'http://195.35.20.172:8000/api/v1/'; 
 
   isSalesModalOpen: boolean = false;
   isPurchaseModalOpen: boolean = false;
