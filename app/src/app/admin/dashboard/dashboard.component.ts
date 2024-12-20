@@ -13,7 +13,7 @@ import { HttpClient } from '@angular/common/http'; // Import HttpClient
 })
 export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   
-  baseUrl: string = 'http://127.0.0.1:8000/api/v1/dashboard/';
+  baseUrl: string = 'http://127.0.0.1:8000/api/v1/';
 
   isSalesModalOpen: boolean = false;
   isPurchaseModalOpen: boolean = false;
@@ -52,13 +52,12 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     dataConfig: { labelsTarget: string[]; dataTarget: number[]; labelField: string; dataField: string }
   ): Promise<void> {
     return new Promise((resolve, reject) => {
-      const apiUrl = this.baseUrl + endpoint + '/'; 
-      // console.log("===>>>",this.baseUrl)
+      const apiUrl = this.baseUrl + 'dashboard/' + endpoint + '/'; 
       this.http.get(apiUrl).subscribe(
         (response: any) => {
           dataConfig.labelsTarget.length = 0; // Clear existing data
           dataConfig.dataTarget.length = 0;
-          response.forEach((item: any) => {
+          response.data.forEach((item: any) => {
             dataConfig.labelsTarget.push(item[dataConfig.labelField]);
             dataConfig.dataTarget.push(item[dataConfig.dataField]);
           });
@@ -378,47 +377,47 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     // 3rd charts charts  Last6MonthsCashflowData
     this.initializeChart(this.chartLast6MonthsCashflowCanvas, this.Last6MonthsCashflowData, 'bar', "Last 6 Month's Cashflow"); // Top 6 Profit Making Items
 
-    // Promise.all([
-    //   this.fetchDataAndInitializeChart('Sales_Over_the_Last_12_Months', {
-    //     labelsTarget: this.salesData.labels,
-    //     dataTarget: this.salesData.datasets[0].data,
-    //     labelField: 'month_year',
-    //     dataField: 'total_sales',
-    //   }),
-    //   this.fetchDataAndInitializeChart('Purchase_Over_the_Last_12_Months', {
-    //     labelsTarget: this.purchaseData.labels,
-    //     dataTarget: this.purchaseData.datasets[0].data,
-    //     labelField: 'month_year',
-    //     dataField: 'monthly_purchases',
-    //   }),      
-    //   this.fetchDataAndInitializeChart('Top_10_Itmes_Sold_In_Last_30_Days', {
-    //     labelsTarget: this.top6ItemsData.labels,
-    //     dataTarget: this.top6ItemsData.datasets[0].data,
-    //     labelField: 'product_name',
-    //     dataField: 'total_sold_quantity',
-    //   }),
-    //   this.fetchDataAndInitializeChart('Top_6_Items_Groups_In_Last_6_Months', {
-    //     labelsTarget: this.top6ItemsIn6MonthsData.labels,
-    //     dataTarget: this.top6ItemsIn6MonthsData.datasets[0].data,
-    //     labelField: 'item_group',
-    //     dataField: 'monthly_sales',
-    //   }),
-    //   this.fetchDataAndInitializeChart('Top_6_Sold_Items_In_Current_FY', {
-    //     labelsTarget: this.top6ProfitMakingItemsData.labels,
-    //     dataTarget: this.top6ProfitMakingItemsData.datasets[0].data,
-    //     labelField: 'item_name',
-    //     dataField: 'total_amount',
-    //   }),
-    // ])
-    //   .then(() => {
-    //     // Initialize charts after all data is fetched
-    //     this.initializeChart(this.chartTop6ItemsCanvas, this.top6ItemsData, 'pie', 'Top 6 Items Sold');
-    //     this.initializeChart(this.chartTop6ItemsIn6MonthsCanvas, this.top6ItemsIn6MonthsData, 'bar', 'Top 6 Items (Last 6 Months)');
-    //     this.initializeChart(this.chartTop6ProfitMakingItemsCanvas, this.top6ProfitMakingItemsData, 'bar', 'Top 6 Profit-Making Items');
-    //   })
-    //   .catch(error => {
-    //     console.error('Error loading chart data:', error);
-    // });
+    Promise.all([
+      this.fetchDataAndInitializeChart('Sales_Over_the_Last_12_Months', {
+        labelsTarget: this.salesData.labels,
+        dataTarget: this.salesData.datasets[0].data,
+        labelField: 'month_year',
+        dataField: 'total_sales',
+      }),
+      this.fetchDataAndInitializeChart('Purchase_Over_the_Last_12_Months', {
+        labelsTarget: this.purchaseData.labels,
+        dataTarget: this.purchaseData.datasets[0].data,
+        labelField: 'month_year',
+        dataField: 'monthly_purchases',
+      }),      
+      this.fetchDataAndInitializeChart('Top_10_Itmes_Sold_In_Last_30_Days', {
+        labelsTarget: this.top6ItemsData.labels,
+        dataTarget: this.top6ItemsData.datasets[0].data,
+        labelField: 'product_name',
+        dataField: 'total_sold_quantity',
+      }),
+      this.fetchDataAndInitializeChart('Top_6_Items_Groups_In_Last_6_Months', {
+        labelsTarget: this.top6ItemsIn6MonthsData.labels,
+        dataTarget: this.top6ItemsIn6MonthsData.datasets[0].data,
+        labelField: 'item_group',
+        dataField: 'monthly_sales',
+      }),
+      this.fetchDataAndInitializeChart('Top_6_Sold_Items_In_Current_FY', {
+        labelsTarget: this.top6ProfitMakingItemsData.labels,
+        dataTarget: this.top6ProfitMakingItemsData.datasets[0].data,
+        labelField: 'item_name',
+        dataField: 'total_amount',
+      }),
+    ])
+      .then(() => {
+        // Initialize charts after all data is fetched
+        this.initializeChart(this.chartTop6ItemsCanvas, this.top6ItemsData, 'pie', 'Top 6 Items Sold');
+        this.initializeChart(this.chartTop6ItemsIn6MonthsCanvas, this.top6ItemsIn6MonthsData, 'bar', 'Top 6 Items (Last 6 Months)');
+        this.initializeChart(this.chartTop6ProfitMakingItemsCanvas, this.top6ProfitMakingItemsData, 'bar', 'Top 6 Profit-Making Items');
+      })
+      .catch(error => {
+        console.error('Error loading chart data:', error);
+    });
 
   }
 
