@@ -157,7 +157,7 @@ export class LeadsComponent {
               templateOptions: {
                 label: 'Assigned',
                 dataKey: 'employee_id',
-                dataLabel: "name",
+                dataLabel: "first_name",
                 options: [],
                 required: true,
                 lazy: {
@@ -176,7 +176,7 @@ export class LeadsComponent {
                   });
                 }
               }
-            },
+            },            
             {
               key: 'lead_status',
               type: 'select',
