@@ -46,13 +46,13 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('liquidityChartCanvas') liquidityChartCanvas!: ElementRef<HTMLCanvasElement>; 
 
   // For 2nd row charts 
-  @ViewChild('chartTop6Items') chartTop6ItemsCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('chartTop5Items') chartTop5ItemsCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('chartDirectExpenses') chartDirectExpensesCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('chartOperationalExpenses') chartOperationalExpensesCanvas!: ElementRef<HTMLCanvasElement>;
 
   //3rd row
-  @ViewChild('chartTop6ItemsIn6MonthsCanvas') chartTop6ItemsIn6MonthsCanvas!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('chartTop6ProfitMakingItemsCanvas') chartTop6ProfitMakingItemsCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('chartTop5ItemsIn6MonthsCanvas') chartTop5ItemsIn6MonthsCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('chartTop5ProfitMakingItemsCanvas') chartTop5ProfitMakingItemsCanvas!: ElementRef<HTMLCanvasElement>;
 
   //2nd-row Right-side-chart
   @ViewChild('chartLast6MonthsCashflowCanvas') chartLast6MonthsCashflowCanvas!: ElementRef<HTMLCanvasElement>;
@@ -141,7 +141,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   };
 
   // For 2nd row charts 
-  top6ItemsData = {
+  top5ItemsData = {
     labels: [],
     datasets: [{
       label: 'Top Items Sold',
@@ -258,8 +258,8 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   //2nd row Row Charts
-  //Data for Top 6 Items Groups sales in Last 6 Months
-  top6ItemsIn6MonthsData = {
+  //Data for Top 5 Items Groups sales in Last 6 Months
+  top5ItemsIn6MonthsData = {
     chart_title : 'wq',
     labels: [], // Labels
     datasets: [{
@@ -272,8 +272,8 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     }]
   };
 
-  //Data for Top 6 Profit making Items In last FY
-  top6ProfitMakingItemsData = {
+  //Data for Top 5 Profit making Items In last FY
+  top5ProfitMakingItemsData = {
     labels: [],    // Labels
     datasets: [{
       label: 'Profit (in ₹)',
@@ -399,30 +399,30 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
         labelField: 'month_year',
         dataField: 'monthly_purchases',
       }),      
-      this.fetchDataAndInitializeChart('Top_10_Itmes_Sold_In_Last_30_Days', {
-        labelsTarget: this.top6ItemsData.labels,
-        dataTarget: this.top6ItemsData.datasets[0].data,
+      this.fetchDataAndInitializeChart('Top_5_Itmes_Sold_In_Last_30_Days', {
+        labelsTarget: this.top5ItemsData.labels,
+        dataTarget: this.top5ItemsData.datasets[0].data,
         labelField: 'product_name',
         dataField: 'total_sold_quantity',
       }),
-      this.fetchDataAndInitializeChart('Top_6_Items_Groups_In_Last_6_Months', {
-        labelsTarget: this.top6ItemsIn6MonthsData.labels,
-        dataTarget: this.top6ItemsIn6MonthsData.datasets[0].data,
+      this.fetchDataAndInitializeChart('Top_5_Items_Groups_In_Last_6_Months', {
+        labelsTarget: this.top5ItemsIn6MonthsData.labels,
+        dataTarget: this.top5ItemsIn6MonthsData.datasets[0].data,
         labelField: 'item_group',
-        dataField: 'monthly_sales',
+        dataField: 'total_amount',
       }),
-      this.fetchDataAndInitializeChart('Top_6_Sold_Items_In_Current_FY', {
-        labelsTarget: this.top6ProfitMakingItemsData.labels,
-        dataTarget: this.top6ProfitMakingItemsData.datasets[0].data,
+      this.fetchDataAndInitializeChart('Top_5_Sold_Items_In_Current_FY', {
+        labelsTarget: this.top5ProfitMakingItemsData.labels,
+        dataTarget: this.top5ProfitMakingItemsData.datasets[0].data,
         labelField: 'item_name',
         dataField: 'total_amount',
       }),
     ])
       .then(() => {
         // Initialize charts after all data is fetched
-        this.initializeChart(this.chartTop6ItemsCanvas, this.top6ItemsData, 'pie', 'Top 6 Items Sold');
-        this.initializeChart(this.chartTop6ItemsIn6MonthsCanvas, this.top6ItemsIn6MonthsData, 'bar', 'Top 6 Items (Last 6 Months)');
-        this.initializeChart(this.chartTop6ProfitMakingItemsCanvas, this.top6ProfitMakingItemsData, 'bar', 'Top 6 Profit-Making Items');
+        this.initializeChart(this.chartTop5ItemsCanvas, this.top5ItemsData, 'pie', 'Top 5 Items Sold In Last 30 days');
+        this.initializeChart(this.chartTop5ItemsIn6MonthsCanvas, this.top5ItemsIn6MonthsData, 'bar', 'Top 5 Items (Last 6 Months)');
+        this.initializeChart(this.chartTop5ProfitMakingItemsCanvas, this.top5ProfitMakingItemsData, 'bar', 'Top 5 Profit-Making Items');
       })
       .catch(error => {
         console.error('Error loading chart data:', error);
