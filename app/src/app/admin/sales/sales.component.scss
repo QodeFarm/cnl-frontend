@@ -98,33 +98,51 @@
 .quickpack-container {
     display: flex;
     align-items: center;
-    gap: 0.5rem; /* Adjust spacing between elements */
+    gap: 10px; /* Adjust spacing between elements */
   }
+
+.quickpack-container label {
+    margin-right: 10px; /* Space between label and dropdown */
+    white-space: nowrap; /* Prevents wrapping of text */
+}
+
+.quickpack-container .dropdown-container {
+  flex-grow: 1; /* Adjust width of the dropdown if needed */
+}
   
-  .quickpack-select {
-    width: 200px; /* Set dropdown width */
-    height: 38px; /* Adjust height to match buttons */
-    border-radius: 4px;
-  }
+.quickpack-container .dropdown-select {
+  min-width: 200px; /* Adjust dropdown width */
+  padding: 5px;
+}
+
+.quickpack-container button {
+  margin-left: 10px; /* Space between dropdown and button */
+}
+
+// .quickpack-select {
+//     width: 200px; /* Set dropdown width */
+//     height: 38px; /* Adjust height to match buttons */
+//     border-radius: 4px;
+//   }
   
-  .btn-icon {
-    background-color: #2c5ca9; /* Match the blue button background */
-    color: white;
-    border: none;
-    height: 38px;
-    width: 38px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+//   .btn-icon {
+//     background-color: #2c5ca9; /* Match the blue button background */
+//     color: white;
+//     border: none;
+//     height: 38px;
+//     width: 38px;
+//     display: flex;
+//     justify-content: center;
+//     align-items: center;
+//   }
   
-  .btn-icon i {
-    font-size: 16px;
-  }
+//   .btn-icon i {
+//     font-size: 16px;
+//   }
   
-  .btn-primary {
-    height: 38px; /* Match height with the dropdown */
-  }
+//   .btn-primary {
+//     height: 38px; /* Match height with the dropdown */
+//   }
 
 //==================================
 /* Dropdown container */

@@ -772,16 +772,11 @@ handleProductPull(selectedProducts: any[]) {
       });
   }
 
-  // onQuickpackChange(event: Event) {    
-  //   const target = event.target as HTMLSelectElement;
-  //   this.selectedQuickpack = target.value;
-  //   console.log("selectedQuickpack : ", this.selectedQuickpack);
-  // }
 
   loadQuickpackProducts() {
     console.log("quick pack id : ", this.selectedQuickpack)
     if (!this.selectedQuickpack) {
-      alert('Please select a Quickpack!');
+      console.log('Please select a Quickpack!');
       return;
     }
 
@@ -791,7 +786,7 @@ handleProductPull(selectedProducts: any[]) {
         const quickPackDataItems = response.data.quick_pack_data_items || [];
 
         if (quickPackDataItems.length === 0) {
-          alert('No items found in the selected Quickpack!');
+          console.log('No items found in the selected Quickpack!');
           return;
         }
         // Populate `sale_order_items` with Quickpack data
@@ -815,17 +810,6 @@ handleProductPull(selectedProducts: any[]) {
         console.log('Sale Order Items populated:', this.formConfig.model.sale_order_items);
       });
   }
-
-
-  /**
-   * Handle additional action (e.g., open a modal, add new Quickpack)
-   */
-  onAdditionalAction() {
-    console.log('Additional action triggered');
-    // Implement logic for the icon button
-  }
-
-  
 //=====================================================
   isConfirmationModalOpen: boolean = false;
   selectedOption: string = 'sale_order';

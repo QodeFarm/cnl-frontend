@@ -169,7 +169,7 @@ export class PurchaseComponent {
     // set form config
     this.setFormConfig();
     this.checkAndPopulateData();
-
+    this.loadQuickpackOptions();
     // set purchase_order default value
     this.formConfig.model['purchase_order_data']['order_type'] = 'purchase_order';
 
@@ -284,6 +284,59 @@ export class PurchaseComponent {
   showPurchaseOrderListFn() {
     this.showPurchaseOrderList = true;
   }
+
+//=====================================================
+quickpackOptions: any[] = []; // To store available Quickpack options
+selectedQuickpack: string = ''; // Selected Quickpack value
+
+loadQuickpackOptions() {
+  console.log("We are in method...")
+  this.http.get('sales/quick_pack/') // Replace with your API endpoint
+    .subscribe((response: any) => {
+      this.quickpackOptions = response.data || []; // Adjust based on API response
+      console.log("quickpackOptions : ", this.quickpackOptions);
+    });
+}
+
+
+loadQuickpackProducts() {
+  console.log("quick pack id : ", this.selectedQuickpack)
+  if (!this.selectedQuickpack) {
+    console.log('Please select a Quickpack!');
+    return;
+  }
+
+  this.http.get(`sales/quick_pack/${this.selectedQuickpack}`)
+    .subscribe((response: any) => {
+      console.log("response : ", response.data.quick_pack_data_items);
+      const quickPackDataItems = response.data.quick_pack_data_items || [];
+
+      if (quickPackDataItems.length === 0) {
+        console.log('No items found in the selected Quickpack!');
+        return;
+      }
+      // Populate `sale_order_items` with Quickpack data
+      this.formConfig.model.purchase_order_items = quickPackDataItems.map((item: any) => ({
+        product: item.product,
+        quantity: item.quantity,
+        print_name: item.product.print_name,
+        rate: item.product.mrp,
+        discount: item.product.dis_amount,
+        unit_options_id: item.product.unit_options
+
+      }));
+
+      // Trigger form change detection (if needed)
+      if (this.purchaseForm) {
+        console.log("we are inside : ", this.purchaseForm.form);
+        this.purchaseForm.form.controls.purchase_order_items.patchValue(this.formConfig.model.purchase_order_items);
+        console.log("After method ...")
+      }
+
+      console.log('Sale Order Items populated:', this.formConfig.model.purchase_order_items);
+    });
+}
+//=====================================================
 
   setFormConfig() {
     this.PurchaseOrderEditID = null;
