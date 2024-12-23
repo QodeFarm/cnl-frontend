@@ -111,31 +111,32 @@
     <div class="left-container">
         <div class="first-row">
             <div class="chart-container">
-                <canvas #chartTop6Items></canvas>
+                <canvas #chartTop5Items></canvas>
             </div>
 
             <div class="chart-container">
-                <canvas #chartDirectExpenses></canvas>
+                <canvas  #chartTop5ItemsIn6MonthsCanvas ></canvas>
             </div>
 
             <div class="chart-container">
-                <canvas #chartOperationalExpenses></canvas>
+                <canvas #chartTop5ProfitMakingItemsCanvas></canvas>
             </div>
         </div>
 
         <div class="second-row">
+            <!-- Commented for future changes
             <div class="second-chart-container">
-                <canvas #chartTop6ItemsIn6MonthsCanvas></canvas>
+                <canvas #chartDirectExpenses></canvas>
             </div>
 
             <div class="second-chart-container">
-                <canvas #chartTop6ProfitMakingItemsCanvas></canvas>
+                <canvas #chartOperationalExpenses></canvas>
             </div>
 
             <div class="second-chart-container">
                 <canvas #chartOperatiorenalExpenses></canvas>
                 <p>Amazon/Flipkart/Meesho</p>
-            </div>
+            </div> -->
         </div>
     </div>
 
@@ -144,5 +145,57 @@
         <div class="right-side-chart">
             <canvas #chartLast6MonthsCashflowCanvas></canvas>
         </div>
+    </div>
+</div>
+
+<!-- Task and Work Order HEADING Div -->
+<div class="task-workOrder-heading">
+    <h4>Tasks</h4>
+    <h4>Work Orders</h4>
+</div>
+
+<!-- Task and Work Order TABLEs Div -->
+<div class="task-workOrder-row">
+    <div class="left-task-container">
+        <table class="task-table">
+            <thead>
+                <tr>
+                    <th>Appointed</th>
+                    <th>Title</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let task of taskList">
+                    <td>{{ task.name }}</td>
+                    <td>{{ task.title }}</td>
+                    <td>{{ task.status }}</td>
+                    <td>{{ task.priority }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="right-task-container">
+        <table class="task-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Completed</th>
+                    <th>Pending</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let order of workOrders">
+                    <td>{{ order.name }}</td>
+                    <td>{{ order.quantity }}</td>
+                    <td>{{ order.completed_qty }}</td>
+                    <td>{{ order.pending_qty }}</td>
+                    <td>{{ order.status_name }}</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>

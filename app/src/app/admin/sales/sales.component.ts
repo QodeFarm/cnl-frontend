@@ -833,6 +833,9 @@ handleProductPull(selectedProducts: any[]) {
   saleEstimateSelected = false;
   showSuccessToast = false;
   toastMessage = '';
+  isAmountModalOpen: boolean = false; // Controls Amount modal
+  totalAmount: number = 0; // Replace this with the actual total amount from your logic
+  amountExceedMessage: string = ''; // Dynamic message for the modal
   updateProductInfo(currentRowIndex, product, unitData = '') {
     // Select the card wrapper element
     const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
@@ -933,6 +936,43 @@ handleProductPull(selectedProducts: any[]) {
             console.error('Error updating record:', error);
         });
   }
+
+  // Function to open Amount Exceed modal
+openAmountModal(total_amount: number, max_limit: number) {
+  console.log("Opening Amount Exceed modal.");
+  this.isAmountModalOpen = true;
+  this.amountExceedMessage = `The total amount of ${total_amount} exceeds the credit limit of ${max_limit}. Do you want to proceed?`; // Set dynamic message
+}
+
+// Confirm action in Amount Exceed modal
+proceedWithAmount() {
+  console.log("User confirmed to proceed with amount exceeding credit limit.");
+  this.isAmountModalOpen = false;
+
+  if (!this.SaleOrderEditID) {
+      console.log("Opening Sale Order/Estimate modal after confirmation.");
+      this.openSaleOrderEstimateModal(); // Open Sale Order/Estimate modal
+  } else {
+      console.log("Proceeding to update existing sale order.");
+      this.updateSaleOrder(); // Proceed to update existing sale order
+  }
+}
+
+// Cancel action in Amount Exceed modal
+closeAmountModal() {
+  console.log("User canceled submission due to exceeding amount limit.");
+  this.isAmountModalOpen = false;
+
+  // Ensure the first modal (Sale Order/Estimate Modal) does not open
+  this.isConfirmationModalOpen = false;
+}
+
+// Close Sale Order/Estimate modal
+closeSaleOrderEstimateModal() {
+  console.log("Sale Order/Estimate modal closed.");
+  this.isConfirmationModalOpen = false;
+}
+
 //=======================================================
   setFormConfig() {
     this.SaleOrderEditID = null;
@@ -964,14 +1004,34 @@ handleProductPull(selectedProducts: any[]) {
       submit: {
         label: 'Submit',
         submittedFn: () => {
-            // Open confirmation modal only if it's a new sale order
-            if (!this.SaleOrderEditID) {
-                this.openSaleOrderEstimateModal();
+            console.log("Submit button clicked.");
+    
+            const totalAmount = this.formConfig.model.sale_order.total_amount; // Get the total amount
+            const customer = this.formConfig.model.sale_order.customer; // Get the customer details
+    
+            if (!customer || !customer.credit_limit) {
+                console.error("Customer information or credit limit is missing.");
+                return;
+            }
+    
+            const maxLimit = parseFloat(customer.credit_limit); // Convert credit limit to number
+            console.log(`Total Amount: ${totalAmount}, Credit Limit: ${maxLimit}`);
+    
+            if (totalAmount >= maxLimit) {
+                // Exceeds credit limit: show the Amount Exceed modal
+                this.openAmountModal(totalAmount, maxLimit);
             } else {
-                this.updateSaleOrder(); // Call update method for editing
+                // Within credit limit: check if a new sale order or existing
+                if (!this.SaleOrderEditID) {
+                    console.log("Within credit limit: Opening Sale Order/Estimate modal.");
+                    this.openSaleOrderEstimateModal();
+                } else {
+                    console.log("Within credit limit: Proceeding to update existing sale order.");
+                    this.updateSaleOrder();
+                }
             }
         }
-      },        
+    },      
       reset: {
         resetFn: () => {
           this.ngOnInit();

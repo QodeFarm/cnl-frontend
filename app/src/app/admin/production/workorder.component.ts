@@ -350,16 +350,81 @@ curdConfig: TaCurdConfig = {
                 required: true,
                 bindId: true,
                 lazy: {
-                  // url: 'products/products_get/?type_name=Finished',
                   url: 'products/products/',
                   lazyOneTime: true
                 },
               },
-              hooks:{
-                onInit:(field:any)=>{
-                  field.formControl.valueChanges.subscribe((data: any) => {
-                  const product_id = field.formControl.value
-                  this.populateBom(product_id)
+              hooks: {
+                onInit: (field: any) => {
+                  // Subscribe to changes in product_id field
+                  field.formControl.valueChanges.subscribe((selectedProductId) => {
+                    const product = field.formControl.value;
+                    this.populateBom(product)
+            
+                    // Clear previous size and color fields and their values
+                    const workOrderGroup = this.formConfig.fields.find((f: any) => f.key === 'work_order');
+                    if (workOrderGroup && workOrderGroup.fieldGroup) {
+                      const sizeField = workOrderGroup.fieldGroup.find((f: any) => f.key === 'size');
+                      const colorField = workOrderGroup.fieldGroup.find((f: any) => f.key === 'color');
+            
+                      if (sizeField) {
+                        sizeField.templateOptions.required = false; // Make the field not required
+                        sizeField.formControl.setValue(null); // Clear current value
+                        sizeField.templateOptions.options = []; // Clear previous options
+                        sizeField.formControl.disable(); // Temporarily disable until new data arrives
+                      }
+            
+                      if (colorField) {
+                        colorField.formControl.setValue(null); // Clear current value
+                        colorField.templateOptions.options = []; // Clear previous options
+                        colorField.formControl.disable(); // Temporarily disable until new data arrives
+                      }
+            
+                      // Fetch size and color options for the selected product
+                      if (product) {
+                        this.http.get(`products/product_variations/?product_id=${product}`).subscribe((response: any) => {
+                          if (response.data.length > 0) {
+                            const availableSizes = response.data.map((variation: any) => ({
+                              label: variation.size?.size_name || '----',
+                              value: {
+                                size_id: variation.size?.size_id || null,
+                                size_name: variation.size?.size_name || '----'
+                              }
+                            }));
+            
+                            const availableColors = response.data.map((variation: any) => ({
+                              label: variation.color?.color_name || '----',
+                              value: {
+                                color_id: variation.color?.color_id || null,
+                                color_name: variation.color?.color_name || '----'
+                              }
+                            }));
+            
+                            // Update size field
+                            if (sizeField) {
+                              sizeField.formControl.enable(); // Enable field
+                              sizeField.templateOptions.required = true; // Make the field required
+                              sizeField.templateOptions.options = availableSizes.filter(
+                                (item, index, self) => index === self.findIndex((t) => t.value.size_id === item.value.size_id)
+                              ); // Ensure unique options
+                            }
+
+                          } else {
+                            console.log(`For Product: ${product} - No sizes or colors available.`);
+                            if (sizeField) {
+                              sizeField.formControl.disable();
+                              sizeField.templateOptions.options = [];
+                            }
+                            if (colorField) {
+                              colorField.formControl.disable();
+                              colorField.templateOptions.options = [];
+                            }
+                          }
+                        });
+                      }
+                    } else {
+                      console.error('Work Order Group not found.');
+                    }
                   });
                 }
               }
@@ -373,10 +438,11 @@ curdConfig: TaCurdConfig = {
                 dataKey: 'size_id',
                 dataLabel: 'size_name',
                 options: [],
+                disabled: true,
                 required: false,
                 lazy: {
                   lazyOneTime: true,
-                  url : `products/sizes/`
+                  url: `products/sizes/`
                 }
               },
               hooks: {
@@ -388,6 +454,69 @@ curdConfig: TaCurdConfig = {
                       this.formConfig.model['work_order'] = {};
                     }
                     this.formConfig.model['work_order']['size_id'] = data.size_id;
+                  });
+                },
+                onInit: (field: any) => {
+                  // Trigger color field update whenever size changes
+                  field.formControl.valueChanges.subscribe(selectedSizeId => {
+                    const workOrderGroup = this.formConfig.fields.find((f: any) => f.key === 'work_order');
+                    if (workOrderGroup && workOrderGroup.fieldGroup) {
+                      const colorField = workOrderGroup.fieldGroup.find((f: any) => f.key === 'color');
+                      const size = field.formControl.value;
+            
+                      if (size) {
+                        const work_order = this.formConfig.model.work_order;
+            
+                        // Determine the API URL based on size
+                        let url = `products/product_variations/?product_id=${work_order.product_id}&size_id=${size.size_id}`;
+                        if (!size.size_id) {
+                          url = `products/product_variations/?product_id=${work_order.product_id}&size_isnull=True`;
+                        }
+            
+                        // Fetch available colors based on selected size
+                        this.http.get(url).subscribe((response: any) => {
+                          if (response.data && response.data.length > 0) {
+                            // Map available colors
+                            const availableColors = response.data.map((variation: any) => ({
+                              label: variation.color?.color_name || '----',
+                              value: {
+                                color_id: variation.color?.color_id || null,
+                                color_name: variation.color?.color_name || '----'
+                              }
+                            }));
+            
+                            // Filter unique colors
+                            const uniqueColors = availableColors.filter((item, index, self) => 
+                              index === self.findIndex((t) => t.value.color_id === item.value.color_id)
+                            );
+            
+                            // Update and enable the color field
+                            if (colorField) {
+                              colorField.formControl.setValue(null); // Reset color field value
+                              colorField.formControl.enable();
+                              colorField.templateOptions.required = true; // Make the field required
+                              colorField.templateOptions.options = uniqueColors; // Update options
+                            }
+                          } else {
+                            // No colors available, disable the color field and set its value to null
+                            if (colorField) {
+                              colorField.templateOptions.required = false; // Make the field not required
+                              colorField.formControl.setValue(null); // Reset color field value
+                              colorField.formControl.disable();
+                              colorField.templateOptions.options = []; // Clear options
+                            }
+                          }
+                        });
+                      } else {
+                        // If size is null or invalid, disable the color field
+                        if (colorField) {
+                          colorField.templateOptions.required = false; // Make the field not required
+                          colorField.formControl.setValue(null); // Reset color field value
+                          colorField.formControl.disable();
+                          colorField.templateOptions.options = []; // Clear options
+                        }
+                      }
+                    }
                   });
                 }
               }
@@ -402,6 +531,7 @@ curdConfig: TaCurdConfig = {
                 dataLabel: 'color_name',
                 options: [],
                 required: false,
+                disabled: true,
                 lazy: {
                   lazyOneTime: true,
                   url : 'products/colors/'
@@ -428,8 +558,6 @@ curdConfig: TaCurdConfig = {
                 label: 'Quantity',
                 required: true,
                 placeholder: 'Enter Quantity',
-                // type: 'number',
-                // min: 0,
               },
             },
             {
@@ -706,7 +834,7 @@ curdConfig: TaCurdConfig = {
                     dataLabel: 'machine_name',
                     options: [],
                     hideLabel: true,
-                    required: true,
+                    required: false,
                     lazy: {
                       url: 'production/machines/',
                       lazyOneTime: true
@@ -753,7 +881,7 @@ curdConfig: TaCurdConfig = {
                   dataLabel: 'first_name',
                   options: [],
                   hideLabel: true,
-                  required: true,
+                  required: false,
                   lazy: {
                     url: 'hrms/employees/',
                     lazyOneTime: true
@@ -780,7 +908,7 @@ curdConfig: TaCurdConfig = {
                   label: 'Hours Worked',
                   placeholder: 'Enter Hours',
                   hideLabel: true,
-                  required: true
+                  required: false
                 }
               }
             ]
@@ -808,7 +936,7 @@ curdConfig: TaCurdConfig = {
                   label: 'Stage Name',
                   placeholder: 'Enter Stage Name',
                   hideLabel: true,
-                  required: true
+                  required: false
                 }
               },
               {
@@ -828,7 +956,7 @@ curdConfig: TaCurdConfig = {
                   label: 'Stage Start Date',
                   placeholder: 'Enter Start Date',
                   hideLabel: true,
-                  required: true
+                  required: false
                 }
               },
               {
@@ -848,7 +976,7 @@ curdConfig: TaCurdConfig = {
                   label: 'Notes',
                   placeholder: 'Enter Notes',
                   hideLabel: true,
-                  required: true
+                  required: false
                 }
               }
             ]

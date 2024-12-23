@@ -61,6 +61,7 @@ const routes: Routes = [
 
       //Products Module
       { path: 'inventory', data: { title: 'Inventory', moduleName: 'inventory' }, canActivate: [], loadComponent: () => import('./admin/inventory/inventory.component').then(m => m.InventoryComponent) },
+      { path: 'stockjournal', data: { title: 'Stock Journal', moduleName: 'stockjournal' }, canActivate: [], loadComponent: () => import('./admin/stockjournal/stockjournal.component').then(m => m.StockjournalComponent) },
       // { path: 'products', data: { title: 'Products', moduleName: 'products' }, canActivate: [], loadComponent: () => import('./admin/products/products.component').then(m => m.ProductsComponent) },
       { path: 'warehouses', data: { title: 'Warehouses', moduleName: 'warehouses' }, canActivate: [], loadComponent: () => import('./admin/warehouses/warehouses.component').then(m => m.WarehousesComponent) },
       { path: 'quickpacks', data: { title: 'Quick Packs', moduleName: 'quickpacks' }, canActivate: [], loadComponent: () => import('./admin/quickpacks/quickpacks.component').then(m => m.QuickpacksComponent) },
@@ -111,7 +112,8 @@ const routes: Routes = [
       { path: 'products', data: { title: 'Products', moduleName: 'products' }, canActivate: [], loadChildren: () => import('./admin/products/products.module').then(m => m.ProductsModule) },
       { path: 'assets', data: { title: 'Assets', moduleName: 'assets' }, canActivate: [], loadChildren: () => import('./admin/assets/assets.module').then(m => m.AssetsModule) },
 
-
+      //Reporting Tool
+      { path: 'reports/custome-reports', data: { title: 'Reports', moduleName: 'reports' }, canActivate: [], loadComponent: () => import('./admin/reports/reports.component').then(m => m.ReportsComponent) },
 
 
       // { path: 'production', data: { title: 'production', moduleName: 'production' }, canActivate: [], loadChildren: () => import('./admin/production/production.module').then(m => m.ProductionModule) },
