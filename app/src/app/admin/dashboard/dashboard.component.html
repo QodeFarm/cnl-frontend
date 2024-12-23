@@ -111,31 +111,32 @@
     <div class="left-container">
         <div class="first-row">
             <div class="chart-container">
-                <canvas #chartTop6Items></canvas>
+                <canvas #chartTop5Items></canvas>
             </div>
 
             <div class="chart-container">
-                <canvas #chartDirectExpenses></canvas>
+                <canvas  #chartTop5ItemsIn6MonthsCanvas ></canvas>
             </div>
 
             <div class="chart-container">
-                <canvas #chartOperationalExpenses></canvas>
+                <canvas #chartTop5ProfitMakingItemsCanvas></canvas>
             </div>
         </div>
 
         <div class="second-row">
+            <!-- Commented for future changes
             <div class="second-chart-container">
-                <canvas #chartTop6ItemsIn6MonthsCanvas></canvas>
+                <canvas #chartDirectExpenses></canvas>
             </div>
 
             <div class="second-chart-container">
-                <canvas #chartTop6ProfitMakingItemsCanvas></canvas>
+                <canvas #chartOperationalExpenses></canvas>
             </div>
 
             <div class="second-chart-container">
                 <canvas #chartOperatiorenalExpenses></canvas>
                 <p>Amazon/Flipkart/Meesho</p>
-            </div>
+            </div> -->
         </div>
     </div>
 
@@ -147,14 +148,19 @@
     </div>
 </div>
 
-<!-- Task and Work Order tables Div -->
+<!-- Task and Work Order HEADING Div -->
+<div class="task-workOrder-heading">
+    <h4>Tasks</h4>
+    <h4>Work Orders</h4>
+</div>
+
+<!-- Task and Work Order TABLEs Div -->
 <div class="task-workOrder-row">
     <div class="left-task-container">
-        <h4>Task</h4>
         <table class="task-table">
             <thead>
                 <tr>
-                    <th>Assigned To</th>
+                    <th>Appointed</th>
                     <th>Title</th>
                     <th>Status</th>
                     <th>Priority</th>
@@ -171,7 +177,6 @@
         </table>
     </div>
     <div class="right-task-container">
-        <h4>Work Orders</h4>
         <table class="task-table">
             <thead>
                 <tr>
