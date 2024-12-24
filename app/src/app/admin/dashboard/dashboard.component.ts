@@ -19,7 +19,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     this.fetchWorkOrders();
   }
 
-  baseUrl: string = 'http://195.35.20.172:8000/api/v1/'; 
+  baseUrl: string = 'http://127.0.0.1:8000/api/v1/'; 
 
   isSalesModalOpen: boolean = false;
   isPurchaseModalOpen: boolean = false;
@@ -51,7 +51,8 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('chartOperationalExpenses') chartOperationalExpensesCanvas!: ElementRef<HTMLCanvasElement>;
 
   //3rd row
-  @ViewChild('chartTop5ItemsIn6MonthsCanvas') chartTop5ItemsIn6MonthsCanvas!: ElementRef<HTMLCanvasElement>;
+  // @ViewChild('chartTop5ItemsIn6MonthsCanvas') chartTop5ItemsIn6MonthsCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('chartTop5CustomersOf6MonthsCanvas') chartTop5CustomersOf6MonthsCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('chartTop5ProfitMakingItemsCanvas') chartTop5ProfitMakingItemsCanvas!: ElementRef<HTMLCanvasElement>;
 
   //2nd-row Right-side-chart
@@ -259,24 +260,37 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
 
   //2nd row Row Charts
   //Data for Top 5 Items Groups sales in Last 6 Months
-  top5ItemsIn6MonthsData = {
-    chart_title : 'wq',
-    labels: [], // Labels
-    datasets: [{
-      label: 'Sales (in ₹)',
-      data: [],
-      backgroundColor: '#4e73df',
-      borderColor: '#4e73df',
-      borderWidth: 1,
-      barThickness: 20,
-    }]
-  };
+  // top5ItemsIn6MonthsData = {
+  //   chart_title : 'wq',
+  //   labels: [], // Labels
+  //   datasets: [{
+  //     label: 'Sales (in ₹)',
+  //     data: [],
+  //     backgroundColor: '#4e73df',
+  //     borderColor: '#4e73df',
+  //     borderWidth: 1,
+  //     barThickness: 20,
+  //   }]
+  // };
 
   //Data for Top 5 Profit making Items In last FY
   top5ProfitMakingItemsData = {
     labels: [],    // Labels
     datasets: [{
       label: 'Profit (in ₹)',
+      data: [ ],
+      backgroundColor: '#1cc88a',
+      borderColor: '#1cc88a',
+      borderWidth: 1,
+      barThickness: 20,
+    }]
+  };
+
+  //Top 5 buyers(Customers)
+  top5CustomersData = {
+    labels: [],    // Labels
+    datasets: [{
+      label: 'Spending (in ₹)',
       data: [ ],
       backgroundColor: '#1cc88a',
       borderColor: '#1cc88a',
@@ -405,23 +419,30 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
         labelField: 'product_name',
         dataField: 'total_sold_quantity',
       }),
-      this.fetchDataAndInitializeChart('Top_5_Items_Groups_In_Last_6_Months', {
-        labelsTarget: this.top5ItemsIn6MonthsData.labels,
-        dataTarget: this.top5ItemsIn6MonthsData.datasets[0].data,
-        labelField: 'item_group',
-        dataField: 'total_amount',
-      }),
+      // this.fetchDataAndInitializeChart('Top_5_Items_Groups_In_Last_6_Months', {
+      //   labelsTarget: this.top5ItemsIn6MonthsData.labels,
+      //   dataTarget: this.top5ItemsIn6MonthsData.datasets[0].data,
+      //   labelField: 'item_group',
+      //   dataField: 'total_amount',
+      // }),
       this.fetchDataAndInitializeChart('Top_5_Sold_Items_In_Current_FY', {
         labelsTarget: this.top5ProfitMakingItemsData.labels,
         dataTarget: this.top5ProfitMakingItemsData.datasets[0].data,
         labelField: 'item_name',
         dataField: 'total_amount',
       }),
+      this.fetchDataAndInitializeChart('Top_5_Customers_In_Last_6_Months', {
+        labelsTarget: this.top5CustomersData.labels,
+        dataTarget: this.top5CustomersData.datasets[0].data,
+        labelField: 'CustomerName',
+        dataField: 'TotalAmount',
+      }),
     ])
       .then(() => {
         // Initialize charts after all data is fetched
         this.initializeChart(this.chartTop5ItemsCanvas, this.top5ItemsData, 'pie', 'Top 5 Items Sold In Last 30 days');
-        this.initializeChart(this.chartTop5ItemsIn6MonthsCanvas, this.top5ItemsIn6MonthsData, 'bar', 'Top 5 Items (Last 6 Months)');
+        // this.initializeChart(this.chartTop5ItemsIn6MonthsCanvas, this.top5ItemsIn6MonthsData, 'bar', 'Top 5 Items (Last 6 Months)');
+        this.initializeChart(this.chartTop5CustomersOf6MonthsCanvas, this.top5CustomersData, 'bar', 'Top 5 Customers (Last 6 Months)');
         this.initializeChart(this.chartTop5ProfitMakingItemsCanvas, this.top5ProfitMakingItemsData, 'bar', 'Top 5 Profit-Making Items');
       })
       .catch(error => {
@@ -479,6 +500,22 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
             display: false, // Hide grid lines on X-axis
           },
         },
+        y: {
+          beginAtZero: true,
+          ticks: {
+              callback: function(value) {
+                  if (value >= 1e7) { // If the value is over a billion
+                      return (value / 1e7) + 'Cr'; // Convert to billions
+                  } else if (value >= 1e5) { // If the value is over a million
+                      return (value / 1e5) + 'L'; // Convert to millions
+                  } else if (value >= 1e3) { // If the value is over a thousand
+                    return (value / 1e3) + 'K'; // Convert to thousands
+                  } else {
+                      return value; // Keep the value as is if it's smaller than a million
+                  }
+              }
+          }
+        }
       };
     }
   
