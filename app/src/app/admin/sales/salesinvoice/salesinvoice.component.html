@@ -5,7 +5,24 @@
           <span *ngIf="SaleInvoiceEditID" class="custom-heading">Update Sale Invoice</span>
           <span *ngIf="!SaleInvoiceEditID" class="custom-heading">Create Sale Invoice</span>
         </button>
-        <div style="display: flex; gap: 10px;">
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <div *ngIf="!SaleInvoiceEditID" class="quickpack-container d-flex align-items-center">
+              <div class="quickpack-box p-2 d-flex align-items-center">
+                  <div class="dropdown-container">
+                      <select
+                          id="quickpackSelect"
+                          class="dropdown-select"
+                          [(ngModel)]="selectedQuickpack">
+                          <option value="" disabled selected aria-disabled="true">Select Quickpack values</option>
+                          <option *ngFor="let quickpack of quickpackOptions" 
+                                  [value]="quickpack.quick_pack_id">
+                              {{ quickpack.name }}
+                          </option>
+                      </select>
+                  </div>
+                  <button class="btn btn-primary ml-2" (click)="loadQuickpackProducts()">OK</button>
+              </div>
+          </div>  
 
         <button (click)="openCopyModal()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#copyModal">
             Copy
