@@ -994,7 +994,8 @@ closeSaleOrderEstimateModal() {
     
             const totalAmount = this.formConfig.model.sale_order.total_amount; // Get the total amount
             const customer = this.formConfig.model.sale_order.customer; // Get the customer details
-    
+            console.log("Customer in formconfig : ", customer);
+            console.log("Customer.credit_limit : ", customer.credit_limit);
             if (!customer || !customer.credit_limit) {
                 console.error("Customer information or credit limit is missing.");
                 return;
