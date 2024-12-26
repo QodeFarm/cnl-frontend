@@ -16,9 +16,13 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnInit() {
     Chart.register(...registerables);
     this.fetchTasks();
-    this.fetchWorkOrders();
+    this.fetchWorkOrders(); 
+    this.fourthRowSmallTableData('Product_Not_Sold_In_30_Days_For_Table')
+    this.fourthRowSmallTableData('Customers_With_No_Sales_In_30_Days_For_Table')  
+    this.fourthRowSmallTableData('Pending_For_Table')
   }
 
+  // baseUrl: string = 'http://127.0.0.1:8000/api/v1/'; 
   baseUrl: string = 'http://195.35.20.172:8000/api/v1/'; 
 
   isSalesModalOpen: boolean = false;
@@ -33,6 +37,10 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   payablesChart: any;
   liquidityChart: any;
 
+  products : string[] = [];
+  customers : string[] = [];
+  pendings : string[] = [];
+
   //Task Related
   taskList: Array<any> = []; // Store processed task data
   
@@ -45,20 +53,20 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('payablesChartCanvas') payablesChartCanvas!: ElementRef<HTMLCanvasElement>; 
   @ViewChild('liquidityChartCanvas') liquidityChartCanvas!: ElementRef<HTMLCanvasElement>; 
 
-  // For 2nd row charts 
   @ViewChild('chartTop5Items') chartTop5ItemsCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('chartDirectExpenses') chartDirectExpensesCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('chartOperationalExpenses') chartOperationalExpensesCanvas!: ElementRef<HTMLCanvasElement>;
 
-  //3rd row
-  @ViewChild('chartTop5ItemsIn6MonthsCanvas') chartTop5ItemsIn6MonthsCanvas!: ElementRef<HTMLCanvasElement>;
+  // @ViewChild('chartTop5ItemsIn6MonthsCanvas') chartTop5ItemsIn6MonthsCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('chartTop5CustomersOf6MonthsCanvas') chartTop5CustomersOf6MonthsCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('chartTop5ProfitMakingItemsCanvas') chartTop5ProfitMakingItemsCanvas!: ElementRef<HTMLCanvasElement>;
 
-  //2nd-row Right-side-chart
   @ViewChild('chartLast6MonthsCashflowCanvas') chartLast6MonthsCashflowCanvas!: ElementRef<HTMLCanvasElement>;
 
 
-  constructor(private http: HttpClient) {} // Inject HttpClient
+  constructor(private http: HttpClient) {} 
+
+  //For Charts
   private fetchDataAndInitializeChart(
     endpoint: string,
     dataConfig: { labelsTarget: string[]; dataTarget: number[]; labelField: string; dataField: string }
@@ -140,7 +148,6 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     }]
   };
 
-  // For 2nd row charts 
   top5ItemsData = {
     labels: [],
     datasets: [{
@@ -257,20 +264,19 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     }, 100); // Delay to ensure modal and canvas are rendered
   }
 
-  //2nd row Row Charts
   //Data for Top 5 Items Groups sales in Last 6 Months
-  top5ItemsIn6MonthsData = {
-    chart_title : 'wq',
-    labels: [], // Labels
-    datasets: [{
-      label: 'Sales (in ₹)',
-      data: [],
-      backgroundColor: '#4e73df',
-      borderColor: '#4e73df',
-      borderWidth: 1,
-      barThickness: 20,
-    }]
-  };
+  // top5ItemsIn6MonthsData = {
+  //   chart_title : 'wq',
+  //   labels: [], // Labels
+  //   datasets: [{
+  //     label: 'Sales (in ₹)',
+  //     data: [],
+  //     backgroundColor: '#4e73df',
+  //     borderColor: '#4e73df',
+  //     borderWidth: 1,
+  //     barThickness: 20,
+  //   }]
+  // };
 
   //Data for Top 5 Profit making Items In last FY
   top5ProfitMakingItemsData = {
@@ -285,8 +291,21 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     }]
   };
 
+  //Top 5 buyers(Customers)
+  top5CustomersData = {
+    labels: [],    // Labels
+    datasets: [{
+      label: 'Spending (in ₹)',
+      data: [ ],
+      backgroundColor: '#1cc88a',
+      borderColor: '#1cc88a',
+      borderWidth: 1,
+      barThickness: 20,
+    }]
+  };
+
   Last6MonthsCashflowData = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], // Labels
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], 
     datasets: [{
       label: 'Inflow',
       data: [90 , 78, 30, 28, 20, 15],
@@ -377,13 +396,12 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
 
-  // For 2nd row charts 
   ngAfterViewInit() {
     // Initialize all three charts after view is rendered
     this.initializeChart(this.chartDirectExpensesCanvas, this.directExpensesData, 'pie' ,'Last 6 Months Direct Expenses');
     this.initializeChart(this.chartOperationalExpensesCanvas, this.operationalExpensesData, 'pie' ,'Last 6 Months Operational Expenses');
     
-    // 3rd charts charts  Last6MonthsCashflowData
+    //Last6MonthsCashflowData
     this.initializeChart(this.chartLast6MonthsCashflowCanvas, this.Last6MonthsCashflowData, 'bar', "Last 6 Month's Cashflow"); // Top 6 Profit Making Items
 
     Promise.all([
@@ -405,29 +423,35 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
         labelField: 'product_name',
         dataField: 'total_sold_quantity',
       }),
-      this.fetchDataAndInitializeChart('Top_5_Items_Groups_In_Last_6_Months', {
-        labelsTarget: this.top5ItemsIn6MonthsData.labels,
-        dataTarget: this.top5ItemsIn6MonthsData.datasets[0].data,
-        labelField: 'item_group',
-        dataField: 'total_amount',
-      }),
+      // this.fetchDataAndInitializeChart('Top_5_Items_Groups_In_Last_6_Months', {
+      //   labelsTarget: this.top5ItemsIn6MonthsData.labels,
+      //   dataTarget: this.top5ItemsIn6MonthsData.datasets[0].data,
+      //   labelField: 'item_group',
+      //   dataField: 'total_amount',
+      // }),
       this.fetchDataAndInitializeChart('Top_5_Sold_Items_In_Current_FY', {
         labelsTarget: this.top5ProfitMakingItemsData.labels,
         dataTarget: this.top5ProfitMakingItemsData.datasets[0].data,
         labelField: 'item_name',
         dataField: 'total_amount',
       }),
+      this.fetchDataAndInitializeChart('Top_5_Customers_In_Last_6_Months', {
+        labelsTarget: this.top5CustomersData.labels,
+        dataTarget: this.top5CustomersData.datasets[0].data,
+        labelField: 'CustomerName',
+        dataField: 'TotalAmount',
+      }),
     ])
       .then(() => {
         // Initialize charts after all data is fetched
         this.initializeChart(this.chartTop5ItemsCanvas, this.top5ItemsData, 'pie', 'Top 5 Items Sold In Last 30 days');
-        this.initializeChart(this.chartTop5ItemsIn6MonthsCanvas, this.top5ItemsIn6MonthsData, 'bar', 'Top 5 Items (Last 6 Months)');
+        // this.initializeChart(this.chartTop5ItemsIn6MonthsCanvas, this.top5ItemsIn6MonthsData, 'bar', 'Top 5 Items (Last 6 Months)');
+        this.initializeChart(this.chartTop5CustomersOf6MonthsCanvas, this.top5CustomersData, 'bar', 'Top 5 Customers (Last 6 Months)');
         this.initializeChart(this.chartTop5ProfitMakingItemsCanvas, this.top5ProfitMakingItemsData, 'bar', 'Top 5 Profit-Making Items');
       })
       .catch(error => {
         console.error('Error loading chart data:', error);
     });
-
   }
 
   ngOnDestroy() {
@@ -436,10 +460,8 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     this.destroyChart(this.receivablesChart, chart => this.receivablesChart = null);
     this.destroyChart(this.payablesChart, chart => this.payablesChart = null);
     this.destroyChart(this.liquidityChart, chart => this.liquidityChart = null);
-
   }
 
-  // For 2nd & 3rd row charts 
   private initializeChart(canvas: ElementRef<HTMLCanvasElement>, data: any, type: keyof ChartTypeRegistry, chart_title: string  ): Chart | null {
     const ctx = canvas?.nativeElement?.getContext('2d');
     if (!ctx) {
@@ -479,6 +501,25 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
             display: false, // Hide grid lines on X-axis
           },
         },
+        y: {
+          beginAtZero: true,
+          ticks: {
+              callback: function(value) {
+                  if (value >= 1e7) { // If the value is over a Cr
+                      return (value / 1e7) + 'Cr'; // Convert to Cr
+
+                  } else if (value >= 1e5) { 
+                      return (value / 1e5) + 'L'; 
+
+                  } else if (value >= 1e3) { 
+                    return (value / 1e3) + 'K';
+
+                  } else {
+                      return value;
+                  }
+              }
+          }
+        }
       };
     }
   
@@ -523,7 +564,33 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       },
       (error) => {
-        console.error('Error fetching work orders:', error);
+        alert('Error fetching work orders:');
+      }
+    );
+  }
+
+  // Reusable function to fetch data from any endpoint and populate the SMALL table which is present in 4th row
+  fourthRowSmallTableData(endpoint: string) {
+    this.http.get<any>(this.baseUrl +  'dashboard/' +  endpoint + '/').subscribe(
+      (response) => {
+        if (response && response.data && endpoint == "Product_Not_Sold_In_30_Days_For_Table") {
+          this.products = response.data.map(item => item.product_name);
+
+        } else if (response && response.data && endpoint === "Customers_With_No_Sales_In_30_Days_For_Table") {
+          this.customers = response.data.map(item => item.customer_name);
+
+        } else if (response && response.data && endpoint === "Pending_For_Table") {
+          this.pendings = response.data.map((order: any) => ({
+            order_type: `${order.order_type}(${order.order_count})`,  
+            total_value: order.total_value
+          }));
+
+        } else {
+          alert('Invalid response format');
+        }
+      },
+      (error) => {
+        alert('Error fetching products:');
       }
     );
   }
