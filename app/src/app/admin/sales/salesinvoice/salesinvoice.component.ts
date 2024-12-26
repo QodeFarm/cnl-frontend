@@ -568,6 +568,8 @@ loadQuickpackProducts() {
       this.formConfig.model.sale_invoice_items = quickPackDataItems.map((item: any) => ({
         product: item.product,
         quantity: item.quantity,
+        size: item.size,
+        color: item.color,
         print_name: item.product.print_name,
         rate: item.product.mrp,
         discount: item.product.dis_amount,
