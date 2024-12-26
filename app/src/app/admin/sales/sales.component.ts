@@ -179,6 +179,8 @@ export class SalesComponent {
     // set form config
     this.setFormConfig();
     this.checkAndPopulateData();
+    this.loadQuickpackOptions(); // Fetch Quickpack options
+    console.log("data in load : ", this.loadQuickpackOptions())
     
     // set sale_order default value
     this.formConfig.model['sale_order']['order_type'] = 'sale_order';
@@ -759,7 +761,58 @@ handleProductPull(selectedProducts: any[]) {
     const url = `/products/product_variations/?product_name=${productID}`;
     return this.http.get(url).pipe(((res: any) => res.data));
   }
-  
+//=====================================================
+  quickpackOptions: any[] = []; // To store available Quickpack options
+  selectedQuickpack: string = ''; // Selected Quickpack value
+
+  loadQuickpackOptions() {
+    this.http.get('sales/quick_pack/') // Replace with your API endpoint
+      .subscribe((response: any) => {
+        this.quickpackOptions = response.data || []; // Adjust based on API response
+        console.log("quickpackOptions : ", this.quickpackOptions);
+      });
+  }
+
+
+  loadQuickpackProducts() {
+    console.log("quick pack id : ", this.selectedQuickpack)
+    if (!this.selectedQuickpack) {
+      console.log('Please select a Quickpack!');
+      return;
+    }
+
+    this.http.get(`sales/quick_pack/${this.selectedQuickpack}`)
+      .subscribe((response: any) => {
+        console.log("response : ", response.data.quick_pack_data_items);
+        const quickPackDataItems = response.data.quick_pack_data_items || [];
+
+        if (quickPackDataItems.length === 0) {
+          console.log('No items found in the selected Quickpack!');
+          return;
+        }
+        // Populate `sale_order_items` with Quickpack data
+        this.formConfig.model.sale_order_items = quickPackDataItems.map((item: any) => ({
+          product: item.product,
+          quantity: item.quantity,
+          size: item.size,
+          color: item.color,
+          print_name: item.product.print_name,
+          rate: item.product.mrp,
+          discount: item.product.dis_amount,
+          unit_options_id: item.product.unit_options
+
+        }));
+
+        // Trigger form change detection (if needed)
+        if (this.salesForm) {
+          console.log("we are inside : ", this.salesForm.form);
+          this.salesForm.form.controls.sale_order_items.patchValue(this.formConfig.model.sale_order_items);
+          console.log("After method ...")
+        }
+
+        console.log('Sale Order Items populated:', this.formConfig.model.sale_order_items);
+      });
+  }
 //=====================================================
   isConfirmationModalOpen: boolean = false;
   selectedOption: string = 'sale_order';
@@ -1103,7 +1156,8 @@ confirmWorkOrder() {
     
             const totalAmount = this.formConfig.model.sale_order.total_amount; // Get the total amount
             const customer = this.formConfig.model.sale_order.customer; // Get the customer details
-    
+            console.log("Customer in formconfig : ", customer);
+            console.log("Customer.credit_limit : ", customer.credit_limit);
             if (!customer || !customer.credit_limit) {
                 console.error("Customer information or credit limit is missing.");
                 return;
@@ -1524,6 +1578,7 @@ confirmWorkOrder() {
                       // ***Size dropdown will populate with available sizes when product in selected***
                       field.formControl.valueChanges.subscribe(selectedProductId => {
                         const product = this.formConfig.model.sale_order_items[currentRowIndex]?.product;
+                        console.log("Product id : ", product)
                         // Ensure the product exists before making an HTTP request
                         if (product?.product_id) {
                           this.http.get(`products/product_variations/?product_id=${product.product_id}`).subscribe((response: any) => {
@@ -1656,6 +1711,7 @@ confirmWorkOrder() {
                     // ***Product Details Auto Fill Code***
                     field.formControl.valueChanges.subscribe(data => {
                       this.productOptions = data;
+                      console.log("Data in products : ", data)
                       if (field.form && field.form.controls && field.form.controls.code && data && data.code) {
                         field.form.controls.code.setValue(data.code)
                       }

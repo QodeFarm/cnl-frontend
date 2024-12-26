@@ -173,6 +173,7 @@ export class SalesinvoiceComponent {
     this.SaleInvoiceEditID = null;
     this.setFormConfig();
     this.checkAndPopulateData();
+    this.loadQuickpackOptions(); // Fetch Quickpack options
     // Set sale_order default value
     this.formConfig.model['sale_invoice_order']['order_type'] = 'sale_invoice';
 
@@ -533,7 +534,60 @@ export class SalesinvoiceComponent {
   ngOnDestroy() {
     document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
   }
-    
+//=====================================================
+quickpackOptions: any[] = []; // To store available Quickpack options
+selectedQuickpack: string = ''; // Selected Quickpack value
+
+loadQuickpackOptions() {
+  console.log("We are in method...")
+  this.http.get('sales/quick_pack/') // Replace with your API endpoint
+    .subscribe((response: any) => {
+      this.quickpackOptions = response.data || []; // Adjust based on API response
+      console.log("quickpackOptions : ", this.quickpackOptions);
+    });
+}
+
+
+loadQuickpackProducts() {
+  console.log("quick pack id : ", this.selectedQuickpack)
+  if (!this.selectedQuickpack) {
+    console.log('Please select a Quickpack!');
+    return;
+  }
+
+  this.http.get(`sales/quick_pack/${this.selectedQuickpack}`)
+    .subscribe((response: any) => {
+      console.log("response : ", response.data.quick_pack_data_items);
+      const quickPackDataItems = response.data.quick_pack_data_items || [];
+
+      if (quickPackDataItems.length === 0) {
+        console.log('No items found in the selected Quickpack!');
+        return;
+      }
+      // Populate `sale_order_items` with Quickpack data
+      this.formConfig.model.sale_invoice_items = quickPackDataItems.map((item: any) => ({
+        product: item.product,
+        quantity: item.quantity,
+        size: item.size,
+        color: item.color,
+        print_name: item.product.print_name,
+        rate: item.product.mrp,
+        discount: item.product.dis_amount,
+        unit_options_id: item.product.unit_options
+
+      }));
+
+      // Trigger form change detection (if needed)
+      if (this.saleinvoiceForm) {
+        console.log("we are inside : ", this.saleinvoiceForm.form);
+        this.saleinvoiceForm.form.controls.sale_invoice_items.patchValue(this.formConfig.model.sale_invoice_items);
+        console.log("After method ...")
+      }
+
+      console.log('Sale Order Items populated:', this.formConfig.model.sale_invoice_items);
+    });
+}
+//=====================================================
   setFormConfig() {
     this.SaleInvoiceEditID = null;
 

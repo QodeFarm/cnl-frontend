@@ -116,9 +116,6 @@ export class PurchaseInvoiceComponent {
           : { ...nestedData };
       });
     }
-
-    // Log and navigate to the target module with populated data
-    console.log('Populated Data:', populatedData);
     
     // Determine the target route based on the selected table
     const targetRoute = 
@@ -163,7 +160,7 @@ export class PurchaseInvoiceComponent {
     // set form config
     this.setFormConfig();
     this.checkAndPopulateData();
-
+    this.loadQuickpackOptions();
     // set purchase_order default value
     this.formConfig.model['purchase_invoice_orders']['order_type'] = 'purchase_invoice';
 
@@ -176,7 +173,6 @@ export class PurchaseInvoiceComponent {
   checkAndPopulateData() {
     // Check if data has already been populated
     if (this.dataToPopulate === undefined) {
-      console.log("Data status checking 1 : ", (this.dataToPopulate === undefined))
       // Subscribe to route params and history state data
       this.route.paramMap.subscribe(params => {
         // Retrieve data from history only if it's the first time populating
@@ -273,6 +269,60 @@ export class PurchaseInvoiceComponent {
   showPurchaseInvoiceListFn() {
     this.showPurchaseInvoiceList = true;
   }
+
+//=====================================================
+quickpackOptions: any[] = []; // To store available Quickpack options
+selectedQuickpack: string = ''; // Selected Quickpack value
+
+loadQuickpackOptions() {
+  this.http.get('sales/quick_pack/') // Replace with your API endpoint
+    .subscribe((response: any) => {
+      this.quickpackOptions = response.data || []; // Adjust based on API response
+      console.log("quickpackOptions : ", this.quickpackOptions);
+    });
+}
+
+
+loadQuickpackProducts() {
+  console.log("quick pack id : ", this.selectedQuickpack)
+  if (!this.selectedQuickpack) {
+    console.log('Please select a Quickpack!');
+    return;
+  }
+
+  this.http.get(`sales/quick_pack/${this.selectedQuickpack}`)
+    .subscribe((response: any) => {
+      console.log("response : ", response.data.quick_pack_data_items);
+      const quickPackDataItems = response.data.quick_pack_data_items || [];
+
+      if (quickPackDataItems.length === 0) {
+        console.log('No items found in the selected Quickpack!');
+        return;
+      }
+      // Populate `sale_order_items` with Quickpack data
+      this.formConfig.model.purchase_invoice_items = quickPackDataItems.map((item: any) => ({
+        product: item.product,
+        quantity: item.quantity,
+        size: item.size,
+        color: item.color,
+        print_name: item.product.print_name,
+        rate: item.product.mrp,
+        discount: item.product.dis_amount,
+        unit_options_id: item.product.unit_options
+
+      }));
+
+      // Trigger form change detection (if needed)
+      if (this.purchaseinvoiceForm) {
+        console.log("we are inside : ", this.purchaseinvoiceForm.form);
+        this.purchaseinvoiceForm.form.controls.purchase_invoice_items.patchValue(this.formConfig.model.purchase_invoice_items);
+        console.log("After method ...")
+      }
+
+      console.log('Sale Order Items populated:', this.formConfig.model.purchase_invoice_items);
+    });
+}
+//=====================================================
   setFormConfig() {
     this.PurchaseInvoiceEditID = null;
     this.formConfig = {
@@ -473,7 +523,6 @@ export class PurchaseInvoiceComponent {
               },
               hooks: {
                 onInit: (field: any) => {
-                  console.log("Tax : ", this.dataToPopulate.purchase_invoice_orders.tax);
                   if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders.tax && field.formControl) {
                     field.formControl.setValue(this.dataToPopulate.purchase_invoice_orders.tax);
                   }
@@ -1587,7 +1636,6 @@ export class PurchaseInvoiceComponent {
                               hooks: {
                                 onChanges: (field: any) => {
                                   field.formControl.valueChanges.subscribe(data => {
-                                    console.log("gst_type", data);
                                     if (data && data.gst_type_id) {
                                       this.formConfig.model['purchase_invoice_orders']['gst_type_id'] = data.gst_type_id;
                                     }
@@ -1617,7 +1665,6 @@ export class PurchaseInvoiceComponent {
                               hooks: {
                                 onChanges: (field: any) => {
                                   field.formControl.valueChanges.subscribe(data => {
-                                    console.log("payment_term", data);
                                     if (data && data.payment_term_id) {
                                       this.formConfig.model['purchase_invoice_orders']['payment_term_id'] = data.payment_term_id;
                                     }
@@ -1647,7 +1694,6 @@ export class PurchaseInvoiceComponent {
                               hooks: {
                                 onChanges: (field: any) => {
                                   field.formControl.valueChanges.subscribe(data => {
-                                    console.log("ledger_account", data);
                                     if (data && data.ledger_account_id) {
                                       this.formConfig.model['purchase_invoice_orders']['ledger_account_id'] = data.ledger_account_id;
                                     }
@@ -1680,7 +1726,6 @@ export class PurchaseInvoiceComponent {
                               hooks: {
                                 onChanges: (field: any) => {
                                   field.formControl.valueChanges.subscribe(data => {
-                                    console.log("order_status", data);
                                     if (data && data.order_status_id) {
                                       this.formConfig.model['purchase_invoice_orders']['order_status_id'] = data.order_status_id;
                                     }
