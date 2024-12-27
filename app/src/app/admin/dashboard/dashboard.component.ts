@@ -494,6 +494,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     if (type === 'bar') {
       chartOptions.scales = {
         x: {
+          stacked: true,
           ticks: {
             display: false, // Hide labels on the X-axis
           },
@@ -502,6 +503,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
           },
         },
         y: {
+          stacked: true,
           beginAtZero: true,
           ticks: {
               callback: function(value) {
