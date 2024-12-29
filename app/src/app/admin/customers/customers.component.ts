@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { forkJoin } from 'rxjs';  // Import forkJoin from rxjs
 
 @Component({
   selector: 'app-customers',
@@ -17,9 +18,10 @@ export class CustomersComponent {
     return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   }
   private observer: MutationObserver;
+  customFieldConfig: any;
 
   constructor(private http: HttpClient) {}
-
+  customFieldFormConfig: any = {};
   ngOnInit() {
     this.showCustomerList = false;
     this.showForm = true;  //temporary change 'true'
@@ -27,6 +29,8 @@ export class CustomersComponent {
     // Set form config
     this.setFormConfig();
     console.log('this.formConfig', this.formConfig);
+    this.fetchCustomFields();
+    
   }
 
   ngAfterViewInit() {
@@ -47,6 +51,293 @@ export class CustomersComponent {
     }
   }
 
+  getCustomFieldConfig() {
+    if (this.customFieldFormConfig && this.customFieldFormConfig.fields) {
+      return this.customFieldFormConfig.fields.map((field: any) => ({
+        key: field.key,
+        type: field.type,
+        className: 'col-md-12',
+        templateOptions: {
+          label: field.templateOptions.label,
+          placeholder: field.templateOptions.placeholder,
+          required: field.templateOptions.required,
+          options: field.templateOptions.options || [] // Ensure options exist for select fields
+        }
+      }));
+    }
+    return [];  // Return an empty array if there are no custom fields
+  }
+
+  
+  
+  
+customFieldMetadata: any = {}; // To store mapping of field names to metadata
+
+fetchCustomFields() {
+  this.http.get('http://127.0.0.1:8000/api/v1/customfields/customfieldscreate/').subscribe(
+    (response: any) => {
+      console.log('Custom Fields API Response:', response);
+
+      if (response?.data) {
+        const customFields = response.data.filter((field: any) => field.entity.entity_name === 'customers');
+
+        // Save metadata for mapping
+        this.customFieldMetadata = customFields.reduce((map: any, field: any) => {
+          map[field.field_name.toLowerCase()] = {
+            custom_field_id: field.custom_field_id, // ID of the field
+            field_type_id: field.field_type_id, // Field type ID
+            entity_id: field.entity.entity_id, // Entity ID
+            is_required: field.is_required, // Whether the field is required
+            validation_rules: field.validation_rules, // Any validation rules
+            options: field.custom_field_options || [] // Predefined options, if any
+          };
+          return map;
+        }, {});
+
+        console.log('Custom Field Metadata:', this.customFieldMetadata);
+        this.addCustomFieldsToFormConfig(customFields); // Dynamically add fields to the form
+      } else {
+        console.warn('No custom fields data found in the API response.');
+      }
+    },
+    (error) => {
+      console.error('Error fetching custom fields:', error);
+    }
+  );
+}
+
+
+  
+  
+  
+  
+  // Function to fetch custom field options based on field ID
+  fetchFieldOptions(customFieldId: string, fieldKey: string) {
+    const url = `http://127.0.0.1:8000/api/v1/customfields/customfieldscreate/${customFieldId}/`;
+
+    this.http.get(url).subscribe(
+      (response: any) => {
+        const options = response.data.custom_field_options.map((option: any) => ({
+          label: option.option_value,
+          value: option.option_value,
+        }));
+
+        const customField = this.formConfig.fields.find((f: any) => f.key === fieldKey);
+        if (customField) {
+          customField.templateOptions.options = options;
+        }
+
+        console.log('Options for field:', fieldKey, options);
+      },
+      (error) => {
+        console.error('Error fetching field options:', error);
+      }
+    );
+  }
+
+  
+  // Adds custom fields to the main formConfig
+  addCustomFieldsToFormConfig(customFields: any) {
+    const customFieldConfigs = customFields.map((field: any) => {
+      const key = field.field_name.toLowerCase(); // Use normalized key
+      return {
+        key: key,
+        type: field.field_type.field_type_name.toLowerCase() === 'select' ? 'select' : 'input',
+        className: 'col-md-6',
+        defaultValue: this.formConfig.model['customfield_values'][key] || '', // Pre-fill value
+        templateOptions: {
+          label: field.field_name,
+          placeholder: field.field_name,
+          required: field.is_required,
+          options: field.options || [], // Options for select fields
+        }
+      };
+    });
+  
+    console.log('Custom Field Configs:', customFieldConfigs);
+  
+    this.formConfig.fields = [
+      ...this.formConfig.fields,
+      {
+        key: 'customfield_values',
+        fieldGroup: customFieldConfigs,
+      },
+    ];
+  }
+  
+
+  submitCustomerForm() {
+    const customerData = { ...this.formConfig.model['customer_data'] }; // Main customer data
+    const customFieldValues = this.formConfig.model['customfield_values']; // User-entered custom fields
+  
+    if (!customerData) {
+      console.error('Customer data is missing.');
+      return;
+    }
+  
+    // Construct payload for one custom field at a time
+    const customFieldsPayload = this.constructCustomFieldsPayload(customFieldValues);
+  
+    // Construct the final payload
+    const payload = {
+      ...customerData, // Add all the main customer fields
+      custom_field: customFieldsPayload.custom_field, // Single custom field as dictionary
+      custom_field_options: customFieldsPayload.custom_field_options, // Array or empty
+      custom_field_values: customFieldsPayload.custom_field_values // Array of dictionaries
+    };
+  
+    console.log('Final Payload:', payload); // Debugging to verify the payload
+  
+    // Submit the payload
+    this.http.post('http://127.0.0.1:8000/api/v1/customfields/customfieldvalues/', payload).subscribe(
+      (response: any) => {
+        console.log('Customer and custom fields created successfully:', response);
+        this.showCustomerListFn(); // Redirect or refresh the customer list
+      },
+      (error) => {
+        console.error('Error creating customer and custom fields:', error);
+      }
+    );
+  }
+  
+  
+  constructCustomFieldsPayload(customFieldValues: any) {
+    if (!customFieldValues) {
+      console.warn('No custom field values provided.');
+      return {
+        custom_field: {},
+        custom_field_options: [],
+        custom_field_values: []
+      };
+    }
+  
+    // Construct custom field payload
+    const firstFieldKey = Object.keys(customFieldValues)[0]; // Handle one custom field at a time
+    const metadata = this.customFieldMetadata[firstFieldKey.toLowerCase()] || {}; // Fetch metadata
+  
+    return {
+      // Single custom field dictionary
+      custom_field: {
+        field_name: firstFieldKey, // Use the first field name
+        is_required: metadata.is_required || false, // Metadata for required fields
+        validation_rules: metadata.validation_rules || null, // Validation rules
+        field_type_id: metadata.field_type_id || null, // Field type ID
+        entity_id: metadata.entity_id || null // Entity ID
+      },
+      // Optional field options
+      custom_field_options: metadata.options || [], // Predefined options if available
+      // Single field value
+      custom_field_values: [
+        {
+          field_value: customFieldValues[firstFieldKey], // Value entered by the user
+          field_value_type: typeof customFieldValues[firstFieldKey] === "number" ? "number" : "string", // Type
+          entity_id: metadata.entity_id || null // Link value to the entity ID
+        }
+      ]
+    };
+  }
+  
+  
+  
+  
+  
+  // // Submit custom field values
+  submitCustomFieldValues(customerId: string, customFieldValues: any) {
+    if (!customFieldValues) {
+      console.error('No custom field values provided.');
+      return;
+    }
+  
+    const requests = [];
+  
+    Object.keys(customFieldValues).forEach((fieldKey) => {
+      const fieldValue = customFieldValues[fieldKey];
+      const metadata = this.customFieldMetadata[fieldKey.toLowerCase()];
+  
+      if (!metadata) {
+        console.warn(`No metadata found for custom field: ${fieldKey}`);
+        return;
+      }
+  
+      const payload = {
+        custom_field: {
+          custom_field_id: metadata.custom_field_id,
+          field_name: fieldKey
+        },
+        entity: {
+          entity_id: customerId
+        },
+        field_value: fieldValue,
+        field_value_type: typeof fieldValue === 'number' ? 'number' : 'string'
+      };
+  
+      console.log('Constructed Payload:', payload); // Log the constructed payload
+  
+      requests.push(this.http.post('http://127.0.0.1:8000/api/v1/customfields/customfieldvalues/', payload));
+    });
+  
+    forkJoin(requests).subscribe(
+      (responses) => {
+        console.log('Custom field values saved successfully:', responses);
+      },
+      (error) => {
+        console.error('Error saving custom field values:', error);
+      }
+    );
+  }
+  
+  
+  
+  
+  
+//    // 2️⃣ Submit custom fields separately to `/customfieldvalues/` endpoint
+//    submitCustomFieldValues(customerId: string) {
+//     const customFieldValues = this.formConfig.model['custom_fields'];  // Extract only custom fields
+
+//     const requests = [];  // Store all custom field POST requests
+
+//     if (customFieldValues) {
+//       // Loop through each custom field and create a POST request
+//       Object.keys(customFieldValues).forEach((fieldKey) => {
+//         const fieldValue = customFieldValues[fieldKey];
+//         const payload = {
+//           entity_id: customerId,  // Attach the customer ID
+//           field_key: fieldKey,    // Use the field key (like LPA, Income)
+//           field_value: fieldValue,
+//           field_value_type: typeof fieldValue === 'number' ? 'Number' : 'String'
+//         };
+
+//         // Create a POST request for each custom field
+//         requests.push(
+//           this.http.post('http://127.0.0.1:8000/api/v1/customfields/customfieldvalues/', payload)
+//         );
+//       });
+
+//       // Execute all POST requests in parallel using forkJoin
+//       forkJoin(requests).subscribe(
+//         (response) => {
+//           console.log('Custom field values saved successfully:', response);
+//           this.showCustomerListFn();  // Navigate to the customer list view
+//         },
+//         (error) => {
+//           console.error('Error saving custom field values:', error);
+//         }
+//       );
+//     } else {
+//       console.error('No custom fields found in the form model.');
+//     }
+//   }
+
+
+  
+  
+  
+//   // Utility function to fetch custom field config by key
+//   getCustomFieldByKey(fieldKey: string) {
+//     return this.customFieldFormConfig.fields.find((field: any) => field.key === fieldKey);
+//   }
+  
+  
   applyDomManipulations(containerSelector: string) {
     const container = document.querySelector(containerSelector);
     if (!container) return;
@@ -86,21 +377,63 @@ export class CustomersComponent {
     document.getElementById('modalClose').click();
   }
 
-  editCustomer(event) {
+  editCustomer(event: string) {
     this.CustomerEditID = event;
-    this.http.get('customers/customers/' + event).subscribe((res: any) => {
-      if (res && res.data) {
-        this.formConfig.model = res.data;
-        // Set labels for update
-        this.formConfig.pkId = 'customer_id';
-        this.formConfig.submit.label = 'Update';
-        // Show form after setting form values
-        this.formConfig.model['customer_id'] = this.CustomerEditID;
-        this.showForm = true;
+  
+    // Fetch customer details
+    this.http.get(`customers/customers/${event}`).subscribe(
+      (res: any) => {
+        if (res && res.data) {
+          // Set customer data in the form model
+          this.formConfig.model = res.data;
+          this.formConfig.model['customer_id'] = this.CustomerEditID;
+  
+          // Fetch and map custom field values
+          this.fetchAndSetCustomFieldValues(this.CustomerEditID);
+  
+          // Update form labels for editing mode
+          this.formConfig.pkId = 'customer_id';
+          this.formConfig.submit.label = 'Update';
+          this.showForm = true; // Display the form
+        }
+      },
+      (error) => {
+        console.error('Error fetching customer data:', error);
       }
-    });
+    );
+  
+    // Close the customer list modal
     this.hide();
   }
+
+  fetchAndSetCustomFieldValues(customerId: string) {
+  const url = `http://127.0.0.1:8000/api/v1/customfields/customfieldvalues/?entity_id=${customerId}`;
+
+  this.http.get(url).subscribe(
+    (response: any) => {
+      if (response?.data) {
+        const customFieldValues = response.data.reduce((acc: any, fieldValue: any) => {
+          // Normalize to lowercase for consistency
+          acc[fieldValue.custom_field.field_name.toLowerCase()] = fieldValue.field_value;
+          return acc;
+        }, {});
+
+        // Populate the customfield_values model
+        this.formConfig.model['customfield_values'] = customFieldValues;
+
+        console.log('Mapped Custom Field Values:', customFieldValues);
+      } else {
+        console.warn('No custom field values found for the customer.');
+        this.formConfig.model['customfield_values'] = {}; // Clear custom fields if none are found
+      }
+    },
+    (error) => {
+      console.error('Error fetching custom field values:', error);
+    }
+  );
+}
+
+  
 
   showCustomerListFn() {
     this.showCustomerList = true;
@@ -118,7 +451,7 @@ export class CustomersComponent {
       exParams: [],
       submit: {
         label: 'Submit',
-        submittedFn: () => this.ngOnInit()
+        submittedFn: () => this.submitCustomerForm(),
       },
       reset: {
         resetFn: () => {
@@ -133,6 +466,7 @@ export class CustomersComponent {
         }, {
           address_type: 'Shipping',
         }],
+        customfield_values: []
       },
       fields: [
         {
@@ -855,10 +1189,34 @@ export class CustomersComponent {
                 "displayStyle": "files",
                 "multiple": true
               }
+            },
+            // Custom Fields Section
+            // {
+            //   template: '<div class="custom-form-card-title mt-4">Custom Fields</div>',
+            //   fieldGroupClassName: "ant-row",
+            // },
+            // {
+            //   key: 'custom_fields',
+            //   fieldGroup: this.getCustomFieldConfig() // Append the custom fields dynamically
+            // }
+          ]
+        },
+        {
+          className: 'row col-6 m-0 custom-form-card',//'row col-6 m-0 custom-form-card',
+          fieldGroup: [
+            // Custom Fields Section
+            {
+              template: '<div class="custom-form-card-title mt-4">Custom Fields</div>',
+              fieldGroupClassName: "ant-row",
+            },
+            {
+              key: 'customfield_values',
+              fieldGroup: this.getCustomFieldConfig() // Append the custom fields dynamically
             }
           ]
         },
       ]
+      
     }
   }
 }
