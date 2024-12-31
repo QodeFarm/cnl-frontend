@@ -22,7 +22,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     this.fourthRowSmallTableData('Pending_For_Table')
   }
 
-  // baseUrl: string = 'http://127.0.0.1:8000/api/v1/'; 
+  //baseUrl: string = 'http://127.0.0.1:8000/api/v1/'; 
   baseUrl: string = 'http://195.35.20.172:8000/api/v1/'; 
 
   isSalesModalOpen: boolean = false;
@@ -62,6 +62,8 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('chartTop5ProfitMakingItemsCanvas') chartTop5ProfitMakingItemsCanvas!: ElementRef<HTMLCanvasElement>;
 
   @ViewChild('chartLast6MonthsCashflowCanvas') chartLast6MonthsCashflowCanvas!: ElementRef<HTMLCanvasElement>;
+
+  @ViewChild('SalesOrderTrendChartCanvas') salesTrendsChartCanvas!: ElementRef<HTMLCanvasElement>;
 
 
   constructor(private http: HttpClient) {} 
@@ -405,6 +407,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     this.initializeChart(this.chartLast6MonthsCashflowCanvas, this.Last6MonthsCashflowData, 'bar', "Last 6 Month's Cashflow"); // Top 6 Profit Making Items
 
     Promise.all([
+      this.fetchDataAndRenderChart("Sales_Order_Trend_Graph"),
       this.fetchDataAndInitializeChart('Sales_Over_the_Last_12_Months', {
         labelsTarget: this.salesData.labels,
         dataTarget: this.salesData.datasets[0].data,
@@ -596,4 +599,108 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     );
   }
+
+  //chart for sales order trends
+  fetchDataAndRenderChart(endpoint): void {
+    const apiUrl = this.baseUrl + 'dashboard/' + endpoint + '/'; // Replace with your actual API URL createSalesOrderTrendChart
+
+    this.http.get(apiUrl).subscribe((response: any) => {
+      if (response && response.data) {
+        const chartLabels = response.data.map((item: any) => item.month_name_year);
+        const totalSalesOrders = response.data.map((item: any) => item.total_sales_orders);
+        const invoicesConverted = response.data.map((item: any) => item.invoices_converted);
+        const returnsConverted = response.data.map((item: any) => item.returns_converted);
+        const pendingSalesOrders = response.data.map((item: any) => item.pending_sales_orders);
+
+        this.createSalesOrderTrendChart(chartLabels, totalSalesOrders, invoicesConverted, returnsConverted, pendingSalesOrders, "Sale Order Trends");
+      }
+    });
+  }
+
+  createSalesOrderTrendChart(labels: string[], total: number[], invoices: number[], returns: number[], pending: number[], chart_title: string ): void {
+    
+    const canvas = this.salesTrendsChartCanvas.nativeElement;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Total Sales Orders',
+              data: total,
+              backgroundColor: '#ff5e94',
+              borderColor: '#4e73df',
+              borderWidth: 1,
+              barThickness: 20,
+            },
+            {
+              label: 'Invoices Converted',
+              data: invoices,
+              backgroundColor: 'rgba(54, 162, 235, 0.8)',
+              borderColor: '#4e73df',
+              borderWidth: 1,
+              barThickness: 20,
+            },
+            {
+              label: 'Returns Converted',
+              data: returns,
+              backgroundColor: 'rgba(255, 99, 132, 0.8)',
+              borderColor: '#4e73df',
+              borderWidth: 1,
+              barThickness: 20,
+            },
+            {
+              label: 'Pending Sales Orders',
+              data: pending,
+              backgroundColor: 'rgba(255, 206, 86, 0.8)',
+              borderColor: '#4e73df',
+              borderWidth: 1,
+              barThickness: 20,
+            },
+          ],
+        },
+        options: {
+          plugins: {
+            tooltip: {
+              mode: 'index',
+              intersect: false,
+            },
+            legend: {
+              display: false,
+            },
+            title: {
+              display: true,
+              text: chart_title,
+              color: '#2c2e35',  
+              font: {
+                size: 12,
+                family: 'tahoma',
+                weight: 'bold',
+              },
+            }
+          },
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              stacked: true,
+              ticks: {
+                display: false, // Hide labels on the X-axis
+              },
+              grid: {
+                display: false, // Hide grid lines on X-axis
+              },
+            },
+            y: {
+              stacked: true,
+              beginAtZero: true,
+            }
+          },
+        },
+      });
+    }
+  }
+
 }
