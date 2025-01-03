@@ -15,7 +15,6 @@ export class EmployeeAttendanceComponent {
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
     drawerPlacement: 'top',
-    // drawerPlacement: 'right',
     tableConfig: {
       apiUrl: 'hrms/employee_attendance/',
       title: 'Employee Attendance',
