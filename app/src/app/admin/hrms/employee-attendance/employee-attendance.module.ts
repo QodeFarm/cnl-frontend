@@ -1,8 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
 import { EmployeeAttendanceRoutingModule } from './employee-attendance-routing.module';
-import { EmployeeAttendanceComponent } from './employee-attendance.component';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 

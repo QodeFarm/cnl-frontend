@@ -11,9 +11,7 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
   styleUrls: ['./employee-list.component.scss']
 })
 
-export class EmployeeListComponent {
-
-  
+export class EmployeeListComponent { 
   @Output('edit') edit = new EventEmitter<void>();
 
   tableConfig: TaTableConfig = {
@@ -23,7 +21,7 @@ export class EmployeeListComponent {
     pkId: "employee_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['first_name','email','phone','address','hire_date','job_type_id','designation_id','department_id','shift_id','manager_id']
+      keys: ['first_name','email','phone','hire_date','job_type_id','designation_id','department_id','shift_id','manager_id']
     },
     cols: [
       {
@@ -48,11 +46,6 @@ export class EmployeeListComponent {
         name: 'Phone',
         sort: true
       },
-      // {
-      //   fieldKey: 'address',
-      //   name: 'Address',
-      //   sort: true
-      // },
       {
         fieldKey: 'hire_date',
         name: 'Hire Date',
@@ -114,8 +107,8 @@ export class EmployeeListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            // confirm: true,
-            // confirmMsg: "Sure to delete?",
+            confirm: true,
+            confirmMsg: "Sure to delete?",
             apiUrl: 'hrms/employees'
           },
           {

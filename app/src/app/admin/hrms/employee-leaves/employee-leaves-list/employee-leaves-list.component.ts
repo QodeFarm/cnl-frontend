@@ -21,7 +21,7 @@ export class EmployeeLeavesListComponent {
     pkId: "leave_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['employee','start_date','end_date','status_id','comments','leave_type']
+      keys: ['employee','start_date','end_date','comments','leave_type']
     },
     cols: [
       {
@@ -55,15 +55,6 @@ export class EmployeeLeavesListComponent {
         name: 'End Date',
         sort: true
       },
-      // {
-      //   fieldKey: 'status_id',
-      //   name: 'Status',
-      //   sort: true,
-      //   displayType: "map",
-      //   mapFn: (currentValue: any, row: any, col: any) => {
-      //     return `${row.status.status_name}`;
-      //   },
-      // },
       {
         fieldKey: 'comments', 
         name: 'Comments',

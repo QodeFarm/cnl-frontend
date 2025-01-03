@@ -55,7 +55,6 @@ const routes: Routes = [
       { path: 'hrms/employee-leaves', data: { title: 'Employee Leaves', moduleName: 'employee-leaves' }, canActivate: [], loadComponent: () => import('./admin/hrms/employee-leaves/employee-leaves.component').then(m => m.EmployeeLeavesComponent) },
       { path: 'hrms/leave-approvals', data: { title: 'Leave Approvals', moduleName: 'leave-approvals' }, canActivate: [], loadComponent: () => import('./admin/hrms/leave-approvals/leave-approvals.component').then(m => m.LeaveApprovalsComponent) },
       { path: 'hrms/employee-leave-balance', data: { title: 'Employee Leave Balance', moduleName: 'employee-leave-balance' }, canActivate: [], loadComponent: () => import('./admin/hrms/employee-leave-balance/employee-leave-balance.component').then(m => m.EmployeeLeaveBalanceComponent) },
-      { path: 'hrms/attendance', data: { title: 'Attendance', moduleName: 'attendance' }, canActivate: [], loadComponent: () => import('./admin/hrms/attendance/attendance.component').then(m => m.AttendanceComponent) },
       { path: 'hrms/employee-attendance', data: { title: 'Employee Attendance', moduleName: 'employee-attendance' }, canActivate: [], loadComponent: () => import('./admin/hrms/employee-attendance/employee-attendance.component').then(m => m.EmployeeAttendanceComponent) },
       { path: 'hrms/swipes', data: { title: 'Swipes', moduleName: 'swipes' }, canActivate: [], loadComponent: () => import('./admin/hrms/swipes/swipes.component').then(m => m.SwipesComponent) },
 

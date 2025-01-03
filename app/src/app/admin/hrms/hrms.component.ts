@@ -42,12 +42,15 @@ export class EmployeesComponent  implements OnInit {
     this.EmployeeEditID = event;
     this.http.get('hrms/employees/' + event).subscribe((res: any) => {
       if (res) {
-        this.formConfig.model = res;
+        // this.formConfig.model = res;
+        this.formConfig.model = {
+          employee: res.data.employee
+        };
         this.formConfig.showActionBtn = true;
         this.formConfig.pkId = 'employee_id';
         //set labels for update
         this.formConfig.submit.label = 'Update';
-        // this.formConfig.model['employee_id'] = this.EmployeeEditID;
+        this.formConfig.model['employee_id'] = this.EmployeeEditID;
         this.showForm = true;
       }
     })
@@ -108,9 +111,12 @@ export class EmployeesComponent  implements OnInit {
           this.ngOnInit();
         }
       },
-      model:{},
+      model:{
+        employee:{},
+      },
       fields: [
         {
+          key:"employee",
           fieldGroupClassName: "ant-row custom-form-block",
           fieldGroup: [
             {
@@ -169,8 +175,14 @@ export class EmployeesComponent  implements OnInit {
                 required: true
               },
               hooks: {
-                onInit: (field: any) => {
-                  //field.templateOptions.options = this.cs.getRole();
+                onChanges: (field: any) => {
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['employee']) {
+                      this.formConfig.model['employee']['job_type_id'] = data.job_type_id;
+                    } else {
+                      console.error('Form config or job_type data model is not defined.');
+                    }
+                  });
                 }
               }
             },
@@ -190,8 +202,14 @@ export class EmployeesComponent  implements OnInit {
                 required: false
               },
               hooks: {
-                onInit: (field: any) => {
-                  //field.templateOptions.options = this.cs.getRole();
+                onChanges: (field: any) => {
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['employee']) {
+                      this.formConfig.model['employee']['designation_id'] = data.designation_id;
+                    } else {
+                      console.error('Form config or designation data model is not defined.');
+                    }
+                  });
                 }
               }
             },
@@ -211,8 +229,14 @@ export class EmployeesComponent  implements OnInit {
                 required: false
               },
               hooks: {
-                onInit: (field: any) => {
-                  //field.templateOptions.options = this.cs.getRole();
+                onChanges: (field: any) => {
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['employee']) {
+                      this.formConfig.model['employee']['job_code_id'] = data.job_code_id;
+                    } else {
+                      console.error('Form config or job_code data model is not defined.');
+                    }
+                  });
                 }
               }
             },
@@ -232,8 +256,14 @@ export class EmployeesComponent  implements OnInit {
                 required: false
               },
               hooks: {
-                onInit: (field: any) => {
-                  //field.templateOptions.options = this.cs.getRole();
+                onChanges: (field: any) => {
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['employee']) {
+                      this.formConfig.model['employee']['department_id'] = data.department_id;
+                    } else {
+                      console.error('Form config or department data model is not defined.');
+                    }
+                  });
                 }
               }
             },
@@ -253,8 +283,14 @@ export class EmployeesComponent  implements OnInit {
                 required: false
               },
               hooks: {
-                onInit: (field: any) => {
-                  //field.templateOptions.options = this.cs.getRole();
+                onChanges: (field: any) => {
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['employee']) {
+                      this.formConfig.model['employee']['shift_id'] = data.shift_id;
+                    } else {
+                      console.error('Form config or shift data model is not defined.');
+                    }
+                  });
                 }
               }
             },  
@@ -274,8 +310,14 @@ export class EmployeesComponent  implements OnInit {
                 required: false
               },
               hooks: {
-                onInit: (field: any) => {
-                  //field.templateOptions.options = this.cs.getRole();
+                onChanges: (field: any) => {
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['employee']) {
+                      this.formConfig.model['employee']['employee_id'] = data.employee_id;
+                    } else {
+                      console.error('Form config or employee data model is not defined.');
+                    }
+                  });
                 }
               }
             },
@@ -353,77 +395,6 @@ export class EmployeesComponent  implements OnInit {
             },
           ]
         },
-
-        // end employees
-
-        // start of employee_details keys
-
-        // {
-        //   fieldGroupClassName: "row col-12 m-0 custom-form-card",
-        //   fieldGroup: [
-        //     {
-        //       template: '<div class="custom-form-card-title">Employee Details</div>',
-        //       className: 'col-12',
-        //     },
-        //     {
-        //       fieldGroupClassName: "ant-row custom-form-block",
-        //       key: 'employee_details',
-        //       fieldGroup: [
-        //         {
-        //           key: 'date_of_birth',
-        //           type: 'input',
-        //           className: 'col-3 pb-3 ps-0',
-        //           templateOptions: {
-        //             label: 'Date Of Birth',
-        //             type: 'date',
-        //             placeholder: 'Select Date',
-        //             required: true,
-        //           }
-        //         },
-        //         {
-        //           key: 'gender',
-        //           type: 'input',
-        //           className: 'col-3 pb-3 ps-0',
-        //           templateOptions: {
-        //             label: 'Gender',
-        //             placeholder: 'Enter Gender',
-        //             required: false,
-        //           }
-        //         },
-        //         {
-        //           key: 'nationality',
-        //           type: 'input',
-        //           className: 'col-3 pb-3 ps-0',
-        //           templateOptions: {
-        //             label: 'Nationality',
-        //             placeholder: 'Enter Nationality',
-        //             required: false,
-        //           }
-        //         },
-        //         {
-        //           key: 'emergency_contact',
-        //           type: 'input',
-        //           className: 'col-3 pb-3 ps-0',
-        //           templateOptions: {
-        //             label: 'Emergency Contact',
-        //             placeholder: 'Enter Emergency Contact',
-        //             required: false,
-        //           }
-        //         },
-        //         {
-        //           key: 'emergency_contact_relationship',
-        //           type: 'input',
-        //           className: 'col-3 pb-3 ps-0',
-        //           templateOptions: {
-        //             label: 'Emergency Contact Relationship',
-        //             placeholder: 'Enter Name',
-        //             required: false,
-        //           }
-        //         },
-        //       ]
-        //     }
-        //   ]
-        // }
       ]
     }
   }

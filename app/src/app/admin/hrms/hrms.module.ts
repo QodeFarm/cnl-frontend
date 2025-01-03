@@ -17,7 +17,6 @@ import { LeaveTypesComponent } from './leave-types/leave-types.component';
 import { EmployeeLeavesListComponent } from './employee-leaves/employee-leaves-list/employee-leaves-list.component';
 import { LeaveApprovalsComponent } from './leave-approvals/leave-approvals.component';
 import { EmployeeLeaveBalanceComponent } from './employee-leave-balance/employee-leave-balance.component';
-import { AttendanceListComponent } from './attendance/attendance-list/attendance-list.component';
 import { SwipesListComponent } from './swipes/swipes-list/swipes-list.component';
 import { EmployeeAttendanceComponent } from './employee-attendance/employee-attendance.component';
 
@@ -43,7 +42,6 @@ import { EmployeeAttendanceComponent } from './employee-attendance/employee-atte
     EmployeeLeavesListComponent,
     LeaveApprovalsComponent,
     EmployeeLeaveBalanceComponent,
-    AttendanceListComponent,
     SwipesListComponent,
     EmployeeAttendanceComponent,
   ],

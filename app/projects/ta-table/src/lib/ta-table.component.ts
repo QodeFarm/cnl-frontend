@@ -403,7 +403,6 @@ export class TaTableComponent implements OnDestroy {
       '/admin/sales/sale-returns',
       '/admin/hrms/employee-attendance',
       '/admin/employees',
-      '/admin/hrms/leave-approvals',
       '/admin/hrms/employee-leave-balance'
     ]
     this.loadStatuses();
@@ -416,7 +415,6 @@ export class TaTableComponent implements OnDestroy {
     const hideStatusUrls = [
       '/admin/hrms/employee-attendance',
       '/admin/employees',// Added employees URL
-      '/admin/hrms/leave-approvals',
       '/admin/hrms/employee-leave-balance'
     ];
     this.isStatusButtonVisible = !hideStatusUrls.includes(currentUrl);
@@ -425,7 +423,6 @@ export class TaTableComponent implements OnDestroy {
     const employeeFilterUrls = [
       '/admin/hrms/employee-attendance',
       '/admin/employees', // Added employees URL
-      '/admin/hrms/leave-approvals',
       '/admin/hrms/employee-leave-balance'
     ];
     this.isEmployeeFilterVisible = employeeFilterUrls.includes(currentUrl);
