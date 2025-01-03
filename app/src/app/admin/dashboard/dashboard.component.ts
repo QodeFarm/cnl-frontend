@@ -37,14 +37,11 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   payablesChart: any;
   liquidityChart: any;
 
-  products : string[] = [];
+  products : string[] = [];  //for Small tables
   customers : string[] = [];
   pendings : string[] = [];
 
-  //Task Related
-  taskList: Array<any> = []; // Store processed task data
-  
-  //Work Order
+  taskList: Array<any> = []; // Store processed task data  
   workOrders: Array<any> = []; // Store processed work order data
 
   @ViewChild('salesChartCanvas') salesChartCanvas!: ElementRef<HTMLCanvasElement>;
@@ -57,7 +54,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('chartDirectExpenses') chartDirectExpensesCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('chartOperationalExpenses') chartOperationalExpensesCanvas!: ElementRef<HTMLCanvasElement>;
 
-  // @ViewChild('chartTop5ItemsIn6MonthsCanvas') chartTop5ItemsIn6MonthsCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('chartTop5ItemsIn6MonthsCanvas') chartTop5ItemsIn6MonthsCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('chartTop5CustomersOf6MonthsCanvas') chartTop5CustomersOf6MonthsCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('chartTop5ProfitMakingItemsCanvas') chartTop5ProfitMakingItemsCanvas!: ElementRef<HTMLCanvasElement>;
 
@@ -266,19 +263,19 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     }, 100); // Delay to ensure modal and canvas are rendered
   }
 
-  //Data for Top 5 Items Groups sales in Last 6 Months
-  // top5ItemsIn6MonthsData = {
-  //   chart_title : 'wq',
-  //   labels: [], // Labels
-  //   datasets: [{
-  //     label: 'Sales (in ₹)',
-  //     data: [],
-  //     backgroundColor: '#4e73df',
-  //     borderColor: '#4e73df',
-  //     borderWidth: 1,
-  //     barThickness: 20,
-  //   }]
-  // };
+  // Data for Top 5 Items Groups sales in Last 6 Months
+  top5ItemsIn6MonthsData = {
+    chart_title : 'wq',
+    labels: [], // Labels
+    datasets: [{
+      label: 'Sales (in ₹)',
+      data: [],
+      backgroundColor: '#4e73df',
+      borderColor: '#4e73df',
+      borderWidth: 1,
+      barThickness: 20,
+    }]
+  };
 
   //Data for Top 5 Profit making Items In last FY
   top5ProfitMakingItemsData = {
@@ -426,12 +423,12 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
         labelField: 'product_name',
         dataField: 'total_sold_quantity',
       }),
-      // this.fetchDataAndInitializeChart('Top_5_Items_Groups_In_Last_6_Months', {
-      //   labelsTarget: this.top5ItemsIn6MonthsData.labels,
-      //   dataTarget: this.top5ItemsIn6MonthsData.datasets[0].data,
-      //   labelField: 'item_group',
-      //   dataField: 'total_amount',
-      // }),
+      this.fetchDataAndInitializeChart('Top_5_Items_Groups_In_Last_6_Months', {
+        labelsTarget: this.top5ItemsIn6MonthsData.labels,
+        dataTarget: this.top5ItemsIn6MonthsData.datasets[0].data,
+        labelField: 'item_group',
+        dataField: 'total_amount',
+      }),
       this.fetchDataAndInitializeChart('Top_5_Sold_Items_In_Current_FY', {
         labelsTarget: this.top5ProfitMakingItemsData.labels,
         dataTarget: this.top5ProfitMakingItemsData.datasets[0].data,
@@ -448,7 +445,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
       .then(() => {
         // Initialize charts after all data is fetched
         this.initializeChart(this.chartTop5ItemsCanvas, this.top5ItemsData, 'pie', 'Top 5 Items Sold In Last 30 days');
-        // this.initializeChart(this.chartTop5ItemsIn6MonthsCanvas, this.top5ItemsIn6MonthsData, 'bar', 'Top 5 Items (Last 6 Months)');
+        this.initializeChart(this.chartTop5ItemsIn6MonthsCanvas, this.top5ItemsIn6MonthsData, 'pie', 'Top 5 Items (Last 6 Months)');
         this.initializeChart(this.chartTop5CustomersOf6MonthsCanvas, this.top5CustomersData, 'bar', 'Top 5 Customers (Last 6 Months)');
         this.initializeChart(this.chartTop5ProfitMakingItemsCanvas, this.top5ProfitMakingItemsData, 'bar', 'Top 5 Profit-Making Items');
       })
