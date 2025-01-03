@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { LeaveApprovalsListComponent } from './leave-approvals-list/leave-approvals-list.component';
+import { LeaveApprovalsComponent } from './leave-approvals.component';
 
 const routes: Routes = [
   {
-    path:"",
-    component:LeaveApprovalsListComponent
+    path:"leave-approvals",
+    component:LeaveApprovalsComponent
   }  
 ];
 

@@ -2,6 +2,15 @@
 
     <div class="ta-cell">
         <div class="ta-row p-0 justify-content-end flex-nowrap">
+
+            <!-- Employee Filter -->
+            <div class="filter-group" style="margin-right: 10px;" *ngIf="isEmployeeFilterVisible">
+                <nz-select [(ngModel)]="selectedEmployee" nzPlaceHolder="Select Employee" style="width: 185px" (ngModelChange)="onEmployeeChange($event)">
+                    <nz-option *ngFor="let employee of employeeOptions" [nzValue]="employee.value" [nzLabel]="employee.label">
+                    </nz-option>
+                </nz-select>
+            </div>   
+
             <!-- Quick Period Dropdown -->
             <div class="filter-group" style="margin-right: 10px;" *ngIf="isButtonVisible">
                 <nz-select id="quickPeriod" [(ngModel)]="selectedQuickPeriod" (ngModelChange)="onQuickPeriodChange()" nzPlaceHolder="Quick Period" class="quick-period-select" style="width: 160px;">
@@ -20,11 +29,21 @@
             </div>
 
             <!-- Apply Filters status DropDown -->
-            <div class="filter-group" style="margin-right: 10px;" *ngIf="isButtonVisible">
+
+            <!-- <div class="filter-group" style="margin-right: 10px;" *ngIf="isButtonVisible">
                 <nz-select [(ngModel)]="selectedStatus" nzPlaceHolder="Select Status" style="width: 185px" (ngModelChange)="onStatusChange($event)">
                     <nz-option *ngFor="let status of statusOptions" [nzValue]="status.value" [nzLabel]="status.label">
                     </nz-option>
                 </nz-select>
+            </div> -->
+
+            <div *ngIf="isButtonVisible">
+                <div class="filter-group" style="margin-right: 10px;" *ngIf="isStatusButtonVisible">
+                  <nz-select [(ngModel)]="selectedStatus" nzPlaceHolder="Select Status" style="width: 185px" (ngModelChange)="onStatusChange($event)">
+                    <nz-option *ngFor="let status of statusOptions" [nzValue]="status.value" [nzLabel]="status.label">
+                    </nz-option>
+                  </nz-select>
+                </div>
             </div>
 
             <!-- Apply Filters OK Button -->

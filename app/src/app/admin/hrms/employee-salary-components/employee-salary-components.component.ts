@@ -1,70 +1,70 @@
-import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { TaFormConfig } from '@ta/ta-form';
-import { CommonModule } from '@angular/common';
-import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
-import { EmployeeSalaryComponentsListComponent } from './employee-salary-components-list/employee-salary-components-list.component';
+import { TaCurdConfig } from '@ta/ta-curd';
 
 @Component({
   selector: 'app-employee-salary-components',
-  standalone: true,
-  imports: [CommonModule,AdminCommmonModule,EmployeeSalaryComponentsListComponent],
   templateUrl: './employee-salary-components.component.html',
   styleUrls: ['./employee-salary-components.component.scss']
 })
 export class EmployeeSalaryComponentsComponent {
-  showEmployeeSalaryComponentsList: boolean = false;
-  showForm: boolean = false;
-  EmployeeSalaryComponentsEditID: any; 
-
-  constructor(private http: HttpClient) {
-  }
-
-  ngOnInit() {
-    this.showEmployeeSalaryComponentsList = false;
-    this.showForm = true;
-    this.EmployeeSalaryComponentsEditID = null;
-    // set form config
-    this.setFormConfig();
-    console.log('this.formConfig', this.formConfig);
-
-  };
-
-  formConfig: TaFormConfig = {};
-
-  hide() {
-    document.getElementById('modalClose').click();
-  };
-
-  editEmployeeSalaryComponents(event) {
-    console.log('event', event);
-    this.EmployeeSalaryComponentsEditID = event;
-    this.http.get('hrms/employee_salary_components/' + event).subscribe((res: any) => {
-      if (res) {
-        this.formConfig.model = res;
-        this.formConfig.showActionBtn = true;
-        this.formConfig.pkId = 'employee_component_id';
-        //set labels for update
-        this.formConfig.submit.label = 'Update';
-        this.showForm = true;
-      }
-    })
-    this.hide();
-  };
-
-  showEmployeeSalaryComponentsListFn() {
-    this.showEmployeeSalaryComponentsList = true;
-  };
-
-  setFormConfig() {
-    this.EmployeeSalaryComponentsEditID = null;
-    this.formConfig = {
-      url: "hrms/employee_salary_components/",
-      // title: 'leads',
-      formState: {
-        viewMode: false,
+  curdConfig: TaCurdConfig = {
+    drawerSize: 500,
+    drawerPlacement: 'top',
+    tableConfig: {
+      apiUrl: 'hrms/employee_salary_components/',
+      title: 'Employee Salary Components',
+      pkId: "employee_component_id",
+      pageSize: 10,
+      "globalSearch": {
+        keys: ['employee_component_id', 'component_id','component_amount','salary_id']
       },
-      showActionBtn : true,
+      cols: [
+        {
+          fieldKey: 'component_id',
+          name: 'salary Component',
+          sort: true,
+          displayType: "map",
+          mapFn: (currentValue: any, row: any, col: any) => {
+            return `${row.component.component_name}`;
+          },
+        },
+        {
+          fieldKey: 'component_amount', 
+          name: 'Component Amount',
+          sort: true
+        }, 
+        {
+          fieldKey: 'salary_id',
+          name: 'Salary',
+          sort: true,
+          displayType: "map",
+          mapFn: (currentValue: any, row: any, col: any) => {
+            return `${row.salary.salary_amount}`;
+          },
+        },
+        {
+          fieldKey: "code",
+          name: "Action",
+          type: 'action',
+          actions: [{
+              type: 'delete',
+              label: 'Delete',
+              confirm: true,
+              confirmMsg: "Sure to delete?",
+              apiUrl: 'hrms/employee_salary_components'
+            },
+            {
+              type: 'edit',
+              label: 'Edit'
+            }
+          ]
+        }
+      ]
+    },
+    formConfig: {
+      url: 'hrms/employee_salary_components/',
+      title: 'Employee Salary Components',
+      pkId: "employee_component_id",
       exParams: [
         {
           key: 'component_id',
@@ -77,77 +77,63 @@ export class EmployeeSalaryComponentsComponent {
           value: 'data.salary.salary_id'
         }
       ],
-      submit: {
-        label: 'Submit',
-        submittedFn: () => this.ngOnInit()
-      },
-      reset: {
-        resetFn: () => {
-          this.ngOnInit();
-        }
-      },
-      model:{},
-
-      fields: [
-        {
-          fieldGroupClassName: "ant-row custom-form-block",
-          fieldGroup: [
-            {
-              key: 'component',
-              type: 'select',
-              className: 'col-3 pb-3 ps-0',
-              templateOptions: {
-                label: 'Component',
-                dataKey: 'component_id',
-                dataLabel: "component_name",
-                options: [],
-                lazy: {
-                  url: 'hrms/salary_components/',
-                  lazyOneTime: true
-                },
-                required: true
+      fields: [{
+        fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
+        fieldGroup: [
+          {
+            key: 'component',
+            type: 'select',
+            className: 'col-6 pb-3 ps-0',
+            templateOptions: {
+              label: 'Component',
+              dataKey: 'component_id',
+              dataLabel: "component_name",
+              options: [],
+              lazy: {
+                url: 'hrms/salary_components/',
+                lazyOneTime: true
               },
-              hooks: {
-                onInit: (field: any) => {
-                  //field.templateOptions.options = this.cs.getRole();
-                }
-              }
+              required: true
             },
-            {
-              key: 'component_amount',
-              type: 'input',
-              className: 'col-3 pb-3 ps-0',
-              templateOptions: {
-                label: 'Component Amount',
-                placeholder: 'Enter Component Amount',
-                type: 'number',
-              }
-            },
-            {
-              key: 'salary',
-              type: 'select',
-              className: 'col-3 pb-3 ps-0',
-              templateOptions: {
-                label: 'Salary',
-                dataKey: 'salary_id',
-                dataLabel: "salary_amount",
-                options: [],
-                lazy: {
-                  url: 'hrms/employee_salary/',
-                  lazyOneTime: true
-                },
-                required: true
-              },
-              hooks: {
-                onInit: (field: any) => {
-                  //field.templateOptions.options = this.cs.getRole();
-                }
+            hooks: {
+              onInit: (field: any) => {
+                //field.templateOptions.options = this.cs.getRole();
               }
             }
-          ]
-        }
-      ]
+          },
+          {
+            key: 'component_amount',
+            type: 'input',
+            className: 'col-6 pb-3 ps-0',
+            templateOptions: {
+              label: 'Component Amount',
+              placeholder: 'Enter Component Amount',
+              type: 'number',
+            }
+          },
+          {
+            key: 'salary',
+            type: 'select',
+            className: 'col-6 pb-3 ps-0',
+            templateOptions: {
+              label: 'Salary',
+              dataKey: 'salary_id',
+              dataLabel: "salary_amount",
+              options: [],
+              lazy: {
+                url: 'hrms/employee_salary/',
+                lazyOneTime: true
+              },
+              required: true
+            },
+            hooks: {
+              onInit: (field: any) => {
+                //field.templateOptions.options = this.cs.getRole();
+              }
+            }
+          }
+        ]
+      }]
     }
   }
 }
-
