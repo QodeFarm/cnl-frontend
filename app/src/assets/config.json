@@ -1,5 +1,5 @@
 {
-  "baseUrl": "http://195.35.20.172/api/v1/",
+  "baseUrl": "http://195.35.20.172:8000/api/v1/",
   "cdnPath": "http://195.35.20.172/cdn/"
 }
 

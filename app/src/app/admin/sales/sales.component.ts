@@ -36,6 +36,7 @@ export class SalesComponent {
   shippingTrackingNumber: any;
   unitOptionOfProduct: any[] | string = []; // Initialize as an array by default
   isModalOpen = false;  //Added line to fix past orders modal box correctly
+  showModal = false;
   //COPY ---------------------------------
   // List of all tables
   tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return', 'Purchase Order', 'Purchase Invoice', 'Purchase Return'];
@@ -178,6 +179,8 @@ export class SalesComponent {
     // set form config
     this.setFormConfig();
     this.checkAndPopulateData();
+    this.loadQuickpackOptions(); // Fetch Quickpack options
+    console.log("data in load : ", this.loadQuickpackOptions())
     
     // set sale_order default value
     this.formConfig.model['sale_order']['order_type'] = 'sale_order';
@@ -758,7 +761,58 @@ handleProductPull(selectedProducts: any[]) {
     const url = `/products/product_variations/?product_name=${productID}`;
     return this.http.get(url).pipe(((res: any) => res.data));
   }
-  
+//=====================================================
+  quickpackOptions: any[] = []; // To store available Quickpack options
+  selectedQuickpack: string = ''; // Selected Quickpack value
+
+  loadQuickpackOptions() {
+    this.http.get('sales/quick_pack/') // Replace with your API endpoint
+      .subscribe((response: any) => {
+        this.quickpackOptions = response.data || []; // Adjust based on API response
+        console.log("quickpackOptions : ", this.quickpackOptions);
+      });
+  }
+
+
+  loadQuickpackProducts() {
+    console.log("quick pack id : ", this.selectedQuickpack)
+    if (!this.selectedQuickpack) {
+      console.log('Please select a Quickpack!');
+      return;
+    }
+
+    this.http.get(`sales/quick_pack/${this.selectedQuickpack}`)
+      .subscribe((response: any) => {
+        console.log("response : ", response.data.quick_pack_data_items);
+        const quickPackDataItems = response.data.quick_pack_data_items || [];
+
+        if (quickPackDataItems.length === 0) {
+          console.log('No items found in the selected Quickpack!');
+          return;
+        }
+        // Populate `sale_order_items` with Quickpack data
+        this.formConfig.model.sale_order_items = quickPackDataItems.map((item: any) => ({
+          product: item.product,
+          quantity: item.quantity,
+          size: item.size,
+          color: item.color,
+          print_name: item.product.print_name,
+          rate: item.product.mrp,
+          discount: item.product.dis_amount,
+          unit_options_id: item.product.unit_options
+
+        }));
+
+        // Trigger form change detection (if needed)
+        if (this.salesForm) {
+          console.log("we are inside : ", this.salesForm.form);
+          this.salesForm.form.controls.sale_order_items.patchValue(this.formConfig.model.sale_order_items);
+          console.log("After method ...")
+        }
+
+        console.log('Sale Order Items populated:', this.formConfig.model.sale_order_items);
+      });
+  }
 //=====================================================
   isConfirmationModalOpen: boolean = false;
   selectedOption: string = 'sale_order';
@@ -766,6 +820,9 @@ handleProductPull(selectedProducts: any[]) {
   saleEstimateSelected = false;
   showSuccessToast = false;
   toastMessage = '';
+  isAmountModalOpen: boolean = false; // Controls Amount modal
+  totalAmount: number = 0; // Replace this with the actual total amount from your logic
+  amountExceedMessage: string = ''; // Dynamic message for the modal
   updateProductInfo(currentRowIndex, product, unitData = '') {
     // Select the card wrapper element
     const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
@@ -787,29 +844,29 @@ handleProductPull(selectedProducts: any[]) {
   };
 
   //Added this logic for creating workorder from sale order and changing flow status by triggering URL
-  createWorkOrder() {
-    if (this.SaleOrderEditID) {
-      const productDetails = this.formConfig.model.sale_order_items;
-      const saleOrderDetails = this.formConfig.model.sale_order;
+  // createWorkOrder() {
+  //   if (this.SaleOrderEditID) {
+  //     const productDetails = this.formConfig.model.sale_order_items;
+  //     const saleOrderDetails = this.formConfig.model.sale_order;
   
-      // Check if productDetails and saleOrderDetails have valid data
-      if (productDetails && saleOrderDetails) {
-        const payload = {
-          productDetails: productDetails,
-          saleOrderDetails: saleOrderDetails,
-        };
+  //     // Check if productDetails and saleOrderDetails have valid data
+  //     if (productDetails && saleOrderDetails) {
+  //       const payload = {
+  //         productDetails: productDetails,
+  //         saleOrderDetails: saleOrderDetails,
+  //       };
   
-        console.log('Navigating to production with payload:', payload);
+  //       console.log('Navigating to production with payload:', payload);
   
-        // Navigate to the Work Order route without triggering the `move_next_stage` endpoint
-        this.router.navigate(['admin/production'], { state: payload });
-      } else {
-        console.warn('Product details or sale order details are missing.');
-      }
-    } else {
-      console.warn('SaleOrderEditID is not set. Unable to create work order.');
-    }
-  }
+  //       // Navigate to the Work Order route without triggering the `move_next_stage` endpoint
+  //       this.router.navigate(['admin/production'], { state: payload });
+  //     } else {
+  //       console.warn('Product details or sale order details are missing.');
+  //     }
+  //   } else {
+  //     console.warn('SaleOrderEditID is not set. Unable to create work order.');
+  //   }
+  // }
   
   createSaleOrder() {
       this.http.post('sales/sale_order/', this.formConfig.model)
@@ -866,6 +923,204 @@ handleProductPull(selectedProducts: any[]) {
             console.error('Error updating record:', error);
         });
   }
+
+  // Function to open Amount Exceed modal
+openAmountModal(total_amount: number, max_limit: number) {
+  console.log("Opening Amount Exceed modal.");
+  this.isAmountModalOpen = true;
+  this.amountExceedMessage = `The total amount of ${total_amount} exceeds the credit limit of ${max_limit}. Do you want to proceed?`; // Set dynamic message
+}
+
+// Confirm action in Amount Exceed modal
+proceedWithAmount() {
+  console.log("User confirmed to proceed with amount exceeding credit limit.");
+  this.isAmountModalOpen = false;
+
+  if (!this.SaleOrderEditID) {
+      console.log("Opening Sale Order/Estimate modal after confirmation.");
+      this.openSaleOrderEstimateModal(); // Open Sale Order/Estimate modal
+  } else {
+      console.log("Proceeding to update existing sale order.");
+      this.updateSaleOrder(); // Proceed to update existing sale order
+  }
+}
+
+// Cancel action in Amount Exceed modal
+closeAmountModal() {
+  console.log("User canceled submission due to exceeding amount limit.");
+  this.isAmountModalOpen = false;
+
+  // Ensure the first modal (Sale Order/Estimate Modal) does not open
+  this.isConfirmationModalOpen = false;
+}
+
+// Close Sale Order/Estimate modal
+closeSaleOrderEstimateModal() {
+  console.log("Sale Order/Estimate modal closed.");
+  this.isConfirmationModalOpen = false;
+}
+
+createWorkOrder() {
+  // console.log("dataa1",this.SaleOrderEditID)
+  if (this.SaleOrderEditID) {
+    // **1. Filtering Selected Items**: Check if `selectItem` exists and is `true`
+    const selectedProducts = this.formConfig.model.sale_order_items.filter(item => item.selectItem);
+
+    // Log the filtered selected products
+    console.log("Filtered Selected Products:", selectedProducts);
+
+    const saleOrderDetails = this.formConfig.model.sale_order;
+    const saleOrderItemsDetails = this.formConfig.model.sale_order_items
+    const orderAttachmentsDetails = this.formConfig.model.order_attachments
+    const orderShipmentsDetails = this.formConfig.model.order_shipments
+
+
+    // **2. Proceed Only if Data is Valid**: Ensure selected products and sale order details exist
+    if (selectedProducts.length > 0 && saleOrderDetails && orderAttachmentsDetails && orderShipmentsDetails) {
+      this.selectedOrder = {
+        productDetails: selectedProducts, // Only include selected products
+        saleOrderDetails: saleOrderDetails,
+        orderAttachments : orderAttachmentsDetails,
+        orderShipments : orderShipmentsDetails
+      };
+
+      // Show the modal for confirmation
+      this.showModal = true;
+    } else {
+      // Warn if conditions for creating a work order are not met
+      console.warn('No products selected or sale order details are missing.');
+    }
+  } else {
+    // Warn if `SaleOrderEditID` is not set
+    console.warn('SaleOrderEditID is not set. Unable to create work order.');
+  }
+}
+
+closeModalworkorder() {
+  this.showModal = false;
+  this.selectedOrder = null;
+}
+
+confirmWorkOrder() {
+  console.log("data1",this.selectedOrder)
+  if (this.selectedOrder) {
+    const { productDetails, saleOrderDetails, orderAttachments, orderShipments} = this.selectedOrder;
+
+    const parentOrderNo = saleOrderDetails.order_no; // Parent order number
+    let childOrderCounter = 1; // Counter for child sale orders
+
+    const processProductRequests = productDetails.map((product) => {
+      const childOrderNo = `${parentOrderNo}-${childOrderCounter++}`; // Generate child order number
+      console.log("saleorderdetailsdata",saleOrderDetails)
+
+      // Step 1: Construct the payload for the child sale order
+      const childSaleOrderPayload = {
+        sale_order: 
+        {
+          order_no: childOrderNo,
+          customer_id: saleOrderDetails.customer.customer_id,
+          order_date: saleOrderDetails.order_date,
+          ref_date: saleOrderDetails.ref_date,
+          delivery_date: saleOrderDetails.delivery_date,
+          order_type: 'sale_order',
+          sale_estimate: saleOrderDetails.sale_estimate || 'No',
+          flow_status: { flow_status_name: 'Production' },
+          billing_address: saleOrderDetails.billing_address,
+          shipping_address: saleOrderDetails.shipping_address,
+          email: saleOrderDetails.email,
+          remarks: saleOrderDetails.remarks || null
+        },
+        sale_order_items: productDetails,
+        // [
+          // {
+          //   product_id: product.product_id,
+          //   unit_options_id: product.unit_options_id,
+          //   quantity: product.quantity || 0,
+          //   rate: product.rate,
+          //   amount: product.amount,
+          //   print_name: product.print_name,
+          //   size_id: product.size?.size_id || null,
+          //   color_id: product.color?.color_id || null
+          // }
+        // ],
+        order_attachments: orderAttachments,
+        // .map((attachment) => ({
+        //   attachment_name: attachment.attachment_name,
+        //   attachment_path: attachment.attachment_path,
+        //   order_type_id: attachment.order_type_id
+        // })) || [],
+        order_shipments: orderShipments
+          // ? {
+          //     shipping_mode_id: saleOrderDetails.order_shipments.shipping_mode?.shipping_mode_id || null,
+          //     shipping_company_id: saleOrderDetails.order_shipments.shipping_company?.shipping_company_id || null,
+          //     destination: saleOrderDetails.order_shipments.destination,
+          //     shipping_tracking_no: `${saleOrderDetails.order_shipments.shipping_tracking_no}-${childOrderCounter}`,
+          //     shipping_date: saleOrderDetails.order_shipments.shipping_date,
+          //     shipping_charges: saleOrderDetails.order_shipments.shipping_charges || null,
+          //     port_of_landing: saleOrderDetails.order_shipments.port_of_landing || null,
+          //     port_of_discharge: saleOrderDetails.order_shipments.port_of_discharge || null,
+          //     no_of_packets: saleOrderDetails.order_shipments.no_of_packets || null,
+          //     weight: saleOrderDetails.order_shipments.weight || null
+          //   }
+          // : {}
+      };
+
+      console.log('Payload for child sale order:', childSaleOrderPayload);
+
+      // Step 2: Post the child sale order
+      return this.http.post('sales/sale_order/', childSaleOrderPayload).pipe(
+        tap((childSaleOrderResponse: any) => {
+          console.log(`Child Sale Order ${childOrderNo} created:`, childSaleOrderResponse);
+
+          // Step 3: Construct and post the Work Order payload
+          const workOrderPayload = {
+            work_order: {
+              product_id: product.product_id,
+              quantity: product.quantity || 0,
+              completed_qty: 0, // Initialize as 0
+              pending_qty: product.quantity || 0, // Pending is the same as the total quantity
+              start_date: saleOrderDetails.order_date || new Date().toISOString().split('T')[0],
+              // end_date: saleOrderDetails.delivery_date || new Date().toISOString().split('T')[0],
+              sync_qty: true, // As per the example payload
+              size_id: product.size?.size_id || null,
+              color_id: product.color?.color_id || null,
+              status_id: '', // Set as empty if not provided
+              sale_order_id: childSaleOrderResponse.data.sale_order.sale_order_id // Link the sale order ID
+            },
+            bom: [], // Empty for now
+            work_order_machines: [], // Empty for now
+            workers: [], // Empty for now
+            work_order_stages: [] // Empty for now
+          };
+
+          console.log('Work Order Payload:', workOrderPayload);
+
+          this.http.post('production/work_order/', workOrderPayload).subscribe({
+            next: (workOrderResponse) => {
+              console.log('Work Order created:', workOrderResponse);
+            },
+            error: (err) => {
+              console.error('Error creating Work Order:', err);
+            }
+          });
+        })
+      );
+    });
+
+    // Process all requests
+    forkJoin(processProductRequests).subscribe({
+      next: () => {
+        this.closeModalworkorder();
+        alert('Child Sale Orders and Work Orders created successfully!');
+      },
+      error: (err) => {
+        console.error('Error processing products:', err);
+        alert('Failed to create Child Sale Orders or Work Orders. Please try again.');
+      }
+    });
+  }
+}
+
 //=======================================================
   setFormConfig() {
     this.SaleOrderEditID = null;
@@ -897,14 +1152,35 @@ handleProductPull(selectedProducts: any[]) {
       submit: {
         label: 'Submit',
         submittedFn: () => {
-            // Open confirmation modal only if it's a new sale order
-            if (!this.SaleOrderEditID) {
-                this.openSaleOrderEstimateModal();
+            console.log("Submit button clicked.");
+    
+            const totalAmount = this.formConfig.model.sale_order.total_amount; // Get the total amount
+            const customer = this.formConfig.model.sale_order.customer; // Get the customer details
+            console.log("Customer in formconfig : ", customer);
+            console.log("Customer.credit_limit : ", customer.credit_limit);
+            if (!customer || !customer.credit_limit) {
+                console.error("Customer information or credit limit is missing.");
+                return;
+            }
+    
+            const maxLimit = parseFloat(customer.credit_limit); // Convert credit limit to number
+            console.log(`Total Amount: ${totalAmount}, Credit Limit: ${maxLimit}`);
+    
+            if (totalAmount >= maxLimit) {
+                // Exceeds credit limit: show the Amount Exceed modal
+                this.openAmountModal(totalAmount, maxLimit);
             } else {
-                this.updateSaleOrder(); // Call update method for editing
+                // Within credit limit: check if a new sale order or existing
+                if (!this.SaleOrderEditID) {
+                    console.log("Within credit limit: Opening Sale Order/Estimate modal.");
+                    this.openSaleOrderEstimateModal();
+                } else {
+                    console.log("Within credit limit: Proceeding to update existing sale order.");
+                    this.updateSaleOrder();
+                }
             }
         }
-      },        
+    },      
       reset: {
         resetFn: () => {
           this.ngOnInit();
@@ -1302,6 +1578,7 @@ handleProductPull(selectedProducts: any[]) {
                       // ***Size dropdown will populate with available sizes when product in selected***
                       field.formControl.valueChanges.subscribe(selectedProductId => {
                         const product = this.formConfig.model.sale_order_items[currentRowIndex]?.product;
+                        console.log("Product id : ", product)
                         // Ensure the product exists before making an HTTP request
                         if (product?.product_id) {
                           this.http.get(`products/product_variations/?product_id=${product.product_id}`).subscribe((response: any) => {
@@ -1434,6 +1711,7 @@ handleProductPull(selectedProducts: any[]) {
                     // ***Product Details Auto Fill Code***
                     field.formControl.valueChanges.subscribe(data => {
                       this.productOptions = data;
+                      console.log("Data in products : ", data)
                       if (field.form && field.form.controls && field.form.controls.code && data && data.code) {
                         field.form.controls.code.setValue(data.code)
                       }

@@ -72,7 +72,7 @@ export class LeadsListComponent {
         name: 'Assigned',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.assignee.name}`;
+          return `${row.assignee.first_name} ${row.assignee.last_name}`;
         },
         sort: true
       },

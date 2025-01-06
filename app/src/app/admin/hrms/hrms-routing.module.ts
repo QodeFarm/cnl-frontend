@@ -11,9 +11,9 @@ import { LeaveTypesComponent } from './leave-types/leave-types.component';
 import { EmployeeLeavesComponent } from './employee-leaves/employee-leaves.component';
 import { LeaveApprovalsComponent } from './leave-approvals/leave-approvals.component';
 import { EmployeeLeaveBalanceComponent } from './employee-leave-balance/employee-leave-balance.component';
-import { AttendanceComponent } from './attendance/attendance.component';
 import { SwipesComponent } from './swipes/swipes.component';
 import { EmployeeSalaryComponent } from './employee-salary/employee-salary.component';
+import { EmployeeAttendanceComponent } from './employee-attendance/employee-attendance.component';
 
 const routes: Routes = [
   {
@@ -69,8 +69,8 @@ const routes: Routes = [
     component: EmployeeLeaveBalanceComponent
   },
   {
-    path: 'attendance',
-    component: AttendanceComponent
+    path: 'employee-attendance',
+    component: EmployeeAttendanceComponent
   },
   {
     path: 'swipes',

@@ -255,6 +255,7 @@
                             <li><a [routerLink]="['/admin/master/departments']">Departments</a></li>
                             <li><a [routerLink]="['/admin/master/shifts']">Shifts</a></li>
                             <li><a [routerLink]="['/admin/master/salary-components']">Salary Components</a></li>
+                            <li><a [routerLink]="['/admin/master/employee-salary-components/']">Employee Salary Components</a></li>
                             <li><a [routerLink]="['/admin/master/leave-types']">Leave Types</a></li>
                         </ul>
                     </div>
@@ -278,6 +279,9 @@
                         </ng-container>
                         <ng-container *ngSwitchCase="'salary-components'">
                             <app-salary-components></app-salary-components>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'employee-salary-components'">
+                            <app-employee-salary-components></app-employee-salary-components>
                         </ng-container>
                         <ng-container *ngSwitchCase="'leave-types'">
                             <app-leave-types></app-leave-types>

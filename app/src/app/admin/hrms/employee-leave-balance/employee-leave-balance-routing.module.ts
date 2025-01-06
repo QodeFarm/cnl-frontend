@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { EmployeeLeaveBalanceListComponent } from './employee-leave-balance-list/employee-leave-balance-list.component';
+import { EmployeeLeaveBalanceComponent } from './employee-leave-balance.component';
 
 const routes: Routes = [
   {
     path:"",
-    component:EmployeeLeaveBalanceListComponent
+    component:EmployeeLeaveBalanceComponent
   }  
 ];
 

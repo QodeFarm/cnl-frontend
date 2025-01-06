@@ -1,18 +1,17 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LeaveApprovalsRoutingModule } from './leave-approvals-routing.module';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+
+import { StockjournalRoutingModule } from './stockjournal-routing.module';
+import { StockjournalComponent } from './stockjournal.component';
 
 
 @NgModule({
-  declarations: [
-    // LeaveApprovalsComponent,
-    // LeaveApprovalsListComponent
-  ],
+  declarations: [],
   imports: [
     CommonModule,
     AdminCommmonModule,
-    LeaveApprovalsRoutingModule
+    StockjournalRoutingModule,
   ]
 })
-export class LeaveApprovalsModule { }
+export class StockjournalModule { }
