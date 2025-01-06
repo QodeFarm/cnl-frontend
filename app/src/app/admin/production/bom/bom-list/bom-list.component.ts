@@ -31,6 +31,12 @@ export class BomListComponent {
     },
     cols: [
       {
+        fieldKey: 'created_at',
+        name: 'Created At',
+        sort: true,
+        displayType: 'datetime'
+      },
+      {
         fieldKey: 'bom',
         name: 'BOM Name',
         sort: true,

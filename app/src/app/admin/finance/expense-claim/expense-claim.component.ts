@@ -93,7 +93,7 @@ export class ExpenseClaimComponent {
               templateOptions: {
                 label: 'Employee',
                 dataKey: 'employee',
-                dataLabel: "name",
+                dataLabel: 'first_name',
                 options: [],
                 lazy: {
                   url: 'hrms/employees/',

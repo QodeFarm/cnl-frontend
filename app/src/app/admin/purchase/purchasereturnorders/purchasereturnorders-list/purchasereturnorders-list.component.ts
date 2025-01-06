@@ -30,6 +30,11 @@ export class PurchasereturnordersListComponent {
     },
     cols: [
       {
+        fieldKey: 'due_date',
+        name: 'Due Date',
+        sort: true
+      },
+      {
         fieldKey: 'purchase_type',
         name: 'Purchase Type',
         displayType: "map",
@@ -46,11 +51,6 @@ export class PurchasereturnordersListComponent {
       {
         fieldKey: 'return_reason',
         name: 'Return Reason',
-        sort: true
-      },
-      {
-        fieldKey: 'due_date',
-        name: 'Due Date',
         sort: true
       },
       {

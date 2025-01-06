@@ -25,12 +25,18 @@ export class ExpenseClaimListComponent {
     },
     cols: [
       {
+        fieldKey: 'created_at',
+        name: 'Created At',
+        sort: true,
+        displayType: 'datetime',
+      },
+      {
         fieldKey: 'employee_id',
         name: 'Employee',
         sort: true,
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.employee.name}`;
+          return `${row.employee.first_name} ${row.employee?.second_name || ''}`;
         },
       },
       {

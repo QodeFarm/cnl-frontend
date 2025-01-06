@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
@@ -11,8 +11,20 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
   templateUrl: './salesinvoice-list.component.html',
   styleUrls: ['./salesinvoice-list.component.scss']
 })
-export class SalesInvoiceListComponent {
 
+export class SalesInvoiceListComponent implements OnInit {
+
+  ngOnInit() {
+    console.log('Sorting table columns by "created_at"...');
+    
+    // this.tableConfig.cols.sort((a, b) => {
+    //   // Assuming 'created_at' is a field in the objects inside 'cols'
+    //   const dateA = new Date(a.created_at).getTime();
+    //   const dateB = new Date(b.created_at).getTime();
+      
+    //   return dateB - dateA; // Ascending order
+    // });
+  }
   @Output('edit') edit = new EventEmitter<void>();
 
   tableConfig: TaTableConfig = {
@@ -27,9 +39,14 @@ export class SalesInvoiceListComponent {
     ],
     pageSize: 10,
     "globalSearch": {
-      keys: ['customer','invoice_no','invoice_date','total_amount','tax_amount','advance_amount','status_name','remarks']
+      keys: ['invoice_date','customer','invoice_no','total_amount','tax_amount','advance_amount','status_name','remarks']
     },
     cols: [
+      {
+        fieldKey: 'invoice_date',
+        name: 'Invoice Date',
+        sort: true
+      },
       {
         fieldKey: 'customer',
         name: 'Customer',
@@ -45,10 +62,11 @@ export class SalesInvoiceListComponent {
         sort: true
       },
       {
-        fieldKey: 'invoice_date',
-        name: 'Invoice Date',
+        fieldKey: 'created_at',
+        name: 'created_at',
         sort: true
       },
+     
       {
         fieldKey: 'total_amount',
         name: 'Total Amount',

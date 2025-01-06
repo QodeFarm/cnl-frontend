@@ -21,19 +21,9 @@ export class EmployeeSalaryListComponent {
     pkId: "salary_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['salary_amount','salary_currency','salary_start_date','salary_end_date','employee_id']
+      keys: ['salary_start_date','salary_end_date','salary_amount','salary_currency','employee_id']
     },
     cols: [
-      {
-        fieldKey: 'salary_amount', 
-        name: 'Salary Amount',
-        sort: true
-      }, 
-      {
-        fieldKey: 'salary_currency', 
-        name: 'Salary Currency',
-        sort: true
-      }, 
       {
         fieldKey: 'salary_start_date',
         name: 'Salary Start Date',
@@ -44,6 +34,16 @@ export class EmployeeSalaryListComponent {
         name: 'Salary End Date',
         sort: true
       },
+      {
+        fieldKey: 'salary_amount', 
+        name: 'Salary Amount',
+        sort: true
+      }, 
+      {
+        fieldKey: 'salary_currency', 
+        name: 'Salary Currency',
+        sort: true
+      }, 
       {
         fieldKey: 'employee_id',
         name: 'Employee',

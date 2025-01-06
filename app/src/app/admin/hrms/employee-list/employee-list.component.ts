@@ -25,6 +25,11 @@ export class EmployeeListComponent {
     },
     cols: [
       {
+        fieldKey: 'hire_date',
+        name: 'Hire Date',
+        sort: true
+      },
+      {
         fieldKey: 'first_name',
         name: 'Name',
         sort: true,
@@ -47,8 +52,8 @@ export class EmployeeListComponent {
         sort: true
       },
       {
-        fieldKey: 'hire_date',
-        name: 'Hire Date',
+        fieldKey: 'address',
+        name: 'Address',
         sort: true
       },
       {

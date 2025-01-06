@@ -24,9 +24,20 @@ export class LeadsListComponent {
     pkId: "lead_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['name','email','phone','lead_status','score','assignee','interaction_date','notes']
+      keys: ['interaction_date','name','email','phone','lead_status','score','assignee','notes']
     },
     cols: [
+      {
+        fieldKey: 'interaction_date',
+        name: 'Interaction Date',
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          const interactionDate = row.interaction[0].interaction_date;
+          const [date, time] = interactionDate.split('T');
+          return `${date}<br>${time}`;
+        },
+        sort: false
+      },
       {
         fieldKey: 'name',
         name: 'Name',
@@ -64,17 +75,6 @@ export class LeadsListComponent {
           return `${row.assignee.first_name} ${row.assignee.last_name}`;
         },
         sort: true
-      },
-      {
-        fieldKey: 'interaction_date',
-        name: 'Interaction Date',
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          const interactionDate = row.interaction[0].interaction_date;
-          const [date, time] = interactionDate.split('T');
-          return `${date}<br>${time}`;
-        },
-        sort: false
       },
       {
         fieldKey: 'notes',
