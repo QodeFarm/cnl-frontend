@@ -40,14 +40,12 @@ export class EmployeesComponent  implements OnInit {
   editEmployee(event) {
     console.log('event', event);
     this.EmployeeEditID = event;
-    this.http.get('hrms/employee/' + event).subscribe((res: any) => {
-      console.log('data in res',res)
-      if (res && res.data) {
+    this.http.get('hrms/employees/' + event).subscribe((res: any) => {
+      if (res) {
+        // this.formConfig.model = res;
         this.formConfig.model = {
-          employee: res.data.employee,
-          employee_details: res.data.employee_details || {}
+          employee: res.data.employee
         };
-        this.formConfig.model = res.data;
         this.formConfig.showActionBtn = true;
         this.formConfig.pkId = 'employee_id';
         //set labels for update
@@ -59,7 +57,6 @@ export class EmployeesComponent  implements OnInit {
     this.hide();
   };
 
-
   showEmployeesListFn() {
     this.showEmployeesList = true;
   };
@@ -67,13 +64,44 @@ export class EmployeesComponent  implements OnInit {
   setFormConfig() {
     this.EmployeeEditID = null;
     this.formConfig = {
-      url: "hrms/employee/",
+      url: "hrms/employees/",
       // title: 'leads',
       formState: {
         viewMode: false,
       },
       showActionBtn : true,
-      exParams: [],
+      exParams: [
+        {
+          key: 'job_type_id',
+          type: 'script',
+          value: 'data.job_type.job_type_id'
+        },
+        {
+          key: 'designation_id',
+          type: 'script',
+          value: 'data.designation.designation_id'
+        },
+        {
+          key: 'job_code_id',
+          type: 'script',
+          value: 'data.job_code.job_code_id'
+        },
+        {
+          key: 'department_id',
+          type: 'script',
+          value: 'data.department.department_id'
+        },
+        {
+          key: 'shift_id',
+          type: 'script',
+          value: 'data.shift.shift_id'
+        },
+        {
+          key: 'manager_id',
+          type: 'script',
+          value: 'data.manager.employee_id'
+        }
+      ],
       submit: {
         label: 'Submit',
         submittedFn: () => this.ngOnInit()
@@ -84,13 +112,12 @@ export class EmployeesComponent  implements OnInit {
         }
       },
       model:{
-        employee: {},
-        employee_details: {},
+        employee:{},
       },
       fields: [
         {
+          key:"employee",
           fieldGroupClassName: "ant-row custom-form-block",
-          key: 'employee',
           fieldGroup: [
             {
               key: 'first_name',
@@ -113,45 +140,24 @@ export class EmployeesComponent  implements OnInit {
               },
             },
             {
-              key: 'email',
-              type: 'input',
-              className: 'col-3 pb-3 ps-0',
-              templateOptions: {
-                label: 'Email',
-                placeholder: 'Enter Email',
-                required: true,
-              },
-            },
-            {
               key: 'phone',
               type: 'input',
               className: 'col-3 pb-3 ps-0',
               templateOptions: {
                 label: 'Phone',
                 placeholder: 'Enter with country code',
-                required: false,
+                required: true,
               },
             },
             {
-              key: 'address',
-              type: 'textarea',
-              className: 'col-6 pb-3 ps-0',
-              templateOptions: {
-                label: 'Address',
-                placeholder: 'Enter Address',
-                required: false,
-              },
-            },
-            {
-              key: 'hire_date',
-              type: 'input',  // Use 'input' to allow custom types like 'datetime-local'
+              key: 'gender',
+              type: 'input',
               className: 'col-3 pb-3 ps-0',
               templateOptions: {
-                label: 'Hire Date',
-                type: 'date',  
-                placeholder: 'Select Hire Date and Time',
-                required: false,
-              },
+                label: 'Gender',
+                placeholder: 'Enter Gender',
+                required: true,
+              }
             },
             {
               key: 'job_type',
@@ -193,10 +199,10 @@ export class EmployeesComponent  implements OnInit {
                   url: 'hrms/designations/',
                   lazyOneTime: true
                 },
-                required: true
+                required: false
               },
               hooks: {
-                onInit: (field: any) => {
+                onChanges: (field: any) => {
                   field.formControl.valueChanges.subscribe((data: any) => {
                     if (this.formConfig && this.formConfig.model && this.formConfig.model['employee']) {
                       this.formConfig.model['employee']['designation_id'] = data.designation_id;
@@ -204,7 +210,7 @@ export class EmployeesComponent  implements OnInit {
                       console.error('Form config or designation data model is not defined.');
                     }
                   });
-                },
+                }
               }
             },
             {
@@ -220,10 +226,10 @@ export class EmployeesComponent  implements OnInit {
                   url: 'hrms/job_codes/',
                   lazyOneTime: true
                 },
-                required: true
+                required: false
               },
               hooks: {
-                onInit: (field: any) => {
+                onChanges: (field: any) => {
                   field.formControl.valueChanges.subscribe((data: any) => {
                     if (this.formConfig && this.formConfig.model && this.formConfig.model['employee']) {
                       this.formConfig.model['employee']['job_code_id'] = data.job_code_id;
@@ -231,7 +237,7 @@ export class EmployeesComponent  implements OnInit {
                       console.error('Form config or job_code data model is not defined.');
                     }
                   });
-                },
+                }
               }
             },
             {
@@ -247,7 +253,7 @@ export class EmployeesComponent  implements OnInit {
                   url: 'hrms/departments/',
                   lazyOneTime: true
                 },
-                required: true
+                required: false
               },
               hooks: {
                 onChanges: (field: any) => {
@@ -274,7 +280,7 @@ export class EmployeesComponent  implements OnInit {
                   url: 'hrms/shifts/',
                   lazyOneTime: true
                 },
-                required: true
+                required: false
               },
               hooks: {
                 onChanges: (field: any) => {
@@ -287,80 +293,108 @@ export class EmployeesComponent  implements OnInit {
                   });
                 }
               }
+            },  
+            {
+              key: 'manager',
+              type: 'select',
+              className: 'col-3 pb-3 ps-0',
+              templateOptions: {
+                label: 'Manager',
+                dataKey: 'employee_id',
+                dataLabel: "first_name",
+                options: [],
+                lazy: {
+                  url: 'hrms/employees/',
+                  lazyOneTime: true
+                },
+                required: false
+              },
+              hooks: {
+                onChanges: (field: any) => {
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['employee']) {
+                      this.formConfig.model['employee']['employee_id'] = data.employee_id;
+                    } else {
+                      console.error('Form config or employee data model is not defined.');
+                    }
+                  });
+                }
+              }
+            },
+            {
+              key: 'hire_date',
+              type: 'input',  // Use 'input' to allow custom types like 'datetime-local'
+              className: 'col-3 pb-3 ps-0',
+              templateOptions: {
+                label: 'Hire Date',
+                type: 'date',  
+                placeholder: 'Select Hire Date and Time',
+                required: false,
+              },
+            },
+            {
+              key: 'email',
+              type: 'input',
+              className: 'col-3 pb-3 ps-0',
+              templateOptions: {
+                label: 'Email',
+                placeholder: 'Enter Email',
+                required: false,
+              },
+            },
+            {
+              key: 'address',
+              type: 'textarea',
+              className: 'col-6 pb-3 ps-0',
+              templateOptions: {
+                label: 'Address',
+                placeholder: 'Enter Address',
+                required: false,
+              },
+            },
+            {
+              key: 'date_of_birth',
+              type: 'input',
+              className: 'col-3 pb-3 ps-0',
+              templateOptions: {
+                label: 'Date Of Birth',
+                type: 'date',
+                placeholder: 'Select Date',
+                required: false,
+              }
+            },
+            {
+              key: 'nationality',
+              type: 'input',
+              className: 'col-3 pb-3 ps-0',
+              templateOptions: {
+                label: 'Nationality',
+                placeholder: 'Enter Nationality',
+                required: false,
+              }
+            },
+            {
+              key: 'emergency_contact',
+              type: 'input',
+              className: 'col-3 pb-3 ps-0',
+              templateOptions: {
+                label: 'Emergency Contact',
+                placeholder: 'Enter Emergency Contact',
+                required: false,
+              }
+            },
+            {
+              key: 'emergency_contact_relationship',
+              type: 'input',
+              className: 'col-3 pb-3 ps-0',
+              templateOptions: {
+                label: 'Emergency Contact Relationship',
+                placeholder: 'Enter Name',
+                required: false,
+              }
             },
           ]
         },
-
-        // end employees
-
-        // start of employee_details keys
-
-        {
-          fieldGroupClassName: "row col-12 m-0 custom-form-card",
-          fieldGroup: [
-            {
-              template: '<div class="custom-form-card-title">Employee Details</div>',
-              className: 'col-12',
-            },
-            {
-              fieldGroupClassName: "ant-row custom-form-block",
-              key: 'employee_details',
-              fieldGroup: [
-                {
-                  key: 'date_of_birth',
-                  type: 'input',
-                  className: 'col-3 pb-3 ps-0',
-                  templateOptions: {
-                    label: 'Date Of Birth',
-                    type: 'date',
-                    placeholder: 'Select Date',
-                    required: true,
-                  }
-                },
-                {
-                  key: 'gender',
-                  type: 'input',
-                  className: 'col-3 pb-3 ps-0',
-                  templateOptions: {
-                    label: 'Gender',
-                    placeholder: 'Enter Gender',
-                    required: false,
-                  }
-                },
-                {
-                  key: 'nationality',
-                  type: 'input',
-                  className: 'col-3 pb-3 ps-0',
-                  templateOptions: {
-                    label: 'Nationality',
-                    placeholder: 'Enter Nationality',
-                    required: false,
-                  }
-                },
-                {
-                  key: 'emergency_contact',
-                  type: 'input',
-                  className: 'col-3 pb-3 ps-0',
-                  templateOptions: {
-                    label: 'Emergency Contact',
-                    placeholder: 'Enter Emergency Contact',
-                    required: false,
-                  }
-                },
-                {
-                  key: 'emergency_contact_relationship',
-                  type: 'input',
-                  className: 'col-3 pb-3 ps-0',
-                  templateOptions: {
-                    label: 'Emergency Contact Relationship',
-                    placeholder: 'Enter Name',
-                    required: false,
-                  }
-                },
-              ]
-            }
-          ]
-        }
       ]
     }
   }
