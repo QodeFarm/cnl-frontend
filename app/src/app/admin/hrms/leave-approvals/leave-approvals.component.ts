@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
@@ -17,6 +17,7 @@ export class LeaveApprovalsComponent {
   showLeaveApprovalsList: boolean = false;
   showForm: boolean = false;
   LeaveApprovalsEditID: any; 
+  @ViewChild(LeaveApprovalsListComponent) LeaveApprovalsListComponent!: LeaveApprovalsListComponent;
 
   constructor(private http: HttpClient) {
   }
@@ -55,6 +56,7 @@ export class LeaveApprovalsComponent {
 
   showLeaveApprovalsListFn() {
     this.showLeaveApprovalsList = true;
+    this.LeaveApprovalsListComponent?.refreshTable();
   };
 
   setFormConfig() {

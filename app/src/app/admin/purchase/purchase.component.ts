@@ -23,6 +23,7 @@ export class PurchaseComponent {
   showForm: boolean = false;
   PurchaseOrderEditID: any;
   productOptions: any;
+  @ViewChild(PurchaseListComponent) PurchaseListComponent!: PurchaseListComponent;
   // nowDate = () => {
   //   return new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate();
   // }
@@ -283,6 +284,7 @@ export class PurchaseComponent {
 
   showPurchaseOrderListFn() {
     this.showPurchaseOrderList = true;
+    this.PurchaseListComponent?.refreshTable();
   }
 
   setFormConfig() {

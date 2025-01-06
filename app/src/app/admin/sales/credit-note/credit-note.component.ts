@@ -14,6 +14,7 @@ import { CreditNoteListComponent } from './credit-note-list/credit-note-list.com
 })
 export class CreditNoteComponent {
   @ViewChild('salescreditnoteForm', { static: false }) salescreditnoteForm: TaFormComponent | undefined;
+  @ViewChild(CreditNoteListComponent) CreditNoteListComponent!: CreditNoteListComponent;
   
   sidebarMessage: string = '';
   showSaleCreditnoteList: boolean = false;
@@ -148,6 +149,7 @@ export class CreditNoteComponent {
   // Displays the sales order list modal
   showSaleCreditNoteListFn() {
     this.showSaleCreditnoteList = true;
+    this.CreditNoteListComponent?.refreshTable();
   }
 
 

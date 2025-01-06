@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { BankAccountListComponent } from './bank-account-list/bank-account-list.component';
+
 
 @Component({
   selector: 'app-bank-account',
@@ -16,6 +17,7 @@ export class BankAccountComponent {
   showBankAccountList: boolean = false;
   showForm: boolean = false;
   BankAccountEditID: any;
+  @ViewChild(BankAccountListComponent) BankAccountListComponent!: BankAccountListComponent;
 
   constructor(private http: HttpClient) {
   }
@@ -54,6 +56,7 @@ export class BankAccountComponent {
 
   showBankAccountListFn() {
     this.showBankAccountList = true;
+    this.BankAccountListComponent?.refreshTable();
   };
 
   setFormConfig() {

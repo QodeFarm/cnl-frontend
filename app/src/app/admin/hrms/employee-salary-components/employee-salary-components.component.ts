@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
@@ -16,6 +16,7 @@ export class EmployeeSalaryComponentsComponent {
   showEmployeeSalaryComponentsList: boolean = false;
   showForm: boolean = false;
   EmployeeSalaryComponentsEditID: any; 
+  @ViewChild(EmployeeSalaryComponentsListComponent) EmployeeSalaryComponentsListComponent!: EmployeeSalaryComponentsListComponent;
 
   constructor(private http: HttpClient) {
   }
@@ -54,6 +55,7 @@ export class EmployeeSalaryComponentsComponent {
 
   showEmployeeSalaryComponentsListFn() {
     this.showEmployeeSalaryComponentsList = true;
+    this.EmployeeSalaryComponentsListComponent?.refreshTable();
   };
 
   setFormConfig() {

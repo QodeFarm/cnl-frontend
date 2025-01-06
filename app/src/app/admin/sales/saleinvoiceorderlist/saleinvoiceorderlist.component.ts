@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 
 @Component({
   selector: 'app-saleinvoiceorderlist',
@@ -16,6 +17,12 @@ export class SaleinvoiceorderlistComponent {
   @Output() productsPulled = new EventEmitter<any[]>();
   @Input() noOrdersMessage: string = '';
   @Output() modalClosed = new EventEmitter<void>();
+  @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+
+  refreshTable() {
+   this.taTableComponent?.refresh();
+  };
+  
   selectedOrder: any = null;
   selectedProducts: any[] = [];
 

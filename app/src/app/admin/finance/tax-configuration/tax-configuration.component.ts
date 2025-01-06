@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { TaxConfigurationListComponent } from './tax-configuration-list/tax-configuration-list.component';
 import { CommonModule } from '@angular/common';
@@ -16,6 +16,7 @@ export class TaxConfigurationComponent {
   showTaxConfigurationList: boolean = false;
   showForm: boolean = false;
   TaxConfigurationEditID: any;
+  @ViewChild(TaxConfigurationListComponent) TaxConfigurationListComponent!: TaxConfigurationListComponent;
 
   constructor(private http: HttpClient) {
   }
@@ -54,6 +55,7 @@ export class TaxConfigurationComponent {
 
   showTaxConfigurationListFn() {
     this.showTaxConfigurationList = true;
+    this.TaxConfigurationListComponent?.refreshTable();
   };
 
   setFormConfig() {

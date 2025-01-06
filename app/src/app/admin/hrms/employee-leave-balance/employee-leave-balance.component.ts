@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
@@ -16,6 +16,7 @@ export class EmployeeLeaveBalanceComponent {
   showEmployeeLeaveBalanceComponentList: boolean = false;
   showForm: boolean = false;
   EmployeeLeaveBalanceComponentEditID: any; 
+  @ViewChild(EmployeeLeaveBalanceListComponent) EmployeeLeaveBalanceListComponent!: EmployeeLeaveBalanceListComponent;
 
   constructor(private http: HttpClient) {
   }
@@ -54,6 +55,7 @@ export class EmployeeLeaveBalanceComponent {
 
   showEmployeeLeaveBalanceComponentListFn() {
     this.showEmployeeLeaveBalanceComponentList = true;
+    this.EmployeeLeaveBalanceListComponent?.refreshTable();
   };
 
   setFormConfig() {

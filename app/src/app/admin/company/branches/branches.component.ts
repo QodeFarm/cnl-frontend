@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { BranchListComponent } from './branch-list/branch-list.component';
@@ -17,6 +17,7 @@ export class BranchesComponent {
   showBranchList: boolean = false;
   showForm: boolean = false;
   BranchEditID: any;
+  @ViewChild(BranchListComponent) BranchListComponent!: BranchListComponent;
 
   constructor(private http: HttpClient) {
   }
@@ -54,6 +55,7 @@ export class BranchesComponent {
 
   showBranchListFn() {
     this.showBranchList = true;
+    this.BranchListComponent?.refreshTable();
   };
 
   setFormConfig() {

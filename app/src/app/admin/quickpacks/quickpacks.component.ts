@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule } from '@angular/common';
@@ -17,6 +17,7 @@ export class QuickpacksComponent implements OnInit {
   showQuickPackList: boolean = false;
   showForm: boolean = false;
   productOptions: any;
+  @ViewChild(QuickpacksListComponent) QuickpacksListComponent!: QuickpacksListComponent;
 
   constructor(private http: HttpClient) {}
 
@@ -53,6 +54,7 @@ export class QuickpacksComponent implements OnInit {
 
   showQuickPackListFn() {
     this.showQuickPackList = true;
+    this.QuickpacksListComponent?.refreshTable();
   }
 
   setFormConfig() {

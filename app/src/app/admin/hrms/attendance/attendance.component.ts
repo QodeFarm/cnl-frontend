@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
@@ -17,6 +17,7 @@ export class AttendanceComponent {
   showAttendanceList: boolean = false;
   showForm: boolean = false;
   AttendanceEditID: any; 
+  @ViewChild(AttendanceListComponent) AttendanceListComponent!: AttendanceListComponent;
 
   constructor(private http: HttpClient) {
   }
@@ -55,6 +56,7 @@ export class AttendanceComponent {
 
   showAttendanceListFn() {
     this.showAttendanceList = true;
+    this.AttendanceListComponent?.refreshTable();
   };
 
   setFormConfig() {

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule } from '@angular/common';
@@ -16,6 +16,7 @@ export class ExpenseClaimComponent {
   showExpenseClaimList: boolean = false;
   showForm: boolean = false;
   ExpenseClaimEditID: any;
+  @ViewChild(ExpenseClaimListComponent) ExpenseClaimListComponent!: ExpenseClaimListComponent;
 
   constructor(private http: HttpClient) {
   }
@@ -54,6 +55,7 @@ export class ExpenseClaimComponent {
 
   showExpenseClaimListFn() {
     this.showExpenseClaimList = true;
+    this.ExpenseClaimListComponent?.refreshTable();
   };
 
   setFormConfig() {

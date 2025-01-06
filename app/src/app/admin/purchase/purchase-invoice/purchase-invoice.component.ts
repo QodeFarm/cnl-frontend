@@ -22,6 +22,8 @@ export class PurchaseInvoiceComponent {
   showForm: boolean = false;
   PurchaseInvoiceEditID: any;
   productOptions: any;
+  @ViewChild(PurchaseInvoiceListComponent) PurchaseInvoiceListComponent!: PurchaseInvoiceListComponent;
+
   nowDate = () => {
     const date = new Date();
     return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
@@ -272,6 +274,7 @@ export class PurchaseInvoiceComponent {
 
   showPurchaseInvoiceListFn() {
     this.showPurchaseInvoiceList = true;
+    this.PurchaseInvoiceListComponent?.refreshTable();
   }
   setFormConfig() {
     this.PurchaseInvoiceEditID = null;

@@ -1,4 +1,4 @@
-import { Component, OnInit} from '@angular/core';
+import { Component, OnInit, ViewChild} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
 import { Router } from '@angular/router';
@@ -19,6 +19,7 @@ export class TasksComponent implements OnInit {
   showForm: boolean = false;
   TasksEditID: any;
   formConfig: TaFormConfig = {};
+  @ViewChild(TasksListComponent) TasksListComponent!: TasksListComponent;
 
   // constructor(private http: HttpClient) {}
   constructor(private http: HttpClient, private userService: UserService) {}  // Inject UserService
@@ -120,6 +121,7 @@ export class TasksComponent implements OnInit {
 
   showTasksListFn() {
     this.showTasksList = true;
+    this.TasksListComponent?.refreshTable();
   }
 
   setFormConfig() {

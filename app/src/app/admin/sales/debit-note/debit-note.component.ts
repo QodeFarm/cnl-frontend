@@ -13,6 +13,7 @@ import { DebitNoteListComponent } from './debit-note-list/debit-note-list.compon
 })
 export class DebitNoteComponent {
   @ViewChild('salesdebitnoteForm', { static: false }) salesdebitnoteForm: TaFormComponent | undefined;
+  @ViewChild(DebitNoteListComponent) DebitNoteListComponent!: DebitNoteListComponent;
 
   sidebarMessage: string = '';
   showSaleDebitnoteList: boolean = false;
@@ -148,6 +149,7 @@ export class DebitNoteComponent {
   // Displays the sales order list modal
   showSaleDebitNoteListFn() {
     this.showSaleDebitnoteList = true;
+    this.DebitNoteListComponent?.refreshTable();
   }
 
   setFormConfig() {

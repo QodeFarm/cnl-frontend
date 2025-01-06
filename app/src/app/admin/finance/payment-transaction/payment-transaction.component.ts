@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
 import { PaymentTransactionListComponent } from './payment-transaction-list/payment-transaction-list.component';
@@ -18,6 +18,7 @@ export class PaymentTransactionComponent {
   showForm: boolean = false;
   PaymentTransactionEditID: any;
   invoiceOptions: any[] = []; 
+  @ViewChild(PaymentTransactionListComponent) PaymentTransactionListComponent!: PaymentTransactionListComponent;
 
   constructor(private http: HttpClient, private cd: ChangeDetectorRef) {}
 
@@ -86,6 +87,7 @@ export class PaymentTransactionComponent {
 
   showPaymentTransactionListFn() {
     this.showPaymentTransactionList = true;
+    this.PaymentTransactionListComponent?.refreshTable();
   };
 
 

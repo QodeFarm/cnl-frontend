@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -19,6 +19,8 @@ export class CustomersComponent {
   showCustomerList: boolean = false;
   showForm: boolean = false;
   CustomerEditID: any;
+  @ViewChild(CustomersListComponent) CustomersListComponent!: CustomersListComponent;
+
   nowDate = () => {
     const date = new Date();
     return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
@@ -111,6 +113,7 @@ export class CustomersComponent {
 
   showCustomerListFn() {
     this.showCustomerList = true;
+    this.CustomersListComponent?.refreshTable();
   }
 
   setFormConfig() {
