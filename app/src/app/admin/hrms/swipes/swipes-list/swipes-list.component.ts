@@ -21,9 +21,14 @@ export class SwipesListComponent {
     pkId: "swipe_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['employee_id','swipe_time']
+      keys: ['swipe_time','employee_id']
     },
     cols: [
+      {
+        fieldKey: 'swipe_time',
+        name: 'Swipe Time',
+        sort: true
+      },
       {
         fieldKey: 'employee_id',
         name: 'Employee',
@@ -36,11 +41,6 @@ export class SwipesListComponent {
           return `${firstName} ${lastName}`.trim();
         },
       }, 
-      {
-        fieldKey: 'swipe_time',
-        name: 'Swipe Time',
-        sort: true
-      },
       {
         fieldKey: "code",
         name: "Action",

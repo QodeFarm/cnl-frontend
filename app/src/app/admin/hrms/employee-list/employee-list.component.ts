@@ -23,9 +23,14 @@ export class EmployeeListComponent {
     pkId: "employee_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['first_name','last_name','email','phone','address','hire_date','job_type_id','designation_id','job_code_id','department_id','shift_id']
+      keys: ['hire_date','first_name','last_name','email','phone','address','job_type_id','designation_id','job_code_id','department_id','shift_id']
     },
     cols: [
+      {
+        fieldKey: 'hire_date',
+        name: 'Hire Date',
+        sort: true
+      },
       {
         fieldKey: 'first_name',
         name: 'Name',
@@ -51,11 +56,6 @@ export class EmployeeListComponent {
       {
         fieldKey: 'address',
         name: 'Address',
-        sort: true
-      },
-      {
-        fieldKey: 'hire_date',
-        name: 'Hire Date',
         sort: true
       },
       {

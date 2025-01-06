@@ -25,6 +25,12 @@ export class EmployeeLeaveBalanceListComponent {
     },
     cols: [
       {
+        fieldKey: 'created_at',
+        name: 'Created At',
+        sort: true,
+        displayType: 'datetime'
+      },
+      {
         fieldKey: 'employee_id',
         name: 'Employee',
         sort: true,

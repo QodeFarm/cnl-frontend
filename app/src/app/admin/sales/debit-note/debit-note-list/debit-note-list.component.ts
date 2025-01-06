@@ -25,6 +25,11 @@ export class DebitNoteListComponent {
     },
     cols: [
       {
+        fieldKey: 'debit_date',
+        name: 'Debit Date',
+        sort: true
+      },
+      {
         fieldKey: 'customer_id',
         name: 'Customer',
         displayType: "map",
@@ -45,11 +50,6 @@ export class DebitNoteListComponent {
       {
         fieldKey: 'debit_note_number',
         name: 'Debit note no',
-        sort: true
-      },
-      {
-        fieldKey: 'debit_date',
-        name: 'Debit Date',
         sort: true
       },
       {

@@ -22,9 +22,20 @@ export class BankAccountListComponent {
     pkId: "bank_account_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['account_name','account_number','bank_name','branch_name','account_type']
+      keys: ['account_type','account_name','account_number','bank_name','branch_name',]
     },
     cols: [
+      {
+        fieldKey: 'created_at',
+        name: 'Created At',
+        sort: true,
+        displayType: 'datetime'
+      },
+      {
+        fieldKey: 'account_type', 
+        name: 'Account Type',
+        sort: true
+      },
       {
         fieldKey: 'account_name',
         name: 'Account Name',
@@ -43,11 +54,6 @@ export class BankAccountListComponent {
       {
         fieldKey: 'branch_name', 
         name: 'Branch Name',
-        sort: true
-      },
-      {
-        fieldKey: 'account_type', 
-        name: 'Account Type',
         sort: true
       },
       {

@@ -22,9 +22,14 @@ export class AttendanceListComponent {
     pkId: "attendance_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['employee_id','attendance_date','clock_in_time','clock_out_time','status_id','department_id','shift_id']
+      keys: ['attendance_date','employee_id','clock_in_time','clock_out_time','status_id','department_id','shift_id']
     },
     cols: [
+      {
+        fieldKey: 'attendance_date',
+        name: 'Attendance Date',
+        sort: true
+      },
       {
         fieldKey: 'employee_id',
         name: 'Employee',
@@ -37,11 +42,6 @@ export class AttendanceListComponent {
           return `${firstName} ${lastName}`.trim();
         },
       }, 
-      {
-        fieldKey: 'attendance_date',
-        name: 'Attendance Date',
-        sort: true
-      },
       {
         fieldKey: 'clock_in_time',
         name: 'Clock In Time',

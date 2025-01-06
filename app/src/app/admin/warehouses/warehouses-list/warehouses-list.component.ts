@@ -24,6 +24,12 @@ export class WarehousesListComponent {
     },
     cols: [
       {
+        fieldKey: 'created_at',
+        name: 'Created At',
+        sort: true,
+        displayType: 'datetime'
+      },
+      {
         fieldKey: 'name',
         name: 'Name',
         sort: true

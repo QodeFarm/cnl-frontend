@@ -23,9 +23,14 @@ export class AssetMaintenanceListComponent {
     pkId: "asset_maintenance_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['asset_id','cost','maintenance_date','maintenance_description']
+      keys: ['maintenance_date','asset_id','cost','maintenance_description']
     },
     cols: [
+      {
+        fieldKey: 'maintenance_date',
+        name: 'Maintenance Date',
+        sort: true
+      },
       {
         fieldKey: 'asset_id',
         name: 'Asset',
@@ -38,11 +43,6 @@ export class AssetMaintenanceListComponent {
       {
         fieldKey: 'cost', 
         name: 'Cost',
-        sort: true
-      },
-      {
-        fieldKey: 'maintenance_date',
-        name: 'Maintenance Date',
         sort: true
       },
       {

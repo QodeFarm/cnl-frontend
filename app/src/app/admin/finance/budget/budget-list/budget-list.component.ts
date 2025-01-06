@@ -25,6 +25,12 @@ export class BudgetListComponent {
     },
     cols: [
       {
+        fieldKey: 'created_at',
+        name: 'Created At',
+        sort: true,
+        displayType: 'datetime'
+      },
+      {
         fieldKey: 'account_id',
         name: 'Account',
         sort: true,
