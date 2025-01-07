@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
 import { FinancialReportListComponent } from './financial-report-list/financial-report-list.component';
@@ -16,6 +16,7 @@ export class FinancialReportComponent {
   showFinancialReportList: boolean = false;
   showForm: boolean = false;
   FinancialReportEditID: any;
+  @ViewChild(FinancialReportListComponent) FinancialReportListComponent!: FinancialReportListComponent;
 
   constructor(private http: HttpClient) {}
 
@@ -53,6 +54,7 @@ export class FinancialReportComponent {
 
   showFinancialReportListFn() {
     this.showFinancialReportList = true;
+    this.FinancialReportListComponent?.refreshTable();
   };
 
   setFormConfig() {

@@ -20,6 +20,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class SalesinvoiceComponent {
   @ViewChild('saleinvoiceForm', { static: false }) saleinvoiceForm: TaFormComponent | undefined;
   @ViewChild('ordersModal', { static: false }) ordersModal!: ElementRef;
+  @ViewChild(SalesInvoiceListComponent) SalesInvoiceListComponent!: SalesInvoiceListComponent;
   invoiceNumber: any;
   customerName: string = '';
   showSaleInvoiceList: boolean = false;
@@ -282,6 +283,7 @@ export class SalesinvoiceComponent {
 
   showSaleInvoiceListFn() {
     this.showSaleInvoiceList = true;
+    this.SalesInvoiceListComponent.refreshTable()
   }
 
   showPendingOrdersList() {

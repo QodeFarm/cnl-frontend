@@ -1,8 +1,9 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
+import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 
 @Component({
   selector: 'app-tasks-list',
@@ -14,6 +15,11 @@ import { Router } from '@angular/router';
 export class TasksListComponent {
 
   @Output('edit') edit = new EventEmitter<void>();
+  @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+
+  refreshTable() {
+   this.taTableComponent?.refresh();
+  };
 
   tableConfig: TaTableConfig = {
     apiUrl: 'tasks/task/',
@@ -40,7 +46,7 @@ export class TasksListComponent {
         name: 'User',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.user.first_name}`;
+          return `${row.user?.first_name || ''}`;
         },
         sort: true
       },
@@ -49,7 +55,7 @@ export class TasksListComponent {
         name: 'group',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.group.group_name}`;
+          return `${row.group?.group_name || ''}`;
         },
         sort: true
       },
@@ -63,7 +69,7 @@ export class TasksListComponent {
         name: 'priority',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.priority.priority_name}`;
+          return `${row.priority?.priority_name || ''}`;
         },
         sort: true
       },
@@ -72,7 +78,7 @@ export class TasksListComponent {
         name: 'Statuses',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.status.status_name}`;
+          return `${row.status?.status_name}`;
         },
         sort: true
       },

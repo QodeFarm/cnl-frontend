@@ -21,6 +21,7 @@ import { BindingType } from '@angular/compiler';
 export class SalesComponent {
   @ViewChild('salesForm', { static: false }) salesForm: TaFormComponent | undefined;
   @ViewChild('ordersModal', { static: false }) ordersModal: ElementRef;
+  @ViewChild(SalesListComponent) SalesListComponent!: SalesListComponent;
   orderNumber: any;
   invoiceData: any;
   salesReceiptForm: FormGroup;
@@ -445,6 +446,7 @@ export class SalesComponent {
   // Displays the sales order list modal
   showSaleOrderListFn() {
     this.showSaleOrderList = true;
+    this.SalesListComponent?.refreshTable();
   }
 
   // Shows the past orders list modal and fetches orders based on the selected customer

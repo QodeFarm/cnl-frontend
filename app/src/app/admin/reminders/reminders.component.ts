@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { RemindersListComponent } from './reminders-list/reminders-list.component';
@@ -16,6 +16,7 @@ export class RemindersComponent {
   showRemindersList: boolean = false;
   showForm: boolean = false;
   RemindersEditID: any;
+  @ViewChild(RemindersListComponent) RemindersListComponent!: RemindersListComponent;
 
   constructor(private http: HttpClient) {
   }
@@ -56,6 +57,7 @@ export class RemindersComponent {
 
   showRemindersListFn() {
     this.showRemindersList = true;
+    this.RemindersListComponent?.refreshTable();
   };
 
   setFormConfig() {

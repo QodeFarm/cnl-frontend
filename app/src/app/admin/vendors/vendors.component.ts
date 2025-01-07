@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { Router } from '@angular/router';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
@@ -18,6 +18,8 @@ export class VendorsComponent{
   showVendorList: boolean = false;
   showForm: boolean = false;
   VendorEditID: any;
+  @ViewChild(VendorsListComponent) VendorsListComponent!: VendorsListComponent;
+
   nowDate = () => {
     const date = new Date();
     return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
@@ -111,6 +113,7 @@ export class VendorsComponent{
 
   showVendorListFn() {
     this.showVendorList = true;
+    this.VendorsListComponent?.refreshTable();
   }
 
   setFormConfig() {

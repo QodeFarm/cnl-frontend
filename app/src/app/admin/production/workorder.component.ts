@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule, DatePipe, formatDate } from '@angular/common';
@@ -22,6 +22,7 @@ export class WorkorderComponent implements OnInit {
   WorkOrdrEditID: any;
   WorkOrderBoardView: any; //
   formConfig: TaFormConfig = {};
+  @ViewChild(WorkOrderListComponent) WorkOrderListComponent!: WorkOrderListComponent;
 
   constructor(private http: HttpClient) {}
   
@@ -78,6 +79,7 @@ export class WorkorderComponent implements OnInit {
 
   showWorkorderListFn() {
     this.showWorkorderList = true;
+    this.WorkOrderListComponent?.refreshTable();
   }
 
    // Method to populate the form with data (when admin wants to create a work order from sale order)
@@ -453,7 +455,7 @@ curdConfig: TaCurdConfig = {
                       console.error(`Size at index ${index} is not defined. Initializing...`);
                       this.formConfig.model['work_order'] = {};
                     }
-                    this.formConfig.model['work_order']['size_id'] = data.size_id;
+                    this.formConfig.model['work_order']['size_id'] = data?.size_id || null;
                   });
                 },
                 onInit: (field: any) => {
@@ -545,7 +547,7 @@ curdConfig: TaCurdConfig = {
                       console.error(`Color at index ${index} is not defined. Initializing...`);
                       this.formConfig.model['work_order'][index] = {};
                     }
-                    this.formConfig.model['work_order']['color_id'] = data.color_id;
+                    this.formConfig.model['work_order']['color_id'] = data?.color_id || null;
                   });
                 }
               }
@@ -728,7 +730,7 @@ curdConfig: TaCurdConfig = {
                         console.error(`Products at index ${index} is not defined. Initializing...`);
                         this.formConfig.model['bom'][index] = {};
                       }
-                      this.formConfig.model['bom'][index]['color_id'] = data.color_id;
+                      this.formConfig.model['bom'][index]['color_id'] = data?.color_id || null;
                     });
                   }
                 }

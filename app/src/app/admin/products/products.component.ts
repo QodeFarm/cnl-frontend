@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule } from '@angular/common';
@@ -19,6 +19,7 @@ export class ProductsComponent implements OnInit {
   ProductEditID: any;
   formConfig: TaFormConfig = {};
   dialogMessage: string = '';
+  @ViewChild(ProductsListComponent) ProductsListComponent!: ProductsListComponent;
 
   constructor(private http: HttpClient) {}
 
@@ -64,6 +65,7 @@ export class ProductsComponent implements OnInit {
 
   showProductsListFn() {
     this.showProductsList = true;
+    this.ProductsListComponent?.refreshTable();
   }
 
   // Method to create the record

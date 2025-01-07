@@ -18,6 +18,7 @@ import { ConstantPool } from '@angular/compiler';
 })
 export class PurchasereturnordersComponent {
   @ViewChild('purchasereturnForm', { static: false }) purchasereturnForm: TaFormComponent | undefined;
+  @ViewChild(PurchasereturnordersListComponent) PurchasereturnordersListComponent!: PurchasereturnordersListComponent;
   orderNumber: any;
   showPurchaseReturnOrderList: boolean = false;
   showForm: boolean = false;
@@ -264,6 +265,7 @@ export class PurchasereturnordersComponent {
 
   showPurchaseReturnOrderListFn() {
     this.showPurchaseReturnOrderList = true;
+    this.PurchasereturnordersListComponent?.refreshTable();
   }
 
   setFormConfig() {

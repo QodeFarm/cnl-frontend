@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { BomListComponent } from './bom-list/bom-list.component';
@@ -16,6 +16,7 @@ export class BomComponent {
   showBomList: boolean = false;
   showForm: boolean = false;
   BomEditID: any;
+  @ViewChild(BomListComponent) BomListComponent!: BomListComponent;
 
   constructor(private http: HttpClient) {};
 
@@ -52,6 +53,7 @@ export class BomComponent {
 
   showBomListFn() {
     this.showBomList = true;
+    this.BomListComponent?.refreshTable();
   };
 
   setFormConfig() {

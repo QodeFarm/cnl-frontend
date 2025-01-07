@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit} from '@angular/core';
+import { Component, OnInit, ViewChild} from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { EmployeeListComponent } from './employee-list/employee-list.component';
 import { CommonModule } from '@angular/common';
@@ -17,6 +17,7 @@ export class EmployeesComponent  implements OnInit {
   showEmployeesList: boolean = false;
   showForm: boolean = false;
   EmployeeEditID: any;
+  @ViewChild(EmployeeListComponent) EmployeeListComponent!: EmployeeListComponent;
 
   constructor(private http: HttpClient) {
   }
@@ -59,6 +60,7 @@ export class EmployeesComponent  implements OnInit {
 
   showEmployeesListFn() {
     this.showEmployeesList = true;
+    this.EmployeeListComponent?.refreshTable();
   };
 
   setFormConfig() {

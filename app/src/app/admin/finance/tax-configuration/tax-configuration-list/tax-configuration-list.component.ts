@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
+import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 
 @Component({
   standalone: true,
@@ -13,6 +14,12 @@ import { Router } from '@angular/router';
 })
 export class TaxConfigurationListComponent {
   @Output('edit') edit = new EventEmitter<void>();
+  @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+
+  refreshTable() {
+   this.taTableComponent?.refresh();
+ };
+ 
   tableConfig: TaTableConfig = {
     apiUrl: 'finance/tax_configurations/',
     showCheckbox:true,

@@ -23,6 +23,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 export class SaleReturnsComponent {
   @ViewChild('salereturnForm', { static: false }) salereturnForm: TaFormComponent | undefined;
   @ViewChild('saleinvoiceordersModal', { static: true }) ordersModal: ElementRef;
+  @ViewChild(SaleReturnsListComponent) SaleReturnsListComponent!: SaleReturnsListComponent;
   returnNumber: any;
   showSaleReturnOrderList: boolean = false;
   showForm: boolean = false;
@@ -322,6 +323,7 @@ export class SaleReturnsComponent {
 
   showSalesReturnOrderListFn() {
     this.showSaleReturnOrderList = true;
+    this.SaleReturnsListComponent?.refreshTable();
   }
 
 
