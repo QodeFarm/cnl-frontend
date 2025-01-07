@@ -39,6 +39,12 @@ export class ProductsListComponent {
     },
     cols: [
       {
+        fieldKey: 'created_at',
+        name: 'Created At',
+        displayType: 'datetime',
+        sort: true
+      },
+      {
         fieldKey: 'name',
         name: 'Name',
         sort: true

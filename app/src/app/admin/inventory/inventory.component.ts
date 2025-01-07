@@ -24,6 +24,12 @@ export class InventoryComponent   {
     },
     cols: [
       {
+        fieldKey: 'created_at',
+        name: 'created At',
+        sort: true,
+        displayType: 'datetime',
+      },
+      {
         fieldKey: 'name',
         name: 'Name',
         sort: true

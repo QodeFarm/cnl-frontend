@@ -31,6 +31,12 @@ export class QuickpacksListComponent {
     },
     cols: [
       {
+        fieldKey: 'created_at',
+        name: 'Created At',
+        sort: true,
+        displayType: 'datetime'
+      },
+      {
         fieldKey: 'name',
         name: 'Quick Pack Name',
         sort: true

@@ -33,9 +33,14 @@ export class PurchaseInvoiceListComponent {
     ],
     pageSize: 10,
     "globalSearch": {
-      keys: ['vendor','purchase_type','invoice_no','invoice_date','supplier_invoice_no','tax','total_amount','tax_amount','advance_amount','status_name','remarks']
+      keys: ['invoice_date','vendor','purchase_type','invoice_no','supplier_invoice_no','tax','total_amount','tax_amount','advance_amount','status_name','remarks']
     },
     cols: [
+      {
+        fieldKey: 'invoice_date',
+        name: 'Invoice Date',
+        sort: true
+      },
       {
         fieldKey: 'vendor',
         name: 'Vendor',
@@ -58,11 +63,6 @@ export class PurchaseInvoiceListComponent {
       {
         fieldKey: 'invoice_no',
         name: 'Invoice No',
-        sort: true
-      },
-      {
-        fieldKey: 'invoice_date',
-        name: 'Invoice Date',
         sort: true
       },
       {

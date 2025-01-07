@@ -33,9 +33,14 @@ export class PurchaseListComponent {
     ],
     pageSize: 10,
     "globalSearch": {
-      keys: ['purchase_type_id','order_date','order_no','tax','tax_amount','total_amount','vendor','status_name','remarks']
+      keys: ['order_date','purchase_type_id','order_no','tax','tax_amount','total_amount','vendor','status_name','remarks']
     },
     cols: [
+      {
+        fieldKey: 'order_date',
+        name: 'Order Date',
+        sort: true
+      },
       {
         fieldKey: 'purchase_type_id',
         name: 'Purchase Type',
@@ -45,11 +50,6 @@ export class PurchaseListComponent {
           // console.log("-->", currentValue);
           return `${row.purchase_type.name}`;
         },
-      },
-      {
-        fieldKey: 'order_date',
-        name: 'Order Date',
-        sort: true
       },
       {
         fieldKey: 'order_no',

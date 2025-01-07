@@ -27,9 +27,15 @@ export class TasksListComponent {
     pkId: "task_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['title','user_id','group_id','description','priority_id','due_date','status_id']
+      keys: ['due_date','title','user_id','group_id','description','priority_id','status_id']
     },
     cols: [
+      {
+        fieldKey: 'due_date',
+        name: 'Due Date',
+        sort: true,
+        displayType: "date"
+      },
       {
         fieldKey: 'title',
         name: 'Title',
@@ -40,7 +46,7 @@ export class TasksListComponent {
         name: 'User',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.user?.first_name}`;
+          return `${row.user?.first_name || ''}`;
         },
         sort: true
       },
@@ -63,15 +69,9 @@ export class TasksListComponent {
         name: 'priority',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.priority?.priority_name}`;
+          return `${row.priority?.priority_name || ''}`;
         },
         sort: true
-      },
-      {
-        fieldKey: 'due_date',
-        name: 'Due Date',
-        sort: true,
-        displayType: "date"
       },
       {
         fieldKey: 'status_id',

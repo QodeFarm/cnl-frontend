@@ -31,6 +31,12 @@ export class ChartOfAccountsListComponent {
     },
     cols: [
       {
+        fieldKey: 'created_at',
+        name: 'Created At',
+        sort: true,
+        displayType: 'datetime'
+      },
+      {
         fieldKey: 'account_code',
         name: 'Account Code',
         sort: true

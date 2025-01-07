@@ -35,9 +35,15 @@ export class VendorsListComponent {
     ],
     pageSize: 10,
     globalSearch: {
-      keys: ['name','gst_no','email','phone','vendor_category_id','ledger_account','city_id','created_at']
+      keys: ['created_at','name','gst_no','email','phone','vendor_category_id','ledger_account','city_id']
     },
     cols: [
+      {
+        fieldKey: 'created_at',
+        name: 'Created At',
+        sort: true,
+        displayType: "date"
+      },
       {
         fieldKey: 'name',
         name: 'Name',
@@ -84,12 +90,6 @@ export class VendorsListComponent {
         mapFn: (currentValue: any, row: any, col: any) => {
           return row.city?.city_name;
         },
-      },
-      {
-        fieldKey: 'created_at',
-        name: 'Created At',
-        sort: true,
-        displayType: "date"
       },
       {
         fieldKey: "vendor_id",

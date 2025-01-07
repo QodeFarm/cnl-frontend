@@ -12,9 +12,7 @@ import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
   styleUrls: ['./employee-list.component.scss']
 })
 
-export class EmployeeListComponent {
-
-  
+export class EmployeeListComponent { 
   @Output('edit') edit = new EventEmitter<void>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
@@ -23,15 +21,20 @@ export class EmployeeListComponent {
    };
 
   tableConfig: TaTableConfig = {
-    apiUrl: 'hrms/employee/',
+    apiUrl: 'hrms/employees/',
     // title: 'Edit Sales Order List',
     showCheckbox:true,
     pkId: "employee_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['first_name','last_name','email','phone','address','hire_date','job_type_id','designation_id','job_code_id','department_id','shift_id']
+      keys: ['first_name','email','phone','hire_date','job_type_id','designation_id','department_id','shift_id','manager_id']
     },
     cols: [
+      {
+        fieldKey: 'hire_date',
+        name: 'Hire Date',
+        sort: true
+      },
       {
         fieldKey: 'first_name',
         name: 'Name',
@@ -57,11 +60,6 @@ export class EmployeeListComponent {
       {
         fieldKey: 'address',
         name: 'Address',
-        sort: true
-      },
-      {
-        fieldKey: 'hire_date',
-        name: 'Hire Date',
         sort: true
       },
       {
@@ -101,6 +99,18 @@ export class EmployeeListComponent {
         sort: true
       },
       {
+        fieldKey: 'manager_id',
+        name: 'Manager',
+        sort: true,
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          // Concatenate first_name and last_name correctly
+          const firstName = row.manager?.first_name || '';
+          const lastName = row.manager?.last_name || '';
+          return `${firstName} ${lastName}`.trim();
+        },
+      }, 
+      {
         fieldKey: "code",
         name: "Action",
         type: 'action',
@@ -108,9 +118,9 @@ export class EmployeeListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            // confirm: true,
-            // confirmMsg: "Sure to delete?",
-            apiUrl: 'hrms/employee'
+            confirm: true,
+            confirmMsg: "Sure to delete?",
+            apiUrl: 'hrms/employees'
           },
           {
             type: 'callBackFn',

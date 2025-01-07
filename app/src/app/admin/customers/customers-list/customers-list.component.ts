@@ -31,13 +31,19 @@ export class CustomersListComponent {
       {
         key: 'summary',
         value: 'true'
-      }
+      },
     ],
     pageSize: 10,
     "globalSearch": {
-      keys: ['name','email','phone','gst','city_id','ledger_account_id','created_at']
+      keys: ['created_at','name','email','phone','gst','city_id','ledger_account_id']
     },
     cols: [
+      {
+        fieldKey: 'created_at',
+        name: 'Created At',
+        sort: true,
+        displayType: "datetime"
+      }, 
       {
         fieldKey: 'name',
         name: 'Name',
@@ -75,13 +81,7 @@ export class CustomersListComponent {
         mapFn: (currentValue: any, row: any, col: any) => {
           return row.ledger_account.name;
         },
-      },
-      {
-        fieldKey: 'created_at',
-        name: 'Created At',
-        sort: true,
-        displayType: "date"
-      },      
+      },     
       {
         fieldKey: "code",
         name: "Action",
@@ -112,3 +112,8 @@ export class CustomersListComponent {
 
   }
 }
+
+
+
+
+

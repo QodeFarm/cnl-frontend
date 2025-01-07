@@ -31,6 +31,11 @@ export class CreditNoteListComponent {
     },
     cols: [
       {
+        fieldKey: 'credit_date',
+        name: 'Credit Date',
+        sort: true
+      },
+      {
         fieldKey: 'customer_id',
         name: 'Customer',
         displayType: "map",
@@ -51,11 +56,6 @@ export class CreditNoteListComponent {
       {
         fieldKey: 'credit_note_number',
         name: 'Credit note no',
-        sort: true
-      },
-      {
-        fieldKey: 'credit_date',
-        name: 'Credit Date',
         sort: true
       },
       {

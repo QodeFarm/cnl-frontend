@@ -30,6 +30,12 @@ export class TaxConfigurationListComponent {
     },
     cols: [
       {
+        fieldKey: 'created_at',
+        name: 'Created At',
+        sort: true,
+        displayType: 'datetime'
+      },
+      {
         fieldKey: 'tax_name',
         name: 'Tax Name',
         sort: true

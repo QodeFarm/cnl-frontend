@@ -11,25 +11,26 @@ import { JobTypesComponent } from './job-types/job-types.component';
 import { JobCodesComponent } from './job-codes/job-codes.component';
 import { ShiftsComponent } from './shifts/shifts.component';
 import { SalaryComponentsComponent } from './salary-components/salary-components.component';
+import { EmployeeSalaryListComponent } from './employee-salary/employee-salary-list/employee-salary-list.component';
+import { EmployeeSalaryComponentsComponent } from './employee-salary-components/employee-salary-components.component';
 import { LeaveTypesComponent } from './leave-types/leave-types.component';
 import { EmployeeLeavesListComponent } from './employee-leaves/employee-leaves-list/employee-leaves-list.component';
-import { LeaveApprovalsListComponent } from './leave-approvals/leave-approvals-list/leave-approvals-list.component';
-import { EmployeeLeaveBalanceListComponent } from './employee-leave-balance/employee-leave-balance-list/employee-leave-balance-list.component';
-import { AttendanceListComponent } from './attendance/attendance-list/attendance-list.component';
+import { LeaveApprovalsComponent } from './leave-approvals/leave-approvals.component';
+import { EmployeeLeaveBalanceComponent } from './employee-leave-balance/employee-leave-balance.component';
 import { SwipesListComponent } from './swipes/swipes-list/swipes-list.component';
-import { EmployeeSalaryListComponent } from './employee-salary/employee-salary-list/employee-salary-list.component';
-import { EmployeeSalaryComponentsListComponent } from './employee-salary-components/employee-salary-components-list/employee-salary-components-list.component';
+import { EmployeeAttendanceComponent } from './employee-attendance/employee-attendance.component';
+
 
 
 @NgModule({
   declarations: [
-    // EmployeesComponent,
     DepartmentsComponent,
     DesignationsComponent,
     JobTypesComponent,
     JobCodesComponent,
     ShiftsComponent,
     SalaryComponentsComponent,
+    EmployeeSalaryComponentsComponent,
     LeaveTypesComponent,
   ],
   imports: [
@@ -38,12 +39,11 @@ import { EmployeeSalaryComponentsListComponent } from './employee-salary-compone
     AdminCommmonModule,
     EmployeeListComponent,
     EmployeeSalaryListComponent,
-    EmployeeSalaryComponentsListComponent,
     EmployeeLeavesListComponent,
-    LeaveApprovalsListComponent,
-    EmployeeLeaveBalanceListComponent,
-    AttendanceListComponent,
+    LeaveApprovalsComponent,
+    EmployeeLeaveBalanceComponent,
     SwipesListComponent,
+    EmployeeAttendanceComponent,
   ],
   exports:[
     JobTypesComponent,
@@ -52,6 +52,7 @@ import { EmployeeSalaryComponentsListComponent } from './employee-salary-compone
     JobCodesComponent,
     ShiftsComponent,
     SalaryComponentsComponent,
+    EmployeeSalaryComponentsComponent,
     LeaveTypesComponent,
   ]
 })
