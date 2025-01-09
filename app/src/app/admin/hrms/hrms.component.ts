@@ -153,12 +153,15 @@ export class EmployeesComponent  implements OnInit {
             },
             {
               key: 'gender',
-              type: 'input',
+              type: 'select',
               className: 'col-3 pb-3 ps-0',
               templateOptions: {
                 label: 'Gender',
-                placeholder: 'Enter Gender',
                 required: true,
+                options: [
+                  { value: 'Female', label: 'Female' },
+                  { value: 'Male', label: 'Male' }
+                ]
               }
             },
             {
@@ -315,7 +318,7 @@ export class EmployeesComponent  implements OnInit {
                 onChanges: (field: any) => {
                   field.formControl.valueChanges.subscribe((data: any) => {
                     if (this.formConfig && this.formConfig.model && this.formConfig.model['employee']) {
-                      this.formConfig.model['employee']['employee_id'] = data.employee_id;
+                      this.formConfig.model['employee']['manager_id'] = data.employee_id;
                     } else {
                       console.error('Form config or employee data model is not defined.');
                     }
