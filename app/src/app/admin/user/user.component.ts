@@ -97,76 +97,93 @@ export class UserComponent {
         {
           fieldGroupClassName: "row col-12 p-0 m-0 custom-form",
           fieldGroup: [
+            
             {
-              key: 'profile_picture_url',
-              type: 'file',
-              className: "ta-cell pr-md col-md-6 col-12",
-              props: {
-                displayStyle: 'avatar',
-                storeFolder: "profile",
-                label: 'Profile Pic',
-                multiple: false,
-                placeholder: 'Enter Profile Pic',
-                required: true,
-              }
-            },
-            {
-              key: 'title',
-              type: 'select',
-              className: 'ta-cell pr-md col-md-6 col-12',
-              templateOptions: {
-                label: 'Title',
-                required: true,
-                options: [
-                  { 'label': "Mr.", value: 'Mr.' },
-                  { 'label': "Ms.", value: 'Ms.' }
-                ]
-              },
-              hooks: {
-                onInit: (field: any) => {
-                  //field.templateOptions.options = this.cs.getRole();
+            className: 'col p-0',
+            fieldGroup: [
+              {
+                key: 'title',
+                type: 'select',
+                className: 'ta-cell pr-md col-12',
+                templateOptions: {
+                  label: 'Title',
+                  required: true,
+                  options: [
+                    { 'label': "Mr.", value: 'Mr.' },
+                    { 'label': "Ms.", value: 'Ms.' }
+                  ]
+                },
+                hooks: {
+                  onInit: (field: any) => {
+                    //field.templateOptions.options = this.cs.getRole();
+                  }
                 }
-              }
-            },
-            {
-              key: 'first_name',
-              type: 'text',
-              className: 'ta-cell pr-md col-md-6 col-12',
-              templateOptions: {
-                label: 'First Name',
-                required: true
               },
-              hooks: {
-                onInit: (field: any) => {
-                  //field.templateOptions.options = this.cs.getRole();
-                }
-              }
-            },
-            {
-              key: 'last_name',
-              type: 'text',
-              className: 'ta-cell pr-md col-md-6 col-12',
-              templateOptions: {
-                label: 'Last Name',
-                required: true
-              }
-            },
-            {
-              key: 'email',
-              type: 'text',
-              className: 'ta-cell pr-md col-md-6 col-12',
-              templateOptions: {
-                label: 'User Email',
-                dataKey: 'user',
-                dataLabel: "user",
-                required: true
+              {
+                 fieldGroupClassName: "row m-0",
+                fieldGroup: [
+                  {
+                    key: 'first_name',
+                    type: 'text',
+                    className: 'ta-cell pr-md col-12 col-md-6',
+                    templateOptions: {
+                      label: 'First Name',
+                      required: true
+                    },
+                    hooks: {
+                      onInit: (field: any) => {
+                        //field.templateOptions.options = this.cs.getRole();
+                      }
+                    }
+                  },
+                  {
+                    key: 'last_name',
+                    type: 'text',
+                    className: 'ta-cell pr-md col-12 col-md-6',
+                    templateOptions: {
+                      label: 'Last Name',
+                      required: true
+                    }
+                  },
+                  {
+                    key: 'email',
+                    type: 'text',
+                    className: 'ta-cell pr-md col-12',
+                    templateOptions: {
+                      label: 'User Email',
+                      dataKey: 'user',
+                      dataLabel: "user",
+                      required: true
+                    },
+                    hooks: {
+                      onInit: (field: any) => {
+                        //field.templateOptions.options = this.cs.getRole();
+                      }
+                    }
+                  },
+                ],
               },
-              hooks: {
-                onInit: (field: any) => {
-                  //field.templateOptions.options = this.cs.getRole();
-                }
-              }
+            ],
+           },
+           {
+            className: 'col-auto p-0',
+            fieldGroup: [
+                {
+                  key: 'profile_picture_url',
+                  type: 'file',
+                  className: "ta-cell pr-md col",
+                  props: {
+                    displayStyle: 'avatar',
+                    storeFolder: "profile",
+                    label: 'Profile Pic',
+                    multiple: false,
+                    placeholder: 'Enter Profile Pic',
+                    required: true,
+                  }
+                },
+              ],
             },
+           
             {
               key: 'mobile',
               type: 'text',
