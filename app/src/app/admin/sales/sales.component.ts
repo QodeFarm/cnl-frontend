@@ -1200,13 +1200,13 @@ confirmWorkOrder() {
           key: 'sale_order',
           fieldGroup: [
               {
-                className: 'col-9 p-0',
+                className: 'col-md-9 col-sm-8 col-12 p-0',
                 fieldGroupClassName: "ant-row mx-0 row align-items-end mt-2",
                 fieldGroup: [
                     {
                       key: 'sale_type',
                       type: 'select',
-                      className: 'col-4',
+                      className: 'col-md-4 col-sm-6 col-12',
                       templateOptions: {
                         label: 'Sale type',
                         dataKey: 'name',
@@ -1234,7 +1234,7 @@ confirmWorkOrder() {
                     {
                       key: 'customer',
                       type: 'select',
-                      className: 'col-4',
+                      className: 'col-md-4 col-sm-6 col-12',
                       props: {
                         label: 'Customer',
                         dataKey: 'customer_id',
@@ -1272,7 +1272,7 @@ confirmWorkOrder() {
                     {
                       key: 'email',
                       type: 'input',
-                      className: 'col-4',
+                      className: 'col-md-4 col-sm-6 col-12',
                       templateOptions: {
                         type: 'input',
                         label: 'Email',
@@ -1282,7 +1282,7 @@ confirmWorkOrder() {
                     {
                       key: 'order_no',
                       type: 'input',
-                      className: 'col-4',
+                      className: 'col-md-4 col-sm-6 col-12',
                       templateOptions: {
                         label: 'Order no',
                         placeholder: 'Enter Order No',
@@ -1294,7 +1294,7 @@ confirmWorkOrder() {
                     {
                       key: 'flow_status',
                       type: 'select',
-                      className: 'col-4',
+                      className: 'col-md-4 col-sm-6 col-12',
                       templateOptions: {
                         label: 'Flow status',
                         dataKey: 'flow_status_id',
@@ -1374,7 +1374,7 @@ confirmWorkOrder() {
                       key: 'delivery_date',
                       type: 'date',
                       defaultValue: this.nowDate(),
-                      className: 'col-4',
+                      className: 'col-md-4 col-sm-6 col-12',
                       templateOptions: {
                         type: 'date',
                         label: 'Delivery date',
@@ -2344,7 +2344,7 @@ confirmWorkOrder() {
                 ]
               },
               {
-                className: 'col-3 p-0 inline-form-fields',
+                className: 'col-md-3 col-sm-4 col-12 p-0 inline-form-fields',
                 fieldGroupClassName: "ant-row row mx-0 mt-2",
                 fieldGroup: [
                   {

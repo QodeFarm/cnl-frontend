@@ -152,7 +152,7 @@ export class CustomersComponent {
               fieldGroupClassName:'row m-0 pr-0',
               fieldGroup: [
                 {
-                  className: 'col-4',
+                  className: 'col-md-4 col-sm-6 col-12',
                   key: 'name',
                   type: 'input',
                   templateOptions: {
@@ -162,7 +162,7 @@ export class CustomersComponent {
                   }
                 },
                 {
-                  className: 'col-4',
+                  className: 'col-md-4 col-sm-6 col-12',
                   key: 'print_name',
                   type: 'input',
                   templateOptions: {
@@ -172,7 +172,7 @@ export class CustomersComponent {
                   }
                 },               
                 {
-                  className: 'col-4',
+                  className: 'col-md-4 col-sm-6 col-12',
                   key: 'code',
                   type: 'input',
                   templateOptions: {
@@ -182,7 +182,7 @@ export class CustomersComponent {
                   }
                 },
                 {
-                  className: 'col-4',
+                  className: 'col-md-4 col-sm-6 col-12',
                   key: 'customer_category',
                   type: 'select',
                   templateOptions: {
@@ -210,7 +210,7 @@ export class CustomersComponent {
                 {
                   key: 'ledger_account',
                   type: 'select',
-                  className: 'col-4',
+                  className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     dataKey: 'ledger_account_id',
                     dataLabel: 'name',
@@ -236,7 +236,7 @@ export class CustomersComponent {
                   }
                 },
                 {
-                  className: 'col-4',
+                  className: 'col-md-4 col-sm-6 col-12',
                   key: 'tax_type',
                   type: 'select',
                   templateOptions: {
@@ -265,11 +265,11 @@ export class CustomersComponent {
               },
               fieldGroup: [
                 {
-                  className: 'col-9 p-0',
+                  className: 'col-md-9 col-sm-8 col-12 p-0',
                   fieldGroupClassName: "ant-row mx-0 row align-items-end mt-2",
                   fieldGroup: [
                     {
-                      className: 'col-4',
+                      className: 'col-md-4 col-sm-6 col-12',
                       key: 'name',
                       type: 'input',
                       templateOptions: {
@@ -279,7 +279,7 @@ export class CustomersComponent {
                       }
                     },
                     {
-                      className: 'col-4',
+                      className: 'col-md-4 col-sm-6 col-12',
                       key: 'print_name',
                       type: 'input',
                       templateOptions: {
@@ -289,7 +289,7 @@ export class CustomersComponent {
                       }
                     },
                     {
-                      className: 'col-4',
+                      className: 'col-md-4 col-sm-6 col-12',
                       key: 'identification',
                       type: 'input',
                       templateOptions: {
@@ -298,7 +298,7 @@ export class CustomersComponent {
                       }
                     },
                     {
-                      className: 'col-4',
+                      className: 'col-md-4 col-sm-6 col-12',
                       key: 'code',
                       type: 'input',
                       templateOptions: {
@@ -308,7 +308,7 @@ export class CustomersComponent {
                       }
                     },
                     {
-                      className: 'col-4',
+                      className: 'col-md-4 col-sm-6 col-12',
                       key: 'customer_category',
                       type: 'select',
                       templateOptions: {
@@ -334,7 +334,7 @@ export class CustomersComponent {
                       }
                     },
                     {
-                      className: 'col-4',
+                      className: 'col-md-4 col-sm-6 col-12',
                       key: 'contact_person',
                       type: 'input',
                       templateOptions: {
@@ -343,7 +343,7 @@ export class CustomersComponent {
                       }
                     },
                     {
-                      className: 'ta-cell pr-md col-4',
+                      className: 'ta-cell pr-md col-md-4 col-sm-6 col-12',
                       key: 'website',
                       type: 'input',
                       templateOptions: {
@@ -352,7 +352,7 @@ export class CustomersComponent {
                       }
                     },
                     {
-                      className: 'ta-cell pr-md col-4',
+                      className: 'ta-cell pr-md col-md-4 col-sm-6 col-12',
                       key: 'payment_term',
                       type: 'select',
                       templateOptions: {
@@ -378,7 +378,7 @@ export class CustomersComponent {
                       }
                     },
                     {
-                      className: 'ta-cell pr-md col-4',
+                      className: 'ta-cell pr-md col-md-4 col-sm-6 col-12',
                       key: 'interest_rate_yearly',
                       type: 'input',
                       templateOptions: {
@@ -388,7 +388,7 @@ export class CustomersComponent {
                       }
                     },
                     {
-                      className: 'ta-cell pr-md col-4',
+                      className: 'ta-cell pr-md col-md-4 col-sm-6 col-12',
                       key: 'customer_common_for_sales_purchase',
                       type: 'checkbox',
                       templateOptions: {
@@ -408,7 +408,7 @@ export class CustomersComponent {
                   ]
                 },
                 {
-                  className: 'col-3 p-0',
+                  className: 'col-md-3 col-12 col-sm-4 p-0',
                   fieldGroupClassName: "ant-row row mx-0 mt-2",
                   fieldGroup: [
                     {
@@ -439,7 +439,7 @@ export class CustomersComponent {
                             {
                               key: 'ledger_account',
                               type: 'select',
-                              className: 'col-3',
+                              className: 'col-md-4 col-sm-6 col-12',
                               templateOptions: {
                                 dataKey: 'ledger_account_id',
                                 dataLabel: 'name',
@@ -465,7 +465,7 @@ export class CustomersComponent {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-md-4 col-sm-6 col-12',
                               key: 'gst_category',
                               type: 'select',
                               templateOptions: {
@@ -491,7 +491,7 @@ export class CustomersComponent {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-md-4 col-sm-6 col-12',
                               key: 'tax_type',
                               type: 'select',
                               templateOptions: {
@@ -505,7 +505,7 @@ export class CustomersComponent {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-md-4 col-sm-6 col-12',
                               key: 'gst',
                               type: 'input',
                               templateOptions: {
@@ -514,7 +514,7 @@ export class CustomersComponent {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-md-4 col-sm-6 col-12',
                               key: 'registration_date',
                               type: 'date',
                               defaultValue: this.nowDate(),
@@ -526,7 +526,7 @@ export class CustomersComponent {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-md-4 col-sm-6 col-12',
                               key: 'transporter',
                               type: 'select',
                               templateOptions: {
@@ -552,7 +552,7 @@ export class CustomersComponent {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-md-4 col-sm-6 col-12',
                               key: 'firm_status',
                               type: 'select',
                               templateOptions: {
@@ -578,7 +578,7 @@ export class CustomersComponent {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-md-4 col-sm-6 col-12',
                               key: 'territory',
                               type: 'select',
                               templateOptions: {
@@ -604,7 +604,7 @@ export class CustomersComponent {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-md-4 col-sm-6 col-12',
                               key: 'cin',
                               type: 'input',
                               templateOptions: {
@@ -613,7 +613,7 @@ export class CustomersComponent {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-md-4 col-sm-6 col-12',
                               key: 'pan',
                               type: 'input',
                               templateOptions: {
@@ -622,7 +622,7 @@ export class CustomersComponent {
                               }
                             },                          
                             {
-                              className: 'col-3',
+                              className: 'col-md-4 col-sm-6 col-12',
                               key: 'price_category',
                               type: 'select',
                               templateOptions: {
@@ -648,7 +648,7 @@ export class CustomersComponent {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-md-4 col-sm-6 col-12',
                               key: 'distance',
                               type: 'input',
                               templateOptions: {
@@ -658,7 +658,7 @@ export class CustomersComponent {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-md-4 col-sm-6 col-12',
                               key: 'credit_limit',
                               type: 'input',
                               templateOptions: {
@@ -668,7 +668,7 @@ export class CustomersComponent {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-md-4 col-sm-6 col-12',
                               key: 'max_credit_days',
                               type: 'input',
                               templateOptions: {
@@ -678,7 +678,7 @@ export class CustomersComponent {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-md-4 col-sm-6 col-12',
                               key: 'gst_suspend',
                               type: 'checkbox',
                               templateOptions: {
@@ -686,7 +686,7 @@ export class CustomersComponent {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-md-4 col-sm-6 col-12',
                               key: 'tds_on_gst_applicable',
                               type: 'checkbox',
                               templateOptions: {
@@ -694,7 +694,7 @@ export class CustomersComponent {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-md-4 col-sm-6 col-12',
                               key: 'tds_applicable',
                               type: 'checkbox',
                               templateOptions: {
@@ -702,7 +702,7 @@ export class CustomersComponent {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-md-4 col-sm-6 col-12',
                               key: 'is_sub_customer',
                               type: 'checkbox',
                               templateOptions: {
@@ -730,7 +730,7 @@ export class CustomersComponent {
                       fieldGroupClassName: "ant-row row align-items-end mt-3",
                           fieldGroup: [                                  
                               {
-                                className: 'col-4',
+                                className: 'col-md-4 col-sm-6 col-12',
                                 key: 'facebook',
                                 type: 'input',
                                 templateOptions: {
@@ -739,7 +739,7 @@ export class CustomersComponent {
                                 }
                               },
                               {
-                                className: 'col-4',
+                                className: 'col-md-4 col-sm-6 col-12',
                                 key: 'skype',
                                 type: 'input',
                                 templateOptions: {
@@ -748,7 +748,7 @@ export class CustomersComponent {
                                 }
                               },
                               {
-                                className: 'col-4',
+                                className: 'col-md-4 col-sm-6 col-12',
                                 key: 'twitter',
                                 type: 'input',
                                 templateOptions: {
@@ -757,7 +757,7 @@ export class CustomersComponent {
                                 }
                               },
                               {
-                                className: 'col-4',
+                                className: 'col-md-4 col-sm-6 col-12',
                                 key: 'linked_in',
                                 type: 'input',
                                 templateOptions: {

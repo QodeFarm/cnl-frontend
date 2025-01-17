@@ -96,10 +96,10 @@ export class UserComponent {
       fields: [
         {
           fieldGroupClassName: "row col-12 p-0 m-0 custom-form",
-          fieldGroup: [
-            
+          fieldGroup: [    
+                    
             {
-            className: 'col p-0',
+            className: 'col-lg-9 col-md col-12 p-0',
             fieldGroup: [
               {
                 key: 'title',
@@ -166,7 +166,7 @@ export class UserComponent {
             ],
            },
            {
-            className: 'col-auto p-0',
+            className: 'col-lg-3 col-md-auto col-12 p-0',
             fieldGroup: [
                 {
                   key: 'profile_picture_url',
