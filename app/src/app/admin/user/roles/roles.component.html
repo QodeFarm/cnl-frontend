@@ -19,22 +19,24 @@
                 <!-- Modal body start -->
                 <div class="container mt-2">
                     <h2>{{ selectedRow?.role_name}}</h2>
-                    <div style=" height: 390px; overflow: scroll;">
-                        <div *ngFor="let module of moduleList">
-                            <div>
-                                <input type="checkbox" [(ngModel)]="module.selected" (change)="toggleModule(module, module.selected)"> {{module.module_name}}
-                            </div>
-                            <div style="margin-left: 20px;" *ngFor="let section of module.module_sections">
+                    <div style=" height: 390px; overflow: scroll;" class="row m-0">
+                        <div *ngFor="let module of moduleList"  class="col-md-3 col-sm-4 col-6 p-1">
+                            <div class="border p-3 h-100">
                                 <div>
-                                    <input type="checkbox" [(ngModel)]="section.selected" (change)="toggleSection(module, section, section.selected)"> {{section.section_name}}
+                                    <input type="checkbox" [(ngModel)]="module.selected" (change)="toggleModule(module, module.selected)"> {{module.module_name}}
                                 </div>
-                                <div style="margin-left: 20px;" *ngFor="let action of section.actions">
-                                    <input type="checkbox" [(ngModel)]="action.selected" (change)="toggleAction(module, section, action, action.selected)"> {{action.action_name}}
+                                <div style="margin-left: 20px;" *ngFor="let section of module.module_sections">
+                                    <div>
+                                        <input type="checkbox" [(ngModel)]="section.selected" (change)="toggleSection(module, section, section.selected)"> {{section.section_name}}
+                                    </div>
+                                    <div style="margin-left: 20px;" *ngFor="let action of section.actions">
+                                        <input type="checkbox" [(ngModel)]="action.selected" (change)="toggleAction(module, section, action, action.selected)"> {{action.action_name}}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> 
                 <!-- Modal body end -->
             </div>
             <div class="modal-footer">

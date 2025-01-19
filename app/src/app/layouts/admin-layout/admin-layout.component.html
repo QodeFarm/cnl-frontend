@@ -1,16 +1,12 @@
 <header>
     <!-- Topbar -->
-    <nav class="navbar navbar-expand navbar-light topbar static-top ">
-        <a class="sidebar-brand layout-logo-design" [routerLink]="['/admin/dashboard']">
-            <!-- <img style="width: 2.2rem;" src="assets/img/logo.png" />  -->
-            <h3>C&L</h3>
-            <span>Accounts Book</span>
-        </a>
+    <nav class="navbar navbar-expand navbar-light topbar static-top justify-content-between">
+       
         <!-- Sidebar Toggle (Topbar) -->
-        <button id="sidebarToggleTop" (click)="menuToggle()" class="btn bar-toggle ml-3 mr-2">
+        <button id="sidebarToggleTop" (click)="menuToggle()" class="btn bar-toggle">
          <i class="fa fa-bars"></i>
      </button>
-
+    
         <!-- Topbar Search -->
         <!-- <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
            <div class="input-group">
@@ -24,7 +20,12 @@
        </form> -->
 
         <!-- Topbar Navbar -->
-        <ul class="navbar-nav ml-auto">
+        <a class="sidebar-brand layout-logo-design" [routerLink]="['/admin/dashboard']">
+            <!-- <img style="width: 2.2rem;" src="assets/img/logo.png" />  -->
+            <h3>C&L</h3>
+            <span>Accounts Book</span>
+        </a>
+        <ul class="navbar-nav">
 
             <li class="nav-item dropdown no-arrow mx-1">
                 <button class="nav-link dropdown-toggle" (click)="startSpeechRecognition()" id="alerts1" role="button" data-bs-toggle="" aria-haspopup="true" aria-expanded="false">
