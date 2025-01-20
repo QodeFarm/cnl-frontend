@@ -1,0 +1,14 @@
+.nav-tabs{
+    background-color: #ffffff;
+    border-bottom: 1px solid #142768;
+}
+.nav-tabs li a{
+    border: none;
+    color: #000000;
+    border-top: none !important;
+    border-radius: 0;
+}
+.nav-tabs li a.active{
+    color: #ffffff;
+    background-color: #142768 !important;
+}

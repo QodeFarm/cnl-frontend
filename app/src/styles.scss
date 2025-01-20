@@ -525,12 +525,13 @@ ta-form {
             padding-bottom: 1rem;
             .form-label {
                 color: #000;
+                white-space: nowarp;
                 span {
                     color: #ff0000;
                 }
             }
         }
-    }
+    } 
 }
 
 .logo-design-block {
@@ -583,6 +584,10 @@ ta-form {
 }
 
 .custom-form {
+  .tab-form-list ta-field-tabs{
+    border: 1px solid #142768;
+    display: block;
+  }
     .ant-input,
     .ant-select-selector,
     .ant-picker {
@@ -647,6 +652,28 @@ ta-form {
                     }
                 }
             }
+        }
+    }
+    &.new-items-list{
+        .ant-card{
+          margin: 0;
+          .ant-card-head {
+            padding: 0;
+          }
+          .ant-card-body {
+            padding: 0;            
+            overflow-x: auto; 
+            width: 100%; 
+          }
+          .table{
+            th{
+                white-space: nowrap;
+                min-width: 100px;
+            }
+            td{
+                min-width: 100px;
+            }
+          }
         }
     }
 }
@@ -855,6 +882,9 @@ ta-form {
     background: transparent;
     .ant-upload {
         padding: 0 0 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     p.ant-upload-text {
         margin: 10px 0 4px;
@@ -905,3 +935,57 @@ ta-form {
 .custom-dialog-box button:hover {
     background-color: #0056b3;
 }
+
+
+// inline form-fields styles beggin
+.inline-form-fields{
+    .ant-row{
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        position: relative;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
+        padding-top: 15px;
+        padding-bottom: 15px;
+        formly-field{
+            padding-bottom: 0;
+            ta-wrapper-form-field>div{
+                display: flex;
+                .form-label{
+                   flex: 0 0 auto;
+                   width: auto;
+                   max-width: 100%;
+                }
+                .ta-field{
+                   flex-basis: 0;
+                   flex-grow: 1;
+                   max-width: 100%;
+                   input{
+                       text-align: end;
+                       border: none;
+                       &[disabled]{
+                           background-color: #ffffff;
+                           color: #000000;
+                       }
+                       &:focus{
+                        box-shadow: none;
+                       }
+                   }
+                }
+            }
+            &.product-total{
+                padding-top: 10px;
+                input{
+                    &[disabled]{
+                        background-color: #142768 !important;
+                        color: #ffffff !important;
+                        font-size: 18px;
+                        cursor: inherit;
+                    }
+                }
+            }
+        }
+     
+    }
+ 
+}
+// inline form-fields styles end
