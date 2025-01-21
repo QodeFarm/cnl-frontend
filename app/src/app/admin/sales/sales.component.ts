@@ -1646,6 +1646,7 @@ confirmWorkOrder() {
                   dataKey: 'product_id',
                   hideLabel: true,
                   dataLabel: 'name',
+                  placeholder: 'product',
                   options: [],
                   required: true,
                   lazy: {
@@ -1843,6 +1844,7 @@ confirmWorkOrder() {
                   dataKey: 'size_id',
                   hideLabel: true,
                   dataLabel: 'size_name',
+                  placeholder: 'size',
                   options: [],
                   required: false,
                   lazy: {
@@ -1970,6 +1972,7 @@ confirmWorkOrder() {
                   dataKey: 'color_id',
                   hideLabel: true,
                   dataLabel: 'color_name',
+                  placeholder: 'color',
                   options: [],
                   required: false,
                   lazy: {
@@ -2072,7 +2075,7 @@ confirmWorkOrder() {
                 key: 'code',
                 templateOptions: {
                   label: 'Code',
-                  placeholder: 'Enter code',
+                  placeholder: 'code',
                   hideLabel: true,
                 },
                 hooks: {
@@ -2102,7 +2105,7 @@ confirmWorkOrder() {
                 templateOptions: {
                   type: 'number',
                   label: 'Total Boxes',
-                  placeholder: 'Enter Total Boxes',
+                  placeholder: 'Boxes',
                   hideLabel: true
                 },
                 hooks: {
@@ -2131,7 +2134,7 @@ confirmWorkOrder() {
                 key: 'unit_options_id',
                 templateOptions: {
                   label: 'Unit',
-                  placeholder: 'Select Unit',
+                  placeholder: 'Unit',
                   hideLabel: true,
                   dataLabel: 'unit_name',
                   dataKey: 'unit_options_id',
@@ -2170,7 +2173,7 @@ confirmWorkOrder() {
                 templateOptions: {
                   type: 'number',
                   label: 'Qty',
-                  placeholder: 'Enter Qty',
+                  placeholder: 'Qty',
                   min: 1,
                   hideLabel: true,
                   required: true
@@ -2301,7 +2304,7 @@ confirmWorkOrder() {
                 templateOptions: {
                   type: 'number',
                   label: 'Amount',
-                  placeholder: 'Enter Amount',
+                  placeholder: 'Amount',
                   hideLabel: true,
                   disabled: true
                 },
@@ -2334,7 +2337,7 @@ confirmWorkOrder() {
                 key: 'print_name',
                 templateOptions: {
                   label: 'Print name',
-                  placeholder: 'Enter Product Print name',
+                  placeholder: 'name',
                   hideLabel: true
                 },
                 hooks: {

@@ -153,7 +153,7 @@ export class CustomersComponent {
               fieldGroupClassName:'row m-0 pr-0',
               fieldGroup: [
                 {
-                  className: 'col-4',
+                  className: 'col-3',
                   key: 'name',
                   type: 'input',
                   templateOptions: {
@@ -163,7 +163,7 @@ export class CustomersComponent {
                   }
                 },
                 {
-                  className: 'col-4',
+                  className: 'col-3',
                   key: 'print_name',
                   type: 'input',
                   templateOptions: {
@@ -173,7 +173,7 @@ export class CustomersComponent {
                   }
                 },               
                 {
-                  className: 'col-4',
+                  className: 'col-3',
                   key: 'code',
                   type: 'input',
                   templateOptions: {
@@ -183,7 +183,23 @@ export class CustomersComponent {
                   }
                 },
                 {
-                  className: 'col-4',
+                  className: 'col-3 p-0',
+                  key: 'customer_data',
+                  fieldGroupClassName: "ant-row row mx-0 mt-2",
+                  fieldGroup: [
+                    {
+                      key: 'picture',
+                      type: 'file',
+                      className: 'ta-cell pr-md col d-flex justify-content-center pr-0',
+                      templateOptions: {
+                        label: 'Picture',
+                        required: true
+                      }
+                    }                                
+                  ]
+                },
+                {
+                  className: 'col-3',
                   key: 'customer_category',
                   type: 'select',
                   templateOptions: {
@@ -211,7 +227,7 @@ export class CustomersComponent {
                 {
                   key: 'ledger_account',
                   type: 'select',
-                  className: 'col-4',
+                  className: 'col-3',
                   templateOptions: {
                     dataKey: 'ledger_account_id',
                     dataLabel: 'name',
@@ -237,7 +253,7 @@ export class CustomersComponent {
                   }
                 },
                 {
-                  className: 'col-4',
+                  className: 'col-3',
                   key: 'tax_type',
                   type: 'select',
                   templateOptions: {
@@ -249,7 +265,8 @@ export class CustomersComponent {
                     ],
                     required: true,
                   }
-                }                                        
+                },
+                                                        
               ]
             }
           ]
@@ -259,109 +276,225 @@ export class CustomersComponent {
           type: 'tabs',
           fieldGroup: [
             {
-              className: 'col-12 custom-form-card-block p-0',
-              fieldGroupClassName:'row m-0 pr-0',
+              className: 'col-12 pb-0',
+              fieldGroupClassName: "field-no-bottom-space",
               props: {
-                label: 'Customer Details'
+                label: 'Addresses'
               },
               fieldGroup: [
                 {
-                  className: 'col-9 p-0',
-                  key: 'customer_data',
-                  fieldGroupClassName: "ant-row mx-0 row align-items-end mt-2",
+                  fieldGroupClassName: "",
                   fieldGroup: [
                     {
-                      className: 'col-4',
-                      key: 'contact_person',
-                      type: 'input',
+                      key: 'customer_addresses',
+                      type: 'table',
+                      className: 'custom-form-list',
                       templateOptions: {
-                        label: 'Contact Person',
-                        placeholder: 'Enter Contact Person',
+                        // addText: 'Add Addresses',
+                        tableCols: [
+                          {
+                            name: 'address_type',
+                            label: 'Address Type'  // New column for Address Type
+                          },
+                          {
+                            name: 'address',
+                            label: 'Address'
+                          },
+                          {
+                            name: 'city',
+                            label: 'City'
+                          },
+                          {
+                            name: 'state',
+                            label: 'State'
+                          },
+                          {
+                            name: 'country',
+                            label: 'Country'
+                          },
+                          {
+                            name: 'pin_code',
+                            label: 'Pin Code'
+                          },
+                          {
+                            name: 'phone',
+                            label: 'Phone'
+                          },
+                          {
+                            name: 'email',
+                            label: 'Email'
+                          },
+                          {
+                            name: 'route_map',
+                            label: 'Route Map'
+                          },
+                          {
+                            name: 'longitude',
+                            label: 'Longitude'
+                          },
+                          {
+                            name: 'latitude',
+                            label: 'Latitude'
+                          }
+                        ]
+                      },
+                      fieldArray: {
+                        fieldGroup: [
+                          {
+                            key: 'address_type',
+                            type: 'input',
+                            className: 'custom-select-bold',
+                            templateOptions: {
+                              label: 'Address Type',
+                              hideLabel: true,
+                              readonly: true,
+                              required: true,
+                              value: 'Billing',  // Set to 'Billing'
+                              attributes: {
+                                style: 'font-weight: bold; border: none; background-color: transparent; margin-bottom: 10px;' // Bold text, no border, transparent background
+                              }
+                            }
+                          },
+                          {
+                            key: 'city',
+                            type: 'select',
+                            templateOptions: {
+                              dataKey: 'city_id',
+                              dataLabel: 'city_name',
+                              label: 'City',
+                              placeholder: 'city',
+                              hideLabel: true,
+                              required: true,
+                              lazy: {
+                                url: 'masters/city/',
+                                lazyOneTime: true
+                              }
+                            },
+                            hooks: {
+                              onChanges: (field: any) => {
+                                field.formControl.valueChanges.subscribe((data: any) => {
+                                  console.log('city', data);
+                                  // const index = field.parent.parent.model.indexOf(field.parent.model);
+                                  const index = field.parent.key;
+                                  if (this.formConfig && this.formConfig.model) {
+                                    this.formConfig.model['customer_addresses'][index]['city_id'] = data.city_id;
+                                  } else {
+                                    console.error('Form config or Customer addresses model is not defined.');
+                                  }
+                                });
+                              }
+                            }
+                          },
+                          {
+                            key: 'state',
+                            type: 'select',
+                            templateOptions: {
+                              dataKey: 'state_id',
+                              dataLabel: 'state_name',
+                              label: 'State',
+                              placeholder: 'state',
+                              hideLabel: true,
+                              required: true,
+                              lazy: {
+                                url: 'masters/state/',
+                                lazyOneTime: true
+                              }
+                            },
+                            hooks: {
+                              onChanges: (field: any) => {
+                                field.formControl.valueChanges.subscribe((data: any) => {
+                                  console.log('state', data);
+                                  // const index = field.parent.parent.model.indexOf(field.parent.model);
+                                  const index = field.parent.key;
+                                  if (this.formConfig && this.formConfig.model) {
+                                    this.formConfig.model['customer_addresses'][index]['state_id'] = data.state_id;
+                                  } else {
+                                    console.error('Form config or Customer addresses model is not defined.');
+                                  }
+                                });
+                              }
+                            }
+                          },
+                          {
+                            key: 'country',
+                            type: 'select',
+                            templateOptions: {
+                              dataKey: 'country_id',
+                              dataLabel: 'country_name',
+                              label: 'Country',
+                              hideLabel: true,
+                              required: true,
+                              placeholder: 'country',
+                              lazy: {
+                                url: 'masters/country/',
+                                lazyOneTime: true
+                              }
+                            },
+                            hooks: {
+                              onChanges: (field: any) => {
+                                field.formControl.valueChanges.subscribe((data: any) => {
+                                  console.log('country', data);
+                                  // const index = field.parent.parent.model.indexOf(field.parent.model);
+                                  const index = field.parent.key;
+                                  if (this.formConfig && this.formConfig.model) {
+                                    this.formConfig.model['customer_addresses'][index]['country_id'] = data.country_id;
+                                  } else {
+                                    console.error('Form config or Customer addresses model is not defined.');
+                                  }
+                                });
+                              }
+                            }
+                          },
+                          {
+                            type: 'input',
+                            key: 'pin_code',
+                            templateOptions: {
+                              label: 'Pin Code',
+                              hideLabel: true,
+                              placeholder: 'Pin Code',
+                            }
+                          },
+                          {
+                            type: 'input',
+                            key: 'phone',
+                            templateOptions: {
+                              label: 'Phone',
+                              hideLabel: true,
+                              placeholder: 'Phone',
+                            }
+                          },
+                          {
+                            type: 'input',
+                            key: 'email',
+                            templateOptions: {
+                              label: 'Email',
+                              hideLabel: true,
+                              placeholder: 'email',
+                            }
+                          },
+                          {
+                            type: 'textarea',
+                            key: 'address',
+                            templateOptions: {
+                              label: 'Address',
+                              hideLabel: true,
+                              placeholder: 'Address',
+                            }
+                          }
+                        ]
                       }
                     },
-                    {
-                      className: 'col-4',
-                      key: 'firm_status',
-                      type: 'select',
-                      templateOptions: {
-                        label: 'Firm Status',
-                        dataKey: 'firm_status_id',
-                        dataLabel: 'name',
-                        options: [],
-                        lazy: {
-                          url: 'masters/firm_statuses/',
-                          lazyOneTime: true
-                        }
-                      },
-                      hooks: {
-                        onChanges: (field: any) => {
-                          field.formControl.valueChanges.subscribe((data: any) => {
-                            if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
-                              this.formConfig.model['customer_data']['firm_status_id'] = data.firm_status_id;
-                            } else {
-                              console.error('Form config or Customer data model is not defined.');
-                            }
-                          });
-                        }
-                      }
-                    }, 
-                    {
-                      className: 'col-4',
-                      key: 'registration_date',
-                      type: 'date',
-                      defaultValue: this.nowDate(),
-                      templateOptions: {
-                        label: 'Registration Date',
-                        placeholder: 'Enter Registration Date',
-                        type: 'date',
-                        readonly: true
-                      }
-                    }, 
-                    {
-                      className: 'col-4',
-                      key: 'territory',
-                      type: 'select',
-                      templateOptions: {
-                        label: 'Territory',
-                        dataKey: 'territory_id',
-                        dataLabel: 'name',
-                        options: [],
-                        lazy: {
-                          url: 'masters/territory/',
-                          lazyOneTime: true
-                        }
-                      },
-                      hooks: {
-                        onChanges: (field: any) => {
-                          field.formControl.valueChanges.subscribe((data: any) => {
-                            if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
-                              this.formConfig.model['customer_data']['territory_id'] = data.territory_id;
-                            } else {
-                              console.error('Form config or Customer data model is not defined.');
-                            }
-                          });
-                        }
-                      }
-                    },              
+                    // {
+                    //   className: 'col-12 p-0',
+                    //   key: 'customer_addresses',
+                    //   fieldGroupClassName: "ant-row row align-items-end mt-3",
+                    //       fieldGroup: [
+                            
+                    //       ]
+                    //     },
+                      ]
+                    }
                   ]
-                },
-                {
-                  className: 'col-3 p-0',
-                  key: 'customer_data',
-                  fieldGroupClassName: "ant-row row mx-0 mt-2",
-                  fieldGroup: [
-                    {
-                      key: 'picture',
-                      type: 'file',
-                      className: 'ta-cell pr-md col d-flex justify-content-center pr-0',
-                      templateOptions: {
-                        label: 'Picture',
-                        required: true
-                      }
-                    }                                
-                  ]
-                },
-              ]            
             },
             {
               className: 'col-12 custom-form-card-block',
@@ -704,7 +837,7 @@ export class CustomersComponent {
             {
               className: 'col-12 px-0 pt-3',
               props: {
-                label: 'Customer Attachments'
+                label: 'Attachments'
               },
               fieldGroup: [
                 {
@@ -727,235 +860,97 @@ export class CustomersComponent {
                   ]
                 }
               ]
-            }       
+            },
+            {
+              className: 'col-12 custom-form-card-block p-0',
+              fieldGroupClassName:'row m-0 pr-0',
+              props: {
+                label: 'Other Details'
+              },
+              fieldGroup: [
+                {
+                  className: 'col-9 p-0',
+                  key: 'customer_data',
+                  fieldGroupClassName: "ant-row mx-0 row align-items-end mt-2",
+                  fieldGroup: [
+                    {
+                      className: 'col-md-4 col-sm-6 col-12',
+                      key: 'contact_person',
+                      type: 'input',
+                      templateOptions: {
+                        label: 'Contact Person',
+                        placeholder: 'Enter Contact Person',
+                      }
+                    },
+                    {
+                      className: 'col-4',
+                      key: 'firm_status',
+                      type: 'select',
+                      templateOptions: {
+                        label: 'Firm Status',
+                        dataKey: 'firm_status_id',
+                        dataLabel: 'name',
+                        options: [],
+                        lazy: {
+                          url: 'masters/firm_statuses/',
+                          lazyOneTime: true
+                        }
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          field.formControl.valueChanges.subscribe((data: any) => {
+                            if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
+                              this.formConfig.model['customer_data']['firm_status_id'] = data.firm_status_id;
+                            } else {
+                              console.error('Form config or Customer data model is not defined.');
+                            }
+                          });
+                        }
+                      }
+                    }, 
+                    {
+                      className: 'col-4',
+                      key: 'registration_date',
+                      type: 'date',
+                      defaultValue: this.nowDate(),
+                      templateOptions: {
+                        label: 'Registration Date',
+                        placeholder: 'Enter Registration Date',
+                        type: 'date',
+                        readonly: true
+                      }
+                    }, 
+                    {
+                      className: 'col-4',
+                      key: 'territory',
+                      type: 'select',
+                      templateOptions: {
+                        label: 'Territory',
+                        dataKey: 'territory_id',
+                        dataLabel: 'name',
+                        options: [],
+                        lazy: {
+                          url: 'masters/territory/',
+                          lazyOneTime: true
+                        }
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          field.formControl.valueChanges.subscribe((data: any) => {
+                            if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
+                              this.formConfig.model['customer_data']['territory_id'] = data.territory_id;
+                            } else {
+                              console.error('Form config or Customer data model is not defined.');
+                            }
+                          });
+                        }
+                      }
+                    },              
+                  ]
+                },
+              ]            
+            },       
           ]
-        },
-        {
-          key: 'customer_addresses',
-          type: 'table',
-          className: 'custom-form-list',
-          templateOptions: {
-            title: 'Customer Addresses',
-            addText: 'Add Addresses',
-            tableCols: [
-              {
-                name: 'address_type',
-                label: 'Address Type'  // New column for Address Type
-              },
-              {
-                name: 'address',
-                label: 'Address'
-              },
-              {
-                name: 'city',
-                label: 'City'
-              },
-              {
-                name: 'state',
-                label: 'State'
-              },
-              {
-                name: 'country',
-                label: 'Country'
-              },
-              {
-                name: 'pin_code',
-                label: 'Pin Code'
-              },
-              {
-                name: 'phone',
-                label: 'Phone'
-              },
-              {
-                name: 'email',
-                label: 'Email'
-              },
-              {
-                name: 'route_map',
-                label: 'Route Map'
-              },
-              {
-                name: 'longitude',
-                label: 'Longitude'
-              },
-              {
-                name: 'latitude',
-                label: 'Latitude'
-              }
-            ]
-          },
-          fieldArray: {
-            fieldGroup: [
-              {
-                key: 'address_type',
-                type: 'input',
-                className: 'custom-select-bold',
-                templateOptions: {
-                  label: 'Address Type',
-                  hideLabel: true,
-                  readonly: true,
-                  required: true,
-                  value: 'Billing',  // Set to 'Billing'
-                  attributes: {
-                    style: 'font-weight: bold; border: none; background-color: transparent; margin-bottom: 10px;' // Bold text, no border, transparent background
-                  }
-                }
-              },
-              {
-                key: 'city',
-                type: 'select',
-                templateOptions: {
-                  dataKey: 'city_id',
-                  dataLabel: 'city_name',
-                  label: 'City',
-                  placeholder: 'select',
-                  hideLabel: true,
-                  required: true,
-                  lazy: {
-                    url: 'masters/city/',
-                    lazyOneTime: true
-                  }
-                },
-                hooks: {
-                  onChanges: (field: any) => {
-                    field.formControl.valueChanges.subscribe((data: any) => {
-                      console.log('city', data);
-                      // const index = field.parent.parent.model.indexOf(field.parent.model);
-                      const index = field.parent.key;
-                      if (this.formConfig && this.formConfig.model) {
-                        this.formConfig.model['customer_addresses'][index]['city_id'] = data.city_id;
-                      } else {
-                        console.error('Form config or Customer addresses model is not defined.');
-                      }
-                    });
-                  }
-                }
-              },
-              {
-                key: 'state',
-                type: 'select',
-                templateOptions: {
-                  dataKey: 'state_id',
-                  dataLabel: 'state_name',
-                  label: 'State',
-                  placeholder: 'select',
-                  hideLabel: true,
-                  required: true,
-                  lazy: {
-                    url: 'masters/state/',
-                    lazyOneTime: true
-                  }
-                },
-                hooks: {
-                  onChanges: (field: any) => {
-                    field.formControl.valueChanges.subscribe((data: any) => {
-                      console.log('state', data);
-                      // const index = field.parent.parent.model.indexOf(field.parent.model);
-                      const index = field.parent.key;
-                      if (this.formConfig && this.formConfig.model) {
-                        this.formConfig.model['customer_addresses'][index]['state_id'] = data.state_id;
-                      } else {
-                        console.error('Form config or Customer addresses model is not defined.');
-                      }
-                    });
-                  }
-                }
-              },
-              {
-                key: 'country',
-                type: 'select',
-                templateOptions: {
-                  dataKey: 'country_id',
-                  dataLabel: 'country_name',
-                  label: 'Country',
-                  hideLabel: true,
-                  required: true,
-                  placeholder: 'select',
-                  lazy: {
-                    url: 'masters/country/',
-                    lazyOneTime: true
-                  }
-                },
-                hooks: {
-                  onChanges: (field: any) => {
-                    field.formControl.valueChanges.subscribe((data: any) => {
-                      console.log('country', data);
-                      // const index = field.parent.parent.model.indexOf(field.parent.model);
-                      const index = field.parent.key;
-                      if (this.formConfig && this.formConfig.model) {
-                        this.formConfig.model['customer_addresses'][index]['country_id'] = data.country_id;
-                      } else {
-                        console.error('Form config or Customer addresses model is not defined.');
-                      }
-                    });
-                  }
-                }
-              },
-              {
-                type: 'input',
-                key: 'pin_code',
-                templateOptions: {
-                  label: 'Pin Code',
-                  hideLabel: true,
-                  placeholder: 'Pin Code',
-                }
-              },
-              {
-                type: 'input',
-                key: 'phone',
-                templateOptions: {
-                  label: 'Phone',
-                  hideLabel: true,
-                  placeholder: 'Phone',
-                }
-              },
-              {
-                type: 'input',
-                key: 'email',
-                templateOptions: {
-                  label: 'Email',
-                  hideLabel: true,
-                  placeholder: 'email',
-                }
-              },
-              {
-                type: 'input',
-                key: 'route_map',
-                templateOptions: {
-                  label: 'Route Map',
-                  hideLabel: true,
-                  placeholder: 'Route Map'
-                }
-              },
-              {
-                type: 'input',
-                key: 'longitude',
-                templateOptions: {
-                  label: 'Longitude',
-                  hideLabel: true,
-                  placeholder: 'Longitude',
-                }
-              },
-              {
-                type: 'input',
-                key: 'latitude',
-                templateOptions: {
-                  label: 'Latitude',
-                  hideLabel: true,
-                  placeholder: 'Latitude',
-                }
-              },
-              {
-                type: 'textarea',
-                key: 'address',
-                templateOptions: {
-                  label: 'Address',
-                  hideLabel: true,
-                  placeholder: 'Enter Address',
-                }
-              }
-            ]
-          }
         },
     ]
 
