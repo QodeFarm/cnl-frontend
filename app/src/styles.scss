@@ -737,6 +737,19 @@ ta-form {
                             background-color: #2f923d;
                         }
                     }
+                    a{
+                        border: 1px solid #142768;
+                        background-color: #142768;
+                        color: #ffffff;
+                        padding: 4px 10px;
+                        font-size: 14px;
+                        border-radius: 5px;
+                        &:hover{
+                          border:1px solid #233a88;
+                          background-color: #233a88;
+                          color: #ffffff;
+                        }
+                    }
                 }
             }
         }
