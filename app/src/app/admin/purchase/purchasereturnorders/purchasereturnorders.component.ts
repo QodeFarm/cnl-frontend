@@ -608,7 +608,7 @@ export class PurchasereturnordersComponent {
                   defaultValue: '0.00'
                 },
                 {
-                  key: 'total',
+                  key: 'total_amount',
                   type: 'text',
                   className: 'col-12 product-total',
                   templateOptions: {

@@ -718,7 +718,6 @@ loadQuickpackProducts() {
           ]
         },
         // end of purchase_order
-
         {
           key: 'purchase_order_items',
           type: 'repeat',
