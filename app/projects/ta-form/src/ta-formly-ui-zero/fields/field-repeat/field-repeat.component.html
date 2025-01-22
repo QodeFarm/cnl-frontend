@@ -6,7 +6,7 @@
                     <th *ngFor="let col of field.fieldArray.fieldGroup;">
                         {{ col.templateOptions.label }}
                     </th>
-                    <th *ngIf="!isCustomersPage">
+                    <th *ngIf="!isRestrictedPage">
                         Actions
                     </th>
                 </tr>
@@ -17,7 +17,7 @@
                     <td *ngFor="let fg of f.fieldGroup">
                         <formly-field class="col" [field]="fg"></formly-field>
                     </td>
-                    <td *ngIf="!isCustomersPage" style="vertical-align: middle;text-align: center;">
+                    <td *ngIf="!isRestrictedPage" style="vertical-align: middle;text-align: center;">
                         <div class="">
                             <button nz-button nzDanger type="button" (click)="remove(i)"><i class="fa fa-trash"></i></button>
                         </div>
@@ -30,7 +30,7 @@
 </nz-card>
 
 <ng-template #extraTemplate>
-    <button *ngIf="!isCustomersPage" nz-button nzType="primary" type="button" (click)="add()">{{ to.addText }}</button>
+    <button *ngIf="!isRestrictedPage" nz-button nzType="primary" type="button" (click)="add()">{{ to.addText }}</button>
 </ng-template>
 
 
