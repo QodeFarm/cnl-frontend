@@ -2733,8 +2733,8 @@ confirmWorkOrder() {
                               hooks: {
                                 onInit: (field: any) => {
                                   // Set the initial value from dataToPopulate if available
-                                  if (this.dataToPopulate && this.dataToPopulate.sale_order && this.dataToPopulate.sale_order.doc_amount && field.formControl) {
-                                    field.formControl.setValue(this.dataToPopulate.sale_order.doc_amount);
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_order && this.dataToPopulate.sale_order.total_amount && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.sale_order.total_amount);
                                   }
                                 }
                               }
