@@ -975,7 +975,7 @@ ta-form {
             &.product-total{
                 padding-top: 10px;
                 input{
-                    &[disabled]{
+                    &{
                         background-color: #142768 !important;
                         color: #ffffff !important;
                         font-size: 18px;

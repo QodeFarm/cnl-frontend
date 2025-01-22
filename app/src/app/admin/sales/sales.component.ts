@@ -1532,17 +1532,17 @@ confirmWorkOrder() {
                   //   },
                   //      defaultValue: '0.00'
                   // },
-                  {
-                    key: 'round_off',
-                    type: 'text',
-                    className: 'col-12',
-                    templateOptions: {
-                      label: 'Round Off',
-                       required: false
-                    },
-                    defaultValue: '0.00'
+                  // {
+                  //   key: 'round_off',
+                  //   type: 'text',
+                  //   className: 'col-12',
+                  //   templateOptions: {
+                  //     label: 'Round Off',
+                  //      required: false
+                  //   },
+                  //   defaultValue: '0.00'
 
-                  },
+                  // },
                   {
                     key: 'advance_amount',
                     type: 'text',
@@ -1554,12 +1554,13 @@ confirmWorkOrder() {
                     defaultValue: '0.00'
                   },
                   {
-                    key: 'total',
+                    key: 'total_amount',
                     type: 'text',
                     className: 'col-12 product-total',
                     templateOptions: {
                       label: ' ',
                       required: false,
+                      placeholder: 'Total Amount',
                       disabled: true,
                     },
                     defaultValue: '0.00'
@@ -2732,8 +2733,8 @@ confirmWorkOrder() {
                               hooks: {
                                 onInit: (field: any) => {
                                   // Set the initial value from dataToPopulate if available
-                                  if (this.dataToPopulate && this.dataToPopulate.sale_order && this.dataToPopulate.sale_order.total_amount && field.formControl) {
-                                    field.formControl.setValue(this.dataToPopulate.sale_order.total_amount);
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_order && this.dataToPopulate.sale_order.doc_amount && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.sale_order.doc_amount);
                                   }
                                 }
                               }
