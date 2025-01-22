@@ -184,7 +184,7 @@ export class CustomersComponent {
                 },
                 {
                   className: 'col-3 p-0',
-                  key: 'customer_data',
+                  // key: 'customer_data',
                   fieldGroupClassName: "ant-row row mx-0 mt-2",
                   fieldGroup: [
                     {

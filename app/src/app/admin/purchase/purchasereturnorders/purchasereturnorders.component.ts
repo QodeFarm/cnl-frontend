@@ -169,7 +169,7 @@ export class PurchasereturnordersComponent {
     this.formConfig.model['purchase_return_orders']['order_type'] = 'purchase_return';
 
     this.getOrderNo();
-    this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[2].hide =true;
+    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[2].hide = true;
     // console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
   }
 
@@ -242,7 +242,7 @@ export class PurchasereturnordersComponent {
         this.formConfig.submit.label = 'Update';
         this.formConfig.model['purchase_return_id'] = this.PurchaseReturnOrderEditID;
         this.showForm = true;
-        this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[2].hide = false;
+        this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[2].hide = false;
       }
     });
     this.hide();
@@ -425,24 +425,24 @@ export class PurchasereturnordersComponent {
                     required: true
                   }
                 },
-                {
-                  key: 'ref_no',
-                  type: 'input',
-                  className: 'col-md-4 col-sm-6 col-12',
-                  templateOptions: {
-                    type: 'input',
-                    label: 'Ref No',
-                    placeholder: 'Enter Ref No',
-                    required: true
-                  },
-                  hooks: {
-                    onInit: (field: any) => {
-                      if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders.ref_no && field.formControl) {
-                        field.formControl.setValue(this.dataToPopulate.purchase_return_orders.ref_no);
-                      }
-                    }
-                  }
-                },
+                // {
+                //   key: 'ref_no',
+                //   type: 'input',
+                //   className: 'col-md-4 col-sm-6 col-12',
+                //   templateOptions: {
+                //     type: 'input',
+                //     label: 'Ref No',
+                //     placeholder: 'Enter Ref No',
+                //     required: true
+                //   },
+                //   hooks: {
+                //     onInit: (field: any) => {
+                //       if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders.ref_no && field.formControl) {
+                //         field.formControl.setValue(this.dataToPopulate.purchase_return_orders.ref_no);
+                //       }
+                //     }
+                //   }
+                // },
                 {
                   key: 'ref_date',
                   type: 'date',
@@ -468,7 +468,7 @@ export class PurchasereturnordersComponent {
                   }
                 },
                 // {
-                //   key: 'tax',
+                //   key: 'tax_type',
                 //   type: 'select',
                 //   className: 'col-2',
                 //   templateOptions: {
@@ -486,50 +486,15 @@ export class PurchasereturnordersComponent {
                 //     }
                 //   }
                 // },
-                // {
-                //   key: 'remarks',
-                //   type: 'textarea',
-                //   className: 'col-3',
-                //   templateOptions: {
-                //     type: 'input',
-                //     label: 'Remarks',
-                //     placeholder: 'Enter Remarks',
-                //   },
-                //   hooks: {
-                //     onInit: (field: any) => {
-                //       if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders.remarks && field.formControl) {
-                //         field.formControl.setValue(this.dataToPopulate.purchase_return_orders.remarks);
-                //       }
-                //     }
-                //   }
-                // },
-                // {
-                //   key: 'return_reason',
-                //   type: 'textarea',
-                //   className: 'col-3',
-                //   templateOptions: {
-                //     label: 'Return Reason',
-                //     placeholder: 'Enter Return Reason',
-                //   }
-                // },
-                // {
-                //   key: 'billing_address',
-                //   type: 'textarea',
-                //   className: 'col-6',
-                //   templateOptions: {
-                //     label: 'Billing Address',
-                //     placeholder: 'Enter Billing Address',
-                //   }
-                // },
-                // {
-                //   key: 'shipping_address',
-                //   type: 'textarea',
-                //   className: 'col-6',
-                //   templateOptions: {
-                //     label: 'Shipping Address',
-                //     placeholder: 'Enter Shipping Address',
-                //   }
-                // }
+                {
+                  key: 'return_reason',
+                  type: 'textarea',
+                  className: 'col-8',
+                  templateOptions: {
+                    label: 'Return Reason',
+                    placeholder: 'Enter Return Reason',
+                  }
+                },
               ]
             },
             {
@@ -575,37 +540,6 @@ export class PurchasereturnordersComponent {
                     required: false
                   },
                   defaultValue: '0.00',
-                },
-                // {
-                //   key: 'item_value',
-                //   type: 'text',
-                //   className: 'col-12',
-                //   templateOptions: {
-                //     label: 'Total Value',
-                //      required: false
-                //   },
-                //      defaultValue: '0.00'
-                // },
-                // {
-                //   key: 'round_off',
-                //   type: 'text',
-                //   className: 'col-12',
-                //   templateOptions: {
-                //     label: 'Round Off',
-                //      required: false
-                //   },
-                //   defaultValue: '0.00'
-
-                // },
-                {
-                  key: 'advance_amount',
-                  type: 'text',
-                  className: 'col-12',
-                  templateOptions: {
-                    label: 'Advance',
-                      required: false
-                  },
-                  defaultValue: '0.00'
                 },
                 {
                   key: 'total_amount',
@@ -1583,35 +1517,35 @@ export class PurchasereturnordersComponent {
                               }
                               }
                             },
-                            // {
-                            //   key: 'order_status',
-                            //   type: 'select',
-                            //   className: 'col-md-4 col-lg-3 col-sm-6 col-12',
-                            //   templateOptions: {
-                            //   label: 'Order Status Type',
-                            //   placeholder: 'Select Order Status Type',
-                            //   dataKey: 'order_status_id',
-                            //   dataLabel: 'status_name',
-                            //   lazy: {
-                            //     url: 'masters/order_status/',
-                            //     lazyOneTime: true
-                            //   },
+                            {
+                              key: 'order_status',
+                              type: 'select',
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                              templateOptions: {
+                              label: 'Order Status Type',
+                              placeholder: 'Select Order Status Type',
+                              dataKey: 'order_status_id',
+                              dataLabel: 'status_name',
+                              lazy: {
+                                url: 'masters/order_status/',
+                                lazyOneTime: true
+                              },
                               
-                            //   expressions: {
-                            //     hide: '!model.purchase_return_id'
-                            //   },
-                            //   },
-                            //   hooks: {
-                            //   onChanges: (field: any) => {
-                            //     field.formControl.valueChanges.subscribe(data => {
-                            //     console.log("order_status", data);
-                            //     if (data && data.order_status_id) {
-                            //       this.formConfig.model['purchase_return_orders']['order_status_id'] = data.order_status_id;
-                            //     }
-                            //     });
-                            //   }
-                            //   }
-                            // },
+                              expressions: {
+                                hide: '!model.purchase_return_id'
+                              },
+                              },
+                              hooks: {
+                              onChanges: (field: any) => {
+                                field.formControl.valueChanges.subscribe(data => {
+                                console.log("order_status", data);
+                                if (data && data.order_status_id) {
+                                  this.formConfig.model['purchase_return_orders']['order_status_id'] = data.order_status_id;
+                                }
+                                });
+                              }
+                              }
+                            },
                             {
                               key: 'total_boxes',
                               type: 'input',

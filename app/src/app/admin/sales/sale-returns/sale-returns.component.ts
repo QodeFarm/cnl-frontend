@@ -181,7 +181,7 @@ export class SaleReturnsComponent {
     this.formConfig.model['sale_return_order']['order_type'] = 'sale_return';
 
     this.getReturnNo();
-    this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[2].hide = true;
+    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[6].hide = true;
     // console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])  }
   }
 
@@ -290,7 +290,7 @@ export class SaleReturnsComponent {
         this.formConfig.model['sale_return_id'] = this.SaleReturnOrderEditID;
         this.showForm = true; // Show form for editing
         // Show necessary fields for editing
-        this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[2].hide = false;
+        this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[6].hide = false;
       }
     });
     this.hide();
@@ -748,35 +748,6 @@ export class SaleReturnsComponent {
                     // disabled: true
                   },
                 },
-
-                {
-                  key: 'orders_salesman',
-                  type: 'select',
-                  className: 'col-md-4 col-sm-6 col-12',
-                  templateOptions: {
-                    label: 'Order Salesman',
-                    dataKey: 'order_salesman_id',
-                    dataLabel: "name",
-                    options: [],
-                    lazy: {
-                      url: 'masters/orders_salesman/',
-                      lazyOneTime: true
-                    }
-                  },
-                  hooks: {
-                    onChanges: (field: any) => {
-                      field.formControl.valueChanges.subscribe((data: any) => {
-                        // console.log("order_type", data);
-                        if (data && data.order_salesman_id) {
-                          this.formConfig.model['sale_return_order']['order_salesman_id'] = data.order_salesman_id;
-                        }
-                      });
-                      if (this.dataToPopulate && this.dataToPopulate.sale_return_order?.orders_salesman) {
-                        field.formControl.setValue(this.dataToPopulate.sale_return_order.orders_salesman);
-                      }
-                    }
-                  }
-                },
                 {
                   key: 'return_date',
                   type: 'date',
@@ -817,28 +788,29 @@ export class SaleReturnsComponent {
                     readonly: true
                   }
                 },
-                {
-                  key: 'against_bill',
-                  type: 'input',
-                  className: 'col-md-4 col-sm-6 col-12',
-                  templateOptions: {
-                    type: 'input',
-                    label: 'Against bill',
-                    placeholder: 'Enter Against bill',
-                    required: true
-                  }
-                },
-                {
-                  key: 'against_bill_date',
-                  type: 'date',
-                  defaultValue: this.nowDate(),
-                  className: 'col-md-4 col-sm-6 col-12',
-                  templateOptions: {
-                    type: 'date',
-                    label: 'Against bill date',
-                    placeholder: 'Select Against bill date',
-                  }
-                },
+                // {
+                //   key: 'against_bill',
+                //   type: 'input',
+                //   className: 'col-md-4 col-sm-6 col-12',
+                //   templateOptions: {
+                //     type: 'input',
+                //     label: 'Against bill',
+                //     placeholder: 'Enter Against bill',
+                //     required: false
+                //   }
+                // },
+                // {
+                //   key: 'against_bill_date',
+                //   type: 'date',
+                //   defaultValue: this.nowDate(),
+                //   className: 'col-md-4 col-sm-6 col-12',
+                //   templateOptions: {
+                //     type: 'date',
+                //     label: 'Against bill date',
+                //     placeholder: 'Select Against bill date',
+                //     required: false
+                //   }
+                // },
                 // {
                 //   key: 'tax',
                 //   type: 'select',
@@ -858,6 +830,41 @@ export class SaleReturnsComponent {
                 //     }
                 //   }
                 // },
+                {
+                  key: 'return_option',
+                  type: 'select',
+                  className: 'col-4',
+                  templateOptions: {
+                    label: 'Return Option',
+                    dataKey: 'return_option_id',
+                    dataLabel: 'name',
+                    required: true,
+                    options: [],
+                    lazy: {
+                      url: 'masters/return_options/',
+                      lazyOneTime: true
+                    }
+                  },
+                  hooks: {
+                    onChanges: (field: any) => {
+                      field.formControl.valueChanges.subscribe((data: any) => {
+                        if (data && data.return_option_id) {
+                          this.formConfig.model['sale_return_order']['return_option_id'] = data.return_option_id;
+                        }
+                      });
+                    }
+                  }
+                }, 
+                {
+                  key: 'return_reason',
+                  type: 'textarea',
+                  className: 'col-8',
+                  templateOptions: {
+                    label: 'Return Reason',
+                    placeholder: 'Enter Return Reason',
+                    required: true
+                  }
+                },
                 // {
                 //   key: 'remarks',
                 //   type: 'textarea',
@@ -908,16 +915,6 @@ export class SaleReturnsComponent {
                   },
                   defaultValue: '0.00'
                 },
-                // {
-                //   key: 'texable_amt',
-                //   type: 'text',
-                //   className: 'col-12',
-                //   templateOptions: {
-                //     label: 'Texable Amt',
-                //     required: false,                    
-                //   },
-                //   defaultValue: '0.00'
-                // },
                 {
                   key: 'cess_amount',
                   type: 'text',
@@ -938,39 +935,8 @@ export class SaleReturnsComponent {
                   },
                   defaultValue: '0.00',
                 },
-                // {
-                //   key: 'item_value',
-                //   type: 'text',
-                //   className: 'col-12',
-                //   templateOptions: {
-                //     label: 'Total Value',
-                //      required: false
-                //   },
-                //      defaultValue: '0.00'
-                // },
                 {
-                  key: 'round_off',
-                  type: 'text',
-                  className: 'col-12',
-                  templateOptions: {
-                    label: 'Round Off',
-                    required: false
-                  },
-                  defaultValue: '0.00'
-
-                },
-                // {
-                //   key: 'advance_amount',
-                //   type: 'text',
-                //   className: 'col-12',
-                //   templateOptions: {
-                //     label: 'Advance',
-                //     required: false
-                //   },
-                //   defaultValue: '0.00'
-                // },
-                {
-                  key: 'total',
+                  key: 'total_amount',
                   type: 'text',
                   className: 'col-12 product-total',
                   templateOptions: {
@@ -1917,26 +1883,26 @@ export class SaleReturnsComponent {
                                 }
                               }
                             },
-                            {
-                              key: 'advance_amount',
-                              type: 'input',
-                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
-                              templateOptions: {
-                                type: 'number',
-                                label: 'Advance amount',
-                                placeholder: 'Enter Advance amount'
-                              },
-                              hooks: {
-                                onInit: (field: any) => {
-                                  if (this.dataToPopulate && this.dataToPopulate.sale_return_order && this.dataToPopulate.sale_return_order.advance_amount && field.formControl) {
-                                    field.formControl.setValue(this.dataToPopulate.sale_return_order.advance_amount);
-                                  }
-                                  field.formControl.valueChanges.subscribe(data => {
-                                    this.totalAmountCal();
-                                  })
-                                }
-                              }
-                            },
+                            // {
+                            //   key: 'advance_amount',
+                            //   type: 'input',
+                            //   className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                            //   templateOptions: {
+                            //     type: 'number',
+                            //     label: 'Advance amount',
+                            //     placeholder: 'Enter Advance amount'
+                            //   },
+                            //   hooks: {
+                            //     onInit: (field: any) => {
+                            //       if (this.dataToPopulate && this.dataToPopulate.sale_return_order && this.dataToPopulate.sale_return_order.advance_amount && field.formControl) {
+                            //         field.formControl.setValue(this.dataToPopulate.sale_return_order.advance_amount);
+                            //       }
+                            //       field.formControl.valueChanges.subscribe(data => {
+                            //         this.totalAmountCal();
+                            //       })
+                            //     }
+                            //   }
+                            // },
                             {
                               key: 'taxable',
                               type: 'input',
@@ -2035,63 +2001,33 @@ export class SaleReturnsComponent {
                               }
                             },
                             {
-                              key: 'ledger_account',
+                              key: 'order_status',
                               type: 'select',
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
-                                label: 'Ledger account',
-                                placeholder: 'Select Ledger account',
-                                dataKey: 'ledger_account_id', // Assuming ledger_account_id is the key for the selected value
-                                dataLabel: 'name',
+                                label: 'Order status',
+                                dataKey: 'order_status_id',
+                                dataLabel: 'status_name',
+                                placeholder: 'Select Order status type',
                                 lazy: {
-                                  url: 'customers/ledger_accounts/',
+                                  url: 'masters/order_status/',
                                   lazyOneTime: true
-                                }
+                                },
+                                expressions: {
+                                  hide: '!model.sale_return_order_id',
+                                },
                               },
                               hooks: {
-                                onInit: (field: any) => {
-                                  // Subscribe to value changes
+                                onChanges: (field: any) => {
                                   field.formControl.valueChanges.subscribe(data => {
-                                    if (data && data.ledger_account_id) {
-                                      this.formConfig.model['sale_return_order']['ledger_account_id'] = data.ledger_account_id; // Update the model with the selected ledger_account_id
+                                    //console.log("ledger_account", data);
+                                    if (data && data.order_status_id) {
+                                      this.formConfig.model['sale_return_order']['order_status_id'] = data.order_status_id;
                                     }
                                   });
-                                  // Set the default value for Ledger Account if it exists
-                                  if (this.dataToPopulate && this.dataToPopulate.sale_return_order.ledger_account && field.formControl) {
-                                    const LedgerField = this.dataToPopulate.sale_return_order.ledger_account
-                                    field.formControl.setValue(LedgerField);
-                                  }
                                 }
                               }
                             },
-                            // {
-                            //   key: 'order_status',
-                            //   type: 'select',
-                            //   className: 'col-md-4 col-lg-3 col-sm-6 col-12',
-                            //   templateOptions: {
-                            //     label: 'Order status',
-                            //     dataKey: 'order_status_id',
-                            //     dataLabel: 'status_name',
-                            //     placeholder: 'Select Order status type',
-                            //     lazy: {
-                            //       url: 'masters/order_status/',
-                            //       lazyOneTime: true
-                            //     },
-                            //     expressions: {
-                            //       hide: '!model.sale_return_order_id',
-                            //     },
-                            //   },
-                            //   hooks: {
-                            //     onChanges: (field: any) => {
-                            //       field.formControl.valueChanges.subscribe(data => {
-                            //         //console.log("ledger_account", data);
-                            //         if (data && data.order_status_id) {
-                            //           this.formConfig.model['sale_return_order']['order_status_id'] = data.order_status_id;
-                            //         }
-                            //       });
-                            //     }
-                            //   }
-                            // },
                             {
                               key: 'item_value',
                               type: 'input',

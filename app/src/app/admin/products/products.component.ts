@@ -88,6 +88,7 @@ export class ProductsComponent implements OnInit {
           alert('An error occurred while creating the record.');
         }
       });
+      this.ngOnInit();
   };
 
   updateProducts() {
@@ -220,25 +221,25 @@ export class ProductsComponent implements OnInit {
                     required: true,
                   }
                 },
-				{
-				  className: 'col-3',
-				  key: 'code',
-				  type: 'input',
-				  templateOptions: {
-					label: 'Code',
-					placeholder: 'Enter Code',
-					required: true
-				  },
-				  hooks: {
-					onInit: (field: any) => {
-					  this.http.get('masters/generate_order_no/?type=prd').subscribe((res: any) => {
-						if (res && res.data && res.data?.order_number) {
-						  field.formControl.setValue(res.data?.order_number);
-						}
-					  });
-					}
-				  }
-				},
+                {
+                  className: 'col-3',
+                  key: 'code',
+                  type: 'input',
+                  templateOptions: {
+                  label: 'Code',
+                  placeholder: 'Enter Code',
+                  required: true
+                  },
+                  hooks: {
+                  onInit: (field: any) => {
+                    this.http.get('masters/generate_order_no/?type=prd').subscribe((res: any) => {
+                    if (res && res.data && res.data?.order_number) {
+                      field.formControl.setValue(res.data?.order_number);
+                    }
+                    });
+                  }
+                  }
+                },
                 {
                   className: 'col-3',
                   key: 'print_name',
@@ -251,7 +252,7 @@ export class ProductsComponent implements OnInit {
                 },               
                 {
                   className: 'col-3 p-0',
-                  key: 'products',
+                  // key: 'products',
                   fieldGroupClassName: "ant-row row mx-0 mt-2",
                   fieldGroup: [
                     {

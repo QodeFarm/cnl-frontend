@@ -201,7 +201,7 @@ export class VendorsComponent {
                 },
                 {
                   className: 'col-3 p-0',
-                  key: 'vendor_data',
+                  // key: 'vendor_data',
                   fieldGroupClassName: "ant-row row mx-0 mt-2",
                   fieldGroup: [
                     {

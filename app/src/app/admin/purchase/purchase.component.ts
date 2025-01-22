@@ -177,7 +177,7 @@ export class PurchaseComponent {
 
     // to get PurchaseOrder number for save
     this.getOrderNo();
-    this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[7].hide =true;
+    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide =true;
     // console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
   }
 
@@ -260,7 +260,7 @@ export class PurchaseComponent {
 
         this.formConfig.model['purchase_order_id'] = this.PurchaseOrderEditID;
         this.showForm = true;
-        this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[7].hide = false;
+        this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = false;
       }
     });
     this.hide();
@@ -570,25 +570,25 @@ loadQuickpackProducts() {
                     // readonly: true
                   }
                 },
-                // {
-                //   key: 'tax',
-                //   type: 'select',
-                //   className: 'col-2',
-                //   templateOptions: {
-                //     label: 'Tax',
-                //     options: [
-                //       { 'label': "Inclusive", value: 'Inclusive' },
-                //       { 'label': "Exclusive", value: 'Exclusive' }
-                //     ]
-                //   },
-                //   hooks: {
-                //     onInit: (field: any) => {
-                //       if (this.dataToPopulate && this.dataToPopulate.purchase_order_data.tax && field.formControl) {
-                //         field.formControl.setValue(this.dataToPopulate.purchase_order_data.tax);
-                //       }
-                //     }
-                //   }
-                // },
+                {
+                  key: 'tax_type',
+                  type: 'select',
+                  className: 'col-2',
+                  templateOptions: {
+                    label: 'Tax',
+                    options: [
+                      { 'label': "Inclusive", value: 'Inclusive' },
+                      { 'label': "Exclusive", value: 'Exclusive' }
+                    ]
+                  },
+                  hooks: {
+                    onInit: (field: any) => {
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_order_data.tax && field.formControl) {
+                        field.formControl.setValue(this.dataToPopulate.purchase_order_data.tax);
+                      }
+                    }
+                  }
+                },
                 // {
                 //   key: 'remarks',
                 //   type: 'textarea',
@@ -1789,34 +1789,34 @@ loadQuickpackProducts() {
                                 }
                               }
                             },     
-                            // {
-                            //   key: 'order_status',
-                            //   type: 'select',
-                            //   className: 'col-md-4 col-lg-3 col-sm-6 col-12',
-                            //   templateOptions: {
-                            //     label: 'Order status',
-                            //     dataKey: 'order_status_id',
-                            //     dataLabel: 'status_name',
-                            //     placeholder: 'Select Order status type',
-                            //     lazy: {
-                            //       url: 'masters/order_status/',
-                            //       lazyOneTime: true
-                            //     },
-                            //     expressions: {
-                            //       hide: '!model.purchase_order_data_id',
-                            //     },
-                            //   },
-                            //   hooks: {
-                            //     onChanges: (field: any) => {
-                            //       field.formControl.valueChanges.subscribe(data => {
-                            //         //console.log("ledger_account", data);
-                            //         if (data && data.order_status_id) {
-                            //           this.formConfig.model['purchase_order_data']['order_status_id'] = data.order_status_id;
-                            //         }
-                            //       });
-                            //     }
-                            //   }
-                            // },
+                            {
+                              key: 'order_status',
+                              type: 'select',
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                              templateOptions: {
+                                label: 'Order status',
+                                dataKey: 'order_status_id',
+                                dataLabel: 'status_name',
+                                placeholder: 'Select Order status type',
+                                lazy: {
+                                  url: 'masters/order_status/',
+                                  lazyOneTime: true
+                                },
+                                expressions: {
+                                  hide: '!model.purchase_order_data_id',
+                                },
+                              },
+                              hooks: {
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    //console.log("ledger_account", data);
+                                    if (data && data.order_status_id) {
+                                      this.formConfig.model['purchase_order_data']['order_status_id'] = data.order_status_id;
+                                    }
+                                  });
+                                }
+                              }
+                            },
                             {
                               key: 'item_value',
                               type: 'input',

@@ -188,7 +188,9 @@ export class SalesComponent {
 
     // to get SaleOrder number for save 
     this.getOrderNo();
-    this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[8].hide = true;
+    this.formConfig.fields[0].fieldGroup[0].fieldGroup[4].hide = true;
+    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide = true;
+
     // this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[9].hide = true;
     // //console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
   }
@@ -410,7 +412,8 @@ export class SalesComponent {
         this.formConfig.submit.label = 'Update';
         this.formConfig.model['sale_order_id'] = this.SaleOrderEditID;
         this.showForm = true;
-        this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[8].hide = false;
+        this.formConfig.fields[0].fieldGroup[0].fieldGroup[4].hide = false;
+        this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide = false;
         // this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[9].hide = false;
         // Load sale_order_items with selected status
       //   this.saleOrderItems = res.data.sale_order.sale_order_items.map(item => ({
@@ -1423,25 +1426,25 @@ confirmWorkOrder() {
                         readonly: true
                       }
                     },
-                    // {
-                    //   key: 'tax',
-                    //   type: 'select',
-                    //   className: 'col-4',
-                    //   templateOptions: {
-                    //     label: 'Tax',
-                    //     options: [
-                    //       { 'label': "Inclusive", value: 'Inclusive' },
-                    //       { 'label': "Exclusive", value: 'Exclusive' }
-                    //     ]
-                    //   },
-                    //   hooks: {
-                    //     onInit: (field: any) => {
-                    //       if (this.dataToPopulate && this.dataToPopulate.sale_order.tax && field.formControl) {
-                    //         field.formControl.setValue(this.dataToPopulate.sale_order.tax);
-                    //       }
-                    //     }
-                    //   }
-                    // },
+                    {
+                      key: 'tax_type',
+                      type: 'select',
+                      className: 'col-4',
+                      templateOptions: {
+                        label: 'Tax',
+                        options: [
+                          { 'label': "Inclusive", value: 'Inclusive' },
+                          { 'label': "Exclusive", value: 'Exclusive' }
+                        ]
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.sale_order.tax && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.sale_order.tax);
+                          }
+                        }
+                      }
+                    },
                     // {
                     //   key: 'remarks',
                     //   type: 'textarea',

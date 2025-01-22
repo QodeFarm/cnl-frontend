@@ -64,11 +64,11 @@ tableConfig: TaTableConfig = {
       },
       sort: true
     },
-    {
-      fieldKey: 'tax',
-      name: 'Tax',
-      sort: true
-    },
+    // {
+    //   fieldKey: 'tax',
+    //   name: 'Tax',
+    //   sort: true
+    // },
     {
       fieldKey: 'return_reason',
       name: 'Return Reason',
