@@ -18,19 +18,20 @@ export class WorkorderComponent implements OnInit {
   showCreateBomButton = false
   isBomButtonDisabled = false
   showWorkorderList: boolean = false;
-  showForm: boolean = false;
+  showForm: boolean = true;
   WorkOrdrEditID: any;
   WorkOrderBoardView: any; //
   formConfig: TaFormConfig = {};
   @ViewChild(WorkOrderListComponent) WorkOrderListComponent!: WorkOrderListComponent;
+  editMode: boolean = false;
 
   constructor(private http: HttpClient) {}
   
   ngOnInit() {
-    // this.showWorkorderList = false;
-    // this.showForm = false;
+    this.showWorkorderList = false;
+    this.showForm = true;
     this.setFormConfig();
-    this.formConfig.reset.resetFn(this.ngOnInit());
+    // this.formConfig.reset.resetFn(this.ngOnInit());
     
   
     // Check if navigation state contains work order data for editing
@@ -59,9 +60,21 @@ export class WorkorderComponent implements OnInit {
     }
   }
 
+  makeFieldsNotTouchable(indexes: number[]) {
+    indexes.forEach(index => {
+      const field = this.formConfig.fields[0].fieldGroup[index];
+      
+      if (field) {
+        field.templateOptions.disabled = true; // Disable the field
+      }
+    });
+  }
+
   editWorkorder(event: any) {
+    this.editMode = true;
     this.showCreateBomButton = false
     this.hideFields(false); // Shows fields at indexes 5, 4, and 9
+    this.makeFieldsNotTouchable([0, 1, 2]);
     console.log('event', event);
     this.WorkOrdrEditID = event;
     this.http.get('production/work_order/' + event).subscribe((res: any) => {
@@ -112,8 +125,6 @@ export class WorkorderComponent implements OnInit {
             end_date: data.saleOrderDetails.delivery_date || null
         };
     }
-
-    // console.log('Form model after population:', this.formConfig.model);
 }
 
 
@@ -130,7 +141,6 @@ submitWorkOrder() {
 }
 
 populateBom(product_id:any){
-  if (this.formConfig.model.work_order && !this.formConfig.model.work_order.work_order_id) {
     const url = `production/bom/?product_id=${product_id}` // To get 'bom_id', filter by  selected product_id
     let bom_data = {}
     this.http.get(url).subscribe((response: any) => {
@@ -167,7 +177,6 @@ populateBom(product_id:any){
         }
       }
     })
-  }
 };
 
 
@@ -327,7 +336,6 @@ fetchSizeOptions(productId: string, productField: any, lastSelectedSize?: any) {
 // fetch color options based on the selected size
 fetchColorOptions(sizeId: string, productId: string, sizeField: any, lastSelectedColor?: any) {
   let apiUrl = `products/product_variations/?product_id=${productId}&size_id=${sizeId}`;
-  console.log('sizeid', sizeId)
   if (!sizeId) {
     apiUrl = `products/product_variations/?product_id=${productId}&size_isnull=True`;
   }
@@ -412,7 +420,7 @@ curdConfig: TaCurdConfig = {
     pkId: "bom_id",
     exParams: [],
     fields: [{
-      fieldGroupClassName: "row",
+      fieldGroupClassName: "ant-row custom-form-block",
       fieldGroup: [
         {
         key: 'bom_name',
@@ -488,13 +496,14 @@ curdConfig: TaCurdConfig = {
               },
               hooks: {
                 onInit: (field: any) => {
-                  let previousProductId: any = null; // Keep track of the previously selected product ID
+                  // let previousProductId: any = null; // Keep track of the previously selected product ID                  
                   field.formControl.valueChanges.subscribe((data: any) => {
-                    // const product = field.formControl.value;
-                    this.populateBom(data)
+                    if (!this.editMode) {
+                      this.populateBom(data);
+                    }
                     if (this.formConfig && this.formConfig.model && this.formConfig.model['work_order']) {
                       this.formConfig.model['work_order']['product_id'] = data;
-
+            
                       if (data) {
                         const lastSelectedSize = this.formConfig.model.work_order.size_id;
                         this.fetchSizeOptions(data, field, lastSelectedSize);
@@ -508,14 +517,13 @@ curdConfig: TaCurdConfig = {
                       //   this.clearSize(field);
                       //   previousProductId = data; // Update the previously selected product ID
                       // }
-
                     } else {
                       console.error('Form config or work_order data model is not defined.');
                     }
                   });
                 }
               }
-            },
+            },            
             {
               key: 'size',
               type: 'select',
