@@ -710,12 +710,12 @@ export class SaleReturnsComponent {
                         if (data && data.customer_id) {
                           this.formConfig.model['sale_return_order']['customer_id'] = data.customer_id;
                         }
-                        // if (data.customer_addresses && data.customer_addresses.billing_address) {
-                        //   field.form.controls.billing_address.setValue(data.customer_addresses.billing_address)
-                        // }
-                        // if (data.customer_addresses && data.customer_addresses.shipping_address) {
-                        //   field.form.controls.shipping_address.setValue(data.customer_addresses.shipping_address)
-                        // }
+                        if (data.customer_addresses && data.customer_addresses.billing_address) {
+                          field.form.controls.billing_address.setValue(data.customer_addresses.billing_address)
+                        }
+                        if (data.customer_addresses && data.customer_addresses.shipping_address) {
+                          field.form.controls.shipping_address.setValue(data.customer_addresses.shipping_address)
+                        }
                         if (data.email) {
                           field.form.controls.email.setValue(data.email)
                         }
@@ -725,16 +725,6 @@ export class SaleReturnsComponent {
                       }
                     }
                   }
-                },
-                {
-                  key: 'email',
-                  type: 'input',
-                  className: 'col-md-4 col-sm-6 col-12',
-                  templateOptions: {
-                    type: 'input',
-                    label: 'Email',
-                    placeholder: 'Enter Email'
-                  },
                 },
                 {
                   key: 'return_no',
@@ -758,24 +748,7 @@ export class SaleReturnsComponent {
                     label: 'Return Date',
                     required: true
                   }
-                },
-                // {
-                //   key: 'ref_no',
-                //   type: 'input',
-                //   className: 'col-4',
-                //   templateOptions: {
-                //     type: 'input',
-                //     label: 'Ref No',
-                //     placeholder: 'Enter Ref No'
-                //   },
-                //   hooks: {
-                //     onInit: (field: any) => {
-                //       if (this.dataToPopulate && this.dataToPopulate.sale_return_order.ref_no && field.formControl) {
-                //         field.formControl.setValue(this.dataToPopulate.sale_return_order.ref_no);
-                //       }
-                //     }
-                //   }
-                // },
+                }, 
                 {
                   key: 'ref_date',
                   type: 'date',
@@ -788,48 +761,53 @@ export class SaleReturnsComponent {
                     readonly: true
                   }
                 },
-                // {
-                //   key: 'against_bill',
-                //   type: 'input',
-                //   className: 'col-md-4 col-sm-6 col-12',
-                //   templateOptions: {
-                //     type: 'input',
-                //     label: 'Against bill',
-                //     placeholder: 'Enter Against bill',
-                //     required: false
-                //   }
-                // },
-                // {
-                //   key: 'against_bill_date',
-                //   type: 'date',
-                //   defaultValue: this.nowDate(),
-                //   className: 'col-md-4 col-sm-6 col-12',
-                //   templateOptions: {
-                //     type: 'date',
-                //     label: 'Against bill date',
-                //     placeholder: 'Select Against bill date',
-                //     required: false
-                //   }
-                // },
-                // {
-                //   key: 'tax',
-                //   type: 'select',
-                //   className: 'col-4',
-                //   templateOptions: {
-                //     label: 'Tax',
-                //     options: [
-                //       { 'label': "Inclusive", value: 'Inclusive' },
-                //       { 'label': "Exclusive", value: 'Exclusive' }
-                //     ]
-                //   },
-                //   hooks: {
-                //     onInit: (field: any) => {
-                //       if (this.dataToPopulate && this.dataToPopulate.sale_return_order.tax && field.formControl) {
-                //         field.formControl.setValue(this.dataToPopulate.sale_return_order.tax);
-                //       }
-                //     }
-                //   }
-                // },
+                {
+                  key: 'against_bill_date',
+                  type: 'date',
+                  defaultValue: this.nowDate(),
+                  className: 'col-4',
+                  templateOptions: {
+                    type: 'date',
+                    label: 'Against bill date',
+                    placeholder: 'Select Against bill date',
+                  }
+                },
+                {
+                  key: 'ref_no',
+                  type: 'input',
+                  className: 'col-4',
+                  templateOptions: {
+                    type: 'input',
+                    label: 'Ref No',
+                    placeholder: 'Enter Ref No'
+                  },
+                  hooks: {
+                    onInit: (field: any) => {
+                      if (this.dataToPopulate && this.dataToPopulate.sale_return_order.ref_no && field.formControl) {
+                        field.formControl.setValue(this.dataToPopulate.sale_return_order.ref_no);
+                      }
+                    }
+                  }
+                },
+                {
+                  key: 'tax_type',
+                  type: 'select',
+                  className: 'col-4',
+                  templateOptions: {
+                    label: 'Tax',
+                    options: [
+                      { 'label': "Inclusive", value: 'Inclusive' },
+                      { 'label': "Exclusive", value: 'Exclusive' }
+                    ]
+                  },
+                  hooks: {
+                    onInit: (field: any) => {
+                      if (this.dataToPopulate && this.dataToPopulate.sale_return_order.tax && field.formControl) {
+                        field.formControl.setValue(this.dataToPopulate.sale_return_order.tax);
+                      }
+                    }
+                  }
+                },
                 {
                   key: 'return_option',
                   type: 'select',
@@ -854,15 +832,14 @@ export class SaleReturnsComponent {
                       });
                     }
                   }
-                }, 
+                },
                 {
                   key: 'return_reason',
                   type: 'textarea',
-                  className: 'col-8',
+                  className: 'col-6',
                   templateOptions: {
                     label: 'Return Reason',
                     placeholder: 'Enter Return Reason',
-                    required: true
                   }
                 },
                 // {
@@ -881,24 +858,6 @@ export class SaleReturnsComponent {
                 //     }
                 //   }
                 // },
-                // {
-                //   key: 'billing_address',
-                //   type: 'textarea',
-                //   className: 'col-4',
-                //   templateOptions: {
-                //     label: 'Billing address',
-                //     placeholder: 'Enter Billing address'
-                //   },
-                // },
-                // {
-                //   key: 'shipping_address',
-                //   type: 'textarea',
-                //   className: 'col-4',
-                //   templateOptions: {
-                //     label: 'Shipping address',
-                //     placeholder: 'Enter Shipping address'
-                //   },
-                // },  
               ]
             },
             {
@@ -910,11 +869,21 @@ export class SaleReturnsComponent {
                   type: 'text',
                   className: 'col-12',
                   templateOptions: {
-                    label: 'Sub Total',
+                    label: 'Items Total',
                     disabled: true,
                   },
                   defaultValue: '0.00'
                 },
+                // {
+                //   key: 'texable_amt',
+                //   type: 'text',
+                //   className: 'col-12',
+                //   templateOptions: {
+                //     label: 'Texable Amt',
+                //     required: false,                    
+                //   },
+                //   defaultValue: '0.00'
+                // },
                 {
                   key: 'cess_amount',
                   type: 'text',
@@ -935,6 +904,37 @@ export class SaleReturnsComponent {
                   },
                   defaultValue: '0.00',
                 },
+                // {
+                //   key: 'item_value',
+                //   type: 'text',
+                //   className: 'col-12',
+                //   templateOptions: {
+                //     label: 'Total Value',
+                //      required: false
+                //   },
+                //      defaultValue: '0.00'
+                // },
+                {
+                  key: 'dis_amt',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Discount Amount',
+                    required: false
+                  },
+                  defaultValue: '0.00'
+
+                },
+                // {
+                //   key: 'advance_amount',
+                //   type: 'text',
+                //   className: 'col-12',
+                //   templateOptions: {
+                //     label: 'Advance Amount',
+                //     required: false
+                //   },
+                //   defaultValue: '0.00'
+                // },
                 {
                   key: 'total_amount',
                   type: 'text',
@@ -942,6 +942,7 @@ export class SaleReturnsComponent {
                   templateOptions: {
                     label: ' ',
                     required: false,
+                    placeholder: 'Total Amount',
                     disabled: true,
                   },
                   defaultValue: '0.00'
@@ -953,7 +954,7 @@ export class SaleReturnsComponent {
         {
           key: 'sale_return_items',
           type: 'repeat',
-          className: 'custom-form-list new-items-list',
+          className: 'custom-form-list',
           templateOptions: {
             // title: 'Products',
             addText: 'Add Product',
@@ -1028,9 +1029,9 @@ export class SaleReturnsComponent {
                   dataKey: 'product_id',
                   hideLabel: true,
                   dataLabel: 'name',
+                  placeholder: 'product',
                   options: [],
                   required: true,
-                  placeholder: 'Select Product',
                   lazy: {
                     url: 'products/products/?summary=true',
                     lazyOneTime: true
@@ -1226,9 +1227,9 @@ export class SaleReturnsComponent {
                   dataKey: 'size_id',
                   hideLabel: true,
                   dataLabel: 'size_name',
+                  placeholder: 'size',
                   options: [],
                   required: false,
-                  placeholder: 'Select Size',
                   lazy: {
                     lazyOneTime: true
                   }
@@ -1354,9 +1355,9 @@ export class SaleReturnsComponent {
                   dataKey: 'color_id',
                   hideLabel: true,
                   dataLabel: 'color_name',
+                  placeholder: 'color',
                   options: [],
                   required: false,
-                  placeholder: 'Select Color',
                   lazy: {
                     lazyOneTime: true
                   }
@@ -1457,7 +1458,7 @@ export class SaleReturnsComponent {
                 key: 'code',
                 templateOptions: {
                   label: 'Code',
-                  placeholder: 'Enter code',
+                  placeholder: 'code',
                   hideLabel: true,
                 },
                 hooks: {
@@ -1487,7 +1488,7 @@ export class SaleReturnsComponent {
                 templateOptions: {
                   type: 'number',
                   label: 'Total Boxes',
-                  placeholder: 'Enter Total Boxes',
+                  placeholder: 'Boxes',
                   hideLabel: true
                 },
                 hooks: {
@@ -1516,7 +1517,7 @@ export class SaleReturnsComponent {
                 key: 'unit_options_id',
                 templateOptions: {
                   label: 'Unit',
-                  placeholder: 'Select Unit',
+                  placeholder: 'Unit',
                   hideLabel: true,
                   dataLabel: 'unit_name',
                   dataKey: 'unit_options_id',
@@ -1555,7 +1556,7 @@ export class SaleReturnsComponent {
                 templateOptions: {
                   type: 'number',
                   label: 'Qty',
-                  placeholder: 'Enter Qty',
+                  placeholder: 'Qty',
                   min: 1,
                   hideLabel: true,
                   required: true
@@ -1686,7 +1687,7 @@ export class SaleReturnsComponent {
                 templateOptions: {
                   type: 'number',
                   label: 'Amount',
-                  placeholder: 'Enter Amount',
+                  placeholder: 'Amount',
                   hideLabel: true,
                   disabled: true
                 },
@@ -1719,7 +1720,7 @@ export class SaleReturnsComponent {
                 key: 'print_name',
                 templateOptions: {
                   label: 'Print name',
-                  placeholder: 'Enter Product Print name',
+                  placeholder: 'name',
                   hideLabel: true
                 },
                 hooks: {
@@ -1845,19 +1846,23 @@ export class SaleReturnsComponent {
                           key: 'sale_return_order',
                           fieldGroup: [
                             {
-                              key: 'total_boxes',
+                              key: 'tax_amount',
                               type: 'input',
+                              defaultValue: "0",
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 type: 'number',
-                                label: 'Total boxes',
-                                placeholder: 'Enter Total boxes'
+                                label: 'Tax amount',
+                                placeholder: 'Enter Tax amount'
                               },
                               hooks: {
                                 onInit: (field: any) => {
-                                  if (this.dataToPopulate && this.dataToPopulate.sale_return_order && this.dataToPopulate.sale_return_order.total_boxes && field.formControl) {
-                                    field.formControl.setValue(this.dataToPopulate.sale_return_order.total_boxes);
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_return_order && this.dataToPopulate.sale_return_order.tax_amount && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.sale_return_order.tax_amount);
                                   }
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    this.totalAmountCal();
+                                  })
                                 }
                               }
                             },
@@ -1883,26 +1888,26 @@ export class SaleReturnsComponent {
                                 }
                               }
                             },
-                            // {
-                            //   key: 'advance_amount',
-                            //   type: 'input',
-                            //   className: 'col-md-4 col-lg-3 col-sm-6 col-12',
-                            //   templateOptions: {
-                            //     type: 'number',
-                            //     label: 'Advance amount',
-                            //     placeholder: 'Enter Advance amount'
-                            //   },
-                            //   hooks: {
-                            //     onInit: (field: any) => {
-                            //       if (this.dataToPopulate && this.dataToPopulate.sale_return_order && this.dataToPopulate.sale_return_order.advance_amount && field.formControl) {
-                            //         field.formControl.setValue(this.dataToPopulate.sale_return_order.advance_amount);
-                            //       }
-                            //       field.formControl.valueChanges.subscribe(data => {
-                            //         this.totalAmountCal();
-                            //       })
-                            //     }
-                            //   }
-                            // },
+                            {
+                              key: 'advance_amount',
+                              type: 'input',
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                              templateOptions: {
+                                type: 'number',
+                                label: 'Advance amount',
+                                placeholder: 'Enter Advance amount'
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_return_order && this.dataToPopulate.sale_return_order.advance_amount && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.sale_return_order.advance_amount);
+                                  }
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    this.totalAmountCal();
+                                  })
+                                }
+                              }
+                            },
                             {
                               key: 'taxable',
                               type: 'input',
@@ -1917,27 +1922,6 @@ export class SaleReturnsComponent {
                                   if (this.dataToPopulate && this.dataToPopulate.sale_return_order && this.dataToPopulate.sale_return_order.taxable && field.formControl) {
                                     field.formControl.setValue(this.dataToPopulate.sale_return_order.taxable);
                                   }
-                                }
-                              }
-                            },
-                            {
-                              key: 'tax_amount',
-                              type: 'input',
-                              defaultValue: "0",
-                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
-                              templateOptions: {
-                                type: 'number',
-                                label: 'Tax amount',
-                                placeholder: 'Enter Tax amount'
-                              },
-                              hooks: {
-                                onInit: (field: any) => {
-                                  if (this.dataToPopulate && this.dataToPopulate.sale_return_order && this.dataToPopulate.sale_return_order.tax_amount && field.formControl) {
-                                    field.formControl.setValue(this.dataToPopulate.sale_return_order.tax_amount);
-                                  }
-                                  field.formControl.valueChanges.subscribe(data => {
-                                    this.totalAmountCal();
-                                  })
                                 }
                               }
                             },
@@ -2001,6 +1985,36 @@ export class SaleReturnsComponent {
                               }
                             },
                             {
+                              key: 'ledger_account',
+                              type: 'select',
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                              templateOptions: {
+                                label: 'Ledger account',
+                                placeholder: 'Select Ledger account',
+                                dataKey: 'ledger_account_id', // Assuming ledger_account_id is the key for the selected value
+                                dataLabel: 'name',
+                                lazy: {
+                                  url: 'customers/ledger_accounts/',
+                                  lazyOneTime: true
+                                }
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  // Subscribe to value changes
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    if (data && data.ledger_account_id) {
+                                      this.formConfig.model['sale_return_order']['ledger_account_id'] = data.ledger_account_id; // Update the model with the selected ledger_account_id
+                                    }
+                                  });
+                                  // Set the default value for Ledger Account if it exists
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_return_order.ledger_account && field.formControl) {
+                                    const LedgerField = this.dataToPopulate.sale_return_order.ledger_account
+                                    field.formControl.setValue(LedgerField);
+                                  }
+                                }
+                              }
+                            },
+                            {
                               key: 'order_status',
                               type: 'select',
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
@@ -2028,27 +2042,27 @@ export class SaleReturnsComponent {
                                 }
                               }
                             },
-                            {
-                              key: 'item_value',
-                              type: 'input',
-                              defaultValue: "0",
-                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
-                              templateOptions: {
-                                type: 'input',
-                                label: 'Items value',
-                                placeholder: 'Enter Item value',
-                                readonly: true
-                                // required: true
-                              },
-                              hooks: {
-                                onInit: (field: any) => {
-                                  // Set the initial value from dataToPopulate if available
-                                  if (this.dataToPopulate && this.dataToPopulate.sale_return_order && this.dataToPopulate.sale_return_order.item_value && field.formControl) {
-                                    field.formControl.setValue(this.dataToPopulate.sale_return_order.item_value);
-                                  }
-                                }
-                              }
-                            },
+                            // {
+                            //   key: 'item_value',
+                            //   type: 'input',
+                            //   defaultValue: "0",
+                            //   className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                            //   templateOptions: {
+                            //     type: 'input',
+                            //     label: 'Items value',
+                            //     placeholder: 'Enter Item value',
+                            //     readonly: true
+                            //     // required: true
+                            //   },
+                            //   hooks: {
+                            //     onInit: (field: any) => {
+                            //       // Set the initial value from dataToPopulate if available
+                            //       if (this.dataToPopulate && this.dataToPopulate.sale_return_order && this.dataToPopulate.sale_return_order.item_value && field.formControl) {
+                            //         field.formControl.setValue(this.dataToPopulate.sale_return_order.item_value);
+                            //       }
+                            //     }
+                            //   }
+                            // },
                             {
                               key: 'dis_amt',
                               type: 'input',
@@ -2056,9 +2070,9 @@ export class SaleReturnsComponent {
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 type: 'input',
-                                label: 'Discount amount',
+                                label: 'Overall Discount',
                                 placeholder: 'Enter Discount amount',
-                                readonly: true
+                                readonly: false
                                 // required: true
                               },
                               hooks: {
@@ -2320,7 +2334,53 @@ export class SaleReturnsComponent {
                   ]
                 }
               ]
-            }
+            },
+            {
+              className: 'col-12 custom-form-card-block px-0 pt-3',
+              props: {
+                label: 'Customer Details'
+              },
+              fieldGroup: [
+                // {
+                //   template: '<div class="custom-form-card-title">   </div>',
+                //   fieldGroupClassName: "ant-row",
+                // },
+                {
+                  fieldGroupClassName: "ant-row",
+                  key: 'sale_return_order',
+                  fieldGroup: [
+                    {
+                      key: 'email',
+                      type: 'input',
+                      className: 'col-md-4 col-sm-6 col-12',
+                      templateOptions: {
+                        type: 'input',
+                        label: 'Email',
+                        placeholder: 'Enter Email'
+                      },
+                    },
+                    {
+                      key: 'billing_address',
+                      type: 'textarea',
+                      className: 'col-4',
+                      templateOptions: {
+                        label: 'Billing address',
+                        placeholder: 'Enter Billing address'
+                      },
+                    },
+                    {
+                      key: 'shipping_address',
+                      type: 'textarea',
+                      className: 'col-4',
+                      templateOptions: {
+                        label: 'Shipping address',
+                        placeholder: 'Enter Shipping address'
+                      },
+                    },
+                  ]
+                },
+              ]
+            },
           ]
         }
       ]

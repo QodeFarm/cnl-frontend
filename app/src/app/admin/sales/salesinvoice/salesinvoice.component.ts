@@ -105,49 +105,49 @@ export class SalesinvoiceComponent {
 
   // Method to open the copy modal and populate dropdown
   openCopyModal() {
-      this.availableTables = this.tables.filter(table => table !== this.currentTable);
+    this.availableTables = this.tables.filter(table => table !== this.currentTable);
   }
 
 
   copyToTable() {
     const selectedMapping = this.fieldMapping[this.selectedTable];
-    
+
     if (!selectedMapping) {
       console.error('Mapping not found for selected table:', this.selectedTable);
       return;
     }
-  
+
     const dataToCopy = this.formConfig.model[selectedMapping.sourceModel] || {};
     const populatedData = { [selectedMapping.targetModel]: {} };
-  
+
     // Copy main fields
     Object.keys(dataToCopy).forEach(field => {
       populatedData[selectedMapping.targetModel][field] = dataToCopy[field];
     });
-  
+
     // Copy nested models if they exist
     if (selectedMapping.nestedModels) {
       Object.keys(selectedMapping.nestedModels).forEach(sourceNestedModel => {
         const targetNestedModel = selectedMapping.nestedModels[sourceNestedModel];
         const nestedData = this.formConfig.model[sourceNestedModel] || [];
-        
+
         populatedData[targetNestedModel] = Array.isArray(nestedData)
           ? nestedData.map(item => ({ ...item }))
           : { ...nestedData };
       });
     }
-  
+
     // Log and navigate to the target module with populated data
     console.log('Populated Data:', populatedData);
-    
+
     // Determine the target route based on the selected table
-    const targetRoute = 
+    const targetRoute =
       this.selectedTable === 'Sale Order' ? 'sales' :
-      this.selectedTable === 'Sale Return' ? 'sales/sale-returns' :
-      this.selectedTable === 'Purchase Order' ? 'purchase' :
-      this.selectedTable === 'Purchase Invoice' ? 'purchase/purchase-invoice' :
-      this.selectedTable === 'Purchase Return' ? 'purchase/purchasereturns' :
-      null;
+        this.selectedTable === 'Sale Return' ? 'sales/sale-returns' :
+          this.selectedTable === 'Purchase Order' ? 'purchase' :
+            this.selectedTable === 'Purchase Invoice' ? 'purchase/purchase-invoice' :
+              this.selectedTable === 'Purchase Return' ? 'purchase/purchasereturns' :
+                null;
 
     if (!targetRoute) {
       console.error('No valid route for selected table:', this.selectedTable);
@@ -164,12 +164,12 @@ export class SalesinvoiceComponent {
     private route: ActivatedRoute,
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   dataToPopulate: any;
   salesInvoiceForm: FormGroup;
 
-  ngOnInit() {    
+  ngOnInit() {
     this.showSaleInvoiceList = false;
     this.showForm = true;
     this.SaleInvoiceEditID = null;
@@ -181,23 +181,23 @@ export class SalesinvoiceComponent {
 
     // To get SaleInvoice number for save
     this.getInvoiceNo();
-    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide = true;
+    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = true;
   }
 
   checkAndPopulateData() {
     // Check if data has already been populated
     if (this.dataToPopulate === undefined) {
       this.route.paramMap.subscribe(params => {
-        this.dataToPopulate = history.state.data; 
+        this.dataToPopulate = history.state.data;
         console.log('Data retrieved:', this.dataToPopulate);
-        
+
         // Populate the form only if data exists
         if (this.dataToPopulate) {
           const saleInvoiceItems = this.dataToPopulate.sale_invoice_items || [];
-  
+
           // Clear existing sale_invoice_items to avoid duplicates
           this.formConfig.model.sale_invoice_items = [];
-  
+
           // Populate form with data, ensuring unique entries
           saleInvoiceItems.forEach(item => {
             const populatedItem = {
@@ -218,22 +218,22 @@ export class SalesinvoiceComponent {
         }
       });
     } else {
-    // Detect if the page was refreshed
+      // Detect if the page was refreshed
       const wasPageRefreshed = window.performance?.navigation?.type === window.performance?.navigation?.TYPE_RELOAD;
-    
+
       // Clear data if the page was refreshed
       if (wasPageRefreshed) {
         this.dataToPopulate = undefined;
         console.log("Page was refreshed, clearing data.");
-        
+
         // Ensure the history state is cleared to prevent repopulation
         history.replaceState(null, '');
         return; // Stop further execution as we don't want to repopulate the form
       }
     }
-  }  
+  }
 
-//COPY PART END -------------------------------------------------------------
+  //COPY PART END -------------------------------------------------------------
 
   formConfig: TaFormConfig = {};
 
@@ -258,7 +258,7 @@ export class SalesinvoiceComponent {
         // show form after setting form values
         this.formConfig.model['sale_invoice_id'] = this.SaleInvoiceEditID;
         this.showForm = true;
-        this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide = false;
+        this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = false;
       }
     });
     this.hide();
@@ -378,8 +378,8 @@ export class SalesinvoiceComponent {
     console.log("saleOrderId : ", saleOrderId)
     console.log("order : ", order);
     if (!saleOrderId) {
-        console.error('Invalid saleOrderId:', saleOrderId);
-        return;
+      console.error('Invalid saleOrderId:', saleOrderId);
+      return;
     }
     // Fetch sale invoice details using the saleInvoiceId
     this.http.get(`sales/sale_order/${saleOrderId}`).subscribe((res: any) => {
@@ -537,60 +537,60 @@ export class SalesinvoiceComponent {
   ngOnDestroy() {
     document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
   }
-//=====================================================
-quickpackOptions: any[] = []; // To store available Quickpack options
-selectedQuickpack: string = ''; // Selected Quickpack value
+  //=====================================================
+  quickpackOptions: any[] = []; // To store available Quickpack options
+  selectedQuickpack: string = ''; // Selected Quickpack value
 
-loadQuickpackOptions() {
-  console.log("We are in method...")
-  this.http.get('sales/quick_pack/') // Replace with your API endpoint
-    .subscribe((response: any) => {
-      this.quickpackOptions = response.data || []; // Adjust based on API response
-      console.log("quickpackOptions : ", this.quickpackOptions);
-    });
-}
-
-
-loadQuickpackProducts() {
-  console.log("quick pack id : ", this.selectedQuickpack)
-  if (!this.selectedQuickpack) {
-    console.log('Please select a Quickpack!');
-    return;
+  loadQuickpackOptions() {
+    console.log("We are in method...")
+    this.http.get('sales/quick_pack/') // Replace with your API endpoint
+      .subscribe((response: any) => {
+        this.quickpackOptions = response.data || []; // Adjust based on API response
+        console.log("quickpackOptions : ", this.quickpackOptions);
+      });
   }
 
-  this.http.get(`sales/quick_pack/${this.selectedQuickpack}`)
-    .subscribe((response: any) => {
-      console.log("response : ", response.data.quick_pack_data_items);
-      const quickPackDataItems = response.data.quick_pack_data_items || [];
 
-      if (quickPackDataItems.length === 0) {
-        console.log('No items found in the selected Quickpack!');
-        return;
-      }
-      // Populate `sale_order_items` with Quickpack data
-      this.formConfig.model.sale_invoice_items = quickPackDataItems.map((item: any) => ({
-        product: item.product,
-        quantity: item.quantity,
-        size: item.size,
-        color: item.color,
-        print_name: item.product.print_name,
-        rate: item.product.mrp,
-        discount: item.product.dis_amount,
-        unit_options_id: item.product.unit_options
+  loadQuickpackProducts() {
+    console.log("quick pack id : ", this.selectedQuickpack)
+    if (!this.selectedQuickpack) {
+      console.log('Please select a Quickpack!');
+      return;
+    }
 
-      }));
+    this.http.get(`sales/quick_pack/${this.selectedQuickpack}`)
+      .subscribe((response: any) => {
+        console.log("response : ", response.data.quick_pack_data_items);
+        const quickPackDataItems = response.data.quick_pack_data_items || [];
 
-      // Trigger form change detection (if needed)
-      if (this.saleinvoiceForm) {
-        console.log("we are inside : ", this.saleinvoiceForm.form);
-        this.saleinvoiceForm.form.controls.sale_invoice_items.patchValue(this.formConfig.model.sale_invoice_items);
-        console.log("After method ...")
-      }
+        if (quickPackDataItems.length === 0) {
+          console.log('No items found in the selected Quickpack!');
+          return;
+        }
+        // Populate `sale_order_items` with Quickpack data
+        this.formConfig.model.sale_invoice_items = quickPackDataItems.map((item: any) => ({
+          product: item.product,
+          quantity: item.quantity,
+          size: item.size,
+          color: item.color,
+          print_name: item.product.print_name,
+          rate: item.product.mrp,
+          discount: item.product.dis_amount,
+          unit_options_id: item.product.unit_options
 
-      console.log('Sale Order Items populated:', this.formConfig.model.sale_invoice_items);
-    });
-}
-//=====================================================
+        }));
+
+        // Trigger form change detection (if needed)
+        if (this.saleinvoiceForm) {
+          console.log("we are inside : ", this.saleinvoiceForm.form);
+          this.saleinvoiceForm.form.controls.sale_invoice_items.patchValue(this.formConfig.model.sale_invoice_items);
+          console.log("After method ...")
+        }
+
+        console.log('Sale Order Items populated:', this.formConfig.model.sale_invoice_items);
+      });
+  }
+  //=====================================================
   setFormConfig() {
     this.SaleInvoiceEditID = null;
 
@@ -628,7 +628,7 @@ loadQuickpackProducts() {
         }
       },
       model: {
-        sale_invoice_order: {        
+        sale_invoice_order: {
           // customer_id: null,
         },
         sale_invoice_items: [{}],
@@ -688,57 +688,18 @@ loadQuickpackProducts() {
                         if (data && data.customer_id) {
                           this.formConfig.model['sale_invoice_order']['customer_id'] = data.customer_id;
                         }
-                        // if (data.customer_addresses && data.customer_addresses.billing_address) {
-                        //   field.form.controls.billing_address.setValue(data.customer_addresses.billing_address)
-                        // }
-                        // if (data.customer_addresses && data.customer_addresses.shipping_address) {
-                        //   field.form.controls.shipping_address.setValue(data.customer_addresses.shipping_address)
-                        // }
+                        if (data.customer_addresses && data.customer_addresses.billing_address) {
+                          field.form.controls.billing_address.setValue(data.customer_addresses.billing_address)
+                        }
+                        if (data.customer_addresses && data.customer_addresses.shipping_address) {
+                          field.form.controls.shipping_address.setValue(data.customer_addresses.shipping_address)
+                        }
                         if (data.email) {
                           field.form.controls.email.setValue(data.email)
                         }
                       });
                       if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.customer && field.formControl) {
                         field.formControl.setValue(this.dataToPopulate.sale_invoice_order.customer);
-                      }
-                    }
-                  }
-                },
-                {
-                  key: 'email',
-                  type: 'input',
-                  className: 'col-md-4 col-sm-6 col-12',
-                  templateOptions: {
-                    type: 'input',
-                    label: 'Email',
-                    placeholder: 'Enter Email'
-                  },
-                },
-
-                {
-                  key: 'orders_salesman',
-                  type: 'select',
-                  className: 'col-md-4 col-sm-6 col-12',
-                  templateOptions: {
-                    label: 'Order Salesman',
-                    dataKey: 'order_salesman_id',
-                    dataLabel: "name",
-                    options: [],
-                    lazy: {
-                      url: 'masters/orders_salesman/',
-                      lazyOneTime: true
-                    },
-                    //required: true,
-                  },
-                  hooks: {
-                    onChanges: (field: any) => {
-                      field.formControl.valueChanges.subscribe(data => {
-                        if (data && data.order_salesman_id) {
-                          this.formConfig.model['sale_invoice_order']['order_salesman_id'] = data.order_salesman_id;
-                        }
-                      });
-                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order?.orders_salesman) {
-                        field.formControl.setValue(this.dataToPopulate.sale_invoice_order.orders_salesman);
                       }
                     }
                   }
@@ -759,18 +720,6 @@ loadQuickpackProducts() {
                     onInit: (field: any) => { }
                   }
                 },
-                // {
-                //   key: 'delivery_date',
-                //   type: 'date',
-                //   defaultValue: this.nowDate(),
-                //   className: 'col-md-4 col-sm-6 col-12',
-                //   templateOptions: {
-                //     type: 'date',
-                //     label: 'Delivery date',
-                //     readonly: true,
-                //     required: true
-                //   }
-                // },
                 {
                   key: 'invoice_date',
                   type: 'date',
@@ -783,23 +732,6 @@ loadQuickpackProducts() {
                     required: true
                   }
                 },
-                 {
-                    key: 'ref_no',
-                    type: 'input',
-                    className: 'col-md-4 col-sm-6 col-12',
-                    templateOptions: {
-                     type: 'input',
-                     label: 'Ref No',
-                     placeholder: 'Enter Ref No'
-                   },
-                     hooks: {
-                     onInit: (field: any) => {
-                       if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.ref_no && field.formControl) {
-                         field.formControl.setValue(this.dataToPopulate.sale_invoice_order.ref_no);
-                       }
-                    }
-                  }
-                 },
                 {
                   key: 'ref_date',
                   type: 'date',
@@ -810,6 +742,34 @@ loadQuickpackProducts() {
                     label: 'Ref date',
                     placeholder: 'Select Ref date',
                     readonly: true
+                  }
+                },
+                {
+                  key: 'due_date',
+                  type: 'date',
+                  defaultValue: this.nowDate(),
+                  className: 'col-4',
+                  templateOptions: {
+                    type: 'date',
+                    label: 'Due Date',
+                    readonly: true
+                  }
+                },
+                {
+                  key: 'ref_no',
+                  type: 'input',
+                  className: 'col-4',
+                  templateOptions: {
+                    type: 'input',
+                    label: 'Ref No',
+                    placeholder: 'Enter Ref No'
+                  },
+                  hooks: {
+                    onInit: (field: any) => {
+                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.ref_no && field.formControl) {
+                        field.formControl.setValue(this.dataToPopulate.sale_invoice_order.ref_no);
+                      }
+                    }
                   }
                 },
                 {
@@ -831,40 +791,22 @@ loadQuickpackProducts() {
                     }
                   }
                 },
-                // {
-                //   key: 'remarks',
-                //   type: 'textarea',
-                //   className: 'col-4',
-                //   templateOptions: {
-                //     label: 'Remarks',
-                //     placeholder: 'Enter Remarks',
-                //   },
-                //   hooks: {
-                //     onInit: (field: any) => {
-                //       if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.remarks && field.formControl) {
-                //         field.formControl.setValue(this.dataToPopulate.sale_invoice_order.remarks);
-                //       }
-                //     }
-                //   }
-                // },
-                // {
-                //   key: 'billing_address',
-                //   type: 'textarea',
-                //   className: 'col-4',
-                //   templateOptions: {
-                //     label: 'Billing address',
-                //     placeholder: 'Enter Billing address'
-                //   },
-                // },
-                // {
-                //   key: 'shipping_address',
-                //   type: 'textarea',
-                //   className: 'col-4',
-                //   templateOptions: {
-                //     label: 'Shipping address',
-                //     placeholder: 'Enter Shipping address'
-                //   },
-                // },  
+                {
+                  key: 'remarks',
+                  type: 'textarea',
+                  className: 'col-4',
+                  templateOptions: {
+                    label: 'Remarks',
+                    placeholder: 'Enter Remarks',
+                  },
+                  hooks: {
+                    onInit: (field: any) => {
+                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.remarks && field.formControl) {
+                        field.formControl.setValue(this.dataToPopulate.sale_invoice_order.remarks);
+                      }
+                    }
+                  }
+                },
               ]
             },
             {
@@ -876,7 +818,7 @@ loadQuickpackProducts() {
                   type: 'text',
                   className: 'col-12',
                   templateOptions: {
-                    label: 'Sub Total',
+                    label: 'Items Total',
                     disabled: true,
                   },
                   defaultValue: '0.00'
@@ -922,11 +864,11 @@ loadQuickpackProducts() {
                 //      defaultValue: '0.00'
                 // },
                 {
-                  key: 'round_off',
+                  key: 'dis_amt',
                   type: 'text',
                   className: 'col-12',
                   templateOptions: {
-                    label: 'Round Off',
+                    label: 'Discount Amount',
                     required: false
                   },
                   defaultValue: '0.00'
@@ -937,18 +879,19 @@ loadQuickpackProducts() {
                   type: 'text',
                   className: 'col-12',
                   templateOptions: {
-                    label: 'Advance',
+                    label: 'Advance Amount',
                     required: false
                   },
                   defaultValue: '0.00'
                 },
                 {
-                  key: 'total',
+                  key: 'total_amount',
                   type: 'text',
                   className: 'col-12 product-total',
                   templateOptions: {
                     label: ' ',
                     required: false,
+                    placeholder: 'Total Amount',
                     disabled: true,
                   },
                   defaultValue: '0.00'
@@ -960,7 +903,7 @@ loadQuickpackProducts() {
         {
           key: 'sale_invoice_items',
           type: 'repeat',
-          className: 'custom-form-list new-items-list',
+          className: 'custom-form-list',
           templateOptions: {
             // title: 'Products',
             addText: 'Add Product',
@@ -1035,9 +978,9 @@ loadQuickpackProducts() {
                   dataKey: 'product_id',
                   hideLabel: true,
                   dataLabel: 'name',
+                  placeholder: 'product',
                   options: [],
                   required: true,
-                  placeholder: 'Select Product',
                   lazy: {
                     url: 'products/products/?summary=true',
                     lazyOneTime: true
@@ -1233,9 +1176,9 @@ loadQuickpackProducts() {
                   dataKey: 'size_id',
                   hideLabel: true,
                   dataLabel: 'size_name',
+                  placeholder: 'size',
                   options: [],
                   required: false,
-                  placeholder: 'Select Size',
                   lazy: {
                     lazyOneTime: true
                   }
@@ -1361,9 +1304,9 @@ loadQuickpackProducts() {
                   dataKey: 'color_id',
                   hideLabel: true,
                   dataLabel: 'color_name',
+                  placeholder: 'color',
                   options: [],
                   required: false,
-                  placeholder: 'Select Color',
                   lazy: {
                     lazyOneTime: true
                   }
@@ -1464,7 +1407,7 @@ loadQuickpackProducts() {
                 key: 'code',
                 templateOptions: {
                   label: 'Code',
-                  placeholder: 'Enter code',
+                  placeholder: 'code',
                   hideLabel: true,
                 },
                 hooks: {
@@ -1494,7 +1437,7 @@ loadQuickpackProducts() {
                 templateOptions: {
                   type: 'number',
                   label: 'Total Boxes',
-                  placeholder: 'Enter Total Boxes',
+                  placeholder: 'Boxes',
                   hideLabel: true
                 },
                 hooks: {
@@ -1523,7 +1466,7 @@ loadQuickpackProducts() {
                 key: 'unit_options_id',
                 templateOptions: {
                   label: 'Unit',
-                  placeholder: 'Select Unit',
+                  placeholder: 'Unit',
                   hideLabel: true,
                   dataLabel: 'unit_name',
                   dataKey: 'unit_options_id',
@@ -1562,7 +1505,7 @@ loadQuickpackProducts() {
                 templateOptions: {
                   type: 'number',
                   label: 'Qty',
-                  placeholder: 'Enter Qty',
+                  placeholder: 'Qty',
                   min: 1,
                   hideLabel: true,
                   required: true
@@ -1676,6 +1619,7 @@ loadQuickpackProducts() {
                   }
                 }
               },
+
               {
                 type: 'input',
                 key: 'mrp',
@@ -1692,7 +1636,7 @@ loadQuickpackProducts() {
                 templateOptions: {
                   type: 'number',
                   label: 'Amount',
-                  placeholder: 'Enter Amount',
+                  placeholder: 'Amount',
                   hideLabel: true,
                   disabled: true
                 },
@@ -1725,7 +1669,7 @@ loadQuickpackProducts() {
                 key: 'print_name',
                 templateOptions: {
                   label: 'Print name',
-                  placeholder: 'Enter Product Print name',
+                  placeholder: 'name',
                   hideLabel: true
                 },
                 hooks: {
@@ -1851,19 +1795,23 @@ loadQuickpackProducts() {
                           key: 'sale_invoice_order',
                           fieldGroup: [
                             {
-                              key: 'total_boxes',
+                              key: 'tax_amount',
                               type: 'input',
+                              defaultValue: "0",
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 type: 'number',
-                                label: 'Total boxes',
-                                placeholder: 'Enter Total boxes'
+                                label: 'Tax amount',
+                                placeholder: 'Enter Tax amount'
                               },
                               hooks: {
                                 onInit: (field: any) => {
-                                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order && this.dataToPopulate.sale_invoice_order.total_boxes && field.formControl) {
-                                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.total_boxes);
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order && this.dataToPopulate.sale_invoice_order.tax_amount && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.tax_amount);
                                   }
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    this.totalAmountCal();
+                                  })
                                 }
                               }
                             },
@@ -1923,27 +1871,6 @@ loadQuickpackProducts() {
                                   if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order && this.dataToPopulate.sale_invoice_order.taxable && field.formControl) {
                                     field.formControl.setValue(this.dataToPopulate.sale_invoice_order.taxable);
                                   }
-                                }
-                              }
-                            },
-                            {
-                              key: 'tax_amount',
-                              type: 'input',
-                              defaultValue: "0",
-                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
-                              templateOptions: {
-                                type: 'number',
-                                label: 'Tax amount',
-                                placeholder: 'Enter Tax amount'
-                              },
-                              hooks: {
-                                onInit: (field: any) => {
-                                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order && this.dataToPopulate.sale_invoice_order.tax_amount && field.formControl) {
-                                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.tax_amount);
-                                  }
-                                  field.formControl.valueChanges.subscribe(data => {
-                                    this.totalAmountCal();
-                                  })
                                 }
                               }
                             },
@@ -2064,27 +1991,27 @@ loadQuickpackProducts() {
                                 }
                               }
                             },
-                            {
-                              key: 'item_value',
-                              type: 'input',
-                              defaultValue: "0",
-                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
-                              templateOptions: {
-                                type: 'input',
-                                label: 'Items value',
-                                placeholder: 'Enter Item value',
-                                readonly: true
-                                // required: true
-                              },
-                              hooks: {
-                                onInit: (field: any) => {
-                                  // Set the initial value from dataToPopulate if available
-                                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order && this.dataToPopulate.sale_invoice_order.item_value && field.formControl) {
-                                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.item_value);
-                                  }
-                                }
-                              }
-                            },
+                            // {
+                            //   key: 'item_value',
+                            //   type: 'input',
+                            //   defaultValue: "0",
+                            //   className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                            //   templateOptions: {
+                            //     type: 'input',
+                            //     label: 'Items value',
+                            //     placeholder: 'Enter Item value',
+                            //     readonly: true
+                            //     // required: true
+                            //   },
+                            //   hooks: {
+                            //     onInit: (field: any) => {
+                            //       // Set the initial value from dataToPopulate if available
+                            //       if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order && this.dataToPopulate.sale_invoice_order.item_value && field.formControl) {
+                            //         field.formControl.setValue(this.dataToPopulate.sale_invoice_order.item_value);
+                            //       }
+                            //     }
+                            //   }
+                            // },
                             {
                               key: 'dis_amt',
                               type: 'input',
@@ -2092,9 +2019,9 @@ loadQuickpackProducts() {
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 type: 'input',
-                                label: 'Discount amount',
+                                label: 'Overall Discount',
                                 placeholder: 'Enter Discount amount',
-                                readonly: true
+                                readonly: false
                                 // required: true
                               },
                               hooks: {
@@ -2356,7 +2283,53 @@ loadQuickpackProducts() {
                   ]
                 }
               ]
-            }
+            },
+            {
+              className: 'col-12 custom-form-card-block px-0 pt-3',
+              props: {
+                label: 'Customer Details'
+              },
+              fieldGroup: [
+                // {
+                //   template: '<div class="custom-form-card-title">   </div>',
+                //   fieldGroupClassName: "ant-row",
+                // },
+                {
+                  fieldGroupClassName: "ant-row",
+                  key: 'sale_invoice_order',
+                  fieldGroup: [
+                    {
+                      key: 'email',
+                      type: 'input',
+                      className: 'col-md-4 col-sm-6 col-12',
+                      templateOptions: {
+                        type: 'input',
+                        label: 'Email',
+                        placeholder: 'Enter Email'
+                      },
+                    },
+                    {
+                      key: 'billing_address',
+                      type: 'textarea',
+                      className: 'col-4',
+                      templateOptions: {
+                        label: 'Billing address',
+                        placeholder: 'Enter Billing address'
+                      },
+                    },
+                    {
+                      key: 'shipping_address',
+                      type: 'textarea',
+                      className: 'col-4',
+                      templateOptions: {
+                        label: 'Shipping address',
+                        placeholder: 'Enter Shipping address'
+                      },
+                    },
+                  ]
+                },
+              ]
+            },
           ]
         }
       ]
