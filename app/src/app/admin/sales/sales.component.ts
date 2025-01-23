@@ -188,8 +188,8 @@ export class SalesComponent {
 
     // to get SaleOrder number for save 
     this.getOrderNo();
-    this.formConfig.fields[0].fieldGroup[0].fieldGroup[4].hide = true;
-    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide = true;
+    this.formConfig.fields[0].fieldGroup[0].fieldGroup[8].hide = true; //flow_status hiding in create page 
+    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = true;
 
     // this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[9].hide = true;
     // //console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
@@ -412,8 +412,8 @@ export class SalesComponent {
         this.formConfig.submit.label = 'Update';
         this.formConfig.model['sale_order_id'] = this.SaleOrderEditID;
         this.showForm = true;
-        this.formConfig.fields[0].fieldGroup[0].fieldGroup[4].hide = false;
-        this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide = false;
+        this.formConfig.fields[0].fieldGroup[0].fieldGroup[8].hide = false;
+        this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = false;
         // this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[9].hide = false;
         // Load sale_order_items with selected status
       //   this.saleOrderItems = res.data.sale_order.sale_order_items.map(item => ({
@@ -1214,6 +1214,8 @@ confirmWorkOrder() {
                         label: 'Sale type',
                         dataKey: 'name',
                         dataLabel: "name",
+                        defaultValue: 'Advance Order',
+                        required: true,
                         options: [],
                         lazy: {
                           url: 'masters/sale_types/',
@@ -1256,12 +1258,12 @@ confirmWorkOrder() {
                             if (data && data.customer_id) {
                               this.formConfig.model['sale_order']['customer_id'] = data.customer_id;
                             }
-                            // if (data.customer_addresses && data.customer_addresses.billing_address) {
-                            //   field.form.controls.billing_address.setValue(data.customer_addresses.billing_address)
-                            // }
-                            // if (data.customer_addresses && data.customer_addresses.shipping_address) {
-                            //   field.form.controls.shipping_address.setValue(data.customer_addresses.shipping_address)
-                            // }
+                            if (data.customer_addresses && data.customer_addresses.billing_address) {
+                              field.form.controls.billing_address.setValue(data.customer_addresses.billing_address)
+                            }
+                            if (data.customer_addresses && data.customer_addresses.shipping_address) {
+                              field.form.controls.shipping_address.setValue(data.customer_addresses.shipping_address)
+                            }
                             if (data.email) {
                               field.form.controls.email.setValue(data.email)
                             }
@@ -1273,16 +1275,6 @@ confirmWorkOrder() {
                       }
                     },
                     {
-                      key: 'email',
-                      type: 'input',
-                      className: 'col-md-4 col-sm-6 col-12',
-                      templateOptions: {
-                        type: 'input',
-                        label: 'Email',
-                        placeholder: 'Enter Email'
-                      },
-                    },
-                    {
                       key: 'order_no',
                       type: 'input',
                       className: 'col-md-4 col-sm-6 col-12',
@@ -1292,6 +1284,78 @@ confirmWorkOrder() {
                         required: true,
                         // readonly: true
                         disabled: true
+                      }
+                    },
+                    {
+                      key: 'delivery_date',
+                      type: 'date',
+                      defaultValue: this.nowDate(),
+                      className: 'col-md-4 col-sm-6 col-12',
+                      templateOptions: {
+                        type: 'date',
+                        label: 'Delivery date',
+                        readonly: true,
+                        required: true
+                      }
+                    },
+                    {
+                      key: 'order_date',
+                      type: 'date',
+                      defaultValue: this.nowDate(),
+                      className: 'col-4',
+                      templateOptions: {
+                        type: 'date',
+                        label: 'Order date',
+                        readonly: true,
+                        required: true
+                      }
+                    },
+                    {
+                      key: 'ref_date',
+                      type: 'date',
+                      defaultValue: this.nowDate(),
+                      className: 'col-4',
+                      templateOptions: {
+                        type: 'date',
+                        label: 'Ref date',
+                        placeholder: 'Select Ref date',
+                        readonly: true
+                      }
+                    },
+                    {
+                      key: 'ref_no',
+                      type: 'input',
+                      className: 'col-4',
+                      templateOptions: {
+                        type: 'input',
+                        label: 'Ref No',
+                        placeholder: 'Enter Ref No'
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.sale_order.ref_no && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.sale_order.ref_no);
+                          }
+                        }
+                      }
+                    },
+                    {
+                      key: 'tax_type',
+                      type: 'select',
+                      className: 'col-4',
+                      templateOptions: {
+                        label: 'Tax',
+                        options: [
+                          { 'label': "Inclusive", value: 'Inclusive' },
+                          { 'label': "Exclusive", value: 'Exclusive' }
+                        ]
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.sale_order.tax && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.sale_order.tax);
+                          }
+                        }
                       }
                     },
                     {
@@ -1374,111 +1438,21 @@ confirmWorkOrder() {
                       }
                      },
                     {
-                      key: 'delivery_date',
-                      type: 'date',
-                      defaultValue: this.nowDate(),
-                      className: 'col-md-4 col-sm-6 col-12',
-                      templateOptions: {
-                        type: 'date',
-                        label: 'Delivery date',
-                        readonly: true,
-                        required: true
-                      }
-                    },
-                    {
-                      key: 'order_date',
-                      type: 'date',
-                      defaultValue: this.nowDate(),
+                      key: 'remarks',
+                      type: 'textarea',
                       className: 'col-4',
                       templateOptions: {
-                        type: 'date',
-                        label: 'Order date',
-                        readonly: true,
-                        required: true
-                      }
-                    },
-                    // {
-                    //   key: 'ref_no',
-                    //   type: 'input',
-                    //   className: 'col-4',
-                    //   templateOptions: {
-                    //     type: 'input',
-                    //     label: 'Ref No',
-                    //     placeholder: 'Enter Ref No'
-                    //   },
-                    //   hooks: {
-                    //     onInit: (field: any) => {
-                    //       if (this.dataToPopulate && this.dataToPopulate.sale_order.ref_no && field.formControl) {
-                    //         field.formControl.setValue(this.dataToPopulate.sale_order.ref_no);
-                    //       }
-                    //     }
-                    //   }
-                    // },
-                    {
-                      key: 'ref_date',
-                      type: 'date',
-                      defaultValue: this.nowDate(),
-                      className: 'col-4',
-                      templateOptions: {
-                        type: 'date',
-                        label: 'Ref date',
-                        placeholder: 'Select Ref date',
-                        readonly: true
-                      }
-                    },
-                    {
-                      key: 'tax_type',
-                      type: 'select',
-                      className: 'col-4',
-                      templateOptions: {
-                        label: 'Tax',
-                        options: [
-                          { 'label': "Inclusive", value: 'Inclusive' },
-                          { 'label': "Exclusive", value: 'Exclusive' }
-                        ]
+                        label: 'Remarks',
+                        placeholder: 'Enter Remarks',
                       },
                       hooks: {
                         onInit: (field: any) => {
-                          if (this.dataToPopulate && this.dataToPopulate.sale_order.tax && field.formControl) {
-                            field.formControl.setValue(this.dataToPopulate.sale_order.tax);
+                          if (this.dataToPopulate && this.dataToPopulate.sale_order.remarks && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.sale_order.remarks);
                           }
                         }
                       }
                     },
-                    // {
-                    //   key: 'remarks',
-                    //   type: 'textarea',
-                    //   className: 'col-4',
-                    //   templateOptions: {
-                    //     label: 'Remarks',
-                    //     placeholder: 'Enter Remarks',
-                    //   },
-                    //   hooks: {
-                    //     onInit: (field: any) => {
-                    //       if (this.dataToPopulate && this.dataToPopulate.sale_order.remarks && field.formControl) {
-                    //         field.formControl.setValue(this.dataToPopulate.sale_order.remarks);
-                    //       }
-                    //     }
-                    //   }
-                    // },
-                    // {
-                    //   key: 'billing_address',
-                    //   type: 'textarea',
-                    //   className: 'col-4',
-                    //   templateOptions: {
-                    //     label: 'Billing address',
-                    //     placeholder: 'Enter Billing address'
-                    //   },
-                    // },
-                    // {
-                    //   key: 'shipping_address',
-                    //   type: 'textarea',
-                    //   className: 'col-4',
-                    //   templateOptions: {
-                    //     label: 'Shipping address',
-                    //     placeholder: 'Enter Shipping address'
-                    //   },
-                    // },  
                 ]
               },
               {
@@ -1490,7 +1464,7 @@ confirmWorkOrder() {
                     type: 'text',
                     className: 'col-12',
                     templateOptions: {
-                      label: 'Sub Total',
+                      label: 'Items Total',
                       disabled: true,
                     }, 
                     defaultValue: '0.00'                    
@@ -1535,23 +1509,23 @@ confirmWorkOrder() {
                   //   },
                   //      defaultValue: '0.00'
                   // },
-                  // {
-                  //   key: 'round_off',
-                  //   type: 'text',
-                  //   className: 'col-12',
-                  //   templateOptions: {
-                  //     label: 'Round Off',
-                  //      required: false
-                  //   },
-                  //   defaultValue: '0.00'
+                  {
+                    key: 'dis_amt',
+                    type: 'text',
+                    className: 'col-12',
+                    templateOptions: {
+                      label: 'Discount Amount',
+                       required: false
+                    },
+                    defaultValue: '0.00'
 
-                  // },
+                  },
                   {
                     key: 'advance_amount',
                     type: 'text',
                     className: 'col-12',
                     templateOptions: {
-                      label: 'Advance',
+                      label: 'Advance Amount',
                        required: false
                     },
                     defaultValue: '0.00'
@@ -1575,7 +1549,7 @@ confirmWorkOrder() {
         {
           key: 'sale_order_items',
           type: 'repeat',
-          className: 'custom-form-list new-items-list',
+          className: 'custom-form-list',
           templateOptions: {
             // title: 'Products',
             addText: 'Add Product',
@@ -2467,19 +2441,23 @@ confirmWorkOrder() {
                           key: 'sale_order',
                           fieldGroup: [
                             {
-                              key: 'total_boxes',
+                              key: 'tax_amount',
                               type: 'input',
+                              defaultValue: "0",
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 type: 'number',
-                                label: 'Total boxes',
-                                placeholder: 'Enter Total boxes'
+                                label: 'Tax amount',
+                                placeholder: 'Enter Tax amount'
                               },
                               hooks: {
                                 onInit: (field: any) => {
-                                  if (this.dataToPopulate && this.dataToPopulate.sale_order && this.dataToPopulate.sale_order.total_boxes && field.formControl) {
-                                    field.formControl.setValue(this.dataToPopulate.sale_order.total_boxes);
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_order && this.dataToPopulate.sale_order.tax_amount && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.sale_order.tax_amount);
                                   }
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    this.totalAmountCal();
+                                  })
                                 }
                               }
                             },
@@ -2539,27 +2517,6 @@ confirmWorkOrder() {
                                   if (this.dataToPopulate && this.dataToPopulate.sale_order && this.dataToPopulate.sale_order.taxable && field.formControl) {
                                     field.formControl.setValue(this.dataToPopulate.sale_order.taxable);
                                   }
-                                }
-                              }
-                            },
-                            {
-                              key: 'tax_amount',
-                              type: 'input',
-                              defaultValue: "0",
-                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
-                              templateOptions: {
-                                type: 'number',
-                                label: 'Tax amount',
-                                placeholder: 'Enter Tax amount'
-                              },
-                              hooks: {
-                                onInit: (field: any) => {
-                                  if (this.dataToPopulate && this.dataToPopulate.sale_order && this.dataToPopulate.sale_order.tax_amount && field.formControl) {
-                                    field.formControl.setValue(this.dataToPopulate.sale_order.tax_amount);
-                                  }
-                                  field.formControl.valueChanges.subscribe(data => {
-                                    this.totalAmountCal();
-                                  })
                                 }
                               }
                             },
@@ -2680,27 +2637,27 @@ confirmWorkOrder() {
                                 }
                               }
                             },
-                            {
-                              key: 'item_value',
-                              type: 'input',
-                              defaultValue: "0",
-                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
-                              templateOptions: {
-                                type: 'input',
-                                label: 'Items value',
-                                placeholder: 'Enter Item value',
-                                readonly: true
-                                // required: true
-                              },
-                              hooks: {
-                                onInit: (field: any) => {
-                                  // Set the initial value from dataToPopulate if available
-                                  if (this.dataToPopulate && this.dataToPopulate.sale_order && this.dataToPopulate.sale_order.item_value && field.formControl) {
-                                    field.formControl.setValue(this.dataToPopulate.sale_order.item_value);
-                                  }
-                                }
-                              }
-                            },
+                            // {
+                            //   key: 'item_value',
+                            //   type: 'input',
+                            //   defaultValue: "0",
+                            //   className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                            //   templateOptions: {
+                            //     type: 'input',
+                            //     label: 'Items value',
+                            //     placeholder: 'Enter Item value',
+                            //     readonly: true
+                            //     // required: true
+                            //   },
+                            //   hooks: {
+                            //     onInit: (field: any) => {
+                            //       // Set the initial value from dataToPopulate if available
+                            //       if (this.dataToPopulate && this.dataToPopulate.sale_order && this.dataToPopulate.sale_order.item_value && field.formControl) {
+                            //         field.formControl.setValue(this.dataToPopulate.sale_order.item_value);
+                            //       }
+                            //     }
+                            //   }
+                            // },
                             {
                               key: 'dis_amt',
                               type: 'input',
@@ -2708,9 +2665,9 @@ confirmWorkOrder() {
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 type: 'input',
-                                label: 'Discount amount',
+                                label: 'Overall Discount',
                                 placeholder: 'Enter Discount amount',
-                                readonly: true
+                                readonly: false
                                 // required: true
                               },
                               hooks: {
@@ -2972,7 +2929,53 @@ confirmWorkOrder() {
                   ]
                 }
               ]
-            }
+            },
+            {
+              className: 'col-12 custom-form-card-block px-0 pt-3',
+              props: {
+                label: 'Customer Details'
+              },
+              fieldGroup: [
+                // {
+                //   template: '<div class="custom-form-card-title">   </div>',
+                //   fieldGroupClassName: "ant-row",
+                // },
+                {
+                  fieldGroupClassName: "ant-row",
+                  key: 'sale_order',
+                  fieldGroup: [
+                    {
+                      key: 'email',
+                      type: 'input',
+                      className: 'col-md-4 col-sm-6 col-12',
+                      templateOptions: {
+                        type: 'input',
+                        label: 'Email',
+                        placeholder: 'Enter Email'
+                      },
+                    },
+                    {
+                      key: 'billing_address',
+                      type: 'textarea',
+                      className: 'col-4',
+                      templateOptions: {
+                        label: 'Billing address',
+                        placeholder: 'Enter Billing address'
+                      },
+                    },
+                    {
+                      key: 'shipping_address',
+                      type: 'textarea',
+                      className: 'col-4',
+                      templateOptions: {
+                        label: 'Shipping address',
+                        placeholder: 'Enter Shipping address'
+                      },
+                    }, 
+                  ]
+                },
+              ]
+            },
           ]
         }
       ]
