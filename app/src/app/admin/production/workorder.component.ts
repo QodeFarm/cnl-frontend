@@ -22,7 +22,7 @@ export class WorkorderComponent implements OnInit {
   WorkOrdrEditID: any;
   WorkOrderBoardView: any; //
   formConfig: TaFormConfig = {};
-  // @ViewChild(WorkOrderListComponent) WorkOrderListComponent!: WorkOrderListComponent;
+  @ViewChild(WorkOrderListComponent) WorkOrderListComponent!: WorkOrderListComponent;
 
   constructor(private http: HttpClient) {}
   
@@ -83,7 +83,7 @@ export class WorkorderComponent implements OnInit {
 
   showWorkorderListFn() {
     this.showWorkorderList = true;
-    // this.WorkOrderListComponent?.refreshTable();
+    this.WorkOrderListComponent?.refreshTable();
   }
 
    // Method to populate the form with data (when admin wants to create a work order from sale order)
@@ -289,6 +289,12 @@ fetchSizeOptions(productId: string, productField: any, lastSelectedSize?: any) {
 
         // Locate and update the size field with the options
         const sizeField = productField.parent.fieldGroup.find(f => f.key === 'size');
+
+        if (uniqueOptions.length > 0) {
+          sizeField.templateOptions.required = true
+        } else {
+          sizeField.templateOptions.required = false
+        }
         if (sizeField) {
           sizeField.templateOptions.options = uniqueOptions.filter(
             (item, index, self) =>
@@ -336,6 +342,13 @@ fetchColorOptions(sizeId: string, productId: string, sizeField: any, lastSelecte
 
         // Locate and update the color field with the options
         const colorField = sizeField.parent.fieldGroup.find(f => f.key === 'color');
+
+        if (uniqueOptions.length > 0) {
+          colorField.templateOptions.required = true
+        } else {
+          colorField.templateOptions.required = false
+        }
+
         if (colorField) {
           colorField.templateOptions.options = uniqueOptions.filter(
             (item, index, self) =>
@@ -456,15 +469,32 @@ curdConfig: TaCurdConfig = {
               },
               hooks: {
                 onInit: (field: any) => {
+                  let previousProductId: any = null; // Keep track of the previously selected product ID
                   field.formControl.valueChanges.subscribe((data: any) => {
                     // const product = field.formControl.value;
                     this.populateBom(data)
                     if (this.formConfig && this.formConfig.model && this.formConfig.model['work_order']) {
                       this.formConfig.model['work_order']['product_id'] = data;
 
+                      function clearSize(){
+                        const sizeField = field.parent.fieldGroup.find(f => f.key === 'size');
+                        sizeField.formControl.setValue(null); // Clear value
+                        sizeField.templateOptions.options = []; // Clear options
+                        sizeField.templateOptions.required = false;
+                      }
+
                       if (data) {
                         const lastSelectedSize = this.formConfig.model.work_order.size_id;
                         this.fetchSizeOptions(data, field, lastSelectedSize);
+                      } else {
+                        // Clear size and color fields if product ID is cleared
+                        clearSize();
+                      }
+                      
+                      // Clear the size and color fields if the product ID changes
+                      if (data !== previousProductId) {
+                        clearSize();
+                        previousProductId = data; // Update the previously selected product ID
                       }
 
                     } else {
@@ -487,6 +517,7 @@ curdConfig: TaCurdConfig = {
               },
               hooks: {
                 onInit: (field: any) => {
+                  let previousSizeId: any = null; // Keep track of the previously selected product ID
                   // Log the initially selected size_id from the form model
                   const selectedSizeId = this.formConfig.model['work_order']?.size_id;
 
@@ -500,6 +531,13 @@ curdConfig: TaCurdConfig = {
                     }
                   }
 
+                  function clearColor(){
+                    const colorField = field.parent.fieldGroup.find(f => f.key === 'color');
+                    colorField.formControl.setValue(null); // Clear value
+                    colorField.templateOptions.options = []; // Clear options
+                    colorField.templateOptions.required = false;
+                  }
+
                   field.formControl.valueChanges.subscribe((data: any) => {
                     if (this.formConfig && this.formConfig.model && this.formConfig.model['work_order']) {
                       this.formConfig.model['work_order']['size_id'] = data?.size_id;
@@ -508,6 +546,13 @@ curdConfig: TaCurdConfig = {
                       if (data?.size_id) {
                         const product_id = this.formConfig.model.work_order.product_id;
                         this.fetchColorOptions(data.size_id, product_id, field, lastSelectedColor);
+                      } else {
+                        clearColor();
+                      }
+
+                      if (data !== previousSizeId) {
+                        clearColor();
+                        previousSizeId = data?.size_id; // Update the previously selected product ID
                       }
 
                     } else {
@@ -678,7 +723,7 @@ curdConfig: TaCurdConfig = {
                         console.error(`Products at index ${index} is not defined. Initializing...`);
                         this.formConfig.model['bom'][index] = {};
                       }
-                      this.formConfig.model['bom'][index]['product_id'] = data.product_id;
+                      this.formConfig.model['bom'][index]['product_id'] = data?.product_id;
                     });
                   }
                 }
