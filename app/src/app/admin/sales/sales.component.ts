@@ -216,8 +216,8 @@ export class SalesComponent {
           saleOrderItems.forEach((item, index) => {
             this.formConfig.model.sale_order_items.push({
               product_id: item.product.product_id,
-              size: item.size,
-              color: item.color,
+              size: item.size.size_name,
+              color: item.color.color_name,
               code: item.code,
               unit: item.unit,
               total_boxes: item.total_boxes,
@@ -1206,36 +1206,52 @@ confirmWorkOrder() {
                 className: 'col-md-9 col-sm-8 col-12 p-0',
                 fieldGroupClassName: "ant-row mx-0 row align-items-end mt-2",
                 fieldGroup: [
-                    {
-                      key: 'sale_type',
-                      type: 'select',
-                      className: 'col-md-4 col-sm-6 col-12',
-                      templateOptions: {
-                        label: 'Sale type',
-                        dataKey: 'name',
-                        dataLabel: "name",
-                        defaultValue: 'Advance Order',
-                        required: true,
-                        options: [],
-                        lazy: {
-                          url: 'masters/sale_types/',
-                          lazyOneTime: true
-                        }
-                      },
-                      hooks: {
-                        onInit: (field: any) => {
-                          field.formControl.valueChanges.subscribe(data => {
-                            //console.log("sale_type", data);
-                            if (data && data.sale_type_id) {
-                              this.formConfig.model['sale_order']['sale_type_id'] = data.sale_type_id;
-                            }
-                          });
-                        },
-                        onChanges: (field: any) => {
-
-                        }
+                  {
+                    key: 'sale_type',
+                    type: 'select',
+                    className: 'col-md-4 col-sm-6 col-12',
+                    templateOptions: {
+                      label: 'Sale type',
+                      dataKey: 'sale_type_id',
+                      dataLabel: 'name',
+                      required: true,
+                      options: [], // Options will be populated dynamically
+                      lazy: {
+                        url: 'masters/sale_types/',
+                        lazyOneTime: true
                       }
                     },
+                    hooks: {
+                      onInit: (field: any) => {
+                        // Fetch data from the API
+                        const lazyUrl = field.templateOptions.lazy.url;
+                        this.http.get(lazyUrl).subscribe((response: any) => {
+                          const saleTypes = response.data;
+                  
+                          // Populate the options dynamically
+                          field.templateOptions.options = saleTypes;
+                  
+                          // Find the option with name "Advance Order"
+                          const defaultOption = saleTypes.find(
+                            (option: any) => option.name === 'Advance Order'
+                          );
+                  
+                          // Set the default value if "Advance Order" exists
+                          if (defaultOption) {
+                            field.formControl.setValue(defaultOption);
+                          }
+                        });
+                  
+                        // Handle value changes
+                        field.formControl.valueChanges.subscribe((data: any) => {
+                          console.log('Selected sale_type:', data);
+                          if (data && data.sale_type_id) {
+                            this.formConfig.model['sale_order']['sale_type_id'] = data.sale_type_id;
+                          }
+                        });
+                      }
+                    }
+                  },                  
                     {
                       key: 'customer',
                       type: 'select',
