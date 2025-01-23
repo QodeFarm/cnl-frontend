@@ -169,8 +169,7 @@ export class PurchaseInvoiceComponent {
 
     // to get PurchaseOrder number for save
     this.getInvoiceNo();
-    this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[7].hide =true; //Hiding order status in create field
-
+    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide =true;  //Hiding order status in create field
   }
 
   checkAndPopulateData() {
@@ -245,7 +244,7 @@ export class PurchaseInvoiceComponent {
         this.formConfig.submit.label = 'Update';
         // show form after setting form values
         this.formConfig.model['purchase_invoice_id'] = this.PurchaseInvoiceEditID;
-        this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[7].hide =false;
+        this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = false;
         this.showForm = true;
         
       }
@@ -431,12 +430,12 @@ loadQuickpackProducts() {
                         if (data && data.vendor_id) {
                           this.formConfig.model['purchase_invoice_orders']['vendor_id'] = data.vendor_id;
                         }
-                        // if (data.vendor_addresses && data.vendor_addresses.billing_address) {
-                        //   field.form.controls.billing_address.setValue(data.vendor_addresses.billing_address)
-                        // }
-                        // if (data.vendor_addresses && data.vendor_addresses.shipping_address) {
-                        //   field.form.controls.shipping_address.setValue(data.vendor_addresses.shipping_address)
-                        // }
+                        if (data.vendor_addresses && data.vendor_addresses.billing_address) {
+                          field.form.controls.billing_address.setValue(data.vendor_addresses.billing_address)
+                        }
+                        if (data.vendor_addresses && data.vendor_addresses.shipping_address) {
+                          field.form.controls.shipping_address.setValue(data.vendor_addresses.shipping_address)
+                        }
                         if (data.email) {
                           field.form.controls.email.setValue(data.email)
                         }
@@ -455,7 +454,8 @@ loadQuickpackProducts() {
                     label: 'Invoice no',
                     placeholder: 'Enter Invoice No',
                     required: true,
-                    readonly: true
+                    // readonly: true
+                    disabled: true
                   },
                   hooks: {
                     onInit: (field: any) => {
@@ -466,20 +466,6 @@ loadQuickpackProducts() {
                   // expressionProperties: {
                   //   'templateOptions.disabled': this.PurchaseOrderEditID ? 'true' : 'fa'
                   // }
-                },
-                {
-                  key: 'email',
-                  type: 'input',
-                  className: 'col-md-4 col-sm-6 col-12',
-                  templateOptions: {
-                    type: 'input',
-                    label: 'Email',
-                    placeholder: 'Enter Email',
-                    // required: true
-                  },
-                  hooks: {
-                    onInit: (field: any) => { }
-                  }
                 },
                 {
                   key: 'invoice_date',
@@ -501,7 +487,7 @@ loadQuickpackProducts() {
                   templateOptions: {
                     type: 'date',
                     label: 'Delivery date',
-                    // readonly: true,
+                    readonly: true,
                     required: true
                   }
                 },
@@ -516,27 +502,6 @@ loadQuickpackProducts() {
                     //required: true
                   }
                 },
-                // {
-                //   key: 'tax',
-                //   type: 'select',
-                //   // defaultValue: 'Exclusive',
-                //   className: 'col-2',
-                //   templateOptions: {
-                //     label: 'Tax',
-                //     options: [
-                //       { 'label': "Inclusive", value: 'Inclusive' },
-                //       { 'label': "Exclusive", value: 'Exclusive' }
-                //     ],
-                //     // required: true
-                //   },
-                //   hooks: {
-                //     onInit: (field: any) => {
-                //       if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders.tax && field.formControl) {
-                //         field.formControl.setValue(this.dataToPopulate.purchase_invoice_orders.tax);
-                //       }
-                //     }
-                //   }
-                // },
                 {
                   key: 'supplier_invoice_no',
                   type: 'input',
@@ -552,43 +517,44 @@ loadQuickpackProducts() {
                     onInit: (field: any) => { }
                   }
                 },
-                // {
-                //   key: 'remarks',
-                //   type: 'textarea',
-                //   className: 'col-4',
-                //   templateOptions: {
-                //     type: 'input',
-                //     label: 'Remarks',
-                //     placeholder: 'Enter Remarks',
-                //   },
-                //   hooks: {
-                //     onInit: (field: any) => {
-                //       if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders.remarks && field.formControl) {
-                //         field.formControl.setValue(this.dataToPopulate.purchase_invoice_orders.remarks);
-                //       }
-                //     }
-                //   }
-                // },
-                // {
-                //   key: 'billing_address',
-                //   type: 'textarea',
-                //   className: 'col-6',
-                //   templateOptions: {
-                //     label: 'Billing Address',
-                //     placeholder: 'Enter Billing Address',
-                //     //required: true
-                //   }
-                // },
-                // {
-                //   key: 'shipping_address',
-                //   type: 'textarea',
-                //   className: 'col-6',
-                //   templateOptions: {
-                //     label: 'Shipping Address',
-                //     placeholder: 'Enter Shipping Address',
-                //     //required: true
-                //   }
-                // },
+                {
+                  key: 'tax',
+                  type: 'select',
+                  // defaultValue: 'Exclusive',
+                  className: 'col-4',
+                  templateOptions: {
+                    label: 'Tax',
+                    options: [
+                      { 'label': "Inclusive", value: 'Inclusive' },
+                      { 'label': "Exclusive", value: 'Exclusive' }
+                    ],
+                    // required: true
+                  },
+                  hooks: {
+                    onInit: (field: any) => {
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders.tax && field.formControl) {
+                        field.formControl.setValue(this.dataToPopulate.purchase_invoice_orders.tax);
+                      }
+                    }
+                  }
+                },
+                {
+                  key: 'remarks',
+                  type: 'textarea',
+                  className: 'col-4',
+                  templateOptions: {
+                    type: 'input',
+                    label: 'Remarks',
+                    placeholder: 'Enter Remarks',
+                  },
+                  hooks: {
+                    onInit: (field: any) => {
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders.remarks && field.formControl) {
+                        field.formControl.setValue(this.dataToPopulate.purchase_invoice_orders.remarks);
+                      }
+                    }
+                  }
+                },
               ]
             },
             {
@@ -600,7 +566,7 @@ loadQuickpackProducts() {
                   type: 'text',
                   className: 'col-12',
                   templateOptions: {
-                    label: 'Sub Total',
+                    label: 'Items Total',
                     disabled: true,
                   }, 
                   defaultValue: '0.00'                    
@@ -645,24 +611,24 @@ loadQuickpackProducts() {
                 //   },
                 //      defaultValue: '0.00'
                 // },
-                // {
-                //   key: 'round_off',
-                //   type: 'text',
-                //   className: 'col-12',
-                //   templateOptions: {
-                //     label: 'Round Off',
-                //      required: false
-                //   },
-                //   defaultValue: '0.00'
+                {
+                  key: 'dis_amt',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Discount Amount',
+                     required: false
+                  },
+                  defaultValue: '0.00'
 
-                // },
+                },
                 {
                   key: 'advance_amount',
                   type: 'text',
                   className: 'col-12',
                   templateOptions: {
-                    label: 'Advance',
-                      required: false
+                    label: 'Advance Amount',
+                     required: false
                   },
                   defaultValue: '0.00'
                 },
@@ -687,7 +653,7 @@ loadQuickpackProducts() {
         {
           key: 'purchase_invoice_items',
           type: 'repeat',
-          className: 'custom-form-list new-items-list',
+          className: 'custom-form-list',
           // defaultValue: [],
           // fieldGroupClassName: 'table-field pr-md',
           templateOptions: {
@@ -1739,55 +1705,55 @@ loadQuickpackProducts() {
                                 }
                               }
                             },     
-                            // {
-                            //   key: 'order_status',
-                            //   type: 'select',
-                            //   className: 'col-md-4 col-lg-3 col-sm-6 col-12',
-                            //   templateOptions: {
-                            //     label: 'Order status',
-                            //     dataKey: 'order_status_id',
-                            //     dataLabel: 'status_name',
-                            //     placeholder: 'Select Order status type',
-                            //     lazy: {
-                            //       url: 'masters/order_status/',
-                            //       lazyOneTime: true
-                            //     },
-                            //     expressions: {
-                            //       hide: '!model.purchase_invoice_orders_id',
-                            //     },
-                            //   },
-                            //   hooks: {
-                            //     onChanges: (field: any) => {
-                            //       field.formControl.valueChanges.subscribe(data => {
-                            //         //console.log("ledger_account", data);
-                            //         if (data && data.order_status_id) {
-                            //           this.formConfig.model['purchase_invoice_orders']['order_status_id'] = data.order_status_id;
-                            //         }
-                            //       });
-                            //     }
-                            //   }
-                            // },
                             {
-                              key: 'item_value',
-                              type: 'input',
-                              defaultValue: "0",
+                              key: 'order_status',
+                              type: 'select',
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
-                                type: 'input',
-                                label: 'Items value',
-                                placeholder: 'Enter Item value',
-                                readonly: true
-                                // required: true
+                                label: 'Order status',
+                                dataKey: 'order_status_id',
+                                dataLabel: 'status_name',
+                                placeholder: 'Select Order status type',
+                                lazy: {
+                                  url: 'masters/order_status/',
+                                  lazyOneTime: true
+                                },
+                                expressions: {
+                                  hide: '!model.purchase_invoice_orders_id',
+                                },
                               },
                               hooks: {
-                                onInit: (field: any) => {
-                                  // Set the initial value from dataToPopulate if available
-                                  if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders && this.dataToPopulate.purchase_invoice_orders.item_value && field.formControl) {
-                                    field.formControl.setValue(this.dataToPopulate.purchase_invoice_orders.item_value);
-                                  }
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    //console.log("ledger_account", data);
+                                    if (data && data.order_status_id) {
+                                      this.formConfig.model['purchase_invoice_orders']['order_status_id'] = data.order_status_id;
+                                    }
+                                  });
                                 }
                               }
                             },
+                            // {
+                            //   key: 'item_value',
+                            //   type: 'input',
+                            //   defaultValue: "0",
+                            //   className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                            //   templateOptions: {
+                            //     type: 'input',
+                            //     label: 'Items value',
+                            //     placeholder: 'Enter Item value',
+                            //     readonly: true
+                            //     // required: true
+                            //   },
+                            //   hooks: {
+                            //     onInit: (field: any) => {
+                            //       // Set the initial value from dataToPopulate if available
+                            //       if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders && this.dataToPopulate.purchase_invoice_orders.item_value && field.formControl) {
+                            //         field.formControl.setValue(this.dataToPopulate.purchase_invoice_orders.item_value);
+                            //       }
+                            //     }
+                            //   }
+                            // },
                             {
                               key: 'dis_amt',
                               type: 'input',
@@ -1795,7 +1761,7 @@ loadQuickpackProducts() {
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 type: 'input',
-                                label: 'Discount amount',
+                                label: 'Overall amount',
                                 placeholder: 'Enter Discount amount',
                                 readonly: true
                                 // required: true
@@ -2059,7 +2025,53 @@ loadQuickpackProducts() {
                   ]
                 }
               ]
-            }
+            },
+            {
+              className: 'col-12 custom-form-card-block px-0 pt-3',
+              props: {
+                label: 'Vendor Details'
+              },
+              fieldGroup: [
+                // {
+                //   template: '<div class="custom-form-card-title">   </div>',
+                //   fieldGroupClassName: "ant-row",
+                // },
+                {
+                  fieldGroupClassName: "ant-row",
+                  key: 'purchase_invoice_orders',
+                  fieldGroup: [
+                    {
+                      key: 'email',
+                      type: 'input',
+                      className: 'col-md-4 col-sm-6 col-12',
+                      templateOptions: {
+                        type: 'input',
+                        label: 'Email',
+                        placeholder: 'Enter Email'
+                      },
+                    },
+                    {
+                      key: 'billing_address',
+                      type: 'textarea',
+                      className: 'col-4',
+                      templateOptions: {
+                        label: 'Billing address',
+                        placeholder: 'Enter Billing address'
+                      },
+                    },
+                    {
+                      key: 'shipping_address',
+                      type: 'textarea',
+                      className: 'col-4',
+                      templateOptions: {
+                        label: 'Shipping address',
+                        placeholder: 'Enter Shipping address'
+                      },
+                    }, 
+                  ]
+                },
+              ]
+            },
           ]
         }
       ]

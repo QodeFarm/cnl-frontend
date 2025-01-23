@@ -447,12 +447,12 @@ loadQuickpackProducts() {
                         if (data && data.vendor_id) {
                           this.formConfig.model['purchase_order_data']['vendor_id'] = data.vendor_id;
                         }
-                        // if (data.vendor_addresses && data.vendor_addresses.billing_address) {
-                        //     field.form.controls.billing_address.setValue(data.vendor_addresses.billing_address)
-                        // }
-                        // if (data.vendor_addresses && data.vendor_addresses.shipping_address) {
-                        //   field.form.controls.shipping_address.setValue(data.vendor_addresses.shipping_address)
-                        // }
+                        if (data.vendor_addresses && data.vendor_addresses.billing_address) {
+                            field.form.controls.billing_address.setValue(data.vendor_addresses.billing_address)
+                        }
+                        if (data.vendor_addresses && data.vendor_addresses.shipping_address) {
+                          field.form.controls.shipping_address.setValue(data.vendor_addresses.shipping_address)
+                        }
                         if (data.email) {
                           field.form.controls.email.setValue(data.email)
                         }
@@ -464,33 +464,6 @@ loadQuickpackProducts() {
                   }
                 },
                 {
-                  key: 'vendor_agent',
-                  type: 'select',
-                  className: 'col-md-4 col-sm-6 col-12',
-                  templateOptions: {
-                    label: 'Vendor agent',
-                    dataKey: 'vendor_agent_id',
-                    dataLabel: "name",
-                    options: [],
-                    lazy: {
-                      url: 'vendors/vendor_agent',
-                      lazyOneTime: true
-                    },
-                    // required: true,
-
-                  },
-                  hooks: {
-                    onChanges: (field: any) => {
-                      field.formControl.valueChanges.subscribe(data => {
-                        // console.log("vendors", data);
-                        if (data && data.vendor_agent_id) {
-                          this.formConfig.model['purchase_order_data']['vendor_agent_id'] = data.vendor_agent_id;
-                        }
-                      });
-                    }
-                  }
-                },
-                {
                   key: 'order_no',
                   type: 'input',
                   className: 'col-md-4 col-sm-6 col-12',
@@ -498,23 +471,11 @@ loadQuickpackProducts() {
                     label: 'Order no',
                     placeholder: 'Enter Order No',
                     required: true,
-                    readonly: true
+                    // readonly: true
+                    disabled: true
                   },
                   hooks: {
                     onInit: (field: any) => {}
-                  }
-                },
-                {
-                  key: 'email',
-                  type: 'input',
-                  className: 'col-md-4 col-sm-6 col-12',
-                  templateOptions: {
-                    type: 'input',
-                    label: 'Email',
-                    placeholder: 'Enter Email'
-                  },
-                  hooks: {
-                    onInit: (field: any) => { }
                   }
                 },
                 {
@@ -525,6 +486,7 @@ loadQuickpackProducts() {
                   templateOptions: {
                     type: 'date',
                     label: 'Delivery date',
+                    readonly: true,
                     required: true
                   }
                 },
@@ -540,23 +502,6 @@ loadQuickpackProducts() {
                     required: true
                   }
                 },
-                // {
-                //   key: 'ref_no',
-                //   type: 'input',
-                //   className: 'col-2',
-                //   templateOptions: {
-                //     type: 'input',
-                //     label: 'Ref No',
-                //     placeholder: 'Enter Ref No'
-                //   },
-                //   hooks: {
-                //     onInit: (field: any) => {
-                //       if (this.dataToPopulate && this.dataToPopulate.purchase_order_data.ref_no && field.formControl) {
-                //         field.formControl.setValue(this.dataToPopulate.purchase_order_data.ref_no);
-                //       }
-                //     }
-                //   }
-                // },
                 {
                   key: 'ref_date',
                   type: 'date',
@@ -567,13 +512,30 @@ loadQuickpackProducts() {
                     label: 'Ref date',
                     placeholder: 'Select Ref date',
                     required: true,
-                    // readonly: true
+                    readonly: true
+                  }
+                },
+                {
+                  key: 'ref_no',
+                  type: 'input',
+                  className: 'col-4',
+                  templateOptions: {
+                    type: 'input',
+                    label: 'Ref No',
+                    placeholder: 'Enter Ref No'
+                  },
+                  hooks: {
+                    onInit: (field: any) => {
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_order_data.ref_no && field.formControl) {
+                        field.formControl.setValue(this.dataToPopulate.purchase_order_data.ref_no);
+                      }
+                    }
                   }
                 },
                 {
                   key: 'tax_type',
                   type: 'select',
-                  className: 'col-2',
+                  className: 'col-4',
                   templateOptions: {
                     label: 'Tax',
                     options: [
@@ -589,41 +551,23 @@ loadQuickpackProducts() {
                     }
                   }
                 },
-                // {
-                //   key: 'remarks',
-                //   type: 'textarea',
-                //   className: 'col-4',
-                //   templateOptions: {
-                //     type: 'input',
-                //     label: 'Remarks',
-                //     placeholder: 'Enter Remarks',
-                //   },
-                //   hooks: {
-                //     onInit: (field: any) => {
-                //       if (this.dataToPopulate && this.dataToPopulate.purchase_order_data.remarks && field.formControl) {
-                //         field.formControl.setValue(this.dataToPopulate.purchase_order_data.remarks);
-                //       }
-                //     }
-                //   }
-                // },
-                // {
-                //   key: 'billing_address',
-                //   type: 'textarea',
-                //   className: 'col-6',
-                //   templateOptions: {
-                //     label: 'Billing address',
-                //     placeholder: 'Enter Billing address',
-                //   }
-                // },
-                // {
-                //   key: 'shipping_address',
-                //   type: 'textarea',
-                //   className: 'col-6',
-                //   templateOptions: {
-                //     label: 'Shipping address',
-                //     placeholder: 'Enter Shipping address',
-                //   }
-                // }
+                {
+                  key: 'remarks',
+                  type: 'textarea',
+                  className: 'col-4',
+                  templateOptions: {
+                    type: 'input',
+                    label: 'Remarks',
+                    placeholder: 'Enter Remarks',
+                  },
+                  hooks: {
+                    onInit: (field: any) => {
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_order_data.remarks && field.formControl) {
+                        field.formControl.setValue(this.dataToPopulate.purchase_order_data.remarks);
+                      }
+                    }
+                  }
+                },
               ]
             },
             {
@@ -635,7 +579,7 @@ loadQuickpackProducts() {
                   type: 'text',
                   className: 'col-12',
                   templateOptions: {
-                    label: 'Sub Total',
+                    label: 'Items Total',
                     disabled: true,
                   }, 
                   defaultValue: '0.00'                    
@@ -680,24 +624,24 @@ loadQuickpackProducts() {
                 //   },
                 //      defaultValue: '0.00'
                 // },
-                // {
-                //   key: 'round_off',
-                //   type: 'text',
-                //   className: 'col-12',
-                //   templateOptions: {
-                //     label: 'Round Off',
-                //      required: false
-                //   },
-                //   defaultValue: '0.00'
+                {
+                  key: 'dis_amt',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Discount Amount',
+                     required: false
+                  },
+                  defaultValue: '0.00'
 
-                // },
+                },
                 {
                   key: 'advance_amount',
                   type: 'text',
                   className: 'col-12',
                   templateOptions: {
-                    label: 'Advance',
-                      required: false
+                    label: 'Advance Amount',
+                     required: false
                   },
                   defaultValue: '0.00'
                 },
@@ -721,7 +665,7 @@ loadQuickpackProducts() {
         {
           key: 'purchase_order_items',
           type: 'repeat',
-          className: 'custom-form-list new-items-list',
+          className: 'custom-form-list',
           templateOptions: {
             // title: 'Products',
             addText: 'Add Product',
@@ -1817,27 +1761,27 @@ loadQuickpackProducts() {
                                 }
                               }
                             },
-                            {
-                              key: 'item_value',
-                              type: 'input',
-                              defaultValue: "0",
-                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
-                              templateOptions: {
-                                type: 'input',
-                                label: 'Items value',
-                                placeholder: 'Enter Item value',
-                                readonly: true
-                                // required: true
-                              },
-                              hooks: {
-                                onInit: (field: any) => {
-                                  // Set the initial value from dataToPopulate if available
-                                  if (this.dataToPopulate && this.dataToPopulate.purchase_order_data && this.dataToPopulate.purchase_order_data.item_value && field.formControl) {
-                                    field.formControl.setValue(this.dataToPopulate.purchase_order_data.item_value);
-                                  }
-                                }
-                              }
-                            },
+                            // {
+                            //   key: 'item_value',
+                            //   type: 'input',
+                            //   defaultValue: "0",
+                            //   className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                            //   templateOptions: {
+                            //     type: 'input',
+                            //     label: 'Items value',
+                            //     placeholder: 'Enter Item value',
+                            //     readonly: true
+                            //     // required: true
+                            //   },
+                            //   hooks: {
+                            //     onInit: (field: any) => {
+                            //       // Set the initial value from dataToPopulate if available
+                            //       if (this.dataToPopulate && this.dataToPopulate.purchase_order_data && this.dataToPopulate.purchase_order_data.item_value && field.formControl) {
+                            //         field.formControl.setValue(this.dataToPopulate.purchase_order_data.item_value);
+                            //       }
+                            //     }
+                            //   }
+                            // },
                             {
                               key: 'dis_amt',
                               type: 'input',
@@ -1845,7 +1789,7 @@ loadQuickpackProducts() {
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 type: 'input',
-                                label: 'Discount amount',
+                                label: 'Overall amount',
                                 placeholder: 'Enter Discount amount',
                                 readonly: true
                                 // required: true
@@ -2109,12 +2053,85 @@ loadQuickpackProducts() {
                   ]
                 }
               ]
-            }
+            },
+            {
+              className: 'col-12 custom-form-card-block px-0 pt-3',
+              props: {
+                label: 'Vendor Details'
+              },
+              fieldGroup: [
+                // {
+                //   template: '<div class="custom-form-card-title">   </div>',
+                //   fieldGroupClassName: "ant-row",
+                // },
+                {
+                  fieldGroupClassName: "ant-row",
+                  key: 'purchase_order_data',
+                  fieldGroup: [
+                    {
+                      key: 'vendor_agent',
+                      type: 'select',
+                      className: 'col-md-4 col-sm-6 col-12',
+                      templateOptions: {
+                        label: 'Vendor agent',
+                        dataKey: 'vendor_agent_id',
+                        dataLabel: "name",
+                        options: [],
+                        lazy: {
+                          url: 'vendors/vendor_agent',
+                          lazyOneTime: true
+                        },
+                        // required: true,
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          field.formControl.valueChanges.subscribe(data => {
+                            // console.log("vendors", data);
+                            if (data && data.vendor_agent_id) {
+                              this.formConfig.model['purchase_order_data']['vendor_agent_id'] = data.vendor_agent_id;
+                            }
+                          });
+                        }
+                      }
+                    },
+                    {
+                      key: 'email',
+                      type: 'input',
+                      className: 'col-md-4 col-sm-6 col-12',
+                      templateOptions: {
+                        type: 'input',
+                        label: 'Email',
+                        placeholder: 'Enter Email'
+                      },
+                    },
+                    {
+                      key: 'billing_address',
+                      type: 'textarea',
+                      className: 'col-4',
+                      templateOptions: {
+                        label: 'Billing address',
+                        placeholder: 'Enter Billing address'
+                      },
+                    },
+                    {
+                      key: 'shipping_address',
+                      type: 'textarea',
+                      className: 'col-4',
+                      templateOptions: {
+                        label: 'Shipping address',
+                        placeholder: 'Enter Shipping address'
+                      },
+                    }, 
+                  ]
+                },
+              ]
+            },
           ]
         }
-        ]
-        }
-        }
+      ]
+    }
+  }
+
 
 totalAmountCal() {
 
