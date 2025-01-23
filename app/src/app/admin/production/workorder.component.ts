@@ -290,11 +290,11 @@ fetchSizeOptions(productId: string, productField: any, lastSelectedSize?: any) {
         // Locate and update the size field with the options
         const sizeField = productField.parent.fieldGroup.find(f => f.key === 'size');
 
-        if (uniqueOptions.length > 0) {
-          sizeField.templateOptions.required = true
-        } else {
-          sizeField.templateOptions.required = false
-        }
+        // if (uniqueOptions.length > 0) {
+        //   sizeField.templateOptions.required = true
+        // } else {
+        //   sizeField.templateOptions.required = false
+        // }
         if (sizeField) {
           sizeField.templateOptions.options = uniqueOptions.filter(
             (item, index, self) =>
@@ -326,7 +326,11 @@ fetchSizeOptions(productId: string, productField: any, lastSelectedSize?: any) {
 
 // fetch color options based on the selected size
 fetchColorOptions(sizeId: string, productId: string, sizeField: any, lastSelectedColor?: any) {
-  const apiUrl = `products/product_variations/?product_id=${productId}&size_id=${sizeId}`;
+  let apiUrl = `products/product_variations/?product_id=${productId}&size_id=${sizeId}`;
+  console.log('sizeid', sizeId)
+  if (!sizeId) {
+    apiUrl = `products/product_variations/?product_id=${productId}&size_isnull=True`;
+  }
 
   this.http.get(apiUrl).subscribe(
     (response: any) => {
@@ -343,11 +347,11 @@ fetchColorOptions(sizeId: string, productId: string, sizeField: any, lastSelecte
         // Locate and update the color field with the options
         const colorField = sizeField.parent.fieldGroup.find(f => f.key === 'color');
 
-        if (uniqueOptions.length > 0) {
-          colorField.templateOptions.required = true
-        } else {
-          colorField.templateOptions.required = false
-        }
+        // if (uniqueOptions.length > 0) {
+        //   colorField.templateOptions.required = true
+        // } else {
+        //   colorField.templateOptions.required = false
+        // }
 
         if (colorField) {
           colorField.templateOptions.options = uniqueOptions.filter(
@@ -378,6 +382,21 @@ fetchColorOptions(sizeId: string, productId: string, sizeField: any, lastSelecte
     }
   );
 };
+
+ clearColor(field : any) {
+  const colorField = field.parent.fieldGroup.find(f => f.key === 'color');
+  colorField.formControl.setValue(null); // Clear value
+  colorField.templateOptions.options = []; // Clear options
+  colorField.templateOptions.required = false;
+}
+
+
+clearSize(field : any){
+  const sizeField = field.parent.fieldGroup.find(f => f.key === 'size');
+  sizeField.formControl.setValue(null); // Clear value
+  sizeField.templateOptions.options = []; // Clear options
+  sizeField.templateOptions.required = false;
+}
 
 curdConfig: TaCurdConfig = {
   drawerSize: 500,
@@ -476,26 +495,19 @@ curdConfig: TaCurdConfig = {
                     if (this.formConfig && this.formConfig.model && this.formConfig.model['work_order']) {
                       this.formConfig.model['work_order']['product_id'] = data;
 
-                      function clearSize(){
-                        const sizeField = field.parent.fieldGroup.find(f => f.key === 'size');
-                        sizeField.formControl.setValue(null); // Clear value
-                        sizeField.templateOptions.options = []; // Clear options
-                        sizeField.templateOptions.required = false;
-                      }
-
                       if (data) {
                         const lastSelectedSize = this.formConfig.model.work_order.size_id;
                         this.fetchSizeOptions(data, field, lastSelectedSize);
                       } else {
                         // Clear size and color fields if product ID is cleared
-                        clearSize();
+                        // this.clearSize(field);
                       }
                       
                       // Clear the size and color fields if the product ID changes
-                      if (data !== previousProductId) {
-                        clearSize();
-                        previousProductId = data; // Update the previously selected product ID
-                      }
+                      // if (data !== previousProductId) {
+                      //   this.clearSize(field);
+                      //   previousProductId = data; // Update the previously selected product ID
+                      // }
 
                     } else {
                       console.error('Form config or work_order data model is not defined.');
@@ -531,27 +543,21 @@ curdConfig: TaCurdConfig = {
                     }
                   }
 
-                  function clearColor(){
-                    const colorField = field.parent.fieldGroup.find(f => f.key === 'color');
-                    colorField.formControl.setValue(null); // Clear value
-                    colorField.templateOptions.options = []; // Clear options
-                    colorField.templateOptions.required = false;
-                  }
-
                   field.formControl.valueChanges.subscribe((data: any) => {
                     if (this.formConfig && this.formConfig.model && this.formConfig.model['work_order']) {
                       this.formConfig.model['work_order']['size_id'] = data?.size_id;
                       const lastSelectedColor = this.formConfig.model.work_order.color_id;
-
+                      
+                      const product_id = this.formConfig.model.work_order.product_id;
                       if (data?.size_id) {
-                        const product_id = this.formConfig.model.work_order.product_id;
-                        this.fetchColorOptions(data.size_id, product_id, field, lastSelectedColor);
+                        this.fetchColorOptions(data?.size_id, product_id, field, lastSelectedColor);
                       } else {
-                        clearColor();
+                        this.fetchColorOptions(null, product_id, field, lastSelectedColor);
+                        this.clearColor(field);
                       }
 
                       if (data !== previousSizeId) {
-                        clearColor();
+                        this.clearColor(field);
                         previousSizeId = data?.size_id; // Update the previously selected product ID
                       }
 
