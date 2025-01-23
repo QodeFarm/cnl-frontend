@@ -662,6 +662,9 @@ export class SalesinvoiceComponent {
                     onInit: (field: any) => {
                       if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.bill_type && field.formControl) {
                         field.formControl.setValue(this.dataToPopulate.sale_invoice_order.bill_type);
+                      } else {
+                        // If no data to populate, set 'CASH' as default
+                        field.formControl.setValue('CASH');
                       }
                     }
                   }
@@ -741,7 +744,8 @@ export class SalesinvoiceComponent {
                     type: 'date',
                     label: 'Ref date',
                     placeholder: 'Select Ref date',
-                    readonly: true
+                    readonly: true,
+                    required: true,
                   }
                 },
                 {
@@ -752,7 +756,8 @@ export class SalesinvoiceComponent {
                   templateOptions: {
                     type: 'date',
                     label: 'Due Date',
-                    readonly: true
+                    readonly: true,
+                    required: true,
                   }
                 },
                 {
@@ -762,7 +767,8 @@ export class SalesinvoiceComponent {
                   templateOptions: {
                     type: 'input',
                     label: 'Ref No',
-                    placeholder: 'Enter Ref No'
+                    placeholder: 'Enter Ref No',
+                    required: true,
                   },
                   hooks: {
                     onInit: (field: any) => {
@@ -778,6 +784,7 @@ export class SalesinvoiceComponent {
                   className: 'col-4',
                   templateOptions: {
                     label: 'Tax',
+                    required: true,
                     options: [
                       { 'label': "Inclusive", value: 'Inclusive' },
                       { 'label': "Exclusive", value: 'Exclusive' }
@@ -797,6 +804,7 @@ export class SalesinvoiceComponent {
                   className: 'col-4',
                   templateOptions: {
                     label: 'Remarks',
+                    // required: true,
                     placeholder: 'Enter Remarks',
                   },
                   hooks: {

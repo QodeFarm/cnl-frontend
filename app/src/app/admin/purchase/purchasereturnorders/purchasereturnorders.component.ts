@@ -169,7 +169,7 @@ export class PurchasereturnordersComponent {
     this.formConfig.model['purchase_return_orders']['order_type'] = 'purchase_return';
 
     this.getOrderNo();
-    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide = true;
+    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = true;
     // console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
   }
 
@@ -242,7 +242,7 @@ export class PurchasereturnordersComponent {
         this.formConfig.submit.label = 'Update';
         this.formConfig.model['purchase_return_id'] = this.PurchaseReturnOrderEditID;
         this.showForm = true;
-        this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide = false;
+        this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = false;
       }
     });
     this.hide();
@@ -326,6 +326,7 @@ export class PurchasereturnordersComponent {
                     label: 'Purchase Type',
                     dataKey: 'name',
                     dataLabel: "name",
+                    required: true,
                     options: [],
                     lazy: {
                       url: 'masters/purchase_types/',
@@ -421,6 +422,7 @@ export class PurchasereturnordersComponent {
                     type: 'date',
                     label: 'Ref Date',
                     readonly: true,
+                    required: true,
                     placeholder: 'Select Ref Date',
                   }
                 },
@@ -433,6 +435,7 @@ export class PurchasereturnordersComponent {
                     type: 'date',
                     label: 'Due Date',
                     readonly: true,
+                    required: true,
                     placeholder: 'Select Due Date',
                   }
                 },
@@ -460,6 +463,7 @@ export class PurchasereturnordersComponent {
                   className: 'col-4',
                   templateOptions: {
                     label: 'Tax',
+                    required: true,
                     options: [
                       { 'label': "Inclusive", value: 'Inclusive' },
                       { 'label': "Exclusive", value: 'Exclusive' }
@@ -479,6 +483,7 @@ export class PurchasereturnordersComponent {
                   className: 'col-4',
                   templateOptions: {
                     label: 'Return Reason',
+                    required: true,
                     placeholder: 'Enter Return Reason',
                   }
                 },
@@ -1479,6 +1484,67 @@ export class PurchasereturnordersComponent {
                           key: 'purchase_return_orders',
                           fieldGroup: [
                             {
+                              key: 'tax_amount',
+                              type: 'input',
+                              defaultValue: "0",
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                              templateOptions: {
+                              type: 'input',
+                              label: 'Tax amount',
+                              placeholder: 'Enter Tax amount',
+                              // required: true
+                              },
+                              hooks: {
+                              onInit: (field: any) => {
+                                if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders && this.dataToPopulate.purchase_return_orders.tax_amount && field.formControl) {
+                                field.formControl.setValue(this.dataToPopulate.purchase_return_orders.tax_amount);
+                                }
+                                field.formControl.valueChanges.subscribe(data => {
+                                this.totalAmountCal();
+                                })
+                              }
+                              }
+                            },
+                            {
+                              key: 'cess_amount',
+                              type: 'input',
+                              defaultValue: "0",
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                              templateOptions: {
+                              type: 'input',
+                              label: 'Cess amount',
+                              placeholder: 'Enter Cess amount',
+                              // required: true
+                              },
+                              hooks: {
+                              onInit: (field: any) => {
+                                if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders && this.dataToPopulate.purchase_return_orders.cess_amount && field.formControl) {
+                                field.formControl.setValue(this.dataToPopulate.purchase_return_orders.cess_amount);
+                                }
+                                field.formControl.valueChanges.subscribe(data => {
+                                this.totalAmountCal();
+                                })
+                              }
+                              }
+                            },
+                            {
+                              key: 'taxable',
+                              type: 'input',
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                              templateOptions: {
+                              type: 'input',
+                              label: 'Taxable',
+                              placeholder: 'Enter Taxable',
+                              },
+                              hooks: {
+                              onInit: (field: any) => {
+                                if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders && this.dataToPopulate.purchase_return_orders.taxable && field.formControl) {
+                                field.formControl.setValue(this.dataToPopulate.purchase_return_orders.taxable);
+                                }
+                              }
+                              }
+                            },
+                            {
                               key: 'gst_type',
                               type: 'select',
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
@@ -1535,77 +1601,16 @@ export class PurchasereturnordersComponent {
                               }
                               }
                             },
-                            {
-                              key: 'total_boxes',
-                              type: 'input',
-                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
-                              templateOptions: {
-                              type: 'input',
-                              label: 'Total Boxes',
-                              placeholder: 'Enter total boxes',
-                              }
-                            },
-                            {
-                              key: 'cess_amount',
-                              type: 'input',
-                              defaultValue: "0",
-                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
-                              templateOptions: {
-                              type: 'input',
-                              label: 'Cess amount',
-                              placeholder: 'Enter Cess amount',
-                              // required: true
-                              },
-                              hooks: {
-                              onInit: (field: any) => {
-                                if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders && this.dataToPopulate.purchase_return_orders.cess_amount && field.formControl) {
-                                field.formControl.setValue(this.dataToPopulate.purchase_return_orders.cess_amount);
-                                }
-                                field.formControl.valueChanges.subscribe(data => {
-                                this.totalAmountCal();
-                                })
-                              }
-                              }
-                            },
-                            {
-                              key: 'taxable',
-                              type: 'input',
-                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
-                              templateOptions: {
-                              type: 'input',
-                              label: 'Taxable',
-                              placeholder: 'Enter Taxable',
-                              },
-                              hooks: {
-                              onInit: (field: any) => {
-                                if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders && this.dataToPopulate.purchase_return_orders.taxable && field.formControl) {
-                                field.formControl.setValue(this.dataToPopulate.purchase_return_orders.taxable);
-                                }
-                              }
-                              }
-                            },
-                            {
-                              key: 'tax_amount',
-                              type: 'input',
-                              defaultValue: "0",
-                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
-                              templateOptions: {
-                              type: 'input',
-                              label: 'Tax amount',
-                              placeholder: 'Enter Tax amount',
-                              // required: true
-                              },
-                              hooks: {
-                              onInit: (field: any) => {
-                                if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders && this.dataToPopulate.purchase_return_orders.tax_amount && field.formControl) {
-                                field.formControl.setValue(this.dataToPopulate.purchase_return_orders.tax_amount);
-                                }
-                                field.formControl.valueChanges.subscribe(data => {
-                                this.totalAmountCal();
-                                })
-                              }
-                              }
-                            },
+                            // {
+                            //   key: 'total_boxes',
+                            //   type: 'input',
+                            //   className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                            //   templateOptions: {
+                            //   type: 'input',
+                            //   label: 'Total Boxes',
+                            //   placeholder: 'Enter total boxes',
+                            //   }
+                            // },
                             // {
                             //   key: 'item_value',
                             //   type: 'input',
@@ -1633,7 +1638,7 @@ export class PurchasereturnordersComponent {
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                               type: 'input',
-                              label: 'Overall amount',
+                              label: 'Overall Discount',
                               placeholder: 'Enter Discount amount',
                               // required: true
                               },

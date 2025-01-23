@@ -684,6 +684,9 @@ export class SaleReturnsComponent {
                     onInit: (field: any) => {
                       if (this.dataToPopulate && this.dataToPopulate.sale_return_order.bill_type && field.formControl) {
                         field.formControl.setValue(this.dataToPopulate.sale_return_order.bill_type);
+                      } else {
+                        // If no data to populate, set 'CASH' as default
+                        field.formControl.setValue('CASH');
                       }
                     }
                   }
@@ -758,6 +761,7 @@ export class SaleReturnsComponent {
                     type: 'date',
                     label: 'Ref date',
                     placeholder: 'Select Ref date',
+                    required: true,
                     readonly: true
                   }
                 },
@@ -770,6 +774,7 @@ export class SaleReturnsComponent {
                     type: 'date',
                     label: 'Against bill date',
                     placeholder: 'Select Against bill date',
+                    required: true,
                   }
                 },
                 {
@@ -779,7 +784,8 @@ export class SaleReturnsComponent {
                   templateOptions: {
                     type: 'input',
                     label: 'Ref No',
-                    placeholder: 'Enter Ref No'
+                    placeholder: 'Enter Ref No',
+                    required: true,
                   },
                   hooks: {
                     onInit: (field: any) => {
@@ -795,6 +801,7 @@ export class SaleReturnsComponent {
                   className: 'col-4',
                   templateOptions: {
                     label: 'Tax',
+                    required: true,
                     options: [
                       { 'label': "Inclusive", value: 'Inclusive' },
                       { 'label': "Exclusive", value: 'Exclusive' }
@@ -806,6 +813,17 @@ export class SaleReturnsComponent {
                         field.formControl.setValue(this.dataToPopulate.sale_return_order.tax);
                       }
                     }
+                  }
+                },
+                {
+                  key: 'against_bill',
+                  type: 'input',
+                  className: 'col-4',
+                  templateOptions: {
+                    type: 'input',
+                    label: 'Against bill',
+                    placeholder: 'Enter Against bill',
+                    required: true
                   }
                 },
                 {
@@ -840,6 +858,7 @@ export class SaleReturnsComponent {
                   templateOptions: {
                     label: 'Return Reason',
                     placeholder: 'Enter Return Reason',
+                    required: true,
                   }
                 },
                 // {
@@ -1884,26 +1903,6 @@ export class SaleReturnsComponent {
                                   field.formControl.valueChanges.subscribe(data => {
                                     this.totalAmountCal();
 
-                                  })
-                                }
-                              }
-                            },
-                            {
-                              key: 'advance_amount',
-                              type: 'input',
-                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
-                              templateOptions: {
-                                type: 'number',
-                                label: 'Advance amount',
-                                placeholder: 'Enter Advance amount'
-                              },
-                              hooks: {
-                                onInit: (field: any) => {
-                                  if (this.dataToPopulate && this.dataToPopulate.sale_return_order && this.dataToPopulate.sale_return_order.advance_amount && field.formControl) {
-                                    field.formControl.setValue(this.dataToPopulate.sale_return_order.advance_amount);
-                                  }
-                                  field.formControl.valueChanges.subscribe(data => {
-                                    this.totalAmountCal();
                                   })
                                 }
                               }

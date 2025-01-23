@@ -398,26 +398,46 @@ loadQuickpackProducts() {
                   key: 'purchase_type',
                   type: 'select',
                   className: 'col-md-4 col-sm-6 col-12',
-                  // defaultValue: "d4d85a98-a703-4772-8b3c-736fc4cbf849",
                   templateOptions: {
                     label: 'Purchase type',
                     dataKey: 'purchase_type_id',
                     dataLabel: "name",
                     options: [],
-                    // required: true,
                     lazy: {
                       url: 'masters/purchase_types/',
                       lazyOneTime: true
                     }
                   },
                   hooks: {
-                    onChanges: (field: any) => {
-                      field.formControl.valueChanges.subscribe(data => {
+                    onInit: (field: any) => {
+                      // Fetch data from the API
+                      const lazyUrl = field.templateOptions.lazy.url;
+                      this.http.get(lazyUrl).subscribe((response: any) => {
+                        const purchaseTypes = response.data;
+                
+                        // Populate the options dynamically
+                        field.templateOptions.options = purchaseTypes;
+                
+                        // Find the option with name "Standard Purchase"
+                        const defaultOption = purchaseTypes.find(
+                          (option: any) => option.name === 'Standard Purchase'
+                        );
+                
+                        // Set the default value if "Standard Purchase" exists
+                        if (defaultOption) {
+                          field.formControl.setValue(defaultOption);
+                        }
+                      });
+                
+                      // Handle value changes
+                      field.formControl.valueChanges.subscribe((data: any) => {
                         console.log("purchase_type", data);
                         if (data && data.purchase_type_id) {
                           this.formConfig.model['purchase_order_data']['purchase_type_id'] = data.purchase_type_id;
                         }
                       });
+                    },
+                    onChanges: (field: any) => {
                       if (this.dataToPopulate && this.dataToPopulate.purchase_order_data.purchase_type && field.formControl) {
                         field.formControl.setValue(this.dataToPopulate.purchase_order_data.purchase_type);
                       }
@@ -522,7 +542,8 @@ loadQuickpackProducts() {
                   templateOptions: {
                     type: 'input',
                     label: 'Ref No',
-                    placeholder: 'Enter Ref No'
+                    placeholder: 'Enter Ref No',
+                    required: true,
                   },
                   hooks: {
                     onInit: (field: any) => {
@@ -538,6 +559,7 @@ loadQuickpackProducts() {
                   className: 'col-4',
                   templateOptions: {
                     label: 'Tax',
+                    required: true,
                     options: [
                       { 'label': "Inclusive", value: 'Inclusive' },
                       { 'label': "Exclusive", value: 'Exclusive' }
@@ -1553,6 +1575,27 @@ loadQuickpackProducts() {
                           key: 'purchase_order_data',
                           fieldGroup: [
                             {
+                              key: 'tax_amount',
+                              type: 'input',
+                              defaultValue: "0",
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                              templateOptions: {
+                                type: 'number',
+                                label: 'Tax amount',
+                                placeholder: 'Enter Tax amount'
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  if (this.dataToPopulate && this.dataToPopulate.purchase_order_data && this.dataToPopulate.purchase_order_data.tax_amount && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.purchase_order_data.tax_amount);
+                                  }
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    this.totalAmountCal();
+                                  })
+                                }
+                              }
+                            },
+                            {
                               key: 'cess_amount',
                               type: 'input',
                               defaultValue: "0",
@@ -1608,27 +1651,6 @@ loadQuickpackProducts() {
                                   if (this.dataToPopulate && this.dataToPopulate.purchase_order_data && this.dataToPopulate.purchase_order_data.taxable && field.formControl) {
                                     field.formControl.setValue(this.dataToPopulate.purchase_order_data.taxable);
                                   }
-                                }
-                              }
-                            },
-                            {
-                              key: 'tax_amount',
-                              type: 'input',
-                              defaultValue: "0",
-                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
-                              templateOptions: {
-                                type: 'number',
-                                label: 'Tax amount',
-                                placeholder: 'Enter Tax amount'
-                              },
-                              hooks: {
-                                onInit: (field: any) => {
-                                  if (this.dataToPopulate && this.dataToPopulate.purchase_order_data && this.dataToPopulate.purchase_order_data.tax_amount && field.formControl) {
-                                    field.formControl.setValue(this.dataToPopulate.purchase_order_data.tax_amount);
-                                  }
-                                  field.formControl.valueChanges.subscribe(data => {
-                                    this.totalAmountCal();
-                                  })
                                 }
                               }
                             },
@@ -1789,7 +1811,7 @@ loadQuickpackProducts() {
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 type: 'input',
-                                label: 'Overall amount',
+                                label: 'Overall Discount',
                                 placeholder: 'Enter Discount amount',
                                 readonly: true
                                 // required: true

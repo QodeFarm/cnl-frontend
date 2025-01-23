@@ -1335,7 +1335,8 @@ confirmWorkOrder() {
                         type: 'date',
                         label: 'Ref date',
                         placeholder: 'Select Ref date',
-                        readonly: true
+                        readonly: true,
+                        required: true,
                       }
                     },
                     {
@@ -1345,7 +1346,8 @@ confirmWorkOrder() {
                       templateOptions: {
                         type: 'input',
                         label: 'Ref No',
-                        placeholder: 'Enter Ref No'
+                        placeholder: 'Enter Ref No',
+                        required: true,
                       },
                       hooks: {
                         onInit: (field: any) => {
@@ -1361,6 +1363,7 @@ confirmWorkOrder() {
                       className: 'col-4',
                       templateOptions: {
                         label: 'Tax',
+                        required: true,
                         options: [
                           { 'label': "Inclusive", value: 'Inclusive' },
                           { 'label': "Exclusive", value: 'Exclusive' }
@@ -1460,6 +1463,7 @@ confirmWorkOrder() {
                       templateOptions: {
                         label: 'Remarks',
                         placeholder: 'Enter Remarks',
+                        // required: true,
                       },
                       hooks: {
                         onInit: (field: any) => {
