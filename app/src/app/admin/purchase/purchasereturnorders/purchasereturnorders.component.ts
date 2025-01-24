@@ -335,6 +335,25 @@ export class PurchasereturnordersComponent {
                   },
                   hooks: {
                     onChanges: (field: any) => {
+                      // Fetch data from the API
+                      const lazyUrl = field.templateOptions.lazy.url;
+                      this.http.get(lazyUrl).subscribe((response: any) => {
+                        const purchaseTypes = response.data;
+                
+                        // Populate the options dynamically
+                        field.templateOptions.options = purchaseTypes;
+                
+                        // Find the option with name "Standard Purchase"
+                        const defaultOption = purchaseTypes.find(
+                          (option: any) => option.name === 'Standard Purchase'
+                        );
+                
+                        // Set the default value if "Standard Purchase" exists
+                        if (defaultOption) {
+                          field.formControl.setValue(defaultOption);
+                        }
+                      });
+
                       field.formControl.valueChanges.subscribe(data => {
                         console.log("purchase_type", data);
                         if (data && data.purchase_type_id) {
@@ -458,7 +477,7 @@ export class PurchasereturnordersComponent {
                   }
                 },
                 {
-                  key: 'tax_type',
+                  key: 'tax',
                   type: 'select',
                   className: 'col-4',
                   templateOptions: {
@@ -485,6 +504,23 @@ export class PurchasereturnordersComponent {
                     label: 'Return Reason',
                     required: true,
                     placeholder: 'Enter Return Reason',
+                  }
+                },
+                {
+                  key: 'remarks',
+                  type: 'textarea',
+                  className: 'col-4',
+                  templateOptions: {
+                    type: 'input',
+                    label: 'Remarks',
+                    placeholder: 'Enter Remarks',
+                  },
+                  hooks: {
+                    onInit: (field: any) => {
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_order_data.remarks && field.formControl) {
+                        field.formControl.setValue(this.dataToPopulate.purchase_order_data.remarks);
+                      }
+                    }
                   }
                 },
               ]

@@ -59,11 +59,11 @@ export class PurchasereturnordersListComponent {
         name: 'Return Reason',
         sort: true
       },
-      // {
-      //   fieldKey: 'tax',
-      //   name: 'Tax',
-      //   sort: true
-      // },
+      {
+        fieldKey: 'tax',
+        name: 'Tax',
+        sort: true
+      },
       {
         fieldKey: 'tax_amount',
         name: 'Tax Amount',

@@ -796,7 +796,7 @@ export class SaleReturnsComponent {
                   }
                 },
                 {
-                  key: 'tax_type',
+                  key: 'tax',
                   type: 'select',
                   className: 'col-4',
                   templateOptions: {
