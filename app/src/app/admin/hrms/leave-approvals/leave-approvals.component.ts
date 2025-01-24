@@ -190,12 +190,6 @@ export class LeaveApprovalsComponent {
 
   updateLeaveApproval(url: string, statusId: string) {
     const now = new Date();
-    // const formattedDate = now.getFullYear() + '-' +
-    //     String(now.getMonth() + 1).padStart(2, '0') + '-' +
-    //     String(now.getDate()).padStart(2, '0') + 'T' +
-    //     String(now.getHours()).padStart(2, '0') + ':' +
-    //     String(now.getMinutes()).padStart(2, '0') + ':' +
-    //     String(now.getSeconds()).padStart(2, '0');
 
     const formattedDate = now.getFullYear() + '-' +
         String(now.getMonth() + 1).padStart(2, '0') + '-' +
@@ -314,12 +308,6 @@ export class LeaveApprovalsComponent {
 
   updateLeaveRejection(url: string, statusId: string) {
     const now = new Date();
-    // const formattedDate = now.getFullYear() + '-' +
-    //   String(now.getMonth() + 1).padStart(2, '0') + '-' +
-    //   String(now.getDate()).padStart(2, '0') + 'T' +
-    //   String(now.getHours()).padStart(2, '0') + ':' +
-    //   String(now.getMinutes()).padStart(2, '0') + ':' +
-    //   String(now.getSeconds()).padStart(2, '0');
 
     const formattedDate = now.getFullYear() + '-' +
         String(now.getMonth() + 1).padStart(2, '0') + '-' +
