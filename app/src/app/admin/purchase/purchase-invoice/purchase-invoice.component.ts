@@ -1675,7 +1675,7 @@ loadQuickpackProducts() {
                                 dataKey: 'payment_term_id', // Assuming payment_term_id is the key for the selected value
                                 dataLabel: 'name',
                                 lazy: {
-                                  url: 'masters/customer_payment_terms/',
+                                  url: 'vendors/vendor_payment_terms/',
                                   lazyOneTime: true
                                 },
                               },
