@@ -68,7 +68,7 @@ export class LeaveApprovalsComponent {
           },
         },
         {
-          fieldKey: 'status_id',
+          fieldKey: 'status_name',
           name: 'Status',
           sort: true,
           displayType: "map",
@@ -190,12 +190,17 @@ export class LeaveApprovalsComponent {
 
   updateLeaveApproval(url: string, statusId: string) {
     const now = new Date();
+    // const formattedDate = now.getFullYear() + '-' +
+    //     String(now.getMonth() + 1).padStart(2, '0') + '-' +
+    //     String(now.getDate()).padStart(2, '0') + 'T' +
+    //     String(now.getHours()).padStart(2, '0') + ':' +
+    //     String(now.getMinutes()).padStart(2, '0') + ':' +
+    //     String(now.getSeconds()).padStart(2, '0');
+
     const formattedDate = now.getFullYear() + '-' +
         String(now.getMonth() + 1).padStart(2, '0') + '-' +
-        String(now.getDate()).padStart(2, '0') + 'T' +
-        String(now.getHours()).padStart(2, '0') + ':' +
-        String(now.getMinutes()).padStart(2, '0') + ':' +
-        String(now.getSeconds()).padStart(2, '0');
+        String(now.getDate()).padStart(2, '0');
+
 
     // Prepare the payload for the PATCH request
     const payload = {
@@ -309,12 +314,16 @@ export class LeaveApprovalsComponent {
 
   updateLeaveRejection(url: string, statusId: string) {
     const now = new Date();
+    // const formattedDate = now.getFullYear() + '-' +
+    //   String(now.getMonth() + 1).padStart(2, '0') + '-' +
+    //   String(now.getDate()).padStart(2, '0') + 'T' +
+    //   String(now.getHours()).padStart(2, '0') + ':' +
+    //   String(now.getMinutes()).padStart(2, '0') + ':' +
+    //   String(now.getSeconds()).padStart(2, '0');
+
     const formattedDate = now.getFullYear() + '-' +
-      String(now.getMonth() + 1).padStart(2, '0') + '-' +
-      String(now.getDate()).padStart(2, '0') + 'T' +
-      String(now.getHours()).padStart(2, '0') + ':' +
-      String(now.getMinutes()).padStart(2, '0') + ':' +
-      String(now.getSeconds()).padStart(2, '0');
+        String(now.getMonth() + 1).padStart(2, '0') + '-' +
+        String(now.getDate()).padStart(2, '0');
 
     const payload = {
       status_id: statusId, // Fetched status ID for 'Rejected'
