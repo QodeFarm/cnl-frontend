@@ -37,14 +37,13 @@ export class PaymentTransactionComponent {
     // Make the HTTP request to the determined URL
     this.http.get<any>(url).subscribe(response => {
       // Access the 'data' array from the response
-      const invoices = response.data;
-  
+      const invoices = response.data;  
       // Find the invoice field
-      const invoiceField = this.formConfig.fields[0].fieldGroup.find(f => f.key === 'invoice_id');
+      const invoiceField = this.formConfig.fields[0].fieldGroup.find(f => f.key === 'invoice');
       if (invoiceField) {
         // Update options with the fetched invoice data
         this.invoiceOptions = invoices.map(invoice => ({
-          value: invoice.invoice_no,
+          value: {invoice_id : invoice.invoice_no, invoice_no : invoice.invoice_no},
           label: invoice.invoice_no
         }));
   
@@ -100,7 +99,13 @@ export class PaymentTransactionComponent {
         viewMode: false,
       },
       showActionBtn: true,
-      exParams: [],	  
+      exParams: [
+        {
+          key: 'invoice',
+          type: 'script',
+          value: 'data.invoice.invoice_id'
+        }
+      ],	  
       submit: {
         label: 'Submit',
         submittedFn: () => this.ngOnInit()
@@ -132,7 +137,6 @@ export class PaymentTransactionComponent {
                 onChanges: (field: any) => {
                   field.formControl.valueChanges.subscribe((OrderType: any) => {
                     if (OrderType) {
-                      console.log('Selected Order Type:', OrderType);
                       this.loadInvoices(OrderType);
                     }
                   });
@@ -140,18 +144,31 @@ export class PaymentTransactionComponent {
               }
             },
             {
-              key: 'invoice_id',
+              key: 'invoice',
               type: 'select',
               className: 'col-3 pb-3 ps-0',
               templateOptions: {
                 label: 'Invoice',
-                placeholder: 'Select Invoice',
                 dataKey: 'invoice_id',
-                dataLabel: 'invoice_no',
-                required: true,
+                dataLabel: "invoice_no",
                 options: [],
+                lazy: {
+                  lazyOneTime: true
+                },
+                required: false
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['invoice']) {
+                      this.formConfig.model['invoice_id'] = data.invoice_id;
+                    } else {
+                      console.error('Form config or invoice_id data model is not defined.');
+                    }
+                  });
+                }
               }
-            },                                       
+            },                                     
             {
               key: 'payment_date',
               type: 'date',
