@@ -13,7 +13,7 @@
                                 id="quickpackSelect"
                                 class="dropdown-select m-0 "
                                 [(ngModel)]="selectedQuickpack">
-                                <option value="" disabled selected aria-disabled="true">Select Quickpack values</option>
+                                <option value="" disabled selected aria-disabled="true">Quickpack</option>
                                 <option *ngFor="let quickpack of quickpackOptions" 
                                         [value]="quickpack.quick_pack_id">
                                     {{ quickpack.name }}
