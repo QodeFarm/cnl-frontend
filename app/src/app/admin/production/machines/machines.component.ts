@@ -5,8 +5,8 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 @Component({
   selector: 'app-machines',
-  standalone: true,
-  imports: [CommonModule, AdminCommmonModule],
+  // standalone: true,
+  // imports: [CommonModule, AdminCommmonModule],
   templateUrl: './machines.component.html',
   styleUrls: ['./machines.component.scss']
 })

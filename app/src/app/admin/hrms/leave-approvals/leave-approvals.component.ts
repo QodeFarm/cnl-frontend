@@ -19,6 +19,7 @@ export class LeaveApprovalsComponent {
     curdConfig: TaCurdConfig = {
     drawerSize: 500,
     drawerPlacement: 'right',
+    hideAddBtn: true,
     tableConfig: {
       apiUrl: 'hrms/leave_approvals/',
       title: 'Leave Approvals',

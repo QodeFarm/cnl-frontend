@@ -30,6 +30,7 @@ export class SaleReceiptComponent implements OnInit {
     return {
       drawerSize: 500,
       drawerPlacement: 'right',
+      hideAddBtn: true,
       tableConfig: {
         apiUrl: 'sales/sale_order/?summary=true&flow_status=Delivery In progress',
         title: 'Sales Receipt',
