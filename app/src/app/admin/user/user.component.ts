@@ -6,7 +6,7 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 @Component({
   selector: 'app-user',
   standalone: true,
-  imports: [CommonModule,AdminCommmonModule],
+  imports: [CommonModule, AdminCommmonModule],
   templateUrl: './user.component.html',
   styleUrls: ['./user.component.scss']
 })
@@ -269,7 +269,7 @@ export class UserComponent {
                 required: true
               },
               expressions: {
-                hide: "model.user_id"
+                hide: "(model.user_id)?true:false"
               },
               hooks: {
                 onInit: (field: any) => {
@@ -287,7 +287,7 @@ export class UserComponent {
                 required: true
               },
               expressions: {
-                hide: "model.user_id"
+                hide: "(model.user_id)?true:false"
               },
               hooks: {
                 onInit: (field: any) => {
