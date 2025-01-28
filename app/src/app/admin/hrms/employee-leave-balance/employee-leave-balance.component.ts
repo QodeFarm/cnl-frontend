@@ -20,6 +20,7 @@ export class EmployeeLeaveBalanceComponent {
     drawerSize: 500,
     // drawerPlacement: 'top',
     drawerPlacement: 'right',
+    hideAddBtn: true,
     tableConfig: {
       apiUrl: 'hrms/employee_leave_balance/',
       title: 'Employee Leave Balance',

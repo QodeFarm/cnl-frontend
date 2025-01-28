@@ -313,79 +313,84 @@ export class TasksComponent implements OnInit {
 
         // start of task_comments keys
         {
-          key: 'task_comments',
-          type: 'table',
-          className: 'custom-form-list',
-          templateOptions: {
-            title: 'Task Comments',
-            addText: 'Add Comments',
-            tableCols: [
-              { name: 'comment_text', label: 'Comment Text' }
-            ]
-          },
-          fieldArray: {
-            fieldGroup: [
+          fieldGroupClassName: 'row m-0',
+          fieldGroup: [          
               {
-                key: 'comment_text',
-                type: 'textarea',
+                key: 'task_comments',
+                type: 'table',
+                className: 'custom-form-list col-6',
                 templateOptions: {
-                  label: 'Comment Text',
-                  placeholder: 'Enter Comment Text',
-                  hideLabel: true,
-                  required: true,
-                  // Leave out the `readonly` field here
-                },
-                defaultValue: '',  // Set the default value to an empty string for new comments
-                expressionProperties: {
-                  'templateOptions.readonly': (model: any, formState: any) => {
-                    // Ensure that model is available and check 'isExisting' field safely
-                    return model && model['isExisting'] === true;
-                  }
-                  //   'type': (model: any, formState: any) => {
-                  //   // Set the input type based on whether the comment is existing
-                  //   return model && model['isExisting'] ? 'text' : 'textarea';
-                  // }
-                },
-              }
-            ]
-          }
-        },
-        // end of task_comments keys
-
-        // start of task_attachments keys
-        {
-          className: 'col-6 pb-0',
-          fieldGroupClassName: "field-no-bottom-space",
-          fieldGroup: [
-            {
-              fieldGroupClassName: "row col-12 m-0 custom-form-card",
-              fieldGroup: [
-                {
-                  className: 'col-12 custom-form-card-block w-100',
-                  fieldGroup:[
-                    {
-                      template: '<div class="custom-form-card-title"> Task Attachments </div>',
-                      fieldGroupClassName: "ant-row",
-                    },
-                    {
-                      key: 'task_attachments',
-                      type: 'file',
-                      className: 'ta-cell col-12 custom-file-attachement',
-                      templateOptions: {
-                        "displayStyle": "files",
-                        "multiple": true
-                        // label: 'Order Attachments',
-                        // // required: true
-                        // required: true
-                      }
-                    },
+                  title: 'Task Comments',
+                  addText: 'Add Comments',
+                  tableCols: [
+                    { name: 'comment_text', label: 'Comment Text' }
                   ]
                 },
-              ]
-            }
-          ]
+                fieldArray: {
+                  fieldGroup: [
+                    {
+                      key: 'comment_text',
+                      type: 'textarea',
+                      templateOptions: {
+                        label: 'Comment Text',
+                        placeholder: 'Enter Comment Text',
+                        hideLabel: true,
+                        required: true,
+                        // Leave out the `readonly` field here
+                      },
+                      defaultValue: '',  // Set the default value to an empty string for new comments
+                      expressionProperties: {
+                        'templateOptions.readonly': (model: any, formState: any) => {
+                          // Ensure that model is available and check 'isExisting' field safely
+                          return model && model['isExisting'] === true;
+                        }
+                        //   'type': (model: any, formState: any) => {
+                        //   // Set the input type based on whether the comment is existing
+                        //   return model && model['isExisting'] ? 'text' : 'textarea';
+                        // }
+                      },
+                    }
+                  ]
+                }
+              },
+              // end of task_comments keys
+
+              // start of task_attachments keys
+              {
+                className: 'col-6 pb-0',
+                fieldGroupClassName: "field-no-bottom-space",
+                fieldGroup: [
+                  {
+                    fieldGroupClassName: "row col-12 m-0 custom-form-card",
+                    fieldGroup: [
+                      {
+                        className: 'col-12 custom-form-card-block w-100',
+                        fieldGroup:[
+                          {
+                            template: '<div class="custom-form-card-title"> Task Attachments </div>',
+                            fieldGroupClassName: "ant-row",
+                          },
+                          {
+                            key: 'task_attachments',
+                            type: 'file',
+                            className: 'ta-cell col-12 custom-file-attachement',
+                            templateOptions: {
+                              "displayStyle": "files",
+                              "multiple": true
+                              // label: 'Order Attachments',
+                              // // required: true
+                              // required: true
+                            }
+                          },
+                        ]
+                      },
+                    ]
+                  }
+                ]
+              }
+            ]     
         }
-      ]
+       ]
     };
   }
 }
