@@ -187,9 +187,8 @@ export class TaTableComponent implements OnDestroy {
         if (response && response.data && response.data.length > 0) {
           // Map the employees' data to options for the select dropdown
           this.employeeOptions = response.data.map(employee => {
-            console.log('Fetched Employee List:', this.employeeOptions);
-            const fullName = `${employee.first_name} ${employee.last_name || ''}`.trim(); // Concatenate first and last names
-
+          const fullName = `${employee.first_name} ${employee.last_name || ''}`.trim(); // Concatenate first and last names
+ 
             return {
               value: employee.employee_id,  // Use the employee ID as value
               label: fullName // Store the full name

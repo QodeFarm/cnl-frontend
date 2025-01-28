@@ -177,7 +177,7 @@ export class PurchaseComponent {
 
     // to get PurchaseOrder number for save
     this.getOrderNo();
-    this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[7].hide =true;
+    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide =true;
     // console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
   }
 
@@ -260,7 +260,7 @@ export class PurchaseComponent {
 
         this.formConfig.model['purchase_order_id'] = this.PurchaseOrderEditID;
         this.showForm = true;
-        this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[7].hide = false;
+        this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = false;
       }
     });
     this.hide();
@@ -391,247 +391,312 @@ loadQuickpackProducts() {
           key: 'purchase_order_data',
           fieldGroup: [
             {
-              key: 'purchase_type',
-              type: 'select',
-              className: 'col-2',
-              // defaultValue: "d4d85a98-a703-4772-8b3c-736fc4cbf849",
-              templateOptions: {
-                label: 'Purchase type',
-                dataKey: 'purchase_type_id',
-                dataLabel: "name",
-                options: [],
-                // required: true,
-                lazy: {
-                  url: 'masters/purchase_types/',
-                  lazyOneTime: true
-                }
-              },
-              hooks: {
-                onChanges: (field: any) => {
-                  field.formControl.valueChanges.subscribe(data => {
-                    console.log("purchase_type", data);
-                    if (data && data.purchase_type_id) {
-                      this.formConfig.model['purchase_order_data']['purchase_type_id'] = data.purchase_type_id;
+              className: 'col-md-9 col-sm-8 col-12 p-0',
+              fieldGroupClassName: "ant-row mx-0 row align-items-end mt-2",
+              fieldGroup: [
+                {
+                  key: 'purchase_type',
+                  type: 'select',
+                  className: 'col-md-4 col-sm-6 col-12',
+                  templateOptions: {
+                    label: 'Purchase type',
+                    dataKey: 'purchase_type_id',
+                    dataLabel: "name",
+                    options: [],
+                    lazy: {
+                      url: 'masters/purchase_types/',
+                      lazyOneTime: true
                     }
-                  });
-                  if (this.dataToPopulate && this.dataToPopulate.purchase_order_data.purchase_type && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.purchase_order_data.purchase_type);
+                  },
+                  hooks: {
+                    onInit: (field: any) => {
+                      // Fetch data from the API
+                      const lazyUrl = field.templateOptions.lazy.url;
+                      this.http.get(lazyUrl).subscribe((response: any) => {
+                        const purchaseTypes = response.data;
+                
+                        // Populate the options dynamically
+                        field.templateOptions.options = purchaseTypes;
+                
+                        // Find the option with name "Standard Purchase"
+                        const defaultOption = purchaseTypes.find(
+                          (option: any) => option.name === 'Standard Purchase'
+                        );
+                
+                        // Set the default value if "Standard Purchase" exists
+                        if (defaultOption) {
+                          field.formControl.setValue(defaultOption);
+                        }
+                      });
+                
+                      // Handle value changes
+                      field.formControl.valueChanges.subscribe((data: any) => {
+                        console.log("purchase_type", data);
+                        if (data && data.purchase_type_id) {
+                          this.formConfig.model['purchase_order_data']['purchase_type_id'] = data.purchase_type_id;
+                        }
+                      });
+                    },
+                    onChanges: (field: any) => {
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_order_data.purchase_type && field.formControl) {
+                        field.formControl.setValue(this.dataToPopulate.purchase_order_data.purchase_type);
+                      }
+                    }
                   }
-                }
-              }
-            },
-            {
-              key: 'vendor',
-              type: 'select',
-              className: 'col-2',
-              props: {
-                label: 'Vendor',
-                dataKey: 'vendor_id',
-                dataLabel: "name",
-                options: [],
-                lazy: {
-                  url: 'vendors/vendors/?summary=true',
-                  lazyOneTime: true
                 },
-                required: true
+                {
+                  key: 'vendor',
+                  type: 'select',
+                  className: 'col-md-4 col-sm-6 col-12',
+                  props: {
+                    label: 'Vendor',
+                    dataKey: 'vendor_id',
+                    dataLabel: "name",
+                    options: [],
+                    lazy: {
+                      url: 'vendors/vendors/?summary=true',
+                      lazyOneTime: true
+                    },
+                    required: true
 
-              },
-              hooks: {
-                onInit: (field: any) => {
-                  field.formControl.valueChanges.subscribe(data => {
-                    // console.log("vendors", data);
-                    if (data && data.vendor_id) {
-                      this.formConfig.model['purchase_order_data']['vendor_id'] = data.vendor_id;
+                  },
+                  hooks: {
+                    onInit: (field: any) => {
+                      field.formControl.valueChanges.subscribe(data => {
+                        // console.log("vendors", data);
+                        if (data && data.vendor_id) {
+                          this.formConfig.model['purchase_order_data']['vendor_id'] = data.vendor_id;
+                        }
+                        if (data.vendor_addresses && data.vendor_addresses.billing_address) {
+                            field.form.controls.billing_address.setValue(data.vendor_addresses.billing_address)
+                        }
+                        if (data.vendor_addresses && data.vendor_addresses.shipping_address) {
+                          field.form.controls.shipping_address.setValue(data.vendor_addresses.shipping_address)
+                        }
+                        if (data.email) {
+                          field.form.controls.email.setValue(data.email)
+                        }
+                      });
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_order_data.vendor && field.formControl) {
+                        field.formControl.setValue(this.dataToPopulate.purchase_order_data.vendor);
+                      }
                     }
-                    if (data.vendor_addresses && data.vendor_addresses.billing_address) {
-                        field.form.controls.billing_address.setValue(data.vendor_addresses.billing_address)
-                    }
-                    if (data.vendor_addresses && data.vendor_addresses.shipping_address) {
-                      field.form.controls.shipping_address.setValue(data.vendor_addresses.shipping_address)
-                    }
-                    if (data.email) {
-                      field.form.controls.email.setValue(data.email)
-                    }
-                  });
-                  if (this.dataToPopulate && this.dataToPopulate.purchase_order_data.vendor && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.purchase_order_data.vendor);
                   }
-                }
-              }
-            },
-            {
-              key: 'vendor_agent',
-              type: 'select',
-              className: 'col-2',
-              templateOptions: {
-                label: 'Vendor agent',
-                dataKey: 'vendor_agent_id',
-                dataLabel: "name",
-                options: [],
-                lazy: {
-                  url: 'vendors/vendor_agent',
-                  lazyOneTime: true
                 },
-                // required: true,
-
-              },
-              hooks: {
-                onChanges: (field: any) => {
-                  field.formControl.valueChanges.subscribe(data => {
-                    // console.log("vendors", data);
-                    if (data && data.vendor_agent_id) {
-                      this.formConfig.model['purchase_order_data']['vendor_agent_id'] = data.vendor_agent_id;
+                {
+                  key: 'order_no',
+                  type: 'input',
+                  className: 'col-md-4 col-sm-6 col-12',
+                  templateOptions: {
+                    label: 'Order no',
+                    placeholder: 'Enter Order No',
+                    required: true,
+                    // readonly: true
+                    disabled: true
+                  },
+                  hooks: {
+                    onInit: (field: any) => {}
+                  }
+                },
+                {
+                  key: 'delivery_date',
+                  type: 'date',
+                  defaultValue: this.nowDate(),
+                  className: 'col-md-4 col-sm-6 col-12',
+                  templateOptions: {
+                    type: 'date',
+                    label: 'Delivery date',
+                    readonly: true,
+                    required: true
+                  }
+                },
+                {
+                  key: 'order_date',
+                  type: 'date',
+                  defaultValue: this.nowDate(),
+                  className: 'col-4',
+                  templateOptions: {
+                    type: 'date',
+                    label: 'Order date',
+                    readonly: true,
+                    required: true
+                  }
+                },
+                {
+                  key: 'ref_date',
+                  type: 'date',
+                  defaultValue: this.nowDate(),
+                  className: 'col-4',
+                  templateOptions: {
+                    type: 'date',
+                    label: 'Ref date',
+                    placeholder: 'Select Ref date',
+                    required: true,
+                    readonly: true
+                  }
+                },
+                {
+                  key: 'ref_no',
+                  type: 'input',
+                  className: 'col-4',
+                  templateOptions: {
+                    type: 'input',
+                    label: 'Ref No',
+                    placeholder: 'Enter Ref No',
+                    required: true,
+                  },
+                  hooks: {
+                    onInit: (field: any) => {
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_order_data.ref_no && field.formControl) {
+                        field.formControl.setValue(this.dataToPopulate.purchase_order_data.ref_no);
+                      }
                     }
-                  });
-                }
-              }
-            },
-            {
-              key: 'order_no',
-              type: 'input',
-              className: 'col-2',
-              templateOptions: {
-                label: 'Order no',
-                placeholder: 'Enter Order No',
-                required: true,
-                readonly: true
-              },
-              hooks: {
-                onInit: (field: any) => {}
-              }
-            },
-            {
-              key: 'email',
-              type: 'input',
-              className: 'col-2',
-              templateOptions: {
-                type: 'input',
-                label: 'Email',
-                placeholder: 'Enter Email'
-              },
-              hooks: {
-                onInit: (field: any) => { }
-              }
-            },
-            {
-              key: 'delivery_date',
-              type: 'date',
-              defaultValue: this.nowDate(),
-              className: 'col-2',
-              templateOptions: {
-                type: 'date',
-                label: 'Delivery date',
-                required: true
-              }
-            },
-            {
-              key: 'order_date',
-              type: 'date',
-              defaultValue: this.nowDate(),
-              className: 'col-2',
-              templateOptions: {
-                type: 'date',
-                label: 'Order date',
-                readonly: true,
-                required: true
-              }
-            },
-            {
-              key: 'ref_no',
-              type: 'input',
-              className: 'col-2',
-              templateOptions: {
-                type: 'input',
-                label: 'Ref No',
-                placeholder: 'Enter Ref No'
-              },
-              hooks: {
-                onInit: (field: any) => {
-                  if (this.dataToPopulate && this.dataToPopulate.purchase_order_data.ref_no && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.purchase_order_data.ref_no);
                   }
-                }
-              }
-            },
-            {
-              key: 'ref_date',
-              type: 'date',
-              defaultValue: this.nowDate(),
-              className: 'col-2',
-              templateOptions: {
-                type: 'date',
-                label: 'Ref date',
-                placeholder: 'Select Ref date',
-                required: true,
-                // readonly: true
-              }
-            },
-            {
-              key: 'tax',
-              type: 'select',
-              className: 'col-2',
-              templateOptions: {
-                label: 'Tax',
-                options: [
-                  { 'label': "Inclusive", value: 'Inclusive' },
-                  { 'label': "Exclusive", value: 'Exclusive' }
-                ]
-              },
-              hooks: {
-                onInit: (field: any) => {
-                  if (this.dataToPopulate && this.dataToPopulate.purchase_order_data.tax && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.purchase_order_data.tax);
+                },
+                {
+                  key: 'tax',
+                  type: 'select',
+                  className: 'col-4',
+                  templateOptions: {
+                    label: 'Tax',
+                    required: true,
+                    options: [
+                      { 'label': "Inclusive", value: 'Inclusive' },
+                      { 'label': "Exclusive", value: 'Exclusive' }
+                    ]
+                  },
+                  hooks: {
+                    onInit: (field: any) => {
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_order_data.tax && field.formControl) {
+                        field.formControl.setValue(this.dataToPopulate.purchase_order_data.tax);
+                      }
+                    }
                   }
-                }
-              }
-            },
-            {
-              key: 'remarks',
-              type: 'textarea',
-              className: 'col-4',
-              templateOptions: {
-                type: 'input',
-                label: 'Remarks',
-                placeholder: 'Enter Remarks',
-              },
-              hooks: {
-                onInit: (field: any) => {
-                  if (this.dataToPopulate && this.dataToPopulate.purchase_order_data.remarks && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.purchase_order_data.remarks);
+                },
+                {
+                  key: 'remarks',
+                  type: 'textarea',
+                  className: 'col-4',
+                  templateOptions: {
+                    type: 'input',
+                    label: 'Remarks',
+                    placeholder: 'Enter Remarks',
+                  },
+                  hooks: {
+                    onInit: (field: any) => {
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_order_data.remarks && field.formControl) {
+                        field.formControl.setValue(this.dataToPopulate.purchase_order_data.remarks);
+                      }
+                    }
                   }
-                }
-              }
+                },
+              ]
             },
             {
-              key: 'billing_address',
-              type: 'textarea',
-              className: 'col-6',
-              templateOptions: {
-                label: 'Billing address',
-                placeholder: 'Enter Billing address',
-              }
+              className: 'col-md-3 col-sm-4 col-12 p-0 inline-form-fields',
+              fieldGroupClassName: "ant-row row mx-0 mt-2",
+              fieldGroup: [
+                {
+                  key: 'item_value',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Items Total',
+                    disabled: true,
+                  }, 
+                  defaultValue: '0.00'                    
+                },
+                // {
+                //   key: 'texable_amt',
+                //   type: 'text',
+                //   className: 'col-12',
+                //   templateOptions: {
+                //     label: 'Texable Amt',
+                //     required: false,                    
+                //   },
+                //   defaultValue: '0.00'
+                // },
+                {
+                  key: 'cess_amount',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Cess Amount',
+                    required: false
+                  },
+                  defaultValue: '0.00',
+                },
+                {
+                  key: 'tax_amount',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Tax Amount',
+                    required: false
+                  },
+                  defaultValue: '0.00',
+                },
+                // {
+                //   key: 'item_value',
+                //   type: 'text',
+                //   className: 'col-12',
+                //   templateOptions: {
+                //     label: 'Total Value',
+                //      required: false
+                //   },
+                //      defaultValue: '0.00'
+                // },
+                {
+                  key: 'dis_amt',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Discount Amount',
+                     required: false
+                  },
+                  defaultValue: '0.00'
+
+                },
+                {
+                  key: 'advance_amount',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Advance Amount',
+                     required: false
+                  },
+                  defaultValue: '0.00'
+                },
+                {
+                  key: 'total_amount',
+                  type: 'text',
+                  className: 'col-12 product-total',
+                  templateOptions: {
+                    label: ' ',
+                    required: false,
+                    placeholder: 'Total Amount',
+                    disabled: true,
+                  },
+                  defaultValue: '0.00'
+                },                                                      
+              ]
             },
-            {
-              key: 'shipping_address',
-              type: 'textarea',
-              className: 'col-6',
-              templateOptions: {
-                label: 'Shipping address',
-                placeholder: 'Enter Shipping address',
-              }
-            }
           ]
         },
         // end of purchase_order
-
         {
           key: 'purchase_order_items',
-          type: 'table',
+          type: 'repeat',
           className: 'custom-form-list',
           templateOptions: {
             // title: 'Products',
             addText: 'Add Product',
             tableCols: [
+              { 
+                name: 'selectItem', 
+                label: '', 
+                type: 'checkbox'
+              }, 
               {
                 name: 'product',
                 label: 'Product'
@@ -677,15 +742,28 @@ loadQuickpackProducts() {
           fieldArray: {
             fieldGroup: [
               {
+                key: 'selectItem',
+                type: 'checkbox',
+                defaultValue: false,
+                templateOptions: {
+                    hideLabel: true,
+                },
+                expressionProperties: {
+                    'templateOptions.hidden': () => !(this.PurchaseOrderEditID),
+                    'templateOptions.disabled': (model) => model.invoiced === 'YES' || !this.PurchaseOrderEditID
+                  }
+              }, 
+              {
                 key: 'product',
                 type: 'select',
                 templateOptions: {
-                  label: 'Select Product',
+                  label: 'Product',
                   dataKey: 'product_id',
                   hideLabel: true,
                   dataLabel: 'name',
                   options: [],
                   required: true,
+                  placeholder: 'product',
                   lazy: {
                     url: 'products/products/?summary=true',
                     lazyOneTime: true
@@ -876,12 +954,13 @@ loadQuickpackProducts() {
                 key: 'size',
                 type: 'select',
                 templateOptions: {
-                  label: 'Select Size',
+                  label: 'Size',
                   dataKey: 'size_id',
                   hideLabel: true,
                   dataLabel: 'size_name',
                   options: [],
                   required: false,
+                  placeholder: 'size',
                   lazy: {
                     lazyOneTime: true
                   }
@@ -1003,12 +1082,13 @@ loadQuickpackProducts() {
                 key: 'color',
                 type: 'select',
                 templateOptions: {
-                  label: 'Select Color',
+                  label: 'Color',
                   dataKey: 'color_id',
                   hideLabel: true,
                   dataLabel: 'color_name',
                   options: [],
                   required: false,
+                  placeholder: 'color',
                   lazy: {
                     lazyOneTime: true
                   }
@@ -1109,7 +1189,7 @@ loadQuickpackProducts() {
                 key: 'code',
                 templateOptions: {
                   label: 'Code',
-                  placeholder: 'Enter code',
+                  placeholder: 'code',
                   hideLabel: true,
                 },
                 hooks: {
@@ -1139,7 +1219,7 @@ loadQuickpackProducts() {
                 templateOptions: {
                 type: 'number',
                   label: 'Total Boxes',
-                  placeholder: 'Enter Total Boxes',
+                  placeholder: 'Boxes',
                   hideLabel: true
                 },
                 hooks: {
@@ -1168,7 +1248,7 @@ loadQuickpackProducts() {
                 key: 'unit_options_id',
                 templateOptions: {
                   label: 'Unit',
-                  placeholder: 'Select Unit',
+                  placeholder: 'Unit',
                   hideLabel: true,
                   dataLabel: 'unit_name',
                   dataKey: 'unit_options_id',
@@ -1207,7 +1287,7 @@ loadQuickpackProducts() {
                 templateOptions: {
                   type: 'number',
                   label: 'Qty',
-                  placeholder: 'Enter Qty',
+                  placeholder: 'Qty',
                   min: 1,
                   hideLabel: true,
                   required: true
@@ -1328,7 +1408,7 @@ loadQuickpackProducts() {
                 key: 'print_name',
                 templateOptions: {
                   label: 'Print name',
-                  placeholder: 'Enter Product Print name',
+                  placeholder: 'name',
                   hideLabel: true
                 },
                 hooks: {
@@ -1368,7 +1448,7 @@ loadQuickpackProducts() {
                 templateOptions: {
                   type: 'number',
                   label: 'Amount',
-                  placeholder: 'Enter Amount',
+                  placeholder: 'Amount',
                   hideLabel: true,
                   disabled: true
                 },
@@ -1471,14 +1551,318 @@ loadQuickpackProducts() {
         
         {
           fieldGroupClassName: "row col-12 m-0 custom-form-card",
+          className: 'tab-form-list px-3',
+          type: 'tabs',
           fieldGroup: [
             {
-              className: 'col-6 custom-form-card-block',
+              className: 'col-12 px-0 pt-3',
+              props: {
+                label: 'Billing Details'
+              },
               fieldGroup: [
                 {
-                  template: '<div class="custom-form-card-title">  Shipping Details </div>',
-                  fieldGroupClassName: "ant-row",
-                },
+                  fieldGroupClassName: "",
+                  fieldGroup: [
+                    {
+                      className: 'col-12 mb-3 custom-form-card-block w-100',
+                      fieldGroup: [
+                        // {
+                        //   template: '<div class="custom-form-card-title">  </div>',
+                        //   fieldGroupClassName: "ant-row",
+                        // },
+                        {
+                          fieldGroupClassName: "ant-row",
+                          key: 'purchase_order_data',
+                          fieldGroup: [
+                            {
+                              key: 'tax_amount',
+                              type: 'input',
+                              defaultValue: "0",
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                              templateOptions: {
+                                type: 'number',
+                                label: 'Tax amount',
+                                placeholder: 'Enter Tax amount'
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  if (this.dataToPopulate && this.dataToPopulate.purchase_order_data && this.dataToPopulate.purchase_order_data.tax_amount && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.purchase_order_data.tax_amount);
+                                  }
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    this.totalAmountCal();
+                                  })
+                                }
+                              }
+                            },
+                            {
+                              key: 'cess_amount',
+                              type: 'input',
+                              defaultValue: "0",
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                              templateOptions: {
+                                type: 'number',
+                                label: 'Cess amount',
+                                placeholder: 'Enter Cess amount'
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  if (this.dataToPopulate && this.dataToPopulate.purchase_order_data && this.dataToPopulate.purchase_order_data.cess_amount && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.purchase_order_data.cess_amount);
+                                  }
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    this.totalAmountCal();
+
+                                  })
+                                }
+                              }
+                            },
+                            {
+                              key: 'advance_amount',
+                              type: 'input',
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                              templateOptions: {
+                                type: 'number',
+                                label: 'Advance amount',
+                                placeholder: 'Enter Advance amount'
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  if (this.dataToPopulate && this.dataToPopulate.purchase_order_data && this.dataToPopulate.purchase_order_data.advance_amount && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.purchase_order_data.advance_amount);
+                                  }
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    this.totalAmountCal();
+                                  })
+                                }
+                              }
+                            },
+                            {
+                              key: 'taxable',
+                              type: 'input',
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                              templateOptions: {
+                                type: 'input',
+                                label: 'Taxable',
+                                placeholder: 'Enter Taxable'
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  if (this.dataToPopulate && this.dataToPopulate.purchase_order_data && this.dataToPopulate.purchase_order_data.taxable && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.purchase_order_data.taxable);
+                                  }
+                                }
+                              }
+                            },
+							              // {
+                            //   key: 'round_off',
+                            //   type: 'input',
+                            //   // defaultValue: "7777700",
+                            //   className: 'col-4',
+                            //   templateOptions: {
+                            //     type: 'input',
+                            //     label: 'Round off',
+                            //     placeholder: 'Enter Round off',
+                            //     // required: true
+                            //   }
+                            // },
+                            {
+                              key: 'gst_type',
+                              type: 'select',
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                              templateOptions: {
+                                label: 'Gst type',
+                                placeholder: 'Select Gst type',
+                                dataKey: 'gst_type_id', // Assuming gst_type_id is the key you want to use
+                                dataLabel: "name",
+                                lazy: {
+                                  url: 'masters/gst_types/',
+                                  lazyOneTime: true
+                                },
+                                // required: true // Uncomment if required
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    if (data && data.gst_type_id) {
+                                      this.formConfig.model['purchase_order_data']['gst_type_id'] = data.gst_type_id;
+                                    }
+                                  });
+                                  // Set the default value for Ledger Account if it exists
+                                  if (this.dataToPopulate && this.dataToPopulate.purchase_order_data.gst_type && field.formControl) {
+                                    const GstFiled = this.dataToPopulate.purchase_order_data.gst_type
+                                    field.formControl.setValue(GstFiled);
+                                  }
+                                }
+                              }
+                            },                                                                                    
+                            {
+                              key: 'payment_term',
+                              type: 'select',
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                              templateOptions: {
+                                label: 'Payment term',
+                                placeholder: 'Select Payment term',
+                                dataKey: 'payment_term_id', // Assuming payment_term_id is the key for the selected value
+                                dataLabel: 'name',
+                                lazy: {
+                                  url: 'vendors/vendor_payment_terms/',
+                                  lazyOneTime: true
+                                },
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    if (data && data.payment_term_id) {
+                                      this.formConfig.model['purchase_order_data']['payment_term_id'] = data.payment_term_id;
+                                    }
+                                  });
+                                  // Set the default value for Ledger Account if it exists
+                                  if (this.dataToPopulate && this.dataToPopulate.purchase_order_data.payment_term_id && field.formControl) {
+                                    const PaymentField = this.dataToPopulate.purchase_order_data.payment_term_id
+                                    field.formControl.setValue(PaymentField);
+                                  }
+                                }
+                              }
+                            },                            
+                            {
+                              key: 'ledger_account',
+                              type: 'select',
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                              templateOptions: {
+                                label: 'Ledger account',
+                                placeholder: 'Select Ledger account',
+                                dataKey: 'ledger_account_id', // Assuming ledger_account_id is the key for the selected value
+                                dataLabel: 'name',
+                                lazy: {
+                                  url: 'customers/ledger_accounts/',
+                                  lazyOneTime: true
+                                }
+                              },
+                              hooks: {
+                                onInit: (field: any) => {                           
+                                  // Subscribe to value changes
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    if (data && data.ledger_account_id) {
+                                      this.formConfig.model['purchase_order_data']['ledger_account_id'] = data.ledger_account_id; // Update the model with the selected ledger_account_id
+                                    }
+                                  });
+                                  // Set the default value for Ledger Account if it exists
+                                  if (this.dataToPopulate && this.dataToPopulate.purchase_order_data.ledger_account && field.formControl) {
+                                    const LedgerField = this.dataToPopulate.purchase_order_data.ledger_account
+                                    field.formControl.setValue(LedgerField);
+                                  }
+                                }
+                              }
+                            },     
+                            {
+                              key: 'order_status',
+                              type: 'select',
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                              templateOptions: {
+                                label: 'Order status',
+                                dataKey: 'order_status_id',
+                                dataLabel: 'status_name',
+                                placeholder: 'Select Order status type',
+                                lazy: {
+                                  url: 'masters/order_status/',
+                                  lazyOneTime: true
+                                },
+                                expressions: {
+                                  hide: '!model.purchase_order_data_id',
+                                },
+                              },
+                              hooks: {
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    //console.log("ledger_account", data);
+                                    if (data && data.order_status_id) {
+                                      this.formConfig.model['purchase_order_data']['order_status_id'] = data.order_status_id;
+                                    }
+                                  });
+                                }
+                              }
+                            },
+                            // {
+                            //   key: 'item_value',
+                            //   type: 'input',
+                            //   defaultValue: "0",
+                            //   className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                            //   templateOptions: {
+                            //     type: 'input',
+                            //     label: 'Items value',
+                            //     placeholder: 'Enter Item value',
+                            //     readonly: true
+                            //     // required: true
+                            //   },
+                            //   hooks: {
+                            //     onInit: (field: any) => {
+                            //       // Set the initial value from dataToPopulate if available
+                            //       if (this.dataToPopulate && this.dataToPopulate.purchase_order_data && this.dataToPopulate.purchase_order_data.item_value && field.formControl) {
+                            //         field.formControl.setValue(this.dataToPopulate.purchase_order_data.item_value);
+                            //       }
+                            //     }
+                            //   }
+                            // },
+                            {
+                              key: 'dis_amt',
+                              type: 'input',
+                              // defaultValue: "777770",
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                              templateOptions: {
+                                type: 'input',
+                                label: 'Overall Discount',
+                                placeholder: 'Enter Discount amount',
+                                readonly: true
+                                // required: true
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  // Set the initial value from dataToPopulate if available
+                                  if (this.dataToPopulate && this.dataToPopulate.purchase_order_data && this.dataToPopulate.purchase_order_data.dis_amt && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.purchase_order_data.dis_amt);
+                                  }
+                                }
+                              }
+                            },
+                            {
+                              key: 'total_amount',
+                              type: 'input',
+                              defaultValue: "0",
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                              templateOptions: {
+                                type: 'input',
+                                label: 'Total amount',
+                                placeholder: 'Enter Total amount',
+                                readonly: true
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  // Set the initial value from dataToPopulate if available
+                                  if (this.dataToPopulate && this.dataToPopulate.purchase_order_data && this.dataToPopulate.purchase_order_data.total_amount && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.purchase_order_data.total_amount);
+                                  }
+                                }
+                              }
+                            }   
+                          ]
+                        },
+                      ]
+                    }                 
+                  ]
+                }
+              ]
+            },
+            {
+              className: 'col-12 custom-form-card-block px-0 pt-3',
+              props: {
+                label: 'Shipping Details'
+              },
+              fieldGroup: [
+                // {
+                //   template: '<div class="custom-form-card-title">   </div>',
+                //   fieldGroupClassName: "ant-row",
+                // },
                 {
                   fieldGroupClassName: "ant-row",
                   key: 'order_shipments',
@@ -1486,7 +1870,7 @@ loadQuickpackProducts() {
                     {
                       key: 'destination',
                       type: 'input',
-                      className: 'col-6',
+                      className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                       templateOptions: {
                         label: 'Destination',
                         placeholder: 'Enter Destination',
@@ -1502,7 +1886,7 @@ loadQuickpackProducts() {
                     {
                       key: 'port_of_landing',
                       type: 'input',
-                      className: 'col-6',
+                      className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                       templateOptions: {
                         label: 'Port of Landing',
                         placeholder: 'Enter Port of Landing',
@@ -1516,32 +1900,32 @@ loadQuickpackProducts() {
                       }
                     },
                     {
-                        key: 'shipping_mode_id',
-                        type: 'select',
-                        className: 'col-6',
-                        templateOptions: {
-                          label: 'Shipping Mode',
-                          placeholder: 'Select Shipping Mode',
-                          dataKey: 'shipping_mode_id',
-                          dataLabel: "name",
-                          bindId: true,
-                          lazy: {
-                            url: 'masters/shipping_modes',
-                            lazyOneTime: true
-                          }
-                        },
-                        hooks: {
-                          onInit: (field: any) => {
-                            if (this.dataToPopulate && this.dataToPopulate.order_shipments.shipping_mode_id && field.formControl) {
-                              field.formControl.setValue(this.dataToPopulate.order_shipments.shipping_mode_id);
-                            }
-                          }
+                      key: 'shipping_mode_id',
+                      type: 'select',
+                      className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                      templateOptions: {
+                        label: 'Shipping Mode',
+                        placeholder: 'Select Shipping Mode',
+                        dataKey: 'shipping_mode_id',
+                        dataLabel: "name",
+                        bindId: true,
+                        lazy: {
+                          url: 'masters/shipping_modes',
+                          lazyOneTime: true
                         }
                       },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.shipping_mode_id && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.shipping_mode_id);
+                          }
+                        }
+                      }
+                    },
                     {
                       key: 'port_of_discharge',
                       type: 'input',
-                      className: 'col-6',
+                      className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                       templateOptions: {
                         label: 'Port of Discharge',
                         placeholder: 'Select Port of Discharge',
@@ -1555,32 +1939,32 @@ loadQuickpackProducts() {
                       }
                     },
                     {
-                        key: 'shipping_company_id',
-                        type: 'select',
-                        className: 'col-6',
-                        templateOptions: {
-                          label: 'Shipping Company',
-                          placeholder: 'Select Shipping Company',
-                          dataKey: 'shipping_company_id',
-                          dataLabel: "name",
-                          bindId: true,
-                          lazy: {
-                            url: 'masters/shipping_companies',
-                            lazyOneTime: true
-                          }
-                        },
-                        hooks: {
-                          onInit: (field: any) => {
-                            if (this.dataToPopulate && this.dataToPopulate.order_shipments.shipping_company_id && field.formControl) {
-                              field.formControl.setValue(this.dataToPopulate.order_shipments.shipping_company_id);
-                            }
-                          }
+                      key: 'shipping_company_id',
+                      type: 'select',
+                      className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                      templateOptions: {
+                        label: 'Shipping Company',
+                        placeholder: 'Select Shipping Company',
+                        dataKey: 'shipping_company_id',
+                        dataLabel: "name",
+                        bindId: true,
+                        lazy: {
+                          url: 'masters/shipping_companies',
+                          lazyOneTime: true
                         }
                       },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.shipping_company_id && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.shipping_company_id);
+                          }
+                        }
+                      }
+                    },
                     {
                       key: 'no_of_packets',
                       type: 'input',
-                      className: 'col-6',
+                      className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                       templateOptions: {
                         type: "number",
                         label: 'No. of Packets',
@@ -1597,7 +1981,7 @@ loadQuickpackProducts() {
                     {
                       key: 'weight',
                       type: 'input',
-                      className: 'col-6',
+                      className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                       templateOptions: {
                         type: "number",
                         label: 'Weight',
@@ -1614,378 +1998,162 @@ loadQuickpackProducts() {
                     {
                       key: 'shipping_tracking_no',
                       type: 'input',
-                      className: 'col-6',
+                      className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                       templateOptions: {
-                        label: 'Shipping Tracking No',
-                        placeholder: 'Enter Shipping Tracking No',
-                        // readonly: true,
-                        // disabled: true
+                        label: 'Shipping Tracking No.',
+                        placeholder: 'Enter Shipping Tracking No.',
+                        readonly: true
                       }
                     },
                     {
-                        key: 'shipping_date',
+                      key: 'shipping_date',
+                      type: 'date',
+                      // defaultValue: this.nowDate(),
+                      className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                      templateOptions: {
                         type: 'date',
-                        // defaultValue: this.nowDate(),
-                        className: 'col-6',
-                        templateOptions: {
-                          type: 'date',
-                          label: 'Shipping Date',
-                          // required: true
-                        }
+                        label: 'Shipping Date',
+                        // required: true
+                      }
+                    },
+                    {
+                      key: 'shipping_charges',
+                      type: 'input',
+                      className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                      templateOptions: {
+                        type: "number",
+                        label: 'Shipping Charges.',
+                        placeholder: 'Enter Shipping Charges',
+                        // required: true
                       },
-                      {
-                        key: 'shipping_charges',
-                        type: 'input',
-                        className: 'col-6',
-                        templateOptions: {
-                          type: "number",
-                          label: 'Shipping Charges.',
-                          placeholder: 'Enter Shipping Charges',
-                          // required: true
-                        },
-                        hooks: {
-                          onInit: (field: any) => {
-                            if (this.dataToPopulate && this.dataToPopulate.order_shipments.shipping_charges && field.formControl) {
-                              field.formControl.setValue(this.dataToPopulate.order_shipments.shipping_charges);
-                            }
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.shipping_charges && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.shipping_charges);
                           }
-                          // required: true
                         }
                       }
+                    }
                   ]
                 },
               ]
             },
             {
-                className: 'col-6 pb-0',
-                fieldGroupClassName: "field-no-bottom-space",
-                fieldGroup: [
-                  {
-                    fieldGroupClassName: "",
-                    fieldGroup: [
-                      {
-                        className: 'col-12 mb-3 custom-form-card-block w-100',
-                        fieldGroup: [
-                          {
-                            template: '<div class="custom-form-card-title"> Billing Details </div>',
-                            fieldGroupClassName: "ant-row",
-                          },
-                          {
-                            fieldGroupClassName: "ant-row",
-                            key: 'purchase_order_data',
-                            fieldGroup: [
-                              {
-                                key: 'cess_amount',
-                                type: 'input',
-                                defaultValue: "0",
-                                className: 'col-4',
-                                templateOptions: {
-                                  type: 'number',
-                                  label: 'Cess amount',
-                                  placeholder: 'Enter Cess amount'
-                                },
-                                hooks: {
-                                  onInit: (field: any) => {
-                                    if (this.dataToPopulate && this.dataToPopulate.purchase_order_data && this.dataToPopulate.purchase_order_data.cess_amount && field.formControl) {
-                                      field.formControl.setValue(this.dataToPopulate.purchase_order_data.cess_amount);
-                                    }
-                                    field.formControl.valueChanges.subscribe(data => {
-                                      this.totalAmountCal();
-  
-                                    })
-                                  }
-                                }
-                              },
-                              {
-                                key: 'advance_amount',
-                                type: 'input',
-                                className: 'col-4',
-                                templateOptions: {
-                                  type: 'number',
-                                  label: 'Advance amount',
-                                  placeholder: 'Enter Advance amount'
-                                },
-                                hooks: {
-                                  onInit: (field: any) => {
-                                    if (this.dataToPopulate && this.dataToPopulate.purchase_order_data && this.dataToPopulate.purchase_order_data.advance_amount && field.formControl) {
-                                      field.formControl.setValue(this.dataToPopulate.purchase_order_data.advance_amount);
-                                    }
-                                    field.formControl.valueChanges.subscribe(data => {
-                                      this.totalAmountCal();
-                                    })
-                                  }
-                                }
-                              },
-                              {
-                                key: 'taxable',
-                                type: 'input',
-                                className: 'col-4',
-                                templateOptions: {
-                                  type: 'input',
-                                  label: 'Taxable',
-                                  placeholder: 'Enter Taxable'
-                                },
-                                hooks: {
-                                  onInit: (field: any) => {
-                                    if (this.dataToPopulate && this.dataToPopulate.purchase_order_data && this.dataToPopulate.purchase_order_data.taxable && field.formControl) {
-                                      field.formControl.setValue(this.dataToPopulate.purchase_order_data.taxable);
-                                    }
-                                  }
-                                }
-                              },
-                              {
-                                key: 'tax_amount',
-                                type: 'input',
-                                defaultValue: "0",
-                                className: 'col-4',
-                                templateOptions: {
-                                  type: 'number',
-                                  label: 'Tax amount',
-                                  placeholder: 'Enter Tax amount'
-                                },
-                                hooks: {
-                                  onInit: (field: any) => {
-                                    if (this.dataToPopulate && this.dataToPopulate.purchase_order_data && this.dataToPopulate.purchase_order_data.tax_amount && field.formControl) {
-                                      field.formControl.setValue(this.dataToPopulate.purchase_order_data.tax_amount);
-                                    }
-                                    field.formControl.valueChanges.subscribe(data => {
-                                      this.totalAmountCal();
-                                    })
-                                  }
-                                }
-                              },
-                            // {
-                            //   key: 'round_off',
-                            //   type: 'input',
-                            //   // defaultValue: "7777700",
-                            //   className: 'col-4',
-                            //   templateOptions: {
-                            //     type: 'input',
-                            //     label: 'Round off',
-                            //     placeholder: 'Enter Round off',
-                            //     // required: true
-                            //   }
-                            // },
-                            {
-                              key: 'gst_type',
-                              type: 'select',
-                              className: 'col-4',
-                              templateOptions: {
-                                label: 'Gst type',
-                                placeholder: 'Select Gst type',
-                                dataKey: 'name',
-                                dataLabel: "name",
-                                lazy: {
-                                  url: 'masters/gst_types/',
-                                  lazyOneTime: true
-                                }
-                              },
-                              hooks: {
-                                onInit: (field: any) => {
-                                  field.formControl.valueChanges.subscribe(data => {
-                                    console.log("gst_type", data);
-                                    if (data && data.gst_type_id) {
-                                      this.formConfig.model['purchase_order_data']['gst_type_id'] = data.gst_type_id;
-                                    }
-                                  });
-                                  // Set the default value for Ledger Account if it exists
-                                  if (this.dataToPopulate && this.dataToPopulate.purchase_order_data.gst_type && field.formControl) {
-                                    const GstFiled = this.dataToPopulate.purchase_order_data.gst_type
-                                    field.formControl.setValue(GstFiled);
-                                  }
-                                }
-                              }
-                            },
-                            {
-                              key: 'payment_term',
-                              type: 'select',
-                              className: 'col-4',
-                              templateOptions: {
-                                label: 'Payment term',
-                                placeholder: 'Select Payment term',
-                                dataKey: 'name',
-                                dataLabel: "name",
-                                lazy: {
-                                  url: 'vendors/vendor_payment_terms/',
-                                  lazyOneTime: true
-                                }
-                              },
-                              hooks: {
-                                onInit: (field: any) => {
-                                  field.formControl.valueChanges.subscribe(data => {
-                                    if (data && data.payment_term_id) {
-                                      this.formConfig.model['purchase_order_data']['payment_term_id'] = data.payment_term_id;
-                                    }
-                                  });
-                                  // Set the default value for Ledger Account if it exists
-                                  if (this.dataToPopulate && this.dataToPopulate.purchase_order_data.payment_term_id && field.formControl) {
-                                    const PaymentField = this.dataToPopulate.purchase_order_data.payment_term_id
-                                    field.formControl.setValue(PaymentField);
-                                  }
-                                }
-                              }
-                            },
-                            {
-                              key: 'ledger_account',
-                              type: 'select',
-                              className: 'col-4',
-                              templateOptions: {
-                                dataKey: 'name',
-                                dataLabel: "name",
-                                label: 'Ledger account',
-                                placeholder: 'Select Ledger account',
-                                lazy: {
-                                  url: 'customers/ledger_accounts/',
-                                  lazyOneTime: true
-                                }
-                              },
-                              hooks: {
-                                onInit: (field: any) => {
-                                  field.formControl.valueChanges.subscribe(data => {
-                                    console.log("ledger_account", data);
-                                    if (data && data.ledger_account_id) {
-                                      this.formConfig.model['purchase_order_data']['ledger_account_id'] = data.ledger_account_id;
-                                    }
-                                  });
-                                  // Set the default value for Ledger Account if it exists
-                                  if (this.dataToPopulate && this.dataToPopulate.purchase_order_data.ledger_account && field.formControl) {
-                                    const LedgerField = this.dataToPopulate.purchase_order_data.ledger_account
-                                    field.formControl.setValue(LedgerField);
-                                  }
-                                }
-                              }
-                            },
-                            {
-                              key: 'order_status',
-                              type: 'select',
-                              className: 'col-4',
-                              templateOptions: {
-                                label: 'Order status Type',
-                                dataKey: 'order_status_id',
-                                dataLabel: 'status_name',
-                                placeholder: 'Select Order status type',
-                                lazy: {
-                                  url: 'masters/order_status/',
-                                  lazyOneTime: true
-                                },
-                                expressions: {
-                                  hide: '!model.purchase_order_id'
-                                },
-                              },
-                              hooks: {
-                                onChanges: (field: any) => {
-                                  field.formControl.valueChanges.subscribe(data => {
-                                    console.log("order_status", data);
-                                    if (data && data.order_status_id) {
-                                      this.formConfig.model['purchase_order_data']['order_status_id'] = data.order_status_id;
-                                    }
-                                  });
-                                }
-                              }
-                            },
-                            {
-                              key: 'item_value',
-                              type: 'input',
-                              defaultValue: "0",
-                              className: 'col-4',
-                              templateOptions: {
-                                type: 'input',
-                                label: 'Items value',
-                                placeholder: 'Enter Item value',
-                                readonly: true
-                                // required: true
-                              },
-                              hooks: {
-                                onInit: (field: any) => {
-                                  // Set the initial value from dataToPopulate if available
-                                  if (this.dataToPopulate && this.dataToPopulate.purchase_order_data && this.dataToPopulate.purchase_order_data.item_value && field.formControl) {
-                                    field.formControl.setValue(this.dataToPopulate.purchase_order_data.item_value);
-                                  }
-                                }
-                              }
-                            },
-                            {
-                              key: 'dis_amt',
-                              type: 'input',
-                              // defaultValue: "777770",
-                              className: 'col-4',
-                              templateOptions: {
-                                type: 'input',
-                                label: 'Discount Amt',
-                                readonly: true,
-                                placeholder: 'Enter Discount Amt',
-                                // required: true
-                              
-                              },
-                              hooks: {
-                                onInit: (field: any) => {
-                                  // Set the initial value from dataToPopulate if available
-                                  if (this.dataToPopulate && this.dataToPopulate.purchase_order_data && this.dataToPopulate.purchase_order_data.dis_amt && field.formControl) {
-                                    field.formControl.setValue(this.dataToPopulate.purchase_order_data.dis_amt);
-                                  }
-                                }
-                              }
-                            },
-                            {
-                              key: 'total_amount',
-                              type: 'input',
-                              defaultValue: "0",
-                              className: 'col-4',
-                              templateOptions: {
-                                type: 'input',
-                                label: 'Total amount',
-                                placeholder: 'Enter Total amount',
-                                readonly: true
-                              },
-                              hooks: {
-                                onInit: (field: any) => {
-                                  // Set the initial value from dataToPopulate if available
-                                  if (this.dataToPopulate && this.dataToPopulate.purchase_order_data && this.dataToPopulate.purchase_order_data.total_amount && field.formControl) {
-                                    field.formControl.setValue(this.dataToPopulate.purchase_order_data.total_amount);
-                                  }
-                                }
-                              }
-                            },
-                          ]
-                        },
-                      ]
-                    },
+              className: 'col-12 px-0 pt-3',
+              props: {
+                label: 'Order Attachments'
+              },
+              fieldGroup: [
                 {
-                    className: 'col-12 custom-form-card-block w-100',
-                    fieldGroup: [
-                      {
-                        template: '<div class="custom-form-card-title"> Order Attachments </div>',
-                        fieldGroupClassName: "ant-row",
-                      },
-                      {
-                        key: 'order_attachments',
-                        type: 'file',
-                        className: 'ta-cell col-12 custom-file-attachement',
-                        props: {
-                          "displayStyle": "files",
-                          "multiple": true
-                        },
-                        hooks: {
-                          onInit: (field: any) => {
-                            if (this.dataToPopulate && this.dataToPopulate.order_attachments && field.formControl) {
-                              field.formControl.setValue(this.dataToPopulate.order_attachments);
+                  fieldGroupClassName: "",
+                  fieldGroup: [
+                    {
+                      className: 'col-12 custom-form-card-block w-100 p-0',
+                      fieldGroup: [
+                        // {
+                        //   template: '<div class="custom-form-card-title"> Order Attachments </div>',
+                        //   fieldGroupClassName: "ant-row",
+                        // },
+                        {
+                          key: 'order_attachments',
+                          type: 'file',
+                          className: 'ta-cell col-12 col-md-6 custom-file-attachement',
+                          props: {
+                            "displayStyle": "files",
+                            "multiple": true
+                          },
+                          hooks: {
+                            onInit: (field: any) => {
+                              if (this.dataToPopulate && this.dataToPopulate.order_attachments && field.formControl) {
+                                field.formControl.setValue(this.dataToPopulate.order_attachments);
+                              }
                             }
                           }
                         }
-                      }
-                    ]
-                  }
-                ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              className: 'col-12 custom-form-card-block px-0 pt-3',
+              props: {
+                label: 'Vendor Details'
               },
+              fieldGroup: [
+                // {
+                //   template: '<div class="custom-form-card-title">   </div>',
+                //   fieldGroupClassName: "ant-row",
+                // },
+                {
+                  fieldGroupClassName: "ant-row",
+                  key: 'purchase_order_data',
+                  fieldGroup: [
+                    {
+                      key: 'vendor_agent',
+                      type: 'select',
+                      className: 'col-md-4 col-sm-6 col-12',
+                      templateOptions: {
+                        label: 'Vendor agent',
+                        dataKey: 'vendor_agent_id',
+                        dataLabel: "name",
+                        options: [],
+                        lazy: {
+                          url: 'vendors/vendor_agent',
+                          lazyOneTime: true
+                        },
+                        // required: true,
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          field.formControl.valueChanges.subscribe(data => {
+                            // console.log("vendors", data);
+                            if (data && data.vendor_agent_id) {
+                              this.formConfig.model['purchase_order_data']['vendor_agent_id'] = data.vendor_agent_id;
+                            }
+                          });
+                        }
+                      }
+                    },
+                    {
+                      key: 'email',
+                      type: 'input',
+                      className: 'col-md-4 col-sm-6 col-12',
+                      templateOptions: {
+                        type: 'input',
+                        label: 'Email',
+                        placeholder: 'Enter Email'
+                      },
+                    },
+                    {
+                      key: 'billing_address',
+                      type: 'textarea',
+                      className: 'col-4',
+                      templateOptions: {
+                        label: 'Billing address',
+                        placeholder: 'Enter Billing address'
+                      },
+                    },
+                    {
+                      key: 'shipping_address',
+                      type: 'textarea',
+                      className: 'col-4',
+                      templateOptions: {
+                        label: 'Shipping address',
+                        placeholder: 'Enter Shipping address'
+                      },
+                    }, 
+                  ]
+                },
+              ]
+            },
+          ]
+        }
+      ]
+    }
+  }
 
-            ]
-
-          }
-        ]
-        }
-        ]
-        }
-        }
 
 totalAmountCal() {
 

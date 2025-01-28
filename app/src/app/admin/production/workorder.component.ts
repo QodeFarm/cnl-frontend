@@ -23,11 +23,16 @@ export class WorkorderComponent implements OnInit {
   WorkOrderBoardView: any; //
   formConfig: TaFormConfig = {};
   @ViewChild(WorkOrderListComponent) WorkOrderListComponent!: WorkOrderListComponent;
+  editMode: boolean = false;
 
   constructor(private http: HttpClient) {}
   
   ngOnInit() {
+    this.showWorkorderList = false;
+    this.showForm = true;
     this.setFormConfig();
+    // this.formConfig.reset.resetFn(this.ngOnInit());
+    
   
     // Check if navigation state contains work order data for editing
     if (history.state && (history.state.productDetails || history.state.saleOrderDetails)) {
@@ -55,9 +60,21 @@ export class WorkorderComponent implements OnInit {
     }
   }
 
+  makeFieldsNotTouchable(indexes: number[]) {
+    indexes.forEach(index => {
+      const field = this.formConfig.fields[0].fieldGroup[index];
+      
+      if (field) {
+        field.templateOptions.disabled = true; // Disable the field
+      }
+    });
+  }
+
   editWorkorder(event: any) {
+    this.editMode = true;
     this.showCreateBomButton = false
     this.hideFields(false); // Shows fields at indexes 5, 4, and 9
+    this.makeFieldsNotTouchable([0, 1, 2]);
     console.log('event', event);
     this.WorkOrdrEditID = event;
     this.http.get('production/work_order/' + event).subscribe((res: any) => {
@@ -73,7 +90,7 @@ export class WorkorderComponent implements OnInit {
         this.showForm = true;
         // this.formConfig.fields[0].fieldGroup[2].hide = false
       }
-    });
+    })
     this.hide();
   }
 
@@ -108,8 +125,6 @@ export class WorkorderComponent implements OnInit {
             end_date: data.saleOrderDetails.delivery_date || null
         };
     }
-
-    // console.log('Form model after population:', this.formConfig.model);
 }
 
 
@@ -126,7 +141,6 @@ submitWorkOrder() {
 }
 
 populateBom(product_id:any){
-  if (this.formConfig.model.work_order && !this.formConfig.model.work_order.work_order_id) {
     const url = `production/bom/?product_id=${product_id}` // To get 'bom_id', filter by  selected product_id
     let bom_data = {}
     this.http.get(url).subscribe((response: any) => {
@@ -163,7 +177,6 @@ populateBom(product_id:any){
         }
       }
     })
-  }
 };
 
 
@@ -268,6 +281,131 @@ updateInventory() {
   });
 }
 
+fetchSizeOptions(productId: string, productField: any, lastSelectedSize?: any) {
+  const apiUrl = `products/product_variations/?product_id=${productId}`;
+
+  this.http.get(apiUrl).subscribe(
+    (response: any) => {
+
+      if (response && response.data && Array.isArray(response.data)) {
+        const uniqueOptions = response.data.map((item: any) => ({
+          value: {
+            size_id: item.size?.size_id || null,
+            size_name: item.size?.size_name || '----',
+          },
+          label: item.size?.size_name || '----',
+        }));
+
+        // Locate and update the size field with the options
+        const sizeField = productField.parent.fieldGroup.find(f => f.key === 'size');
+
+        // if (uniqueOptions.length > 0) {
+        //   sizeField.templateOptions.required = true
+        // } else {
+        //   sizeField.templateOptions.required = false
+        // }
+        if (sizeField) {
+          sizeField.templateOptions.options = uniqueOptions.filter(
+            (item, index, self) =>
+              index === self.findIndex(t => t.value.size_id === item.value.size_id)
+          );
+
+          // Set the previously selected size (if it exists) only after options are ready
+          if (lastSelectedSize) {
+            const matchingOption = sizeField.templateOptions.options.find(
+              option => option.value.size_id === lastSelectedSize.size_id
+            );
+            if (matchingOption) {
+              sizeField.formControl.setValue(matchingOption.value.size_id);
+            }
+          }
+
+          // Trigger Angular change detection
+          sizeField.formControl.updateValueAndValidity();
+        }
+      } else {
+        console.error('Invalid or empty data in size options response:', response);
+      }
+    },
+    error => {
+      console.error('Error fetching size options:', error);
+    }
+  );
+};
+
+// fetch color options based on the selected size
+fetchColorOptions(sizeId: string, productId: string, sizeField: any, lastSelectedColor?: any) {
+  let apiUrl = `products/product_variations/?product_id=${productId}&size_id=${sizeId}`;
+  if (!sizeId) {
+    apiUrl = `products/product_variations/?product_id=${productId}&size_isnull=True`;
+  }
+
+  this.http.get(apiUrl).subscribe(
+    (response: any) => {
+
+      if (response && response.data && Array.isArray(response.data)) {
+        const uniqueOptions = response.data.map((item: any) => ({
+          value: {
+            color_id: item.color?.color_id || null,
+            color_name: item.color?.color_name || '----',
+          },
+          label: item.color?.color_name || '----',
+        }));
+
+        // Locate and update the color field with the options
+        const colorField = sizeField.parent.fieldGroup.find(f => f.key === 'color');
+
+        // if (uniqueOptions.length > 0) {
+        //   colorField.templateOptions.required = true
+        // } else {
+        //   colorField.templateOptions.required = false
+        // }
+
+        if (colorField) {
+          colorField.templateOptions.options = uniqueOptions.filter(
+            (item, index, self) =>
+              index === self.findIndex(t => t.value.color_id === item.value.color_id)
+          );
+
+
+          // Set the previously selected color (if it exists) only after options are ready
+          if (lastSelectedColor) {
+            const matchingOption = colorField.templateOptions.options.find(
+              option => option.value.color_id === lastSelectedColor
+            );
+            if (matchingOption) {
+              colorField.formControl.setValue(matchingOption.value);
+            }
+          }
+
+          // Trigger Angular change detection
+          colorField.formControl.updateValueAndValidity();
+        }
+      } else {
+        console.error('Invalid or empty data in color options response:', response);
+      }
+    },
+    error => {
+      console.error('Error fetching color options:', error);
+    }
+  );
+};
+
+ clearColor(field : any) {
+  const colorField = field.parent.fieldGroup.find(f => f.key === 'color');
+  colorField.formControl.setValue(null); // Clear value
+  colorField.templateOptions.options = []; // Clear options
+  colorField.templateOptions.required = false;
+}
+
+
+clearSize(field : any){
+  const sizeField = field.parent.fieldGroup.find(f => f.key === 'size');
+  sizeField.formControl.setValue(null); // Clear value
+  sizeField.templateOptions.options = []; // Clear options
+  sizeField.templateOptions.required = false;
+}
+
 curdConfig: TaCurdConfig = {
   drawerSize: 500,
   drawerPlacement: 'top',
@@ -282,7 +420,7 @@ curdConfig: TaCurdConfig = {
     pkId: "bom_id",
     exParams: [],
     fields: [{
-      fieldGroupClassName: "row",
+      fieldGroupClassName: "ant-row custom-form-block",
       fieldGroup: [
         {
         key: 'bom_name',
@@ -358,79 +496,34 @@ curdConfig: TaCurdConfig = {
               },
               hooks: {
                 onInit: (field: any) => {
-                  // Subscribe to changes in product_id field
-                  field.formControl.valueChanges.subscribe((selectedProductId) => {
-                    const product = field.formControl.value;
-                    this.populateBom(product)
+                  // let previousProductId: any = null; // Keep track of the previously selected product ID                  
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (!this.editMode) {
+                      this.populateBom(data);
+                    }
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['work_order']) {
+                      this.formConfig.model['work_order']['product_id'] = data;
             
-                    // Clear previous size and color fields and their values
-                    const workOrderGroup = this.formConfig.fields.find((f: any) => f.key === 'work_order');
-                    if (workOrderGroup && workOrderGroup.fieldGroup) {
-                      const sizeField = workOrderGroup.fieldGroup.find((f: any) => f.key === 'size');
-                      const colorField = workOrderGroup.fieldGroup.find((f: any) => f.key === 'color');
-            
-                      if (sizeField) {
-                        sizeField.templateOptions.required = false; // Make the field not required
-                        sizeField.formControl.setValue(null); // Clear current value
-                        sizeField.templateOptions.options = []; // Clear previous options
-                        sizeField.formControl.disable(); // Temporarily disable until new data arrives
+                      if (data) {
+                        const lastSelectedSize = this.formConfig.model.work_order.size_id;
+                        this.fetchSizeOptions(data, field, lastSelectedSize);
+                      } else {
+                        // Clear size and color fields if product ID is cleared
+                        // this.clearSize(field);
                       }
-            
-                      if (colorField) {
-                        colorField.formControl.setValue(null); // Clear current value
-                        colorField.templateOptions.options = []; // Clear previous options
-                        colorField.formControl.disable(); // Temporarily disable until new data arrives
-                      }
-            
-                      // Fetch size and color options for the selected product
-                      if (product) {
-                        this.http.get(`products/product_variations/?product_id=${product}`).subscribe((response: any) => {
-                          if (response.data.length > 0) {
-                            const availableSizes = response.data.map((variation: any) => ({
-                              label: variation.size?.size_name || '----',
-                              value: {
-                                size_id: variation.size?.size_id || null,
-                                size_name: variation.size?.size_name || '----'
-                              }
-                            }));
-            
-                            const availableColors = response.data.map((variation: any) => ({
-                              label: variation.color?.color_name || '----',
-                              value: {
-                                color_id: variation.color?.color_id || null,
-                                color_name: variation.color?.color_name || '----'
-                              }
-                            }));
-            
-                            // Update size field
-                            if (sizeField) {
-                              sizeField.formControl.enable(); // Enable field
-                              sizeField.templateOptions.required = true; // Make the field required
-                              sizeField.templateOptions.options = availableSizes.filter(
-                                (item, index, self) => index === self.findIndex((t) => t.value.size_id === item.value.size_id)
-                              ); // Ensure unique options
-                            }
-
-                          } else {
-                            console.log(`For Product: ${product} - No sizes or colors available.`);
-                            if (sizeField) {
-                              sizeField.formControl.disable();
-                              sizeField.templateOptions.options = [];
-                            }
-                            if (colorField) {
-                              colorField.formControl.disable();
-                              colorField.templateOptions.options = [];
-                            }
-                          }
-                        });
-                      }
+                      
+                      // Clear the size and color fields if the product ID changes
+                      // if (data !== previousProductId) {
+                      //   this.clearSize(field);
+                      //   previousProductId = data; // Update the previously selected product ID
+                      // }
                     } else {
-                      console.error('Work Order Group not found.');
+                      console.error('Form config or work_order data model is not defined.');
                     }
                   });
                 }
               }
-            },
+            },            
             {
               key: 'size',
               type: 'select',
@@ -439,85 +532,45 @@ curdConfig: TaCurdConfig = {
                 label: 'Size',
                 dataKey: 'size_id',
                 dataLabel: 'size_name',
-                options: [],
-                disabled: true,
+                options: [], // To be dynamically populated
                 required: false,
-                lazy: {
-                  lazyOneTime: true,
-                  url: `products/sizes/`
-                }
               },
               hooks: {
-                onChanges: (field: any) => {
-                  field.formControl.valueChanges.subscribe((data: any) => {
-                    const index = field.parent.key;
-                    if (!this.formConfig.model['work_order']) {
-                      console.error(`Size at index ${index} is not defined. Initializing...`);
-                      this.formConfig.model['work_order'] = {};
-                    }
-                    this.formConfig.model['work_order']['size_id'] = data?.size_id || null;
-                  });
-                },
                 onInit: (field: any) => {
-                  // Trigger color field update whenever size changes
-                  field.formControl.valueChanges.subscribe(selectedSizeId => {
-                    const workOrderGroup = this.formConfig.fields.find((f: any) => f.key === 'work_order');
-                    if (workOrderGroup && workOrderGroup.fieldGroup) {
-                      const colorField = workOrderGroup.fieldGroup.find((f: any) => f.key === 'color');
-                      const size = field.formControl.value;
-            
-                      if (size) {
-                        const work_order = this.formConfig.model.work_order;
-            
-                        // Determine the API URL based on size
-                        let url = `products/product_variations/?product_id=${work_order.product_id}&size_id=${size.size_id}`;
-                        if (!size.size_id) {
-                          url = `products/product_variations/?product_id=${work_order.product_id}&size_isnull=True`;
-                        }
-            
-                        // Fetch available colors based on selected size
-                        this.http.get(url).subscribe((response: any) => {
-                          if (response.data && response.data.length > 0) {
-                            // Map available colors
-                            const availableColors = response.data.map((variation: any) => ({
-                              label: variation.color?.color_name || '----',
-                              value: {
-                                color_id: variation.color?.color_id || null,
-                                color_name: variation.color?.color_name || '----'
-                              }
-                            }));
-            
-                            // Filter unique colors
-                            const uniqueColors = availableColors.filter((item, index, self) => 
-                              index === self.findIndex((t) => t.value.color_id === item.value.color_id)
-                            );
-            
-                            // Update and enable the color field
-                            if (colorField) {
-                              colorField.formControl.setValue(null); // Reset color field value
-                              colorField.formControl.enable();
-                              colorField.templateOptions.required = true; // Make the field required
-                              colorField.templateOptions.options = uniqueColors; // Update options
-                            }
-                          } else {
-                            // No colors available, disable the color field and set its value to null
-                            if (colorField) {
-                              colorField.templateOptions.required = false; // Make the field not required
-                              colorField.formControl.setValue(null); // Reset color field value
-                              colorField.formControl.disable();
-                              colorField.templateOptions.options = []; // Clear options
-                            }
-                          }
-                        });
+                  let previousSizeId: any = null; // Keep track of the previously selected product ID
+                  // Log the initially selected size_id from the form model
+                  const selectedSizeId = this.formConfig.model['work_order']?.size_id;
+
+                  // Ensure that the size field is populated with the correct value if it's already set in the model
+                  if (selectedSizeId) {
+                    const sizeField = field;
+                    const sizeOption = sizeField.templateOptions.options.find(option => option.value.size_id === selectedSizeId);
+                    if (sizeOption) {
+                      // Pre-select the size in the dropdown if it's available
+                      sizeField.formControl.setValue(sizeOption.value.size_id);
+                    }
+                  }
+
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['work_order']) {
+                      this.formConfig.model['work_order']['size_id'] = data?.size_id;
+                      const lastSelectedColor = this.formConfig.model.work_order.color_id;
+                      
+                      const product_id = this.formConfig.model.work_order.product_id;
+                      if (data?.size_id) {
+                        this.fetchColorOptions(data?.size_id, product_id, field, lastSelectedColor);
                       } else {
-                        // If size is null or invalid, disable the color field
-                        if (colorField) {
-                          colorField.templateOptions.required = false; // Make the field not required
-                          colorField.formControl.setValue(null); // Reset color field value
-                          colorField.formControl.disable();
-                          colorField.templateOptions.options = []; // Clear options
-                        }
+                        this.fetchColorOptions(null, product_id, field, lastSelectedColor);
+                        this.clearColor(field);
                       }
+
+                      if (data !== previousSizeId) {
+                        this.clearColor(field);
+                        previousSizeId = data?.size_id; // Update the previously selected product ID
+                      }
+
+                    } else {
+                      console.error('Form config or size_id data model is not defined.');
                     }
                   });
                 }
@@ -531,26 +584,36 @@ curdConfig: TaCurdConfig = {
                 label: 'Color',
                 dataKey: 'color_id',
                 dataLabel: 'color_name',
-                options: [],
+                options: [], // Dynamically populated
                 required: false,
-                disabled: true,
                 lazy: {
                   lazyOneTime: true,
-                  url : 'products/colors/'
-                }
+                },
               },
               hooks: {
-                onChanges: (field: any) => {
-                  field.formControl.valueChanges.subscribe((data: any) => {
-                    const index = field.parent.key;
-                    if (!this.formConfig.model['work_order'][index]) {
-                      console.error(`Color at index ${index} is not defined. Initializing...`);
-                      this.formConfig.model['work_order'][index] = {};
+                onInit: (field: any) => {
+                  const selectedColorId = this.formConfig.model['work_order']?.color_id;
+
+                  // Subscribe to changes in the options array and attempt to pre-fill the color field when options are updated
+                  field.templateOptions.optionsChange = () => {
+                    if (selectedColorId) {
+                      const colorOption = field.templateOptions.options.find(option => option.value.color_id === selectedColorId);
+                      if (colorOption) {
+                        field.formControl.setValue(colorOption.value.color_id); // Pre-select the value
+                      }
                     }
-                    this.formConfig.model['work_order']['color_id'] = data?.color_id || null;
+                  };
+
+                  // Subscribe to field value changes and update the model accordingly
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['work_order']) {
+                      this.formConfig.model['work_order']['color_id'] = data?.color_id;
+                    } else {
+                      console.error('Form config or color_id data model is not defined.');
+                    }
                   });
-                }
-              }
+                },
+              },
             },
             {
               key: 'quantity',
@@ -674,7 +737,7 @@ curdConfig: TaCurdConfig = {
                         console.error(`Products at index ${index} is not defined. Initializing...`);
                         this.formConfig.model['bom'][index] = {};
                       }
-                      this.formConfig.model['bom'][index]['product_id'] = data.product_id;
+                      this.formConfig.model['bom'][index]['product_id'] = data?.product_id;
                     });
                   }
                 }
