@@ -8,11 +8,21 @@
 </div> -->
 <ta-table #table [options]="options.tableConfig" (doAction)="tableAction($event)" [customProductTemplate]="customProductTemplate">
     <!--Added this customProductTemplate -->
-    <div class="after-search">
+    <ng-container before-search>
+        <ng-content select="[before-search]">
+        </ng-content>
+    </ng-container>
+    <ng-container after-search>
+        <ng-content select="[after-search]">
+        </ng-content>
         <button *ngIf="!options.hideAddBtn" nz-button nzType="primary" class="ml-md" (click)="openDrawer()">
             <i nz-icon nzType="plus"></i>Add
         </button>
-    </div>
+    </ng-container>
+    <ng-container bottom-left>
+        <ng-content select="[bottomleft]">
+        </ng-content>
+    </ng-container>
 </ta-table>
 
 <nz-drawer [nzClosable]="false" [nzHeight]="options.drawerHeight || '100%'" [nzWidth]="options.drawerSize || 'auto'" [nzVisible]="visible" [nzClosable]="true" [nzPlacement]="options.drawerPlacement || 'right'" [nzTitle]="formTitle" (nzOnClose)="close()">
