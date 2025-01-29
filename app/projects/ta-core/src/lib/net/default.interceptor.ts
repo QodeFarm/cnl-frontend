@@ -115,7 +115,6 @@ export class DefaultInterceptor implements HttpInterceptor {
           detailedError += `<strong>${key.toUpperCase()}:</strong> ${message}<br>`;
 
         }
-<<<<<<< HEAD
         // -- old notification error type is commented below -- 
         // this.notification.error(
         //   `${detailedError}`,
@@ -138,20 +137,6 @@ export class DefaultInterceptor implements HttpInterceptor {
       if (responseBody?.data && Object.keys(responseBody.data).length) {
         const errorText = this.formatErrors(responseBody);
         this.showError(errorText);
-=======
-        this.notification.error(
-          `${detailedError}`,
-          '',
-          {
-            nzDuration: 5000,
-            nzStyle: {
-              backgroundColor: '#fff9f9',
-              border: '1px solid #ffa39e',
-              maxWidth: '1000px'
-            }
-          }
-        );
->>>>>>> a0adc12da57e5787306678539bc76ffe1e388a38
         return;
       }
     }
