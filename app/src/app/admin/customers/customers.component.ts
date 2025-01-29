@@ -152,35 +152,112 @@ export class CustomersComponent {
               key: 'customer_data',
               fieldGroupClassName:'row m-0 pr-0',
               fieldGroup: [
+                // Left Section (col-9 for form fields)
                 {
-                  className: 'col-3',
-                  key: 'name',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'Name',
-                    placeholder: 'Enter Name',
-                    required: true,
-                  }
-                },
-                {
-                  className: 'col-3',
-                  key: 'print_name',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'Print Name',
-                    placeholder: 'Enter Print Name',
-                    required: true,
-                  }
-                },               
-                {
-                  className: 'col-3',
-                  key: 'code',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'Code',
-                    placeholder: 'Enter Code',
-                    required: true,
-                  }
+                  className: 'col-9',
+                  fieldGroupClassName:'row m-0 p-0',
+                  fieldGroup: [
+                    {
+                      className: 'col-4',
+                      key: 'name',
+                      type: 'input',
+                      templateOptions: {
+                        label: 'Name',
+                        placeholder: 'Enter Name',
+                        required: true,
+                      }
+                    },
+                    {
+                      className: 'col-4',
+                      key: 'print_name',
+                      type: 'input',
+                      templateOptions: {
+                        label: 'Print Name',
+                        placeholder: 'Enter Print Name',
+                        required: true,
+                      }
+                    },               
+                    {
+                      className: 'col-4',
+                      key: 'code',
+                      type: 'input',
+                      templateOptions: {
+                        label: 'Code',
+                        placeholder: 'Enter Code',
+                        required: true,
+                      }
+                    },
+                  
+                    {
+                      className: 'col-4',
+                      key: 'customer_category',
+                      type: 'select',
+                      templateOptions: {
+                        label: 'Customer Category',
+                        dataKey: 'customer_category_id',
+                        dataLabel: 'name',
+                        options: [],
+                        lazy: {
+                          url: 'masters/customer_categories/',
+                          lazyOneTime: true
+                        }
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          field.formControl.valueChanges.subscribe((data: any) => {
+                            if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
+                              this.formConfig.model['customer_data']['customer_category_id'] = data.customer_category_id;
+                            } else {
+                              console.error('Form config or Customer data model is not defined.');
+                            }
+                          });
+                        }
+                      }
+                    },
+                    {
+                      key: 'ledger_account',
+                      type: 'select',
+                      className: 'col-4',
+                      templateOptions: {
+                        dataKey: 'ledger_account_id',
+                        dataLabel: 'name',
+                        label: 'Ledger Account',
+                        placeholder: 'Ledger Account',
+                        required: true,
+                        lazy: {
+                          url: 'customers/ledger_accounts/',
+                          lazyOneTime: true
+                        }
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          field.formControl.valueChanges.subscribe((data: any) => {
+                            console.log('ledger_account', data);
+                            if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
+                              this.formConfig.model['customer_data']['ledger_account_id'] = data.ledger_account_id;
+                            } else {
+                              console.error('Form config or Customer data model is not defined.');
+                            }
+                          });
+                        }
+                      }
+                    },
+                    {
+                      className: 'col-4',
+                      key: 'tax_type',
+                      type: 'select',
+                      templateOptions: {
+                        label: 'Tax Type',
+                        placeholder: 'Select Tax Type',
+                        options: [
+                          { value: 'Inclusive', label: 'Inclusive' },
+                          { value: 'Exclusive', label: 'Exclusive' }
+                        ],
+                        required: true,
+                      }
+                    },
+                                                            
+                  ]
                 },
                 {
                   className: 'col-3 p-0',
@@ -198,75 +275,6 @@ export class CustomersComponent {
                     }                                
                   ]
                 },
-                {
-                  className: 'col-3',
-                  key: 'customer_category',
-                  type: 'select',
-                  templateOptions: {
-                    label: 'Customer Category',
-                    dataKey: 'customer_category_id',
-                    dataLabel: 'name',
-                    options: [],
-                    lazy: {
-                      url: 'masters/customer_categories/',
-                      lazyOneTime: true
-                    }
-                  },
-                  hooks: {
-                    onChanges: (field: any) => {
-                      field.formControl.valueChanges.subscribe((data: any) => {
-                        if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
-                          this.formConfig.model['customer_data']['customer_category_id'] = data.customer_category_id;
-                        } else {
-                          console.error('Form config or Customer data model is not defined.');
-                        }
-                      });
-                    }
-                  }
-                },
-                {
-                  key: 'ledger_account',
-                  type: 'select',
-                  className: 'col-3',
-                  templateOptions: {
-                    dataKey: 'ledger_account_id',
-                    dataLabel: 'name',
-                    label: 'Ledger Account',
-                    placeholder: 'Ledger Account',
-                    required: true,
-                    lazy: {
-                      url: 'customers/ledger_accounts/',
-                      lazyOneTime: true
-                    }
-                  },
-                  hooks: {
-                    onChanges: (field: any) => {
-                      field.formControl.valueChanges.subscribe((data: any) => {
-                        console.log('ledger_account', data);
-                        if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
-                          this.formConfig.model['customer_data']['ledger_account_id'] = data.ledger_account_id;
-                        } else {
-                          console.error('Form config or Customer data model is not defined.');
-                        }
-                      });
-                    }
-                  }
-                },
-                {
-                  className: 'col-3',
-                  key: 'tax_type',
-                  type: 'select',
-                  templateOptions: {
-                    label: 'Tax Type',
-                    placeholder: 'Select Tax Type',
-                    options: [
-                      { value: 'Inclusive', label: 'Inclusive' },
-                      { value: 'Exclusive', label: 'Exclusive' }
-                    ],
-                    required: true,
-                  }
-                },
-                                                        
               ]
             }
           ]
