@@ -138,18 +138,19 @@ fetchCustomFields() {
   
   // Adds custom fields to the main formConfig
   addCustomFieldsToFormConfig(customFields: any) {
+    console.log("customFields : ", customFields);
     const customFieldConfigs = customFields.map((field: any) => {
-      const key = field.field_name.toLowerCase(); // Use normalized key
+      const key = field.custom_field_id.toLowerCase(); // Use normalized key
       return {
         key: key,
         type: field.field_type.field_type_name.toLowerCase() === 'select' ? 'select' : 'input',
         className: 'col-md-6',
-        defaultValue: this.formConfig.model['customfield_values'][key] || '', // Pre-fill value
+        defaultValue: this.formConfig.model['custom_field_values'][key] || '', // Pre-fill value
         templateOptions: {
           label: field.field_name,
           placeholder: field.field_name,
           required: field.is_required,
-          options: field.options || [], // Options for select fields
+          options: Array.isArray(field.options) ? field.options : [],
         }
       };
     });
@@ -159,7 +160,7 @@ fetchCustomFields() {
     this.formConfig.fields = [
       ...this.formConfig.fields,
       {
-        key: 'customfield_values',
+        key: 'custom_field_values',
         fieldGroup: customFieldConfigs,
       },
     ];
@@ -168,7 +169,9 @@ fetchCustomFields() {
 
   submitCustomerForm() {
     const customerData = { ...this.formConfig.model['customer_data'] }; // Main customer data
-    const customFieldValues = this.formConfig.model['customfield_values']; // User-entered custom fields
+    const customerAttachments = this.formConfig.model['customer_attachments'];
+    const customerAddresses = this.formConfig.model['customer_addresses'];
+    const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
   
     if (!customerData) {
       console.error('Customer data is missing.');
@@ -177,29 +180,34 @@ fetchCustomFields() {
   
     // Construct payload for one custom field at a time
     const customFieldsPayload = this.constructCustomFieldsPayload(customFieldValues);
-  
+    console.log("Testing the data in customFieldsPayload: ", customFieldsPayload);
     // Construct the final payload
     const payload = {
-      ...customerData, // Add all the main customer fields
+      customer_data: customerData, // Add all the main customer fields
+      customer_addresses: customerAddresses,
+      customer_attachments: customerAttachments,
       custom_field: customFieldsPayload.custom_field, // Single custom field as dictionary
-      custom_field_options: customFieldsPayload.custom_field_options, // Array or empty
+      // custom_field_options: customFieldsPayload.custom_field_options, // Array or empty
       custom_field_values: customFieldsPayload.custom_field_values // Array of dictionaries
     };
   
     console.log('Final Payload:', payload); // Debugging to verify the payload
   
     // Submit the payload
-    this.http.post('http://127.0.0.1:8000/api/v1/customfields/customfieldvalues/', payload).subscribe(
+    this.http.post('customers/customers/', payload).subscribe(
       (response: any) => {
-        console.log('Customer and custom fields created successfully:', response);
-        this.showCustomerListFn(); // Redirect or refresh the customer list
+        this.showSuccessToast = true;
+          this.toastMessage = "Record Created successfully"; // Set the toast message for update
+          this.ngOnInit();
+          setTimeout(() => {
+            this.showSuccessToast = false;
+          }, 3000);
       },
       (error) => {
         console.error('Error creating customer and custom fields:', error);
       }
     );
   }
-  
   
   constructCustomFieldsPayload(customFieldValues: any) {
     if (!customFieldValues) {
@@ -211,80 +219,165 @@ fetchCustomFields() {
       };
     }
   
-    // Construct custom field payload
-    const firstFieldKey = Object.keys(customFieldValues)[0]; // Handle one custom field at a time
-    const metadata = this.customFieldMetadata[firstFieldKey.toLowerCase()] || {}; // Fetch metadata
+    // Initialize custom field values as an array
+    const customFieldValuesArray = [];
   
+    // Iterate over all custom field keys and construct values
+    Object.keys(customFieldValues).forEach((fieldKey) => {
+      const metadata = this.customFieldMetadata[fieldKey.toLowerCase()] || {}; // Fetch metadata for each field
+      console.log("Metadata entity : ", metadata);
+  
+      customFieldValuesArray.push({
+        field_value: customFieldValues[fieldKey], // Value entered by the user
+        field_value_type: typeof customFieldValues[fieldKey] === "number" ? "number" : "string", // Type
+        entity_id: metadata.entity_id || "9d87168d-5639-4ecd-8739-18c8a1a801d4", // Default entity ID
+        custom_field_id: fieldKey, // Field name as custom_field_id
+        entity_data_id: this.formConfig.model.customer_data.customer_id
+      });
+    });
+  
+    // Construct payload for multiple custom fields
     return {
-      // Single custom field dictionary
-      custom_field: {
-        field_name: firstFieldKey, // Use the first field name
-        is_required: metadata.is_required || false, // Metadata for required fields
-        validation_rules: metadata.validation_rules || null, // Validation rules
-        field_type_id: metadata.field_type_id || null, // Field type ID
-        entity_id: metadata.entity_id || null // Entity ID
-      },
+      // Custom field metadata for all fields
+      custom_field: Object.keys(customFieldValues).map((fieldKey) => ({
+        field_name: fieldKey, // Use field name
+        is_required: this.customFieldMetadata[fieldKey.toLowerCase()]?.is_required || false,
+        validation_rules: this.customFieldMetadata[fieldKey.toLowerCase()]?.validation_rules || null,
+        field_type_id: this.customFieldMetadata[fieldKey.toLowerCase()]?.field_type_id || null,
+        entity_id: this.customFieldMetadata[fieldKey.toLowerCase()]?.entity_id || null,
+      })),
       // Optional field options
-      custom_field_options: metadata.options || [], // Predefined options if available
-      // Single field value
-      custom_field_values: [
-        {
-          field_value: customFieldValues[firstFieldKey], // Value entered by the user
-          field_value_type: typeof customFieldValues[firstFieldKey] === "number" ? "number" : "string", // Type
-          entity_id: metadata.entity_id || null // Link value to the entity ID
-        }
-      ]
+      // custom_field_options: Object.values(this.customFieldMetadata).map((metadata) => metadata.options || []),
+      // Multiple custom field values
+      custom_field_values: customFieldValuesArray // Multiple field values
     };
   }
+  
+  // constructCustomFieldsPayload(customFieldValues: any) {
+  //   if (!customFieldValues) {
+  //     console.warn('No custom field values provided.');
+  //     return {
+  //       custom_field: {},
+  //       custom_field_options: [],
+  //       custom_field_values: []
+  //     };
+  //   }
+  
+  //   // Construct custom field payload
+  //   const firstFieldKey = Object.keys(customFieldValues)[0]; // Handle one custom field at a time
+  //   const metadata = this.customFieldMetadata[firstFieldKey.toLowerCase()] || {}; // Fetch metadata
+  
+  //   return {
+  //     // Single custom field dictionary
+  //     custom_field: {
+  //       field_name: firstFieldKey, // Use the first field name
+  //       is_required: metadata.is_required || false, // Metadata for required fields
+  //       validation_rules: metadata.validation_rules || null, // Validation rules
+  //       field_type_id: metadata.field_type_id || null, // Field type ID
+  //       entity_id: metadata.entity_id || null // Entity ID
+  //     },
+  //     // Optional field options
+  //     custom_field_options: metadata.options || [], // Predefined options if available
+  //     // Single field value
+  //     custom_field_values: [
+  //       {
+  //         field_value: customFieldValues[firstFieldKey], // Value entered by the user
+  //         field_value_type: typeof customFieldValues[firstFieldKey] === "number" ? "number" : "string", // Type
+  //         entity_id: metadata.entity_id || null // Link value to the entity ID
+  //       }
+  //     ]
+  //   };
+  // }
+  
+  // constructCustomFieldsPayload(customFieldValues: any) {
+  //   if (!customFieldValues) {
+  //     console.warn('No custom field values provided.');
+  //     return {
+  //       custom_field: {},
+  //       custom_field_options: [],
+  //       custom_field_values: []
+  //     };
+  //   }
+  
+  //   // Extract first custom field key
+  //   const firstFieldKey = Object.keys(customFieldValues)[0]; // Handle one custom field at a time
+  //   console.log("customFieldValues : ", customFieldValues);
+  //   console.log("firstFieldKey : ", firstFieldKey);
+  //   const metadata = this.customFieldMetadata[firstFieldKey.toLowerCase()] || {}; // Fetch metadata
+  //   console.log("Metadata entity : ", metadata)
+  
+  //   return {
+  //     // Single custom field dictionary
+  //     custom_field: {
+  //       field_name: firstFieldKey, // Use the first field name
+  //       is_required: metadata.is_required || false, // Metadata for required fields
+  //       validation_rules: metadata.validation_rules || null, // Validation rules
+  //       field_type_id: metadata.field_type_id || null, // Field type ID
+  //       entity_id: metadata.entity_id || null // Entity ID
+  //     },
+  //     // Optional field options
+  //     custom_field_options: metadata.options || [], // Predefined options if available
+  //     // Single field value
+  //     custom_field_values: [
+  //       {
+  //         field_value: customFieldValues[firstFieldKey], // Value entered by the user
+  //         field_value_type: typeof customFieldValues[firstFieldKey] === "number" ? "number" : "string", // Type
+  //         entity_id: metadata.entity_id || "9d87168d-5639-4ecd-8739-18c8a1a801d4", // Link value to the entity ID
+  //         custom_field_id: firstFieldKey, // Map field_name as custom_field_id
+  //         entity_data_id: this.formConfig.model.customer_data.customer_id
+  //       }
+  //     ]
+  //   };
+  // }
   
   
   
   
   
   // // Submit custom field values
-  submitCustomFieldValues(customerId: string, customFieldValues: any) {
-    if (!customFieldValues) {
-      console.error('No custom field values provided.');
-      return;
-    }
+  // submitCustomFieldValues(customerId: string, customFieldValues: any) {
+  //   if (!customFieldValues) {
+  //     console.error('No custom field values provided.');
+  //     return;
+  //   }
   
-    const requests = [];
+  //   const requests = [];
   
-    Object.keys(customFieldValues).forEach((fieldKey) => {
-      const fieldValue = customFieldValues[fieldKey];
-      const metadata = this.customFieldMetadata[fieldKey.toLowerCase()];
+  //   Object.keys(customFieldValues).forEach((fieldKey) => {
+  //     const fieldValue = customFieldValues[fieldKey];
+  //     const metadata = this.customFieldMetadata[fieldKey.toLowerCase()];
   
-      if (!metadata) {
-        console.warn(`No metadata found for custom field: ${fieldKey}`);
-        return;
-      }
+  //     if (!metadata) {
+  //       console.warn(`No metadata found for custom field: ${fieldKey}`);
+  //       return;
+  //     }
   
-      const payload = {
-        custom_field: {
-          custom_field_id: metadata.custom_field_id,
-          field_name: fieldKey
-        },
-        entity: {
-          entity_id: customerId
-        },
-        field_value: fieldValue,
-        field_value_type: typeof fieldValue === 'number' ? 'number' : 'string'
-      };
+  //     const payload = {
+  //       custom_field: {
+  //         custom_field_id: metadata.custom_field_id,
+  //         field_name: fieldKey
+  //       },
+  //       entity: {
+  //         entity_id: customerId
+  //       },
+  //       field_value: fieldValue,
+  //       field_value_type: typeof fieldValue === 'number' ? 'number' : 'string'
+  //     };
   
-      console.log('Constructed Payload:', payload); // Log the constructed payload
+  //     console.log('Constructed Payload:', payload); // Log the constructed payload
   
-      requests.push(this.http.post('http://127.0.0.1:8000/api/v1/customfields/customfieldvalues/', payload));
-    });
+  //     requests.push(this.http.post('http://127.0.0.1:8000/api/v1/customfields/customfieldvalues/', payload));
+  //   });
   
-    forkJoin(requests).subscribe(
-      (responses) => {
-        console.log('Custom field values saved successfully:', responses);
-      },
-      (error) => {
-        console.error('Error saving custom field values:', error);
-      }
-    );
-  }
+  //   forkJoin(requests).subscribe(
+  //     (responses) => {
+  //       console.log('Custom field values saved successfully:', responses);
+  //     },
+  //     (error) => {
+  //       console.error('Error saving custom field values:', error);
+  //     }
+  //   );
+  // }
   
   
   
@@ -384,13 +477,19 @@ fetchCustomFields() {
     this.http.get(`customers/customers/${event}`).subscribe(
       (res: any) => {
         if (res && res.data) {
+          console.log("Res in edit : ", res)
           // Set customer data in the form model
           this.formConfig.model = res.data;
           this.formConfig.model['customer_id'] = this.CustomerEditID;
-  
-          // Fetch and map custom field values
-          this.fetchAndSetCustomFieldValues(this.CustomerEditID);
-  
+          
+          // Ensure custom_field_values are correctly populated in the model
+          if (res.data.custom_field_values) {
+            this.formConfig.model['custom_field_values'] = res.data.custom_field_values.reduce((acc: any, fieldValue: any) => {
+              acc[fieldValue.custom_field_id] = fieldValue.field_value; // Map custom_field_id to the corresponding value
+              return acc;
+            }, {});
+          }
+
           // Update form labels for editing mode
           this.formConfig.pkId = 'customer_id';
           this.formConfig.submit.label = 'Update';
@@ -407,31 +506,33 @@ fetchCustomFields() {
   }
 
   fetchAndSetCustomFieldValues(customerId: string) {
-  const url = `http://127.0.0.1:8000/api/v1/customfields/customfieldvalues/?entity_id=${customerId}`;
+    console.log("customerId in Custom : ", customerId);
+    const url = `customfields/customfieldvalues/?entity_data_id=${customerId}`;
+    console.log("URL : ", url)
+    this.http.get(url).subscribe(
+      (response: any) => {
+        if (response?.data) {
+          console.log("Repsonse 2: ", response);
+          const customFieldValues = response.data.reduce((acc: any, fieldValue: any) => {
+            // Normalize to lowercase for consistency
+            acc[fieldValue.custom_field.field_name.toLowerCase()] = fieldValue.field_value;
+            return acc;
+          }, {});
+          console.log("customFieldValues : ", customFieldValues);
+          // Populate the custom_field_values model
+          this.formConfig.model['custom_field_values'] = customFieldValues;
 
-  this.http.get(url).subscribe(
-    (response: any) => {
-      if (response?.data) {
-        const customFieldValues = response.data.reduce((acc: any, fieldValue: any) => {
-          // Normalize to lowercase for consistency
-          acc[fieldValue.custom_field.field_name.toLowerCase()] = fieldValue.field_value;
-          return acc;
-        }, {});
-
-        // Populate the customfield_values model
-        this.formConfig.model['customfield_values'] = customFieldValues;
-
-        console.log('Mapped Custom Field Values:', customFieldValues);
-      } else {
-        console.warn('No custom field values found for the customer.');
-        this.formConfig.model['customfield_values'] = {}; // Clear custom fields if none are found
+          console.log('Mapped Custom Field Values:', this.formConfig.model['custom_field_values']);
+        } else {
+          console.warn('No custom field values found for the customer.');
+          this.formConfig.model['custom_field_values'] = {}; // Clear custom fields if none are found
+        }
+      },
+      (error) => {
+        console.error('Error fetching custom field values:', error);
       }
-    },
-    (error) => {
-      console.error('Error fetching custom field values:', error);
-    }
-  );
-}
+    );
+  }
 
   
 
@@ -439,11 +540,71 @@ fetchCustomFields() {
     this.showCustomerList = true;
   }
 
+  showSuccessToast = false;
+  toastMessage = '';
+  // Method to handle updating the Sale Return Order
+  updateCustomer() {
+    const customerData = { ...this.formConfig.model['customer_data'] }; // Main customer data
+    const customerAttachments = this.formConfig.model['customer_attachments'];
+    const customerAddresses = this.formConfig.model['customer_addresses'];
+    const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
+    
+    if (!customerData) {
+      console.error('Customer data is missing.');
+      return;
+    }
+  
+    // Construct payload for custom fields based on updated values
+    const customFieldsPayload = this.constructCustomFieldsPayload(customFieldValues);
+    console.log("Testing the data in customFieldsPayload: ", customFieldsPayload);
+    
+    // Construct the final payload for update
+    const payload = {
+      customer_data: customerData, // Add all the main customer fields
+      customer_addresses: customerAddresses,
+      customer_attachments: customerAttachments,
+      custom_field: customFieldsPayload.custom_field, // Single custom field as dictionary
+      custom_field_options: customFieldsPayload.custom_field_options, // Array or empty
+      custom_field_values: customFieldsPayload.custom_field_values // Array of dictionaries
+    };
+  
+    console.log('Final Payload for Update:', payload); // Debugging to verify the payload
+  
+    // Send the update request with the payload
+    this.http.put(`customers/customers/${customerData.customer_id}/`, payload).subscribe(
+      (response: any) => {
+        this.showSuccessToast = true;
+          this.toastMessage = "Record updated successfully"; // Set the toast message for update
+          this.ngOnInit();
+          setTimeout(() => {
+            this.showSuccessToast = false;
+          }, 3000);
+        // this.showCustomerListFn(); // Redirect or refresh the customer list
+        // this.ngOnInit();
+      },
+      (error) => {
+        console.error('Error updating customer:', error);
+      }
+    );
+  }
+  
+  
+  
+
+  onSubmit() {
+    if (this.formConfig.submit.label === 'Update') {
+      this.updateCustomer(); // Call update on submission
+    } else {
+      this.submitCustomerForm(); // Otherwise, create a new record
+      this.ngOnInit();
+    }
+  }
+
   setFormConfig() {
     this.CustomerEditID = null;
     this.formConfig = {
-      url: "customers/customers/",
-      title: 'Customers',
+      // url: "customers/customers/",
+      title: '',
       formState: {
         viewMode: false
       },
@@ -451,7 +612,7 @@ fetchCustomFields() {
       exParams: [],
       submit: {
         label: 'Submit',
-        submittedFn: () => this.submitCustomerForm(),
+        submittedFn: () => this.onSubmit()
       },
       reset: {
         resetFn: () => {
@@ -466,7 +627,7 @@ fetchCustomFields() {
         }, {
           address_type: 'Shipping',
         }],
-        customfield_values: []
+        custom_field_values: []
       },
       fields: [
         {
@@ -1210,7 +1371,7 @@ fetchCustomFields() {
               fieldGroupClassName: "ant-row",
             },
             {
-              key: 'customfield_values',
+              key: 'custom_field_values',
               fieldGroup: this.getCustomFieldConfig() // Append the custom fields dynamically
             }
           ]
