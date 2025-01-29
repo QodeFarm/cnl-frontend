@@ -88,12 +88,12 @@ export class DefaultInterceptor implements HttpInterceptor {
 
   private checkStatus(ev: HttpErrorResponse): void {
     let errorMsg = `Request error ${ev.status}: `;
-    
+
     if (ev.status == 400) {
       const responseBody = ev.error;  // Assuming response is in `ev.error` (adjust as necessary)
 
       // Case 1: If the message is available, show it directly
-      if (responseBody && responseBody.message && responseBody.data.length === 0 ) {
+      if (responseBody && responseBody.message && responseBody.data.length === 0) {
         // If only message is present (no detailed error data)
         const errortext = responseBody.message;
         // -- old notification error type is commented below -- 
@@ -105,7 +105,7 @@ export class DefaultInterceptor implements HttpInterceptor {
         this.showError(errortext)
         return;
       }
-  
+
       // Case 2: If detailed validation errors are present in `data`
       if (responseBody && responseBody.data && Object.keys(responseBody.data).length > 0 && Object.values(responseBody.data).every(value => typeof value === 'string')
       ) {
@@ -115,6 +115,7 @@ export class DefaultInterceptor implements HttpInterceptor {
           detailedError += `<strong>${key.toUpperCase()}:</strong> ${message}<br>`;
 
         }
+<<<<<<< HEAD
         // -- old notification error type is commented below -- 
         // this.notification.error(
         //   `${detailedError}`,
@@ -137,10 +138,24 @@ export class DefaultInterceptor implements HttpInterceptor {
       if (responseBody?.data && Object.keys(responseBody.data).length) {
         const errorText = this.formatErrors(responseBody);
         this.showError(errorText);
+=======
+        this.notification.error(
+          `${detailedError}`,
+          '',
+          {
+            nzDuration: 5000,
+            nzStyle: {
+              backgroundColor: '#fff9f9',
+              border: '1px solid #ffa39e',
+              maxWidth: '1000px'
+            }
+          }
+        );
+>>>>>>> a0adc12da57e5787306678539bc76ffe1e388a38
         return;
       }
     }
-    
+
     // Fallback for other HTTP status codes
     const errortext = "An error occurred. Please try again.";
     this.notification.error(
@@ -148,7 +163,7 @@ export class DefaultInterceptor implements HttpInterceptor {
       errortext,
       { nzDuration: 5000, nzStyle: { backgroundColor: '#fff9f9', border: '1px solid #ffa39e', maxWidth: '600px' } }
     );
-  }    
+  }
 
   /**
    * 刷新 Token 请求
@@ -322,7 +337,7 @@ export class DefaultInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     // 统一加上服务端前缀
     let url = req.url;
-    this.loadingS.show();
+    // this.loadingS.show();
     if (!url.startsWith('https://') && !url.startsWith('http://') && !url.startsWith('assets')) {
       const baseUrl = this.siteConfig.CONFIG.baseUrl;
       url = baseUrl + url//environment.api.baseUrl + url;
@@ -345,8 +360,11 @@ export class DefaultInterceptor implements HttpInterceptor {
         return of(ev);
       }),
       catchError((err: HttpErrorResponse) => this.handleData(err, newReq, next)),
-      finalize(() => this.loadingS.hide())
+      finalize(() => {
+        // this.loadingS.hide();
+      })
     );
+
   }
 
   showError(message: string): void {

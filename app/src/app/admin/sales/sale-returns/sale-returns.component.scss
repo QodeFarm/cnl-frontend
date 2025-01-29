@@ -1,0 +1,21 @@
+.custom-modal.modal-center.show{
+   display: inline-flex !important;
+    width: 100%;
+    .modal-dialog{
+      width: 100%;
+      display: flex;
+      align-items: center;
+    }
+}
+
+.modal.fade .modal-dialog{
+  border: none;
+  .modal-content{
+    border: solid 2px white;
+    margin: 2px;
+  }
+}
+.modal-backdrop-custom {
+  background-color: rgba(0, 0, 0, 0.921) !important;
+  opacity: 1 !important;
+}

@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, Output, ViewChild, EventEmitter, ElementRef, TemplateRef  } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, Output, ViewChild, EventEmitter, ElementRef, TemplateRef } from '@angular/core';
 import { getValue } from '@ta/ta-core';
 import { cloneDeep } from 'lodash';
 import {
@@ -54,7 +54,8 @@ export class TaTableComponent implements OnDestroy {
   @Input() customProductTemplate!: TemplateRef<any>;
   // selectedProducts: any[] = []; // This holds the selected products
   // @Output() selectedProductsChange = new EventEmitter<any[]>(); // Event emitter to notify parent component
-  
+  checked = false;
+  indeterminate = false;
   selectedEmployee: string | null = null;
   selectedStatus: string | null = null;
   selectedQuickPeriod: string | null = null;
@@ -63,6 +64,7 @@ export class TaTableComponent implements OnDestroy {
   isButtonVisible = false;
   isStatusButtonVisible = false;
   isEmployeeFilterVisible = false;
+  setOfCheckedId = new Set<number>();
 
   statusOptions: Array<{ value: string, label: string }> = []; // Store the statuses here
 
@@ -154,10 +156,32 @@ export class TaTableComponent implements OnDestroy {
     this.selectedStatus = status;
     // this.applyFilters();
   }
-  ;
+  refreshCheckedStatus(): void {
+    const listOfEnabledData = this.rows.filter(({ disabled }) => !disabled);
+    this.checked = listOfEnabledData.every((row) => this.setOfCheckedId.has(row[this.options.pkId]));
+    this.indeterminate = listOfEnabledData.some((row) => this.setOfCheckedId.has(row[this.options.pkId])) && !this.checked;
+  }
+  onAllChecked(checked: boolean): void {
+    this.rows
+      .filter(({ disabled }) => !disabled)
+      .forEach((row) => this.updateCheckedSet(row[this.options.pkId], checked));
+    this.refreshCheckedStatus();
+  }
+  updateCheckedSet(id: number, checked: boolean): void {
+    if (checked) {
+      this.setOfCheckedId.add(id);
+    } else {
+      this.setOfCheckedId.delete(id);
+    }
+  }
+  onItemChecked(id: number, checked: boolean): void {
+    this.updateCheckedSet(id, checked);
+    this.refreshCheckedStatus();
+  }
+
   loadEmployees() {
     const url = 'hrms/employees/'; // Replace with your actual employee API endpoint
-  
+
     this.http.get<any>(url).subscribe(
       (response) => {
         if (response && response.data && response.data.length > 0) {
@@ -193,7 +217,7 @@ export class TaTableComponent implements OnDestroy {
       fromDate: this.fromDate,
       toDate: this.toDate,
       status: this.selectedStatus,
-      employee :this.selectedEmployee,
+      employee: this.selectedEmployee,
     };
 
     // Generate query string from filters
@@ -456,6 +480,9 @@ export class TaTableComponent implements OnDestroy {
         this.loading = false;
         this.total = data.totalCount; // mock the total data here
         this.rows = data.data || data;
+        if (this.options.showCheckbox) {
+          this.refreshCheckedStatus();
+        }
       }, (error) => {
         this.loading = false;
       });
@@ -602,7 +629,7 @@ export class TaTableComponent implements OnDestroy {
     // Optionally, emit the event to parent if needed
     this.doAction.emit({ action, row });
   }
-  
+
   // getFilters(){
   //   const filters = this.options.cols.filter((item: { searchValue: any; })=>{
   //     item.searchValue;
