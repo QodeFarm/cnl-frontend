@@ -25,8 +25,9 @@ const routes: Routes = [
     component: AdminLayoutComponent,
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
-      { path: 'profile', data: { title: 'Change Password', moduleName: 'profile' }, canActivate: [], loadChildren: () => import('./admin/profile/profile.module').then(m => m.ProfileModule) },
+      { path: 'profile', data: { title: 'Profile', moduleName: 'profile' }, canActivate: [], loadChildren: () => import('./admin/profile/profile.module').then(m => m.ProfileModule) },
       { path: 'dashboard', data: { title: 'Dashbord', moduleName: 'dashboard' }, canActivate: [], loadComponent: () => import('./admin/dashboard/dashboard.component').then(m => m.DashboardComponent) },
+      { path: 'profile/change-password', data: { title: 'Change Password', moduleName: 'change-password' }, canActivate: [], loadComponent: () => import('./admin/profile/change-password/change-password.component').then(m => m.ChangePasswordComponent) },
       // { path: 'users', data: { title: 'Users', moduleName: 'Users' }, canActivate: [], loadChildren: () => import('./admin/user/user.component').then(m => m.UserComponent) },
       // sales module
       { path: 'sales', data: { title: 'Sales', moduleName: 'Sales' }, canActivate: [], loadComponent: () => import('./admin/sales/sales.component').then(m => m.SalesComponent) },

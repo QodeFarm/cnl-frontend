@@ -2,9 +2,13 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { CommonModule } from '@angular/common';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 @Component({
   selector: 'app-change-password',
+  standalone: true,
+  imports: [CommonModule, AdminCommmonModule],
   templateUrl: './change-password.component.html',
   styleUrls: ['./change-password.component.scss']
 })
