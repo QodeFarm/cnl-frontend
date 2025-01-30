@@ -1,0 +1,36 @@
+<div class="container-fluid pt-3">
+    <div class="workflow-banner">
+        <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;">
+            <button (click)="workflowEditID = null" type="button" class="btn pl-0" style="color: black;">
+                <span *ngIf="workflowEditID" class="custom-heading">Update Workflow</span>
+                <span *ngIf="!workflowEditID" class="custom-heading">Create Workflow</span>
+            </button>
+            <button (click)="showWorkflowListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#workflowListModal">
+                Workflow List
+            </button>
+        </div>
+    </div>
+    <div class="row custom-form">
+        <div>
+            <ta-form [options]="formConfig"></ta-form>
+        </div>
+    </div>
+</div>
+
+<!-- Workflow List Modal -->
+<div class="modal fade custom-modal" id="workflowListModal" tabindex="-1" aria-labelledby="workflowListModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="workflowListModalLabel">Edit Workflow List</h5>
+                <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" *ngIf="showWorkflowList">
+                <app-workflow-list (edit)="editWorkflow($event)" class="custom-list"></app-workflow-list>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

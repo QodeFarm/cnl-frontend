@@ -9,7 +9,7 @@ import { WarehousesListComponent } from './warehouses-list/warehouses-list.compo
 
 @NgModule({
   declarations: [
-    WarehousesComponent
+    // WarehousesComponent
   ],
   imports: [
     CommonModule,

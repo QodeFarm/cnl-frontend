@@ -1,8 +1,9 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
+import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 
 @Component({
   selector: 'app-expense-claim-list',
@@ -14,6 +15,11 @@ import { Router } from '@angular/router';
 export class ExpenseClaimListComponent {
 
   @Output('edit') edit = new EventEmitter<void>();
+  @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+
+  refreshTable() {
+    this.taTableComponent?.refresh();
+  };
 
   tableConfig: TaTableConfig = {
     apiUrl: 'finance/expense_claims/',
@@ -21,16 +27,22 @@ export class ExpenseClaimListComponent {
     pkId: "expense_claim_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['expense_claim_id']
+      keys: ['employee_id','claim_date','description','total_amount','status']
     },
     cols: [
+      {
+        fieldKey: 'created_at',
+        name: 'Created At',
+        sort: true,
+        displayType: 'datetime',
+      },
       {
         fieldKey: 'employee_id',
         name: 'Employee',
         sort: true,
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.employee.name}`;
+          return `${row.employee.first_name} ${row.employee?.second_name || ''}`;
         },
       },
       {
@@ -41,17 +53,17 @@ export class ExpenseClaimListComponent {
       {
         fieldKey: 'description', 
         name: 'Description',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'total_amount', 
         name: 'Total Amount',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'status', 
         name: 'Status',
-        sort: false
+        sort: true
       },
       {
         fieldKey: "code",

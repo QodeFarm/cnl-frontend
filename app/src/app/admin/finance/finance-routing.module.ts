@@ -23,7 +23,7 @@ const routes: Routes = [
     component: PaymentTransactionComponent,
   },
   {
-    path: 'tax-configurationt',
+    path: 'tax-configuration',
     component: TaxConfigurationComponent,
   },
   {

@@ -12,7 +12,7 @@
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
 
-.ta-row {
+ .ta-row {
     display: flex;
     justify-content: flex-start;
     align-items: stretch;
@@ -5988,6 +5988,7 @@ a.close.disabled {
 .modal.fade .modal-dialog {
     transition: transform 0.3s ease-out;
     transform: translate(0, -50px);
+    border: solid 2px white;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -6080,7 +6081,7 @@ a.close.disabled {
 }
 
 .modal-backdrop.show {
-    opacity: 0.5;
+    opacity: 0.9;
 }
 
 .modal-header {
@@ -8232,7 +8233,7 @@ button.bg-dark:focus {
 
 .pr-3,
 .px-3 {
-    padding-right: 1rem !important;
+    padding-right: 0.3rem !important;
 }
 
 .pb-3,
@@ -8242,7 +8243,7 @@ button.bg-dark:focus {
 
 .pl-3,
 .px-3 {
-    padding-left: 1rem !important;
+    padding-left: 0.3rem !important;
 }
 
 .p-4 {

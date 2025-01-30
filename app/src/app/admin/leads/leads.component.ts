@@ -1,17 +1,23 @@
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
+import { CommonModule } from '@angular/common';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { LeadsListComponent } from './leads-list/leads-list.component';
+
 
 @Component({
   selector: 'app-leads',
+  standalone: true,
+  imports: [CommonModule,AdminCommmonModule,LeadsListComponent],
   templateUrl: './leads.component.html',
   styleUrls: ['./leads.component.scss']
 })
-
 export class LeadsComponent {
   showLeadsList: boolean = false;
   showForm: boolean = false;
   LeadsEditID: any;
+  @ViewChild(LeadsListComponent) leadsListComponent!: LeadsListComponent;
 
 
   set_default_status_id(): any {
@@ -66,6 +72,7 @@ export class LeadsComponent {
 
   showLeadsListFn() {
     this.showLeadsList = true;
+    this.leadsListComponent?.refreshTable();
   };
 
   setFormConfig() {
@@ -152,7 +159,7 @@ export class LeadsComponent {
               templateOptions: {
                 label: 'Assigned',
                 dataKey: 'employee_id',
-                dataLabel: "name",
+                dataLabel: "first_name",
                 options: [],
                 required: true,
                 lazy: {
@@ -171,7 +178,7 @@ export class LeadsComponent {
                   });
                 }
               }
-            },
+            },            
             {
               key: 'lead_status',
               type: 'select',
@@ -208,7 +215,7 @@ export class LeadsComponent {
           type: 'table',
           className: 'custom-form-list',
           templateOptions: {
-            title: 'Task Interactions',
+            title: 'Lead Interactions',
             addText: 'Add Interaction Notes',
             tableCols: [
               { name: 'interaction_type_id', label: 'Interaction Type' },

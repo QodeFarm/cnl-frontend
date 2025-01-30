@@ -1,18 +1,26 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 
 @Component({
   selector: 'app-work-order-list',
+  standalone: true,
+  imports: [CommonModule, AdminCommmonModule],
   templateUrl: './work-order-list.component.html',
   styleUrls: ['./work-order-list.component.scss']
 })
 export class WorkOrderListComponent {
   
   @Output('edit') edit = new EventEmitter<void>();
+  @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+
+  refreshTable() {
+   this.taTableComponent?.refresh();
+  };
 
   tableConfig: TaTableConfig = {
     apiUrl: 'production/work_order/',
@@ -27,21 +35,54 @@ export class WorkOrderListComponent {
     ],
     pageSize: 10,
     globalSearch: {
-      keys: ['work_order_id']
+      keys: ['start_date','product','quantity','status_id','end_date']
     },
     cols: [
       {
+        fieldKey: 'start_date',
+        name: 'Start Date',
+        sort: true
+      },
+      {
         fieldKey: 'product',
         name: 'Product',
-        sort: false,
+        sort: true,
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
           return row.product.name;
         },
       },
       {
+        fieldKey: 'size',
+        name: 'Size',
+        sort: true,
+        displayType: 'map',
+        mapFn: (currentValue: any, row: any, col: any) => {
+          return row?.size?.size_name;
+        },
+      },
+      {
+        fieldKey: 'color',
+        name: 'Color',
+        sort: true,
+        displayType: 'map',
+        mapFn: (currentValue: any, row: any, col: any) => {
+          return row?.color?.color_name;
+        },
+      },
+      {
         fieldKey: 'quantity',
         name: 'Quantity',
+        sort: true
+      },
+      {
+        fieldKey: 'completed_qty',
+        name: 'Completed QTY',
+        sort: true
+      },
+      {
+        fieldKey: 'pending_qty',
+        name: 'Pending QTY',
         sort: true
       },
       {
@@ -54,14 +95,9 @@ export class WorkOrderListComponent {
         sort: true
       },
       {
-        fieldKey: 'start_date',
-        name: 'Start Date',
-        sort: true
-      },
-      {
         fieldKey: 'end_date',
         name: 'End Date',
-        sort: false
+        sort: true
       },
       {
         fieldKey: "code",

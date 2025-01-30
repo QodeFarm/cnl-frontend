@@ -9,10 +9,10 @@ const routes: Routes = [
     path : '',
     component: CustomfieldsComponent,
   },
-  // {
-  //   path : '',
-  //   component: CustomfieldsListComponent,
-  // }
+  {
+    path : '',
+    component: CustomfieldsListComponent,
+  }
 ];
 
 @NgModule({

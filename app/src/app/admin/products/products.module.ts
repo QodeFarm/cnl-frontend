@@ -19,11 +19,16 @@ import { BrandSalesmanComponent } from './brand-salesman/brand-salesman.componen
 import { ProductBrandsComponent } from './product-brands/product-brands.component';
 import { ProductsListComponent } from './products-list/products-list.component';
 import { ProductItemBalanceComponent } from './product-item-balance/product-item-balance.component';
+import { SizeComponent } from './size/size.component';
+import { ColorComponent } from './color/color.component';
+import { WarehouseLocationsComponent } from './warehouse-locations/warehouse-locations.component';
+import { PackageUnitsComponent } from './package-units/package-units.component';
+import { GPackageUnitsComponent } from './g-package-units/g-package-units.component';
 
 
 @NgModule({
   declarations: [
-    ProductsComponent,
+    // ProductsComponent,
     ProductTypesComponent,
     ProductGroupsComponent,
     ProductCategoriesComponent,
@@ -38,7 +43,12 @@ import { ProductItemBalanceComponent } from './product-item-balance/product-item
     BrandSalesmanComponent,
     ProductBrandsComponent,
     ProductItemBalanceComponent,
-    ProductItemBalanceComponent
+    ProductItemBalanceComponent,
+    SizeComponent,
+    ColorComponent,
+    WarehouseLocationsComponent,
+    PackageUnitsComponent,
+    GPackageUnitsComponent
     // ProductsListComponent
   ],
   imports: [
@@ -48,7 +58,7 @@ import { ProductItemBalanceComponent } from './product-item-balance/product-item
     ProductsListComponent
   ],
   exports: [
-    ProductsComponent,
+    // ProductsComponent,
     ProductTypesComponent,
     ProductGroupsComponent,
     ProductCategoriesComponent,
@@ -62,7 +72,12 @@ import { ProductItemBalanceComponent } from './product-item-balance/product-item
     ProductItemTypeComponent,
     BrandSalesmanComponent,
     ProductBrandsComponent,
-    ProductItemBalanceComponent
+    ProductItemBalanceComponent,
+    SizeComponent,
+    ColorComponent,
+    WarehouseLocationsComponent,
+    PackageUnitsComponent,
+    GPackageUnitsComponent
   ]
 })
 export class ProductsModule { }

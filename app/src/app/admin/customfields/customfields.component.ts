@@ -32,6 +32,7 @@ export class CustomfieldsComponent {
     this.customFieldEditID = event;
     this.http.get('customfields/customfieldscreate/' + event).subscribe((res: any) => {
       if (res && res.data) {
+        console.log("Res : ", res);
         this.formConfig.model = res.data;
         this.formConfig.showActionBtn = true;
         this.formConfig.pkId = 'custom_field_id';
@@ -104,7 +105,7 @@ export class CustomfieldsComponent {
               hooks: {
                 onChanges: (field: any) => {
                   field.formControl.valueChanges.subscribe((data: any) => {
-                    //console.log("ledger_account", data);
+                    console.log("entity_id", data);
                     if (data && data.entity_id) {
                       this.formConfig.model['custom_field']['entity_id'] = data.entity_id;
                     }

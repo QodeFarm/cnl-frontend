@@ -1,8 +1,9 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
+import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 
 @Component({
   selector: 'app-purchasereturnorders-list',
@@ -13,6 +14,11 @@ import { Router } from '@angular/router';
 })
 export class PurchasereturnordersListComponent {
   @Output('edit') edit = new EventEmitter<void>();
+  @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+
+  refreshTable() {
+   this.taTableComponent?.refresh();
+  };
 
   tableConfig: TaTableConfig = {
     apiUrl: 'purchase/purchase_return_order/?summary=true',
@@ -26,9 +32,14 @@ export class PurchasereturnordersListComponent {
     ],
     pageSize: 10,
     globalSearch: {
-      keys: []
+      keys: ['purchase_type','return_no','return_reason','due_date','tax','tax_amount','total_amount','vendor','status_name','remarks']
     },
     cols: [
+      {
+        fieldKey: 'due_date',
+        name: 'Due Date',
+        sort: true
+      },
       {
         fieldKey: 'purchase_type',
         name: 'Purchase Type',
@@ -46,11 +57,6 @@ export class PurchasereturnordersListComponent {
       {
         fieldKey: 'return_reason',
         name: 'Return Reason',
-        sort: true
-      },
-      {
-        fieldKey: 'due_date',
-        name: 'Due Date',
         sort: true
       },
       {
@@ -78,7 +84,7 @@ export class PurchasereturnordersListComponent {
         sort: true
       },
       {
-        fieldKey: 'order_status',
+        fieldKey: 'status_name',
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {

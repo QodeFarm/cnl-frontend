@@ -13,8 +13,9 @@ import { Router } from '@angular/router';
 // import { _HttpClient } from '@delon/theme';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { catchError, filter, mergeMap, switchMap, take } from 'rxjs/operators';
+import { catchError, filter, finalize, mergeMap, switchMap, take } from 'rxjs/operators';
 import { SiteConfigService } from '../services/site-config.service';
+import { LoadingService } from '../services/loading.service';
 
 const CODEMESSAGE: { [key: number]: string } = {
   200: 'The server successfully returned the requested data.',
@@ -44,7 +45,7 @@ export class DefaultInterceptor implements HttpInterceptor {
   private refreshToking = false;
   private refreshToken$: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
-  constructor(private injector: Injector, private siteConfig: SiteConfigService) {
+  constructor(private injector: Injector, private siteConfig: SiteConfigService, private loadingS: LoadingService) {
     if (this.refreshTokenType === 'auth-refresh') {
       //this.buildAuthRefresh();
     }
@@ -66,19 +67,71 @@ export class DefaultInterceptor implements HttpInterceptor {
     setTimeout(() => this.injector.get(Router).navigateByUrl(url));
   }
 
+  // private checkStatus(ev: HttpErrorResponse): void {
+  //   let errorMsg = `Request error ${ev.status}: `;
+  //   if (ev.status == 400) {
+  //     const errortext = CODEMESSAGE[ev.status] || ev.statusText;
+  //     this.notification.error('', errortext);
+  //     return;
+  //   }
+  //   if ((ev.status >= 200 && ev.status < 300) || ev.status === 401) {
+  //     return;
+  //   }
+
+  //   const errortext = "Username or Password is not valid" //CODEMESSAGE[ev.status] || ev.statusText;
+  //   this.notification.error(errorMsg, errortext);
+  // }
+
   private checkStatus(ev: HttpErrorResponse): void {
-    let errorMsg =`Request error ${ev.status}: `;
+    let errorMsg = `Request error ${ev.status}: `;
+
     if (ev.status == 400) {
-      const errortext = CODEMESSAGE[ev.status] || ev.statusText;
-      this.notification.error('', errortext);
-      return;
-    }
-    if ((ev.status >= 200 && ev.status < 300) || ev.status === 401) {
-      return;
+      const responseBody = ev.error;  // Assuming response is in `ev.error` (adjust as necessary)
+
+      // Case 1: If the message is available, show it directly
+      if (responseBody && responseBody.message && responseBody.data.length === 0) {
+        // If only message is present (no detailed error data)
+        const errortext = responseBody.message;
+        console.log('errortext : ', errortext)
+        this.notification.error(
+          `<div style="font-size: 12px; color: #333;">${errortext}</div>`,
+          '',
+          { nzDuration: 5000, nzStyle: { backgroundColor: '#fff9f9', border: '1px solid #ffa39e', maxWidth: '800px' } }
+        );
+        return;
+      }
+
+      // Case 2: If detailed validation errors are present in `data`
+      if (responseBody && responseBody.data && Object.keys(responseBody.data).length > 0) {
+        let detailedError = '';
+        for (const [key, message] of Object.entries(responseBody.data)) {
+          // For each validation error, format it as "KEY: Error message"
+          detailedError += `<strong>${key.toUpperCase()}:</strong> ${message}<br>`;
+
+        }
+        this.notification.error(
+          `${detailedError}`,
+          '',
+          {
+            nzDuration: 5000,
+            nzStyle: {
+              backgroundColor: '#fff9f9',
+              border: '1px solid #ffa39e',
+              maxWidth: '1000px'
+            }
+          }
+        );
+        return;
+      }
     }
 
-    const errortext = "Username or Password is not valid" //CODEMESSAGE[ev.status] || ev.statusText;
-    this.notification.error(errorMsg, errortext);
+    // Fallback for other HTTP status codes
+    const errortext = "An error occurred. Please try again.";
+    this.notification.error(
+      errorMsg,
+      errortext,
+      { nzDuration: 5000, nzStyle: { backgroundColor: '#fff9f9', border: '1px solid #ffa39e', maxWidth: '600px' } }
+    );
   }
 
   /**
@@ -185,6 +238,7 @@ export class DefaultInterceptor implements HttpInterceptor {
   }
 
   private handleData(ev: HttpErrorResponse, req: HttpRequest<any>, next: HttpHandler): Observable<any> {
+    this.loadingS.hide();
     this.checkStatus(ev);
     //Business processing: some common operations
     switch (ev.status) {
@@ -252,6 +306,7 @@ export class DefaultInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     // 统一加上服务端前缀
     let url = req.url;
+    // this.loadingS.show();
     if (!url.startsWith('https://') && !url.startsWith('http://') && !url.startsWith('assets')) {
       const baseUrl = this.siteConfig.CONFIG.baseUrl;
       url = baseUrl + url//environment.api.baseUrl + url;
@@ -265,6 +320,7 @@ export class DefaultInterceptor implements HttpInterceptor {
     const newReq = req.clone({ url, setHeaders: this.getAdditionalHeaders(req.headers) });
     return next.handle(newReq).pipe(
       mergeMap((ev) => {
+
         // 允许统一对请求错误处理
         if (ev instanceof HttpErrorResponse) {
           return this.handleData(ev, newReq, next);
@@ -273,6 +329,10 @@ export class DefaultInterceptor implements HttpInterceptor {
         return of(ev);
       }),
       catchError((err: HttpErrorResponse) => this.handleData(err, newReq, next)),
+      finalize(() => {
+        // this.loadingS.hide();
+      })
     );
+
   }
 }

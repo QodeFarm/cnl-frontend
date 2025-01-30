@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 
 @Component({
   selector: 'app-purchase-invoice-list',
@@ -14,6 +15,11 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 export class PurchaseInvoiceListComponent {
   
   @Output('edit') edit = new EventEmitter<void>();
+  @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+
+  refreshTable() {
+   this.taTableComponent?.refresh();
+  };
   
   tableConfig: TaTableConfig = {
     apiUrl: 'purchase/purchase_invoice_order/?summary=true',
@@ -27,9 +33,14 @@ export class PurchaseInvoiceListComponent {
     ],
     pageSize: 10,
     "globalSearch": {
-      keys: ['id', 'first_name', 'last_name']
+      keys: ['invoice_date','vendor','purchase_type','invoice_no','supplier_invoice_no','tax','total_amount','tax_amount','advance_amount','status_name','remarks']
     },
     cols: [
+      {
+        fieldKey: 'invoice_date',
+        name: 'Invoice Date',
+        sort: true
+      },
       {
         fieldKey: 'vendor',
         name: 'Vendor',
@@ -55,37 +66,32 @@ export class PurchaseInvoiceListComponent {
         sort: true
       },
       {
-        fieldKey: 'invoice_date',
-        name: 'Invoice Date',
-        sort: true
-      },
-      {
         fieldKey: 'supplier_invoice_no',
         name: 'Supplier invoice no',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'tax',
         name: 'Tax',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'total_amount',
         name: 'Total amount',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'tax_amount',
         name: 'Tax amount',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'advance_amount',
         name: 'Advance Amount',
-        sort: false
+        sort: true
       },
       {
-        fieldKey: 'order_status',
+        fieldKey: 'status_name',
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
@@ -96,7 +102,7 @@ export class PurchaseInvoiceListComponent {
       {
         fieldKey: 'remarks',
         name: 'Remarks',
-        sort: false
+        sort: true
       },
       {
         fieldKey: "code",

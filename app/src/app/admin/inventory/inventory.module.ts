@@ -8,7 +8,7 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 @NgModule({
   declarations: [
-    InventoryComponent
+    // InventoryComponent
   ],
   imports: [
     CommonModule,

@@ -10,13 +10,16 @@ import { CustomfieldsListComponent } from './customfields-list/customfields-list
 @NgModule({
   declarations: [
     CustomfieldsComponent,
+    
   ],
   imports: [
     AdminCommmonModule,
     CommonModule,
     CustomfieldsRoutingModule,
     CustomfieldsListComponent,
-    CustomfieldsRoutingModule
-  ]
+  ],
+  exports: [
+    CustomfieldsComponent,
+  ],
 })
 export class CustomfieldsModule { }

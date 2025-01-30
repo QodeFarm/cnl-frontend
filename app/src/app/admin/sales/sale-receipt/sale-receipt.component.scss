@@ -1,0 +1,32 @@
+.dialog-actions {
+    display: flex;
+    justify-content: center; /* Center the buttons horizontally */
+    gap: 10px; /* Increased gap between the buttons */
+    margin-top: 15px; /* Adds space between message and buttons */
+    .btn-danger{
+      border:1px solid #e74a3b;
+      background-color: #e74a3b;
+      color: #ffffff;
+      &:hover{
+        border:1px solid #e02d1b;
+        background-color: #e02d1b;
+        color: #ffffff;
+      }
+    }
+    .btn-primary{
+      border: 1px solid #142768;
+      background-color: #142768;
+      color: #ffffff;
+      &:hover{
+        border:1px solid #233a88;
+        background-color: #233a88;
+        color: #ffffff;
+      }
+    }
+  }
+  
+  button {
+    min-width: 80px; /* Ensure consistent button size */
+    padding: 8px 16px; /* Improve button padding */
+    font-size: 14px; /* Make the button text more readable */
+  }

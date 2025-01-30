@@ -1,8 +1,13 @@
+import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { AssetMaintenanceListComponent } from './asset-maintenance-list/asset-maintenance-list.component';
 
 @Component({
+  standalone: true,
+  imports: [CommonModule, AdminCommmonModule, AssetMaintenanceListComponent],
   selector: 'app-asset-maintenance',
   templateUrl: './asset-maintenance.component.html',
   styleUrls: ['./asset-maintenance.component.scss']
@@ -14,6 +19,7 @@ export class AssetMaintenanceComponent {
   showAssetMaintenanceList: boolean = false;
   showForm: boolean = false;
   AssetMaintenanceEditID: any;
+  @ViewChild(AssetMaintenanceListComponent) AssetMaintenanceListComponent!: AssetMaintenanceListComponent;
 
   constructor(private http: HttpClient) {
   }
@@ -53,6 +59,7 @@ export class AssetMaintenanceComponent {
 
   showAssetMaintenanceListFn() {
     this.showAssetMaintenanceList = true;
+    this.AssetMaintenanceListComponent?.refreshTable();
   };
 
     setFormConfig() {

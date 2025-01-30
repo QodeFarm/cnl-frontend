@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 
 @Component({
   selector: 'app-products-list',
@@ -15,6 +16,11 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 export class ProductsListComponent {
   
   @Output('edit') edit = new EventEmitter<void>();
+  @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+
+  refreshTable() {
+   this.taTableComponent?.refresh();
+  };
 
   tableConfig: TaTableConfig = {
     apiUrl: 'products/products/?summary=true',
@@ -29,9 +35,15 @@ export class ProductsListComponent {
     ],
     pageSize: 10,
     globalSearch: {
-      keys: ['product_id', 'name']
+      keys: ['name','code','unit_options','balance','sales_rate','mrp','dis_amount','print_name','hsn_code','barcode']
     },
     cols: [
+      {
+        fieldKey: 'created_at',
+        name: 'Created At',
+        displayType: 'datetime',
+        sort: true
+      },
       {
         fieldKey: 'name',
         name: 'Name',
@@ -40,21 +52,21 @@ export class ProductsListComponent {
       {
         fieldKey: 'code',
         name: 'Code',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'unit_options',
         name: 'Unit',
-        sort: false,
+        sort: true,
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
-          return row.unit_options.unit_name;
+          return row?.unit_options?.unit_name;
         },
       },
       {
         fieldKey: 'sales_rate',
         name: 'Sale Rate',
-        sort: false
+        sort: true
       },
       // {
       //   fieldKey: 'wholesale_rate',
@@ -69,17 +81,17 @@ export class ProductsListComponent {
       {
         fieldKey: 'mrp',
         name: 'MRP',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'dis_amount',
         name: 'Disc',
-        sort: false
+        sort: true
       },
       {
-        fieldKey: 'product_balance',
-        name: 'Bal',
-        sort: false
+        fieldKey: 'balance',
+        name: 'Balance',
+        sort: true
       },
       {
         fieldKey: 'print_name',
@@ -89,12 +101,12 @@ export class ProductsListComponent {
       {
         fieldKey: 'hsn_code',
         name: 'HSN',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'barcode',
         name: 'Barcode',
-        sort: false
+        sort: true
       },
       {
         fieldKey: "code",

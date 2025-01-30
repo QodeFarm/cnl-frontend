@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
+import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 
 @Component({
   standalone: true,
@@ -13,15 +14,27 @@ import { Router } from '@angular/router';
 })
 export class TaxConfigurationListComponent {
   @Output('edit') edit = new EventEmitter<void>();
+  @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+
+  refreshTable() {
+   this.taTableComponent?.refresh();
+ };
+ 
   tableConfig: TaTableConfig = {
     apiUrl: 'finance/tax_configurations/',
     showCheckbox:true,
     pkId: "tax_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['tax_id']
+      keys: ['tax_name','tax_rate','tax_type','is_active']
     },
     cols: [
+      {
+        fieldKey: 'created_at',
+        name: 'Created At',
+        sort: true,
+        displayType: 'datetime'
+      },
       {
         fieldKey: 'tax_name',
         name: 'Tax Name',
@@ -35,12 +48,12 @@ export class TaxConfigurationListComponent {
       {
         fieldKey: 'tax_type', 
         name: 'Tax Type',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'is_active', 
         name: 'Is Active',
-        sort: false
+        sort: true
       },
       {
         fieldKey: "code",

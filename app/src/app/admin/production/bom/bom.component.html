@@ -1,0 +1,38 @@
+<div class="container-fluid pt-3">
+    <div class="Bom-banner">
+        <div class="col-12 px-0" style="display: flex; justify-content: space-between;align-items: center;">
+            <button (click)="BomEditID = null" type="button" class="btn pl-0" style="color: black;">
+                <span *ngIf="BomEditID" class="custom-heading">Update BOM</span>
+                <span *ngIf="!BomEditID" class="custom-heading">Create BOM</span>
+            </button>
+            <button (click)="showBomListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#BomListModal">
+                BOM List
+            </button>
+        </div>
+    </div>
+    <div class="row custom-form">
+        <div>
+            <ta-form [options]="formConfig"></ta-form>
+        </div>
+    </div>
+</div>
+
+<!-- Bom List Modal -->
+
+<div class="modal fade custom-modal" id="BomListModal" tabindex="-1" aria-labelledby="BomListModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="BomListModalLabel">Edit BOM List</h5>
+                <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" *ngIf="showBomList">
+                <app-bom-list (edit)="editBom($event)" class="custom-list"></app-bom-list>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+            </div>
+        </div>
+    </div>
+</div> 

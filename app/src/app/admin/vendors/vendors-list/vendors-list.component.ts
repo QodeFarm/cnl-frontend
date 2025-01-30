@@ -1,8 +1,9 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
+import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 
 @Component({
   selector: 'app-vendors-list',
@@ -14,6 +15,11 @@ import { Router } from '@angular/router';
 export class VendorsListComponent {
 
   @Output('edit') edit = new EventEmitter<void>();
+  @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+
+  refreshTable() {
+   this.taTableComponent?.refresh();
+  };
 
   tableConfig: TaTableConfig = {
     // apiUrl: 'vendors/vendors/?summary=true&summary=true&page=1&limit=10&sort[0]=name,DESC',
@@ -29,9 +35,15 @@ export class VendorsListComponent {
     ],
     pageSize: 10,
     globalSearch: {
-      keys: ['id', 'name']
+      keys: ['created_at','name','gst_no','email','phone','vendor_category_id','ledger_account','city_id']
     },
     cols: [
+      {
+        fieldKey: 'created_at',
+        name: 'Created At',
+        sort: true,
+        displayType: "date"
+      },
       {
         fieldKey: 'name',
         name: 'Name',
@@ -55,19 +67,19 @@ export class VendorsListComponent {
       {
         fieldKey: 'vendor_category_id',
         name: 'Vendor Category',
-        sort: false,
+        sort: true,
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
-          return row.vendor_category.name;
+          return row.vendor_category?.name;
         },
       },
       {
         fieldKey: 'ledger_account',
         name: 'Ledger Account',
-        sort: false,
+        sort: true,
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
-          return row.ledger_account.name;
+          return row.ledger_account?.name;
         },
       },
       {
@@ -76,14 +88,8 @@ export class VendorsListComponent {
         sort: false,
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
-          return row.city.city_name;
+          return row.city?.city_name;
         },
-      },
-      {
-        fieldKey: 'created_at',
-        name: 'Created At',
-        sort: false,
-        displayType: "date"
       },
       {
         fieldKey: "vendor_id",

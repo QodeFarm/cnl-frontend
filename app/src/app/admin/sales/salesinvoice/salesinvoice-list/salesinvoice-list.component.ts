@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 
 @Component({
   selector: 'app-salesinvoice-list',
@@ -11,9 +12,26 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
   templateUrl: './salesinvoice-list.component.html',
   styleUrls: ['./salesinvoice-list.component.scss']
 })
-export class SalesInvoiceListComponent {
 
+export class SalesInvoiceListComponent implements OnInit {
+
+  ngOnInit() {
+    console.log('Sorting table columns by "created_at"...');
+    
+    // this.tableConfig.cols.sort((a, b) => {
+    //   // Assuming 'created_at' is a field in the objects inside 'cols'
+    //   const dateA = new Date(a.created_at).getTime();
+    //   const dateB = new Date(b.created_at).getTime();
+      
+    //   return dateB - dateA; // Ascending order
+    // });
+  }
   @Output('edit') edit = new EventEmitter<void>();
+  @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+
+  refreshTable() {
+   this.taTableComponent?.refresh();
+  };
 
   tableConfig: TaTableConfig = {
     apiUrl: 'sales/sale_invoice_order/?summary=true',
@@ -27,11 +45,16 @@ export class SalesInvoiceListComponent {
     ],
     pageSize: 10,
     "globalSearch": {
-      keys: ['sale_invoice_id']
+      keys: ['invoice_date','customer','invoice_no','total_amount','tax_amount','advance_amount','status_name','remarks']
     },
     cols: [
       {
-        fieldKey: 'customer_id',
+        fieldKey: 'invoice_date',
+        name: 'Invoice Date',
+        sort: true
+      },
+      {
+        fieldKey: 'customer',
         name: 'Customer',
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
@@ -45,10 +68,11 @@ export class SalesInvoiceListComponent {
         sort: true
       },
       {
-        fieldKey: 'invoice_date',
-        name: 'Invoice Date',
+        fieldKey: 'created_at',
+        name: 'created_at',
         sort: true
       },
+     
       {
         fieldKey: 'total_amount',
         name: 'Total Amount',
@@ -57,7 +81,7 @@ export class SalesInvoiceListComponent {
       {
         fieldKey: 'tax_amount',
         name: 'Tax Amount',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'advance_amount',
@@ -65,18 +89,18 @@ export class SalesInvoiceListComponent {
         sort: true
       },
       {
-        fieldKey: 'order_status_id',
+        fieldKey: 'status_name',
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.order_status.status_name}`;
+          return `${row?.order_status?.status_name}`;
         },
         sort: true
       },
       {
         fieldKey: 'remarks',
         name: 'Remarks',
-        sort: false
+        sort: true
       },
       {
         fieldKey: "code",

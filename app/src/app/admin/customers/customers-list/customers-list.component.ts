@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { TaTableConfig } from '@ta/ta-table';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 
 @Component({
   selector: 'app-customers-list',
@@ -16,6 +17,11 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 export class CustomersListComponent {
 
   @Output('edit') edit = new EventEmitter<void>();
+  @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+
+  refreshTable() {
+    this.taTableComponent?.refresh();
+  };
 
   tableConfig: TaTableConfig = {
     apiUrl: 'customers/customers/?summary=true',
@@ -25,13 +31,19 @@ export class CustomersListComponent {
       {
         key: 'summary',
         value: 'true'
-      }
+      },
     ],
     pageSize: 10,
     "globalSearch": {
-      keys: ['customer_id', 'name']
+      keys: ['created_at','name','email','phone','gst','city_id','ledger_account_id']
     },
     cols: [
+      {
+        fieldKey: 'created_at',
+        name: 'Created At',
+        sort: true,
+        displayType: "datetime"
+      }, 
       {
         fieldKey: 'name',
         name: 'Name',
@@ -40,7 +52,7 @@ export class CustomersListComponent {
       {
         fieldKey: 'email',
         name: 'Email',
-        sort: true
+        sort: false,
       },
       {
         fieldKey: 'phone',
@@ -50,10 +62,10 @@ export class CustomersListComponent {
       {
         fieldKey: 'gst',
         name: 'GST',
-        sort: false,
+        sort: true,
       },
       {
-        fieldKey: 'city.name',
+        fieldKey: 'city_id',
         name: 'City Name',
         sort: false,
         displayType: 'map',
@@ -64,18 +76,12 @@ export class CustomersListComponent {
       {
         fieldKey: 'ledger_account_id',
         name: 'Ledger Account',
-        sort: false,
+        sort: true,
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
           return row.ledger_account.name;
         },
-      },
-      {
-        fieldKey: 'created_at',
-        name: 'Created At',
-        sort: false,
-        displayType: "date"
-      },      
+      },     
       {
         fieldKey: "code",
         name: "Action",
@@ -106,3 +112,8 @@ export class CustomersListComponent {
 
   }
 }
+
+
+
+
+

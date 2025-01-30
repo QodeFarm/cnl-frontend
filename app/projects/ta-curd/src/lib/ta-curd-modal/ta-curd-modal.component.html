@@ -6,9 +6,10 @@
 
 
 </div> -->
-<ta-table #table [options]="options.tableConfig" (doAction)="tableAction($event)">
+<ta-table #table [options]="options.tableConfig" (doAction)="tableAction($event)" [customProductTemplate]="customProductTemplate">
+    <!--Added this customProductTemplate -->
     <div class="after-search">
-        <button nz-button nzType="primary" class="ml-md" (click)="openDrawer()">
+        <button *ngIf="!options.hideAddBtn" nz-button nzType="primary" class="ml-md" (click)="openDrawer()">
             <i nz-icon nzType="plus"></i>Add
         </button>
     </div>

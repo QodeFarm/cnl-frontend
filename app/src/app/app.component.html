@@ -1,1 +1,9 @@
+<div class="loader" *ngIf="(loadingService.loading$ | async)">
+    <div class="center center1">
+        <div class="ring"></div>
+    </div>
+    <div class="center center2">
+        <div class="ring"></div>
+    </div>
+</div>
 <router-outlet></router-outlet>

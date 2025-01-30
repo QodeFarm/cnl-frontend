@@ -1,9 +1,14 @@
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
+import { JournalEntryListComponent } from './journal-entry-list/journal-entry-list.component';
+import { CommonModule } from '@angular/common';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 @Component({
   selector: 'app-journal-entry',
+  standalone: true,
+  imports: [CommonModule, AdminCommmonModule, JournalEntryListComponent],
   templateUrl: './journal-entry.component.html',
   styleUrls: ['./journal-entry.component.scss']
 })
@@ -11,6 +16,7 @@ export class JournalEntryComponent {
   showJournalEntryList: boolean = false;
   showForm: boolean = false;
   JournalEntryEditID: any;
+  @ViewChild(JournalEntryListComponent) JournalEntryListComponent!: JournalEntryListComponent;
 
   constructor(private http: HttpClient) {};
 
@@ -47,6 +53,7 @@ export class JournalEntryComponent {
 
   showJournalEntryListFn() {
     this.showJournalEntryList = true;
+    this.JournalEntryListComponent?.refreshTable();
   };
 
   setFormConfig() {

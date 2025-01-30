@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 
 @Component({
   selector: 'app-purchase-list',
@@ -14,6 +15,11 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 export class PurchaseListComponent {
   
   @Output('edit') edit = new EventEmitter<void>();
+  @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+
+  refreshTable() {
+   this.taTableComponent?.refresh();
+  };
   
   tableConfig: TaTableConfig = {
     apiUrl: 'purchase/purchase_order/?summary=true',
@@ -27,9 +33,14 @@ export class PurchaseListComponent {
     ],
     pageSize: 10,
     "globalSearch": {
-      keys: ['id', 'first_name', 'last_name']
+      keys: ['order_date','purchase_type_id','order_no','tax','tax_amount','total_amount','vendor','status_name','remarks']
     },
     cols: [
+      {
+        fieldKey: 'order_date',
+        name: 'Order Date',
+        sort: true
+      },
       {
         fieldKey: 'purchase_type_id',
         name: 'Purchase Type',
@@ -41,11 +52,6 @@ export class PurchaseListComponent {
         },
       },
       {
-        fieldKey: 'order_date',
-        name: 'Order Date',
-        sort: true
-      },
-      {
         fieldKey: 'order_no',
         name: 'Order No',
         sort: true
@@ -53,20 +59,20 @@ export class PurchaseListComponent {
       {
         fieldKey: 'tax',
         name: 'Tax',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'tax_amount',
         name: 'Tax amount',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'total_amount',
         name: 'Total amount',
-        sort: false
+        sort: true
       },
       {
-        fieldKey: 'vendor_id',
+        fieldKey: 'vendor',
         name: 'Vendor',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
@@ -75,7 +81,7 @@ export class PurchaseListComponent {
         sort: true
       },
       {
-        fieldKey: 'order_status',
+        fieldKey: 'status_name',
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
@@ -86,7 +92,7 @@ export class PurchaseListComponent {
       {
         fieldKey: 'remarks',
         name: 'Remarks',
-        sort: false
+        sort: true
       },
       {
         fieldKey: "code",

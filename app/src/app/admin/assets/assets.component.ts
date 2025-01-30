@@ -1,9 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
+import { CommonModule } from '@angular/common';
+import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { AssetsListComponent } from './assets-list/assets-list.component';
 
 @Component({
   selector: 'app-assets',
+  standalone: true,
+  imports: [CommonModule, AdminCommmonModule, AssetsListComponent],
   templateUrl: './assets.component.html',
   styleUrls: ['./assets.component.scss']
 })
@@ -14,6 +19,7 @@ export class AssetsComponent{
   showAssetsList: boolean = false;
   showForm: boolean = false;
   AssetsEditID: any;
+  @ViewChild(AssetsListComponent) AssetsListComponent!: AssetsListComponent;
 
   constructor(private http: HttpClient) {}
 
@@ -52,6 +58,7 @@ export class AssetsComponent{
 
   showAssetsListFn() {
     this.showAssetsList = true;
+    this.AssetsListComponent?.refreshTable();
     }
 
     setFormConfig() {

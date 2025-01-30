@@ -1,8 +1,9 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
+import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 
 @Component({
   selector: 'app-payment-transaction-list',
@@ -14,6 +15,11 @@ import { Router } from '@angular/router';
 export class PaymentTransactionListComponent {
 
   @Output('edit') edit = new EventEmitter<void>();
+  @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+
+  refreshTable() {
+   this.taTableComponent?.refresh();
+ };
 
   tableConfig: TaTableConfig = {
     apiUrl: 'finance/payment_transactions/',
@@ -21,9 +27,14 @@ export class PaymentTransactionListComponent {
     pkId: "payment_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['payment_id']
+      keys: ['payment_date','invoice_id','order_type','payment_method','payment_status','amount','reference_number','currency','transaction_type','notes']
     },
     cols: [
+      {
+        fieldKey: 'payment_date', 
+        name: 'Payment Date',
+        sort: true
+      },
       {
         fieldKey: 'invoice_id',
         name: 'Invoice',
@@ -32,11 +43,6 @@ export class PaymentTransactionListComponent {
       {
         fieldKey: 'order_type',
         name: 'Order Type',
-        sort: true
-      },
-      {
-        fieldKey: 'payment_date', 
-        name: 'Payment Date',
         sort: true
       },
       {
@@ -57,12 +63,12 @@ export class PaymentTransactionListComponent {
       {
         fieldKey: 'reference_number', 
         name: 'Reference Number',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'currency', 
         name: 'Currency',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'transaction_type', 
@@ -72,7 +78,7 @@ export class PaymentTransactionListComponent {
       {
         fieldKey: 'notes', 
         name: 'Notes',
-        sort: false
+        sort: true
       },
       {
         fieldKey: "code",

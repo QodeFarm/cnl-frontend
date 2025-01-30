@@ -6,6 +6,7 @@ export * from './lib/ta-core.service';
 // export * from './lib/ta-core.component';
 export * from './lib/ta-core.module';
 export * from './lib/net/default.interceptor';
+export * from './lib/services/loading.service';
 export * from './lib/error/http-error.interceptor';
 export * from './lib/error/global-error-handler';
 export * from './lib/services/local-storage.service';

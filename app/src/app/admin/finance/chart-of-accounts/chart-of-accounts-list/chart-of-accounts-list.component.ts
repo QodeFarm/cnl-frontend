@@ -1,8 +1,9 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
+import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 
 @Component({
   selector: 'app-chart-of-accounts-list',
@@ -14,6 +15,11 @@ import { Router } from '@angular/router';
 export class ChartOfAccountsListComponent {
 
   @Output('edit') edit = new EventEmitter<void>();
+  @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+
+  refreshTable() {
+   this.taTableComponent?.refresh();
+ };
 
   tableConfig: TaTableConfig = {
     apiUrl: 'finance/chart_of_accounts/',
@@ -21,9 +27,15 @@ export class ChartOfAccountsListComponent {
     pkId: "account_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['account_id']
+      keys: ['account_code','account_name','account_type','parent_account_id','bank_account_id']
     },
     cols: [
+      {
+        fieldKey: 'created_at',
+        name: 'Created At',
+        sort: true,
+        displayType: 'datetime'
+      },
       {
         fieldKey: 'account_code',
         name: 'Account Code',
@@ -37,7 +49,7 @@ export class ChartOfAccountsListComponent {
       {
         fieldKey: 'account_type', 
         name: 'Account Type',
-        sort: false
+        sort: true
       },
       {
         fieldKey: 'parent_account_id',

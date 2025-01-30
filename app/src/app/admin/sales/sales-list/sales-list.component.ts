@@ -1,8 +1,9 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
+import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 
 @Component({
   selector: 'app-sales-list',
@@ -14,6 +15,11 @@ import { Router } from '@angular/router';
 export class SalesListComponent {
 
   @Output('edit') edit = new EventEmitter<void>();
+  @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+
+  refreshTable() {
+   this.taTableComponent?.refresh();
+  };
 
 
   tableConfig: TaTableConfig = {
@@ -29,7 +35,7 @@ export class SalesListComponent {
     ],
     pageSize: 10,
     "globalSearch": {
-      keys: ['id', 'first_name', 'last_name']
+      keys: ['order_date','order_no','sale_type','customer','amount','tax','advance_amount','status_name','flow_status']
     },
     cols: [
       {
@@ -49,7 +55,7 @@ export class SalesListComponent {
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
           // console.log("-->", currentValue);
-          return `${row.sale_type.name}`;
+          return `${row.sale_type?.name || ''}`;
         },
       },
 
@@ -60,6 +66,11 @@ export class SalesListComponent {
         mapFn: (currentValue: any, row: any, col: any) => {
           return `${row.customer.name}`;
         },
+        sort: true
+      },
+      {
+        fieldKey: 'sale_estimate',
+        name: 'Sale Estimate',
         sort: true
       },
       {
@@ -74,29 +85,11 @@ export class SalesListComponent {
       },
       {
         fieldKey: 'advance_amount',
-        name: 'Advance Amt',
+        name: 'Advance Amt',
         sort: true
       },
-      // {
-      //   fieldKey: 'job_type_id',
-      //   name: 'Document Status',
-      //   displayType: "map",
-      //   mapFn: (currentValue: any, row: any, col: any) => {
-      //     return `${row.job_type_id.job_type_name}`;
-      //   },
-      //   sort: true
-      // },
-      // {
-      //   fieldKey: 'job_code_id',
-      //   name: 'Print Count',
-      //   displayType: "map",
-      //   mapFn: (currentValue: any, row: any, col: any) => {
-      //     return `${row.job_code_id.job_code}`;
-      //   },
-      //   sort: true
-      // },
       {
-        fieldKey: 'order_status',
+        fieldKey: 'status_name',
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
@@ -105,8 +98,12 @@ export class SalesListComponent {
         sort: true
       },
       {
-        fieldKey: 'flow_status',
+        fieldKey: 'flow_status_name',
         name: 'Flow Status',
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          return `${row.flow_status.flow_status_name}`;
+        },
         sort: true
       },
       {

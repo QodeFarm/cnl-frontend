@@ -1,0 +1,128 @@
+.sidebar-message {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: white; /* White background */
+  color: black; /* Black text */
+  padding: 10px 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  display: flex; /* Use flexbox to align items */
+  align-items: center; /* Center vertically */
+  z-index: 1000;
+  font-size: 16px;
+}
+  
+.checkmark-circle {
+  width: 30px;
+  height: 30px;
+  background-color: white; /* Green circle */
+  border: 2px solid #008044;
+  border-radius: 50%; /* Make it a circle */
+  display: flex; /* Center the tick mark */
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px; /* Space between circle and text */
+}
+
+
+.custom-dialog-overlay {
+
+  position: fixed;
+
+  top: 0;
+
+  left: 0;
+
+  width: 100vw;
+
+  height: 100vh;
+
+  background: rgba(0, 0, 0, 0.5); /* Dark overlay */
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  z-index: 999; /* Ensure it's above other elements */
+
+}
+
+.custom-dialog-box {
+
+  background-color: #fff;
+
+  padding: 20px;
+
+  border-radius: 10px;
+
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+
+  text-align: center;
+
+  width: 300px;
+
+}
+
+.custom-dialog-box p {
+
+  margin-bottom: 20px;
+
+}
+
+.custom-dialog-box button {
+
+  padding: 10px 20px;
+
+  background-color: #007bff;
+
+  color: white;
+
+  border: none;
+
+  border-radius: 5px;
+
+  cursor: pointer;
+
+}
+
+.custom-dialog-box button:hover {
+
+  background-color: #0056b3;
+
+}
+
+.toast-message {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: white; /* White background */
+  color: black; /* Black text */
+  padding: 10px 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  display: flex; /* Use flexbox to align items */
+  align-items: center; /* Center vertically */
+  z-index: 1000;
+  font-size: 16px;
+}
+
+.tick-circle {
+  width: 30px;
+  height: 30px;
+  background-color: white; /* Green circle */
+  border: 2px solid #008044;
+  border-radius: 50%; /* Make it a circle */
+  display: flex; /* Center the tick mark */
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px; /* Space between circle and text */
+}
+
+.tick-mark {
+  color: rgb(0, 128, 79); 
+  font-size: 20px; /* Adjust size as needed */
+}
+  

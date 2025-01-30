@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, Output, ViewChild, EventEmitter, ElementRef } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, Output, ViewChild, EventEmitter, ElementRef, TemplateRef } from '@angular/core';
 import { getValue } from '@ta/ta-core';
 import { cloneDeep } from 'lodash';
 import {
@@ -51,15 +51,27 @@ export class TaTableComponent implements OnDestroy {
   @Input() options!: TaTableConfig;
   @Output() doAction: EventEmitter<any> = new EventEmitter();
   @ViewChild('taTable') taTable!: NzTableComponent<any> | any;
-
+  @Input() customProductTemplate!: TemplateRef<any>;
+  // selectedProducts: any[] = []; // This holds the selected products
+  // @Output() selectedProductsChange = new EventEmitter<any[]>(); // Event emitter to notify parent component
+  checked = false;
+  indeterminate = false;
+  selectedEmployee: string | null = null;
   selectedStatus: string | null = null;
   selectedQuickPeriod: string | null = null;
   fromDate: Date | null = null;
   toDate: Date | null = null;
   isButtonVisible = false;
+  isStatusButtonVisible = false;
+  isEmployeeFilterVisible = false;
+  setOfCheckedId = new Set<number>();
 
   statusOptions: Array<{ value: string, label: string }> = []; // Store the statuses here
-  
+
+  employeeOptions: Array<{ value: number; label: string }> = [];// Add this for employee filter
+
+
+  // List of quick period options like 'Today', 'Last Week', etc.
   quickPeriodOptions = [
     { value: 'today', label: 'Today' },
     { value: 'yesterday', label: 'Yesterday' },
@@ -77,7 +89,7 @@ export class TaTableComponent implements OnDestroy {
     const today = new Date();
     let startDate: Date | null = null;
     let endDate: Date | null = today;
-  
+
     switch (this.selectedQuickPeriod) {
       case 'today':
         startDate = endDate;
@@ -116,14 +128,14 @@ export class TaTableComponent implements OnDestroy {
         endDate = new Date(today.getFullYear(), 2, 31);
         break;
     }
-  
+
     this.fromDate = startDate;
     this.toDate = endDate;
   }
-;
+  ;
   loadStatuses() {
     const url = 'masters/order_status/';
-    
+
     this.http.get<any>(url).subscribe(
       (response) => {
         if (response && response.data && response.data.length > 0) {
@@ -140,22 +152,80 @@ export class TaTableComponent implements OnDestroy {
       }
     );
   }
-onStatusChange(status: string) {
-  this.selectedStatus = status;
-  // this.applyFilters();
-}
-  
+  onStatusChange(status: string) {
+    this.selectedStatus = status;
+    // this.applyFilters();
+  }
+  refreshCheckedStatus(): void {
+    const listOfEnabledData = this.rows.filter(({ disabled }) => !disabled);
+    this.checked = listOfEnabledData.every((row) => this.setOfCheckedId.has(row[this.options.pkId]));
+    this.indeterminate = listOfEnabledData.some((row) => this.setOfCheckedId.has(row[this.options.pkId])) && !this.checked;
+  }
+  onAllChecked(checked: boolean): void {
+    this.rows
+      .filter(({ disabled }) => !disabled)
+      .forEach((row) => this.updateCheckedSet(row[this.options.pkId], checked));
+    this.refreshCheckedStatus();
+  }
+  updateCheckedSet(id: number, checked: boolean): void {
+    if (checked) {
+      this.setOfCheckedId.add(id);
+    } else {
+      this.setOfCheckedId.delete(id);
+    }
+  }
+  onItemChecked(id: number, checked: boolean): void {
+    this.updateCheckedSet(id, checked);
+    this.refreshCheckedStatus();
+  }
+
+  loadEmployees() {
+    const url = 'hrms/employees/'; // Replace with your actual employee API endpoint
+
+    this.http.get<any>(url).subscribe(
+      (response) => {
+        if (response && response.data && response.data.length > 0) {
+          // Map the employees' data to options for the select dropdown
+          this.employeeOptions = response.data.map(employee => {
+          const fullName = `${employee.first_name} ${employee.last_name || ''}`.trim(); // Concatenate first and last names
+ 
+            return {
+              value: employee.employee_id,  // Use the employee ID as value
+              label: fullName // Store the full name
+            };
+          });
+        } else {
+          console.warn('No employees found in the API response.');
+        }
+      },
+      (error) => {
+        console.error('Error fetching employees:', error);
+      }
+    );
+  }
+  onEmployeeChange(employee: string) {
+    this.selectedEmployee = employee; // Now selectedEmployee will store the full name
+    console.log('Selected Employee Name:', this.selectedEmployee); // Log full name
+    // this.applyFilters(); // Apply the filter immediately
+  }
+
+  // Apply filters like quick period, date range, and status to fetch filtered data
   applyFilters() {
     // Construct the filters object
     const filters = {
-        quickPeriod: this.selectedQuickPeriod,
-        fromDate: this.fromDate,
-        toDate: this.toDate,
-        status: this.selectedStatus,
+      quickPeriod: this.selectedQuickPeriod,
+      fromDate: this.fromDate,
+      toDate: this.toDate,
+      status: this.selectedStatus,
+      employee: this.selectedEmployee,
     };
-    
+
     // Generate query string from filters
     const queryString = this.generateQueryString(filters);
+
+    // Add page and limit parameters
+    const page = this.pageIndex;
+    const limit = this.pageSize;
 
     const tableParamConfig: TaParamsConfig = {
       apiUrl: this.options.apiUrl,
@@ -165,29 +235,37 @@ onStatusChange(status: string) {
       fixedFilters: this.options.fixedFilters
     }
 
+    // Append page and limit to the query string
+    // Construct final URL with filters and pagination
+    const finalQueryString = `${queryString}&page=${page}&limit=${limit}`;
+
     const full_path = this.options.apiUrl;
+    const url = `${full_path}${finalQueryString}`;
 
-    const url = `${full_path}${queryString}`;
+    // Fetch filtered data from the server using the constructed URL
     this.http.get(url).subscribe(
-        response => {
-            this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
-                this.loading = false;
-                this.rows = response['data'] || data;
-            });
-        },
-        error => {
-            console.error('Error executing URL:', `${full_path}${queryString}`, error);
-        }
+      response => {
+        this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
+          this.loading = false;
+          this.rows = response['data'] || data;
+        });
+      },
+      error => {
+        console.error('Error executing URL:', `${full_path}${queryString}`, error);
+      }
     );
-    return queryString;
-}
+    // return queryString;
+    return finalQueryString;
+  }
 
-clearFilters() {
+  // Clear all filters like quick period, date range, and status
+  clearFilters() {
     // Reset all filter values
     this.selectedQuickPeriod = null;
     this.fromDate = null;
     this.toDate = null;
     this.selectedStatus = null;
+    this.selectedEmployee = null; // Clear employee filter
 
     // Optionally, you might want to clear other filters or reset pagination if necessary
     this.pageIndex = 1;
@@ -201,76 +279,91 @@ clearFilters() {
       fixedFilters: this.options.fixedFilters
     }
 
-    const url = this.options.apiUrl; // Base URL without any filters
+    // const url = `${this.options.apiUrl}&page=${this.pageIndex}&limit=${this.pageSize}`;
+    const url = `${this.options.apiUrl}`;
+
+
+    console.log('API URL:', url); // Debugging log
+
+    // const url = this.options.apiUrl; // Base URL without any filters
     this.http.get(url).subscribe(
-        response => {
-            this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
-                this.loading = false;
-                this.rows = response['data'] || data;
-            });
-        },
-        error => {
-            console.error('Error executing URL:', url, error);
-        }
+      response => {
+        this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
+          this.loading = false;
+          this.rows = response['data'] || data;
+        });
+      },
+      error => {
+        console.error('Error executing URL:', url, error);
+      }
     );
-}
+  }
 
-
-generateQueryString(filters: { quickPeriod: string, fromDate: Date, toDate: Date, status: string}): string {
+  // Generate query string for the API call based on the applied filters
+  generateQueryString(filters: { quickPeriod: string, fromDate: Date, toDate: Date, status: string, employee: string }): string {
     const queryParts: string[] = [];
 
+    // Add filter for 'fromDate' if available
     if (filters.fromDate) {
-        const fromDateStr = this.formatDate(filters.fromDate);
-        queryParts.push(`created_at_after=${encodeURIComponent(fromDateStr)}`);
+      const fromDateStr = this.formatDate(filters.fromDate);
+      queryParts.push(`created_at_after=${encodeURIComponent(fromDateStr)}`);
     }
 
+    // Add filter for 'toDate' if available
     if (filters.toDate) {
-        const toDateStr = this.formatDate(filters.toDate);
-        queryParts.push(`created_at_before=${encodeURIComponent(toDateStr)}`);
+      const toDateStr = this.formatDate(filters.toDate);
+      queryParts.push(`created_at_before=${encodeURIComponent(toDateStr)}`);
     }
 
+    // Add filter for status if available
     if (filters.status) {
       queryParts.push(`status_name=${encodeURIComponent(filters.status)}`);
     }
 
+    // Add filter for status if available
+    if (filters.employee) {
+      queryParts.push(`employee_id=${encodeURIComponent(filters.employee)}`);
+    }
+
+    // Return the query string by joining all the filters
     return '?&' + queryParts.join('&');
-}
-formatDate(date: Date): string {
+  }
+  formatDate(date: Date): string {
     // Format date as 'yyyy-MM-dd'
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
     return `${year}-${month}-${day}`;
-}
-
-downloadData(event: any) {
-  const tableParamConfig: TaParamsConfig = {
-    apiUrl: this.options.apiUrl,
-    pageIndex: this.pageIndex,
-    pageSize: this.pageSize,
   }
 
-  this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
-    this.loading = false;
-    const full_path = this.options.apiUrl
-    const name_of_file = full_path.split('/')[1]
-    let fullUrl = `${this.options.apiUrl}`;
-    const query = this.applyFilters()
-    if (query.length > 1) {
-      fullUrl = `${fullUrl}${query}&`
+  downloadData(event: any) {
+    const tableParamConfig: TaParamsConfig = {
+      apiUrl: this.options.apiUrl,
+      pageIndex: this.pageIndex,
+      pageSize: this.pageSize,
     }
 
-    const download_url = `${fullUrl}download/excel/`
-    this.http.get(download_url, { responseType: 'blob' }).subscribe((blob: Blob) => {
-      const a = document.createElement('a');
-      const objectUrl = URL.createObjectURL(blob);
-      a.href = objectUrl;
-      a.download = `${name_of_file}.xlsx`
-      a.click();
-      URL.revokeObjectURL(objectUrl);
-    });
-  })
-};
+    this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
+      this.loading = false;
+      const full_path = this.options.apiUrl
+      const name_of_file = full_path.split('/')[1]
+      let fullUrl = `${this.options.apiUrl}`;
+      const query = this.applyFilters()
+      if (query.length > 1) {
+        fullUrl = `${fullUrl}${query}&`
+      }
+
+      const download_url = `${fullUrl}download/excel/`
+      this.http.get(download_url, { responseType: 'blob' }).subscribe((blob: Blob) => {
+        const a = document.createElement('a');
+        const objectUrl = URL.createObjectURL(blob);
+        a.href = objectUrl;
+        a.download = `${name_of_file}.xlsx`
+        a.click();
+        URL.revokeObjectURL(objectUrl);
+      });
+    })
+  };
 
   searchValue = '';
   visible = false;
@@ -323,15 +416,48 @@ downloadData(event: any) {
     // this.loadDataFromServer();
     const currentUrl = this.router.url;
     // console.log('Current URL:', currentUrl); 
-    this.isButtonVisible = [
+    const visibleUrls = [
       '/admin/purchase',
       '/admin/purchase/invoice',
+      '/admin/purchase/purchase-invoice',
       '/admin/purchase/purchasereturns',
       '/admin/sales',
       '/admin/sales/salesinvoice',
       '/admin/sales/sale-returns',
-    ].includes(currentUrl);
+      '/admin/hrms/employee-attendance',
+      '/admin/employees',
+      '/admin/hrms/employee-leave-balance'
+    ]
     this.loadStatuses();
+    this.loadEmployees();
+
+    // Show status filter for specific URLs    
+    this.isButtonVisible = visibleUrls.includes(currentUrl);
+
+    // Hide status button for specific URLs
+    const hideStatusUrls = [
+      '/admin/hrms/employee-attendance',
+      '/admin/employees',// Added employees URL
+      '/admin/hrms/employee-leave-balance'
+    ];
+    this.isStatusButtonVisible = !hideStatusUrls.includes(currentUrl);
+
+    // Show employee filter for specific URLs
+    const employeeFilterUrls = [
+      '/admin/hrms/employee-attendance',
+      '/admin/employees', // Added employees URL
+      '/admin/hrms/employee-leave-balance'
+    ];
+    this.isEmployeeFilterVisible = employeeFilterUrls.includes(currentUrl);
+
+    // // Check if current URL is '/admin/hrms/employee-attendance' to show employee filter
+    // this.isEmployeeFilterVisible = currentUrl === '/admin/hrms/employee-attendance';
+
+    // if (currentUrl === '/admin/hrms/employee-attendance') { // add URL where you want to hide the Status dropdown.
+    //   this.isStatusButtonVisible = false;  // Hide Status dropdown for this specific URL
+    // } else {
+    //   this.isStatusButtonVisible = true;   // Show Status dropdown for other URLs
+    // }
   }
   loadDataFromServer(startIntial?: boolean): void {
 
@@ -352,8 +478,11 @@ downloadData(event: any) {
       this.loading = true;
       this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
         this.loading = false;
-        this.total = data.total; // mock the total data here
+        this.total = data.totalCount; // mock the total data here
         this.rows = data.data || data;
+        if (this.options.showCheckbox) {
+          this.refreshCheckedStatus();
+        }
       }, (error) => {
         this.loading = false;
       });
@@ -491,6 +620,16 @@ downloadData(event: any) {
   ngOnDestroy() {
     this.actionObservable$.unsubscribe();
   }
+  // Additional code for handling action button events in the table(added this code for file upload)(start)
+  performAction(action: any, row: any) {
+    if (action && action.type === 'callBackFn' && typeof action.callBackFn === 'function') {
+      action.callBackFn(row); // Execute the callback function with row data
+    }
+
+    // Optionally, emit the event to parent if needed
+    this.doAction.emit({ action, row });
+  }
+
   // getFilters(){
   //   const filters = this.options.cols.filter((item: { searchValue: any; })=>{
   //     item.searchValue;
