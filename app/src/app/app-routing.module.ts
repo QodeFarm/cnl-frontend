@@ -115,6 +115,9 @@ const routes: Routes = [
       //Reporting Tool
       { path: 'reports/custome-reports', data: { title: 'Reports', moduleName: 'reports' }, canActivate: [], loadComponent: () => import('./admin/reports/reports.component').then(m => m.ReportsComponent) },
 
+      //Customfields Tool
+      { path: 'customfields', data: { title: 'customfields', moduleName: 'customfields' }, canActivate: [], loadChildren: () => import('./admin/customfields/customfields.module').then(m => m.CustomfieldsModule) },
+
 
       // { path: 'production', data: { title: 'production', moduleName: 'production' }, canActivate: [], loadChildren: () => import('./admin/production/production.module').then(m => m.ProductionModule) },
       // { path: 'finance', data: { title: 'finance', moduleName: 'finance' }, canActivate: [], loadChildren: () => import('./admin/finance/finance.module').then(m => m.FinanceModule) },
