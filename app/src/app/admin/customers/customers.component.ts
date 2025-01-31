@@ -2,6 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { forkJoin } from 'rxjs';  // Import forkJoin from rxjs
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { CustomersListComponent } from './customers-list/customers-list.component';
@@ -26,9 +27,10 @@ export class CustomersComponent {
     return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   }
   private observer: MutationObserver;
+  customFieldConfig: any;
 
-  constructor(private http: HttpClient) { }
-
+  constructor(private http: HttpClient) {}
+  customFieldFormConfig: any = {};
   ngOnInit() {
     this.showCustomerList = false;
     this.showForm = true;  //temporary change 'true'
@@ -36,6 +38,8 @@ export class CustomersComponent {
     // Set form config
     this.setFormConfig();
     console.log('this.formConfig', this.formConfig);
+    this.fetchCustomFields();
+    
   }
 
   ngAfterViewInit() {
@@ -56,6 +60,224 @@ export class CustomersComponent {
     }
   }
 
+  // getCustomFieldConfig() {
+  //   if (this.customFieldFormConfig && this.customFieldFormConfig.fields) {
+  //     return this.customFieldFormConfig.fields.map((field: any) => ({
+  //       key: field.key,
+  //       type: field.type,
+  //       className: 'col-md-12',
+  //       templateOptions: {
+  //         label: field.templateOptions.label,
+  //         placeholder: field.templateOptions.placeholder,
+  //         required: field.templateOptions.required,
+  //         options: field.templateOptions.options || [] // Ensure options exist for select fields
+  //       }
+  //     }));
+  //   }
+  //   return [];  // Return an empty array if there are no custom fields
+  // }
+
+  
+  
+  
+  customFieldMetadata: any = {}; // To store mapping of field names to metadata
+  fetchCustomFields() {
+    this.http.get('customfields/customfieldscreate/').subscribe(
+      (response: any) => {
+        console.log('Custom Fields API Response:', response);
+  
+        if (response?.data) {
+          const customFields = response.data.filter((field: any) => field.entity.entity_name === 'customers');
+  
+          // Save metadata for mapping
+          this.customFieldMetadata = customFields.reduce((map: any, field: any) => {
+            map[field.custom_field_id.toLowerCase()] = {
+              custom_field_id: field.custom_field_id,
+              field_type_id: field.field_type_id,
+              entity_id: field.entity.entity_id,
+              is_required: field.is_required,
+              validation_rules: field.validation_rules,
+              options: [], // Initially empty, will be populated if options exist
+            };
+            return map;
+          }, {});
+  
+          console.log('Custom Field Metadata:', this.customFieldMetadata);
+  
+          // Fetch options for each custom field
+          this.fetchAllFieldOptions(customFields);
+        } else {
+          console.warn('No custom fields data found in the API response.');
+        }
+      },
+      (error) => {
+        console.error('Error fetching custom fields:', error);
+      }
+    );
+  }
+  
+  // Fetch options for all custom fields in one call
+  fetchAllFieldOptions(customFields: any[]) {
+    this.http.get('customfields/customfieldoptions/').subscribe(
+      (response: any) => {
+        console.log("Custom Field Options API Response:", response);
+  
+        if (response?.data) {
+          // Group options by custom_field_id
+          const fieldOptionsMap = response.data.reduce((map: any, option: any) => {
+            const fieldId = option.custom_field_id.toLowerCase();
+            if (!map[fieldId]) {
+              map[fieldId] = [];
+            }
+            if (option.option_value) {
+              map[fieldId].push({ label: option.option_value, value: option.option_value });
+            }
+            return map;
+          }, {});
+  
+          // Update customFieldMetadata with options
+          Object.keys(fieldOptionsMap).forEach(fieldId => {
+            if (this.customFieldMetadata[fieldId]) {
+              this.customFieldMetadata[fieldId].options = fieldOptionsMap[fieldId];
+            }
+          });
+  
+          console.log('Updated Custom Field Metadata with Options:', this.customFieldMetadata);
+  
+          // Add custom fields to formConfig
+          this.addCustomFieldsToFormConfig(customFields);
+        } else {
+          console.warn('No options found in the API response.');
+          this.addCustomFieldsToFormConfig(customFields); // Proceed without options
+        }
+      },
+      (error) => {
+        console.error('Error fetching custom field options:', error);
+        this.addCustomFieldsToFormConfig(customFields); // Proceed without options
+      }
+    );
+  }
+  
+  // Add custom fields dynamically to the formConfig
+  addCustomFieldsToFormConfig(customFields: any) {
+    console.log("Custom Fields to Add:", customFields);
+  
+    const customFieldConfigs = customFields.map((field: any) => {
+      const key = field.custom_field_id.toLowerCase(); // Normalize key
+      const fieldMetadata = this.customFieldMetadata[key] || {};
+  
+      return {
+        key: key,
+        type: fieldMetadata.options.length > 0 ? 'select' : 'input', // Use select if options exist
+        className: 'col-md-6',
+        defaultValue: this.formConfig.model['custom_field_values'][key] || '', // Pre-fill value
+        templateOptions: {
+          label: field.field_name,
+          placeholder: field.field_name,
+          required: fieldMetadata.is_required,
+          options: fieldMetadata.options, // Set options if available
+        },
+      };
+    });
+  
+    console.log('Final Custom Field Config:', customFieldConfigs);
+  
+    this.formConfig.fields = [
+      ...this.formConfig.fields,
+      {
+        key: 'custom_field_values',
+        fieldGroup: customFieldConfigs,
+      },
+    ];
+  }
+
+  submitCustomerForm() {
+    const customerData = { ...this.formConfig.model['customer_data'] }; // Main customer data
+    const customerAttachments = this.formConfig.model['customer_attachments'];
+    const customerAddresses = this.formConfig.model['customer_addresses'];
+    const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
+  
+    if (!customerData) {
+      console.error('Customer data is missing.');
+      return;
+    }
+  
+    // Construct payload for one custom field at a time
+    const customFieldsPayload = this.constructCustomFieldsPayload(customFieldValues);
+    console.log("Testing the data in customFieldsPayload: ", customFieldsPayload);
+    // Construct the final payload
+    const payload = {
+      customer_data: customerData, // Add all the main customer fields
+      customer_addresses: customerAddresses,
+      customer_attachments: customerAttachments,
+      custom_field: customFieldsPayload.custom_field, // Single custom field as dictionary
+      // custom_field_options: customFieldsPayload.custom_field_options, // Array or empty
+      custom_field_values: customFieldsPayload.custom_field_values // Array of dictionaries
+    };
+  
+    console.log('Final Payload:', payload); // Debugging to verify the payload
+  
+    // Submit the payload
+    this.http.post('customers/customers/', payload).subscribe(
+      (response: any) => {
+        this.showSuccessToast = true;
+          this.toastMessage = "Record Created successfully"; // Set the toast message for update
+          this.ngOnInit();
+          setTimeout(() => {
+            this.showSuccessToast = false;
+          }, 3000);
+      },
+      (error) => {
+        console.error('Error creating customer and custom fields:', error);
+      }
+    );
+  }
+  
+  constructCustomFieldsPayload(customFieldValues: any) {
+    if (!customFieldValues) {
+      console.warn('No custom field values provided.');
+      return {
+        custom_field: {},
+        custom_field_options: [],
+        custom_field_values: []
+      };
+    }
+  
+    // Initialize custom field values as an array
+    const customFieldValuesArray = [];
+
+    // Iterate over all custom field keys and construct values
+    Object.keys(customFieldValues).forEach((fieldKey) => {
+      const metadata = this.customFieldMetadata[fieldKey.toLowerCase()] || {}; // Fetch metadata for each field
+      console.log("Metadata entity : ", metadata);
+  
+      customFieldValuesArray.push({
+        field_value: customFieldValues[fieldKey], // Value entered by the user
+        field_value_type: typeof customFieldValues[fieldKey] === "number" ? "number" : "string", // Type
+        entity_id: metadata.entity_name || "e1fba6d0-23a0-4ae3-a2df-a6d563510042", // Default entity ID
+        custom_field_id: fieldKey, // Field name as custom_field_id
+        entity_data_id: this.formConfig.model.customer_data.customer_id
+      });
+    });
+  
+    // Construct payload for multiple custom fields
+    return {
+      // Custom field metadata for all fields
+      custom_field: Object.keys(customFieldValues).map((fieldKey) => ({
+        field_name: fieldKey, // Use field name
+        is_required: this.customFieldMetadata[fieldKey.toLowerCase()]?.is_required || false,
+        validation_rules: this.customFieldMetadata[fieldKey.toLowerCase()]?.validation_rules || null,
+        field_type_id: this.customFieldMetadata[fieldKey.toLowerCase()]?.field_type_id || null,
+        entity_id: this.customFieldMetadata[fieldKey.toLowerCase()]?.entity_id || null,
+      })),
+      // Optional field options
+      // custom_field_options: Object.values(this.customFieldMetadata).map((metadata) => metadata.options || []),
+      // Multiple custom field values
+      custom_field_values: customFieldValuesArray // Multiple field values
+    };
+  }
+  
+  
   applyDomManipulations(containerSelector: string) {
     const container = document.querySelector(containerSelector);
     if (!container) return;
@@ -95,32 +317,142 @@ export class CustomersComponent {
     document.getElementById('modalClose').click();
   }
 
-  editCustomer(event) {
+  editCustomer(event: string) {
     this.CustomerEditID = event;
-    this.http.get('customers/customers/' + event).subscribe((res: any) => {
-      if (res && res.data) {
-        this.formConfig.model = res.data;
-        // Set labels for update
-        this.formConfig.pkId = 'customer_id';
-        this.formConfig.submit.label = 'Update';
-        // Show form after setting form values
-        this.formConfig.model['customer_id'] = this.CustomerEditID;
-        this.showForm = true;
+  
+    // Fetch customer details
+    this.http.get(`customers/customers/${event}`).subscribe(
+      (res: any) => {
+        if (res && res.data) {
+          console.log("Res in edit : ", res)
+          // Set customer data in the form model
+          this.formConfig.model = res.data;
+          this.formConfig.model['customer_id'] = this.CustomerEditID;
+          
+          // Ensure custom_field_values are correctly populated in the model
+          if (res.data.custom_field_values) {
+            this.formConfig.model['custom_field_values'] = res.data.custom_field_values.reduce((acc: any, fieldValue: any) => {
+              acc[fieldValue.custom_field_id] = fieldValue.field_value; // Map custom_field_id to the corresponding value
+              return acc;
+            }, {});
+          }
+
+          // Update form labels for editing mode
+          this.formConfig.pkId = 'customer_id';
+          this.formConfig.submit.label = 'Update';
+          this.showForm = true; // Display the form
+        }
+      },
+      (error) => {
+        console.error('Error fetching customer data:', error);
       }
-    });
+    );
+  
+    // Close the customer list modal
     this.hide();
   }
+
+  fetchAndSetCustomFieldValues(customerId: string) {
+    console.log("customerId in Custom : ", customerId);
+    const url = `customfields/customfieldvalues/?entity_data_id=${customerId}`;
+    console.log("URL : ", url)
+    this.http.get(url).subscribe(
+      (response: any) => {
+        if (response?.data) {
+          console.log("Repsonse 2: ", response);
+          const customFieldValues = response.data.reduce((acc: any, fieldValue: any) => {
+            // Normalize to lowercase for consistency
+            acc[fieldValue.custom_field.field_name.toLowerCase()] = fieldValue.field_value;
+            return acc;
+          }, {});
+          console.log("customFieldValues : ", customFieldValues);
+          // Populate the custom_field_values model
+          this.formConfig.model['custom_field_values'] = customFieldValues;
+
+          console.log('Mapped Custom Field Values:', this.formConfig.model['custom_field_values']);
+        } else {
+          console.warn('No custom field values found for the customer.');
+          this.formConfig.model['custom_field_values'] = {}; // Clear custom fields if none are found
+        }
+      },
+      (error) => {
+        console.error('Error fetching custom field values:', error);
+      }
+    );
+  }
+
+  
 
   showCustomerListFn() {
     this.showCustomerList = true;
     this.CustomersListComponent?.refreshTable();
   }
 
+  showSuccessToast = false;
+  toastMessage = '';
+  // Method to handle updating the Sale Return Order
+  updateCustomer() {
+    const customerData = { ...this.formConfig.model['customer_data'] }; // Main customer data
+    const customerAttachments = this.formConfig.model['customer_attachments'];
+    const customerAddresses = this.formConfig.model['customer_addresses'];
+    const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
+    
+    if (!customerData) {
+      console.error('Customer data is missing.');
+      return;
+    }
+  
+    // Construct payload for custom fields based on updated values
+    const customFieldsPayload = this.constructCustomFieldsPayload(customFieldValues);
+    console.log("Testing the data in customFieldsPayload: ", customFieldsPayload);
+    
+    // Construct the final payload for update
+    const payload = {
+      customer_data: customerData, // Add all the main customer fields
+      customer_addresses: customerAddresses,
+      customer_attachments: customerAttachments,
+      custom_field: customFieldsPayload.custom_field, // Single custom field as dictionary
+      custom_field_options: customFieldsPayload.custom_field_options, // Array or empty
+      custom_field_values: customFieldsPayload.custom_field_values // Array of dictionaries
+    };
+  
+    console.log('Final Payload for Update:', payload); // Debugging to verify the payload
+  
+    // Send the update request with the payload
+    this.http.put(`customers/customers/${customerData.customer_id}/`, payload).subscribe(
+      (response: any) => {
+        this.showSuccessToast = true;
+          this.toastMessage = "Record updated successfully"; // Set the toast message for update
+          this.ngOnInit();
+          setTimeout(() => {
+            this.showSuccessToast = false;
+          }, 3000);
+        // this.showCustomerListFn(); // Redirect or refresh the customer list
+        // this.ngOnInit();
+      },
+      (error) => {
+        console.error('Error updating customer:', error);
+      }
+    );
+  }
+  
+  
+  
+
+  onSubmit() {
+    if (this.formConfig.submit.label === 'Update') {
+      this.updateCustomer(); // Call update on submission
+    } else {
+      this.submitCustomerForm(); // Otherwise, create a new record
+      this.ngOnInit();
+    }
+  }
+
   setFormConfig() {
     this.CustomerEditID = null;
     this.formConfig = {
-      url: "customers/customers/",
-      title: 'Customers',
+      // url: "customers/customers/",
+      title: '',
       formState: {
         viewMode: false
       },
@@ -128,7 +460,7 @@ export class CustomersComponent {
       exParams: [],
       submit: {
         label: 'Submit',
-        submittedFn: () => this.ngOnInit()
+        submittedFn: () => this.onSubmit()
       },
       reset: {
         resetFn: () => {
@@ -143,6 +475,7 @@ export class CustomersComponent {
         }, {
           address_type: 'Shipping',
         }],
+        custom_field_values: []
       },
       fields:[
         {
@@ -484,14 +817,6 @@ export class CustomersComponent {
                         ]
                       }
                     },
-                    // {
-                    //   className: 'col-12 p-0',
-                    //   key: 'customer_addresses',
-                    //   fieldGroupClassName: "ant-row row align-items-end mt-3",
-                    //       fieldGroup: [
-                            
-                    //       ]
-                    //     },
                       ]
                     }
                   ]
@@ -949,261 +1274,20 @@ export class CustomersComponent {
                   ]
                 },
               ]            
-            },       
+            },                    
           ]
         },
-    ]
-
-
-      // fields: [
-      //   {
-      //     key: 'customer_addresses',
-      //     type: 'table',
-      //     className: 'custom-form-list',
-      //     templateOptions: {
-      //       title: 'Customer Addresses',
-      //       addText: 'Add Addresses',
-      //       tableCols: [
-      //         {
-      //           name: 'address_type',
-      //           label: 'Address Type'  // New column for Address Type
-      //         },
-      //         {
-      //           name: 'address',
-      //           label: 'Address'
-      //         },
-      //         {
-      //           name: 'city',
-      //           label: 'City'
-      //         },
-      //         {
-      //           name: 'state',
-      //           label: 'State'
-      //         },
-      //         {
-      //           name: 'country',
-      //           label: 'Country'
-      //         },
-      //         {
-      //           name: 'pin_code',
-      //           label: 'Pin Code'
-      //         },
-      //         {
-      //           name: 'phone',
-      //           label: 'Phone'
-      //         },
-      //         {
-      //           name: 'email',
-      //           label: 'Email'
-      //         },
-      //         {
-      //           name: 'route_map',
-      //           label: 'Route Map'
-      //         },
-      //         {
-      //           name: 'longitude',
-      //           label: 'Longitude'
-      //         },
-      //         {
-      //           name: 'latitude',
-      //           label: 'Latitude'
-      //         }
-      //       ]
-      //     },
-      //     fieldArray: {
-      //       fieldGroup: [
-      //         {
-      //           key: 'address_type',
-      //           type: 'input',
-      //           className: 'custom-select-bold',
-      //           templateOptions: {
-      //             label: 'Address Type',
-      //             hideLabel: true,
-      //             readonly: true,
-      //             required: true,
-      //             value: 'Billing',  // Set to 'Billing'
-      //             attributes: {
-      //               style: 'font-weight: bold; border: none; background-color: transparent; margin-bottom: 10px;' // Bold text, no border, transparent background
-      //             }
-      //           }
-      //         },
-      //         {
-      //           key: 'city',
-      //           type: 'select',
-      //           templateOptions: {
-      //             dataKey: 'city_id',
-      //             dataLabel: 'city_name',
-      //             label: 'City',
-      //             placeholder: 'select',
-      //             hideLabel: true,
-      //             required: true,
-      //             lazy: {
-      //               url: 'masters/city/',
-      //               lazyOneTime: true
-      //             }
-      //           },
-      //           hooks: {
-      //             onChanges: (field: any) => {
-      //               field.formControl.valueChanges.subscribe((data: any) => {
-      //                 console.log('city', data);
-      //                 // const index = field.parent.parent.model.indexOf(field.parent.model);
-      //                 const index = field.parent.key;
-      //                 if (this.formConfig && this.formConfig.model) {
-      //                   this.formConfig.model['customer_addresses'][index]['city_id'] = data.city_id;
-      //                 } else {
-      //                   console.error('Form config or Customer addresses model is not defined.');
-      //                 }
-      //               });
-      //             }
-      //           }
-      //         },
-      //         {
-      //           key: 'state',
-      //           type: 'select',
-      //           templateOptions: {
-      //             dataKey: 'state_id',
-      //             dataLabel: 'state_name',
-      //             label: 'State',
-      //             placeholder: 'select',
-      //             hideLabel: true,
-      //             required: true,
-      //             lazy: {
-      //               url: 'masters/state/',
-      //               lazyOneTime: true
-      //             }
-      //           },
-      //           hooks: {
-      //             onChanges: (field: any) => {
-      //               field.formControl.valueChanges.subscribe((data: any) => {
-      //                 console.log('state', data);
-      //                 // const index = field.parent.parent.model.indexOf(field.parent.model);
-      //                 const index = field.parent.key;
-      //                 if (this.formConfig && this.formConfig.model) {
-      //                   this.formConfig.model['customer_addresses'][index]['state_id'] = data.state_id;
-      //                 } else {
-      //                   console.error('Form config or Customer addresses model is not defined.');
-      //                 }
-      //               });
-      //             }
-      //           }
-      //         },
-      //         {
-      //           key: 'country',
-      //           type: 'select',
-      //           templateOptions: {
-      //             dataKey: 'country_id',
-      //             dataLabel: 'country_name',
-      //             label: 'Country',
-      //             hideLabel: true,
-      //             required: true,
-      //             placeholder: 'select',
-      //             lazy: {
-      //               url: 'masters/country/',
-      //               lazyOneTime: true
-      //             }
-      //           },
-      //           hooks: {
-      //             onChanges: (field: any) => {
-      //               field.formControl.valueChanges.subscribe((data: any) => {
-      //                 console.log('country', data);
-      //                 // const index = field.parent.parent.model.indexOf(field.parent.model);
-      //                 const index = field.parent.key;
-      //                 if (this.formConfig && this.formConfig.model) {
-      //                   this.formConfig.model['customer_addresses'][index]['country_id'] = data.country_id;
-      //                 } else {
-      //                   console.error('Form config or Customer addresses model is not defined.');
-      //                 }
-      //               });
-      //             }
-      //           }
-      //         },
-      //         {
-      //           type: 'input',
-      //           key: 'pin_code',
-      //           templateOptions: {
-      //             label: 'Pin Code',
-      //             hideLabel: true,
-      //             placeholder: 'Pin Code',
-      //           }
-      //         },
-      //         {
-      //           type: 'input',
-      //           key: 'phone',
-      //           templateOptions: {
-      //             label: 'Phone',
-      //             hideLabel: true,
-      //             placeholder: 'Phone',
-      //           }
-      //         },
-      //         {
-      //           type: 'input',
-      //           key: 'email',
-      //           templateOptions: {
-      //             label: 'Email',
-      //             hideLabel: true,
-      //             placeholder: 'email',
-      //           }
-      //         },
-      //         {
-      //           type: 'input',
-      //           key: 'route_map',
-      //           templateOptions: {
-      //             label: 'Route Map',
-      //             hideLabel: true,
-      //             placeholder: 'Route Map'
-      //           }
-      //         },
-      //         {
-      //           type: 'input',
-      //           key: 'longitude',
-      //           templateOptions: {
-      //             label: 'Longitude',
-      //             hideLabel: true,
-      //             placeholder: 'Longitude',
-      //           }
-      //         },
-      //         {
-      //           type: 'input',
-      //           key: 'latitude',
-      //           templateOptions: {
-      //             label: 'Latitude',
-      //             hideLabel: true,
-      //             placeholder: 'Latitude',
-      //           }
-      //         },
-      //         {
-      //           type: 'textarea',
-      //           key: 'address',
-      //           templateOptions: {
-      //             label: 'Address',
-      //             hideLabel: true,
-      //             placeholder: 'Enter Address',
-      //           }
-      //         }
-      //       ]
-      //     }
-      //   },
-      //   {
-      //     className: 'row col-6 m-0 custom-form-card',//'row col-6 m-0 custom-form-card',
-      //     fieldGroup: [
-      //       {
-      //         template: '<div class="custom-form-card-title">Customer Attachments</div>',
-      //         fieldGroupClassName: "ant-row",
-      //       },
-      //       {
-      //         key: 'customer_attachments',
-      //         type: 'file',
-      //         className: 'ta-cell col-16 custom-file-attachement',
-      //         props: {
-      //           "displayStyle": "files",
-      //           "multiple": true
-      //         }
-      //       }
-      //     ]
-      //   },
-      // ]
-
-
+        {
+          className: 'row col-6 m-0 custom-form-card',//'row col-6 m-0 custom-form-card',
+          fieldGroup: [
+            // Custom Fields Section
+            {
+              template: '<div class="custom-form-card-title mt-4">Custom Fields</div>',
+              fieldGroupClassName: "ant-row",
+            },
+          ]
+        },
+      ]
     }
   }
 }
