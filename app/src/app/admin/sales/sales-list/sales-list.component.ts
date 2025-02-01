@@ -4,6 +4,7 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-sales-list',
@@ -16,11 +17,36 @@ export class SalesListComponent {
 
   @Output('edit') edit = new EventEmitter<void>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
-
+  
+  constructor(private router: Router, private http: HttpClient) {}
   refreshTable() {
    this.taTableComponent?.refresh();
   };
 
+  // Method to handle "Email Sent" button click
+  onMailLinkClick(): void {
+    console.log("We are in method ...")
+    const selectedIds = this.taTableComponent.options.checkedRows;
+    if (selectedIds.length === 0) {
+      alert('Please select at least one sale order.');
+      return;
+    }
+
+    const saleOrderId = selectedIds[0]; // Assuming only one row can be selected
+    const payload = { flag: "email" };
+    const url = `http://195.35.20.172:8000/api/v1/masters/document_generator/${saleOrderId}/sale_order/`;
+    this.http.post(url, payload).subscribe(
+      (response) => {
+        console.log('Email sent successfully', response);
+        alert('Email sent successfully!');
+        this.refreshTable();
+      },
+      (error) => {
+        console.error('Error sending email', error);
+        alert('Error sending email. Please try again.');
+      }
+    );
+  }
 
   tableConfig: TaTableConfig = {
     apiUrl: 'sales/sale_order/?summary=true',
@@ -133,7 +159,4 @@ export class SalesListComponent {
     ]
   };
 
-  constructor(private router: Router) {
-
-  }
 }
