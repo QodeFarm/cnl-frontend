@@ -477,6 +477,9 @@ ta-table {
 //     box-shadow: none;
 // }
 .ant-drawer {
+    .ant-drawer-mask {
+        background-color: rgba(0, 0, 0, 0.9) !important;
+    }
     .ant-drawer-content-wrapper {
         // width: 65% !important;
         // left: 50%;
@@ -491,6 +494,8 @@ ta-table {
             width: 50%;
             margin: 0 auto;
             height: auto;
+            border: solid 2px white;
+            border-radius: 5px;
         }
         .ant-drawer-header {
             background-color: #142768;
@@ -625,10 +630,16 @@ ta-form {
             thead {
                 th{
                     white-space: nowrap;
-                     min-width: 50px;    
-                     &:nth-child(5){
-                        min-width: 70px;
-                     }            
+                     min-width: 120px; 
+                     &:nth-child(1),&:last-child{
+                        min-width: 50px;
+                     }
+                     &:nth-child(2){
+                        min-width: 150px;
+                     }       
+                    //  &:nth-child(5){
+                    //     min-width: 70px;
+                    //  }            
                 }
             }
         }

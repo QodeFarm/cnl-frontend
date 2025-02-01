@@ -1577,7 +1577,8 @@ confirmWorkOrder() {
               { 
                 name: 'selectItem', 
                 label: '', 
-                type: 'checkbox'
+                type: 'checkbox',
+                width: '50px' 
               }, 
               {
                 name: 'product',
