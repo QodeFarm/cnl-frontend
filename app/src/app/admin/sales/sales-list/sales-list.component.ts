@@ -19,9 +19,31 @@ export class SalesListComponent {
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
   
   constructor(private router: Router, private http: HttpClient) {}
+  
   refreshTable() {
    this.taTableComponent?.refresh();
   };
+
+  //-----------email sending links----------
+  onSelect(event: Event): void {
+    const selectElement = event.target as HTMLSelectElement;
+    const selectedValue = selectElement.value;
+
+    switch (selectedValue) {
+      case 'email':
+        this.onMailLinkClick();
+        break;
+      case 'whatsapp':
+        break;
+      default:
+        // Handle default case (e.g., "Mail" selected)
+        break;
+    }
+
+    // Reset the dropdown to the default option
+    selectElement.value = '';
+  }
+
 
   // Method to handle "Email Sent" button click
   onMailLinkClick(): void {
@@ -34,11 +56,11 @@ export class SalesListComponent {
 
     const saleOrderId = selectedIds[0]; // Assuming only one row can be selected
     const payload = { flag: "email" };
-    const url = `http://195.35.20.172:8000/api/v1/masters/document_generator/${saleOrderId}/sale_order/`;
+    const url = `masters/document_generator/${saleOrderId}/sale_order/`;
     this.http.post(url, payload).subscribe(
       (response) => {
         console.log('Email sent successfully', response);
-        alert('Email sent successfully!');
+        // alert('Email sent successfully!');
         this.refreshTable();
       },
       (error) => {
@@ -47,7 +69,7 @@ export class SalesListComponent {
       }
     );
   }
-
+  //-----------email sending links - end ----------
   tableConfig: TaTableConfig = {
     apiUrl: 'sales/sale_order/?summary=true',
     // title: 'Edit Sales Order List',

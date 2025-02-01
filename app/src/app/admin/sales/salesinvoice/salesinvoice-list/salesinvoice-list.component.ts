@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-salesinvoice-list',
@@ -32,6 +33,52 @@ export class SalesInvoiceListComponent implements OnInit {
   refreshTable() {
    this.taTableComponent?.refresh();
   };
+
+  // In your component (e.g., SalesListComponent)
+  onSelect(event: Event): void {
+    const selectElement = event.target as HTMLSelectElement;
+    const selectedValue = selectElement.value;
+
+    switch (selectedValue) {
+      case 'email':
+        this.onMailLinkClick();
+        break;
+      case 'whatsapp':
+        break;
+      default:
+        // Handle default case (e.g., "Mail" selected)
+        break;
+    }
+
+    // Reset the dropdown to the default option
+    selectElement.value = '';
+  }
+
+
+  // Method to handle "Email Sent" button click
+  onMailLinkClick(): void {
+    console.log("We are in method ...")
+    const selectedIds = this.taTableComponent.options.checkedRows;
+    if (selectedIds.length === 0) {
+      alert('Please select at least one sale order.');
+      return;
+    }
+
+    const saleInvoiceId = selectedIds[0]; // Assuming only one row can be selected
+    const payload = { flag: "email" };
+    const url = `masters/document_generator/${saleInvoiceId}/sale_invoice/`;
+    this.http.post(url, payload).subscribe(
+      (response) => {
+        console.log('Email sent successfully', response);
+        // alert('Email sent successfully!');
+        this.refreshTable();
+      },
+      (error) => {
+        console.error('Error sending email', error);
+        alert('Error sending email. Please try again.');
+      }
+    );
+  }
 
   tableConfig: TaTableConfig = {
     apiUrl: 'sales/sale_invoice_order/?summary=true',
@@ -128,5 +175,5 @@ export class SalesInvoiceListComponent implements OnInit {
     ]
   };
 
-  constructor(private router: Router) { }
+  constructor(private router: Router, private http: HttpClient) {}
 }

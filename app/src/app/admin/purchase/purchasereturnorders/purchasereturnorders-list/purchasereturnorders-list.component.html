@@ -1,1 +1,21 @@
-<ta-table [options]="tableConfig"></ta-table>
+<!-- <ta-table [options]="tableConfig"> </ta-table> -->
+<ta-table [options]="tableConfig"> 
+    <div class="bottom-left" bottom-left>
+        <div class="d-flex align-items-center">
+            <!-- Mail Dropdown -->
+            <select class="form-select me-2" (change)="onSelect($event)">
+                <option value="" disabled selected aria-disabled="true">Mail</option>
+                <option value="email">Email link</option>
+                <option value="whatsapp">WhatsApp</option>
+            </select>
+            <!-- Other Dropdown -->
+            <select class="form-select me-2">
+                <option value="option1">Option 1</option>
+                <option value="option2">Option 2</option>
+                <option value="option3">Option 3</option>
+            </select>
+            <!-- Reload Button -->
+            <button class="btn btn-primary text-nowrap">reload</button>
+        </div>
+    </div>
+</ta-table>

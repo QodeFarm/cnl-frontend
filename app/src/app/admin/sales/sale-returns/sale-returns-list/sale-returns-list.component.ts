@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-sale-returns-list',
@@ -20,6 +21,53 @@ export class SaleReturnsListComponent {
 refreshTable() {
   this.taTableComponent?.refresh();
  };
+
+ //-----------email sending links----------
+ onSelect(event: Event): void {
+  const selectElement = event.target as HTMLSelectElement;
+  const selectedValue = selectElement.value;
+
+  switch (selectedValue) {
+    case 'email':
+      this.onMailLinkClick();
+      break;
+    case 'whatsapp':
+      break;
+    default:
+      // Handle default case (e.g., "Mail" selected)
+      break;
+  }
+
+  // Reset the dropdown to the default option
+  selectElement.value = '';
+}
+
+
+// Method to handle "Email Sent" button click
+onMailLinkClick(): void {
+  console.log("We are in method ...")
+  const selectedIds = this.taTableComponent.options.checkedRows;
+  if (selectedIds.length === 0) {
+    alert('Please select at least one sale order.');
+    return;
+  }
+
+  const saleReturnId = selectedIds[0]; // Assuming only one row can be selected
+  const payload = { flag: "email" };
+  const url = `masters/document_generator/${saleReturnId}/sale_return/`;
+  this.http.post(url, payload).subscribe(
+    (response) => {
+      console.log('Email sent successfully', response);
+      // alert('Email sent successfully!');
+      this.refreshTable();
+    },
+    (error) => {
+      console.error('Error sending email', error);
+      alert('Error sending email. Please try again.');
+    }
+  );
+}
+//-----------email sending links - end ----------
 
 tableConfig: TaTableConfig = {
   apiUrl: 'sales/sale_return_order/?summary=true',
@@ -120,5 +168,5 @@ tableConfig: TaTableConfig = {
   ]
 };
 
-constructor(private router: Router) {}
+constructor(private router: Router, private http: HttpClient) {}
 }
