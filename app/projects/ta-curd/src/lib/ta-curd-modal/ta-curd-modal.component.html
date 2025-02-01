@@ -8,13 +8,28 @@
 </div> -->
 <ta-table #table [options]="options.tableConfig" (doAction)="tableAction($event)" [customProductTemplate]="customProductTemplate">
     <!--Added this customProductTemplate -->
-    <div class="after-search">
+    <ng-container before-search>
+        <ng-content select="[before-search]">
+        </ng-content>
+    </ng-container>
+    <ng-container after-search>
+        <ng-content select="[after-search]">
+        </ng-content>
         <button *ngIf="!options.hideAddBtn" nz-button nzType="primary" class="ml-md" (click)="openDrawer()">
             <i nz-icon nzType="plus"></i>Add
         </button>
-    </div>
+    </ng-container>
+    <ng-container bottom-left>
+        <ng-content select="[bottom-left]">
+        </ng-content>
+    </ng-container>
 </ta-table>
-
+<!-- <nz-modal [nzWidth]="options.drawerSize || 'auto'" [(nzVisible)]="visible " [nzTitle]="formTitle " (nzOnCancel)="visible=false " [nzMaskClosable]="false ">
+    <ng-container *nzModalContent>
+        <ta-form *ngIf="visible" #form [options]="options.formConfig"></ta-form>
+    </ng-container>
+    <div *nzModalFooter></div>
+</nz-modal> -->
 <nz-drawer [nzClosable]="false" [nzHeight]="options.drawerHeight || '100%'" [nzWidth]="options.drawerSize || 'auto'" [nzVisible]="visible" [nzClosable]="true" [nzPlacement]="options.drawerPlacement || 'right'" [nzTitle]="formTitle" (nzOnClose)="close()">
     <ng-template nzDrawerContent>
         <ta-form *ngIf="visible" #form [options]="options.formConfig"></ta-form>

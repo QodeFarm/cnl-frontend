@@ -132,7 +132,6 @@ export class TaTableComponent implements OnDestroy {
     this.fromDate = startDate;
     this.toDate = endDate;
   }
-  ;
   loadStatuses() {
     const url = 'masters/order_status/';
 
@@ -156,28 +155,6 @@ export class TaTableComponent implements OnDestroy {
     this.selectedStatus = status;
     // this.applyFilters();
   }
-  refreshCheckedStatus(): void {
-    const listOfEnabledData = this.rows.filter(({ disabled }) => !disabled);
-    this.checked = listOfEnabledData.every((row) => this.setOfCheckedId.has(row[this.options.pkId]));
-    this.indeterminate = listOfEnabledData.some((row) => this.setOfCheckedId.has(row[this.options.pkId])) && !this.checked;
-  }
-  onAllChecked(checked: boolean): void {
-    this.rows
-      .filter(({ disabled }) => !disabled)
-      .forEach((row) => this.updateCheckedSet(row[this.options.pkId], checked));
-    this.refreshCheckedStatus();
-  }
-  updateCheckedSet(id: number, checked: boolean): void {
-    if (checked) {
-      this.setOfCheckedId.add(id);
-    } else {
-      this.setOfCheckedId.delete(id);
-    }
-  }
-  onItemChecked(id: number, checked: boolean): void {
-    this.updateCheckedSet(id, checked);
-    this.refreshCheckedStatus();
-  }
 
   loadEmployees() {
     const url = 'hrms/employees/'; // Replace with your actual employee API endpoint
@@ -187,8 +164,8 @@ export class TaTableComponent implements OnDestroy {
         if (response && response.data && response.data.length > 0) {
           // Map the employees' data to options for the select dropdown
           this.employeeOptions = response.data.map(employee => {
-          const fullName = `${employee.first_name} ${employee.last_name || ''}`.trim(); // Concatenate first and last names
- 
+            const fullName = `${employee.first_name} ${employee.last_name || ''}`.trim(); // Concatenate first and last names
+
             return {
               value: employee.employee_id,  // Use the employee ID as value
               label: fullName // Store the full name
@@ -400,11 +377,14 @@ export class TaTableComponent implements OnDestroy {
 
   ngOnInit(): void {
     // // console.log('table otpions', this.options);
+    this.options.checkedRows = [];
     if (this.options.pageSize) {
       this.pageSize = this.options.pageSize;
     } else {
       this.options.pageSize = 10;
     }
+    this.options.reload = () => { this.reload() };
+
     if (!this.options.pageSizeOptions) {
       this.options.pageSizeOptions = [10, 20, 30, 50, 100, 300, 500, 1000]
     }
@@ -497,12 +477,43 @@ export class TaTableComponent implements OnDestroy {
     this.pageIndex = params.pageIndex;
     //this.filters = params.filter;
     const sort = params.sort;
-    const currentSort = sort.find((item) => item.value !== null);
-    const sortField = (currentSort && currentSort.key) || null;
-    const sortOrder = (currentSort && currentSort.value) || null;
-    this.sort = { key: sortField, value: sortOrder };
+    this.sort = null;
+    const currentSort = sort.find((item) => item.value);
+    if (currentSort) {
+      const sortField = (currentSort && currentSort.key) || null;
+      const sortOrder = (currentSort && currentSort.value) || null;
+      this.sort = { key: sortField, value: sortOrder };
+    } else {
+      if (this.options.defaultSort) {
+        this.sort = this.options.defaultSort
+      }
+    }
+
     this.loadDataFromServer();
     // this.loadDataFromServer(pageIndex, pageSize, sortField, sortOrder, filter);
+  }
+  refreshCheckedStatus(): void {
+    const listOfEnabledData = this.rows.filter(({ disabled }) => !disabled);
+    this.checked = listOfEnabledData.every((row) => this.setOfCheckedId.has(row[this.options.pkId]));
+    this.options.checkedRows = Array.from(this.setOfCheckedId) || [];
+    this.indeterminate = listOfEnabledData.some((row) => this.setOfCheckedId.has(row[this.options.pkId])) && !this.checked;
+  }
+  onAllChecked(checked: boolean): void {
+    this.rows
+      .filter(({ disabled }) => !disabled)
+      .forEach((row) => this.updateCheckedSet(row[this.options.pkId], checked));
+    this.refreshCheckedStatus();
+  }
+  updateCheckedSet(id: number, checked: boolean): void {
+    if (checked) {
+      this.setOfCheckedId.add(id);
+    } else {
+      this.setOfCheckedId.delete(id);
+    }
+  }
+  onItemChecked(id: number, checked: boolean): void {
+    this.updateCheckedSet(id, checked);
+    this.refreshCheckedStatus();
   }
   reset(c: any) {
     c.searchValue = null;

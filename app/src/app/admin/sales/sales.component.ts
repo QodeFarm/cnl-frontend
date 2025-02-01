@@ -1569,7 +1569,7 @@ confirmWorkOrder() {
         {
           key: 'sale_order_items',
           type: 'repeat',
-          className: 'custom-form-list',
+          className: 'custom-form-list product-table',
           templateOptions: {
             // title: 'Products',
             addText: 'Add Product',

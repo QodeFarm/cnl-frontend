@@ -485,6 +485,8 @@ ta-table {
         height: auto;
         // max-height: calc(100% - 40px);
         overflow-y: auto;
+        display: flex;
+        align-items: center;
         .ant-drawer-content {
             width: 50%;
             margin: 0 auto;
@@ -614,6 +616,23 @@ ta-form {
 }
 
 .custom-form-list {
+    &.product-table{
+        .table{
+            white-space: nowrap;
+            overflow-x: auto;
+            width: 100%;
+            display: block;
+            thead {
+                th{
+                    white-space: nowrap;
+                     min-width: 50px;    
+                     &:nth-child(5){
+                        min-width: 70px;
+                     }            
+                }
+            }
+        }
+      }
     .ant-card {
         margin: 0 5px;
     }
@@ -1021,3 +1040,16 @@ ta-form {
  
 }
 // inline form-fields styles end
+.modal-content{
+    .ant-table-content{
+        height: calc(100vh - 305px);
+        overflow-y: auto;
+    }
+}
+.ant-pagination-total-text{
+    .bottom-left{
+        position: absolute;
+        left: 0;
+        z-index: 99;
+    }
+}
