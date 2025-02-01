@@ -1,0 +1,38 @@
+<div class="container-fluid pt-3">
+    <div class="customfield-banner">
+      <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;">
+        <button (click)="customFieldEditID = null" type="button" class="btn pl-0" style="color: black;">
+          <span *ngIf="customFieldEditID" class="custom-heading">Update Custom Field</span>
+          <span *ngIf="!customFieldEditID" class="custom-heading">Create Custom Field</span>
+        </button>
+        <button (click)="showCustomFieldListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#customFieldListModal">
+          Custom Field List
+        </button>
+      </div>
+    </div>
+  
+    <div class="row custom-form">
+      <div class="col-12 px-1">
+        <ta-form [options]="formConfig"></ta-form>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Custom Field List Modal -->
+  <div class="modal fade custom-modal" id="customFieldListModal" tabindex="-1" aria-labelledby="customFieldListModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl ">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="customFieldListModalLabel">Custom Field List</h5>
+          <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" *ngIf="showCustomFieldList">
+          <app-customfields-list (edit)="editCustomField($event)" class="custom-list"></app-customfields-list>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
