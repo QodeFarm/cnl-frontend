@@ -1,0 +1,132 @@
+.toast-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #fff; /* Pure white background */
+    color: #0e0d0d; /* Dark grey text */
+    padding: 12px 30px;
+    width: 385px; /* Wider box */
+    border-radius: 0px; /* No rounded corners */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Soft shadow */
+    display: flex;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    z-index: 1000;
+    animation: fadeIn 0.4s ease-in-out;
+    border: 2px solid #dcdcdc; /* Subtle border */
+}
+
+/* Circle with white inside and green border */
+.tick-circle {
+    width: 23px; /* Slightly smaller */
+    height: 23px;
+    background-color: #fff; /* White inside */
+    border: 2px solid #28a745; /* Green border */
+    border-radius: 50%; /* Perfect circle */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px; /* Space between icon and text */
+}
+
+/* Smaller tick mark inside the white circle */
+.tick-mark {
+    color: #28a745; /* Green tick */
+    font-size: 12px; /* Smaller size */
+    // font-weight: bold;
+    line-height: 1; /* Perfectly centered */
+}
+
+.toast-message-text {
+    flex: 1;
+    color: rgb(41, 41, 41);
+    font-size: 16px;
+    font-weight: 500; /* Medium weight */
+}
+
+/* Close button (X symbol) */
+.toast-close {
+    font-size: 16px;
+    color: rgb(73, 73, 73);
+    cursor: pointer;
+    margin-left: 12px; /* Space between text and close button */
+}
+
+.toast-close:hover {
+    color: #000; /* Darker on hover */
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.custom-dialog-overlay {
+
+    position: fixed;
+  
+    top: 0;
+  
+    left: 0;
+  
+    width: 100vw;
+  
+    height: 100vh;
+  
+    background: rgba(0, 0, 0, 0.5); /* Dark overlay */
+  
+    display: flex;
+  
+    justify-content: center;
+  
+    align-items: center;
+  
+    z-index: 999; /* Ensure it's above other elements */
+  
+  }
+  
+.custom-dialog-box {
+  
+    background-color: #fff;
+  
+    padding: 20px;
+  
+    border-radius: 10px;
+  
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  
+    text-align: center;
+  
+    width: 300px;
+  
+  }
+  
+.custom-dialog-box p {
+  
+    margin-bottom: 20px;
+  
+  }
+  
+.custom-dialog-box button {
+  
+    padding: 10px 20px;
+  
+    background-color: #007bff;
+  
+    color: white;
+  
+    border: none;
+  
+    border-radius: 5px;
+  
+    cursor: pointer;
+  
+  }
+  
+.custom-dialog-box button:hover {
+  
+    background-color: #0056b3;
+  
+  }
