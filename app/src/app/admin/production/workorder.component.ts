@@ -741,7 +741,7 @@ curdConfig: TaCurdConfig = {
                 dataLabel: 'order_no',
                 options: [], // Options will be loaded via lazy
                 lazy: {
-                  url: 'sales/sale_order/?flow_status=Review Inventory',
+                  url: 'sales/sale_order/?flow_status=Production',
                   lazyOneTime: true
                 },
                 required: true // Required only if 'User' is selected
