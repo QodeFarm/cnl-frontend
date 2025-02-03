@@ -42,14 +42,31 @@ export class PurchaseInvoiceListComponent {
     selectElement.value = '';
   }
 
+  showDialog() {
+    const dialog = document.getElementById('customDialog');
+    if (dialog) {
+      dialog.style.display = 'flex'; // Show the dialog
+    }
+  }
+  
+ 
+  // Function to close the custom dialog
+  closeDialog() {
+    const dialog = document.getElementById('customDialog');
+    if (dialog) {
+      dialog.style.display = 'none'; // Hide the dialog
+    }
+  }
+  
+  showSuccessToast = false;
+  toastMessage = '';
 
   // Method to handle "Email Sent" button click
   onMailLinkClick(): void {
     console.log("We are in method ...")
     const selectedIds = this.taTableComponent.options.checkedRows;
     if (selectedIds.length === 0) {
-      alert('Please select at least one sale order.');
-      return;
+      return this.showDialog();
     }
 
     const purchaseInvoiceId = selectedIds[0]; // Assuming only one row can be selected
@@ -57,13 +74,15 @@ export class PurchaseInvoiceListComponent {
     const url = `masters/document_generator/${purchaseInvoiceId}/purchase_invoice/`;
     this.http.post(url, payload).subscribe(
       (response) => {
-        console.log('Email sent successfully', response);
-        // alert('Email sent successfully!');
-        this.refreshTable();
+        this.showSuccessToast = true;
+          this.toastMessage = "Mail Sent successfully"; // Set the toast message for update
+          this.refreshTable();
+          setTimeout(() => {
+            this.showSuccessToast = false;
+          }, 2000);
       },
       (error) => {
         console.error('Error sending email', error);
-        alert('Error sending email. Please try again.');
       }
     );
   }
