@@ -95,6 +95,24 @@ export class WorkOrderListComponent {
         sort: true
       },
       {
+        fieldKey: 'order_no',
+        name: 'Sale Order',
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          return `${row.sale_order.order_no}`;
+        },
+        sort: true
+      },
+      {
+        fieldKey: 'status_name',
+        name: 'Flow Status',
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          return `${row.sale_order.status_name}`;
+        },
+        sort: true
+      },
+      {
         fieldKey: 'end_date',
         name: 'End Date',
         sort: true
