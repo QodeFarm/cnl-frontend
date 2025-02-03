@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, Renderer2, AfterViewInit, ElementRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule, DatePipe, formatDate } from '@angular/common';
@@ -25,7 +25,7 @@ export class WorkorderComponent implements OnInit {
   @ViewChild(WorkOrderListComponent) WorkOrderListComponent!: WorkOrderListComponent;
   editMode: boolean = false;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private el: ElementRef, private renderer: Renderer2) {}
   
   ngOnInit() {
     this.showWorkorderList = false;
@@ -74,7 +74,9 @@ export class WorkorderComponent implements OnInit {
     this.editMode = true;
     this.showCreateBomButton = false
     this.hideFields(false); // Shows fields at indexes 5, 4, and 9
+    this.formConfig.fields[0].fieldGroup[10].hide = true;
     this.makeFieldsNotTouchable([0, 1, 2]);
+    this.disableMaterials()
     console.log('event', event);
     this.WorkOrdrEditID = event;
     this.http.get('production/work_order/' + event).subscribe((res: any) => {
@@ -406,6 +408,27 @@ clearSize(field : any){
   sizeField.templateOptions.required = false;
 }
 
+disableMaterials() {
+  if (this.editMode) {
+    const cardBodies = this.el.nativeElement.querySelectorAll('.ant-card-body');
+    if (cardBodies.length > 1) { 
+      const secondCardBody = cardBodies[0]; // Select the second `.ant-card-body`
+  
+      // Completely disable interaction (without affecting the UI appearance)
+      this.renderer.setStyle(secondCardBody, 'pointer-events', 'none'); // Disable clicks & hover events
+      this.renderer.setAttribute(secondCardBody, 'aria-disabled', 'true'); // Accessibility
+      this.renderer.setStyle(secondCardBody, 'user-select', 'none'); // Prevent text selection
+  
+      // If there are any interactive elements inside, disable them
+      const inputs = secondCardBody.querySelectorAll('input, button, select, textarea, a, .ant-select, .ant-dropdown');
+      inputs.forEach((input: HTMLElement) => {
+        this.renderer.setAttribute(input, 'disabled', 'true');
+      });
+    }
+  };
+};
+
+
 curdConfig: TaCurdConfig = {
   drawerSize: 500,
   drawerPlacement: 'top',
@@ -692,7 +715,52 @@ curdConfig: TaCurdConfig = {
                 label: 'Sync QTY',
                 required: false
               }
-            }
+            },
+            {
+              key: 'selectionType',
+              type: 'radio',
+              className: 'col-2',
+              defaultValue: 'no', // Set default selection to 'user'
+              templateOptions: {
+                label: 'Creating for Sale Order ?',
+                options: [
+                  { label: 'Yes', value: 'yes' },
+                  { label: 'No', value: 'no' }
+                ],
+                required: true,
+              }
+            },
+            {
+              key: 'sale_order',
+              type: 'select',
+              className: 'col-2',
+              hideExpression: (model) => model.selectionType !== 'yes',
+              templateOptions: {
+                label: 'Order No',
+                dataKey: 'sale_order_id',
+                dataLabel: 'order_no',
+                options: [], // Options will be loaded via lazy
+                lazy: {
+                  url: 'sales/sale_order/?flow_status=Review Inventory',
+                  lazyOneTime: true
+                },
+                required: true // Required only if 'User' is selected
+              },
+              hooks: {
+                onChanges: (field: any) => {
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (field.formControl.value && this.editMode) {
+                      field.model.selectionType = 'yes'; // Set selectionType to 'yes' if sale_order_id is present
+                    }
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['work_order']) {
+                      this.formConfig.model['work_order']['sale_order_id'] = data?.sale_order_id;
+                    } else {
+                      console.error('Form config or sale_order_id data model is not defined.');
+                    }
+                  });
+                }
+              }
+            },
           ]
         },
         {
