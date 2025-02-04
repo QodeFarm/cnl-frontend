@@ -212,6 +212,10 @@ export class ProductsComponent implements OnInit {
               fieldGroupClassName:'row m-0 pr-0',
               fieldGroup: [
                 {
+                  className: 'col-9',
+                  fieldGroupClassName:'row m-0 p-0',
+                  fieldGroup: [
+                {
                   className: 'col-3',
                   key: 'name',
                   type: 'input',
@@ -250,22 +254,7 @@ export class ProductsComponent implements OnInit {
                     required: true,
                   }
                 },               
-                {
-                  className: 'col-3 p-0',
-                  // key: 'products',
-                  fieldGroupClassName: "ant-row row mx-0 mt-2",
-                  fieldGroup: [
-                    {
-                      key: 'picture',
-                      type: 'file',
-                      className: 'ta-cell pr-md col d-flex justify-content-center pr-0',
-                      templateOptions: {
-                        label: 'Picture',
-                        required: true
-                      }
-                    }                                
-                  ]
-                },
+
                 {
                   key: 'product_group',
                   type: 'select',
@@ -384,6 +373,7 @@ export class ProductsComponent implements OnInit {
                   required: false
                   }
                 },
+                
                 {
                   className: 'col-3',
                   key: 'balance',
@@ -400,9 +390,26 @@ export class ProductsComponent implements OnInit {
                   templateOptions: {
                   label: 'Print Barcode'
                   }
-                }
+                },
+                
               ]
-            }
+            },
+            {
+              className: 'col-3 p-0',
+              // key: 'products',
+              fieldGroupClassName: "ant-row row mx-0 mt-2",
+              fieldGroup: [
+                {
+                  key: 'picture',
+                  type: 'file',
+                  className: 'ta-cell pr-md col d-flex justify-content-center pr-0',
+                  templateOptions: {
+                    label: 'Picture',
+                    required: true
+                  }
+                }                                
+              ]
+            },
           ]
         },
         {
@@ -806,5 +813,7 @@ export class ProductsComponent implements OnInit {
               },
           ]
         }
-      }
+      ]
+    }
+  }
 }
