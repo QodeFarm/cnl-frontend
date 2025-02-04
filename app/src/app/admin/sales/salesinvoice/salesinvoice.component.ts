@@ -8,7 +8,7 @@ import { OrderslistComponent } from '../orderslist/orderslist.component';
 import { SalesInvoiceListComponent } from './salesinvoice-list/salesinvoice-list.component';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-
+declare var bootstrap;
 @Component({
   selector: 'app-salesinvoice',
   standalone: true,
@@ -339,23 +339,14 @@ export class SalesinvoiceComponent {
       })
     ).subscribe();
   }
-
+  ordersListModal: any;
   openModal() {
-    this.ordersModal.nativeElement.classList.add('show');
-    this.ordersModal.nativeElement.style.display = 'block';
-    document.body.classList.add('modal-open');
-    document.body.style.overflow = 'hidden';
+    this.ordersListModal = new bootstrap.Modal(document.getElementById("ordersListModal"));
+    this.ordersListModal.show();
   }
 
   hideModal() {
-    const modalBackdrop = document.querySelector('.modal-backdrop');
-    if (modalBackdrop) {
-      modalBackdrop.remove();
-    }
-    this.ordersModal.nativeElement.classList.remove('show');
-    this.ordersModal.nativeElement.style.display = 'none';
-    document.body.classList.remove('modal-open');
-    document.body.style.overflow = '';
+    this.ordersListModal.hide();
   }
 
   getPendingOrdersByCustomer(customerId: string): Observable<any> {
@@ -911,7 +902,7 @@ export class SalesinvoiceComponent {
         {
           key: 'sale_invoice_items',
           type: 'repeat',
-          className: 'custom-form-list',
+          className: 'custom-form-list product-table',
           templateOptions: {
             // title: 'Products',
             addText: 'Add Product',
@@ -919,7 +910,8 @@ export class SalesinvoiceComponent {
               {
                 name: 'selectItem',
                 label: '',
-                type: 'checkbox'
+                type: 'checkbox',
+                width: '50px'
               },
               {
                 name: 'product',
@@ -1441,73 +1433,6 @@ export class SalesinvoiceComponent {
               },
               {
                 type: 'input',
-                key: 'total_boxes',
-                templateOptions: {
-                  type: 'number',
-                  label: 'Total Boxes',
-                  placeholder: 'Boxes',
-                  hideLabel: true
-                },
-                hooks: {
-                  onInit: (field: any) => {
-                    const parentArray = field.parent;
-
-                    // Check if parentArray exists and proceed
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
-
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
-                        const existingBox = this.dataToPopulate.sale_invoice_items[currentRowIndex].total_boxes;
-
-                        // Set the full product object instead of just the product_id
-                        if (existingBox) {
-                          field.formControl.setValue(existingBox); // Set full product object (not just product_id)
-                        }
-                      }
-                    }
-                  }
-                }
-              },
-              {
-                type: 'select',
-                key: 'unit_options_id',
-                templateOptions: {
-                  label: 'Unit',
-                  placeholder: 'Unit',
-                  hideLabel: true,
-                  dataLabel: 'unit_name',
-                  dataKey: 'unit_options_id',
-                  bindId: true,
-                  required: true,
-                  lazy: {
-                    url: 'masters/unit_options',
-                    lazyOneTime: true
-                  }
-                },
-                hooks: {
-                  onInit: (field: any) => {
-                    const parentArray = field.parent;
-
-                    // Check if parentArray exists and proceed
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
-
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
-                        const existingUnit = this.dataToPopulate.sale_invoice_items[currentRowIndex].product.unit_options;
-
-                        // Set the full product object instead of just the product_id
-                        if (existingUnit) {
-                          field.formControl.setValue(existingUnit.unit_options_id); // Set full product object (not just product_id)
-                        }
-                      }
-                    }
-                  }
-                }
-              },
-              {
-                type: 'input',
                 key: 'quantity',
                 // defaultValue: 1,
                 templateOptions: {
@@ -1622,21 +1547,11 @@ export class SalesinvoiceComponent {
                       }
                     }
                     field.formControl.valueChanges.subscribe(data => {
+                      this.totalAmountCal();
                       // Add any logic needed for when discount changes
                     });
                   }
                 }
-              },
-
-              {
-                type: 'input',
-                key: 'mrp',
-                templateOptions: {
-                  label: 'Mrp',
-                  placeholder: 'Mrp',
-                  hideLabel: true,
-                  disabled: true
-                },
               },
               {
                 type: 'input',
@@ -1674,6 +1589,16 @@ export class SalesinvoiceComponent {
               },
               {
                 type: 'input',
+                key: 'mrp',
+                templateOptions: {
+                  label: 'Mrp',
+                  placeholder: 'Mrp',
+                  hideLabel: true,
+                  disabled: true
+                },
+              },
+              {
+                type: 'input',
                 key: 'print_name',
                 templateOptions: {
                   label: 'Print name',
@@ -1695,6 +1620,73 @@ export class SalesinvoiceComponent {
                         // Set the full product object instead of just the product_id
                         if (existingName) {
                           field.formControl.setValue(existingName); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                type: 'input',
+                key: 'total_boxes',
+                templateOptions: {
+                  type: 'number',
+                  label: 'Total Boxes',
+                  placeholder: 'Boxes',
+                  hideLabel: true
+                },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
+                        const existingBox = this.dataToPopulate.sale_invoice_items[currentRowIndex].total_boxes;
+
+                        // Set the full product object instead of just the product_id
+                        if (existingBox) {
+                          field.formControl.setValue(existingBox); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                type: 'select',
+                key: 'unit_options_id',
+                templateOptions: {
+                  label: 'Unit',
+                  placeholder: 'Unit',
+                  hideLabel: true,
+                  dataLabel: 'unit_name',
+                  dataKey: 'unit_options_id',
+                  bindId: true,
+                  required: true,
+                  lazy: {
+                    url: 'masters/unit_options',
+                    lazyOneTime: true
+                  }
+                },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
+                        const existingUnit = this.dataToPopulate.sale_invoice_items[currentRowIndex].product.unit_options;
+
+                        // Set the full product object instead of just the product_id
+                        if (existingUnit) {
+                          field.formControl.setValue(existingUnit.unit_options_id); // Set full product object (not just product_id)
                         }
                       }
                     }

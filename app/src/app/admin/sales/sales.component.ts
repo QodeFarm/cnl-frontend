@@ -1581,12 +1581,12 @@ export class SalesComponent {
             // title: 'Products',
             addText: 'Add Product',
             tableCols: [
-              {
-                name: 'selectItem',
-                label: '',
+              { 
+                name: 'selectItem', 
+                label: '', 
                 type: 'checkbox',
                 width: '50px'
-              },
+              }, 
               {
                 name: 'product',
                 label: 'Product'
@@ -1631,19 +1631,19 @@ export class SalesComponent {
             ]
           },
           fieldArray: {
-            fieldGroup: [
+            fieldGroup: [      
               {
                 key: 'selectItem',
                 type: 'checkbox',
                 defaultValue: false,
                 templateOptions: {
-                  hideLabel: true,
+                    hideLabel: true,
                 },
                 expressionProperties: {
-                  'templateOptions.hidden': () => !(this.SaleOrderEditID),
-                  'templateOptions.disabled': (model) => model.invoiced === 'YES' || !this.SaleOrderEditID
-                }
-              },
+                    'templateOptions.hidden': () => !(this.SaleOrderEditID),
+                    'templateOptions.disabled': (model) => model.invoiced === 'YES' || !this.SaleOrderEditID
+                  }
+              },                                     
               {
                 key: 'product',
                 type: 'select',
@@ -1670,13 +1670,13 @@ export class SalesComponent {
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
                         const existingProduct = this.dataToPopulate.sale_order_items[currentRowIndex].product;
-
+                        
                         // Set the full product object instead of just the product_id
                         if (existingProduct) {
                           field.formControl.setValue(existingProduct); // Set full product object (not just product_id)
                         }
                       }
-
+                      
                       // Subscribe to value changes of the field
                       // ***Size dropdown will populate with available sizes when product in selected***
                       field.formControl.valueChanges.subscribe(selectedProductId => {
@@ -1841,7 +1841,7 @@ export class SalesComponent {
                     });
                   }
                 }
-              },
+              }, 
               {
                 key: 'size',
                 type: 'select',
@@ -1866,7 +1866,7 @@ export class SalesComponent {
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
                         const existingSize = this.dataToPopulate.sale_order_items[currentRowIndex].size;
-
+                        
                         // Set the full product object instead of just the product_id
                         if (existingSize && existingSize.size_id) {
                           field.formControl.setValue(existingSize); // Set full product object (not just product_id)
@@ -1918,34 +1918,34 @@ export class SalesComponent {
                           }
                           // Call the API using HttpClient (this.http.get)
                           this.http.get(url).subscribe((data: any) => {
-                            function sumQuantities(dataObject: any): number {
-                              // First, check if the data object contains the array in the 'data' field
-                              if (dataObject && Array.isArray(dataObject.data)) {
-                                // Now we can safely use reduce on dataObject.data
-                                return dataObject.data.reduce((sum, item) => sum + (item.quantity || 0), 0);
-                              } else {
-                                console.error("Data is not an array:", dataObject);
-                                return 0;
+                              function sumQuantities(dataObject: any): number {
+                                // First, check if the data object contains the array in the 'data' field
+                                if (dataObject && Array.isArray(dataObject.data)) {
+                                  // Now we can safely use reduce on dataObject.data
+                                  return dataObject.data.reduce((sum, item) => sum + (item.quantity || 0), 0);
+                                } else {
+                                  console.error("Data is not an array:", dataObject);
+                                  return 0;
+                                }
                               }
-                            }
-                            const totalBalance = sumQuantities(data);
-                            const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
-                            if (cardWrapper && data.data[0]) {
-                              // Remove existing product info if present
-                              cardWrapper.querySelector('.center-message')?.remove();
-                              // Display fetched product variation info
-                              const productInfoDiv = document.createElement('div');
-                              productInfoDiv.classList.add('center-message');
-                              productInfoDiv.innerHTML = `
+                              const totalBalance = sumQuantities(data);
+                              const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
+                              if (cardWrapper && data.data[0]) {
+                                // Remove existing product info if present
+                                cardWrapper.querySelector('.center-message')?.remove();
+                                // Display fetched product variation info
+                                const productInfoDiv = document.createElement('div');
+                                productInfoDiv.classList.add('center-message');
+                                productInfoDiv.innerHTML = `
                                         <span style="color: red;">Product Info:</span>
-                                        <span style="color: blue;">${data.data[0]?.product.name || 'NA'}</span> |
+                                        <span style="color: blue;">${data.data[0]?.product.name|| 'NA'}</span> |
                                         <span style="color: red;">Balance:</span>
                                         <span style="color: blue;">${totalBalance}</span> |
                                         ${this.unitOptionOfProduct} `;
-                              cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
-                              console.log("Size :  Product Info Updated**")
-                            }
-                          },
+                                cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
+                                console.log("Size :  Product Info Updated**")
+                              }
+                            },
                             (error) => {
                               console.error("Error fetching data:", error);
                             });
@@ -1969,7 +1969,7 @@ export class SalesComponent {
                     });
                   }
                 }
-              },
+              }, 
               {
                 key: 'color',
                 type: 'select',
@@ -1994,13 +1994,13 @@ export class SalesComponent {
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
                         const existingColor = this.dataToPopulate.sale_order_items[currentRowIndex].color;
-
+                        
                         // Set the full product object instead of just the product_id
                         if (existingColor) {
                           field.formControl.setValue(existingColor);
                         }
                       }
-
+                      
                       // Subscribe to value changes when the form field changes
                       field.formControl.valueChanges.subscribe(selectedColorId => {
                         const product = this.formConfig.model.sale_order_items[currentRowIndex]?.product;
@@ -2050,7 +2050,7 @@ export class SalesComponent {
                               console.error("Error fetching data:", error);
                             });
                         } else {
-                          console.log(`No valid Color selected for :${product.name} at Row ${currentRowIndex}.`);
+                          console.log(`No valid Color selected for :${product.name } at Row ${currentRowIndex}.`);
                           console.log({
                             product: product?.name,
                             size: size?.size_name,
@@ -2075,7 +2075,7 @@ export class SalesComponent {
                     });
                   }
                 }
-              },
+              },                   
               {
                 type: 'input',
                 key: 'code',
@@ -2087,85 +2087,18 @@ export class SalesComponent {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-
+              
                     // Check if parentArray exists and proceed
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key; // Simplified number conversion
-
+              
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
                         const existingCode = this.dataToPopulate.sale_order_items[currentRowIndex].product?.code;
-
+                        
                         // Set the full product object instead of just the product_id
                         if (existingCode) {
                           field.formControl.setValue(existingCode); // Set full product object (not just product_id)
-                        }
-                      }
-                    }
-                  }
-                }
-              },
-              {
-                type: 'input',
-                key: 'total_boxes',
-                templateOptions: {
-                  type: 'number',
-                  label: 'Total Boxes',
-                  placeholder: 'Boxes',
-                  hideLabel: true
-                },
-                hooks: {
-                  onInit: (field: any) => {
-                    const parentArray = field.parent;
-
-                    // Check if parentArray exists and proceed
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
-
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
-                        const existingBox = this.dataToPopulate.sale_order_items[currentRowIndex].total_boxes;
-
-                        // Set the full product object instead of just the product_id
-                        if (existingBox) {
-                          field.formControl.setValue(existingBox); // Set full product object (not just product_id)
-                        }
-                      }
-                    }
-                  }
-                }
-              },
-              {
-                type: 'select',
-                key: 'unit_options_id',
-                templateOptions: {
-                  label: 'Unit',
-                  placeholder: 'Unit',
-                  hideLabel: true,
-                  dataLabel: 'unit_name',
-                  dataKey: 'unit_options_id',
-                  bindId: true,
-                  required: true,
-                  lazy: {
-                    url: 'masters/unit_options',
-                    lazyOneTime: true
-                  }
-                },
-                hooks: {
-                  onInit: (field: any) => {
-                    const parentArray = field.parent;
-
-                    // Check if parentArray exists and proceed
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
-
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
-                        const existingUnit = this.dataToPopulate.sale_order_items[currentRowIndex].product.unit_options;
-
-                        // Set the full product object instead of just the product_id
-                        if (existingUnit) {
-                          field.formControl.setValue(existingUnit.unit_options_id); // Set full product object (not just product_id)
                         }
                       }
                     }
@@ -2187,22 +2120,22 @@ export class SalesComponent {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-
+              
                     // Check if parentArray exists and proceed
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key; // Simplified number conversion
-
+              
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
                         const existingQuan = this.dataToPopulate.sale_order_items[currentRowIndex].quantity;
-
+                        
                         // Set the full product object instead of just the product_id
                         if (existingQuan) {
                           field.formControl.setValue(existingQuan); // Set full product object (not just product_id)
                         }
                       }
                     }
-
+              
                     // Subscribe to value changes
                     field.formControl.valueChanges.subscribe(data => {
                       if (field.form && field.form.controls && field.form.controls.rate && data) {
@@ -2218,7 +2151,7 @@ export class SalesComponent {
                     // You can handle any changes here if needed
                   }
                 }
-              },
+              },              
               {
                 type: 'input',
                 key: 'rate',
@@ -2231,22 +2164,22 @@ export class SalesComponent {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-
+              
                     // Check if parentArray exists and proceed
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key; // Simplified number conversion
-
+              
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
                         const existingPrice = this.dataToPopulate.sale_order_items[currentRowIndex].rate;
-
+                        
                         // Set the full product object instead of just the product_id
                         if (existingPrice) {
                           field.formControl.setValue(existingPrice); // Set full product object (not just product_id)
                         }
                       }
                     }
-
+                    
                     // Subscribe to value changes to update amount
                     field.formControl.valueChanges.subscribe(data => {
                       if (field.form && field.form.controls && field.form.controls.quantity && data) {
@@ -2272,15 +2205,15 @@ export class SalesComponent {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-
+              
                     // Check if parentArray exists and proceed
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key; // Simplified number conversion
-
+              
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
                         const existingDisc = this.dataToPopulate.sale_order_items[currentRowIndex].discount;
-
+                        
                         // Set the full product object instead of just the product_id
                         if (existingDisc) {
                           field.formControl.setValue(existingDisc); // Set full product object (not just product_id)
@@ -2288,21 +2221,10 @@ export class SalesComponent {
                       }
                     }
                     field.formControl.valueChanges.subscribe(data => {
-                      // Add any logic needed for when discount changes
+                      this.totalAmountCal();
                     });
                   }
                 }
-              },
-
-              {
-                type: 'input',
-                key: 'mrp',
-                templateOptions: {
-                  label: 'Mrp',
-                  placeholder: 'Mrp',
-                  hideLabel: true,
-                  disabled: true
-                },
               },
               {
                 type: 'input',
@@ -2317,15 +2239,15 @@ export class SalesComponent {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-
+              
                     // Check if parentArray exists and proceed
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key; // Simplified number conversion
-
+              
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
                         const existingAmount = this.dataToPopulate.sale_order_items[currentRowIndex].amount;
-
+                        
                         // Set the full product object instead of just the product_id
                         if (existingAmount) {
                           field.formControl.setValue(existingAmount); // Set full product object (not just product_id)
@@ -2340,6 +2262,16 @@ export class SalesComponent {
               },
               {
                 type: 'input',
+                key: 'mrp',
+                templateOptions: {
+                  label: 'Mrp',
+                  placeholder: 'Mrp',
+                  hideLabel: true,
+                  disabled: true
+                },
+              },
+              {
+                type: 'input',
                 key: 'print_name',
                 templateOptions: {
                   label: 'Print name',
@@ -2349,15 +2281,15 @@ export class SalesComponent {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-
+              
                     // Check if parentArray exists and proceed
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key; // Simplified number conversion
-
+              
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
                         const existingName = this.dataToPopulate.sale_order_items[currentRowIndex].print_name;
-
+                        
                         // Set the full product object instead of just the product_id
                         if (existingName) {
                           field.formControl.setValue(existingName); // Set full product object (not just product_id)
@@ -2366,6 +2298,73 @@ export class SalesComponent {
                     }
                   }
                 }
+              },
+              {
+                type: 'select',
+                key: 'unit_options_id',
+                templateOptions: {
+                  label: 'Unit',
+                  placeholder: 'Unit',
+                  hideLabel: true,
+                  dataLabel: 'unit_name',
+                  dataKey: 'unit_options_id',
+                  bindId: true,
+                  required: true,
+                  lazy: {
+                    url: 'masters/unit_options',
+                    lazyOneTime: true
+                  }
+                },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
+                        const existingUnit = this.dataToPopulate.sale_order_items[currentRowIndex].product.unit_options;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingUnit) {
+                          field.formControl.setValue(existingUnit.unit_options_id); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                type: 'input',
+                key: 'total_boxes',
+                templateOptions: {
+                  type: 'number',
+                  label: 'Total Boxes',
+                  placeholder: 'Boxes',
+                  hideLabel: true
+                },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
+                        const existingBox = this.dataToPopulate.sale_order_items[currentRowIndex].total_boxes;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingBox) {
+                          field.formControl.setValue(existingBox); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }                
               },
               {
                 type: 'input',
@@ -2379,15 +2378,15 @@ export class SalesComponent {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-
+              
                     // Check if parentArray exists and proceed
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key; // Simplified number conversion
-
+              
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
                         const existingtax = this.dataToPopulate.sale_order_items[currentRowIndex].tax;
-
+                        
                         // Set the full product object instead of just the product_id
                         if (existingtax) {
                           field.formControl.setValue(existingtax); // Set full product object (not just product_id)
@@ -2408,15 +2407,15 @@ export class SalesComponent {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-
+              
                     // Check if parentArray exists and proceed
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key; // Simplified number conversion
-
+              
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
                         const existingRemarks = this.dataToPopulate.sale_order_items[currentRowIndex].remarks;
-
+                        
                         // Set the full product object instead of just the product_id
                         if (existingRemarks) {
                           field.formControl.setValue(existingRemarks); // Set full product object (not just product_id)
@@ -2431,13 +2430,13 @@ export class SalesComponent {
                 key: 'invoiced',
                 defaultValue: 'NO', // Default value set to 'NO'
                 templateOptions: {
-                  label: 'Invoiced',
-                  options: [
-                    { value: 'YES', label: 'Yes' },
-                    { value: 'NO', label: 'No' }
-                  ],
-                  hideLabel: true,
-                  disabled: true // Make the field read-only in the form
+                    label: 'Invoiced',
+                    options: [
+                        { value: 'YES', label: 'Yes' },
+                        { value: 'NO', label: 'No' }
+                    ],
+                    hideLabel: true,
+                    disabled: true // Make the field read-only in the form
                 },
               }
             ]
@@ -2695,7 +2694,7 @@ export class SalesComponent {
                                 type: 'input',
                                 label: 'Overall Discount',
                                 placeholder: 'Enter Discount amount',
-                                readonly: false
+                                readonly: true
                                 // required: true
                               },
                               hooks: {
