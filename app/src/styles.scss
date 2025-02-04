@@ -525,8 +525,9 @@ ta-table {
     }
     .ant-drawer-body{
         .inner-content{
-             overflow-y: auto;
+            overflow-y: auto;
             height: calc(100vh - 155px);
+            overflow-x: hidden;
         }
     }
 }
