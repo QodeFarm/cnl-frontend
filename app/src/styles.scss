@@ -484,7 +484,6 @@ ta-table {
         // width: 65% !important;
         // left: 50%;
         // transform: translate(-50%, 20px);
-        margin: 20px auto;
         height: auto;
         // max-height: calc(100% - 40px);
         overflow-y: auto;
@@ -523,6 +522,13 @@ ta-table {
         //     overflow-y: auto; 
         //     overflow-x: hidden;
         // }
+    }
+    .ant-drawer-body{
+        .inner-content{
+            overflow-y: auto;
+            height: calc(100vh - 155px);
+            overflow-x: hidden;
+        }
     }
 }
 
@@ -1056,6 +1062,7 @@ ta-form {
         height: calc(100vh - 305px);
         overflow-y: auto;
     }
+   
 }
 .ant-pagination-total-text{
     .bottom-left{
