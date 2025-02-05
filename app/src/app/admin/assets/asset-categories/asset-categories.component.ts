@@ -21,6 +21,7 @@ export class AssetCategoriesComponent {
       "globalSearch": {
         keys: ['asset_category_id', 'category_name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'category_name',

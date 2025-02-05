@@ -18,6 +18,7 @@ export class LeaveTypesComponent {
       "globalSearch": {
         keys: ['leave_type_id','leave_type_name','description','max_days_allowed']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'leave_type_name',

@@ -18,6 +18,7 @@ export class JobTypesComponent {
       "globalSearch": {
         keys: ['job_type_id', 'job_type_name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [{
           fieldKey: 'job_type_name',
           name: 'Job Type Name'

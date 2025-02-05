@@ -22,6 +22,7 @@ export class UserGroupMembersComponent {
       "globalSearch": {
         keys: ['member_id', 'group_id', 'employee_id']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
 		{
           fieldKey: 'group_id',

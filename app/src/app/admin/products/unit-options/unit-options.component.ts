@@ -20,6 +20,7 @@ export class UnitOptionsComponent {
       "globalSearch": {
         keys: ['unit_options_id', 'unit_name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'unit_name',

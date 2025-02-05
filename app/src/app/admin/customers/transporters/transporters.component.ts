@@ -19,6 +19,7 @@ export class TransportersComponent {
       "globalSearch": {
         keys: ['transporter_id', 'name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'name',

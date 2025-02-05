@@ -18,6 +18,7 @@ export class NotificationMethodsComponent {
       "globalSearch": {
         keys: ['method_id', 'method_name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'method_name',

@@ -21,6 +21,7 @@ export class ProductTypesComponent {
       "globalSearch": {
         keys: ['type_id', 'type_name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'type_name',

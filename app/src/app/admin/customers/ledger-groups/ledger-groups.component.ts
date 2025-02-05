@@ -18,6 +18,7 @@ export class LedgerGroupsComponent {
       "globalSearch": {
         keys: ['ledger_group_id', 'name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'name',

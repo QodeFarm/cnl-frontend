@@ -18,6 +18,7 @@ export class EmployeeSalaryComponentsComponent {
       "globalSearch": {
         keys: ['employee_component_id', 'component_id','component_amount','salary_id']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'component_id',

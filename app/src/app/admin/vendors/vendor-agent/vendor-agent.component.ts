@@ -19,6 +19,7 @@ export class VendorAgentComponent {
       "globalSearch": {
         keys: ['vendor_agent_id', 'name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'code',

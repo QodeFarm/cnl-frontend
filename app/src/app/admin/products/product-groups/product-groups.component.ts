@@ -19,6 +19,7 @@ export class ProductGroupsComponent   {
     "globalSearch": {
       keys: ['id', 'name']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {
         fieldKey: 'group_name',

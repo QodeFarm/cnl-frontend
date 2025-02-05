@@ -19,6 +19,7 @@ export class ProductItemBalanceComponent {
       "globalSearch": {
         keys: ['product_balance_id']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'balance',

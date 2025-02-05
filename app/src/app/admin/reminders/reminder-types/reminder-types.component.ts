@@ -19,6 +19,7 @@ export class ReminderTypesComponent {
       "globalSearch": {
         keys: ['reminder_type_id', 'type_name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'type_name',

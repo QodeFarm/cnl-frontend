@@ -19,6 +19,7 @@ export class PurchaseTypesComponent {
       "globalSearch": {
         keys: ['purchase_type_id', 'name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'name',

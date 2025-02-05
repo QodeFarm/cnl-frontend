@@ -18,6 +18,7 @@ export class LedgerAccountsComponent {
       "globalSearch": {
         keys: ['ledger_account_id', 'name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'name',
