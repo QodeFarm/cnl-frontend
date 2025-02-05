@@ -18,9 +18,7 @@ export class AssetCategoriesComponent {
       title: 'Asset Categories',
       pkId: "asset_category_id",
       pageSize: 10,
-      "globalSearch": {
-        keys: ['asset_category_id', 'category_name']
-      },
+      "globalSearch": {keys: ['asset_category_id', 'category_name']},
       defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
