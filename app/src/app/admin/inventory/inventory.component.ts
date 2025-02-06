@@ -23,13 +23,8 @@ export class InventoryComponent {
       "globalSearch": {
         keys: ['id', 'name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
-        {
-          fieldKey: 'created_at',
-          name: 'created At',
-          sort: true,
-          displayType: 'datetime',
-        },
         {
           fieldKey: 'name',
           name: 'Name',

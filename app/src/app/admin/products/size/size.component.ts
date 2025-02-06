@@ -20,6 +20,7 @@ export class SizeComponent {
       "globalSearch": {
         keys: ['size_id','size_name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'size_name',

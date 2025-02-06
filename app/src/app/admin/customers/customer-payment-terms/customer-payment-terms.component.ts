@@ -19,6 +19,7 @@ export class CustomerPaymentTermsComponent {
       "globalSearch": {
         keys: ['payment_term_id', 'name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'name',

@@ -18,6 +18,7 @@ export class ShiftsComponent {
       "globalSearch": {
         keys: ['shift_id','shift_name','start_time','end_time']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'shift_name',

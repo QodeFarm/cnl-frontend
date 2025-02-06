@@ -32,18 +32,8 @@ export class LeadsListComponent {
     "globalSearch": {
       keys: ['interaction_date','name','email','phone','lead_status','score','assignee','notes']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
-      {
-        fieldKey: 'interaction_date',
-        name: 'Interaction Date',
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          const interactionDate = row.interaction[0].interaction_date;
-          const [date, time] = interactionDate.split('T');
-          return `${date}<br>${time}`;
-        },
-        sort: false
-      },
       {
         fieldKey: 'name',
         name: 'Name',
@@ -81,6 +71,17 @@ export class LeadsListComponent {
           return `${row.assignee.first_name} ${row.assignee.last_name}`;
         },
         sort: true
+      },
+      {
+        fieldKey: 'interaction_date',
+        name: 'Interaction Date',
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          const interactionDate = row.interaction[0].interaction_date;
+          const [date, time] = interactionDate.split('T');
+          return `${date}<br>${time}`;
+        },
+        sort: false
       },
       {
         fieldKey: 'notes',

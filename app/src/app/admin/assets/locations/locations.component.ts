@@ -21,6 +21,7 @@ export class LocationsComponent {
       "globalSearch": {
         keys: ['location_id', 'location_name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'location_name',

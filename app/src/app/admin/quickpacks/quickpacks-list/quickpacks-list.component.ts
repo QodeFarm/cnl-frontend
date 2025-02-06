@@ -29,13 +29,8 @@ export class QuickpacksListComponent {
     globalSearch: {
       keys: ['name','lot_qty','description','active']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
-      {
-        fieldKey: 'created_at',
-        name: 'Created At',
-        sort: true,
-        displayType: 'datetime'
-      },
       {
         fieldKey: 'name',
         name: 'Quick Pack Name',

@@ -18,6 +18,7 @@ export class ReminderSettingsComponent {
       "globalSearch": {
         keys: ['user_id', 'notification_frequency_id','notification_method_id']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'user_id',

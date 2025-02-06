@@ -29,7 +29,8 @@ export class LeaveApprovalsComponent {
       "globalSearch": {
         keys: ['approval_id', 'name']
       },
-      defaultSort: { key: 'approval_date', value: 'descend' },
+      // defaultSort: { key: 'approval_date', value: 'descend' },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'leave_id',

@@ -29,6 +29,7 @@ export class EmployeeLeavesListComponent {
     "globalSearch": {
       keys: ['employee','start_date','end_date','comments','leave_type']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {
         fieldKey: 'employee',

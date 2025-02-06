@@ -19,6 +19,7 @@ export class ProductPurchaseGlComponent {
       "globalSearch": {
         keys: ['id']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'name',

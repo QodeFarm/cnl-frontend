@@ -19,6 +19,7 @@ export class DepartmentsComponent {
       "globalSearch": {
         keys: ['department_id', 'designation_name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [{
           fieldKey: 'department_name',
           name: 'Department Name'

@@ -18,6 +18,7 @@ export class PaymentLinkTypeComponent {
       "globalSearch": {
         keys: ['payment_link_type_id', 'name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'name',

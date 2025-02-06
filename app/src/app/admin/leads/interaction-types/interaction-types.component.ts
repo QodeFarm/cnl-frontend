@@ -19,6 +19,7 @@ export class InteractionTypesComponent {
       "globalSearch": {
         keys: ['interaction_type_id']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'interaction_type',

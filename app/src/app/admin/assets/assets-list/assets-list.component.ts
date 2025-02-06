@@ -31,13 +31,8 @@ export class AssetsListComponent {
     "globalSearch": {
       keys: ['purchase_date','name','price','asset_category_id','unit_options_id','location_id','asset_status_id']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
-      {
-        fieldKey: 'purchase_date', 
-        name: 'Purchase Date',
-        sort: true,
-        displayType: "date"
-      },
       {
         fieldKey: 'name',
         name: 'Name',
@@ -65,6 +60,12 @@ export class AssetsListComponent {
         mapFn: (currentValue: any, row: any, col: any) => {
           return `${row.unit_options.unit_name}`;
         },
+      },
+      {
+        fieldKey: 'purchase_date', 
+        name: 'Purchase Date',
+        sort: true,
+        displayType: "date"
       },
       {
         fieldKey: 'location_id',

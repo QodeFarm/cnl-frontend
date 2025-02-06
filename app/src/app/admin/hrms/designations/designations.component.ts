@@ -19,6 +19,7 @@ export class DesignationsComponent {
       "globalSearch": {
         keys: ['designation_id','designation_name','responsibilities']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'designation_name',

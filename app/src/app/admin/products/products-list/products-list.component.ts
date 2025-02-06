@@ -37,13 +37,8 @@ export class ProductsListComponent {
     globalSearch: {
       keys: ['name','code','unit_options','balance','sales_rate','mrp','dis_amount','print_name','hsn_code','barcode']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
-      {
-        fieldKey: 'created_at',
-        name: 'Created At',
-        displayType: 'datetime',
-        sort: true
-      },
       {
         fieldKey: 'name',
         name: 'Name',

@@ -21,6 +21,7 @@ export class ProductBrandsComponent {
       "globalSearch": {
         keys: ['brand_id', 'brand_name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'brand_name',

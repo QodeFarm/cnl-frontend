@@ -22,6 +22,7 @@ export class MachinesComponent {
       "globalSearch": {
         keys: ['machine_id', 'machine_name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'machine_name',

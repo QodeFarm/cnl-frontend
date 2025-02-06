@@ -19,6 +19,7 @@ export class ProductGstClassificationsComponent {
       "globalSearch": {
         keys: ['id']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'type',

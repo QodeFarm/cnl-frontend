@@ -22,6 +22,7 @@ export class ProductionStatusesComponent {
       "globalSearch": {
         keys: ['status_id', 'status_name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'status_name',

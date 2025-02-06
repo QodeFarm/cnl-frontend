@@ -18,6 +18,7 @@ export class SalaryComponentsComponent {
       "globalSearch": {
         keys: ['component_id', 'component_name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [{
           fieldKey: 'component_name',
           name: 'Component Name'

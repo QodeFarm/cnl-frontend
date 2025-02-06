@@ -19,6 +19,7 @@ export class PackageUnitsComponent {
       "globalSearch": {
         keys: ['pack_unit_id','unit_name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'unit_name',
