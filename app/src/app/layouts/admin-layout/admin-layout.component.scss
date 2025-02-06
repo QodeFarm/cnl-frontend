@@ -1,0 +1,15 @@
+.navbar{
+    p{
+        margin: 0;
+        font-size: 17px;
+        color: #ffffff;
+    }
+}
+.company-title{
+    position: absolute;
+    right: 50%;
+    transform: translateX(50%);
+    @media(max-width:1199px){
+           transform: inherit;
+    }
+}

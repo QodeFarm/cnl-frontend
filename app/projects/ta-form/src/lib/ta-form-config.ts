@@ -17,6 +17,7 @@ export interface TaFormConfig {
     submittedFn?: (res: any) => any;
     successMsg?: string;
     cssClass?: string;
+    errorMsg?: string;
   };
   reset?: {
     cssClass?: string,

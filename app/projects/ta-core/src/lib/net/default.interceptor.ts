@@ -16,6 +16,7 @@ import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { catchError, filter, finalize, mergeMap, switchMap, take } from 'rxjs/operators';
 import { SiteConfigService } from '../services/site-config.service';
 import { LoadingService } from '../services/loading.service';
+import { NzModalService } from 'ng-zorro-antd/modal';
 
 const CODEMESSAGE: { [key: number]: string } = {
   200: 'The server successfully returned the requested data.',
@@ -55,6 +56,9 @@ export class DefaultInterceptor implements HttpInterceptor {
     return this.injector.get(NzNotificationService);
   }
 
+  private get modelSvc(): NzModalService {
+    return this.injector.get(NzModalService);
+  }
   // private get tokenSrv(): ITokenService {
   //   return this.injector.get(DA_SERVICE_TOKEN);
   // }
@@ -84,47 +88,59 @@ export class DefaultInterceptor implements HttpInterceptor {
 
   private checkStatus(ev: HttpErrorResponse): void {
     let errorMsg = `Request error ${ev.status}: `;
-    
+
     if (ev.status == 400) {
       const responseBody = ev.error;  // Assuming response is in `ev.error` (adjust as necessary)
 
       // Case 1: If the message is available, show it directly
-      if (responseBody && responseBody.message && responseBody.data.length === 0 ) {
+      if (responseBody && responseBody.message && responseBody.data.length === 0) {
         // If only message is present (no detailed error data)
         const errortext = responseBody.message;
-        console.log('errortext : ', errortext)
-        this.notification.error(
-          `<div style="font-size: 12px; color: #333;">${errortext}</div>`,
-          '',
-          { nzDuration: 5000, nzStyle: { backgroundColor: '#fff9f9', border: '1px solid #ffa39e', maxWidth: '800px' } }
-        );
+        // -- old notification error type is commented below -- 
+        // this.notification.error(
+        //   `<div style="font-size: 12px; color: #333;">${errortext}</div>`,
+        //   '',
+        //   { nzDuration: 5000, nzStyle: { backgroundColor: '#fff9f9', border: '1px solid #ffa39e', maxWidth: '800px' } }
+        // );
+        this.showError(errortext)
         return;
       }
-  
+
       // Case 2: If detailed validation errors are present in `data`
-      if (responseBody && responseBody.data && Object.keys(responseBody.data).length > 0) {
+      if (responseBody && responseBody.data && Object.keys(responseBody.data).length > 0 && Object.values(responseBody.data).every(value => typeof value === 'string')
+      ) {
         let detailedError = '';
         for (const [key, message] of Object.entries(responseBody.data)) {
           // For each validation error, format it as "KEY: Error message"
           detailedError += `<strong>${key.toUpperCase()}:</strong> ${message}<br>`;
 
         }
-        this.notification.error(
-          `${detailedError}`,
-          '',
-          { 
-            nzDuration: 5000, 
-            nzStyle: { 
-              backgroundColor: '#fff9f9', 
-              border: '1px solid #ffa39e', 
-              maxWidth: '1000px'
-            } 
-          }
-        );        
+        // -- old notification error type is commented below -- 
+        // this.notification.error(
+        //   `${detailedError}`,
+        //   '',
+        //   { 
+        //     nzDuration: 5000, 
+        //     nzStyle: { 
+        //       backgroundColor: '#fff9f9', 
+        //       border: '1px solid #ffa39e', 
+        //       maxWidth: '1000px'
+        //     } 
+        //   }
+        // );
+        this.showError(detailedError);
+        return;
+      }
+      
+
+      // if more backend requirements not satisfied.
+      if (responseBody?.data && Object.keys(responseBody.data).length) {
+        const errorText = this.formatErrors(responseBody);
+        this.showError(errorText);
         return;
       }
     }
-    
+
     // Fallback for other HTTP status codes
     const errortext = "An error occurred. Please try again.";
     this.notification.error(
@@ -132,7 +148,7 @@ export class DefaultInterceptor implements HttpInterceptor {
       errortext,
       { nzDuration: 5000, nzStyle: { backgroundColor: '#fff9f9', border: '1px solid #ffa39e', maxWidth: '600px' } }
     );
-  }    
+  }
 
   /**
    * 刷新 Token 请求
@@ -306,7 +322,7 @@ export class DefaultInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     // 统一加上服务端前缀
     let url = req.url;
-    this.loadingS.show();
+    // this.loadingS.show();
     if (!url.startsWith('https://') && !url.startsWith('http://') && !url.startsWith('assets')) {
       const baseUrl = this.siteConfig.CONFIG.baseUrl;
       url = baseUrl + url//environment.api.baseUrl + url;
@@ -329,7 +345,48 @@ export class DefaultInterceptor implements HttpInterceptor {
         return of(ev);
       }),
       catchError((err: HttpErrorResponse) => this.handleData(err, newReq, next)),
-      finalize(() => this.loadingS.hide())
+      finalize(() => {
+        // this.loadingS.hide();
+      })
     );
+
+  }
+
+  showError(message: string): void {
+    const modalRef = this.modelSvc.create({
+      nzTitle: 'Error :',
+      nzContent: `<p>${message}</p>`, // Display the error message
+      nzClosable: true, // Disable the close button
+      nzFooter: [
+        {
+          label: 'OK',
+          type: 'primary',
+          onClick: () => modalRef.destroy(), // Close the modal when OK is clicked
+        },
+      ],
+      nzCentered: true, // Center the modal
+    });
+  };
+
+  formatErrors(responseBody: any): string {
+    if (!responseBody?.data) return responseBody?.message || 'An unknown error occurred';
+  
+    let errorMessages: string[] = [];
+  
+    Object.entries(responseBody.data).forEach(([key, value]) => {
+      const processMessages = (subKey: string, messages: any) => {
+        if (Array.isArray(messages)) {
+          messages.forEach((msg) => errorMessages.push(`<b>${key.toUpperCase()}</b> - ${subKey} - ${msg}<br>`));
+        }
+      };
+  
+      if (Array.isArray(value)) {
+        value.forEach(item => typeof item === 'object' && Object.entries(item).forEach(([subKey, messages]) => processMessages(subKey, messages)));
+      } else if (typeof value === 'object') {
+        Object.entries(value).forEach(([subKey, messages]) => processMessages(subKey, messages));
+      }
+    });
+  
+    return errorMessages.length ? errorMessages.join('') : responseBody.message || 'Unknown error';
   }
 }

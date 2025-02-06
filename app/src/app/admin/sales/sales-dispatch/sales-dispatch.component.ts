@@ -31,6 +31,7 @@ export class SalesDispatchComponent implements OnInit {
     return {
       drawerSize: 500,
       drawerPlacement: 'right',
+      hideAddBtn: true,
       tableConfig: {
         apiUrl: 'sales/sale_order/?summary=true&flow_status=dispatch',
         title: 'Sales Dispatch',

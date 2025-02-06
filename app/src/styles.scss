@@ -153,7 +153,7 @@
                     visibility: visible;
                     opacity: 1;
                     min-width: 200px;
-                    margin-left: 60px !important;
+                    margin-left: 50px !important;
                     background-color: hsla(0, 0%, 100%, 1);
                     border: 1px solid #ccc;
                     border-radius: 0.5rem;
@@ -220,7 +220,7 @@
                     z-index: 9;
                     max-height: 450px;
                     border: 1px solid #ccc;
-                    left: 52px !important;
+                    left: 42px !important;
                     top: 38px !important;
                     border-radius: 0 0 0.5rem 0.5rem;
                     height: auto !important;
@@ -477,18 +477,24 @@ ta-table {
 //     box-shadow: none;
 // }
 .ant-drawer {
+    .ant-drawer-mask {
+        background-color: rgba(0, 0, 0, 0.9) !important;
+    }
     .ant-drawer-content-wrapper {
         // width: 65% !important;
         // left: 50%;
         // transform: translate(-50%, 20px);
-        margin: 20px auto;
         height: auto;
         // max-height: calc(100% - 40px);
         overflow-y: auto;
+        display: flex;
+        align-items: center;
         .ant-drawer-content {
             width: 50%;
             margin: 0 auto;
             height: auto;
+            border: solid 2px white;
+            border-radius: 5px;
         }
         .ant-drawer-header {
             background-color: #142768;
@@ -517,6 +523,13 @@ ta-table {
         //     overflow-x: hidden;
         // }
     }
+    .ant-drawer-body{
+        .inner-content{
+            overflow-y: auto;
+            height: calc(100vh - 155px);
+            overflow-x: hidden;
+        }
+    }
 }
 
 ta-form {
@@ -525,12 +538,13 @@ ta-form {
             padding-bottom: 1rem;
             .form-label {
                 color: #000;
+                white-space: nowarp;
                 span {
                     color: #ff0000;
                 }
             }
         }
-    }
+    } 
 }
 
 .logo-design-block {
@@ -583,6 +597,10 @@ ta-form {
 }
 
 .custom-form {
+  .tab-form-list ta-field-tabs{
+    border: 1px solid #142768;
+    display: block;
+  }
     .ant-input,
     .ant-select-selector,
     .ant-picker {
@@ -609,6 +627,29 @@ ta-form {
 }
 
 .custom-form-list {
+    &.product-table{
+        .table{
+            white-space: nowrap;
+            overflow-x: auto;
+            width: 100%;
+            display: block;
+            thead {
+                th{
+                    white-space: nowrap;
+                     min-width: 120px; 
+                     &:nth-child(1),&:last-child{
+                        min-width: 50px;
+                     }
+                     &:nth-child(2){
+                        min-width: 150px;
+                     }       
+                    //  &:nth-child(5){
+                    //     min-width: 70px;
+                    //  }            
+                }
+            }
+        }
+      }
     .ant-card {
         margin: 0 5px;
     }
@@ -647,6 +688,28 @@ ta-form {
                     }
                 }
             }
+        }
+    }
+    &.new-items-list{
+        .ant-card{
+          margin: 0;
+          .ant-card-head {
+            padding: 0;
+          }
+          .ant-card-body {
+            padding: 0;            
+            overflow-x: auto; 
+            width: 100%; 
+          }
+          .table{
+            th{
+                white-space: nowrap;
+                min-width: 100px;
+            }
+            td{
+                min-width: 100px;
+            }
+          }
         }
     }
 }
@@ -719,6 +782,38 @@ ta-form {
         tbody {
             td {
                 font-size: 13px;
+            }
+        }
+    }
+    &.sale-receipt-table{
+        table{
+            tbody{
+                td{
+                    // button{
+                    //     border:1px solid #37af47;
+                    //     background-color: #37af47;
+                    //     color: #ffffff;
+                    //     border-radius: 20px;
+                    //     padding: 3px 15px;
+                    //     &:hover{
+                    //         border:1px solid #2f923d;
+                    //         background-color: #2f923d;
+                    //     }
+                    // }
+                    a,button{
+                        border: 1px solid #142768;
+                        background-color: #142768;
+                        color: #ffffff;
+                        padding: 4px 10px;
+                        font-size: 14px;
+                        border-radius: 5px;
+                        &:hover{
+                          border:1px solid #233a88;
+                          background-color: #233a88;
+                          color: #ffffff;
+                        }
+                    }
+                }
             }
         }
     }
@@ -855,6 +950,9 @@ ta-form {
     background: transparent;
     .ant-upload {
         padding: 0 0 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     p.ant-upload-text {
         margin: 10px 0 4px;
@@ -904,4 +1002,72 @@ ta-form {
 
 .custom-dialog-box button:hover {
     background-color: #0056b3;
+}
+
+
+// inline form-fields styles beggin
+.inline-form-fields{
+    .ant-row{
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        position: relative;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
+        padding-top: 15px;
+        padding-bottom: 15px;
+        formly-field{
+            padding-bottom: 0;
+            ta-wrapper-form-field>div{
+                display: flex;
+                .form-label{
+                   flex: 0 0 auto;
+                   width: auto;
+                   max-width: 100%;
+                }
+                .ta-field{
+                   flex-basis: 0;
+                   flex-grow: 1;
+                   max-width: 100%;
+                   input{
+                       text-align: end;
+                       border: none;
+                       &[disabled]{
+                           background-color: #ffffff;
+                           color: #000000;
+                       }
+                       &:focus{
+                        box-shadow: none;
+                       }
+                   }
+                }
+            }
+            &.product-total{
+                padding-top: 10px;
+                input{
+                    &{
+                        background-color: #142768 !important;
+                        color: #ffffff !important;
+                        font-size: 18px;
+                        cursor: inherit;
+                    }
+                }
+            }
+        }
+     
+    }
+ 
+}
+// inline form-fields styles end
+.modal-content{
+    .ant-table-content{
+        height: calc(100vh - 305px);
+        overflow-y: auto;
+    }
+   
+}
+.ant-pagination-total-text{
+    .bottom-left{
+        position: absolute;
+        left: 0;
+        z-index: 99;
+    }
 }

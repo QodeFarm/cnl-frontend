@@ -8,7 +8,7 @@ import { OrderslistComponent } from '../orderslist/orderslist.component';
 import { SalesInvoiceListComponent } from './salesinvoice-list/salesinvoice-list.component';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-
+declare var bootstrap;
 @Component({
   selector: 'app-salesinvoice',
   standalone: true,
@@ -105,49 +105,49 @@ export class SalesinvoiceComponent {
 
   // Method to open the copy modal and populate dropdown
   openCopyModal() {
-      this.availableTables = this.tables.filter(table => table !== this.currentTable);
+    this.availableTables = this.tables.filter(table => table !== this.currentTable);
   }
 
 
   copyToTable() {
     const selectedMapping = this.fieldMapping[this.selectedTable];
-    
+
     if (!selectedMapping) {
       console.error('Mapping not found for selected table:', this.selectedTable);
       return;
     }
-  
+
     const dataToCopy = this.formConfig.model[selectedMapping.sourceModel] || {};
     const populatedData = { [selectedMapping.targetModel]: {} };
-  
+
     // Copy main fields
     Object.keys(dataToCopy).forEach(field => {
       populatedData[selectedMapping.targetModel][field] = dataToCopy[field];
     });
-  
+
     // Copy nested models if they exist
     if (selectedMapping.nestedModels) {
       Object.keys(selectedMapping.nestedModels).forEach(sourceNestedModel => {
         const targetNestedModel = selectedMapping.nestedModels[sourceNestedModel];
         const nestedData = this.formConfig.model[sourceNestedModel] || [];
-        
+
         populatedData[targetNestedModel] = Array.isArray(nestedData)
           ? nestedData.map(item => ({ ...item }))
           : { ...nestedData };
       });
     }
-  
+
     // Log and navigate to the target module with populated data
     console.log('Populated Data:', populatedData);
-    
+
     // Determine the target route based on the selected table
-    const targetRoute = 
+    const targetRoute =
       this.selectedTable === 'Sale Order' ? 'sales' :
-      this.selectedTable === 'Sale Return' ? 'sales/sale-returns' :
-      this.selectedTable === 'Purchase Order' ? 'purchase' :
-      this.selectedTable === 'Purchase Invoice' ? 'purchase/purchase-invoice' :
-      this.selectedTable === 'Purchase Return' ? 'purchase/purchasereturns' :
-      null;
+        this.selectedTable === 'Sale Return' ? 'sales/sale-returns' :
+          this.selectedTable === 'Purchase Order' ? 'purchase' :
+            this.selectedTable === 'Purchase Invoice' ? 'purchase/purchase-invoice' :
+              this.selectedTable === 'Purchase Return' ? 'purchase/purchasereturns' :
+                null;
 
     if (!targetRoute) {
       console.error('No valid route for selected table:', this.selectedTable);
@@ -164,12 +164,12 @@ export class SalesinvoiceComponent {
     private route: ActivatedRoute,
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   dataToPopulate: any;
   salesInvoiceForm: FormGroup;
 
-  ngOnInit() {    
+  ngOnInit() {
     this.showSaleInvoiceList = false;
     this.showForm = true;
     this.SaleInvoiceEditID = null;
@@ -181,23 +181,23 @@ export class SalesinvoiceComponent {
 
     // To get SaleInvoice number for save
     this.getInvoiceNo();
-    this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[8].hide = true;
+    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = true;
   }
 
   checkAndPopulateData() {
     // Check if data has already been populated
     if (this.dataToPopulate === undefined) {
       this.route.paramMap.subscribe(params => {
-        this.dataToPopulate = history.state.data; 
+        this.dataToPopulate = history.state.data;
         console.log('Data retrieved:', this.dataToPopulate);
-        
+
         // Populate the form only if data exists
         if (this.dataToPopulate) {
           const saleInvoiceItems = this.dataToPopulate.sale_invoice_items || [];
-  
+
           // Clear existing sale_invoice_items to avoid duplicates
           this.formConfig.model.sale_invoice_items = [];
-  
+
           // Populate form with data, ensuring unique entries
           saleInvoiceItems.forEach(item => {
             const populatedItem = {
@@ -218,22 +218,22 @@ export class SalesinvoiceComponent {
         }
       });
     } else {
-    // Detect if the page was refreshed
+      // Detect if the page was refreshed
       const wasPageRefreshed = window.performance?.navigation?.type === window.performance?.navigation?.TYPE_RELOAD;
-    
+
       // Clear data if the page was refreshed
       if (wasPageRefreshed) {
         this.dataToPopulate = undefined;
         console.log("Page was refreshed, clearing data.");
-        
+
         // Ensure the history state is cleared to prevent repopulation
         history.replaceState(null, '');
         return; // Stop further execution as we don't want to repopulate the form
       }
     }
-  }  
+  }
 
-//COPY PART END -------------------------------------------------------------
+  //COPY PART END -------------------------------------------------------------
 
   formConfig: TaFormConfig = {};
 
@@ -258,7 +258,7 @@ export class SalesinvoiceComponent {
         // show form after setting form values
         this.formConfig.model['sale_invoice_id'] = this.SaleInvoiceEditID;
         this.showForm = true;
-        this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[8].hide = false;
+        this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = false;
       }
     });
     this.hide();
@@ -339,23 +339,14 @@ export class SalesinvoiceComponent {
       })
     ).subscribe();
   }
-
+  ordersListModal: any;
   openModal() {
-    this.ordersModal.nativeElement.classList.add('show');
-    this.ordersModal.nativeElement.style.display = 'block';
-    document.body.classList.add('modal-open');
-    document.body.style.overflow = 'hidden';
+    this.ordersListModal = new bootstrap.Modal(document.getElementById("ordersListModal"));
+    this.ordersListModal.show();
   }
 
   hideModal() {
-    const modalBackdrop = document.querySelector('.modal-backdrop');
-    if (modalBackdrop) {
-      modalBackdrop.remove();
-    }
-    this.ordersModal.nativeElement.classList.remove('show');
-    this.ordersModal.nativeElement.style.display = 'none';
-    document.body.classList.remove('modal-open');
-    document.body.style.overflow = '';
+    this.ordersListModal.hide();
   }
 
   getPendingOrdersByCustomer(customerId: string): Observable<any> {
@@ -378,8 +369,8 @@ export class SalesinvoiceComponent {
     console.log("saleOrderId : ", saleOrderId)
     console.log("order : ", order);
     if (!saleOrderId) {
-        console.error('Invalid saleOrderId:', saleOrderId);
-        return;
+      console.error('Invalid saleOrderId:', saleOrderId);
+      return;
     }
     // Fetch sale invoice details using the saleInvoiceId
     this.http.get(`sales/sale_order/${saleOrderId}`).subscribe((res: any) => {
@@ -537,60 +528,60 @@ export class SalesinvoiceComponent {
   ngOnDestroy() {
     document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
   }
-//=====================================================
-quickpackOptions: any[] = []; // To store available Quickpack options
-selectedQuickpack: string = ''; // Selected Quickpack value
+  //=====================================================
+  quickpackOptions: any[] = []; // To store available Quickpack options
+  selectedQuickpack: string = ''; // Selected Quickpack value
 
-loadQuickpackOptions() {
-  console.log("We are in method...")
-  this.http.get('sales/quick_pack/') // Replace with your API endpoint
-    .subscribe((response: any) => {
-      this.quickpackOptions = response.data || []; // Adjust based on API response
-      console.log("quickpackOptions : ", this.quickpackOptions);
-    });
-}
-
-
-loadQuickpackProducts() {
-  console.log("quick pack id : ", this.selectedQuickpack)
-  if (!this.selectedQuickpack) {
-    console.log('Please select a Quickpack!');
-    return;
+  loadQuickpackOptions() {
+    console.log("We are in method...")
+    this.http.get('sales/quick_pack/') // Replace with your API endpoint
+      .subscribe((response: any) => {
+        this.quickpackOptions = response.data || []; // Adjust based on API response
+        console.log("quickpackOptions : ", this.quickpackOptions);
+      });
   }
 
-  this.http.get(`sales/quick_pack/${this.selectedQuickpack}`)
-    .subscribe((response: any) => {
-      console.log("response : ", response.data.quick_pack_data_items);
-      const quickPackDataItems = response.data.quick_pack_data_items || [];
 
-      if (quickPackDataItems.length === 0) {
-        console.log('No items found in the selected Quickpack!');
-        return;
-      }
-      // Populate `sale_order_items` with Quickpack data
-      this.formConfig.model.sale_invoice_items = quickPackDataItems.map((item: any) => ({
-        product: item.product,
-        quantity: item.quantity,
-        size: item.size,
-        color: item.color,
-        print_name: item.product.print_name,
-        rate: item.product.mrp,
-        discount: item.product.dis_amount,
-        unit_options_id: item.product.unit_options
+  loadQuickpackProducts() {
+    console.log("quick pack id : ", this.selectedQuickpack)
+    if (!this.selectedQuickpack) {
+      console.log('Please select a Quickpack!');
+      return;
+    }
 
-      }));
+    this.http.get(`sales/quick_pack/${this.selectedQuickpack}`)
+      .subscribe((response: any) => {
+        console.log("response : ", response.data.quick_pack_data_items);
+        const quickPackDataItems = response.data.quick_pack_data_items || [];
 
-      // Trigger form change detection (if needed)
-      if (this.saleinvoiceForm) {
-        console.log("we are inside : ", this.saleinvoiceForm.form);
-        this.saleinvoiceForm.form.controls.sale_invoice_items.patchValue(this.formConfig.model.sale_invoice_items);
-        console.log("After method ...")
-      }
+        if (quickPackDataItems.length === 0) {
+          console.log('No items found in the selected Quickpack!');
+          return;
+        }
+        // Populate `sale_order_items` with Quickpack data
+        this.formConfig.model.sale_invoice_items = quickPackDataItems.map((item: any) => ({
+          product: item.product,
+          quantity: item.quantity,
+          size: item.size,
+          color: item.color,
+          print_name: item.product.print_name,
+          rate: item.product.mrp,
+          discount: item.product.dis_amount,
+          unit_options_id: item.product.unit_options
 
-      console.log('Sale Order Items populated:', this.formConfig.model.sale_invoice_items);
-    });
-}
-//=====================================================
+        }));
+
+        // Trigger form change detection (if needed)
+        if (this.saleinvoiceForm) {
+          console.log("we are inside : ", this.saleinvoiceForm.form);
+          this.saleinvoiceForm.form.controls.sale_invoice_items.patchValue(this.formConfig.model.sale_invoice_items);
+          console.log("After method ...")
+        }
+
+        console.log('Sale Order Items populated:', this.formConfig.model.sale_invoice_items);
+      });
+  }
+  //=====================================================
   setFormConfig() {
     this.SaleInvoiceEditID = null;
 
@@ -628,7 +619,7 @@ loadQuickpackProducts() {
         }
       },
       model: {
-        sale_invoice_order: {        
+        sale_invoice_order: {
           // customer_id: null,
         },
         sale_invoice_items: [{}],
@@ -637,257 +628,294 @@ loadQuickpackProducts() {
       },
       fields: [
         {
-          fieldGroupClassName: "ant-row custom-form-block",
+          fieldGroupClassName: "ant-row custom-form-block row",
           key: 'sale_invoice_order',
           fieldGroup: [
             {
-              key: 'bill_type',
-              type: 'select',
-              // defaultValue: 'Exclusive',
-              className: 'col-2',
-              templateOptions: {
-                label: 'Bill type',
-                options: [
-                  { 'label': "Cash", value: 'CASH' },
-                  { 'label': "Credit", value: 'CREDIT' },
-                  { 'label': "Others", value: 'OTHERS' }
-                ],
-                required: true
-              },
-              hooks: {
-                onInit: (field: any) => {
-                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.bill_type && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.bill_type);
+              className: 'col-md-9 col-sm-8 col-12 p-0',
+              fieldGroupClassName: "ant-row mx-0 row align-items-end mt-2",
+              fieldGroup: [
+                {
+                  key: 'bill_type',
+                  type: 'select',
+                  // defaultValue: 'Exclusive',
+                  className: 'col-md-4 col-sm-6 col-12',
+                  templateOptions: {
+                    label: 'Bill type',
+                    options: [
+                      { 'label': "Cash", value: 'CASH' },
+                      { 'label': "Credit", value: 'CREDIT' },
+                      { 'label': "Others", value: 'OTHERS' }
+                    ],
+                    required: true
+                  },
+                  hooks: {
+                    onInit: (field: any) => {
+                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.bill_type && field.formControl) {
+                        field.formControl.setValue(this.dataToPopulate.sale_invoice_order.bill_type);
+                      } else {
+                        // If no data to populate, set 'CASH' as default
+                        field.formControl.setValue('CASH');
+                      }
+                    }
                   }
-                }
-              }
-            },                                                                                          
-            {
-              key: 'customer',
-              type: 'select',
-              className: 'col-2',
-              props: {
-                label: 'Customer',
-                dataKey: 'customer_id',
-                dataLabel: "name",
-                options: [],
-                lazy: {
-                  url: 'customers/customers/?summary=true',
-                  lazyOneTime: true
                 },
-                required: true
-              },
-              hooks: {
-                onInit: (field: any) => {
-                  field.formControl.valueChanges.subscribe(data => {
-                    if (data && data.customer_id) {
-                      // Set customer_id in the model
-                      this.formConfig.model['sale_invoice_order']['customer_id'] = data.customer_id;
+                {
+                  key: 'customer',
+                  type: 'select',
+                  className: 'col-md-4 col-sm-6 col-12',
+                  props: {
+                    label: 'Customer',
+                    dataKey: 'customer_id',
+                    dataLabel: "name",
+                    options: [],
+                    lazy: {
+                      url: 'customers/customers/?summary=true',
+                      lazyOneTime: true
+                    },
+                    required: true
+                  },
+                  hooks: {
+                    onInit: (field: any) => {
+                      field.formControl.valueChanges.subscribe(data => {
+                        //console.log("customer", data);
+                        if (data && data.customer_id) {
+                          this.formConfig.model['sale_invoice_order']['customer_id'] = data.customer_id;
+                        }
+                        if (data.customer_addresses && data.customer_addresses.billing_address) {
+                          field.form.controls.billing_address.setValue(data.customer_addresses.billing_address)
+                        }
+                        if (data.customer_addresses && data.customer_addresses.shipping_address) {
+                          field.form.controls.shipping_address.setValue(data.customer_addresses.shipping_address)
+                        }
+                        if (data.email) {
+                          field.form.controls.email.setValue(data.email)
+                        }
+                      });
+                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.customer && field.formControl) {
+                        field.formControl.setValue(this.dataToPopulate.sale_invoice_order.customer);
+                      }
                     }
-            
-                    // Update billing and shipping addresses
-                    if (data.customer_addresses && data.customer_addresses.billing_address) {
-                      field.form.controls.billing_address.setValue(data.customer_addresses.billing_address);
-                    }
-                    if (data.customer_addresses && data.customer_addresses.shipping_address) {
-                      field.form.controls.shipping_address.setValue(data.customer_addresses.shipping_address);
-                    }
-            
-                    // Update email field
-                    if (data.email) {
-                      field.form.controls.email.setValue(data.email);
-                    }
-                  });
-            
-                  // Populate customer from sale_invoice_order
-                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order?.customer) {
-                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.customer);
                   }
-                }
-              }
-            },                                 
-            {
-              key: 'email',
-              type: 'input',
-              className: 'col-2',
-              templateOptions: {
-                type: 'email',
-                label: 'Email',
-                placeholder: 'Enter Email',
-              },
-            },
-            {
-              key: 'orders_salesman',
-              type: 'select',
-              className: 'col-2',
-              templateOptions: {
-                label: 'Order Salesman',
-                dataKey: 'order_salesman_id',
-                dataLabel: "name",
-                options: [],
-                lazy: {
-                  url: 'masters/orders_salesman/',
-                  lazyOneTime: true
                 },
-                //required: true,
-              },
-              hooks: {
-                onChanges: (field: any) => {
-                  field.formControl.valueChanges.subscribe(data => {
-                    if (data && data.order_salesman_id) {
-                      this.formConfig.model['sale_invoice_order']['order_salesman_id'] = data.order_salesman_id;
+                {
+                  key: 'invoice_no',
+                  type: 'input',
+                  className: 'col-md-4 col-sm-6 col-12',
+                  templateOptions: {
+                    label: 'Invoice No',
+                    placeholder: 'Enter Invoice No',
+                    required: true,
+                    readonly: true,
+                    disabled: true
+
+                  },
+                  hooks: {
+                    onInit: (field: any) => { }
+                  }
+                },
+                {
+                  key: 'invoice_date',
+                  type: 'date',
+                  defaultValue: this.nowDate(),
+                  className: 'col-md-4 col-sm-6 col-12',
+                  templateOptions: {
+                    type: 'date',
+                    label: 'Invoice Date',
+                    readonly: true,
+                    required: true
+                  }
+                },
+                {
+                  key: 'ref_date',
+                  type: 'date',
+                  defaultValue: this.nowDate(),
+                  className: 'col-4',
+                  templateOptions: {
+                    type: 'date',
+                    label: 'Ref date',
+                    placeholder: 'Select Ref date',
+                    readonly: true,
+                    required: true,
+                  }
+                },
+                {
+                  key: 'due_date',
+                  type: 'date',
+                  defaultValue: this.nowDate(),
+                  className: 'col-4',
+                  templateOptions: {
+                    type: 'date',
+                    label: 'Due Date',
+                    readonly: true,
+                    required: true,
+                  }
+                },
+                {
+                  key: 'ref_no',
+                  type: 'input',
+                  className: 'col-4',
+                  templateOptions: {
+                    type: 'input',
+                    label: 'Ref No',
+                    placeholder: 'Enter Ref No',
+                    required: true,
+                  },
+                  hooks: {
+                    onInit: (field: any) => {
+                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.ref_no && field.formControl) {
+                        field.formControl.setValue(this.dataToPopulate.sale_invoice_order.ref_no);
+                      }
                     }
-                  });
-                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order?.orders_salesman) {
-                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.orders_salesman);
                   }
-                }
-              }
+                },
+                {
+                  key: 'tax',
+                  type: 'select',
+                  className: 'col-4',
+                  templateOptions: {
+                    label: 'Tax',
+                    required: true,
+                    options: [
+                      { 'label': "Inclusive", value: 'Inclusive' },
+                      { 'label': "Exclusive", value: 'Exclusive' }
+                    ]
+                  },
+                  hooks: {
+                    onInit: (field: any) => {
+                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.tax && field.formControl) {
+                        field.formControl.setValue(this.dataToPopulate.sale_invoice_order.tax);
+                      }
+                    }
+                  }
+                },
+                {
+                  key: 'remarks',
+                  type: 'textarea',
+                  className: 'col-4',
+                  templateOptions: {
+                    label: 'Remarks',
+                    // required: true,
+                    placeholder: 'Enter Remarks',
+                  },
+                  hooks: {
+                    onInit: (field: any) => {
+                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.remarks && field.formControl) {
+                        field.formControl.setValue(this.dataToPopulate.sale_invoice_order.remarks);
+                      }
+                    }
+                  }
+                },
+              ]
             },
             {
-              key: 'invoice_no',
-              type: 'input',
-              className: 'col-2',
-              templateOptions: {
-                label: 'Invoice No',
-                placeholder: 'Enter Invoice No',
-                required: true,
-                readonly: true,
-                disabled: true
+              className: 'col-md-3 col-sm-4 col-12 p-0 inline-form-fields',
+              fieldGroupClassName: "ant-row row mx-0 mt-2",
+              fieldGroup: [
+                {
+                  key: 'item_value',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Items Total',
+                    disabled: true,
+                  },
+                  defaultValue: '0.00'
+                },
+                // {
+                //   key: 'texable_amt',
+                //   type: 'text',
+                //   className: 'col-12',
+                //   templateOptions: {
+                //     label: 'Texable Amt',
+                //     required: false,                    
+                //   },
+                //   defaultValue: '0.00'
+                // },
+                {
+                  key: 'cess_amount',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Cess Amount',
+                    required: false
+                  },
+                  defaultValue: '0.00',
+                },
+                {
+                  key: 'tax_amount',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Tax Amount',
+                    required: false
+                  },
+                  defaultValue: '0.00',
+                },
+                // {
+                //   key: 'item_value',
+                //   type: 'text',
+                //   className: 'col-12',
+                //   templateOptions: {
+                //     label: 'Total Value',
+                //      required: false
+                //   },
+                //      defaultValue: '0.00'
+                // },
+                {
+                  key: 'dis_amt',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Discount Amount',
+                    required: false
+                  },
+                  defaultValue: '0.00'
 
-              },
-              hooks: {
-                onInit: (field: any) => { }
-              }
-            },
-            {
-              key: 'invoice_date',
-              type: 'date',
-              defaultValue: this.nowDate(),
-              className: 'col-2',
-              templateOptions: {
-                type: 'date',
-                label: 'Invoice Date',
-                readonly: true,
-                required: true
-              }
-            },
-            {
-              key: 'ref_no',
-              type: 'input',
-              className: 'col-2',
-              templateOptions: {
-                type: 'input',
-                label: 'Ref No',
-                placeholder: 'Enter Ref No',
-                required: true,
-              },
-              hooks: {
-                onInit: (field: any) => {
-                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.ref_no && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.ref_no);
-                  }
-                }
-              }
-            },
-            {
-              key: 'ref_date',
-              type: 'date',
-              defaultValue: this.nowDate(),
-              className: 'col-2',
-              templateOptions: {
-                type: 'date',
-                label: 'Ref Date',
-                placeholder: 'Select Ref date',
-                required: true,
-                // readonly: true
-              }
-            },
-            {
-              key: 'due_date',
-              type: 'date',
-              defaultValue: this.nowDate(),
-              className: 'col-2',
-              templateOptions: {
-                type: 'date',
-                label: 'Due Date',
-                readonly: true
-              }
-            },
-            {
-              key: 'tax',
-              type: 'select',
-              className: 'col-2',
-              templateOptions: {
-                label: 'Tax',
-                options: [
-                  { 'label': "Inclusive", value: 'Inclusive' },
-                  { 'label': "Exclusive", value: 'Exclusive' }
-                ]
-              },
-              hooks: {
-                onInit: (field: any) => {
-                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.tax && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.tax);
-                  }
-                }
-              }
-              // hooks: {
-              //   onInit: (field: any) => { }
-              // }
-            },
-            {
-              key: 'remarks',
-              type: 'textarea',
-              className: 'col-4',
-              templateOptions: {
-                label: 'Remarks',
-                placeholder: 'Enter Remarks',
-              },
-              hooks: {
-                onInit: (field: any) => {
-                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.remarks && field.formControl) {
-                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.remarks);
-                  }
-                }
-              }
-            },
-            {
-              key: 'billing_address',
-              type: 'textarea',
-              className: 'col-6',
-              templateOptions: {
-                label: 'Billing Address',
-                placeholder: 'Enter Billing Address',
-
-              },
-            },
-            {
-              key: 'shipping_address',
-              type: 'textarea',
-              className: 'col-6',
-              templateOptions: {
-                label: 'Shipping Address',
-                placeholder: 'Enter Shipping Address',
-              },
+                },
+                {
+                  key: 'advance_amount',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Advance Amount',
+                    required: false
+                  },
+                  defaultValue: '0.00'
+                },
+                {
+                  key: 'total_amount',
+                  type: 'text',
+                  className: 'col-12 product-total',
+                  templateOptions: {
+                    label: ' ',
+                    required: false,
+                    placeholder: 'Total Amount',
+                    disabled: true,
+                  },
+                  defaultValue: '0.00'
+                },
+              ]
             },
           ]
         },
         {
           key: 'sale_invoice_items',
           type: 'repeat',
-          className: 'custom-form-list',
+          className: 'custom-form-list product-table',
           templateOptions: {
             // title: 'Products',
             addText: 'Add Product',
             tableCols: [
               {
-                name: 'product',
-                label: 'Product'
+                name: 'selectItem',
+                label: '',
+                type: 'checkbox',
+                width: '50px'
               },
               {
-                name: 'code',
-                label: 'Code'
+                name: 'product',
+                label: 'Product'
               },
               {
                 name: 'size',
@@ -896,6 +924,10 @@ loadQuickpackProducts() {
               {
                 name: 'color',
                 label: 'color'
+              },
+              {
+                name: 'code',
+                label: 'Code'
               },
               {
                 name: 'unit',
@@ -920,19 +952,33 @@ loadQuickpackProducts() {
               {
                 name: 'discount',
                 label: 'Discount'
-              }
+              },
+              // { name: 'select_item', label: 'Select' }
             ]
           },
           fieldArray: {
-            fieldGroup: [ 
+            fieldGroup: [
+              {
+                key: 'selectItem',
+                type: 'checkbox',
+                defaultValue: false,
+                templateOptions: {
+                  hideLabel: true,
+                },
+                expressionProperties: {
+                  'templateOptions.hidden': () => !(this.SaleInvoiceEditID),
+                  'templateOptions.disabled': (model) => model.invoiced === 'YES' || !this.SaleInvoiceEditID
+                }
+              },
               {
                 key: 'product',
                 type: 'select',
                 templateOptions: {
-                  label: 'Select Product',
+                  label: 'Product',
                   dataKey: 'product_id',
                   hideLabel: true,
                   dataLabel: 'name',
+                  placeholder: 'product',
                   options: [],
                   required: true,
                   lazy: {
@@ -950,18 +996,19 @@ loadQuickpackProducts() {
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
                         const existingProduct = this.dataToPopulate.sale_invoice_items[currentRowIndex].product;
-                        
+
                         // Set the full product object instead of just the product_id
                         if (existingProduct) {
                           field.formControl.setValue(existingProduct); // Set full product object (not just product_id)
                         }
                       }
-                      
+
                       // Subscribe to value changes of the field
                       // ***Size dropdown will populate with available sizes when product in selected***
                       field.formControl.valueChanges.subscribe(selectedProductId => {
                         const product = this.formConfig.model.sale_invoice_items[currentRowIndex]?.product;
                         console.log("Product id : ", product)
+                        debugger
                         // Ensure the product exists before making an HTTP request
                         if (product?.product_id) {
                           this.http.get(`products/product_variations/?product_id=${product.product_id}`).subscribe((response: any) => {
@@ -1120,15 +1167,16 @@ loadQuickpackProducts() {
                     });
                   }
                 }
-              }, 
+              },
               {
                 key: 'size',
                 type: 'select',
                 templateOptions: {
-                  label: 'Select Size',
+                  label: 'Size',
                   dataKey: 'size_id',
                   hideLabel: true,
                   dataLabel: 'size_name',
+                  placeholder: 'size',
                   options: [],
                   required: false,
                   lazy: {
@@ -1144,7 +1192,7 @@ loadQuickpackProducts() {
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
                         const existingSize = this.dataToPopulate.sale_invoice_items[currentRowIndex].size;
-                        
+
                         // Set the full product object instead of just the product_id
                         if (existingSize && existingSize.size_id) {
                           field.formControl.setValue(existingSize); // Set full product object (not just product_id)
@@ -1196,34 +1244,34 @@ loadQuickpackProducts() {
                           }
                           // Call the API using HttpClient (this.http.get)
                           this.http.get(url).subscribe((data: any) => {
-                              function sumQuantities(dataObject: any): number {
-                                // First, check if the data object contains the array in the 'data' field
-                                if (dataObject && Array.isArray(dataObject.data)) {
-                                  // Now we can safely use reduce on dataObject.data
-                                  return dataObject.data.reduce((sum, item) => sum + (item.quantity || 0), 0);
-                                } else {
-                                  console.error("Data is not an array:", dataObject);
-                                  return 0;
-                                }
+                            function sumQuantities(dataObject: any): number {
+                              // First, check if the data object contains the array in the 'data' field
+                              if (dataObject && Array.isArray(dataObject.data)) {
+                                // Now we can safely use reduce on dataObject.data
+                                return dataObject.data.reduce((sum, item) => sum + (item.quantity || 0), 0);
+                              } else {
+                                console.error("Data is not an array:", dataObject);
+                                return 0;
                               }
-                              const totalBalance = sumQuantities(data);
-                              const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
-                              if (cardWrapper && data.data[0]) {
-                                // Remove existing product info if present
-                                cardWrapper.querySelector('.center-message')?.remove();
-                                // Display fetched product variation info
-                                const productInfoDiv = document.createElement('div');
-                                productInfoDiv.classList.add('center-message');
-                                productInfoDiv.innerHTML = `
+                            }
+                            const totalBalance = sumQuantities(data);
+                            const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
+                            if (cardWrapper && data.data[0]) {
+                              // Remove existing product info if present
+                              cardWrapper.querySelector('.center-message')?.remove();
+                              // Display fetched product variation info
+                              const productInfoDiv = document.createElement('div');
+                              productInfoDiv.classList.add('center-message');
+                              productInfoDiv.innerHTML = `
                                         <span style="color: red;">Product Info:</span>
-                                        <span style="color: blue;">${data.data[0]?.product.name|| 'NA'}</span> |
+                                        <span style="color: blue;">${data.data[0]?.product.name || 'NA'}</span> |
                                         <span style="color: red;">Balance:</span>
                                         <span style="color: blue;">${totalBalance}</span> |
                                         ${this.unitOptionOfProduct} `;
-                                cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
-                                console.log("Size :  Product Info Updated**")
-                              }
-                            },
+                              cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
+                              console.log("Size :  Product Info Updated**")
+                            }
+                          },
                             (error) => {
                               console.error("Error fetching data:", error);
                             });
@@ -1247,15 +1295,16 @@ loadQuickpackProducts() {
                     });
                   }
                 }
-              }, 
+              },
               {
                 key: 'color',
                 type: 'select',
                 templateOptions: {
-                  label: 'Select Color',
+                  label: 'Color',
                   dataKey: 'color_id',
                   hideLabel: true,
                   dataLabel: 'color_name',
+                  placeholder: 'color',
                   options: [],
                   required: false,
                   lazy: {
@@ -1271,13 +1320,13 @@ loadQuickpackProducts() {
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
                         const existingColor = this.dataToPopulate.sale_invoice_items[currentRowIndex].color;
-                        
+
                         // Set the full product object instead of just the product_id
                         if (existingColor) {
                           field.formControl.setValue(existingColor);
                         }
                       }
-                      
+
                       // Subscribe to value changes when the form field changes
                       field.formControl.valueChanges.subscribe(selectedColorId => {
                         const product = this.formConfig.model.sale_invoice_items[currentRowIndex]?.product;
@@ -1327,7 +1376,7 @@ loadQuickpackProducts() {
                               console.error("Error fetching data:", error);
                             });
                         } else {
-                          console.log(`No valid Color selected for :${product.name } at Row ${currentRowIndex}.`);
+                          console.log(`No valid Color selected for :${product.name} at Row ${currentRowIndex}.`);
                           console.log({
                             product: product?.name,
                             size: size?.size_name,
@@ -1352,27 +1401,27 @@ loadQuickpackProducts() {
                     });
                   }
                 }
-              }, 
+              },
               {
                 type: 'input',
                 key: 'code',
                 templateOptions: {
                   label: 'Code',
-                  placeholder: 'Enter code',
+                  placeholder: 'code',
                   hideLabel: true,
                 },
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-              
+
                     // Check if parentArray exists and proceed
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key; // Simplified number conversion
-              
+
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
                         const existingCode = this.dataToPopulate.sale_invoice_items[currentRowIndex].product?.code;
-                        
+
                         // Set the full product object instead of just the product_id
                         if (existingCode) {
                           field.formControl.setValue(existingCode); // Set full product object (not just product_id)
@@ -1384,79 +1433,12 @@ loadQuickpackProducts() {
               },
               {
                 type: 'input',
-                key: 'total_boxes',
-                templateOptions: {
-                  type: 'number',
-                  label: 'Total Boxes',
-                  placeholder: 'Enter Total Boxes',
-                  hideLabel: true
-                },
-                hooks: {
-                  onInit: (field: any) => {
-                    const parentArray = field.parent;
-              
-                    // Check if parentArray exists and proceed
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
-              
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
-                        const existingBox = this.dataToPopulate.sale_invoice_items[currentRowIndex].total_boxes;
-                        
-                        // Set the full product object instead of just the product_id
-                        if (existingBox) {
-                          field.formControl.setValue(existingBox); // Set full product object (not just product_id)
-                        }
-                      }
-                    }
-                  }
-                }                
-              },
-              {
-                type: 'select',
-                key: 'unit_options_id',
-                templateOptions: {
-                  label: 'Unit',
-                  placeholder: 'Select Unit',
-                  hideLabel: true,
-                  dataLabel: 'unit_name',
-                  dataKey: 'unit_options_id',
-                  bindId: true,
-                  required: true,
-                  lazy: {
-                    url: 'masters/unit_options',
-                    lazyOneTime: true
-                  }
-                },
-                hooks: {
-                  onInit: (field: any) => {
-                    const parentArray = field.parent;
-              
-                    // Check if parentArray exists and proceed
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
-              
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
-                        const existingUnit = this.dataToPopulate.sale_invoice_items[currentRowIndex].product.unit_options;
-                        
-                        // Set the full product object instead of just the product_id
-                        if (existingUnit) {
-                          field.formControl.setValue(existingUnit.unit_options_id); // Set full product object (not just product_id)
-                        }
-                      }
-                    }
-                  }
-                }
-              },
-              {
-                type: 'input',
                 key: 'quantity',
-                //defaultValue: 1,
+                // defaultValue: 1,
                 templateOptions: {
                   type: 'number',
                   label: 'Qty',
-                  placeholder: 'Enter Qty',
+                  placeholder: 'Qty',
                   min: 1,
                   hideLabel: true,
                   required: true
@@ -1464,29 +1446,29 @@ loadQuickpackProducts() {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-              
+
                     // Check if parentArray exists and proceed
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key; // Simplified number conversion
-              
+
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
                         const existingQuan = this.dataToPopulate.sale_invoice_items[currentRowIndex].quantity;
-                        
+
                         // Set the full product object instead of just the product_id
                         if (existingQuan) {
                           field.formControl.setValue(existingQuan); // Set full product object (not just product_id)
                         }
                       }
                     }
-              
+
                     // Subscribe to value changes
                     field.formControl.valueChanges.subscribe(data => {
                       if (field.form && field.form.controls && field.form.controls.rate && data) {
                         const rate = field.form.controls.rate.value;
                         const quantity = data;
                         if (rate && quantity) {
-                          field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity, 10));
+                          field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity));
                         }
                       }
                     });
@@ -1508,22 +1490,22 @@ loadQuickpackProducts() {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-              
+
                     // Check if parentArray exists and proceed
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key; // Simplified number conversion
-              
+
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
                         const existingPrice = this.dataToPopulate.sale_invoice_items[currentRowIndex].rate;
-                        
+
                         // Set the full product object instead of just the product_id
                         if (existingPrice) {
                           field.formControl.setValue(existingPrice); // Set full product object (not just product_id)
                         }
                       }
                     }
-                    
+
                     // Subscribe to value changes to update amount
                     field.formControl.valueChanges.subscribe(data => {
                       if (field.form && field.form.controls && field.form.controls.quantity && data) {
@@ -1549,15 +1531,15 @@ loadQuickpackProducts() {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-              
+
                     // Check if parentArray exists and proceed
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key; // Simplified number conversion
-              
+
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
                         const existingDisc = this.dataToPopulate.sale_invoice_items[currentRowIndex].discount;
-                        
+
                         // Set the full product object instead of just the product_id
                         if (existingDisc) {
                           field.formControl.setValue(existingDisc); // Set full product object (not just product_id)
@@ -1565,6 +1547,7 @@ loadQuickpackProducts() {
                       }
                     }
                     field.formControl.valueChanges.subscribe(data => {
+                      this.totalAmountCal();
                       // Add any logic needed for when discount changes
                     });
                   }
@@ -1572,30 +1555,35 @@ loadQuickpackProducts() {
               },
               {
                 type: 'input',
-                key: 'print_name',
+                key: 'amount',
                 templateOptions: {
-                  label: 'Print name',
-                  placeholder: 'Enter Product Print name',
-                  hideLabel: true
+                  type: 'number',
+                  label: 'Amount',
+                  placeholder: 'Amount',
+                  hideLabel: true,
+                  disabled: true
                 },
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-              
+
                     // Check if parentArray exists and proceed
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key; // Simplified number conversion
-              
+
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
-                        const existingName = this.dataToPopulate.sale_invoice_items[currentRowIndex].print_name;
-                        
+                        const existingAmount = this.dataToPopulate.sale_invoice_items[currentRowIndex].amount;
+
                         // Set the full product object instead of just the product_id
-                        if (existingName) {
-                          field.formControl.setValue(existingName); // Set full product object (not just product_id)
+                        if (existingAmount) {
+                          field.formControl.setValue(existingAmount); // Set full product object (not just product_id)
                         }
                       }
                     }
+                    field.formControl.valueChanges.subscribe(data => {
+                      this.totalAmountCal();
+                    });
                   }
                 }
               },
@@ -1611,35 +1599,97 @@ loadQuickpackProducts() {
               },
               {
                 type: 'input',
-                key: 'amount',
+                key: 'print_name',
                 templateOptions: {
-                  type: 'number',
-                  label: 'Amount',
-                  placeholder: 'Enter Amount',
-                  hideLabel: true,
-                  disabled: true
+                  label: 'Print name',
+                  placeholder: 'name',
+                  hideLabel: true
                 },
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-              
+
                     // Check if parentArray exists and proceed
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key; // Simplified number conversion
-              
+
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
-                        const existingAmount = this.dataToPopulate.sale_invoice_items[currentRowIndex].amount;
-                        
+                        const existingName = this.dataToPopulate.sale_invoice_items[currentRowIndex].print_name;
+
                         // Set the full product object instead of just the product_id
-                        if (existingAmount) {
-                          field.formControl.setValue(existingAmount); // Set full product object (not just product_id)
+                        if (existingName) {
+                          field.formControl.setValue(existingName); // Set full product object (not just product_id)
                         }
                       }
                     }
-                    field.formControl.valueChanges.subscribe(data => {
-                      this.totalAmountCal();
-                    });
+                  }
+                }
+              },
+              {
+                type: 'input',
+                key: 'total_boxes',
+                templateOptions: {
+                  type: 'number',
+                  label: 'Total Boxes',
+                  placeholder: 'Boxes',
+                  hideLabel: true
+                },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
+                        const existingBox = this.dataToPopulate.sale_invoice_items[currentRowIndex].total_boxes;
+
+                        // Set the full product object instead of just the product_id
+                        if (existingBox) {
+                          field.formControl.setValue(existingBox); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                type: 'select',
+                key: 'unit_options_id',
+                templateOptions: {
+                  label: 'Unit',
+                  placeholder: 'Unit',
+                  hideLabel: true,
+                  dataLabel: 'unit_name',
+                  dataKey: 'unit_options_id',
+                  bindId: true,
+                  required: true,
+                  lazy: {
+                    url: 'masters/unit_options',
+                    lazyOneTime: true
+                  }
+                },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
+                        const existingUnit = this.dataToPopulate.sale_invoice_items[currentRowIndex].product.unit_options;
+
+                        // Set the full product object instead of just the product_id
+                        if (existingUnit) {
+                          field.formControl.setValue(existingUnit.unit_options_id); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
                   }
                 }
               },
@@ -1655,15 +1705,15 @@ loadQuickpackProducts() {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-              
+
                     // Check if parentArray exists and proceed
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key; // Simplified number conversion
-              
+
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
                         const existingtax = this.dataToPopulate.sale_invoice_items[currentRowIndex].tax;
-                        
+
                         // Set the full product object instead of just the product_id
                         if (existingtax) {
                           field.formControl.setValue(existingtax); // Set full product object (not just product_id)
@@ -1684,15 +1734,15 @@ loadQuickpackProducts() {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-              
+
                     // Check if parentArray exists and proceed
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key; // Simplified number conversion
-              
+
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
                         const existingRemarks = this.dataToPopulate.sale_invoice_items[currentRowIndex].remarks;
-                        
+
                         // Set the full product object instead of just the product_id
                         if (existingRemarks) {
                           field.formControl.setValue(existingRemarks); // Set full product object (not just product_id)
@@ -1702,199 +1752,33 @@ loadQuickpackProducts() {
                   }
                 }
               },
+              {
+                type: 'select',
+                key: 'invoiced',
+                defaultValue: 'NO', // Default value set to 'NO'
+                templateOptions: {
+                  label: 'Invoiced',
+                  options: [
+                    { value: 'YES', label: 'Yes' },
+                    { value: 'NO', label: 'No' }
+                  ],
+                  hideLabel: true,
+                  disabled: true // Make the field read-only in the form
+                },
+              }
             ]
           },
         },
-
         {
           fieldGroupClassName: "row col-12 m-0 custom-form-card",
+          className: 'tab-form-list px-3',
+          type: 'tabs',
           fieldGroup: [
             {
-              className: 'col-6 custom-form-card-block',
-              fieldGroup: [
-                {
-                  template: '<div class="custom-form-card-title"> Shipping Details </div>',
-                  fieldGroupClassName: "ant-row",
-                },
-                {
-                  fieldGroupClassName: "ant-row",
-                  key: 'order_shipments',
-                  fieldGroup: [
-                    {
-                      key: 'destination',
-                      type: 'input',
-                      className: 'col-6',
-                      templateOptions: {
-                        label: 'Destination',
-                        placeholder: 'Enter Destination',
-                      },
-                      hooks: {
-                        onInit: (field: any) => {
-                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.destination && field.formControl) {
-                            field.formControl.setValue(this.dataToPopulate.order_shipments.destination);
-                          }
-                        }
-                      }
-                    },
-                    {
-                      key: 'port_of_landing',
-                      type: 'input',
-                      className: 'col-6',
-                      templateOptions: {
-                        label: 'Port of Landing',
-                        placeholder: 'Enter Port of Landing',
-                      },
-                      hooks: {
-                        onInit: (field: any) => {
-                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.port_of_landing && field.formControl) {
-                            field.formControl.setValue(this.dataToPopulate.order_shipments.port_of_landing);
-                          }
-                        }
-                      }
-                    },
-                    {
-                      key: 'shipping_mode_id',
-                      type: 'select',
-                      className: 'col-6',
-                      templateOptions: {
-                        label: 'Shipping Mode',
-                        placeholder: 'Select Shipping Mode',
-                        dataKey: 'shipping_mode_id',
-                        dataLabel: "name",
-                        bindId: true,
-                        lazy: {
-                          url: 'masters/shipping_modes',
-                          lazyOneTime: true
-                        }
-                      },
-                      hooks: {
-                        onInit: (field: any) => {
-                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.shipping_mode_id && field.formControl) {
-                            field.formControl.setValue(this.dataToPopulate.order_shipments.shipping_mode_id);
-                          }
-                        }
-                      }
-                    },
-                    {
-                      key: 'port_of_discharge',
-                      type: 'input',
-                      className: 'col-6',
-                      templateOptions: {
-                        label: 'Port of Discharge',
-                        placeholder: 'Select Port of Discharge',
-                      },
-                      hooks: {
-                        onInit: (field: any) => {
-                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.port_of_discharge && field.formControl) {
-                            field.formControl.setValue(this.dataToPopulate.order_shipments.port_of_discharge);
-                          }
-                        }
-                      }
-                    },
-                    {
-                      key: 'shipping_company_id',
-                      type: 'select',
-                      className: 'col-6',
-                      templateOptions: {
-                        label: 'Shipping Company',
-                        placeholder: 'Select Shipping Company',
-                        dataKey: 'shipping_company_id',
-                        dataLabel: "name",
-                        bindId: true,
-                        lazy: {
-                          url: 'masters/shipping_companies',
-                          lazyOneTime: true
-                        }
-                      },
-                      hooks: {
-                        onInit: (field: any) => {
-                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.shipping_company_id && field.formControl) {
-                            field.formControl.setValue(this.dataToPopulate.order_shipments.shipping_company_id);
-                          }
-                        }
-                      }
-                    },
-                    {
-                      key: 'no_of_packets',
-                      type: 'input',
-                      className: 'col-6',
-                      templateOptions: {
-                        type: "number",
-                        label: 'No. of Packets',
-                        placeholder: 'Select No. of Packets',
-                      },
-                      hooks: {
-                        onInit: (field: any) => {
-                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.no_of_packets && field.formControl) {
-                            field.formControl.setValue(this.dataToPopulate.order_shipments.no_of_packets);
-                          }
-                        }
-                      }
-                    },
-                    {
-                      key: 'weight',
-                      type: 'input',
-                      className: 'col-6',
-                      templateOptions: {
-                        type: "number",
-                        label: 'Weight',
-                        placeholder: 'Enter Weight',
-                      },
-                      hooks: {
-                        onInit: (field: any) => {
-                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.weight && field.formControl) {
-                            field.formControl.setValue(this.dataToPopulate.order_shipments.weight);
-                          }
-                        }
-                      }
-                    },
-                    {
-                      key: 'shipping_tracking_no',
-                      type: 'input',
-                      className: 'col-6',
-                      templateOptions: {
-                        label: 'Shipping Tracking No.',
-                        placeholder: 'Enter Shipping Tracking No.',
-                        readonly: true
-                      }
-                    },
-                    {
-                      key: 'shipping_date',
-                      type: 'date',
-                      // defaultValue: this.nowDate(),
-                      className: 'col-6',
-                      templateOptions: {
-                        type: 'date',
-                        label: 'Shipping Date',
-                        // required: true
-                      }
-                    },
-                    {
-                      key: 'shipping_charges',
-                      type: 'input',
-                      className: 'col-6',
-                      templateOptions: {
-                        type: "number",
-                        label: 'Shipping Charges',
-                        placeholder: 'Enter Shipping Charges',
-                        // required: true
-                      },
-                      hooks: {
-                        onInit: (field: any) => {
-                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.shipping_charges && field.formControl) {
-                            field.formControl.setValue(this.dataToPopulate.order_shipments.shipping_charges);
-                          }
-                        }
-                        // required: true
-                      }
-                    }
-                  ]
-                },
-              ]
-            },
-            {
-              className: 'col-6 pb-0',
-              fieldGroupClassName: "field-no-bottom-space",
+              className: 'col-12 px-0 pt-3',
+              props: {
+                label: 'Billing Details'
+              },
               fieldGroup: [
                 {
                   fieldGroupClassName: "",
@@ -1902,28 +1786,32 @@ loadQuickpackProducts() {
                     {
                       className: 'col-12 mb-3 custom-form-card-block w-100',
                       fieldGroup: [
-                        {
-                          template: '<div class="custom-form-card-title"> Billing Details </div>',
-                          fieldGroupClassName: "ant-row",
-                        },
+                        // {
+                        //   template: '<div class="custom-form-card-title">  </div>',
+                        //   fieldGroupClassName: "ant-row",
+                        // },
                         {
                           fieldGroupClassName: "ant-row",
                           key: 'sale_invoice_order',
                           fieldGroup: [
                             {
-                              key: 'total_boxes',
+                              key: 'tax_amount',
                               type: 'input',
-                              className: 'col-4',
+                              defaultValue: "0",
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 type: 'number',
-                                label: 'Total boxes',
-                                placeholder: 'Enter Total boxes',
+                                label: 'Tax amount',
+                                placeholder: 'Enter Tax amount'
                               },
                               hooks: {
                                 onInit: (field: any) => {
-                                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order && this.dataToPopulate.sale_invoice_order.total_boxes && field.formControl) {
-                                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.total_boxes);
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order && this.dataToPopulate.sale_invoice_order.tax_amount && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.tax_amount);
                                   }
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    this.totalAmountCal();
+                                  })
                                 }
                               }
                             },
@@ -1931,7 +1819,7 @@ loadQuickpackProducts() {
                               key: 'cess_amount',
                               type: 'input',
                               defaultValue: "0",
-                              className: 'col-4',
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 type: 'number',
                                 label: 'Cess amount',
@@ -1944,14 +1832,15 @@ loadQuickpackProducts() {
                                   }
                                   field.formControl.valueChanges.subscribe(data => {
                                     this.totalAmountCal();
-                                  });
+
+                                  })
                                 }
                               }
                             },
                             {
                               key: 'advance_amount',
                               type: 'input',
-                              className: 'col-4',
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 type: 'number',
                                 label: 'Advance amount',
@@ -1964,14 +1853,14 @@ loadQuickpackProducts() {
                                   }
                                   field.formControl.valueChanges.subscribe(data => {
                                     this.totalAmountCal();
-                                  });
+                                  })
                                 }
                               }
                             },
                             {
                               key: 'taxable',
                               type: 'input',
-                              className: 'col-4',
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 type: 'input',
                                 label: 'Taxable',
@@ -1986,30 +1875,9 @@ loadQuickpackProducts() {
                               }
                             },
                             {
-                              key: 'tax_amount',
-                              type: 'input',
-                              defaultValue: "0",
-                              className: 'col-4',
-                              templateOptions: {
-                                type: 'number',
-                                label: 'Tax amount',
-                                placeholder: 'Enter Tax amount'
-                              },
-                              hooks: {
-                                onInit: (field: any) => {
-                                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order && this.dataToPopulate.sale_invoice_order.tax_amount && field.formControl) {
-                                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.tax_amount);
-                                  }
-                                  field.formControl.valueChanges.subscribe(data => {
-                                    this.totalAmountCal();
-                                  });
-                                }
-                              }
-                            },                            
-                            {
                               key: 'gst_type',
                               type: 'select',
-                              className: 'col-4',
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 label: 'Gst type',
                                 placeholder: 'Select Gst type',
@@ -2035,11 +1903,11 @@ loadQuickpackProducts() {
                                   }
                                 }
                               }
-                            },                                                                                    
+                            },
                             {
                               key: 'payment_term',
                               type: 'select',
-                              className: 'col-4',
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 label: 'Payment term',
                                 placeholder: 'Select Payment term',
@@ -2064,11 +1932,11 @@ loadQuickpackProducts() {
                                   }
                                 }
                               }
-                            },                            
+                            },
                             {
                               key: 'ledger_account',
                               type: 'select',
-                              className: 'col-4',
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 label: 'Ledger account',
                                 placeholder: 'Select Ledger account',
@@ -2080,7 +1948,7 @@ loadQuickpackProducts() {
                                 }
                               },
                               hooks: {
-                                onInit: (field: any) => {                           
+                                onInit: (field: any) => {
                                   // Subscribe to value changes
                                   field.formControl.valueChanges.subscribe(data => {
                                     if (data && data.ledger_account_id) {
@@ -2094,28 +1962,28 @@ loadQuickpackProducts() {
                                   }
                                 }
                               }
-                            },                            
+                            },
                             {
                               key: 'order_status',
                               type: 'select',
-                              className: 'col-4',
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 label: 'Order status',
-                                placeholder: 'Select Order Status Type',
                                 dataKey: 'order_status_id',
                                 dataLabel: 'status_name',
+                                placeholder: 'Select Order status type',
                                 lazy: {
                                   url: 'masters/order_status/',
                                   lazyOneTime: true
                                 },
                                 expressions: {
-                                  hide: '!model.sale_invoice_id',
+                                  hide: '!model.sale_invoice_order_id',
                                 },
                               },
                               hooks: {
                                 onChanges: (field: any) => {
                                   field.formControl.valueChanges.subscribe(data => {
-                                    console.log("order_status", data);
+                                    //console.log("ledger_account", data);
                                     if (data && data.order_status_id) {
                                       this.formConfig.model['sale_invoice_order']['order_status_id'] = data.order_status_id;
                                     }
@@ -2123,37 +1991,37 @@ loadQuickpackProducts() {
                                 }
                               }
                             },
-                            {
-                              key: 'item_value',
-                              type: 'input',
-                              defaultValue: "0",
-                              className: 'col-4',
-                              templateOptions: {
-                                type: 'input',
-                                label: 'Items value',
-                                placeholder: 'Enter Item value',
-                                readonly: true
-                                // required: true
-                              },
-                              hooks: {
-                                onInit: (field: any) => {
-                                  // Set the initial value from dataToPopulate if available
-                                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order && this.dataToPopulate.sale_invoice_order.item_value && field.formControl) {
-                                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.item_value);
-                                  }
-                                }
-                              }
-                            },
+                            // {
+                            //   key: 'item_value',
+                            //   type: 'input',
+                            //   defaultValue: "0",
+                            //   className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                            //   templateOptions: {
+                            //     type: 'input',
+                            //     label: 'Items value',
+                            //     placeholder: 'Enter Item value',
+                            //     readonly: true
+                            //     // required: true
+                            //   },
+                            //   hooks: {
+                            //     onInit: (field: any) => {
+                            //       // Set the initial value from dataToPopulate if available
+                            //       if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order && this.dataToPopulate.sale_invoice_order.item_value && field.formControl) {
+                            //         field.formControl.setValue(this.dataToPopulate.sale_invoice_order.item_value);
+                            //       }
+                            //     }
+                            //   }
+                            // },
                             {
                               key: 'dis_amt',
                               type: 'input',
                               // defaultValue: "777770",
-                              className: 'col-4',
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 type: 'input',
-                                label: 'Discount amount',
+                                label: 'Overall Discount',
                                 placeholder: 'Enter Discount amount',
-                                readonly: true
+                                readonly: false
                                 // required: true
                               },
                               hooks: {
@@ -2169,7 +2037,7 @@ loadQuickpackProducts() {
                               key: 'total_amount',
                               type: 'input',
                               defaultValue: "0",
-                              className: 'col-4',
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 type: 'input',
                                 label: 'Total amount',
@@ -2184,22 +2052,220 @@ loadQuickpackProducts() {
                                   }
                                 }
                               }
-                            }                            
+                            }
                           ]
                         },
                       ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              className: 'col-12 custom-form-card-block px-0 pt-3',
+              props: {
+                label: 'Shipping Details'
+              },
+              fieldGroup: [
+                // {
+                //   template: '<div class="custom-form-card-title">   </div>',
+                //   fieldGroupClassName: "ant-row",
+                // },
+                {
+                  fieldGroupClassName: "ant-row",
+                  key: 'order_shipments',
+                  fieldGroup: [
+                    {
+                      key: 'destination',
+                      type: 'input',
+                      className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                      templateOptions: {
+                        label: 'Destination',
+                        placeholder: 'Enter Destination',
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.destination && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.destination);
+                          }
+                        }
+                      }
                     },
                     {
-                      className: 'col-12 custom-form-card-block w-100',
+                      key: 'port_of_landing',
+                      type: 'input',
+                      className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                      templateOptions: {
+                        label: 'Port of Landing',
+                        placeholder: 'Enter Port of Landing',
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.port_of_landing && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.port_of_landing);
+                          }
+                        }
+                      }
+                    },
+                    {
+                      key: 'shipping_mode_id',
+                      type: 'select',
+                      className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                      templateOptions: {
+                        label: 'Shipping Mode',
+                        placeholder: 'Select Shipping Mode',
+                        dataKey: 'shipping_mode_id',
+                        dataLabel: "name",
+                        bindId: true,
+                        lazy: {
+                          url: 'masters/shipping_modes',
+                          lazyOneTime: true
+                        }
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.shipping_mode_id && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.shipping_mode_id);
+                          }
+                        }
+                      }
+                    },
+                    {
+                      key: 'port_of_discharge',
+                      type: 'input',
+                      className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                      templateOptions: {
+                        label: 'Port of Discharge',
+                        placeholder: 'Select Port of Discharge',
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.port_of_discharge && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.port_of_discharge);
+                          }
+                        }
+                      }
+                    },
+                    {
+                      key: 'shipping_company_id',
+                      type: 'select',
+                      className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                      templateOptions: {
+                        label: 'Shipping Company',
+                        placeholder: 'Select Shipping Company',
+                        dataKey: 'shipping_company_id',
+                        dataLabel: "name",
+                        bindId: true,
+                        lazy: {
+                          url: 'masters/shipping_companies',
+                          lazyOneTime: true
+                        }
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.shipping_company_id && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.shipping_company_id);
+                          }
+                        }
+                      }
+                    },
+                    {
+                      key: 'no_of_packets',
+                      type: 'input',
+                      className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                      templateOptions: {
+                        type: "number",
+                        label: 'No. of Packets',
+                        placeholder: 'Select No. of Packets',
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.no_of_packets && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.no_of_packets);
+                          }
+                        }
+                      }
+                    },
+                    {
+                      key: 'weight',
+                      type: 'input',
+                      className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                      templateOptions: {
+                        type: "number",
+                        label: 'Weight',
+                        placeholder: 'Enter Weight',
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.weight && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.weight);
+                          }
+                        }
+                      }
+                    },
+                    {
+                      key: 'shipping_tracking_no',
+                      type: 'input',
+                      className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                      templateOptions: {
+                        label: 'Shipping Tracking No.',
+                        placeholder: 'Enter Shipping Tracking No.',
+                        readonly: true
+                      }
+                    },
+                    {
+                      key: 'shipping_date',
+                      type: 'date',
+                      // defaultValue: this.nowDate(),
+                      className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                      templateOptions: {
+                        type: 'date',
+                        label: 'Shipping Date',
+                        // required: true
+                      }
+                    },
+                    {
+                      key: 'shipping_charges',
+                      type: 'input',
+                      className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                      templateOptions: {
+                        type: "number",
+                        label: 'Shipping Charges.',
+                        placeholder: 'Enter Shipping Charges',
+                        // required: true
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.shipping_charges && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.shipping_charges);
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+              ]
+            },
+            {
+              className: 'col-12 px-0 pt-3',
+              props: {
+                label: 'Order Attachments'
+              },
+              fieldGroup: [
+                {
+                  fieldGroupClassName: "",
+                  fieldGroup: [
+                    {
+                      className: 'col-12 custom-form-card-block w-100 p-0',
                       fieldGroup: [
-                        {
-                          template: '<div class="custom-form-card-title"> Order Attachments </div>',
-                          fieldGroupClassName: "ant-row",
-                        },
+                        // {
+                        //   template: '<div class="custom-form-card-title"> Order Attachments </div>',
+                        //   fieldGroupClassName: "ant-row",
+                        // },
                         {
                           key: 'order_attachments',
                           type: 'file',
-                          className: 'ta-cell col-12 custom-file-attachement',
+                          className: 'ta-cell col-12 col-md-6 custom-file-attachement',
                           props: {
                             "displayStyle": "files",
                             "multiple": true
@@ -2215,13 +2281,57 @@ loadQuickpackProducts() {
                       ]
                     }
                   ]
-                },
-
+                }
               ]
-
-            }
+            },
+            {
+              className: 'col-12 custom-form-card-block px-0 pt-3',
+              props: {
+                label: 'Customer Details'
+              },
+              fieldGroup: [
+                // {
+                //   template: '<div class="custom-form-card-title">   </div>',
+                //   fieldGroupClassName: "ant-row",
+                // },
+                {
+                  fieldGroupClassName: "ant-row",
+                  key: 'sale_invoice_order',
+                  fieldGroup: [
+                    {
+                      key: 'email',
+                      type: 'input',
+                      className: 'col-md-4 col-sm-6 col-12',
+                      templateOptions: {
+                        type: 'input',
+                        label: 'Email',
+                        placeholder: 'Enter Email'
+                      },
+                    },
+                    {
+                      key: 'billing_address',
+                      type: 'textarea',
+                      className: 'col-4',
+                      templateOptions: {
+                        label: 'Billing address',
+                        placeholder: 'Enter Billing address'
+                      },
+                    },
+                    {
+                      key: 'shipping_address',
+                      type: 'textarea',
+                      className: 'col-4',
+                      templateOptions: {
+                        label: 'Shipping address',
+                        placeholder: 'Enter Shipping address'
+                      },
+                    },
+                  ]
+                },
+              ]
+            },
           ]
-        },
+        }
       ]
     }
   }

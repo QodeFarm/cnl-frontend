@@ -6,6 +6,7 @@ import { AdminCommonService } from 'src/app/services/admin-common.service';
 import { HttpClient } from '@angular/common/http';
 import { filter, map, mergeMap } from 'rxjs/operators';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
+import { CustomfieldsModule } from 'src/app/admin/customfields/customfields.module';
 interface SpeechRecognitionResult {
   transcript: string; // Holds the recognized speech as text
 }
@@ -38,7 +39,7 @@ export interface Tab {
   templateUrl: './admin-layout.component.html',
   styleUrls: ['./admin-layout.component.scss'],
   standalone: true,
-  imports: [CommonModule, RouterModule, NzTabsModule]
+  imports: [CommonModule, RouterModule, NzTabsModule, CustomfieldsModule]
 })
 export class AdminLayoutComponent {
   menulList = <any>[];

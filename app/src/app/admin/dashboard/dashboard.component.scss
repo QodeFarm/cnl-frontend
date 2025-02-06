@@ -176,12 +176,15 @@
 }
 
 h4 {
-  background-color: #f1f1f1;
-  color: rgb(0, 0, 0); /* White text color */
-  padding: 10px 5px; /* Padding inside the header */
-  border-radius: 10px; /* Curved edges */
-  font-size: 18px; /* Font size for the header */
-  text-align: center; /* Center the text */
+  // background-color: #f1f1f1;
+  // color: rgb(0, 0, 0); /* White text color */
+  // padding: 10px 5px; /* Padding inside the header */
+  // border-radius: 10px; /* Curved edges */
+  // font-size: 18px; /* Font size for the header */
+  // text-align: center; /* Center the text */
+  color: #142768;
+  font-size: 1.2rem;
+  font-weight: 600;
 }
 
 .task-workOrder-row {

@@ -1,16 +1,18 @@
 <header>
     <!-- Topbar -->
-    <nav class="navbar navbar-expand navbar-light topbar static-top ">
-        <a class="sidebar-brand layout-logo-design" [routerLink]="['/admin/dashboard']">
-            <!-- <img style="width: 2.2rem;" src="assets/img/logo.png" />  -->
-            <h3>C&L</h3>
-            <span>Accounts Book</span>
-        </a>
+    <nav class="navbar navbar-expand navbar-light topbar static-top justify-content-between">
+       
         <!-- Sidebar Toggle (Topbar) -->
-        <button id="sidebarToggleTop" (click)="menuToggle()" class="btn bar-toggle ml-3 mr-2">
-         <i class="fa fa-bars"></i>
-     </button>
-
+         <div class="d-flex align-items-center">
+            <a class="sidebar-brand layout-logo-design" [routerLink]="['/admin/dashboard']">
+                <!-- <img style="width: 2.2rem;" src="assets/img/logo.png" />  -->
+                <h3>C&L</h3>
+                <span>Accounts Book</span>
+            </a>                
+            <button id="sidebarToggleTop" (click)="menuToggle()" class="btn bar-toggle ms-3">
+                <i class="fa fa-bars"></i>
+            </button>
+        </div>
         <!-- Topbar Search -->
         <!-- <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
            <div class="input-group">
@@ -24,8 +26,10 @@
        </form> -->
 
         <!-- Topbar Navbar -->
-        <ul class="navbar-nav ml-auto">
-
+     
+      
+        <ul class="navbar-nav align-items-center">
+            <li class="company-title"><span class="badge bg-light ms-2" style="font-weight: 500; font-size: 14px; color:#142768; border-radius: 3px;padding: 7px 10px;">[123456]-Tech Solutions Private Limited</span></li>
             <li class="nav-item dropdown no-arrow mx-1">
                 <button class="nav-link dropdown-toggle" (click)="startSpeechRecognition()" id="alerts1" role="button" data-bs-toggle="" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-microphone"></i>
@@ -177,6 +181,9 @@
                         </li>
                         <li>
                             <a [routerLink]="['/admin/users/roles']"><i class="fa fa-user-cog"></i> User Roles</a>
+                        </li>
+                        <li>
+                            <a [routerLink]="['/admin/customfields']"><i class="fa fa-user-cog"></i> Custom fields</a>
                         </li>
                         <li>
                             <a [routerLink]="['/admin/reminders']"><i class="fa fa-bell"></i> Reminders</a>
