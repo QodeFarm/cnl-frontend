@@ -1089,7 +1089,13 @@ confirmWorkOrder() {
               status_id: '', // Set as empty if not provided
               sale_order_id: childSaleOrderResponse.data.sale_order.sale_order_id // Link the sale order ID
             },
-            bom: [], // Empty for now
+            bom: [
+              {
+                product_id: product.product_id,
+                size_id: product.size?.size_id || null,
+                color_id: product.color?.color_id || null,
+              }
+            ], // Empty for now
             work_order_machines: [], // Empty for now
             workers: [], // Empty for now
             work_order_stages: [] // Empty for now
@@ -1113,7 +1119,7 @@ confirmWorkOrder() {
     forkJoin(processProductRequests).subscribe({
       next: () => {
         this.closeModalworkorder();
-        alert('Child Sale Orders and Work Orders created successfully!');
+        console.log('Child Sale Orders and Work Orders created successfully!');
       },
       error: (err) => {
         console.error('Error processing products:', err);
@@ -1121,6 +1127,7 @@ confirmWorkOrder() {
       }
     });
   }
+  this.ngOnInit();
 }
 
 //=======================================================
@@ -1160,10 +1167,10 @@ confirmWorkOrder() {
             const customer = this.formConfig.model.sale_order.customer; // Get the customer details
             console.log("Customer in formconfig : ", customer);
             console.log("Customer.credit_limit : ", customer.credit_limit);
-            if (!customer || !customer.credit_limit) {
-                console.error("Customer information or credit limit is missing.");
-                return;
-            }
+            // if (!customer || !customer.credit_limit) {
+            //     console.error("Customer information or credit limit is missing.");
+            //     return;
+            // }
     
             const maxLimit = parseFloat(customer.credit_limit); // Convert credit limit to number
             console.log(`Total Amount: ${totalAmount}, Credit Limit: ${maxLimit}`);

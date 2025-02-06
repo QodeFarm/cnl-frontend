@@ -89,7 +89,7 @@ export class SalesListComponent {
         sort: true
       },
       {
-        fieldKey: 'status_name',
+        fieldKey: 'order_status',
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
