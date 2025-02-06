@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, Renderer2, AfterViewInit, ElementRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule, DatePipe, formatDate } from '@angular/common';
@@ -25,7 +25,7 @@ export class WorkorderComponent implements OnInit {
   @ViewChild(WorkOrderListComponent) WorkOrderListComponent!: WorkOrderListComponent;
   editMode: boolean = false;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private el: ElementRef, private renderer: Renderer2) {}
   
   ngOnInit() {
     this.showWorkorderList = false;
@@ -74,7 +74,9 @@ export class WorkorderComponent implements OnInit {
     this.editMode = true;
     this.showCreateBomButton = false
     this.hideFields(false); // Shows fields at indexes 5, 4, and 9
+    this.formConfig.fields[0].fieldGroup[10].hide = true;
     this.makeFieldsNotTouchable([0, 1, 2]);
+    this.disableMaterials()
     console.log('event', event);
     this.WorkOrdrEditID = event;
     this.http.get('production/work_order/' + event).subscribe((res: any) => {
@@ -406,6 +408,27 @@ clearSize(field : any){
   sizeField.templateOptions.required = false;
 }
 
+disableMaterials() {
+  if (this.editMode) {
+    const cardBodies = this.el.nativeElement.querySelectorAll('.ant-card-body');
+    if (cardBodies.length > 1) { 
+      const secondCardBody = cardBodies[0]; // Select the second `.ant-card-body`
+  
+      // Completely disable interaction (without affecting the UI appearance)
+      this.renderer.setStyle(secondCardBody, 'pointer-events', 'none'); // Disable clicks & hover events
+      this.renderer.setAttribute(secondCardBody, 'aria-disabled', 'true'); // Accessibility
+      this.renderer.setStyle(secondCardBody, 'user-select', 'none'); // Prevent text selection
+  
+      // If there are any interactive elements inside, disable them
+      const inputs = secondCardBody.querySelectorAll('input, button, select, textarea, a, .ant-select, .ant-dropdown');
+      inputs.forEach((input: HTMLElement) => {
+        this.renderer.setAttribute(input, 'disabled', 'true');
+      });
+    }
+  };
+};
+
+
 curdConfig: TaCurdConfig = {
   drawerSize: 500,
   drawerPlacement: 'top',
@@ -692,360 +715,442 @@ curdConfig: TaCurdConfig = {
                 label: 'Sync QTY',
                 required: false
               }
-            }
-          ]
-        },
-        {
-          key: 'bom',
-          type: 'table',
-          className: 'custom-form-list',
-          templateOptions: {
-            title: 'Bill Of Material',
-            addText: 'Add Materials',
-            tableCols: [
-              { name: 'product_id', label: 'Product' },
-              { name: 'size_id', label: 'Size' },
-              { name: 'color_id', label: 'Color' },
-              { name: 'quantity', label: 'Quantity' },
-              { name: 'unit_cost', label: 'Unit Cost' },
-              { name: 'total_cost', label: 'Total Cost' },
-              { name: 'notes', label: 'Notes' },
-            ]
-          },
-          fieldArray: {
-            fieldGroup: [
-              {
-                key: 'product',
-                type: 'select',
-                templateOptions: {
-                  label: 'Product',
-                  dataKey: 'product_id',
-                  hideLabel: true,
-                  dataLabel: 'name',
-                  options: [],
-                  required: true,
-                  lazy: {
-                  url: 'products/products/',
+            },
+            {
+              key: 'selectionType',
+              type: 'radio',
+              className: 'col-2',
+              defaultValue: 'no', // Set default selection to 'user'
+              templateOptions: {
+                label: 'Creating for Sale Order ?',
+                options: [
+                  { label: 'Yes', value: 'yes' },
+                  { label: 'No', value: 'no' }
+                ],
+                required: true,
+              }
+            },
+            {
+              key: 'sale_order',
+              type: 'select',
+              className: 'col-2',
+              hideExpression: (model) => model.selectionType !== 'yes',
+              templateOptions: {
+                label: 'Order No',
+                dataKey: 'sale_order_id',
+                dataLabel: 'order_no',
+                options: [], // Options will be loaded via lazy
+                lazy: {
+                  url: 'sales/sale_order/',
                   lazyOneTime: true
-                  }
                 },
-                hooks: {
-                  onChanges: (field: any) => {
-                    field.formControl.valueChanges.subscribe((data: any) => {
-                      const index = field.parent.key;
-                      if (!this.formConfig.model['bom'][index]) {
-                        console.error(`Products at index ${index} is not defined. Initializing...`);
-                        this.formConfig.model['bom'][index] = {};
-                      }
-                      this.formConfig.model['bom'][index]['product_id'] = data?.product_id;
-                    });
-                  }
-                }
+                required: true // Required only if 'User' is selected
               },
-              {
-                key: 'size',
-                type: 'select',
-                templateOptions: {
-                  label: 'Size',
-                  dataKey: 'size_id',
-                  hideLabel: true,
-                  dataLabel: 'size_name',
-                  options: [],
-                  required: false,
-                  lazy: {
-                    lazyOneTime: true,
-                    url : 'products/sizes/'
-                  }
-                },
-                hooks: {
-                  onChanges: (field: any) => {
-                    field.formControl.valueChanges.subscribe((data: any) => {
-                      const index = field.parent.key;
-                      if (!this.formConfig.model['bom'][index]) {
-                        console.error(`Products at index ${index} is not defined. Initializing...`);
-                        this.formConfig.model['bom'][index] = {};
-                      }
-                      this.formConfig.model['bom'][index]['size_id'] = data?.size_id;
-                    });
-                  }
-                }
-              },
-              {
-                key: 'color',
-                type: 'select',
-                templateOptions: {
-                  label: 'Color',
-                  dataKey: 'color_id',
-                  hideLabel: true,
-                  dataLabel: 'color_name',
-                  options: [],
-                  required: false,
-                  lazy: {
-                    lazyOneTime: true,
-                    url : 'products/colors/'
-                  }
-                },
-                hooks: {
-                  onChanges: (field: any) => {
-                    field.formControl.valueChanges.subscribe((data: any) => {
-                      const index = field.parent.key;
-                      if (!this.formConfig.model['bom'][index]) {
-                        console.error(`Products at index ${index} is not defined. Initializing...`);
-                        this.formConfig.model['bom'][index] = {};
-                      }
-                      this.formConfig.model['bom'][index]['color_id'] = data?.color_id || null;
-                    });
-                  }
-                }
-              },
-              {
-                key: 'quantity',
-                type: 'input',
-                templateOptions: {
-                  label: 'Quantity',
-                  placeholder: 'Enter Quantity',
-                  hideLabel: true,
-                  required: true,
-                  type: 'number'
-                },
-                hooks:{
-                  onInit: (field: any) => {
-                    field.formControl.valueChanges.subscribe(data => {
-                      if (field.form && field.form.controls && field.form.controls.quantity && field.form.controls.unit_cost && data) {
-                        const quantity = field.form.controls.quantity.value;
-                        const unit_cost = field.form.controls.unit_cost.value;
-                        if (quantity && unit_cost) {
-                          field.form.controls.total_cost.setValue((parseFloat(quantity) * parseFloat(unit_cost)).toFixed(2));
-                        }
-                      } else {
-                        field.form.controls.total_cost.setValue(0);
-                      }
-                    })
-                  },
-                }
-              },
-              {
-                key: 'unit_cost',
-                type: 'input',
-                templateOptions: {
-                  label: 'Unit Cost',
-                  placeholder: 'Enter Unit Cost',
-                  hideLabel: true,
-                  required: true,
-                  type: 'number'
-                },
-                hooks:{
-                  onInit: (field: any) => {
-                    field.formControl.valueChanges.subscribe(data => {
-                      if (field.form && field.form.controls && field.form.controls.quantity && field.form.controls.unit_cost && data) {
-                        const quantity = field.form.controls.quantity.value;
-                        const unit_cost = field.form.controls.unit_cost.value;
-                        if (quantity && unit_cost) {
-                          field.form.controls.total_cost.setValue((parseFloat(quantity) * parseFloat(unit_cost)).toFixed(2));
-
-                        }
-                      } else {
-                        field.form.controls.total_cost.setValue(0);
-                      }
-                    })
-                  },
-                }
-              },
-              {
-                key: 'total_cost',
-                type: 'input',
-                templateOptions: {
-                  label: 'Total Cost',
-                  // placeholder: 'Enter Total Cost',
-                  hideLabel: true,
-                  required: true,
-                  disabled: true
-                },
-              },              
-              {
-                key: 'notes',
-                type: 'text',
-                templateOptions: {
-                  label: 'Notes',
-                  placeholder: 'Enter Notes',
-                  hideLabel: true,
-                  required: false
+              hooks: {
+                onChanges: (field: any) => {
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (field.formControl.value && this.editMode) {
+                      field.model.selectionType = 'yes'; // Set selectionType to 'yes' if sale_order_id is present
+                    }
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['work_order']) {
+                      this.formConfig.model['work_order']['sale_order_id'] = data?.sale_order_id;
+                    } else {
+                      console.error('Form config or sale_order_id data model is not defined.');
+                    }
+                  });
                 }
               }
-            ]
-          }
+            },
+          ]
         },
-        //-----------------------------------work_order_machines-------------------------------------
+        // ----------------*** Tab menu starts here ***--------------------
         {
-          key: 'work_order_machines',
-          type: 'table',
-          className: 'custom-form-list',
-          templateOptions: {
-            title: 'Machines',
-            addText: 'Add Machine',
-            tableCols: [
-              { name: 'machine', label: 'Machine' }
-            ]
-          },
-          fieldArray: {
-            fieldGroup: [
+          fieldGroupClassName: "row col-12 m-0 custom-form-card",
+          className: 'tab-form-list px-3',
+          type: 'tabs',
+          fieldGroup: [
+            // ---------------------------- ** Bill Of Material ** ---------------------------------------
+            {
+              className: 'col-12 px-0 pt-3',
+              props: {
+                label: 'Bill Of Material'
+              },
+              fieldGroup: [
                 {
-                  key: 'machine',
-                  type: 'select',
-                  className: 'col',
+                  key: 'bom',
+                  type: 'table',
+                  className: 'custom-form-list',
                   templateOptions: {
-                    label: 'Machine',
-                    dataKey: 'machine_id',
-                    dataLabel: 'machine_name',
-                    options: [],
-                    hideLabel: true,
-                    required: false,
-                    lazy: {
-                      url: 'production/machines/',
-                      lazyOneTime: true
-                    },
+                    addText: 'Add Materials',
+                    tableCols: [
+                      { name: 'product_id', label: 'Product' },
+                      { name: 'size_id', label: 'Size' },
+                      { name: 'color_id', label: 'Color' },
+                      { name: 'quantity', label: 'Quantity' },
+                      { name: 'unit_cost', label: 'Unit Cost' },
+                      { name: 'total_cost', label: 'Total Cost' },
+                      { name: 'notes', label: 'Notes' },
+                    ]
                   },
-                  hooks: {
-                    onChanges: (field: any) => {
-                      field.formControl.valueChanges.subscribe((data: any) => {
-                        const index = field.parent.key;
-                        if (!this.formConfig.model['work_order_machines'][index]) {
-                          console.error(`Machine at index ${index} is not defined. Initializing...`);
-                          this.formConfig.model['work_order_machines'][index] = {};
+                  fieldArray: {
+                    fieldGroup: [
+                      {
+                        key: 'product',
+                        type: 'select',
+                        templateOptions: {
+                          label: 'Product',
+                          dataKey: 'product_id',
+                          hideLabel: true,
+                          dataLabel: 'name',
+                          options: [],
+                          required: true,
+                          lazy: {
+                          url: 'products/products/',
+                          lazyOneTime: true
+                          }
+                        },
+                        hooks: {
+                          onChanges: (field: any) => {
+                            field.formControl.valueChanges.subscribe((data: any) => {
+                              const index = field.parent.key;
+                              if (!this.formConfig.model['bom'][index]) {
+                                console.error(`Products at index ${index} is not defined. Initializing...`);
+                                this.formConfig.model['bom'][index] = {};
+                              }
+                              this.formConfig.model['bom'][index]['product_id'] = data?.product_id;
+                            });
+                          }
                         }
-                        this.formConfig.model['work_order_machines'][index]['machine_id'] = data.machine_id;
-                      });
+                      },
+                      {
+                        key: 'size',
+                        type: 'select',
+                        templateOptions: {
+                          label: 'Size',
+                          dataKey: 'size_id',
+                          hideLabel: true,
+                          dataLabel: 'size_name',
+                          options: [],
+                          required: false,
+                          lazy: {
+                            lazyOneTime: true,
+                            url : 'products/sizes/'
+                          }
+                        },
+                        hooks: {
+                          onChanges: (field: any) => {
+                            field.formControl.valueChanges.subscribe((data: any) => {
+                              const index = field.parent.key;
+                              if (!this.formConfig.model['bom'][index]) {
+                                console.error(`Products at index ${index} is not defined. Initializing...`);
+                                this.formConfig.model['bom'][index] = {};
+                              }
+                              this.formConfig.model['bom'][index]['size_id'] = data?.size_id;
+                            });
+                          }
+                        }
+                      },
+                      {
+                        key: 'color',
+                        type: 'select',
+                        templateOptions: {
+                          label: 'Color',
+                          dataKey: 'color_id',
+                          hideLabel: true,
+                          dataLabel: 'color_name',
+                          options: [],
+                          required: false,
+                          lazy: {
+                            lazyOneTime: true,
+                            url : 'products/colors/'
+                          }
+                        },
+                        hooks: {
+                          onChanges: (field: any) => {
+                            field.formControl.valueChanges.subscribe((data: any) => {
+                              const index = field.parent.key;
+                              if (!this.formConfig.model['bom'][index]) {
+                                console.error(`Products at index ${index} is not defined. Initializing...`);
+                                this.formConfig.model['bom'][index] = {};
+                              }
+                              this.formConfig.model['bom'][index]['color_id'] = data?.color_id || null;
+                            });
+                          }
+                        }
+                      },
+                      {
+                        key: 'quantity',
+                        type: 'input',
+                        templateOptions: {
+                          label: 'Quantity',
+                          placeholder: 'Enter Quantity',
+                          hideLabel: true,
+                          required: true,
+                          type: 'number'
+                        },
+                        hooks:{
+                          onInit: (field: any) => {
+                            field.formControl.valueChanges.subscribe(data => {
+                              if (field.form && field.form.controls && field.form.controls.quantity && field.form.controls.unit_cost && data) {
+                                const quantity = field.form.controls.quantity.value;
+                                const unit_cost = field.form.controls.unit_cost.value;
+                                if (quantity && unit_cost) {
+                                  field.form.controls.total_cost.setValue((parseFloat(quantity) * parseFloat(unit_cost)).toFixed(2));
+                                }
+                              } else {
+                                field.form.controls.total_cost.setValue(0);
+                              }
+                            })
+                          },
+                        }
+                      },
+                      {
+                        key: 'unit_cost',
+                        type: 'input',
+                        templateOptions: {
+                          label: 'Unit Cost',
+                          placeholder: 'Enter Unit Cost',
+                          hideLabel: true,
+                          required: true,
+                          type: 'number'
+                        },
+                        hooks:{
+                          onInit: (field: any) => {
+                            field.formControl.valueChanges.subscribe(data => {
+                              if (field.form && field.form.controls && field.form.controls.quantity && field.form.controls.unit_cost && data) {
+                                const quantity = field.form.controls.quantity.value;
+                                const unit_cost = field.form.controls.unit_cost.value;
+                                if (quantity && unit_cost) {
+                                  field.form.controls.total_cost.setValue((parseFloat(quantity) * parseFloat(unit_cost)).toFixed(2));
+        
+                                }
+                              } else {
+                                field.form.controls.total_cost.setValue(0);
+                              }
+                            })
+                          },
+                        }
+                      },
+                      {
+                        key: 'total_cost',
+                        type: 'input',
+                        templateOptions: {
+                          label: 'Total Cost',
+                          // placeholder: 'Enter Total Cost',
+                          hideLabel: true,
+                          required: true,
+                          disabled: true
+                        },
+                      },              
+                      {
+                        key: 'notes',
+                        type: 'text',
+                        templateOptions: {
+                          label: 'Notes',
+                          placeholder: 'Enter Notes',
+                          hideLabel: true,
+                          required: false
+                        }
+                      }
+                    ]
+                  }
+                },
+              ]
+            },
+            // ---------------------------- ** Worker ** ---------------------------------------
+            {
+                className: 'col-12 px-0 pt-3',
+                props: {
+                  label: 'Worker'
+                },
+                fieldGroup: [
+                  {
+                    key: 'workers',
+                    type: 'table',
+                    className: 'custom-form-list',
+                    templateOptions: {
+                      addText: 'Add Worker',
+                      tableCols: [
+                        { name: 'hours_worked', label: 'Hours' },
+                        { name: 'employee_id', label: 'Worker' }
+                      ]
+                    },
+                    fieldArray: {
+                      fieldGroup: [
+                        {
+                          key: 'employee',
+                          type: 'select',
+                          className: 'col',
+                          templateOptions: {
+                            label: 'Worker',
+                            dataKey: 'employee_id',
+                            dataLabel: 'first_name',
+                            options: [],
+                            hideLabel: true,
+                            required: false,
+                            lazy: {
+                              url: 'hrms/employees/',
+                              lazyOneTime: true
+                            },
+                          },
+                          hooks: {
+                            onChanges: (field: any) => {
+                              field.formControl.valueChanges.subscribe((data: any) => {
+                                const index = field.parent.key;
+                                if (!this.formConfig.model['workers'][index]) {
+                                  console.error(`Machine at index ${index} is not defined. Initializing...`);
+                                  this.formConfig.model['workers'][index] = {};
+                                }
+                                this.formConfig.model['workers'][index]['employee_id'] = data.employee_id;
+                              });
+                            }
+                          }
+                        },
+                        {
+                          key: 'hours_worked',
+                          type: 'input',
+                          className: 'col',
+                          templateOptions: {
+                            label: 'Hours Worked',
+                            placeholder: 'Enter Hours',
+                            hideLabel: true,
+                            required: false
+                          }
+                        }
+                      ]
                     }
+                  }
+                ]
+              },
+                // ----------------------** Machines **------------------------------
+              {
+                className: 'col-12 px-0 pt-3',
+                props: {
+                  label: 'Machines'
+                },
+                fieldGroup: [
+                  {
+                    key: 'work_order_machines',
+                    type: 'table',
+                    className: 'custom-form-list',
+                    templateOptions: {
+                      addText: 'Add Machine',
+                      tableCols: [
+                        { name: 'machine', label: 'Machine' }
+                      ]
+                    },
+                    fieldArray: {
+                      fieldGroup: [
+                        {
+                          key: 'machine',
+                          type: 'select',
+                          className: 'col',
+                          templateOptions: {
+                            label: 'Machine',
+                            dataKey: 'machine_id',
+                            dataLabel: 'machine_name',
+                            options: [],
+                            hideLabel: true,
+                            required: false,
+                            lazy: {
+                              url: 'production/machines/',
+                              lazyOneTime: true
+                            },
+                          },
+                          hooks: {
+                            onChanges: (field: any) => {
+                              field.formControl.valueChanges.subscribe((data: any) => {
+                                const index = field.parent.key;
+                                if (!this.formConfig.model['work_order_machines'][index]) {
+                                  console.error(`Machine at index ${index} is not defined. Initializing...`);
+                                  this.formConfig.model['work_order_machines'][index] = {};
+                                }
+                                this.formConfig.model['work_order_machines'][index]['machine_id'] = data.machine_id;
+                              });
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              // ----------------------** Work Stage **------------------------------
+              {
+                className: 'col-12 px-0 pt-3',
+                props: {
+                  label: 'Work Stage'
+                },
+                fieldGroup: [
+                  {
+                    key: 'work_order_stages',
+                    type: 'table',
+                    className: 'custom-form-list',
+                    templateOptions: {
+                      addText: 'Add Work Level',
+                      tableCols: [
+                        { name: 'hours_worked', label: 'Hours' },
+                        { name: 'employee_id', label: 'Worker' }
+                      ]
+                    },
+                    fieldArray: {
+                      fieldGroup: [
+                      {
+                        key: 'stage_name',
+                        type: 'input',
+                        templateOptions: {
+                          label: 'Stage Name',
+                          placeholder: 'Enter Stage Name',
+                          hideLabel: true,
+                          required: false
+                        }
+                      },
+                      {
+                        key: 'stage_description',
+                        type: 'input',
+                        templateOptions: {
+                          label: 'Description',
+                          placeholder: 'Enter Description',
+                          hideLabel: true,
+                          required: false
+                        }
+                      },
+                      {
+                        key: 'stage_start_date',
+                        type: 'date',
+                        templateOptions: {
+                          label: 'Stage Start Date',
+                          placeholder: 'Enter Start Date',
+                          hideLabel: true,
+                          required: false
+                        }
+                      },
+                      {
+                        key: 'stage_end_date',
+                        type: 'date',
+                        templateOptions: {
+                          label: 'Stage End Date',
+                          placeholder: 'Enter End Date',
+                          hideLabel: true,
+                          required: false
+                        }
+                      },
+                      {
+                        key: 'notes',
+                        type: 'textarea',
+                        templateOptions: {
+                          label: 'Notes',
+                          placeholder: 'Enter Notes',
+                          hideLabel: true,
+                          required: false
+                        }
+                      }
+                    ]
                   }
                 }
               ]
-         }
-        },
-        // -----------------------------------workers--------------------------------
-        {
-          key: 'workers',
-          type: 'table',
-          className: 'custom-form-list',
-          templateOptions: {
-            title: 'Worker',
-            addText: 'Add Worker',
-            tableCols: [
-              { name: 'hours_worked', label: 'Hours' },
-              { name: 'employee_id', label: 'Worker' }
-            ]
-          },
-          fieldArray: {
-            fieldGroup: [
-              {
-                key: 'employee',
-                type: 'select',
-                className: 'col',
-                templateOptions: {
-                  label: 'Worker',
-                  dataKey: 'employee_id',
-                  dataLabel: 'first_name',
-                  options: [],
-                  hideLabel: true,
-                  required: false,
-                  lazy: {
-                    url: 'hrms/employees/',
-                    lazyOneTime: true
-                  },
-                },
-                hooks: {
-                  onChanges: (field: any) => {
-                    field.formControl.valueChanges.subscribe((data: any) => {
-                      const index = field.parent.key;
-                      if (!this.formConfig.model['workers'][index]) {
-                        console.error(`Machine at index ${index} is not defined. Initializing...`);
-                        this.formConfig.model['workers'][index] = {};
-                      }
-                      this.formConfig.model['workers'][index]['employee_id'] = data.employee_id;
-                    });
-                  }
-                }
-              },
-              {
-                key: 'hours_worked',
-                type: 'input',
-                className: 'col',
-                templateOptions: {
-                  label: 'Hours Worked',
-                  placeholder: 'Enter Hours',
-                  hideLabel: true,
-                  required: false
-                }
-              }
-            ]
-          }
-        },
-        // -----------------------------------work_order_stages--------------------------------
-        {
-          key: 'work_order_stages',
-          type: 'table',
-          className: 'custom-form-list',
-          templateOptions: {
-            title: 'Work Stage',
-            addText: 'Add Work Level',
-            tableCols: [
-              { name: 'hours_worked', label: 'Hours' },
-              { name: 'employee_id', label: 'Worker' }
-            ]
-          },
-          fieldArray: {
-            fieldGroup: [
-              {
-                key: 'stage_name',
-                type: 'input',
-                templateOptions: {
-                  label: 'Stage Name',
-                  placeholder: 'Enter Stage Name',
-                  hideLabel: true,
-                  required: false
-                }
-              },
-              {
-                key: 'stage_description',
-                type: 'input',
-                templateOptions: {
-                  label: 'Description',
-                  placeholder: 'Enter Description',
-                  hideLabel: true,
-                  required: false
-                }
-              },
-              {
-                key: 'stage_start_date',
-                type: 'date',
-                templateOptions: {
-                  label: 'Stage Start Date',
-                  placeholder: 'Enter Start Date',
-                  hideLabel: true,
-                  required: false
-                }
-              },
-              {
-                key: 'stage_end_date',
-                type: 'date',
-                templateOptions: {
-                  label: 'Stage End Date',
-                  placeholder: 'Enter End Date',
-                  hideLabel: true,
-                  required: false
-                }
-              },
-              {
-                key: 'notes',
-                type: 'textarea',
-                templateOptions: {
-                  label: 'Notes',
-                  placeholder: 'Enter Notes',
-                  hideLabel: true,
-                  required: false
-                }
-              }
-            ]
-          }
+            },
+          ]
         }
       ]
     }
