@@ -24,7 +24,8 @@ export class UnitOptionsComponent {
       cols: [
         {
           fieldKey: 'unit_name',
-          name: 'Name'
+          name: 'Name',
+          sort: true
         },
         {
           fieldKey: "code",

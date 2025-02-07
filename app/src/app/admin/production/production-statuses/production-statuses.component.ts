@@ -26,7 +26,8 @@ export class ProductionStatusesComponent {
       cols: [
         {
           fieldKey: 'status_name',
-          name: 'Status Name'
+          name: 'Status Name',
+          sort: true
         },
         {
           fieldKey: "code",

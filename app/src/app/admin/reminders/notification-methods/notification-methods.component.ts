@@ -22,7 +22,8 @@ export class NotificationMethodsComponent {
       cols: [
         {
           fieldKey: 'method_name',
-          name: 'Method Name'
+          name: 'Method Name',
+          sort: true
         },
         {
           fieldKey: "code",

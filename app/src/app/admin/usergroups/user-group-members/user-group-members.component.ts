@@ -28,16 +28,21 @@ export class UserGroupMembersComponent {
           fieldKey: 'group_id',
           name: 'Groups',
           displayType: "map",
+          sort: true,
           mapFn: (currentValue: any, row: any, col: any) => {
             return `${row.group.group_name}`;
           },
         },
-		{
+        {
           fieldKey: 'employee_id',
-          name: 'Employees',
+          name: 'Employee',
+          sort: true,
           displayType: "map",
           mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.employee.name}`;
+            // Concatenate first_name and last_name correctly
+            const firstName = row.employee?.first_name || '';
+            const lastName = row.employee?.last_name || '';
+            return `${firstName} ${lastName}`.trim();
           },
         },
         {
@@ -107,7 +112,7 @@ export class UserGroupMembersComponent {
               templateOptions: {
                 label: 'Employees',
                 dataKey: 'employee_id',
-                dataLabel: "name",
+                dataLabel: "first_name",
                 options: [],
                 lazy: {
                   url: 'hrms/employees/',

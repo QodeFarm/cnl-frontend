@@ -23,11 +23,13 @@ export class DesignationsComponent {
       cols: [
         {
           fieldKey: 'designation_name',
-          name: 'Designation Name'
+          name: 'Designation Name',
+          sort: true
         },
         {
           fieldKey: 'responsibilities',
-          name: 'Responsibilities'
+          name: 'Responsibilities',
+          sort: true
         },
         {
           fieldKey: "code",

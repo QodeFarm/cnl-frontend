@@ -23,7 +23,8 @@ export class ReminderTypesComponent {
       cols: [
         {
           fieldKey: 'type_name',
-          name: 'Type Name'
+          name: 'Type Name',
+          sort: true
         },
         {
           fieldKey: "code",

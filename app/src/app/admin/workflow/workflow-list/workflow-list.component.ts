@@ -29,6 +29,7 @@ export class WorkflowListComponent {
     globalSearch: {
       keys: ['workflow_id', 'name']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {
         fieldKey: 'name',

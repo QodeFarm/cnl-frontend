@@ -23,7 +23,8 @@ export class GstTypesComponent {
       cols: [
         {
           fieldKey: 'name',
-          name: 'Name'
+          name: 'Name',
+          sort: true
         },
         {
           fieldKey: "code",

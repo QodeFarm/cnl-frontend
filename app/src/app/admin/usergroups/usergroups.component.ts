@@ -26,11 +26,13 @@ export class UsergroupsComponent {
       cols: [
         {
           fieldKey: 'group_name',
-          name: 'Group Name'
+          name: 'Group Name',
+          sort: true
         },
 		    {
         fieldKey: 'description', 
         name: 'Description',
+        sort: true
         }, 
         {
           fieldKey: "code",

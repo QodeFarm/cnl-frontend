@@ -25,7 +25,8 @@ export class ProductUniqueQuantityCodesComponent {
       cols: [
         {
           fieldKey: 'quantity_code_name',
-          name: 'Name'
+          name: 'Name',
+          sort: true
         },
         {
           fieldKey: "code",

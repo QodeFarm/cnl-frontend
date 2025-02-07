@@ -24,7 +24,8 @@ export class ProductItemTypeComponent {
       cols: [
         {
           fieldKey: 'item_name',
-          name: 'Name'
+          name: 'Name',
+          sort: true
         },
         {
           fieldKey: "code",

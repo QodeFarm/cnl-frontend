@@ -17,24 +17,10 @@ export class ProductItemBalanceComponent {
       pkId: "product_balance_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['product_balance_id']
+        keys: ['product','warehouse_location_id','quantity']
       },
       defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
-        {
-          fieldKey: 'balance',
-          name: 'Balance',
-          sort: true
-        },     
-        {
-          fieldKey: 'location',
-          name: 'Location',
-          sort: true,
-          displayType: "map",
-          mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.location.location_name}`;
-          },
-        },
         {
           fieldKey: 'product',
           name: 'Product',
@@ -44,6 +30,20 @@ export class ProductItemBalanceComponent {
             return `${row.product.name}`;
           },
         },
+        {
+          fieldKey: 'warehouse_location_id',
+          name: 'Warehouse Locations',
+          sort: true,
+          displayType: "map",
+          mapFn: (currentValue: any, row: any, col: any) => {
+            return `${row.warehouse_location.location_name}`;
+          },
+        },
+        {
+          fieldKey: 'quantity',
+          name: 'Quantity',
+          sort: true
+        },     
         {
           fieldKey: "code",
           name: "Action",
@@ -75,9 +75,9 @@ export class ProductItemBalanceComponent {
           value: 'data.product.product_id'
         },
         {
-          key: 'location_id',
+          key: 'warehouse_location_id',
           type: 'script',
-          value: 'data.location.location_id'
+          value: 'data.warehouse_location.warehouse_location_id'
         },
       ],
       fields: 
@@ -86,64 +86,64 @@ export class ProductItemBalanceComponent {
           fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
           fieldGroup: 
         [
-	       {
-          key: 'balance',
-          type: 'input',
-          className: 'col-6 pb-3 ps-0',
-          templateOptions: {
-            label: 'Balance',
-            type: 'number',
-            placeholder: 'Enter Balance',
-            required: true,
-          }
-        },
-        {
-          key: 'location',
-          type: 'select',
-          className: 'col-6 pb-3 ps-0',
-          templateOptions: {
-            label: 'Location',
-            placeholder: 'Enter Location',
-            dataKey: 'location_id',
-            dataLabel: 'location_name',
-            required: true, // Consider setting required to true if necessary
-            lazy: {
-              url: 'inventory/warehouse_locations/',
-              lazyOneTime: true
+          {
+            key: 'product',
+            type: 'select',
+            className: 'col-6 pb-3 ps-0',
+            templateOptions: {
+              label: 'Products',
+              dataKey: 'product_id',
+              dataLabel: "name",
+              options: [],
+              lazy: {
+                url: 'products/products/',
+                lazyOneTime: true
+              },
+              required: true
             },
-          },
-          hooks: {
-            onInit: (field: any) => {
-              field.templateOptions.options = []; // Initialize options as empty
-        
-              // Subscribe to formControl value changes if needed, or simply set the options once
-              field.formControl.valueChanges.subscribe(data => {
-                console.log("Location data:", data); // Debug log
-              });
+            hooks: {
+              onInit: (field: any) => {
+                //field.templateOptions.options = this.cs.getRole();
+              }
             }
-          }
-        },
-        {
-          key: 'product',
-          type: 'select',
-          className: 'col-6 pb-3 ps-0',
-          templateOptions: {
-            label: 'Products',
-            dataKey: 'product_id',
-            dataLabel: "name",
-            options: [],
-            lazy: {
-              url: 'products/products/',
-              lazyOneTime: true
+          },
+          {
+            key: 'warehouse_location',
+            type: 'select',
+            className: 'col-6 pb-3 ps-0',
+            templateOptions: {
+              label: 'Warehouse Location',
+              placeholder: 'Enter Location',
+              dataKey: 'warehouse_location_id',
+              dataLabel: 'location_name',
+              required: true, // Consider setting required to true if necessary
+              lazy: {
+                url: 'inventory/warehouse_locations/',
+                lazyOneTime: true
+              },
             },
-            required: true
-          },
-          hooks: {
-            onInit: (field: any) => {
-              //field.templateOptions.options = this.cs.getRole();
+            hooks: {
+              onInit: (field: any) => {
+                field.templateOptions.options = []; // Initialize options as empty
+          
+                // Subscribe to formControl value changes if needed, or simply set the options once
+                field.formControl.valueChanges.subscribe(data => {
+                  console.log("Location data:", data); // Debug log
+                });
+              }
             }
-          }
-        },
+          },
+          {
+            key: 'quantity',
+            type: 'input',
+            className: 'col-6 pb-3 ps-0',
+            templateOptions: {
+              label: 'Quantity',
+              type: 'number',
+              placeholder: 'Enter Quantity',
+              required: true,
+            }
+          },
       ]
     }]
   }}

@@ -22,15 +22,18 @@ export class LeaveTypesComponent {
       cols: [
         {
           fieldKey: 'leave_type_name',
-          name: 'Leave Type Name'
+          name: 'Leave Type Name',
+          sort: true
         },
         {
           fieldKey: 'description',
-          name: 'Description'
+          name: 'Description',
+          sort: true
         },
         {
           fieldKey: 'max_days_allowed',
-          name: 'Max Days Allowed'
+          name: 'Max Days Allowed',
+          sort: true
         },
         {
           fieldKey: "code",

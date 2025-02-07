@@ -17,13 +17,14 @@ export class StatusesComponent {
       pkId: "status_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['status_id', 'name']
+        keys: ['status_id', 'status_name']
       },
       defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'status_name',
-          name: 'Status name'
+          name: 'Status name',
+          sort: true
         },
         {
           fieldKey: "code",

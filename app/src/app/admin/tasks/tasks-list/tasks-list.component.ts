@@ -27,7 +27,7 @@ export class TasksListComponent {
     pkId: "task_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['due_date','title','user_id','group_id','description','priority_id','status_id']
+      keys: ['title','user_id','group_id','description','priority_id','due_date','status_id']
     },
     defaultSort: { key: 'created_at', value: 'descend' },
     cols: [

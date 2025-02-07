@@ -17,7 +17,7 @@ export class ProductCategoriesComponent  {
     pkId: "category_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['id']
+      keys: ['category_name','code']
     },
     defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
@@ -29,7 +29,7 @@ export class ProductCategoriesComponent  {
       {
         fieldKey: 'code', 
         name: 'Code',
-        sort: false
+        sort: true
       },
   
       {

@@ -22,15 +22,18 @@ export class ShiftsComponent {
       cols: [
         {
           fieldKey: 'shift_name',
-          name: 'Shift Name'
+          name: 'Shift Name',
+          sort: true
         },
         {
           fieldKey: 'start_time',
-          name: 'Start Time'
+          name: 'Start Time',
+          sort: true
         },
         {
           fieldKey: 'end_time',
-          name: 'End Time'
+          name: 'End Time',
+          sort: true
         },
         {
           fieldKey: "code",

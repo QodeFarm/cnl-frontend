@@ -17,7 +17,7 @@ export class ProductSalesGlComponent {
       pkId: "sales_gl_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['id']
+        keys: ['name','sales_accounts','code','inactive','type','account_no','is_loan_account','address','employee','pan']
       },
       defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
@@ -29,7 +29,7 @@ export class ProductSalesGlComponent {
         {
           fieldKey: 'sales_accounts',
           name: 'Sales Accounts',
-          sort: false,
+          sort: true,
         },
         {
           fieldKey: 'code',
@@ -45,18 +45,18 @@ export class ProductSalesGlComponent {
         {
           fieldKey: 'inactive',
           name: 'Inactive',
-          sort: false,
+          sort: true,
           type: 'boolean'
         },
         {
           fieldKey: 'type', 
           name: 'Type',
-          sort: false
+          sort: true
         },
 		{
 		  fieldKey: 'account_no',
 		  name: 'Account No',
-		  sort: false,
+		  sort: true,
 		  isEncrypted: true
 		},
         // {
@@ -72,7 +72,7 @@ export class ProductSalesGlComponent {
         {
           fieldKey: 'is_loan_account', 
           name: 'Is Loan Account',
-          sort: false,
+          sort: true,
 		      type: 'boolean'
         },
         // {
@@ -84,18 +84,18 @@ export class ProductSalesGlComponent {
         {
           fieldKey: 'address', 
           name: 'Address',
-          sort: false
+          sort: true
         },
         {
           fieldKey: 'employee', 
           name: 'Employee',
-          sort: false,
+          sort: true,
 		      type: 'boolean'
         },
         {
           fieldKey: 'pan', 
           name: 'PAN',
-          sort: false
+          sort: true
         },
         {
           fieldKey: "code",

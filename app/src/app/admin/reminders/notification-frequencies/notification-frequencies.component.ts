@@ -22,7 +22,8 @@ export class NotificationFrequenciesComponent {
       cols: [
         {
           fieldKey: 'frequency_name',
-          name: 'Frequency Name'
+          name: 'Frequency Name',
+          sort: true
         },
         {
           fieldKey: "code",

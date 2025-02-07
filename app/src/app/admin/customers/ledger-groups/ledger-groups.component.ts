@@ -16,7 +16,7 @@ export class LedgerGroupsComponent {
       pkId: "ledger_group_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['ledger_group_id', 'name']
+        keys: ['ledger_group_id', 'name','code','inactive','under_group','nature']
       },
       defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
@@ -33,17 +33,18 @@ export class LedgerGroupsComponent {
         {
           fieldKey: 'inactive',
           name: 'Inactive',
-          sort: false,
+          sort: true,
           type: 'boolean'
         },
         {
           fieldKey: 'under_group', 
-          name: 'Under Group'
+          name: 'Under Group',
+          sort: true
         },
         {
           fieldKey: 'nature',
           name: 'Nature',
-          sort: false
+          sort: true
         },
         {
           fieldKey: "code",

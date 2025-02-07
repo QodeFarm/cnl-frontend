@@ -17,33 +17,39 @@ export class VendorPaymentTermsComponent {
       pkId: "payment_term_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['payment_term_id', 'name']
+        keys: ['payment_term_id', 'name', 'code','fixed_days','no_of_fixed_days','payment_cycle','run_on']
       },
       defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
 	      {
           fieldKey: 'name',
-          name: 'Name'
+          name: 'Name',
+          sort: true
         },
         {
           fieldKey: 'code',
-          name: 'code'
+          name: 'code',
+          sort: true
         },
 		    {
           fieldKey: 'fixed_days',
-          name: 'Fixed Days'
+          name: 'Fixed Days',
+          sort: true
         },
 		    {
           fieldKey: 'no_of_fixed_days',
-          name: 'No of fixed days'
+          name: 'No of fixed days',
+          sort: true
         },
         {
           fieldKey: 'payment_cycle',
-          name: 'Payment Cycle'
+          name: 'Payment Cycle',
+          sort: true
         },
 		    {
           fieldKey: 'run_on',
-          name: 'Run On'
+          name: 'Run On',
+          sort: true
         },
         {
           fieldKey: "code",

@@ -22,7 +22,8 @@ export class DepartmentsComponent {
       defaultSort: { key: 'created_at', value: 'descend' },
       cols: [{
           fieldKey: 'department_name',
-          name: 'Department Name'
+          name: 'Department Name',
+          sort: true
         },
         {
           fieldKey: "code",

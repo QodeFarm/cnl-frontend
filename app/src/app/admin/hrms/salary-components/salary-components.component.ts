@@ -21,7 +21,8 @@ export class SalaryComponentsComponent {
       defaultSort: { key: 'created_at', value: 'descend' },
       cols: [{
           fieldKey: 'component_name',
-          name: 'Component Name'
+          name: 'Component Name',
+          sort: true
         },
         {
           fieldKey: "code",

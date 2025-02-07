@@ -21,7 +21,8 @@ export class JobCodesComponent {
       defaultSort: { key: 'created_at', value: 'descend' },
       cols: [{
           fieldKey: 'job_code',
-          name: 'Job Code'
+          name: 'Job Code',
+          sort: true
         },
         {
           fieldKey: "code",

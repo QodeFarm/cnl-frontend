@@ -66,11 +66,14 @@ export class LeadsListComponent {
       {
         fieldKey: 'assignee',
         name: 'Assigned',
+        sort: true,
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.assignee.first_name} ${row.assignee.last_name}`;
+          // Concatenate first_name and last_name correctly
+          const firstName = row.assignee?.first_name || '';
+          const lastName = row.assignee?.last_name || '';
+          return `${firstName} ${lastName}`.trim();
         },
-        sort: true
       },
       {
         fieldKey: 'interaction_date',
