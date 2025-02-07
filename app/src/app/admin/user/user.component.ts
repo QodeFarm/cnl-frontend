@@ -68,7 +68,7 @@ export class UserComponent {
       ]
     },
     formConfig: {
-      url: 'users/create_user/',
+      url: 'users/users_update/',
       title: 'User',
       pkId: "user_id",
       exParams: [
