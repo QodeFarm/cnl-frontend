@@ -48,13 +48,13 @@ export class CompanyComponent {
         fieldGroupClassName: 'ant-row custom-form-block',
         fieldGroup : [
           {
-            className: 'col-9 p-0',
+            className: 'col-md-9 col-12 col-sm-8 p-0',
             fieldGroupClassName: "ant-row",
             fieldGroup: [
               {
                 key: 'name',
                 type: 'input',
-                className: 'col-3',
+                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Name',
                   placeholder: 'Enter name',
@@ -64,7 +64,7 @@ export class CompanyComponent {
               {
                 key: 'print_name',
                 type: 'input',
-                className: 'col-3',
+                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Print name',
                   placeholder: 'Enter print name',
@@ -74,7 +74,7 @@ export class CompanyComponent {
               {
                 key: 'short_name',
                 type: 'input',
-                className: 'col-3',
+                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Short name',
                   placeholder: 'Enter short name',
@@ -84,7 +84,7 @@ export class CompanyComponent {
               {
                 key: 'phone',
                 type: 'input',
-                className: 'col-3',
+                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Phone',
                   placeholder: 'Enter number',
@@ -94,7 +94,7 @@ export class CompanyComponent {
               {
                 key: 'email',
                 type: 'input',
-                className: 'col-3',
+                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Email',
                   placeholder: 'Enter email',
@@ -104,7 +104,7 @@ export class CompanyComponent {
               {
                 key: 'code',
                 type: 'input',
-                className: 'col-3',
+                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Code',
                   placeholder: 'Enter code',
@@ -114,7 +114,7 @@ export class CompanyComponent {
               {
                 key: 'num_branches',
                 type: 'input',
-                className: 'col-3',
+                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Num branches',
                   placeholder: 'Enter number',
@@ -124,7 +124,7 @@ export class CompanyComponent {
               {
                 key: 'num_employees',
                 type: 'input',
-                className: 'col-3',
+                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Num employees',
                   placeholder: 'Enter number',
@@ -134,7 +134,7 @@ export class CompanyComponent {
               {
                 key: 'pin_code',
                 type: 'input',
-                className: 'col-3',
+                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Pin code',
                   placeholder: 'Enter pin code',
@@ -144,7 +144,7 @@ export class CompanyComponent {
               {
                 key: 'city',
                 type: 'select',
-                className: 'col-3',
+                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'City',
                   dataKey: 'city_id',
@@ -165,7 +165,7 @@ export class CompanyComponent {
               {
                 key: 'state',
                 type: 'select',
-                className: 'col-3',
+                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'State',
                   dataKey: 'state_id',
@@ -186,7 +186,7 @@ export class CompanyComponent {
               {
                 key: 'country',
                 type: 'select',
-                className: 'col-3',
+                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Country',
                   dataKey: 'country_id',
@@ -207,7 +207,7 @@ export class CompanyComponent {
               {
                 key: 'website',
                 type: 'input',
-                className: 'col-3',
+                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Website',
                   placeholder: 'Enter URL',
@@ -217,7 +217,7 @@ export class CompanyComponent {
               {
                 key: 'facebook_url',
                 type: 'input',
-                className: 'col-3',
+                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Facebook URL',
                   placeholder: 'Enter URL',
@@ -227,7 +227,7 @@ export class CompanyComponent {
               {
                 key: 'skype_id',
                 type: 'input',
-                className: 'col-3',
+                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Skype id',
                   placeholder: 'Enter URL',
@@ -237,7 +237,7 @@ export class CompanyComponent {
               {
                 key: 'twitter_handle',
                 type: 'input',
-                className: 'col-3',
+                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Twitter handle',
                   placeholder: 'Enter URL',
@@ -247,7 +247,7 @@ export class CompanyComponent {
               {
                 key: 'pan',
                 type: 'input',
-                className: 'col-3',
+                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'PAN',
                   placeholder: 'Enter pan',
@@ -257,7 +257,7 @@ export class CompanyComponent {
               {
                 key: 'tan',
                 type: 'input',
-                className: 'col-3',
+                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'TAN',
                   placeholder: 'Enter tan',
@@ -267,7 +267,7 @@ export class CompanyComponent {
               {
                 key: 'cin',
                 type: 'input',
-                className: 'col-3',
+                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'CIN',
                   placeholder: 'Enter cin',
@@ -277,7 +277,7 @@ export class CompanyComponent {
               {
                 key: 'gst_tin',
                 type: 'input',
-                className: 'col-3',
+                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'GST TIN',
                   placeholder: 'Enter gst tin',
@@ -287,7 +287,7 @@ export class CompanyComponent {
               {
                   key: 'esi_no',
                   type: 'input',
-                  className: 'col-3',
+                  className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'ESI no',
                     placeholder: 'Enter number',
@@ -297,7 +297,7 @@ export class CompanyComponent {
                 {
                   key: 'pf_no',
                   type: 'input',
-                  className: 'col-3',
+                  className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'PF no',
                     placeholder: 'Enter number',
@@ -307,7 +307,7 @@ export class CompanyComponent {
                 {
                   key: 'authorized_person',
                   type: 'input',
-                  className: 'col-3',
+                  className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'Authorized person',
                     placeholder: 'Enter name',
@@ -317,7 +317,7 @@ export class CompanyComponent {
                 {
                   key: 'iec_code',
                   type: 'input',
-                  className: 'col-3',
+                  className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'IEC code',
                     placeholder: 'Enter IEC code',
@@ -327,7 +327,7 @@ export class CompanyComponent {
                 {
                   key: 'eway_username',
                   type: 'input',
-                  className: 'col-3',
+                  className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'E-Way Username',
                     placeholder: 'Enter name',
@@ -337,7 +337,7 @@ export class CompanyComponent {
                 {
                   key: 'eway_password',
                   type: 'input',
-                  className: 'col-3',
+                  className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'E-Way password',
                     placeholder: 'Enter password',
@@ -347,7 +347,7 @@ export class CompanyComponent {
                 {
                   key: 'gstn_username',
                   type: 'input',
-                  className: 'col-3',
+                  className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'GSTN Username',
                     placeholder: 'Enter name',
@@ -357,7 +357,7 @@ export class CompanyComponent {
                 {
                   key: 'gstn_password',
                   type: 'input',
-                  className: 'col-3',
+                  className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'GSTN password',
                     placeholder: 'Enter password',
@@ -367,7 +367,7 @@ export class CompanyComponent {
                 {
                   key: 'vat_gst_status',
                   type: 'select',
-                  className: 'col-3',
+                  className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'Vat GST status',
                     placeholder: 'select',
@@ -382,7 +382,7 @@ export class CompanyComponent {
                 {
                   key: 'gst_type',
                   type: 'select',
-                  className: 'col-3',
+                  className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'GST type',
                     placeholder: 'select',
@@ -397,7 +397,7 @@ export class CompanyComponent {
                 {
                   key: 'marketplace_url',
                   type: 'input',
-                  className: 'col-3',
+                  className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'Marketplace URL',
                     placeholder: 'Enter URL',
@@ -407,7 +407,7 @@ export class CompanyComponent {
                 {
                   key: 'drug_license_no',
                   type: 'input',
-                  className: 'col-3',
+                  className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'Drug license no',
                     placeholder: 'Enter number',
@@ -417,7 +417,7 @@ export class CompanyComponent {
                 {
                   key: 'address',
                   type: 'textarea',
-                  className: 'col-6',
+                  className: 'col-md-6 col-12',
                   templateOptions: {
                     label: 'Address',
                     placeholder: 'Enter address',
@@ -427,7 +427,7 @@ export class CompanyComponent {
                 {
                   key: 'print_address',
                   type:  'textarea',
-                  className: 'col-6',
+                  className: 'col-md-6 col-12',
                   templateOptions: {
                     label: 'Print Address',
                     placeholder: 'Enter address',
@@ -437,7 +437,7 @@ export class CompanyComponent {
                 {
                   key: 'turnover_less_than_5cr',
                   type: 'checkbox',
-                  className: 'col-3',
+                  className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'Turnover less than 5cr',
                     placeholder: 'Enter Name',
@@ -447,7 +447,7 @@ export class CompanyComponent {
                 {
                   key: 'einvoice_approved_only',
                   type: 'checkbox',
-                  className: 'col-3',
+                  className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'E-Invoice approved only',
                     placeholder: 'Enter Name',
@@ -457,7 +457,7 @@ export class CompanyComponent {
                 {
                   key: 'is_deleted',
                   type: 'checkbox',
-                  className: 'col-3',
+                  className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'Is Deleted',
                     placeholder: 'Enter Name',
@@ -469,7 +469,7 @@ export class CompanyComponent {
 
             // Right side for the picture and additional fields
             {
-              className: 'col-3 p-0',
+              className: 'col-md-3 col-sm-4 col-12 p-0',
               fieldGroup: [
                 {
                   key: 'logo',

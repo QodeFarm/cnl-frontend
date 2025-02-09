@@ -44,6 +44,7 @@ export interface Tab {
 export class AdminLayoutComponent {
   menulList = <any>[];
   userName: any;
+  role:any;
   public currentHoverTabKey: string;
   public tabs: Tab[] = [];
   showContain = false;
@@ -91,12 +92,20 @@ export class AdminLayoutComponent {
   unloadNotification($event: any): void {
     $event.returnValue = true;
   }
+  layertoggleMenu() {
+    document.body.classList.remove("sidebar-toggled");
+    const sidebarElement = this.elementRef.nativeElement.querySelector('.sidebar');
+    if (sidebarElement) {
+      this.renderer.removeClass(sidebarElement, 'toggled');
+    }
+  }
   ngOnInit() {
     const user = this.taLoacal.getItem('user');
     this.menulList = [];
 
     if (user) {
       this.userName = user.username;
+      this.role = user.role_name;
       const userId = user.user_id; // Extracting the user_id dynamically
       const role_Id = user.role_id
 
