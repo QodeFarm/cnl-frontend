@@ -37,6 +37,7 @@ export class SalesListComponent {
     "globalSearch": {
       keys: ['order_date','order_no','sale_type','customer','amount','tax','advance_amount','status_name','flow_status']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {
         fieldKey: 'order_date',

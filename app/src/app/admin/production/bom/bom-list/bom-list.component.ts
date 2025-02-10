@@ -35,6 +35,7 @@ export class BomListComponent {
     "globalSearch": {
       keys: ['bom_id']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {
         fieldKey: 'bom',

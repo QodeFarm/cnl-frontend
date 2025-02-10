@@ -35,12 +35,8 @@ tableConfig: TaTableConfig = {
   "globalSearch": {
     keys: ['return_date','customer','return_no','status_name','tax','return_reason','due_date','tax_amount','total_amount','remarks']
   },
+  defaultSort: { key: 'created_at', value: 'descend' },
   cols: [
-    {
-      fieldKey: 'return_date',
-      name: 'Return Date',
-      sort: true
-    },
     {
       fieldKey: 'customer',
       name: 'Customer',
@@ -53,6 +49,11 @@ tableConfig: TaTableConfig = {
     {
       fieldKey: 'return_no',
       name: 'Return No',
+      sort: true
+    },
+    {
+      fieldKey: 'return_date',
+      name: 'Return Date',
       sort: true
     },
     {
