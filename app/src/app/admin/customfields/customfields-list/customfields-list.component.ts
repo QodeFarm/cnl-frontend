@@ -21,7 +21,7 @@ export class CustomfieldsListComponent {
     pkId: 'custom_field_id', // Primary key identifier
     pageSize: 10,
     globalSearch: {
-      keys: ['field_name', 'entity_name']
+      keys: ['field_name', 'entity_id','field_type_id','is_required']
     },
     cols: [
       {
