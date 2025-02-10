@@ -17,8 +17,9 @@ export class ProductGroupsComponent   {
     pkId: "product_group_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['id', 'name']
+      keys: ['group_name', 'description']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {
         fieldKey: 'group_name',
@@ -28,9 +29,8 @@ export class ProductGroupsComponent   {
       {
         fieldKey: 'description', 
         name: 'Description',
-        sort: false
+        sort: true
       },
-  
       {
         fieldKey: "code",
         name: "Action",

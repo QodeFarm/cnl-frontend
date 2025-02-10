@@ -20,20 +20,24 @@ export class MachinesComponent {
       pkId: "machine_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['machine_id', 'machine_name']
+        keys: ['machine_id', 'machine_name', 'description', 'status']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'machine_name',
-          name: 'Machine Name'
+          name: 'Machine Name',
+          sort: true
         },
         {
           fieldKey: 'description',
-          name: 'Description'
+          name: 'Description',
+          sort: true
         },
         {
           fieldKey: 'status',
-          name: 'status'
+          name: 'status',
+          sort: true
         },
         {
           fieldKey: "code",

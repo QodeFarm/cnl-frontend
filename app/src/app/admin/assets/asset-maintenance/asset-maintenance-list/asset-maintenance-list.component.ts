@@ -31,12 +31,8 @@ export class AssetMaintenanceListComponent {
     "globalSearch": {
       keys: ['maintenance_date','asset_id','cost','maintenance_description']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
-      {
-        fieldKey: 'maintenance_date',
-        name: 'Maintenance Date',
-        sort: true
-      },
       {
         fieldKey: 'asset_id',
         name: 'Asset',
@@ -49,6 +45,11 @@ export class AssetMaintenanceListComponent {
       {
         fieldKey: 'cost', 
         name: 'Cost',
+        sort: true
+      },
+      {
+        fieldKey: 'maintenance_date',
+        name: 'Maintenance Date',
         sort: true
       },
       {

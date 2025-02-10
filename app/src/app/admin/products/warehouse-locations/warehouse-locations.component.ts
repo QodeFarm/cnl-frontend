@@ -16,16 +16,19 @@ export class WarehouseLocationsComponent {
       pkId: "location_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['location_id','location_name']
+        keys: ['location_id','location_name','description','warehouse']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'location_name',
-          name: 'Location Name'
+          name: 'Location Name',
+          sort: true
         },
         {
           fieldKey: 'description',
-          name: 'Description'
+          name: 'Description',
+          sort: true
         },
         {
           fieldKey: 'warehouse',

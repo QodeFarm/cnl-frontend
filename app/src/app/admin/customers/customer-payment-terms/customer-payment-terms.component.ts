@@ -17,8 +17,9 @@ export class CustomerPaymentTermsComponent {
       pkId: "payment_term_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['payment_term_id', 'name']
+        keys: ['payment_term_id', 'name','code','fixed_days','no_of_fixed_days','payment_cycle', 'run_on']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'name',
@@ -34,22 +35,22 @@ export class CustomerPaymentTermsComponent {
           fieldKey: 'fixed_days', 
           name: 'Fixed days',
           type: 'number',
-          sort: false
+          sort: true
         },
         {
           fieldKey: 'no_of_fixed_days', 
           name: 'No.of.fixed days',
-          sort: false
+          sort: true
         },
         {
           fieldKey: 'payment_cycle', 
           name: 'Payment Cycle',
-          sort: false
+          sort: true
         },
         {
           fieldKey: 'run_on', 
           name: 'Run on',
-          sort: false
+          sort: true
         },
         {
           fieldKey: "code",
