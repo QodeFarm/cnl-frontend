@@ -17,7 +17,7 @@ export class ProductStockUnitsComponent {
       pkId: "stock_unit_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['id']
+        keys: ['id','stock_unit_name', 'quantity_code_id', 'description']
       },
       cols: [
         {

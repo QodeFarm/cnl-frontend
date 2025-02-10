@@ -16,18 +16,18 @@ export class LedgerAccountsComponent {
       pkId: "ledger_account_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['ledger_account_id', 'name']
+        keys: ['ledger_account_id', 'name','code','inactive','type','account_no','is_loan_account','address','pan','ledger_group_id']
       },
       cols: [
         {
           fieldKey: 'name',
           name: 'Name',
-          sort: true
+          // sort: true
         },
         {
           fieldKey: 'code', 
           name: 'Code',
-          sort: true
+          // sort: true
         },
         // {
         //   fieldKey: 'is_subledger',
@@ -87,7 +87,7 @@ export class LedgerAccountsComponent {
         {
           fieldKey: 'ledger_group_id',
           name: 'Ledger Group',
-          sort: true,
+          // sort: true,
           displayType: "map",
           mapFn: (currentValue: any, row: any, col: any) => {
             return `${row.ledger_group.name}`;

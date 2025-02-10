@@ -18,7 +18,7 @@ export class SizeComponent {
       pkId: "size_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['size_id','size_name']
+        keys: ['size_id','size_name','size_category','size_system','length','height', 'width', 'size_unit', 'description']
       },
       cols: [
         {

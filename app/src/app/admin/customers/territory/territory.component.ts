@@ -19,18 +19,18 @@ export class TerritoryComponent {
       pkId: "territory_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['territory_id', 'name']
+        keys: ['territory_id', 'name','code']
       },
       cols: [
         {
           fieldKey: 'name',
           name: 'Name',
-          sort: true
+          // sort: true
         },
         {
           fieldKey: 'code', 
           name: 'Code',
-          sort: true
+          // sort: true
         },
         {
           fieldKey: "code",
@@ -58,13 +58,13 @@ export class TerritoryComponent {
       pkId: "territory_id",
       fields: [
         {
-          className: 'col-9 p-0',
+          // className: 'col-9 p-0',
           fieldGroupClassName: "ant-row",
           fieldGroup:[
             {
               key: 'name',
               type: 'input',
-              className: 'col-6',
+              className: 'col-6 ps-0',
               templateOptions: {
                 label: 'Name',
                 placeholder: 'Enter Name',
@@ -74,7 +74,7 @@ export class TerritoryComponent {
             {
               key: 'code',
               type: 'input',
-              className: 'col-6',
+              className: 'col-6 ps-0',
               templateOptions: {
                 label: 'Code',
                 placeholder: 'Enter Code',

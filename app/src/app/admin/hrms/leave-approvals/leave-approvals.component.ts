@@ -25,7 +25,7 @@ export class LeaveApprovalsComponent {
       pkId: "approval_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['approval_id', 'name']
+        keys: ['approval_id', 'leave_id','name','status_id','approval_date']
       },
       cols: [
         {

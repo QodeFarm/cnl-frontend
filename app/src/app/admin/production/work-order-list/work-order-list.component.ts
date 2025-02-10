@@ -29,7 +29,7 @@ export class WorkOrderListComponent {
     ],
     pageSize: 10,
     globalSearch: {
-      keys: ['start_date','product','quantity','status_id','end_date']
+      keys: ['start_date','product','size','color','quantity', 'completed_qty','pending_qty','status_id','end_date']
     },
     cols: [
       {

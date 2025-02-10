@@ -16,7 +16,7 @@ export class PaymentLinkTypeComponent {
       pkId: "payment_link_type_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['payment_link_type_id', 'name']
+        keys: ['payment_link_type_id', 'name','description']
       },
       cols: [
         {

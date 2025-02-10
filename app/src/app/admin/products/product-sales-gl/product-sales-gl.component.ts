@@ -17,13 +17,13 @@ export class ProductSalesGlComponent {
       pkId: "sales_gl_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['id']
+        keys: ['id','name','sales_accounts','code','inactive','type','account_no','is_loan_account','address','employee','pan']
       },
       cols: [
         {
           fieldKey: 'name',
           name: 'Name',
-          sort: true
+          // sort: true
         },
         {
           fieldKey: 'sales_accounts',

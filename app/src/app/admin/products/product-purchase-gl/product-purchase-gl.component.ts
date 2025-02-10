@@ -17,7 +17,7 @@ export class ProductPurchaseGlComponent {
       pkId: "purchase_gl_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['id']
+        keys: ['id','name','purchase_accounts','code','inactive','type','account_no','is_loan_account','address', 'pan', 'employee']
       },
       cols: [
         {

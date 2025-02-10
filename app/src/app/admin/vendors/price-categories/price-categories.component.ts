@@ -17,7 +17,7 @@ export class PriceCategoriesComponent {
       pkId: "price_category_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['price_category_id', 'name']
+        keys: ['price_category_id', 'name','code']
       },
       cols: [
 		    {

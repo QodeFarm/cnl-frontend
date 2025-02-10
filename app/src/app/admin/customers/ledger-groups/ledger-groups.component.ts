@@ -16,7 +16,7 @@ export class LedgerGroupsComponent {
       pkId: "ledger_group_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['ledger_group_id', 'name']
+        keys: ['ledger_group_id', 'name','code','inactive','under_group','nature']
       },
       cols: [
         {

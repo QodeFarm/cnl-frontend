@@ -16,7 +16,7 @@ export class WarehouseLocationsComponent {
       pkId: "location_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['location_id','location_name']
+        keys: ['location_id','location_name','description','warehouse']
       },
       cols: [
         {

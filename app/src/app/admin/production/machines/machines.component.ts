@@ -20,7 +20,7 @@ export class MachinesComponent {
       pkId: "machine_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['machine_id', 'machine_name']
+        keys: ['machine_id', 'description','machine_name','status',]
       },
       cols: [
         {

@@ -17,7 +17,7 @@ export class StatusesComponent {
       pkId: "status_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['status_id', 'name']
+        keys: ['status_id', 'status_name']
       },
       cols: [
         {

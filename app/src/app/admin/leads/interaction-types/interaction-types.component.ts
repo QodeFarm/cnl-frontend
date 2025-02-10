@@ -17,7 +17,7 @@ export class InteractionTypesComponent {
       pkId: "interaction_type_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['interaction_type_id']
+        keys: ['interaction_type']
       },
       cols: [
         {

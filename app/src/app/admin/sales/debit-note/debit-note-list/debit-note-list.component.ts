@@ -21,7 +21,7 @@ export class DebitNoteListComponent {
     pkId: "debit_note_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['debit_note_id']
+      keys: ['customer_id','debit_date','sale_invoice_id','debit_note_number','reason','total_amount','status_name']
     },
     cols: [
       {
@@ -63,7 +63,7 @@ export class DebitNoteListComponent {
         sort: true
       },
       {
-        fieldKey: 'order_status_id',
+        fieldKey: 'status_name',
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {

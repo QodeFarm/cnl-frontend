@@ -21,7 +21,7 @@ export class BudgetListComponent {
     pkId: "budget_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['account_id','fiscal_year','allocated_amount','spent_amount']
+      keys: ['created_at','account_id','fiscal_year','allocated_amount','spent_amount']
     },
     cols: [
       {

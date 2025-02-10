@@ -20,7 +20,7 @@ export class InventoryComponent   {
     pkId: "product_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['id', 'name']
+      keys: ['created_at','id', 'name','code','category_name','barcode','stock_unit_name','mrp','purchase_rate','sales_rate','balance','updated_at' ]
     },
     cols: [
       {
@@ -40,7 +40,7 @@ export class InventoryComponent   {
         sort: true
       },
       {
-        fieldKey: 'category',
+        fieldKey: 'category_name',
         name: 'Category',
         sort: true,
         displayType: "map",
@@ -54,7 +54,7 @@ export class InventoryComponent   {
         sort: true
       },
       {
-        fieldKey: 'stock_unit',
+        fieldKey: 'stock_unit_name',
         name: 'Unit',
         sort: true,
         displayType: "map",

@@ -36,7 +36,7 @@ export class VendorsListComponent {
         fieldKey: 'created_at',
         name: 'Created At',
         sort: true,
-        displayType: "date"
+        displayType: "datetime"
       },
       {
         fieldKey: 'name',

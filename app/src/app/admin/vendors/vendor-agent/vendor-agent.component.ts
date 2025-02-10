@@ -17,7 +17,7 @@ export class VendorAgentComponent {
       pkId: "vendor_agent_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['vendor_agent_id', 'name']
+        keys: ['vendor_agent_id', 'name', 'code','commission_rate','rate_on','amount_type']
       },
       cols: [
         {

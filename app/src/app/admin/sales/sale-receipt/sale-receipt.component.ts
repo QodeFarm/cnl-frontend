@@ -36,7 +36,7 @@ export class SaleReceiptComponent implements OnInit {
         pkId: "sale_order_id",
         pageSize: 10,
         globalSearch: {
-          // keys: ['customer', 'receipt_no']
+          keys: ['customer','order_no','invoice_no','products']
         },
         cols: [
           {

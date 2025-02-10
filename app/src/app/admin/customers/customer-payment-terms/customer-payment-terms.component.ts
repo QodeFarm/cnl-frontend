@@ -17,18 +17,18 @@ export class CustomerPaymentTermsComponent {
       pkId: "payment_term_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['payment_term_id', 'name']
+        keys: ['payment_term_id', 'name', 'code','fixed_days','no_of_fixed_days','payment_cycle','run_on' ]
       },
       cols: [
         {
           fieldKey: 'name',
           name: 'Name',
-          sort: true
+          // sort: true
         },
         {
           fieldKey: 'code', 
           name: 'Code',
-          sort: true
+          // sort: true
         },
         {
           fieldKey: 'fixed_days', 

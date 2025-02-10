@@ -19,7 +19,7 @@ export class ProductBrandsComponent {
       pkId: "brand_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['brand_id', 'brand_name']
+        keys: ['brand_id', 'brand_name','code','brand_salesman_name']
       },
       cols: [
         {
@@ -38,7 +38,7 @@ export class ProductBrandsComponent {
         //   sort: true
         // },
         {
-          fieldKey: 'brand_salesman',
+          fieldKey: 'brand_salesman_name',
           name: 'Brand Salesman',
           sort: true,
           displayType: "map",

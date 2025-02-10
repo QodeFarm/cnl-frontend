@@ -18,7 +18,7 @@ export class VendorCategoryComponent {
       pkId: "vendor_category_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['vendor_category_id', 'name']
+        keys: ['vendor_category_id', 'name','code']
       },
       cols: [
         {

@@ -21,7 +21,7 @@ export class ExpenseClaimListComponent {
     pkId: "expense_claim_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['employee_id','claim_date','description','total_amount','status']
+      keys: ['created_at','employee_id','claim_date','description','total_amount','status']
     },
     cols: [
       {

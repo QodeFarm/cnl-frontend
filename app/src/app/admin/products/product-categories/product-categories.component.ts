@@ -17,7 +17,7 @@ export class ProductCategoriesComponent  {
     pkId: "category_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['id']
+      keys: ['id', 'category_name','code',]
     },
     cols: [
       {

@@ -17,7 +17,7 @@ export class ProductItemBalanceComponent {
       pkId: "product_balance_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['product_balance_id']
+        keys: ['product_balance_id','balance','location','product']
       },
       cols: [
         {

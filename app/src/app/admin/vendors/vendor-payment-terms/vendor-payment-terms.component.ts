@@ -17,7 +17,7 @@ export class VendorPaymentTermsComponent {
       pkId: "payment_term_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['payment_term_id', 'name']
+        keys: ['payment_term_id', 'name','code','fixed_days','no_of_fixed_days','payment_cycle','run_on']
       },
       cols: [
 	      {

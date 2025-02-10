@@ -17,28 +17,28 @@ export class TransportersComponent {
       pkId: "transporter_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['transporter_id', 'name']
+        keys: ['transporter_id', 'name','code','gst_no','website_url']
       },
       cols: [
         {
           fieldKey: 'name',
           name: 'Name',
-          sort: true
+          // sort: true
         },
         {
           fieldKey: 'code', 
           name: 'Code',
-          sort: true
+          // sort: true
         },
         {
           fieldKey: 'gst_no', 
           name: 'GST',
-          sort: false
+          // sort: false
         },
         {
           fieldKey: 'website_url', 
           name: 'Web URL',
-          sort: false
+          // sort: false
         },
         {
           fieldKey: "code",

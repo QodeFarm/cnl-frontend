@@ -21,7 +21,7 @@ export class CreditNoteListComponent {
     pkId: "credit_note_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['credit_note_id']
+      keys: ['customer_id','credit_date','sale_invoice_id','credit_note_number','reason','total_amount','status_name']
     },
     cols: [
       {
@@ -63,7 +63,7 @@ export class CreditNoteListComponent {
         sort: true
       },
       {
-        fieldKey: 'order_status_id',
+        fieldKey: 'status_name',
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {

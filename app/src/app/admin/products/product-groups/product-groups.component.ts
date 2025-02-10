@@ -17,7 +17,7 @@ export class ProductGroupsComponent   {
     pkId: "product_group_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['id', 'name']
+      keys: ['id', 'group_name','description']
     },
     cols: [
       {

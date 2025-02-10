@@ -17,7 +17,7 @@ export class DepartmentsComponent {
       pkId: "department_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['department_id', 'designation_name']
+        keys: ['department_id','department_name','designation_name']
       },
       cols: [{
           fieldKey: 'department_name',
