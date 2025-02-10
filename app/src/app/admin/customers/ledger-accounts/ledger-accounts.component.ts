@@ -16,8 +16,9 @@ export class LedgerAccountsComponent {
       pkId: "ledger_account_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['ledger_account_id', 'name']
+        keys: ['ledger_account_id', 'name','code','inactive','type','account_no','is_loan_account', 'address','pan','ledger_group_id']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'name',
@@ -38,18 +39,18 @@ export class LedgerAccountsComponent {
         {
           fieldKey: 'inactive',
           name: 'Inactive',
-          sort: false,
+          sort: true,
           type: 'boolean'
         },
         {
           fieldKey: 'type', 
           name: 'Type',
-          sort: false
+          sort: true
         },
         {
           fieldKey: 'account_no',
           name: 'Account No',
-          sort: false,
+          sort: true,
           isEncrypted: true
         },
         // {
@@ -65,7 +66,7 @@ export class LedgerAccountsComponent {
         {
           fieldKey: 'is_loan_account',
           name: 'Loan Account',
-          sort: false,
+          sort: true,
           type: 'boolean'
         },
         // {
@@ -77,12 +78,12 @@ export class LedgerAccountsComponent {
         {
           fieldKey: 'address', 
           name: 'Address',
-          sort: false
+          sort: true
         },
         {
           fieldKey: 'pan',
           name: 'PAN',
-          sort: false,
+          sort: true,
         },
         {
           fieldKey: 'ledger_group_id',

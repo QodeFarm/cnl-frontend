@@ -145,9 +145,13 @@ export class ProfileComponent {
                 },
                 hooks: {
                   onInit: (field: any) => {
-                    //field.templateOptions.options = this.cs.getRole();
+                    const user = JSON.parse(localStorage.getItem('user') || '{}');
+                    // If the logged-in user is not admin, disable the role field
+                    if (user?.role_name !== 'Admin'){
+                      field.templateOptions.disabled = true;
+                    }
                   }
-                }
+                } 
               },
               {
                 key: 'gender',

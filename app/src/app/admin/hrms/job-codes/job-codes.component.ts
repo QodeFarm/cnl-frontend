@@ -18,9 +18,11 @@ export class JobCodesComponent {
       "globalSearch": {
         keys: ['job_code_id', 'job_code']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [{
           fieldKey: 'job_code',
-          name: 'Job Code'
+          name: 'Job Code',
+          sort: true
         },
         {
           fieldKey: "code",

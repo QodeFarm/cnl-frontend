@@ -18,18 +18,22 @@ export class LeaveTypesComponent {
       "globalSearch": {
         keys: ['leave_type_id','leave_type_name','description','max_days_allowed']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'leave_type_name',
-          name: 'Leave Type Name'
+          name: 'Leave Type Name',
+          sort: true
         },
         {
           fieldKey: 'description',
-          name: 'Description'
+          name: 'Description',
+          sort: true
         },
         {
           fieldKey: 'max_days_allowed',
-          name: 'Max Days Allowed'
+          name: 'Max Days Allowed',
+          sort: true
         },
         {
           fieldKey: "code",
