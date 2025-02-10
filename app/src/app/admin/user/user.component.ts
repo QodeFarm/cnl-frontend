@@ -20,7 +20,7 @@ export class UserComponent {
       pkId: "user_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['username', 'email']
+        keys: ['username', 'email','role','mobile']
       },
       cols: [
         {

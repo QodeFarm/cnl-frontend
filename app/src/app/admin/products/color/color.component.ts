@@ -22,7 +22,8 @@ export class ColorComponent {
       cols: [
         {
           fieldKey: 'color_name',
-          name: 'Color Name'
+          name: 'Color Name',
+          sort: true
         },
         {
           fieldKey: "code",

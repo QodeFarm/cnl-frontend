@@ -22,14 +22,17 @@ export class UsergroupsComponent {
       "globalSearch": {
         keys: ['group_id', 'group_name', 'description']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'group_name',
-          name: 'Group Name'
+          name: 'Group Name',
+          sort: true
         },
 		    {
         fieldKey: 'description', 
         name: 'Description',
+        sort: true
         }, 
         {
           fieldKey: "code",
