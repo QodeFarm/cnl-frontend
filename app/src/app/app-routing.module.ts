@@ -27,6 +27,7 @@ const routes: Routes = [
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
       { path: 'profile', data: { title: 'Profile', moduleName: 'profile' }, canActivate: [], loadChildren: () => import('./admin/profile/profile.module').then(m => m.ProfileModule) },
       { path: 'dashboard', data: { title: 'Dashbord', moduleName: 'dashboard' }, canActivate: [], loadComponent: () => import('./admin/dashboard/dashboard.component').then(m => m.DashboardComponent) },
+      { path: 'profile/change-password', data: { title: 'Change Password', moduleName: 'change-password' }, canActivate: [], loadComponent: () => import('./admin/profile/change-password/change-password.component').then(m => m.ChangePasswordComponent) },
       // { path: 'users', data: { title: 'Users', moduleName: 'Users' }, canActivate: [], loadChildren: () => import('./admin/user/user.component').then(m => m.UserComponent) },
       // sales module
       { path: 'sales', data: { title: 'Sales', moduleName: 'Sales' }, canActivate: [], loadComponent: () => import('./admin/sales/sales.component').then(m => m.SalesComponent) },
@@ -60,7 +61,7 @@ const routes: Routes = [
 
       //Products Module
       { path: 'inventory', data: { title: 'Inventory', moduleName: 'inventory' }, canActivate: [], loadComponent: () => import('./admin/inventory/inventory.component').then(m => m.InventoryComponent) },
-      { path: 'stockjournal', data: { title: 'Stock Journal', moduleName: 'stockjournal' }, canActivate: [], loadComponent: () => import('./admin/stockjournal/stockjournal.component').then(m => m.StockjournalComponent) },
+      { path: 'production/stockjournal', data: { title: 'Stock Journal', moduleName: 'stockjournal' }, canActivate: [], loadComponent: () => import('./admin/stockjournal/stockjournal.component').then(m => m.StockjournalComponent) },
       // { path: 'products', data: { title: 'Products', moduleName: 'products' }, canActivate: [], loadComponent: () => import('./admin/products/products.component').then(m => m.ProductsComponent) },
       { path: 'warehouses', data: { title: 'Warehouses', moduleName: 'warehouses' }, canActivate: [], loadComponent: () => import('./admin/warehouses/warehouses.component').then(m => m.WarehousesComponent) },
       { path: 'quickpacks', data: { title: 'Quick Packs', moduleName: 'quickpacks' }, canActivate: [], loadComponent: () => import('./admin/quickpacks/quickpacks.component').then(m => m.QuickpacksComponent) },
@@ -113,6 +114,9 @@ const routes: Routes = [
 
       //Reporting Tool
       { path: 'reports/custome-reports', data: { title: 'Reports', moduleName: 'reports' }, canActivate: [], loadComponent: () => import('./admin/reports/reports.component').then(m => m.ReportsComponent) },
+
+      //Customfields Tool
+      { path: 'customfields', data: { title: 'customfields', moduleName: 'customfields' }, canActivate: [], loadChildren: () => import('./admin/customfields/customfields.module').then(m => m.CustomfieldsModule) },
 
 
       // { path: 'production', data: { title: 'production', moduleName: 'production' }, canActivate: [], loadChildren: () => import('./admin/production/production.module').then(m => m.ProductionModule) },

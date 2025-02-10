@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 
 @Component({
   selector: 'app-work-order-list',
@@ -15,6 +16,11 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 export class WorkOrderListComponent {
   
   @Output('edit') edit = new EventEmitter<void>();
+  @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+
+  refreshTable() {
+   this.taTableComponent?.refresh();
+  };
 
   tableConfig: TaTableConfig = {
     apiUrl: 'production/work_order/',
@@ -52,7 +58,7 @@ export class WorkOrderListComponent {
         sort: true,
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
-          return row.size.size_name;
+          return row?.size?.size_name;
         },
       },
       {
@@ -61,7 +67,7 @@ export class WorkOrderListComponent {
         sort: true,
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
-          return row.color.color_name;
+          return row?.color?.color_name;
         },
       },
       {
@@ -85,6 +91,24 @@ export class WorkOrderListComponent {
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
           return `${row.status.status_name}`;
+        },
+        sort: true
+      },
+      {
+        fieldKey: 'order_no',
+        name: 'Sale Order',
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          return `${row.sale_order.order_no}`;
+        },
+        sort: true
+      },
+      {
+        fieldKey: 'status_name',
+        name: 'Flow Status',
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          return `${row.sale_order.status_name}`;
         },
         sort: true
       },

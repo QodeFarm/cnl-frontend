@@ -5,8 +5,8 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 @Component({
   selector: 'app-machines',
-  standalone: true,
-  imports: [CommonModule, AdminCommmonModule],
+  // standalone: true,
+  // imports: [CommonModule, AdminCommmonModule],
   templateUrl: './machines.component.html',
   styleUrls: ['./machines.component.scss']
 })
@@ -20,20 +20,24 @@ export class MachinesComponent {
       pkId: "machine_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['machine_id', 'description','machine_name','status',]
+        keys: ['machine_id', 'machine_name', 'description', 'status']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'machine_name',
-          name: 'Machine Name'
+          name: 'Machine Name',
+          sort: true
         },
         {
           fieldKey: 'description',
-          name: 'Description'
+          name: 'Description',
+          sort: true
         },
         {
           fieldKey: 'status',
-          name: 'status'
+          name: 'status',
+          sort: true
         },
         {
           fieldKey: "code",

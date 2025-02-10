@@ -14,7 +14,7 @@
 }
   
 .quickpack-container .dropdown-select {
-  min-width: 200px; /* Adjust dropdown width */
+  min-width: 100px; /* Adjust dropdown width */
   padding: 5px;
 }
 
@@ -28,7 +28,7 @@
     width: 100%; /* Adjust width as required */
     max-width: 300px;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    // border-radius: 4px;
     background-color: #fff;
     font-size: 14px;
     overflow: hidden;
@@ -59,12 +59,15 @@
 }
 
 .quickpack-box {
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  // border: 1px solid #ccc;
+  // border-radius: 4px;
   background-color: #f9f9f9;
   display: flex;
   align-items: center;
-  padding: 8px;
+  // padding: 8px;
+  .btn-primary{
+    border-radius: 0 4px 4px 0 !important;
+  }
 }
 .dropdown-select {
   border: none;
@@ -72,3 +75,20 @@
   font-size: 14px;
   margin-right: 8px;
 }
+.custom-modal.modal-center.show{
+  display: inline-flex !important;
+   width: 100%;
+   .modal-dialog{
+     width: 100%;
+     display: flex;
+     align-items: center;
+   }
+}
+
+.modal.fade .modal-dialog{
+ border: none;
+ .modal-content{
+   border: solid 2px white;
+   margin: 2px;
+ }
+} 

@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 
 @Component({
   selector: 'app-employee-list',
@@ -13,6 +14,11 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 export class EmployeeListComponent { 
   @Output('edit') edit = new EventEmitter<void>();
+  @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+
+  refreshTable() {
+    this.taTableComponent?.refresh();
+   };
 
   tableConfig: TaTableConfig = {
     apiUrl: 'hrms/employees/',
@@ -23,12 +29,8 @@ export class EmployeeListComponent {
     "globalSearch": {
       keys: ['hire_date','first_name','last_name','email','phone','address','hire_date','job_type_id','designation_id','department_id','shift_id','manager_id']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
-      {
-        fieldKey: 'hire_date',
-        name: 'Hire Date',
-        sort: true
-      },
       {
         fieldKey: 'first_name',
         name: 'Name',
@@ -54,6 +56,11 @@ export class EmployeeListComponent {
       {
         fieldKey: 'address',
         name: 'Address',
+        sort: true
+      },
+      {
+        fieldKey: 'hire_date',
+        name: 'Hire Date',
         sort: true
       },
       {

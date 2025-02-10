@@ -19,6 +19,7 @@ export class ProductGstClassificationsComponent {
       "globalSearch": {
         keys: ['id','type','code', 'hsn_or_sac_code','hsn_description']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'type',
@@ -33,12 +34,12 @@ export class ProductGstClassificationsComponent {
         {
           fieldKey: 'hsn_or_sac_code', 
           name: 'hsn or sac Code',
-          sort: false
+          sort: true
         },
         {
           fieldKey: 'hsn_description', 
           name: 'hsn Description',
-          sort: false
+          sort: true
         },
         {
           fieldKey: "code",

@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
@@ -16,6 +16,7 @@ export class WorkflowComponent {
   showWorkflowList: boolean = false;
   showForm: boolean = false;
   workflowEditID: any;
+  @ViewChild(WorkflowListComponent) WorkflowListComponent!: WorkflowListComponent;
 
   constructor(private http: HttpClient) {}
 
@@ -53,6 +54,7 @@ export class WorkflowComponent {
   // Show workflow list modal
   showWorkflowListFn() {
     this.showWorkflowList = true;
+    this.WorkflowListComponent?.refreshTable();
   }
 
   // Set form configuration

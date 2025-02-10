@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit} from '@angular/core';
+import { Component, OnInit, ViewChild} from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { EmployeeListComponent } from './employee-list/employee-list.component';
 import { CommonModule } from '@angular/common';
@@ -17,6 +17,7 @@ export class EmployeesComponent  implements OnInit {
   showEmployeesList: boolean = false;
   showForm: boolean = false;
   EmployeeEditID: any;
+  @ViewChild(EmployeeListComponent) EmployeeListComponent!: EmployeeListComponent;
 
   constructor(private http: HttpClient) {
   }
@@ -59,6 +60,7 @@ export class EmployeesComponent  implements OnInit {
 
   showEmployeesListFn() {
     this.showEmployeesList = true;
+    this.EmployeeListComponent?.refreshTable();
   };
 
   setFormConfig() {
@@ -151,12 +153,15 @@ export class EmployeesComponent  implements OnInit {
             },
             {
               key: 'gender',
-              type: 'input',
+              type: 'select',
               className: 'col-3 pb-3 ps-0',
               templateOptions: {
                 label: 'Gender',
-                placeholder: 'Enter Gender',
                 required: true,
+                options: [
+                  { value: 'Female', label: 'Female' },
+                  { value: 'Male', label: 'Male' }
+                ]
               }
             },
             {
@@ -313,7 +318,7 @@ export class EmployeesComponent  implements OnInit {
                 onChanges: (field: any) => {
                   field.formControl.valueChanges.subscribe((data: any) => {
                     if (this.formConfig && this.formConfig.model && this.formConfig.model['employee']) {
-                      this.formConfig.model['employee']['employee_id'] = data.employee_id;
+                      this.formConfig.model['employee']['manager_id'] = data.employee_id;
                     } else {
                       console.error('Form config or employee data model is not defined.');
                     }

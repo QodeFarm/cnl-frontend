@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, Renderer2, AfterViewInit, ElementRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule, DatePipe, formatDate } from '@angular/common';
@@ -22,11 +22,17 @@ export class WorkorderComponent implements OnInit {
   WorkOrdrEditID: any;
   WorkOrderBoardView: any; //
   formConfig: TaFormConfig = {};
+  @ViewChild(WorkOrderListComponent) WorkOrderListComponent!: WorkOrderListComponent;
+  editMode: boolean = false;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private el: ElementRef, private renderer: Renderer2) {}
   
   ngOnInit() {
+    this.showWorkorderList = false;
+    this.showForm = true;
     this.setFormConfig();
+    // this.formConfig.reset.resetFn(this.ngOnInit());
+    
   
     // Check if navigation state contains work order data for editing
     if (history.state && (history.state.productDetails || history.state.saleOrderDetails)) {
@@ -54,9 +60,23 @@ export class WorkorderComponent implements OnInit {
     }
   }
 
+  makeFieldsNotTouchable(indexes: number[]) {
+    indexes.forEach(index => {
+      const field = this.formConfig.fields[0].fieldGroup[index];
+      
+      if (field) {
+        field.templateOptions.disabled = true; // Disable the field
+      }
+    });
+  }
+
   editWorkorder(event: any) {
+    this.editMode = true;
     this.showCreateBomButton = false
     this.hideFields(false); // Shows fields at indexes 5, 4, and 9
+    this.formConfig.fields[0].fieldGroup[10].hide = true;
+    this.makeFieldsNotTouchable([0, 1, 2]);
+    this.disableMaterials()
     console.log('event', event);
     this.WorkOrdrEditID = event;
     this.http.get('production/work_order/' + event).subscribe((res: any) => {
@@ -72,12 +92,13 @@ export class WorkorderComponent implements OnInit {
         this.showForm = true;
         // this.formConfig.fields[0].fieldGroup[2].hide = false
       }
-    });
+    })
     this.hide();
   }
 
   showWorkorderListFn() {
     this.showWorkorderList = true;
+    this.WorkOrderListComponent?.refreshTable();
   }
 
    // Method to populate the form with data (when admin wants to create a work order from sale order)
@@ -106,8 +127,6 @@ export class WorkorderComponent implements OnInit {
             end_date: data.saleOrderDetails.delivery_date || null
         };
     }
-
-    // console.log('Form model after population:', this.formConfig.model);
 }
 
 
@@ -124,7 +143,6 @@ submitWorkOrder() {
 }
 
 populateBom(product_id:any){
-  if (this.formConfig.model.work_order && !this.formConfig.model.work_order.work_order_id) {
     const url = `production/bom/?product_id=${product_id}` // To get 'bom_id', filter by  selected product_id
     let bom_data = {}
     this.http.get(url).subscribe((response: any) => {
@@ -161,7 +179,6 @@ populateBom(product_id:any){
         }
       }
     })
-  }
 };
 
 
@@ -266,6 +283,152 @@ updateInventory() {
   });
 }
 
+fetchSizeOptions(productId: string, productField: any, lastSelectedSize?: any) {
+  const apiUrl = `products/product_variations/?product_id=${productId}`;
+
+  this.http.get(apiUrl).subscribe(
+    (response: any) => {
+
+      if (response && response.data && Array.isArray(response.data)) {
+        const uniqueOptions = response.data.map((item: any) => ({
+          value: {
+            size_id: item.size?.size_id || null,
+            size_name: item.size?.size_name || '----',
+          },
+          label: item.size?.size_name || '----',
+        }));
+
+        // Locate and update the size field with the options
+        const sizeField = productField.parent.fieldGroup.find(f => f.key === 'size');
+
+        // if (uniqueOptions.length > 0) {
+        //   sizeField.templateOptions.required = true
+        // } else {
+        //   sizeField.templateOptions.required = false
+        // }
+        if (sizeField) {
+          sizeField.templateOptions.options = uniqueOptions.filter(
+            (item, index, self) =>
+              index === self.findIndex(t => t.value.size_id === item.value.size_id)
+          );
+
+          // Set the previously selected size (if it exists) only after options are ready
+          if (lastSelectedSize) {
+            const matchingOption = sizeField.templateOptions.options.find(
+              option => option.value.size_id === lastSelectedSize.size_id
+            );
+            if (matchingOption) {
+              sizeField.formControl.setValue(matchingOption.value.size_id);
+            }
+          }
+
+          // Trigger Angular change detection
+          sizeField.formControl.updateValueAndValidity();
+        }
+      } else {
+        console.error('Invalid or empty data in size options response:', response);
+      }
+    },
+    error => {
+      console.error('Error fetching size options:', error);
+    }
+  );
+};
+
+// fetch color options based on the selected size
+fetchColorOptions(sizeId: string, productId: string, sizeField: any, lastSelectedColor?: any) {
+  let apiUrl = `products/product_variations/?product_id=${productId}&size_id=${sizeId}`;
+  if (!sizeId) {
+    apiUrl = `products/product_variations/?product_id=${productId}&size_isnull=True`;
+  }
+
+  this.http.get(apiUrl).subscribe(
+    (response: any) => {
+
+      if (response && response.data && Array.isArray(response.data)) {
+        const uniqueOptions = response.data.map((item: any) => ({
+          value: {
+            color_id: item.color?.color_id || null,
+            color_name: item.color?.color_name || '----',
+          },
+          label: item.color?.color_name || '----',
+        }));
+
+        // Locate and update the color field with the options
+        const colorField = sizeField.parent.fieldGroup.find(f => f.key === 'color');
+
+        // if (uniqueOptions.length > 0) {
+        //   colorField.templateOptions.required = true
+        // } else {
+        //   colorField.templateOptions.required = false
+        // }
+
+        if (colorField) {
+          colorField.templateOptions.options = uniqueOptions.filter(
+            (item, index, self) =>
+              index === self.findIndex(t => t.value.color_id === item.value.color_id)
+          );
+
+
+          // Set the previously selected color (if it exists) only after options are ready
+          if (lastSelectedColor) {
+            const matchingOption = colorField.templateOptions.options.find(
+              option => option.value.color_id === lastSelectedColor
+            );
+            if (matchingOption) {
+              colorField.formControl.setValue(matchingOption.value);
+            }
+          }
+
+          // Trigger Angular change detection
+          colorField.formControl.updateValueAndValidity();
+        }
+      } else {
+        console.error('Invalid or empty data in color options response:', response);
+      }
+    },
+    error => {
+      console.error('Error fetching color options:', error);
+    }
+  );
+};
+
+ clearColor(field : any) {
+  const colorField = field.parent.fieldGroup.find(f => f.key === 'color');
+  colorField.formControl.setValue(null); // Clear value
+  colorField.templateOptions.options = []; // Clear options
+  colorField.templateOptions.required = false;
+}
+
+
+clearSize(field : any){
+  const sizeField = field.parent.fieldGroup.find(f => f.key === 'size');
+  sizeField.formControl.setValue(null); // Clear value
+  sizeField.templateOptions.options = []; // Clear options
+  sizeField.templateOptions.required = false;
+}
+
+disableMaterials() {
+  if (this.editMode) {
+    const cardBodies = this.el.nativeElement.querySelectorAll('.ant-card-body');
+    if (cardBodies.length > 1) { 
+      const secondCardBody = cardBodies[0]; // Select the second `.ant-card-body`
+  
+      // Completely disable interaction (without affecting the UI appearance)
+      this.renderer.setStyle(secondCardBody, 'pointer-events', 'none'); // Disable clicks & hover events
+      this.renderer.setAttribute(secondCardBody, 'aria-disabled', 'true'); // Accessibility
+      this.renderer.setStyle(secondCardBody, 'user-select', 'none'); // Prevent text selection
+  
+      // If there are any interactive elements inside, disable them
+      const inputs = secondCardBody.querySelectorAll('input, button, select, textarea, a, .ant-select, .ant-dropdown');
+      inputs.forEach((input: HTMLElement) => {
+        this.renderer.setAttribute(input, 'disabled', 'true');
+      });
+    }
+  };
+};
+
+
 curdConfig: TaCurdConfig = {
   drawerSize: 500,
   drawerPlacement: 'top',
@@ -280,7 +443,7 @@ curdConfig: TaCurdConfig = {
     pkId: "bom_id",
     exParams: [],
     fields: [{
-      fieldGroupClassName: "row",
+      fieldGroupClassName: "ant-row custom-form-block",
       fieldGroup: [
         {
         key: 'bom_name',
@@ -356,79 +519,34 @@ curdConfig: TaCurdConfig = {
               },
               hooks: {
                 onInit: (field: any) => {
-                  // Subscribe to changes in product_id field
-                  field.formControl.valueChanges.subscribe((selectedProductId) => {
-                    const product = field.formControl.value;
-                    this.populateBom(product)
+                  // let previousProductId: any = null; // Keep track of the previously selected product ID                  
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (!this.editMode) {
+                      this.populateBom(data);
+                    }
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['work_order']) {
+                      this.formConfig.model['work_order']['product_id'] = data;
             
-                    // Clear previous size and color fields and their values
-                    const workOrderGroup = this.formConfig.fields.find((f: any) => f.key === 'work_order');
-                    if (workOrderGroup && workOrderGroup.fieldGroup) {
-                      const sizeField = workOrderGroup.fieldGroup.find((f: any) => f.key === 'size');
-                      const colorField = workOrderGroup.fieldGroup.find((f: any) => f.key === 'color');
-            
-                      if (sizeField) {
-                        sizeField.templateOptions.required = false; // Make the field not required
-                        sizeField.formControl.setValue(null); // Clear current value
-                        sizeField.templateOptions.options = []; // Clear previous options
-                        sizeField.formControl.disable(); // Temporarily disable until new data arrives
+                      if (data) {
+                        const lastSelectedSize = this.formConfig.model.work_order.size_id;
+                        this.fetchSizeOptions(data, field, lastSelectedSize);
+                      } else {
+                        // Clear size and color fields if product ID is cleared
+                        // this.clearSize(field);
                       }
-            
-                      if (colorField) {
-                        colorField.formControl.setValue(null); // Clear current value
-                        colorField.templateOptions.options = []; // Clear previous options
-                        colorField.formControl.disable(); // Temporarily disable until new data arrives
-                      }
-            
-                      // Fetch size and color options for the selected product
-                      if (product) {
-                        this.http.get(`products/product_variations/?product_id=${product}`).subscribe((response: any) => {
-                          if (response.data.length > 0) {
-                            const availableSizes = response.data.map((variation: any) => ({
-                              label: variation.size?.size_name || '----',
-                              value: {
-                                size_id: variation.size?.size_id || null,
-                                size_name: variation.size?.size_name || '----'
-                              }
-                            }));
-            
-                            const availableColors = response.data.map((variation: any) => ({
-                              label: variation.color?.color_name || '----',
-                              value: {
-                                color_id: variation.color?.color_id || null,
-                                color_name: variation.color?.color_name || '----'
-                              }
-                            }));
-            
-                            // Update size field
-                            if (sizeField) {
-                              sizeField.formControl.enable(); // Enable field
-                              sizeField.templateOptions.required = true; // Make the field required
-                              sizeField.templateOptions.options = availableSizes.filter(
-                                (item, index, self) => index === self.findIndex((t) => t.value.size_id === item.value.size_id)
-                              ); // Ensure unique options
-                            }
-
-                          } else {
-                            console.log(`For Product: ${product} - No sizes or colors available.`);
-                            if (sizeField) {
-                              sizeField.formControl.disable();
-                              sizeField.templateOptions.options = [];
-                            }
-                            if (colorField) {
-                              colorField.formControl.disable();
-                              colorField.templateOptions.options = [];
-                            }
-                          }
-                        });
-                      }
+                      
+                      // Clear the size and color fields if the product ID changes
+                      // if (data !== previousProductId) {
+                      //   this.clearSize(field);
+                      //   previousProductId = data; // Update the previously selected product ID
+                      // }
                     } else {
-                      console.error('Work Order Group not found.');
+                      console.error('Form config or work_order data model is not defined.');
                     }
                   });
                 }
               }
-            },
+            },            
             {
               key: 'size',
               type: 'select',
@@ -437,85 +555,45 @@ curdConfig: TaCurdConfig = {
                 label: 'Size',
                 dataKey: 'size_id',
                 dataLabel: 'size_name',
-                options: [],
-                disabled: true,
+                options: [], // To be dynamically populated
                 required: false,
-                lazy: {
-                  lazyOneTime: true,
-                  url: `products/sizes/`
-                }
               },
               hooks: {
-                onChanges: (field: any) => {
-                  field.formControl.valueChanges.subscribe((data: any) => {
-                    const index = field.parent.key;
-                    if (!this.formConfig.model['work_order']) {
-                      console.error(`Size at index ${index} is not defined. Initializing...`);
-                      this.formConfig.model['work_order'] = {};
-                    }
-                    this.formConfig.model['work_order']['size_id'] = data.size_id;
-                  });
-                },
                 onInit: (field: any) => {
-                  // Trigger color field update whenever size changes
-                  field.formControl.valueChanges.subscribe(selectedSizeId => {
-                    const workOrderGroup = this.formConfig.fields.find((f: any) => f.key === 'work_order');
-                    if (workOrderGroup && workOrderGroup.fieldGroup) {
-                      const colorField = workOrderGroup.fieldGroup.find((f: any) => f.key === 'color');
-                      const size = field.formControl.value;
-            
-                      if (size) {
-                        const work_order = this.formConfig.model.work_order;
-            
-                        // Determine the API URL based on size
-                        let url = `products/product_variations/?product_id=${work_order.product_id}&size_id=${size.size_id}`;
-                        if (!size.size_id) {
-                          url = `products/product_variations/?product_id=${work_order.product_id}&size_isnull=True`;
-                        }
-            
-                        // Fetch available colors based on selected size
-                        this.http.get(url).subscribe((response: any) => {
-                          if (response.data && response.data.length > 0) {
-                            // Map available colors
-                            const availableColors = response.data.map((variation: any) => ({
-                              label: variation.color?.color_name || '----',
-                              value: {
-                                color_id: variation.color?.color_id || null,
-                                color_name: variation.color?.color_name || '----'
-                              }
-                            }));
-            
-                            // Filter unique colors
-                            const uniqueColors = availableColors.filter((item, index, self) => 
-                              index === self.findIndex((t) => t.value.color_id === item.value.color_id)
-                            );
-            
-                            // Update and enable the color field
-                            if (colorField) {
-                              colorField.formControl.setValue(null); // Reset color field value
-                              colorField.formControl.enable();
-                              colorField.templateOptions.required = true; // Make the field required
-                              colorField.templateOptions.options = uniqueColors; // Update options
-                            }
-                          } else {
-                            // No colors available, disable the color field and set its value to null
-                            if (colorField) {
-                              colorField.templateOptions.required = false; // Make the field not required
-                              colorField.formControl.setValue(null); // Reset color field value
-                              colorField.formControl.disable();
-                              colorField.templateOptions.options = []; // Clear options
-                            }
-                          }
-                        });
+                  let previousSizeId: any = null; // Keep track of the previously selected product ID
+                  // Log the initially selected size_id from the form model
+                  const selectedSizeId = this.formConfig.model['work_order']?.size_id;
+
+                  // Ensure that the size field is populated with the correct value if it's already set in the model
+                  if (selectedSizeId) {
+                    const sizeField = field;
+                    const sizeOption = sizeField.templateOptions.options.find(option => option.value.size_id === selectedSizeId);
+                    if (sizeOption) {
+                      // Pre-select the size in the dropdown if it's available
+                      sizeField.formControl.setValue(sizeOption.value.size_id);
+                    }
+                  }
+
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['work_order']) {
+                      this.formConfig.model['work_order']['size_id'] = data?.size_id;
+                      const lastSelectedColor = this.formConfig.model.work_order.color_id;
+                      
+                      const product_id = this.formConfig.model.work_order.product_id;
+                      if (data?.size_id) {
+                        this.fetchColorOptions(data?.size_id, product_id, field, lastSelectedColor);
                       } else {
-                        // If size is null or invalid, disable the color field
-                        if (colorField) {
-                          colorField.templateOptions.required = false; // Make the field not required
-                          colorField.formControl.setValue(null); // Reset color field value
-                          colorField.formControl.disable();
-                          colorField.templateOptions.options = []; // Clear options
-                        }
+                        this.fetchColorOptions(null, product_id, field, lastSelectedColor);
+                        this.clearColor(field);
                       }
+
+                      if (data !== previousSizeId) {
+                        this.clearColor(field);
+                        previousSizeId = data?.size_id; // Update the previously selected product ID
+                      }
+
+                    } else {
+                      console.error('Form config or size_id data model is not defined.');
                     }
                   });
                 }
@@ -529,26 +607,36 @@ curdConfig: TaCurdConfig = {
                 label: 'Color',
                 dataKey: 'color_id',
                 dataLabel: 'color_name',
-                options: [],
+                options: [], // Dynamically populated
                 required: false,
-                disabled: true,
                 lazy: {
                   lazyOneTime: true,
-                  url : 'products/colors/'
-                }
+                },
               },
               hooks: {
-                onChanges: (field: any) => {
-                  field.formControl.valueChanges.subscribe((data: any) => {
-                    const index = field.parent.key;
-                    if (!this.formConfig.model['work_order'][index]) {
-                      console.error(`Color at index ${index} is not defined. Initializing...`);
-                      this.formConfig.model['work_order'][index] = {};
+                onInit: (field: any) => {
+                  const selectedColorId = this.formConfig.model['work_order']?.color_id;
+
+                  // Subscribe to changes in the options array and attempt to pre-fill the color field when options are updated
+                  field.templateOptions.optionsChange = () => {
+                    if (selectedColorId) {
+                      const colorOption = field.templateOptions.options.find(option => option.value.color_id === selectedColorId);
+                      if (colorOption) {
+                        field.formControl.setValue(colorOption.value.color_id); // Pre-select the value
+                      }
                     }
-                    this.formConfig.model['work_order']['color_id'] = data.color_id;
+                  };
+
+                  // Subscribe to field value changes and update the model accordingly
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['work_order']) {
+                      this.formConfig.model['work_order']['color_id'] = data?.color_id;
+                    } else {
+                      console.error('Form config or color_id data model is not defined.');
+                    }
                   });
-                }
-              }
+                },
+              },
             },
             {
               key: 'quantity',
@@ -627,360 +715,442 @@ curdConfig: TaCurdConfig = {
                 label: 'Sync QTY',
                 required: false
               }
-            }
-          ]
-        },
-        {
-          key: 'bom',
-          type: 'table',
-          className: 'custom-form-list',
-          templateOptions: {
-            title: 'Bill Of Material',
-            addText: 'Add Materials',
-            tableCols: [
-              { name: 'product_id', label: 'Product' },
-              { name: 'size_id', label: 'Size' },
-              { name: 'color_id', label: 'Color' },
-              { name: 'quantity', label: 'Quantity' },
-              { name: 'unit_cost', label: 'Unit Cost' },
-              { name: 'total_cost', label: 'Total Cost' },
-              { name: 'notes', label: 'Notes' },
-            ]
-          },
-          fieldArray: {
-            fieldGroup: [
-              {
-                key: 'product',
-                type: 'select',
-                templateOptions: {
-                  label: 'Product',
-                  dataKey: 'product_id',
-                  hideLabel: true,
-                  dataLabel: 'name',
-                  options: [],
-                  required: true,
-                  lazy: {
-                  url: 'products/products/',
+            },
+            {
+              key: 'selectionType',
+              type: 'radio',
+              className: 'col-2',
+              defaultValue: 'no', // Set default selection to 'user'
+              templateOptions: {
+                label: 'Creating for Sale Order ?',
+                options: [
+                  { label: 'Yes', value: 'yes' },
+                  { label: 'No', value: 'no' }
+                ],
+                required: true,
+              }
+            },
+            {
+              key: 'sale_order',
+              type: 'select',
+              className: 'col-2',
+              hideExpression: (model) => model.selectionType !== 'yes',
+              templateOptions: {
+                label: 'Order No',
+                dataKey: 'sale_order_id',
+                dataLabel: 'order_no',
+                options: [], // Options will be loaded via lazy
+                lazy: {
+                  url: 'sales/sale_order/',
                   lazyOneTime: true
-                  }
                 },
-                hooks: {
-                  onChanges: (field: any) => {
-                    field.formControl.valueChanges.subscribe((data: any) => {
-                      const index = field.parent.key;
-                      if (!this.formConfig.model['bom'][index]) {
-                        console.error(`Products at index ${index} is not defined. Initializing...`);
-                        this.formConfig.model['bom'][index] = {};
-                      }
-                      this.formConfig.model['bom'][index]['product_id'] = data.product_id;
-                    });
-                  }
-                }
+                required: true // Required only if 'User' is selected
               },
-              {
-                key: 'size',
-                type: 'select',
-                templateOptions: {
-                  label: 'Size',
-                  dataKey: 'size_id',
-                  hideLabel: true,
-                  dataLabel: 'size_name',
-                  options: [],
-                  required: false,
-                  lazy: {
-                    lazyOneTime: true,
-                    url : 'products/sizes/'
-                  }
-                },
-                hooks: {
-                  onChanges: (field: any) => {
-                    field.formControl.valueChanges.subscribe((data: any) => {
-                      const index = field.parent.key;
-                      if (!this.formConfig.model['bom'][index]) {
-                        console.error(`Products at index ${index} is not defined. Initializing...`);
-                        this.formConfig.model['bom'][index] = {};
-                      }
-                      this.formConfig.model['bom'][index]['size_id'] = data?.size_id;
-                    });
-                  }
-                }
-              },
-              {
-                key: 'color',
-                type: 'select',
-                templateOptions: {
-                  label: 'Color',
-                  dataKey: 'color_id',
-                  hideLabel: true,
-                  dataLabel: 'color_name',
-                  options: [],
-                  required: false,
-                  lazy: {
-                    lazyOneTime: true,
-                    url : 'products/colors/'
-                  }
-                },
-                hooks: {
-                  onChanges: (field: any) => {
-                    field.formControl.valueChanges.subscribe((data: any) => {
-                      const index = field.parent.key;
-                      if (!this.formConfig.model['bom'][index]) {
-                        console.error(`Products at index ${index} is not defined. Initializing...`);
-                        this.formConfig.model['bom'][index] = {};
-                      }
-                      this.formConfig.model['bom'][index]['color_id'] = data.color_id;
-                    });
-                  }
-                }
-              },
-              {
-                key: 'quantity',
-                type: 'input',
-                templateOptions: {
-                  label: 'Quantity',
-                  placeholder: 'Enter Quantity',
-                  hideLabel: true,
-                  required: true,
-                  type: 'number'
-                },
-                hooks:{
-                  onInit: (field: any) => {
-                    field.formControl.valueChanges.subscribe(data => {
-                      if (field.form && field.form.controls && field.form.controls.quantity && field.form.controls.unit_cost && data) {
-                        const quantity = field.form.controls.quantity.value;
-                        const unit_cost = field.form.controls.unit_cost.value;
-                        if (quantity && unit_cost) {
-                          field.form.controls.total_cost.setValue((parseFloat(quantity) * parseFloat(unit_cost)).toFixed(2));
-                        }
-                      } else {
-                        field.form.controls.total_cost.setValue(0);
-                      }
-                    })
-                  },
-                }
-              },
-              {
-                key: 'unit_cost',
-                type: 'input',
-                templateOptions: {
-                  label: 'Unit Cost',
-                  placeholder: 'Enter Unit Cost',
-                  hideLabel: true,
-                  required: true,
-                  type: 'number'
-                },
-                hooks:{
-                  onInit: (field: any) => {
-                    field.formControl.valueChanges.subscribe(data => {
-                      if (field.form && field.form.controls && field.form.controls.quantity && field.form.controls.unit_cost && data) {
-                        const quantity = field.form.controls.quantity.value;
-                        const unit_cost = field.form.controls.unit_cost.value;
-                        if (quantity && unit_cost) {
-                          field.form.controls.total_cost.setValue((parseFloat(quantity) * parseFloat(unit_cost)).toFixed(2));
-
-                        }
-                      } else {
-                        field.form.controls.total_cost.setValue(0);
-                      }
-                    })
-                  },
-                }
-              },
-              {
-                key: 'total_cost',
-                type: 'input',
-                templateOptions: {
-                  label: 'Total Cost',
-                  // placeholder: 'Enter Total Cost',
-                  hideLabel: true,
-                  required: true,
-                  disabled: true
-                },
-              },              
-              {
-                key: 'notes',
-                type: 'text',
-                templateOptions: {
-                  label: 'Notes',
-                  placeholder: 'Enter Notes',
-                  hideLabel: true,
-                  required: false
+              hooks: {
+                onChanges: (field: any) => {
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (field.formControl.value && this.editMode) {
+                      field.model.selectionType = 'yes'; // Set selectionType to 'yes' if sale_order_id is present
+                    }
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['work_order']) {
+                      this.formConfig.model['work_order']['sale_order_id'] = data?.sale_order_id;
+                    } else {
+                      console.error('Form config or sale_order_id data model is not defined.');
+                    }
+                  });
                 }
               }
-            ]
-          }
+            },
+          ]
         },
-        //-----------------------------------work_order_machines-------------------------------------
+        // ----------------*** Tab menu starts here ***--------------------
         {
-          key: 'work_order_machines',
-          type: 'table',
-          className: 'custom-form-list',
-          templateOptions: {
-            title: 'Machines',
-            addText: 'Add Machine',
-            tableCols: [
-              { name: 'machine', label: 'Machine' }
-            ]
-          },
-          fieldArray: {
-            fieldGroup: [
+          fieldGroupClassName: "row col-12 m-0 custom-form-card",
+          className: 'tab-form-list px-3',
+          type: 'tabs',
+          fieldGroup: [
+            // ---------------------------- ** Bill Of Material ** ---------------------------------------
+            {
+              className: 'col-12 px-0 pt-3',
+              props: {
+                label: 'Bill Of Material'
+              },
+              fieldGroup: [
                 {
-                  key: 'machine',
-                  type: 'select',
-                  className: 'col',
+                  key: 'bom',
+                  type: 'table',
+                  className: 'custom-form-list',
                   templateOptions: {
-                    label: 'Machine',
-                    dataKey: 'machine_id',
-                    dataLabel: 'machine_name',
-                    options: [],
-                    hideLabel: true,
-                    required: false,
-                    lazy: {
-                      url: 'production/machines/',
-                      lazyOneTime: true
-                    },
+                    addText: 'Add Materials',
+                    tableCols: [
+                      { name: 'product_id', label: 'Product' },
+                      { name: 'size_id', label: 'Size' },
+                      { name: 'color_id', label: 'Color' },
+                      { name: 'quantity', label: 'Quantity' },
+                      { name: 'unit_cost', label: 'Unit Cost' },
+                      { name: 'total_cost', label: 'Total Cost' },
+                      { name: 'notes', label: 'Notes' },
+                    ]
                   },
-                  hooks: {
-                    onChanges: (field: any) => {
-                      field.formControl.valueChanges.subscribe((data: any) => {
-                        const index = field.parent.key;
-                        if (!this.formConfig.model['work_order_machines'][index]) {
-                          console.error(`Machine at index ${index} is not defined. Initializing...`);
-                          this.formConfig.model['work_order_machines'][index] = {};
+                  fieldArray: {
+                    fieldGroup: [
+                      {
+                        key: 'product',
+                        type: 'select',
+                        templateOptions: {
+                          label: 'Product',
+                          dataKey: 'product_id',
+                          hideLabel: true,
+                          dataLabel: 'name',
+                          options: [],
+                          required: true,
+                          lazy: {
+                          url: 'products/products/',
+                          lazyOneTime: true
+                          }
+                        },
+                        hooks: {
+                          onChanges: (field: any) => {
+                            field.formControl.valueChanges.subscribe((data: any) => {
+                              const index = field.parent.key;
+                              if (!this.formConfig.model['bom'][index]) {
+                                console.error(`Products at index ${index} is not defined. Initializing...`);
+                                this.formConfig.model['bom'][index] = {};
+                              }
+                              this.formConfig.model['bom'][index]['product_id'] = data?.product_id;
+                            });
+                          }
                         }
-                        this.formConfig.model['work_order_machines'][index]['machine_id'] = data.machine_id;
-                      });
+                      },
+                      {
+                        key: 'size',
+                        type: 'select',
+                        templateOptions: {
+                          label: 'Size',
+                          dataKey: 'size_id',
+                          hideLabel: true,
+                          dataLabel: 'size_name',
+                          options: [],
+                          required: false,
+                          lazy: {
+                            lazyOneTime: true,
+                            url : 'products/sizes/'
+                          }
+                        },
+                        hooks: {
+                          onChanges: (field: any) => {
+                            field.formControl.valueChanges.subscribe((data: any) => {
+                              const index = field.parent.key;
+                              if (!this.formConfig.model['bom'][index]) {
+                                console.error(`Products at index ${index} is not defined. Initializing...`);
+                                this.formConfig.model['bom'][index] = {};
+                              }
+                              this.formConfig.model['bom'][index]['size_id'] = data?.size_id;
+                            });
+                          }
+                        }
+                      },
+                      {
+                        key: 'color',
+                        type: 'select',
+                        templateOptions: {
+                          label: 'Color',
+                          dataKey: 'color_id',
+                          hideLabel: true,
+                          dataLabel: 'color_name',
+                          options: [],
+                          required: false,
+                          lazy: {
+                            lazyOneTime: true,
+                            url : 'products/colors/'
+                          }
+                        },
+                        hooks: {
+                          onChanges: (field: any) => {
+                            field.formControl.valueChanges.subscribe((data: any) => {
+                              const index = field.parent.key;
+                              if (!this.formConfig.model['bom'][index]) {
+                                console.error(`Products at index ${index} is not defined. Initializing...`);
+                                this.formConfig.model['bom'][index] = {};
+                              }
+                              this.formConfig.model['bom'][index]['color_id'] = data?.color_id || null;
+                            });
+                          }
+                        }
+                      },
+                      {
+                        key: 'quantity',
+                        type: 'input',
+                        templateOptions: {
+                          label: 'Quantity',
+                          placeholder: 'Enter Quantity',
+                          hideLabel: true,
+                          required: true,
+                          type: 'number'
+                        },
+                        hooks:{
+                          onInit: (field: any) => {
+                            field.formControl.valueChanges.subscribe(data => {
+                              if (field.form && field.form.controls && field.form.controls.quantity && field.form.controls.unit_cost && data) {
+                                const quantity = field.form.controls.quantity.value;
+                                const unit_cost = field.form.controls.unit_cost.value;
+                                if (quantity && unit_cost) {
+                                  field.form.controls.total_cost.setValue((parseFloat(quantity) * parseFloat(unit_cost)).toFixed(2));
+                                }
+                              } else {
+                                field.form.controls.total_cost.setValue(0);
+                              }
+                            })
+                          },
+                        }
+                      },
+                      {
+                        key: 'unit_cost',
+                        type: 'input',
+                        templateOptions: {
+                          label: 'Unit Cost',
+                          placeholder: 'Enter Unit Cost',
+                          hideLabel: true,
+                          required: true,
+                          type: 'number'
+                        },
+                        hooks:{
+                          onInit: (field: any) => {
+                            field.formControl.valueChanges.subscribe(data => {
+                              if (field.form && field.form.controls && field.form.controls.quantity && field.form.controls.unit_cost && data) {
+                                const quantity = field.form.controls.quantity.value;
+                                const unit_cost = field.form.controls.unit_cost.value;
+                                if (quantity && unit_cost) {
+                                  field.form.controls.total_cost.setValue((parseFloat(quantity) * parseFloat(unit_cost)).toFixed(2));
+        
+                                }
+                              } else {
+                                field.form.controls.total_cost.setValue(0);
+                              }
+                            })
+                          },
+                        }
+                      },
+                      {
+                        key: 'total_cost',
+                        type: 'input',
+                        templateOptions: {
+                          label: 'Total Cost',
+                          // placeholder: 'Enter Total Cost',
+                          hideLabel: true,
+                          required: true,
+                          disabled: true
+                        },
+                      },              
+                      {
+                        key: 'notes',
+                        type: 'text',
+                        templateOptions: {
+                          label: 'Notes',
+                          placeholder: 'Enter Notes',
+                          hideLabel: true,
+                          required: false
+                        }
+                      }
+                    ]
+                  }
+                },
+              ]
+            },
+            // ---------------------------- ** Worker ** ---------------------------------------
+            {
+                className: 'col-12 px-0 pt-3',
+                props: {
+                  label: 'Worker'
+                },
+                fieldGroup: [
+                  {
+                    key: 'workers',
+                    type: 'table',
+                    className: 'custom-form-list',
+                    templateOptions: {
+                      addText: 'Add Worker',
+                      tableCols: [
+                        { name: 'hours_worked', label: 'Hours' },
+                        { name: 'employee_id', label: 'Worker' }
+                      ]
+                    },
+                    fieldArray: {
+                      fieldGroup: [
+                        {
+                          key: 'employee',
+                          type: 'select',
+                          className: 'col',
+                          templateOptions: {
+                            label: 'Worker',
+                            dataKey: 'employee_id',
+                            dataLabel: 'first_name',
+                            options: [],
+                            hideLabel: true,
+                            required: false,
+                            lazy: {
+                              url: 'hrms/employees/',
+                              lazyOneTime: true
+                            },
+                          },
+                          hooks: {
+                            onChanges: (field: any) => {
+                              field.formControl.valueChanges.subscribe((data: any) => {
+                                const index = field.parent.key;
+                                if (!this.formConfig.model['workers'][index]) {
+                                  console.error(`Machine at index ${index} is not defined. Initializing...`);
+                                  this.formConfig.model['workers'][index] = {};
+                                }
+                                this.formConfig.model['workers'][index]['employee_id'] = data.employee_id;
+                              });
+                            }
+                          }
+                        },
+                        {
+                          key: 'hours_worked',
+                          type: 'input',
+                          className: 'col',
+                          templateOptions: {
+                            label: 'Hours Worked',
+                            placeholder: 'Enter Hours',
+                            hideLabel: true,
+                            required: false
+                          }
+                        }
+                      ]
                     }
+                  }
+                ]
+              },
+                // ----------------------** Machines **------------------------------
+              {
+                className: 'col-12 px-0 pt-3',
+                props: {
+                  label: 'Machines'
+                },
+                fieldGroup: [
+                  {
+                    key: 'work_order_machines',
+                    type: 'table',
+                    className: 'custom-form-list',
+                    templateOptions: {
+                      addText: 'Add Machine',
+                      tableCols: [
+                        { name: 'machine', label: 'Machine' }
+                      ]
+                    },
+                    fieldArray: {
+                      fieldGroup: [
+                        {
+                          key: 'machine',
+                          type: 'select',
+                          className: 'col',
+                          templateOptions: {
+                            label: 'Machine',
+                            dataKey: 'machine_id',
+                            dataLabel: 'machine_name',
+                            options: [],
+                            hideLabel: true,
+                            required: false,
+                            lazy: {
+                              url: 'production/machines/',
+                              lazyOneTime: true
+                            },
+                          },
+                          hooks: {
+                            onChanges: (field: any) => {
+                              field.formControl.valueChanges.subscribe((data: any) => {
+                                const index = field.parent.key;
+                                if (!this.formConfig.model['work_order_machines'][index]) {
+                                  console.error(`Machine at index ${index} is not defined. Initializing...`);
+                                  this.formConfig.model['work_order_machines'][index] = {};
+                                }
+                                this.formConfig.model['work_order_machines'][index]['machine_id'] = data.machine_id;
+                              });
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              // ----------------------** Work Stage **------------------------------
+              {
+                className: 'col-12 px-0 pt-3',
+                props: {
+                  label: 'Work Stage'
+                },
+                fieldGroup: [
+                  {
+                    key: 'work_order_stages',
+                    type: 'table',
+                    className: 'custom-form-list',
+                    templateOptions: {
+                      addText: 'Add Work Level',
+                      tableCols: [
+                        { name: 'hours_worked', label: 'Hours' },
+                        { name: 'employee_id', label: 'Worker' }
+                      ]
+                    },
+                    fieldArray: {
+                      fieldGroup: [
+                      {
+                        key: 'stage_name',
+                        type: 'input',
+                        templateOptions: {
+                          label: 'Stage Name',
+                          placeholder: 'Enter Stage Name',
+                          hideLabel: true,
+                          required: false
+                        }
+                      },
+                      {
+                        key: 'stage_description',
+                        type: 'input',
+                        templateOptions: {
+                          label: 'Description',
+                          placeholder: 'Enter Description',
+                          hideLabel: true,
+                          required: false
+                        }
+                      },
+                      {
+                        key: 'stage_start_date',
+                        type: 'date',
+                        templateOptions: {
+                          label: 'Stage Start Date',
+                          placeholder: 'Enter Start Date',
+                          hideLabel: true,
+                          required: false
+                        }
+                      },
+                      {
+                        key: 'stage_end_date',
+                        type: 'date',
+                        templateOptions: {
+                          label: 'Stage End Date',
+                          placeholder: 'Enter End Date',
+                          hideLabel: true,
+                          required: false
+                        }
+                      },
+                      {
+                        key: 'notes',
+                        type: 'textarea',
+                        templateOptions: {
+                          label: 'Notes',
+                          placeholder: 'Enter Notes',
+                          hideLabel: true,
+                          required: false
+                        }
+                      }
+                    ]
                   }
                 }
               ]
-         }
-        },
-        // -----------------------------------workers--------------------------------
-        {
-          key: 'workers',
-          type: 'table',
-          className: 'custom-form-list',
-          templateOptions: {
-            title: 'Worker',
-            addText: 'Add Worker',
-            tableCols: [
-              { name: 'hours_worked', label: 'Hours' },
-              { name: 'employee_id', label: 'Worker' }
-            ]
-          },
-          fieldArray: {
-            fieldGroup: [
-              {
-                key: 'employee',
-                type: 'select',
-                className: 'col',
-                templateOptions: {
-                  label: 'Worker',
-                  dataKey: 'employee_id',
-                  dataLabel: 'first_name',
-                  options: [],
-                  hideLabel: true,
-                  required: false,
-                  lazy: {
-                    url: 'hrms/employees/',
-                    lazyOneTime: true
-                  },
-                },
-                hooks: {
-                  onChanges: (field: any) => {
-                    field.formControl.valueChanges.subscribe((data: any) => {
-                      const index = field.parent.key;
-                      if (!this.formConfig.model['workers'][index]) {
-                        console.error(`Machine at index ${index} is not defined. Initializing...`);
-                        this.formConfig.model['workers'][index] = {};
-                      }
-                      this.formConfig.model['workers'][index]['employee_id'] = data.employee_id;
-                    });
-                  }
-                }
-              },
-              {
-                key: 'hours_worked',
-                type: 'input',
-                className: 'col',
-                templateOptions: {
-                  label: 'Hours Worked',
-                  placeholder: 'Enter Hours',
-                  hideLabel: true,
-                  required: false
-                }
-              }
-            ]
-          }
-        },
-        // -----------------------------------work_order_stages--------------------------------
-        {
-          key: 'work_order_stages',
-          type: 'table',
-          className: 'custom-form-list',
-          templateOptions: {
-            title: 'Work Stage',
-            addText: 'Add Work Level',
-            tableCols: [
-              { name: 'hours_worked', label: 'Hours' },
-              { name: 'employee_id', label: 'Worker' }
-            ]
-          },
-          fieldArray: {
-            fieldGroup: [
-              {
-                key: 'stage_name',
-                type: 'input',
-                templateOptions: {
-                  label: 'Stage Name',
-                  placeholder: 'Enter Stage Name',
-                  hideLabel: true,
-                  required: false
-                }
-              },
-              {
-                key: 'stage_description',
-                type: 'input',
-                templateOptions: {
-                  label: 'Description',
-                  placeholder: 'Enter Description',
-                  hideLabel: true,
-                  required: false
-                }
-              },
-              {
-                key: 'stage_start_date',
-                type: 'date',
-                templateOptions: {
-                  label: 'Stage Start Date',
-                  placeholder: 'Enter Start Date',
-                  hideLabel: true,
-                  required: false
-                }
-              },
-              {
-                key: 'stage_end_date',
-                type: 'date',
-                templateOptions: {
-                  label: 'Stage End Date',
-                  placeholder: 'Enter End Date',
-                  hideLabel: true,
-                  required: false
-                }
-              },
-              {
-                key: 'notes',
-                type: 'textarea',
-                templateOptions: {
-                  label: 'Notes',
-                  placeholder: 'Enter Notes',
-                  hideLabel: true,
-                  required: false
-                }
-              }
-            ]
-          }
+            },
+          ]
         }
       ]
     }

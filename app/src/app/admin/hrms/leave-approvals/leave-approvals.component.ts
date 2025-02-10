@@ -8,7 +8,7 @@ import { HttpClient } from '@angular/common/http';
 @Component({
   selector: 'app-leave-approvals',
   standalone: true,
-  imports: [CommonModule,AdminCommmonModule],
+  imports: [CommonModule, AdminCommmonModule],
   templateUrl: './leave-approvals.component.html',
   styleUrls: ['./leave-approvals.component.scss']
 })
@@ -16,17 +16,21 @@ export class LeaveApprovalsComponent {
   @Output('edit') edit = new EventEmitter<void>();
   @Output('circle') circle = new EventEmitter<void>();
 
-    curdConfig: TaCurdConfig = {
+  curdConfig: TaCurdConfig = {
     drawerSize: 500,
     drawerPlacement: 'right',
+    hideAddBtn: true,
     tableConfig: {
       apiUrl: 'hrms/leave_approvals/',
       title: 'Leave Approvals',
       pkId: "approval_id",
       pageSize: 10,
+      showCheckbox: true,
       "globalSearch": {
         keys: ['approval_id', 'leave_id','name','status_id','approval_date']
       },
+      // defaultSort: { key: 'approval_date', value: 'descend' },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'leave_id',
@@ -39,7 +43,7 @@ export class LeaveApprovalsComponent {
             const lastName = row.leave.employee?.last_name || '';
             return `${firstName} ${lastName}`.trim();
           },
-        }, 
+        },
         {
           fieldKey: 'leave_id',
           name: 'Leave Type',
@@ -68,7 +72,7 @@ export class LeaveApprovalsComponent {
           },
         },
         {
-          fieldKey: 'status_id',
+          fieldKey: 'status_name',
           name: 'Status',
           sort: true,
           displayType: "map",
@@ -145,13 +149,13 @@ export class LeaveApprovalsComponent {
           value: 'data.approver.manager_id'
         }
       ],
-      fields: [ ]
+      fields: []
     }
   }
 
-  constructor(private http: HttpClient) {};
+  constructor(private http: HttpClient) { };
 
-//=====================================Status = Approved ==============================================
+  //=====================================Status = Approved ==============================================
 
 
   circleLeaveApprovals(event: any) {
@@ -163,118 +167,118 @@ export class LeaveApprovalsComponent {
 
     // Fetch the status ID by status name
     this.http.get(statusesUrl).subscribe(
-        (response: any) => {
-            if (response && Array.isArray(response.data)) {
-                // Find the status object with the matching status name
-                const status = response.data.find((s: any) => s.status_name.toLowerCase() === statusName.toLowerCase());
-                
-                if (status && status.status_id) {
-                    this.updateLeaveApproval(url, status.status_id);
-              
-                } else {
-                    console.error(`Error: Status "${statusName}" not found.`);
-                    alert(`Status "${statusName}" not found.`);
-                }
-            } else {
-                console.error("Invalid response format from statuses API:", response);
-                alert("Failed to fetch statuses. Please try again.");
-            }
-        },
-        (error) => {
-            console.error("Error fetching statuses:", error);
-            alert("Failed to fetch statuses. Please try again.");
+      (response: any) => {
+        if (response && Array.isArray(response.data)) {
+          // Find the status object with the matching status name
+          const status = response.data.find((s: any) => s.status_name.toLowerCase() === statusName.toLowerCase());
+
+          if (status && status.status_id) {
+            this.updateLeaveApproval(url, status.status_id);
+
+          } else {
+            console.error(`Error: Status "${statusName}" not found.`);
+            alert(`Status "${statusName}" not found.`);
+          }
+        } else {
+          console.error("Invalid response format from statuses API:", response);
+          alert("Failed to fetch statuses. Please try again.");
         }
+      },
+      (error) => {
+        console.error("Error fetching statuses:", error);
+        alert("Failed to fetch statuses. Please try again.");
+      }
     );
   }
 
 
   updateLeaveApproval(url: string, statusId: string) {
     const now = new Date();
+
     const formattedDate = now.getFullYear() + '-' +
-        String(now.getMonth() + 1).padStart(2, '0') + '-' +
-        String(now.getDate()).padStart(2, '0') + 'T' +
-        String(now.getHours()).padStart(2, '0') + ':' +
-        String(now.getMinutes()).padStart(2, '0') + ':' +
-        String(now.getSeconds()).padStart(2, '0');
+      String(now.getMonth() + 1).padStart(2, '0') + '-' +
+      String(now.getDate()).padStart(2, '0');
+
 
     // Prepare the payload for the PATCH request
     const payload = {
-        status_id: statusId, // Fetched status ID
-        approval_date: formattedDate // Today's date
+      status_id: statusId, // Fetched status ID
+      approval_date: formattedDate // Today's date
     };
 
     // Send the PATCH request to update the status
     this.http.patch(url, payload).subscribe(
       (res: any) => {
-          if (res && res.data && res.data.leave_id) {
-              // Extract employee ID, leave type ID, and leave days
-              const leave = res.data.leave;
-              const employeeId = leave.employee.employee_id;
-              const leaveTypeId = leave.leave_type.leave_type_id;
-              const leaveDays = res.data.leave_days;
+        if (res && res.data && res.data.leave_id) {
+          // Extract employee ID, leave type ID, and leave days
+          const leave = res.data.leave;
+          const employeeId = leave.employee.employee_id;
+          const leaveTypeId = leave.leave_type.leave_type_id;
+          const leaveDays = res.data.leave_days;
 
-              // Fetch the employee's leave balance
-              this.http.get(`hrms/employee_leave_balance/?employee_id=${employeeId}&leave_type_id=${leaveTypeId}`).subscribe(
-                  (balanceResponse: any) => {
-                      if (balanceResponse && balanceResponse.data && balanceResponse.data.length > 0) {
-                        const leaveBalance = balanceResponse.data[0]; // Assuming one record is returned
-                        const balanceId = leaveBalance.balance_id;
+          // Fetch the employee's leave balance
+          this.http.get(`hrms/employee_leave_balance/?employee_id=${employeeId}&leave_type_id=${leaveTypeId}`).subscribe(
+            (balanceResponse: any) => {
+              if (balanceResponse && balanceResponse.data && balanceResponse.data.length > 0) {
+                const leaveBalance = balanceResponse.data[0]; // Assuming one record is returned
+                const balanceId = leaveBalance.balance_id;
 
-                        // Check if leave_balance exists in the response
-                        const totalBalance = leaveBalance.leave_balance;
-                        if (totalBalance === undefined) {
-                          console.error("Error: leave_balance field is undefined in the response.");
-                          return;
-                        }
-                  
-                        // Convert leave_balance to a number, as it is a string in the response
-                        const totalBalanceParsed = parseFloat(totalBalance); // Ensure it's a number
-                        if (isNaN(totalBalanceParsed)) {
-                          console.error("Error: Invalid leave_balance value.");
-                          return;
-                        }
-                          const remainingBalance = totalBalance - leaveDays;
+                // Check if leave_balance exists in the response
+                const totalBalance = leaveBalance.leave_balance;
+                if (totalBalance === undefined) {
+                  console.error("Error: leave_balance field is undefined in the response.");
+                  return;
+                }
+
+                // Convert leave_balance to a number, as it is a string in the response
+                const totalBalanceParsed = parseFloat(totalBalance); // Ensure it's a number
+                if (isNaN(totalBalanceParsed)) {
+                  console.error("Error: Invalid leave_balance value.");
+                  return;
+                }
+                const remainingBalance = totalBalance - leaveDays;
 
 
-                          // Prepare the payload for the leave balance update
-                          const balancePayload = {
-                            leave_balance: remainingBalance
-                          }
+                // Prepare the payload for the leave balance update
+                const balancePayload = {
+                  leave_balance: remainingBalance
+                }
 
-                          // Save the updated leave balance
-                          this.http.patch(`hrms/employee_leave_balance/${balanceId}/`, balancePayload).subscribe(
-                              () => {
-                                  window.location.reload(); // Reload page to reflect changes
-                              },
-                              (error) => {
-                                  console.error("Error saving leave balance:", error);
-                                  alert("Failed to update leave balance.");
-                              }
-                          );
-                      } else {
-                          console.error("No leave balance found for employee or leave type.");
-                          alert("No leave balance found for this employee and leave type.");
-                      }
+                // Save the updated leave balance
+                this.http.patch(`hrms/employee_leave_balance/${balanceId}/`, balancePayload).subscribe(
+                  () => {
+                    // window.location.reload(); // Reload page to reflect changes
+                    this.curdConfig.tableConfig.reload();
                   },
                   (error) => {
-                      console.error("Error fetching leave balance:", error);
-                      alert("Failed to fetch leave balance.");
+                    console.error("Error saving leave balance:", error);
+                    alert("Failed to update leave balance.");
                   }
-              );
-          } else {
-              console.error("Error: Leave data not found in response:", res);
-          }
+                );
+              } else {
+                console.error("No leave balance found for employee or leave type.");
+                alert("No leave balance found for this employee and leave type.");
+              }
+            },
+            (error) => {
+              console.error("Error fetching leave balance:", error);
+              alert("Failed to fetch leave balance.");
+            }
+          );
+        } else {
+          console.error("Error: Leave data not found in response:", res);
+        }
       },
       (error) => {
-          console.error("HTTP error:", error);
-          alert("An error occurred while updating the leave status.");
+        console.error("HTTP error:", error);
+        alert("An error occurred while updating the leave status.");
       }
     );
   }
 
 
-//=====================================Status = Rejected ==============================================
-      
+  //=====================================Status = Rejected ==============================================
+
   circleLeaveRejections(event: any) {
     const url = `hrms/leave_approvals/${event}/`;
     const statusName = 'Rejected'; // Status name to search for
@@ -309,12 +313,10 @@ export class LeaveApprovalsComponent {
 
   updateLeaveRejection(url: string, statusId: string) {
     const now = new Date();
+
     const formattedDate = now.getFullYear() + '-' +
       String(now.getMonth() + 1).padStart(2, '0') + '-' +
-      String(now.getDate()).padStart(2, '0') + 'T' +
-      String(now.getHours()).padStart(2, '0') + ':' +
-      String(now.getMinutes()).padStart(2, '0') + ':' +
-      String(now.getSeconds()).padStart(2, '0');
+      String(now.getDate()).padStart(2, '0');
 
     const payload = {
       status_id: statusId, // Fetched status ID for 'Rejected'
@@ -325,7 +327,8 @@ export class LeaveApprovalsComponent {
     this.http.patch(url, payload).subscribe(
       (res: any) => {
         if (res && res.data && res.data.approval_id) {
-          window.location.reload(); // Reload the page to reflect changes
+          // window.location.reload(); // Reload the page to reflect changes
+          this.curdConfig.tableConfig.reload();
         } else {
           console.error("Error: Approval ID not found in response:", res);
         }
@@ -335,5 +338,9 @@ export class LeaveApprovalsComponent {
         alert("An error occurred while updating the leave status.");
       }
     );
+  }
+  bulkApproval() {
+    console.log('bulk Ids', this.curdConfig.tableConfig.checkedRows);
+    this.curdConfig.tableConfig.reload();
   }
 }

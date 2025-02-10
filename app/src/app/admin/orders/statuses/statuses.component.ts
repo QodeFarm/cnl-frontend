@@ -19,10 +19,12 @@ export class StatusesComponent {
       "globalSearch": {
         keys: ['status_id', 'status_name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'status_name',
-          name: 'Status name'
+          name: 'Status name',
+          sort: true
         },
         {
           fieldKey: "code",

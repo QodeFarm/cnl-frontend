@@ -13,7 +13,7 @@ const routes: Routes = [
     component: WorkorderComponent
   },
   {
-    path :'productionstatuses',
+    path :'production-statuses',
     component: ProductionStatusesComponent
   },
   {

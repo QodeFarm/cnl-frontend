@@ -5,8 +5,8 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 @Component({
   selector: 'app-production-statuses',
-  standalone: true,
-  imports: [CommonModule, AdminCommmonModule],
+  // standalone: true,
+  // imports: [CommonModule, AdminCommmonModule],
   templateUrl: './production-statuses.component.html',
   styleUrls: ['./production-statuses.component.scss']
 })
@@ -22,10 +22,12 @@ export class ProductionStatusesComponent {
       "globalSearch": {
         keys: ['status_id', 'status_name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'status_name',
-          name: 'Status Name'
+          name: 'Status Name',
+          sort: true
         },
         {
           fieldKey: "code",

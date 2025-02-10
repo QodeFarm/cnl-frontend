@@ -18,40 +18,49 @@ export class SizeComponent {
       pkId: "size_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['size_id','size_name','size_category','size_system','length','height', 'width', 'size_unit', 'description']
+        keys: ['size_id','size_name','size_category','size_system','length','height', 'width','size_unit','description']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'size_name',
-          name: 'Size Name'
+          name: 'Size Name',
+          sort: true
         },
         {
           fieldKey: 'size_category',
-          name: 'Size Category'
+          name: 'Size Category',
+          sort: true
         },
         {
           fieldKey: 'size_system',
-          name: 'Size System'
+          name: 'Size System',
+          sort: true
         },
         {
           fieldKey: 'length',
-          name: 'Length'
+          name: 'Length',
+          sort: true
         },
         {
           fieldKey: 'height',
-          name: 'Height'
-        },
+          name: 'Height',
+          sort: true
+        }, 
         {
           fieldKey: 'width',
-          name: 'Width'
+          name: 'Width',
+          sort: true
         },
         {
           fieldKey: 'size_unit',
-          name: 'Size Unit'
+          name: 'Size Unit',
+          sort: true
         },
         {
           fieldKey: 'description',
-          name: 'Description'
+          name: 'Description',
+          sort: true
         },
         {
           fieldKey: "code",

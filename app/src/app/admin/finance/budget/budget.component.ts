@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
 import { BudgetListComponent } from './budget-list/budget-list.component';
@@ -16,6 +16,7 @@ export class BudgetComponent {
   showBudgetList: boolean = false;
   showForm: boolean = false;
   BudgetEditID: any;
+  @ViewChild(BudgetListComponent) BudgetListComponent!: BudgetListComponent;
 
   constructor(private http: HttpClient) {
   }
@@ -54,6 +55,7 @@ export class BudgetComponent {
 
   showBudgetListFn() {
     this.showBudgetList = true;
+    this.BudgetListComponent?.refreshTable();
   };
 
   setFormConfig() {

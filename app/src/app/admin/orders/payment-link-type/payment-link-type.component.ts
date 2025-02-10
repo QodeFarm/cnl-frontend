@@ -16,16 +16,19 @@ export class PaymentLinkTypeComponent {
       pkId: "payment_link_type_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['payment_link_type_id', 'name','description']
+        keys: ['payment_link_type_id', 'name', 'description']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'name',
-          name: 'Name'
+          name: 'Name',
+          sort: true
         },
-		{
+		    {
           fieldKey: 'description',
-          name: 'Description'
+          name: 'Description',
+          sort: true
         },
         {
           fieldKey: "code",

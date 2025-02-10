@@ -19,14 +19,17 @@ export class OrderStatusesComponent {
       "globalSearch": {
         keys: ['order_status_id', 'status_name','description']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'status_name',
-          name: 'Status name'
+          name: 'Status name',
+          sort: true
         },
-		{
+		    {
           fieldKey: 'description',
-          name: 'Description'
+          name: 'Description',
+          sort: true
         },
         {
           fieldKey: "code",

@@ -6,6 +6,7 @@ import { AdminCommonService } from 'src/app/services/admin-common.service';
 import { HttpClient } from '@angular/common/http';
 import { filter, map, mergeMap } from 'rxjs/operators';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
+import { CustomfieldsModule } from 'src/app/admin/customfields/customfields.module';
 interface SpeechRecognitionResult {
   transcript: string; // Holds the recognized speech as text
 }
@@ -38,11 +39,12 @@ export interface Tab {
   templateUrl: './admin-layout.component.html',
   styleUrls: ['./admin-layout.component.scss'],
   standalone: true,
-  imports: [CommonModule, RouterModule, NzTabsModule]
+  imports: [CommonModule, RouterModule, NzTabsModule, CustomfieldsModule]
 })
 export class AdminLayoutComponent {
   menulList = <any>[];
   userName: any;
+  role:any;
   public currentHoverTabKey: string;
   public tabs: Tab[] = [];
   showContain = false;
@@ -90,12 +92,20 @@ export class AdminLayoutComponent {
   unloadNotification($event: any): void {
     $event.returnValue = true;
   }
+  layertoggleMenu() {
+    document.body.classList.remove("sidebar-toggled");
+    const sidebarElement = this.elementRef.nativeElement.querySelector('.sidebar');
+    if (sidebarElement) {
+      this.renderer.removeClass(sidebarElement, 'toggled');
+    }
+  }
   ngOnInit() {
     const user = this.taLoacal.getItem('user');
     this.menulList = [];
 
     if (user) {
       this.userName = user.username;
+      this.role = user.role_name;
       const userId = user.user_id; // Extracting the user_id dynamically
       const role_Id = user.role_id
 

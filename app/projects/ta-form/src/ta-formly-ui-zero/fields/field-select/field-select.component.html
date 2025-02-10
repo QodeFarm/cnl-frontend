@@ -1,9 +1,5 @@
-<nz-select style="width: 100%;" 
-[class.ng-dirty]="showError"
- (nzOnSearch)="onSearch($event)" 
- nzAllowClear nzShowSearch [nzServerSearch]="serverSearch" 
- [compareWith]="compareFn" [nzPlaceHolder]="to.placeholder" 
- [formControl]="formControl" [formlyAttributes]="field" [nzMode]="to.multiple ? 'multiple' :(to.mode)?to.mode: 'default'">
+<nz-select style="width: 100%;" [nzBackdrop]="true" [nzDropdownMatchSelectWidth]="false" [class.ng-dirty]="showError" (nzOnSearch)="onSearch($event)" nzAllowClear nzShowSearch [nzServerSearch]="serverSearch" [compareWith]="compareFn" [nzPlaceHolder]="to.placeholder"
+    [formControl]="formControl" [formlyAttributes]="field" [nzMode]="to.multiple ? 'multiple' :(to.mode)?to.mode: 'default'">
 
     <nz-option *ngIf="to.lazy && lazySelectedItem" nzDisabled [nzValue]="lazySelectedItem.value" [nzLabel]="lazySelectedItem.label"></nz-option>
     <ng-container *ngFor="let item of to.options | formlySelectOptions: field | async">

@@ -17,16 +17,19 @@ export class PriceCategoriesComponent {
       pkId: "price_category_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['price_category_id', 'name','code']
+        keys: ['price_category_id', 'name', 'code']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
 		    {
           fieldKey: 'name',
-          name: 'Name'
+          name: 'Name',
+          sort: true
         },
 		    {
           fieldKey: 'code',
-          name: 'Code'
+          name: 'Code',
+          sort: true
         },
         {
           fieldKey: "code",

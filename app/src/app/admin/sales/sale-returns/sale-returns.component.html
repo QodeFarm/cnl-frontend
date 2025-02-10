@@ -45,7 +45,7 @@
   </div>
 
 
-  <div #saleinvoiceordersModal class="modal fade custom-modal" id="saleinvoiceordersListModal" tabindex="-1" aria-labelledby="saleinvoiceordersListModalLabel" aria-hidden="true">
+  <div #saleinvoiceordersModal class="modal fade custom-modal modal-center" id="saleinvoiceordersListModal" tabindex="-1" aria-labelledby="saleinvoiceordersListModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
       <div class="modal-content">
         <div class="modal-header">
@@ -58,7 +58,8 @@
           (orderSelected)="handleInvoiceOrderSelected($event)"
           (productsPulled)="handleProductsPulled($event)"
           [noOrdersMessage]="noOrdersMessage"
-          (modalClosed)="closeModal()">
+          (modalClosed)="closeModal()"
+          class="custom-list">
       </app-saleinvoiceorderlist>
   
         </div> 
@@ -70,7 +71,7 @@
 
   
 <!-- Copy Modal -->
-<div class="modal fade custom-modal" id="copyModal" tabindex="-1" aria-labelledby="copyModalLabel" aria-hidden="true">
+<div class="modal fade custom-modal modal-center" id="copyModal" tabindex="-1" aria-labelledby="copyModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-sm custom-size"> <!-- Add custom-size class here -->
       <div class="modal-content">
           <div class="modal-header">

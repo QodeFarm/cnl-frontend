@@ -18,10 +18,12 @@ export class NotificationFrequenciesComponent {
       "globalSearch": {
         keys: ['frequency_id', 'frequency_name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'frequency_name',
-          name: 'Frequency Name'
+          name: 'Frequency Name',
+          sort: true
         },
         {
           fieldKey: "code",

@@ -17,12 +17,14 @@ export class InteractionTypesComponent {
       pkId: "interaction_type_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['interaction_type']
+        keys: ['interaction_type_id','interaction_type']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'interaction_type',
-          name: 'Interaction type'
+          name: 'Interaction type',
+          sort: true
         },
         {
           fieldKey: "code",

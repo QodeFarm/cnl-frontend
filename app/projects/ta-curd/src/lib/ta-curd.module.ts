@@ -10,6 +10,7 @@ import { TaCoreModule } from '@ta/ta-core';
 import { TaCurdModalComponent } from './ta-curd-modal/ta-curd-modal.component';
 import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzModalModule } from 'ng-zorro-antd/modal';
 
 @NgModule({
     declarations: [
@@ -25,7 +26,8 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
         NzCardModule,
         NzIconModule,
         NzDrawerModule,
-        NzButtonModule
+        NzButtonModule,
+        NzModalModule
     ],
     exports: [
         TaCurdComponent,
@@ -33,9 +35,9 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
     ]
 })
 export class TaCurdModule {
-  static rootComponent = TaCurdModalComponent;
-  // constructor(private componentFactoryResolver: ComponentFactoryResolver) { }
-  // public resolveComponent(): ComponentFactory<TaCurdModalComponent> {
-  //   return this.componentFactoryResolver.resolveComponentFactory(TaCurdModalComponent);
-  // }
- }
+    static rootComponent = TaCurdModalComponent;
+    // constructor(private componentFactoryResolver: ComponentFactoryResolver) { }
+    // public resolveComponent(): ComponentFactory<TaCurdModalComponent> {
+    //   return this.componentFactoryResolver.resolveComponentFactory(TaCurdModalComponent);
+    // }
+}

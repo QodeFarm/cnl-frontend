@@ -1,5 +1,7 @@
 <div class="ta-row p-0 justify-content-end">
-
+    <div class="ta-cell" *ngIf="options.title">
+        <span class="custom-heading"> {{options.title}}</span>
+    </div>
     <div class="ta-cell">
         <div class="ta-row p-0 justify-content-end flex-nowrap">
 
@@ -9,7 +11,7 @@
                     <nz-option *ngFor="let employee of employeeOptions" [nzValue]="employee.value" [nzLabel]="employee.label">
                     </nz-option>
                 </nz-select>
-            </div>   
+            </div>
 
             <!-- Quick Period Dropdown -->
             <div class="filter-group" style="margin-right: 10px;" *ngIf="isButtonVisible">
@@ -39,10 +41,10 @@
 
             <div *ngIf="isButtonVisible">
                 <div class="filter-group" style="margin-right: 10px;" *ngIf="isStatusButtonVisible">
-                  <nz-select [(ngModel)]="selectedStatus" nzPlaceHolder="Select Status" style="width: 185px" (ngModelChange)="onStatusChange($event)">
-                    <nz-option *ngFor="let status of statusOptions" [nzValue]="status.value" [nzLabel]="status.label">
-                    </nz-option>
-                  </nz-select>
+                    <nz-select [(ngModel)]="selectedStatus" nzPlaceHolder="Select Status" style="width: 185px" (ngModelChange)="onStatusChange($event)">
+                        <nz-option *ngFor="let status of statusOptions" [nzValue]="status.value" [nzLabel]="status.label">
+                        </nz-option>
+                    </nz-select>
                 </div>
             </div>
 
@@ -71,6 +73,8 @@
 
     <div class="ta-cell">
         <div class="ta-row p-0 justify-content-end flex-nowrap">
+            <ng-content nz-col select="[before-search]">
+            </ng-content>
             <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton">
                 <input type="text" nz-input placeholder="Search" [(ngModel)]="globalSearchValue" (keyup.enter)="globalSearch()" />
             </nz-input-group>
@@ -81,7 +85,7 @@
             </ng-template>
             <button nz-button (click)="export()" *ngIf="options.export"> <i nz-icon nzType="file-excel"
                     nzTheme="outline"></i> Export</button>
-            <ng-content nz-col select=".after-search">
+            <ng-content nz-col select="[after-search]">
             </ng-content>
         </div>
     </div>
@@ -92,7 +96,7 @@
     [nzShowTotal]="totalTemplate" [nzLoading]="loading" [nzTotal]="total" [nzPageSize]="options.pageSize" (nzQueryParams)="onQueryParamsChange($event)" [nzPageIndex]="pageIndex" [nzPaginationPosition]="options.paginationPosition">
     <thead>
         <tr>
-            <th *ngIf="options.showCheckbox" style="width: 50px;" [nzChecked]="false" nzLabel="Select all"></th>
+            <th *ngIf="options.showCheckbox" style="width: 50px;" [nzIndeterminate]="indeterminate" [nzChecked]="checked" nzLabel="Select all" (nzCheckedChange)="onAllChecked($event)"></th>
 
             <ng-container *ngFor="let c of options.cols">
 
@@ -119,7 +123,7 @@
     </thead>
     <tbody>
         <tr *ngFor="let data of rows">
-            <td *ngIf="options.showCheckbox" style="width: 50px;" [nzChecked]="false" [nzDisabled]="false" [nzLabel]="data.name"></td>
+            <td *ngIf="options.showCheckbox" style="width: 50px;" [nzChecked]="setOfCheckedId.has(data[options.pkId])" (nzCheckedChange)="onItemChecked(data[options.pkId], $event)" [nzDisabled]="false" [nzLabel]="data.name"></td>
 
             <td [ngClass]="c.tdClassName" *ngFor="let c of options.cols" [nzEllipsis]="c.ellipsis">
                 <label class="col-name">{{c.name}} :</label>
@@ -157,6 +161,8 @@
 
 
 <ng-template #totalTemplate let-total>
+    <ng-content nz-col select="[bottom-left]">
+    </ng-content>
     Total Records - {{total}}
     <button nz-button nzType="default" nzShape="circle" (click)="refresh()"><i nz-icon nzType="sync"></i></button>
     <div nz-row nzGutter="8">

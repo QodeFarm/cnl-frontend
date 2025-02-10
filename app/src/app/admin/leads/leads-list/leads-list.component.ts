@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 
 
 @Component({
@@ -16,6 +17,11 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 export class LeadsListComponent {
 
   @Output('edit') edit = new EventEmitter<void>();
+  @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+
+  refreshTable() {
+    this.taTableComponent?.refresh();
+  }
 
   tableConfig: TaTableConfig = {
     apiUrl: 'leads/leads/',
@@ -26,18 +32,8 @@ export class LeadsListComponent {
     "globalSearch": {
       keys: ['interaction_date','name','email','phone','lead_status','score','assignee','notes']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
-      {
-        fieldKey: 'interaction_date',
-        name: 'Interaction Date',
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          const interactionDate = row.interaction[0].interaction_date;
-          const [date, time] = interactionDate.split('T');
-          return `${date}<br>${time}`;
-        },
-        sort: false
-      },
       {
         fieldKey: 'name',
         name: 'Name',
@@ -70,11 +66,25 @@ export class LeadsListComponent {
       {
         fieldKey: 'assignee',
         name: 'Assigned',
+        sort: true,
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.assignee.first_name} ${row.assignee.last_name}`;
+          // Concatenate first_name and last_name correctly
+          const firstName = row.assignee?.first_name || '';
+          const lastName = row.assignee?.last_name || '';
+          return `${firstName} ${lastName}`.trim();
         },
-        sort: true
+      },
+      {
+        fieldKey: 'interaction_date',
+        name: 'Interaction Date',
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          const interactionDate = row.interaction[0].interaction_date;
+          const [date, time] = interactionDate.split('T');
+          return `${date}<br>${time}`;
+        },
+        sort: false
       },
       {
         fieldKey: 'notes',

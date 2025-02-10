@@ -17,8 +17,9 @@ export class ProductPurchaseGlComponent {
       pkId: "purchase_gl_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['id','name','purchase_accounts','code','inactive','type','account_no','is_loan_account','address', 'pan', 'employee']
+        keys: ['name','purchase_accounts','code','inactive','type','account_no','is_loan_account','address','employee','pan']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'name',
@@ -28,7 +29,7 @@ export class ProductPurchaseGlComponent {
         {
           fieldKey: 'purchase_accounts',
           name: 'Purchase Accounts',
-          sort: false,
+          sort: true,
         },
         {
           fieldKey: 'code',
@@ -44,18 +45,18 @@ export class ProductPurchaseGlComponent {
         {
           fieldKey: 'inactive',
           name: 'Inactive',
-          sort: false,
+          sort: true,
           type: 'boolean'
         },
         {
           fieldKey: 'type', 
           name: 'Type',
-          sort: false
+          sort: true
         },
         {
           fieldKey: 'account_no',
           name: 'Account No',
-          sort: false,
+          sort: true,
           isEncrypted: true
         },
         // {
@@ -71,7 +72,7 @@ export class ProductPurchaseGlComponent {
         {
           fieldKey: 'is_loan_account', 
           name: 'Is Loan Account',
-          sort: false,
+          sort: true,
 		      type: 'boolean'
         },
         // {
@@ -83,18 +84,18 @@ export class ProductPurchaseGlComponent {
         {
           fieldKey: 'address', 
           name: 'Address',
-          sort: false
+          sort: true
         },
         {
           fieldKey: 'employee', 
           name: 'Employee',
-          sort: false,
+          sort: true,
 		      type: 'boolean'
         },
         {
           fieldKey: 'pan', 
           name: 'PAN',
-          sort: false
+          sort: true
         },
         {
           fieldKey: "code",
