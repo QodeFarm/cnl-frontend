@@ -57,7 +57,7 @@ export class UserComponent {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
-              apiUrl: 'users/user'
+              apiUrl: 'users/create_user'
             },
             {
               type: 'edit',
