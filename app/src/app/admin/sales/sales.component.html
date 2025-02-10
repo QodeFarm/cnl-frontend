@@ -5,14 +5,11 @@
         <span *ngIf="SaleOrderEditID" class="custom-heading">Update Sales Order</span>
         <span *ngIf="!SaleOrderEditID" class="custom-heading">Create Sales Order</span>
       </button>
-      <div style="display: flex; gap: 10px; align-items: center;">
+            <div style="display: flex; gap: 10px; align-items: center;">
                 <div *ngIf="!SaleOrderEditID" class="quickpack-container d-flex align-items-center">
                     <div class="quickpack-box d-flex align-items-center">
                         <div class="dropdown-container rounded-start">
-                            <select
-                                id="quickpackSelect"
-                                class="dropdown-select m-0 "
-                                [(ngModel)]="selectedQuickpack">
+                            <select id="quickpackSelect" class="dropdown-select m-0 " [(ngModel)]="selectedQuickpack">
                                 <option value="" disabled selected aria-disabled="true">Quickpack</option>
                                 <option *ngFor="let quickpack of quickpackOptions" 
                                         [value]="quickpack.quick_pack_id">
@@ -22,27 +19,28 @@
                         </div>
                         <button class="btn btn-primary ml-0 rounded-end" (click)="loadQuickpackProducts()">OK</button>
                     </div>
-                </div>                  
+                </div>
                 <!-- New Copy Button -->
-            <button (click)="openCopyModal()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#copyModal">
+                <button (click)="openCopyModal()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#copyModal">
                 Copy
             </button>
+                <!-- data-bs-toggle="modal" data-bs-target="#ordersListModal" -->
 
-            <button (click)="showOrdersList()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ordersListModal">
+                <button (click)="showOrdersList()" type="button" class="btn btn-primary">
                 Past Orders
             </button>
-            
-            <button (click)="showSaleOrderListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#saleOrderListModal">
+
+                <button (click)="showSaleOrderListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#saleOrderListModal">
                 Sales Order List
             </button>
 
-        <!-- <button *checkAction="{ moduleName: 'Sales', sectionName: 'Customers', actionName: 'Update' }" (click)="showSaleOrderListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#saleOrderListModal">
+                <!-- <button *checkAction="{ moduleName: 'Sales', sectionName: 'Customers', actionName: 'Update' }" (click)="showSaleOrderListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#saleOrderListModal">
           Sales Order List
         </button>  Commented this code causing issues(form is not displaying) now pasted old code-->
 
 
                 <!-- Invoice Creation Button (Only for Edit and if flow status is "Ready for Invoice") -->
-        <button *ngIf="SaleOrderEditID && formConfig.model.sale_order.flow_status.flow_status_name === 'Ready for Invoice'" (click)="openSaleInvoiceModal()" type="button" class="btn btn-primary">
+                <button *ngIf="SaleOrderEditID && formConfig.model.sale_order.flow_status.flow_status_name === 'Ready for Invoice'" (click)="openSaleInvoiceModal()" type="button" class="btn btn-primary">
             Create Invoice
         </button>
 
@@ -55,7 +53,8 @@
         </div>
     </div>
 
-    <div class="row custom-form"> <!--  removed this commented line because when I refresh the page form is not displaying *checkAction="{ moduleName: 'Sales', sectionName: 'Sale Order', actionName: 'Create' }" -->
+    <div class="row custom-form">
+        <!--  removed this commented line because when I refresh the page form is not displaying *checkAction="{ moduleName: 'Sales', sectionName: 'Sale Order', actionName: 'Create' }" -->
         <div class="col-12 px-1" *ngIf="orderNumber || showForm">
             <ta-form #salesForm [options]="formConfig"></ta-form>
         </div>
@@ -89,15 +88,8 @@
                 <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
             </div>
             <div class="modal-body">
-                <app-orderslist 
-                    [customerOrders]="customerOrders" 
-                    [noOrdersMessage]="noOrdersMessage"
-                    (orderSelected)="handleOrderSelected($event)"
-                    [selectedCustomerId]="formConfig.model.sale_order.customer_id"
-                    (productsPulled)="handleProductPull($event)" 
-                    (modalClosed)="closeOrdersListModal()"
-                    (modalClosed)="hideModal()" 
-                    class="custom-list">
+                <app-orderslist [customerOrders]="customerOrders" [noOrdersMessage]="noOrdersMessage" (orderSelected)="handleOrderSelected($event)" [selectedCustomerId]="formConfig.model.sale_order.customer_id" (productsPulled)="handleProductPull($event)" (modalClosed)="closeOrdersListModal()"
+                    (modalClosed)="hideModal()" class="custom-list">
                 </app-orderslist>
             </div>
         </div>
@@ -175,14 +167,14 @@
 <!-- code for workorder modalbox in sales  -->
 <div *ngIf="showModal" class="custom-dialog-overlay">
     <div class="custom-dialog-box">
-      <h5>Confirm Work Order Creation</h5>
-      <p>Are you sure you want to create a work order for the selected products?</p>
-      <div class="dialog-actions">
-        <button class="btn btn-danger" (click)="closeModalworkorder()">Cancel</button>
-        <button class="btn btn-primary" (click)="confirmWorkOrder()">Confirm</button>
-      </div>
+        <h5>Confirm Work Order Creation</h5>
+        <p>Are you sure you want to create a work order for the selected products?</p>
+        <div class="dialog-actions">
+            <button class="btn btn-danger" (click)="closeModalworkorder()">Cancel</button>
+            <button class="btn btn-primary" (click)="confirmWorkOrder()">Confirm</button>
+        </div>
     </div>
-  </div>
+</div>
 
 
 <!-- Existing Sale Order/Estimate Modal -->
@@ -198,7 +190,7 @@
         <br />
         <button (click)="confirmSelection()">OK</button>
     </div>
-</div>       
+</div>
 
 <!-- Modal for Amount Check -->
 <div id="amountDialog" class="custom-dialog-overlay" *ngIf="isAmountModalOpen">
@@ -210,10 +202,9 @@
         </div>
     </div>
 
-<div id="errorModal" class="modal">
-    <div class="modal-content">
-        <span class="close-button" (click)="closeModalQuick()">&times;</span>
-        <p id="modalMessage"></p>
+    <div id="errorModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" (click)="closeModalQuick()">&times;</span>
+            <p id="modalMessage"></p>
+        </div>
     </div>
-</div>
-      

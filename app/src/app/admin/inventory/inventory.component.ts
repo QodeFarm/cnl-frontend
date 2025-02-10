@@ -21,7 +21,7 @@ export class InventoryComponent {
       pkId: "product_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['id', 'name']
+        keys: ['name', 'code','category','barcode','stock_unit','mrp','purchase_rate','sales_rate','wholesale_rate','dealer_rate','balance','updated_at']
       },
       defaultSort: { key: 'created_at', value: 'descend' },
       cols: [

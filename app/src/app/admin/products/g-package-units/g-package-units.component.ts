@@ -19,10 +19,12 @@ export class GPackageUnitsComponent {
       "globalSearch": {
         keys: ['g_pack_unit_id','unit_name']
       },
+      defaultSort: { key: 'unit_name', value: 'descend' },
       cols: [
         {
           fieldKey: 'unit_name',
-          name: 'Unit Name'
+          name: 'Unit Name',
+          sort: true
         },
         {
           fieldKey: "code",

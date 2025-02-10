@@ -10700,8 +10700,7 @@ a:focus {
         border-right: 10px solid transparent;
         border-bottom: 10px solid #fff;
         right: 15px;
-        top: -9px;
-        ;
+        top: 12px;
     }
     .topbar .dropdown-list {
         width: 20rem !important;
@@ -11011,6 +11010,7 @@ a:focus {
         overflow: visible;
         width: 12.5rem !important;
         min-width: 12.5rem;
+        transition: all 0.1s ease-in-out;
     }
     .sidebar.toggled .nav-item .collapse {
         position: absolute;
@@ -11027,7 +11027,8 @@ a:focus {
     .sidebar.toggled .nav-item .collapse .collapse-inner {
         box-shadow: none;
         border-radius: 0 !important;
-        background-color: #f7f7f7 !important
+        background-color: #f7f7f7 !important;
+        padding-top: 0 !important;
     }
     .sidebar.toggled .nav-item .collapsing {
         display: none;

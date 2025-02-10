@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-salesinvoice-list',
@@ -32,6 +33,70 @@ export class SalesInvoiceListComponent implements OnInit {
   refreshTable() {
    this.taTableComponent?.refresh();
   };
+
+  // In your component (e.g., SalesListComponent)
+  onSelect(event: Event): void {
+    const selectElement = event.target as HTMLSelectElement;
+    const selectedValue = selectElement.value;
+
+    switch (selectedValue) {
+      case 'email':
+        this.onMailLinkClick();
+        break;
+      case 'whatsapp':
+        break;
+      default:
+        // Handle default case (e.g., "Mail" selected)
+        break;
+    }
+
+    // Reset the dropdown to the default option
+    selectElement.value = '';
+  }
+
+  showDialog() {
+    const dialog = document.getElementById('customDialog');
+    if (dialog) {
+      dialog.style.display = 'flex'; // Show the dialog
+    }
+  }
+
+  // Function to close the custom dialog
+  closeDialog() {
+    const dialog = document.getElementById('customDialog');
+    if (dialog) {
+      dialog.style.display = 'none'; // Hide the dialog
+    }
+  }
+
+  showSuccessToast = false;
+  toastMessage = '';
+
+  // Method to handle "Email Sent" button click
+  onMailLinkClick(): void {
+    console.log("We are in method ...")
+    const selectedIds = this.taTableComponent.options.checkedRows;
+    if (selectedIds.length === 0) {
+      return this.showDialog();
+    }
+
+    const saleInvoiceId = selectedIds[0]; // Assuming only one row can be selected
+    const payload = { flag: "email" };
+    const url = `masters/document_generator/${saleInvoiceId}/sale_invoice/`;
+    this.http.post(url, payload).subscribe(
+      (response) => {
+        this.showSuccessToast = true;
+          this.toastMessage = "Mail Sent successfully"; // Set the toast message for update
+          this.refreshTable();
+          setTimeout(() => {
+            this.showSuccessToast = false;
+          }, 2000);
+      },
+      (error) => {
+        console.error('Error sending email', error);
+      }
+    );
+  }
 
   tableConfig: TaTableConfig = {
     apiUrl: 'sales/sale_invoice_order/?summary=true',
@@ -118,5 +183,5 @@ export class SalesInvoiceListComponent implements OnInit {
     ]
   };
 
-  constructor(private router: Router) { }
+  constructor(private router: Router, private http: HttpClient) {}
 }

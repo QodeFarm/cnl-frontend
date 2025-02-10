@@ -64,7 +64,7 @@
   </div>
 </div>
 <!-- Pending Orders List -->
-<div #ordersModal class="modal fade custom-modal modal-center modal-backdrop-custom" id="ordersListModal" tabindex="-1" aria-labelledby="ordersListModalLabel" aria-hidden="true">
+<div #ordersModal class="modal fade custom-modal modal-center" id="ordersListModal" tabindex="-1" aria-labelledby="ordersListModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header">
@@ -72,7 +72,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="hideModal()"></button>
       </div>
       <div class="modal-body">
-        <app-orderslist 
+        <app-orderslist class="custom-list" 
           [customerOrders]="customerOrders" 
           (orderSelected)="handleOrderSelected($event)"
           (productsPulled)="handleProductPull($event)"

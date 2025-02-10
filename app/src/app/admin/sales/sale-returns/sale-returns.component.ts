@@ -12,6 +12,8 @@ import { SaleinvoiceorderlistComponent } from '../saleinvoiceorderlist/saleinvoi
 import { SaleReturnsListComponent } from './sale-returns-list/sale-returns-list.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup } from '@angular/forms';
+declare var bootstrap;
+
 
 @Component({
   selector: 'app-sale-returns',
@@ -380,11 +382,14 @@ export class SaleReturnsComponent {
     ).subscribe();
   }
 
+  saleinvoiceordersListModal: any;
   openModal() {
-    this.ordersModal.nativeElement.classList.add('show');
-    this.ordersModal.nativeElement.style.display = 'block';
-    document.body.classList.add('modal-open');
-    document.body.style.overflow = 'hidden';
+    this.saleinvoiceordersListModal = new bootstrap.Modal(document.getElementById("saleinvoiceordersListModal"));
+    this.saleinvoiceordersListModal.show();
+    // this.ordersModal.nativeElement.classList.add('show');
+    // this.ordersModal.nativeElement.style.display = 'block';
+    // document.body.classList.add('modal-open');
+    // document.body.style.overflow = 'hidden';
   }
 
   getOrdersByCustomer(customerId: string): Observable<any> {
@@ -600,14 +605,16 @@ export class SaleReturnsComponent {
 
 
   hideModal() {
-    const modalBackdrop = document.querySelector('.modal-backdrop');
-    if (modalBackdrop) {
-      modalBackdrop.remove();
-    }
-    this.ordersModal.nativeElement.classList.remove('show');
-    this.ordersModal.nativeElement.style.display = 'none';
-    document.body.classList.remove('modal-open');
-    document.body.style.overflow = '';
+    this.saleinvoiceordersListModal.hide();
+
+    // const modalBackdrop = document.querySelector('.modal-backdrop');
+    // if (modalBackdrop) {
+    //   modalBackdrop.remove();
+    // }
+    // this.ordersModal.nativeElement.classList.remove('show');
+    // this.ordersModal.nativeElement.style.display = 'none';
+    // document.body.classList.remove('modal-open');
+    // document.body.style.overflow = '';
   }
 
   ngOnDestroy() {
@@ -973,7 +980,7 @@ export class SaleReturnsComponent {
         {
           key: 'sale_return_items',
           type: 'repeat',
-          className: 'custom-form-list',
+          className: 'custom-form-list product-table',
           templateOptions: {
             // title: 'Products',
             addText: 'Add Product',
@@ -1501,73 +1508,7 @@ export class SaleReturnsComponent {
                   }
                 }
               },
-              {
-                type: 'input',
-                key: 'total_boxes',
-                templateOptions: {
-                  type: 'number',
-                  label: 'Total Boxes',
-                  placeholder: 'Boxes',
-                  hideLabel: true
-                },
-                hooks: {
-                  onInit: (field: any) => {
-                    const parentArray = field.parent;
-
-                    // Check if parentArray exists and proceed
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
-
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.sale_return_items.length > currentRowIndex) {
-                        const existingBox = this.dataToPopulate.sale_return_items[currentRowIndex].total_boxes;
-
-                        // Set the full product object instead of just the product_id
-                        if (existingBox) {
-                          field.formControl.setValue(existingBox); // Set full product object (not just product_id)
-                        }
-                      }
-                    }
-                  }
-                }
-              },
-              {
-                type: 'select',
-                key: 'unit_options_id',
-                templateOptions: {
-                  label: 'Unit',
-                  placeholder: 'Unit',
-                  hideLabel: true,
-                  dataLabel: 'unit_name',
-                  dataKey: 'unit_options_id',
-                  bindId: true,
-                  required: true,
-                  lazy: {
-                    url: 'masters/unit_options',
-                    lazyOneTime: true
-                  }
-                },
-                hooks: {
-                  onInit: (field: any) => {
-                    const parentArray = field.parent;
-
-                    // Check if parentArray exists and proceed
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
-
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.sale_return_items.length > currentRowIndex) {
-                        const existingUnit = this.dataToPopulate.sale_return_items[currentRowIndex].product.unit_options;
-
-                        // Set the full product object instead of just the product_id
-                        if (existingUnit) {
-                          field.formControl.setValue(existingUnit.unit_options_id); // Set full product object (not just product_id)
-                        }
-                      }
-                    }
-                  }
-                }
-              },
+             
               {
                 type: 'input',
                 key: 'quantity',
@@ -1684,21 +1625,10 @@ export class SaleReturnsComponent {
                       }
                     }
                     field.formControl.valueChanges.subscribe(data => {
-                      // Add any logic needed for when discount changes
+                      this.totalAmountCal();
                     });
                   }
                 }
-              },
-
-              {
-                type: 'input',
-                key: 'mrp',
-                templateOptions: {
-                  label: 'Mrp',
-                  placeholder: 'Mrp',
-                  hideLabel: true,
-                  disabled: true
-                },
               },
               {
                 type: 'input',
@@ -1736,6 +1666,17 @@ export class SaleReturnsComponent {
               },
               {
                 type: 'input',
+                key: 'mrp',
+                templateOptions: {
+                  label: 'Mrp',
+                  placeholder: 'Mrp',
+                  hideLabel: true,
+                  disabled: true
+                },
+              },
+              
+              {
+                type: 'input',
                 key: 'print_name',
                 templateOptions: {
                   label: 'Print name',
@@ -1757,6 +1698,73 @@ export class SaleReturnsComponent {
                         // Set the full product object instead of just the product_id
                         if (existingName) {
                           field.formControl.setValue(existingName); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                type: 'select',
+                key: 'unit_options_id',
+                templateOptions: {
+                  label: 'Unit',
+                  placeholder: 'Unit',
+                  hideLabel: true,
+                  dataLabel: 'unit_name',
+                  dataKey: 'unit_options_id',
+                  bindId: true,
+                  required: true,
+                  lazy: {
+                    url: 'masters/unit_options',
+                    lazyOneTime: true
+                  }
+                },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_return_items.length > currentRowIndex) {
+                        const existingUnit = this.dataToPopulate.sale_return_items[currentRowIndex].product.unit_options;
+
+                        // Set the full product object instead of just the product_id
+                        if (existingUnit) {
+                          field.formControl.setValue(existingUnit.unit_options_id); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                type: 'input',
+                key: 'total_boxes',
+                templateOptions: {
+                  type: 'number',
+                  label: 'Total Boxes',
+                  placeholder: 'Boxes',
+                  hideLabel: true
+                },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_return_items.length > currentRowIndex) {
+                        const existingBox = this.dataToPopulate.sale_return_items[currentRowIndex].total_boxes;
+
+                        // Set the full product object instead of just the product_id
+                        if (existingBox) {
+                          field.formControl.setValue(existingBox); // Set full product object (not just product_id)
                         }
                       }
                     }
