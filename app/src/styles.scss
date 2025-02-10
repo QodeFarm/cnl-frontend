@@ -409,6 +409,9 @@
     width: 20%;
     border-radius: 14px;
     padding: 0;
+    @media(max-width:767px){
+       margin-bottom: 10px;
+    }
     .dashboard-card-head {
         height: 58px;
         background-color: #394c8f;
@@ -421,6 +424,13 @@
         color: #fff;
         z-index: 1;
         position: relative;
+        @media(max-width:1024px){
+            font-size: 18px;
+        }
+        @media(max-width:767px){
+            font-size: 16px;
+            height: 50px;
+        }
         &::after {
             content: "";
             height: 50px;
@@ -454,6 +464,22 @@
             color: #2c2e35;
             font-weight: 500;
             margin-bottom: 5px;
+        }
+        @media(max-width:1024px){
+            h5 {
+                font-size: 20px;
+            }
+            p {
+                font-size: 12px;
+            }
+        }
+        @media(max-width:767px){
+            h5 {
+                font-size: 18px;
+            }
+            p {
+                font-size: 11px;
+            }
         }
     }
 }
@@ -1128,7 +1154,7 @@ ta-form {
 @media(max-width:1024px){
     .sidebar{
         width: 0px;
-        left: -50px;
+        left: -60px;
         position: fixed;
         transform: translateX(0%);
         top: 56px !important;
@@ -1142,29 +1168,38 @@ ta-form {
             left: 0;
             min-width: unset;
             min-height: calc(100vh - 56px);
-            width: 200px !important;
+            width: 230px !important;
+            min-width: 230px !important;
             transform: translateX(0%);
             transition: all ease .3s;        
-            .custome-horizental-scroll{
-                overflow-y: auto !important;
-                height: calc(100vh - 55px) !important;
-                list-style: none;
-                padding: 0;
-                margin: 0;
-                &::-webkit-scrollbar {
-                    width: 0.5em;
+            .nav-item{
+                &:hover{
+                    .nav-link{
+                        span {
+                            margin-left: 15px !important;
+                        }
+                    }
                 }
-                &::-webkit-scrollbar-thumb {
-                    background-color: darkgrey;
-                    outline: 0px solid slategrey;
-                }
-                ::-webkit-scrollbar-track {
-                    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-                    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-                }
-          }        
-        
-    
+            }
+        }
+        .custome-horizental-scroll{
+            overflow-y: auto !important;
+            height: calc(100vh - 55px) !important;
+            list-style: none;
+            padding: 10px 0 0 !important;
+            margin: 0;
+            &::-webkit-scrollbar {
+                width: 0.5em;
+            }
+            &::-webkit-scrollbar-thumb {
+                background-color: darkgrey;
+                outline: 0px solid slategrey;
+            }
+            ::-webkit-scrollbar-track {
+                -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+                box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+            }
+        }  
         .nav-item{
             .nav-link{
                 width: auto !important;
@@ -1178,11 +1213,11 @@ ta-form {
                     min-height: inherit;
                     padding: 0;
                     left: 0;
-                 }
-                 span {
+                }
+                span {
                     margin-left: 15px !important;
                 }
-             
+            
             }
             &:hover{
                 .nav-link{
@@ -1191,7 +1226,6 @@ ta-form {
                     }
                 }
             }
-            } 
         }
     }
 }
