@@ -18,6 +18,7 @@ export class TaskPrioritiesComponent {
       "globalSearch": {
         keys: ['priority_id', 'priority_name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'priority_name',

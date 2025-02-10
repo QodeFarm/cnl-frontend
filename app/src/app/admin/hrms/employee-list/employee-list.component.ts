@@ -29,12 +29,8 @@ export class EmployeeListComponent {
     "globalSearch": {
       keys: ['first_name','email','phone','hire_date','job_type_id','designation_id','department_id','shift_id','manager_id']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
-      {
-        fieldKey: 'hire_date',
-        name: 'Hire Date',
-        sort: true
-      },
       {
         fieldKey: 'first_name',
         name: 'Name',
@@ -60,6 +56,11 @@ export class EmployeeListComponent {
       {
         fieldKey: 'address',
         name: 'Address',
+        sort: true
+      },
+      {
+        fieldKey: 'hire_date',
+        name: 'Hire Date',
         sort: true
       },
       {

@@ -32,18 +32,8 @@ export class LeadsListComponent {
     "globalSearch": {
       keys: ['interaction_date','name','email','phone','lead_status','score','assignee','notes']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
-      {
-        fieldKey: 'interaction_date',
-        name: 'Interaction Date',
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          const interactionDate = row.interaction[0].interaction_date;
-          const [date, time] = interactionDate.split('T');
-          return `${date}<br>${time}`;
-        },
-        sort: false
-      },
       {
         fieldKey: 'name',
         name: 'Name',
@@ -76,11 +66,25 @@ export class LeadsListComponent {
       {
         fieldKey: 'assignee',
         name: 'Assigned',
+        sort: true,
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.assignee.first_name} ${row.assignee.last_name}`;
+          // Concatenate first_name and last_name correctly
+          const firstName = row.assignee?.first_name || '';
+          const lastName = row.assignee?.last_name || '';
+          return `${firstName} ${lastName}`.trim();
         },
-        sort: true
+      },
+      {
+        fieldKey: 'interaction_date',
+        name: 'Interaction Date',
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          const interactionDate = row.interaction[0].interaction_date;
+          const [date, time] = interactionDate.split('T');
+          return `${date}<br>${time}`;
+        },
+        sort: false
       },
       {
         fieldKey: 'notes',

@@ -19,9 +19,11 @@ export class LeadStatusesComponent {
       "globalSearch": {
         keys: ['lead_status_id', 'status_name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [{
           fieldKey: 'status_name',
-          name: 'Status Name'
+          name: 'Status Name',
+          sort: true
         },
         {
           fieldKey: "code",
