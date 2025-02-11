@@ -37,7 +37,7 @@ export class StockjournalComponent implements OnInit {
     hideAddBtn: true,
     tableConfig: {
       apiUrl: 'production/work_order/?stock_journal=true',
-      title: 'Inventory',
+      title: 'Stock Journal',
       pkId: "product_id",
       pageSize: 10,
       "globalSearch": {

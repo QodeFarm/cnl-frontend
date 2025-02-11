@@ -28,13 +28,8 @@ export class TaxConfigurationListComponent {
     "globalSearch": {
       keys: ['created_at','tax_name','tax_rate','tax_type','is_active']
     },
+    defaultSort: { key: 'created_at', value: 'descend' }, 
     cols: [
-      {
-        fieldKey: 'created_at',
-        name: 'Created At',
-        sort: true,
-        displayType: 'datetime'
-      },
       {
         fieldKey: 'tax_name',
         name: 'Tax Name',

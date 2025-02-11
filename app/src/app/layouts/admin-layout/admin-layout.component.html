@@ -29,7 +29,7 @@
      
       
         <ul class="navbar-nav align-items-center">
-            <li class="company-title"><span class="badge bg-light ms-2" style="font-weight: 500; font-size: 14px; color:#142768; border-radius: 3px;padding: 7px 10px;">[123456]-Tech Solutions Private Limited</span></li>
+            <li class="company-title"><span class="badge bg-light ms-2" style="font-weight: 500; font-size: 14px; color:#142768; border-radius: 3px;padding: 7px 10px;">[{{company_code | uppercase}}]-{{company_name | uppercase}}</span></li>
             <li class="nav-item dropdown no-arrow mx-1">
                 <button class="nav-link dropdown-toggle" (click)="startSpeechRecognition()" id="alerts1" role="button" data-bs-toggle="" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-microphone"></i>

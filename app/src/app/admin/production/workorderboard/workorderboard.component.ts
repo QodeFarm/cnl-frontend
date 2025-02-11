@@ -38,6 +38,7 @@ export class WorkorderboardComponent implements OnInit {
         globalSearch: {
           keys: ['product', 'quantity', 'status_id', 'start_date', 'end_date']
         },
+        defaultSort: { key: 'created_at', value: 'descend' },
         cols: [
           {
             fieldKey: 'product',

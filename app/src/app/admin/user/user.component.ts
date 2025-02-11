@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { LocalStorageService } from '@ta/ta-core';
 import { TaCurdConfig } from '@ta/ta-curd';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
@@ -15,7 +16,7 @@ export class UserComponent {
     drawerSize: 500,
     drawerPlacement: 'top',
     tableConfig: {
-      apiUrl: 'users/user/',
+      // apiUrl: 'users/user/',
       title: 'Users',
       pkId: "user_id",
       pageSize: 10,
@@ -327,6 +328,14 @@ export class UserComponent {
           ]
         }
       ]
+    }
+  }
+  constructor(private taLocal: LocalStorageService) {}
+
+  ngOnInit(): void {
+    const user = this.taLocal.getItem('user');
+    if (user && user.user_id) {
+      this.curdConfig.tableConfig.apiUrl = `users/user?exclude_id=${user.user_id}`;
     }
   }
 }
