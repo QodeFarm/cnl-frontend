@@ -198,68 +198,323 @@ prepareFileMetadata(selectedFile: File): any {
   };
 }
 
-// Main method to confirm receipt and prepare the payload with receipt_path
-async confirmReceipt() {
-  if (this.selectedOrder) {
-    const saleOrderId = this.selectedOrder.sale_order_id;
+// // Main method to confirm receipt and prepare the payload with receipt_path
+// async confirmReceipt() {
+//   if (this.selectedOrder) {
+//     const saleOrderId = this.selectedOrder.sale_order_id;
 
-    // Step 1: Fetch the sale_invoice_id based on sale_order_id
-    const saleInvoiceId = await this.fetchSaleInvoiceId(saleOrderId);
-    if (!saleInvoiceId) {
-      console.error("Sale invoice ID is missing or couldn't be fetched.");
-      return;
-    }
+//     // Step 1: Fetch the sale_invoice_id based on sale_order_id
+//     const saleInvoiceId = await this.fetchSaleInvoiceId(saleOrderId);
+//     if (!saleInvoiceId) {
+//       console.error("Sale invoice ID is missing or couldn't be fetched.");
+//       return;
+//     }
 
-    const saleReceiptUrl = 'sales/sale_receipts/';
+//     const saleReceiptUrl = 'sales/sale_receipts/';
 
-    // Step 2: Prepare the request payload
-    let receiptPath = []; // Default to an empty array if no file is selected
+//     // Step 2: Prepare the request payload
+//     let receiptPath = []; // Default to an empty array if no file is selected
 
-    // Check if a file has been selected for upload
-    if (this.selectedOrder.selectedFile) {
-      const selectedFile = this.selectedOrder.selectedFile;
+//     // Check if a file has been selected for upload
+//     if (this.selectedOrder.selectedFile) {
+//       const selectedFile = this.selectedOrder.selectedFile;
 
-      // Prepare file metadata in the required structure for receipt_path
-      receiptPath = [this.prepareFileMetadata(selectedFile)];
-    }
+//       // Prepare file metadata in the required structure for receipt_path
+//       receiptPath = [this.prepareFileMetadata(selectedFile)];
+//     }
 
-    // Step 3: Prepare the payload with receipt_path
-    const payload = {
-      sale_invoice_id: saleInvoiceId,
-      receipt_name: `Receipt for Order ${saleOrderId}`,
-      description: 'Uploaded receipt for order confirmation',
-      receipt_path: receiptPath  // Include the file metadata or empty array
-    };
+//     // Step 3: Prepare the payload with receipt_path
+//     const payload = {
+//       sale_invoice_id: saleInvoiceId,
+//       receipt_name: `Receipt for Order ${saleOrderId}`,
+//       description: 'Uploaded receipt for order confirmation',
+//       receipt_path: receiptPath  // Include the file metadata or empty array
+//     };
 
-    // Step 4: Send the request to create a SaleReceipt
-    this.http.post(saleReceiptUrl, payload).subscribe(
-      (response: any) => {
-        console.log('Sale receipt created successfully:', response);
+//     // Step 4: Send the request to create a SaleReceipt
+//     this.http.post(saleReceiptUrl, payload).subscribe(
+//       (response: any) => {
+//         console.log('Sale receipt created successfully:', response);
 
-        // Move the order to the next stage
-        const nextStageUrl = `sales/SaleOrder/${saleOrderId}/move_next_stage/`;
+//         // Move the order to the next stage
+//         const nextStageUrl = `sales/SaleOrder/${saleOrderId}/move_next_stage/`;
 
-        this.http.post(nextStageUrl, {}).subscribe(
-          () => {
-            console.log('Dispatch confirmed for order:', saleOrderId);
-            this.closeModal(); // Close the modal after confirmation
-            this.refreshCurdConfig(); // Refresh data list in curdConfig
-          },
-          error => {
-            console.error('Error in confirming dispatch:', error);
-            alert('Failed to confirm dispatch. Please try again.');
-          }
-        );
-      },
-      error => {
-        console.error('Error in creating sale receipt:', error);
-        alert('Failed to create sale receipt. Please try again.');
+//         this.http.post(nextStageUrl, {}).subscribe(
+//           () => {
+//             console.log('Dispatch confirmed for order:', saleOrderId);
+//             this.closeModal(); // Close the modal after confirmation
+//             this.refreshCurdConfig(); // Refresh data list in curdConfig
+//           },
+//           error => {
+//             console.error('Error in confirming dispatch:', error);
+//             alert('Failed to confirm dispatch. Please try again.');
+//           }
+//         );
+//       },
+//       error => {
+//         console.error('Error in creating sale receipt:', error);
+//         alert('Failed to create sale receipt. Please try again.');
+//       }
+//     );
+//   } else {
+//     console.warn("No order selected for confirmation.");
+//   }
+// }
+
+  async confirmReceipt() {
+    if (this.selectedOrder) {
+      const childSaleOrderId = this.selectedOrder.sale_order_id;  // Child Sale Order ID
+      const parentOrderNo = this.selectedOrder.order_no.split('-').slice(0, 3).join('-'); // Extract Parent Order No (e.g., SO-2501-00002)
+
+      console.log("Processing child sale order:", childSaleOrderId);
+      console.log("Parent Order No:", parentOrderNo);
+
+      // Step 1: Fetch the sale_invoice_id for the child sale order
+      const saleInvoiceId = await this.fetchSaleInvoiceId(childSaleOrderId);
+      if (!saleInvoiceId) {
+        console.error("Sale invoice ID is missing or couldn't be fetched.");
+        return;
       }
-    );
-  } else {
-    console.warn("No order selected for confirmation.");
+
+      const saleReceiptUrl = 'sales/sale_receipts/';
+      let receiptPath = [];
+
+      // Step 2: Check if a file has been selected for upload
+      if (this.selectedOrder.selectedFile) {
+        const selectedFile = this.selectedOrder.selectedFile;
+        receiptPath = [this.prepareFileMetadata(selectedFile)];
+      }
+
+      // Step 3: Prepare the payload for sale receipt
+      const payload = {
+        sale_invoice_id: saleInvoiceId,
+        receipt_name: `Receipt for Order ${childSaleOrderId}`,
+        description: 'Uploaded receipt for order confirmation',
+        receipt_path: receiptPath
+      };
+
+      // Step 4: Create the sale receipt
+      this.http.post(saleReceiptUrl, payload).subscribe(
+        (response: any) => {
+          console.log(' Sale receipt created successfully:', response);
+
+          //  Step 5: Update child sale order to flow_status = "Completed"
+          const updateChildStatusUrl = `sales/sale_order/${childSaleOrderId}/`;
+          const updateChildPayload = { flow_status_id: '595ae9ff-8806-4ca5-ba04-bcb572ee0194', order_status_id: '717c922f-c092-4d40-94e7-6a12d7095600' }; // Replace with actual ID for "Completed"
+
+          this.http.patch(updateChildStatusUrl, updateChildPayload).subscribe(
+            () => {
+              console.log(` Child Sale Order ${childSaleOrderId} updated to Completed.`);
+              this.closeModal(); // Close the modal after confirmation
+              this.refreshCurdConfig();
+
+              //  Step 6: Fetch all child sale orders for the parent
+              const childOrdersUrl = `sales/sale_order/?parent_order_no=${parentOrderNo}`;
+              console.log("Fetching child orders with URL:", childOrdersUrl);
+              this.http.get<any>(childOrdersUrl).subscribe(
+                (childOrdersResponse) => {
+                  console.log(" Fetched child sale orders:", childOrdersResponse);
+              
+                  console.log(" Checking all child orders' statuses:");
+                  childOrdersResponse.data.forEach((childOrder: any) => {
+                    console.log(`Order No: ${childOrder.order_no}, Flow Status: ${childOrder.flow_status.flow_status_name}`);
+                  });
+              
+                  //  Ignore Parent Sale Order when checking if all child orders are completed
+                  const allCompleted = childOrdersResponse.data
+                    .filter((order: any) => order.order_no !== parentOrderNo) //  Exclude Parent Order
+                    .every((childOrder: any) => childOrder.flow_status.flow_status_name === 'Completed');
+              
+                  console.log(" allCompleted:", allCompleted);
+              
+                  if (allCompleted) {
+                    console.log(` All child sale orders for ${parentOrderNo} are completed. Updating parent order.`);
+              
+                    //  Fetch the Parent Sale Order ID
+                    const parentSaleOrder = childOrdersResponse.data.find(
+                      (order: any) => order.order_no === parentOrderNo
+                    );
+              
+                    if (parentSaleOrder) {
+                      const parentSaleOrderId = parentSaleOrder.sale_order_id;
+                      console.log(" Parent Sale Order ID:", parentSaleOrderId);
+              
+                      //  Update Parent Sale Order flow_status to "Completed"
+                      const updateParentStatusUrl = `sales/sale_order/${parentSaleOrderId}/`;
+                      console.log(" updateParentStatusUrl:", updateParentStatusUrl);
+                      const updateParentPayload = { flow_status_id: '595ae9ff-8806-4ca5-ba04-bcb572ee0194', order_status_id: '717c922f-c092-4d40-94e7-6a12d7095600' }; // Replace with correct ID
+              
+                      this.http.patch(updateParentStatusUrl, updateParentPayload).subscribe(
+                        () => {
+                          console.log(` Parent Sale Order ${parentOrderNo} updated to Completed.`);
+                          this.closeModal();
+                          this.refreshCurdConfig();
+                        },
+                        error => {
+                          console.error(" Error updating parent sale order status:", error);
+                          alert("Failed to update parent sale order status. Please try again.");
+                        }
+                      );
+                    } else {
+                      console.error(` Parent Sale Order ${parentOrderNo} not found.`);
+                    }
+                  } else {
+                    console.log(`Some child sale orders are still pending. Updating parent order to "Partially Delivered".`);
+                  
+                    //  Fetch the Parent Sale Order ID
+                    const parentSaleOrder = childOrdersResponse.data.find(
+                      (order: any) => order.order_no === parentOrderNo
+                    );
+                  
+                    if (parentSaleOrder) {
+                      const parentSaleOrderId = parentSaleOrder.sale_order_id;
+                      console.log(" Parent Sale Order ID:", parentSaleOrderId);
+                  
+                      //  Update Parent Sale Order to "Partially Delivered"
+                      const updateParentStatusUrl = `sales/sale_order/${parentSaleOrderId}/`;
+                      console.log(" updateParentStatusUrl:", updateParentStatusUrl);
+                      const updateParentPayload = { 
+                        flow_status_id: '35ba9d92-dd2b-4adf-94ec-1391e50cfb30',  //  Partially Delivered
+                        order_status_id: 'e2079d63-2e5f-4f8e-9d8b-817cefa87398'
+                      };
+                  
+                      this.http.patch(updateParentStatusUrl, updateParentPayload).subscribe(
+                        () => {
+                          console.log(` Parent Sale Order ${parentOrderNo} updated to Partially Delivered.`);
+                          this.closeModal();
+                          this.refreshCurdConfig();
+                        },
+                        error => {
+                          console.error(" Error updating parent sale order status:", error);
+                          alert("Failed to update parent sale order status. Please try again.");
+                        }
+                      );
+                    } else {
+                      console.error(` Parent Sale Order ${parentOrderNo} not found.`);
+                    }
+                  }
+                },
+                (error) => {
+                  console.error(" Error fetching child sale orders:", error);
+                  alert("Failed to fetch child sale orders. Please try again.");
+                }
+              );
+              
+            },
+            error => {
+              console.error(" Error updating child sale order status:", error);
+              alert("Failed to update child sale order status. Please try again.");
+            }
+          );
+        },
+        error => {
+          console.error(' Error in creating sale receipt:', error);
+          alert('Failed to create sale receipt. Please try again.');
+        }
+      );
+    } else {
+      console.warn(" No order selected for confirmation.");
+    }
   }
-}
+
+  // async confirmReceipt() {
+  //   if (this.selectedOrder) {
+  //     const saleOrderId = this.selectedOrder.sale_order_id;
+
+  //     // Step 1: Fetch the sale_invoice_id based on sale_order_id
+  //     const saleInvoiceId = await this.fetchSaleInvoiceId(saleOrderId);
+  //     if (!saleInvoiceId) {
+  //       console.error("Sale invoice ID is missing or couldn't be fetched.");
+  //       return;
+  //     }
+
+  //     const saleReceiptUrl = 'sales/sale_receipts/';
+  //     let receiptPath = [];
+
+  //     // Step 2: Check if a file has been selected for upload
+  //     if (this.selectedOrder.selectedFile) {
+  //       const selectedFile = this.selectedOrder.selectedFile;
+  //       receiptPath = [this.prepareFileMetadata(selectedFile)];
+  //     }
+
+  //     // Step 3: Prepare the payload for sale receipt
+  //     const payload = {
+  //       sale_invoice_id: saleInvoiceId,
+  //       receipt_name: `Receipt for Order ${saleOrderId}`,
+  //       description: 'Uploaded receipt for order confirmation',
+  //       receipt_path: receiptPath
+  //     };
+
+  //     // Step 4: Create the sale receipt
+  //     this.http.post(saleReceiptUrl, payload).subscribe(
+  //       (response: any) => {
+  //         console.log('Sale receipt created successfully:', response);
+
+  //         // Step 5: Check if all child sale orders are completed
+  //         const childOrdersUrl = `sales/sale_order/?parent_order_id=${saleOrderId}`;
+  //         this.http.get<any>(childOrdersUrl).subscribe(
+  //           (childOrdersResponse) => {
+  //             console.log("Fetched child sale orders:", childOrdersResponse);
+
+  //             // Check if all child orders have flow_status = 'Completed'
+  //             const allCompleted = childOrdersResponse.data.every(
+  //               (childOrder: any) => childOrder.flow_status === 'Completed'
+  //             );
+
+  //             if (allCompleted) {
+  //               console.log("All child sale orders are completed. Moving parent to next stage.");
+
+  //               //  Move Parent Sale Order to the next stage
+  //               const nextStageUrl = `sales/SaleOrder/${saleOrderId}/move_next_stage/`;
+  //               this.http.post(nextStageUrl, {}).subscribe(
+  //                 () => {
+  //                   console.log('Dispatch confirmed for order:', saleOrderId);
+  //                   this.closeModal();
+  //                   this.refreshCurdConfig();
+  //                 },
+  //                 error => {
+  //                   console.error('Error in confirming dispatch:', error);
+  //                   alert('Failed to confirm dispatch. Please try again.');
+  //                 }
+  //               );
+  //             } else {
+  //               console.log("Some child sale orders are still pending. Updating parent flow_status to 'Partially Delivered'.");
+
+  //               //  Some child orders are not completed → Update Parent Sale Order flow_status
+  //               const updateParentStatusUrl = `sales/sale_order/${saleOrderId}/`;
+  //               // const updatePayload = {flow_status_id: 'e2079d63-2e5f-4f8e-9d8b-817cefa87398'};
+  //               // console.log("updatePayload : ", updatePayload);
+  //               // { flow_status: "Partially Delivered" };
+
+  //               this.http.patch(`sales/sale_order/${saleOrderId}/`, {flow_status_id: '35ba9d92-dd2b-4adf-94ec-1391e50cfb30'}).subscribe(
+  //                 () => {
+  //                   console.log(`Parent Sale Order ${saleOrderId} updated to Partially Delivered.`);
+  //                   this.closeModal();
+  //                   this.refreshCurdConfig();
+  //                 },
+  //                 error => {
+  //                   console.error("Error updating parent sale order status:", error);
+  //                   alert("Failed to update parent sale order status. Please try again.");
+  //                 }
+  //               );
+  //             }
+  //           },
+  //           (error) => {
+  //             console.error("Error fetching child sale orders:", error);
+  //             alert("Failed to fetch child sale orders. Please try again.");
+  //           }
+  //         );
+  //       },
+  //       error => {
+  //         console.error('Error in creating sale receipt:', error);
+  //         alert('Failed to create sale receipt. Please try again.');
+  //       }
+  //     );
+  //   } else {
+  //     console.warn("No order selected for confirmation.");
+  //   }
+  // }
+
 
   
 }
