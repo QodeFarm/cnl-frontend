@@ -20,7 +20,7 @@ export class UserComponent {
       pkId: "user_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['username', 'email']
+        keys: ['username', 'email','role','mobile']
       },
       cols: [
         {
@@ -57,7 +57,7 @@ export class UserComponent {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
-              apiUrl: 'users/user'
+              apiUrl: 'users/create_user'
             },
             {
               type: 'edit',
@@ -68,7 +68,7 @@ export class UserComponent {
       ]
     },
     formConfig: {
-      url: 'users/users_update/',
+      url: 'users/create_user/',
       title: 'User',
       pkId: "user_id",
       exParams: [
@@ -273,6 +273,20 @@ export class UserComponent {
                   //field.templateOptions.options = this.cs.getRole();
                 }
               }
+            },
+            {
+              key: 'flag',
+              type: 'input',
+              defaultValue: 'admin_update',
+              className: 'ta-cell pr-md col-12',   
+              templateOptions: {
+                type: 'hidden' // Hides the input field
+              },    
+              hooks: {
+                onInit: (field: any) => {
+                  field.formControl.setValue('admin_update'); // Ensures value is always 'admin_update'
+                }                
+              }           
             },
             {
               key: 'password',

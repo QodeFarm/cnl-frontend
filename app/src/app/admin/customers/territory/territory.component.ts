@@ -19,8 +19,9 @@ export class TerritoryComponent {
       pkId: "territory_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['territory_id', 'name']
+        keys: ['territory_id', 'name', 'code']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'name',

@@ -39,12 +39,14 @@ export class SaleReceiptComponent implements OnInit {
         globalSearch: {
           // keys: ['customer', 'receipt_no']
         },
+        defaultSort: { key: 'created_at', value: 'descend' },
         cols: [
           {
             fieldKey: 'customer',
             name: 'Customer',
             displayType: 'map',
             mapFn: (currentValue: any, row: any) => `${row.customer.name}`,
+            sort: true
           },
           {
             fieldKey: 'order_no',
@@ -54,7 +56,7 @@ export class SaleReceiptComponent implements OnInit {
           {
             fieldKey: 'invoice_no',
             name: 'Invoice No',
-            sort: true
+            // sort: true
           },
           {
             fieldKey: 'products',

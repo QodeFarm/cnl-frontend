@@ -29,12 +29,8 @@ export class CreditNoteListComponent {
     "globalSearch": {
       keys: ['credit_note_id']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
-      {
-        fieldKey: 'credit_date',
-        name: 'Credit Date',
-        sort: true
-      },
       {
         fieldKey: 'customer_id',
         name: 'Customer',
@@ -56,6 +52,11 @@ export class CreditNoteListComponent {
       {
         fieldKey: 'credit_note_number',
         name: 'Credit note no',
+        sort: true
+      },
+      {
+        fieldKey: 'credit_date',
+        name: 'Credit Date',
         sort: true
       },
       {

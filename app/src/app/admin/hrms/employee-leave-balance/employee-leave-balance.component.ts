@@ -29,6 +29,7 @@ export class EmployeeLeaveBalanceComponent {
       "globalSearch": {
         keys: ['employee','leave_type','leave_balance','year']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'employee',

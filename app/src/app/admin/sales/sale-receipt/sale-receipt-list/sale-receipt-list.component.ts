@@ -24,6 +24,7 @@ export class SaleReceiptListComponent {
     "globalSearch": {
       keys: ['sale_invoice_id','sale_invoice','receipt_name','description']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {
         fieldKey: 'sale_invoice_id',
