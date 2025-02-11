@@ -4,6 +4,7 @@ import { FormlyModule } from '@ngx-formly/core';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FieldTabsComponent } from './field-tabs.component';
+import { NzTabsModule } from 'ng-zorro-antd/tabs';
 
 
 
@@ -14,6 +15,7 @@ import { FieldTabsComponent } from './field-tabs.component';
     FormsModule,
     ReactiveFormsModule,
     NzDatePickerModule,
+    NzTabsModule,
     FormlyModule.forChild({
       types: [
         {
