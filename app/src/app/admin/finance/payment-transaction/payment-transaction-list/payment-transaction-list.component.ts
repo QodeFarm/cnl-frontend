@@ -29,12 +29,8 @@ export class PaymentTransactionListComponent {
     "globalSearch": {
       keys: ['payment_date','invoice_id','order_type','payment_method','payment_status','amount','reference_number','currency','transaction_type','notes']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
-      {
-        fieldKey: 'payment_date', 
-        name: 'Payment Date',
-        sort: true
-      },
       {
         fieldKey: 'invoice_id',
         name: 'Invoice',
@@ -43,6 +39,11 @@ export class PaymentTransactionListComponent {
       {
         fieldKey: 'order_type',
         name: 'Order Type',
+        sort: true
+      },
+      {
+        fieldKey: 'payment_date', 
+        name: 'Payment Date',
         sort: true
       },
       {

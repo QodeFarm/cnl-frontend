@@ -17,8 +17,9 @@ export class ProductStockUnitsComponent {
       pkId: "stock_unit_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['id']
+        keys: ['stock_unit_name','quantity_code_id','description']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'stock_unit_name',
@@ -37,7 +38,7 @@ export class ProductStockUnitsComponent {
         {
           fieldKey: 'description', 
           name: 'Description',
-          sort: false
+          sort: true
         },
 		
         {

@@ -18,7 +18,7 @@ export class PurchasereturnordersListComponent {
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   refreshTable() {
-   this.taTableComponent?.refresh();
+    this.taTableComponent?.refresh();
   };
 
   //-----------email sending links----------
@@ -99,14 +99,10 @@ export class PurchasereturnordersListComponent {
     ],
     pageSize: 10,
     globalSearch: {
-      keys: ['purchase_type','return_no','return_reason','due_date','tax','tax_amount','total_amount','vendor','status_name','remarks']
+      keys: ['purchase_type', 'return_no', 'return_reason', 'due_date', 'tax', 'tax_amount', 'total_amount', 'vendor', 'status_name', 'remarks']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
-      {
-        fieldKey: 'due_date',
-        name: 'Due Date',
-        sort: true
-      },
       {
         fieldKey: 'purchase_type',
         name: 'Purchase Type',
@@ -124,6 +120,11 @@ export class PurchasereturnordersListComponent {
       {
         fieldKey: 'return_reason',
         name: 'Return Reason',
+        sort: true
+      },
+      {
+        fieldKey: 'due_date',
+        name: 'Due Date',
         sort: true
       },
       {

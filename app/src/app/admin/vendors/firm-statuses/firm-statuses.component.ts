@@ -19,10 +19,12 @@ export class FirmStatusesComponent {
       "globalSearch": {
         keys: ['firm_status_id', 'name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
 		    {
           fieldKey: 'name',
-          name: 'Name'
+          name: 'Name',
+          sort: true
         },
         {
           fieldKey: "code",

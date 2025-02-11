@@ -29,12 +29,8 @@ export class DebitNoteListComponent {
     "globalSearch": {
       keys: ['debit_note_id']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
-      {
-        fieldKey: 'debit_date',
-        name: 'Debit Date',
-        sort: true
-      },
       {
         fieldKey: 'customer_id',
         name: 'Customer',
@@ -56,6 +52,11 @@ export class DebitNoteListComponent {
       {
         fieldKey: 'debit_note_number',
         name: 'Debit note no',
+        sort: true
+      },
+      {
+        fieldKey: 'debit_date',
+        name: 'Debit Date',
         sort: true
       },
       {

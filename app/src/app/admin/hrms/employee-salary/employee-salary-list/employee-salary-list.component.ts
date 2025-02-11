@@ -29,6 +29,7 @@ export class EmployeeSalaryListComponent {
     "globalSearch": {
       keys: ['salary_start_date','salary_end_date','salary_amount','salary_currency','employee_id']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {
         fieldKey: 'salary_start_date',

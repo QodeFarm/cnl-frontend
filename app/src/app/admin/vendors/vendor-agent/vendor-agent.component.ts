@@ -17,28 +17,34 @@ export class VendorAgentComponent {
       pkId: "vendor_agent_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['vendor_agent_id', 'name']
+        keys: ['vendor_agent_id', 'name','code','commission_rate','rate_on','amount_type']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'code',
-          name: 'code'
+          name: 'code',
+          sort: true
         },
 		    {
           fieldKey: 'name',
-          name: 'Name'
+          name: 'Name',
+          sort: true
         },
 		    {
           fieldKey: 'commission_rate',
-          name: 'Commission Rate'
+          name: 'Commission Rate',
+          sort: true
         },
 		    {
           fieldKey: 'rate_on',
-          name: 'Rate On'
+          name: 'Rate On',
+          sort: true
         },
 		    {
           fieldKey: 'amount_type',
-          name: 'Amount Type'
+          name: 'Amount Type',
+          sort: true
         },
         {
           fieldKey: "code",

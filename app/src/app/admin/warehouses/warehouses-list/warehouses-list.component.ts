@@ -28,13 +28,8 @@ export class WarehousesListComponent {
     "globalSearch": {
       keys: ['name','code','phone','city_id','state_id']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
-      {
-        fieldKey: 'created_at',
-        name: 'Created At',
-        sort: true,
-        displayType: 'datetime'
-      },
       {
         fieldKey: 'name',
         name: 'Name',

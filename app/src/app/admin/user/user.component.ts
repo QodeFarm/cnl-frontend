@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { LocalStorageService } from '@ta/ta-core';
 import { TaCurdConfig } from '@ta/ta-curd';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
@@ -15,12 +16,12 @@ export class UserComponent {
     drawerSize: 500,
     drawerPlacement: 'top',
     tableConfig: {
-      apiUrl: 'users/user/',
+      // apiUrl: 'users/user/',
       title: 'Users',
       pkId: "user_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['username', 'email']
+        keys: ['username', 'email','role','mobile']
       },
       cols: [
         {
@@ -57,7 +58,7 @@ export class UserComponent {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
-              apiUrl: 'users/user'
+              apiUrl: 'users/create_user'
             },
             {
               type: 'edit',
@@ -68,7 +69,7 @@ export class UserComponent {
       ]
     },
     formConfig: {
-      url: 'users/users_update/',
+      url: 'users/create_user/',
       title: 'User',
       pkId: "user_id",
       exParams: [
@@ -275,6 +276,20 @@ export class UserComponent {
               }
             },
             {
+              key: 'flag',
+              type: 'input',
+              defaultValue: 'admin_update',
+              className: 'ta-cell pr-md col-12',   
+              templateOptions: {
+                type: 'hidden' // Hides the input field
+              },    
+              hooks: {
+                onInit: (field: any) => {
+                  field.formControl.setValue('admin_update'); // Ensures value is always 'admin_update'
+                }                
+              }           
+            },
+            {
               key: 'password',
               type: 'text',
               className: 'ta-cell pr-md col-md-6 col-12',
@@ -313,6 +328,14 @@ export class UserComponent {
           ]
         }
       ]
+    }
+  }
+  constructor(private taLocal: LocalStorageService) {}
+
+  ngOnInit(): void {
+    const user = this.taLocal.getItem('user');
+    if (user && user.user_id) {
+      this.curdConfig.tableConfig.apiUrl = `users/user?exclude_id=${user.user_id}`;
     }
   }
 }
