@@ -29,7 +29,7 @@ export class AssetMaintenanceListComponent {
     pkId: "asset_maintenance_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['maintenance_date','asset_id','cost','maintenance_description']
+      keys: ['asset_id','maintenance_date','asset_id','cost','maintenance_description']
     },
     defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
