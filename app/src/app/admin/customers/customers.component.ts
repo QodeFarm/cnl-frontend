@@ -483,15 +483,15 @@ export class CustomersComponent {
             {
               className: 'col-12 custom-form-card-block p-0',
               key: 'customer_data',
-              fieldGroupClassName:'row m-0 pr-0',
+              fieldGroupClassName:'row m-0 pr-0 responsive-row',
               fieldGroup: [
                 // Left Section (col-9 for form fields)
                 {
-                  className: 'col-9',
+                  className: 'col-sm-9 col-12 p-0',
                   fieldGroupClassName:'row m-0 p-0',
                   fieldGroup: [
                     {
-                      className: 'col-4',
+                      className: 'col-md-4 col-sm-6 col-12',
                       key: 'name',
                       type: 'input',
                       templateOptions: {
@@ -501,7 +501,7 @@ export class CustomersComponent {
                       }
                     },
                     {
-                      className: 'col-4',
+                      className: 'col-md-4 col-sm-6 col-12',
                       key: 'print_name',
                       type: 'input',
                       templateOptions: {
@@ -511,7 +511,7 @@ export class CustomersComponent {
                       }
                     },               
                     {
-                      className: 'col-4',
+                      className: 'col-md-4 col-sm-6 col-12',
                       key: 'code',
                       type: 'input',
                       templateOptions: {
@@ -522,7 +522,7 @@ export class CustomersComponent {
                     },
                   
                     {
-                      className: 'col-4',
+                      className: 'col-md-4 col-sm-6 col-12',
                       key: 'customer_category',
                       type: 'select',
                       templateOptions: {
@@ -550,7 +550,7 @@ export class CustomersComponent {
                     {
                       key: 'ledger_account',
                       type: 'select',
-                      className: 'col-4',
+                      className: 'col-md-4 col-sm-6 col-12',
                       templateOptions: {
                         dataKey: 'ledger_account_id',
                         dataLabel: 'name',
@@ -576,7 +576,7 @@ export class CustomersComponent {
                       }
                     },
                     {
-                      className: 'col-4',
+                      className: 'col-md-4 col-sm-6 col-12',
                       key: 'tax_type',
                       type: 'select',
                       templateOptions: {
@@ -593,14 +593,14 @@ export class CustomersComponent {
                   ]
                 },
                 {
-                  className: 'col-3 p-0',
+                  className: 'col-sm-3 col-12 p-0',
                   // key: 'customer_data',
                   fieldGroupClassName: "ant-row row mx-0 mt-2",
                   fieldGroup: [
                     {
                       key: 'picture',
                       type: 'file',
-                      className: 'ta-cell pr-md col d-flex justify-content-center pr-0',
+                      className: 'ta-cell pr-md col d-flex justify-content-md-center pr-0',
                       templateOptions: {
                         label: 'Picture',
                         required: true
