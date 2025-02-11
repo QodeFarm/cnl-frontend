@@ -45,6 +45,8 @@ export class AdminLayoutComponent {
   menulList = <any>[];
   userName: any;
   role:any;
+  company_name: any;
+  company_code: any;
   public currentHoverTabKey: string;
   public tabs: Tab[] = [];
   showContain = false;
@@ -107,7 +109,9 @@ export class AdminLayoutComponent {
       this.userName = user.username;
       this.role = user.role_name;
       const userId = user.user_id; // Extracting the user_id dynamically
-      const role_Id = user.role_id
+      const role_Id = user.role_id;
+      this.company_name = user.company_name;
+      this.company_code = user.company_code;
 
       // Using template literals to inject user_id dynamically into the URL
       this.http.get(`users/user_access/${role_Id}`).subscribe((res: any) => {
