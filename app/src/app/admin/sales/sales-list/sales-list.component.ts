@@ -158,7 +158,7 @@ export class SalesListComponent {
         sort: true
       },
       {
-        fieldKey: 'status_name',
+        fieldKey: 'order_status',
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
@@ -167,7 +167,7 @@ export class SalesListComponent {
         sort: true
       },
       {
-        fieldKey: 'flow_status_name',
+        fieldKey: 'flow_status',
         name: 'Flow Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
