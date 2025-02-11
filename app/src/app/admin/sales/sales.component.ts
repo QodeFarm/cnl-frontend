@@ -1059,7 +1059,8 @@ export class SalesComponent {
 
                         console.log('Work Order Payload:', workOrderPayload);
 
-                        return this.http.post('production/work_order/', workOrderPayload);
+                        return this.http.post('production/work_order/', workOrderPayload)
+                        
                     });
 
                     forkJoin(processWorkOrders).subscribe({
@@ -1159,6 +1160,11 @@ export class SalesComponent {
                         this.http.post('production/work_order/', workOrderPayload).subscribe({
                             next: (workOrderResponse) => {
                                 console.log('Work Order created:', workOrderResponse);
+                                this.showSuccessToast = true;
+                                this.toastMessage = "WorkOrder & Child Sale Order created"; // Set the toast message for update
+                                setTimeout(() => {
+                                  this.showSuccessToast = false;
+                                }, 3000);
                             },
                             error: (err) => {
                                 console.error('Error creating Work Order:', err);
