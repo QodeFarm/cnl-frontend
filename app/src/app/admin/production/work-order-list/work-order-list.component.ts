@@ -37,12 +37,8 @@ export class WorkOrderListComponent {
     globalSearch: {
       keys: ['start_date','product','quantity','status_id','end_date']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
-      {
-        fieldKey: 'start_date',
-        name: 'Start Date',
-        sort: true
-      },
       {
         fieldKey: 'product',
         name: 'Product',
@@ -83,7 +79,7 @@ export class WorkOrderListComponent {
       {
         fieldKey: 'pending_qty',
         name: 'Pending QTY',
-        sort: true
+        sort: false
       },
       {
         fieldKey: 'status_id',
