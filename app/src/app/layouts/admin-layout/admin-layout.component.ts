@@ -44,7 +44,7 @@ export interface Tab {
 export class AdminLayoutComponent {
   menulList = <any>[];
   userName: any;
-  role:any;
+  role: any;
   public currentHoverTabKey: string;
   public tabs: Tab[] = [];
   showContain = false;
@@ -385,11 +385,16 @@ export class AdminLayoutComponent {
     if (windowWidth < 768) {
       this.hideSidebarCollapse();
     }
-    if (windowWidth < 480 && !this.elementRef.nativeElement.querySelector('.sidebar').classList.contains('toggled')) {
-      this.renderer.addClass(document.body, 'sidebar-toggled');
-      this.renderer.addClass(this.elementRef.nativeElement.querySelector('.sidebar'), 'toggled');
-      this.hideSidebarCollapse();
+    if (windowWidth < 480 && this.elementRef.nativeElement.querySelector('.sidebar').classList.contains('toggled')) {
+      this.renderer.removeClass(document.body, 'sidebar-toggled');
+      this.renderer.removeClass(this.elementRef.nativeElement.querySelector('.sidebar'), 'toggled');
+      //this.hideSidebarCollapse();
     }
+    // if (windowWidth < 480 && !this.elementRef.nativeElement.querySelector('.sidebar').classList.contains('toggled')) {
+    //   this.renderer.addClass(document.body, 'sidebar-toggled');
+    //   this.renderer.addClass(this.elementRef.nativeElement.querySelector('.sidebar'), 'toggled');
+    //   this.hideSidebarCollapse();
+    // }
   }
 
   hideSidebarCollapse() {
