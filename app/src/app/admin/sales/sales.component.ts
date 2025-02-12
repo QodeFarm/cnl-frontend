@@ -1190,113 +1190,6 @@ export class SalesComponent {
     this.ngOnInit();
 }
 
-
-
-//   confirmWorkOrder() {
-//     console.log("data1", this.selectedOrder)
-//     if (this.selectedOrder) {
-//       const { productDetails, saleOrderDetails, orderAttachments, orderShipments } = this.selectedOrder;
-
-//       const parentOrderNo = saleOrderDetails.order_no; // Parent order number
-//       let childOrderCounter = 1; // Counter for child sale orders
-
-//       const processProductRequests = productDetails.map((product) => {
-//         const childOrderNo = `${parentOrderNo}-${childOrderCounter++}`; // Generate child order number
-//         console.log("saleorderdetailsdata", saleOrderDetails)
-
-//         // Step 1: Construct the payload for the child sale order
-//         const childSaleOrderPayload = {
-//           sale_order:
-//           {
-//             order_no: childOrderNo,
-//             ref_no: saleOrderDetails.ref_no,
-//             sale_type_id: saleOrderDetails.sale_type_id,
-//             tax: saleOrderDetails.tax,
-//             cess_amount: saleOrderDetails.cess_amount,
-//             tax_amount: saleOrderDetails.tax_amount,
-//             advance_amount: saleOrderDetails.advance_amount,
-//             ledger_account_id: saleOrderDetails.ledger_account_id,
-//             order_status_id: saleOrderDetails.order_status_id,
-//             customer_id: saleOrderDetails.customer.customer_id,
-//             order_date: saleOrderDetails.order_date,
-//             ref_date: saleOrderDetails.ref_date,
-//             delivery_date: saleOrderDetails.delivery_date,
-//             order_type: 'sale_order',
-//             sale_estimate: saleOrderDetails.sale_estimate || 'No',
-//             flow_status: { flow_status_name: 'Production' },
-//             billing_address: saleOrderDetails.billing_address,
-//             shipping_address: saleOrderDetails.shipping_address,
-//             email: saleOrderDetails.email,
-//             remarks: saleOrderDetails.remarks || null
-//           },
-//           sale_order_items: productDetails,
-//           order_attachments: orderAttachments,
-//           order_shipments: orderShipments
-//         };
-
-//         console.log('Payload for child sale order:', childSaleOrderPayload);
-
-//         // Step 2: Post the child sale order
-//         return this.http.post('sales/sale_order/', childSaleOrderPayload).pipe(
-//           tap((childSaleOrderResponse: any) => {
-//             console.log(`Child Sale Order ${childOrderNo} created:`, childSaleOrderResponse);
-
-//           // Step 3: Construct and post the Work Order payload
-//           const workOrderPayload = {
-//             work_order: {
-//               product_id: product.product_id,
-//               quantity: product.quantity || 0,
-//               completed_qty: 0, // Initialize as 0
-//               pending_qty: product.quantity || 0, // Pending is the same as the total quantity
-//               start_date: saleOrderDetails.order_date || new Date().toISOString().split('T')[0],
-//               // end_date: saleOrderDetails.delivery_date || new Date().toISOString().split('T')[0],
-//               sync_qty: true, // As per the example payload
-//               size_id: product.size?.size_id || null,
-//               color_id: product.color?.color_id || null,
-//               status_id: '', // Set as empty if not provided
-//               sale_order_id: childSaleOrderResponse.data.sale_order.sale_order_id // Link the sale order ID
-//             },
-//             bom: [
-//               {
-//                 product_id: product.product_id,
-//                 size_id: product.size?.size_id || null,
-//                 color_id: product.color?.color_id || null,
-//               }
-//             ], // Empty for now
-//             work_order_machines: [], // Empty for now
-//             workers: [], // Empty for now
-//             work_order_stages: [] // Empty for now
-//           };
-
-//             console.log('Work Order Payload:', workOrderPayload);
-
-//             this.http.post('production/work_order/', workOrderPayload).subscribe({
-//               next: (workOrderResponse) => {
-//                 console.log('Work Order created:', workOrderResponse);
-//               },
-//               error: (err) => {
-//                 console.error('Error creating Work Order:', err);
-//               }
-//             });
-//           })
-//         );
-//       });
-
-//     // Process all requests
-//     forkJoin(processProductRequests).subscribe({
-//       next: () => {
-//         this.closeModalworkorder();
-//         console.log('Child Sale Orders and Work Orders created successfully!');
-//       },
-//       error: (err) => {
-//         console.error('Error processing products:', err);
-//         alert('Failed to create Child Sale Orders or Work Orders. Please try again.');
-//       }
-//     });
-//   }
-//   this.ngOnInit();
-// }
-
   //=======================================================
   setFormConfig() {
     this.SaleOrderEditID = null;
@@ -1581,7 +1474,21 @@ export class SalesComponent {
                         const saleOrderItems = this.formConfig.model['sale_order_items'];
                         const orderAttachments = this.formConfig.model['order_attachments'];
                         const orderShipments = this.formConfig.model['order_shipments'];
-
+                        const totalAmount = () => {
+                          if (!Array.isArray(saleOrderItems) || saleOrderItems.length === 0) {
+                            console.log("No items found, returning 0");
+                            return 0;
+                          }
+                        
+                          return saleOrderItems.reduce((sum, item) => {
+                            const quantity = Number(item.quantity) || 0;
+                            const rate = Number(item.rate) || 0; // Convert rate to a number
+                        
+                            // console.log(`Calculating: ${quantity} * ${rate} = ${quantity * rate}`);
+                            return sum + (quantity * rate);
+                          }, 0);
+                        };
+                        
                         this.invoiceData = {
                           sale_invoice_order: {
                             bill_type: saleOrder.bill_type || 'CASH',
@@ -1591,9 +1498,8 @@ export class SalesComponent {
                             ref_no: saleOrder.ref_no,
                             ref_date: this.nowDate(),
                             tax: saleOrder.tax || 'Inclusive',
-                            due_date: saleOrder.due_date,
                             remarks: saleOrder.remarks,
-                            advance_amount: saleOrder.advance_amount,
+                            advance_amount: saleOrder.advance_amount || '0',
                             item_value: saleOrder.item_value,
                             discount: saleOrder.discount,
                             dis_amt: saleOrder.dis_amt,
@@ -1602,7 +1508,7 @@ export class SalesComponent {
                             cess_amount: saleOrder.cess_amount,
                             transport_charges: saleOrder.transport_charges,
                             round_off: saleOrder.round_off,
-                            total_amount: saleOrder.total_amount,
+                            total_amount: totalAmount(),
                             vehicle_name: saleOrder.vehicle_name,
                             total_boxes: saleOrder.total_boxes,
                             shipping_address: saleOrder.shipping_address,
@@ -1615,7 +1521,8 @@ export class SalesComponent {
                             payment_term_id: saleOrder.payment_term_id,
                             payment_link_type_id: saleOrder.payment_link_type_id,
                             ledger_account_id: saleOrder.ledger_account_id,
-                            flow_status: saleOrder.flow_status
+                            flow_status: saleOrder.flow_status,
+                            order_status_id: '717c922f-c092-4d40-94e7-6a12d7095600'
                           },
                           sale_invoice_items: saleOrderItems,
                           order_attachments: orderAttachments,

@@ -115,6 +115,11 @@ export class SalesInvoiceListComponent implements OnInit {
     defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {
+        fieldKey: 'invoice_no',
+        name: 'Invoice No',
+        sort: true
+      },
+      {
         fieldKey: 'customer',
         name: 'Customer',
         displayType: 'map',
@@ -124,10 +129,10 @@ export class SalesInvoiceListComponent implements OnInit {
         sort: true
       },
       {
-        fieldKey: 'invoice_no',
-        name: 'Invoice No',
+        fieldKey: 'invoice_date',
+        name: 'Invoice Date',
         sort: true
-      },
+      }, 
       {
         fieldKey: 'total_amount',
         name: 'Total Amount',
