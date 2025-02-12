@@ -87,12 +87,6 @@ export class VendorsListComponent {
         },
       },
       {
-        fieldKey: 'created_at',
-        name: 'Created At',
-        sort: true,
-        displayType: "date"
-      },
-      {
         fieldKey: "vendor_id",
         name: "Action",
         type: 'action',

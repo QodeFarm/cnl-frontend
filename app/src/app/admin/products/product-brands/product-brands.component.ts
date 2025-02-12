@@ -39,7 +39,7 @@ export class ProductBrandsComponent {
         //   sort: true
         // },
         {
-          fieldKey: 'brand_salesman',
+          fieldKey: 'brand_salesman_name',
           name: 'Brand Salesman',
           sort: true,
           displayType: "map",

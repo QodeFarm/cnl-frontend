@@ -136,16 +136,6 @@ export class SaleReturnsListComponent {
       //   sort: true
       // },
       {
-        fieldKey: 'return_reason',
-        name: 'Return Reason',
-        sort: true
-      },
-      {
-        fieldKey: 'due_date',
-        name: 'Due Date',
-        sort: true
-      },
-      {
         fieldKey: 'tax_amount',
         name: 'Tax Amount',
         sort: true
@@ -156,8 +146,8 @@ export class SaleReturnsListComponent {
         sort: true
       },
       {
-        fieldKey: 'remarks',
-        name: 'Remarks',
+        fieldKey: 'return_reason',
+        name: 'Return Reason',
         sort: true
       },
       {

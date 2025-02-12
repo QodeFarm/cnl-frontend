@@ -103,7 +103,7 @@ export class SalesListComponent {
     ],
     pageSize: 10,
     "globalSearch": {
-      keys: ['order_date','order_no','sale_type','customer','amount','tax','advance_amount','status_name','flow_status']
+      keys: ['order_date','order_no','sale_type','customer','sale_estimate','amount','tax','advance_amount','status_name','flow_status_name']
     },
     defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
@@ -158,7 +158,7 @@ export class SalesListComponent {
         sort: true
       },
       {
-        fieldKey: 'status_name',
+        fieldKey: 'order_status',
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
@@ -167,7 +167,7 @@ export class SalesListComponent {
         sort: true
       },
       {
-        fieldKey: 'flow_status_name',
+        fieldKey: 'flow_status',
         name: 'Flow Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
