@@ -190,7 +190,6 @@ export class JournalEntryComponent {
                 hooks: {
                   onChanges: (field: any) => {
                     field.formControl.valueChanges.subscribe((data: any) => {
-                      console.log('user', data);
                       const index = field.parent.key;
                       if (!this.formConfig.model['journal_entry_lines'][index]) {
                         console.error(`account_id at index ${index} is not defined. Initializing...`);
@@ -198,6 +197,34 @@ export class JournalEntryComponent {
                       }
 
                       this.formConfig.model['journal_entry_lines'][index]['account_id'] = data.account_id;
+                    });
+                  }
+                }
+              },
+              {
+                key: 'customer',
+                type: 'select',
+                templateOptions: {
+                  label: 'Customer',
+                  dataKey: 'name',
+                  dataLabel: 'name',
+                  options: [],
+                  hideLabel: true,
+                  required: false,
+                  lazy: {
+                    url: 'customers/customer/',
+                    lazyOneTime: true
+                  },
+                },
+                hooks: {
+                  onChanges: (field: any) => {
+                    field.formControl.valueChanges.subscribe((data: any) => {
+                      const index = field.parent.key;
+                      if (!this.formConfig.model['journal_entry_lines'][index]) {
+                        console.error(`customer_id at index ${index} is not defined. Initializing...`);
+                        this.formConfig.model['journal_entry_lines'][index] = {};
+                      }
+                      this.formConfig.model['journal_entry_lines'][index]['customer_id'] = data.customer_id;
                     });
                   }
                 }
