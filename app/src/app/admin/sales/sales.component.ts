@@ -11,6 +11,7 @@ import { SalesListComponent } from './sales-list/sales-list.component';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { SalesinvoiceComponent } from './salesinvoice/salesinvoice.component';
 import { BindingType } from '@angular/compiler';
+import { FormlyField, FormlyFieldConfig } from '@ngx-formly/core';
 declare var bootstrap;
 @Component({
   standalone: true,
@@ -399,6 +400,7 @@ export class SalesComponent {
 
   editSaleOrder(event) {
     this.SaleOrderEditID = event;
+    this.showForm = false;
     this.http.get('sales/sale_order/' + event).subscribe((res: any) => {
       if (res && res.data) {
 
@@ -970,6 +972,62 @@ export class SalesComponent {
   closeSaleOrderEstimateModal() {
     console.log("Sale Order/Estimate modal closed.");
     this.isConfirmationModalOpen = false;
+  }
+  loadProductVariations(field: FormlyFieldConfig, productValuechange: boolean = false) {
+    const parentArray = field.parent;
+
+    const product = field.formControl.value; //this.formConfig.model.sale_order_items[currentRowIndex]?.product;
+    // Ensure the product exists before making an HTTP request
+
+    if (product?.product_id) {
+      const sizeField: any = parentArray.fieldGroup.find((f: any) => f.key === 'size');
+      const colorField: any = parentArray.fieldGroup.find((f: any) => f.key === 'color');
+      if (productValuechange) {
+        sizeField.formControl.setValue(null);
+        colorField.formControl.setValue(null);
+      }
+      // Clear previous options for both size and color fields before adding new ones
+      if (sizeField) sizeField.templateOptions.options = [];
+      if (colorField) colorField.templateOptions.options = [];
+      this.http.get(`products/product_variations/?product_id=${product.product_id}`).subscribe((response: any) => {
+        if (response.data.length > 0) {
+
+          let availableSizes, availableColors;
+          // Check if response data is non-empty for size
+          if (response.data && response.data.length > 0) {
+            availableSizes = response.data.map((variation: any) => ({
+              label: variation.size?.size_name || '----',
+              value: {
+                size_id: variation.size?.size_id || null,
+                size_name: variation.size?.size_name || '----'
+              }
+            }));
+            availableColors = response.data.map((variation: any) => ({
+              label: variation.color?.color_name || '----',
+              value: {
+                color_id: variation.color?.color_id || null,
+                color_name: variation.color?.color_name || '----'
+              }
+            }));
+            // Enable and update the size field options if sizes are available
+            if (sizeField) {
+              sizeField.formControl.enable(); // Ensure the field is enabled
+              sizeField.templateOptions.options = availableSizes.filter((item, index, self) => index === self.findIndex((t) => t.value.size_id === item.value.size_id)); // Ensure unique size options
+            }
+          } else {
+            // Clear options and keep the fields enabled, without any selection if no options exist
+            if (sizeField) {
+              sizeField.templateOptions.options = [];
+            }
+            if (colorField) {
+              colorField.templateOptions.options = [];
+            }
+          }
+        }
+      });
+    } else {
+      console.error('Product not selected or invalid.');
+    }
   }
 
   createWorkOrder() {
@@ -1677,88 +1735,40 @@ export class SalesComponent {
                         }
                       }
 
+                      this.loadProductVariations(field);
                       // Subscribe to value changes of the field
                       // ***Size dropdown will populate with available sizes when product in selected***
                       field.formControl.valueChanges.subscribe(selectedProductId => {
-                        const product = this.formConfig.model.sale_order_items[currentRowIndex]?.product;
-                        console.log("Product id : ", product)
-                        debugger
-                        // Ensure the product exists before making an HTTP request
-                        if (product?.product_id) {
-                          this.http.get(`products/product_variations/?product_id=${product.product_id}`).subscribe((response: any) => {
-                            if (response.data.length > 0) {
-                              const sizeField = parentArray.fieldGroup.find((f: any) => f.key === 'size');
-                              const colorField = parentArray.fieldGroup.find((f: any) => f.key === 'color');
-                              // Clear previous options for both size and color fields before adding new ones
-                              if (sizeField) sizeField.templateOptions.options = [];
-                              if (colorField) colorField.templateOptions.options = [];
-                              let availableSizes, availableColors;
-                              // Check if response data is non-empty for size
-                              if (response.data && response.data.length > 0) {
-                                availableSizes = response.data.map((variation: any) => ({
-                                  label: variation.size?.size_name || '----',
-                                  value: {
-                                    size_id: variation.size?.size_id || null,
-                                    size_name: variation.size?.size_name || '----'
-                                  }
-                                }));
-                                availableColors = response.data.map((variation: any) => ({
-                                  label: variation.color?.color_name || '----',
-                                  value: {
-                                    color_id: variation.color?.color_id || null,
-                                    color_name: variation.color?.color_name || '----'
-                                  }
-                                }));
-                                // Enable and update the size field options if sizes are available
-                                if (sizeField) {
-                                  sizeField.formControl.enable(); // Ensure the field is enabled
-                                  sizeField.templateOptions.options = availableSizes.filter((item, index, self) => index === self.findIndex((t) => t.value.size_id === item.value.size_id)); // Ensure unique size options
-                                }
-                              } else {
-                                // Clear options and keep the fields enabled, without any selection if no options exist
-                                if (sizeField) {
-                                  sizeField.templateOptions.options = [];
-                                }
-                                if (colorField) {
-                                  colorField.templateOptions.options = [];
-                                }
-                              }
-                            } else {
-                              console.log(`For Product: ${product.name}  - No Size and Colors are available setting those to Null**`)
-                              this.formConfig.model.sale_order_items[currentRowIndex]['size_id'] = null;
-                              this.formConfig.model.sale_order_items[currentRowIndex]['color_id'] = null;
-                            }
-                          });
-                        } else {
-                          console.error('Product not selected or invalid.');
-                        }
+                        this.loadProductVariations(field);
                       });
                       // ***Product Info Text when product is selected code***
+
                       field.formControl.valueChanges.subscribe(async selectedProductId => {
-                        const product = this.formConfig.model.sale_order_items[currentRowIndex]?.product;
-                        this.http.get(`products/products_get/?product_id=${product.product_id}`).subscribe({
-                          next: (response: any) => {
-                            // Handle the successful response here
-                            const unitInfo = response.data[0] || {};
-                            // Using optional chaining and nullish coalescing to assign values
-                            const unitOption = unitInfo.unit_options?.unit_name ?? 'NA';
-                            const stockUnit = unitInfo.stock_unit?.stock_unit_name ?? 'NA';
-                            const packUnit = unitInfo.pack_unit?.unit_name ?? 'NA';
-                            const gPackUnit = unitInfo.g_pack_unit?.unit_name ?? 'NA';
-                            const packVsStock = unitInfo.pack_vs_stock ?? 0;
-                            const gPackVsPack = unitInfo.g_pack_vs_pack ?? 0;
-                            // Regular expression to match 'Stock Unit' 'Stock Pack Gpack Unit' & 'Stock Pack Unit'.
-                            const stockUnitReg = /\b[sS][tT][oO][cC][kK][_ ]?[uU][nN][iI][tT]\b/g
-                            const GpackReg = /\b(?:[sS]tock[_ ]?[pP]ack[_ ]?)?[gG][pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
-                            const stockPackReg = /\b[sS][tT][oO][cC][kK][_ ]?[pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g
-                            // Check which pattern matches unit_name
-                            let unitData = ''
-                            if (stockUnitReg.test(unitOption)) {
-                              unitData = `
+                        const product = field.formControl.value;
+                        if (product.product_id) {
+                          this.http.get(`products/products_get/?product_id=${product.product_id}`).subscribe({
+                            next: (response: any) => {
+                              // Handle the successful response here
+                              const unitInfo = response.data[0] || {};
+                              // Using optional chaining and nullish coalescing to assign values
+                              const unitOption = unitInfo.unit_options?.unit_name ?? 'NA';
+                              const stockUnit = unitInfo.stock_unit?.stock_unit_name ?? 'NA';
+                              const packUnit = unitInfo.pack_unit?.unit_name ?? 'NA';
+                              const gPackUnit = unitInfo.g_pack_unit?.unit_name ?? 'NA';
+                              const packVsStock = unitInfo.pack_vs_stock ?? 0;
+                              const gPackVsPack = unitInfo.g_pack_vs_pack ?? 0;
+                              // Regular expression to match 'Stock Unit' 'Stock Pack Gpack Unit' & 'Stock Pack Unit'.
+                              const stockUnitReg = /\b[sS][tT][oO][cC][kK][_ ]?[uU][nN][iI][tT]\b/g
+                              const GpackReg = /\b(?:[sS]tock[_ ]?[pP]ack[_ ]?)?[gG][pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
+                              const stockPackReg = /\b[sS][tT][oO][cC][kK][_ ]?[pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g
+                              // Check which pattern matches unit_name
+                              let unitData = ''
+                              if (stockUnitReg.test(unitOption)) {
+                                unitData = `
                                       <span style="color: red;">Stock Unit:</span> 
                                       <span style="color: blue;">${stockUnit}</span> | &nbsp;`
-                            } else if (GpackReg.test(unitOption)) {
-                              unitData = `
+                              } else if (GpackReg.test(unitOption)) {
+                                unitData = `
                                       <span style="color: red;">Stock Unit:</span> 
                                       <span style="color: blue;">${stockUnit}</span> |
                                       <span style="color: red;">Pck Unit:</span> 
@@ -1769,46 +1779,48 @@ export class SalesComponent {
                                       <span style="color: blue;">${gPackUnit}</span> |
                                       <span style="color: red;">GPackVsStock:</span> 
                                       <span style="color: blue;">${gPackVsPack}</span> | &nbsp;`
-                            } else if (stockPackReg.test(unitOption)) {
-                              unitData = `
+                              } else if (stockPackReg.test(unitOption)) {
+                                unitData = `
                                       <span style="color: red;">Stock Unit:</span> 
                                       <span style="color: blue;">${stockUnit}</span> |
                                       <span style="color: red;">Pack Unit:</span> 
                                       <span style="color: blue;">${packUnit}</span> |
                                       <span style="color: red;">PackVsStock:</span> 
                                       <span style="color: blue;">${packVsStock}</span> | &nbsp;`
-                            } else {
-                              console.log('No Unit Option match found');
-                            }
-                            // Check if a valid product is selected
-                            if (product?.product_id) {
-                              this.formConfig.model.sale_order_items[currentRowIndex].product_id = product.product_id;
-                              const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
-                              if (cardWrapper) {
-                                // Remove existing product info if present
-                                cardWrapper.querySelector('.center-message')?.remove();
-                                // Create and insert new product info
-                                const productInfoDiv = document.createElement('div');
-                                productInfoDiv.classList.add('center-message');
-                                productInfoDiv.innerHTML = `
+                              } else {
+                                console.log('No Unit Option match found');
+                              }
+                              // Check if a valid product is selected
+                              if (product?.product_id) {
+                                this.formConfig.model.sale_order_items[currentRowIndex].product_id = product.product_id;
+                                const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
+                                if (cardWrapper) {
+                                  // Remove existing product info if present
+                                  cardWrapper.querySelector('.center-message')?.remove();
+                                  // Create and insert new product info
+                                  const productInfoDiv = document.createElement('div');
+                                  productInfoDiv.classList.add('center-message');
+                                  productInfoDiv.innerHTML = `
                                         <span style="color: red;">Product Info:</span> 
                                         <span style="color: blue;">${product.name}</span> |                            
                                         <span style="color: red;">Balance:</span> 
                                         <span style="color: blue;">${product.balance}</span> |
                                         ${unitData}`;
-                                cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
-                                this.unitOptionOfProduct = unitData; // save this data to use in color and size
-                                console.log(`Product :  Product Info Updated for ${product.name}**`)
+                                  cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
+                                  this.unitOptionOfProduct = unitData; // save this data to use in color and size
+                                  console.log(`Product :  Product Info Updated for ${product.name}**`)
+                                }
+                              } else {
+                                console.log(`No valid product selected for Row ${currentRowIndex}.`);
                               }
-                            } else {
-                              console.log(`No valid product selected for Row ${currentRowIndex}.`);
+                            },
+                            error: (err) => {
+                              // Handle errors here
                             }
-                          },
-                          error: (err) => {
-                            // Handle errors here
-                          }
-                        });
+                          });
+                        }
                       });
+
                     } else {
                       console.error('Parent array is undefined or not accessible');
                     };
