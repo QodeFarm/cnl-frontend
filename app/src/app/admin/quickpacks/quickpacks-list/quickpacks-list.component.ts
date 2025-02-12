@@ -27,7 +27,7 @@ export class QuickpacksListComponent {
     pkId: "quick_pack_id",
     pageSize: 10,
     globalSearch: {
-      keys: ['name','lot_qty','description','active']
+      keys: ['created_at','name','lot_qty','description','active']
     },
     defaultSort: { key: 'created_at', value: 'descend' },
     cols: [

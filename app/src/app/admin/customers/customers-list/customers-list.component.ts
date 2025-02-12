@@ -76,13 +76,7 @@ export class CustomersListComponent {
         mapFn: (currentValue: any, row: any, col: any) => {
           return row.ledger_account.name;
         },
-      },  
-      {
-        fieldKey: 'created_at',
-        name: 'Created At',
-        sort: true,
-        displayType: "datetime"
-      },    
+      },      
       {
         fieldKey: "code",
         name: "Action",

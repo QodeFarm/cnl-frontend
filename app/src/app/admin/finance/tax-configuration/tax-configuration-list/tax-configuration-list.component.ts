@@ -26,7 +26,7 @@ export class TaxConfigurationListComponent {
     pkId: "tax_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['tax_name','tax_rate','tax_type','is_active']
+      keys: ['created_at','tax_name','tax_rate','tax_type','is_active']
     },
     defaultSort: { key: 'created_at', value: 'descend' }, 
     cols: [

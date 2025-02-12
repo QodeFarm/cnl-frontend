@@ -24,7 +24,7 @@ export class ProductSalesGlComponent {
         {
           fieldKey: 'name',
           name: 'Name',
-          sort: true
+          // sort: true
         },
         {
           fieldKey: 'sales_accounts',

@@ -27,7 +27,7 @@ export class EmployeeListComponent {
     pkId: "employee_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['first_name','email','phone','hire_date','job_type_id','designation_id','department_id','shift_id','manager_id']
+      keys: ['hire_date','first_name','last_name','email','phone','address','hire_date','job_type_id','designation_id','department_id','shift_id','manager_id']
     },
     defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
