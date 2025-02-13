@@ -110,12 +110,13 @@ export class SalesInvoiceListComponent implements OnInit {
     ],
     pageSize: 10,
     "globalSearch": {
-      keys: ['invoice_date','customer','invoice_no','total_amount','tax_amount','advance_amount','status_name','remarks']
+      keys: ['invoice_date','customer','invoice_no','created_at','total_amount','tax_amount','advance_amount','status_name','remarks']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {
-        fieldKey: 'invoice_date',
-        name: 'Invoice Date',
+        fieldKey: 'invoice_no',
+        name: 'Invoice No',
         sort: true
       },
       {
@@ -128,16 +129,10 @@ export class SalesInvoiceListComponent implements OnInit {
         sort: true
       },
       {
-        fieldKey: 'invoice_no',
-        name: 'Invoice No',
+        fieldKey: 'invoice_date',
+        name: 'Invoice Date',
         sort: true
-      },
-      {
-        fieldKey: 'created_at',
-        name: 'created_at',
-        sort: true
-      },
-     
+      }, 
       {
         fieldKey: 'total_amount',
         name: 'Total Amount',

@@ -23,12 +23,12 @@ export class LedgerAccountsComponent {
         {
           fieldKey: 'name',
           name: 'Name',
-          sort: true
+          // sort: true
         },
         {
           fieldKey: 'code', 
           name: 'Code',
-          sort: true
+          // sort: true
         },
         // {
         //   fieldKey: 'is_subledger',
@@ -88,7 +88,7 @@ export class LedgerAccountsComponent {
         {
           fieldKey: 'ledger_group_id',
           name: 'Ledger Group',
-          sort: true,
+          // sort: true,
           displayType: "map",
           mapFn: (currentValue: any, row: any, col: any) => {
             return `${row.ledger_group.name}`;

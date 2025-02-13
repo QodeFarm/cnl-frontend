@@ -27,15 +27,10 @@ export class BudgetListComponent {
     pkId: "budget_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['account_id','fiscal_year','allocated_amount','spent_amount']
+      keys: ['created_at','account_id','fiscal_year','allocated_amount','spent_amount']
     },
+    defaultSort: { key: 'created_at', value: 'descend' }, 
     cols: [
-      {
-        fieldKey: 'created_at',
-        name: 'Created At',
-        sort: true,
-        displayType: 'datetime'
-      },
       {
         fieldKey: 'account_id',
         name: 'Account',

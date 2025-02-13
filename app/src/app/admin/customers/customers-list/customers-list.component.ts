@@ -37,13 +37,8 @@ export class CustomersListComponent {
     "globalSearch": {
       keys: ['created_at','name','email','phone','gst','city_id','ledger_account_id']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
-      {
-        fieldKey: 'created_at',
-        name: 'Created At',
-        sort: true,
-        displayType: "datetime"
-      }, 
       {
         fieldKey: 'name',
         name: 'Name',
@@ -81,7 +76,7 @@ export class CustomersListComponent {
         mapFn: (currentValue: any, row: any, col: any) => {
           return row.ledger_account.name;
         },
-      },     
+      },      
       {
         fieldKey: "code",
         name: "Action",

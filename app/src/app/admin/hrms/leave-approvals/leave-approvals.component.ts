@@ -27,7 +27,7 @@ export class LeaveApprovalsComponent {
       pageSize: 10,
       showCheckbox: true,
       "globalSearch": {
-        keys: ['approval_id', 'name']
+        keys: ['approval_id', 'leave_id','name','status_id','approval_date']
       },
       // defaultSort: { key: 'approval_date', value: 'descend' },
       defaultSort: { key: 'created_at', value: 'descend' },

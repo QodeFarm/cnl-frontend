@@ -317,6 +317,7 @@ export class SalesComponent {
           });
 
           const saleOrderId = this.invoiceData.sale_invoice_order.sale_order_id;
+          this.triggerWorkflowPipeline(saleOrderId);
           // this.triggerWorkflowPipeline(saleOrderId);
           // Check if all products are invoiced
           const allInvoiced = this.invoiceData.sale_invoice_items.every(item => item.invoiced === 'YES');
@@ -1031,40 +1032,40 @@ export class SalesComponent {
   }
 
   createWorkOrder() {
-    // console.log("dataa1",this.SaleOrderEditID)
     if (this.SaleOrderEditID) {
-      // **1. Filtering Selected Items**: Check if `selectItem` exists and is `true`
-      const selectedProducts = this.formConfig.model.sale_order_items.filter(item => item.selectItem);
+        // 1. Check for selected items
+        let selectedProducts = this.formConfig.model.sale_order_items.filter(item => item.selectItem);
 
-      // Log the filtered selected products
-      console.log("Filtered Selected Products:", selectedProducts);
+        // 2. If no products are selected, select all products by default
+        if (selectedProducts.length === 0) {
+            selectedProducts = [...this.formConfig.model.sale_order_items]; // Select all products
+            console.log("No product selected. Defaulting to all products:", selectedProducts);
+        }
 
-      const saleOrderDetails = this.formConfig.model.sale_order;
-      const saleOrderItemsDetails = this.formConfig.model.sale_order_items
-      const orderAttachmentsDetails = this.formConfig.model.order_attachments
-      const orderShipmentsDetails = this.formConfig.model.order_shipments
+        // 3. Get sale order details
+        const saleOrderDetails = this.formConfig.model.sale_order;
+        const orderAttachmentsDetails = this.formConfig.model.order_attachments;
+        const orderShipmentsDetails = this.formConfig.model.order_shipments;
 
+        // 4. Proceed only if sale order details exist
+        if (saleOrderDetails && orderAttachmentsDetails && orderShipmentsDetails) {
+            this.selectedOrder = {
+                productDetails: selectedProducts,
+                saleOrderDetails: saleOrderDetails,
+                orderAttachments: orderAttachmentsDetails,
+                orderShipments: orderShipmentsDetails
+            };
 
-      // **2. Proceed Only if Data is Valid**: Ensure selected products and sale order details exist
-      if (selectedProducts.length > 0 && saleOrderDetails && orderAttachmentsDetails && orderShipmentsDetails) {
-        this.selectedOrder = {
-          productDetails: selectedProducts, // Only include selected products
-          saleOrderDetails: saleOrderDetails,
-          orderAttachments: orderAttachmentsDetails,
-          orderShipments: orderShipmentsDetails
-        };
-
-        // Show the modal for confirmation
-        this.showModal = true;
-      } else {
-        // Warn if conditions for creating a work order are not met
-        console.warn('No products selected or sale order details are missing.');
-      }
+            // 5. Open the modal
+            this.showModal = true;
+        } else {
+            console.warn('Sale order details or attachments/shipments are missing.');
+        }
     } else {
-      // Warn if `SaleOrderEditID` is not set
-      console.warn('SaleOrderEditID is not set. Unable to create work order.');
+        console.warn('SaleOrderEditID is not set. Unable to create work order.');
     }
-  }
+}
+
 
   closeModalworkorder() {
     this.showModal = false;
@@ -1072,124 +1073,180 @@ export class SalesComponent {
   }
 
   confirmWorkOrder() {
-    console.log("data1", this.selectedOrder)
+    console.log("data1", this.selectedOrder);
     if (this.selectedOrder) {
-      const { productDetails, saleOrderDetails, orderAttachments, orderShipments } = this.selectedOrder;
+        let { productDetails, saleOrderDetails, orderAttachments, orderShipments } = this.selectedOrder;
 
-      const parentOrderNo = saleOrderDetails.order_no; // Parent order number
-      let childOrderCounter = 1; // Counter for child sale orders
+        // 1. Check if all products are selected (auto-selection case)
+        const allProducts = this.formConfig.model.sale_order_items;
+        const isAllProductsSelected = productDetails.length === allProducts.length;
 
-      const processProductRequests = productDetails.map((product) => {
-        const childOrderNo = `${parentOrderNo}-${childOrderCounter++}`; // Generate child order number
-        console.log("saleorderdetailsdata", saleOrderDetails)
+        if (isAllProductsSelected) {
+            console.log("All products selected. Creating only work orders...");
 
-        // Step 1: Construct the payload for the child sale order
-        const childSaleOrderPayload = {
-          sale_order:
-          {
-            order_no: childOrderNo,
-            customer_id: saleOrderDetails.customer.customer_id,
-            order_date: saleOrderDetails.order_date,
-            ref_date: saleOrderDetails.ref_date,
-            delivery_date: saleOrderDetails.delivery_date,
-            order_type: 'sale_order',
-            sale_estimate: saleOrderDetails.sale_estimate || 'No',
-            flow_status: { flow_status_name: 'Production' },
-            billing_address: saleOrderDetails.billing_address,
-            shipping_address: saleOrderDetails.shipping_address,
-            email: saleOrderDetails.email,
-            remarks: saleOrderDetails.remarks || null
-          },
-          sale_order_items: productDetails,
-          // [
-          // {
-          //   product_id: product.product_id,
-          //   unit_options_id: product.unit_options_id,
-          //   quantity: product.quantity || 0,
-          //   rate: product.rate,
-          //   amount: product.amount,
-          //   print_name: product.print_name,
-          //   size_id: product.size?.size_id || null,
-          //   color_id: product.color?.color_id || null
-          // }
-          // ],
-          order_attachments: orderAttachments,
-          // .map((attachment) => ({
-          //   attachment_name: attachment.attachment_name,
-          //   attachment_path: attachment.attachment_path,
-          //   order_type_id: attachment.order_type_id
-          // })) || [],
-          order_shipments: orderShipments
-          // ? {
-          //     shipping_mode_id: saleOrderDetails.order_shipments.shipping_mode?.shipping_mode_id || null,
-          //     shipping_company_id: saleOrderDetails.order_shipments.shipping_company?.shipping_company_id || null,
-          //     destination: saleOrderDetails.order_shipments.destination,
-          //     shipping_tracking_no: `${saleOrderDetails.order_shipments.shipping_tracking_no}-${childOrderCounter}`,
-          //     shipping_date: saleOrderDetails.order_shipments.shipping_date,
-          //     shipping_charges: saleOrderDetails.order_shipments.shipping_charges || null,
-          //     port_of_landing: saleOrderDetails.order_shipments.port_of_landing || null,
-          //     port_of_discharge: saleOrderDetails.order_shipments.port_of_discharge || null,
-          //     no_of_packets: saleOrderDetails.order_shipments.no_of_packets || null,
-          //     weight: saleOrderDetails.order_shipments.weight || null
-          //   }
-          // : {}
-        };
+            this.http.post(`sales/SaleOrder/${saleOrderDetails.sale_order_id}/move_next_stage/`, {}).subscribe({
+                next: (updateResponse) => {
+                    console.log('Parent Sale Order updated to Production:', updateResponse);
 
-        console.log('Payload for child sale order:', childSaleOrderPayload);
+                    // Create Work Orders for all products (No child sale order)
+                    const processWorkOrders = productDetails.map((product) => {
+                        const workOrderPayload = {
+                            work_order: {
+                                product_id: product.product_id,
+                                quantity: product.quantity || 0,
+                                completed_qty: 0,
+                                pending_qty: product.quantity || 0,
+                                start_date: saleOrderDetails.order_date || new Date().toISOString().split('T')[0],
+                                sync_qty: true,
+                                size_id: product.size?.size_id || null,
+                                color_id: product.color?.color_id || null,
+                                status_id: '',
+                                sale_order_id: saleOrderDetails.sale_order_id // Link to parent sale order
+                            },
+                            bom: [
+                              {
+                                product_id: product.product_id,
+                                size_id: product.size?.size_id || null,
+                                color_id: product.color?.color_id || null,
+                              }
+                            ],
+                            work_order_machines: [],
+                            workers: [],
+                            work_order_stages: []
+                        };
 
-        // Step 2: Post the child sale order
-        return this.http.post('sales/sale_order/', childSaleOrderPayload).pipe(
-          tap((childSaleOrderResponse: any) => {
-            console.log(`Child Sale Order ${childOrderNo} created:`, childSaleOrderResponse);
+                        console.log('Work Order Payload:', workOrderPayload);
 
-            // Step 3: Construct and post the Work Order payload
-            const workOrderPayload = {
-              work_order: {
-                product_id: product.product_id,
-                quantity: product.quantity || 0,
-                completed_qty: 0, // Initialize as 0
-                pending_qty: product.quantity || 0, // Pending is the same as the total quantity
-                start_date: saleOrderDetails.order_date || new Date().toISOString().split('T')[0],
-                // end_date: saleOrderDetails.delivery_date || new Date().toISOString().split('T')[0],
-                sync_qty: true, // As per the example payload
-                size_id: product.size?.size_id || null,
-                color_id: product.color?.color_id || null,
-                status_id: '', // Set as empty if not provided
-                sale_order_id: childSaleOrderResponse.data.sale_order.sale_order_id // Link the sale order ID
-              },
-              bom: [], // Empty for now
-              work_order_machines: [], // Empty for now
-              workers: [], // Empty for now
-              work_order_stages: [] // Empty for now
-            };
+                        return this.http.post('production/work_order/', workOrderPayload)
+                        
+                    });
 
-            console.log('Work Order Payload:', workOrderPayload);
-
-            this.http.post('production/work_order/', workOrderPayload).subscribe({
-              next: (workOrderResponse) => {
-                console.log('Work Order created:', workOrderResponse);
-              },
-              error: (err) => {
-                console.error('Error creating Work Order:', err);
-              }
+                    forkJoin(processWorkOrders).subscribe({
+                        next: () => {
+                            this.closeModalworkorder();
+                            console.log('Work Orders created successfully (without child sale orders)!');
+                        },
+                        error: (err) => {
+                            console.error('Error creating Work Orders:', err);
+                            alert('Failed to create Work Orders. Please try again.');
+                        }
+                    });
+                },
+                error: (err) => {
+                    console.error('Error updating Parent Sale Order:', err);
+                }
             });
-          })
-        );
-      });
+        } else {
+            console.log("Partial products selected. Creating child sale orders & work orders...");
 
-      // Process all requests
-      forkJoin(processProductRequests).subscribe({
-        next: () => {
-          this.closeModalworkorder();
-          alert('Child Sale Orders and Work Orders created successfully!');
-        },
-        error: (err) => {
-          console.error('Error processing products:', err);
-          alert('Failed to create Child Sale Orders or Work Orders. Please try again.');
+            // If only some products are selected, create Child Sale Orders & Work Orders
+            const parentOrderNo = saleOrderDetails.order_no; // Parent order number
+            let childOrderCounter = 1;
+
+            const processProductRequests = productDetails.map((product) => {
+                const childOrderNo = `${parentOrderNo}-${childOrderCounter++}`;
+
+                // Create Child Sale Order
+                const childSaleOrderPayload = {
+                    sale_order: {
+                        order_no: childOrderNo,
+                        ref_no: saleOrderDetails.ref_no,
+                        sale_type_id: saleOrderDetails.sale_type_id,
+                        tax: saleOrderDetails.tax,
+                        cess_amount: saleOrderDetails.cess_amount,
+                        tax_amount: saleOrderDetails.tax_amount,
+                        advance_amount: saleOrderDetails.advance_amount,
+                        ledger_account_id: saleOrderDetails.ledger_account_id,
+                        order_status_id: saleOrderDetails.order_status_id,
+                        customer_id: saleOrderDetails.customer.customer_id,
+                        order_date: saleOrderDetails.order_date,
+                        ref_date: saleOrderDetails.ref_date,
+                        delivery_date: saleOrderDetails.delivery_date,
+                        order_type: 'sale_order',
+                        sale_estimate: saleOrderDetails.sale_estimate || 'No',
+                        flow_status: { flow_status_name: 'Production' }, // Set flow_status to 'Production'
+                        billing_address: saleOrderDetails.billing_address,
+                        shipping_address: saleOrderDetails.shipping_address,
+                        email: saleOrderDetails.email,
+                        remarks: saleOrderDetails.remarks || null
+                    },
+                    sale_order_items: [product], // Only selected product
+                    order_attachments: orderAttachments,
+                    order_shipments: orderShipments
+                };
+
+                console.log('Payload for child sale order:', childSaleOrderPayload);
+
+                return this.http.post('sales/sale_order/', childSaleOrderPayload).pipe(
+                    tap((childSaleOrderResponse: any) => {
+                        console.log(`Child Sale Order ${childOrderNo} created:`, childSaleOrderResponse);
+
+                        this.http.patch(`sales/sale_order_items/${product.sale_order_item_id}/`, { work_order_created: 'YES' })
+                            .subscribe({
+                                next: () => console.log(`Product ${product.product_id} marked as Work Order Created in Parent Sale Order`),
+                                error: (err) => console.error('Error updating work order status:', err)
+                            });
+
+                        // Create Work Order linked to Child Sale Order
+                        const workOrderPayload = {
+                            work_order: {
+                                product_id: product.product_id,
+                                quantity: product.quantity || 0,
+                                completed_qty: 0,
+                                pending_qty: product.quantity || 0,
+                                start_date: saleOrderDetails.order_date || new Date().toISOString().split('T')[0],
+                                sync_qty: true,
+                                size_id: product.size?.size_id || null,
+                                color_id: product.color?.color_id || null,
+                                status_id: '',
+                                sale_order_id: childSaleOrderResponse.data.sale_order.sale_order_id // Link to child sale order
+                            },
+                            bom: [
+                              {
+                                product_id: product.product_id,
+                                size_id: product.size?.size_id || null,
+                                color_id: product.color?.color_id || null,
+                              }
+                            ],
+                            work_order_machines: [],
+                            workers: [],
+                            work_order_stages: []
+                        };
+
+                        console.log('Work Order Payload:', workOrderPayload);
+
+                        this.http.post('production/work_order/', workOrderPayload).subscribe({
+                            next: (workOrderResponse) => {
+                                console.log('Work Order created:', workOrderResponse);
+                                this.showSuccessToast = true;
+                                this.toastMessage = "WorkOrder & Child Sale Order created"; // Set the toast message for update
+                                setTimeout(() => {
+                                  this.showSuccessToast = false;
+                                }, 3000);
+                            },
+                            error: (err) => {
+                                console.error('Error creating Work Order:', err);
+                            }
+                        });
+                    })
+                );
+            });
+
+            // 5. Process all child sale orders & work orders
+            forkJoin(processProductRequests).subscribe({
+                next: () => {
+                    this.closeModalworkorder();
+                    console.log('Child Sale Orders and Work Orders created successfully!');
+                },
+                error: (err) => {
+                    console.error('Error processing products:', err);
+                    alert('Failed to create Child Sale Orders or Work Orders. Please try again.');
+                }
+            });
         }
-      });
     }
-  }
+    this.ngOnInit();
+}
 
   //=======================================================
   setFormConfig() {
@@ -1228,10 +1285,10 @@ export class SalesComponent {
           const customer = this.formConfig.model.sale_order.customer; // Get the customer details
           console.log("Customer in formconfig : ", customer);
           console.log("Customer.credit_limit : ", customer.credit_limit);
-          if (!customer || !customer.credit_limit) {
-            console.error("Customer information or credit limit is missing.");
-            return;
-          }
+          // if (!customer || !customer.credit_limit) {
+          //   console.error("Customer information or credit limit is missing.");
+          //   return;
+          // }
 
           const maxLimit = parseFloat(customer.credit_limit); // Convert credit limit to number
           console.log(`Total Amount: ${totalAmount}, Credit Limit: ${maxLimit}`);
@@ -1475,7 +1532,21 @@ export class SalesComponent {
                         const saleOrderItems = this.formConfig.model['sale_order_items'];
                         const orderAttachments = this.formConfig.model['order_attachments'];
                         const orderShipments = this.formConfig.model['order_shipments'];
-
+                        const totalAmount = () => {
+                          if (!Array.isArray(saleOrderItems) || saleOrderItems.length === 0) {
+                            console.log("No items found, returning 0");
+                            return 0;
+                          }
+                        
+                          return saleOrderItems.reduce((sum, item) => {
+                            const quantity = Number(item.quantity) || 0;
+                            const rate = Number(item.rate) || 0; // Convert rate to a number
+                        
+                            // console.log(`Calculating: ${quantity} * ${rate} = ${quantity * rate}`);
+                            return sum + (quantity * rate);
+                          }, 0);
+                        };
+                        
                         this.invoiceData = {
                           sale_invoice_order: {
                             bill_type: saleOrder.bill_type || 'CASH',
@@ -1485,9 +1556,8 @@ export class SalesComponent {
                             ref_no: saleOrder.ref_no,
                             ref_date: this.nowDate(),
                             tax: saleOrder.tax || 'Inclusive',
-                            due_date: saleOrder.due_date,
                             remarks: saleOrder.remarks,
-                            advance_amount: saleOrder.advance_amount,
+                            advance_amount: saleOrder.advance_amount || '0',
                             item_value: saleOrder.item_value,
                             discount: saleOrder.discount,
                             dis_amt: saleOrder.dis_amt,
@@ -1496,7 +1566,7 @@ export class SalesComponent {
                             cess_amount: saleOrder.cess_amount,
                             transport_charges: saleOrder.transport_charges,
                             round_off: saleOrder.round_off,
-                            total_amount: saleOrder.total_amount,
+                            total_amount: totalAmount(),
                             vehicle_name: saleOrder.vehicle_name,
                             total_boxes: saleOrder.total_boxes,
                             shipping_address: saleOrder.shipping_address,
@@ -1509,7 +1579,8 @@ export class SalesComponent {
                             payment_term_id: saleOrder.payment_term_id,
                             payment_link_type_id: saleOrder.payment_link_type_id,
                             ledger_account_id: saleOrder.ledger_account_id,
-                            flow_status: saleOrder.flow_status
+                            flow_status: saleOrder.flow_status,
+                            order_status_id: '717c922f-c092-4d40-94e7-6a12d7095600'
                           },
                           sale_invoice_items: saleOrderItems,
                           order_attachments: orderAttachments,
@@ -1698,10 +1769,10 @@ export class SalesComponent {
                   hideLabel: true,
                 },
                 expressionProperties: {
-                  'templateOptions.hidden': () => !(this.SaleOrderEditID),
-                  'templateOptions.disabled': (model) => model.invoiced === 'YES' || !this.SaleOrderEditID
-                }
-              },
+                    'templateOptions.hidden': () => !(this.SaleOrderEditID),
+                    'templateOptions.disabled': (model) => model.invoiced === 'YES' ||  model.work_order_created === 'YES' || !this.SaleOrderEditID
+                  }
+              },                                     
               {
                 key: 'product',
                 type: 'select',

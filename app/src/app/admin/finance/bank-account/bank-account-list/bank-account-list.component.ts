@@ -28,15 +28,10 @@ export class BankAccountListComponent {
     pkId: "bank_account_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['account_type','account_name','account_number','bank_name','branch_name',]
+      keys: ['created_at','account_type','account_name','account_number','bank_name','branch_name',]
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
-      {
-        fieldKey: 'created_at',
-        name: 'Created At',
-        sort: true,
-        displayType: 'datetime'
-      },
       {
         fieldKey: 'account_type', 
         name: 'Account Type',

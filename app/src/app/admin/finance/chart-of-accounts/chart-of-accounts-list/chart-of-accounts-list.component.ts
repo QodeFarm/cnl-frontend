@@ -27,15 +27,10 @@ export class ChartOfAccountsListComponent {
     pkId: "account_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['account_code','account_name','account_type','parent_account_id','bank_account_id']
+      keys: ['created_at','account_code','account_name','account_type','parent_account_id','bank_account_id']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
-      {
-        fieldKey: 'created_at',
-        name: 'Created At',
-        sort: true,
-        displayType: 'datetime'
-      },
       {
         fieldKey: 'account_code',
         name: 'Account Code',

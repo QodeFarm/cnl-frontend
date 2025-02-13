@@ -24,12 +24,12 @@ export class TransportersComponent {
         {
           fieldKey: 'name',
           name: 'Name',
-          sort: true
+          // sort: true
         },
         {
           fieldKey: 'code', 
           name: 'Code',
-          sort: true
+          // sort: true
         },
         {
           fieldKey: 'gst_no', 

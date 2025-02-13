@@ -29,12 +29,8 @@ export class FinancialReportListComponent {
     "globalSearch": {
       keys: ['generated_at','report_name','report_type']
     },
+    defaultSort: { key: 'created_at', value: 'descend' }, 
     cols: [
-      {
-        fieldKey: 'generated_at', 
-        name: 'Generated At',
-        sort: true
-      },  
       {
         fieldKey: 'report_name',
         name: 'Account Code',
@@ -44,7 +40,12 @@ export class FinancialReportListComponent {
         fieldKey: 'report_type',
         name: 'Report Type',
         sort: true
-      },       
+      }, 
+      {
+        fieldKey: 'generated_at', 
+        name: 'Generated At',
+        sort: true
+      },        
       {
         fieldKey: "code",
         name: "Action",

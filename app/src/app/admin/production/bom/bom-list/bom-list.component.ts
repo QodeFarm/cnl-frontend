@@ -33,8 +33,9 @@ export class BomListComponent {
     // ],
     pageSize: 10,
     "globalSearch": {
-      keys: ['bom_id']
+      keys: ['created_at','bom','notes','product']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {
         fieldKey: 'bom',
@@ -46,7 +47,7 @@ export class BomListComponent {
         },
       },
       {
-        fieldKey: 'product_id',
+        fieldKey: 'product',
         name: 'Product',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {

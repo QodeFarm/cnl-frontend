@@ -38,14 +38,17 @@ export class SalesDispatchComponent implements OnInit {
         pkId: "sale_order_id",
         pageSize: 10,
         globalSearch: {
-          keys: ['customer', 'order_no']
+          keys: ['customer', 'order_no','products']
         },
+        defaultSort: { key: 'created_at', value: 'descend' },
         cols: [
           {
             fieldKey: 'customer',
             name: 'Customer',
             displayType: 'map',
             mapFn: (currentValue: any, row: any) => `${row.customer.name}`,
+            sort: true
+
           },
           {
             fieldKey: 'order_no',

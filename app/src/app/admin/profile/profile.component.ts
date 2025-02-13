@@ -19,10 +19,19 @@ import { LocalStorageService } from '@ta/ta-core';
 export class ProfileComponent {
   userName: string | null = null;
   userId: number | null = null;
+  showErrorToast: boolean;
+  showSuccessToast: boolean;
+  toastMessage: string;
   title = "Profile";
   showForm = false;
+  showToast(message: string, isError = false) {
+    this.toastMessage = message;
+    this.showErrorToast = isError;
+    this.showSuccessToast = !isError;
+    setTimeout(() => { this.showErrorToast = false; this.showSuccessToast = false; }, 3000);
+  }
   options: TaFormConfig = {
-    url: 'users/create_user/',
+    // url: 'users/create_user/',
     title: 'User Profile',
     pkId: "user_id",
     exParams: [
@@ -42,34 +51,49 @@ export class ProfileComponent {
         value: 'data.status.status_id'
       }
     ],
-  submit: {
+    submit: {
       label: "Update Profile",
       icon: 'save',
       successMsg: "Profile updated successfully",
       submittedFn: (res: any) => {
-        // Get user from local storage
-        const user = this.taLoacal.getItem('user');
-        if (!user?.user_id) {
-          console.error('No user ID found');
-          return;
-        }
-        // Construct update URL with user ID
-        const updateUrl = `users/create_user/${user.user_id}/`;
-        // Prepare the payload (modify if your API needs specific structure)
-        const payload = this.options.model;
-        // Send update request
-        this.http.put(updateUrl, payload).subscribe({
-          next: (response) => {
-            console.log('Update successful', response);
-            this.router.navigateByUrl('/profile');
-            // Optional: Update local storage with new data
-          },
-          error: (err) => {
-            console.error('Update failed', err);
-            // Add error handling (e.g., show toast message)
+        try {
+          const user = this.taLoacal.getItem('user');
+          if (!user?.user_id) {
+            this.showToast("Error: User not found.", true);
+            return;
           }
-        });
-      },
+
+          const updateUrl = `users/create_user/${user.user_id}/`;
+          const model = this.options.model;
+
+          if (!model) {
+            this.showToast("Error: Missing profile data.", true);
+            return;
+          }
+
+          const payload = {
+            ...model,
+            role_id: model.role?.role_id || model.role || null,
+            status_id: model.status?.status_id || model.status || null,
+          };
+
+          this.http.put(updateUrl, payload).subscribe({
+            next: () => this.showToast("Profile updated successfully!"),
+            error: (err) => {
+              const messages: { [key: number]: string } = {
+                0: "Network error. Please check your connection.",
+                400: "Invalid data provided.",
+                404: "User not found.",
+                500: "Server error. Try again later.",
+              };
+              this.showToast(messages[err.status] || "An error occurred.", true);
+            }
+          });
+
+        } catch (error) {
+          this.showToast("Something went wrong. Please try again.", true);
+        }
+      }
     },
     fields: [
       {
@@ -147,11 +171,11 @@ export class ProfileComponent {
                   onInit: (field: any) => {
                     const user = JSON.parse(localStorage.getItem('user') || '{}');
                     // If the logged-in user is not admin, disable the role field
-                    if (user?.role_name !== 'Admin'){
+                    if (user?.role_name !== 'Admin') {
                       field.templateOptions.disabled = true;
                     }
                   }
-                } 
+                }
               },
               {
                 key: 'gender',
@@ -223,7 +247,8 @@ export class ProfileComponent {
     ]
   };
 
-  constructor(private router: Router,private activeRouter: ActivatedRoute, private http: HttpClient,private taLoacal: LocalStorageService) {}
+
+  constructor(private router: Router, private activeRouter: ActivatedRoute, private http: HttpClient, private taLoacal: LocalStorageService) { }
 
   ngOnInit(): void {
     const user = this.taLoacal.getItem('user');

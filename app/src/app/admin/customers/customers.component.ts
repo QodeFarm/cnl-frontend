@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -29,7 +29,7 @@ export class CustomersComponent {
   private observer: MutationObserver;
   customFieldConfig: any;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private cdref:ChangeDetectorRef) {}
   customFieldFormConfig: any = {};
   ngOnInit() {
     this.showCustomerList = false;
@@ -181,14 +181,36 @@ export class CustomersComponent {
     });
   
     console.log('Final Custom Field Config:', customFieldConfigs);
-  
+
+    this.formConfig.fields[1].fieldGroup = [
+      ...this.formConfig.fields[1].fieldGroup, // Keep existing fields
+      {
+        className: 'col-12 custom-form-card-block p-0',
+        fieldGroupClassName:'row m-0 pr-0',
+        props: {
+          label: 'Custom Fields'
+        },
+        fieldGroup: [
+          {
+            className: 'col-9 p-0',
+            key: 'custom_field_values',
+            fieldGroupClassName: "ant-row mx-0 row align-items-end mt-2",
+            fieldGroup: customFieldConfigs
+          },
+        ]            
+      },
+    ];
+
     this.formConfig.fields = [
       ...this.formConfig.fields,
       {
         key: 'custom_field_values',
         fieldGroup: customFieldConfigs,
+        hide: true
       },
     ];
+
+    // this.formConfig = { ...this.formConfig };
   }
 
   submitCustomerForm() {
@@ -204,7 +226,6 @@ export class CustomersComponent {
   
     // Construct payload for one custom field at a time
     const customFieldsPayload = this.constructCustomFieldsPayload(customFieldValues);
-    console.log("Testing the data in customFieldsPayload: ", customFieldsPayload);
     // Construct the final payload
     const payload = {
       customer_data: customerData, // Add all the main customer fields
@@ -436,17 +457,26 @@ export class CustomersComponent {
     );
   }
   
-  
+  // onSubmit() {
+  //   if (!this.CustomerEditID) {
+  //     this.submitCustomerForm();
+  //   } else {
+  //     this.updateCustomer();
+  //      // Otherwise, create a new record
+  //   }
+  // }
   
 
-  onSubmit() {
-    if (this.formConfig.submit.label === 'Update') {
-      this.updateCustomer(); // Call update on submission
-    } else {
-      this.submitCustomerForm(); // Otherwise, create a new record
-      this.ngOnInit();
-    }
-  }
+  // onSubmit() {
+  //   if (this.formConfig.submit.label === 'Update') {
+  //     this.updateCustomer(); // Call update on submission
+  //   } else {
+  //     this.submitCustomerForm(); // Otherwise, create a new record
+  //     // this.ngOnInit();
+  //   }
+  //   this.ngOnInit();
+  //   this.cdref.detectChanges
+  // }
 
   setFormConfig() {
     this.CustomerEditID = null;
@@ -460,7 +490,14 @@ export class CustomersComponent {
       exParams: [],
       submit: {
         label: 'Submit',
-        submittedFn: () => this.onSubmit()
+        submittedFn: () => {
+          if (!this.CustomerEditID) {
+            this.submitCustomerForm();
+          } else {
+            this.updateCustomer();
+             // Otherwise, create a new record
+          }
+        }
       },
       reset: {
         resetFn: () => {
@@ -1285,16 +1322,16 @@ export class CustomersComponent {
             },                    
           ]
         },
-        {
-          className: 'row col-6 m-0 custom-form-card',//'row col-6 m-0 custom-form-card',
-          fieldGroup: [
-            // Custom Fields Section
-            {
-              template: '<div class="custom-form-card-title mt-4">Custom Fields</div>',
-              fieldGroupClassName: "ant-row",
-            },
-          ]
-        },
+        // {
+        //   className: 'row col-6 m-0 custom-form-card',//'row col-6 m-0 custom-form-card',
+        //   fieldGroup: [
+        //     // Custom Fields Section
+        //     {
+        //       template: '<div class="custom-form-card-title mt-4">Custom Fields</div>',
+        //       fieldGroupClassName: "ant-row",
+        //     },
+        //   ]
+        // },
       ]
     }
   }
