@@ -1,6 +1,6 @@
-<div class="tab-inner">
+<!-- <div class="tab-inner">
     <ul class="nav nav-tabs" role="tablist">
-        <li class="nav-item" *ngFor="let tab of field.fieldGroup; let i = index">
+        <li class="nav-item" >
             <a class="nav-link" [class.active]="i === activeTab" (click)="selectTab(i)" role="tab">
             {{ tab.templateOptions?.label || 'Tab ' + (i + 1) }}
         </a>
@@ -12,4 +12,12 @@
             <formly-field [field]="tab"></formly-field>
         </div>
     </div>
+</div> -->
+
+<div class="tab-inner">
+    <nz-tabset [(nzSelectedIndex)]="activeTab">
+        <nz-tab *ngFor="let tab of field.fieldGroup; let i = index" [nzTitle]="tab?.templateOptions?.label" (nzClick)="selectTab(i)">
+            <formly-field [field]="tab"></formly-field>
+        </nz-tab>
+    </nz-tabset>
 </div>

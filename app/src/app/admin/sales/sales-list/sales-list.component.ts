@@ -17,11 +17,11 @@ export class SalesListComponent {
 
   @Output('edit') edit = new EventEmitter<void>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
-  
-  constructor(private router: Router, private http: HttpClient) {}
-  
+
+  constructor(private router: Router, private http: HttpClient) { }
+
   refreshTable() {
-   this.taTableComponent?.refresh();
+    this.taTableComponent?.refresh();
   };
 
   //-----------email sending links----------
@@ -75,13 +75,13 @@ export class SalesListComponent {
     this.http.post(url, payload).subscribe(
       (response) => {
         this.showSuccessToast = true;
-          this.toastMessage = "Mail Sent successfully"; // Set the toast message for update
-          this.refreshTable();
-          setTimeout(() => {
-            this.showSuccessToast = false;
-          }, 2000);
+        this.toastMessage = "Mail Sent successfully"; // Set the toast message for update
+        this.refreshTable();
+        setTimeout(() => {
+          this.showSuccessToast = false;
+        }, 2000);
         // alert('Email sent successfully!');
-        
+
       },
       (error) => {
         console.error('Error sending email', error);
@@ -171,7 +171,9 @@ export class SalesListComponent {
         name: 'Flow Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.flow_status.flow_status_name}`;
+          if (row.flow_status)
+            return `${row.flow_status.flow_status_name}`
+          return '';
         },
         sort: true
       },

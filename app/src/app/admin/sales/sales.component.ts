@@ -11,6 +11,7 @@ import { SalesListComponent } from './sales-list/sales-list.component';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { SalesinvoiceComponent } from './salesinvoice/salesinvoice.component';
 import { BindingType } from '@angular/compiler';
+import { FormlyField, FormlyFieldConfig } from '@ngx-formly/core';
 declare var bootstrap;
 @Component({
   standalone: true,
@@ -400,6 +401,7 @@ export class SalesComponent {
 
   editSaleOrder(event) {
     this.SaleOrderEditID = event;
+    this.showForm = false;
     this.http.get('sales/sale_order/' + event).subscribe((res: any) => {
       if (res && res.data) {
 
@@ -972,6 +974,62 @@ export class SalesComponent {
     console.log("Sale Order/Estimate modal closed.");
     this.isConfirmationModalOpen = false;
   }
+  loadProductVariations(field: FormlyFieldConfig, productValuechange: boolean = false) {
+    const parentArray = field.parent;
+
+    const product = field.formControl.value; //this.formConfig.model.sale_order_items[currentRowIndex]?.product;
+    // Ensure the product exists before making an HTTP request
+
+    if (product?.product_id) {
+      const sizeField: any = parentArray.fieldGroup.find((f: any) => f.key === 'size');
+      const colorField: any = parentArray.fieldGroup.find((f: any) => f.key === 'color');
+      if (productValuechange) {
+        sizeField.formControl.setValue(null);
+        colorField.formControl.setValue(null);
+      }
+      // Clear previous options for both size and color fields before adding new ones
+      if (sizeField) sizeField.templateOptions.options = [];
+      if (colorField) colorField.templateOptions.options = [];
+      this.http.get(`products/product_variations/?product_id=${product.product_id}`).subscribe((response: any) => {
+        if (response.data.length > 0) {
+
+          let availableSizes, availableColors;
+          // Check if response data is non-empty for size
+          if (response.data && response.data.length > 0) {
+            availableSizes = response.data.map((variation: any) => ({
+              label: variation.size?.size_name || '----',
+              value: {
+                size_id: variation.size?.size_id || null,
+                size_name: variation.size?.size_name || '----'
+              }
+            }));
+            availableColors = response.data.map((variation: any) => ({
+              label: variation.color?.color_name || '----',
+              value: {
+                color_id: variation.color?.color_id || null,
+                color_name: variation.color?.color_name || '----'
+              }
+            }));
+            // Enable and update the size field options if sizes are available
+            if (sizeField) {
+              sizeField.formControl.enable(); // Ensure the field is enabled
+              sizeField.templateOptions.options = availableSizes.filter((item, index, self) => index === self.findIndex((t) => t.value.size_id === item.value.size_id)); // Ensure unique size options
+            }
+          } else {
+            // Clear options and keep the fields enabled, without any selection if no options exist
+            if (sizeField) {
+              sizeField.templateOptions.options = [];
+            }
+            if (colorField) {
+              colorField.templateOptions.options = [];
+            }
+          }
+        }
+      });
+    } else {
+      console.error('Product not selected or invalid.');
+    }
+  }
 
   createWorkOrder() {
     if (this.SaleOrderEditID) {
@@ -1263,11 +1321,11 @@ export class SalesComponent {
       },
       fields: [
         {
-          fieldGroupClassName: "ant-row custom-form-block row",
+          fieldGroupClassName: "ant-row custom-form-block row ms-0",
           key: 'sale_order',
           fieldGroup: [
             {
-              className: 'col-md-9 col-sm-8 col-12 p-0',
+              className: 'col-lg-9 col-md-8 col-12 p-0',
               fieldGroupClassName: "ant-row mx-0 row align-items-end mt-2",
               fieldGroup: [
                 {
@@ -1382,7 +1440,7 @@ export class SalesComponent {
                   key: 'order_date',
                   type: 'date',
                   defaultValue: this.nowDate(),
-                  className: 'col-4',
+                  className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     type: 'date',
                     label: 'Order date',
@@ -1394,7 +1452,7 @@ export class SalesComponent {
                   key: 'ref_date',
                   type: 'date',
                   defaultValue: this.nowDate(),
-                  className: 'col-4',
+                  className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     type: 'date',
                     label: 'Ref date',
@@ -1406,7 +1464,7 @@ export class SalesComponent {
                 {
                   key: 'ref_no',
                   type: 'input',
-                  className: 'col-4',
+                  className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     type: 'input',
                     label: 'Ref No',
@@ -1424,7 +1482,7 @@ export class SalesComponent {
                 {
                   key: 'tax',
                   type: 'select',
-                  className: 'col-4',
+                  className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'Tax',
                     required: true,
@@ -1537,7 +1595,7 @@ export class SalesComponent {
                 {
                   key: 'remarks',
                   type: 'textarea',
-                  className: 'col-4',
+                  className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'Remarks',
                     placeholder: 'Enter Remarks',
@@ -1554,7 +1612,7 @@ export class SalesComponent {
               ]
             },
             {
-              className: 'col-md-3 col-sm-4 col-12 p-0 inline-form-fields',
+              className: 'col-lg-3 col-md-4 col-12 p-md-0 inline-form-fields',
               fieldGroupClassName: "ant-row row mx-0 mt-2",
               fieldGroup: [
                 {
@@ -1652,12 +1710,12 @@ export class SalesComponent {
             // title: 'Products',
             addText: 'Add Product',
             tableCols: [
-              { 
-                name: 'selectItem', 
-                label: '', 
+              {
+                name: 'selectItem',
+                label: '',
                 type: 'checkbox',
                 width: '50px'
-              }, 
+              },
               {
                 name: 'product',
                 label: 'Product'
@@ -1702,13 +1760,13 @@ export class SalesComponent {
             ]
           },
           fieldArray: {
-            fieldGroup: [      
+            fieldGroup: [
               {
                 key: 'selectItem',
                 type: 'checkbox',
                 defaultValue: false,
                 templateOptions: {
-                    hideLabel: true,
+                  hideLabel: true,
                 },
                 expressionProperties: {
                     'templateOptions.hidden': () => !(this.SaleOrderEditID),
@@ -1741,95 +1799,47 @@ export class SalesComponent {
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
                         const existingProduct = this.dataToPopulate.sale_order_items[currentRowIndex].product;
-                        
+
                         // Set the full product object instead of just the product_id
                         if (existingProduct) {
                           field.formControl.setValue(existingProduct); // Set full product object (not just product_id)
                         }
                       }
-                      
+
+                      this.loadProductVariations(field);
                       // Subscribe to value changes of the field
                       // ***Size dropdown will populate with available sizes when product in selected***
                       field.formControl.valueChanges.subscribe(selectedProductId => {
-                        const product = this.formConfig.model.sale_order_items[currentRowIndex]?.product;
-                        console.log("Product id : ", product)
-                        debugger
-                        // Ensure the product exists before making an HTTP request
-                        if (product?.product_id) {
-                          this.http.get(`products/product_variations/?product_id=${product.product_id}`).subscribe((response: any) => {
-                            if (response.data.length > 0) {
-                              const sizeField = parentArray.fieldGroup.find((f: any) => f.key === 'size');
-                              const colorField = parentArray.fieldGroup.find((f: any) => f.key === 'color');
-                              // Clear previous options for both size and color fields before adding new ones
-                              if (sizeField) sizeField.templateOptions.options = [];
-                              if (colorField) colorField.templateOptions.options = [];
-                              let availableSizes, availableColors;
-                              // Check if response data is non-empty for size
-                              if (response.data && response.data.length > 0) {
-                                availableSizes = response.data.map((variation: any) => ({
-                                  label: variation.size?.size_name || '----',
-                                  value: {
-                                    size_id: variation.size?.size_id || null,
-                                    size_name: variation.size?.size_name || '----'
-                                  }
-                                }));
-                                availableColors = response.data.map((variation: any) => ({
-                                  label: variation.color?.color_name || '----',
-                                  value: {
-                                    color_id: variation.color?.color_id || null,
-                                    color_name: variation.color?.color_name || '----'
-                                  }
-                                }));
-                                // Enable and update the size field options if sizes are available
-                                if (sizeField) {
-                                  sizeField.formControl.enable(); // Ensure the field is enabled
-                                  sizeField.templateOptions.options = availableSizes.filter((item, index, self) => index === self.findIndex((t) => t.value.size_id === item.value.size_id)); // Ensure unique size options
-                                }
-                              } else {
-                                // Clear options and keep the fields enabled, without any selection if no options exist
-                                if (sizeField) {
-                                  sizeField.templateOptions.options = [];
-                                }
-                                if (colorField) {
-                                  colorField.templateOptions.options = [];
-                                }
-                              }
-                            } else {
-                              console.log(`For Product: ${product.name}  - No Size and Colors are available setting those to Null**`)
-                              this.formConfig.model.sale_order_items[currentRowIndex]['size_id'] = null;
-                              this.formConfig.model.sale_order_items[currentRowIndex]['color_id'] = null;
-                            }
-                          });
-                        } else {
-                          console.error('Product not selected or invalid.');
-                        }
+                        this.loadProductVariations(field);
                       });
                       // ***Product Info Text when product is selected code***
+
                       field.formControl.valueChanges.subscribe(async selectedProductId => {
-                        const product = this.formConfig.model.sale_order_items[currentRowIndex]?.product;
-                        this.http.get(`products/products_get/?product_id=${product.product_id}`).subscribe({
-                          next: (response: any) => {
-                            // Handle the successful response here
-                            const unitInfo = response.data[0] || {};
-                            // Using optional chaining and nullish coalescing to assign values
-                            const unitOption = unitInfo.unit_options?.unit_name ?? 'NA';
-                            const stockUnit = unitInfo.stock_unit?.stock_unit_name ?? 'NA';
-                            const packUnit = unitInfo.pack_unit?.unit_name ?? 'NA';
-                            const gPackUnit = unitInfo.g_pack_unit?.unit_name ?? 'NA';
-                            const packVsStock = unitInfo.pack_vs_stock ?? 0;
-                            const gPackVsPack = unitInfo.g_pack_vs_pack ?? 0;
-                            // Regular expression to match 'Stock Unit' 'Stock Pack Gpack Unit' & 'Stock Pack Unit'.
-                            const stockUnitReg = /\b[sS][tT][oO][cC][kK][_ ]?[uU][nN][iI][tT]\b/g
-                            const GpackReg = /\b(?:[sS]tock[_ ]?[pP]ack[_ ]?)?[gG][pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
-                            const stockPackReg = /\b[sS][tT][oO][cC][kK][_ ]?[pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g
-                            // Check which pattern matches unit_name
-                            let unitData = ''
-                            if (stockUnitReg.test(unitOption)) {
-                              unitData = `
+                        const product = field.formControl.value;
+                        if (product.product_id) {
+                          this.http.get(`products/products_get/?product_id=${product.product_id}`).subscribe({
+                            next: (response: any) => {
+                              // Handle the successful response here
+                              const unitInfo = response.data[0] || {};
+                              // Using optional chaining and nullish coalescing to assign values
+                              const unitOption = unitInfo.unit_options?.unit_name ?? 'NA';
+                              const stockUnit = unitInfo.stock_unit?.stock_unit_name ?? 'NA';
+                              const packUnit = unitInfo.pack_unit?.unit_name ?? 'NA';
+                              const gPackUnit = unitInfo.g_pack_unit?.unit_name ?? 'NA';
+                              const packVsStock = unitInfo.pack_vs_stock ?? 0;
+                              const gPackVsPack = unitInfo.g_pack_vs_pack ?? 0;
+                              // Regular expression to match 'Stock Unit' 'Stock Pack Gpack Unit' & 'Stock Pack Unit'.
+                              const stockUnitReg = /\b[sS][tT][oO][cC][kK][_ ]?[uU][nN][iI][tT]\b/g
+                              const GpackReg = /\b(?:[sS]tock[_ ]?[pP]ack[_ ]?)?[gG][pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
+                              const stockPackReg = /\b[sS][tT][oO][cC][kK][_ ]?[pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g
+                              // Check which pattern matches unit_name
+                              let unitData = ''
+                              if (stockUnitReg.test(unitOption)) {
+                                unitData = `
                                       <span style="color: red;">Stock Unit:</span> 
                                       <span style="color: blue;">${stockUnit}</span> | &nbsp;`
-                            } else if (GpackReg.test(unitOption)) {
-                              unitData = `
+                              } else if (GpackReg.test(unitOption)) {
+                                unitData = `
                                       <span style="color: red;">Stock Unit:</span> 
                                       <span style="color: blue;">${stockUnit}</span> |
                                       <span style="color: red;">Pck Unit:</span> 
@@ -1840,46 +1850,48 @@ export class SalesComponent {
                                       <span style="color: blue;">${gPackUnit}</span> |
                                       <span style="color: red;">GPackVsStock:</span> 
                                       <span style="color: blue;">${gPackVsPack}</span> | &nbsp;`
-                            } else if (stockPackReg.test(unitOption)) {
-                              unitData = `
+                              } else if (stockPackReg.test(unitOption)) {
+                                unitData = `
                                       <span style="color: red;">Stock Unit:</span> 
                                       <span style="color: blue;">${stockUnit}</span> |
                                       <span style="color: red;">Pack Unit:</span> 
                                       <span style="color: blue;">${packUnit}</span> |
                                       <span style="color: red;">PackVsStock:</span> 
                                       <span style="color: blue;">${packVsStock}</span> | &nbsp;`
-                            } else {
-                              console.log('No Unit Option match found');
-                            }
-                            // Check if a valid product is selected
-                            if (product?.product_id) {
-                              this.formConfig.model.sale_order_items[currentRowIndex].product_id = product.product_id;
-                              const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
-                              if (cardWrapper) {
-                                // Remove existing product info if present
-                                cardWrapper.querySelector('.center-message')?.remove();
-                                // Create and insert new product info
-                                const productInfoDiv = document.createElement('div');
-                                productInfoDiv.classList.add('center-message');
-                                productInfoDiv.innerHTML = `
+                              } else {
+                                console.log('No Unit Option match found');
+                              }
+                              // Check if a valid product is selected
+                              if (product?.product_id) {
+                                this.formConfig.model.sale_order_items[currentRowIndex].product_id = product.product_id;
+                                const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
+                                if (cardWrapper) {
+                                  // Remove existing product info if present
+                                  cardWrapper.querySelector('.center-message')?.remove();
+                                  // Create and insert new product info
+                                  const productInfoDiv = document.createElement('div');
+                                  productInfoDiv.classList.add('center-message');
+                                  productInfoDiv.innerHTML = `
                                         <span style="color: red;">Product Info:</span> 
                                         <span style="color: blue;">${product.name}</span> |                            
                                         <span style="color: red;">Balance:</span> 
                                         <span style="color: blue;">${product.balance}</span> |
                                         ${unitData}`;
-                                cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
-                                this.unitOptionOfProduct = unitData; // save this data to use in color and size
-                                console.log(`Product :  Product Info Updated for ${product.name}**`)
+                                  cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
+                                  this.unitOptionOfProduct = unitData; // save this data to use in color and size
+                                  console.log(`Product :  Product Info Updated for ${product.name}**`)
+                                }
+                              } else {
+                                console.log(`No valid product selected for Row ${currentRowIndex}.`);
                               }
-                            } else {
-                              console.log(`No valid product selected for Row ${currentRowIndex}.`);
+                            },
+                            error: (err) => {
+                              // Handle errors here
                             }
-                          },
-                          error: (err) => {
-                            // Handle errors here
-                          }
-                        });
+                          });
+                        }
                       });
+
                     } else {
                       console.error('Parent array is undefined or not accessible');
                     };
@@ -1912,7 +1924,7 @@ export class SalesComponent {
                     });
                   }
                 }
-              }, 
+              },
               {
                 key: 'size',
                 type: 'select',
@@ -1937,7 +1949,7 @@ export class SalesComponent {
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
                         const existingSize = this.dataToPopulate.sale_order_items[currentRowIndex].size;
-                        
+
                         // Set the full product object instead of just the product_id
                         if (existingSize && existingSize.size_id) {
                           field.formControl.setValue(existingSize); // Set full product object (not just product_id)
@@ -1989,34 +2001,34 @@ export class SalesComponent {
                           }
                           // Call the API using HttpClient (this.http.get)
                           this.http.get(url).subscribe((data: any) => {
-                              function sumQuantities(dataObject: any): number {
-                                // First, check if the data object contains the array in the 'data' field
-                                if (dataObject && Array.isArray(dataObject.data)) {
-                                  // Now we can safely use reduce on dataObject.data
-                                  return dataObject.data.reduce((sum, item) => sum + (item.quantity || 0), 0);
-                                } else {
-                                  console.error("Data is not an array:", dataObject);
-                                  return 0;
-                                }
+                            function sumQuantities(dataObject: any): number {
+                              // First, check if the data object contains the array in the 'data' field
+                              if (dataObject && Array.isArray(dataObject.data)) {
+                                // Now we can safely use reduce on dataObject.data
+                                return dataObject.data.reduce((sum, item) => sum + (item.quantity || 0), 0);
+                              } else {
+                                console.error("Data is not an array:", dataObject);
+                                return 0;
                               }
-                              const totalBalance = sumQuantities(data);
-                              const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
-                              if (cardWrapper && data.data[0]) {
-                                // Remove existing product info if present
-                                cardWrapper.querySelector('.center-message')?.remove();
-                                // Display fetched product variation info
-                                const productInfoDiv = document.createElement('div');
-                                productInfoDiv.classList.add('center-message');
-                                productInfoDiv.innerHTML = `
+                            }
+                            const totalBalance = sumQuantities(data);
+                            const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
+                            if (cardWrapper && data.data[0]) {
+                              // Remove existing product info if present
+                              cardWrapper.querySelector('.center-message')?.remove();
+                              // Display fetched product variation info
+                              const productInfoDiv = document.createElement('div');
+                              productInfoDiv.classList.add('center-message');
+                              productInfoDiv.innerHTML = `
                                         <span style="color: red;">Product Info:</span>
-                                        <span style="color: blue;">${data.data[0]?.product.name|| 'NA'}</span> |
+                                        <span style="color: blue;">${data.data[0]?.product.name || 'NA'}</span> |
                                         <span style="color: red;">Balance:</span>
                                         <span style="color: blue;">${totalBalance}</span> |
                                         ${this.unitOptionOfProduct} `;
-                                cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
-                                console.log("Size :  Product Info Updated**")
-                              }
-                            },
+                              cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
+                              console.log("Size :  Product Info Updated**")
+                            }
+                          },
                             (error) => {
                               console.error("Error fetching data:", error);
                             });
@@ -2040,7 +2052,7 @@ export class SalesComponent {
                     });
                   }
                 }
-              }, 
+              },
               {
                 key: 'color',
                 type: 'select',
@@ -2065,13 +2077,13 @@ export class SalesComponent {
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
                         const existingColor = this.dataToPopulate.sale_order_items[currentRowIndex].color;
-                        
+
                         // Set the full product object instead of just the product_id
                         if (existingColor) {
                           field.formControl.setValue(existingColor);
                         }
                       }
-                      
+
                       // Subscribe to value changes when the form field changes
                       field.formControl.valueChanges.subscribe(selectedColorId => {
                         const product = this.formConfig.model.sale_order_items[currentRowIndex]?.product;
@@ -2121,7 +2133,7 @@ export class SalesComponent {
                               console.error("Error fetching data:", error);
                             });
                         } else {
-                          console.log(`No valid Color selected for :${product.name } at Row ${currentRowIndex}.`);
+                          console.log(`No valid Color selected for :${product.name} at Row ${currentRowIndex}.`);
                           console.log({
                             product: product?.name,
                             size: size?.size_name,
@@ -2146,7 +2158,7 @@ export class SalesComponent {
                     });
                   }
                 }
-              },                   
+              },
               {
                 type: 'input',
                 key: 'code',
@@ -2158,15 +2170,15 @@ export class SalesComponent {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-              
+
                     // Check if parentArray exists and proceed
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key; // Simplified number conversion
-              
+
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
                         const existingCode = this.dataToPopulate.sale_order_items[currentRowIndex].product?.code;
-                        
+
                         // Set the full product object instead of just the product_id
                         if (existingCode) {
                           field.formControl.setValue(existingCode); // Set full product object (not just product_id)
@@ -2191,22 +2203,22 @@ export class SalesComponent {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-              
+
                     // Check if parentArray exists and proceed
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key; // Simplified number conversion
-              
+
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
                         const existingQuan = this.dataToPopulate.sale_order_items[currentRowIndex].quantity;
-                        
+
                         // Set the full product object instead of just the product_id
                         if (existingQuan) {
                           field.formControl.setValue(existingQuan); // Set full product object (not just product_id)
                         }
                       }
                     }
-              
+
                     // Subscribe to value changes
                     field.formControl.valueChanges.subscribe(data => {
                       if (field.form && field.form.controls && field.form.controls.rate && data) {
@@ -2222,7 +2234,7 @@ export class SalesComponent {
                     // You can handle any changes here if needed
                   }
                 }
-              },              
+              },
               {
                 type: 'input',
                 key: 'rate',
@@ -2235,22 +2247,22 @@ export class SalesComponent {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-              
+
                     // Check if parentArray exists and proceed
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key; // Simplified number conversion
-              
+
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
                         const existingPrice = this.dataToPopulate.sale_order_items[currentRowIndex].rate;
-                        
+
                         // Set the full product object instead of just the product_id
                         if (existingPrice) {
                           field.formControl.setValue(existingPrice); // Set full product object (not just product_id)
                         }
                       }
                     }
-                    
+
                     // Subscribe to value changes to update amount
                     field.formControl.valueChanges.subscribe(data => {
                       if (field.form && field.form.controls && field.form.controls.quantity && data) {
@@ -2276,15 +2288,15 @@ export class SalesComponent {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-              
+
                     // Check if parentArray exists and proceed
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key; // Simplified number conversion
-              
+
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
                         const existingDisc = this.dataToPopulate.sale_order_items[currentRowIndex].discount;
-                        
+
                         // Set the full product object instead of just the product_id
                         if (existingDisc) {
                           field.formControl.setValue(existingDisc); // Set full product object (not just product_id)
@@ -2310,15 +2322,15 @@ export class SalesComponent {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-              
+
                     // Check if parentArray exists and proceed
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key; // Simplified number conversion
-              
+
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
                         const existingAmount = this.dataToPopulate.sale_order_items[currentRowIndex].amount;
-                        
+
                         // Set the full product object instead of just the product_id
                         if (existingAmount) {
                           field.formControl.setValue(existingAmount); // Set full product object (not just product_id)
@@ -2352,15 +2364,15 @@ export class SalesComponent {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-              
+
                     // Check if parentArray exists and proceed
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key; // Simplified number conversion
-              
+
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
                         const existingName = this.dataToPopulate.sale_order_items[currentRowIndex].print_name;
-                        
+
                         // Set the full product object instead of just the product_id
                         if (existingName) {
                           field.formControl.setValue(existingName); // Set full product object (not just product_id)
@@ -2389,15 +2401,15 @@ export class SalesComponent {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-              
+
                     // Check if parentArray exists and proceed
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key; // Simplified number conversion
-              
+
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
                         const existingUnit = this.dataToPopulate.sale_order_items[currentRowIndex].product.unit_options;
-                        
+
                         // Set the full product object instead of just the product_id
                         if (existingUnit) {
                           field.formControl.setValue(existingUnit.unit_options_id); // Set full product object (not just product_id)
@@ -2419,15 +2431,15 @@ export class SalesComponent {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-              
+
                     // Check if parentArray exists and proceed
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key; // Simplified number conversion
-              
+
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
                         const existingBox = this.dataToPopulate.sale_order_items[currentRowIndex].total_boxes;
-                        
+
                         // Set the full product object instead of just the product_id
                         if (existingBox) {
                           field.formControl.setValue(existingBox); // Set full product object (not just product_id)
@@ -2435,7 +2447,7 @@ export class SalesComponent {
                       }
                     }
                   }
-                }                
+                }
               },
               {
                 type: 'input',
@@ -2449,15 +2461,15 @@ export class SalesComponent {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-              
+
                     // Check if parentArray exists and proceed
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key; // Simplified number conversion
-              
+
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
                         const existingtax = this.dataToPopulate.sale_order_items[currentRowIndex].tax;
-                        
+
                         // Set the full product object instead of just the product_id
                         if (existingtax) {
                           field.formControl.setValue(existingtax); // Set full product object (not just product_id)
@@ -2478,15 +2490,15 @@ export class SalesComponent {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-              
+
                     // Check if parentArray exists and proceed
                     if (parentArray) {
                       const currentRowIndex = +parentArray.key; // Simplified number conversion
-              
+
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
                         const existingRemarks = this.dataToPopulate.sale_order_items[currentRowIndex].remarks;
-                        
+
                         // Set the full product object instead of just the product_id
                         if (existingRemarks) {
                           field.formControl.setValue(existingRemarks); // Set full product object (not just product_id)
@@ -2501,13 +2513,13 @@ export class SalesComponent {
                 key: 'invoiced',
                 defaultValue: 'NO', // Default value set to 'NO'
                 templateOptions: {
-                    label: 'Invoiced',
-                    options: [
-                        { value: 'YES', label: 'Yes' },
-                        { value: 'NO', label: 'No' }
-                    ],
-                    hideLabel: true,
-                    disabled: true // Make the field read-only in the form
+                  label: 'Invoiced',
+                  options: [
+                    { value: 'YES', label: 'Yes' },
+                    { value: 'NO', label: 'No' }
+                  ],
+                  hideLabel: true,
+                  disabled: true // Make the field read-only in the form
                 },
               }
             ]
@@ -2519,7 +2531,7 @@ export class SalesComponent {
           type: 'tabs',
           fieldGroup: [
             {
-              className: 'col-12 px-0 pt-3',
+              className: 'col-12 p-0',
               props: {
                 label: 'Billing Details'
               },
@@ -2528,7 +2540,7 @@ export class SalesComponent {
                   fieldGroupClassName: "",
                   fieldGroup: [
                     {
-                      className: 'col-12 mb-3 custom-form-card-block w-100',
+                      className: 'col-12 p-0 custom-form-card-block w-100',
                       fieldGroup: [
                         // {
                         //   template: '<div class="custom-form-card-title">  </div>',
@@ -2806,7 +2818,7 @@ export class SalesComponent {
               ]
             },
             {
-              className: 'col-12 custom-form-card-block px-0 pt-3',
+              className: 'col-12 custom-form-card-block p-0',
               props: {
                 label: 'Shipping Details'
               },
@@ -2991,7 +3003,7 @@ export class SalesComponent {
               ]
             },
             {
-              className: 'col-12 px-0 pt-3',
+              className: 'col-12 p-0',
               props: {
                 label: 'Order Attachments'
               },
@@ -3029,7 +3041,7 @@ export class SalesComponent {
               ]
             },
             {
-              className: 'col-12 custom-form-card-block px-0 pt-3',
+              className: 'col-12 custom-form-card-block p-0',
               props: {
                 label: 'Customer Details'
               },
@@ -3055,7 +3067,7 @@ export class SalesComponent {
                     {
                       key: 'billing_address',
                       type: 'textarea',
-                      className: 'col-4',
+                      className: 'col-md-4 col-sm-6 col-12',
                       templateOptions: {
                         label: 'Billing address',
                         placeholder: 'Enter Billing address'
@@ -3064,7 +3076,7 @@ export class SalesComponent {
                     {
                       key: 'shipping_address',
                       type: 'textarea',
-                      className: 'col-4',
+                      className: 'col-md-4 col-sm-6 col-12',
                       templateOptions: {
                         label: 'Shipping address',
                         placeholder: 'Enter Shipping address'

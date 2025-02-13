@@ -75,13 +75,13 @@ export class CustomfieldsComponent {
       },
       fields: [
         {
-          fieldGroupClassName: "ant-row custom-form-block",
+          fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
           key: 'custom_field',
           fieldGroup: [
             {
               key: 'field_name',
               type: 'input',
-              className: 'col-4',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Field Name',
                 placeholder: 'Enter Custom Field Name',
@@ -91,7 +91,7 @@ export class CustomfieldsComponent {
             {
               key: 'entitiy',
               type: 'select',
-              className: 'col-4',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 dataKey: 'entitiy_id',
                 dataLabel: "entity_name",
@@ -116,7 +116,7 @@ export class CustomfieldsComponent {
             {
               key: 'field_type',
               type: 'select',
-              className: 'col-4',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Field Type',
                 placeholder: 'Select Field Type',
@@ -145,7 +145,7 @@ export class CustomfieldsComponent {
             {
               key: 'validation_rules',
               type: 'textarea',
-              className: 'col-4',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Validation Rules',
                 placeholder: 'Enter validation rules as JSON',
@@ -155,7 +155,7 @@ export class CustomfieldsComponent {
             {
               key: 'is_required',
               type: 'checkbox',
-              className: 'col-4',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Is Required',
               }

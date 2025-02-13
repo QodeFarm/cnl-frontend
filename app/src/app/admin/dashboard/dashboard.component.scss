@@ -4,7 +4,7 @@
 .receivables-modal,
 .payables-modal,
 .liquidity-modal {
-  display: block;
+  // display: block;
   position: fixed;
   z-index: 1;
   left: 0;
@@ -12,10 +12,14 @@
   width: 100%;
   height: 100%;
   overflow: auto;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(0, 0, 0, 0.9);
   padding-top: 60px;
+  display: flex;
+  align-items: center;
 }
-
+.dashboard-card{
+  cursor: pointer;
+}
 /* Modal Content Styles */
 .sales-modal-content,
 .purchase-modal-content,
@@ -28,11 +32,14 @@
   border: 1px solid #888;
   width: 80%;
   max-width: 900px;
-  height: 90%;
+  // height: 90%;
   text-align: center;
   border-radius: 10px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   position: relative;
+  @media(max-width:575px){
+    width: 98%;
+  }
 }
 
 /* Text Style for Modal Content */
@@ -81,6 +88,9 @@
 
 .second-main-row {
   display: flex;
+  @media(max-width:767px){
+    flex-wrap: wrap;
+  }
 }
 
 // first & third row CSS
@@ -89,8 +99,11 @@
   padding-left: 15px;
   padding-bottom: 10px;
   display: flex;
-  gap: 10px; /* Reduced gap between columns */
+  // gap: 10px; /* Reduced gap between columns */
   padding-top: 0px;
+  @media(max-width:767px){
+    padding: 0px;
+  }
 }
 
 /* Chart Container */
@@ -99,7 +112,7 @@
   background-color: #f1f1f1;
   border-radius: 10px;
   position: relative;
-  width: 243px; /* Maintain fixed width */
+  // width: 243px; /* Maintain fixed width */
   height: 220px; /* Explicit height to prevent uncontrolled scaling */
   padding: 10px; /* Padding inside the container */
   display: flex;
@@ -120,13 +133,14 @@
 }
 .right-side-chart {
   position: relative;
-  width: 495px; /* Maintain fixed width */
+  // width: 495px; /* Maintain fixed width */
   height: 450px; /* Explicit height to prevent uncontrolled scaling */
   background-color: #f1f1f1;
   border-radius: 10px;
   flex-direction: column;
   justify-content: center;
   align-items: center; /* Center-align the chart */
+  padding: 10px;
 }
 
 /* Chart Title */
@@ -140,10 +154,10 @@
 
 /* Responsive Design */
 @media screen and (max-width: 768px) {
-  .row {
-    flex-direction: column;
-    gap: 20px;
-  }
+  // .row {
+  //   flex-direction: column;
+  //   gap: 20px;
+  // }
 
   .col-md-4 {
     flex: 1;
@@ -191,6 +205,9 @@ h4 {
   display: flex;
   height: 250px;
   margin-bottom: 10px;
+  @media(max-width:767px){
+    height: auto;
+  }
 }
 
 /* General styles for the table container */
@@ -201,16 +218,27 @@ h4 {
   display: flex;
   flex-direction: column; /* Ensure children are stacked vertically */
   background-color: #f1f1f1;
+  height: 215px;
+  @media(max-width:767px){
+    background-color: #ffffff;
+    padding: 0 10px !important;
+    margin-left: 0px;
+  }
 }
 
 .right-task-container {
   padding-left: 5px;
-  margin-right: 16px;
+  margin-right: 15px;
   overflow-x: auto; /* Makes the table scrollable horizontally on small screens */
   overflow-y: auto; /* Adds vertical scroll if the content exceeds the set height */
   display: flex;
   flex-direction: column; /* Ensure children are stacked vertically */
   background-color: #f1f1f1;
+  height: 215px;
+  @media(max-width:767px){
+    background-color: #ffffff;
+    padding-left:10px !important;
+  }
 }
 
 .task-table-wrapper {
@@ -227,6 +255,7 @@ h4 {
   // border: 1px solid #ff0101; /* Light border around the table */
   border-radius: 10px; /* Rounded corners for the whole table */
   background-color: #f1f1f1;
+  z-index: 0;
 }
 
 /* Styles for table headings */
@@ -259,6 +288,9 @@ h4 {
 /* Optional: Adjust the width of the columns if needed */
 .task-table th, .task-table td {
   width: 25%; /* Adjust the column width (for each column) */
+  @media(max-width:475px){
+    width: 150px;
+  }
 }
 
 /* Adjust the size of the whole table */
@@ -280,26 +312,18 @@ h4 {
 
 // CSS code for Small table
 /* Container to hold all four divs */
-.container-4 {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: space-between;
-  margin-left: 15px;
-  margin-top: 10px;
-  margin-right: 18px;
-  height: 200px;
-}
+
 
 /* Style for each individual card */
 .card {
-  flex: 1 1 23%; /* Flexbox rule to make sure they are of equal size */
+  // flex: 1 1 23%; /* Flexbox rule to make sure they are of equal size */
   border: 1px solid #ccc;
   border-radius: 10px;
   background-color: #f1f1f1;
   box-sizing: border-box;
-  height: 100%;
+  height: 215px;
   overflow-y: auto;
+
 }
 
 /* Table styling */
@@ -331,17 +355,17 @@ h4 {
 }
 
 /* Responsive design: Adjust layout on smaller screens */
-@media (max-width: 768px) {
-  .card {
-    flex: 1 1 48%;
-  }
-}
+// @media (max-width: 768px) {
+//   .card {
+//     flex: 1 1 48%;
+//   }
+// }
 
-@media (max-width: 480px) {
-  .card {
-    flex: 1 1 100%;
-  }
-}
+// @media (max-width: 480px) {
+//   .card {
+//     flex: 1 1 100%;
+//   }
+// }
 
 /* right corner for the first <th> */
 .small-4th-row-table th.rounded-left, .small-4th-row-table th.rounded-right {
