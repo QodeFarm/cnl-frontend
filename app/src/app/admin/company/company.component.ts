@@ -44,13 +44,26 @@ export class CompanyComponent {
 
 
     fields: [
+      
       {
         fieldGroupClassName: 'ant-row custom-form-block',
+        className:"p-0",
         fieldGroup : [
           {
             className: 'col-md-9 col-12 col-sm-8 p-0',
             fieldGroupClassName: "ant-row",
+            
             fieldGroup: [
+              {
+                key: 'logo',
+                type: 'file',
+                className: 'ta-cell col-12 d-sm-none d-block',
+                templateOptions: {
+                  label: 'Logo',
+                  placeholder: 'Upload',
+                  // required: true
+                }
+              },
               {
                 key: 'name',
                 type: 'input',
@@ -474,7 +487,7 @@ export class CompanyComponent {
                 {
                   key: 'logo',
                   type: 'file',
-                  className: 'ta-cell col-12',
+                  className: 'ta-cell col-12 d-sm-block d-none',
                   templateOptions: {
                     label: 'Logo',
                     placeholder: 'Upload',

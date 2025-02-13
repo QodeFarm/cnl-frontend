@@ -15,15 +15,9 @@
 </div> -->
 
 <div class="tab-inner">
-
-    <nz-tabset style="height:220px;" [(nzSelectedIndex)]="activeTab">
-
+    <nz-tabset [(nzSelectedIndex)]="activeTab">
         <nz-tab *ngFor="let tab of field.fieldGroup; let i = index" [nzTitle]="tab?.templateOptions?.label" (nzClick)="selectTab(i)">
             <formly-field [field]="tab"></formly-field>
         </nz-tab>
-
     </nz-tabset>
-
-
-
 </div>

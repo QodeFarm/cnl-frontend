@@ -669,6 +669,9 @@ ta-form {
     color: #142768;
     font-size: 1.2rem;
     font-weight: 600;
+    @media(max-width:991px){
+        font-size: 1rem;
+    } 
 }
 
 .btn-primary {
@@ -807,6 +810,31 @@ ta-form {
             }
           }
         }
+    }
+    &.no-ant-card{
+        .ant-card {
+            margin: 0px; 
+            border: none;
+            .ant-card-head {
+                 display: none;
+            }
+            .ant-card-body {
+                padding: 0px;
+                .ant-table-container{
+                    overflow-x: auto;
+                    display: block;
+                    .table{
+                        border: none;
+                        overflow-x: auto;
+                        thead th{
+                            min-width: 150px;
+                        }
+                    }
+                }
+              
+            }
+        }
+       
     }
 }
 
@@ -1155,8 +1183,8 @@ ta-form {
 // inline form-fields styles end
 .modal-content{
     .ant-table-content{
-        height: calc(100vh - 305px);
-        overflow-y: auto;
+        max-height: calc(100vh - 305px);
+        overflow: auto;
     }
    
 }
@@ -1165,6 +1193,23 @@ ta-form {
         position: absolute;
         left: 0;
         z-index: 99;
+        .form-select{
+            height: 32px;
+            font-size: 14px;
+            border-radius: 3px;
+            line-height: 1;
+            width: 150px;
+        }
+        .btn-primary{
+            border-radius: 3px;
+            height: 32px;
+        }
+        @media(max-width:1199px){
+            bottom: -83px;
+            .form-select{
+                width: auto;
+            }
+        }
     }
 }
 .sidemenu-bar{
@@ -1178,7 +1223,88 @@ ta-form {
     }
 }
 
+.custom-form-card-block{
+    .responsive-row{
+        @media(max-width:575px){
+            flex-direction: column-reverse;
+        }
+    }
+}
+.ant-input-affix-wrapper {
+    padding: 0px 11px 0 0;
+}
+.tab-inner{
+    .ant-tabs-tab{
+        margin: 0 !important;
+        padding: 0.5rem 1rem;       
+        &.ant-tabs-tab-active{
+            background-color: #142768 !important;
+            border-color: #142678 !important;
+            .ant-tabs-tab-btn{
+                color: #fff;                
+            }
+        }
+    }
+    .ant-tabs-top > .ant-tabs-nav{
+        &::before{
+            border-color: #142678 !important;
+        }
+        .ant-tabs-nav-operations{
+            overflow: inherit;
+            min-width: 50px;
+            .ant-tabs-nav-more{
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 24px;
+            }
+        }
+    }
+}
+.company-banner{
+    button{
+        margin-left: 15px;
+    }
+}
+.ant-pagination-prev .ant-pagination-item-link, 
+.ant-pagination-next .ant-pagination-item-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.ant-pagination-prev, 
+.ant-pagination-next, 
+.ant-pagination-jump-prev, 
+.ant-pagination-jump-next {
+    line-height: inherit;
+}
+.select-field,.quick-period-select{
+    width: 185px;
+}
+@media(max-width:1199px){
+    .customer-title-alignment{
+        flex-wrap: wrap;
+    }
+    .ant-table-content {
+        table{
+          tr{
+                th:not(:first-child), td:not(:first-child){
+                    width: 150px;
+                }
+            }
+        }
+    }
+}
 @media(max-width:1024px){
+    .select-field,.quick-period-select{
+        width: 165px;
+    }
+    .custom-modal{
+        .modal-dialog {
+            max-width:80%;
+        }
+    }
+   
     .sidebar{
         width: 0px;
         left: -60px;
@@ -1255,7 +1381,60 @@ ta-form {
         }
     }
 }
+@media(max-width:960px){
+    .select-field,.quick-period-select{
+        width: 150px;
+    }
+    .ant-table-content {
+      table{
+        tr{
+            border: 1px solid #142678;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            background: #ffffff;
+           
+            td{
+                display: flex;
+                ta-table-cell-dynamic,label,ta-table-actions{
+                    flex: 1;
+                    margin: 0;
+                    span{
+                        word-break: break-all;
+                    }
+                }
+                .col-name {
+                    color: #142678;
+                    font-weight: 600;
+                }
+                .ant-checkbox-wrapper{
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin: 0 0 5px 0;
+                }
+                &.ant-table-selection-column {
+                    border-color: #142678 !important;
+                    border-radius: 5px 0 0 0;
+                }
+                .ant-btn-dangerous {
+                    background: #ffffff !important;
+                }
+            }
+            th:not(:first-child), td:not(:first-child){
+                width: auto;
+            }
+        }
+      }
+    }
+}
 @media(max-width:767px){
+    .custom-modal .modal-dialog {
+        max-width: 98%;
+    }
+    .select-field,.quick-period-select{
+        width: 120px;
+    }
+
     .sidebar-toggled{
         .menu-overlay{
             content: '';
@@ -1283,7 +1462,16 @@ ta-form {
         }
        
     }
-   
+    .sidebar-toggled .sidebar .nav-item .nav-link{
+        &[data-bs-toggle="collapse"]::after {
+            content: '\f107';
+        }
+        &.collapsed{
+            &[data-bs-toggle="collapse"]::after {
+                content: '\f105';
+            }
+        }
+    }
     .sidebar {
         top: 0 !important;
         &.toggled{      
@@ -1335,6 +1523,7 @@ ta-form {
                 }
               
             }
+           
                
         }
         .dropdown-menu {
@@ -1424,18 +1613,26 @@ ta-form {
         }
     }
 }
-.company-banner{
-    button{
-        margin-left: 15px;
+@media(max-width:575px){
+    .filter-alignments .ta-row{
+        flex-wrap: wrap;
     }
-}
-.custom-form-card-block{
-    .responsive-row{
-        @media(max-width:575px){
-            flex-direction: column-reverse;
+    .custom-modal .modal-dialog {
+        max-width: 98%;
+        margin: 10px auto;
+    }
+    .customers-banner{
+        button,.custom-heading {
+            font-size: .9rem;
         }
     }
+    .customer-title-alignment{
+        flex-wrap: wrap;
+    }
+    ta-table .ant-input-group-wrapper {
+        width: auto;
+    }
 }
-.ant-input-affix-wrapper {
-    padding: 0px 11px 0 0;
+@media(max-width:425px){
+   
 }

@@ -29,15 +29,15 @@
      
       
         <ul class="navbar-nav align-items-center">
-            <li class="company-title"><span class="badge bg-light ms-2" style="font-weight: 500; font-size: 14px; color:#142768; border-radius: 3px;padding: 7px 10px;">[123456]-Tech Solutions Private Limited</span></li>
-            <li class="nav-item dropdown no-arrow mx-1">
+            <li class="company-title"><span class="badge bg-light ms-2" style="font-weight: 500; font-size: 14px; color:#142768; border-radius: 3px;padding: 7px 10px;"><span class="company-code" style="padding: 0 !important;">[123456] - </span>TECH SOLUTIONS PVT LTD</span></li>
+            <li class="nav-item dropdown no-arrow mx-1 d-none">
                 <button class="nav-link dropdown-toggle" (click)="startSpeechRecognition()" id="alerts1" role="button" data-bs-toggle="" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-microphone"></i>
                 </button>
             </li>
 
             <!-- Nav Item - Alerts -->
-            <li class="nav-item dropdown no-arrow mx-1">
+            <li class="nav-item dropdown no-arrow mx-1 d-none">
                 <a class="nav-link dropdown-toggle" id="alertsDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-bell fa-fw"></i>
                     <!-- Counter - Alerts -->
@@ -85,7 +85,7 @@
                 </div>
             </li>
             <!-- Nav Item - Search Dropdown -->
-            <li class="nav-item dropdown no-arrow">
+            <li class="nav-item dropdown no-arrow d-none">
 
                 <a class="nav-link dropdown-toggle" id="searchDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-search fa-fw"></i>
@@ -105,7 +105,7 @@
                 </div>
             </li>
             <!-- Nav Item - Messages -->
-            <li class="nav-item dropdown no-arrow mx-1">
+            <li class="nav-item dropdown no-arrow mx-1 d-none">
                 <a class="nav-link dropdown-toggle" id="messagesDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-envelope fa-fw"></i>
                     <!-- Counter - Messages -->
@@ -195,7 +195,7 @@
                 </div>
             </li>
             <!-- Nav Item - Favourite -->
-            <li class="nav-item dropdown no-arrow mx-1">
+            <li class="nav-item dropdown no-arrow mx-1 d-none">
                 <a class="nav-link dropdown-toggle" id="favouriteDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-star fa-fw" title="Favourite"></i>
 
@@ -346,14 +346,11 @@
         <!-- Page Heading -->
         <!-- <h1 class="h3 mb-4 text-gray-800">Blank Page</h1> -->
         <!-- <router-outlet></router-outlet> -->
-        <div class="tab  flex-fill h-100 px-0 bg-white border-bottom d-flex flex-column">
-
+        <div class="tab  flex-fill h-100 px-0 bg-white d-flex flex-column">
             <nz-tabset [(nzSelectedIndex)]="selectedTabIndex" nzType="editable-card" nzHideAdd (nzClose)="removeTab($event)">
-
                 <nz-tab (nzSelect)="onTabSelect(tab)" [nzClosable]="true" [nzTitle]="tab.name" *ngFor="let tab of tabs">
                     <ng-container *ngComponentOutlet="tab.component;"></ng-container>
                 </nz-tab>
-
             </nz-tabset>
 
             <!-- All tabs -->

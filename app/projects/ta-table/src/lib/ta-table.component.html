@@ -1,32 +1,32 @@
-<div class="ta-row p-0 justify-content-end">
+<div class="ta-row p-0 justify-content-end customer-title-alignment">
     <div class="ta-cell" *ngIf="options.title">
         <span class="custom-heading"> {{options.title}}</span>
     </div>
-    <div class="ta-cell">
-        <div class="ta-row p-0 justify-content-end flex-nowrap">
+    <div class="ta-cell filter-alignments">
+        <div class="ta-row p-0 justify-content-end">
 
             <!-- Employee Filter -->
-            <div class="filter-group" style="margin-right: 10px;" *ngIf="isEmployeeFilterVisible">
-                <nz-select [(ngModel)]="selectedEmployee" nzPlaceHolder="Select Employee" style="width: 185px" (ngModelChange)="onEmployeeChange($event)">
+            <div class="filter-group mt-2"  *ngIf="isEmployeeFilterVisible">
+                <nz-select [(ngModel)]="selectedEmployee" nzPlaceHolder="Select Employee"  class="select-field"  (ngModelChange)="onEmployeeChange($event)">
                     <nz-option *ngFor="let employee of employeeOptions" [nzValue]="employee.value" [nzLabel]="employee.label">
                     </nz-option>
                 </nz-select>
             </div>
 
             <!-- Quick Period Dropdown -->
-            <div class="filter-group" style="margin-right: 10px;" *ngIf="isButtonVisible">
-                <nz-select id="quickPeriod" [(ngModel)]="selectedQuickPeriod" (ngModelChange)="onQuickPeriodChange()" nzPlaceHolder="Quick Period" class="quick-period-select" style="width: 160px;">
+            <div class="filter-group mt-2" style="margin-left: 5px;" *ngIf="isButtonVisible">
+                <nz-select id="quickPeriod" [(ngModel)]="selectedQuickPeriod" (ngModelChange)="onQuickPeriodChange()" nzPlaceHolder="Quick Period" class="quick-period-select">
                     <nz-option *ngFor="let period of quickPeriodOptions" [nzValue]="period.value" [nzLabel]="period.label"></nz-option>
                 </nz-select>
             </div>
 
             <!-- From Date Picker -->
-            <div class="filter-group" style="margin-right: 10px;" *ngIf="isButtonVisible">
+            <div class="filter-group mt-2" style="margin-left: 5px;" *ngIf="isButtonVisible">
                 <nz-date-picker id="fromDate" [(ngModel)]="fromDate" nzPlaceHolder="From date" class="date-picker" style="width: 130px;"></nz-date-picker>
             </div>
 
             <!-- To Date Picker -->
-            <div class="filter-group" style="margin-right: 10px;" *ngIf="isButtonVisible">
+            <div class="filter-group mt-2" style="margin-left: 5px;" *ngIf="isButtonVisible">
                 <nz-date-picker id="toDate" [(ngModel)]="toDate" nzPlaceHolder="To date" class="date-picker" style="width: 130px;"></nz-date-picker>
             </div>
 
@@ -40,38 +40,19 @@
             </div> -->
 
             <div *ngIf="isButtonVisible">
-                <div class="filter-group" style="margin-right: 10px;" *ngIf="isStatusButtonVisible">
-                    <nz-select [(ngModel)]="selectedStatus" nzPlaceHolder="Select Status" style="width: 185px" (ngModelChange)="onStatusChange($event)">
+                <div class="filter-group mt-2" style="margin-left: 5px;" *ngIf="isStatusButtonVisible">
+                    <nz-select [(ngModel)]="selectedStatus" nzPlaceHolder="Select Status" class="select-field"  (ngModelChange)="onStatusChange($event)">
                         <nz-option *ngFor="let status of statusOptions" [nzValue]="status.value" [nzLabel]="status.label">
                         </nz-option>
                     </nz-select>
                 </div>
             </div>
 
-            <!-- Apply Filters OK Button -->
-            <div class="filter-group" style="margin-right: 10px;" *ngIf="isButtonVisible">
-                <button nz-button nzType="primary" (click)="applyFilters()" class="apply-filters-button">
-                    <i nz-icon nzType="check" nzTheme="outline"></i>
-                </button>
-            </div>
-
-            <!-- Apply Filters Clear Button -->
-            <div class="filter-group" style="margin-right: 10px;" *ngIf="isButtonVisible">
-                <button nz-button nzType="primary" (click)="clearFilters()" class="clear-filters-button">
-                    <i nz-icon nzType="close" nzTheme="outline"></i>
-                </button>
-            </div>
-
-            <!-- Download Button -->
-            <div class="filter-group" style="margin-right: 10px;" *ngIf="isButtonVisible">
-                <button nz-button nzType="primary" (click)="downloadData($event)">
-                    <i nz-icon nzType="download" nzTheme="outline"></i>
-                </button>
-            </div>
+           
         </div>
     </div>
 
-    <div class="ta-cell">
+    <div class="ta-cell mt-2 ms-2">
         <div class="ta-row p-0 justify-content-end flex-nowrap">
             <ng-content nz-col select="[before-search]">
             </ng-content>
@@ -79,7 +60,7 @@
                 <input type="text" nz-input placeholder="Search" [(ngModel)]="globalSearchValue" (keyup.enter)="globalSearch()" />
             </nz-input-group>
             <ng-template #suffixIconButton>
-                <i nz-icon class="ant-input-clear-icon" nzTheme="fill" nzType="close-circle" *ngIf="globalSearchValue" (click)="globalSearchClear()"></i>
+                <i nz-icon class="ant-input-clear-icon" style="position: absolute;z-index: 9;right: 40px;top:12px" nzTheme="fill" nzType="close-circle" *ngIf="globalSearchValue" (click)="globalSearchClear()"></i>
                 <button nz-button nzType="primary" nzSearch (click)="globalSearch()"><i nz-icon
                         nzType="search"></i></button>
             </ng-template>
@@ -87,6 +68,26 @@
                     nzTheme="outline"></i> Export</button>
             <ng-content nz-col select="[after-search]">
             </ng-content>
+             <!-- Apply Filters OK Button -->
+             <div class="filter-group" style="margin-inline: 5px;" *ngIf="isButtonVisible">
+                <button nz-button nzType="primary" (click)="applyFilters()" class="apply-filters-button">
+                    <i nz-icon nzType="check" nzTheme="outline"></i>
+                </button>
+            </div>
+
+            <!-- Apply Filters Clear Button -->
+            <div class="filter-group" style="margin-right: 5px;" *ngIf="isButtonVisible">
+                <button nz-button nzType="primary" (click)="clearFilters()" class="clear-filters-button">
+                    <i nz-icon nzType="close" nzTheme="outline"></i>
+                </button>
+            </div>
+
+            <!-- Download Button -->
+            <div class="filter-group"  *ngIf="isButtonVisible">
+                <button nz-button nzType="primary" (click)="downloadData($event)">
+                    <i nz-icon nzType="download" nzTheme="outline"></i>
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -100,7 +101,7 @@
 
             <ng-container *ngFor="let c of options.cols">
 
-                <th (nzSortOrderChange)="nzSortOrderChange($event)" [nzColumnKey]="c.sortKey || c.fieldKey" [nzFilterFn]="false" [nzSortDirections]="(c.sort)?[]:[null]" [nzSortOrder]="c.sortOrder" [nzSortFn]="c.sort" [nzWidth]="c.width" nzCustomFilter>{{c.name}}
+                <th style="min-width: 150px;" (nzSortOrderChange)="nzSortOrderChange($event)" [nzColumnKey]="c.sortKey || c.fieldKey" [nzFilterFn]="false" [nzSortDirections]="(c.sort)?[]:[null]" [nzSortOrder]="c.sortOrder" [nzSortFn]="c.sort" [nzWidth]="c.width" nzCustomFilter>{{c.name}}
                     <nz-filter-trigger *ngIf="c.filter" [(nzVisible)]="c.visible" [nzActive]="c.filterValue && c.filterValue.length > 0" [nzDropdownMenu]="menu">
                         <i nz-icon nzType="filter"></i>
                     </nz-filter-trigger>
@@ -125,7 +126,7 @@
         <tr *ngFor="let data of rows">
             <td *ngIf="options.showCheckbox" style="width: 50px;" [nzChecked]="setOfCheckedId.has(data[options.pkId])" (nzCheckedChange)="onItemChecked(data[options.pkId], $event)" [nzDisabled]="false" [nzLabel]="data.name"></td>
 
-            <td [ngClass]="c.tdClassName" *ngFor="let c of options.cols" [nzEllipsis]="c.ellipsis">
+            <td style="min-width: 150px;" [ngClass]="c.tdClassName" *ngFor="let c of options.cols" [nzEllipsis]="c.ellipsis">
                 <label class="col-name">{{c.name}} :</label>
 
                 <!-- Display selected file name and Replace button -->
