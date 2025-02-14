@@ -27,6 +27,11 @@
                 <button (click)="openCopyModal()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#copyModal">
                     Copy
                 </button>
+
+                <button (click)="showOrdersList()" type="button" class="btn btn-primary">
+                    Past Orders
+                </button>
+
             <button (click)="showPurchaseOrderListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
                 Purchase List
             </button>
@@ -55,6 +60,23 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
                 <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Past Orders List Modal -->
+<div #ordersModal class="modal fade custom-modal modal-center" id="ordersListModal" tabindex="-1" aria-labelledby="ordersListModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ordersListModalLabel">Past Orders List</h5>
+                <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+            </div>
+            <div class="modal-body">
+                <app-order-list [vendorOrders]="vendorOrders" [noOrdersMessage]="noOrdersMessage" (orderSelected)="handleOrderSelected($event)" [selectedVendorId]="this.formConfig.model.purchase_order_data.vendor_id" (productsPulled)="handleProductPull($event)" (modalClosed)="closeOrdersListModal()"
+                    (modalClosed)="hideModal()" class="custom-list">
+                </app-order-list>
             </div>
         </div>
     </div>
