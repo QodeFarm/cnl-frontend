@@ -66,7 +66,7 @@ export class ProductCategoriesComponent  {
 	       {
             key: 'category_name',
             type: 'input',
-            className: 'col-6 pb-3 ps-0',
+            className: 'col-md-6 col-12 px-1 pb-md-0 pb-3',
             templateOptions: {
               label: 'Category Name',
               required: true
@@ -80,7 +80,7 @@ export class ProductCategoriesComponent  {
           {
             key: 'code',
             type: 'input',
-            className: 'col-6 pb-3 pe-0',
+            className: 'col-md-6 col-12 px-1',
             templateOptions: {
               label: 'Code',
               required: true

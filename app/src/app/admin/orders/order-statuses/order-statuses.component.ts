@@ -73,7 +73,7 @@ export class OrderStatusesComponent {
        {
           key: 'status_name',
           type: 'input',
-          className: 'col-6 pb-3 ps-0',
+          className: 'col-md-6 col-12 px-1 mb-3 mb-md-0',
           templateOptions: {
             label: 'Status name',
             placeholder: 'Enter status name',
@@ -83,7 +83,7 @@ export class OrderStatusesComponent {
         {
           key: 'description',
           type: 'textarea',
-          className: 'col-6 pb-3 pe-0',
+          className: 'col-md-6 col-12 px-1',
           templateOptions: {
             label: 'Description',
             placeholder: 'Enter Description',

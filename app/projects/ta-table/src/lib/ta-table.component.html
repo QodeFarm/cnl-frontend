@@ -6,7 +6,7 @@
         <div class="ta-row p-0 justify-content-end">
 
             <!-- Employee Filter -->
-            <div class="filter-group mt-2"  *ngIf="isEmployeeFilterVisible">
+            <div class="filter-group col p-0 mt-2"  *ngIf="isEmployeeFilterVisible">
                 <nz-select [(ngModel)]="selectedEmployee" nzPlaceHolder="Select Employee"  class="select-field"  (ngModelChange)="onEmployeeChange($event)">
                     <nz-option *ngFor="let employee of employeeOptions" [nzValue]="employee.value" [nzLabel]="employee.label">
                     </nz-option>
@@ -14,19 +14,19 @@
             </div>
 
             <!-- Quick Period Dropdown -->
-            <div class="filter-group mt-2" style="margin-left: 5px;" *ngIf="isButtonVisible">
+            <div class="filter-group col p-0 mt-2" style="margin-left: 5px;" *ngIf="isButtonVisible">
                 <nz-select id="quickPeriod" [(ngModel)]="selectedQuickPeriod" (ngModelChange)="onQuickPeriodChange()" nzPlaceHolder="Quick Period" class="quick-period-select">
                     <nz-option *ngFor="let period of quickPeriodOptions" [nzValue]="period.value" [nzLabel]="period.label"></nz-option>
                 </nz-select>
             </div>
 
             <!-- From Date Picker -->
-            <div class="filter-group mt-2" style="margin-left: 5px;" *ngIf="isButtonVisible">
+            <div class="filter-group col p-0 mt-2" style="margin-left: 5px;" *ngIf="isButtonVisible">
                 <nz-date-picker id="fromDate" [(ngModel)]="fromDate" nzPlaceHolder="From date" class="date-picker" style="width: 130px;"></nz-date-picker>
             </div>
 
             <!-- To Date Picker -->
-            <div class="filter-group mt-2" style="margin-left: 5px;" *ngIf="isButtonVisible">
+            <div class="filter-group col p-0 mt-2" style="margin-left: 5px;" *ngIf="isButtonVisible">
                 <nz-date-picker id="toDate" [(ngModel)]="toDate" nzPlaceHolder="To date" class="date-picker" style="width: 130px;"></nz-date-picker>
             </div>
 
@@ -39,8 +39,8 @@
                 </nz-select>
             </div> -->
 
-            <div *ngIf="isButtonVisible">
-                <div class="filter-group mt-2" style="margin-left: 5px;" *ngIf="isStatusButtonVisible">
+            <div *ngIf="isButtonVisible" class="filter-group col p-0" style="margin-left: 5px;">
+                <div class="filter-group mt-2"  *ngIf="isStatusButtonVisible">
                     <nz-select [(ngModel)]="selectedStatus" nzPlaceHolder="Select Status" class="select-field"  (ngModelChange)="onStatusChange($event)">
                         <nz-option *ngFor="let status of statusOptions" [nzValue]="status.value" [nzLabel]="status.label">
                         </nz-option>

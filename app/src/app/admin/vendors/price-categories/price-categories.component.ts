@@ -71,7 +71,7 @@ export class PriceCategoriesComponent {
 		    {
           key: 'name',
           type: 'input',
-          className: 'col-6 ps-0',
+          className: 'col-md-6 col-12 px-1 pb-3 pb-md-0',
           templateOptions: {
             label: 'Name',
             placeholder: 'Enter name',
@@ -81,7 +81,7 @@ export class PriceCategoriesComponent {
 		    {
           key: 'code',
           type: 'input',
-          className: 'col-6 pe-0',
+          className: 'col-md-6 col-12 px-1',
           templateOptions: {
             label: 'Code',
             placeholder: 'Enter code',

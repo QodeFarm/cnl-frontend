@@ -131,7 +131,7 @@ export class ProductPurchaseGlComponent {
 	       {
               key: 'name',
               type: 'input',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'Name',
                 required: true
@@ -145,7 +145,7 @@ export class ProductPurchaseGlComponent {
 			     {
               key: 'purchase_accounts',
               type: 'input',
-              className: 'col-6 pb-3 pe-0',
+              className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'Purchase Accounts',
               },
@@ -158,7 +158,7 @@ export class ProductPurchaseGlComponent {
             {
               key: 'code',
               type: 'input',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'Code',
               },
@@ -171,7 +171,7 @@ export class ProductPurchaseGlComponent {
             {
               key: 'type',
               type: 'input',
-              className: 'col-6 pb-3 pe-0',
+              className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'Type',
               },
@@ -184,7 +184,7 @@ export class ProductPurchaseGlComponent {
             {
               key: 'inactive',
               type: 'checkbox',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'Inactive'
               }
@@ -192,7 +192,7 @@ export class ProductPurchaseGlComponent {
             {
               key: 'is_subledger',
               type: 'checkbox',
-              className: 'col-6 pb-3 pe-0',
+              className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'Is Subledger'
               }
@@ -200,7 +200,7 @@ export class ProductPurchaseGlComponent {
             {
               key: 'account_no',
               type: 'input',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'Account No',
                 type: 'password'
@@ -209,7 +209,7 @@ export class ProductPurchaseGlComponent {
             {
               key: 'rtgs_ifsc_code',
               type: 'input',
-              className: 'col-6 pb-3 pe-0',
+              className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'RTGS IFSC Code',
               },
@@ -222,7 +222,7 @@ export class ProductPurchaseGlComponent {
             {
               key: 'tds_applicable',
               type: 'checkbox',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'TDS Applicable'
               }
@@ -230,7 +230,7 @@ export class ProductPurchaseGlComponent {
             {
               key: 'is_loan_account',
               type: 'checkbox',
-              className: 'col-6 pb-3 pe-0',
+              className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'Is Loan Account'
               }
@@ -238,7 +238,7 @@ export class ProductPurchaseGlComponent {
             {
               key: 'classification',
               type: 'input',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'Classification',
               },
@@ -251,7 +251,7 @@ export class ProductPurchaseGlComponent {
             {
               key: 'pan',
               type: 'input',
-              className: 'col-6 pb-3 pe-0',
+              className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'PAN',
               },
@@ -264,7 +264,7 @@ export class ProductPurchaseGlComponent {
             {
               key: 'employee',
               type: 'checkbox',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 pb-3 pb-md-0 px-1',
               templateOptions: {
                 label: 'Employee'
               }
@@ -272,7 +272,7 @@ export class ProductPurchaseGlComponent {
 			      {
               key: 'address',
               type: 'textarea',
-              className: 'col-6 pb-3 pe-0',
+              className: 'col-md-6 col-12  px-1',
               templateOptions: {
                 label: 'Address',
               },

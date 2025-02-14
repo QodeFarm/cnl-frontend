@@ -57,7 +57,7 @@ export class AssetCategoriesComponent {
             {
               key: 'category_name',
               type: 'input',
-              className: 'col-6 pe-0',
+              className: 'col-md-6 col-12 p-0',
               templateOptions: {
                 label: 'Category Name',
                 placeholder: 'Enter Category Name',
