@@ -1,16 +1,19 @@
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
 import { TaFormComponent, TaFormConfig } from '@ta/ta-form';
-import { distinctUntilChanged } from 'rxjs/operators';
+import { distinctUntilChanged, switchMap, tap } from 'rxjs/operators';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 import { CommonModule } from '@angular/common';
 import { PurchaseListComponent } from './purchase-list/purchase-list.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder } from '@angular/forms';
+import { forkJoin, Observable } from 'rxjs';
+import { OrderListComponent } from './order-list/order-list.component';
+declare var bootstrap;
 @Component({
   selector: 'app-purchase',
-  imports: [CommonModule, AdminCommmonModule, PurchaseListComponent],
+  imports: [CommonModule, AdminCommmonModule, PurchaseListComponent, OrderListComponent],
   standalone: true,
   templateUrl: './purchase.component.html',
   styleUrls: ['./purchase.component.scss']
@@ -18,9 +21,11 @@ import { FormBuilder } from '@angular/forms';
 
 export class PurchaseComponent {
   @ViewChild('purchaseForm', { static: false }) purchaseForm: TaFormComponent | undefined;
+  @ViewChild('ordersModal', { static: false }) ordersModal: ElementRef;
   orderNumber: any;
   showPurchaseOrderList: boolean = false;
   showForm: boolean = false;
+  vendorDetails: Object;
   PurchaseOrderEditID: any;
   productOptions: any;
   @ViewChild(PurchaseListComponent) PurchaseListComponent!: PurchaseListComponent;
@@ -268,9 +273,11 @@ export class PurchaseComponent {
 
   getOrderNo() {
     this.orderNumber = null;
+    this.shippingTrackingNumber = null;
     this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
         if (res && res.data && res.data.order_number) {
-            this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
+          this.shippingTrackingNumber = res.data.order_number;
+          this.formConfig.model['order_shipments']['shipping_tracking_no'] = this.shippingTrackingNumber;
     this.http.get('masters/generate_order_no/?type=PO').subscribe((res: any) => {
       console.log(res);
       if (res && res.data && res.data.order_number) {
@@ -341,6 +348,298 @@ loadQuickpackProducts() {
       console.log('Sale Order Items populated:', this.formConfig.model.purchase_order_items);
     });
 }
+  //=====================================================
+  tempSelectedProducts: any[] = [];
+  vendorOrders: any[] = [];
+  noOrdersMessage: string;
+  shippingTrackingNumber: any;
+  // Shows the past orders list modal and fetches orders based on the selected customer
+  showOrdersList() {
+    // Clear temporary selections and reset checkbox states
+    this.tempSelectedProducts = [];
+
+    // Reset all checkboxes for products in vendorOrders
+    this.vendorOrders.forEach(order => {
+      order.productsList?.forEach(product => {
+        product.checked = false; // Add a `checked` property to manage checkbox state
+      });
+    });
+
+    const selectedVendorId = this.formConfig.model.purchase_order_data.vendor_id;
+    const selectedVendorName = this.formConfig.model.purchase_order_data.vendor?.name;
+
+    if (!selectedVendorId) {
+      this.noOrdersMessage = 'Please select a vendor.';
+      this.vendorOrders = [];
+      this.openModal();
+      return;
+    }
+
+    this.vendorOrders = [];
+    this.noOrdersMessage = '';
+
+    this.getOrdersByVendor(selectedVendorId).pipe(
+      switchMap(orders => {
+        if (orders.count === 0) {
+          this.noOrdersMessage = `No past orders for ${selectedVendorName}.`;
+          this.vendorOrders = [];
+          this.openModal();
+          return [];
+        }
+
+        const detailedOrderRequests = orders.data.map(order =>
+          this.getOrderDetails(order.purchase_order_id).pipe(
+            tap(orderDetails => {
+              order.productsList = orderDetails.data.purchase_order_items.map(item => ({
+                product_name: item.product?.name ?? 'Unknown Product',
+                quantity: item.quantity,
+                code: item.product?.code,
+                rate: item.rate,
+                amount: item.amount,
+                discount: item.discount,
+                unit_name: item.unit_options?.unit_name ?? 'N/A',
+                total_boxes: item.total_boxes ?? 0,
+                size: item.size?.size_name ?? 'N/A',
+                color: item.color?.color_name ?? 'N/A',
+                remarks: item.remarks ?? '',
+                tax: item.tax ?? 0,
+                print_name: item.print_name ?? item.product?.name ?? 'N/A',
+                checked: false // Initialize checkbox as unchecked
+              }));
+            })
+          )
+        );
+
+        return forkJoin(detailedOrderRequests).pipe(
+          tap(() => {
+            this.vendorOrders = orders.data;
+            this.openModal();
+          })
+        );
+      })
+    ).subscribe();
+  }
+
+  ordersListModal: any;
+  openModal() {
+
+    this.ordersListModal = new bootstrap.Modal(document.getElementById("ordersListModal"));
+    this.ordersListModal.show();
+
+  }
+
+  hideModal() {
+    this.ordersListModal.hide();
+  }
+
+
+  removeModalBackdrop() {
+    // Remove all existing backdrops to prevent leftover overlays
+    document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+
+    // Reset body styling to ensure the page is fully interactive again
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';  // Reset overflow to allow scrolling
+  }
+
+  // Fetch orders by customer ID
+  getOrdersByVendor(vendorId: string): Observable<any> {
+    //console.log("customer id",vendorId)
+    const url = `purchase/purchase_order/?vendor_id=${vendorId}`;
+    // console.log("data in url 1 : ",url);
+    return this.http.get<any>(url);
+  }
+
+  // Fetch detailed information about an order by its ID
+  getOrderDetails(orderId: string): Observable<any> {
+    const url = `purchase/purchase_order/${orderId}/`;
+    // console.log("data in url 2 : ",url);
+    return this.http.get<any>(url);
+  }
+
+  // Handles the selection of an order from the list
+  selectOrder(order: any) {
+    console.log('Order selected:', order); // Output the order object for debugging
+
+    // Extract the purchase_order_id correctly
+    const orderId = typeof order === 'object' && order.purchase_order_id ? order.purchase_order_id : null;
+
+    if (orderId && typeof orderId === 'string') {
+      console.log('Order ID:', orderId); // Output the extracted ID
+      this.handleOrderSelected(orderId); // Pass the extracted ID
+    } else {
+      console.error('Invalid orderId, expected a string:', order);
+    }
+  }
+  // Handles the order selection process and updates the form model with the order details
+  handleOrderSelected(order: any) {
+    console.log('Fetching details for Order:', order); // Log the whole order object
+
+    // Extract the orderId correctly
+    const orderIdStr = order?.purchase_order_id || '';
+
+    // Check if orderId is valid and is a string
+    if (orderIdStr && typeof orderIdStr === 'string') {
+      this.PurchaseOrderEditID = null; // Ensure this is null to stay in "create" mode.
+
+      // Fetch the order details using the correct ID
+      this.http.get(`purchase/purchase_order/${orderIdStr}`).subscribe(
+        (res: any) => {
+          console.log('Order details response:', res); // Added for debugging
+          if (res && res.data) {
+            // Load the form data but do not set the primary ID to ensure it stays in "create" mode
+            const orderData = res.data;
+
+            // Remove identifiers that mark it as an existing order
+            // delete orderData.purchase_order.purchase_order_id;
+            // delete orderData.purchase_order.id;
+
+            // Set the model with the order data
+            this.formConfig.model = orderData;
+
+            // Ensure the order type is always 'purchase_order'
+            if (!this.formConfig.model['purchase_order_data']['order_type']) {
+              this.formConfig.model['purchase_order_data']['order_type'] = 'purchase_order'; // Set default order type
+            }
+
+            // Do not override the order number if one was already generated
+            // Ensure new orders start with a blank order number unless one was already generated
+            if (!this.orderNumber) {
+              this.formConfig.model['purchase_order_data']['order_no'] = ''; // Ensure new order starts blank
+            } else {
+              this.formConfig.model['purchase_order_data']['order_no'] = this.orderNumber; // Retain the initial order number
+            }
+
+            // Handle the shipping tracking number similarly
+            if (!this.shippingTrackingNumber) {
+              this.formConfig.model['order_shipments']['shipping_tracking_no'] = ''; // Ensure new order starts blank
+            } else {
+              this.formConfig.model['order_shipments']['shipping_tracking_no'] = this.shippingTrackingNumber; // Retain the initial tracking number
+            }
+
+            // Set default dates for the new order
+            this.formConfig.model['purchase_order_data']['delivery_date'] = this.nowDate();
+            this.formConfig.model['purchase_order_data']['order_date'] = this.nowDate();
+            this.formConfig.model['purchase_order_data']['ref_date'] = this.nowDate();
+            // this.formConfig.model['order_shipments']['shipping_date'] = this.nowDate();
+
+            // Show the form for creating a new order based on this data
+            this.showForm = true;
+            // this.formConfig.submit.label = 'Submit'; // Change the button label to indicate it's a creation.
+            this.cdRef.detectChanges();
+          }
+        },
+        (error) => {
+          console.error('Error fetching order details:', error);
+        }
+      );
+    } else {
+      console.error('Invalid orderId, expected a string:', orderIdStr);
+    }
+
+    this.hideModal();
+  }
+
+
+  closeOrdersListModal() {
+    this.hideModal();
+  }
+
+
+
+  // Closes the modal and removes the modal backdrop
+  closeModal() {
+    this.hideModal(); // Use the hideModal method to remove the modal elements
+  }
+
+
+  // Handles the selected products and updates the form model with them
+  handleProductPull(selectedProducts: any[]) {
+    console.log('Pulled selected products in OrdersListComponent:', selectedProducts);
+
+    // Retrieve or initialize the current purchase_order_items list
+    let existingProducts = this.formConfig.model['purchase_order_items'] || [];
+
+    // Filter out any empty entries from existing products
+    existingProducts = existingProducts.filter(product => product && product.product_id);
+
+    selectedProducts.forEach(newProduct => {
+      if (!newProduct || !newProduct.product_id || !newProduct.code) {
+        console.warn("Skipped an incomplete or undefined product:", newProduct);
+        return; // Skip if data is incomplete
+      }
+
+      // Check for duplicates by comparing all key fields
+      const isDuplicate = existingProducts.some(existingProduct => (
+        existingProduct.product_id === newProduct.product_id &&
+        existingProduct.code === newProduct.code &&
+        existingProduct.total_boxes === (newProduct.total_boxes || 0) &&
+        existingProduct.unit_options_id === (newProduct.unit_options_id || null) &&
+        existingProduct.quantity === (newProduct.quantity || 1) &&
+        existingProduct.size?.size_name === (newProduct.size?.size_name || 'Unspecified') &&
+        existingProduct.color?.color_name === (newProduct.color?.color_name || 'Unspecified')
+      ));
+
+      if (!isDuplicate) {
+        console.log("Adding new product:", newProduct);
+
+        // Add valid, non-duplicate product to existingProducts list
+        existingProducts.push({
+          product: {
+            product_id: newProduct.product_id,
+            name: newProduct.name || '',
+            code: newProduct.code || '',
+          },
+          product_id: newProduct.product_id,
+          code: newProduct.code || '',
+          total_boxes: newProduct.total_boxes || 0,
+          unit_options_id: newProduct.unit_options_id || null,
+          quantity: newProduct.quantity,
+          rate: parseFloat(newProduct.rate) || 0,
+          discount: parseFloat(newProduct.discount) || 0,
+          print_name: newProduct.print_name || newProduct.name || '',
+          amount: parseFloat(newProduct.amount) || 0, // Ensure amount is a number
+          tax: parseFloat(newProduct.tax) || 0,       // Ensure tax is a number
+          remarks: newProduct.remarks || '',
+
+          // Set size and color properties with defaults if not provided
+          size: {
+            size_id: newProduct.size?.size_id || null,
+            size_name: newProduct.size?.size_name || 'Unspecified'
+          },
+          color: {
+            color_id: newProduct.color?.color_id || null,
+            color_name: newProduct.color?.color_name || 'Unspecified'
+          },
+          size_id: newProduct.size?.size_id || null,
+          color_id: newProduct.color?.color_id || null
+        });
+      } else {
+        console.log("Duplicate detected, skipping product:", newProduct);
+      }
+    });
+
+    // Update the model with the final product list, ensuring there are no placeholder or duplicate rows
+    this.formConfig.model['purchase_order_items'] = [...existingProducts];
+
+    // Trigger change detection to update the UI immediately
+    this.formConfig.model = { ...this.formConfig.model }; // Refresh the formConfig model
+    setTimeout(() => this.cdRef.detectChanges(), 0); // Use async change detection for smooth UI update
+
+    // Log the final products to confirm the update
+    console.log("Final Products List in purchase_order_items:", this.formConfig.model['purchase_order_items']);
+  }
+
+  ngOnDestroy() {
+    // Ensure modals are disposed of correctly
+    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+  }
+
+  // API call to fetch available sizes and colors for a selected product
+  fetchProductVariations(productID: string): Observable<any> {
+    const url = `/products/product_variations/?product_name=${productID}`;
+    return this.http.get(url).pipe(((res: any) => res.data));
+  }
 //=====================================================
 
   setFormConfig() {
