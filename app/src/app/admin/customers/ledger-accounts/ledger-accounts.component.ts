@@ -159,7 +159,8 @@ export class LedgerAccountsComponent {
                 options: [
                   { value: 'customer', label: 'Customer' },
                   { value: 'Bank', label: 'Bank' },
-                  { value: 'cash', label: 'cash' }
+                  { value: 'cash', label: 'cash' },
+                  { value: 'Vendor', label: 'Vendor'}
                 ],
               },
               hooks: {
