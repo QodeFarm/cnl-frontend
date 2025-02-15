@@ -6,8 +6,8 @@
         <div class="ta-row p-0 justify-content-end">
 
             <!-- Employee Filter -->
-            <div class="filter-group col p-0 mt-2"  *ngIf="isEmployeeFilterVisible">
-                <nz-select [(ngModel)]="selectedEmployee" nzPlaceHolder="Select Employee"  class="select-field"  (ngModelChange)="onEmployeeChange($event)">
+            <div class="filter-group col p-0 mt-2" *ngIf="isEmployeeFilterVisible">
+                <nz-select [(ngModel)]="selectedEmployee" nzPlaceHolder="Select Employee" class="select-field" (ngModelChange)="onEmployeeChange($event)">
                     <nz-option *ngFor="let employee of employeeOptions" [nzValue]="employee.value" [nzLabel]="employee.label">
                     </nz-option>
                 </nz-select>
@@ -40,15 +40,15 @@
             </div> -->
 
             <div *ngIf="isButtonVisible" class="filter-group col p-0" style="margin-left: 5px;">
-                <div class="filter-group mt-2"  *ngIf="isStatusButtonVisible">
-                    <nz-select [(ngModel)]="selectedStatus" nzPlaceHolder="Select Status" class="select-field"  (ngModelChange)="onStatusChange($event)">
+                <div class="filter-group mt-2" *ngIf="isStatusButtonVisible">
+                    <nz-select [(ngModel)]="selectedStatus" nzPlaceHolder="Select Status" class="select-field" (ngModelChange)="onStatusChange($event)">
                         <nz-option *ngFor="let status of statusOptions" [nzValue]="status.value" [nzLabel]="status.label">
                         </nz-option>
                     </nz-select>
                 </div>
             </div>
 
-           
+
         </div>
     </div>
 
@@ -68,8 +68,8 @@
                     nzTheme="outline"></i> Export</button>
             <ng-content nz-col select="[after-search]">
             </ng-content>
-             <!-- Apply Filters OK Button -->
-             <div class="filter-group" style="margin-inline: 5px;" *ngIf="isButtonVisible">
+            <!-- Apply Filters OK Button -->
+            <div class="filter-group" style="margin-inline: 5px;" *ngIf="isButtonVisible">
                 <button nz-button nzType="primary" (click)="applyFilters()" class="apply-filters-button">
                     <i nz-icon nzType="check" nzTheme="outline"></i>
                 </button>
@@ -83,7 +83,7 @@
             </div>
 
             <!-- Download Button -->
-            <div class="filter-group"  *ngIf="isButtonVisible">
+            <div class="filter-group" *ngIf="isButtonVisible">
                 <button nz-button nzType="primary" (click)="downloadData($event)">
                     <i nz-icon nzType="download" nzTheme="outline"></i>
                 </button>
@@ -94,7 +94,7 @@
 
 <!-- [nzTitle]="options.title"  (nzQueryParams)="onQueryParamsChange($event)"-->
 <nz-table #taTable nzShowSizeChanger [nzPageSizeOptions]="options.pageSizeOptions" [nzTableLayout]="options.tableLayout" [nzBordered]="options.bordered" [nzScroll]="{ x: options.scrollX, y: options.scrollY }" [nzData]="rows" [nzFrontPagination]="false"
-    [nzShowTotal]="totalTemplate" [nzLoading]="loading" [nzTotal]="total" [nzPageSize]="options.pageSize" (nzQueryParams)="onQueryParamsChange($event)" [nzPageIndex]="pageIndex" [nzPaginationPosition]="options.paginationPosition">
+    [nzShowTotal]="totalTemplate" [nzFooter]="footerTemplate" [nzLoading]="loading" [nzTotal]="total" [nzPageSize]="options.pageSize" (nzQueryParams)="onQueryParamsChange($event)" [nzPageIndex]="pageIndex" [nzPaginationPosition]="options.paginationPosition">
     <thead>
         <tr>
             <th *ngIf="options.showCheckbox" style="width: 50px;" [nzIndeterminate]="indeterminate" [nzChecked]="checked" nzLabel="Select all" (nzCheckedChange)="onAllChecked($event)"></th>
@@ -160,11 +160,18 @@
 
 </nz-table>
 
+<ng-template #footerTemplate>
+    <ng-content nz-col select="[footer]">
+    </ng-content>
+    <span class="total-record-footer d-none d-sm-block"> Total Records - {{total}}</span>
+    <!-- should be translated -->
+</ng-template>
+
 
 <ng-template #totalTemplate let-total>
     <ng-content nz-col select="[bottom-left]">
     </ng-content>
-    Total Records - {{total}}
+    <span class="total-record d-block d-sm-none">Total Records - {{total}} </span>
     <button nz-button nzType="default" nzShape="circle" (click)="refresh()"><i nz-icon nzType="sync"></i></button>
     <div nz-row nzGutter="8">
         <div nz-col nzXs="24" nzSm="12" nzMd="12">
