@@ -1,9 +1,44 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; 
-import { Router } from '@angular/router'; // Import Router
+import { Component, OnInit, EventEmitter, Output } from '@angular/core';
+import { Router } from '@angular/router';
 import { TaCurdConfig } from '@ta/ta-curd';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { HttpClient } from '@angular/common/http';
+
+const TABLE_FIELDS = {
+  workOrder: [
+    { key: 'product.name', label: 'Product Name' },
+    { key: 'size.size_name', label: 'Size' },
+    { key: 'color.color_name', label: 'Color' },
+    { key: 'quantity', label: 'Quantity' },
+    { key: 'completed_qty', label: 'Completed Quantity', defaultValue: 0 },
+    { key: 'status.status_name', label: 'Status' },
+    { key: 'start_date', label: 'Start Date' },
+    { key: 'end_date', label: 'End Date' }
+  ],
+  workers: [
+    { key: 'employee.first_name', label: 'Employee' },
+    { key: 'hours_worked', label: 'Hours Worked' }
+  ],
+  bom: [
+    { key: 'product.name', label: 'Product Name' },
+    { key: 'product.code', label: 'Product Code' },
+    { key: 'product.print_name', label: 'Print Name' },
+    { key: 'size.size_name', label: 'Size' },
+    { key: 'color.color_name', label: 'Color' },
+    { key: 'quantity', label: 'Quantity' },
+    { key: 'unit_cost', label: 'Unit Cost' },
+    { key: 'total_cost', label: 'Total Cost' },
+    { key: 'notes', label: 'Notes' }
+  ],
+  stages: [
+    { key: 'stage_name', label: 'Stage Name' },
+    { key: 'stage_description', label: 'Description' },
+    { key: 'stage_start_date', label: 'Start Date' },
+    { key: 'stage_end_date', label: 'End Date' },
+    { key: 'notes', label: 'Notes' }
+  ]
+};
 
 @Component({
   selector: 'app-workorderboard',
@@ -15,103 +50,41 @@ import { HttpClient } from '@angular/common/http';
 export class WorkorderboardComponent implements OnInit {
   isLoading = true;
   showModal = false;
-  showViewModal = false; // New variable for view modal
+  showEditModal = false;
   selectedOrder: any = null;
+  selectedWorkOrderId: string;
+  workOrderData: any = null;
+  tableFields = TABLE_FIELDS;
+  
+  @Output() view = new EventEmitter<any>();
 
-  curdConfig: TaCurdConfig = this.getCurdConfig();
-
-  constructor(private http: HttpClient) {}
+  constructor(private router: Router, private http: HttpClient) {}
 
   ngOnInit() {
     this.isLoading = false;
   }
 
-  getCurdConfig(): TaCurdConfig {
-    return {
-      drawerSize: 500,
-      drawerPlacement: 'right',
-      tableConfig: {
-        apiUrl: 'production/work_order/?summary=true&flow_status=Production',
-        title: 'Work Order',
-        pkId: "work_order_id",
-        pageSize: 10,
-        globalSearch: {
-          keys: ['product', 'quantity', 'status_id', 'start_date', 'end_date']
-        },
-        defaultSort: { key: 'created_at', value: 'descend' },
-        cols: [
-          {
-            fieldKey: 'product',
-            name: 'Product',
-            displayType: "map",
-            mapFn: (currentValue: any, row: any, col: any) => {
-              return `${row.product.name}`;
-            },
-            sort: true
-          },
-          {
-            fieldKey: 'quantity',
-            name: 'Quantity',
-            sort: true
-          },
-          {
-            fieldKey: 'status_id',
-            name: 'Status',
-            displayType: 'map',
-            mapFn: (currentValue: any, row: any) => `${row.status.status_name}`,
-            sort: true
-          },
-          {
-            fieldKey: 'start_date',
-            name: 'Start Date',
-            sort: true
-          },
-          {
-            fieldKey: 'end_date',
-            name: 'End Date',
-            sort: true
-          },
-          {
-            fieldKey: 'actions',
-            name: 'Actions',
-            type: 'action',
-            actions: [
-              {
-                type: 'callBackFn',
-                label: 'Done',
-                callBackFn: (row: any) => this.openModal(row),
-              },
-              {
-                type: 'callBackFn',
-                label: 'View', // Action for viewing details
-                callBackFn: (row: any) => {
-                  console.log('View button clicked for:', row);
-                  this.onViewWorkOrder(row.work_order_id); // Pass only the ID, not the entire row
-                }
-              }
-              
-            ]
-          }
-        ]
+  getNestedValue(obj: any, path: string): any {
+    return path.split('.').reduce((acc, part) => acc?.[part], obj);
+  }
+
+  viewWorkOrder(workOrderId: string) {
+    this.selectedWorkOrderId = workOrderId;
+    this.showEditModal = true;
+    this.workOrderData = null; // Reset previous data
+
+    this.http.get(`production/work_order/${workOrderId}`).subscribe({
+      next: (res: any) => {
+        this.workOrderData = res?.data ?? null;
       },
-      formConfig: {
-        url: 'sales/sale_order/{saleOrderId}/move_next_stage/',
-        title: 'Work Order Confirmation',
-        pkId: "sale_order_id",
-        exParams: [],
-        fields: [
-          {
-            key: 'sale_order_id',
-            type: 'text',
-          },
-          {
-            key: 'confirmation',
-            type: 'select',
-            defaultValue: 'yes'
-          }
-        ]
+      error: (err) => {
+        console.error("Error fetching work order:", err);
       }
-    };
+    });
+  }
+
+  closeEditModal() {
+      this.showEditModal = false;
   }
 
   openModal(order: any) {
@@ -124,57 +97,6 @@ export class WorkorderboardComponent implements OnInit {
     this.selectedOrder = null;
   }
 
-  //code for view button in workorderboard
-  onViewWorkOrder(workOrderId: string) {
-    console.log('Fetching details for view, work order ID:', workOrderId);
-    this.selectedOrder = null; // Clear any previous data
-  
-    // Make an API call to fetch the complete work order details
-    this.http.get(`production/work_order/${workOrderId}`).subscribe(
-      (res: any) => {
-        console.log('Received response for work order view:', res);
-  
-        if (res && res.data) {
-          const data = res.data;
-  
-          // Populate selectedOrder with all necessary fields from the response
-          this.selectedOrder = {
-            ...data.work_order,
-            materials: data.bom || [], // Map the `bom` field as `materials`
-            machines: data.work_order_machines.map((machine: any) => ({
-              machineName: machine.machine.machine_name // Map nested `machine.machine_name`
-            })) || [],
-            workers: data.workers.map((worker: any) => ({
-              workerName: worker.employee.name, // Map nested `employee.name`
-              hoursWorked: worker.hours_worked // Map `hours_worked`
-            })) || [],
-            workStages: data.work_order_stages || []
-          };
-  
-          console.log('Selected order populated with full data:', this.selectedOrder);
-  
-          // Display the view modal with the complete data
-          this.showViewModal = true;
-        } else {
-          console.warn('No data found for work order ID:', workOrderId);
-        }
-      },
-      error => {
-        console.error('Error fetching work order details:', error);
-        alert('Failed to fetch work order details. Please try again.');
-      }
-    );
-  }
-  
-  
-
-  
-
-  closeViewModal() {
-    this.showViewModal = false;
-    this.selectedOrder = null;
-  }
-
   confirmDispatch() {
     if (this.selectedOrder) {
       const saleOrderId = this.selectedOrder.sale_order_id;
@@ -184,7 +106,7 @@ export class WorkorderboardComponent implements OnInit {
         () => {
           console.log('Dispatch confirmed for order:', saleOrderId);
           this.closeModal();
-          this.refreshCurdConfig();
+          this.curdConfig = this.getCurdConfig();
         },
         error => {
           console.error('Error in confirming dispatch:', error);
@@ -194,7 +116,42 @@ export class WorkorderboardComponent implements OnInit {
     }
   }
 
-  refreshCurdConfig() {
-    this.curdConfig = this.getCurdConfig();
+  getCurdConfig(): TaCurdConfig {
+    return {
+      drawerSize: 500,
+      drawerPlacement: 'right',
+      tableConfig: {
+        apiUrl: 'production/work_order/?summary=true&flow_status=Production',
+        title: 'Work Order Board',
+        pkId: "work_order_id",
+        pageSize: 10,
+        globalSearch: { keys: ['product', 'quantity', 'status_id', 'start_date', 'end_date'] },
+        defaultSort: { key: 'created_at', value: 'descend' },
+        cols: [
+          { fieldKey: 'product', name: 'Product', displayType: "map", mapFn: (cv, row) => `${row.product.name}`, sort: true },
+          { fieldKey: 'quantity', name: 'Quantity', sort: true },
+          { fieldKey: 'status_id', name: 'Status', displayType: 'map', mapFn: (cv, row) => `${row.status.status_name}`, sort: true },
+          { fieldKey: 'start_date', name: 'Start Date', sort: true },
+          { fieldKey: 'end_date', name: 'End Date', sort: true },
+          { fieldKey: 'actions', name: 'Actions', type: 'action',
+            actions: [
+              { type: 'callBackFn', label: 'Done', callBackFn: (row) => this.openModal(row) },
+              { type: 'callBackFn', label: 'View', callBackFn: (row) => this.viewWorkOrder(row.work_order_id) }
+            ]
+          }
+        ]
+      },
+      formConfig: {
+        url: 'sales/sale_order/{saleOrderId}/move_next_stage/',
+        title: 'Work Order Confirmation',
+        pkId: "sale_order_id",
+        fields: [
+          { key: 'sale_order_id', type: 'text' },
+          { key: 'confirmation', type: 'select', defaultValue: 'yes' }
+        ]
+      }
+    };
   }
+
+  curdConfig: TaCurdConfig = this.getCurdConfig();
 }
