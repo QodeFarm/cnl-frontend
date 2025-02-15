@@ -229,6 +229,35 @@ export class JournalEntryComponent {
                   }
                 }
               },
+
+              {
+                key: 'vendor',
+                type: 'select',
+                templateOptions: {
+                  label: 'Vendor',
+                  dataKey: 'name',
+                  dataLabel: 'name',
+                  options: [],
+                  hideLabel: true,
+                  required: false,
+                  lazy: {
+                    url: 'vendors/vendor_get/',
+                    lazyOneTime: true
+                  },
+                },
+                hooks: {
+                  onChanges: (field: any) => {
+                    field.formControl.valueChanges.subscribe((data: any) => {
+                      const index = field.parent.key;
+                      if (!this.formConfig.model['journal_entry_lines'][index]) {
+                        console.error(`vendor_id at index ${index} is not defined. Initializing...`);
+                        this.formConfig.model['journal_entry_lines'][index] = {};
+                      }
+                      this.formConfig.model['journal_entry_lines'][index]['vendor_id'] = data.vendor_id;
+                    });
+                  }
+                }
+              },
             ]
           }
         }
