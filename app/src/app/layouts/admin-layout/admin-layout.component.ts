@@ -44,7 +44,7 @@ export interface Tab {
 export class AdminLayoutComponent {
   menulList = <any>[];
   userName: any;
-  role:any;
+  role: any;
   company_name: any;
   company_code: any;
   public currentHoverTabKey: string;
@@ -84,11 +84,11 @@ export class AdminLayoutComponent {
       this.hideSidebarCollapse();
     }
 
-    if (windowWidth < 480 && !this.elementRef.nativeElement.querySelector('.sidebar').classList.contains('toggled')) {
-      this.renderer.addClass(document.body, 'sidebar-toggled');
-      this.renderer.addClass(this.elementRef.nativeElement.querySelector('.sidebar'), 'toggled');
-      this.hideSidebarCollapse();
-    }
+    // if (windowWidth < 480 && !this.elementRef.nativeElement.querySelector('.sidebar').classList.contains('toggled')) {
+    //   this.renderer.addClass(document.body, 'sidebar-toggled');
+    //   this.renderer.addClass(this.elementRef.nativeElement.querySelector('.sidebar'), 'toggled');
+    //   this.hideSidebarCollapse();
+    // }
   }
   @HostListener('window:beforeunload', ['$event'])
   unloadNotification($event: any): void {
