@@ -5,6 +5,7 @@ import { CommonModule, DatePipe, formatDate } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { WorkOrderListComponent } from './work-order-list/work-order-list.component';
 import { TaCurdConfig } from '@ta/ta-curd';
+import { FormlyFieldConfig } from '@ngx-formly/core';
 
 
 @Component({
@@ -24,6 +25,7 @@ export class WorkorderComponent implements OnInit {
   formConfig: TaFormConfig = {};
   @ViewChild(WorkOrderListComponent) WorkOrderListComponent!: WorkOrderListComponent;
   editMode: boolean = false;
+  dataToPopulate: any;
 
   constructor(private http: HttpClient, private el: ElementRef, private renderer: Renderer2) {}
   
@@ -470,8 +472,66 @@ curdConfig: TaCurdConfig = {
   }
 }
 
+ loadProductVariations(field: FormlyFieldConfig, productValuechange: boolean = false) {
+      const parentArray = field.parent;
+  
+      const product = field.formControl.value;
+      // Ensure the product exists before making an HTTP request
+  
+      if (product?.product_id) {
+        const sizeField: any = parentArray.fieldGroup.find((f: any) => f.key === 'size');
+        const colorField: any = parentArray.fieldGroup.find((f: any) => f.key === 'color');
+        if (productValuechange) {
+          sizeField.formControl.setValue(null);
+          colorField.formControl.setValue(null);
+        }
+        // Clear previous options for both size and color fields before adding new ones
+        if (sizeField) sizeField.templateOptions.options = [];
+        if (colorField) colorField.templateOptions.options = [];
+        this.http.get(`products/product_variations/?product_id=${product.product_id}`).subscribe((response: any) => {
+          if (response.data.length > 0) {
+  
+            let availableSizes, availableColors;
+            // Check if response data is non-empty for size
+            if (response.data && response.data.length > 0) {
+              availableSizes = response.data.map((variation: any) => ({
+                label: variation.size?.size_name || '----',
+                value: {
+                  size_id: variation.size?.size_id || null,
+                  size_name: variation.size?.size_name || '----'
+                }
+              }));
+              availableColors = response.data.map((variation: any) => ({
+                label: variation.color?.color_name || '----',
+                value: {
+                  color_id: variation.color?.color_id || null,
+                  color_name: variation.color?.color_name || '----'
+                }
+              }));
+              // Enable and update the size field options if sizes are available
+              if (sizeField) {
+                sizeField.formControl.enable(); // Ensure the field is enabled
+                sizeField.templateOptions.options = availableSizes.filter((item, index, self) => index === self.findIndex((t) => t.value.size_id === item.value.size_id)); // Ensure unique size options
+              }
+            } else {
+              // Clear options and keep the fields enabled, without any selection if no options exist
+              if (sizeField) {
+                sizeField.templateOptions.options = [];
+              }
+              if (colorField) {
+                colorField.templateOptions.options = [];
+              }
+            }
+          }
+        });
+      } else {
+        console.info('Product not selected or invalid.');
+      }
+    };
+
   setFormConfig() {
-    this.WorkOrdrEditID =null
+    this.WorkOrdrEditID =null,
+    this.dataToPopulate != undefined;
     this.formConfig = {
       url: "production/work_order/",
       formState: {
@@ -657,6 +717,9 @@ curdConfig: TaCurdConfig = {
                 required: false,
                 placeholder: 'Enter Completed Quantity'
               },
+              expressionProperties: {
+                'templateOptions.disabled': (model) => model?.pending_qty === 0
+              }
             },
             {
               key: 'pending_qty',
@@ -667,8 +730,8 @@ curdConfig: TaCurdConfig = {
                 required: false,
                 readonly: true,
                 placeholder: 'Pending Quantity'
-              },
-            },
+              }
+            },            
             {
               key: 'status_id',
               type: 'select',
@@ -802,22 +865,40 @@ curdConfig: TaCurdConfig = {
                           dataKey: 'product_id',
                           hideLabel: true,
                           dataLabel: 'name',
+                          placeholder: 'product',
                           options: [],
                           required: true,
                           lazy: {
-                          url: 'products/products/',
-                          lazyOneTime: true
+                            url: 'products/products/?summary=true',
+                            lazyOneTime: true
                           }
                         },
                         hooks: {
-                          onChanges: (field: any) => {
+                          onInit: (field: any) => {
+                            const parentArray = field.parent;
+                            if (!parentArray) {
+                              console.error('Parent array is undefined or not accessible');
+                              return;
+                            }
+                      
+                            const currentRowIndex = +parentArray.key;
+                      
+                            // Populate product if data exists
+                            const existingProduct = this.dataToPopulate?.bom?.[currentRowIndex]?.product;
+                            if (existingProduct) {
+                              field.formControl.setValue(existingProduct);
+                            }
+                      
+                            this.loadProductVariations(field);
+                      
+                            // Subscribe to value changes (to update sizes dynamically)
                             field.formControl.valueChanges.subscribe((data: any) => {
-                              const index = field.parent.key;
-                              if (!this.formConfig.model['bom'][index]) {
-                                console.error(`Products at index ${index} is not defined. Initializing...`);
-                                this.formConfig.model['bom'][index] = {};
+                              if (!this.formConfig.model['bom'][currentRowIndex]) {
+                                console.error(`Products at index ${currentRowIndex} is not defined. Initializing...`);
+                                this.formConfig.model['bom'][currentRowIndex] = {};
                               }
-                              this.formConfig.model['bom'][index]['product_id'] = data?.product_id;
+                              this.formConfig.model['bom'][currentRowIndex]['product_id'] = data?.product_id;
+                              this.loadProductVariations(field);
                             });
                           }
                         }
@@ -830,22 +911,68 @@ curdConfig: TaCurdConfig = {
                           dataKey: 'size_id',
                           hideLabel: true,
                           dataLabel: 'size_name',
+                          placeholder: 'size',
                           options: [],
                           required: false,
                           lazy: {
-                            lazyOneTime: true,
-                            url : 'products/sizes/'
+                            lazyOneTime: true
                           }
                         },
                         hooks: {
-                          onChanges: (field: any) => {
-                            field.formControl.valueChanges.subscribe((data: any) => {
-                              const index = field.parent.key;
-                              if (!this.formConfig.model['bom'][index]) {
-                                console.error(`Products at index ${index} is not defined. Initializing...`);
-                                this.formConfig.model['bom'][index] = {};
+                          onInit: (field: any) => {
+                            const parentArray = field.parent;
+                            if (!parentArray) {
+                              console.error('Parent array is undefined or not accessible');
+                              return;
+                            }
+                      
+                            const currentRowIndex = +parentArray.key;
+                            const billOfMaterial = this.dataToPopulate?.bom?.[currentRowIndex];
+                            
+                            // Populate existing size if available
+                            const existingSize = billOfMaterial?.size;
+                            if (existingSize?.size_id) {
+                              field.formControl.setValue(existingSize);
+                            }
+                      
+                            // Subscribe to value changes (Merged from onInit & onChanges)
+                            field.formControl.valueChanges.subscribe((selectedSize: any) => {
+                              const product = this.formConfig.model.bom[currentRowIndex]?.product;
+                              if (!product?.product_id) {
+                                console.warn(`Product missing for row ${currentRowIndex}, skipping color fetch.`);
+                                return;
                               }
-                              this.formConfig.model['bom'][index]['size_id'] = data?.size_id;
+                      
+                              const size_id = selectedSize?.size_id || null;
+                              const url = size_id
+                                ? `products/product_variations/?product_id=${product.product_id}&size_id=${size_id}`
+                                : `products/product_variations/?product_id=${product.product_id}&size_isnull=True`;
+                      
+                              // Fetch available colors based on the selected size
+                              this.http.get(url).subscribe((response: any) => {
+                                const uniqueColors = response.data.map((variation: any) => ({
+                                  label: variation.color?.color_name || '----',
+                                  value: {
+                                    color_id: variation.color?.color_id || null,
+                                    color_name: variation.color?.color_name || '----'
+                                  }
+                                })).filter((item, index, self) =>
+                                  index === self.findIndex((t) => t.value.color_id === item.value.color_id)
+                                );
+                      
+                                // Update color field options
+                                const colorField = parentArray.fieldGroup.find((f: any) => f.key === 'color');
+                                if (colorField) {
+                                  colorField.templateOptions.options = uniqueColors;
+                                }
+                              });
+                      
+                              // Update the model with selected size
+                              if (this.formConfig?.model?.bom) {
+                                this.formConfig.model.bom[currentRowIndex].size_id = selectedSize?.size_id;
+                              } else {
+                                console.error('Form config or model is not defined.');
+                              }
                             });
                           }
                         }
@@ -858,26 +985,53 @@ curdConfig: TaCurdConfig = {
                           dataKey: 'color_id',
                           hideLabel: true,
                           dataLabel: 'color_name',
+                          placeholder: 'color',
                           options: [],
                           required: false,
                           lazy: {
-                            lazyOneTime: true,
-                            url : 'products/colors/'
+                            lazyOneTime: true
                           }
                         },
                         hooks: {
-                          onChanges: (field: any) => {
-                            field.formControl.valueChanges.subscribe((data: any) => {
-                              const index = field.parent.key;
-                              if (!this.formConfig.model['bom'][index]) {
-                                console.error(`Products at index ${index} is not defined. Initializing...`);
-                                this.formConfig.model['bom'][index] = {};
+                          onInit: (field: any) => {
+                            const parentArray = field.parent;
+                            if (!parentArray) {
+                              console.error('Parent array is undefined or not accessible');
+                              return;
+                            }
+                      
+                            const currentRowIndex = +parentArray.key;
+                            const billOfMaterial = this.dataToPopulate?.bom?.[currentRowIndex];
+                      
+                            // Populate existing color if available
+                            const existingColor = billOfMaterial?.color;
+                            if (existingColor) {
+                              field.formControl.setValue(existingColor);
+                            }
+                      
+                            // Subscribe to value changes (Merged from onInit & onChanges)
+                            field.formControl.valueChanges.subscribe((selectedColor: any) => {
+                              const row = this.formConfig.model.bom[currentRowIndex];
+                              if (!row?.product?.product_id) {
+                                console.warn(`Product missing for row ${currentRowIndex}, skipping color update.`);
+                                return;
                               }
-                              this.formConfig.model['bom'][index]['color_id'] = data?.color_id || null;
+                      
+                              const { product, size, color } = row;
+                              const params = new URLSearchParams({ product_id: product.product_id });
+                      
+                              if (color?.color_id) params.append("color_id", color.color_id);
+                              else params.append("color_isnull", "True");
+                      
+                              if (size?.size_id) params.append("size_id", size.size_id);
+                              else params.append("size_isnull", "True");
+                      
+                              // Update the model with selected color
+                              row.color_id = color?.color_id || null;
                             });
                           }
                         }
-                      },
+                      }, 
                       {
                         key: 'quantity',
                         type: 'input',
