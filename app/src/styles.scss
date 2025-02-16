@@ -1194,7 +1194,7 @@ ta-form {
         left: 0;
         z-index: 99;
         .form-select{
-            height: 32px;
+            height: 36px;
             font-size: 14px;
             border-radius: 3px;
             line-height: 1;
@@ -1202,10 +1202,10 @@ ta-form {
         }
         .btn-primary{
             border-radius: 3px;
-            height: 32px;
         }
         @media(max-width:1199px){
-            bottom: -83px;
+            bottom: -85px;
+            left: -5px;
             .form-select{
                 width: auto;
             }
@@ -1278,7 +1278,9 @@ ta-form {
 .ant-pagination-jump-next {
     line-height: inherit;
 }
-
+.ant-table-footer{
+    display: none;
+}
 @media(max-width:1199px){
     .customer-title-alignment{
         flex-wrap: wrap;
@@ -1393,7 +1395,9 @@ ta-form {
             margin-bottom: 15px;
             border-radius: 5px;
             background: #ffffff;
-           
+           &:last-child{
+            margin-bottom: 0;
+           }
             td{
                 display: flex;
                 ta-table-cell-dynamic,label,ta-table-actions{
@@ -1612,6 +1616,9 @@ ta-form {
     }
 }
 @media(max-width:575px){
+    .ant-table-footer{
+        display: block;
+    }
     .topbar .dropdown .dropdown-menu {
         width:100%;
         right: 0rem;

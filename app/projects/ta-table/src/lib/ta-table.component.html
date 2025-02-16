@@ -163,7 +163,7 @@
 <ng-template #footerTemplate>
     <ng-content nz-col select="[footer]">
     </ng-content>
-    <span class="total-record-footer d-none d-sm-block"> Total Records - {{total}}</span>
+    <span class="total-record-footer "> Total Records - {{total}}</span>
     <!-- should be translated -->
 </ng-template>
 
@@ -171,7 +171,7 @@
 <ng-template #totalTemplate let-total>
     <ng-content nz-col select="[bottom-left]">
     </ng-content>
-    <span class="total-record d-block d-sm-none">Total Records - {{total}} </span>
+    <span class="total-record d-none d-sm-inline-block me-2">Total Records - {{total}} </span>
     <button nz-button nzType="default" nzShape="circle" (click)="refresh()"><i nz-icon nzType="sync"></i></button>
     <div nz-row nzGutter="8">
         <div nz-col nzXs="24" nzSm="12" nzMd="12">
