@@ -70,7 +70,7 @@ export class ProductUniqueQuantityCodesComponent {
        {
           key: 'quantity_code_name',
           type: 'text',
-          className: 'col-6 pb-3 ps-0',
+          className: 'col-md-6 col-12 p-0',
           templateOptions: {
             label: 'Quantity Code Name',
             placeholder: 'Enter Quantity Code Name',

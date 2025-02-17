@@ -69,7 +69,7 @@ export class ProductItemTypeComponent {
 	       {
           key: 'item_name',
           type: 'text',
-          className: 'col-6 pb-3 ps-0',
+          className: 'col-md-6 col-12 p-0',
           templateOptions: {
             label: 'Item Name',
             placeholder: 'Enter Item Name',

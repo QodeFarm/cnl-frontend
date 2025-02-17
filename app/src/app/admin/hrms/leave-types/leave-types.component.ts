@@ -66,7 +66,7 @@ export class LeaveTypesComponent {
             {
               key: 'leave_type_name',
               type: 'input',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 px-1 mb-3',
               templateOptions: {
                 label: 'Leave Type Name',
                 placeholder: 'Enter Leave Type Name',
@@ -76,7 +76,7 @@ export class LeaveTypesComponent {
             {
               key: 'description',
               type: 'input',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 px-1 mb-3',
               templateOptions: {
                 label: 'Description',
                 placeholder: 'Enter Description',
@@ -86,7 +86,7 @@ export class LeaveTypesComponent {
             {
               key: 'max_days_allowed',
               type: 'input',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 px-1 ',
               templateOptions: {
                 label: 'Max Days Allowed',
                 placeholder: 'Enter Max Days Allowed',

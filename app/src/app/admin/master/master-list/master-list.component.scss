@@ -1,0 +1,15 @@
+
+.custom-tabs{
+    padding-inline: 15px !important;
+    .nav-tabs{
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        overflow-y: hidden;
+        @media(max-width:1199px){
+            .nav-item .nav-link{
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+        }
+    }
+}

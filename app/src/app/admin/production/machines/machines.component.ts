@@ -70,7 +70,7 @@ export class MachinesComponent {
             {
               key: 'machine_name',
               type: 'input',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 px-1 mb-3',
               templateOptions: {
                 label: 'Machine Name',
                 placeholder: 'Enter Machine Name',
@@ -80,7 +80,7 @@ export class MachinesComponent {
             {
               key: 'status',
               type: 'select',
-              className: 'col-6 pb-3 pe-0',
+              className: 'col-md-6 col-12 px-1 mb-3',
               templateOptions: {
                 label: 'Status',
                 placeholder: 'Enter Status',
@@ -95,7 +95,7 @@ export class MachinesComponent {
             {
               key: 'description',
               type: 'textarea',
-              className: 'col-6',
+              className: 'col-md-6 col-12 px-1',
               templateOptions: {
                 label: 'Description',
                 placeholder: 'Enter Description',
