@@ -75,7 +75,7 @@ export class WarehouseLocationsComponent {
           {
           key: 'location_name',
           type: 'input',
-          className: 'col-6 pb-3 ps-0',
+          className: 'col-md-6 col-12 px-1 mb-3',
           templateOptions: {
             label: 'Location Name',
             placeholder: 'Enter Location Name',
@@ -85,7 +85,7 @@ export class WarehouseLocationsComponent {
         {
           key: 'description',
           type: 'input',
-          className: 'col-6 pb-3 ps-0',
+          className: 'col-md-6 col-12 px-1 mb-3',
           templateOptions: {
             label: 'Description',
             placeholder: 'Enter Location Description',
@@ -95,7 +95,7 @@ export class WarehouseLocationsComponent {
         {
           key: 'warehouse',
           type: 'select',
-          className: 'col-6 pb-3 ps-0',
+          className: 'col-md-6 col-12 px-1',
           templateOptions: {
             label: 'Warehouse',
             dataKey: 'warehouse_id',

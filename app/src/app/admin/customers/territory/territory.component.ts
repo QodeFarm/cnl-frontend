@@ -65,7 +65,7 @@ export class TerritoryComponent {
             {
               key: 'name',
               type: 'input',
-              className: 'col-6 ps-0',
+              className: 'col-md-6 col-12 pb-md-0 pb-3 px-1',
               templateOptions: {
                 label: 'Name',
                 placeholder: 'Enter Name',
@@ -75,7 +75,7 @@ export class TerritoryComponent {
             {
               key: 'code',
               type: 'input',
-              className: 'col-6 ps-0',
+              className: 'col-md-6 col-12 px-1',
               templateOptions: {
                 label: 'Code',
                 placeholder: 'Enter Code',

@@ -65,7 +65,7 @@ export class ProductGroupsComponent   {
 	       {
             key: 'group_name',
             type: 'text',
-            className: 'col-6 pb-3 ps-0',
+            className: 'col-md-6 col-12 px-1 pb-md-0 pb-3',
             templateOptions: {
               label: 'Group Name',
               required: true
@@ -79,7 +79,7 @@ export class ProductGroupsComponent   {
           {
             key: 'description',
             type: 'textarea',
-            className: 'col-6 pb-3 pe-0',
+            className: 'col-md-6 col-12 px-1',
             templateOptions: {
               label: 'Description',
               required: true

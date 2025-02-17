@@ -64,7 +64,7 @@ export class LocationsComponent {
             {
               key: 'location_name',
               type: 'input',
-              className: 'col-6 pe-0',
+              className: 'col-md-6 col-12 px-1 mb-md-0 mb-3',
               templateOptions: {
                 label: 'Location Name',
                 placeholder: 'Enter Location Name',
@@ -74,7 +74,7 @@ export class LocationsComponent {
             {
               key: 'address',
               type: 'textarea',
-              className: 'col-6 pe-0',
+              className: 'col-md-6 col-12 px-1',
               templateOptions: {
                 label: 'Address',
                 placeholder: 'Enter Address',

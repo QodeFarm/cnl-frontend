@@ -13,6 +13,7 @@
   <!-- Define Custom Product Checkboxes Template -->
   <ng-template #customProductTemplate let-row>
     <ng-container *ngIf="row.products && row.products.length > 0; else noProducts">
+      <div class="product-checkList">
       <div *ngFor="let product of row.products; let i = index" style="display: flex; align-items: center;">
         <input
           type="checkbox"
@@ -27,6 +28,7 @@
           {{ product.product_name }} (Qty: {{ product.quantity }})
         </label>
       </div>
+    </div>
     </ng-container>
     <ng-template #noProducts>No products available</ng-template>
   </ng-template>
@@ -34,8 +36,8 @@
   
   
   <!-- Modal Footer -->
-  <div class="modal-footer">
+  <div class="modal-footer pb-0 px-0">
     <button (click)="pullSelectedOrders()" class="btn btn-primary">Pull Selected Orders</button>
-    <button type="button" class="btn btn-primary" (click)="closeModal()">Close</button>
+    <button type="button" class="btn btn-danger" (click)="closeModal()">Close</button>
   </div>
 </div>

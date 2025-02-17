@@ -84,7 +84,7 @@ export class EmployeeSalaryComponentsComponent {
           {
             key: 'component',
             type: 'select',
-            className: 'col-6 pb-3 ps-0',
+            className: 'col-md-6 col-12 px-1 mb-3',
             templateOptions: {
               label: 'Component',
               dataKey: 'component_id',
@@ -105,7 +105,7 @@ export class EmployeeSalaryComponentsComponent {
           {
             key: 'component_amount',
             type: 'input',
-            className: 'col-6 pb-3 ps-0',
+            className: 'col-md-6 col-12 px-1 mb-3',
             templateOptions: {
               label: 'Component Amount',
               placeholder: 'Enter Component Amount',
@@ -115,7 +115,7 @@ export class EmployeeSalaryComponentsComponent {
           {
             key: 'salary',
             type: 'select',
-            className: 'col-6 pb-3 ps-0',
+            className: 'col-md-6 col-12 px-1',
             templateOptions: {
               label: 'Salary',
               dataKey: 'salary_id',

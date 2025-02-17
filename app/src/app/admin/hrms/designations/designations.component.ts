@@ -62,7 +62,7 @@ export class DesignationsComponent {
             {
               key: 'designation_name',
               type: 'input',
-              className: 'col-6 ps-0',
+              className: 'col-md-6 col-12 mb-3 mb-md-0 px-1',
               templateOptions: {
                 label: 'Designation Name',
                 placeholder: 'Enter Designation Name',
@@ -72,7 +72,7 @@ export class DesignationsComponent {
             {
               key: 'responsibilities',
               type: 'input',
-              className: 'col-6 ps-0',
+              className: 'col-md-6 col-12  px-1',
               templateOptions: {
                 label: 'Responsibilities',
                 placeholder: 'Enter Responsibilities',

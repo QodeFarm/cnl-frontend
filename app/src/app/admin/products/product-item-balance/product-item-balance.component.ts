@@ -89,7 +89,7 @@ export class ProductItemBalanceComponent {
           {
             key: 'product',
             type: 'select',
-            className: 'col-6 pb-3 ps-0',
+            className: 'col-md-6 col-12 px-1 pb-3',
             templateOptions: {
               label: 'Products',
               dataKey: 'product_id',
@@ -110,7 +110,7 @@ export class ProductItemBalanceComponent {
           {
             key: 'warehouse_location',
             type: 'select',
-            className: 'col-6 pb-3 ps-0',
+            className: 'col-md-6 col-12 px-1 pb-3',
             templateOptions: {
               label: 'Warehouse Location',
               placeholder: 'Enter Location',
@@ -136,7 +136,7 @@ export class ProductItemBalanceComponent {
           {
             key: 'quantity',
             type: 'input',
-            className: 'col-6 pb-3 ps-0',
+            className: 'col-md-6 col-12 px-1',
             templateOptions: {
               label: 'Quantity',
               type: 'number',
