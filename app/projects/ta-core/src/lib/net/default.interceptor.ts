@@ -92,6 +92,25 @@ export class DefaultInterceptor implements HttpInterceptor {
     if (ev.status == 400) {
       const responseBody = ev.error;  // Assuming response is in `ev.error` (adjust as necessary)
 
+      // Case 0: If the error is due to form validation at model level (viewsets - not API View), show the validation errors
+      if (ev.status == 400 && ev.error?.message?.includes('Form validation failed')) {
+        if (ev.error.errors) {
+          let errorMessages: string[] = [];
+      
+          Object.keys(responseBody.errors).forEach((key) => {
+            // Remove underscores and make the key bold
+            const formattedKey = key.replace(/_/g, ' ').toUpperCase();
+            errorMessages.push(`<strong>${formattedKey}:</strong> ${ev.error.errors[key].join(', ')}`);
+          });
+      
+          this.showError(errorMessages.join('<br>'));
+          return
+        } else {
+          this.showError('Form validation failed, but no specific errors were provided.');
+          return
+        }
+      }
+      
       // Case 1: If the message is available, show it directly
       if (responseBody && responseBody.message && responseBody.data.length === 0) {
         // If only message is present (no detailed error data)
@@ -354,9 +373,9 @@ export class DefaultInterceptor implements HttpInterceptor {
 
   showError(message: string): void {
     const modalRef = this.modelSvc.create({
-      nzTitle: 'Error :',
+      // nzTitle: 'Error :',
       nzContent: `<p>${message}</p>`, // Display the error message
-      nzClosable: true, // Disable the close button
+      nzClosable: false, // Disable the close button
       nzFooter: [
         {
           label: 'OK',
@@ -365,6 +384,7 @@ export class DefaultInterceptor implements HttpInterceptor {
         },
       ],
       nzCentered: true, // Center the modal
+      nzWrapClassName: 'error-modal', // Custom class for styling
     });
   };
 
