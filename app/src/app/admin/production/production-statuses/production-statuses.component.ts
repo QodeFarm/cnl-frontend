@@ -60,7 +60,7 @@ export class ProductionStatusesComponent {
             {
               key: 'status_name',
               type: 'input',
-              className: 'col-6',
+              className: 'col-md-6 p-0 col-12',
               templateOptions: {
                 label: 'Status Name',
                 placeholder: 'Enter Status Name',

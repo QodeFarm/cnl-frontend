@@ -1194,7 +1194,7 @@ ta-form {
         left: 0;
         z-index: 99;
         .form-select{
-            height: 32px;
+            height: 36px;
             font-size: 14px;
             border-radius: 3px;
             line-height: 1;
@@ -1202,10 +1202,10 @@ ta-form {
         }
         .btn-primary{
             border-radius: 3px;
-            height: 32px;
         }
         @media(max-width:1199px){
-            bottom: -83px;
+            bottom: -85px;
+            left: -5px;
             .form-select{
                 width: auto;
             }
@@ -1278,12 +1278,19 @@ ta-form {
 .ant-pagination-jump-next {
     line-height: inherit;
 }
-.select-field,.quick-period-select{
-    width: 185px;
+.ant-table-footer{
+    display: none;
 }
 @media(max-width:1199px){
     .customer-title-alignment{
         flex-wrap: wrap;
+        .ta-cell.filter-alignments{
+            .filter-group{
+                .ant-picker,.ant-select{
+                    width: 100% !important;
+                }
+            }
+        }
     }
     .ant-table-content {
         table{
@@ -1296,9 +1303,7 @@ ta-form {
     }
 }
 @media(max-width:1024px){
-    .select-field,.quick-period-select{
-        width: 165px;
-    }
+
     .custom-modal{
         .modal-dialog {
             max-width:80%;
@@ -1382,9 +1387,7 @@ ta-form {
     }
 }
 @media(max-width:960px){
-    .select-field,.quick-period-select{
-        width: 150px;
-    }
+
     .ant-table-content {
       table{
         tr{
@@ -1392,7 +1395,9 @@ ta-form {
             margin-bottom: 15px;
             border-radius: 5px;
             background: #ffffff;
-           
+           &:last-child{
+            margin-bottom: 0;
+           }
             td{
                 display: flex;
                 ta-table-cell-dynamic,label,ta-table-actions{
@@ -1430,9 +1435,6 @@ ta-form {
 @media(max-width:767px){
     .custom-modal .modal-dialog {
         max-width: 98%;
-    }
-    .select-field,.quick-period-select{
-        width: 120px;
     }
 
     .sidebar-toggled{
@@ -1614,6 +1616,28 @@ ta-form {
     }
 }
 @media(max-width:575px){
+    .ant-table-footer{
+        display: block;
+    }
+    .topbar .dropdown .dropdown-menu {
+        width:100%;
+        right: 0rem;
+        
+    }
+    .page-component-header{
+        button{
+            flex: 1;
+            font-size: 0.9rem !important;
+            white-space: nowrap;
+            &:first-child{
+                text-align: left;
+                .custom-heading{
+                    font-size: 1.2rem;
+                }
+            }
+        }     
+    }
+
     .filter-alignments .ta-row{
         flex-wrap: wrap;
     }
@@ -1629,8 +1653,37 @@ ta-form {
     .customer-title-alignment{
         flex-wrap: wrap;
     }
-    ta-table .ant-input-group-wrapper {
-        width: auto;
+  
+    .ant-tabs-content-holder{
+        .btn{
+            font-size: 16px !important;
+        }
+    }
+    .customer-title-alignment{
+        .ta-cell{
+            .filter-group.col{
+                flex: 0 0 50%;
+                max-width: 50%;
+                padding-left: 5px !important;
+                margin-left: 0 !important;
+                .ant-select{
+                    width: 100%;
+                }
+                &:nth-child(odd){
+                    margin-left: 0 !important;
+                    padding-left: 0px !important;
+                }
+            }
+            .ant-select {
+                width: 100%;
+            }
+            &.ms-2{
+                margin-left: 0 !important;
+               .ant-input-group-wrapper {
+                    width: 100%;
+                }
+            }
+        }
     }
 }
 @media(max-width:425px){
@@ -1675,16 +1728,6 @@ ta-form {
     color: #000000;
 }
 
-// .error-modal .ant-modal-footer .ant-btn {
-//     background-color: #4b2df6;
-//     color: #ffffff;
-//     border: 1px solid #4b2df6;
-//     border-radius: 5px;
-//     padding: 5px 50px;
-//     font-weight: bold;
-//     transition: background-color 0.3s ease;
-// }
-
 .error-modal .ant-modal-footer .ant-btn {
     background-color: #007BFF;  /* Brighter Blue */
     color: #ffffff;
@@ -1699,7 +1742,6 @@ ta-form {
     background-color: #0056D2;  /* Darker blue on hover */
     border: 1px solid #0056D2;
 }
-
 
 .error-modal .ant-modal {
     width: auto !important;

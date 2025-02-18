@@ -87,7 +87,7 @@ export class UserGroupMembersComponent {
             {
               key: 'group',
               type: 'select',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 px-1 pb-3 pb-md-0',
               templateOptions: {
                 label: 'Groups',
                 dataKey: 'group_id',
@@ -108,7 +108,7 @@ export class UserGroupMembersComponent {
 			     {
               key: 'employee',
               type: 'select',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 px-1',
               templateOptions: {
                 label: 'Employees',
                 dataKey: 'employee_id',

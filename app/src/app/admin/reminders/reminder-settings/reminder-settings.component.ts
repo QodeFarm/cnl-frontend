@@ -97,7 +97,7 @@ export class ReminderSettingsComponent {
             {
               key: 'user',
               type: 'select',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 px-1 pb-3',
               templateOptions: {
                 label: 'User',
                 dataKey: 'user_id',
@@ -118,7 +118,7 @@ export class ReminderSettingsComponent {
             {
               key: 'notification_frequency',
               type: 'select',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 px-1 pb-3 pb-md-0',
               templateOptions: {
                 label: 'Notification Frequency',
                 dataKey: 'frequency_id',
@@ -139,7 +139,7 @@ export class ReminderSettingsComponent {
             {
               key: 'notification_method',
               type: 'select',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 px-1',
               templateOptions: {
                 label: 'Notification Method',
                 dataKey: 'method_id',

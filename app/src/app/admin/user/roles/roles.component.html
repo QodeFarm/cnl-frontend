@@ -17,13 +17,13 @@
             </div>
             <div class="modal-body">
                 <!-- Modal body start -->
-                <div class="container mt-2">
+                <div class="container-fluid mt-2 p-0">
                     <h2>{{ selectedRow?.role_name}}</h2>
-                    <div style=" height: 390px; overflow: scroll;" class="row m-0">
-                        <div *ngFor="let module of moduleList"  class="col-md-3 col-sm-4 col-6 p-1">
+                    <div style="height: calc(100vh - 220px); overflow-y: auto; overflow-x: hidden;" class="row m-0">
+                        <div *ngFor="let module of moduleList"  class="col-lg-3 col-md-4 col-sm-6 col-12 p-1">
                             <div class="border p-3 h-100">
                                 <div>
-                                    <input type="checkbox" [(ngModel)]="module.selected" (change)="toggleModule(module, module.selected)"> {{module.module_name}}
+                                    <input type="checkbox" [(ngModel)]="module.selected" (change)="toggleModule(module, module.selected)"><span style="font-weight: bold;" class="ms-1">{{module.module_name}}</span>
                                 </div>
                                 <div style="margin-left: 20px;" *ngFor="let section of module.module_sections">
                                     <div>
