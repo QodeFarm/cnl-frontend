@@ -1,9 +1,11 @@
 import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { ProductsListComponent } from './products-list/products-list.component';
+import { TaFormComponent } from '@ta/ta-form';
 
 
 @Component({
@@ -20,16 +22,15 @@ export class ProductsComponent implements OnInit {
   formConfig: TaFormConfig = {};
   dialogMessage: string = '';
   @ViewChild(ProductsListComponent) ProductsListComponent!: ProductsListComponent;
+  @ViewChild(TaFormComponent) taFormComponent!: TaFormComponent;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private notification: NzNotificationService) {}
 
   ngOnInit() {
     this.showProductsList = false;
     this.showForm = true;
     this.ProductEditID = null;
-    // Set form config
     this.setFormConfig();
-    // this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[8].hide = true;
   }
 
   hide() {
@@ -80,15 +81,15 @@ export class ProductsComponent implements OnInit {
     this.http.post('products/products/', createData)
       .subscribe({
         next: (response) => {
-          console.log('Record created successfully:', response);
-          this.ngOnInit();  // Optionally reset the form after successful submission
+          this.notification.success('Record created successfully', '');
+          this.ngOnInit()
+          this.taFormComponent.formlyOptions.resetModel([]);
         },
         error: (error) => {
           console.error('Error creating record:', error);
           alert('An error occurred while creating the record.');
         }
       });
-      this.ngOnInit();
   };
 
   updateProducts() {
@@ -102,46 +103,54 @@ export class ProductsComponent implements OnInit {
     // PUT request to update Sale Return Order
     this.http.put(`products/products/${ProductEditID}/`, updateData).subscribe(
       (response) => {
-        console.log('Sale Credit Notes Order updated successfully', response);
-        this.ngOnInit();
+        this.notification.success('Record updated successfully', '');
+        this.ngOnInit()
+        this.taFormComponent.formlyOptions.resetModel([]);
       },
       (error) => {
         console.error('Error updating Sale Return Order:', error);
       }
     );
-  }
+  } 
 
   // Method to calculate and verify the balance
   verifyBalance(): any {
     const balance = parseInt(this.formConfig.model.products.balance, 10);
-    let totalItemBalanceQuantity = 0;
-    let totalVariationQuantity = 0;
   
     // Helper function to calculate total quantity
-    const calculateTotalQuantity = (items) => {
-      return items ? items.reduce((sum, item) => sum + (parseInt(item.quantity, 10) || 0), 0) : 0;
-    };
+    const calculateTotalQuantity = (items) => 
+      items?.reduce((sum, item) => sum + (parseInt(item.quantity, 10) || 0), 0) || 0;
   
-    // Calculate total quantities
-    totalItemBalanceQuantity = calculateTotalQuantity(this.formConfig.model.product_item_balance);
-    totalVariationQuantity = calculateTotalQuantity(this.formConfig.model.product_variations);
+    // Filter out empty/null variations
+    const productVariations = (this.formConfig.model.product_variations ?? []).filter(
+      (obj) => obj && Object.keys(obj).length
+    );
   
-    // Check if the item balance matches
+    // Update model with cleaned variations
+    this.formConfig.model.product_variations = productVariations;
+  
+    const totalItemBalanceQuantity = calculateTotalQuantity(this.formConfig.model.product_item_balance);
+    const totalVariationQuantity = calculateTotalQuantity(productVariations);
+  
+    // Validate variations match balance
+    if (productVariations.length && totalVariationQuantity !== balance) {
+      return this.showDialog(
+        `<b>Variations !</b><br>
+         Your sum of quantities are <b>${totalVariationQuantity}</b> not matching with overall balance <b>${balance}.</b>`
+      );
+    }
+  
+    // Validate item balance matches
     if (totalItemBalanceQuantity !== balance) {
-      return this.showDialog(`<b>Product Balance Mismatch !</b>
-        <br>Sum of quantities are not equal to total balance: ${balance}.`);
+      return this.showDialog(
+        `<b>Warehouse Locations!</b><br>
+         Your sum of quantities are <b>${totalItemBalanceQuantity}</b> not matching with overall balance <b>${balance}.</b>`
+      );
     }
   
-    // Check if variations exist and the total variations match the balance
-    if (this.formConfig.model.product_variations?.length && totalVariationQuantity !== balance) {
-      return this.showDialog(`<b>Product Variations Mismatch !</b>
-        <br>Please ensure the total quantity of variations equals the balance: ${balance}.`);
-    }
-  
-    return true;  // Everything matches, continue with your logic
+    return true; // Everything matches
   }
-  ;
-
+  
   showDialog(message: string): void {
     this.dialogMessage = message;  // Set the dynamic message
     const dialog = document.getElementById('customDialog');
@@ -159,19 +168,16 @@ export class ProductsComponent implements OnInit {
     }
   };
 
-  // Example for how the form submission might trigger the update
   onSubmit() {
     // Proceed only if verifyBalance() returns true
     if (this.verifyBalance()) {
       if (this.formConfig.submit.label === 'Update') {
         this.updateProducts();
-      }
-      if (this.formConfig.submit.label === 'Submit') {
+      } else if (this.formConfig.submit.label === 'Submit') {
         this.createRecord();
       }
     }
   };
-  
 
   setFormConfig() {
     this.ProductEditID =null
@@ -479,7 +485,7 @@ export class ProductsComponent implements OnInit {
                               label: 'SKU',
                               hideLabel: true,
                               placeholder: 'Enter SKU',
-                              required: true
+                              required: false
                             }
                           },
                           {
@@ -489,7 +495,7 @@ export class ProductsComponent implements OnInit {
                               label: 'Price',
                               hideLabel: true,
                               placeholder: 'Enter Price',
-                              required:true
+                              required:false
                             }
                           },
                           {
@@ -499,7 +505,7 @@ export class ProductsComponent implements OnInit {
                               label: 'Quantity',
                               hideLabel: true,
                               placeholder: 'Enter Quantity',
-                              required:true
+                              required:false
                             }
                           }
                           ]
