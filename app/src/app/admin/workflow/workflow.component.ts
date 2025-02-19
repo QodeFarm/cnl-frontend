@@ -82,13 +82,13 @@ export class WorkflowComponent {
       fields: [
         //----------------------------------------- W O R K F L O W -----------------------------------//
         {
-          fieldGroupClassName: "ant-row custom-form-block",
+          fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
           key: 'workflow',
           fieldGroup: [
             {
               key: 'name',
               type: 'input',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Workflow Name',
                 placeholder: 'Enter Workflow Name',
@@ -98,7 +98,7 @@ export class WorkflowComponent {
             {
               key: 'is_active', // New key for the checkbox
               type: 'checkbox',
-              className: 'col-3', // Adjust className as needed
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Is Active',
                 // Optional properties can be added here
@@ -110,7 +110,7 @@ export class WorkflowComponent {
         {
           key: 'workflow_stages',
           type: 'table',
-          className: 'custom-form-list',
+          className: 'custom-form-list no-ant-card',
           templateOptions: {
             title: 'Workflow Stages',
             addText: 'Add Stage',

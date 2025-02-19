@@ -101,12 +101,12 @@ export class WarehousesComponent {
       model:{},	  
       fields: [
         {
-          fieldGroupClassName: "ant-row custom-form-block",
+          fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
           fieldGroup: [	  
             {
               key: 'name',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Name',
                 placeholder: 'Enter Name',
@@ -116,7 +116,7 @@ export class WarehousesComponent {
             {
               key: 'code',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Code',
                 placeholder: 'Enter Code',
@@ -126,7 +126,7 @@ export class WarehousesComponent {
             {
               key: 'phone',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Phone',
                 placeholder: 'Enter Phone Number',
@@ -136,7 +136,7 @@ export class WarehousesComponent {
             {
               key: 'email',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Email',
                 placeholder: 'Enter Email',
@@ -146,7 +146,7 @@ export class WarehousesComponent {
             {
               key: 'address',
               type: 'textarea',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Address',
                 placeholder: 'Enter Address',
@@ -156,7 +156,7 @@ export class WarehousesComponent {
             {
               key: 'city',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'City',
                 dataKey: 'city_id',
@@ -177,7 +177,7 @@ export class WarehousesComponent {
             {
               key: 'state',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'State',
                 dataKey: 'state_id',
@@ -198,7 +198,7 @@ export class WarehousesComponent {
             {
               key: 'country',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Country',
                 dataKey: 'country_id',
@@ -219,7 +219,7 @@ export class WarehousesComponent {
             {
               key: 'pin_code',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Pin Code',
                 placeholder: 'Enter Pin Code',
@@ -229,7 +229,7 @@ export class WarehousesComponent {
             {
               key: 'item_type',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Item Type',
                 dataKey: 'item_type_id',
@@ -261,7 +261,7 @@ export class WarehousesComponent {
             {
               key: 'longitude',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Longitude',
                 required: false,
@@ -275,7 +275,7 @@ export class WarehousesComponent {
             {
               key: 'latitude',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Latitude',
                 required: false,

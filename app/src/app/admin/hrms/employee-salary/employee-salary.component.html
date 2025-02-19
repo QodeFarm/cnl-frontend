@@ -1,12 +1,12 @@
-<div class="container-fluid pt-3">
+<div class="container-fluid p-3">
     <div class="employee-salary-banner">
-        <div class="col-12 px-0" style="display: flex; justify-content: space-between;align-items: center;">
+        <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
             <button type="button" class="btn pl-0" >
-                <span *ngIf="EmployeeSalaryEditID" class="custom-heading">Update Employee Salary</span>
-                <span *ngIf="!EmployeeSalaryEditID" class="custom-heading">Create Employee Salary</span>
+                <span *ngIf="EmployeeSalaryEditID" class="custom-heading">Update Salary</span>
+                <span *ngIf="!EmployeeSalaryEditID" class="custom-heading">Create Salary</span>
             </button>
             <button (click)="showEmployeeSalaryListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                Employee Salary List
+                Salary List
             </button>
         </div>
     </div>

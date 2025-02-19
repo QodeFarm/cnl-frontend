@@ -119,12 +119,12 @@ export class EmployeesComponent  implements OnInit {
       fields: [
         {
           key:"employee",
-          fieldGroupClassName: "ant-row custom-form-block",
+          fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
           fieldGroup: [
             {
               key: 'first_name',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'First Name',
                 placeholder: 'Enter First Name',
@@ -134,7 +134,7 @@ export class EmployeesComponent  implements OnInit {
             {
               key: 'last_name',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Last Name',
                 placeholder: 'Enter Last Name',
@@ -144,7 +144,7 @@ export class EmployeesComponent  implements OnInit {
             {
               key: 'phone',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Phone',
                 placeholder: 'Enter with country code',
@@ -154,7 +154,7 @@ export class EmployeesComponent  implements OnInit {
             {
               key: 'gender',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Gender',
                 required: true,
@@ -167,7 +167,7 @@ export class EmployeesComponent  implements OnInit {
             {
               key: 'job_type',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Job Type',
                 dataKey: 'job_type_id',
@@ -194,7 +194,7 @@ export class EmployeesComponent  implements OnInit {
             {
               key: 'designation',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Designation',
                 dataKey: 'designation_id',
@@ -221,7 +221,7 @@ export class EmployeesComponent  implements OnInit {
             {
               key: 'job_code',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Job Code',
                 dataKey: 'job_code_id',
@@ -248,7 +248,7 @@ export class EmployeesComponent  implements OnInit {
             {
               key: 'department',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Department',
                 dataKey: 'department_id',
@@ -275,7 +275,7 @@ export class EmployeesComponent  implements OnInit {
             {
               key: 'shift',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Shift',
                 dataKey: 'shift_id',
@@ -302,7 +302,7 @@ export class EmployeesComponent  implements OnInit {
             {
               key: 'manager',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Manager',
                 dataKey: 'employee_id',
@@ -329,7 +329,7 @@ export class EmployeesComponent  implements OnInit {
             {
               key: 'hire_date',
               type: 'input',  // Use 'input' to allow custom types like 'datetime-local'
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Hire Date',
                 type: 'date',  
@@ -340,7 +340,7 @@ export class EmployeesComponent  implements OnInit {
             {
               key: 'email',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Email',
                 placeholder: 'Enter Email',
@@ -350,7 +350,7 @@ export class EmployeesComponent  implements OnInit {
             {
               key: 'address',
               type: 'textarea',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Address',
                 placeholder: 'Enter Address',
@@ -360,7 +360,7 @@ export class EmployeesComponent  implements OnInit {
             {
               key: 'date_of_birth',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Date Of Birth',
                 type: 'date',
@@ -371,7 +371,7 @@ export class EmployeesComponent  implements OnInit {
             {
               key: 'nationality',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Nationality',
                 placeholder: 'Enter Nationality',
@@ -381,7 +381,7 @@ export class EmployeesComponent  implements OnInit {
             {
               key: 'emergency_contact',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Emergency Contact',
                 placeholder: 'Enter Emergency Contact',
@@ -391,7 +391,7 @@ export class EmployeesComponent  implements OnInit {
             {
               key: 'emergency_contact_relationship',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Emergency Contact Relationship',
                 placeholder: 'Enter Name',

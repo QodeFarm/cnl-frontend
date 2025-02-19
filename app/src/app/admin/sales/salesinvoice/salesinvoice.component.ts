@@ -628,11 +628,11 @@ export class SalesinvoiceComponent {
       },
       fields: [
         {
-          fieldGroupClassName: "ant-row custom-form-block row",
+          fieldGroupClassName: "ant-row custom-form-block row ms-0",
           key: 'sale_invoice_order',
           fieldGroup: [
             {
-              className: 'col-md-9 col-sm-8 col-12 p-0',
+              className: 'col-lg-9 col-md-8 col-12 p-0',
               fieldGroupClassName: "ant-row mx-0 row align-items-end mt-2",
               fieldGroup: [
                 {
@@ -730,7 +730,7 @@ export class SalesinvoiceComponent {
                   key: 'ref_date',
                   type: 'date',
                   defaultValue: this.nowDate(),
-                  className: 'col-4',
+                  className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     type: 'date',
                     label: 'Ref date',
@@ -743,7 +743,7 @@ export class SalesinvoiceComponent {
                   key: 'due_date',
                   type: 'date',
                   defaultValue: this.nowDate(),
-                  className: 'col-4',
+                  className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     type: 'date',
                     label: 'Due Date',
@@ -754,7 +754,7 @@ export class SalesinvoiceComponent {
                 {
                   key: 'ref_no',
                   type: 'input',
-                  className: 'col-4',
+                  className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     type: 'input',
                     label: 'Ref No',
@@ -772,7 +772,7 @@ export class SalesinvoiceComponent {
                 {
                   key: 'tax',
                   type: 'select',
-                  className: 'col-4',
+                  className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'Tax',
                     required: true,
@@ -792,7 +792,7 @@ export class SalesinvoiceComponent {
                 {
                   key: 'remarks',
                   type: 'textarea',
-                  className: 'col-4',
+                  className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'Remarks',
                     // required: true,
@@ -809,7 +809,7 @@ export class SalesinvoiceComponent {
               ]
             },
             {
-              className: 'col-md-3 col-sm-4 col-12 p-0 inline-form-fields',
+              className: 'col-lg-3 col-md-4 col-12 p-md-0 inline-form-fields',
               fieldGroupClassName: "ant-row row mx-0 mt-2",
               fieldGroup: [
                 {
@@ -1775,7 +1775,7 @@ export class SalesinvoiceComponent {
           type: 'tabs',
           fieldGroup: [
             {
-              className: 'col-12 px-0 pt-3',
+              className: 'col-12 p-0',
               props: {
                 label: 'Billing Details'
               },
@@ -1784,7 +1784,7 @@ export class SalesinvoiceComponent {
                   fieldGroupClassName: "",
                   fieldGroup: [
                     {
-                      className: 'col-12 mb-3 custom-form-card-block w-100',
+                      className: 'col-12 p-0 custom-form-card-block w-100',
                       fieldGroup: [
                         // {
                         //   template: '<div class="custom-form-card-title">  </div>',
@@ -2062,7 +2062,7 @@ export class SalesinvoiceComponent {
               ]
             },
             {
-              className: 'col-12 custom-form-card-block px-0 pt-3',
+              className: 'col-12 custom-form-card-block p-0',
               props: {
                 label: 'Shipping Details'
               },
@@ -2247,7 +2247,7 @@ export class SalesinvoiceComponent {
               ]
             },
             {
-              className: 'col-12 px-0 pt-3',
+              className: 'col-12 p-0',
               props: {
                 label: 'Order Attachments'
               },
@@ -2285,7 +2285,7 @@ export class SalesinvoiceComponent {
               ]
             },
             {
-              className: 'col-12 custom-form-card-block px-0 pt-3',
+              className: 'col-12 custom-form-card-block p-0',
               props: {
                 label: 'Customer Details'
               },
@@ -2311,7 +2311,7 @@ export class SalesinvoiceComponent {
                     {
                       key: 'billing_address',
                       type: 'textarea',
-                      className: 'col-4',
+                      className: 'col-md-4 col-sm-6 col-12',
                       templateOptions: {
                         label: 'Billing address',
                         placeholder: 'Enter Billing address'
@@ -2320,7 +2320,7 @@ export class SalesinvoiceComponent {
                     {
                       key: 'shipping_address',
                       type: 'textarea',
-                      className: 'col-4',
+                      className: 'col-md-4 col-sm-6 col-12',
                       templateOptions: {
                         label: 'Shipping address',
                         placeholder: 'Enter Shipping address'

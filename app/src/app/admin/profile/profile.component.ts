@@ -96,17 +96,33 @@ export class ProfileComponent {
       }
     },
     fields: [
+
       {
-        fieldGroupClassName: 'ant-row custom-form-block',
+        fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
+        className: "p-0",
         fieldGroup: [
           {
-            className: 'col-9 p-0',
+            className: 'col-md-9 col-12 col-sm-8 p-0',
             fieldGroupClassName: "ant-row",
+
             fieldGroup: [
+              {
+                key: 'profile_picture_url',
+                type: 'file',
+                className: 'ta-cell col-12 d-sm-none d-block',
+                props: {
+                  displayStyle: 'avatar',
+                  storeFolder: "profile",
+                  label: 'Profile Pic',
+                  multiple: false,
+                  placeholder: 'Enter Profile Pic',
+                  required: true,
+                }
+              },
               {
                 key: 'first_name',
                 type: 'text',
-                className: 'col-6',
+                className: 'col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'First Name',
                   required: true
@@ -120,7 +136,7 @@ export class ProfileComponent {
               {
                 key: 'last_name',
                 type: 'text',
-                className: 'col-6',
+                className: 'col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Last Name',
                   required: true
@@ -129,7 +145,7 @@ export class ProfileComponent {
               {
                 key: 'email',
                 type: 'text',
-                className: 'col-6',
+                className: 'col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'User Email',
                   dataKey: 'user',
@@ -145,7 +161,7 @@ export class ProfileComponent {
               {
                 key: 'mobile',
                 type: 'text',
-                className: 'col-6',
+                className: 'col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Mobile',
                   required: true
@@ -154,7 +170,7 @@ export class ProfileComponent {
               {
                 key: 'role',
                 type: 'select',
-                className: 'col-6',
+                className: 'col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'User Role',
                   dataKey: 'role_name',
@@ -180,7 +196,7 @@ export class ProfileComponent {
               {
                 key: 'gender',
                 type: 'select',
-                className: 'col-6',
+                className: 'col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Gender',
                   required: true,
@@ -198,7 +214,7 @@ export class ProfileComponent {
               {
                 key: 'date_of_birth',
                 type: 'date',
-                className: 'col-6',
+                className: 'col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Date Of Birth',
                   placeholder: 'Enter Birth Date',
@@ -208,7 +224,7 @@ export class ProfileComponent {
               {
                 key: 'status',
                 type: 'select',
-                className: 'col-6',
+                className: 'col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Status',
                   // bindId: true,
@@ -224,13 +240,15 @@ export class ProfileComponent {
               },
             ]
           },
+
+          // Right side for the picture and additional fields
           {
-            className: 'col-3 p-0',
+            className: 'col-md-3 col-sm-4 col-12 p-0',
             fieldGroup: [
               {
                 key: 'profile_picture_url',
                 type: 'file',
-                className: 'col-6',
+                className: 'ta-cell col-12 d-sm-block d-none',
                 props: {
                   displayStyle: 'avatar',
                   storeFolder: "profile",
@@ -243,8 +261,9 @@ export class ProfileComponent {
             ]
           }
         ]
-      }
+      },
     ]
+
   };
 
 

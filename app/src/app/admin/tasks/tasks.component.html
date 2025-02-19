@@ -1,6 +1,6 @@
-<div class="container-fluid pt-3">
+<div class="container-fluid p-3">
     <div class="tasks-banner">
-        <div class="col-12 px-0" style="display: flex; justify-content: space-between;align-items: center;">
+        <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
             <button (click)="TasksEditID = null" type="button" class="btn pl-0" style="color: black;">
                 <span *ngIf="TasksEditID" class="custom-heading">Update Tasks</span>
                 <span *ngIf="!TasksEditID" class="custom-heading">Create Tasks</span>

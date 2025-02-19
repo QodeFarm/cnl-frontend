@@ -1,11 +1,11 @@
-<div class="container-fluid pt-3">
-    <div class="sale-returns-banner">
-      <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;">
+<div class="container-fluid p-3">
+    <div class="sale-returns-banner page-component-header">
+      <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
         <button type="button" class="btn pl-0">
           <span *ngIf="SaleReturnOrderEditID" class="custom-heading">Update Sale Returns</span>
           <span *ngIf="!SaleReturnOrderEditID" class="custom-heading">Create Sale Returns</span>
         </button>
-        <div style="display: flex; gap: 10px;">
+        <div style="display: flex; gap: 10px; align-items: center;justify-content: end;flex-wrap: wrap;">
           <!-- New Copy Button -->
           <button (click)="openCopyModal()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#copyModal">
             Copy

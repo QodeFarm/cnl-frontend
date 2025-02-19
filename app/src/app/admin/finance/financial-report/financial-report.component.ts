@@ -79,12 +79,12 @@ export class FinancialReportComponent {
       model:{},	  
       fields: [
         {
-          fieldGroupClassName: "ant-row custom-form-block",
+          fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
           fieldGroup: [	  
             {
               key: 'report_name',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Report Name',
                 placeholder: 'Enter Report Name',
@@ -94,7 +94,7 @@ export class FinancialReportComponent {
             {
               key: 'report_type',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Report Type',
                 placeholder: 'Select Report Type',
@@ -107,21 +107,39 @@ export class FinancialReportComponent {
                 ]
               }
             },
+            // {
+            //   className: 'col-3 custom-form-card-block w-100',
+            //   fieldGroup: [
+            //     {
+            //       template: '<div class="custom-form-card-title">File Path</div>',
+            //       fieldGroupClassName: "ant-row",
+            //     },
+            //     {
+            //       key: 'file_path',
+            //       type: 'file',
+            //       className: 'ta-cell col-12 custom-file-attachement',
+            //       props: {
+            //         "displayStyle": "files",
+            //         "multiple": false
+            //       }
+            //     }
+            //   ]
+            // }
             {
-              className: 'col-3 custom-form-card-block w-100',
+              className: 'col-12 custom-form-card-block w-100 p-0',
               fieldGroup: [
-                {
-                  template: '<div class="custom-form-card-title">File Path</div>',
-                  fieldGroupClassName: "ant-row",
-                },
+                // {
+                //   template: '<div class="custom-form-card-title"> Order Attachments </div>',
+                //   fieldGroupClassName: "ant-row",
+                // },
                 {
                   key: 'file_path',
                   type: 'file',
-                  className: 'ta-cell col-12 custom-file-attachement',
+                  className: 'ta-cell col-12 col-md-6 custom-file-attachement',
                   props: {
                     "displayStyle": "files",
                     "multiple": false
-                  }
+                  },
                 }
               ]
             }

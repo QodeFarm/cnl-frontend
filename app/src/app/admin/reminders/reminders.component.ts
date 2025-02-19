@@ -87,13 +87,13 @@ export class RemindersComponent {
       },
       fields: [
         {
-          fieldGroupClassName: "ant-row custom-form-block",
+          fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
           key: 'reminders',
           fieldGroup: [
             {
               key: 'reminder_type',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Reminder Types',
                 dataKey: 'reminder_type_id',
@@ -120,7 +120,7 @@ export class RemindersComponent {
             {
               key: 'subject',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Subject',
                 placeholder: 'Enter Subject',
@@ -130,7 +130,7 @@ export class RemindersComponent {
             {
               key: 'description',
               type: 'textarea',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Description',
                 placeholder: 'Enter Description',
@@ -140,7 +140,7 @@ export class RemindersComponent {
             {
               key: 'reminder_date',
               type: 'input',  // Use 'input' to allow custom types like 'datetime-local'
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Reminder Date',
                 type: 'datetime-local',  // Use datetime-local for both date and time input
@@ -151,7 +151,7 @@ export class RemindersComponent {
             {
               key: 'is_recurring',
               type: 'checkbox',
-              className: 'col-3 d-flex align-items-center',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Is Recurring',
                 required: false,
@@ -160,7 +160,7 @@ export class RemindersComponent {
             {
               key: 'recurring_frequency',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Recurring Frequency',
                 placeholder: 'Select Recurring Frequency',
@@ -181,7 +181,7 @@ export class RemindersComponent {
         {
           key: 'reminder_recipients',
           type: 'table',
-          className: 'custom-form-list',
+          className: 'custom-form-list no-ant-card',
           templateOptions: {
             title: 'Reminder Recipients',
             addText: 'Add Recipients',
@@ -290,7 +290,7 @@ export class RemindersComponent {
             {
               key: 'log_action',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Log Action',
                 placeholder: 'Select Log Action',

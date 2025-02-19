@@ -1,12 +1,12 @@
-<div class="container-fluid pt-3">
+<div class="container-fluid p-3">
     <div class="bank-account-banner">
-        <div class="col-12 px-0" style="display: flex; justify-content: space-between;align-items: center;">
+        <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
             <button (click)="PaymentTransactionEditID = null" type="button" class="btn pl-0" style="color: black;">
-                <span *ngIf="PaymentTransactionEditID" class="custom-heading">Update Payment Transaction</span>
-                <span *ngIf="!PaymentTransactionEditID" class="custom-heading">Create Payment Transaction</span>
+                <span *ngIf="PaymentTransactionEditID" class="custom-heading">Update Transaction</span>
+                <span *ngIf="!PaymentTransactionEditID" class="custom-heading">Create Transaction</span>
             </button>
             <button (click)="showPaymentTransactionListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                Payment Transaction List
+                Transaction List
             </button>
         </div>
     </div>

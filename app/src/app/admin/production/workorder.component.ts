@@ -558,13 +558,13 @@ curdConfig: TaCurdConfig = {
       fields: [
         //-----------------------------------------work_order -----------------------------------//
         {
-          fieldGroupClassName: "ant-row custom-form-block",
+          fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
           key: 'work_order',
           fieldGroup: [
             {
               key: 'product_id',
               type: 'select',
-              className: 'col-2',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Product',
                 placeholder: 'Select Product',
@@ -610,7 +610,7 @@ curdConfig: TaCurdConfig = {
             {
               key: 'size',
               type: 'select',
-              className: 'col-2',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Size',
                 dataKey: 'size_id',
@@ -662,7 +662,7 @@ curdConfig: TaCurdConfig = {
             {
               key: 'color',
               type: 'select',
-              className: 'col-2',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Color',
                 dataKey: 'color_id',
@@ -701,7 +701,7 @@ curdConfig: TaCurdConfig = {
             {
               key: 'quantity',
               type: 'input',
-              className: 'col-2',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Quantity',
                 required: true,
@@ -711,7 +711,7 @@ curdConfig: TaCurdConfig = {
             {
               key: 'completed_qty',
               type: 'input',
-              className: 'col-2',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Completed Quantity',
                 required: false,
@@ -724,7 +724,7 @@ curdConfig: TaCurdConfig = {
             {
               key: 'pending_qty',
               type: 'input',
-              className: 'col-2',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Pending Quantity',
                 required: false,
@@ -735,7 +735,7 @@ curdConfig: TaCurdConfig = {
             {
               key: 'status_id',
               type: 'select',
-              className: 'col-2',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Status',
                 placeholder: 'Select Status',
@@ -751,7 +751,7 @@ curdConfig: TaCurdConfig = {
             {
               key: 'start_date',
               type: 'date',
-              className: 'col-2',
+              className: 'col-md-4 col-sm-6 col-12',
               defaultValue: new Date().toISOString().split('T')[0],
               templateOptions: {
                 type: 'date',
@@ -763,7 +763,7 @@ curdConfig: TaCurdConfig = {
             {
               key: 'end_date',
               type: 'date',
-              className: 'col-2',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 type: 'date',
                 label: 'End date',
@@ -773,7 +773,7 @@ curdConfig: TaCurdConfig = {
             {
               key: 'sync_qty',
               type: 'checkbox',
-              className: 'col-3 p-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Sync QTY',
                 required: false
@@ -782,7 +782,7 @@ curdConfig: TaCurdConfig = {
             {
               key: 'selectionType',
               type: 'radio',
-              className: 'col-2',
+              className: 'col-md-4 col-sm-6 col-12',
               defaultValue: 'no', // Set default selection to 'user'
               templateOptions: {
                 label: 'Creating for Sale Order ?',
@@ -796,7 +796,7 @@ curdConfig: TaCurdConfig = {
             {
               key: 'sale_order',
               type: 'select',
-              className: 'col-2',
+              className: 'col-md-4 col-sm-6 col-12',
               hideExpression: (model) => model.selectionType !== 'yes',
               templateOptions: {
                 label: 'Order No',

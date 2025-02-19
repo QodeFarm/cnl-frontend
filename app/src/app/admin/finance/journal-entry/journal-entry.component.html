@@ -1,12 +1,12 @@
-<div class="container-fluid pt-3">
+<div class="container-fluid p-3">
     <div class="leads-banner">
-        <div class="col-12 px-0" style="display: flex; justify-content: space-between;align-items: center;">
+        <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
             <button (click)="JournalEntryEditID = null" type="button" class="btn pl-0" style="color: black;">
                 <span *ngIf="JournalEntryEditID" class="custom-heading">Update Journal Entry</span>
                 <span *ngIf="!JournalEntryEditID" class="custom-heading">Create Journal Entry</span>
             </button>
             <button (click)="showJournalEntryListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#leadsListModal">
-                Journal Entry List
+                Journal List
             </button>
         </div>
     </div>

@@ -86,12 +86,12 @@ export class ExpenseClaimComponent {
       model:{},	  
       fields: [
         {
-          fieldGroupClassName: "ant-row custom-form-block",
+          fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
           fieldGroup: [	  
             {
               key: 'employee',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Employee',
                 dataKey: 'employee',
@@ -112,7 +112,7 @@ export class ExpenseClaimComponent {
             {
               key: 'claim_date',
               type: 'date',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Claim Date',
                 placeholder: 'Select Claim Date',
@@ -122,7 +122,7 @@ export class ExpenseClaimComponent {
             {
               key: 'description',
               type: 'textarea',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Description',
                 placeholder: 'Enter Description',
@@ -132,7 +132,7 @@ export class ExpenseClaimComponent {
             {
               key: 'total_amount',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Total Amount',
                 placeholder: 'Enter Total Amount',
@@ -142,7 +142,7 @@ export class ExpenseClaimComponent {
             {
               key: 'status',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Status',
                 placeholder: 'Status',

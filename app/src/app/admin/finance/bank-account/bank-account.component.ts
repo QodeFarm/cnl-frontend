@@ -81,12 +81,12 @@ export class BankAccountComponent {
       model:{},	  
       fields: [
         {
-          fieldGroupClassName: "ant-row custom-form-block",
+          fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
           fieldGroup: [	  
             {
               key: 'account_name',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Account Name',
                 placeholder: 'Enter Account Name',
@@ -96,7 +96,7 @@ export class BankAccountComponent {
             {
               key: 'account_number',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Account Number',
                 placeholder: 'Enter Account number',
@@ -106,7 +106,7 @@ export class BankAccountComponent {
             {
               key: 'bank_name',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Bank Name',
                 placeholder: 'Enter Bank Name',
@@ -116,7 +116,7 @@ export class BankAccountComponent {
             {
               key: 'branch_name',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Branch Name',
                 placeholder: 'Enter Branch Name',
@@ -126,7 +126,7 @@ export class BankAccountComponent {
             {
               key: 'ifsc_code',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'IFSC Code',
                 placeholder: 'Enter IFSC Code',
@@ -136,7 +136,7 @@ export class BankAccountComponent {
             {
               key: 'account_type',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Account Type',
                 placeholder: 'Select Account Type',
@@ -150,7 +150,7 @@ export class BankAccountComponent {
             {
               key: 'balance',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Balance',
                 placeholder: 'Enter Balance',
