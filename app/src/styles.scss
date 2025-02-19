@@ -189,10 +189,6 @@
             .collapsing {
                 display: none !important;
             }
-            .nav-link {
-                // pointer-events: none;
-                // cursor: pointer;
-            }
         }
         &:hover {             
             .nav-link {
@@ -1685,4 +1681,65 @@ ta-form {
             }
         }
     }
+}
+@media(max-width:425px){
+   
+}
+
+
+// error message styles //
+.error-modal .ant-modal-content,
+.error-modal .ant-modal-header,
+.error-modal .ant-modal-footer {
+    background-color: #ffffff;
+}
+
+.error-modal .ant-modal-content {
+    color: #721c24; /* Dark red text for contrast */
+    border-radius: 10px; /* Rounded corners */
+    text-align: left; /* Align text to the left */
+}
+
+.error-modal .ant-modal-header {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom: 1px solid #ffcccc; /* Light red border */
+}
+
+.error-modal .ant-modal-footer {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.error-modal .ant-modal-close:hover {
+    color: #ff6666;
+}
+
+.error-modal p {
+    font-weight: normal;
+    font-size: 14px;
+    color: #000000;
+}
+
+.error-modal .ant-modal-footer .ant-btn {
+    background-color: #007BFF;  /* Brighter Blue */
+    color: #ffffff;
+    border: 1px solid #007BFF;
+    border-radius: 5px;
+    padding: 5px 50px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.error-modal .ant-modal-footer .ant-btn:hover {
+    background-color: #0056D2;  /* Darker blue on hover */
+    border: 1px solid #0056D2;
+}
+
+.error-modal .ant-modal {
+    width: auto !important;
+    max-width: 90vw;
 }
