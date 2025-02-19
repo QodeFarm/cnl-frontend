@@ -24,6 +24,7 @@ import { ColorComponent } from './color/color.component';
 import { WarehouseLocationsComponent } from './warehouse-locations/warehouse-locations.component';
 import { PackageUnitsComponent } from './package-units/package-units.component';
 import { GPackageUnitsComponent } from './g-package-units/g-package-units.component';
+import { NzNotificationModule } from 'ng-zorro-antd/notification';
 
 
 @NgModule({
@@ -55,7 +56,8 @@ import { GPackageUnitsComponent } from './g-package-units/g-package-units.compon
     CommonModule,
     ProductsRoutingModule,
     AdminCommmonModule,
-    ProductsListComponent
+    ProductsListComponent,
+    NzNotificationModule
   ],
   exports: [
     // ProductsComponent,
