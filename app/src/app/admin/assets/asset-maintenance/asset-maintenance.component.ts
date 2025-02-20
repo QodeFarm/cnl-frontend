@@ -90,12 +90,12 @@ export class AssetMaintenanceComponent {
         model:{},
         fields: [
           {
-            fieldGroupClassName: 'ant-row custom-form-block',
+            fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
             fieldGroup: [
               {
                 key: 'asset',
                 type: 'select',
-                className: 'col-3',
+                className: 'col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Asset',
                   dataKey: 'asset_id',
@@ -122,7 +122,7 @@ export class AssetMaintenanceComponent {
               {
                 key: 'cost',
                 type: 'input',
-                className: 'col-3',
+                className: 'col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Cost',
                   required: false,
@@ -137,7 +137,7 @@ export class AssetMaintenanceComponent {
               {
                 key: 'maintenance_date',
                 type: 'input',
-                className: 'col-3',
+                className: 'col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   type: 'date',
                   label: 'Maintenance date',
@@ -148,7 +148,7 @@ export class AssetMaintenanceComponent {
               {
                 key: 'maintenance_description',
                 type: 'textarea',
-                className: 'col-3',
+                className: 'col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Maintenance Description',
                   required: false,

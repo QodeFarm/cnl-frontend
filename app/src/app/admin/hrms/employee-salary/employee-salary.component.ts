@@ -88,12 +88,12 @@ export class EmployeeSalaryComponent {
 
       fields: [
         {
-          fieldGroupClassName: "ant-row custom-form-block",
+          fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
           fieldGroup: [
             {
               key: 'salary_amount',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Salary Amount',
                 placeholder: 'Enter Salary Amount',
@@ -104,7 +104,7 @@ export class EmployeeSalaryComponent {
             {
               key: 'salary_currency',
               type: 'textarea',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Salary Currency',
                 placeholder: 'Enter Salary Currency',
@@ -114,7 +114,7 @@ export class EmployeeSalaryComponent {
             {
               key: 'salary_start_date',
               type: 'input',  // Use 'input' to allow custom types like 'datetime-local'
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Salary Start Date',
                 type: 'date',  // Use date for date-only input
@@ -125,7 +125,7 @@ export class EmployeeSalaryComponent {
             {
               key: 'salary_end_date',
               type: 'input',  // Use 'input' to allow custom types like 'datetime-local'
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Salary End Date',
                 type: 'date',  // Use date for date-only input
@@ -136,7 +136,7 @@ export class EmployeeSalaryComponent {
             {
               key: 'employee',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Employee',
                 dataKey: 'employee_id',

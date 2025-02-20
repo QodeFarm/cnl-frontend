@@ -215,14 +215,14 @@ export class ProductsComponent implements OnInit {
             {
               className: 'col-12 custom-form-card-block p-0',
               key: 'products',
-              fieldGroupClassName:'row m-0 pr-0',
+              fieldGroupClassName:'row m-0 pr-0 responsive-row',
               fieldGroup: [
                 {
-                  className: 'col-9',
+                  className: 'col-sm-9 col-12 p-0',
                   fieldGroupClassName:'row m-0 p-0',
                   fieldGroup: [
                 {
-                  className: 'col-3',
+                  className: 'col-md-4 col-sm-6 col-12',
                   key: 'name',
                   type: 'input',
                   templateOptions: {
@@ -232,7 +232,17 @@ export class ProductsComponent implements OnInit {
                   }
                 },
                 {
-                  className: 'col-3',
+                  className: 'col-md-4 col-sm-6 col-12',
+                  key: 'print_name',
+                  type: 'input',
+                  templateOptions: {
+                    label: 'Print Name',
+                    placeholder: 'Enter Print Name',
+                    required: true,
+                  }
+                },
+                {
+                  className: 'col-md-4 col-sm-6 col-12',
                   key: 'code',
                   type: 'input',
                   templateOptions: {
@@ -251,20 +261,9 @@ export class ProductsComponent implements OnInit {
                   }
                 },
                 {
-                  className: 'col-3',
-                  key: 'print_name',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'Print Name',
-                    placeholder: 'Enter Print Name',
-                    required: true,
-                  }
-                },               
-
-                {
                   key: 'product_group',
                   type: 'select',
-                  className: 'col-3',
+                  className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'Product Group',
                     dataKey: 'product_group_id',
@@ -291,7 +290,7 @@ export class ProductsComponent implements OnInit {
                 {
                   key: 'stock_unit',
                   type: 'select',
-                  className: 'col-3',
+                  className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                   label: 'Stock Unit',
                   dataKey: 'stock_unit_id',
@@ -318,7 +317,7 @@ export class ProductsComponent implements OnInit {
                 {
                   key: 'sales_gl',
                   type: 'select',
-                  className: 'col-3',
+                  className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                   label: 'Sales GL',
                   dataKey: 'sales_gl_id',
@@ -345,7 +344,7 @@ export class ProductsComponent implements OnInit {
                 {
                   key: 'purchase_gl',
                   type: 'select',
-                  className: 'col-3',
+                  className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                   label: 'Purchase GL',
                   dataKey: 'purchase_gl_id',
@@ -370,7 +369,7 @@ export class ProductsComponent implements OnInit {
                   }
                 },
                 {
-                  className: 'col-3',
+                  className: 'col-md-4 col-sm-6 col-12',
                   key: 'hsn_code',
                   type: 'input',
                   templateOptions: {
@@ -381,7 +380,7 @@ export class ProductsComponent implements OnInit {
                 },
                 
                 {
-                  className: 'col-3',
+                  className: 'col-md-4 col-sm-6 col-12',
                   key: 'balance',
                   type: 'input',
                   templateOptions: {
@@ -390,7 +389,7 @@ export class ProductsComponent implements OnInit {
                   }
                 },
                 {
-                  className: 'col-3 d-flex align-items-center',
+                  className: 'col-md-4 col-sm-6 col-12',
                   key: 'print_barcode',
                   type: 'checkbox',
                   templateOptions: {
@@ -401,14 +400,14 @@ export class ProductsComponent implements OnInit {
               ]
             },
             {
-              className: 'col-3 p-0',
+              className: 'col-sm-3 col-12 p-0',
               // key: 'products',
               fieldGroupClassName: "ant-row row mx-0 mt-2",
               fieldGroup: [
                 {
                   key: 'picture',
                   type: 'file',
-                  className: 'ta-cell pr-md col d-flex justify-content-center pr-0',
+                  className: 'ta-cell pr-md col d-flex justify-content-md-center pr-0',
                   templateOptions: {
                     label: 'Picture',
                     required: true
@@ -435,7 +434,7 @@ export class ProductsComponent implements OnInit {
                     {
                       key: 'product_variations',
                       type: 'table',
-                      className: 'custom-form-list',
+                      className: 'custom-form-list no-ant-card',
                       templateOptions: {
                         // title: 'Product Variations',
                         addText: 'Add New Variations',
@@ -528,7 +527,7 @@ export class ProductsComponent implements OnInit {
                       {
                         key: 'product_item_balance',
                         type: 'table',
-                        className: 'custom-form-list',
+                        className: 'custom-form-list no-ant-card',
                         templateOptions: {
                         addText: 'Add Warehouse Locations',
                         tableCols: [
@@ -601,7 +600,7 @@ export class ProductsComponent implements OnInit {
                             {
                               key: 'gst_classification',
                               type: 'select',
-                              className: 'col-3',
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                               templateOptions: {
                                 label: 'GST Classification',
                                 dataKey: 'gst_classification_id',
@@ -626,7 +625,7 @@ export class ProductsComponent implements OnInit {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                               key: 'gst_input',
                               type: 'input',
                               templateOptions: {
@@ -656,7 +655,7 @@ export class ProductsComponent implements OnInit {
                         fieldGroupClassName: "ant-row row align-items-end mt-3",
                             fieldGroup: [
                               {
-                                className: 'col-3',
+                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'sales_description',
                                 type: 'input',
                                 templateOptions: {
@@ -665,7 +664,7 @@ export class ProductsComponent implements OnInit {
                                 }
                               },
                               {
-                                className: 'col-3',
+                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'mrp',
                                 type: 'input',
                                 templateOptions: {
@@ -675,7 +674,7 @@ export class ProductsComponent implements OnInit {
                                 }
                               },
                               {
-                                className: 'col-3',
+                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'minimum_price',
                                 type: 'input',
                                 templateOptions: {
@@ -684,7 +683,7 @@ export class ProductsComponent implements OnInit {
                                 }
                               },
                               {
-                                className: 'col-3',
+                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'sales_rate',
                                 type: 'input',
                                 templateOptions: {
@@ -694,7 +693,7 @@ export class ProductsComponent implements OnInit {
                                 }
                               },
                               {
-                                className: 'col-3',
+                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'wholesale_rate',
                                 type: 'input',
                                 templateOptions: {
@@ -703,7 +702,7 @@ export class ProductsComponent implements OnInit {
                                 }
                               },
                               {
-                                className: 'col-3',
+                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'dealer_rate',
                                 type: 'input',
                                 templateOptions: {
@@ -712,7 +711,7 @@ export class ProductsComponent implements OnInit {
                                 }
                               },
                               {
-                                className: 'col-3',
+                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'rate_factor',
                                 type: 'input',
                                 templateOptions: {
@@ -721,7 +720,7 @@ export class ProductsComponent implements OnInit {
                                 }
                               },
                               {
-                                className: 'col-3',
+                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'discount',
                                 type: 'input',
                                 templateOptions: {
@@ -730,7 +729,7 @@ export class ProductsComponent implements OnInit {
                                 }
                               },
                               {
-                                className: 'col-3',
+                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'dis_amount',
                                 type: 'input',
                                 templateOptions: {
@@ -740,7 +739,7 @@ export class ProductsComponent implements OnInit {
                                 }
                               },
                               {
-                                className: 'col-3',
+                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'purchase_description',
                                 type: 'input',
                                 templateOptions: {
@@ -749,7 +748,7 @@ export class ProductsComponent implements OnInit {
                                 }
                               },
                               {
-                                className: 'col-3',
+                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'purchase_rate',
                                 type: 'input',
                                 templateOptions: {
@@ -758,7 +757,7 @@ export class ProductsComponent implements OnInit {
                                 }
                               },
                               {
-                                className: 'col-3',
+                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'purchase_rate_factor',
                                 type: 'input',
                                 templateOptions: {
@@ -767,7 +766,7 @@ export class ProductsComponent implements OnInit {
                                 }
                               },
                               {
-                                className: 'col-3',
+                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'purchase_discount',
                                 type: 'input',
                                 templateOptions: {
@@ -789,12 +788,12 @@ export class ProductsComponent implements OnInit {
                     },
                     fieldGroup: [
                       {
-                        className: 'col-9 p-0',
+                        className: 'col-12 p-0',
                         key: 'products',
                         fieldGroupClassName: "ant-row mx-0 row align-items-end mt-2",
                         fieldGroup: [
                           {
-                            className: 'col-3',
+                            className: 'col-md-4 col-sm-6 col-12',
                             key: 'minimum_level',
                             type: 'input',
                             templateOptions: {
@@ -803,7 +802,7 @@ export class ProductsComponent implements OnInit {
                             }
                           },
                           {
-                            className: 'col-3',
+                            className: 'col-md-4 col-sm-6 col-12',
                             key: 'maximum_level',
                             type: 'input',
                             templateOptions: {

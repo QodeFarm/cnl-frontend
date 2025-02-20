@@ -118,12 +118,12 @@ export class PaymentTransactionComponent {
       model:{},	  
       fields: [
         {
-          fieldGroupClassName: "ant-row custom-form-block",
+          fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
           fieldGroup: [
             {
               key: 'order_type',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Order Type',
                 placeholder: 'Select Order Type',
@@ -146,7 +146,7 @@ export class PaymentTransactionComponent {
             {
               key: 'invoice',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Invoice',
                 dataKey: 'invoice_id',
@@ -172,7 +172,7 @@ export class PaymentTransactionComponent {
             {
               key: 'payment_date',
               type: 'date',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Payment Date',
                 placeholder: 'Select Payment Date',
@@ -182,7 +182,7 @@ export class PaymentTransactionComponent {
             {
               key: 'payment_method',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Payment Method',
                 placeholder: 'Select Payment Method',
@@ -198,7 +198,7 @@ export class PaymentTransactionComponent {
             {
               key: 'payment_status',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               defaultValue:  'Pending',
               templateOptions: {
                 label: 'Payment Status',
@@ -214,7 +214,7 @@ export class PaymentTransactionComponent {
             {
               key: 'amount',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Amount',
                 placeholder: 'Enter Amount',
@@ -224,7 +224,7 @@ export class PaymentTransactionComponent {
             {
               key: 'reference_number',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Reference Number',
                 placeholder: 'Enter Reference Number',
@@ -234,7 +234,7 @@ export class PaymentTransactionComponent {
             {
               key: 'currency',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Currency',
                 placeholder: 'Enter Currency',
@@ -244,7 +244,7 @@ export class PaymentTransactionComponent {
             {
               key: 'transaction_type',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               defaultValue:  'Credit',
               templateOptions: {
                 label: 'Transaction Type',
@@ -259,7 +259,7 @@ export class PaymentTransactionComponent {
             {
               key: 'notes',
               type: 'textarea',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Notes',
                 placeholder: 'Enter Notes',

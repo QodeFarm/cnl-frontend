@@ -87,13 +87,13 @@ export class EmployeeLeavesComponent implements OnInit {
       },
       fields: [
         {
-          fieldGroupClassName: "ant-row custom-form-block",
+          fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
           key: 'employee_leaves',
           fieldGroup: [
             {
               key: 'employee',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Employee',
                 dataKey: 'employee_id',
@@ -120,7 +120,7 @@ export class EmployeeLeavesComponent implements OnInit {
             {
               key: 'leave_type',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Leave Type',
                 dataKey: 'leave_type_id',
@@ -147,7 +147,7 @@ export class EmployeeLeavesComponent implements OnInit {
             {
               key: 'start_date',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Start Date',
                 type: 'date',
@@ -158,7 +158,7 @@ export class EmployeeLeavesComponent implements OnInit {
             {
               key: 'end_date',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'End Date',
                 type: 'date',
@@ -169,7 +169,7 @@ export class EmployeeLeavesComponent implements OnInit {
             {
               key: 'comments',
               type: 'textarea',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Comments',
                 placeholder: 'Enter Comments',

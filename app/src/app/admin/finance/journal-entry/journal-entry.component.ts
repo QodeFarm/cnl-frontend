@@ -83,12 +83,12 @@ export class JournalEntryComponent {
       fields: [
         //-----------------------------------------journal_entry-----------------------------------//
         {
-          fieldGroupClassName: "ant-row custom-form-block",
+          fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
           key: 'journal_entry',
           fieldGroup: [{
               key: 'entry_date',
               type: 'date',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Entry Date',
                 placeholder: 'Select date',
@@ -102,7 +102,7 @@ export class JournalEntryComponent {
             {
               key: 'reference',
               type: 'input',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 type: 'input',
                 label: 'Reference',
@@ -116,7 +116,7 @@ export class JournalEntryComponent {
             {
               key: 'description',
               type: 'textarea',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Description',
                 placeholder: 'Enter Description',
@@ -129,7 +129,7 @@ export class JournalEntryComponent {
         {
           key: 'journal_entry_lines',
           type: 'table',
-          className: 'custom-form-list',
+          className: 'custom-form-list product-table',
           templateOptions: {
             title: 'Journal Entry Lines',
             addText: 'Add Journal Entry Line',

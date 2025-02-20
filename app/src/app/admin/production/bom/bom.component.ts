@@ -144,13 +144,13 @@ export class BomComponent {
       fields: [
         //-----------------------------------------B O M -----------------------------------//
         {
-          fieldGroupClassName: "ant-row custom-form-block",
+          fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
           key: 'bom',
           fieldGroup: [
             {
               key: 'bom_name',
               type: 'input',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'BOM Name',
                 placeholder: 'Enter BOM Name',
@@ -163,7 +163,7 @@ export class BomComponent {
             {
               key: 'product',
               type: 'select',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Product',
                 dataKey: 'product_id',
@@ -190,7 +190,7 @@ export class BomComponent {
             {
               key: 'notes',
               type: 'textarea',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 type: 'input',
                 label: 'Notes',
@@ -208,7 +208,7 @@ export class BomComponent {
         {
           key: 'bill_of_material',
           type: 'table',
-          className: 'custom-form-list',
+          className: 'custom-form-list no-ant-card',
           templateOptions: {
             title: 'Bill Of Material',
             addText: 'Add Materials',
