@@ -303,7 +303,7 @@ export class DebitNoteComponent {
         {
           key: 'sale_debit_note_items',
           type: 'table',
-          className: 'custom-form-list  no-ant-card',
+          className: 'custom-form-list',
           templateOptions: {
             title: 'Products',
             addText: 'Add Product',

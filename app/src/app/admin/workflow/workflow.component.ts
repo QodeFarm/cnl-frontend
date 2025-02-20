@@ -110,7 +110,7 @@ export class WorkflowComponent {
         {
           key: 'workflow_stages',
           type: 'table',
-          className: 'custom-form-list no-ant-card',
+          className: 'custom-form-list product-table',
           templateOptions: {
             title: 'Workflow Stages',
             addText: 'Add Stage',

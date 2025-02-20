@@ -329,9 +329,9 @@ export class TasksComponent implements OnInit {
                     {
                       key: 'task_comments',
                       type: 'table',
-                      className: 'custom-form-list no-ant-card',
+                      className: 'custom-form-list',
                       templateOptions: {
-                        title: 'Task Comments',
+                        // title: 'Task Comments',
                         addText: 'Add Comments',
                         tableCols: [
                           { name: 'comment_text', label: 'Comment Text' }
