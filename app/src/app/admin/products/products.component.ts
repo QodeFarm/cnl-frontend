@@ -87,7 +87,6 @@ export class ProductsComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error creating record:', error);
-          alert('An error occurred while creating the record.');
         }
       });
   };
@@ -108,7 +107,7 @@ export class ProductsComponent implements OnInit {
         this.taFormComponent.formlyOptions.resetModel([]);
       },
       (error) => {
-        console.error('Error updating Sale Return Order:', error);
+        console.error('Error updating Products:', error);
       }
     );
   } 
@@ -483,8 +482,10 @@ export class ProductsComponent implements OnInit {
                             templateOptions: {
                               label: 'SKU',
                               hideLabel: true,
-                              placeholder: 'Enter SKU',
-                              required: false
+                              placeholder: 'Enter SKU'
+                            },
+                            expressionProperties: {
+                              'templateOptions.required': (model) => !!model?.quantity  // SKU is required if quantity has a value
                             }
                           },
                           {
@@ -504,9 +505,10 @@ export class ProductsComponent implements OnInit {
                               label: 'Quantity',
                               hideLabel: true,
                               placeholder: 'Enter Quantity',
-                              required:false
+                              required:false,
+                              type: 'number'
                             }
-                          }
+                          }                         
                           ]
                       }
                     },
