@@ -78,13 +78,13 @@ export class CustomerPaymentTermsComponent {
       pkId: "payment_term_id",
       fields: [
         {
-          className: 'col-9 p-0',
+          className: 'col-12 p-0',
           fieldGroupClassName: "ant-row",
           fieldGroup:[
             {
               key: 'name',
               type: 'input',
-              className: 'col-6',
+              className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'Name',
                 placeholder: 'Enter Name',
@@ -94,7 +94,7 @@ export class CustomerPaymentTermsComponent {
             {
               key: 'code',
               type: 'input',
-              className: 'col-6',
+              className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'Code',
                 placeholder: 'Enter Code',
@@ -104,7 +104,7 @@ export class CustomerPaymentTermsComponent {
             {
               key: 'fixed_days',
               type: 'input',
-              className: 'col-6',
+              className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'Fixed days',
                 type: 'number',
@@ -115,7 +115,7 @@ export class CustomerPaymentTermsComponent {
             {
               key: 'no_of_fixed_days',
               type: 'input',
-              className: 'col-6',
+              className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'no.of.Fixed days',
                 type: 'number',
@@ -124,7 +124,7 @@ export class CustomerPaymentTermsComponent {
               }
             },
             {
-              className: 'col-6',
+              className: 'col-md-6 col-12 pb-3 pb-md-0 px-1',
               key: 'payment_cycle',
               type: 'input',
               templateOptions: {
@@ -133,7 +133,7 @@ export class CustomerPaymentTermsComponent {
               }
             },
             {
-              className: 'col-6',
+              className: 'col-md-6 col-12 px-1',
               key: 'run_on',
               type: 'input',
               templateOptions: {

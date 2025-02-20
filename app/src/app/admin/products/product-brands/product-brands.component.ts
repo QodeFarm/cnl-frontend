@@ -87,7 +87,7 @@ export class ProductBrandsComponent {
 	       {
           key: 'brand_name',
           type: 'text',
-          className: 'col-6 pb-3 ps-0',
+          className: 'col-md-6 col-12 px-1 pb-3',
           templateOptions: {
             label: 'Brand Name',
             placeholder: 'Enter Brand Name',
@@ -97,7 +97,7 @@ export class ProductBrandsComponent {
         {
           key: 'code',
           type: 'text',
-          className: 'col-6 pb-3 pe-0',
+          className: 'col-md-6 col-12 px-1 pb-3',
           templateOptions: {
             label: 'Code',
             placeholder: 'Enter Code',
@@ -117,7 +117,7 @@ export class ProductBrandsComponent {
         {
           key: 'brand_salesman',
           type: 'select',
-          className: 'col-6 pb-3 ps-0',
+          className: 'col-md-6 col-12 px-1',
           templateOptions: {
             label: 'Brand Salesman Id',
             dataKey: 'name',

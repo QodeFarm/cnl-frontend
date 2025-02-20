@@ -311,11 +311,11 @@ export class PurchasereturnordersComponent {
       },
       fields: [
         {
-          fieldGroupClassName: "ant-row custom-form-block",
+          fieldGroupClassName: "ant-row custom-form-block row ms-0",
           key: 'purchase_return_orders',
           fieldGroup: [
             {
-              className: 'col-md-9 col-sm-8 col-12 p-0',
+              className: 'col-lg-9 col-md-8 col-12 p-0',
               fieldGroupClassName: "ant-row mx-0 row align-items-end mt-2",
               fieldGroup: [
                 {
@@ -424,7 +424,7 @@ export class PurchasereturnordersComponent {
                   key: 'return_date',
                   type: 'date',
                   defaultValue: this.nowDate(),
-                  className: 'col-4',
+                  className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     type: 'date',
                     label: 'Return Date',
@@ -436,7 +436,7 @@ export class PurchasereturnordersComponent {
                   key: 'ref_date',
                   type: 'date',
                   defaultValue: this.nowDate(),
-                  className: 'col-4',
+                  className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     type: 'date',
                     label: 'Ref Date',
@@ -449,7 +449,7 @@ export class PurchasereturnordersComponent {
                   key: 'due_date',
                   type: 'date',
                   defaultValue: this.nowDate(),
-                  className: 'col-4',
+                  className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     type: 'date',
                     label: 'Due Date',
@@ -479,7 +479,7 @@ export class PurchasereturnordersComponent {
                 {
                   key: 'tax',
                   type: 'select',
-                  className: 'col-4',
+                  className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'Tax',
                     required: true,
@@ -499,7 +499,7 @@ export class PurchasereturnordersComponent {
                 {
                   key: 'return_reason',
                   type: 'textarea',
-                  className: 'col-4',
+                  className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'Return Reason',
                     required: true,
@@ -509,7 +509,7 @@ export class PurchasereturnordersComponent {
                 {
                   key: 'remarks',
                   type: 'textarea',
-                  className: 'col-4',
+                  className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     type: 'input',
                     label: 'Remarks',
@@ -526,7 +526,7 @@ export class PurchasereturnordersComponent {
               ]
             },
             {
-              className: 'col-md-3 col-sm-4 col-12 p-0 inline-form-fields',
+              className: 'col-lg-3 col-md-4 col-12 p-md-0 inline-form-fields',
               fieldGroupClassName: "ant-row row mx-0 mt-2",
               fieldGroup: [
                 {
@@ -1501,7 +1501,7 @@ export class PurchasereturnordersComponent {
           type: 'tabs',
           fieldGroup: [
             {
-              className: 'col-12 px-0 pt-3',
+              className: 'col-12 p-0',
               props: {
                 label: 'Billing Details'
               },
@@ -1510,7 +1510,7 @@ export class PurchasereturnordersComponent {
                   fieldGroupClassName: "",
                   fieldGroup: [
                     {
-                      className: 'col-12 mb-3 custom-form-card-block w-100',
+                      className: 'col-12 p-0 custom-form-card-block w-100',
                       fieldGroup: [
                         // {
                         //   template: '<div class="custom-form-card-title">  </div>',
@@ -1746,7 +1746,7 @@ export class PurchasereturnordersComponent {
               ]
             },
             {
-              className: 'col-12 custom-form-card-block px-0 pt-3',
+              className: 'col-12 custom-form-card-block p-0',
               props: {
                 label: 'Shipping Details'
               },
@@ -1931,7 +1931,7 @@ export class PurchasereturnordersComponent {
               ]
             },
             {
-              className: 'col-12 px-0 pt-3',
+              className: 'col-12 p-0',
               props: {
                 label: 'Order Attachments'
               },
@@ -1995,7 +1995,7 @@ export class PurchasereturnordersComponent {
                     {
                       key: 'billing_address',
                       type: 'textarea',
-                      className: 'col-4',
+                      className: 'col-md-4 col-sm-6 col-12',
                       templateOptions: {
                         label: 'Billing address',
                         placeholder: 'Enter Billing address'
@@ -2004,7 +2004,7 @@ export class PurchasereturnordersComponent {
                     {
                       key: 'shipping_address',
                       type: 'textarea',
-                      className: 'col-4',
+                      className: 'col-md-4 col-sm-6 col-12',
                       templateOptions: {
                         label: 'Shipping address',
                         placeholder: 'Enter Shipping address'

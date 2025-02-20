@@ -529,15 +529,15 @@ export class VendorsComponent {
             {
               className: 'col-12 custom-form-card-block p-0',
               key: 'vendor_data',
-              fieldGroupClassName:'row m-0 pr-0',
+              fieldGroupClassName:'row m-0 pr-0 responsive-row',
               fieldGroup: [
                 // Left Section (col-9 for form fields)
                 {
-                  className: 'col-9',
+                  className: 'col-sm-9 col-12 p-0',
                   fieldGroupClassName:'row m-0 p-0',
                   fieldGroup: [
                     {
-                      className: 'col-4',
+                      className: 'col-md-4 col-sm-6 col-12',
                       key: 'name',
                       type: 'input',
                       templateOptions: {
@@ -547,7 +547,7 @@ export class VendorsComponent {
                       }
                     },
                     {
-                      className: 'col-4',
+                      className: 'col-md-4 col-sm-6 col-12',
                       key: 'print_name',
                       type: 'input',
                       templateOptions: {
@@ -557,7 +557,7 @@ export class VendorsComponent {
                       }
                     },               
                     {
-                      className: 'col-4',
+                      className: 'col-md-4 col-sm-6 col-12',
                       key: 'code',
                       type: 'input',
                       templateOptions: {
@@ -568,7 +568,7 @@ export class VendorsComponent {
                     },
                   
                     {
-                      className: 'col-4',
+                      className: 'col-md-4 col-sm-6 col-12',
                       key: 'vendor_category',
                       type: 'select',
                       templateOptions: {
@@ -596,7 +596,7 @@ export class VendorsComponent {
                     {
                       key: 'ledger_account',
                       type: 'select',
-                      className: 'col-4',
+                      className: 'col-md-4 col-sm-6 col-12',
                       templateOptions: {
                         dataKey: 'ledger_account_id',
                         dataLabel: 'name',
@@ -622,7 +622,7 @@ export class VendorsComponent {
                       }
                     },
                     {
-                      className: 'col-4',
+                      className: 'col-md-4 col-sm-6 col-12',
                       key: 'tax_type',
                       type: 'select',
                       templateOptions: {
@@ -639,14 +639,14 @@ export class VendorsComponent {
                   ]
                 },
                 {
-                  className: 'col-3 p-0',
+                  className: 'col-sm-3 col-12 p-0',
                   // key: 'vendor_data',
                   fieldGroupClassName: "ant-row row mx-0 mt-2",
                   fieldGroup: [
                     {
                       key: 'picture',
                       type: 'file',
-                      className: 'ta-cell pr-md col d-flex justify-content-center pr-0',
+                      className: 'ta-cell pr-md col d-flex justify-content-md-center pr-0',
                       templateOptions: {
                         label: 'Picture',
                         required: true
@@ -675,7 +675,7 @@ export class VendorsComponent {
                     {
                       key: 'vendor_addresses',
                       type: 'table',
-                      className: 'custom-form-list',
+                      className: 'custom-form-list no-ant-card',
                       templateOptions: {
                         // addText: 'Add Addresses',
                         tableCols: [
@@ -889,7 +889,7 @@ export class VendorsComponent {
                       fieldGroupClassName: "ant-row row align-items-end mt-3",
                           fieldGroup: [
                             {
-                              className: 'col-3',
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                               key: 'payment_term',
                               type: 'select',
                               templateOptions: {
@@ -915,7 +915,7 @@ export class VendorsComponent {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                               key: 'interest_rate_yearly',
                               type: 'input',
                               templateOptions: {
@@ -925,7 +925,7 @@ export class VendorsComponent {
                               }
                             },                          
                             {
-                              className: 'col-3',
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                               key: 'price_category',
                               type: 'select',
                               templateOptions: {
@@ -951,7 +951,7 @@ export class VendorsComponent {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                               key: 'credit_limit',
                               type: 'input',
                               templateOptions: {
@@ -961,7 +961,7 @@ export class VendorsComponent {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                               key: 'max_credit_days',
                               type: 'input',
                               templateOptions: {
@@ -971,7 +971,7 @@ export class VendorsComponent {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                               key: 'is_sub_vendor',
                               type: 'checkbox',
                               templateOptions: {
@@ -979,7 +979,7 @@ export class VendorsComponent {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                               key: 'vendor_common_for_sales_purchase',
                               type: 'checkbox',
                               templateOptions: {
@@ -1008,7 +1008,7 @@ export class VendorsComponent {
                       fieldGroupClassName: "ant-row row align-items-end mt-3",
                           fieldGroup: [
                               {
-                                className: 'ta-cell pr-md col-4',
+                                className: 'ta-cell pr-md col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'website',
                                 type: 'input',
                                 templateOptions: {
@@ -1017,7 +1017,7 @@ export class VendorsComponent {
                                 }
                               },                                  
                               {
-                                className: 'col-4',
+                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'facebook',
                                 type: 'input',
                                 templateOptions: {
@@ -1026,7 +1026,7 @@ export class VendorsComponent {
                                 }
                               },
                               {
-                                className: 'col-4',
+                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'skype',
                                 type: 'input',
                                 templateOptions: {
@@ -1035,7 +1035,7 @@ export class VendorsComponent {
                                 }
                               },
                               {
-                                className: 'col-4',
+                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'twitter',
                                 type: 'input',
                                 templateOptions: {
@@ -1044,7 +1044,7 @@ export class VendorsComponent {
                                 }
                               },
                               {
-                                className: 'col-4',
+                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'linked_in',
                                 type: 'input',
                                 templateOptions: {
@@ -1074,7 +1074,7 @@ export class VendorsComponent {
                       fieldGroupClassName: "ant-row row align-items-end mt-3",
                           fieldGroup: [
                             {
-                              className: 'col-3',
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                               key: 'gst_category',
                               type: 'select',
                               templateOptions: {
@@ -1100,7 +1100,7 @@ export class VendorsComponent {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                               key: 'gst',
                               type: 'input',
                               templateOptions: {
@@ -1109,7 +1109,7 @@ export class VendorsComponent {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                               key: 'cin',
                               type: 'input',
                               templateOptions: {
@@ -1118,7 +1118,7 @@ export class VendorsComponent {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                               key: 'pan',
                               type: 'input',
                               templateOptions: {
@@ -1127,7 +1127,7 @@ export class VendorsComponent {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                               key: 'gst_suspend',
                               type: 'checkbox',
                               templateOptions: {
@@ -1135,7 +1135,7 @@ export class VendorsComponent {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                               key: 'tds_on_gst_applicable',
                               type: 'checkbox',
                               templateOptions: {
@@ -1143,7 +1143,7 @@ export class VendorsComponent {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                               key: 'tds_applicable',
                               type: 'checkbox',
                               templateOptions: {
@@ -1172,7 +1172,7 @@ export class VendorsComponent {
                       fieldGroupClassName: "ant-row row align-items-end mt-3",
                           fieldGroup: [
                             {
-                              className: 'col-4',
+                              className: 'col-md-4 col-sm-6 col-12',
                               key: 'transporter',
                               type: 'select',
                               templateOptions: {
@@ -1198,7 +1198,7 @@ export class VendorsComponent {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-md-4 col-sm-6 col-12',
                               key: 'distance',
                               type: 'input',
                               templateOptions: {
@@ -1248,12 +1248,12 @@ export class VendorsComponent {
               },
               fieldGroup: [
                 {
-                  className: 'col-9 p-0',
+                  className: 'col-12 p-0',
                   key: 'vendor_data',
                   fieldGroupClassName: "ant-row mx-0 row align-items-end mt-2",
                   fieldGroup: [
                     {
-                      className: 'col-md-4 col-sm-6 col-12',
+                      className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                       key: 'contact_person',
                       type: 'input',
                       templateOptions: {
@@ -1262,7 +1262,7 @@ export class VendorsComponent {
                       }
                     },
                     {
-                      className: 'col-4',
+                      className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                       key: 'firm_status',
                       type: 'select',
                       templateOptions: {
@@ -1288,7 +1288,7 @@ export class VendorsComponent {
                       }
                     }, 
                     {
-                      className: 'col-4',
+                      className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                       key: 'registration_date',
                       type: 'date',
                       defaultValue: this.nowDate(),
@@ -1300,7 +1300,7 @@ export class VendorsComponent {
                       }
                     }, 
                     {
-                      className: 'col-4',
+                      className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                       key: 'territory',
                       type: 'select',
                       templateOptions: {

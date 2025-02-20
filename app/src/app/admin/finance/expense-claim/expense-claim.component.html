@@ -1,12 +1,12 @@
-<div class="container-fluid pt-3">
+<div class="container-fluid p-3">
     <div class="bank-account-banner">
-        <div class="col-12 px-0" style="display: flex; justify-content: space-between;align-items: center;">
-            <button (click)="ExpenseClaimEditID = null" type="button" class="btn pl-0" style="color: black;">
+      <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
+         <button (click)="ExpenseClaimEditID = null" type="button" class="btn pl-0" style="color: black;">
             <span *ngIf="ExpenseClaimEditID" class="custom-heading">Update Expense Claim</span>
             <span *ngIf="!ExpenseClaimEditID" class="custom-heading">Create Expense Claim</span>
             </button>
             <button (click)="showExpenseClaimListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-            Expense Claim List
+            Expense List
             </button>
         </div>
     </div>

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild} from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
 import { Router } from '@angular/router';
@@ -22,7 +22,7 @@ export class TasksComponent implements OnInit {
   @ViewChild(TasksListComponent) TasksListComponent!: TasksListComponent;
 
   // constructor(private http: HttpClient) {}
-  constructor(private http: HttpClient, private userService: UserService) {}  // Inject UserService
+  constructor(private http: HttpClient, private userService: UserService) { }  // Inject UserService
 
   set_default_status_id(): any {
     return (this.http.get('masters/statuses/').subscribe((res: any) => {
@@ -43,7 +43,7 @@ export class TasksComponent implements OnInit {
     // Set form config
     this.setFormConfig();
     this.set_default_status_id(); // lead_status_id = 'Open'
-    this.formConfig.fields[0].fieldGroup[7].hide = true; 
+    this.formConfig.fields[0].fieldGroup[7].hide = true;
 
     // Fetch the logged-in user's ID and auto-fill the task_comments
     const userId = this.userService.getUserId();  // Fetch user ID here
@@ -69,34 +69,34 @@ export class TasksComponent implements OnInit {
       if (res && res.data) {
         this.formConfig.model = res.data;
 
-      // Check if the task was assigned to a user or a group and set the selectionType
-      if (res.data['task']['user_id']) {
-        this.formConfig.model['task']['selectionType'] = 'user';
-        this.formConfig.model['task']['user_id'] = res.data['task']['user_id'];  // Set user_id
-      } else if (res.data['task']['group_id']) {
-        this.formConfig.model['task']['selectionType'] = 'group';
-        this.formConfig.model['task']['group_id'] = res.data['task']['group_id'];  // Set group_id
-      }
-
-      // Fetch the logged-in user's ID
-      const userId = this.userService.getUserId();
-
-      if (res.data['task_comments']) {
-        this.formConfig.model['task_comments'] = res.data['task_comments'].map(comment => ({
-          ...comment,
-          comment_text:`By ${comment.user.first_name} ${comment.user.last_name || ''} - ${comment.created_at}
-          ${comment.comment_text}`,
-          isExisting: true, // Mark as existing comments
-        }));
-        
-        // Add the current user's comment (assuming empty comment text for now)
-        if (userId) {
-          this.formConfig.model['task_comments'].push({
-            user_id: userId,
-            comment_text: '' , // Initialize with an empty comment text
-            isExisting: false,  // Mark as a new comment
-          });
+        // Check if the task was assigned to a user or a group and set the selectionType
+        if (res.data['task']['user_id']) {
+          this.formConfig.model['task']['selectionType'] = 'user';
+          this.formConfig.model['task']['user_id'] = res.data['task']['user_id'];  // Set user_id
+        } else if (res.data['task']['group_id']) {
+          this.formConfig.model['task']['selectionType'] = 'group';
+          this.formConfig.model['task']['group_id'] = res.data['task']['group_id'];  // Set group_id
         }
+
+        // Fetch the logged-in user's ID
+        const userId = this.userService.getUserId();
+
+        if (res.data['task_comments']) {
+          this.formConfig.model['task_comments'] = res.data['task_comments'].map(comment => ({
+            ...comment,
+            comment_text: `By ${comment.user.first_name} ${comment.user.last_name || ''} - ${comment.created_at}
+          ${comment.comment_text}`,
+            isExisting: true, // Mark as existing comments
+          }));
+
+          // Add the current user's comment (assuming empty comment text for now)
+          if (userId) {
+            this.formConfig.model['task_comments'].push({
+              user_id: userId,
+              comment_text: '', // Initialize with an empty comment text
+              isExisting: false,  // Mark as a new comment
+            });
+          }
         } else if (userId) {
           // If no task_comments exist, initialize with the current user's comment
           this.formConfig.model['task_comments'] = [{
@@ -105,7 +105,7 @@ export class TasksComponent implements OnInit {
             isExisting: false,  // New comment, editable
           }];
         }
-     
+
         this.formConfig.showActionBtn = true;
         this.formConfig.pkId = 'task_id';
         // Set labels for update
@@ -113,7 +113,7 @@ export class TasksComponent implements OnInit {
         // Show form after setting form values
         this.formConfig.model['task_id'] = this.TasksEditID;
         this.showForm = true;
-        this.formConfig.fields[0].fieldGroup[7].hide = false; 
+        this.formConfig.fields[0].fieldGroup[7].hide = false;
       }
     });
     this.hide();
@@ -150,13 +150,13 @@ export class TasksComponent implements OnInit {
       },
       fields: [
         {
-          fieldGroupClassName: 'ant-row custom-form-block',
+          fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
           key: 'task',
           fieldGroup: [
             {
               key: 'title',
               type: 'input',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Title',
                 placeholder: 'Enter title',
@@ -166,7 +166,7 @@ export class TasksComponent implements OnInit {
             {
               key: 'selectionType',
               type: 'radio',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               defaultValue: 'user', // Set default selection to 'user'
               templateOptions: {
                 label: 'Assign to',
@@ -180,7 +180,7 @@ export class TasksComponent implements OnInit {
             {
               key: 'user',
               type: 'select',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               hideExpression: (model) => model.selectionType !== 'user', // Hide if not user selected
               templateOptions: {
                 label: 'User',
@@ -208,7 +208,7 @@ export class TasksComponent implements OnInit {
             {
               key: 'group',
               type: 'select',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               hideExpression: (model) => model.selectionType !== 'group', // Hide if not group selected
               templateOptions: {
                 label: 'Group',
@@ -236,7 +236,7 @@ export class TasksComponent implements OnInit {
             {
               key: 'priority',
               type: 'select',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Priorities',
                 dataKey: 'priority_id',
@@ -263,7 +263,7 @@ export class TasksComponent implements OnInit {
             {
               key: 'description',
               type: 'textarea',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Description',
                 placeholder: 'Enter description',
@@ -273,7 +273,7 @@ export class TasksComponent implements OnInit {
             {
               key: 'due_date',
               type: 'date',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 type: 'date',
                 label: 'Due date',
@@ -313,84 +313,98 @@ export class TasksComponent implements OnInit {
 
         // start of task_comments keys
         {
-          fieldGroupClassName: 'row m-0',
-          fieldGroup: [          
-              {
-                key: 'task_comments',
-                type: 'table',
-                className: 'custom-form-list col-6',
-                templateOptions: {
-                  title: 'Task Comments',
-                  addText: 'Add Comments',
-                  tableCols: [
-                    { name: 'comment_text', label: 'Comment Text' }
-                  ]
-                },
-                fieldArray: {
+          className: "tab-form-list",
+          type: 'tabs',
+          fieldGroup: [
+            {
+              className: 'col-12 pb-0',
+              fieldGroupClassName: "field-no-bottom-space",
+              props: {
+                label: 'Task Comments'
+              },
+              fieldGroup: [
+                {
+                  fieldGroupClassName: "",
                   fieldGroup: [
                     {
-                      key: 'comment_text',
-                      type: 'textarea',
+                      key: 'task_comments',
+                      type: 'table',
+                      className: 'custom-form-list',
                       templateOptions: {
-                        label: 'Comment Text',
-                        placeholder: 'Enter Comment Text',
-                        hideLabel: true,
-                        required: true,
-                        // Leave out the `readonly` field here
+                        // title: 'Task Comments',
+                        addText: 'Add Comments',
+                        tableCols: [
+                          { name: 'comment_text', label: 'Comment Text' }
+                        ]
                       },
-                      defaultValue: '',  // Set the default value to an empty string for new comments
-                      expressionProperties: {
-                        'templateOptions.readonly': (model: any, formState: any) => {
-                          // Ensure that model is available and check 'isExisting' field safely
-                          return model && model['isExisting'] === true;
+                      fieldArray: {
+                        fieldGroup: [
+                          {
+                            key: 'comment_text',
+                            type: 'textarea',
+                            templateOptions: {
+                              label: 'Comment Text',
+                              placeholder: 'Enter Comment Text',
+                              hideLabel: true,
+                              required: true,
+                              // Leave out the `readonly` field here
+                            },
+                            defaultValue: '',  // Set the default value to an empty string for new comments
+                            expressionProperties: {
+                              'templateOptions.readonly': (model: any, formState: any) => {
+                                // Ensure that model is available and check 'isExisting' field safely
+                                return model && model['isExisting'] === true;
+                              }
+                              //   'type': (model: any, formState: any) => {
+                              //   // Set the input type based on whether the comment is existing
+                              //   return model && model['isExisting'] ? 'text' : 'textarea';
+                              // }
+                            },
+                          }
+
+
+
+                        ]
+                      }
+                    },
+                  ]
+                }
+              ]
+            },
+            {
+              className: 'col-12 p-0',
+              props: {
+                label: 'Task Attachments'
+              },
+              fieldGroup: [
+                {
+                  fieldGroupClassName: "",
+                  fieldGroup: [
+                    {
+                      className: 'col-12 custom-form-card-block w-100 p-0',
+                      fieldGroup: [
+                        // {
+                        //   template: '<div class="custom-form-card-title"> Order Attachments </div>',
+                        //   fieldGroupClassName: "ant-row",
+                        // },
+                        {
+                          key: 'task_attachments',
+                          type: 'file',
+                          className: 'ta-cell col-12 col-md-6 custom-file-attachement',
+                          props: {
+                            "displayStyle": "files",
+                            "multiple": true
+                          },
                         }
-                        //   'type': (model: any, formState: any) => {
-                        //   // Set the input type based on whether the comment is existing
-                        //   return model && model['isExisting'] ? 'text' : 'textarea';
-                        // }
-                      },
+                      ]
                     }
                   ]
                 }
-              },
-              // end of task_comments keys
-
-              // start of task_attachments keys
-              {
-                className: 'col-6 pb-0',
-                fieldGroupClassName: "field-no-bottom-space",
-                fieldGroup: [
-                  {
-                    fieldGroupClassName: "row col-12 m-0 custom-form-card",
-                    fieldGroup: [
-                      {
-                        className: 'col-12 custom-form-card-block w-100',
-                        fieldGroup:[
-                          {
-                            template: '<div class="custom-form-card-title"> Task Attachments </div>',
-                            fieldGroupClassName: "ant-row",
-                          },
-                          {
-                            key: 'task_attachments',
-                            type: 'file',
-                            className: 'ta-cell col-12 custom-file-attachement',
-                            templateOptions: {
-                              "displayStyle": "files",
-                              "multiple": true
-                              // label: 'Order Attachments',
-                              // // required: true
-                              // required: true
-                            }
-                          },
-                        ]
-                      },
-                    ]
-                  }
-                ]
-              }
-            ]     
-        }
-       ]
+              ]
+            },
+          ]
+        },
+      ]
     };
   }
 }

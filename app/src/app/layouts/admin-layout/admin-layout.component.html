@@ -1,14 +1,14 @@
 <header>
     <!-- Topbar -->
     <nav class="navbar navbar-expand navbar-light topbar static-top justify-content-between">
-       
+
         <!-- Sidebar Toggle (Topbar) -->
-         <div class="d-flex align-items-center">
+        <div class="d-flex align-items-center">
             <a class="sidebar-brand layout-logo-design" [routerLink]="['/admin/dashboard']">
                 <!-- <img style="width: 2.2rem;" src="assets/img/logo.png" />  -->
                 <h3>C&L</h3>
                 <span>Accounts Book</span>
-            </a>                
+            </a>
             <button id="sidebarToggleTop" (click)="menuToggle()" class="btn bar-toggle ms-3">
                 <i class="fa fa-bars"></i>
             </button>
@@ -26,10 +26,11 @@
        </form> -->
 
         <!-- Topbar Navbar -->
-     
-      
+
+
         <ul class="navbar-nav align-items-center">
-            <li class="company-title"><span class="badge bg-light ms-2" style="font-weight: 500; font-size: 14px; color:#142768; border-radius: 3px;padding: 7px 10px;"><span class="company-code" style="padding: 0 !important;">[123456] - </span>TECH SOLUTIONS PVT LTD</span></li>
+            <li class="company-title"><span class="badge bg-light ms-2" style="font-weight: 500; font-size: 14px; color:#142768; border-radius: 3px;padding: 7px 10px;"><span class="company-code" style="padding: 0 !important;">{{company_code}} - </span>{{company_name}}</span>
+            </li>
             <li class="nav-item dropdown no-arrow mx-1 d-none">
                 <button class="nav-link dropdown-toggle" (click)="startSpeechRecognition()" id="alerts1" role="button" data-bs-toggle="" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-microphone"></i>
@@ -266,8 +267,8 @@
     <ul class="navbar-nav sidebar sidemenu-bar">
         <li class="nav-item dropdown no-arrow d-md-none d-block user-profile-details">
             <a class="nav-link dropdown-toggle p-0" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-               <div class="d-flex align-items-center">
-                    <img class="img-profile rounded-circle" src="assets/img/user.png">                
+                <div class="d-flex align-items-center">
+                    <img class="img-profile rounded-circle" src="assets/img/user.png">
                     <div class="ml-2">
                         <h4 class=" mb-0">{{userName }} </h4>
                         <span class="m-0">({{role}})</span>
@@ -298,7 +299,7 @@
         </li>
         <ul class="custome-horizental-scroll" style="list-style: none; padding: 0; margin: 0;">
             <li class="nav-item" *ngFor="let m of menulList; let i = index" [ngClass]="{'sub-menu': (m.module_sections && m.module_sections.length > 0)}">
-                <a *ngIf="!(m.module_sections && m.module_sections.length > 0)" class="nav-link" [routerLink]="[m.sec_link]" routerLinkActive="active" (click)="closeMenu()">
+                <a *ngIf="!(m.module_sections && m.module_sections.length > 0)" class="nav-link" [routerLink]="[m.sec_link]" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">
                     <i class="" [ngClass]="m.mod_icon"></i><span>{{m.module_name}}</span>
                 </a>
                 <a *ngIf="m.module_sections && m.module_sections.length > 0" class="nav-link collapsed" [ngClass]="{ 'active': isActive(m.sec_link, m.module_sections)}" [attr.data-bs-toggle]="'collapse'" [attr.data-bs-target]="'#collapseMenu'+i" [attr.aria-expanded]="'true'"
@@ -308,7 +309,7 @@
                 </a>
                 <div *ngIf="m.module_sections && m.module_sections.length > 0" id="collapseMenu{{i}}" class="collapse sub-menu-items" [attr.aria-labelledby]="'heading'+i" [attr.data-parent]="'#accordionSidebar'">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        <a (click)="closeMenu()" class="collapse-item" *ngFor="let sm of m.module_sections" [routerLink]="[sm.sec_link]" routerLinkActive="active">{{sm.section_name}}</a>
+                        <a (click)="closeMenu()" class="collapse-item" *ngFor="let sm of m.module_sections" [routerLink]="[sm.sec_link]" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">{{sm.section_name}}</a>
                     </div>
                 </div>
             </li>
@@ -332,7 +333,7 @@
 
     <!-- Content Wrapper -->
     <!-- <div id="content-wrapper" class="d-flex flex-column"> -->
-        <div id="content-wrapper" class="d-flex flex-column" *ngIf="showContain">
+    <div id="content-wrapper" class="d-flex flex-column" *ngIf="showContain">
 
 
         <!-- Main Content -->

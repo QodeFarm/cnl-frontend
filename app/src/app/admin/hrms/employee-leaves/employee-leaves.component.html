@@ -1,12 +1,12 @@
-<div class="container-fluid pt-3">
+<div class="container-fluid p-3">
     <div class="employee-leaves-banner">
-        <div class="col-12 px-0" style="display: flex; justify-content: space-between;align-items: center;">
+        <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
             <button type="button" class="btn pl-0" >
-                <span *ngIf="EmployeeLeavesEditID" class="custom-heading">Update Employee Leaves</span>
-                <span *ngIf="!EmployeeLeavesEditID" class="custom-heading">Create Employee Leaves</span>
+                <span *ngIf="EmployeeLeavesEditID" class="custom-heading">Update Leaves</span>
+                <span *ngIf="!EmployeeLeavesEditID" class="custom-heading">Create Leaves</span>
             </button>
             <button (click)="showEmployeeLeavesListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                Employee Leaves List
+                Leaves List
             </button>
         </div>
     </div>

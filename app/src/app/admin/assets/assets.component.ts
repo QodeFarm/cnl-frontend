@@ -104,10 +104,10 @@ export class AssetsComponent{
         model:{},
         fields: [
           {
-            fieldGroupClassName: 'ant-row custom-form-block',
+            fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
             fieldGroup: [
               {
-                className: 'col-3',
+                className: 'col-md-4 col-sm-6 col-12',
                 key: 'name',
                 type: 'input',
                 templateOptions: {
@@ -119,7 +119,7 @@ export class AssetsComponent{
               {
                 key: 'purchase_date',
                 type: 'input',
-                className: 'col-3',
+                className: 'col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   type: 'date',
                   label: 'Purchase date',
@@ -130,7 +130,7 @@ export class AssetsComponent{
               {
                 key: 'price',
                 type: 'input',
-                className: 'col-3',
+                className: 'col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Price',
                   required: false,
@@ -145,7 +145,7 @@ export class AssetsComponent{
               {
                 key: 'asset_category',
                 type: 'select',
-                className: 'col-3',
+                className: 'col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Asset Category',
                   dataKey: 'asset_category_id',
@@ -172,7 +172,7 @@ export class AssetsComponent{
               {
                 key: 'asset_status',
                 type: 'select',
-                className: 'col-3',
+                className: 'col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Asset Status',
                   dataKey: 'asset_status_id',
@@ -199,7 +199,7 @@ export class AssetsComponent{
               {
                 key: 'unit_options',
                 type: 'select',
-                className: 'col-3',
+                className: 'col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Unit Options',
                   dataKey: 'unit_options_id',
@@ -226,7 +226,7 @@ export class AssetsComponent{
               {
                 key: 'location',
                 type: 'select',
-                className: 'col-3',
+                className: 'col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Location',
                   dataKey: 'location_id',

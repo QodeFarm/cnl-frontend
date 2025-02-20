@@ -1,11 +1,11 @@
-<div class="container-fluid pt-3">
-    <div class="sale-invoice-banner">
-      <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;">
-        <button type="button" class="btn pl-0">
+<div class="container-fluid p-3">
+  <div class="sale-invoice-banner page-component-header">
+    <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
+      <button type="button" class="btn pl-0">
           <span *ngIf="SaleInvoiceEditID" class="custom-heading">Update Sale Invoice</span>
           <span *ngIf="!SaleInvoiceEditID" class="custom-heading">Create Sale Invoice</span>
         </button>
-        <div style="display: flex; gap: 10px; align-items: center;">
+        <div style="display: flex; gap: 10px; align-items: center;justify-content: end;flex-wrap: wrap;">
           <div *ngIf="!SaleInvoiceEditID" class="quickpack-container d-flex align-items-center">
             <div class="quickpack-box d-flex align-items-center">
                 <div class="dropdown-container rounded-start">

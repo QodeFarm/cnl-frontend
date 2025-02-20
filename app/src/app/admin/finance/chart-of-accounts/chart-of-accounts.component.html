@@ -1,12 +1,12 @@
-<div class="container-fluid pt-3">
+<div class="container-fluid p-3">
     <div class="bank-account-banner">
-        <div class="col-12 px-0" style="display: flex; justify-content: space-between;align-items: center;">
+        <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
             <button (click)="ChartOfAccountsEditID = null" type="button" class="btn pl-0" style="color: black;">
-                <span *ngIf="ChartOfAccountsEditID" class="custom-heading">Update Chart Of Accounts</span>
-                <span *ngIf="!ChartOfAccountsEditID" class="custom-heading">Create Chart Of Accounts</span>
+                <span *ngIf="ChartOfAccountsEditID" class="custom-heading">Update Chart Accounts</span>
+                <span *ngIf="!ChartOfAccountsEditID" class="custom-heading">Create Chart Accounts</span>
             </button>
             <button (click)="showChartOfAccountsListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                Chart Of Accounts List
+                Chart List
             </button>
         </div>
     </div>

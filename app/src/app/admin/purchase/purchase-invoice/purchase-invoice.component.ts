@@ -370,11 +370,11 @@ loadQuickpackProducts() {
       },
       fields: [
         {
-          fieldGroupClassName: "ant-row custom-form-block",
+          fieldGroupClassName: "ant-row custom-form-block row ms-0",
           key: 'purchase_invoice_orders',
           fieldGroup: [
             {
-              className: 'col-md-9 col-sm-8 col-12 p-0',
+              className: 'col-lg-9 col-md-8 col-12 p-0',
               fieldGroupClassName: "ant-row mx-0 row align-items-end mt-2",
               fieldGroup: [
                 {
@@ -490,7 +490,7 @@ loadQuickpackProducts() {
                   key: 'invoice_date',
                   type: 'date',
                   defaultValue: this.nowDate(),
-                  className: 'col-4',
+                  className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     type: 'date',
                     label: 'Invoice date',
@@ -514,7 +514,7 @@ loadQuickpackProducts() {
                   key: 'due_date',
                   type: 'date',
                   defaultValue: this.nowDate(),
-                  className: 'col-4',
+                  className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'Due Date',
                     readonly: true,
@@ -540,7 +540,7 @@ loadQuickpackProducts() {
                   key: 'tax',
                   type: 'select',
                   // defaultValue: 'Exclusive',
-                  className: 'col-4',
+                  className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'Tax',
                     options: [
@@ -560,7 +560,7 @@ loadQuickpackProducts() {
                 {
                   key: 'remarks',
                   type: 'textarea',
-                  className: 'col-4',
+                  className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     type: 'input',
                     label: 'Remarks',
@@ -577,7 +577,7 @@ loadQuickpackProducts() {
               ]
             },
             {
-              className: 'col-md-3 col-sm-4 col-12 p-0 inline-form-fields',
+              className: 'col-lg-3 col-md-4 col-12 p-md-0 inline-form-fields',
               fieldGroupClassName: "ant-row row mx-0 mt-2",
               fieldGroup: [
                 {
@@ -1538,7 +1538,7 @@ loadQuickpackProducts() {
           type: 'tabs',
           fieldGroup: [
             {
-              className: 'col-12 px-0 pt-3',
+              className: 'col-12 p-0',
               props: {
                 label: 'Billing Details'
               },
@@ -1547,7 +1547,7 @@ loadQuickpackProducts() {
                   fieldGroupClassName: "",
                   fieldGroup: [
                     {
-                      className: 'col-12 mb-3 custom-form-card-block w-100',
+                      className: 'col-12 p-0 custom-form-card-block w-100',
                       fieldGroup: [
                         // {
                         //   template: '<div class="custom-form-card-title">  </div>',
@@ -1825,7 +1825,7 @@ loadQuickpackProducts() {
               ]
             },
             {
-              className: 'col-12 custom-form-card-block px-0 pt-3',
+              className: 'col-12 custom-form-card-block p-0',
               props: {
                 label: 'Shipping Details'
               },
@@ -2010,7 +2010,7 @@ loadQuickpackProducts() {
               ]
             },
             {
-              className: 'col-12 px-0 pt-3',
+              className: 'col-12 p-0',
               props: {
                 label: 'Order Attachments'
               },
@@ -2048,7 +2048,7 @@ loadQuickpackProducts() {
               ]
             },
             {
-              className: 'col-12 custom-form-card-block px-0 pt-3',
+              className: 'col-12 custom-form-card-block p-0',
               props: {
                 label: 'Vendor Details'
               },
@@ -2074,7 +2074,7 @@ loadQuickpackProducts() {
                     {
                       key: 'billing_address',
                       type: 'textarea',
-                      className: 'col-4',
+                      className: 'col-md-4 col-sm-6 col-12',
                       templateOptions: {
                         label: 'Billing address',
                         placeholder: 'Enter Billing address'
@@ -2083,7 +2083,7 @@ loadQuickpackProducts() {
                     {
                       key: 'shipping_address',
                       type: 'textarea',
-                      className: 'col-4',
+                      className: 'col-md-4 col-sm-6 col-12',
                       templateOptions: {
                         label: 'Shipping address',
                         placeholder: 'Enter Shipping address'

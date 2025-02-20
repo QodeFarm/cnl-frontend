@@ -99,13 +99,13 @@ export class QuickpacksComponent implements OnInit {
       },
       fields: [
         {
-          fieldGroupClassName: "ant-row custom-form-block",
+          fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
           key: 'quick_pack_data',
           fieldGroup: [
             {
               key: 'name',
               type: 'input',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Quick Pack Name',
                 placeholder: 'Enter Quick Pack Name',
@@ -115,7 +115,7 @@ export class QuickpacksComponent implements OnInit {
             {
               key: 'lot_qty',
               type: 'input',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Lot Quantity',
                 placeholder: 'Enter Lot Quantity',
@@ -125,7 +125,7 @@ export class QuickpacksComponent implements OnInit {
             {
               key: 'active',
               type: 'select',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               defaultValue: 'Y',
               templateOptions: {
                 label: 'Active',
@@ -139,7 +139,7 @@ export class QuickpacksComponent implements OnInit {
             {
               key: 'description',
               type: 'textarea',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Description',
                 placeholder: 'Enter Description',

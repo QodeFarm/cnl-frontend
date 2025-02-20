@@ -56,7 +56,7 @@ export class InteractionTypesComponent {
         fieldGroup: [{
           key: 'interaction_type',
           type: 'input',
-          className: 'col-6 p-0',
+          className: 'col-md-6 col-12 p-0',
           templateOptions: {
             label: 'Interaction type',
             placeholder: 'Enter Interaction type',

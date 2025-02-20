@@ -75,7 +75,7 @@ export class ProductGstClassificationsComponent {
 	       {
               key: 'type',
               type: 'select',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 px-1 pb-3',
               templateOptions: {
                 label: 'Type',
                 required: true,
@@ -94,7 +94,7 @@ export class ProductGstClassificationsComponent {
             {
               key: 'code',
               type: 'input',
-              className: 'col-6 pb-3 pe-0',
+              className: 'col-md-6 col-12 px-1 pb-3',
               templateOptions: {
                 label: 'Code',
                 required: true
@@ -108,7 +108,7 @@ export class ProductGstClassificationsComponent {
             {
               key: 'hsn_or_sac_code',
               type: 'input',
-              className: 'col-6 pb-3 pS-0',
+              className: 'col-md-6 col-12 px-1 pb-md-0 pb-3',
               templateOptions: {
                 label: 'Hsn Or Sac Code',
                 required: true
@@ -122,7 +122,7 @@ export class ProductGstClassificationsComponent {
             {
               key: 'hsn_description',
               type: 'textarea',
-              className: 'col-6 pb-3 pe-0',
+              className: 'col-md-6 col-12 px-1',
               templateOptions: {
                 label: 'Hsn Description',
                 required: true

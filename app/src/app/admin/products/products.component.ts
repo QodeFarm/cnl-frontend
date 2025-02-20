@@ -1,9 +1,11 @@
 import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { ProductsListComponent } from './products-list/products-list.component';
+import { TaFormComponent } from '@ta/ta-form';
 
 
 @Component({
@@ -20,16 +22,15 @@ export class ProductsComponent implements OnInit {
   formConfig: TaFormConfig = {};
   dialogMessage: string = '';
   @ViewChild(ProductsListComponent) ProductsListComponent!: ProductsListComponent;
+  @ViewChild(TaFormComponent) taFormComponent!: TaFormComponent;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private notification: NzNotificationService) {}
 
   ngOnInit() {
     this.showProductsList = false;
     this.showForm = true;
     this.ProductEditID = null;
-    // Set form config
     this.setFormConfig();
-    // this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[8].hide = true;
   }
 
   hide() {
@@ -80,15 +81,14 @@ export class ProductsComponent implements OnInit {
     this.http.post('products/products/', createData)
       .subscribe({
         next: (response) => {
-          console.log('Record created successfully:', response);
-          this.ngOnInit();  // Optionally reset the form after successful submission
+          this.notification.success('Record created successfully', '');
+          this.ngOnInit()
+          this.taFormComponent.formlyOptions.resetModel([]);
         },
         error: (error) => {
           console.error('Error creating record:', error);
-          alert('An error occurred while creating the record.');
         }
       });
-      this.ngOnInit();
   };
 
   updateProducts() {
@@ -102,46 +102,54 @@ export class ProductsComponent implements OnInit {
     // PUT request to update Sale Return Order
     this.http.put(`products/products/${ProductEditID}/`, updateData).subscribe(
       (response) => {
-        console.log('Sale Credit Notes Order updated successfully', response);
-        this.ngOnInit();
+        this.notification.success('Record updated successfully', '');
+        this.ngOnInit()
+        this.taFormComponent.formlyOptions.resetModel([]);
       },
       (error) => {
-        console.error('Error updating Sale Return Order:', error);
+        console.error('Error updating Products:', error);
       }
     );
-  }
+  } 
 
   // Method to calculate and verify the balance
   verifyBalance(): any {
     const balance = parseInt(this.formConfig.model.products.balance, 10);
-    let totalItemBalanceQuantity = 0;
-    let totalVariationQuantity = 0;
   
     // Helper function to calculate total quantity
-    const calculateTotalQuantity = (items) => {
-      return items ? items.reduce((sum, item) => sum + (parseInt(item.quantity, 10) || 0), 0) : 0;
-    };
+    const calculateTotalQuantity = (items) => 
+      items?.reduce((sum, item) => sum + (parseInt(item.quantity, 10) || 0), 0) || 0;
   
-    // Calculate total quantities
-    totalItemBalanceQuantity = calculateTotalQuantity(this.formConfig.model.product_item_balance);
-    totalVariationQuantity = calculateTotalQuantity(this.formConfig.model.product_variations);
+    // Filter out empty/null variations
+    const productVariations = (this.formConfig.model.product_variations ?? []).filter(
+      (obj) => obj && Object.keys(obj).length
+    );
   
-    // Check if the item balance matches
+    // Update model with cleaned variations
+    this.formConfig.model.product_variations = productVariations;
+  
+    const totalItemBalanceQuantity = calculateTotalQuantity(this.formConfig.model.product_item_balance);
+    const totalVariationQuantity = calculateTotalQuantity(productVariations);
+  
+    // Validate variations match balance
+    if (productVariations.length && totalVariationQuantity !== balance) {
+      return this.showDialog(
+        `<b>Variations !</b><br>
+         Your sum of quantities are <b>${totalVariationQuantity}</b> not matching with overall balance <b>${balance}.</b>`
+      );
+    }
+  
+    // Validate item balance matches
     if (totalItemBalanceQuantity !== balance) {
-      return this.showDialog(`<b>Product Balance Mismatch !</b>
-        <br>Sum of quantities are not equal to total balance: ${balance}.`);
+      return this.showDialog(
+        `<b>Warehouse Locations!</b><br>
+         Your sum of quantities are <b>${totalItemBalanceQuantity}</b> not matching with overall balance <b>${balance}.</b>`
+      );
     }
   
-    // Check if variations exist and the total variations match the balance
-    if (this.formConfig.model.product_variations?.length && totalVariationQuantity !== balance) {
-      return this.showDialog(`<b>Product Variations Mismatch !</b>
-        <br>Please ensure the total quantity of variations equals the balance: ${balance}.`);
-    }
-  
-    return true;  // Everything matches, continue with your logic
+    return true; // Everything matches
   }
-  ;
-
+  
   showDialog(message: string): void {
     this.dialogMessage = message;  // Set the dynamic message
     const dialog = document.getElementById('customDialog');
@@ -159,19 +167,16 @@ export class ProductsComponent implements OnInit {
     }
   };
 
-  // Example for how the form submission might trigger the update
   onSubmit() {
     // Proceed only if verifyBalance() returns true
     if (this.verifyBalance()) {
       if (this.formConfig.submit.label === 'Update') {
         this.updateProducts();
-      }
-      if (this.formConfig.submit.label === 'Submit') {
+      } else if (this.formConfig.submit.label === 'Submit') {
         this.createRecord();
       }
     }
   };
-  
 
   setFormConfig() {
     this.ProductEditID =null
@@ -209,14 +214,14 @@ export class ProductsComponent implements OnInit {
             {
               className: 'col-12 custom-form-card-block p-0',
               key: 'products',
-              fieldGroupClassName:'row m-0 pr-0',
+              fieldGroupClassName:'row m-0 pr-0 responsive-row',
               fieldGroup: [
                 {
-                  className: 'col-9',
+                  className: 'col-sm-9 col-12 p-0',
                   fieldGroupClassName:'row m-0 p-0',
                   fieldGroup: [
                 {
-                  className: 'col-3',
+                  className: 'col-md-4 col-sm-6 col-12',
                   key: 'name',
                   type: 'input',
                   templateOptions: {
@@ -226,7 +231,17 @@ export class ProductsComponent implements OnInit {
                   }
                 },
                 {
-                  className: 'col-3',
+                  className: 'col-md-4 col-sm-6 col-12',
+                  key: 'print_name',
+                  type: 'input',
+                  templateOptions: {
+                    label: 'Print Name',
+                    placeholder: 'Enter Print Name',
+                    required: true,
+                  }
+                },
+                {
+                  className: 'col-md-4 col-sm-6 col-12',
                   key: 'code',
                   type: 'input',
                   templateOptions: {
@@ -245,20 +260,9 @@ export class ProductsComponent implements OnInit {
                   }
                 },
                 {
-                  className: 'col-3',
-                  key: 'print_name',
-                  type: 'input',
-                  templateOptions: {
-                    label: 'Print Name',
-                    placeholder: 'Enter Print Name',
-                    required: true,
-                  }
-                },               
-
-                {
                   key: 'product_group',
                   type: 'select',
-                  className: 'col-3',
+                  className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'Product Group',
                     dataKey: 'product_group_id',
@@ -285,7 +289,7 @@ export class ProductsComponent implements OnInit {
                 {
                   key: 'stock_unit',
                   type: 'select',
-                  className: 'col-3',
+                  className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                   label: 'Stock Unit',
                   dataKey: 'stock_unit_id',
@@ -312,7 +316,7 @@ export class ProductsComponent implements OnInit {
                 {
                   key: 'sales_gl',
                   type: 'select',
-                  className: 'col-3',
+                  className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                   label: 'Sales GL',
                   dataKey: 'sales_gl_id',
@@ -339,7 +343,7 @@ export class ProductsComponent implements OnInit {
                 {
                   key: 'purchase_gl',
                   type: 'select',
-                  className: 'col-3',
+                  className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                   label: 'Purchase GL',
                   dataKey: 'purchase_gl_id',
@@ -364,7 +368,7 @@ export class ProductsComponent implements OnInit {
                   }
                 },
                 {
-                  className: 'col-3',
+                  className: 'col-md-4 col-sm-6 col-12',
                   key: 'hsn_code',
                   type: 'input',
                   templateOptions: {
@@ -375,7 +379,7 @@ export class ProductsComponent implements OnInit {
                 },
                 
                 {
-                  className: 'col-3',
+                  className: 'col-md-4 col-sm-6 col-12',
                   key: 'balance',
                   type: 'input',
                   templateOptions: {
@@ -384,7 +388,7 @@ export class ProductsComponent implements OnInit {
                   }
                 },
                 {
-                  className: 'col-3 d-flex align-items-center',
+                  className: 'col-md-4 col-sm-6 col-12',
                   key: 'print_barcode',
                   type: 'checkbox',
                   templateOptions: {
@@ -395,14 +399,14 @@ export class ProductsComponent implements OnInit {
               ]
             },
             {
-              className: 'col-3 p-0',
+              className: 'col-sm-3 col-12 p-0',
               // key: 'products',
               fieldGroupClassName: "ant-row row mx-0 mt-2",
               fieldGroup: [
                 {
                   key: 'picture',
                   type: 'file',
-                  className: 'ta-cell pr-md col d-flex justify-content-center pr-0',
+                  className: 'ta-cell pr-md col d-flex justify-content-md-center pr-0',
                   templateOptions: {
                     label: 'Picture',
                     required: true
@@ -429,7 +433,7 @@ export class ProductsComponent implements OnInit {
                     {
                       key: 'product_variations',
                       type: 'table',
-                      className: 'custom-form-list',
+                      className: 'custom-form-list no-ant-card',
                       templateOptions: {
                         // title: 'Product Variations',
                         addText: 'Add New Variations',
@@ -478,8 +482,10 @@ export class ProductsComponent implements OnInit {
                             templateOptions: {
                               label: 'SKU',
                               hideLabel: true,
-                              placeholder: 'Enter SKU',
-                              required: true
+                              placeholder: 'Enter SKU'
+                            },
+                            expressionProperties: {
+                              'templateOptions.required': (model) => !!model?.quantity  // SKU is required if quantity has a value
                             }
                           },
                           {
@@ -489,7 +495,7 @@ export class ProductsComponent implements OnInit {
                               label: 'Price',
                               hideLabel: true,
                               placeholder: 'Enter Price',
-                              required:true
+                              required:false
                             }
                           },
                           {
@@ -499,9 +505,10 @@ export class ProductsComponent implements OnInit {
                               label: 'Quantity',
                               hideLabel: true,
                               placeholder: 'Enter Quantity',
-                              required:true
+                              required:false,
+                              type: 'number'
                             }
-                          }
+                          }                         
                           ]
                       }
                     },
@@ -522,7 +529,7 @@ export class ProductsComponent implements OnInit {
                       {
                         key: 'product_item_balance',
                         type: 'table',
-                        className: 'custom-form-list',
+                        className: 'custom-form-list no-ant-card',
                         templateOptions: {
                         addText: 'Add Warehouse Locations',
                         tableCols: [
@@ -595,7 +602,7 @@ export class ProductsComponent implements OnInit {
                             {
                               key: 'gst_classification',
                               type: 'select',
-                              className: 'col-3',
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                               templateOptions: {
                                 label: 'GST Classification',
                                 dataKey: 'gst_classification_id',
@@ -620,7 +627,7 @@ export class ProductsComponent implements OnInit {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                               key: 'gst_input',
                               type: 'input',
                               templateOptions: {
@@ -650,7 +657,7 @@ export class ProductsComponent implements OnInit {
                         fieldGroupClassName: "ant-row row align-items-end mt-3",
                             fieldGroup: [
                               {
-                                className: 'col-3',
+                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'sales_description',
                                 type: 'input',
                                 templateOptions: {
@@ -659,7 +666,7 @@ export class ProductsComponent implements OnInit {
                                 }
                               },
                               {
-                                className: 'col-3',
+                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'mrp',
                                 type: 'input',
                                 templateOptions: {
@@ -669,7 +676,7 @@ export class ProductsComponent implements OnInit {
                                 }
                               },
                               {
-                                className: 'col-3',
+                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'minimum_price',
                                 type: 'input',
                                 templateOptions: {
@@ -678,7 +685,7 @@ export class ProductsComponent implements OnInit {
                                 }
                               },
                               {
-                                className: 'col-3',
+                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'sales_rate',
                                 type: 'input',
                                 templateOptions: {
@@ -688,7 +695,7 @@ export class ProductsComponent implements OnInit {
                                 }
                               },
                               {
-                                className: 'col-3',
+                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'wholesale_rate',
                                 type: 'input',
                                 templateOptions: {
@@ -697,7 +704,7 @@ export class ProductsComponent implements OnInit {
                                 }
                               },
                               {
-                                className: 'col-3',
+                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'dealer_rate',
                                 type: 'input',
                                 templateOptions: {
@@ -706,7 +713,7 @@ export class ProductsComponent implements OnInit {
                                 }
                               },
                               {
-                                className: 'col-3',
+                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'rate_factor',
                                 type: 'input',
                                 templateOptions: {
@@ -715,7 +722,7 @@ export class ProductsComponent implements OnInit {
                                 }
                               },
                               {
-                                className: 'col-3',
+                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'discount',
                                 type: 'input',
                                 templateOptions: {
@@ -724,7 +731,7 @@ export class ProductsComponent implements OnInit {
                                 }
                               },
                               {
-                                className: 'col-3',
+                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'dis_amount',
                                 type: 'input',
                                 templateOptions: {
@@ -734,7 +741,7 @@ export class ProductsComponent implements OnInit {
                                 }
                               },
                               {
-                                className: 'col-3',
+                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'purchase_description',
                                 type: 'input',
                                 templateOptions: {
@@ -743,7 +750,7 @@ export class ProductsComponent implements OnInit {
                                 }
                               },
                               {
-                                className: 'col-3',
+                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'purchase_rate',
                                 type: 'input',
                                 templateOptions: {
@@ -752,7 +759,7 @@ export class ProductsComponent implements OnInit {
                                 }
                               },
                               {
-                                className: 'col-3',
+                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'purchase_rate_factor',
                                 type: 'input',
                                 templateOptions: {
@@ -761,7 +768,7 @@ export class ProductsComponent implements OnInit {
                                 }
                               },
                               {
-                                className: 'col-3',
+                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'purchase_discount',
                                 type: 'input',
                                 templateOptions: {
@@ -783,12 +790,12 @@ export class ProductsComponent implements OnInit {
                     },
                     fieldGroup: [
                       {
-                        className: 'col-9 p-0',
+                        className: 'col-12 p-0',
                         key: 'products',
                         fieldGroupClassName: "ant-row mx-0 row align-items-end mt-2",
                         fieldGroup: [
                           {
-                            className: 'col-3',
+                            className: 'col-md-4 col-sm-6 col-12',
                             key: 'minimum_level',
                             type: 'input',
                             templateOptions: {
@@ -797,7 +804,7 @@ export class ProductsComponent implements OnInit {
                             }
                           },
                           {
-                            className: 'col-3',
+                            className: 'col-md-4 col-sm-6 col-12',
                             key: 'maximum_level',
                             type: 'input',
                             templateOptions: {

@@ -1,12 +1,12 @@
-<div class="container-fluid pt-3">
+<div class="container-fluid p-3">
     <div class="customfield-banner">
-      <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;">
+      <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
         <button (click)="customFieldEditID = null" type="button" class="btn pl-0" style="color: black;">
           <span *ngIf="customFieldEditID" class="custom-heading">Update Custom Field</span>
           <span *ngIf="!customFieldEditID" class="custom-heading">Create Custom Field</span>
         </button>
         <button (click)="showCustomFieldListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#customFieldListModal">
-          Custom Field List
+          Custom List
         </button>
       </div>
     </div>
