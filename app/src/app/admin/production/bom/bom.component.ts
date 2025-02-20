@@ -208,7 +208,7 @@ export class BomComponent {
         {
           key: 'bill_of_material',
           type: 'table',
-          className: 'custom-form-list no-ant-card',
+          className: 'custom-form-list',
           templateOptions: {
             title: 'Bill Of Material',
             addText: 'Add Materials',

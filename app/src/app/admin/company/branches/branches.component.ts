@@ -325,7 +325,7 @@ export class BranchesComponent {
                 {
                     key: 'gstn_username',
                     type: 'input',
-                    className: 'col-3',
+                    className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                     templateOptions: {
                       label: 'GSTN Username',
                       placeholder: 'Enter GSTN Username',

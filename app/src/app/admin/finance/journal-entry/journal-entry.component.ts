@@ -129,7 +129,7 @@ export class JournalEntryComponent {
         {
           key: 'journal_entry_lines',
           type: 'table',
-          className: 'custom-form-list product-table',
+          className: 'custom-form-list',
           templateOptions: {
             title: 'Journal Entry Lines',
             addText: 'Add Journal Entry Line',
