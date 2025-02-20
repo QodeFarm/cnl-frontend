@@ -216,6 +216,66 @@ export class VendorsComponent {
     );
   }
   
+  // constructCustomFieldsPayload(customFieldValues: any) {
+  //   if (!customFieldValues) {
+  //     console.warn('No custom field values provided.');
+  //     return {
+  //       custom_field: {},
+  //       custom_field_options: [],
+  //       custom_field_values: []
+  //     };
+  //   }
+  
+  //   // Initialize custom field values as an array
+  //   const customFieldValuesArray = [];
+
+  //   // Iterate over all custom field keys and construct values
+  //   Object.keys(customFieldValues).forEach((fieldKey) => {
+  //     const metadata = this.customFieldMetadata[fieldKey.toLowerCase()] || {}; // Fetch metadata for each field
+  //     console.log("Metadata entity : ", metadata);
+  
+  //     customFieldValuesArray.push({
+  //       field_value: customFieldValues[fieldKey], // Value entered by the user
+  //       field_value_type: typeof customFieldValues[fieldKey] === "number" ? "number" : "string", // Type
+  //       entity_id: metadata.entity_name || "c6ee3061-d258-4c98-a2cf-81a8a107a221", // Default entity ID
+  //       custom_field_id: fieldKey, // Field name as custom_field_id
+  //       custom_id: this.formConfig.model.vendor_data.vendor_id,
+  //       entity_type_id: "3c7d73ad-9048-4415-8cce-312ac5c5aa84"
+  //     });
+  //   });
+  //   console.log("Chekcing data : ", customFieldValuesArray);
+  //   // Construct payload for multiple custom fields
+  //   return {
+  //     // Custom field metadata for all fields
+  //     custom_field: Object.keys(customFieldValues).map((fieldKey) => ({
+  //       field_name: fieldKey, // Use field name
+  //       is_required: this.customFieldMetadata[fieldKey.toLowerCase()]?.is_required || false,
+  //       validation_rules: this.customFieldMetadata[fieldKey.toLowerCase()]?.validation_rules || null,
+  //       field_type_id: this.customFieldMetadata[fieldKey.toLowerCase()]?.field_type_id || null,
+  //       entity_id: this.customFieldMetadata[fieldKey.toLowerCase()]?.entity_id || null,
+  //     })),
+  //     // Optional field options
+  //     // custom_field_options: Object.values(this.customFieldMetadata).map((metadata) => metadata.options || []),
+  //     // Multiple custom field values
+  //     custom_field_values: customFieldValuesArray // Multiple field values
+  //   };
+  // }
+
+  showDialog() {
+    const dialog = document.getElementById('customDialog');
+    if (dialog) {
+      dialog.style.display = 'flex'; // Show the dialog
+    }
+  }
+
+  // Function to close the custom dialog
+  closeDialog() {
+    const dialog = document.getElementById('customDialog');
+    if (dialog) {
+      dialog.style.display = 'none'; // Hide the dialog
+    }
+  }
+
   constructCustomFieldsPayload(customFieldValues: any) {
     if (!customFieldValues) {
       console.warn('No custom field values provided.');
@@ -228,24 +288,42 @@ export class VendorsComponent {
   
     // Initialize custom field values as an array
     const customFieldValuesArray = [];
-
+  
+    // Track missing required fields
+    const missingRequiredFields = [];
+  
     // Iterate over all custom field keys and construct values
     Object.keys(customFieldValues).forEach((fieldKey) => {
       const metadata = this.customFieldMetadata[fieldKey.toLowerCase()] || {}; // Fetch metadata for each field
-      console.log("Metadata entity : ", metadata);
   
-      customFieldValuesArray.push({
-        field_value: customFieldValues[fieldKey], // Value entered by the user
-        field_value_type: typeof customFieldValues[fieldKey] === "number" ? "number" : "string", // Type
-        entity_id: metadata.entity_name || "c6ee3061-d258-4c98-a2cf-81a8a107a221", // Default entity ID
-        custom_field_id: fieldKey, // Field name as custom_field_id
-        vendor_id: this.formConfig.model.vendor_data.vendor_id
-      });
+      // Check if the field is required and missing
+      if (metadata.is_required && 
+          (customFieldValues[fieldKey] === '' || customFieldValues[fieldKey] === null || customFieldValues[fieldKey] === undefined)) {
+        missingRequiredFields.push(fieldKey);
+      }
+  
+      // Only include fields that have a value (skip ignored fields)
+      if (customFieldValues[fieldKey] !== '' && customFieldValues[fieldKey] !== null && customFieldValues[fieldKey] !== undefined) {
+        customFieldValuesArray.push({
+          field_value: customFieldValues[fieldKey], // Value entered by the user
+          field_value_type: typeof customFieldValues[fieldKey] === "number" ? "number" : "string", // Type
+          entity_id: metadata.entity_name || "c6ee3061-d258-4c98-a2cf-81a8a107a221", // Default entity ID
+          custom_field_id: fieldKey, // Field name as custom_field_id
+          custom_id: this.formConfig.model.vendor_data.vendor_id
+        });
+      }
     });
-    console.log("Chekcing data : ", customFieldValuesArray);
+  
+    // If any required fields are missing, show an alert and stop submission
+    if (missingRequiredFields.length > 0) {
+      console.error("Required fields missing:", missingRequiredFields);
+      this.showDialog();
+      // alert("Please fill in all required fields before submitting.");
+      return null; // Prevent submission
+    }
+  
     // Construct payload for multiple custom fields
     return {
-      // Custom field metadata for all fields
       custom_field: Object.keys(customFieldValues).map((fieldKey) => ({
         field_name: fieldKey, // Use field name
         is_required: this.customFieldMetadata[fieldKey.toLowerCase()]?.is_required || false,
@@ -253,10 +331,7 @@ export class VendorsComponent {
         field_type_id: this.customFieldMetadata[fieldKey.toLowerCase()]?.field_type_id || null,
         entity_id: this.customFieldMetadata[fieldKey.toLowerCase()]?.entity_id || null,
       })),
-      // Optional field options
-      // custom_field_options: Object.values(this.customFieldMetadata).map((metadata) => metadata.options || []),
-      // Multiple custom field values
-      custom_field_values: customFieldValuesArray // Multiple field values
+      custom_field_values: customFieldValuesArray // Only include entered values
     };
   }
 
