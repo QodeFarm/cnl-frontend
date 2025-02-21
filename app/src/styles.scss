@@ -1387,7 +1387,11 @@ ta-form {
     }
 }
 @media(max-width:960px){
-
+    .modal.show .modal-dialog {
+        height: inherit;
+        display: inherit;
+        align-items: inherit;
+    }
     .ant-table-content {
       table{
         tr{
