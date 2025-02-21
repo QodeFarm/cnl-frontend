@@ -1,8 +1,9 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
+import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 
 @Component({
   selector: 'app-warehouses-list',
@@ -13,6 +14,11 @@ import { Router } from '@angular/router';
 })
 export class WarehousesListComponent {
   @Output('edit') edit = new EventEmitter<void>();
+  @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+
+  refreshTable() {
+   this.taTableComponent?.refresh();
+  };
 
   tableConfig: TaTableConfig = {
     apiUrl: 'inventory/warehouses/',
@@ -20,8 +26,9 @@ export class WarehousesListComponent {
     pkId: "warehouse_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['name','code','phone','city_id','state_id']
+      keys: ['created_at','name','code','phone','city_id','state_id']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {
         fieldKey: 'name',

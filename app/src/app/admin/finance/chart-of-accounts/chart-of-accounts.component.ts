@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
 import { ChartOfAccountsListComponent } from './chart-of-accounts-list/chart-of-accounts-list.component';
@@ -16,6 +16,7 @@ export class ChartOfAccountsComponent {
   showChartOfAccountsList: boolean = false;
   showForm: boolean = false;
   ChartOfAccountsEditID: any;
+  @ViewChild(ChartOfAccountsListComponent) ChartOfAccountsListComponent!: ChartOfAccountsListComponent;
 
   constructor(private http: HttpClient) {
   }
@@ -54,6 +55,7 @@ export class ChartOfAccountsComponent {
 
   showChartOfAccountsListFn() {
     this.showChartOfAccountsList = true;
+    this.ChartOfAccountsListComponent?.refreshTable();
   };
 
   setFormConfig() {
@@ -89,12 +91,12 @@ export class ChartOfAccountsComponent {
       model:{},	  
       fields: [
         {
-          fieldGroupClassName: "ant-row custom-form-block",
+          fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
           fieldGroup: [	  
             {
               key: 'account_code',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Account Code',
                 placeholder: 'Enter Account Code',
@@ -104,7 +106,7 @@ export class ChartOfAccountsComponent {
             {
               key: 'account_name',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Account Name',
                 placeholder: 'Enter Account Name',
@@ -114,7 +116,7 @@ export class ChartOfAccountsComponent {
             {
               key: 'account_type',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Account Type',
                 placeholder: 'Select Account Type',
@@ -131,7 +133,7 @@ export class ChartOfAccountsComponent {
             {
               key: 'parent_account',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Parent Account',
                 dataKey: 'parent_account_id',
@@ -152,7 +154,7 @@ export class ChartOfAccountsComponent {
             {
               key: 'bank_account',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Bank Account',
                 dataKey: 'bank_account_id',
@@ -173,7 +175,7 @@ export class ChartOfAccountsComponent {
             {
               key: 'is_active',
               type: 'checkbox',
-              className: 'col-3 d-flex align-items-center',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Is Active',
                 required: false,

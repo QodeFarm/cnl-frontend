@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
 import { BudgetListComponent } from './budget-list/budget-list.component';
@@ -16,6 +16,7 @@ export class BudgetComponent {
   showBudgetList: boolean = false;
   showForm: boolean = false;
   BudgetEditID: any;
+  @ViewChild(BudgetListComponent) BudgetListComponent!: BudgetListComponent;
 
   constructor(private http: HttpClient) {
   }
@@ -54,6 +55,7 @@ export class BudgetComponent {
 
   showBudgetListFn() {
     this.showBudgetList = true;
+    this.BudgetListComponent?.refreshTable();
   };
 
   setFormConfig() {
@@ -84,12 +86,12 @@ export class BudgetComponent {
       model:{},	  
       fields: [
         {
-          fieldGroupClassName: "ant-row custom-form-block",
+          fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
           fieldGroup: [	  
             {
               key: 'account',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Account',
                 dataKey: 'account',
@@ -109,7 +111,7 @@ export class BudgetComponent {
             {
               key: 'fiscal_year',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Fiscal Year',
                 placeholder: 'Enter Fiscal Year',
@@ -119,7 +121,7 @@ export class BudgetComponent {
             {
               key: 'allocated_amount',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Allocated Amount',
                 placeholder: 'Enter Allocated Amount',
@@ -129,7 +131,7 @@ export class BudgetComponent {
             {
               key: 'spent_amount',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Spent Amount',
                 placeholder: 'Enter Spent Amount',

@@ -17,28 +17,34 @@ export class VendorAgentComponent {
       pkId: "vendor_agent_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['vendor_agent_id', 'name']
+        keys: ['vendor_agent_id', 'name','code','commission_rate','rate_on','amount_type']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'code',
-          name: 'code'
+          name: 'code',
+          sort: true
         },
 		    {
           fieldKey: 'name',
-          name: 'Name'
+          name: 'Name',
+          sort: true
         },
 		    {
           fieldKey: 'commission_rate',
-          name: 'Commission Rate'
+          name: 'Commission Rate',
+          sort: true
         },
 		    {
           fieldKey: 'rate_on',
-          name: 'Rate On'
+          name: 'Rate On',
+          sort: true
         },
 		    {
           fieldKey: 'amount_type',
-          name: 'Amount Type'
+          name: 'Amount Type',
+          sort: true
         },
         {
           fieldKey: "code",
@@ -80,7 +86,7 @@ export class VendorAgentComponent {
         {
           key: 'code',
           type: 'input',
-          className: 'col-6 pb-3 ps-0',
+          className: 'col-md-6 col-12 pb-3 px-1',
           templateOptions: {
             label: 'Code',
             placeholder: 'Enter code',
@@ -90,7 +96,7 @@ export class VendorAgentComponent {
 		    {
           key: 'name',
           type: 'input',
-          className: 'col-6 pb-3 pe-0',
+          className: 'col-md-6 col-12 pb-3 px-1',
           templateOptions: {
             label: 'Name',
             placeholder: 'Enter name',
@@ -100,7 +106,7 @@ export class VendorAgentComponent {
 		    {
           key: 'commission_rate',
           type: 'input',
-          className: 'col-6 pb-3 ps-0',
+          className: 'col-md-6 col-12 pb-3 px-1',
           templateOptions: {
             label: 'Commission rate',
             placeholder: 'Enter commission rate',
@@ -110,7 +116,7 @@ export class VendorAgentComponent {
         {
           key: 'rate_on',
           type: 'select',
-          className: 'col-6 pb-3 pe-0',
+          className: 'col-md-6 col-12 pb-3 pb-md-0 px-1',
           templateOptions: {
             label: 'Rate On',
             placeholder: 'Enter rate on',
@@ -124,7 +130,7 @@ export class VendorAgentComponent {
         {
           key: 'amount_type',
           type: 'select',
-          className: 'col-6 ps-0',
+          className: 'col-md-6 col-12 px-1',
           templateOptions: {
             label: 'Amount Type',
             placeholder: 'Enter amount type',

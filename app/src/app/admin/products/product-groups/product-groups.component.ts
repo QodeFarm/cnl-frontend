@@ -17,8 +17,9 @@ export class ProductGroupsComponent   {
     pkId: "product_group_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['id', 'name']
+      keys: ['group_name', 'description']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {
         fieldKey: 'group_name',
@@ -28,9 +29,8 @@ export class ProductGroupsComponent   {
       {
         fieldKey: 'description', 
         name: 'Description',
-        sort: false
+        sort: true
       },
-  
       {
         fieldKey: "code",
         name: "Action",
@@ -65,7 +65,7 @@ export class ProductGroupsComponent   {
 	       {
             key: 'group_name',
             type: 'text',
-            className: 'col-6 pb-3 ps-0',
+            className: 'col-md-6 col-12 px-1 pb-md-0 pb-3',
             templateOptions: {
               label: 'Group Name',
               required: true
@@ -79,7 +79,7 @@ export class ProductGroupsComponent   {
           {
             key: 'description',
             type: 'textarea',
-            className: 'col-6 pb-3 pe-0',
+            className: 'col-md-6 col-12 px-1',
             templateOptions: {
               label: 'Description',
               required: true

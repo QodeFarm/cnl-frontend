@@ -17,32 +17,39 @@ export class VendorPaymentTermsComponent {
       pkId: "payment_term_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['payment_term_id', 'name']
+        keys: ['payment_term_id', 'name', 'code','fixed_days','no_of_fixed_days','payment_cycle','run_on']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
 	      {
           fieldKey: 'name',
-          name: 'Name'
+          name: 'Name',
+          sort: true
         },
         {
           fieldKey: 'code',
-          name: 'code'
+          name: 'code',
+          sort: true
         },
 		    {
           fieldKey: 'fixed_days',
-          name: 'Fixed Days'
+          name: 'Fixed Days',
+          sort: true
         },
 		    {
           fieldKey: 'no_of_fixed_days',
-          name: 'No of fixed days'
+          name: 'No of fixed days',
+          sort: true
         },
         {
           fieldKey: 'payment_cycle',
-          name: 'Payment Cycle'
+          name: 'Payment Cycle',
+          sort: true
         },
 		    {
           fieldKey: 'run_on',
-          name: 'Run On'
+          name: 'Run On',
+          sort: true
         },
         {
           fieldKey: "code",
@@ -84,7 +91,7 @@ export class VendorPaymentTermsComponent {
 	     {
           key: 'name',
           type: 'input',
-          className: 'col-6 pb-3 ps-0',
+          className: 'col-md-6 col-12 pb-3 px-1',
           templateOptions: {
             label: 'Name',
             placeholder: 'Enter Name',
@@ -94,7 +101,7 @@ export class VendorPaymentTermsComponent {
         {
           key: 'code',
           type: 'input',
-          className: 'col-6 pb-3 pe-0',
+          className: 'col-md-6 col-12 pb-3 px-1',
           templateOptions: {
             label: 'Code',
             placeholder: 'Enter Code',
@@ -104,7 +111,7 @@ export class VendorPaymentTermsComponent {
 		    {
           key: 'fixed_days',
           type: 'input',
-          className: 'col-6 pb-3 ps-0',
+          className: 'col-md-6 col-12 pb-3 px-1',
           templateOptions: {
             label: 'Fixed Days',
             placeholder: 'Enter fixed days',
@@ -114,7 +121,7 @@ export class VendorPaymentTermsComponent {
 		    {
           key: 'no_of_fixed_days',
           type: 'input',
-          className: 'col-6 pb-3 pe-0',
+          className: 'col-md-6 col-12 pb-3 px-1',
           templateOptions: {
             label: 'No of fixed days',
             placeholder: 'Enter no of fixed days',
@@ -124,7 +131,7 @@ export class VendorPaymentTermsComponent {
 		    {
           key: 'payment_cycle',
           type: 'input',
-          className: 'col-6 ps-0',
+          className: 'col-md-6 col-12 pb-md-0 pb-3 px-1',
           templateOptions: {
             label: 'Payment Cycle',
             placeholder: 'Enter payment cycle',
@@ -134,7 +141,7 @@ export class VendorPaymentTermsComponent {
 		    {
           key: 'run_on',
           type: 'input',
-          className: 'col-6 pe-0',
+          className: 'col-md-6 col-12  px-1',
           templateOptions: {
             label: 'Run on',
             placeholder: 'Enter run on',

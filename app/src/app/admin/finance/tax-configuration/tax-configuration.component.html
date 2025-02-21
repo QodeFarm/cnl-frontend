@@ -1,12 +1,12 @@
-<div class="container-fluid pt-3">
+<div class="container-fluid p-3">
     <div class="Tax Configuration-banner">
-        <div class="col-12 px-0" style="display: flex; justify-content: space-between;align-items: center;">
+        <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
             <button (click)="TaxConfigurationEditID = null" type="button" class="btn pl-0" style="color: black;">
                 <span *ngIf="TaxConfigurationEditID" class="custom-heading">Update Tax Configuration</span>
                 <span *ngIf="!TaxConfigurationEditID" class="custom-heading">Create Tax Configuration</span>
             </button>
             <button (click)="showTaxConfigurationListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#TaxConfigurationListModal">
-                Tax Configuration List
+                Tax List
             </button>
         </div>
     </div>

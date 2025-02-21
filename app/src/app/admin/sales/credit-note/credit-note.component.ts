@@ -14,6 +14,7 @@ import { CreditNoteListComponent } from './credit-note-list/credit-note-list.com
 })
 export class CreditNoteComponent {
   @ViewChild('salescreditnoteForm', { static: false }) salescreditnoteForm: TaFormComponent | undefined;
+  @ViewChild(CreditNoteListComponent) CreditNoteListComponent!: CreditNoteListComponent;
   
   sidebarMessage: string = '';
   showSaleCreditnoteList: boolean = false;
@@ -148,6 +149,7 @@ export class CreditNoteComponent {
   // Displays the sales order list modal
   showSaleCreditNoteListFn() {
     this.showSaleCreditnoteList = true;
+    this.CreditNoteListComponent?.refreshTable();
   }
 
 
@@ -182,13 +184,13 @@ export class CreditNoteComponent {
       },
       fields: [
         {
-          fieldGroupClassName: "ant-row custom-form-block",
+          fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
           key: 'sale_credit_note',
           fieldGroup: [
             {
               key: 'customer',
               type: 'select',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Select Customer',
                 placeholder: 'Select Customer',
@@ -216,7 +218,7 @@ export class CreditNoteComponent {
             {
               key: 'sale_invoice_id',
               type: 'select',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Sale Invoice',
                 placeholder: 'Select Sale Invoice',
@@ -229,7 +231,7 @@ export class CreditNoteComponent {
             {
               key: 'credit_note_number',
               type: 'input',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Credit note no',
                 placeholder: 'Enter Credit note no',
@@ -242,7 +244,7 @@ export class CreditNoteComponent {
               key: 'credit_date',
               type: 'date',
               defaultValue: this.nowDate(),
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 type: 'date',
                 label: 'Credit date',
@@ -253,7 +255,7 @@ export class CreditNoteComponent {
             {
               key: 'total_amount',
               type: 'input',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 type: 'number',
                 label: 'Total amount',
@@ -264,7 +266,7 @@ export class CreditNoteComponent {
               key: 'order_status',
               type: 'select',
               defaultValue: '085266c9-5020-41b3-ab58-1e4d88f4ff19',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
               label: 'Order status',
               dataKey: 'order_status_id',
@@ -292,7 +294,7 @@ export class CreditNoteComponent {
             {
               key: 'reason',
               type: 'textarea',
-              className: 'col-4',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Reason',
                 placeholder: 'Enter Reason',
@@ -303,7 +305,7 @@ export class CreditNoteComponent {
         {
           key: 'sale_credit_note_items',
           type: 'table',
-          className: 'custom-form-list',
+          className: 'custom-form-list product-table',
           templateOptions: {
             title: 'Products',
             addText: 'Add Product',

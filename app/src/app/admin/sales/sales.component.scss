@@ -49,35 +49,69 @@
 }
 
 .toast-message {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background-color: white; /* White background */
-    color: black; /* Black text */
-    padding: 10px 20px;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    display: flex; /* Use flexbox to align items */
-    align-items: center; /* Center vertically */
-    z-index: 1000;
-    font-size: 16px;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #fff; /* Pure white background */
+  color: #0e0d0d; /* Dark grey text */
+  padding: 12px 30px;
+  width: 370px; /* Wider box */
+  height: 60px;
+  border-radius: 0px; /* No rounded corners */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Soft shadow */
+  display: flex;
+  align-items: center;
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  z-index: 1000;
+  animation: fadeIn 0.4s ease-in-out;
+  border: 2px solid #dcdcdc; /* Subtle border */
 }
 
+/* Circle with white inside and green border */
 .tick-circle {
-    width: 30px;
-    height: 30px;
-    background-color: white; /* Green circle */
-    border: 2px solid #008044;
-    border-radius: 50%; /* Make it a circle */
-    display: flex; /* Center the tick mark */
-    align-items: center;
-    justify-content: center;
-    margin-right: 10px; /* Space between circle and text */
+  width: 23px; /* Slightly smaller */
+  height: 23px;
+  background-color: #fff; /* White inside */
+  border: 2px solid #28a745; /* Green border */
+  border-radius: 50%; /* Perfect circle */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px; /* Space between icon and text */
 }
 
+/* Smaller tick mark inside the white circle */
 .tick-mark {
-    color: rgb(0, 128, 79); 
-    font-size: 20px; /* Adjust size as needed */
+  color: #28a745; /* Green tick */
+  font-size: 12px; /* Smaller size */
+  // font-weight: bold;
+  line-height: 1; /* Perfectly centered */
+}
+
+.toast-message-text {
+  flex: 1;
+  color: rgb(41, 41, 41);
+  font-size: 16px;
+  font-weight: 500; /* Medium weight */
+}
+
+/* Close button (X symbol) */
+.toast-close {
+  font-size: 16px;
+  color: rgb(73, 73, 73);
+  cursor: pointer;
+  margin-left: 12px; /* Space between text and close button */
+}
+
+.toast-close:hover {
+  color: #000; /* Darker on hover */
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 //added .modal-backdrop because of this code only we can abble to see past orders modalbox function correctly 
@@ -95,3 +129,123 @@
     max-width: 300px; /* Adjust width as needed */
 }
 
+.quickpack-container {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Adjust spacing between elements */
+  }
+
+.quickpack-container label {
+    margin-right: 10px; /* Space between label and dropdown */
+    white-space: nowrap; /* Prevents wrapping of text */
+}
+
+.quickpack-container .dropdown-container {
+  flex-grow: 1; /* Adjust width of the dropdown if needed */
+}
+  
+.quickpack-container .dropdown-select {
+  min-width: 100px; /* Adjust dropdown width */
+  padding: 5px;
+}
+
+.quickpack-container button {
+  margin-left: 10px; /* Space between dropdown and button */
+}
+
+// .quickpack-select {
+//     width: 200px; /* Set dropdown width */
+//     height: 38px; /* Adjust height to match buttons */
+//     border-radius: 4px;
+//   }
+  
+//   .btn-icon {
+//     background-color: #2c5ca9; /* Match the blue button background */
+//     color: white;
+//     border: none;
+//     height: 38px;
+//     width: 38px;
+//     display: flex;
+//     justify-content: center;
+//     align-items: center;
+//   }
+  
+//   .btn-icon i {
+//     font-size: 16px;
+//   }
+  
+//   .btn-primary {
+//     height: 38px; /* Match height with the dropdown */
+//   }
+
+//==================================
+/* Dropdown container */
+.dropdown-container {
+    position: relative;
+    width: 100%; /* Adjust width as required */
+    max-width: 300px;
+    border: 1px solid #ccc;
+    // border-radius: 4px;
+    background-color: #fff;
+    font-size: 14px;
+    overflow: hidden;
+  }
+  
+  /* Dropdown select styling */
+.dropdown-select {
+    width: 100%;
+    padding: 10px 30px 10px 10px; /* Padding to make room for arrow */
+    font-size: 14px;
+    border: none;
+    outline: none;
+    appearance: none; /* Hides default arrow in browsers */
+    background: transparent;
+    cursor: pointer;
+  }
+  
+  /* Add custom arrow for the dropdown */
+.dropdown-container::after {
+    content: '▼'; /* Unicode for a dropdown arrow */
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none; /* Prevent interaction with the arrow */
+    font-size: 12px;
+    color: #888; /* Adjust arrow color */
+    }
+
+.quickpack-box {
+  // border: 1px solid #ccc;
+  // border-radius: 4px;
+  background-color: #f9f9f9;
+  display: flex;
+  align-items: center;
+  // padding: 8px;
+  .btn-primary{
+    border-radius: 0 4px 4px 0 !important;
+  }
+}
+.dropdown-select {
+  border: none;
+  outline: none;
+  font-size: 14px;
+  margin-right: 8px;
+}
+.custom-modal.modal-center.show{
+   display: inline-flex !important;
+    width: 100%;
+    .modal-dialog{
+      width: 100%;
+      display: flex;
+      align-items: center;
+    }
+}
+
+.modal.fade .modal-dialog{
+  border: none;
+  .modal-content{
+    border: solid 2px white;
+    margin: 2px;
+  }
+} 

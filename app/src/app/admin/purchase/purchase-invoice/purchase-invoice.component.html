@@ -1,11 +1,28 @@
-<div class="container-fluid pt-3">
-    <div class="purchase-invoice-banner">
-        <div class="col-12 px-0" style="display: flex; justify-content: space-between;align-items: center;">
+<div class="container-fluid p-3">
+    <div class="purchase-invoice-banner page-component-header">
+        <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
             <button type="button" class="btn pl-0" >
                 <span *ngIf="PurchaseInvoiceEditID" class="custom-heading">Update Purchase Invoice</span>
                 <span *ngIf="!PurchaseInvoiceEditID" class="custom-heading">Create Purchase Invoice</span>
             </button>
-                <div style="display: flex; gap: 10px;">
+            <div style="display: flex; gap: 10px; align-items: center;justify-content: end;flex-wrap: wrap;">
+                <div *ngIf="!PurchaseInvoiceEditID" class="quickpack-container d-flex align-items-center">
+                    <div class="quickpack-box d-flex align-items-center">
+                        <div class="dropdown-container rounded-start">
+                            <select
+                                id="quickpackSelect"
+                                class="dropdown-select m-0 "
+                                [(ngModel)]="selectedQuickpack">
+                                <option value="" disabled selected aria-disabled="true">Quickpack</option>
+                                <option *ngFor="let quickpack of quickpackOptions" 
+                                        [value]="quickpack.quick_pack_id">
+                                    {{ quickpack.name }}
+                                </option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary ml-0 rounded-end" (click)="loadQuickpackProducts()">OK</button>
+                    </div>
+                </div>  
                 <!-- New Copy Button -->
                 <button (click)="openCopyModal()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#copyModal">
                     Copy
@@ -45,7 +62,7 @@
 
 
 <!-- Copy Modal -->
-<div class="modal fade custom-modal" id="copyModal" tabindex="-1" aria-labelledby="copyModalLabel" aria-hidden="true">
+<div class="modal fade custom-modal modal-center" id="copyModal" tabindex="-1" aria-labelledby="copyModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-sm custom-size"> <!-- Add custom-size class here -->
         <div class="modal-content">
             <div class="modal-header">

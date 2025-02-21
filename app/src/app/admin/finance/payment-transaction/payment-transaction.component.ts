@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
 import { PaymentTransactionListComponent } from './payment-transaction-list/payment-transaction-list.component';
@@ -18,6 +18,7 @@ export class PaymentTransactionComponent {
   showForm: boolean = false;
   PaymentTransactionEditID: any;
   invoiceOptions: any[] = []; 
+  @ViewChild(PaymentTransactionListComponent) PaymentTransactionListComponent!: PaymentTransactionListComponent;
 
   constructor(private http: HttpClient, private cd: ChangeDetectorRef) {}
 
@@ -36,14 +37,13 @@ export class PaymentTransactionComponent {
     // Make the HTTP request to the determined URL
     this.http.get<any>(url).subscribe(response => {
       // Access the 'data' array from the response
-      const invoices = response.data;
-  
+      const invoices = response.data;  
       // Find the invoice field
-      const invoiceField = this.formConfig.fields[0].fieldGroup.find(f => f.key === 'invoice_id');
+      const invoiceField = this.formConfig.fields[0].fieldGroup.find(f => f.key === 'invoice');
       if (invoiceField) {
         // Update options with the fetched invoice data
         this.invoiceOptions = invoices.map(invoice => ({
-          value: invoice.invoice_no,
+          value: {invoice_id : invoice.invoice_no, invoice_no : invoice.invoice_no},
           label: invoice.invoice_no
         }));
   
@@ -86,6 +86,7 @@ export class PaymentTransactionComponent {
 
   showPaymentTransactionListFn() {
     this.showPaymentTransactionList = true;
+    this.PaymentTransactionListComponent?.refreshTable();
   };
 
 
@@ -98,7 +99,13 @@ export class PaymentTransactionComponent {
         viewMode: false,
       },
       showActionBtn: true,
-      exParams: [],	  
+      exParams: [
+        {
+          key: 'invoice',
+          type: 'script',
+          value: 'data.invoice.invoice_id'
+        }
+      ],	  
       submit: {
         label: 'Submit',
         submittedFn: () => this.ngOnInit()
@@ -111,12 +118,12 @@ export class PaymentTransactionComponent {
       model:{},	  
       fields: [
         {
-          fieldGroupClassName: "ant-row custom-form-block",
+          fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
           fieldGroup: [
             {
               key: 'order_type',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Order Type',
                 placeholder: 'Select Order Type',
@@ -130,7 +137,6 @@ export class PaymentTransactionComponent {
                 onChanges: (field: any) => {
                   field.formControl.valueChanges.subscribe((OrderType: any) => {
                     if (OrderType) {
-                      console.log('Selected Order Type:', OrderType);
                       this.loadInvoices(OrderType);
                     }
                   });
@@ -138,22 +144,35 @@ export class PaymentTransactionComponent {
               }
             },
             {
-              key: 'invoice_id',
+              key: 'invoice',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Invoice',
-                placeholder: 'Select Invoice',
                 dataKey: 'invoice_id',
-                dataLabel: 'invoice_no',
-                required: true,
+                dataLabel: "invoice_no",
                 options: [],
+                lazy: {
+                  lazyOneTime: true
+                },
+                required: false
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  field.formControl.valueChanges.subscribe((data: any) => {
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['invoice']) {
+                      this.formConfig.model['invoice_id'] = data.invoice_id;
+                    } else {
+                      console.error('Form config or invoice_id data model is not defined.');
+                    }
+                  });
+                }
               }
-            },                                       
+            },                                     
             {
               key: 'payment_date',
               type: 'date',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Payment Date',
                 placeholder: 'Select Payment Date',
@@ -163,7 +182,7 @@ export class PaymentTransactionComponent {
             {
               key: 'payment_method',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Payment Method',
                 placeholder: 'Select Payment Method',
@@ -179,7 +198,7 @@ export class PaymentTransactionComponent {
             {
               key: 'payment_status',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               defaultValue:  'Pending',
               templateOptions: {
                 label: 'Payment Status',
@@ -195,7 +214,7 @@ export class PaymentTransactionComponent {
             {
               key: 'amount',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Amount',
                 placeholder: 'Enter Amount',
@@ -205,7 +224,7 @@ export class PaymentTransactionComponent {
             {
               key: 'reference_number',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Reference Number',
                 placeholder: 'Enter Reference Number',
@@ -215,7 +234,7 @@ export class PaymentTransactionComponent {
             {
               key: 'currency',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Currency',
                 placeholder: 'Enter Currency',
@@ -225,7 +244,7 @@ export class PaymentTransactionComponent {
             {
               key: 'transaction_type',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               defaultValue:  'Credit',
               templateOptions: {
                 label: 'Transaction Type',
@@ -240,7 +259,7 @@ export class PaymentTransactionComponent {
             {
               key: 'notes',
               type: 'textarea',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Notes',
                 placeholder: 'Enter Notes',

@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 
 @Component({
   selector: 'app-employee-list',
@@ -11,20 +12,24 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
   styleUrls: ['./employee-list.component.scss']
 })
 
-export class EmployeeListComponent {
-
-  
+export class EmployeeListComponent { 
   @Output('edit') edit = new EventEmitter<void>();
+  @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+
+  refreshTable() {
+    this.taTableComponent?.refresh();
+   };
 
   tableConfig: TaTableConfig = {
-    apiUrl: 'hrms/employee/',
+    apiUrl: 'hrms/employees/',
     // title: 'Edit Sales Order List',
     showCheckbox:true,
     pkId: "employee_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['first_name','last_name','email','phone','address','hire_date','job_type_id','designation_id','job_code_id','department_id','shift_id']
+      keys: ['hire_date','first_name','last_name','email','phone','address','hire_date','job_type_id','designation_id','department_id','shift_id','manager_id']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {
         fieldKey: 'first_name',
@@ -95,6 +100,18 @@ export class EmployeeListComponent {
         sort: true
       },
       {
+        fieldKey: 'manager_id',
+        name: 'Manager',
+        sort: true,
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          // Concatenate first_name and last_name correctly
+          const firstName = row.manager?.first_name || '';
+          const lastName = row.manager?.last_name || '';
+          return `${firstName} ${lastName}`.trim();
+        },
+      }, 
+      {
         fieldKey: "code",
         name: "Action",
         type: 'action',
@@ -102,9 +119,9 @@ export class EmployeeListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            // confirm: true,
-            // confirmMsg: "Sure to delete?",
-            apiUrl: 'hrms/employee'
+            confirm: true,
+            confirmMsg: "Sure to delete?",
+            apiUrl: 'hrms/employees'
           },
           {
             type: 'callBackFn',

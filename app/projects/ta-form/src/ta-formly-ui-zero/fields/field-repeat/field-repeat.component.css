@@ -1,3 +1,23 @@
 .table-repeat-field {
     width: 100%;
 }
+
+.table-responsive {
+    overflow-x: auto;
+    /* Enables horizontal scroll */
+}
+
+.sticky-column {
+    position: sticky;
+    right: -1px;
+    background: white;
+    /* Ensure it stays visible */
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    /* Optional shadow for visibility */
+    min-width: 150px;
+}
+@media(max-width:767px){
+    .sticky-column {
+        min-width: 50px;
+    }
+}

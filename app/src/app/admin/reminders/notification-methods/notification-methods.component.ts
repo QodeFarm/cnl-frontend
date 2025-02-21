@@ -18,10 +18,12 @@ export class NotificationMethodsComponent {
       "globalSearch": {
         keys: ['method_id', 'method_name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'method_name',
-          name: 'Method Name'
+          name: 'Method Name',
+          sort: true
         },
         {
           fieldKey: "code",
@@ -54,7 +56,7 @@ export class NotificationMethodsComponent {
             {
               key: 'method_name',
               type: 'input',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 p-0',
               templateOptions: {
                 label: 'Method Name',
                 placeholder: 'Enter Method Name',

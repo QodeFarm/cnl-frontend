@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
@@ -17,6 +17,7 @@ export class LeadsComponent {
   showLeadsList: boolean = false;
   showForm: boolean = false;
   LeadsEditID: any;
+  @ViewChild(LeadsListComponent) leadsListComponent!: LeadsListComponent;
 
 
   set_default_status_id(): any {
@@ -71,6 +72,7 @@ export class LeadsComponent {
 
   showLeadsListFn() {
     this.showLeadsList = true;
+    this.leadsListComponent?.refreshTable();
   };
 
   setFormConfig() {
@@ -100,12 +102,12 @@ export class LeadsComponent {
       fields: [
         //-----------------------------------------L E A D S -----------------------------------//
         {
-          fieldGroupClassName: "ant-row custom-form-block",
+          fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
           key: 'lead',
           fieldGroup: [{
               key: 'name',
               type: 'input',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Name',
                 placeholder: 'Enter Name',
@@ -119,7 +121,7 @@ export class LeadsComponent {
             {
               key: 'email',
               type: 'input',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 type: 'input',
                 label: 'Email',
@@ -133,7 +135,7 @@ export class LeadsComponent {
             {
               key: 'phone',
               type: 'input',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Phone',
                 placeholder: 'Enter Number',
@@ -143,7 +145,7 @@ export class LeadsComponent {
             {
               key: 'score',
               type: 'input',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Score',
                 placeholder: 'Enter Score',
@@ -153,7 +155,7 @@ export class LeadsComponent {
             {
               key: 'assignee',
               type: 'select',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Assigned',
                 dataKey: 'employee_id',
@@ -180,7 +182,7 @@ export class LeadsComponent {
             {
               key: 'lead_status',
               type: 'select',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Lead Status',
                 dataKey: 'lead_status_id',
@@ -213,7 +215,7 @@ export class LeadsComponent {
           type: 'table',
           className: 'custom-form-list',
           templateOptions: {
-            title: 'Task Interactions',
+            title: 'Lead Interactions',
             addText: 'Add Interaction Notes',
             tableCols: [
               { name: 'interaction_type_id', label: 'Interaction Type' },

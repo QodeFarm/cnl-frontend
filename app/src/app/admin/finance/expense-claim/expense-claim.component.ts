@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule } from '@angular/common';
@@ -16,6 +16,7 @@ export class ExpenseClaimComponent {
   showExpenseClaimList: boolean = false;
   showForm: boolean = false;
   ExpenseClaimEditID: any;
+  @ViewChild(ExpenseClaimListComponent) ExpenseClaimListComponent!: ExpenseClaimListComponent;
 
   constructor(private http: HttpClient) {
   }
@@ -54,6 +55,7 @@ export class ExpenseClaimComponent {
 
   showExpenseClaimListFn() {
     this.showExpenseClaimList = true;
+    this.ExpenseClaimListComponent?.refreshTable();
   };
 
   setFormConfig() {
@@ -84,16 +86,16 @@ export class ExpenseClaimComponent {
       model:{},	  
       fields: [
         {
-          fieldGroupClassName: "ant-row custom-form-block",
+          fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
           fieldGroup: [	  
             {
               key: 'employee',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Employee',
                 dataKey: 'employee',
-                dataLabel: "name",
+                dataLabel: 'first_name',
                 options: [],
                 lazy: {
                   url: 'hrms/employees/',
@@ -110,7 +112,7 @@ export class ExpenseClaimComponent {
             {
               key: 'claim_date',
               type: 'date',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Claim Date',
                 placeholder: 'Select Claim Date',
@@ -120,7 +122,7 @@ export class ExpenseClaimComponent {
             {
               key: 'description',
               type: 'textarea',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Description',
                 placeholder: 'Enter Description',
@@ -130,7 +132,7 @@ export class ExpenseClaimComponent {
             {
               key: 'total_amount',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Total Amount',
                 placeholder: 'Enter Total Amount',
@@ -140,7 +142,7 @@ export class ExpenseClaimComponent {
             {
               key: 'status',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Status',
                 placeholder: 'Status',

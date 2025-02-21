@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 
 @Component({
   selector: 'app-credit-note-list',
@@ -14,6 +15,11 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 export class CreditNoteListComponent {
   @Output('edit') edit = new EventEmitter<void>();
   @Output('circle') circle = new EventEmitter<void>();
+  @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+
+  refreshTable() {
+   this.taTableComponent?.refresh();
+  };
 
   tableConfig: TaTableConfig = {
     apiUrl: 'sales/sale_credit_notes/',
@@ -21,11 +27,12 @@ export class CreditNoteListComponent {
     pkId: "credit_note_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['credit_note_id']
+      keys: ['customer','credit_date','sale_invoice_id','credit_note_number','reason','total_amount','status_name']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {
-        fieldKey: 'customer_id',
+        fieldKey: 'customer',
         name: 'Customer',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
@@ -63,7 +70,7 @@ export class CreditNoteListComponent {
         sort: true
       },
       {
-        fieldKey: 'order_status_id',
+        fieldKey: 'status_name',
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {

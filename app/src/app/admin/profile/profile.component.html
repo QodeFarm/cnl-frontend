@@ -1,0 +1,39 @@
+<!-- <div class="login-page">
+    <div class="container"> -->
+        <!-- Outer Row -->
+        <!-- <div class="row bg-white justify-content-center p-5">
+            <h3>Update profle</h3>
+            <ta-form [options]="options"> -->
+
+                <!-- <button class="ant-btn ms-2 ant-btn-primary" [routerLink]="['/']" routerLinkActive="router-link-active" action-postfix>Login</button> -->
+            <!-- </ta-form>
+        </div>
+
+    </div>
+</div> -->
+
+
+<div class="container-fluid px-0 pb-3 p-md-3">
+    <div class="company-banner">
+        <div class="col-12 px-0" style="display: flex; justify-content: space-between;align-items: center;">
+            <button  type="button" class="btn pl-0" style="color: black;">
+                <span  class="custom-heading">Profile</span>
+              </button>        
+        </div>
+    </div>
+    <div class="row custom-form">
+        <div>
+            <ta-form [options]="options"></ta-form>
+        </div>
+    </div>
+</div>
+
+
+ 
+<div id="customToast" class="toast-message" *ngIf="showSuccessToast">
+    <div class="tick-circle">
+        <span class="tick-mark">✔</span>
+    </div>
+    <span class="toast-message-text">{{ toastMessage }}</span>
+    <span class="toast-close" onclick="this.parentElement.style.display='none'">x</span>
+</div>

@@ -17,16 +17,19 @@ export class PriceCategoriesComponent {
       pkId: "price_category_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['price_category_id', 'name']
+        keys: ['price_category_id', 'name', 'code']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
 		    {
           fieldKey: 'name',
-          name: 'Name'
+          name: 'Name',
+          sort: true
         },
 		    {
           fieldKey: 'code',
-          name: 'Code'
+          name: 'Code',
+          sort: true
         },
         {
           fieldKey: "code",
@@ -68,7 +71,7 @@ export class PriceCategoriesComponent {
 		    {
           key: 'name',
           type: 'input',
-          className: 'col-6 ps-0',
+          className: 'col-md-6 col-12 px-1 pb-3 pb-md-0',
           templateOptions: {
             label: 'Name',
             placeholder: 'Enter name',
@@ -78,7 +81,7 @@ export class PriceCategoriesComponent {
 		    {
           key: 'code',
           type: 'input',
-          className: 'col-6 pe-0',
+          className: 'col-md-6 col-12 px-1',
           templateOptions: {
             label: 'Code',
             placeholder: 'Enter code',

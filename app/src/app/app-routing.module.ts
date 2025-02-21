@@ -27,6 +27,7 @@ const routes: Routes = [
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
       { path: 'profile', data: { title: 'Profile', moduleName: 'profile' }, canActivate: [], loadChildren: () => import('./admin/profile/profile.module').then(m => m.ProfileModule) },
       { path: 'dashboard', data: { title: 'Dashbord', moduleName: 'dashboard' }, canActivate: [], loadComponent: () => import('./admin/dashboard/dashboard.component').then(m => m.DashboardComponent) },
+      { path: 'profile/change-password', data: { title: 'Change Password', moduleName: 'change-password' }, canActivate: [], loadComponent: () => import('./admin/profile/change-password/change-password.component').then(m => m.ChangePasswordComponent) },
       // { path: 'users', data: { title: 'Users', moduleName: 'Users' }, canActivate: [], loadChildren: () => import('./admin/user/user.component').then(m => m.UserComponent) },
       // sales module
       { path: 'sales', data: { title: 'Sales', moduleName: 'Sales' }, canActivate: [], loadComponent: () => import('./admin/sales/sales.component').then(m => m.SalesComponent) },
@@ -52,16 +53,15 @@ const routes: Routes = [
       //Employees Module
       { path: 'employees', data: { title: 'Employees', moduleName: 'employees' }, canActivate: [], loadComponent: () => import('./admin/hrms/hrms.component').then(m => m.EmployeesComponent) },
       { path: 'hrms/employee-salary', data: { title: 'Employee Salary', moduleName: 'employee-salary' }, canActivate: [], loadComponent: () => import('./admin/hrms/employee-salary/employee-salary.component').then(m => m.EmployeeSalaryComponent) },
-      { path: 'hrms/employee-salary-components', data: { title: 'Employee Salary Components', moduleName: 'employee-salary-components' }, canActivate: [], loadComponent: () => import('./admin/hrms/employee-salary-components/employee-salary-components.component').then(m => m.EmployeeSalaryComponentsComponent) },
       { path: 'hrms/employee-leaves', data: { title: 'Employee Leaves', moduleName: 'employee-leaves' }, canActivate: [], loadComponent: () => import('./admin/hrms/employee-leaves/employee-leaves.component').then(m => m.EmployeeLeavesComponent) },
       { path: 'hrms/leave-approvals', data: { title: 'Leave Approvals', moduleName: 'leave-approvals' }, canActivate: [], loadComponent: () => import('./admin/hrms/leave-approvals/leave-approvals.component').then(m => m.LeaveApprovalsComponent) },
       { path: 'hrms/employee-leave-balance', data: { title: 'Employee Leave Balance', moduleName: 'employee-leave-balance' }, canActivate: [], loadComponent: () => import('./admin/hrms/employee-leave-balance/employee-leave-balance.component').then(m => m.EmployeeLeaveBalanceComponent) },
-      { path: 'hrms/attendance', data: { title: 'Attendance', moduleName: 'attendance' }, canActivate: [], loadComponent: () => import('./admin/hrms/attendance/attendance.component').then(m => m.AttendanceComponent) },
+      { path: 'hrms/employee-attendance', data: { title: 'Employee Attendance', moduleName: 'employee-attendance' }, canActivate: [], loadComponent: () => import('./admin/hrms/employee-attendance/employee-attendance.component').then(m => m.EmployeeAttendanceComponent) },
       { path: 'hrms/swipes', data: { title: 'Swipes', moduleName: 'swipes' }, canActivate: [], loadComponent: () => import('./admin/hrms/swipes/swipes.component').then(m => m.SwipesComponent) },
 
       //Products Module
       { path: 'inventory', data: { title: 'Inventory', moduleName: 'inventory' }, canActivate: [], loadComponent: () => import('./admin/inventory/inventory.component').then(m => m.InventoryComponent) },
-      { path: 'stockjournal', data: { title: 'Stock Journal', moduleName: 'stockjournal' }, canActivate: [], loadComponent: () => import('./admin/stockjournal/stockjournal.component').then(m => m.StockjournalComponent) },
+      { path: 'production/stockjournal', data: { title: 'Stock Journal', moduleName: 'stockjournal' }, canActivate: [], loadComponent: () => import('./admin/stockjournal/stockjournal.component').then(m => m.StockjournalComponent) },
       // { path: 'products', data: { title: 'Products', moduleName: 'products' }, canActivate: [], loadComponent: () => import('./admin/products/products.component').then(m => m.ProductsComponent) },
       { path: 'warehouses', data: { title: 'Warehouses', moduleName: 'warehouses' }, canActivate: [], loadComponent: () => import('./admin/warehouses/warehouses.component').then(m => m.WarehousesComponent) },
       { path: 'quickpacks', data: { title: 'Quick Packs', moduleName: 'quickpacks' }, canActivate: [], loadComponent: () => import('./admin/quickpacks/quickpacks.component').then(m => m.QuickpacksComponent) },
@@ -114,6 +114,9 @@ const routes: Routes = [
 
       //Reporting Tool
       { path: 'reports/custome-reports', data: { title: 'Reports', moduleName: 'reports' }, canActivate: [], loadComponent: () => import('./admin/reports/reports.component').then(m => m.ReportsComponent) },
+
+      //Customfields Tool
+      { path: 'customfields', data: { title: 'customfields', moduleName: 'customfields' }, canActivate: [], loadChildren: () => import('./admin/customfields/customfields.module').then(m => m.CustomfieldsModule) },
 
 
       // { path: 'production', data: { title: 'production', moduleName: 'production' }, canActivate: [], loadChildren: () => import('./admin/production/production.module').then(m => m.ProductionModule) },

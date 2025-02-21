@@ -1,8 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-purchase-list',
@@ -14,6 +16,77 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 export class PurchaseListComponent {
   
   @Output('edit') edit = new EventEmitter<void>();
+  @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+
+  refreshTable() {
+   this.taTableComponent?.refresh();
+  };
+
+  //-----------email sending links----------
+  onSelect(event: Event): void {
+    const selectElement = event.target as HTMLSelectElement;
+    const selectedValue = selectElement.value;
+
+    switch (selectedValue) {
+      case 'email':
+        this.onMailLinkClick();
+        break;
+      case 'whatsapp':
+        break;
+      default:
+        // Handle default case (e.g., "Mail" selected)
+        break;
+    }
+
+    // Reset the dropdown to the default option
+    selectElement.value = '';
+  }
+
+  showDialog() {
+    const dialog = document.getElementById('customDialog');
+    if (dialog) {
+      dialog.style.display = 'flex'; // Show the dialog
+    }
+  }
+    
+  // Function to close the custom dialog
+  closeDialog() {
+    const dialog = document.getElementById('customDialog');
+    if (dialog) {
+      dialog.style.display = 'none'; // Hide the dialog
+    }
+  }
+  
+  showSuccessToast = false;
+  toastMessage = '';
+
+  // Method to handle "Email Sent" button click
+  onMailLinkClick(): void {
+    console.log("We are in method ...")
+    const selectedIds = this.taTableComponent.options.checkedRows;
+    if (selectedIds.length === 0) {
+      return this.showDialog();
+    }
+
+    const purchaseOrderId = selectedIds[0]; // Assuming only one row can be selected
+    const payload = { flag: "email" };
+    const url = `masters/document_generator/${purchaseOrderId}/purchase_order/`;
+    this.http.post(url, payload).subscribe(
+      (response) => {
+        this.showSuccessToast = true;
+          this.toastMessage = "Mail Sent successfully"; // Set the toast message for update
+          this.refreshTable();
+          setTimeout(() => {
+            this.showSuccessToast = false;
+          }, 2000);
+      },
+      (error) => {
+        console.error('Error sending email', error);
+        // alert('Error sending email. Please try again.');
+      }
+    );
+  }
+  //-----------email sending links - end ----------
   
   tableConfig: TaTableConfig = {
     apiUrl: 'purchase/purchase_order/?summary=true',
@@ -27,8 +100,9 @@ export class PurchaseListComponent {
     ],
     pageSize: 10,
     "globalSearch": {
-      keys: ['purchase_type_id','order_date','order_no','tax','tax_amount','total_amount','vendor','status_name','remarks']
+      keys: ['order_date','purchase_type_id','order_no','tax','tax_amount','total_amount','vendor','status_name','remarks']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {
         fieldKey: 'purchase_type_id',
@@ -114,7 +188,7 @@ export class PurchaseListComponent {
     ]
   };
 
-  constructor(private router: Router) {
+  constructor(private router: Router, private http: HttpClient) {
 
   }
 }

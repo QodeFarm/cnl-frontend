@@ -19,10 +19,12 @@ export class GstCategoriesComponent {
         "globalSearch": {
           keys: ['gst_category_id', 'name']
         },
+        defaultSort: { key: 'created_at', value: 'descend' },
         cols: [
       {
             fieldKey: 'name',
-            name: 'Name'
+            name: 'Name',
+            sort: true
           },
           {
             fieldKey: "code",
@@ -64,7 +66,7 @@ export class GstCategoriesComponent {
       {
             key: 'name',
             type: 'input',
-            className: 'col-6 p-0',
+            className: 'col-md-6 col-12 p-0',
             templateOptions: {
               label: 'Name',
               placeholder: 'Enter name',

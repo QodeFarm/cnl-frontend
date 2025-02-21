@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { AssetMaintenanceListComponent } from './asset-maintenance-list/asset-maintenance-list.component';
@@ -19,6 +19,7 @@ export class AssetMaintenanceComponent {
   showAssetMaintenanceList: boolean = false;
   showForm: boolean = false;
   AssetMaintenanceEditID: any;
+  @ViewChild(AssetMaintenanceListComponent) AssetMaintenanceListComponent!: AssetMaintenanceListComponent;
 
   constructor(private http: HttpClient) {
   }
@@ -58,6 +59,7 @@ export class AssetMaintenanceComponent {
 
   showAssetMaintenanceListFn() {
     this.showAssetMaintenanceList = true;
+    this.AssetMaintenanceListComponent?.refreshTable();
   };
 
     setFormConfig() {
@@ -88,12 +90,12 @@ export class AssetMaintenanceComponent {
         model:{},
         fields: [
           {
-            fieldGroupClassName: 'ant-row custom-form-block',
+            fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
             fieldGroup: [
               {
                 key: 'asset',
                 type: 'select',
-                className: 'col-3',
+                className: 'col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Asset',
                   dataKey: 'asset_id',
@@ -120,7 +122,7 @@ export class AssetMaintenanceComponent {
               {
                 key: 'cost',
                 type: 'input',
-                className: 'col-3',
+                className: 'col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Cost',
                   required: false,
@@ -135,7 +137,7 @@ export class AssetMaintenanceComponent {
               {
                 key: 'maintenance_date',
                 type: 'input',
-                className: 'col-3',
+                className: 'col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   type: 'date',
                   label: 'Maintenance date',
@@ -146,7 +148,7 @@ export class AssetMaintenanceComponent {
               {
                 key: 'maintenance_description',
                 type: 'textarea',
-                className: 'col-3',
+                className: 'col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Maintenance Description',
                   required: false,

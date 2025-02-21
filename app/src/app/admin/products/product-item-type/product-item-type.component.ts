@@ -20,10 +20,12 @@ export class ProductItemTypeComponent {
       "globalSearch": {
         keys: ['item_type_id', 'item_name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'item_name',
-          name: 'Name'
+          name: 'Name',
+          sort: true
         },
         {
           fieldKey: "code",
@@ -67,7 +69,7 @@ export class ProductItemTypeComponent {
 	       {
           key: 'item_name',
           type: 'text',
-          className: 'col-6 pb-3 ps-0',
+          className: 'col-md-6 col-12 p-0',
           templateOptions: {
             label: 'Item Name',
             placeholder: 'Enter Item Name',

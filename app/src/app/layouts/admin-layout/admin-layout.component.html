@@ -1,16 +1,18 @@
 <header>
     <!-- Topbar -->
-    <nav class="navbar navbar-expand navbar-light topbar static-top ">
-        <a class="sidebar-brand layout-logo-design" [routerLink]="['/admin/dashboard']">
-            <!-- <img style="width: 2.2rem;" src="assets/img/logo.png" />  -->
-            <h3>C&L</h3>
-            <span>Accounts Book</span>
-        </a>
-        <!-- Sidebar Toggle (Topbar) -->
-        <button id="sidebarToggleTop" (click)="menuToggle()" class="btn bar-toggle ml-3 mr-2">
-         <i class="fa fa-bars"></i>
-     </button>
+    <nav class="navbar navbar-expand navbar-light topbar static-top justify-content-between">
 
+        <!-- Sidebar Toggle (Topbar) -->
+        <div class="d-flex align-items-center">
+            <a class="sidebar-brand layout-logo-design" [routerLink]="['/admin/dashboard']">
+                <!-- <img style="width: 2.2rem;" src="assets/img/logo.png" />  -->
+                <h3>C&L</h3>
+                <span>Accounts Book</span>
+            </a>
+            <button id="sidebarToggleTop" (click)="menuToggle()" class="btn bar-toggle ms-3">
+                <i class="fa fa-bars"></i>
+            </button>
+        </div>
         <!-- Topbar Search -->
         <!-- <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
            <div class="input-group">
@@ -24,16 +26,19 @@
        </form> -->
 
         <!-- Topbar Navbar -->
-        <ul class="navbar-nav ml-auto">
 
-            <li class="nav-item dropdown no-arrow mx-1">
+
+        <ul class="navbar-nav align-items-center">
+            <li class="company-title"><span class="badge bg-light ms-2" style="font-weight: 500; font-size: 14px; color:#142768; border-radius: 3px;padding: 7px 10px;"><span class="company-code" style="padding: 0 !important;">{{company_code}} - </span>{{company_name}}</span>
+            </li>
+            <li class="nav-item dropdown no-arrow mx-1 d-none">
                 <button class="nav-link dropdown-toggle" (click)="startSpeechRecognition()" id="alerts1" role="button" data-bs-toggle="" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-microphone"></i>
                 </button>
             </li>
 
             <!-- Nav Item - Alerts -->
-            <li class="nav-item dropdown no-arrow mx-1">
+            <li class="nav-item dropdown no-arrow mx-1 d-none">
                 <a class="nav-link dropdown-toggle" id="alertsDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-bell fa-fw"></i>
                     <!-- Counter - Alerts -->
@@ -81,7 +86,7 @@
                 </div>
             </li>
             <!-- Nav Item - Search Dropdown -->
-            <li class="nav-item dropdown no-arrow">
+            <li class="nav-item dropdown no-arrow d-none">
 
                 <a class="nav-link dropdown-toggle" id="searchDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-search fa-fw"></i>
@@ -101,7 +106,7 @@
                 </div>
             </li>
             <!-- Nav Item - Messages -->
-            <li class="nav-item dropdown no-arrow mx-1">
+            <li class="nav-item dropdown no-arrow mx-1 d-none">
                 <a class="nav-link dropdown-toggle" id="messagesDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-envelope fa-fw"></i>
                     <!-- Counter - Messages -->
@@ -179,6 +184,9 @@
                             <a [routerLink]="['/admin/users/roles']"><i class="fa fa-user-cog"></i> User Roles</a>
                         </li>
                         <li>
+                            <a [routerLink]="['/admin/customfields']"><i class="fa fa-user-cog"></i> Custom fields</a>
+                        </li>
+                        <li>
                             <a [routerLink]="['/admin/reminders']"><i class="fa fa-bell"></i> Reminders</a>
                         </li>
                         <li>
@@ -188,7 +196,7 @@
                 </div>
             </li>
             <!-- Nav Item - Favourite -->
-            <li class="nav-item dropdown no-arrow mx-1">
+            <li class="nav-item dropdown no-arrow mx-1 d-none">
                 <a class="nav-link dropdown-toggle" id="favouriteDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-star fa-fw" title="Favourite"></i>
 
@@ -220,7 +228,7 @@
             <div class="topbar-divider d-none d-sm-block"></div>
 
             <!-- Nav Item - User Information -->
-            <li class="nav-item dropdown no-arrow">
+            <li class="nav-item dropdown no-arrow d-md-block d-none">
                 <a class="nav-link dropdown-toggle p-0" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <span class="mr-2 d-none d-lg-inline text-white-600">{{userName | uppercase}}</span>
                     <img class="img-profile rounded-circle" src="assets/img/user.png">
@@ -255,23 +263,57 @@
 <div id="wrapper">
 
     <!-- Sidebar -->
+    <div id="myCanvasNav" class="menu-overlay" (click)="layertoggleMenu()"></div>
     <ul class="navbar-nav sidebar sidemenu-bar">
-        <li class="nav-item" *ngFor="let m of menulList; let i = index" [ngClass]="{'sub-menu': (m.module_sections && m.module_sections.length > 0)}">
-            <a *ngIf="!(m.module_sections && m.module_sections.length > 0)" class="nav-link" [routerLink]="[m.sec_link]" routerLinkActive="active" (click)="closeMenu()">
-                <i class="" [ngClass]="m.mod_icon"></i><span>{{m.module_name}}</span>
-            </a>
-            <a *ngIf="m.module_sections && m.module_sections.length > 0" class="nav-link collapsed" [ngClass]="{ 'active': isActive(m.sec_link, m.module_sections)}" [attr.data-bs-toggle]="'collapse'" [attr.data-bs-target]="'#collapseMenu'+i" [attr.aria-expanded]="'true'"
-                [attr.aria-controls]="'collapseMenu'+i">
-                <i [ngClass]="m.mod_icon"></i>
-                <span>{{m.module_name}}</span>
-            </a>
-            <div *ngIf="m.module_sections && m.module_sections.length > 0" id="collapseMenu{{i}}" class="collapse sub-menu-items" [attr.aria-labelledby]="'heading'+i" [attr.data-parent]="'#accordionSidebar'">
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <a (click)="closeMenu()" class="collapse-item" *ngFor="let sm of m.module_sections" [routerLink]="[sm.sec_link]" routerLinkActive="active">{{sm.section_name}}</a>
+        <li class="nav-item dropdown no-arrow d-md-none d-block user-profile-details">
+            <a class="nav-link dropdown-toggle p-0" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="d-flex align-items-center">
+                    <img class="img-profile rounded-circle" src="assets/img/user.png">
+                    <div class="ml-2">
+                        <h4 class=" mb-0">{{userName }} </h4>
+                        <span class="m-0">({{role}})</span>
+                    </div>
                 </div>
+                <i class="fa fa-caret-down" aria-hidden="true"></i>
+            </a>
+            <p class="company-details">Company Code: <span>{{company_code}}</span></p>
+            <!-- Dropdown - User Information -->
+            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                <a class="dropdown-item" href="/#/admin/profile">
+                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i> Profile
+                </a>
+                <a class="dropdown-item" href="/#/admin/profile/change-password">
+                    <i class="fas fa-lock fa-sm fa-fw mr-2 text-gray-400"></i> Change Password
+                </a>
+                <!-- <a class="dropdown-item" href="#">
+                   <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i> Settings
+               </a>
+               <a class="dropdown-item" href="#">
+                   <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i> Activity Log
+               </a> -->
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#logoutModal">
+                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i> Logout
+                </a>
             </div>
         </li>
-
+        <ul class="custome-horizental-scroll" style="list-style: none; padding: 0; margin: 0;">
+            <li class="nav-item" *ngFor="let m of menulList; let i = index" [ngClass]="{'sub-menu': (m.module_sections && m.module_sections.length > 0)}">
+                <a *ngIf="!(m.module_sections && m.module_sections.length > 0)" class="nav-link" [routerLink]="[m.sec_link]" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">
+                    <i class="" [ngClass]="m.mod_icon"></i><span>{{m.module_name}}</span>
+                </a>
+                <a *ngIf="m.module_sections && m.module_sections.length > 0" class="nav-link collapsed" [ngClass]="{ 'active': isActive(m.sec_link, m.module_sections)}" [attr.data-bs-toggle]="'collapse'" [attr.data-bs-target]="'#collapseMenu'+i" [attr.aria-expanded]="'true'"
+                    [attr.aria-controls]="'collapseMenu'+i">
+                    <i [ngClass]="m.mod_icon"></i>
+                    <span>{{m.module_name}}</span>
+                </a>
+                <div *ngIf="m.module_sections && m.module_sections.length > 0" id="collapseMenu{{i}}" class="collapse sub-menu-items" [attr.aria-labelledby]="'heading'+i" [attr.data-parent]="'#accordionSidebar'">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <a (click)="closeMenu()" class="collapse-item" *ngFor="let sm of m.module_sections" [routerLink]="[sm.sec_link]" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">{{sm.section_name}}</a>
+                    </div>
+                </div>
+            </li>
+        </ul>
         <!-- <li class="nav-item" *ngFor="let m of menulList; let i = index" [ngClass]="{'sub-menu': (m.child && m.child.length > 0)}">
             <a *ngIf="!(m.child && m.child.length > 0)" class="nav-link" [routerLink]="[m.link]" routerLinkActive="active" (click)="closeMenu()">
                 <i class="" [ngClass]="m.icon"></i><span>{{m.label}}</span>
@@ -291,7 +333,7 @@
 
     <!-- Content Wrapper -->
     <!-- <div id="content-wrapper" class="d-flex flex-column"> -->
-        <div id="content-wrapper" class="d-flex flex-column" *ngIf="showContain">
+    <div id="content-wrapper" class="d-flex flex-column" *ngIf="showContain">
 
 
         <!-- Main Content -->
@@ -305,14 +347,11 @@
         <!-- Page Heading -->
         <!-- <h1 class="h3 mb-4 text-gray-800">Blank Page</h1> -->
         <!-- <router-outlet></router-outlet> -->
-        <div class="tab  flex-fill h-100 px-0 bg-white border-bottom d-flex flex-column">
-
+        <div class="tab  flex-fill h-100 px-0 bg-white d-flex flex-column">
             <nz-tabset [(nzSelectedIndex)]="selectedTabIndex" nzType="editable-card" nzHideAdd (nzClose)="removeTab($event)">
-
                 <nz-tab (nzSelect)="onTabSelect(tab)" [nzClosable]="true" [nzTitle]="tab.name" *ngFor="let tab of tabs">
                     <ng-container *ngComponentOutlet="tab.component;"></ng-container>
                 </nz-tab>
-
             </nz-tabset>
 
             <!-- All tabs -->

@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
@@ -17,6 +17,7 @@ export class SwipesComponent {
   showSwipesList: boolean = false;
   showForm: boolean = false;
   SwipesEditID: any; 
+  @ViewChild(SwipesListComponent) SwipesListComponent!: SwipesListComponent;
 
   constructor(private http: HttpClient) {
   }
@@ -55,6 +56,7 @@ export class SwipesComponent {
 
   showSwipesListFn() {
     this.showSwipesList = true;
+    this.SwipesListComponent?.refreshTable();
   };
 
   setFormConfig() {
@@ -86,12 +88,12 @@ export class SwipesComponent {
 
       fields: [
         {
-          fieldGroupClassName: "ant-row custom-form-block",
+          fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
           fieldGroup: [
             {
               key: 'employee',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Employee',
                 dataKey: 'employee_id',
@@ -112,7 +114,7 @@ export class SwipesComponent {
             {
               key: 'swipe_time',
               type: 'input',  // Use 'input' to allow custom types like 'datetime-local'
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Swipe Time',
                 type: 'datetime-local',  // Use datetime-local for both date and time input

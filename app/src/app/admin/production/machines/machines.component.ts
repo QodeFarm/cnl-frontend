@@ -5,8 +5,8 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 @Component({
   selector: 'app-machines',
-  standalone: true,
-  imports: [CommonModule, AdminCommmonModule],
+  // standalone: true,
+  // imports: [CommonModule, AdminCommmonModule],
   templateUrl: './machines.component.html',
   styleUrls: ['./machines.component.scss']
 })
@@ -20,20 +20,24 @@ export class MachinesComponent {
       pkId: "machine_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['machine_id', 'machine_name']
+        keys: ['machine_id', 'machine_name', 'description', 'status']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'machine_name',
-          name: 'Machine Name'
+          name: 'Machine Name',
+          sort: true
         },
         {
           fieldKey: 'description',
-          name: 'Description'
+          name: 'Description',
+          sort: true
         },
         {
           fieldKey: 'status',
-          name: 'status'
+          name: 'status',
+          sort: true
         },
         {
           fieldKey: "code",
@@ -66,7 +70,7 @@ export class MachinesComponent {
             {
               key: 'machine_name',
               type: 'input',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 px-1 mb-3',
               templateOptions: {
                 label: 'Machine Name',
                 placeholder: 'Enter Machine Name',
@@ -76,7 +80,7 @@ export class MachinesComponent {
             {
               key: 'status',
               type: 'select',
-              className: 'col-6 pb-3 pe-0',
+              className: 'col-md-6 col-12 px-1 mb-3',
               templateOptions: {
                 label: 'Status',
                 placeholder: 'Enter Status',
@@ -91,7 +95,7 @@ export class MachinesComponent {
             {
               key: 'description',
               type: 'textarea',
-              className: 'col-6',
+              className: 'col-md-6 col-12 px-1',
               templateOptions: {
                 label: 'Description',
                 placeholder: 'Enter Description',

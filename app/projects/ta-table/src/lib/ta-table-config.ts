@@ -19,6 +19,9 @@ export interface TaTableConfig {
   tableLayout?: 'fixed' | 'auto';
   pageSizeOptions?: number[];
   showCheckbox?: boolean;
+  defaultSort?: { key?: string, value?: 'ascend' | 'descend' },
+  checkedRows?: any[],
+  reload?: () => any
 }
 
 export interface Export {

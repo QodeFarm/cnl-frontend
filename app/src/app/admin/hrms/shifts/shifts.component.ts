@@ -18,18 +18,22 @@ export class ShiftsComponent {
       "globalSearch": {
         keys: ['shift_id','shift_name','start_time','end_time']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'shift_name',
-          name: 'Shift Name'
+          name: 'Shift Name',
+          sort: true
         },
         {
           fieldKey: 'start_time',
-          name: 'Start Time'
+          name: 'Start Time',
+          sort: true
         },
         {
           fieldKey: 'end_time',
-          name: 'End Time'
+          name: 'End Time',
+          sort: true
         },
         {
           fieldKey: "code",
@@ -62,7 +66,7 @@ export class ShiftsComponent {
             {
               key: 'shift_name',
               type: 'input',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 px-1 mb-3',
               templateOptions: {
                 label: 'Shift Name',
                 placeholder: 'Enter Shift Name',
@@ -72,7 +76,7 @@ export class ShiftsComponent {
             {
               key: 'start_time',
               type: 'input',  // Use 'input' to allow custom types like 'datetime-local'
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 px-1 mb-3',
               templateOptions: {
                 label: 'Start Time',
                 type: 'datetime-local',  // Use datetime-local for both date and time input
@@ -83,7 +87,7 @@ export class ShiftsComponent {
             {
               key: 'end_time',
               type: 'input',  // Use 'input' to allow custom types like 'datetime-local'
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 px-1',
               templateOptions: {
                 label: 'End Time',
                 type: 'datetime-local',  // Use datetime-local for both date and time input

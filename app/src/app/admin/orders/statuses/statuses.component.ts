@@ -17,12 +17,14 @@ export class StatusesComponent {
       pkId: "status_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['status_id', 'name']
+        keys: ['status_id', 'status_name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'status_name',
-          name: 'Status name'
+          name: 'Status name',
+          sort: true
         },
         {
           fieldKey: "code",
@@ -66,7 +68,7 @@ export class StatusesComponent {
        {
           key: 'status_name',
           type: 'input',
-          className: 'col-6 pb-3 ps-0',
+          className: 'col-md-6 col-12 p-0',
           templateOptions: {
             label: 'Status name',
             placeholder: 'Enter status name',

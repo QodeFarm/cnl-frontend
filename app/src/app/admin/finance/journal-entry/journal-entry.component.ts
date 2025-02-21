@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { JournalEntryListComponent } from './journal-entry-list/journal-entry-list.component';
 import { CommonModule } from '@angular/common';
@@ -16,6 +16,7 @@ export class JournalEntryComponent {
   showJournalEntryList: boolean = false;
   showForm: boolean = false;
   JournalEntryEditID: any;
+  @ViewChild(JournalEntryListComponent) JournalEntryListComponent!: JournalEntryListComponent;
 
   constructor(private http: HttpClient) {};
 
@@ -52,6 +53,7 @@ export class JournalEntryComponent {
 
   showJournalEntryListFn() {
     this.showJournalEntryList = true;
+    this.JournalEntryListComponent?.refreshTable();
   };
 
   setFormConfig() {
@@ -81,12 +83,12 @@ export class JournalEntryComponent {
       fields: [
         //-----------------------------------------journal_entry-----------------------------------//
         {
-          fieldGroupClassName: "ant-row custom-form-block",
+          fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
           key: 'journal_entry',
           fieldGroup: [{
               key: 'entry_date',
               type: 'date',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Entry Date',
                 placeholder: 'Select date',
@@ -100,7 +102,7 @@ export class JournalEntryComponent {
             {
               key: 'reference',
               type: 'input',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 type: 'input',
                 label: 'Reference',
@@ -114,7 +116,7 @@ export class JournalEntryComponent {
             {
               key: 'description',
               type: 'textarea',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Description',
                 placeholder: 'Enter Description',
@@ -188,7 +190,6 @@ export class JournalEntryComponent {
                 hooks: {
                   onChanges: (field: any) => {
                     field.formControl.valueChanges.subscribe((data: any) => {
-                      console.log('user', data);
                       const index = field.parent.key;
                       if (!this.formConfig.model['journal_entry_lines'][index]) {
                         console.error(`account_id at index ${index} is not defined. Initializing...`);
@@ -196,6 +197,63 @@ export class JournalEntryComponent {
                       }
 
                       this.formConfig.model['journal_entry_lines'][index]['account_id'] = data.account_id;
+                    });
+                  }
+                }
+              },
+              {
+                key: 'customer',
+                type: 'select',
+                templateOptions: {
+                  label: 'Customer',
+                  dataKey: 'name',
+                  dataLabel: 'name',
+                  options: [],
+                  hideLabel: true,
+                  required: false,
+                  lazy: {
+                    url: 'customers/customer/',
+                    lazyOneTime: true
+                  },
+                },
+                hooks: {
+                  onChanges: (field: any) => {
+                    field.formControl.valueChanges.subscribe((data: any) => {
+                      const index = field.parent.key;
+                      if (!this.formConfig.model['journal_entry_lines'][index]) {
+                        console.error(`customer_id at index ${index} is not defined. Initializing...`);
+                        this.formConfig.model['journal_entry_lines'][index] = {};
+                      }
+                      this.formConfig.model['journal_entry_lines'][index]['customer_id'] = data.customer_id;
+                    });
+                  }
+                }
+              },
+
+              {
+                key: 'vendor',
+                type: 'select',
+                templateOptions: {
+                  label: 'Vendor',
+                  dataKey: 'name',
+                  dataLabel: 'name',
+                  options: [],
+                  hideLabel: true,
+                  required: false,
+                  lazy: {
+                    url: 'vendors/vendor_get/',
+                    lazyOneTime: true
+                  },
+                },
+                hooks: {
+                  onChanges: (field: any) => {
+                    field.formControl.valueChanges.subscribe((data: any) => {
+                      const index = field.parent.key;
+                      if (!this.formConfig.model['journal_entry_lines'][index]) {
+                        console.error(`vendor_id at index ${index} is not defined. Initializing...`);
+                        this.formConfig.model['journal_entry_lines'][index] = {};
+                      }
+                      this.formConfig.model['journal_entry_lines'][index]['vendor_id'] = data.vendor_id;
                     });
                   }
                 }

@@ -20,10 +20,12 @@ export class UnitOptionsComponent {
       "globalSearch": {
         keys: ['unit_options_id', 'unit_name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'unit_name',
-          name: 'Name'
+          name: 'Name',
+          sort: true
         },
         {
           fieldKey: "code",
@@ -67,7 +69,7 @@ export class UnitOptionsComponent {
        {
           key: 'unit_name',
           type: 'text',
-          className: 'col-6 pb-3 ps-0',
+          className: 'col-md-6 col-12 p-0',
           templateOptions: {
             label: 'Unit Name',
             placeholder: 'Enter Unit Name',

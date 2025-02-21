@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { TaxConfigurationListComponent } from './tax-configuration-list/tax-configuration-list.component';
 import { CommonModule } from '@angular/common';
@@ -16,6 +16,7 @@ export class TaxConfigurationComponent {
   showTaxConfigurationList: boolean = false;
   showForm: boolean = false;
   TaxConfigurationEditID: any;
+  @ViewChild(TaxConfigurationListComponent) TaxConfigurationListComponent!: TaxConfigurationListComponent;
 
   constructor(private http: HttpClient) {
   }
@@ -54,6 +55,7 @@ export class TaxConfigurationComponent {
 
   showTaxConfigurationListFn() {
     this.showTaxConfigurationList = true;
+    this.TaxConfigurationListComponent?.refreshTable();
   };
 
   setFormConfig() {
@@ -78,12 +80,12 @@ export class TaxConfigurationComponent {
       model:{},
       fields: [
         {
-          fieldGroupClassName: "ant-row custom-form-block",
+          fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
           fieldGroup: [
             {
               key: 'tax_name',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Name',
                 placeholder: 'Enter Name',
@@ -93,7 +95,7 @@ export class TaxConfigurationComponent {
             {
               key: 'tax_rate',
               type: 'input',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Rate',
                 placeholder: 'Enter Rate',
@@ -103,7 +105,7 @@ export class TaxConfigurationComponent {
             {
               key: 'tax_type',
               type: 'select',
-              className: 'col-3 pb-3 ps-0',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Tax Type',
                 placeholder: 'Select Tax Type',
@@ -117,7 +119,7 @@ export class TaxConfigurationComponent {
             {
               key: 'is_active',
               type: 'checkbox',
-              className: 'col-3 d-flex align-items-center',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Is Active',
                 required: false,

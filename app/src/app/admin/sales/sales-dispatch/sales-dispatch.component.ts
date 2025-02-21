@@ -31,20 +31,24 @@ export class SalesDispatchComponent implements OnInit {
     return {
       drawerSize: 500,
       drawerPlacement: 'right',
+      hideAddBtn: true,
       tableConfig: {
         apiUrl: 'sales/sale_order/?summary=true&flow_status=dispatch',
         title: 'Sales Dispatch',
         pkId: "sale_order_id",
         pageSize: 10,
         globalSearch: {
-          keys: ['customer', 'order_no']
+          keys: ['customer', 'order_no','products']
         },
+        defaultSort: { key: 'created_at', value: 'descend' },
         cols: [
           {
             fieldKey: 'customer',
             name: 'Customer',
             displayType: 'map',
             mapFn: (currentValue: any, row: any) => `${row.customer.name}`,
+            sort: true
+
           },
           {
             fieldKey: 'order_no',

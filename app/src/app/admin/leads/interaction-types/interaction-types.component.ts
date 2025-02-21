@@ -17,12 +17,14 @@ export class InteractionTypesComponent {
       pkId: "interaction_type_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['interaction_type_id']
+        keys: ['interaction_type_id','interaction_type']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'interaction_type',
-          name: 'Interaction type'
+          name: 'Interaction type',
+          sort: true
         },
         {
           fieldKey: "code",
@@ -54,7 +56,7 @@ export class InteractionTypesComponent {
         fieldGroup: [{
           key: 'interaction_type',
           type: 'input',
-          className: 'col-6 p-0',
+          className: 'col-md-6 col-12 p-0',
           templateOptions: {
             label: 'Interaction type',
             placeholder: 'Enter Interaction type',

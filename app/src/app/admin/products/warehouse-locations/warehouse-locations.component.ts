@@ -16,16 +16,28 @@ export class WarehouseLocationsComponent {
       pkId: "location_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['location_id','location_name']
+        keys: ['location_id','location_name','description','warehouse']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'location_name',
-          name: 'Location Name'
+          name: 'Location Name',
+          sort: true
         },
         {
           fieldKey: 'description',
-          name: 'Description'
+          name: 'Description',
+          sort: true
+        },
+        {
+          fieldKey: 'warehouse',
+          name: 'Ware house',
+          sort: true,
+          displayType: "map",
+          mapFn: (currentValue: any, row: any, col: any) => {
+            return `${row.warehouse.name}`;
+          },
         },
         {
           fieldKey: "code",
@@ -50,14 +62,20 @@ export class WarehouseLocationsComponent {
       url: 'inventory/warehouse_locations/',
       title: 'Warehouse Locations',
       pkId: "location_id",
-      exParams: [],
+      exParams: [
+        {
+          key: 'warehouse_id',
+          type: 'script',
+          value: 'data.warehouse.warehouse_id'
+        },
+      ],
       fields: [{
         fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
         fieldGroup: [
           {
           key: 'location_name',
           type: 'input',
-          className: 'col-6 p-0',
+          className: 'col-md-6 col-12 px-1 mb-3',
           templateOptions: {
             label: 'Location Name',
             placeholder: 'Enter Location Name',
@@ -67,13 +85,34 @@ export class WarehouseLocationsComponent {
         {
           key: 'description',
           type: 'input',
-          className: 'col-6 p-0',
+          className: 'col-md-6 col-12 px-1 mb-3',
           templateOptions: {
             label: 'Description',
             placeholder: 'Enter Location Description',
             required: true,
           }
-        }
+        },
+        {
+          key: 'warehouse',
+          type: 'select',
+          className: 'col-md-6 col-12 px-1',
+          templateOptions: {
+            label: 'Warehouse',
+            dataKey: 'warehouse_id',
+            dataLabel: "name",
+            options: [],
+            lazy: {
+              url: 'inventory/warehouses/',
+              lazyOneTime: true
+            },
+            required: true
+          },
+          hooks: {
+            onInit: (field: any) => {
+              //field.templateOptions.options = this.cs.getRole();
+            }
+          }
+        },
       ]
       }]
     }

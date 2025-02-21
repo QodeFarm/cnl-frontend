@@ -17,11 +17,14 @@ export class DepartmentsComponent {
       pkId: "department_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['department_id', 'designation_name']
+        keys: ['department_id','department_name','designation_name']
       },
-      cols: [{
+      defaultSort: { key: 'created_at', value: 'descend' },
+      cols: [
+        {
           fieldKey: 'department_name',
-          name: 'Department Name'
+          name: 'Department Name',
+          sort: true
         },
         {
           fieldKey: "code",
@@ -52,7 +55,7 @@ export class DepartmentsComponent {
         fieldGroup: [{
           key: 'department_name',
           type: 'input',
-          className: 'col-6 p-0',
+          className: 'col-md-6 col-12 p-0',
           templateOptions: {
             label: 'Department Name',
             placeholder: 'Enter Department Name',

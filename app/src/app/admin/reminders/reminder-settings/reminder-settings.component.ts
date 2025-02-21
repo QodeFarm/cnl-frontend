@@ -18,19 +18,25 @@ export class ReminderSettingsComponent {
       "globalSearch": {
         keys: ['user_id', 'notification_frequency_id','notification_method_id']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'user_id',
           name: 'User',
+          sort: true,
           displayType: "map",
           mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.user.name}`;
+            // Concatenate first_name and last_name correctly
+            const firstName = row.user?.first_name || '';
+            const lastName = row.user?.last_name || '';
+            return `${firstName} ${lastName}`.trim();
           },
-        },
+        }, 
         {
           fieldKey: 'notification_frequency_id',
           name: 'Notification Frequency',
           displayType: "map",
+          sort: true,
           mapFn: (currentValue: any, row: any, col: any) => {
             return `${row.notification_frequency.frequency_name}`;
           },
@@ -39,6 +45,7 @@ export class ReminderSettingsComponent {
           fieldKey: 'notification_method_id',
           name: 'Notification Methods',
           displayType: "map",
+          sort: true,
           mapFn: (currentValue: any, row: any, col: any) => {
             return `${row.notification_method.method_name}`;
           },
@@ -90,11 +97,11 @@ export class ReminderSettingsComponent {
             {
               key: 'user',
               type: 'select',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 px-1 pb-3',
               templateOptions: {
                 label: 'User',
-                dataKey: 'employee_id',
-                dataLabel: "name",
+                dataKey: 'user_id',
+                dataLabel: "first_name",
                 options: [],
                 required: true,
                 lazy: {
@@ -111,7 +118,7 @@ export class ReminderSettingsComponent {
             {
               key: 'notification_frequency',
               type: 'select',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 px-1 pb-3 pb-md-0',
               templateOptions: {
                 label: 'Notification Frequency',
                 dataKey: 'frequency_id',
@@ -132,7 +139,7 @@ export class ReminderSettingsComponent {
             {
               key: 'notification_method',
               type: 'select',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 px-1',
               templateOptions: {
                 label: 'Notification Method',
                 dataKey: 'method_id',

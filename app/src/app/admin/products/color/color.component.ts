@@ -19,10 +19,12 @@ export class ColorComponent {
       "globalSearch": {
         keys: ['color_id','color_name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'color_name',
-          name: 'Color Name'
+          name: 'Color Name',
+          sort: true
         },
         {
           fieldKey: "code",
@@ -54,7 +56,7 @@ export class ColorComponent {
           {
           key: 'color_name',
           type: 'input',
-          className: 'col-6 p-0',
+          className: 'col-md-6 col-12 p-0',
           templateOptions: {
             label: 'Color Name',
             placeholder: 'Enter Color Name',

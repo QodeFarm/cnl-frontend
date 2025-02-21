@@ -1,6 +1,6 @@
-<div class="container-fluid pt-3">
+<div class="container-fluid p-3">
     <div class="workorder-banner">
-        <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
             <button (click)="WorkOrdrEditID = null" type="button" class="btn pl-0" style="color: black;">
                 <span *ngIf="WorkOrdrEditID" class="custom-heading">Update Work Order</span>
                 <span *ngIf="!WorkOrdrEditID" class="custom-heading">Create Work Order</span>
@@ -9,7 +9,7 @@
                 <button (click)="showWorkorderListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productionModal">Work Order List
                 </button>
                 <!-- <button (click)="updateInventory()" *ngIf="WorkOrdrEditID" type="button" class="btn btn-primary">Update Inventory</button> -->
-                <button (click)="createBom()" *ngIf="showCreateBomButton" type="button" class="btn btn-primary ms-auto" [disabled]="isBomButtonDisabled" data-bs-toggle="modal" data-bs-target="#bomModal">Create BOM
+                <button (click)="createBom()" *ngIf="showCreateBomButton" type="button" class="btn btn-danger ms-auto blink-twice" [disabled]="isBomButtonDisabled" data-bs-toggle="modal" data-bs-target="#bomModal">Create BOM
                 </button>
             </div>
         </div>

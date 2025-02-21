@@ -17,18 +17,19 @@ export class ProductSalesGlComponent {
       pkId: "sales_gl_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['id']
+        keys: ['name','sales_accounts','code','inactive','type','account_no','is_loan_account','address','employee','pan']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'name',
           name: 'Name',
-          sort: true
+          // sort: true
         },
         {
           fieldKey: 'sales_accounts',
           name: 'Sales Accounts',
-          sort: false,
+          sort: true,
         },
         {
           fieldKey: 'code',
@@ -44,18 +45,18 @@ export class ProductSalesGlComponent {
         {
           fieldKey: 'inactive',
           name: 'Inactive',
-          sort: false,
+          sort: true,
           type: 'boolean'
         },
         {
           fieldKey: 'type', 
           name: 'Type',
-          sort: false
+          sort: true
         },
 		{
 		  fieldKey: 'account_no',
 		  name: 'Account No',
-		  sort: false,
+		  sort: true,
 		  isEncrypted: true
 		},
         // {
@@ -71,7 +72,7 @@ export class ProductSalesGlComponent {
         {
           fieldKey: 'is_loan_account', 
           name: 'Is Loan Account',
-          sort: false,
+          sort: true,
 		      type: 'boolean'
         },
         // {
@@ -83,18 +84,18 @@ export class ProductSalesGlComponent {
         {
           fieldKey: 'address', 
           name: 'Address',
-          sort: false
+          sort: true
         },
         {
           fieldKey: 'employee', 
           name: 'Employee',
-          sort: false,
+          sort: true,
 		      type: 'boolean'
         },
         {
           fieldKey: 'pan', 
           name: 'PAN',
-          sort: false
+          sort: true
         },
         {
           fieldKey: "code",
@@ -131,7 +132,7 @@ export class ProductSalesGlComponent {
             
               key: 'name',
               type: 'input',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 px-1 pb-3',
               templateOptions: {
                 label: 'Name',
                 required: true
@@ -142,10 +143,10 @@ export class ProductSalesGlComponent {
                 }
               }
             },
-			{
+			      {
               key: 'sales_accounts',
               type: 'input',
-              className: 'col-6 pb-3 pe-0',
+              className: 'col-md-6 col-12 px-1 pb-3',
               templateOptions: {
                 label: 'Sales Accounts',
               },
@@ -158,7 +159,7 @@ export class ProductSalesGlComponent {
             {
               key: 'code',
               type: 'input',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 px-1 pb-3',
               templateOptions: {
                 label: 'Code',
               },
@@ -171,7 +172,7 @@ export class ProductSalesGlComponent {
             {
               key: 'type',
               type: 'input',
-              className: 'col-6 pb-3 pe-0',
+              className: 'col-md-6 col-12 px-1 pb-3',
               templateOptions: {
                 label: 'Type',
               },
@@ -184,7 +185,7 @@ export class ProductSalesGlComponent {
             {
               key: 'is_subledger',
               type: 'checkbox',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 px-1 pb-3',
               templateOptions: {
                 label: 'Is Subledger'
               }
@@ -192,7 +193,7 @@ export class ProductSalesGlComponent {
             {
               key: 'inactive',
               type: 'checkbox',
-              className: 'col-6 pb-3 pe-0',
+              className: 'col-md-6 col-12 px-1 pb-3',
               templateOptions: {
                 label: 'Inactive'
               }
@@ -200,7 +201,7 @@ export class ProductSalesGlComponent {
             {
               key: 'account_no',
               type: 'input',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 px-1 pb-3',
               templateOptions: {
                 label: 'Account No',
                 type: 'password'
@@ -209,7 +210,7 @@ export class ProductSalesGlComponent {
             {
               key: 'rtgs_ifsc_code',
               type: 'input',
-              className: 'col-6 pb-3 pe-0',
+              className: 'col-md-6 col-12 px-1 pb-3',
               templateOptions: {
                 label: 'RTGS IFSC Code',
               },
@@ -222,7 +223,7 @@ export class ProductSalesGlComponent {
             {
               key: 'classification',
               type: 'input',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 px-1 pb-3',
               templateOptions: {
                 label: 'Classification',
               },
@@ -235,7 +236,7 @@ export class ProductSalesGlComponent {
             {
               key: 'pan',
               type: 'input',
-              className: 'col-6 pb-3 pe-0',
+              className: 'col-md-6 col-12 px-1 pb-3',
               templateOptions: {
                 label: 'PAN',
               },
@@ -248,7 +249,7 @@ export class ProductSalesGlComponent {
             {
               key: 'is_loan_account',
               type: 'checkbox',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 px-1 pb-3',
               templateOptions: {
                 label: 'Is Loan Account'
               }
@@ -256,7 +257,7 @@ export class ProductSalesGlComponent {
             {
               key: 'tds_applicable',
               type: 'checkbox',
-              className: 'col-6 pb-3 pe-0',
+              className: 'col-md-6 col-12 px-1 pb-3',
               templateOptions: {
                 label: 'TDS Applicable'
               }
@@ -264,7 +265,7 @@ export class ProductSalesGlComponent {
 			      {
               key: 'employee',
               type: 'checkbox',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 px-1 pb-3 pb-md-0',
               templateOptions: {
                 label: 'Employee'
               }
@@ -272,7 +273,7 @@ export class ProductSalesGlComponent {
             {
               key: 'address',
               type: 'textarea',
-              className: 'col-6 pb-3 pe-0',
+              className: 'col-md-6 col-12 px-1 pb-0',
               templateOptions: {
                 label: 'Address',
               },

@@ -34,9 +34,10 @@ export class StockjournalComponent implements OnInit {
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
     drawerPlacement: 'right',
+    hideAddBtn: true,
     tableConfig: {
       apiUrl: 'production/work_order/?stock_journal=true',
-      title: 'Inventory',
+      title: 'Stock Journal',
       pkId: "product_id",
       pageSize: 10,
       "globalSearch": {

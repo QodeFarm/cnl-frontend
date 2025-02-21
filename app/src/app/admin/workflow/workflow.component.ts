@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
@@ -16,6 +16,7 @@ export class WorkflowComponent {
   showWorkflowList: boolean = false;
   showForm: boolean = false;
   workflowEditID: any;
+  @ViewChild(WorkflowListComponent) WorkflowListComponent!: WorkflowListComponent;
 
   constructor(private http: HttpClient) {}
 
@@ -53,6 +54,7 @@ export class WorkflowComponent {
   // Show workflow list modal
   showWorkflowListFn() {
     this.showWorkflowList = true;
+    this.WorkflowListComponent?.refreshTable();
   }
 
   // Set form configuration
@@ -80,13 +82,13 @@ export class WorkflowComponent {
       fields: [
         //----------------------------------------- W O R K F L O W -----------------------------------//
         {
-          fieldGroupClassName: "ant-row custom-form-block",
+          fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
           key: 'workflow',
           fieldGroup: [
             {
               key: 'name',
               type: 'input',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Workflow Name',
                 placeholder: 'Enter Workflow Name',
@@ -96,7 +98,7 @@ export class WorkflowComponent {
             {
               key: 'is_active', // New key for the checkbox
               type: 'checkbox',
-              className: 'col-3', // Adjust className as needed
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Is Active',
                 // Optional properties can be added here
@@ -108,7 +110,7 @@ export class WorkflowComponent {
         {
           key: 'workflow_stages',
           type: 'table',
-          className: 'custom-form-list',
+          className: 'custom-form-list product-table',
           templateOptions: {
             title: 'Workflow Stages',
             addText: 'Add Stage',

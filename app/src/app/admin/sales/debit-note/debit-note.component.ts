@@ -13,6 +13,7 @@ import { DebitNoteListComponent } from './debit-note-list/debit-note-list.compon
 })
 export class DebitNoteComponent {
   @ViewChild('salesdebitnoteForm', { static: false }) salesdebitnoteForm: TaFormComponent | undefined;
+  @ViewChild(DebitNoteListComponent) DebitNoteListComponent!: DebitNoteListComponent;
 
   sidebarMessage: string = '';
   showSaleDebitnoteList: boolean = false;
@@ -148,6 +149,7 @@ export class DebitNoteComponent {
   // Displays the sales order list modal
   showSaleDebitNoteListFn() {
     this.showSaleDebitnoteList = true;
+    this.DebitNoteListComponent?.refreshTable();
   }
 
   setFormConfig() {
@@ -181,13 +183,13 @@ export class DebitNoteComponent {
       },
       fields: [
         {
-          fieldGroupClassName: "ant-row custom-form-block",
+          fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
           key: 'sale_debit_note',
           fieldGroup: [
             {
               key: 'customer',
               type: 'select',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Select Customer',
                 placeholder: 'Select Customer',
@@ -215,7 +217,7 @@ export class DebitNoteComponent {
             {
               key: 'sale_invoice_id',
               type: 'select',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Sale Invoice',
                 placeholder: 'Select Sale Invoice',
@@ -228,7 +230,7 @@ export class DebitNoteComponent {
             {
               key: 'debit_note_number',
               type: 'input',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Credit note no',
                 placeholder: 'Enter Credit note no',
@@ -241,7 +243,7 @@ export class DebitNoteComponent {
               key: 'debit_date',
               type: 'date',
               defaultValue: this.nowDate(),
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 type: 'date',
                 label: 'Debit date',
@@ -252,7 +254,7 @@ export class DebitNoteComponent {
             {
               key: 'total_amount',
               type: 'input',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 type: 'number',
                 label: 'Total amount',
@@ -262,7 +264,7 @@ export class DebitNoteComponent {
             {
               key: 'order_status',
               type: 'select',
-              className: 'col-3',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
               label: 'Order status',
               dataKey: 'order_status_id',
@@ -290,7 +292,7 @@ export class DebitNoteComponent {
             {
               key: 'reason',
               type: 'textarea',
-              className: 'col-6',
+              className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Reason',
                 placeholder: 'Enter Reason',

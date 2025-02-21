@@ -18,9 +18,8 @@ export class AssetCategoriesComponent {
       title: 'Asset Categories',
       pkId: "asset_category_id",
       pageSize: 10,
-      "globalSearch": {
-        keys: ['asset_category_id', 'category_name']
-      },
+      "globalSearch": {keys: ['asset_category_id', 'category_name']},
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'category_name',
@@ -58,7 +57,7 @@ export class AssetCategoriesComponent {
             {
               key: 'category_name',
               type: 'input',
-              className: 'col-6 pe-0',
+              className: 'col-md-6 col-12 p-0',
               templateOptions: {
                 label: 'Category Name',
                 placeholder: 'Enter Category Name',

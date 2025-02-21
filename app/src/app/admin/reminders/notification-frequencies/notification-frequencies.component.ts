@@ -18,10 +18,12 @@ export class NotificationFrequenciesComponent {
       "globalSearch": {
         keys: ['frequency_id', 'frequency_name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'frequency_name',
-          name: 'Frequency Name'
+          name: 'Frequency Name',
+          sort: true
         },
         {
           fieldKey: "code",
@@ -54,7 +56,7 @@ export class NotificationFrequenciesComponent {
             {
               key: 'frequency_name',
               type: 'input',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 p-0',
               templateOptions: {
                 label: 'Frequency Name',
                 placeholder: 'Enter Frequency Name',

@@ -1,5 +1,5 @@
 <div class="container-fluid mt-4 custom-tabs">
-    <ul class="nav nav-tabs nav-justified">
+    <ul class="nav nav-tabs nav-justified" >
         <li class="nav-item">
             <a class="nav-link active" data-bs-toggle="tab" href="#general">General</a>
         </li>
@@ -28,6 +28,9 @@
         <li class="nav-item">
             <a class="nav-link" data-bs-toggle="tab" href="#tasks">Tasks</a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#production">Production</a>
+        </li>
     </ul>
     <div class="tab-content">
         <div class="tab-pane  active" id="general">
@@ -53,7 +56,7 @@
                         </ul>
                     </div>
                 </div>
-                <div class="col-md-9">
+                <div class="col-md-9 p-0">
                     <ng-container [ngSwitch]="code">
                         <ng-container *ngSwitchCase="'territory'">
                             <app-territory></app-territory>
@@ -111,7 +114,7 @@
                         </ul>
                     </div>
                 </div>
-                <div class="col-md-9">
+                <div class="col-md-9 p-0">
                     <ng-container [ngSwitch]="code">
                         <ng-container *ngSwitchCase="'ledger-accounts'">
                             <app-ledger-accounts></app-ledger-accounts>
@@ -140,7 +143,7 @@
                         </ul>
                     </div>
                 </div>
-                <div class="col-md-9">
+                <div class="col-md-9 p-0">
                     <ng-container [ngSwitch]="code">
                         <ng-container *ngSwitchCase="'vendor-agent'">
                             <app-vendor-agent></app-vendor-agent>
@@ -184,7 +187,7 @@
                         </ul>
                     </div>
                 </div>
-                <div class="col-md-9">
+                <div class="col-md-9 p-0">
                     <ng-container [ngSwitch]="code">
                         <ng-container *ngSwitchCase="'product-stock-units'">
                             <app-product-stock-units></app-product-stock-units>
@@ -255,11 +258,12 @@
                             <li><a [routerLink]="['/admin/master/departments']">Departments</a></li>
                             <li><a [routerLink]="['/admin/master/shifts']">Shifts</a></li>
                             <li><a [routerLink]="['/admin/master/salary-components']">Salary Components</a></li>
+                            <li><a [routerLink]="['/admin/master/employee-salary-components/']">Employee Salary Components</a></li>
                             <li><a [routerLink]="['/admin/master/leave-types']">Leave Types</a></li>
                         </ul>
                     </div>
                 </div>
-                <div class="col-md-9">
+                <div class="col-md-9 p-0">
                     <ng-container [ngSwitch]="code">
                         <ng-container *ngSwitchCase="'job-types'">
                             <app-job-types></app-job-types>
@@ -278,6 +282,9 @@
                         </ng-container>
                         <ng-container *ngSwitchCase="'salary-components'">
                             <app-salary-components></app-salary-components>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'employee-salary-components'">
+                            <app-employee-salary-components></app-employee-salary-components>
                         </ng-container>
                         <ng-container *ngSwitchCase="'leave-types'">
                             <app-leave-types></app-leave-types>
@@ -298,7 +305,7 @@
                         </ul>
                     </div>
                 </div>
-                <div class="col-md-9">
+                <div class="col-md-9 p-0">
                     <ng-container [ngSwitch]="code">
                         <ng-container *ngSwitchCase="'priorities'">
                             <app-task-priorities></app-task-priorities>
@@ -308,6 +315,32 @@
                 </div>
             </div>
         </div>
+        <div class="tab-pane  fade" id="production">
+            <!-- Content for Products tab -->
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="custom-menu-card">
+                        <h6 class="custom-sub-heading">Production Data</h6>
+                        <ul class="master-menu-list">
+                            <li><a [routerLink]="['/admin/master/productionstatuses']">Production Statuses</a></li>
+                            <li><a [routerLink]="['/admin/master/machines/']">Machines</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-9 p-0">
+                    <ng-container [ngSwitch]="code">
+                        <ng-container *ngSwitchCase="'productionstatuses'">
+                            <app-production-statuses></app-production-statuses>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'machines'">
+                            <app-machines></app-machines>
+                        </ng-container>
+                    </ng-container>
+
+                </div>
+            </div>
+        </div>
+
         <div class="tab-pane  fade" id="assets">
             <!-- Content for Products tab -->
             <div class="row">
@@ -321,7 +354,7 @@
                         </ul>
                     </div>
                 </div>
-                <div class="col-md-9">
+                <div class="col-md-9 p-0">
                     <ng-container [ngSwitch]="code">
                         <ng-container *ngSwitchCase="'asset-categories'">
                             <app-asset-categories></app-asset-categories>
@@ -349,7 +382,7 @@
                         </ul>
                     </div>
                 </div>
-                <div class="col-md-9">
+                <div class="col-md-9 p-0">
                     <ng-container [ngSwitch]="code">
                         <ng-container *ngSwitchCase="'lead-statuses'">
                             <app-lead-statuses></app-lead-statuses>
@@ -379,7 +412,7 @@
                         </ul>
                     </div>
                 </div>
-                <div class="col-md-9">
+                <div class="col-md-9 p-0">
                     <ng-container [ngSwitch]="code">
                         <ng-container *ngSwitchCase="'gst-types'">
                             <app-gst-types></app-gst-types>

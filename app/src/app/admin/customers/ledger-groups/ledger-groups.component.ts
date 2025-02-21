@@ -16,8 +16,9 @@ export class LedgerGroupsComponent {
       pkId: "ledger_group_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['ledger_group_id', 'name']
+        keys: ['ledger_group_id', 'name','code','inactive','under_group','nature']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'name',
@@ -32,17 +33,18 @@ export class LedgerGroupsComponent {
         {
           fieldKey: 'inactive',
           name: 'Inactive',
-          sort: false,
+          sort: true,
           type: 'boolean'
         },
         {
           fieldKey: 'under_group', 
-          name: 'Under Group'
+          name: 'Under Group',
+          sort: true
         },
         {
           fieldKey: 'nature',
           name: 'Nature',
-          sort: false
+          sort: true
         },
         {
           fieldKey: "code",
@@ -70,13 +72,13 @@ export class LedgerGroupsComponent {
       pkId: "ledger_group_id",
       fields: [
         {
-          className: 'col-9 p-0',
+          className: 'col-12 p-0',
           fieldGroupClassName: "ant-row",
           fieldGroup:[
             {
               key: 'name',
               type: 'input',
-              className: 'col-6',
+              className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'Name',
                 placeholder: 'Enter Name',
@@ -86,7 +88,7 @@ export class LedgerGroupsComponent {
             {
               key: 'code',
               type: 'input',
-              className: 'col-6',
+              className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'Code',
                 placeholder: 'Enter Code'
@@ -95,7 +97,7 @@ export class LedgerGroupsComponent {
             {
               key: 'under_group',
               type: 'text',
-              className: 'col-6',
+              className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'Under Group',
                 placeholder: 'Enter Under Group',
@@ -104,7 +106,7 @@ export class LedgerGroupsComponent {
             {
               key: 'nature',
               type: 'input',
-              className: 'col-6',
+              className: 'col-md-6 col-12 pb-3 pb-md-0 px-1',
               templateOptions: {
                 label: 'Nature',
                 placeholder: 'Enter Nature'
@@ -113,7 +115,7 @@ export class LedgerGroupsComponent {
             {
               key: 'inactive',
               type: 'checkbox',
-              className: 'col-6',
+              className: 'col-md-6 col-12 px-1',
               templateOptions: {
                 label: 'Inactive'
               }

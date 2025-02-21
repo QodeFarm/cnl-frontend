@@ -19,14 +19,17 @@ export class DesignationsComponent {
       "globalSearch": {
         keys: ['designation_id','designation_name','responsibilities']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'designation_name',
-          name: 'Designation Name'
+          name: 'Designation Name',
+          sort: true
         },
         {
           fieldKey: 'responsibilities',
-          name: 'Responsibilities'
+          name: 'Responsibilities',
+          sort: true
         },
         {
           fieldKey: "code",
@@ -59,7 +62,7 @@ export class DesignationsComponent {
             {
               key: 'designation_name',
               type: 'input',
-              className: 'col-6 ps-0',
+              className: 'col-md-6 col-12 mb-3 mb-md-0 px-1',
               templateOptions: {
                 label: 'Designation Name',
                 placeholder: 'Enter Designation Name',
@@ -69,7 +72,7 @@ export class DesignationsComponent {
             {
               key: 'responsibilities',
               type: 'input',
-              className: 'col-6 ps-0',
+              className: 'col-md-6 col-12  px-1',
               templateOptions: {
                 label: 'Responsibilities',
                 placeholder: 'Enter Responsibilities',

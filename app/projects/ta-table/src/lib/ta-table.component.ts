@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, Output, ViewChild, EventEmitter, ElementRef, TemplateRef  } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, Output, ViewChild, EventEmitter, ElementRef, TemplateRef } from '@angular/core';
 import { getValue } from '@ta/ta-core';
 import { cloneDeep } from 'lodash';
 import {
@@ -54,15 +54,22 @@ export class TaTableComponent implements OnDestroy {
   @Input() customProductTemplate!: TemplateRef<any>;
   // selectedProducts: any[] = []; // This holds the selected products
   // @Output() selectedProductsChange = new EventEmitter<any[]>(); // Event emitter to notify parent component
-  
-
+  checked = false;
+  indeterminate = false;
+  selectedEmployee: string | null = null;
   selectedStatus: string | null = null;
   selectedQuickPeriod: string | null = null;
   fromDate: Date | null = null;
   toDate: Date | null = null;
   isButtonVisible = false;
+  isStatusButtonVisible = false;
+  isEmployeeFilterVisible = false;
+  setOfCheckedId = new Set<number>();
 
   statusOptions: Array<{ value: string, label: string }> = []; // Store the statuses here
+
+  employeeOptions: Array<{ value: number; label: string }> = [];// Add this for employee filter
+
 
   // List of quick period options like 'Today', 'Last Week', etc.
   quickPeriodOptions = [
@@ -125,7 +132,6 @@ export class TaTableComponent implements OnDestroy {
     this.fromDate = startDate;
     this.toDate = endDate;
   }
-  ;
   loadStatuses() {
     const url = 'masters/order_status/';
 
@@ -150,8 +156,37 @@ export class TaTableComponent implements OnDestroy {
     // this.applyFilters();
   }
 
-  // Apply filters like quick period, date range, and status to fetch filtered data
+  loadEmployees() {
+    const url = 'hrms/employees/'; // Replace with your actual employee API endpoint
 
+    this.http.get<any>(url).subscribe(
+      (response) => {
+        if (response && response.data && response.data.length > 0) {
+          // Map the employees' data to options for the select dropdown
+          this.employeeOptions = response.data.map(employee => {
+            const fullName = `${employee.first_name} ${employee.last_name || ''}`.trim(); // Concatenate first and last names
+
+            return {
+              value: employee.employee_id,  // Use the employee ID as value
+              label: fullName // Store the full name
+            };
+          });
+        } else {
+          console.warn('No employees found in the API response.');
+        }
+      },
+      (error) => {
+        console.error('Error fetching employees:', error);
+      }
+    );
+  }
+  onEmployeeChange(employee: string) {
+    this.selectedEmployee = employee; // Now selectedEmployee will store the full name
+    console.log('Selected Employee Name:', this.selectedEmployee); // Log full name
+    // this.applyFilters(); // Apply the filter immediately
+  }
+
+  // Apply filters like quick period, date range, and status to fetch filtered data
   applyFilters() {
     // Construct the filters object
     const filters = {
@@ -159,6 +194,7 @@ export class TaTableComponent implements OnDestroy {
       fromDate: this.fromDate,
       toDate: this.toDate,
       status: this.selectedStatus,
+      employee: this.selectedEmployee,
     };
 
     // Generate query string from filters
@@ -206,6 +242,7 @@ export class TaTableComponent implements OnDestroy {
     this.fromDate = null;
     this.toDate = null;
     this.selectedStatus = null;
+    this.selectedEmployee = null; // Clear employee filter
 
     // Optionally, you might want to clear other filters or reset pagination if necessary
     this.pageIndex = 1;
@@ -219,7 +256,9 @@ export class TaTableComponent implements OnDestroy {
       fixedFilters: this.options.fixedFilters
     }
 
-    const url = `${this.options.apiUrl}&page=${this.pageIndex}&limit=${this.pageSize}`;
+    // const url = `${this.options.apiUrl}&page=${this.pageIndex}&limit=${this.pageSize}`;
+    const url = `${this.options.apiUrl}`;
+
 
     console.log('API URL:', url); // Debugging log
 
@@ -238,7 +277,7 @@ export class TaTableComponent implements OnDestroy {
   }
 
   // Generate query string for the API call based on the applied filters
-  generateQueryString(filters: { quickPeriod: string, fromDate: Date, toDate: Date, status: string }): string {
+  generateQueryString(filters: { quickPeriod: string, fromDate: Date, toDate: Date, status: string, employee: string }): string {
     const queryParts: string[] = [];
 
     // Add filter for 'fromDate' if available
@@ -258,8 +297,13 @@ export class TaTableComponent implements OnDestroy {
       queryParts.push(`status_name=${encodeURIComponent(filters.status)}`);
     }
 
+    // Add filter for status if available
+    if (filters.employee) {
+      queryParts.push(`employee_id=${encodeURIComponent(filters.employee)}`);
+    }
+
     // Return the query string by joining all the filters
-    return '&' + queryParts.join('&');
+    return '?&' + queryParts.join('&');
   }
   formatDate(date: Date): string {
     // Format date as 'yyyy-MM-dd'
@@ -333,11 +377,14 @@ export class TaTableComponent implements OnDestroy {
 
   ngOnInit(): void {
     // // console.log('table otpions', this.options);
+    this.options.checkedRows = [];
     if (this.options.pageSize) {
       this.pageSize = this.options.pageSize;
     } else {
       this.options.pageSize = 10;
     }
+    this.options.reload = () => { this.reload() };
+
     if (!this.options.pageSizeOptions) {
       this.options.pageSizeOptions = [10, 20, 30, 50, 100, 300, 500, 1000]
     }
@@ -349,15 +396,48 @@ export class TaTableComponent implements OnDestroy {
     // this.loadDataFromServer();
     const currentUrl = this.router.url;
     // console.log('Current URL:', currentUrl); 
-    this.isButtonVisible = [
+    const visibleUrls = [
       '/admin/purchase',
       '/admin/purchase/invoice',
+      '/admin/purchase/purchase-invoice',
       '/admin/purchase/purchasereturns',
       '/admin/sales',
       '/admin/sales/salesinvoice',
       '/admin/sales/sale-returns',
-    ].includes(currentUrl);
+      '/admin/hrms/employee-attendance',
+      '/admin/employees',
+      '/admin/hrms/employee-leave-balance'
+    ]
     this.loadStatuses();
+    this.loadEmployees();
+
+    // Show status filter for specific URLs    
+    this.isButtonVisible = visibleUrls.includes(currentUrl);
+
+    // Hide status button for specific URLs
+    const hideStatusUrls = [
+      '/admin/hrms/employee-attendance',
+      '/admin/employees',// Added employees URL
+      '/admin/hrms/employee-leave-balance'
+    ];
+    this.isStatusButtonVisible = !hideStatusUrls.includes(currentUrl);
+
+    // Show employee filter for specific URLs
+    const employeeFilterUrls = [
+      '/admin/hrms/employee-attendance',
+      '/admin/employees', // Added employees URL
+      '/admin/hrms/employee-leave-balance'
+    ];
+    this.isEmployeeFilterVisible = employeeFilterUrls.includes(currentUrl);
+
+    // // Check if current URL is '/admin/hrms/employee-attendance' to show employee filter
+    // this.isEmployeeFilterVisible = currentUrl === '/admin/hrms/employee-attendance';
+
+    // if (currentUrl === '/admin/hrms/employee-attendance') { // add URL where you want to hide the Status dropdown.
+    //   this.isStatusButtonVisible = false;  // Hide Status dropdown for this specific URL
+    // } else {
+    //   this.isStatusButtonVisible = true;   // Show Status dropdown for other URLs
+    // }
   }
   loadDataFromServer(startIntial?: boolean): void {
 
@@ -380,6 +460,9 @@ export class TaTableComponent implements OnDestroy {
         this.loading = false;
         this.total = data.totalCount; // mock the total data here
         this.rows = data.data || data;
+        if (this.options.showCheckbox) {
+          this.refreshCheckedStatus();
+        }
       }, (error) => {
         this.loading = false;
       });
@@ -394,12 +477,43 @@ export class TaTableComponent implements OnDestroy {
     this.pageIndex = params.pageIndex;
     //this.filters = params.filter;
     const sort = params.sort;
-    const currentSort = sort.find((item) => item.value !== null);
-    const sortField = (currentSort && currentSort.key) || null;
-    const sortOrder = (currentSort && currentSort.value) || null;
-    this.sort = { key: sortField, value: sortOrder };
+    this.sort = null;
+    const currentSort = sort.find((item) => item.value);
+    if (currentSort) {
+      const sortField = (currentSort && currentSort.key) || null;
+      const sortOrder = (currentSort && currentSort.value) || null;
+      this.sort = { key: sortField, value: sortOrder };
+    } else {
+      if (this.options.defaultSort) {
+        this.sort = this.options.defaultSort
+      }
+    }
+
     this.loadDataFromServer();
     // this.loadDataFromServer(pageIndex, pageSize, sortField, sortOrder, filter);
+  }
+  refreshCheckedStatus(): void {
+    const listOfEnabledData = this.rows.filter(({ disabled }) => !disabled);
+    this.checked = listOfEnabledData.every((row) => this.setOfCheckedId.has(row[this.options.pkId]));
+    this.options.checkedRows = Array.from(this.setOfCheckedId) || [];
+    this.indeterminate = listOfEnabledData.some((row) => this.setOfCheckedId.has(row[this.options.pkId])) && !this.checked;
+  }
+  onAllChecked(checked: boolean): void {
+    this.rows
+      .filter(({ disabled }) => !disabled)
+      .forEach((row) => this.updateCheckedSet(row[this.options.pkId], checked));
+    this.refreshCheckedStatus();
+  }
+  updateCheckedSet(id: number, checked: boolean): void {
+    if (checked) {
+      this.setOfCheckedId.add(id);
+    } else {
+      this.setOfCheckedId.delete(id);
+    }
+  }
+  onItemChecked(id: number, checked: boolean): void {
+    this.updateCheckedSet(id, checked);
+    this.refreshCheckedStatus();
   }
   reset(c: any) {
     c.searchValue = null;
@@ -526,7 +640,7 @@ export class TaTableComponent implements OnDestroy {
     // Optionally, emit the event to parent if needed
     this.doAction.emit({ action, row });
   }
-  
+
   // getFilters(){
   //   const filters = this.options.cols.filter((item: { searchValue: any; })=>{
   //     item.searchValue;

@@ -1,8 +1,9 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
+import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 
 @Component({
   selector: 'app-financial-report-list',
@@ -14,6 +15,11 @@ import { Router } from '@angular/router';
 export class FinancialReportListComponent {
 
   @Output('edit') edit = new EventEmitter<void>();
+  @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+
+  refreshTable() {
+   this.taTableComponent?.refresh();
+  };
 
   tableConfig: TaTableConfig = {
     apiUrl: 'finance/financial_reports/',
@@ -21,8 +27,9 @@ export class FinancialReportListComponent {
     pkId: "report_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['report_name','report_type','generated_at']
+      keys: ['generated_at','report_name','report_type']
     },
+    defaultSort: { key: 'created_at', value: 'descend' }, 
     cols: [
       {
         fieldKey: 'report_name',
@@ -33,12 +40,12 @@ export class FinancialReportListComponent {
         fieldKey: 'report_type',
         name: 'Report Type',
         sort: true
-      },
+      }, 
       {
         fieldKey: 'generated_at', 
         name: 'Generated At',
         sort: true
-      },         
+      },        
       {
         fieldKey: "code",
         name: "Action",

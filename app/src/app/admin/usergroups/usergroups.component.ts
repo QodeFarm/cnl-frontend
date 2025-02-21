@@ -22,14 +22,17 @@ export class UsergroupsComponent {
       "globalSearch": {
         keys: ['group_id', 'group_name', 'description']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'group_name',
-          name: 'Group Name'
+          name: 'Group Name',
+          sort: true
         },
 		    {
         fieldKey: 'description', 
         name: 'Description',
+        sort: true
         }, 
         {
           fieldKey: "code",
@@ -62,7 +65,7 @@ export class UsergroupsComponent {
             {
               key: 'group_name',
               type: 'input',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 px-1 pb-3 pb-md-0',
               templateOptions: {
                 label: 'Group Name',
                 placeholder: 'Enter Group Name',
@@ -72,7 +75,7 @@ export class UsergroupsComponent {
 			      {
               key: 'description',
               type: 'textarea',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 px-1',
               templateOptions: {
                 label: 'Description',
                 placeholder: 'Enter Description',

@@ -17,28 +17,29 @@ export class TransportersComponent {
       pkId: "transporter_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['transporter_id', 'name']
+        keys: ['transporter_id', 'name', 'code','gst_no','website_url']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'name',
           name: 'Name',
-          sort: true
+          // sort: true
         },
         {
           fieldKey: 'code', 
           name: 'Code',
-          sort: true
+          // sort: true
         },
         {
           fieldKey: 'gst_no', 
           name: 'GST',
-          sort: false
+          sort: true
         },
         {
           fieldKey: 'website_url', 
           name: 'Web URL',
-          sort: false
+          sort: true
         },
         {
           fieldKey: "code",
@@ -68,13 +69,13 @@ export class TransportersComponent {
       ],
       fields: [
         {
-          className: 'col-9 p-0',
+          className: 'col-12 p-0',
           fieldGroupClassName: "ant-row",
           fieldGroup:[
             {
               key: 'name',
               type: 'input',
-              className: 'col-6',
+              className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'Name',
                 placeholder: 'Enter Name',
@@ -84,7 +85,7 @@ export class TransportersComponent {
             {
               key: 'code',
               type: 'input',
-              className: 'col-6',
+              className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'Code',
                 placeholder: 'Enter Code',
@@ -94,7 +95,7 @@ export class TransportersComponent {
             {
               key: 'gst_no',
               type: 'input',
-              className: 'col-6',
+              className: 'col-md-6 col-12 pb-md-0 pb-3 px-1',
               templateOptions: {
                 label: 'GST',
                 placeholder: 'Enter GST',
@@ -103,7 +104,7 @@ export class TransportersComponent {
             {
               key: 'website_url',
               type: 'input',
-              className: 'col-6',
+              className: 'col-md-6 col-12  px-1',
               templateOptions: {
                 label: 'Website url',
                 placeholder: 'Enter website url',

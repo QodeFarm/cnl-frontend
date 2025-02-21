@@ -18,18 +18,22 @@ export class LeaveTypesComponent {
       "globalSearch": {
         keys: ['leave_type_id','leave_type_name','description','max_days_allowed']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'leave_type_name',
-          name: 'Leave Type Name'
+          name: 'Leave Type Name',
+          sort: true
         },
         {
           fieldKey: 'description',
-          name: 'Description'
+          name: 'Description',
+          sort: true
         },
         {
           fieldKey: 'max_days_allowed',
-          name: 'Max Days Allowed'
+          name: 'Max Days Allowed',
+          sort: true
         },
         {
           fieldKey: "code",
@@ -62,7 +66,7 @@ export class LeaveTypesComponent {
             {
               key: 'leave_type_name',
               type: 'input',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 px-1 mb-3',
               templateOptions: {
                 label: 'Leave Type Name',
                 placeholder: 'Enter Leave Type Name',
@@ -72,7 +76,7 @@ export class LeaveTypesComponent {
             {
               key: 'description',
               type: 'input',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 px-1 mb-3',
               templateOptions: {
                 label: 'Description',
                 placeholder: 'Enter Description',
@@ -82,7 +86,7 @@ export class LeaveTypesComponent {
             {
               key: 'max_days_allowed',
               type: 'input',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 px-1 ',
               templateOptions: {
                 label: 'Max Days Allowed',
                 placeholder: 'Enter Max Days Allowed',

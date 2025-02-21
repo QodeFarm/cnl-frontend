@@ -1,8 +1,9 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
+import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 
 @Component({
   selector: 'app-employee-salary-list',
@@ -14,6 +15,11 @@ import { Router } from '@angular/router';
 export class EmployeeSalaryListComponent {
 
   @Output('edit') edit = new EventEmitter<void>();
+  @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+
+  refreshTable() {
+   this.taTableComponent?.refresh();
+  };
 
   tableConfig: TaTableConfig = {
     apiUrl: 'hrms/employee_salary/',
@@ -21,19 +27,10 @@ export class EmployeeSalaryListComponent {
     pkId: "salary_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['salary_amount','salary_currency','salary_start_date','salary_end_date','employee_id']
+      keys: ['salary_start_date','salary_end_date','salary_amount','salary_currency','employee_id']
     },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
-      {
-        fieldKey: 'salary_amount', 
-        name: 'Salary Amount',
-        sort: true
-      }, 
-      {
-        fieldKey: 'salary_currency', 
-        name: 'Salary Currency',
-        sort: true
-      }, 
       {
         fieldKey: 'salary_start_date',
         name: 'Salary Start Date',
@@ -44,6 +41,16 @@ export class EmployeeSalaryListComponent {
         name: 'Salary End Date',
         sort: true
       },
+      {
+        fieldKey: 'salary_amount', 
+        name: 'Salary Amount',
+        sort: true
+      }, 
+      {
+        fieldKey: 'salary_currency', 
+        name: 'Salary Currency',
+        sort: true
+      }, 
       {
         fieldKey: 'employee_id',
         name: 'Employee',

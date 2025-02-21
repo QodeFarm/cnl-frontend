@@ -18,40 +18,49 @@ export class SizeComponent {
       pkId: "size_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['size_id','size_name']
+        keys: ['size_id','size_name','size_category','size_system','length','height', 'width','size_unit','description']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'size_name',
-          name: 'Size Name'
+          name: 'Size Name',
+          sort: true
         },
         {
           fieldKey: 'size_category',
-          name: 'Size Category'
+          name: 'Size Category',
+          sort: true
         },
         {
           fieldKey: 'size_system',
-          name: 'Size System'
+          name: 'Size System',
+          sort: true
         },
         {
           fieldKey: 'length',
-          name: 'Length'
+          name: 'Length',
+          sort: true
         },
         {
           fieldKey: 'height',
-          name: 'Height'
-        },
+          name: 'Height',
+          sort: true
+        }, 
         {
           fieldKey: 'width',
-          name: 'Width'
+          name: 'Width',
+          sort: true
         },
         {
           fieldKey: 'size_unit',
-          name: 'Size Unit'
+          name: 'Size Unit',
+          sort: true
         },
         {
           fieldKey: 'description',
-          name: 'Description'
+          name: 'Description',
+          sort: true
         },
         {
           fieldKey: "code",
@@ -83,7 +92,7 @@ export class SizeComponent {
           {
           key: 'size_name',
           type: 'input',
-          className: 'col-6 pb-3 ps-0',
+          className: 'col-md-6 col-12 pb-3 px-1',
           templateOptions: {
             label: 'Size Name',
             placeholder: 'Enter Size Name',
@@ -93,7 +102,7 @@ export class SizeComponent {
         {
           key: 'size_category',
           type: 'input',
-          className: 'col-6 pb-3 pe-0',
+          className: 'col-md-6 col-12 pb-3 px-1',
           templateOptions: {
             label: 'Size Category',
             placeholder: 'Enter Size Category',
@@ -103,7 +112,7 @@ export class SizeComponent {
         {
           key: 'size_system',
           type: 'input',
-          className: 'col-6 pb-3 ps-0',
+          className: 'col-md-6 col-12 pb-3 px-1',
           templateOptions: {
             label: 'Size System',
             placeholder: 'Enter Size System',
@@ -113,7 +122,7 @@ export class SizeComponent {
         {
           key: 'length',
           type: 'input',
-          className: 'col-6 pb-3 pe-0',
+          className: 'col-md-6 col-12 pb-3 px-1',
           templateOptions: {
             label: 'Length',
             placeholder: 'Enter Length',
@@ -123,7 +132,7 @@ export class SizeComponent {
         {
           key: 'height',
           type: 'input',
-          className: 'col-6 pb-3 ps-0',
+          className: 'col-md-6 col-12 pb-3 px-1',
           templateOptions: {
             label: 'Height',
             placeholder: 'Enter Height',
@@ -133,7 +142,7 @@ export class SizeComponent {
         {
           key: 'width',
           type: 'input',
-          className: 'col-6 pb-3 pe-0',
+          className: 'col-md-6 col-12 pb-3 px-1',
           templateOptions: {
             label: 'Width',
             placeholder: 'Enter Width',
@@ -143,7 +152,7 @@ export class SizeComponent {
         {
           key: 'size_unit',
           type: 'input',
-          className: 'col-6 pb-3 ps-0',
+          className: 'col-md-6 col-12 mb-md-0 mb-3 px-1',
           templateOptions: {
             label: 'Designation Size Unit',
             placeholder: 'Enter Size Unit',
@@ -153,7 +162,7 @@ export class SizeComponent {
         {
           key: 'description',
           type: 'input',
-          className: 'col-6 pb-3 pe-0',
+          className: 'col-md-6 col-12 px-1',
           templateOptions: {
             label: 'Description',
             placeholder: 'Enter Description',

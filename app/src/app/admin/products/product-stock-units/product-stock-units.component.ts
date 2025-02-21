@@ -17,8 +17,9 @@ export class ProductStockUnitsComponent {
       pkId: "stock_unit_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['id']
+        keys: ['stock_unit_name','quantity_code_id','description']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'stock_unit_name',
@@ -37,7 +38,7 @@ export class ProductStockUnitsComponent {
         {
           fieldKey: 'description', 
           name: 'Description',
-          sort: false
+          sort: true
         },
 		
         {
@@ -80,7 +81,7 @@ export class ProductStockUnitsComponent {
        {
               key: 'stock_unit_name',
               type: 'input',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 px-1 pb-3',
               templateOptions: {
                 label: 'Stock Unit Name',
                 required: true
@@ -94,7 +95,7 @@ export class ProductStockUnitsComponent {
 			{
               key: 'quantity_code',
               type: 'select',
-              className: 'col-6 pb-3 pe-0',
+              className: 'col-md-6 col-12 px-1 pb-3',
               templateOptions: {
                 label: 'Quantity Code',
                 dataKey: 'quantity_code_id',
@@ -115,7 +116,7 @@ export class ProductStockUnitsComponent {
             {
               key: 'description',
               type: 'textarea',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 px-1',
               templateOptions: {
                 label: 'Description',
                 required: true

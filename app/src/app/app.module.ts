@@ -5,6 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { DefaultInterceptor, TaCoreModule, HttpErrorInterceptor, GlobalErrorHandlerService, SiteConfigService, TaActionService } from '@ta/ta-core';
+import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NZ_I18N } from 'ng-zorro-antd/i18n';
 import { en_US } from 'ng-zorro-antd/i18n';
 import { registerLocaleData } from '@angular/common';
@@ -32,6 +33,7 @@ export function initialConfigLoad(siteS: SiteConfigService) {
     AppComponent
   ],
   imports: [
+    NzModalModule,
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,

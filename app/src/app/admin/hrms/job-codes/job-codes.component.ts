@@ -18,9 +18,11 @@ export class JobCodesComponent {
       "globalSearch": {
         keys: ['job_code_id', 'job_code']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [{
           fieldKey: 'job_code',
-          name: 'Job Code'
+          name: 'Job Code',
+          sort: true
         },
         {
           fieldKey: "code",
@@ -51,7 +53,7 @@ export class JobCodesComponent {
         fieldGroup: [{
           key: 'job_code',
           type: 'input',
-          className: 'col-6 p-0',
+          className: 'col-md-6 col-12 p-0',
           templateOptions: {
             label: 'Job Code',
             placeholder: 'Enter Job Code',

@@ -25,12 +25,13 @@ export class RolesComponent {
       pkId: "role_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['id', 'name']
+        keys: ['role_name', 'description']
       },
       cols: [
         {
           fieldKey: 'role_name',
-          name: 'Name'
+          name: 'Name',
+          sort: true
         },
         {
           fieldKey: 'description',

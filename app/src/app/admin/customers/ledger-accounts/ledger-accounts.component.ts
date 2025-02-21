@@ -16,18 +16,19 @@ export class LedgerAccountsComponent {
       pkId: "ledger_account_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['ledger_account_id', 'name']
+        keys: ['ledger_account_id', 'name','code','inactive','type','account_no','is_loan_account', 'address','pan','ledger_group_id']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'name',
           name: 'Name',
-          sort: true
+          // sort: true
         },
         {
           fieldKey: 'code', 
           name: 'Code',
-          sort: true
+          // sort: true
         },
         // {
         //   fieldKey: 'is_subledger',
@@ -38,18 +39,18 @@ export class LedgerAccountsComponent {
         {
           fieldKey: 'inactive',
           name: 'Inactive',
-          sort: false,
+          sort: true,
           type: 'boolean'
         },
         {
           fieldKey: 'type', 
           name: 'Type',
-          sort: false
+          sort: true
         },
         {
           fieldKey: 'account_no',
           name: 'Account No',
-          sort: false,
+          sort: true,
           isEncrypted: true
         },
         // {
@@ -65,7 +66,7 @@ export class LedgerAccountsComponent {
         {
           fieldKey: 'is_loan_account',
           name: 'Loan Account',
-          sort: false,
+          sort: true,
           type: 'boolean'
         },
         // {
@@ -77,17 +78,17 @@ export class LedgerAccountsComponent {
         {
           fieldKey: 'address', 
           name: 'Address',
-          sort: false
+          sort: true
         },
         {
           fieldKey: 'pan',
           name: 'PAN',
-          sort: false,
+          sort: true,
         },
         {
           fieldKey: 'ledger_group_id',
           name: 'Ledger Group',
-          sort: true,
+          // sort: true,
           displayType: "map",
           mapFn: (currentValue: any, row: any, col: any) => {
             return `${row.ledger_group.name}`;
@@ -126,13 +127,13 @@ export class LedgerAccountsComponent {
       ],
       fields: [
         {
-          className: 'col-9 p-0',
+          className: 'col-12 p-0',
           fieldGroupClassName: "ant-row",
           fieldGroup:[
             {
               key: 'name',
               type: 'input',
-              className: 'col-6',
+              className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'Name',
                 placeholder: 'Enter Name',
@@ -142,7 +143,7 @@ export class LedgerAccountsComponent {
             {
               key: 'code',
               type: 'input',
-              className: 'col-6',
+              className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'Code',
                 placeholder: 'Enter Code',
@@ -152,13 +153,14 @@ export class LedgerAccountsComponent {
             {
               key: 'type',
               type: 'select',
-              className: 'col-6',
+              className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'Type',
                 options: [
                   { value: 'customer', label: 'Customer' },
                   { value: 'Bank', label: 'Bank' },
-                  { value: 'cash', label: 'cash' }
+                  { value: 'cash', label: 'cash' },
+                  { value: 'Vendor', label: 'Vendor'}
                 ],
               },
               hooks: {
@@ -170,7 +172,7 @@ export class LedgerAccountsComponent {
             {
               key: 'account_no',
               type: 'input',
-              className: 'col-6',
+              className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'Account No',
                 type: 'password'
@@ -179,7 +181,7 @@ export class LedgerAccountsComponent {
             {
               key: 'rtgs_ifsc_code',
               type: 'input',
-              className: 'col-6',
+              className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'RTGS IFSC Code',
               },
@@ -192,7 +194,7 @@ export class LedgerAccountsComponent {
             {
               key: 'classification',
               type: 'input',
-              className: 'col-6',
+              className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'Classification',
               },
@@ -205,7 +207,7 @@ export class LedgerAccountsComponent {
         {
               key: 'address',
               type: 'text',
-              className: 'col-6',
+              className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'Address',
               },
@@ -218,7 +220,7 @@ export class LedgerAccountsComponent {
         {
               key: 'pan',
               type: 'input',
-              className: 'col-6',
+              className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'PAN',
               },
@@ -231,7 +233,7 @@ export class LedgerAccountsComponent {
             {
               key: 'ledger_group',
               type: 'select',
-              className: 'col-6',
+              className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'Ledger Group',
                 dataKey: 'ledger_group_id',
@@ -252,7 +254,7 @@ export class LedgerAccountsComponent {
             {
               key: 'tds_applicable',
               type: 'checkbox',
-              className: 'col-6',
+              className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'TDS Applicable'
               }
@@ -260,7 +262,7 @@ export class LedgerAccountsComponent {
             {
               key: 'is_subledger',
               type: 'checkbox',
-              className: 'col-6',
+              className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'Is Subledger'
               }
@@ -268,7 +270,7 @@ export class LedgerAccountsComponent {
             {
               key: 'inactive',
               type: 'checkbox',
-              className: 'col-6',
+              className: 'col-md-6 col-12 pb-md-0 pb-3 px-1',
               templateOptions: {
                 label: 'Inactive'
               }
@@ -276,7 +278,7 @@ export class LedgerAccountsComponent {
             {
               key: 'is_loan_account',
               type: 'checkbox',
-              className: 'col-6',
+              className: 'col-md-6 col-12  px-1',
               templateOptions: {
                 label: 'Is Loan Account'
               }

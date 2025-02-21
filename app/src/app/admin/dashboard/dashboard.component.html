@@ -2,7 +2,7 @@
 <div class="container-fluid pt-3">
     <div class="row">
         <!-- Sales Card -->
-        <div class="dashboard-card px-1 h-100" (click)="openSalesModal()">
+        <div class="dashboard-card px-1 col-md col-sm-4 col-6 h-100" (click)="openSalesModal()">
             <div class="dashboard-card-body">
                 <div class="dashboard-card-head">Sales</div>
                 <div class="dashboard-card-content">
@@ -13,7 +13,7 @@
         </div>
 
         <!-- Purchase Card -->
-        <div class="dashboard-card px-1 h-100" (click)="openPurchaseModal()">
+        <div class="dashboard-card col-md col-sm-4 col-6 px-1 h-100" (click)="openPurchaseModal()">
             <div class="dashboard-card-body">
                 <div class="dashboard-card-head">Purchase</div>
                 <div class="dashboard-card-content">
@@ -24,7 +24,7 @@
         </div>
 
         <!-- Receivables Card -->
-        <div class="dashboard-card px-1 h-100" (click)="openReceivablesModal()">
+        <div class="dashboard-card col-md col-sm-4 col-6 px-1 h-100" (click)="openReceivablesModal()">
             <div class="dashboard-card-body">
                 <div class="dashboard-card-head">Receivables</div>
                 <div class="dashboard-card-content">
@@ -35,7 +35,7 @@
         </div>
 
         <!-- Payables Card -->
-        <div class="dashboard-card px-1 h-100" (click)="openPayablesModal()">
+        <div class="dashboard-card col-md col-sm-6 col-6 px-1 h-100" (click)="openPayablesModal()">
             <div class="dashboard-card-body">
                 <div class="dashboard-card-head">Payables</div>
                 <div class="dashboard-card-content">
@@ -46,7 +46,7 @@
         </div>
 
         <!-- Cash/Bank Card -->
-        <div class="dashboard-card px-1 h-100" (click)="openLiquidityModal()">
+        <div class="dashboard-card col-md col-sm-6 col-12 px-1 h-100" (click)="openLiquidityModal()">
             <div class="dashboard-card-body">
                 <div class="dashboard-card-head">Cash/ Bank</div>
                 <div class="dashboard-card-content">
@@ -108,41 +108,197 @@
 
 <!-- second-row -->
 <div class="second-main-row">
-    <div class="left-container">
-        <div class="first-row">
-            <div class="chart-container">
-                <canvas #chartTop6Items></canvas>
+    <div class="left-container col-lg-8 col-md-6 col-12">
+        <div class="first-row row">
+            <div class="col-lg-4 col-md-6 col-12 pl-md-0 pr-md-1">
+                <div class="chart-container">
+                    <canvas #chartTop5Items></canvas>
+                </div>
             </div>
-
+            <!-- <div class="chart-container">
+                <canvas  #chartTop5ItemsIn6MonthsCanvas ></canvas>  
+            </div> -->
+            <div class="col-lg-4 col-md-6 col-12-4 px-md-1">
             <div class="chart-container">
-                <canvas #chartDirectExpenses></canvas>
+                <canvas  #chartTop5CustomersOf6MonthsCanvas ></canvas>   
+            </div></div>
+            <div class="col-lg-4 col-md-6 col-12 px-lg-1 ps-md-0 pe-md-1">
+                <div class="chart-container">
+                    <canvas #chartTop5ProfitMakingItemsCanvas></canvas>
+                </div>
             </div>
-
-            <div class="chart-container">
-                <canvas #chartOperationalExpenses></canvas>
+            <div class="col-lg-4 col-md-6 col-12 pl-lg-0 pr-lg-1 px-md-1">
+                <div class="chart-container">
+                    <canvas #SalesOrderTrendChartCanvas></canvas>
+                </div>
             </div>
         </div>
 
-        <div class="second-row">
+        <!-- <div class="second-row row"> 
+            <!-- <div class="col-md-4 ps-0 pe-1">
             <div class="second-chart-container">
-                <canvas #chartTop6ItemsIn6MonthsCanvas></canvas>
+                <canvas #SalesOrderTrendChartCanvas></canvas>
+            </div>
+            </div> -->
+            <!-- Commented for future changes
+             <div class="second-chart-container">
+                <canvas #chartDirectExpenses></canvas>
             </div>
 
             <div class="second-chart-container">
-                <canvas #chartTop6ProfitMakingItemsCanvas></canvas>
+                <canvas #chartOperationalExpenses></canvas>
             </div>
 
             <div class="second-chart-container">
                 <canvas #chartOperatiorenalExpenses></canvas>
                 <p>Amazon/Flipkart/Meesho</p>
+            </div> -->
+        <!--</div> -->
+    </div>
+
+    <div class="right-container col-lg-4 col-md-6 col-12">
+        <!-- New Div Covering the Entire Empty Space -->
+         <div class="row">
+            <div class="col-12">
+                <div class="right-side-chart">
+                    <canvas #chartLast6MonthsCashflowCanvas></canvas>
+                </div>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="right-container">
-        <!-- New Div Covering the Entire Empty Space -->
-        <div class="right-side-chart">
-            <canvas #chartLast6MonthsCashflowCanvas></canvas>
+<!-- Task and Work Order HEADING Div -->
+
+
+<!-- Task and Work Order TABLEs Div -->
+<div class="task-workOrder-row row m-0">
+    <div class="col-md-6 col-12 p-0">
+        <div class="h-100">
+            <div class="task-workOrder-heading">
+                <h4>Tasks</h4>
+            </div>
+            <div class="left-task-container">       
+                <table class="task-table">
+                    <thead>
+                        <tr>
+                            <th>Appointed</th>
+                            <th>Title</th>
+                            <th>Status</th>
+                            <th>Priority</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let task of taskList">
+                            <td>{{ task.name }}</td>
+                            <td>{{ task.title }}</td>
+                            <td>{{ task.status }}</td>
+                            <td>{{ task.priority }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-12 p-0">
+        <div class="h-100">
+            <div class="task-workOrder-heading">
+                <h4>Work Orders</h4>
+            </div>
+            <div class="right-task-container">         
+                <table class="task-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Completed</th>
+                            <th>Pending</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let order of workOrders">
+                            <td>{{ order.name }}</td>
+                            <td>{{ order.quantity }}</td>
+                            <td>{{ order.completed_qty }}</td>
+                            <td>{{ order.pending_qty }}</td>
+                            <td>{{ order.status_name }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
+ 
+<!-- HTML code for small tables -->
+<div class="container-4 row mx-0 my-3">
+    <div class="col-md-4 col-sm-6 col-12 pr-md-1">
+        <div class="card">
+            <table class="small-4th-row-table">
+                <thead>
+                    <tr>
+                    <th>Product not sold in 30 Days</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let product of products">
+                    <td>{{ product }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-6 col-12 px-md-1 my-md-0 my-2">
+        <div class="card">
+        <table class="small-4th-row-table">
+            <thead>
+            <tr>
+                <th>Customers with No Sales in 30 Days</th>
+            </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let name of customers">
+                    <td>{{ name }}</td>
+                    </tr>
+            </tbody>
+        </table>
+        </div>
+    </div>
+    <div class="col-md-4 col-12 pl-md-1">
+    <div class="card">
+      <table class="small-4th-row-table">
+        <thead>
+          <tr>
+            <th class="rounded-left">Pending</th>
+            <th class="rounded-right"> </th>
+          </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let pending of pendings">
+                <td>{{ pending.order_type }}</td>
+                <td>{{ pending.total_value }}</td>
+            </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+    <!-- <div class="card">
+      <table class="small-4th-row-table">
+        <thead>
+          <tr>
+            <th>Spending</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>$500</td>
+          </tr>
+          <tr>
+            <td>$200</td>
+          </tr>
+        </tbody>
+      </table>
+    </div> -->
+</div>
+  

@@ -17,8 +17,9 @@ export class ProductGstClassificationsComponent {
       pkId: "gst_classification_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['id']
+        keys: ['id','type','code', 'hsn_or_sac_code','hsn_description']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'type',
@@ -33,12 +34,12 @@ export class ProductGstClassificationsComponent {
         {
           fieldKey: 'hsn_or_sac_code', 
           name: 'hsn or sac Code',
-          sort: false
+          sort: true
         },
         {
           fieldKey: 'hsn_description', 
           name: 'hsn Description',
-          sort: false
+          sort: true
         },
         {
           fieldKey: "code",
@@ -74,7 +75,7 @@ export class ProductGstClassificationsComponent {
 	       {
               key: 'type',
               type: 'select',
-              className: 'col-6 pb-3 ps-0',
+              className: 'col-md-6 col-12 px-1 pb-3',
               templateOptions: {
                 label: 'Type',
                 required: true,
@@ -93,7 +94,7 @@ export class ProductGstClassificationsComponent {
             {
               key: 'code',
               type: 'input',
-              className: 'col-6 pb-3 pe-0',
+              className: 'col-md-6 col-12 px-1 pb-3',
               templateOptions: {
                 label: 'Code',
                 required: true
@@ -107,7 +108,7 @@ export class ProductGstClassificationsComponent {
             {
               key: 'hsn_or_sac_code',
               type: 'input',
-              className: 'col-6 pb-3 pS-0',
+              className: 'col-md-6 col-12 px-1 pb-md-0 pb-3',
               templateOptions: {
                 label: 'Hsn Or Sac Code',
                 required: true
@@ -121,7 +122,7 @@ export class ProductGstClassificationsComponent {
             {
               key: 'hsn_description',
               type: 'textarea',
-              className: 'col-6 pb-3 pe-0',
+              className: 'col-md-6 col-12 px-1',
               templateOptions: {
                 label: 'Hsn Description',
                 required: true

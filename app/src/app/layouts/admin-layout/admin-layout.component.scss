@@ -1,0 +1,107 @@
+.navbar{
+    p{
+        margin: 0;
+        font-size: 17px;
+        color: #ffffff;
+    }
+}
+.company-title{
+    position: absolute;
+    right: 50%;
+    transform: translateX(50%);
+    // @media(max-width:1199px){
+    //        transform: inherit;
+    // }
+    // @media(max-width:991px){
+    //     right: inherit;
+    //     position: inherit;
+    //     margin-right: 10px;
+    // }
+    @media(max-width:767px){
+       span{
+        font-size: 12px !important;
+        padding: 5px 8px !important;
+       }
+       .company-code{
+        display: none;
+       }
+      }
+    @media(max-width:575px){
+         right: inherit;
+         position: inherit;
+         transform: inherit;
+    }
+}
+@media(max-width:991px){
+    .topbar .nav-item .nav-link {
+        padding: 0 0.4rem;
+    }
+    .sidebar-brand.layout-logo-design{
+        h3 {
+            font-size: 32px;
+        }
+        span {
+            font-size: 9px;
+        }
+    }
+}
+@media(max-width:767px){
+    .topbar .nav-item .nav-link {
+        padding: 0 0.2rem;
+    }
+    .sidebar-brand.layout-logo-design{
+        h3 {
+            font-size: 27px;
+        }
+        span {
+            font-size: 8px;
+            line-height: 5px;
+            padding-top: 0px;
+        }
+    }
+    .bar-toggle i {
+        font-size: 18px;
+    }
+    header {
+        .navbar{
+           padding-left:10px;
+           padding-right: 5px;
+        }
+        .topbar{
+            #sidebarToggleTop {
+                margin-left: 5px !important;
+             }
+            .topbar-divider {
+              display: none !important;
+            }
+        } 
+    }
+}
+@media(max-width:575px){
+    .navbar-expand .navbar-nav {
+        flex-direction: row;
+        width: 60%;
+        justify-content: space-between;
+        .company-title span {
+            font-size: 11px !important;
+            margin: 0 !important;
+        }
+        @media(max-width:575px){
+            width: 65%;
+        }
+    }
+}
+.company-details{
+    margin: 0;
+    font-weight: 600;
+    font-size: 16px;
+    color: #333333;
+    background: #fff;
+    padding: 5px 15px;
+    z-index: 99;
+    position: relative;
+    span{
+        font-weight: 400;
+        color: #142768;
+    }
+}

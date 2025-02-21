@@ -18,9 +18,11 @@ export class JobTypesComponent {
       "globalSearch": {
         keys: ['job_type_id', 'job_type_name']
       },
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [{
           fieldKey: 'job_type_name',
-          name: 'Job Type Name'
+          name: 'Job Type Name',
+          sort: true
         },
         {
           fieldKey: "code",
@@ -51,7 +53,7 @@ export class JobTypesComponent {
         fieldGroup: [{
           key: 'job_type_name',
           type: 'input',
-          className: 'col-6 p-0',
+          className: 'col-md-6 col-12 p-0',
           templateOptions: {
             label: 'Job Type Name',
             placeholder: 'Enter Job Type Name',
