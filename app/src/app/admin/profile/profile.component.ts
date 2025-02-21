@@ -19,17 +19,8 @@ import { LocalStorageService } from '@ta/ta-core';
 export class ProfileComponent {
   userName: string | null = null;
   userId: number | null = null;
-  showErrorToast: boolean;
-  showSuccessToast: boolean;
-  toastMessage: string;
   title = "Profile";
   showForm = false;
-  showToast(message: string, isError = false) {
-    this.toastMessage = message;
-    this.showErrorToast = isError;
-    this.showSuccessToast = !isError;
-    setTimeout(() => { this.showErrorToast = false; this.showSuccessToast = false; }, 3000);
-  }
   options: TaFormConfig = {
     url: 'users/create_user/',
     title: 'User Profile',
