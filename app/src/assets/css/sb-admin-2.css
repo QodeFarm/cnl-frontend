@@ -5989,6 +5989,7 @@ a.close.disabled {
     transition: transform 0.3s ease-out;
     transform: translate(0, -50px);
     border: solid 2px white;
+    border-radius: 0.3rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
