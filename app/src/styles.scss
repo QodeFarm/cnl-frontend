@@ -1436,23 +1436,22 @@ ta-form {
     .custom-modal .modal-dialog {
         max-width: 98%;
     }
-
-    .sidebar-toggled{
-        .menu-overlay{
-            content: '';
-            height: 100%;
-            width: 100%;
-            z-index: 99;
-            position: fixed;
-            top: 0;
-            left: 0;
-            background-color: rgba(0, 0, 0, 0.8);
-            overflow-y: auto;
-            overflow-x: hidden;
-            text-align: center;
-            opacity: 1;
-            transition: opacity 0.2s ease-in-out;
-        }  
+    .menu-overlay.menuBglayer{
+        content: '';
+        height: 100%;
+        width: 100%;
+        z-index: 99;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background-color: rgba(0, 0, 0, 0.8);
+        overflow-y: auto;
+        overflow-x: hidden;
+        text-align: center;
+        opacity: 1;
+        transition: opacity 0.2s ease-in-out;
+    }  
+    .sidebar-toggled{       
         .nav-item{
             &:hover{
                 .nav-link{
