@@ -97,8 +97,10 @@ export class AdminLayoutComponent {
   layertoggleMenu() {
     document.body.classList.remove("sidebar-toggled");
     const sidebarElement = this.elementRef.nativeElement.querySelector('.sidebar');
+    const menuOverlayElement = this.elementRef.nativeElement.querySelector('.menu-overlay'); 
     if (sidebarElement) {
       this.renderer.removeClass(sidebarElement, 'toggled');
+      this.renderer.removeClass(menuOverlayElement, 'menuBglayer');
     }
   }
   ngOnInit() {
@@ -392,6 +394,7 @@ export class AdminLayoutComponent {
     if (windowWidth < 480 && this.elementRef.nativeElement.querySelector('.sidebar').classList.contains('toggled')) {
       this.renderer.removeClass(document.body, 'sidebar-toggled');
       this.renderer.removeClass(this.elementRef.nativeElement.querySelector('.sidebar'), 'toggled');
+      this.renderer.removeClass(this.elementRef.nativeElement.querySelector('.menu-overlay'), 'menuBglayer');
       //this.hideSidebarCollapse();
     }
     // if (windowWidth < 480 && !this.elementRef.nativeElement.querySelector('.sidebar').classList.contains('toggled')) {
@@ -417,8 +420,9 @@ export class AdminLayoutComponent {
 
     // Toggle the class on the element with class "sidebar"
     const sidebar: any = document.querySelector(".sidebar");
+    const menuOverlay: any = document.querySelector(".menu-overlay");
     sidebar.classList.toggle("toggled");
-
+    menuOverlay.classList.toggle("menuBglayer");
     // Check if the "sidebar" element has the class "toggled"
     if (sidebar.classList.contains("toggled")) {
       // Get all elements with class "collapse" that are descendants of the "sidebar" element
