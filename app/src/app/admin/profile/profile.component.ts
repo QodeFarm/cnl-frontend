@@ -19,19 +19,10 @@ import { LocalStorageService } from '@ta/ta-core';
 export class ProfileComponent {
   userName: string | null = null;
   userId: number | null = null;
-  showErrorToast: boolean;
-  showSuccessToast: boolean;
-  toastMessage: string;
   title = "Profile";
   showForm = false;
-  showToast(message: string, isError = false) {
-    this.toastMessage = message;
-    this.showErrorToast = isError;
-    this.showSuccessToast = !isError;
-    setTimeout(() => { this.showErrorToast = false; this.showSuccessToast = false; }, 3000);
-  }
   options: TaFormConfig = {
-    // url: 'users/create_user/',
+    url: 'users/create_user/',
     title: 'User Profile',
     pkId: "user_id",
     exParams: [
@@ -53,47 +44,11 @@ export class ProfileComponent {
     ],
     submit: {
       label: "Update Profile",
-      icon: 'save',
+      icon: 'user',
       successMsg: "Profile updated successfully",
       submittedFn: (res: any) => {
-        try {
-          const user = this.taLoacal.getItem('user');
-          if (!user?.user_id) {
-            this.showToast("Error: User not found.", true);
-            return;
-          }
-
-          const updateUrl = `users/create_user/${user.user_id}/`;
-          const model = this.options.model;
-
-          if (!model) {
-            this.showToast("Error: Missing profile data.", true);
-            return;
-          }
-
-          const payload = {
-            ...model,
-            role_id: model.role?.role_id || model.role || null,
-            status_id: model.status?.status_id || model.status || null,
-          };
-
-          this.http.put(updateUrl, payload).subscribe({
-            next: () => this.showToast("Profile updated successfully!"),
-            error: (err) => {
-              const messages: { [key: number]: string } = {
-                0: "Network error. Please check your connection.",
-                400: "Invalid data provided.",
-                404: "User not found.",
-                500: "Server error. Try again later.",
-              };
-              this.showToast(messages[err.status] || "An error occurred.", true);
-            }
-          });
-
-        } catch (error) {
-          this.showToast("Something went wrong. Please try again.", true);
-        }
-      }
+        this.router.navigateByUrl('/profile');
+      },
     },
     fields: [
 
