@@ -10,6 +10,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder } from '@angular/forms';
 import { forkJoin, Observable } from 'rxjs';
 import { OrderListComponent } from './order-list/order-list.component';
+import { displayInformation, getUnitData, sumQuantities } from 'src/app/utils/display.utils';
+import { FormlyFieldConfig } from '@ngx-formly/core';
 declare var bootstrap;
 @Component({
   selector: 'app-purchase',
@@ -237,7 +239,82 @@ export class PurchaseComponent {
         return; // Stop further execution as we don't want to repopulate the form
       }
     }
-  }  
+  }
+  
+  loadProductVariations(field: FormlyFieldConfig, productValuechange: boolean = false) {
+      const parentArray = field.parent;
+  
+      const product = field.formControl.value; //this.formConfig.model.sale_order_items[currentRowIndex]?.product;
+      // Ensure the product exists before making an HTTP request
+  
+      if (product?.product_id) {
+        const sizeField: any = parentArray.fieldGroup.find((f: any) => f.key === 'size');
+        const colorField: any = parentArray.fieldGroup.find((f: any) => f.key === 'color');
+        if (productValuechange) {
+          sizeField.formControl.setValue(null);
+          colorField.formControl.setValue(null);
+        }
+        // Clear previous options for both size and color fields before adding new ones
+        if (sizeField) sizeField.templateOptions.options = [];
+        if (colorField) colorField.templateOptions.options = [];
+        this.http.get(`products/product_variations/?product_id=${product.product_id}`).subscribe((response: any) => {
+          if (response.data.length > 0) {
+  
+            let availableSizes, availableColors;
+            // Check if response data is non-empty for size
+            if (response.data && response.data.length > 0) {
+              availableSizes = response.data.map((variation: any) => ({
+                label: variation.size?.size_name || '----',
+                value: {
+                  size_id: variation.size?.size_id || null,
+                  size_name: variation.size?.size_name || '----'
+                }
+              }));
+              availableColors = response.data.map((variation: any) => ({
+                label: variation.color?.color_name || '----',
+                value: {
+                  color_id: variation.color?.color_id || null,
+                  color_name: variation.color?.color_name || '----'
+                }
+              }));
+              // Enable and update the size field options if sizes are available
+              if (sizeField) {
+                sizeField.formControl.enable(); // Ensure the field is enabled
+                sizeField.templateOptions.options = availableSizes.filter((item, index, self) => index === self.findIndex((t) => t.value.size_id === item.value.size_id)); // Ensure unique size options
+              }
+            } else {
+              // Clear options and keep the fields enabled, without any selection if no options exist
+              if (sizeField) {
+                sizeField.templateOptions.options = [];
+              }
+              if (colorField) {
+                colorField.templateOptions.options = [];
+              }
+            }
+          }
+        });
+      } else {
+        console.error('Product not selected or invalid.');
+      }
+    };
+
+    async autoFillProductDetails(field, data) {
+      this.productOptions = data;
+      if (!field.form?.controls || !data) return;
+      const fieldMappings = {
+        code: data.code,
+        rate: data.sales_rate || field.form.controls.rate.value,
+        discount: parseFloat(data.dis_amount) || 0,
+        unit_options_id: data.unit_options?.unit_options_id,
+        print_name: data.print_name,
+        mrp: data.mrp
+      };
+    
+      Object.entries(fieldMappings).forEach(([key, value]) => {
+        if (value !== undefined) field.form.controls[key]?.setValue(value);
+      });
+      this.totalAmountCal();
+    }
 //=====================================================================
   formConfig: TaFormConfig = {};
 
@@ -655,17 +732,17 @@ loadQuickpackProducts() {
         {
           key: 'purchase_order_items',
           type: 'script',
-          value: 'data.purchase_order_items.map(m=> {m.product_id = m.product.product_id; if(m.product.unit_options){m.unit_options_id = m.product.unit_options.unit_options_id};  if(m.unit_options){m.unit_options_id = m.unit_options.unit_options_id};  return m ;})'
+          value: 'data.purchase_order_items.map(m=> {m.product_id = m.product?.product_id; if(m.product.unit_options){m.unit_options_id = m.product.unit_options.unit_options_id};  if(m.unit_options){m.unit_options_id = m.unit_options.unit_options_id};  return m ;})'
         },
         {
           key: 'purchase_order_items',
           type: 'script',
-          value: 'data.purchase_order_items.map(m=> {m.size_id = m.size.size_id; return m ;})'
+          value: 'data.purchase_order_items.map(m=> {m.size_id = m.size?.size_id || null;  return m ;})'
         },
         {
           key: 'purchase_order_items',
           type: 'script',
-          value: 'data.purchase_order_items.map(m=> {m.color_id = m.color.color_id; return m ;})'
+          value: 'data.purchase_order_items.map(m=> {m.color_id = m.color?.color_id || null;  return m ;})',
         },
 
       ],
@@ -1051,7 +1128,7 @@ loadQuickpackProducts() {
                     'templateOptions.hidden': () => !(this.PurchaseOrderEditID),
                     'templateOptions.disabled': (model) => model.invoiced === 'YES' || !this.PurchaseOrderEditID
                   }
-              }, 
+              },
               {
                 key: 'product',
                 type: 'select',
@@ -1060,9 +1137,9 @@ loadQuickpackProducts() {
                   dataKey: 'product_id',
                   hideLabel: true,
                   dataLabel: 'name',
+                  placeholder: 'product',
                   options: [],
                   required: true,
-                  placeholder: 'product',
                   lazy: {
                     url: 'products/products/?summary=true',
                     lazyOneTime: true
@@ -1071,184 +1148,41 @@ loadQuickpackProducts() {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-                    // Check if parentArray exists and proceed
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
-
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.purchase_order_items.length > currentRowIndex) {
-                        const existingProduct = this.dataToPopulate.purchase_order_items[currentRowIndex].product;
-                        
-                        // Set the full product object instead of just the product_id
-                        if (existingProduct) {
-                          field.formControl.setValue(existingProduct); // Set full product object (not just product_id)
-                        }
-                      }
-                      
-                      // Subscribe to value changes of the field
-                      // ***Size dropdown will populate with available sizes when product in selected***
-                      field.formControl.valueChanges.subscribe(selectedProductId => {
-                        const product = this.formConfig.model.purchase_order_items[currentRowIndex]?.product;
-                        console.log("Product id : ", product)
-                        // Ensure the product exists before making an HTTP request
-                        if (product?.product_id) {
-                          this.http.get(`products/product_variations/?product_id=${product.product_id}`).subscribe((response: any) => {
-                            if (response.data.length > 0) {
-                              const sizeField = parentArray.fieldGroup.find((f: any) => f.key === 'size');
-                              const colorField = parentArray.fieldGroup.find((f: any) => f.key === 'color');
-                              // Clear previous options for both size and color fields before adding new ones
-                              if (sizeField) sizeField.templateOptions.options = [];
-                              if (colorField) colorField.templateOptions.options = [];
-                              let availableSizes, availableColors;
-                              // Check if response data is non-empty for size
-                              if (response.data && response.data.length > 0) {
-                                availableSizes = response.data.map((variation: any) => ({
-                                  label: variation.size?.size_name || '----',
-                                  value: {
-                                    size_id: variation.size?.size_id || null,
-                                    size_name: variation.size?.size_name || '----'
-                                  }
-                                }));
-                                availableColors = response.data.map((variation: any) => ({
-                                  label: variation.color?.color_name || '----',
-                                  value: {
-                                    color_id: variation.color?.color_id || null,
-                                    color_name: variation.color?.color_name || '----'
-                                  }
-                                }));
-                                // Enable and update the size field options if sizes are available
-                                if (sizeField) {
-                                  sizeField.formControl.enable(); // Ensure the field is enabled
-                                  sizeField.templateOptions.options = availableSizes.filter((item, index, self) => index === self.findIndex((t) => t.value.size_id === item.value.size_id)); // Ensure unique size options
-                                }
-                              } else {
-                                // Clear options and keep the fields enabled, without any selection if no options exist
-                                if (sizeField) {
-                                  sizeField.templateOptions.options = [];
-                                }
-                                if (colorField) {
-                                  colorField.templateOptions.options = [];
-                                }
-                              }
-                            } else {
-                              console.log(`For Product: ${product.name}  - No Size and Colors are available setting those to Null**`)
-                              this.formConfig.model.purchase_order_items[currentRowIndex]['size_id'] = null;
-                              this.formConfig.model.purchase_order_items[currentRowIndex]['color_id'] = null;
-                            }
-                          });
-                        } else {
-                          console.error('Product not selected or invalid.');
-                        }
-                      });
-                      // ***Product Info Text when product is selected code***
-                      field.formControl.valueChanges.subscribe(async selectedProductId => {
-                        const product = this.formConfig.model.purchase_order_items[currentRowIndex]?.product;
-                        this.http.get(`products/products_get/?product_id=${product.product_id}`).subscribe({
-                          next: (response: any) => {
-                            // Handle the successful response here
-                            const unitInfo = response.data[0] || {};
-                            // Using optional chaining and nullish coalescing to assign values
-                            const unitOption = unitInfo.unit_options?.unit_name ?? 'NA';
-                            const stockUnit = unitInfo.stock_unit?.stock_unit_name ?? 'NA';
-                            const packUnit = unitInfo.pack_unit?.unit_name ?? 'NA';
-                            const gPackUnit = unitInfo.g_pack_unit?.unit_name ?? 'NA';
-                            const packVsStock = unitInfo.pack_vs_stock ?? 0;
-                            const gPackVsPack = unitInfo.g_pack_vs_pack ?? 0;
-                            // Regular expression to match 'Stock Unit' 'Stock Pack Gpack Unit' & 'Stock Pack Unit'.
-                            const stockUnitReg = /\b[sS][tT][oO][cC][kK][_ ]?[uU][nN][iI][tT]\b/g
-                            const GpackReg = /\b(?:[sS]tock[_ ]?[pP]ack[_ ]?)?[gG][pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
-                            const stockPackReg = /\b[sS][tT][oO][cC][kK][_ ]?[pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g
-                            // Check which pattern matches unit_name
-                            let unitData = ''
-                            if (stockUnitReg.test(unitOption)) {
-                              unitData = `
-                                      <span style="color: red;">Stock Unit:</span> 
-                                      <span style="color: blue;">${stockUnit}</span> | &nbsp;`
-                            } else if (GpackReg.test(unitOption)) {
-                              unitData = `
-                                      <span style="color: red;">Stock Unit:</span> 
-                                      <span style="color: blue;">${stockUnit}</span> |
-                                      <span style="color: red;">Pck Unit:</span> 
-                                      <span style="color: blue;">${packUnit}</span> |
-                                      <span style="color: red;">PackVsStock:</span> 
-                                      <span style="color: blue;">${packVsStock}</span> |
-                                      <span style="color: red;">GPackUnit:</span> 
-                                      <span style="color: blue;">${gPackUnit}</span> |
-                                      <span style="color: red;">GPackVsStock:</span> 
-                                      <span style="color: blue;">${gPackVsPack}</span> | &nbsp;`
-                            } else if (stockPackReg.test(unitOption)) {
-                              unitData = `
-                                      <span style="color: red;">Stock Unit:</span> 
-                                      <span style="color: blue;">${stockUnit}</span> |
-                                      <span style="color: red;">Pack Unit:</span> 
-                                      <span style="color: blue;">${packUnit}</span> |
-                                      <span style="color: red;">PackVsStock:</span> 
-                                      <span style="color: blue;">${packVsStock}</span> | &nbsp;`
-                            } else {
-                              console.log('No Unit Option match found');
-                            }
-                            // Check if a valid product is selected
-                            if (product?.product_id) {
-                              this.formConfig.model.purchase_order_items[currentRowIndex].product_id = product.product_id;
-                              const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
-                              if (cardWrapper) {
-                                // Remove existing product info if present
-                                cardWrapper.querySelector('.center-message')?.remove();
-                                // Create and insert new product info
-                                const productInfoDiv = document.createElement('div');
-                                productInfoDiv.classList.add('center-message');
-                                productInfoDiv.innerHTML = `
-                                        <span style="color: red;">Product Info:</span> 
-                                        <span style="color: blue;">${product.name}</span> |                            
-                                        <span style="color: red;">Balance:</span> 
-                                        <span style="color: blue;">${product.balance}</span> |
-                                        ${unitData}`;
-                                cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
-                                this.unitOptionOfProduct = unitData; // save this data to use in color and size
-                                console.log(`Product :  Product Info Updated for ${product.name}**`)
-                              }
-                            } else {
-                              console.log(`No valid product selected for Row ${currentRowIndex}.`);
-                            }
-                          },
-                          error: (err) => {
-                            // Handle errors here
-                          }
-                        });
-                      });
-                    } else {
+                    if (!parentArray) {
                       console.error('Parent array is undefined or not accessible');
-                    };
-                    // ***Product Details Auto Fill Code***
-                    field.formControl.valueChanges.subscribe(data => {
-                      this.productOptions = data;
-                      console.log("Data in products : ", data)
-                      if (field.form && field.form.controls && field.form.controls.code && data && data.code) {
-                        field.form.controls.code.setValue(data.code)
+                      return;
+                    }
+              
+                    const currentRowIndex = +parentArray.key;
+              
+                    // Populate product if data exists
+                    const existingProduct = this.dataToPopulate?.purchase_order_items?.[currentRowIndex]?.product;
+                    if (existingProduct) {
+                      field.formControl.setValue(existingProduct);
+                    }
+              
+                    this.loadProductVariations(field);
+              
+                    // Subscribe to value changes (to update sizes dynamically)
+                    field.formControl.valueChanges.subscribe((data: any) => {
+                      if (!this.formConfig.model['purchase_order_items'][currentRowIndex]) {
+                        console.error(`Products at index ${currentRowIndex} is not defined. Initializing...`);
+                        this.formConfig.model['purchase_order_items'][currentRowIndex] = {};
                       }
-                      if (field.form && field.form.controls && field.form.controls.rate && data && data.mrp) {
-                        field.form.controls.rate.setValue(field.form.controls.rate.value || data.sales_rate)
-                      }
-                      if (field.form && field.form.controls && field.form.controls.discount && data && data.dis_amount) {
-                        field.form.controls.discount.setValue(parseFloat(data.dis_amount))
-                      }
-                      if (field.form && field.form.controls && field.form.controls.unit_options_id && data && data.unit_options && data.unit_options.unit_name) {
-                        field.form.controls.unit_options_id.setValue(data.unit_options.unit_options_id)
-                      }
-                      if (field.form && field.form.controls && field.form.controls.print_name && data && data.print_name) {
-                        field.form.controls.print_name.setValue(data.print_name)
-                      }
-                      if (field.form && field.form.controls && field.form.controls.discount && data && data.dis_amount) {
-                        field.form.controls.discount.setValue(data.dis_amount)
-                      }
-                      if (field.form && field.form.controls && field.form.controls.mrp && data && data.mrp) {
-                        field.form.controls.mrp.setValue(data.mrp)
-                      }
-                      this.totalAmountCal();
+                      this.formConfig.model['purchase_order_items'][currentRowIndex]['product_id'] = data?.product_id;
+                      this.loadProductVariations(field);
+                      this.autoFillProductDetails(field, data); // to fill the remaining fields when product is selected.
                     });
+
+                    // Product Info Text code
+                    field.formControl.valueChanges.subscribe( async selectedProductId => {
+                      const unit = getUnitData(selectedProductId);
+                      const row = this.formConfig.model.purchase_order_items[currentRowIndex];
+                      displayInformation(row.product, null , null, unit, '', ''); 
+                    }); // end of product info text code
                   }
                 }
-              }, 
+              },          
               {
                 key: 'size',
                 type: 'select',
@@ -1257,9 +1191,9 @@ loadQuickpackProducts() {
                   dataKey: 'size_id',
                   hideLabel: true,
                   dataLabel: 'size_name',
+                  placeholder: 'size',
                   options: [],
                   required: false,
-                  placeholder: 'size',
                   lazy: {
                     lazyOneTime: true
                   }
@@ -1267,116 +1201,61 @@ loadQuickpackProducts() {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key;
-
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.purchase_order_items.length > currentRowIndex) {
-                        const existingSize = this.dataToPopulate.purchase_order_items[currentRowIndex].size;
-                        
-                        // Set the full product object instead of just the product_id
-                        if (existingSize && existingSize.size_id) {
-                          field.formControl.setValue(existingSize); // Set full product object (not just product_id)
-                        }
-                      }
-
-                      // Subscribe to value changes when the form field changes
-                      //**End of Size selection part */
-                      // Subscribe to value changes of the size field
-                      field.formControl.valueChanges.subscribe(selectedSizeId => {
-                        const product = this.formConfig.model.purchase_order_items[currentRowIndex]?.product;
-                        const size = this.formConfig.model.purchase_order_items[currentRowIndex]?.size;
-                        const size_id = size?.size_id || null
-                        // Make sure size exists, if exists then assign the drop down options for 'color' filed.
-                        if (size) {
-                          let url = `products/product_variations/?product_id=${product.product_id}&size_id=${size.size_id}`
-                          if (size_id == null) {
-                            url = `products/product_variations/?product_id=${product.product_id}&size_isnull=True`
-                          }
-                          // Fetch available colors based on the selected size
-                          this.http.get(url).subscribe((response: any) => {
-                            const availableColors = response.data.map((variation: any) => {
-                              return {
-                                label: variation.color?.color_name || '----', // Use 'color_name' as the label
-                                value: {
-                                  color_id: variation.color?.color_id || null,
-                                  color_name: variation.color?.color_name || '----'
-                                }
-                              };
-                            });
-                            // Filter unique colors (optional, if there's a chance of duplicate colors)
-                            const uniqueColors = availableColors.filter((item, index, self) => index === self.findIndex((t) => t.value.color_id === item.value.color_id));
-                            // Now, update the color field for the current row
-                            const colorField = parentArray.fieldGroup.find((f: any) => f.key === 'color');
-                            if (colorField) {
-                              // colorField.formControl.setValue(null); // Reset color field value
-                              colorField.templateOptions.options = []
-                              colorField.templateOptions.options = uniqueColors; // Update the options for the 'color' field
-                            }
-                          });
-                        } else {
-                          console.log('Size not selected or invalid.');
-                        };
-                        // -----------------Product Info------------------------
-                        if (product.product_id && selectedSizeId != undefined) {
-                          let url = `products/product_variations/?product_id=${product.product_id}&size_id=${size_id}`;
-                          if (size_id === null) {
-                            url = `products/product_variations/?product_id=${product.product_id}&size_isnull=True`
-                          }
-                          // Call the API using HttpClient (this.http.get)
-                          this.http.get(url).subscribe((data: any) => {
-                              function sumQuantities(dataObject: any): number {
-                                // First, check if the data object contains the array in the 'data' field
-                                if (dataObject && Array.isArray(dataObject.data)) {
-                                  // Now we can safely use reduce on dataObject.data
-                                  return dataObject.data.reduce((sum, item) => sum + (item.quantity || 0), 0);
-                                } else {
-                                  console.error("Data is not an array:", dataObject);
-                                  return 0;
-                                }
-                              }
-                              const totalBalance = sumQuantities(data);
-                              const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
-                              if (cardWrapper && data.data[0]) {
-                                // Remove existing product info if present
-                                cardWrapper.querySelector('.center-message')?.remove();
-                                // Display fetched product variation info
-                                const productInfoDiv = document.createElement('div');
-                                productInfoDiv.classList.add('center-message');
-                                productInfoDiv.innerHTML = `
-                                        <span style="color: red;">Product Info:</span>
-                                        <span style="color: blue;">${data.data[0]?.product.name|| 'NA'}</span> |
-                                        <span style="color: red;">Balance:</span>
-                                        <span style="color: blue;">${totalBalance}</span> |
-                                        ${this.unitOptionOfProduct} `;
-                                cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
-                                console.log("Size :  Product Info Updated**")
-                              }
-                            },
-                            (error) => {
-                              console.error("Error fetching data:", error);
-                            });
-                        } else {
-                          console.log(`No valid product or size selected for Row ${currentRowIndex}.`);
-                        }
-                        //----------------- End of product info-----------------
-                      });
-                    } else {
+                    if (!parentArray) {
                       console.error('Parent array is undefined or not accessible');
-                    };
-                  },
-                  onChanges: (field: any) => {
-                    field.formControl.valueChanges.subscribe((data: any) => {
-                      const index = field.parent.key;
-                      if (this.formConfig && this.formConfig.model) {
-                        this.formConfig.model['purchase_order_items'][index]['size_id'] = data?.size_id;
-                      } else {
-                        console.error('Form config or color model is not defined.');
+                      return;
+                    }
+              
+                    const currentRowIndex = +parentArray.key;
+                    const saleOrderItems = this.dataToPopulate?.purchase_order_items?.[currentRowIndex];
+                    
+                    // Populate existing size if available
+                    const existingSize = saleOrderItems?.size;
+                    if (existingSize?.size_id) {
+                      field.formControl.setValue(existingSize);
+                    }
+
+                    // Subscribe to value changes (Merged from onInit & onChanges)
+                    field.formControl.valueChanges.subscribe((selectedSize: any) => {
+                      const product = this.formConfig.model.purchase_order_items[currentRowIndex]?.product;
+                      if (!product?.product_id) {
+                        console.warn(`Product missing for row ${currentRowIndex}, skipping color fetch.`);
+                        return;
                       }
+                      this.formConfig.model['purchase_order_items'][currentRowIndex]['size_id'] = selectedSize?.size_id;
+              
+                      const size_id = selectedSize?.size_id || null;
+                      const url = size_id
+                        ? `products/product_variations/?product_id=${product.product_id}&size_id=${size_id}`
+                        : `products/product_variations/?product_id=${product.product_id}&size_isnull=True`;
+              
+                      // Fetch available colors based on the selected size
+                      this.http.get(url).subscribe((response: any) => {
+                        if (response.data.length > 0) {
+                          const sizeCount = sumQuantities(response);
+                          const unit = getUnitData(product);
+                          displayInformation(product, selectedSize, null, unit, sizeCount, '');
+                        }
+                        const uniqueColors = response.data.map((variation: any) => ({
+                          label: variation.color?.color_name || '----',
+                          value: {
+                            color_id: variation.color?.color_id || null,
+                            color_name: variation.color?.color_name || '----'
+                          }
+                        })).filter((item, index, self) =>
+                          index === self.findIndex((t) => t.value.color_id === item.value.color_id)
+                        );
+              
+                        // Update color field options
+                        const colorField = parentArray.fieldGroup.find((f: any) => f.key === 'color');
+                        if (colorField) {
+                          colorField.templateOptions.options = uniqueColors;
+                        }
+                      });
                     });
                   }
                 }
-              }, 
+              },
               {
                 key: 'color',
                 type: 'select',
@@ -1385,104 +1264,69 @@ loadQuickpackProducts() {
                   dataKey: 'color_id',
                   hideLabel: true,
                   dataLabel: 'color_name',
+                  placeholder: 'color',
                   options: [],
                   required: false,
-                  placeholder: 'color',
-                  lazy: {
-                    lazyOneTime: true
-                  }
+                  lazy: { lazyOneTime: true }
                 },
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key;
-
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.purchase_order_items.length > currentRowIndex) {
-                        const existingColor = this.dataToPopulate.purchase_order_items[currentRowIndex].color;
-                        
-                        // Set the full product object instead of just the product_id
-                        if (existingColor) {
-                          field.formControl.setValue(existingColor);
-                        }
-                      }
-                      
-                      // Subscribe to value changes when the form field changes
-                      field.formControl.valueChanges.subscribe(selectedColorId => {
-                        const product = this.formConfig.model.purchase_order_items[currentRowIndex]?.product;
-                        const size = this.formConfig.model.purchase_order_items[currentRowIndex]?.size;
-                        const color = this.formConfig.model.purchase_order_items[currentRowIndex]?.color;
-                        const product_id = product?.product_id;
-                        // Check if product_id, size_id, and color_id exist
-                        if (product_id && size && color) {
-                          const color_id = color?.color_id || null;
-                          let url = `products/product_variations/?product_id=${product.product_id}`;
-                          if (color.color_id === null) {
-                            url += '&color_isnull=True';
-                          } else if (color.color_id) {
-                            url += `&color_id=${color.color_id}`;
-                          }
-                          if (size.size_id === null) {
-                            url += '&size_isnull=True';
-                          } else if (size.size_id) {
-                            url += `&size_id=${size.size_id}`;
-                          }
-                          this.formConfig.model.purchase_order_items[currentRowIndex].color_id = color.color_id;
-                          // Call the API using HttpClient (this.http.get)
-                          this.http.get(url).subscribe(
-                            (data: any) => {
-                              const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
-                              if (cardWrapper && data.data[0]) {
-                                cardWrapper.querySelector('.center-message')?.remove();
-                                const productInfoDiv = document.createElement('div');
-                                productInfoDiv.classList.add('center-message');
-                                productInfoDiv.innerHTML = `
-                                        <span style="color: red;">Product Info:</span>
-                                        <span style="color: blue;">${data.data[0].product.name}</span> |
-                                        <span style="color: red;">Size:</span>
-                                        <span style="color: blue;">${data.data[0].size?.size_name || 'NA'}</span> |
-                                        <span style="color: red;">Color:</span>
-                                        <span style="color: blue;">${data.data[0].color?.color_name || 'NA'}</span> |
-                                        <span style="color: red;">Balance:</span>
-                                        <span style="color: blue;">${data.data[0].quantity}</span> |
-                                        ${this.unitOptionOfProduct}`;
-                                cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
-                                console.log("Color :  Product Info Updated**")
-                              } else {
-                                console.log('Color : Data not available.')
-                              }
-                            },
-                            (error) => {
-                              console.error("Error fetching data:", error);
-                            });
-                        } else {
-                          console.log(`No valid Color selected for :${product.name } at Row ${currentRowIndex}.`);
-                          console.log({
-                            product: product?.name,
-                            size: size?.size_name,
-                            color: color?.color_name,
-                            selectedColorId: selectedColorId
-                          })
-                          if (color?.color_id === undefined) {
-                            this.formConfig.model.purchase_order_items[currentRowIndex]['color'] = null
-                          }
-                        }
-                      });
+                    if (!parentArray?.key) {
+                      console.error('Parent array key is missing or inaccessible');
+                      return;
                     }
-                  },
-                  onChanges: (field: any) => {
-                    field.formControl.valueChanges.subscribe((data: any) => {
-                      const index = field.parent.key;
-                      if (this.formConfig && this.formConfig.model) {
-                        this.formConfig.model['purchase_order_items'][index]['color_id'] = data?.color_id;
-                      } else {
-                        console.error('Form config or color model is not defined.');
+              
+                    const currentRowIndex = Number(parentArray.key);
+                    const saleOrderItems = this.dataToPopulate?.purchase_order_items?.[currentRowIndex];
+                    const row = this.formConfig.model.purchase_order_items[currentRowIndex];
+              
+                    if (!row) {
+                      console.error(`Row not found for index ${currentRowIndex}`);
+                      return;
+                    }
+              
+                    // Populate existing color if available
+                    if (saleOrderItems?.color) {
+                      field.formControl.setValue(saleOrderItems.color);
+                    }
+              
+                    // Subscribe to value changes & avoid unnecessary API calls
+                    field.formControl.valueChanges.subscribe((selectedColor: any) => {
+                      if (!row.product?.product_id) {
+                        console.warn(`Product missing for row ${currentRowIndex}, skipping color update.`);
+                        return;
                       }
+
+                      this.formConfig.model['purchase_order_items'][currentRowIndex]['color_id'] = selectedColor?.color_id;
+              
+                      const color_id = selectedColor?.color_id || null;
+                      console.log('color_id :', color_id)
+              
+                      const url = `products/product_variations/?product_id=${row.product.product_id}`
+                        + (color_id ? `&color_id=${color_id}` : `&color_isnull=True`);
+              
+                      // Update selected color
+                      row.color_id = color_id;
+
+                      console.log('url:', url)
+              
+                      this.http.get(url).subscribe(
+                        (response: any) => {
+                          if (response?.data) {
+                            const colorCount = sumQuantities(response);
+                            const unit = getUnitData(row.product);
+                            displayInformation(row.product, row.size, selectedColor, unit, '', colorCount);
+                          } else {
+                            console.log(`No data found for product_id ${row.product.product_id} and color_id ${color_id}`);
+                          }
+                        },
+                        (error) => console.error("API Error:", error)
+                      );
                     });
                   }
                 }
-              }, 
+              },
               {
                 type: 'input',
                 key: 'code',
