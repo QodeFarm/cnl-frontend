@@ -12,6 +12,10 @@ import { HttpClient } from '@angular/common/http'; // Import HttpClient
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
+  currentWeekSales1: any;
+  percentageChange1: any;
+  currentWeekPurchase: any;
+  percentagePurchaseChange: any;
   
   ngOnInit() {
     Chart.register(...registerables);
@@ -22,7 +26,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     this.fourthRowSmallTableData('Pending_For_Table')
   }
 
-  // baseUrl: string = 'http://127.0.0.1:8000/api/v1/'; 
+  //baseUrl: string = 'http://127.0.0.1:8000/api/v1/'; 
   baseUrl: string = 'http://195.35.20.172:8000/api/v1/'; 
 
   isSalesModalOpen: boolean = false;
@@ -404,6 +408,8 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     this.initializeChart(this.chartLast6MonthsCashflowCanvas, this.Last6MonthsCashflowData, 'bar', "Last 6 Month's Cashflow"); // Top 6 Profit Making Items
 
     Promise.all([
+      this.fetchDataAndRenderChart("Compare_weekly_purchase_and_growth"),
+      this.fetchDataAndRenderChart("Compare_weekly_sales_and_growth"), 
       this.fetchDataAndRenderChart("Sales_Order_Trend_Graph"),
       this.fetchDataAndInitializeChart('Sales_Over_the_Last_12_Months', {
         labelsTarget: this.salesData.labels,
@@ -602,6 +608,25 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     const apiUrl = this.baseUrl + 'dashboard/' + endpoint + '/'; // Replace with your actual API URL createSalesOrderTrendChart
 
     this.http.get(apiUrl).subscribe((response: any) => {
+      if (response && response.data && response.data.length > 0) {
+        response.data.forEach((item: any) => {
+          if (this.currentWeekPurchase === undefined && item.current_week_purchases !== undefined) {
+            this.currentWeekPurchase = item.current_week_purchases;
+          }
+    
+          if (this.percentagePurchaseChange === undefined && item.percentage_purchase_change !== undefined) {
+            this.percentagePurchaseChange = item.percentage_purchase_change;
+          }
+    
+          if (this.currentWeekSales1 === undefined && item.current_week_sales !== undefined) {
+            this.currentWeekSales1 = item.current_week_sales;
+          }
+    
+          if (this.percentageChange1 === undefined && item.percentage_change !== undefined) {
+            this.percentageChange1 = item.percentage_change;
+          }
+        });
+      }    
       if (response && response.data) {
         const chartLabels = response.data.map((item: any) => item.month_name_year);
         const totalSalesOrders = response.data.map((item: any) => item.total_sales_orders);

@@ -25,41 +25,44 @@
         <div class="modal-body">
           <!-- Work Order Details Table -->
           <h5>Work Order</h5>
-          <table class="table table-bordered custom-table">
-            <thead>
-              <tr>
-                <th *ngFor="let field of tableFields.workOrder">{{ field.label }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td *ngFor="let field of tableFields.workOrder">
-                  {{ getNestedValue(workOrderData?.work_order, field.key) ?? field.defaultValue }}
-                </td>              
-              </tr>
-            </tbody>
-          </table>
-
+          <div class="overflow-auto d-block mb-md-3 mb-2">
+            <table class="table table-bordered custom-table mb-0">
+              <thead>
+                <tr>
+                  <th *ngFor="let field of tableFields.workOrder">{{ field.label }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td *ngFor="let field of tableFields.workOrder">
+                    {{ getNestedValue(workOrderData?.work_order, field.key) ?? field.defaultValue }}
+                  </td>              
+                </tr>
+              </tbody>
+            </table>
+          </div>
           <!-- Bill of Materials (BOM) Table -->
           <h5>Bill Of Materials</h5>
-          <table class="table table-bordered custom-table">
-            <thead>
-              <tr>
-                <th *ngFor="let field of tableFields.bom">{{ field.label }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let item of workOrderData?.bom">
-                <td *ngFor="let field of tableFields.bom">
-                  {{ getNestedValue(item, field.key) || '' }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
+          <div class="overflow-auto d-block mb-md-3 mb-2">
+            <table class="table table-bordered custom-table mb-0">
+              <thead>
+                <tr>
+                  <th *ngFor="let field of tableFields.bom">{{ field.label }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of workOrderData?.bom">
+                  <td *ngFor="let field of tableFields.bom">
+                    {{ getNestedValue(item, field.key) || '' }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+         </div>
           <!-- Workers Table -->
           <h5>Workers</h5>
-          <table class="table table-bordered custom-table">
+          <div class="overflow-auto d-block mb-md-3 mb-2">
+          <table class="table table-bordered custom-table mb-0">
             <thead>
               <tr>
                 <th *ngFor="let field of tableFields.workers">{{ field.label }}</th>
@@ -73,10 +76,11 @@
               </tr>
             </tbody>
           </table>
-
+</div>
           <!-- Work Stages Table -->
           <h5>Work Stages</h5>
-          <table class="table table-bordered custom-table">
+          <div class="overflow-auto d-block mb-md-3 mb-2">
+          <table class="table table-bordered custom-table mb-0">
             <thead>
               <tr>
                 <th *ngFor="let field of tableFields.stages">{{ field.label }}</th>
@@ -90,6 +94,7 @@
               </tr>
             </tbody>
           </table>
+          </div>
         </div>
 
         <div class="modal-footer text-center">

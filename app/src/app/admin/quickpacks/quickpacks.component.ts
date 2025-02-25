@@ -151,7 +151,7 @@ export class QuickpacksComponent implements OnInit {
         {
           key: 'quick_pack_data_items',
           type: 'repeat',
-          className: 'custom-form-list no-ant-card',
+          className: 'custom-form-list',
           templateOptions: {
             title: 'Products',
             addText: 'Add Product',

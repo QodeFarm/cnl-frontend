@@ -305,7 +305,7 @@ export class CreditNoteComponent {
         {
           key: 'sale_credit_note_items',
           type: 'table',
-          className: 'custom-form-list no-ant-card',
+          className: 'custom-form-list product-table',
           templateOptions: {
             title: 'Products',
             addText: 'Add Product',
