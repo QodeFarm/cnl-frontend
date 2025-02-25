@@ -723,27 +723,30 @@ ta-form {
 
 .custom-form-list {
     &.product-table{
-        .table{
-            white-space: nowrap;
-            overflow-x: auto;
-            width: 100%;
+        .ant-table-container{
             display: block;
-            thead {
-                th{
-                    white-space: nowrap;
-                     min-width: 120px; 
-                     &:nth-child(1),&:last-child{
-                        min-width: 50px;
-                     }
-                     &:nth-child(2){
-                        min-width: 150px;
-                     }       
-                    //  &:nth-child(5){
-                    //     min-width: 70px;
-                    //  }            
+            overflow-x: auto;
+            .table{
+                white-space: nowrap;
+                width: 100%;
+                thead {
+                    th{
+                        white-space: nowrap;
+                         min-width: 120px; 
+                         &:nth-child(1),&:last-child{
+                            min-width: 50px;
+                         }
+                         &:nth-child(2){
+                            min-width: 150px;
+                         }       
+                        //  &:nth-child(5){
+                        //     min-width: 70px;
+                        //  }            
+                    }
                 }
             }
         }
+       
       }
     .ant-card {
         margin: 0 5px;
@@ -1179,7 +1182,7 @@ ta-form {
 // inline form-fields styles end
 .modal-content{
     .ant-table-content{
-        max-height: calc(100vh - 305px);
+        max-height: calc(100vh - 415px);
         overflow: auto;
     }
    
@@ -1277,6 +1280,7 @@ ta-form {
 .ant-table-footer{
     display: none;
 }
+
 @media(max-width:1199px){
     .customer-title-alignment{
         flex-wrap: wrap;
@@ -1432,23 +1436,22 @@ ta-form {
     .custom-modal .modal-dialog {
         max-width: 98%;
     }
-
-    .sidebar-toggled{
-        .menu-overlay{
-            content: '';
-            height: 100%;
-            width: 100%;
-            z-index: 99;
-            position: fixed;
-            top: 0;
-            left: 0;
-            background-color: rgba(0, 0, 0, 0.8);
-            overflow-y: auto;
-            overflow-x: hidden;
-            text-align: center;
-            opacity: 1;
-            transition: opacity 0.2s ease-in-out;
-        }  
+    .menu-overlay.menuBglayer{
+        content: '';
+        height: 100%;
+        width: 100%;
+        z-index: 99;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background-color: rgba(0, 0, 0, 0.8);
+        overflow-y: auto;
+        overflow-x: hidden;
+        text-align: center;
+        opacity: 1;
+        transition: opacity 0.2s ease-in-out;
+    }  
+    .sidebar-toggled{       
         .nav-item{
             &:hover{
                 .nav-link{
@@ -1612,6 +1615,7 @@ ta-form {
     }
 }
 @media(max-width:575px){
+  
     .ant-table-footer{
         display: block;
     }
@@ -1682,11 +1686,15 @@ ta-form {
         }
     }
 }
-@media(max-width:425px){
-   
+
+@media(max-width:475px){
+    .header-right-btn{
+        position: absolute;
+        right: 0;
+        top:-30px;
+        z-index: 9;
+     }
 }
-
-
 // error message styles //
 .error-modal .ant-modal-content,
 .error-modal .ant-modal-header,
