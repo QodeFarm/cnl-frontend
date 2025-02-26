@@ -1,1 +1,44 @@
-<a class="btn btn-primary" href="http://localhost:54501/" role="button" target="_blank">CNL Report App</a>
+<div class="container-fluid mt-2">
+
+<div class="accordion" id="reportAccordion">
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="reportHeading">
+        <button class="accordion-button" type="button" data-bs-toggle="collapse"
+          data-bs-target="#reportCollapse" aria-expanded="true" aria-controls="reportCollapse"
+          (click)="toggleAccordion()">
+          Reports
+        </button>
+      </h2>
+      <div id="reportCollapse" class="accordion-collapse collapse show" aria-labelledby="reportHeading"
+        data-bs-parent="#reportAccordion" *ngIf="isAccordionOpen">
+        <div class="accordion-body">
+          
+          <!-- Report Selection Buttons -->
+          <div class="d-flex gap-3">
+            <button *ngFor="let reportKey of reports | keyvalue" class="btn btn-primary"
+              (click)="selectReport(reportKey.key)">
+              {{ reportKey.key }}
+            </button>
+          </div>
+  
+          <!-- Report Table (Conditional Rendering) -->
+          <div *ngIf="selectedReport" class="mt-3" class="custom-list">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th *ngFor="let column of selectedReport.columns">{{ column }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of selectedReport.data">
+                  <td *ngFor="let column of selectedReport.columns">{{ row[column] }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+  
+        </div>
+      </div>
+    </div>
+  </div>
+  

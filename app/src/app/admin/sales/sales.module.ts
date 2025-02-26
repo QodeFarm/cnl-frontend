@@ -21,14 +21,15 @@ import { SalesinvoiceComponent } from './salesinvoice/salesinvoice.component';
 import { PurchaseComponent } from '../purchase/purchase.component';
 import { PurchaseInvoiceComponent } from '../purchase/purchase-invoice/purchase-invoice.component';
 import { PurchasereturnordersComponent } from '../purchase/purchasereturnorders/purchasereturnorders.component';
+import { SalesReportsComponent } from './sales-reports/sales-reports.component';
 // import { SalesReceiptComponent } from './sales-receipt/sales-receipt.component';
 // import { SalesInvoiceListComponent } from './salesinvoice/salesinvoice-list/salesinvoice-list.component';
 // import { SalesinvoiceComponent } from './salesinvoice/salesinvoice.component';
 
 @NgModule({
   declarations: [
-    SalesComponent,
-    SaleReturnsComponent
+    // SalesComponent,
+    // SaleReturnsComponent
 
   ],
   imports: [
@@ -40,7 +41,8 @@ import { PurchasereturnordersComponent } from '../purchase/purchasereturnorders/
     SaleReturnsListComponent,
     SaleinvoiceorderlistComponent,
     SalesDispatchComponent,
-    CreditNoteListComponent
+    CreditNoteListComponent,
+    SalesReportsComponent
 
     
   ],

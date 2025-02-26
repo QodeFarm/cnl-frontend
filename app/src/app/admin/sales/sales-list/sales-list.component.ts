@@ -5,6 +5,7 @@ import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 import { HttpClient } from '@angular/common/http';
+import { SalesReportsComponent } from '../sales-reports/sales-reports.component';
 
 @Component({
   selector: 'app-sales-list',
