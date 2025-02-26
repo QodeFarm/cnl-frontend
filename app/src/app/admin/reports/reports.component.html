@@ -1,6 +1,6 @@
 <div class="container-fluid mt-2">
 
-<div class="accordion" id="reportAccordion">
+  <div class="accordion" id="reportAccordion">
     <div class="accordion-item">
       <h2 class="accordion-header" id="reportHeading">
         <button class="accordion-button" type="button" data-bs-toggle="collapse"
@@ -22,7 +22,7 @@
           </div>
   
           <!-- Report Table (Conditional Rendering) -->
-          <div *ngIf="selectedReport" class="mt-3" class="custom-list">
+          <div *ngIf="selectedReport && selectedReport.columns.length" class="mt-3">
             <table class="table table-bordered">
               <thead>
                 <tr>
@@ -36,9 +36,15 @@
               </tbody>
             </table>
           </div>
-  
+
+          <!-- Show message if no data is available -->
+          <div *ngIf="selectedReport && selectedReport.data.length === 0" class="mt-3 text-danger">
+            No data available for this report.
+          </div>
+
         </div>
       </div>
     </div>
   </div>
-  
+
+</div>
