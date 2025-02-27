@@ -19,6 +19,7 @@ import { BudgetListComponent } from './budget/budget-list/budget-list.component'
 import { JournalEntryListComponent } from './journal-entry/journal-entry-list/journal-entry-list.component';
 import { JournalEntryComponent } from './journal-entry/journal-entry.component';
 import { PaymentTransactionListComponent } from './payment-transaction/payment-transaction-list/payment-transaction-list.component';
+import { GstDetailsComponent } from './gst-details/gst-details.component';
 
 
 @NgModule({
@@ -31,6 +32,8 @@ import { PaymentTransactionListComponent } from './payment-transaction/payment-t
     // ExpenseClaimComponent,
     // FinancialReportComponent,
     // JournalEntryComponent,
+  
+    GstDetailsComponent
   ],
   imports: [
     CommonModule,
