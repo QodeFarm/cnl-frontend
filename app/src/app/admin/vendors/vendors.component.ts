@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { VendorsListComponent } from './vendors-list/vendors-list.component';
 import { CommonModule } from '@angular/common';
+import { CustomFieldHelper } from '../utils/custom_field_fetch';
 
 @Component({
   selector: 'app-vendors',
@@ -35,166 +36,29 @@ export class VendorsComponent {
     this.VendorEditID = null;
     // Set form config
     this.setFormConfig();
-    console.log('this.formConfig', this.formConfig);
-    this.fetchCustomFields();
-  }
-
-  //---------------Customfields-------------------------------
-  customFieldMetadata: any = {}; // To store mapping of field names to metadata
-  fetchCustomFields() {
-    this.http.get('customfields/customfieldscreate/').subscribe(
-      (response: any) => {
-        console.log('Custom Fields API Response:', response);
-  
-        if (response?.data) {
-          const customFields = response.data.filter((field: any) => field.entity.entity_name === 'vendors');
-  
-          // Save metadata for mapping
-          this.customFieldMetadata = customFields.reduce((map: any, field: any) => {
-            map[field.custom_field_id.toLowerCase()] = {
-              custom_field_id: field.custom_field_id,
-              field_type_id: field.field_type_id,
-              entity_id: field.entity.entity_id,
-              is_required: field.is_required,
-              validation_rules: field.validation_rules,
-              options: [], // Initially empty, will be populated if options exist
-            };
-            return map;
-          }, {});
-  
-          console.log('Custom Field Metadata:', this.customFieldMetadata);
-  
-          // Fetch options for each custom field
-          this.fetchAllFieldOptions(customFields);
-        } else {
-          console.warn('No custom fields data found in the API response.');
-        }
-      },
-      (error) => {
-        console.error('Error fetching custom fields:', error);
-      }
-    );
-  }
-  
-  // Fetch options for all custom fields in one call
-  fetchAllFieldOptions(customFields: any[]) {
-    this.http.get('customfields/customfieldoptions/').subscribe(
-      (response: any) => {
-        console.log("Custom Field Options API Response:", response);
-  
-        if (response?.data) {
-          // Group options by custom_field_id
-          const fieldOptionsMap = response.data.reduce((map: any, option: any) => {
-            const fieldId = option.custom_field_id.toLowerCase();
-            if (!map[fieldId]) {
-              map[fieldId] = [];
-            }
-            if (option.option_value) {
-              map[fieldId].push({ label: option.option_value, value: option.option_value });
-            }
-            return map;
-          }, {});
-  
-          // Update customFieldMetadata with options
-          Object.keys(fieldOptionsMap).forEach(fieldId => {
-            if (this.customFieldMetadata[fieldId]) {
-              this.customFieldMetadata[fieldId].options = fieldOptionsMap[fieldId];
-            }
-          });
-  
-          console.log('Updated Custom Field Metadata with Options:', this.customFieldMetadata);
-  
-          // Add custom fields to formConfig
-          this.addCustomFieldsToFormConfig(customFields);
-        } else {
-          console.warn('No options found in the API response.');
-          this.addCustomFieldsToFormConfig(customFields); // Proceed without options
-        }
-      },
-      (error) => {
-        console.error('Error fetching custom field options:', error);
-        this.addCustomFieldsToFormConfig(customFields); // Proceed without options
-      }
-    );
-  }
-  
-  // Add custom fields dynamically to the formConfig
-  addCustomFieldsToFormConfig(customFields: any) {
-    console.log("Custom Fields to Add:", customFields);
-  
-    const customFieldConfigs = customFields.map((field: any) => {
-      const key = field.custom_field_id.toLowerCase(); // Normalize key
-      const fieldMetadata = this.customFieldMetadata[key] || {};
-  
-      return {
-        key: key,
-        type: fieldMetadata.options.length > 0 ? 'select' : 'input', // Use select if options exist
-        className: 'col-md-6',
-        defaultValue: this.formConfig.model['custom_field_values'][key] || '', // Pre-fill value
-        templateOptions: {
-          label: field.field_name,
-          placeholder: field.field_name,
-          required: fieldMetadata.is_required,
-          options: fieldMetadata.options, // Set options if available
-        },
-      };
+    CustomFieldHelper.fetchCustomFields(this.http, 'vendors', (customFields: any, customFieldMetadata: any) => {
+      CustomFieldHelper.addCustomFieldsToFormConfig(customFields, customFieldMetadata, this.formConfig);
     });
-  
-    console.log('Final Custom Field Config:', customFieldConfigs);
-
-    this.formConfig.fields[1].fieldGroup = [
-      ...this.formConfig.fields[1].fieldGroup, // Keep existing fields
-      {
-        className: 'col-12 custom-form-card-block p-0',
-        fieldGroupClassName:'row m-0 pr-0',
-        props: {
-          label: 'Custom Fields'
-        },
-        fieldGroup: [
-          {
-            className: 'col-9 p-0',
-            key: 'custom_field_values',
-            fieldGroupClassName: "ant-row mx-0 row align-items-end mt-2",
-            fieldGroup: customFieldConfigs
-          },
-        ]            
-      },
-    ];
-
-    this.formConfig.fields = [
-      ...this.formConfig.fields,
-      {
-        key: 'custom_field_values',
-        fieldGroup: customFieldConfigs,
-        hide: true
-      },
-    ];
-
-    // this.formConfig = { ...this.formConfig };
   }
 
+  customFieldMetadata: any = {}; // To store mapping of field names to metadata
   showSuccessToast = false;
   toastMessage = '';
-  submitCustomerForm() {
-    const vendorData = { ...this.formConfig.model['vendor_data'] }; // Main customer data
-    const vendorAttachments = this.formConfig.model['vendor_attachments'];
-    const vendorAddresses = this.formConfig.model['vendor_addresses'];
+  submitVendorForm() {
     const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
   
-    if (!vendorData) {
-      console.error('Customer data is missing.');
-      return;
-    }
-  
+    // Determine the entity type and ID dynamically
+    const entityId = 'c6ee3061-d258-4c98-a2cf-81a8a107a221'; // Since we're in the Sale Order form
+    const customId = this.formConfig.model.vendor_data?.vendor_id || null; //
     // Construct payload for one custom field at a time
-    const customFieldsPayload = this.constructCustomFieldsPayload(customFieldValues);
+    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityId, customId);
+
+    if (!customFieldsPayload) {
+      this.showDialog(); // Stop execution if required fields are missing
+    }
     // Construct the final payload
     const payload = {
-      vendor_data: vendorData, // Add all the main customer fields
-      vendor_addresses: vendorAddresses,
-      vendor_attachments: vendorAttachments,
-      custom_field: customFieldsPayload.custom_field, // Single custom field as dictionary
-      // custom_field_options: customFieldsPayload.custom_field_options, // Array or empty
+      ...this.formConfig.model,
       custom_field_values: customFieldsPayload.custom_field_values // Array of dictionaries
     };
   
@@ -215,51 +79,6 @@ export class VendorsComponent {
       }
     );
   }
-  
-  // constructCustomFieldsPayload(customFieldValues: any) {
-  //   if (!customFieldValues) {
-  //     console.warn('No custom field values provided.');
-  //     return {
-  //       custom_field: {},
-  //       custom_field_options: [],
-  //       custom_field_values: []
-  //     };
-  //   }
-  
-  //   // Initialize custom field values as an array
-  //   const customFieldValuesArray = [];
-
-  //   // Iterate over all custom field keys and construct values
-  //   Object.keys(customFieldValues).forEach((fieldKey) => {
-  //     const metadata = this.customFieldMetadata[fieldKey.toLowerCase()] || {}; // Fetch metadata for each field
-  //     console.log("Metadata entity : ", metadata);
-  
-  //     customFieldValuesArray.push({
-  //       field_value: customFieldValues[fieldKey], // Value entered by the user
-  //       field_value_type: typeof customFieldValues[fieldKey] === "number" ? "number" : "string", // Type
-  //       entity_id: metadata.entity_name || "c6ee3061-d258-4c98-a2cf-81a8a107a221", // Default entity ID
-  //       custom_field_id: fieldKey, // Field name as custom_field_id
-  //       custom_id: this.formConfig.model.vendor_data.vendor_id,
-  //       entity_type_id: "3c7d73ad-9048-4415-8cce-312ac5c5aa84"
-  //     });
-  //   });
-  //   console.log("Chekcing data : ", customFieldValuesArray);
-  //   // Construct payload for multiple custom fields
-  //   return {
-  //     // Custom field metadata for all fields
-  //     custom_field: Object.keys(customFieldValues).map((fieldKey) => ({
-  //       field_name: fieldKey, // Use field name
-  //       is_required: this.customFieldMetadata[fieldKey.toLowerCase()]?.is_required || false,
-  //       validation_rules: this.customFieldMetadata[fieldKey.toLowerCase()]?.validation_rules || null,
-  //       field_type_id: this.customFieldMetadata[fieldKey.toLowerCase()]?.field_type_id || null,
-  //       entity_id: this.customFieldMetadata[fieldKey.toLowerCase()]?.entity_id || null,
-  //     })),
-  //     // Optional field options
-  //     // custom_field_options: Object.values(this.customFieldMetadata).map((metadata) => metadata.options || []),
-  //     // Multiple custom field values
-  //     custom_field_values: customFieldValuesArray // Multiple field values
-  //   };
-  // }
 
   showDialog() {
     const dialog = document.getElementById('customDialog');
@@ -276,94 +95,27 @@ export class VendorsComponent {
     }
   }
 
-  constructCustomFieldsPayload(customFieldValues: any) {
-    if (!customFieldValues) {
-      console.warn('No custom field values provided.');
-      return {
-        custom_field: {},
-        custom_field_options: [],
-        custom_field_values: []
-      };
-    }
-  
-    // Initialize custom field values as an array
-    const customFieldValuesArray = [];
-  
-    // Track missing required fields
-    const missingRequiredFields = [];
-  
-    // Iterate over all custom field keys and construct values
-    Object.keys(customFieldValues).forEach((fieldKey) => {
-      const metadata = this.customFieldMetadata[fieldKey.toLowerCase()] || {}; // Fetch metadata for each field
-  
-      // Check if the field is required and missing
-      if (metadata.is_required && 
-          (customFieldValues[fieldKey] === '' || customFieldValues[fieldKey] === null || customFieldValues[fieldKey] === undefined)) {
-        missingRequiredFields.push(fieldKey);
-      }
-  
-      // Only include fields that have a value (skip ignored fields)
-      if (customFieldValues[fieldKey] !== '' && customFieldValues[fieldKey] !== null && customFieldValues[fieldKey] !== undefined) {
-        customFieldValuesArray.push({
-          field_value: customFieldValues[fieldKey], // Value entered by the user
-          field_value_type: typeof customFieldValues[fieldKey] === "number" ? "number" : "string", // Type
-          entity_id: metadata.entity_name || "c6ee3061-d258-4c98-a2cf-81a8a107a221", // Default entity ID
-          custom_field_id: fieldKey, // Field name as custom_field_id
-          custom_id: this.formConfig.model.vendor_data.vendor_id
-        });
-      }
-    });
-  
-    // If any required fields are missing, show an alert and stop submission
-    if (missingRequiredFields.length > 0) {
-      console.error("Required fields missing:", missingRequiredFields);
-      this.showDialog();
-      // alert("Please fill in all required fields before submitting.");
-      return null; // Prevent submission
-    }
-  
-    // Construct payload for multiple custom fields
-    return {
-      custom_field: Object.keys(customFieldValues).map((fieldKey) => ({
-        field_name: fieldKey, // Use field name
-        is_required: this.customFieldMetadata[fieldKey.toLowerCase()]?.is_required || false,
-        validation_rules: this.customFieldMetadata[fieldKey.toLowerCase()]?.validation_rules || null,
-        field_type_id: this.customFieldMetadata[fieldKey.toLowerCase()]?.field_type_id || null,
-        entity_id: this.customFieldMetadata[fieldKey.toLowerCase()]?.entity_id || null,
-      })),
-      custom_field_values: customFieldValuesArray // Only include entered values
-    };
-  }
-
-  updateCustomer() {
-    const vendorData = { ...this.formConfig.model['vendor_data'] }; // Main customer data
-    const vendorAttachments = this.formConfig.model['vendor_attachments'];
-    const vendorAddresses = this.formConfig.model['vendor_addresses'];
+  updateVendor() {
     const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
    
-    if (!vendorData) {
-      console.error('Customer data is missing.');
-      return;
-    }
+    // Determine the entity type and ID dynamically
+    const entityId = 'c6ee3061-d258-4c98-a2cf-81a8a107a221'; // Since we're in the Sale Order form
+    const customId = this.formConfig.model.vendor_data?.vendor_id || null; //
   
     // Construct payload for custom fields based on updated values
-    const customFieldsPayload = this.constructCustomFieldsPayload(customFieldValues);
+    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityId, customId);
     console.log("Testing the data in customFieldsPayload: ", customFieldsPayload);
     
     // Construct the final payload for update
     const payload = {
-      vendor_data: vendorData, // Add all the main customer fields
-      vendor_addresses: vendorAddresses,
-      vendor_attachments: vendorAttachments,
-      custom_field: customFieldsPayload.custom_field, // Single custom field as dictionary
-      custom_field_options: customFieldsPayload.custom_field_options, // Array or empty
+      ...this.formConfig.model, // Array or empty
       custom_field_values: customFieldsPayload.custom_field_values // Array of dictionaries
     };
   
     console.log('Final Payload for Update:', payload); // Debugging to verify the payload
   
     // Send the update request with the payload
-    this.http.put(`vendors/vendors/${vendorData.vendor_id}/`, payload).subscribe(
+    this.http.put(`vendors/vendors/${this.VendorEditID}/`, payload).subscribe(
       (response: any) => {
         this.showSuccessToast = true;
           this.toastMessage = "Record updated successfully"; // Set the toast message for update
@@ -476,33 +228,15 @@ export class VendorsComponent {
       },
       showActionBtn: true,
       exParams: [
-        //  {
-        //   key: 'city_id',
-        //   type: 'script',
-        //   value: 'data.city.city_id'
-        // },
-        // {
-        //   key: 'state_id',
-        //   type: 'script',
-        //   value: 'data.state.state_id'
-        // },
-        // {
-        //   key: 'country_id',
-        //   type: 'script',
-        //   value: 'data.country.country_id'
-        // } 
+
       ],
-      // submit: {
-      //   label: 'Submit',
-      //   submittedFn: () => this.submitCustomerForm()
-      // },
       submit: {
         label: 'Submit',
         submittedFn: () => {
           if (!this.VendorEditID) {
-            this.submitCustomerForm();
+            this.submitVendorForm();
           } else {
-            this.updateCustomer();
+            this.updateVendor();
              // Otherwise, create a new record
           }
         }
