@@ -638,7 +638,7 @@ export class AdminLayoutComponent {
       description: roleDescription // Set the role description in the payload
     };
 
-    this.http.post('http://195.35.20.172:8000/api/v1/users/role/', payload)
+    this.http.post('https://apicore.cnlerp.com/api/v1/users/role/', payload)
       .subscribe(
         response => console.log('Role created:', response),
         error => console.error('Error creating role:', error)
@@ -650,7 +650,7 @@ export class AdminLayoutComponent {
     endpoint = endpoint.replace(/\s+/g, '_'); // Convert endpoint name to snake_case
     const payload = { group_name: name }; // Set the name in the payload
 
-    this.http.post(`http://195.35.20.172:8000/api/v1/products/${endpoint}/`, payload)
+    this.http.post(`https://apicore.cnlerp.com/api/v1/products/${endpoint}/`, payload)
       .subscribe(
         response => console.log('Data Created:', response),
         error => console.error('Error creating item:', error)
@@ -674,12 +674,12 @@ export class AdminLayoutComponent {
       // Submit the form after speech recognition is complete
       this.recognition.onend = () => {
         console.log('Submitting form with data:', formData);
-        this.http.post('http://195.35.20.172:8000/api/v1/sale_order/', formData)
+        this.http.post('https://apicore.cnlerp.com/api/v1/sale_order/', formData)
           .subscribe(
             response => {
               console.log('Form submitted successfully:', response);
               // Call the users/role API after form submission
-              this.http.post('http://195.35.20.172:8000/api/v1/users/role/', formData)
+              this.http.post('https://apicore.cnlerp.com/api/v1/users/role/', formData)
                 .subscribe(
                   roleResponse => console.log('Role API called successfully:', roleResponse),
                   roleError => console.error('Error calling Role API:', roleError)

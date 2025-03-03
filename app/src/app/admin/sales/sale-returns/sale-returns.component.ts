@@ -319,7 +319,7 @@ export class SaleReturnsComponent {
 
   //--------------------------------------------------------
   getWorkflowId() {
-    return this.http.get('http://195.35.20.172:8000/api/v1/sales/workflows/');
+    return this.http.get('https://apicore.cnlerp.com/api/v1/sales/workflows/');
   }
 
 
