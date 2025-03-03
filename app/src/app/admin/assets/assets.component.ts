@@ -14,7 +14,7 @@ import { AssetsListComponent } from './assets-list/assets-list.component';
 })
 export class AssetsComponent{
   
-  baseUrl: string = 'http://195.35.20.172:8000/api/v1/';
+  baseUrl: string = 'https://apicore.cnlerp.com/api/v1/';
 
   showAssetsList: boolean = false;
   showForm: boolean = false;
