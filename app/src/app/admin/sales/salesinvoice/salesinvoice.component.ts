@@ -8,6 +8,7 @@ import { OrderslistComponent } from '../orderslist/orderslist.component';
 import { SalesInvoiceListComponent } from './salesinvoice-list/salesinvoice-list.component';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { CustomFieldHelper } from '../../utils/custom_field_fetch';
 declare var bootstrap;
 @Component({
   selector: 'app-salesinvoice',
@@ -176,6 +177,10 @@ export class SalesinvoiceComponent {
     this.setFormConfig();
     this.checkAndPopulateData();
     this.loadQuickpackOptions(); // Fetch Quickpack options
+    //custom fields logic...
+    CustomFieldHelper.fetchCustomFields(this.http, 'sale_invoice', (customFields: any, customFieldMetadata: any) => {
+      CustomFieldHelper.addCustomFieldsToFormConfig_2(customFields, customFieldMetadata, this.formConfig);
+    });
     // Set sale_order default value
     this.formConfig.model['sale_invoice_order']['order_type'] = 'sale_invoice';
 
@@ -259,6 +264,14 @@ export class SalesinvoiceComponent {
         this.formConfig.model['sale_invoice_id'] = this.SaleInvoiceEditID;
         this.showForm = true;
         this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = false;
+
+        // Ensure custom_field_values are correctly populated in the model
+        if (res.data.custom_field_values) {
+          this.formConfig.model['custom_field_values'] = res.data.custom_field_values.reduce((acc: any, fieldValue: any) => {
+            acc[fieldValue.custom_field_id] = fieldValue.field_value; // Map custom_field_id to the corresponding value
+            return acc;
+          }, {});
+        }
       }
     });
     this.hide();
@@ -581,12 +594,93 @@ export class SalesinvoiceComponent {
         console.log('Sale Order Items populated:', this.formConfig.model.sale_invoice_items);
       });
   }
+
+  //======================================================
+  showSuccessToast = false;
+  toastMessage = '';
+  showDialog() {
+    const dialog = document.getElementById('customDialog');
+    if (dialog) {
+      dialog.style.display = 'flex'; // Show the dialog
+    }
+  }
+
+  closeToast() {
+    this.showSuccessToast = false;
+  }
+
+  createSaleInovice(){
+    const customFieldValues = this.formConfig.model['custom_field_values']
+
+    // Determine the entity type and ID dynamically
+    const entityId = '3a69c657-9817-4f7f-b4ee-3458a4233fce'; // Since we're in the Sale Invoice form
+    const customId = this.formConfig.model.sale_invoice_order?.sale_invoice_id || null; // Ensure correct sale_order_id
+  
+    // Construct payload for custom fields
+    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityId, customId);
+  
+    if (!customFieldsPayload) {
+      this.showDialog(); // Stop execution if required fields are missing
+    }
+
+    // Construct the final payload
+    const payload = {
+      ...this.formConfig.model,
+      // custom_field: customFieldsPayload.custom_field, // Dictionary of custom fields
+      custom_field_values: customFieldsPayload.custom_field_values // Array of custom field values
+    };
+
+    this.http.post('sales/sale_invoice_order/', payload)
+      .subscribe(response => {
+        this.showSuccessToast = true;
+        this.toastMessage = 'Record created successfully';
+        this.ngOnInit();
+        setTimeout(() => {
+          this.showSuccessToast = false;
+        }, 3000); // Hide toast after 3 seconds
+      }, error => {
+        console.error('Error creating record:', error);
+      });
+  }
+
+  updateSaleInvoice(){
+    const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
+
+    // Determine the entity type and ID dynamically
+    const entityId = '3a69c657-9817-4f7f-b4ee-3458a4233fce'; // Since we're in the Sale Order form
+    const customId = this.formConfig.model.sale_invoice_order?.sale_invoice_id || null; // Ensure correct sale_order_id
+
+    // Construct payload for custom fields based on updated values
+    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityId, customId);
+    console.log("Testing the data in customFieldsPayload: ", customFieldsPayload);
+    
+    // Construct the final payload for update
+    const payload = {
+      ...this.formConfig.model,
+      custom_field_values: customFieldsPayload.custom_field_values // Array of dictionaries
+    };
+
+    // Define logic here for updating the sale order without modal pop-up
+    console.log("Updating sale order:", this.formConfig.model);
+    this.http.put(`sales/sale_invoice_order/${this.SaleInvoiceEditID}/`, payload)
+      .subscribe(response => {
+        this.showSuccessToast = true;
+        this.toastMessage = "Record updated successfully"; // Set the toast message for update
+        this.ngOnInit();
+        setTimeout(() => {
+          this.showSuccessToast = false;
+        }, 3000);
+
+      }, error => {
+        console.error('Error updating record:', error);
+      });
+  }
   //=====================================================
   setFormConfig() {
     this.SaleInvoiceEditID = null;
 
     this.formConfig = {
-      url: "sales/sale_invoice_order/",
+      // url: "sales/sale_invoice_order/",
       title: '',
       formState: {
         viewMode: false
@@ -611,8 +705,19 @@ export class SalesinvoiceComponent {
       ],
       submit: {
         label: 'Submit',
-        submittedFn: () => this.ngOnInit()
+        submittedFn: () => {
+          if (!this.SaleInvoiceEditID) {
+            this.createSaleInovice();
+          } else {
+            this.updateSaleInvoice();
+             // Otherwise, create a new record
+          }
+        }
       },
+      // submit: {
+      //   label: 'Submit',
+      //   submittedFn: () => this.ngOnInit()
+      // },
       reset: {
         resetFn: () => {
           this.ngOnInit();
@@ -624,7 +729,8 @@ export class SalesinvoiceComponent {
         },
         sale_invoice_items: [{}],
         order_attachments: [],
-        order_shipments: {}
+        order_shipments: {},
+        custom_field_values: []
       },
       fields: [
         {
