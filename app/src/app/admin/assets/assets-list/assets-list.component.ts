@@ -14,7 +14,7 @@ import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 })
 export class AssetsListComponent {
   
-  baseUrl: string = 'http://195.35.20.172:8000/api/v1/';
+  baseUrl: string = 'https://apicore.cnlerp.com/api/v1/';
 
   @Output('edit') edit = new EventEmitter<void>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;

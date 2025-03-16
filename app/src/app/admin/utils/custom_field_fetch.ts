@@ -80,7 +80,6 @@ export class CustomFieldHelper {
   
     // Add custom fields dynamically to formConfig
     static addCustomFieldsToFormConfig(customFields: any[], customFieldMetadata: any, formConfig: any) {
-      console.log("Custom Fields to Add:", customFields);
   
       const customFieldConfigs = customFields.map((field: any) => {
         const key = field.custom_field_id.toLowerCase();
@@ -99,8 +98,6 @@ export class CustomFieldHelper {
           },
         };
       });
-  
-      console.log('Final Custom Field Config:', customFieldConfigs);
   
       formConfig.fields[1].fieldGroup = [
         ...formConfig.fields[1].fieldGroup,
