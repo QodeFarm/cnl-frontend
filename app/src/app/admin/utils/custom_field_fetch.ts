@@ -89,7 +89,7 @@ export class CustomFieldHelper {
         return {
           key: key,
           type: fieldMetadata.options.length > 0 ? 'select' : 'input',
-          className: 'col-md-6',
+          className: 'col-md-4',
           defaultValue: formConfig.model['custom_field_values'][key] || '',
           templateOptions: {
             label: field.field_name,
@@ -141,7 +141,7 @@ export class CustomFieldHelper {
         return {
           key: key,
           type: fieldMetadata.options.length > 0 ? 'select' : 'input',
-          className: 'col-md-6',
+          className: 'col-md-4',
           defaultValue: formConfig.model['custom_field_values'][key] || '',
           templateOptions: {
             label: field.field_name,

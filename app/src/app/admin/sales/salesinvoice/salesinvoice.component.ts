@@ -613,7 +613,7 @@ export class SalesinvoiceComponent {
     const customFieldValues = this.formConfig.model['custom_field_values']
 
     // Determine the entity type and ID dynamically
-    const entityId = '3a69c657-9817-4f7f-b4ee-3458a4233fce'; // Since we're in the Sale Invoice form
+    const entityId = '51c907a2-e1a5-43c5-95d7-4e58227776ab'; // Since we're in the Sale Invoice form
     const customId = this.formConfig.model.sale_invoice_order?.sale_invoice_id || null; // Ensure correct sale_order_id
   
     // Construct payload for custom fields
@@ -647,7 +647,7 @@ export class SalesinvoiceComponent {
     const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
 
     // Determine the entity type and ID dynamically
-    const entityId = '3a69c657-9817-4f7f-b4ee-3458a4233fce'; // Since we're in the Sale Order form
+    const entityId = '51c907a2-e1a5-43c5-95d7-4e58227776ab'; // Since we're in the Sale Order form
     const customId = this.formConfig.model.sale_invoice_order?.sale_invoice_id || null; // Ensure correct sale_order_id
 
     // Construct payload for custom fields based on updated values
@@ -661,7 +661,7 @@ export class SalesinvoiceComponent {
     };
 
     // Define logic here for updating the sale order without modal pop-up
-    console.log("Updating sale order:", this.formConfig.model);
+    // console.log("Updating sale order:", this.formConfig.model);
     this.http.put(`sales/sale_invoice_order/${this.SaleInvoiceEditID}/`, payload)
       .subscribe(response => {
         this.showSuccessToast = true;

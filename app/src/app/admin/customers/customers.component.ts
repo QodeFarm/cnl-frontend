@@ -192,38 +192,7 @@ export class CustomersComponent {
   
     // Close the customer list modal
     this.hide();
-  }
-
-  fetchAndSetCustomFieldValues(customerId: string) {
-    console.log("customerId in Custom : ", customerId);
-    const url = `customfields/customfieldvalues/?entity_data_id=${customerId}`;
-    console.log("URL : ", url)
-    this.http.get(url).subscribe(
-      (response: any) => {
-        if (response?.data) {
-          console.log("Repsonse 2: ", response);
-          const customFieldValues = response.data.reduce((acc: any, fieldValue: any) => {
-            // Normalize to lowercase for consistency
-            acc[fieldValue.custom_field.field_name.toLowerCase()] = fieldValue.field_value;
-            return acc;
-          }, {});
-          console.log("customFieldValues : ", customFieldValues);
-          // Populate the custom_field_values model
-          this.formConfig.model['custom_field_values'] = customFieldValues;
-
-          console.log('Mapped Custom Field Values:', this.formConfig.model['custom_field_values']);
-        } else {
-          console.warn('No custom field values found for the customer.');
-          this.formConfig.model['custom_field_values'] = {}; // Clear custom fields if none are found
-        }
-      },
-      (error) => {
-        console.error('Error fetching custom field values:', error);
-      }
-    );
-  }
-
-  
+  } 
 
   showCustomerListFn() {
     this.showCustomerList = true;
@@ -234,15 +203,7 @@ export class CustomersComponent {
   toastMessage = '';
   // Method to handle updating the Sale Return Order
   updateCustomer() {
-    // const customerData = { ...this.formConfig.model['customer_data'] }; // Main customer data
-    // const customerAttachments = this.formConfig.model['customer_attachments'];
-    // const customerAddresses = this.formConfig.model['customer_addresses'];
     const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
-    
-    // if (!customerData) {
-    //   console.error('Customer data is missing.');
-    //   return;
-    // }
 
     const entityId = 'e1fba6d0-23a0-4ae3-a2df-a6d563510042'; // Since we're in the Sale Order form
     const customId = this.formConfig.model.customer_data?.customer_id || null; //
