@@ -51,8 +51,11 @@ export class LoginComponent {
           addonLeftIcon: "lock",
           label: 'Password',
           type: 'password',
-          placeholder: '   Enter Password',
+          placeholder: 'Enter Password',
           required: true,
+          attributes: {
+            style: 'padding-left: 10px;' // Add your padding here
+          }
         }
       }
     ]
