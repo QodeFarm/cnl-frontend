@@ -10,6 +10,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder } from '@angular/forms';
 import { forkJoin, Observable } from 'rxjs';
 import { OrderListComponent } from './order-list/order-list.component';
+import { CustomFieldHelper } from '../utils/custom_field_fetch';
 import { displayInformation, getUnitData, sumQuantities } from 'src/app/utils/display.utils';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 declare var bootstrap;
@@ -179,6 +180,10 @@ export class PurchaseComponent {
     this.setFormConfig();
     this.checkAndPopulateData();
     this.loadQuickpackOptions();
+    //custom fields logic...
+    CustomFieldHelper.fetchCustomFields(this.http, 'purchase_order', (customFields: any, customFieldMetadata: any) => {
+      CustomFieldHelper.addCustomFieldsToFormConfig_2(customFields, customFieldMetadata, this.formConfig);
+    });
     // set purchase_order default value
     this.formConfig.model['purchase_order_data']['order_type'] = 'purchase_order';
 
@@ -343,6 +348,13 @@ export class PurchaseComponent {
         this.formConfig.model['purchase_order_id'] = this.PurchaseOrderEditID;
         this.showForm = true;
         this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = false;
+        // Ensure custom_field_values are correctly populated in the model
+        if (res.data.custom_field_values) {
+          this.formConfig.model['custom_field_values'] = res.data.custom_field_values.reduce((acc: any, fieldValue: any) => {
+            acc[fieldValue.custom_field_id] = fieldValue.field_value; // Map custom_field_id to the corresponding value
+            return acc;
+          }, {});
+        }
       }
     });
     this.hide();
@@ -717,12 +729,92 @@ loadQuickpackProducts() {
     const url = `/products/product_variations/?product_name=${productID}`;
     return this.http.get(url).pipe(((res: any) => res.data));
   }
+//====================================================
+  showSuccessToast = false;
+  toastMessage = '';
+  showDialog() {
+    const dialog = document.getElementById('customDialog');
+    if (dialog) {
+      dialog.style.display = 'flex'; // Show the dialog
+    }
+  }
+
+  closeToast() {
+    this.showSuccessToast = false;
+  }
+
+  createPurchaseOrder(){
+    const customFieldValues = this.formConfig.model['custom_field_values']
+
+    // Determine the entity type and ID dynamically
+    const entityId = '73549956-b503-4910-b24c-630a8e88b423'; // Since we're in the Sale Invoice form
+    const customId = this.formConfig.model.purchase_order_data?.purchase_order_id || null; // Ensure correct purchase_order_id
+  
+    // Construct payload for custom fields
+    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityId, customId);
+  
+    if (!customFieldsPayload) {
+      this.showDialog(); // Stop execution if required fields are missing
+    }
+
+    // Construct the final payload
+    const payload = {
+      ...this.formConfig.model,
+      // custom_field: customFieldsPayload.custom_field, // Dictionary of custom fields
+      custom_field_values: customFieldsPayload.custom_field_values // Array of custom field values
+    };
+
+    this.http.post('purchase/purchase_order/', payload)
+      .subscribe(response => {
+        this.showSuccessToast = true;
+        this.toastMessage = 'Record created successfully';
+        this.ngOnInit();
+        setTimeout(() => {
+          this.showSuccessToast = false;
+        }, 3000); // Hide toast after 3 seconds
+      }, error => {
+        console.error('Error creating record:', error);
+      });
+  }
+
+  updatePurchaseOrder(){
+    const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
+
+    // Determine the entity type and ID dynamically
+    const entityId = '73549956-b503-4910-b24c-630a8e88b423'; // Since we're in the Sale Order form
+    const customId = this.formConfig.model.purchase_order_data?.purchase_order_id || null; // Ensure correct purchase_order_id
+
+    // Construct payload for custom fields based on updated values
+    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityId, customId);
+    console.log("Testing the data in customFieldsPayload: ", customFieldsPayload);
+    
+    // Construct the final payload for update
+    const payload = {
+      ...this.formConfig.model,
+      custom_field_values: customFieldsPayload.custom_field_values // Array of dictionaries
+    };
+
+    // Define logic here for updating the sale order without modal pop-up
+    // console.log("Updating sale order:", this.formConfig.model);
+    this.http.put(`purchase/purchase_order/${this.PurchaseOrderEditID}/`, payload)
+      .subscribe(response => {
+        this.showSuccessToast = true;
+        this.toastMessage = "Record updated successfully"; // Set the toast message for update
+        this.ngOnInit();
+        setTimeout(() => {
+          this.showSuccessToast = false;
+        }, 3000);
+
+      }, error => {
+        console.error('Error updating record:', error);
+      });
+  }
 //=====================================================
 
   setFormConfig() {
     this.PurchaseOrderEditID = null;
     this.formConfig = {
-      url: "purchase/purchase_order/",
+      // url: "purchase/purchase_order/",
       title: '',
       formState: {
         viewMode: false
@@ -748,7 +840,15 @@ loadQuickpackProducts() {
       ],
       submit: {
         label: 'Submit',
-        submittedFn: () => this.ngOnInit()
+        // submittedFn: () => this.ngOnInit()
+        submittedFn: () => {
+          if (!this.PurchaseOrderEditID) {
+            this.createPurchaseOrder();
+          } else {
+            this.updatePurchaseOrder();
+             // Otherwise, create a new record
+          }
+        }
       },
       reset: {
         resetFn: () => {
@@ -759,7 +859,8 @@ loadQuickpackProducts() {
         purchase_order_data: {},
         purchase_order_items: [{}],
         order_attachments: [],
-        order_shipments: {}
+        order_shipments: {},
+        custom_field_values: []
       },
       fields: [
         {
