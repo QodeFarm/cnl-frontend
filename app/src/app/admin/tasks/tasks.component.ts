@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TasksListComponent } from './tasks-list/tasks-list.component';
 import { UserService } from 'src/app/services/user.service';  // Import the UserService
+import { CustomFieldHelper } from '../utils/custom_field_fetch';
 
 @Component({
   selector: 'app-tasks',
@@ -43,6 +44,12 @@ export class TasksComponent implements OnInit {
     // Set form config
     this.setFormConfig();
     this.set_default_status_id(); // lead_status_id = 'Open'
+    
+    //fetching customfields entity='tasks'.
+    CustomFieldHelper.fetchCustomFields(this.http, 'tasks', (customFields: any, customFieldMetadata: any) => {
+      CustomFieldHelper.addCustomFieldsToFormConfig(customFields, customFieldMetadata, this.formConfig);
+    });
+    
     this.formConfig.fields[0].fieldGroup[7].hide = true;
 
     // Fetch the logged-in user's ID and auto-fill the task_comments
@@ -106,6 +113,14 @@ export class TasksComponent implements OnInit {
           }];
         }
 
+        // Ensure custom_field_values are correctly populated in the model
+        if (res.data.custom_field_values) {
+          this.formConfig.model['custom_field_values'] = res.data.custom_field_values.reduce((acc: any, fieldValue: any) => {
+            acc[fieldValue.custom_field_id] = fieldValue.field_value; // Map custom_field_id to the corresponding value
+            return acc;
+          }, {});
+        }
+
         this.formConfig.showActionBtn = true;
         this.formConfig.pkId = 'task_id';
         // Set labels for update
@@ -124,10 +139,95 @@ export class TasksComponent implements OnInit {
     this.TasksListComponent?.refreshTable();
   }
 
+//=================================================
+  showSuccessToast = false;
+  toastMessage = '';
+
+  showDialog() {
+    const dialog = document.getElementById('customDialog');
+    if (dialog) {
+      dialog.style.display = 'flex'; // Show the dialog
+    }
+  }
+
+  submitTasksForm() {
+    const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
+
+    // Determine the entity type and ID dynamically
+    const entityId = '6d91143f-e599-428d-90ee-7ffd3945d88d'; // Since we're in the Sale Order form
+    const customId = this.formConfig.model.task?.task_id || null; //
+
+    // Construct payload for one custom field at a time
+    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityId, customId);
+
+    if (!customFieldsPayload) {
+      this.showDialog(); // Stop execution if required fields are missing
+    }
+    // Construct the final payload
+    const payload = {
+      ...this.formConfig.model,
+      custom_field_values: customFieldsPayload.custom_field_values // Array of dictionaries
+    };
+
+    console.log('Final Payload:', payload); // Debugging to verify the payload
+
+    // Submit the payload
+    this.http.post('tasks/task/', payload).subscribe(
+      (response: any) => {
+        this.showSuccessToast = true;
+          this.toastMessage = "Record Created successfully"; // Set the toast message for update
+          // this.ngOnInit();
+          setTimeout(() => {
+            this.showSuccessToast = false;
+          }, 3000);
+      },
+      (error) => {
+        console.error('Error creating customer and custom fields:', error);
+      }
+    );
+  }
+
+  updateTasks() {
+    const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
+
+    const entityId = '6d91143f-e599-428d-90ee-7ffd3945d88d'; // Since we're in the Sale Order form
+    const customId = this.formConfig.model.task?.task_id || null; //
+  
+    // Construct payload for custom fields based on updated values
+    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityId, customId);
+    console.log("Testing the data in customFieldsPayload: ", customFieldsPayload);
+    
+    // Construct the final payload for update
+    const payload = {
+      ...this.formConfig.model,
+      custom_field_values: customFieldsPayload.custom_field_values // Array of dictionaries
+    };
+  
+    console.log('Final Payload for Update:', payload); // Debugging to verify the payload
+  
+    // Send the update request with the payload
+    this.http.put(`tasks/task/${this.TasksEditID}/`, payload).subscribe(
+      (response: any) => {
+        this.showSuccessToast = true;
+          this.toastMessage = "Record updated successfully"; // Set the toast message for update
+          this.ngOnInit();
+          setTimeout(() => {
+            this.showSuccessToast = false;
+          }, 3000);
+        // this.showCustomerListFn(); // Redirect or refresh the customer list
+        // this.ngOnInit();
+      },
+      (error) => {
+        console.error('Error updating customer:', error);
+      }
+    );
+  }
+
+//===================================================
   setFormConfig() {
     this.TasksEditID = null
     this.formConfig = {
-      url: 'tasks/task/',
+      // url: 'tasks/task/',
       formState: {
         viewMode: false
       },
@@ -135,7 +235,13 @@ export class TasksComponent implements OnInit {
       exParams: [],
       submit: {
         label: 'Submit',
-        submittedFn: () => this.ngOnInit()
+        submittedFn: () => {
+          if (!this.TasksEditID) {
+            this.submitTasksForm();
+          } else {
+            this.updateTasks();
+          }
+        }
       },
       reset: {
         resetFn: () => {
@@ -146,7 +252,8 @@ export class TasksComponent implements OnInit {
         task: {},
         task_comments: [],
         task_attachments: [],
-        task_history: {}
+        task_history: {},
+        custom_field_values: []
       },
       fields: [
         {
