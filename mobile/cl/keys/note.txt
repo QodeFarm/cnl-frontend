@@ -1,0 +1,10 @@
+docker run -it --rm -v .:/app -w /app beevelop/cordova
+docker run -it --rm -v .:/tmp -w /tmp cordova-mobile
+
+
+cordova build android --release
+
+
+alias yourule
+passowrd yourule@2025
+

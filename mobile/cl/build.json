@@ -1,0 +1,18 @@
+{
+    "android": {
+        "debug": {
+            "keystore": "keys/cnl.jks",
+            "storePassword": "cnl@2025",
+            "alias": "cnl",
+            "password": "cnl@2025",
+            "keystoreType": "jks"
+        },
+        "release": {
+            "keystore": "keys/cnl.jks",
+            "storePassword": "cnl@2025",
+            "alias": "cnl",
+            "password": "cnl@2025",
+            "keystoreType": "jks"
+        }
+    }
+}
