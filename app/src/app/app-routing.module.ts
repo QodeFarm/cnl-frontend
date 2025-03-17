@@ -38,6 +38,8 @@ const routes: Routes = [
       { path: 'sales/debit-note', data: { title: 'Sale Debit Note', moduleName: 'debit-note' }, canActivate: [], loadComponent: () => import('./admin/sales/debit-note/debit-note.component').then(m => m.DebitNoteComponent) },
       { path: 'sales/credit-note', data: { title: 'Sale Credit Note', moduleName: 'credit-note' }, canActivate: [], loadComponent: () => import('./admin/sales/credit-note/credit-note.component').then(m => m.CreditNoteComponent) },
       { path: 'customers', data: { title: 'Customers', moduleName: 'customers' }, canActivate: [], loadComponent: () => import('./admin/customers/customers.component').then(m => m.CustomersComponent) },
+      { path: 'sales/payment-receipt', data: { title: 'Payment Receipt', moduleName: "payment-receipt" }, loadComponent: () => import('./admin/sales/payment-receipt/payment-receipt.component').then(m => m.PaymentReceiptComponent) },
+
 
       //Purchase Module
       { path: 'purchase', data: { title: 'Purchase', moduleName: 'purchase' }, canActivate: [], loadComponent: () => import('./admin/purchase/purchase.component').then(m => m.PurchaseComponent) },

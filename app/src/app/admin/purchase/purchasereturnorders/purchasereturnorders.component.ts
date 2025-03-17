@@ -8,6 +8,7 @@ import { PurchasereturnordersListComponent } from './purchasereturnorders-list/p
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder } from '@angular/forms';
 import { ConstantPool } from '@angular/compiler';
+import { CustomFieldHelper } from '../../utils/custom_field_fetch';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { calculateTotalAmount, displayInformation, getUnitData, sumQuantities } from 'src/app/utils/display.utils';
 
@@ -168,6 +169,11 @@ export class PurchasereturnordersComponent {
     this.setFormConfig();
     this.checkAndPopulateData(); 
 
+    //custom fields logic...
+    CustomFieldHelper.fetchCustomFields(this.http, 'purchase_returns', (customFields: any, customFieldMetadata: any) => {
+      CustomFieldHelper.addCustomFieldsToFormConfig_2(customFields, customFieldMetadata, this.formConfig);
+    });
+    
     this.formConfig.model['purchase_return_orders']['order_type'] = 'purchase_return';
 
     this.getOrderNo();
@@ -321,6 +327,14 @@ export class PurchasereturnordersComponent {
         this.totalAmountCal();
         this.showForm = true;
         this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = false;
+      
+        // Ensure custom_field_values are correctly populated in the model
+        if (res.data.custom_field_values) {
+          this.formConfig.model['custom_field_values'] = res.data.custom_field_values.reduce((acc: any, fieldValue: any) => {
+            acc[fieldValue.custom_field_id] = fieldValue.field_value; // Map custom_field_id to the corresponding value
+            return acc;
+          }, {});
+        }
       }
     });
     this.hide();
@@ -345,11 +359,91 @@ export class PurchasereturnordersComponent {
     this.showPurchaseReturnOrderList = true;
     this.PurchasereturnordersListComponent?.refreshTable();
   }
+//======================================================
+showSuccessToast = false;
+  toastMessage = '';
+  showDialog() {
+    const dialog = document.getElementById('customDialog');
+    if (dialog) {
+      dialog.style.display = 'flex'; // Show the dialog
+    }
+  }
 
+  closeToast() {
+    this.showSuccessToast = false;
+  }
+
+  createPurchaseReturns(){
+    const customFieldValues = this.formConfig.model['custom_field_values']
+
+    // Determine the entity type and ID dynamically
+    const entityId = 'ae751045-24f3-41b4-a4d5-9b56052729bf'; // Since we're in the Sale Invoice form
+    const customId = this.formConfig.model.purchase_return_order?.purchase_return_id || null; // Ensure correct purchase_order_id
+  
+    // Construct payload for custom fields
+    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityId, customId);
+  
+    if (!customFieldsPayload) {
+      this.showDialog(); // Stop execution if required fields are missing
+    }
+
+    // Construct the final payload
+    const payload = {
+      ...this.formConfig.model,
+      // custom_field: customFieldsPayload.custom_field, // Dictionary of custom fields
+      custom_field_values: customFieldsPayload.custom_field_values // Array of custom field values
+    };
+
+    this.http.post('purchase/purchase_return_order/', payload)
+      .subscribe(response => {
+        this.showSuccessToast = true;
+        this.toastMessage = 'Record created successfully';
+        this.ngOnInit();
+        setTimeout(() => {
+          this.showSuccessToast = false;
+        }, 3000); // Hide toast after 3 seconds
+      }, error => {
+        console.error('Error creating record:', error);
+      });
+  }
+
+  updatePurchaseReturns(){
+    const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
+
+    // Determine the entity type and ID dynamically
+    const entityId = 'ae751045-24f3-41b4-a4d5-9b56052729bf'; // Since we're in the Sale Order form
+    const customId = this.formConfig.model.purchase_return_order?.purchase_return_id || null; // Ensure correct purchase_order_id
+
+    // Construct payload for custom fields based on updated values
+    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityId, customId);
+    console.log("Testing the data in customFieldsPayload: ", customFieldsPayload);
+    
+    // Construct the final payload for update
+    const payload = {
+      ...this.formConfig.model,
+      custom_field_values: customFieldsPayload.custom_field_values // Array of dictionaries
+    };
+
+    // Define logic here for updating the sale order without modal pop-up
+    // console.log("Updating sale order:", this.formConfig.model);
+    this.http.put(`purchase/purchase_return_order/${this.PurchaseReturnOrderEditID}/`, payload)
+      .subscribe(response => {
+        this.showSuccessToast = true;
+        this.toastMessage = "Record updated successfully"; // Set the toast message for update
+        this.ngOnInit();
+        setTimeout(() => {
+          this.showSuccessToast = false;
+        }, 3000);
+
+      }, error => {
+        console.error('Error updating record:', error);
+      });
+  }
+//======================================================
   setFormConfig() {
     this.PurchaseReturnOrderEditID = null;
     this.formConfig = {
-      url: "purchase/purchase_return_order/",
+      // url: "purchase/purchase_return_order/",
       title: '',
       formState: {
         viewMode: false
@@ -374,7 +468,15 @@ export class PurchasereturnordersComponent {
       ],
       submit: {
         label: 'Submit',
-        submittedFn: () => this.ngOnInit()
+        // submittedFn: () => this.ngOnInit()
+        submittedFn: () => {
+          if (!this.PurchaseReturnOrderEditID) {
+            this.createPurchaseReturns();
+          } else {
+            this.updatePurchaseReturns();
+             // Otherwise, create a new record
+          }
+        }
       },
       reset: {
         resetFn: () => {

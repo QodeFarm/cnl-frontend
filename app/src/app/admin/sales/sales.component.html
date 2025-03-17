@@ -136,7 +136,7 @@
 <!-- Success Message at the Top Right -->
 <div *ngIf="isInvoiceCreated" class="toast-message">
     <div class="tick-circle">
-        <span class="tick-mark">✔</span>
+        <span class="tick-mark">✓</span>
     </div>
     <span class="message-text">Invoice Created Successfully!</span>
 </div>
@@ -158,7 +158,7 @@
 
 <div id="customToast" class="toast-message" *ngIf="showSuccessToast">
     <div class="tick-circle">
-        <span class="tick-mark">✔</span>
+        <span class="tick-mark">✓</span>
     </div>
     <span class="toast-message-text">{{ toastMessage }}</span>
     <span class="toast-close" onclick="this.parentElement.style.display='none'">x</span>
@@ -209,3 +209,10 @@
             <p id="modalMessage"></p>
         </div>
     </div>
+
+<div id="customDialog" class="custom-dialog-overlay" style="display: none;">
+    <div class="custom-dialog-box">
+    <p> ⚠️ Please fill in all required fields before submitting.</p>
+    <button id="dialogOkButton" (click)="closeDialog()">OK</button>
+    </div>
+</div>

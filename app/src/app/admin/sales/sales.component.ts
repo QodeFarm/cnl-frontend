@@ -13,6 +13,7 @@ import { SalesinvoiceComponent } from './salesinvoice/salesinvoice.component';
 import { BindingType } from '@angular/compiler';
 import { FormlyField, FormlyFieldConfig } from '@ngx-formly/core';
 import { calculateTotalAmount } from 'src/app/utils/display.utils';
+import { CustomFieldHelper } from '../utils/custom_field_fetch';
 declare var bootstrap;
 @Component({
   standalone: true,
@@ -175,7 +176,7 @@ export class SalesComponent {
   saleForm: FormGroup;
 
   hasDataPopulated: boolean = false;
-
+  customFieldMetadata: any = {}; 
   ngOnInit() {
     this.showSaleOrderList = false;
     this.showForm = false;
@@ -185,7 +186,9 @@ export class SalesComponent {
     this.checkAndPopulateData();
     this.loadQuickpackOptions(); // Fetch Quickpack options
     console.log("data in load : ", this.loadQuickpackOptions())
-
+    CustomFieldHelper.fetchCustomFields(this.http, 'sale order', (customFields: any, customFieldMetadata: any) => {
+      CustomFieldHelper.addCustomFieldsToFormConfig_2(customFields, customFieldMetadata, this.formConfig);
+    });
     // set sale_order default value
     this.formConfig.model['sale_order']['order_type'] = 'sale_order';
 
@@ -419,13 +422,16 @@ export class SalesComponent {
         this.showForm = true;
         this.formConfig.fields[0].fieldGroup[0].fieldGroup[8].hide = false;
         this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = false;
-        // this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[9].hide = false;
-        // Load sale_order_items with selected status
-        //   this.saleOrderItems = res.data.sale_order.sale_order_items.map(item => ({
-        //     ...item,
-        //     selected: false
-        // }));
+
         this.totalAmountCal();
+
+        // Ensure custom_field_values are correctly populated in the model
+        if (res.data.custom_field_values) {
+          this.formConfig.model['custom_field_values'] = res.data.custom_field_values.reduce((acc: any, fieldValue: any) => {
+            acc[fieldValue.custom_field_id] = fieldValue.field_value; // Map custom_field_id to the corresponding value
+            return acc;
+          }, {});
+        }
       }
     });
     this.hide();
@@ -860,33 +866,28 @@ export class SalesComponent {
     }
   };
 
-  //Added this logic for creating workorder from sale order and changing flow status by triggering URL
-  // createWorkOrder() {
-  //   if (this.SaleOrderEditID) {
-  //     const productDetails = this.formConfig.model.sale_order_items;
-  //     const saleOrderDetails = this.formConfig.model.sale_order;
-
-  //     // Check if productDetails and saleOrderDetails have valid data
-  //     if (productDetails && saleOrderDetails) {
-  //       const payload = {
-  //         productDetails: productDetails,
-  //         saleOrderDetails: saleOrderDetails,
-  //       };
-
-  //       console.log('Navigating to production with payload:', payload);
-
-  //       // Navigate to the Work Order route without triggering the `move_next_stage` endpoint
-  //       this.router.navigate(['admin/production'], { state: payload });
-  //     } else {
-  //       console.warn('Product details or sale order details are missing.');
-  //     }
-  //   } else {
-  //     console.warn('SaleOrderEditID is not set. Unable to create work order.');
-  //   }
-  // }
-
   createSaleOrder() {
-    this.http.post('sales/sale_order/', this.formConfig.model)
+    const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
+  
+    // Determine the entity type and ID dynamically
+    const entityId = 'c13edba7-ec34-4b0a-95e9-86a5c7e05389'; // Since we're in the Sale Order form
+    const customId = this.formConfig.model.sale_order?.sale_order_id || null; // Ensure correct sale_order_id
+  
+    // Construct payload for custom fields
+    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityId, customId);
+  
+    if (!customFieldsPayload) {
+      this.showDialog(); // Stop execution if required fields are missing
+    }
+  
+    // Construct the final payload
+    const payload = {
+      ...this.formConfig.model,
+      // custom_field: customFieldsPayload.custom_field, // Dictionary of custom fields
+      custom_field_values: customFieldsPayload.custom_field_values // Array of custom field values
+    };
+  
+    this.http.post('sales/sale_order/', payload)
       .subscribe(response => {
         this.showSuccessToast = true;
         this.toastMessage = 'Record created successfully';
@@ -898,8 +899,24 @@ export class SalesComponent {
         console.error('Error creating record:', error);
       });
   }
+  
   closeToast() {
     this.showSuccessToast = false;
+  }
+
+  showDialog() {
+    const dialog = document.getElementById('customDialog');
+    if (dialog) {
+      dialog.style.display = 'flex'; // Show the dialog
+    }
+  }
+
+  // Function to close the custom dialog
+  closeDialog() {
+    const dialog = document.getElementById('customDialog');
+    if (dialog) {
+      dialog.style.display = 'none'; // Hide the dialog
+    }
   }
 
   confirmSelection() {
@@ -925,9 +942,25 @@ export class SalesComponent {
 
   // Update method specifically for edit actions
   updateSaleOrder() {
+    const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
+
+    // Determine the entity type and ID dynamically
+    const entityId = 'c13edba7-ec34-4b0a-95e9-86a5c7e05389'; // Since we're in the Sale Order form
+    const customId = this.formConfig.model.sale_order?.sale_order_id || null; // Ensure correct sale_order_id
+
+    // Construct payload for custom fields based on updated values
+    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityId, customId);
+    console.log("Testing the data in customFieldsPayload: ", customFieldsPayload);
+    
+    // Construct the final payload for update
+    const payload = {
+      ...this.formConfig.model,
+      custom_field_values: customFieldsPayload.custom_field_values // Array of dictionaries
+    };
+
     // Define logic here for updating the sale order without modal pop-up
     console.log("Updating sale order:", this.formConfig.model);
-    this.http.put(`sales/sale_order/${this.SaleOrderEditID}/`, this.formConfig.model)
+    this.http.put(`sales/sale_order/${this.SaleOrderEditID}/`, payload)
       .subscribe(response => {
         this.showSuccessToast = true;
         this.toastMessage = "Record updated successfully"; // Set the toast message for update
@@ -1413,7 +1446,8 @@ export class SalesComponent {
         sale_order: {},
         sale_order_items: [{}],
         order_attachments: [],
-        order_shipments: {}
+        order_shipments: {},
+        custom_field_values: []
       },
       fields: [
         {

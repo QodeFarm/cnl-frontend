@@ -13,6 +13,7 @@ import { SaleReturnsListComponent } from './sale-returns-list/sale-returns-list.
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { calculateTotalAmount, displayInformation, getUnitData, sumQuantities } from 'src/app/utils/display.utils';
+import { CustomFieldHelper } from '../../utils/custom_field_fetch';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 declare var bootstrap;
 
@@ -181,6 +182,10 @@ export class SaleReturnsComponent {
     this.SaleReturnOrderEditID = null;
     this.setFormConfig();
     this.checkAndPopulateData();
+    //custom fields logic...
+    CustomFieldHelper.fetchCustomFields(this.http, 'sale_returns', (customFields: any, customFieldMetadata: any) => {
+      CustomFieldHelper.addCustomFieldsToFormConfig_2(customFields, customFieldMetadata, this.formConfig);
+    });
 
     this.formConfig.model['sale_return_order']['order_type'] = 'sale_return';
 
@@ -332,20 +337,35 @@ export class SaleReturnsComponent {
 
   // Method to handle updating the Sale Return Order
   updateSaleReturnOrder() {
-    const saleReturnId = this.formConfig.model.sale_return_order.sale_return_id;
-    console.log("Sale return id in edit : ", saleReturnId);
-    const saleReturnPayload = {
-      sale_return_order: this.formConfig.model.sale_return_order,
-      sale_return_items: this.formConfig.model.sale_return_items,
-      order_attachments: this.formConfig.model.order_attachments,  // Attachments if applicable
-      order_shipments: this.formConfig.model.order_shipments,      // Shipment info if applicable
+    const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
+
+    // Determine the entity type and ID dynamically
+    const entityId = '7323d24c-50e9-4546-a161-bbb160ffa127'; // Since we're in the Sale Order form
+    const customId = this.formConfig.model.sale_return_order?.sale_return_id || null; // Ensure correct sale_order_id
+
+    // Construct payload for custom fields based on updated values
+    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityId, customId);
+    console.log("Testing the data in customFieldsPayload: ", customFieldsPayload);
+    
+    // Construct the final payload for update
+    const payload = {
+      ...this.formConfig.model,
+      custom_field_values: customFieldsPayload.custom_field_values // Array of dictionaries
     };
+    // const saleReturnId = this.formConfig.model.sale_return_order.sale_return_id;
+    // console.log("Sale return id in edit : ", saleReturnId);
+    // const saleReturnPayload = {
+    //   sale_return_order: this.formConfig.model.sale_return_order,
+    //   sale_return_items: this.formConfig.model.sale_return_items,
+    //   order_attachments: this.formConfig.model.order_attachments,  // Attachments if applicable
+    //   order_shipments: this.formConfig.model.order_shipments,      // Shipment info if applicable
+    // };
 
     // PUT request to update Sale Return Order
-    this.http.put(`sales/sale_return_order/${saleReturnId}/`, saleReturnPayload).subscribe(
+    this.http.put(`sales/sale_return_order/${this.SaleReturnOrderEditID}/`, payload).subscribe(
       (response) => {
         this.showSuccessToast = true;
-        this.toastMessage = 'Record Updated successfully';
+        this.toastMessage = "Record updated successfully"; // Set the toast message for update
         this.ngOnInit();
         setTimeout(() => {
           this.showSuccessToast = false;
@@ -374,6 +394,13 @@ export class SaleReturnsComponent {
         this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[6].hide = false;
 
         this.totalAmountCal() //calling calculation in edit mode.
+        // Ensure custom_field_values are correctly populated in the model
+        if (res.data.custom_field_values) {
+          this.formConfig.model['custom_field_values'] = res.data.custom_field_values.reduce((acc: any, fieldValue: any) => {
+            acc[fieldValue.custom_field_id] = fieldValue.field_value; // Map custom_field_id to the corresponding value
+            return acc;
+          }, {});
+        }
       }
     });
     this.hide();
@@ -743,7 +770,8 @@ export class SaleReturnsComponent {
         sale_return_order: {},
         sale_return_items: [{}],
         order_attachments: [],
-        order_shipments: {}
+        order_shipments: {},
+        custom_field_values: []
       },
       fields: [
         {
@@ -2352,16 +2380,46 @@ export class SaleReturnsComponent {
   //========================================
   showSuccessToast = false;
   toastMessage = '';
+  showDialog() {
+    const dialog = document.getElementById('customDialog');
+    if (dialog) {
+      dialog.style.display = 'flex'; // Show the dialog
+    }
+  }
+
+  closeToast() {
+    this.showSuccessToast = false;
+  }
+
   submitForm() {
-    // Prepare the payload for Sale Return Order creation
-    const saleReturnPayload = {
-      sale_return_order: this.formConfig.model.sale_return_order,
-      sale_return_items: this.formConfig.model.sale_return_items,
-      order_attachments: this.formConfig.model.order_attachments,  // Attachments if applicable
-      order_shipments: this.formConfig.model.order_shipments,      // Shipment info if applicable
+    const customFieldValues = this.formConfig.model['custom_field_values']
+
+    // Determine the entity type and ID dynamically
+    const entityId = '7323d24c-50e9-4546-a161-bbb160ffa127'; // Since we're in the Sale Invoice form
+    const customId = this.formConfig.model.sale_return_order?.sale_return_id || null; // Ensure correct sale_order_id
+  
+    // Construct payload for custom fields
+    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityId, customId);
+  
+    if (!customFieldsPayload) {
+      this.showDialog(); // Stop execution if required fields are missing
+    }
+    // // Prepare the payload for Sale Return Order creation
+    // const saleReturnPayload = {
+    //   sale_return_order: this.formConfig.model.sale_return_order,
+    //   sale_return_items: this.formConfig.model.sale_return_items,
+    //   order_attachments: this.formConfig.model.order_attachments,  // Attachments if applicable
+    //   order_shipments: this.formConfig.model.order_shipments,      // Shipment info if applicable
+    // };
+    // Construct the final payload
+    const payload = {
+      ...this.formConfig.model,
+      // custom_field: customFieldsPayload.custom_field, // Dictionary of custom fields
+      custom_field_values: customFieldsPayload.custom_field_values // Array of custom field values
     };
+    console.log("Response of payload in returns : ", payload);
     // First, create the Sale Return record
-    this.http.post('sales/sale_return_order/', saleReturnPayload).subscribe(
+    this.http.post('sales/sale_return_order/', payload).subscribe(
       (response: any) => {
         this.showSuccessToast = true;
         this.toastMessage = 'Record created successfully';
@@ -2374,6 +2432,12 @@ export class SaleReturnsComponent {
 
         if (sale_return_id) {
           console.log('Sale Return created successfully. ID:', sale_return_id);
+          this.showSuccessToast = true;
+            this.toastMessage = 'Record created successfully';
+            this.ngOnInit();
+            setTimeout(() => {
+              this.showSuccessToast = false;
+            }, 3000);
 
           // Now based on the return_option, create the respective entity
           const returnOption = this.formConfig.model.sale_return_order.return_option.name;
