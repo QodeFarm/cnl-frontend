@@ -51,7 +51,7 @@ export class LoginComponent {
           addonLeftIcon: "lock",
           label: 'Password',
           type: 'password',
-          placeholder: 'Enter Password',
+          placeholder: '   Enter Password',
           required: true,
         }
       }
