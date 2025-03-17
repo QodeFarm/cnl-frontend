@@ -12,6 +12,7 @@ import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { SalesinvoiceComponent } from './salesinvoice/salesinvoice.component';
 import { BindingType } from '@angular/compiler';
 import { FormlyField, FormlyFieldConfig } from '@ngx-formly/core';
+import { calculateTotalAmount } from 'src/app/utils/display.utils';
 declare var bootstrap;
 @Component({
   standalone: true,
@@ -413,7 +414,6 @@ export class SalesComponent {
         this.formConfig.pkId = 'sale_order_id';
         this.formConfig.model['flow_status'] = res.data.sale_order.flow_status;
         this.formConfig.model['tax_amount'] = res.data.sale_order.tax_amount;
-        this.totalAmountCal();
         this.formConfig.submit.label = 'Update';
         this.formConfig.model['sale_order_id'] = this.SaleOrderEditID;
         this.showForm = true;
@@ -425,6 +425,7 @@ export class SalesComponent {
         //     ...item,
         //     selected: false
         // }));
+        this.totalAmountCal();
       }
     });
     this.hide();
@@ -1030,6 +1031,24 @@ export class SalesComponent {
     } else {
       console.error('Product not selected or invalid.');
     }
+  };
+
+  async autoFillProductDetails(field, data) {
+    this.productOptions = data;
+    if (!field.form?.controls || !data) return;
+    const fieldMappings = {
+      code: data.code,
+      rate: data.sales_rate || field.form.controls.rate.value,
+      discount: parseFloat(data.dis_amount) || 0,
+      unit_options_id: data.unit_options?.unit_options_id,
+      print_name: data.print_name,
+      mrp: data.mrp
+    };
+  
+    Object.entries(fieldMappings).forEach(([key, value]) => {
+      if (value !== undefined) field.form.controls[key]?.setValue(value);
+    });
+    this.totalAmountCal();
   }
 
   createWorkOrder() {
@@ -1247,7 +1266,87 @@ export class SalesComponent {
         }
     }
     this.ngOnInit();
+  };
+
+  getUnitData(unitInfo) {
+    const unitOption = unitInfo.unit_options?.unit_name ?? 'NA';
+    const stockUnit = unitInfo.stock_unit?.stock_unit_name ?? 'NA';
+    const packUnit = unitInfo.pack_unit?.unit_name ?? 'NA';
+    const gPackUnit = unitInfo.g_pack_unit?.unit_name ?? 'NA';
+    const packVsStock = unitInfo.pack_vs_stock ?? 0;
+    const gPackVsPack = unitInfo.g_pack_vs_pack ?? 0;
+  
+    const stockUnitReg = /\b[sS][tT][oO][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
+    const GpackReg = /\b(?:[sS]tock[_ ]?[pP]ack[_ ]?)?[gG][pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
+    const stockPackReg = /\b[sS][tT][oO][cC][kK][_ ]?[pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
+  
+    if (stockUnitReg.test(unitOption)) {
+      return `<span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> | &nbsp;`;
+    } else if (GpackReg.test(unitOption)) {
+      return `
+        <span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> |
+        <span style="color: red;">Pck Unit:</span> <span style="color: blue;">${packUnit}</span> |
+        <span style="color: red;">PackVsStock:</span> <span style="color: blue;">${packVsStock}</span> |
+        <span style="color: red;">GPackUnit:</span> <span style="color: blue;">${gPackUnit}</span> |
+        <span style="color: red;">GPackVsStock:</span> <span style="color: blue;">${gPackVsPack}</span> | &nbsp;`;
+    } else if (stockPackReg.test(unitOption)) {
+      return `
+        <span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> |
+        <span style="color: red;">Pack Unit:</span> <span style="color: blue;">${packUnit}</span> |
+        <span style="color: red;">PackVsStock:</span> <span style="color: blue;">${packVsStock}</span> | &nbsp;`;
+    } else {
+      console.log('No Unit Option match found');
+      return "";
+    }
+  }
+
+// product info text when size is selected
+  sumQuantities(dataObject: any): number {
+  // First, check if the data object contains the array in the 'data' field
+  if (dataObject && Array.isArray(dataObject.data)) {
+    // Now we can safely use reduce on dataObject.data
+    return dataObject.data.reduce((sum, item) => sum + (item.quantity || 0), 0);
+  } else {
+    console.error("Data is not an array:", dataObject);
+    return 0;
+  }
 }
+
+  displayInformation(product: any, size: any, color: any, unitData : any, sizeBalance: any, colorBalance: any) {
+    const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
+    let data = '';
+
+    if (product) {
+      data = `
+        <span style="color: red;">Product Info:</span> <span style="color: blue;">${product?.name || 'N/A'}</span> |                            
+        <span style="color: red;">Balance:</span> <span style="color: blue;">${product?.balance || 0}</span>`;
+    }
+
+    if (size) {
+      data = `
+        <span style="color: red;">Product Info:</span> <span style="color: blue;">${product?.name || 'N/A'}</span> |                            
+        <span style="color: red;">Size:</span> <span style="color: blue;">${size.size_name}</span> |
+        <span style="color: red;">Balance:</span> <span style="color: blue;">${sizeBalance || 0}</span>
+        `;
+    }
+
+    if (color) {
+      data = `
+        <span style="color: red;">Product Info:</span> <span style="color: blue;">${product?.name || 'N/A'}</span> |                            
+        <span style="color: red;">Size:</span> <span style="color: blue;">${size.size_name}</span> |
+        <span style="color: red;">Color:</span> <span style="color: blue;">${color.color_name}</span> |
+        <span style="color: red;">Balance:</span> <span style="color: blue;">${colorBalance || 0}</span>
+        `;
+    }
+
+    data += ` | ${unitData}`;
+
+    cardWrapper.querySelector('.center-message')?.remove();
+    const productInfoDiv = document.createElement('div');
+    productInfoDiv.classList.add('center-message');
+    productInfoDiv.innerHTML = data;
+    cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
+  };
 
   //=======================================================
   setFormConfig() {
@@ -1286,10 +1385,6 @@ export class SalesComponent {
           const customer = this.formConfig.model.sale_order.customer; // Get the customer details
           console.log("Customer in formconfig : ", customer);
           console.log("Customer.credit_limit : ", customer.credit_limit);
-          // if (!customer || !customer.credit_limit) {
-          //   console.error("Customer information or credit limit is missing.");
-          //   return;
-          // }
 
           const maxLimit = parseFloat(customer.credit_limit); // Convert credit limit to number
           console.log(`Total Amount: ${totalAmount}, Credit Limit: ${maxLimit}`);
@@ -1533,6 +1628,7 @@ export class SalesComponent {
                         const saleOrderItems = this.formConfig.model['sale_order_items'];
                         const orderAttachments = this.formConfig.model['order_attachments'];
                         const orderShipments = this.formConfig.model['order_shipments'];
+
                         const totalAmount = () => {
                           if (!Array.isArray(saleOrderItems) || saleOrderItems.length === 0) {
                             console.log("No items found, returning 0");
@@ -1559,11 +1655,11 @@ export class SalesComponent {
                             tax: saleOrder.tax || 'Inclusive',
                             remarks: saleOrder.remarks,
                             advance_amount: saleOrder.advance_amount || '0',
-                            item_value: saleOrder.item_value,
+                            item_value: totalAmount(),
                             discount: saleOrder.discount,
                             dis_amt: saleOrder.dis_amt,
                             taxable: saleOrder.taxable,
-                            tax_amount: saleOrder.tax_amount,
+                            // tax_amount: saleOrder.tax_amount,
                             cess_amount: saleOrder.cess_amount,
                             transport_charges: saleOrder.transport_charges,
                             round_off: saleOrder.round_off,
@@ -1658,7 +1754,7 @@ export class SalesComponent {
 
                 },              
                 {
-                  key: 'output_cgst',
+                  key: 'cgst',
                   type: 'text',
                   className: 'col-12',
                   templateOptions: {
@@ -1667,7 +1763,7 @@ export class SalesComponent {
                   },
                   defaultValue: '0.00',
                   expressionProperties: {
-                    'model.output_cgst': (model, field) => {
+                    'model.cgst': (model, field) => {
                       if (!field._lastValue || field._lastValue !== model.tax_amount) {
                         const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
                         field._lastValue = model.tax_amount; // Store last value to avoid infinite logs
@@ -1681,7 +1777,7 @@ export class SalesComponent {
                   hideExpression: (model) => !model.billing_address || !model.billing_address?.includes('Andhra Pradesh') // Hide CGST for inter-state
                 },
                 {
-                  key: 'output_sgst',
+                  key: 'sgst',
                   type: 'text',
                   className: 'col-12',
                   templateOptions: {
@@ -1690,7 +1786,7 @@ export class SalesComponent {
                   },
                   defaultValue: '0.00',
                   expressionProperties: {
-                    'model.output_sgst': (model, field) => {
+                    'model.sgst': (model, field) => {
                       if (!field._lastValue || field._lastValue !== model.tax_amount) {
                         const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
                         field._lastValue = model.tax_amount;
@@ -1704,7 +1800,7 @@ export class SalesComponent {
                   hideExpression: (model) => !model.billing_address || !model.billing_address?.includes('Andhra Pradesh') // Hide CGST for inter-state
                 },
                 {
-                  key: 'output_igst',
+                  key: 'igst',
                   type: 'text',
                   className: 'col-12',
                   templateOptions: {
@@ -1713,7 +1809,7 @@ export class SalesComponent {
                   },
                   defaultValue: '0.00',
                   expressionProperties: {
-                    'model.output_igst': (model, field) => {
+                    'model.igst': (model, field) => {
                       if (!field._lastValue || field._lastValue !== model.tax_amount) {
                         const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
                         field._lastValue = model.tax_amount;
@@ -1842,142 +1938,42 @@ export class SalesComponent {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-                    // Check if parentArray exists and proceed
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
-
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
-                        const existingProduct = this.dataToPopulate.sale_order_items[currentRowIndex].product;
-
-                        // Set the full product object instead of just the product_id
-                        if (existingProduct) {
-                          field.formControl.setValue(existingProduct); // Set full product object (not just product_id)
-                        }
-                      }
-
-                      this.loadProductVariations(field);
-                      // Subscribe to value changes of the field
-                      // ***Size dropdown will populate with available sizes when product in selected***
-                      field.formControl.valueChanges.subscribe(selectedProductId => {
-                        this.loadProductVariations(field);
-                      });
-                      // ***Product Info Text when product is selected code***
-
-                      field.formControl.valueChanges.subscribe(async selectedProductId => {
-                        const product = field.formControl.value;
-                        if (product.product_id) {
-                          this.http.get(`products/products_get/?product_id=${product.product_id}`).subscribe({
-                            next: (response: any) => {
-                              // Handle the successful response here
-                              const unitInfo = response.data[0] || {};
-                              // Using optional chaining and nullish coalescing to assign values
-                              const unitOption = unitInfo.unit_options?.unit_name ?? 'NA';
-                              const stockUnit = unitInfo.stock_unit?.stock_unit_name ?? 'NA';
-                              const packUnit = unitInfo.pack_unit?.unit_name ?? 'NA';
-                              const gPackUnit = unitInfo.g_pack_unit?.unit_name ?? 'NA';
-                              const packVsStock = unitInfo.pack_vs_stock ?? 0;
-                              const gPackVsPack = unitInfo.g_pack_vs_pack ?? 0;
-                              // Regular expression to match 'Stock Unit' 'Stock Pack Gpack Unit' & 'Stock Pack Unit'.
-                              const stockUnitReg = /\b[sS][tT][oO][cC][kK][_ ]?[uU][nN][iI][tT]\b/g
-                              const GpackReg = /\b(?:[sS]tock[_ ]?[pP]ack[_ ]?)?[gG][pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
-                              const stockPackReg = /\b[sS][tT][oO][cC][kK][_ ]?[pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g
-                              // Check which pattern matches unit_name
-                              let unitData = ''
-                              if (stockUnitReg.test(unitOption)) {
-                                unitData = `
-                                      <span style="color: red;">Stock Unit:</span> 
-                                      <span style="color: blue;">${stockUnit}</span> | &nbsp;`
-                              } else if (GpackReg.test(unitOption)) {
-                                unitData = `
-                                      <span style="color: red;">Stock Unit:</span> 
-                                      <span style="color: blue;">${stockUnit}</span> |
-                                      <span style="color: red;">Pck Unit:</span> 
-                                      <span style="color: blue;">${packUnit}</span> |
-                                      <span style="color: red;">PackVsStock:</span> 
-                                      <span style="color: blue;">${packVsStock}</span> |
-                                      <span style="color: red;">GPackUnit:</span> 
-                                      <span style="color: blue;">${gPackUnit}</span> |
-                                      <span style="color: red;">GPackVsStock:</span> 
-                                      <span style="color: blue;">${gPackVsPack}</span> | &nbsp;`
-                              } else if (stockPackReg.test(unitOption)) {
-                                unitData = `
-                                      <span style="color: red;">Stock Unit:</span> 
-                                      <span style="color: blue;">${stockUnit}</span> |
-                                      <span style="color: red;">Pack Unit:</span> 
-                                      <span style="color: blue;">${packUnit}</span> |
-                                      <span style="color: red;">PackVsStock:</span> 
-                                      <span style="color: blue;">${packVsStock}</span> | &nbsp;`
-                              } else {
-                                console.log('No Unit Option match found');
-                              }
-                              // Check if a valid product is selected
-                              if (product?.product_id) {
-                                this.formConfig.model.sale_order_items[currentRowIndex].product_id = product.product_id;
-                                const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
-                                if (cardWrapper) {
-                                  // Remove existing product info if present
-                                  cardWrapper.querySelector('.center-message')?.remove();
-                                  // Create and insert new product info
-                                  const productInfoDiv = document.createElement('div');
-                                  productInfoDiv.classList.add('center-message');
-                                  productInfoDiv.innerHTML = `
-                                        <span style="color: red;">Product Info:</span> 
-                                        <span style="color: blue;">${product.name}</span> |                            
-                                        <span style="color: red;">Balance:</span> 
-                                        <span style="color: blue;">${product.balance}</span> |
-                                        ${unitData}`;
-                                  cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
-                                  this.unitOptionOfProduct = unitData; // save this data to use in color and size
-                                  console.log(`Product :  Product Info Updated for ${product.name}**`)
-                                }
-                              } else {
-                                console.log(`No valid product selected for Row ${currentRowIndex}.`);
-                              }
-                            },
-                            error: (err) => {
-                              // Handle errors here
-                            }
-                          });
-                        }
-                      });
-
-                    } else {
+                    if (!parentArray) {
                       console.error('Parent array is undefined or not accessible');
-                    };
-                    // ***Product Details Auto Fill Code***
-                    field.formControl.valueChanges.subscribe(data => {
-                      this.productOptions = data;
-                      console.log("Data in products : ", data)
-                      if (field.form && field.form.controls && field.form.controls.code && data && data.code) {
-                        field.form.controls.code.setValue(data.code)
+                      return;
+                    }
+              
+                    const currentRowIndex = +parentArray.key;
+              
+                    // Populate product if data exists
+                    const existingProduct = this.dataToPopulate?.sale_order_items?.[currentRowIndex]?.product;
+                    if (existingProduct) {
+                      field.formControl.setValue(existingProduct);
+                    }
+              
+                    this.loadProductVariations(field);
+              
+                    // Subscribe to value changes (to update sizes dynamically)
+                    field.formControl.valueChanges.subscribe((data: any) => {
+                      if (!this.formConfig.model['sale_order_items'][currentRowIndex]) {
+                        console.error(`Products at index ${currentRowIndex} is not defined. Initializing...`);
+                        this.formConfig.model['sale_order_items'][currentRowIndex] = {};
                       }
-                      if (field.form && field.form.controls && field.form.controls.rate && data && data.mrp) {
-                        field.form.controls.rate.setValue(field.form.controls.rate.value || data.sales_rate)
-                      }
-                      if (field.form && field.form.controls && field.form.controls.discount && data && data.dis_amount) {
-                        field.form.controls.discount.setValue(parseFloat(data.dis_amount))
-                      }
-                      if (field.form && field.form.controls && field.form.controls.unit_options_id && data && data.unit_options && data.unit_options.unit_name) {
-                        field.form.controls.unit_options_id.setValue(data.unit_options.unit_options_id)
-                      }
-                      if (field.form && field.form.controls && field.form.controls.print_name && data && data.print_name) {
-                        field.form.controls.print_name.setValue(data.print_name)
-                      }
-                      if (field.form && field.form.controls && field.form.controls.discount && data && data.dis_amount) {
-                        field.form.controls.discount.setValue(data.dis_amount)
-                      }
-                      if (field.form && field.form.controls && field.form.controls.mrp && data && data.mrp) {
-                        field.form.controls.mrp.setValue(data.mrp)
-                      }
-                      if (field.form && field.form.controls && field.form.controls.gst_input && data && data.gst_input) {
-                        field.form.controls.gst_input.setValue(data.gst_input)
-                      }
-                      this.totalAmountCal();
+                      this.formConfig.model['sale_order_items'][currentRowIndex]['product_id'] = data?.product_id;
+                      this.loadProductVariations(field);
+                      this.autoFillProductDetails(field, data); // to fill the remaining fields when product is selected.
                     });
+
+                    // Product Info Text code
+                    field.formControl.valueChanges.subscribe( async selectedProductId => {
+                      const unit = this.getUnitData(selectedProductId);
+                      const row = this.formConfig.model.sale_order_items[currentRowIndex];
+                      this.displayInformation(row.product, null , null, unit, '', ''); 
+                      console.log('executed from product info text code');                         
+                    }); // end of product info text code
                   }
                 }
-              },
+              },          
               {
                 key: 'size',
                 type: 'select',
@@ -1996,112 +1992,57 @@ export class SalesComponent {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key;
-
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
-                        const existingSize = this.dataToPopulate.sale_order_items[currentRowIndex].size;
-
-                        // Set the full product object instead of just the product_id
-                        if (existingSize && existingSize.size_id) {
-                          field.formControl.setValue(existingSize); // Set full product object (not just product_id)
-                        }
-                      }
-
-                      // Subscribe to value changes when the form field changes
-                      //**End of Size selection part */
-                      // Subscribe to value changes of the size field
-                      field.formControl.valueChanges.subscribe(selectedSizeId => {
-                        const product = this.formConfig.model.sale_order_items[currentRowIndex]?.product;
-                        const size = this.formConfig.model.sale_order_items[currentRowIndex]?.size;
-                        const size_id = size?.size_id || null
-                        // Make sure size exists, if exists then assign the drop down options for 'color' filed.
-                        if (size) {
-                          let url = `products/product_variations/?product_id=${product.product_id}&size_id=${size.size_id}`
-                          if (size_id == null) {
-                            url = `products/product_variations/?product_id=${product.product_id}&size_isnull=True`
-                          }
-                          // Fetch available colors based on the selected size
-                          this.http.get(url).subscribe((response: any) => {
-                            const availableColors = response.data.map((variation: any) => {
-                              return {
-                                label: variation.color?.color_name || '----', // Use 'color_name' as the label
-                                value: {
-                                  color_id: variation.color?.color_id || null,
-                                  color_name: variation.color?.color_name || '----'
-                                }
-                              };
-                            });
-                            // Filter unique colors (optional, if there's a chance of duplicate colors)
-                            const uniqueColors = availableColors.filter((item, index, self) => index === self.findIndex((t) => t.value.color_id === item.value.color_id));
-                            // Now, update the color field for the current row
-                            const colorField = parentArray.fieldGroup.find((f: any) => f.key === 'color');
-                            if (colorField) {
-                              // colorField.formControl.setValue(null); // Reset color field value
-                              colorField.templateOptions.options = []
-                              colorField.templateOptions.options = uniqueColors; // Update the options for the 'color' field
-                            }
-                          });
-                        } else {
-                          console.log('Size not selected or invalid.');
-                        };
-                        // -----------------Product Info------------------------
-                        if (product.product_id && selectedSizeId != undefined) {
-                          let url = `products/product_variations/?product_id=${product.product_id}&size_id=${size_id}`;
-                          if (size_id === null) {
-                            url = `products/product_variations/?product_id=${product.product_id}&size_isnull=True`
-                          }
-                          // Call the API using HttpClient (this.http.get)
-                          this.http.get(url).subscribe((data: any) => {
-                            function sumQuantities(dataObject: any): number {
-                              // First, check if the data object contains the array in the 'data' field
-                              if (dataObject && Array.isArray(dataObject.data)) {
-                                // Now we can safely use reduce on dataObject.data
-                                return dataObject.data.reduce((sum, item) => sum + (item.quantity || 0), 0);
-                              } else {
-                                console.error("Data is not an array:", dataObject);
-                                return 0;
-                              }
-                            }
-                            const totalBalance = sumQuantities(data);
-                            const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
-                            if (cardWrapper && data.data[0]) {
-                              // Remove existing product info if present
-                              cardWrapper.querySelector('.center-message')?.remove();
-                              // Display fetched product variation info
-                              const productInfoDiv = document.createElement('div');
-                              productInfoDiv.classList.add('center-message');
-                              productInfoDiv.innerHTML = `
-                                        <span style="color: red;">Product Info:</span>
-                                        <span style="color: blue;">${data.data[0]?.product.name || 'NA'}</span> |
-                                        <span style="color: red;">Balance:</span>
-                                        <span style="color: blue;">${totalBalance}</span> |
-                                        ${this.unitOptionOfProduct} `;
-                              cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
-                              console.log("Size :  Product Info Updated**")
-                            }
-                          },
-                            (error) => {
-                              console.error("Error fetching data:", error);
-                            });
-                        } else {
-                          console.log(`No valid product or size selected for Row ${currentRowIndex}.`);
-                        }
-                        //----------------- End of product info-----------------
-                      });
-                    } else {
+                    if (!parentArray) {
                       console.error('Parent array is undefined or not accessible');
-                    };
-                  },
-                  onChanges: (field: any) => {
-                    field.formControl.valueChanges.subscribe((data: any) => {
-                      const index = field.parent.key;
-                      if (this.formConfig && this.formConfig.model) {
-                        this.formConfig.model['sale_order_items'][index]['size_id'] = data?.size_id;
-                      } else {
-                        console.error('Form config or color model is not defined.');
+                      return;
+                    }
+              
+                    const currentRowIndex = +parentArray.key;
+                    const saleOrderItems = this.dataToPopulate?.sale_order_items?.[currentRowIndex];
+                    
+                    // Populate existing size if available
+                    const existingSize = saleOrderItems?.size;
+                    if (existingSize?.size_id) {
+                      field.formControl.setValue(existingSize);
+                    }
+
+                    // Subscribe to value changes (Merged from onInit & onChanges)
+                    field.formControl.valueChanges.subscribe((selectedSize: any) => {
+                      const product = this.formConfig.model.sale_order_items[currentRowIndex]?.product;
+                      if (!product?.product_id) {
+                        console.warn(`Product missing for row ${currentRowIndex}, skipping color fetch.`);
+                        return;
                       }
+                      this.formConfig.model['sale_order_items'][currentRowIndex]['size_id'] = selectedSize?.size_id;
+              
+                      const size_id = selectedSize?.size_id || null;
+                      const url = size_id
+                        ? `products/product_variations/?product_id=${product.product_id}&size_id=${size_id}`
+                        : `products/product_variations/?product_id=${product.product_id}&size_isnull=True`;
+              
+                      // Fetch available colors based on the selected size
+                      this.http.get(url).subscribe((response: any) => {
+                        if (response.data.length > 0) {
+                          const sizeCount = this.sumQuantities(response);
+                          const unit = this.getUnitData(product);
+                          this.displayInformation(product, selectedSize, null, unit, sizeCount, '');
+                        }
+                        const uniqueColors = response.data.map((variation: any) => ({
+                          label: variation.color?.color_name || '----',
+                          value: {
+                            color_id: variation.color?.color_id || null,
+                            color_name: variation.color?.color_name || '----'
+                          }
+                        })).filter((item, index, self) =>
+                          index === self.findIndex((t) => t.value.color_id === item.value.color_id)
+                        );
+              
+                        // Update color field options
+                        const colorField = parentArray.fieldGroup.find((f: any) => f.key === 'color');
+                        if (colorField) {
+                          colorField.templateOptions.options = uniqueColors;
+                        }
+                      });
                     });
                   }
                 }
@@ -2117,101 +2058,66 @@ export class SalesComponent {
                   placeholder: 'color',
                   options: [],
                   required: false,
-                  lazy: {
-                    lazyOneTime: true
-                  }
+                  lazy: { lazyOneTime: true }
                 },
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key;
-
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
-                        const existingColor = this.dataToPopulate.sale_order_items[currentRowIndex].color;
-
-                        // Set the full product object instead of just the product_id
-                        if (existingColor) {
-                          field.formControl.setValue(existingColor);
-                        }
-                      }
-
-                      // Subscribe to value changes when the form field changes
-                      field.formControl.valueChanges.subscribe(selectedColorId => {
-                        const product = this.formConfig.model.sale_order_items[currentRowIndex]?.product;
-                        const size = this.formConfig.model.sale_order_items[currentRowIndex]?.size;
-                        const color = this.formConfig.model.sale_order_items[currentRowIndex]?.color;
-                        const product_id = product?.product_id;
-                        // Check if product_id, size_id, and color_id exist
-                        if (product_id && size && color) {
-                          const color_id = color?.color_id || null;
-                          let url = `products/product_variations/?product_id=${product.product_id}`;
-                          if (color.color_id === null) {
-                            url += '&color_isnull=True';
-                          } else if (color.color_id) {
-                            url += `&color_id=${color.color_id}`;
-                          }
-                          if (size.size_id === null) {
-                            url += '&size_isnull=True';
-                          } else if (size.size_id) {
-                            url += `&size_id=${size.size_id}`;
-                          }
-                          this.formConfig.model.sale_order_items[currentRowIndex].color_id = color.color_id;
-                          // Call the API using HttpClient (this.http.get)
-                          this.http.get(url).subscribe(
-                            (data: any) => {
-                              const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
-                              if (cardWrapper && data.data[0]) {
-                                cardWrapper.querySelector('.center-message')?.remove();
-                                const productInfoDiv = document.createElement('div');
-                                productInfoDiv.classList.add('center-message');
-                                productInfoDiv.innerHTML = `
-                                        <span style="color: red;">Product Info:</span>
-                                        <span style="color: blue;">${data.data[0].product.name}</span> |
-                                        <span style="color: red;">Size:</span>
-                                        <span style="color: blue;">${data.data[0].size?.size_name || 'NA'}</span> |
-                                        <span style="color: red;">Color:</span>
-                                        <span style="color: blue;">${data.data[0].color?.color_name || 'NA'}</span> |
-                                        <span style="color: red;">Balance:</span>
-                                        <span style="color: blue;">${data.data[0].quantity}</span> |
-                                        ${this.unitOptionOfProduct}`;
-                                cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
-                                console.log("Color :  Product Info Updated**")
-                              } else {
-                                console.log('Color : Data not available.')
-                              }
-                            },
-                            (error) => {
-                              console.error("Error fetching data:", error);
-                            });
-                        } else {
-                          console.log(`No valid Color selected for :${product.name} at Row ${currentRowIndex}.`);
-                          console.log({
-                            product: product?.name,
-                            size: size?.size_name,
-                            color: color?.color_name,
-                            selectedColorId: selectedColorId
-                          })
-                          if (color?.color_id === undefined) {
-                            this.formConfig.model.sale_order_items[currentRowIndex]['color'] = null
-                          }
-                        }
-                      });
+                    if (!parentArray?.key) {
+                      console.error('Parent array key is missing or inaccessible');
+                      return;
                     }
-                  },
-                  onChanges: (field: any) => {
-                    field.formControl.valueChanges.subscribe((data: any) => {
-                      const index = field.parent.key;
-                      if (this.formConfig && this.formConfig.model) {
-                        this.formConfig.model['sale_order_items'][index]['color_id'] = data?.color_id;
-                      } else {
-                        console.error('Form config or color model is not defined.');
+              
+                    const currentRowIndex = Number(parentArray.key);
+                    const saleOrderItems = this.dataToPopulate?.sale_order_items?.[currentRowIndex];
+                    const row = this.formConfig.model.sale_order_items[currentRowIndex];
+              
+                    if (!row) {
+                      console.error(`Row not found for index ${currentRowIndex}`);
+                      return;
+                    }
+              
+                    // Populate existing color if available
+                    if (saleOrderItems?.color) {
+                      field.formControl.setValue(saleOrderItems.color);
+                    }
+              
+                    // Subscribe to value changes & avoid unnecessary API calls
+                    field.formControl.valueChanges.subscribe((selectedColor: any) => {
+                      if (!row.product?.product_id) {
+                        console.warn(`Product missing for row ${currentRowIndex}, skipping color update.`);
+                        return;
                       }
+
+                      this.formConfig.model['sale_order_items'][currentRowIndex]['color_id'] = selectedColor?.color_id;
+              
+                      const color_id = selectedColor?.color_id || null;
+                      console.log('color_id :', color_id)
+              
+                      const url = `products/product_variations/?product_id=${row.product.product_id}`
+                        + (color_id ? `&color_id=${color_id}` : `&color_isnull=True`);
+              
+                      // Update selected color
+                      row.color_id = color_id;
+
+                      console.log('url:', url)
+              
+                      this.http.get(url).subscribe(
+                        (response: any) => {
+                          if (response?.data) {
+                            const colorCount = this.sumQuantities(response);
+                            console.log('Color count:', colorCount);
+                            this.displayInformation(row.product, row.size, selectedColor, '', '', colorCount);
+                          } else {
+                            console.log(`No data found for product_id ${row.product.product_id} and color_id ${color_id}`);
+                          }
+                        },
+                        (error) => console.error("API Error:", error)
+                      );
                     });
                   }
                 }
-              },
+              },                       
               {
                 type: 'input',
                 key: 'code',
@@ -2281,14 +2187,11 @@ export class SalesComponent {
                         const quantity = data;
                         const productDiscount = parseInt(rate) * parseInt(quantity) * parseInt(discount)/ 100
                         if (rate && quantity) {
-                          field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity) - productDiscount) ;
+                          field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity) - productDiscount);
                         }
                       }
                     });
                   },
-                  onChanges: (field: any) => {
-                    // You can handle any changes here if needed
-                  }
                 }
               },
               {
@@ -2372,9 +2275,6 @@ export class SalesComponent {
                       //   }
                       // }
                     });
-                    // field.formControl.valueChanges.subscribe(data => {
-                    //   this.totalAmountCal();
-                    // });
                   }
                 }
               },
@@ -2558,13 +2458,13 @@ export class SalesComponent {
                 },
                 hooks: {
                   onInit: (field) => {
-                    if (field.formControl && field.model) {
-                      field.formControl.setValue(
-                        field.model.billing_address?.includes('Andhra Pradesh') 
-                          ? (parseFloat(field.model.tax_amount) / 2).toFixed(2) 
-                          : '0.00'
-                      );
-                    }
+                    // if (field.formControl && field.model) {
+                    //   field.formControl.setValue(
+                    //     field.model.billing_address?.includes('Andhra Pradesh') 
+                    //       ? (parseFloat(field.model.tax_amount) / 2).toFixed(2) 
+                    //       : '0.00'
+                    //   );
+                    // }
                   }
                 },
                 expressionProperties: {
@@ -2581,13 +2481,13 @@ export class SalesComponent {
                 },
                 hooks: {
                   onInit: (field) => {
-                    if (field.formControl && field.model) {
-                      field.formControl.setValue(
-                        field.model.billing_address?.includes('Andhra Pradesh') 
-                          ? (parseFloat(field.model.tax_amount) / 2).toFixed(2) 
-                          : '0.00'
-                      );
-                    }
+                    // if (field.formControl && field.model) {
+                    //   field.formControl.setValue(
+                    //     field.model.billing_address?.includes('Andhra Pradesh') 
+                    //       ? (parseFloat(field.model.tax_amount) / 2).toFixed(2) 
+                    //       : '0.00'
+                    //   );
+                    // }
                   }
                 },
                 expressionProperties: {
@@ -2604,19 +2504,19 @@ export class SalesComponent {
                 },
                 hooks: {
                   onInit: (field) => {
-                    if (field.formControl && field.model) {
-                      field.formControl.setValue(
-                        field.model.billing_address?.includes('Andhra Pradesh') 
-                          ? (parseFloat(field.model.tax_amount) / 2).toFixed(2) 
-                          : '0.00'
-                      );
-                    }
+                    // if (field.formControl && field.model) {
+                    //   field.formControl.setValue(
+                    //     field.model.billing_address?.includes('Andhra Pradesh') 
+                    //       ? (parseFloat(field.model.tax_amount) / 2).toFixed(2) 
+                    //       : '0.00'
+                    //   );
+                    // }
                   }
                 },
                 expressionProperties: {
                   'templateOptions.disabled': 'true' // Make it read-only
-                }
-              },              
+                },
+              },               
               {
                 type: 'input',
                 key: 'remarks',
@@ -2700,17 +2600,72 @@ export class SalesComponent {
                               },
                               hooks: {
                                 onInit: (field: any) => {
-                                  if (this.dataToPopulate && this.dataToPopulate.sale_order && this.dataToPopulate.sale_order.tax_amount && field.formControl) {
+                                  // Initialize with existing tax_amount if available
+                                  if (
+                                    this.dataToPopulate &&
+                                    this.dataToPopulate.sale_order &&
+                                    this.dataToPopulate.sale_order.tax_amount &&
+                                    field.formControl
+                                  ) {
                                     field.formControl.setValue(this.dataToPopulate.sale_order.tax_amount);
-
-                                    this.totalAmountCal();
-                                  } 
-                                  field.formControl.valueChanges.subscribe(data => {
-                                    // this.totalAmountCal();
-                                  })
+                                  }
+                            
+                                  // Store initial tax_amount as a float value
+                                  let previousTaxAmount = parseFloat(this.dataToPopulate?.sale_order?.tax_amount || "0");
+                            
+                                  // Subscribe to value changes on the tax_amount field
+                                  field.formControl.valueChanges.subscribe(newTaxAmount => {
+                                    if (field.form && field.form.controls && field.form.controls.total_amount) {
+                                      // Parse the current total amount as a float
+                                      const totalAmount = parseFloat(field.form.controls.total_amount.value || "0");
+                                      // Parse the new tax amount as a float
+                                      const currentNewTaxAmount = parseFloat(newTaxAmount || "0");
+                                      // Calculate the updated total by subtracting the previous tax value and adding the new one
+                                      const updatedTotal = totalAmount - previousTaxAmount + currentNewTaxAmount;
+                                      // Update the total_amount field with the new total, fixed to two decimals
+                                      field.form.controls.total_amount.setValue(parseFloat(updatedTotal.toFixed(2)));
+                                      // Update previousTaxAmount for future changes
+                                      previousTaxAmount = currentNewTaxAmount;
+                                      console.log("Updated total_amount:", updatedTotal);
+                                    }
+                                  });
                                 }
                               }
-                            },
+                            },                            
+                            // {
+                            //   key: 'tax_amount',
+                            //   type: 'input',
+                            //   defaultValue: "0",
+                            //   className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                            //   templateOptions: {
+                            //     type: 'number',
+                            //     label: 'Tax amount',
+                            //     placeholder: 'Enter Tax amount'
+                            //   },
+                            //   hooks: {
+                            //     onInit: (field: any) => {
+                            //       if (this.dataToPopulate && this.dataToPopulate.sale_order && this.dataToPopulate.sale_order.tax_amount && field.formControl) {
+                            //         field.formControl.setValue(this.dataToPopulate.sale_order.tax_amount);
+                            //         // this.totalAmountCal();
+                            //       } 
+                                  
+                            //       // Subscribe to value changes
+                            //       field.formControl.valueChanges.subscribe(data => {
+                            //         console.log("we are in method...")
+                            //         if (field.form && field.form.controls && field.form.controls.total_amount && data) {
+                            //           console.log("checking controles : ", field.form.controls);
+                            //           const total_amount = field.form.controls.total_amount.value;
+                            //           // const discount = field.form.controls.discount.value;
+                            //           const tax_amount = data;
+                            //           // const productDiscount = parseInt(tax_amount) + parseInt(total_amount)
+                            //           if (tax_amount && total_amount) {
+                            //             field.form.controls.total_amount.setValue(parseInt(tax_amount) + parseInt(total_amount));
+                            //           }
+                            //         }
+                            //       });
+                            //     }
+                            //   }
+                            // },                                                      
                             {
                               key: 'cess_amount',
                               type: 'input',
@@ -2939,7 +2894,7 @@ export class SalesComponent {
                               defaultValue: "0",
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
-                                type: 'input',
+                                type: 'number',
                                 label: 'Total amount',
                                 placeholder: 'Enter Total amount',
                                 readonly: true
@@ -2949,10 +2904,11 @@ export class SalesComponent {
                                   // Set the initial value from dataToPopulate if available
                                   if (this.dataToPopulate && this.dataToPopulate.sale_order && this.dataToPopulate.sale_order.total_amount && field.formControl) {
                                     field.formControl.setValue(this.dataToPopulate.sale_order.total_amount);
+                                    // this.totalAmountCal();
                                   }
 
                                   field.formControl.valueChanges.subscribe(data => {
-                                    this.totalAmountCal();
+                                    // this.totalAmountCal();
                                   });
                                 }
                               }
@@ -3240,138 +3196,10 @@ export class SalesComponent {
     }
   }
 
-  // totalAmountCal() {
-  //   const data = this.formConfig.model;
-  //   if (data) {
-  //     const products = data.sale_order_items || [];
-  //     let totalAmount = 0;
-  //     let totalDiscount = 0;
-  //     let totalRate = 0;
-  //     let taxAmount = 0; // GST calculation
-  
-  //     if (products.length) {
-  //       products.forEach(product => {
-  //         if (product) {
-  //           const quantity = parseFloat(product.quantity || '0');
-  //           const rate = parseFloat(product.rate || '0');
-  //           const discountPercentage = parseFloat(product.discount || '0'); // Discount in %
-  
-  //           // Calculate item_value (quantity * rate only)
-  //           product.item_value = quantity > 0 ? (quantity * rate).toFixed(2) : "0.00";
-  
-  //           // Calculate discount amount from sale_order_items
-  //           product.discount_amount = (quantity * rate * discountPercentage / 100).toFixed(2);
-  
-  //           // Calculate amount after discount
-  //           product.amount = quantity > 0 ? (quantity * rate - parseFloat(product.discount_amount)).toFixed(2) : "0.00";
-  
-  //           if (quantity > 0) {
-  //             totalRate += parseFloat(product.item_value || 0);
-  //             totalAmount += parseFloat(product.amount || 0);
-  //             totalDiscount += parseFloat(product.discount_amount || 0); // Accumulate discount
-  
-  //             // GST Calculation (total_price * gst_input / 100)
-  //             if (product.product.gst_input) {
-  //               taxAmount += (parseFloat(product.amount || 0) * parseFloat(product.product.gst_input || 0)) / 100;
-  //             }
-  //           }
-  //         }
-  //       });
-  //     }
-  
-  //     if (this.salesForm && this.salesForm.form && this.salesForm.form.controls) {
-  //       const controls: any = this.salesForm.form.controls;
-  
-  //       // Set item_value (totalRate) in form
-  //       controls.sale_order.controls.item_value.setValue(totalRate);
-  //       controls.sale_order.controls.tax_amount.setValue(taxAmount); // Set calculated GST amount
-  
-  //       // Set total discount in form (from sale_order_items)
-  //       controls.sale_order.controls.discount.setValue(totalDiscount.toFixed(2));
-  
-  //       const cessAmount = parseFloat(data.sale_order.cess_amount || 0);
-  //       const advanceAmount = parseFloat(data.sale_order.advance_amount || 0);
-  //       const saleOrderDiscount = parseFloat(data.sale_order.dis_amt || 0); // Additional discount at Sale Order level
-  
-  //       // Final total amount calculation
-  //       const total_amount = (totalAmount + cessAmount + taxAmount) - saleOrderDiscount - advanceAmount;
-  //       controls.sale_order.controls.total_amount.setValue(total_amount.toFixed(2));
-  //     }
-  //   }
-  // }
-  
+
   totalAmountCal() {
-    const data = this.formConfig.model;
-    if (data) {
-      const products = data.sale_order_items || [];
-      let totalAmount = 0;
-      let totalDiscount = 0;
-      let totalRate = 0;
-      let taxAmount = 0; // GST calculation
-  
-      // Fetch billing_address from sale_order model
-      const billingAddress = data.sale_order?.billing_address || '';
-  
-      if (products.length) {
-        products.forEach(product => {
-          if (product) {
-            const quantity = parseFloat(product.quantity || '0');
-            const rate = parseFloat(product.rate || '0');
-            const discountPercentage = parseFloat(product.discount || '0'); // Discount in %
-  
-            // Calculate item_value (quantity * rate only)
-            product.item_value = quantity > 0 ? (quantity * rate).toFixed(2) : "0.00";
-  
-            // Calculate discount amount from sale_order_items
-            product.discount_amount = (quantity * rate * discountPercentage / 100).toFixed(2);
-  
-            // Calculate amount after discount
-            product.amount = quantity > 0 ? (quantity * rate - parseFloat(product.discount_amount)).toFixed(2) : "0.00";
-  
-            if (quantity > 0) {
-              totalRate += parseFloat(product.item_value || 0);
-              totalAmount += parseFloat(product.amount || 0);
-              totalDiscount += parseFloat(product.discount_amount || 0); // Accumulate discount
-  
-              // GST Calculation (total_price * gst_input / 100)
-              if (product.product.gst_input) {
-                taxAmount += (parseFloat(product.amount || 0) * parseFloat(product.product.gst_input || 0)) / 100;
-              }
-  
-              // **Assign CGST, SGST, IGST based on billing_address**
-              if (billingAddress.includes('Andhra Pradesh')) {
-                product.output_cgst = (taxAmount / 2).toFixed(2);
-                product.output_sgst = (taxAmount / 2).toFixed(2);
-                product.output_igst = "0.00";
-              } else {
-                product.output_cgst = "0.00";
-                product.output_sgst = "0.00";
-                product.output_igst = taxAmount.toFixed(2);
-              }
-            }
-          }
-        });
-      }
-  
-      if (this.salesForm && this.salesForm.form && this.salesForm.form.controls) {
-        const controls: any = this.salesForm.form.controls;
-  
-        // Set item_value (totalRate) in form
-        controls.sale_order.controls.item_value.setValue(totalRate);
-        controls.sale_order.controls.tax_amount.setValue(taxAmount); // Set calculated GST amount
-  
-        // Set total discount in form (from sale_order_items)
-        controls.sale_order.controls.discount.setValue(totalDiscount.toFixed(2));
-  
-        const cessAmount = parseFloat(data.sale_order.cess_amount || 0);
-        const advanceAmount = parseFloat(data.sale_order.advance_amount || 0);
-        const saleOrderDiscount = parseFloat(data.sale_order.dis_amt || 0); // Additional discount at Sale Order level
-  
-        // Final total amount calculation
-        const total_amount = (totalAmount + cessAmount + taxAmount) - saleOrderDiscount - advanceAmount;
-        controls.sale_order.controls.total_amount.setValue(total_amount.toFixed(2));
-      }
-    }
+    calculateTotalAmount(this.formConfig.model, 'sale_order_items', this.salesForm?.form);
   }
+  
   
 }

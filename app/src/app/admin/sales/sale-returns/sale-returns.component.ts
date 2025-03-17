@@ -12,6 +12,8 @@ import { SaleinvoiceorderlistComponent } from '../saleinvoiceorderlist/saleinvoi
 import { SaleReturnsListComponent } from './sale-returns-list/sale-returns-list.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { calculateTotalAmount, displayInformation, getUnitData, sumQuantities } from 'src/app/utils/display.utils';
+import { FormlyFieldConfig } from '@ngx-formly/core';
 declare var bootstrap;
 
 
@@ -240,9 +242,84 @@ export class SaleReturnsComponent {
     }
   }
 
+   loadProductVariations(field: FormlyFieldConfig, productValuechange: boolean = false) {
+      const parentArray = field.parent;
+  
+      const product = field.formControl.value; //this.formConfig.model.sale_order_items[currentRowIndex]?.product;
+      // Ensure the product exists before making an HTTP request
+  
+      if (product?.product_id) {
+        const sizeField: any = parentArray.fieldGroup.find((f: any) => f.key === 'size');
+        const colorField: any = parentArray.fieldGroup.find((f: any) => f.key === 'color');
+        if (productValuechange) {
+          sizeField.formControl.setValue(null);
+          colorField.formControl.setValue(null);
+        }
+        // Clear previous options for both size and color fields before adding new ones
+        if (sizeField) sizeField.templateOptions.options = [];
+        if (colorField) colorField.templateOptions.options = [];
+        this.http.get(`products/product_variations/?product_id=${product.product_id}`).subscribe((response: any) => {
+          if (response.data.length > 0) {
+  
+            let availableSizes, availableColors;
+            // Check if response data is non-empty for size
+            if (response.data && response.data.length > 0) {
+              availableSizes = response.data.map((variation: any) => ({
+                label: variation.size?.size_name || '----',
+                value: {
+                  size_id: variation.size?.size_id || null,
+                  size_name: variation.size?.size_name || '----'
+                }
+              }));
+              availableColors = response.data.map((variation: any) => ({
+                label: variation.color?.color_name || '----',
+                value: {
+                  color_id: variation.color?.color_id || null,
+                  color_name: variation.color?.color_name || '----'
+                }
+              }));
+              // Enable and update the size field options if sizes are available
+              if (sizeField) {
+                sizeField.formControl.enable(); // Ensure the field is enabled
+                sizeField.templateOptions.options = availableSizes.filter((item, index, self) => index === self.findIndex((t) => t.value.size_id === item.value.size_id)); // Ensure unique size options
+              }
+            } else {
+              // Clear options and keep the fields enabled, without any selection if no options exist
+              if (sizeField) {
+                sizeField.templateOptions.options = [];
+              }
+              if (colorField) {
+                colorField.templateOptions.options = [];
+              }
+            }
+          }
+        });
+      } else {
+        console.error('Product not selected or invalid.');
+      }
+    };
+
+    async autoFillProductDetails(field, data) {
+      this.productOptions = data;
+      if (!field.form?.controls || !data) return;
+      const fieldMappings = {
+        code: data.code,
+        rate: data.sales_rate || field.form.controls.rate.value,
+        discount: parseFloat(data.dis_amount) || 0,
+        unit_options_id: data.unit_options?.unit_options_id,
+        print_name: data.print_name,
+        mrp: data.mrp
+      };
+    
+      Object.entries(fieldMappings).forEach(([key, value]) => {
+        if (value !== undefined) field.form.controls[key]?.setValue(value);
+      });
+      this.totalAmountCal();
+    }
+
   //--------------------------------------------------------
   getWorkflowId() {
-    return this.http.get('http://195.35.20.172:8000/api/v1/sales/workflows/');
+    return this.http.get('http://127.0.0.1:8000/api/v1/sales/workflows/');
   }
 
 
@@ -267,10 +344,12 @@ export class SaleReturnsComponent {
     // PUT request to update Sale Return Order
     this.http.put(`sales/sale_return_order/${saleReturnId}/`, saleReturnPayload).subscribe(
       (response) => {
-        console.log('Sale Return Order updated successfully', response);
-        // Optionally handle success, e.g., reset the form or navigate
-        this.ngOnInit(); // Hide form after successful update
-        // this.loadSaleReturnOrders(); // Refresh the list if necessary
+        this.showSuccessToast = true;
+        this.toastMessage = 'Record Updated successfully';
+        this.ngOnInit();
+        setTimeout(() => {
+          this.showSuccessToast = false;
+        }, 3000);
       },
       (error) => {
         console.error('Error updating Sale Return Order:', error);
@@ -293,6 +372,8 @@ export class SaleReturnsComponent {
         this.showForm = true; // Show form for editing
         // Show necessary fields for editing
         this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[6].hide = false;
+
+        this.totalAmountCal() //calling calculation in edit mode.
       }
     });
     this.hide();
@@ -900,16 +981,16 @@ export class SaleReturnsComponent {
                   },
                   defaultValue: '0.00'
                 },
-                // {
-                //   key: 'texable_amt',
-                //   type: 'text',
-                //   className: 'col-12',
-                //   templateOptions: {
-                //     label: 'Texable Amt',
-                //     required: false,                    
-                //   },
-                //   defaultValue: '0.00'
-                // },
+                {
+                  key: 'discount',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Discount Amount',
+                    required: false
+                  },
+                  defaultValue: '0.00',
+                },
                 {
                   key: 'cess_amount',
                   type: 'text',
@@ -921,26 +1002,6 @@ export class SaleReturnsComponent {
                   defaultValue: '0.00',
                 },
                 {
-                  key: 'tax_amount',
-                  type: 'text',
-                  className: 'col-12',
-                  templateOptions: {
-                    label: 'Tax Amount',
-                    required: false
-                  },
-                  defaultValue: '0.00',
-                },
-                // {
-                //   key: 'item_value',
-                //   type: 'text',
-                //   className: 'col-12',
-                //   templateOptions: {
-                //     label: 'Total Value',
-                //      required: false
-                //   },
-                //      defaultValue: '0.00'
-                // },
-                {
                   key: 'dis_amt',
                   type: 'text',
                   className: 'col-12',
@@ -951,16 +1012,75 @@ export class SaleReturnsComponent {
                   defaultValue: '0.00'
 
                 },
-                // {
-                //   key: 'advance_amount',
-                //   type: 'text',
-                //   className: 'col-12',
-                //   templateOptions: {
-                //     label: 'Advance Amount',
-                //     required: false
-                //   },
-                //   defaultValue: '0.00'
-                // },
+                {
+                  key: 'cgst',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Output CGST',
+                    required: false
+                  },
+                  defaultValue: '0.00',
+                  expressionProperties: {
+                    'model.cgst': (model, field) => {
+                      if (!field._lastValue || field._lastValue !== model.tax_amount) {
+                        const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
+                        field._lastValue = model.tax_amount; // Store last value to avoid infinite logs
+                      }
+                      return model.billing_address?.includes('Andhra Pradesh') 
+                        ? (parseFloat(model.tax_amount) / 2).toFixed(2) 
+                        : '0.00';
+                    },
+                    'templateOptions.disabled': 'true' // Make it read-only
+                  },
+                  hideExpression: (model) => !model.billing_address || !model.billing_address?.includes('Andhra Pradesh') // Hide CGST for inter-state
+                },
+                {
+                  key: 'sgst',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Output SGST',
+                    required: false
+                  },
+                  defaultValue: '0.00',
+                  expressionProperties: {
+                    'model.sgst': (model, field) => {
+                      if (!field._lastValue || field._lastValue !== model.tax_amount) {
+                        const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
+                        field._lastValue = model.tax_amount;
+                      }
+                      return model.billing_address?.includes('Andhra Pradesh') 
+                        ? (parseFloat(model.tax_amount) / 2).toFixed(2) 
+                        : '0.00';
+                    },
+                    'templateOptions.disabled': 'true' // Make it read-only
+                  },
+                  hideExpression: (model) => !model.billing_address || !model.billing_address?.includes('Andhra Pradesh') // Hide CGST for inter-state
+                },
+                {
+                  key: 'igst',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Output IGST',
+                    required: false
+                  },
+                  defaultValue: '0.00',
+                  expressionProperties: {
+                    'model.igst': (model, field) => {
+                      if (!field._lastValue || field._lastValue !== model.tax_amount) {
+                        const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
+                        field._lastValue = model.tax_amount;
+                      }
+                      return !model.billing_address?.includes('Andhra Pradesh') 
+                        ? parseFloat(model.tax_amount).toFixed(2) 
+                        : '0.00';
+                    },
+                    'templateOptions.disabled': 'true' // Make it read-only
+                  },
+                  hideExpression: (model) => !model.billing_address || model.billing_address?.includes('Andhra Pradesh') // Hide if intra-state
+                },
                 {
                   key: 'total_amount',
                   type: 'text',
@@ -1066,185 +1186,42 @@ export class SaleReturnsComponent {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-                    // Check if parentArray exists and proceed
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
-
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.sale_return_items.length > currentRowIndex) {
-                        const existingProduct = this.dataToPopulate.sale_return_items[currentRowIndex].product;
-
-                        // Set the full product object instead of just the product_id
-                        if (existingProduct) {
-                          field.formControl.setValue(existingProduct); // Set full product object (not just product_id)
-                        }
-                      }
-
-                      // Subscribe to value changes of the field
-                      // ***Size dropdown will populate with available sizes when product in selected***
-                      field.formControl.valueChanges.subscribe(selectedProductId => {
-                        const product = this.formConfig.model.sale_return_items[currentRowIndex]?.product;
-                        console.log("Product id : ", product)
-                        debugger
-                        // Ensure the product exists before making an HTTP request
-                        if (product?.product_id) {
-                          this.http.get(`products/product_variations/?product_id=${product.product_id}`).subscribe((response: any) => {
-                            if (response.data.length > 0) {
-                              const sizeField = parentArray.fieldGroup.find((f: any) => f.key === 'size');
-                              const colorField = parentArray.fieldGroup.find((f: any) => f.key === 'color');
-                              // Clear previous options for both size and color fields before adding new ones
-                              if (sizeField) sizeField.templateOptions.options = [];
-                              if (colorField) colorField.templateOptions.options = [];
-                              let availableSizes, availableColors;
-                              // Check if response data is non-empty for size
-                              if (response.data && response.data.length > 0) {
-                                availableSizes = response.data.map((variation: any) => ({
-                                  label: variation.size?.size_name || '----',
-                                  value: {
-                                    size_id: variation.size?.size_id || null,
-                                    size_name: variation.size?.size_name || '----'
-                                  }
-                                }));
-                                availableColors = response.data.map((variation: any) => ({
-                                  label: variation.color?.color_name || '----',
-                                  value: {
-                                    color_id: variation.color?.color_id || null,
-                                    color_name: variation.color?.color_name || '----'
-                                  }
-                                }));
-                                // Enable and update the size field options if sizes are available
-                                if (sizeField) {
-                                  sizeField.formControl.enable(); // Ensure the field is enabled
-                                  sizeField.templateOptions.options = availableSizes.filter((item, index, self) => index === self.findIndex((t) => t.value.size_id === item.value.size_id)); // Ensure unique size options
-                                }
-                              } else {
-                                // Clear options and keep the fields enabled, without any selection if no options exist
-                                if (sizeField) {
-                                  sizeField.templateOptions.options = [];
-                                }
-                                if (colorField) {
-                                  colorField.templateOptions.options = [];
-                                }
-                              }
-                            } else {
-                              console.log(`For Product: ${product.name}  - No Size and Colors are available setting those to Null**`)
-                              this.formConfig.model.sale_return_items[currentRowIndex]['size_id'] = null;
-                              this.formConfig.model.sale_return_items[currentRowIndex]['color_id'] = null;
-                            }
-                          });
-                        } else {
-                          console.error('Product not selected or invalid.');
-                        }
-                      });
-                      // ***Product Info Text when product is selected code***
-                      field.formControl.valueChanges.subscribe(async selectedProductId => {
-                        const product = this.formConfig.model.sale_return_items[currentRowIndex]?.product;
-                        this.http.get(`products/products_get/?product_id=${product.product_id}`).subscribe({
-                          next: (response: any) => {
-                            // Handle the successful response here
-                            const unitInfo = response.data[0] || {};
-                            // Using optional chaining and nullish coalescing to assign values
-                            const unitOption = unitInfo.unit_options?.unit_name ?? 'NA';
-                            const stockUnit = unitInfo.stock_unit?.stock_unit_name ?? 'NA';
-                            const packUnit = unitInfo.pack_unit?.unit_name ?? 'NA';
-                            const gPackUnit = unitInfo.g_pack_unit?.unit_name ?? 'NA';
-                            const packVsStock = unitInfo.pack_vs_stock ?? 0;
-                            const gPackVsPack = unitInfo.g_pack_vs_pack ?? 0;
-                            // Regular expression to match 'Stock Unit' 'Stock Pack Gpack Unit' & 'Stock Pack Unit'.
-                            const stockUnitReg = /\b[sS][tT][oO][cC][kK][_ ]?[uU][nN][iI][tT]\b/g
-                            const GpackReg = /\b(?:[sS]tock[_ ]?[pP]ack[_ ]?)?[gG][pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
-                            const stockPackReg = /\b[sS][tT][oO][cC][kK][_ ]?[pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g
-                            // Check which pattern matches unit_name
-                            let unitData = ''
-                            if (stockUnitReg.test(unitOption)) {
-                              unitData = `
-                                      <span style="color: red;">Stock Unit:</span> 
-                                      <span style="color: blue;">${stockUnit}</span> | &nbsp;`
-                            } else if (GpackReg.test(unitOption)) {
-                              unitData = `
-                                      <span style="color: red;">Stock Unit:</span> 
-                                      <span style="color: blue;">${stockUnit}</span> |
-                                      <span style="color: red;">Pck Unit:</span> 
-                                      <span style="color: blue;">${packUnit}</span> |
-                                      <span style="color: red;">PackVsStock:</span> 
-                                      <span style="color: blue;">${packVsStock}</span> |
-                                      <span style="color: red;">GPackUnit:</span> 
-                                      <span style="color: blue;">${gPackUnit}</span> |
-                                      <span style="color: red;">GPackVsStock:</span> 
-                                      <span style="color: blue;">${gPackVsPack}</span> | &nbsp;`
-                            } else if (stockPackReg.test(unitOption)) {
-                              unitData = `
-                                      <span style="color: red;">Stock Unit:</span> 
-                                      <span style="color: blue;">${stockUnit}</span> |
-                                      <span style="color: red;">Pack Unit:</span> 
-                                      <span style="color: blue;">${packUnit}</span> |
-                                      <span style="color: red;">PackVsStock:</span> 
-                                      <span style="color: blue;">${packVsStock}</span> | &nbsp;`
-                            } else {
-                              console.log('No Unit Option match found');
-                            }
-                            // Check if a valid product is selected
-                            if (product?.product_id) {
-                              this.formConfig.model.sale_return_items[currentRowIndex].product_id = product.product_id;
-                              const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
-                              if (cardWrapper) {
-                                // Remove existing product info if present
-                                cardWrapper.querySelector('.center-message')?.remove();
-                                // Create and insert new product info
-                                const productInfoDiv = document.createElement('div');
-                                productInfoDiv.classList.add('center-message');
-                                productInfoDiv.innerHTML = `
-                                        <span style="color: red;">Product Info:</span> 
-                                        <span style="color: blue;">${product.name}</span> |                            
-                                        <span style="color: red;">Balance:</span> 
-                                        <span style="color: blue;">${product.balance}</span> |
-                                        ${unitData}`;
-                                cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
-                                this.unitOptionOfProduct = unitData; // save this data to use in color and size
-                                console.log(`Product :  Product Info Updated for ${product.name}**`)
-                              }
-                            } else {
-                              console.log(`No valid product selected for Row ${currentRowIndex}.`);
-                            }
-                          },
-                          error: (err) => {
-                            // Handle errors here
-                          }
-                        });
-                      });
-                    } else {
+                    if (!parentArray) {
                       console.error('Parent array is undefined or not accessible');
-                    };
-                    // ***Product Details Auto Fill Code***
-                    field.formControl.valueChanges.subscribe(data => {
-                      this.productOptions = data;
-                      console.log("Data in products : ", data)
-                      if (field.form && field.form.controls && field.form.controls.code && data && data.code) {
-                        field.form.controls.code.setValue(data.code)
+                      return;
+                    }
+              
+                    const currentRowIndex = +parentArray.key;
+              
+                    // Populate product if data exists
+                    const existingProduct = this.dataToPopulate?.sale_return_items?.[currentRowIndex]?.product;
+                    if (existingProduct) {
+                      field.formControl.setValue(existingProduct);
+                    }
+              
+                    this.loadProductVariations(field);
+              
+                    // Subscribe to value changes (to update sizes dynamically)
+                    field.formControl.valueChanges.subscribe((data: any) => {
+                      if (!this.formConfig.model['sale_return_items'][currentRowIndex]) {
+                        console.error(`Products at index ${currentRowIndex} is not defined. Initializing...`);
+                        this.formConfig.model['sale_return_items'][currentRowIndex] = {};
                       }
-                      if (field.form && field.form.controls && field.form.controls.rate && data && data.mrp) {
-                        field.form.controls.rate.setValue(field.form.controls.rate.value || data.sales_rate)
-                      }
-                      if (field.form && field.form.controls && field.form.controls.discount && data && data.dis_amount) {
-                        field.form.controls.discount.setValue(parseFloat(data.dis_amount))
-                      }
-                      if (field.form && field.form.controls && field.form.controls.unit_options_id && data && data.unit_options && data.unit_options.unit_name) {
-                        field.form.controls.unit_options_id.setValue(data.unit_options.unit_options_id)
-                      }
-                      if (field.form && field.form.controls && field.form.controls.print_name && data && data.print_name) {
-                        field.form.controls.print_name.setValue(data.print_name)
-                      }
-                      if (field.form && field.form.controls && field.form.controls.discount && data && data.dis_amount) {
-                        field.form.controls.discount.setValue(data.dis_amount)
-                      }
-                      if (field.form && field.form.controls && field.form.controls.mrp && data && data.mrp) {
-                        field.form.controls.mrp.setValue(data.mrp)
-                      }
-                      this.totalAmountCal();
+                      this.formConfig.model['sale_return_items'][currentRowIndex]['product_id'] = data?.product_id;
+                      this.loadProductVariations(field);
+                      this.autoFillProductDetails(field, data); // to fill the remaining fields when product is selected.
                     });
+
+                    // Product Info Text code
+                    field.formControl.valueChanges.subscribe( async selectedProductId => {
+                      const unit = getUnitData(selectedProductId);
+                      const row = this.formConfig.model.sale_return_items[currentRowIndex];
+                      displayInformation(row.product, null , null, unit, '', ''); 
+                      console.log('executed from product info text code');                         
+                    }); // end of product info text code
                   }
                 }
-              },
+              },          
               {
                 key: 'size',
                 type: 'select',
@@ -1263,112 +1240,57 @@ export class SaleReturnsComponent {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key;
-
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.sale_return_items.length > currentRowIndex) {
-                        const existingSize = this.dataToPopulate.sale_return_items[currentRowIndex].size;
-
-                        // Set the full product object instead of just the product_id
-                        if (existingSize && existingSize.size_id) {
-                          field.formControl.setValue(existingSize); // Set full product object (not just product_id)
-                        }
-                      }
-
-                      // Subscribe to value changes when the form field changes
-                      //**End of Size selection part */
-                      // Subscribe to value changes of the size field
-                      field.formControl.valueChanges.subscribe(selectedSizeId => {
-                        const product = this.formConfig.model.sale_return_items[currentRowIndex]?.product;
-                        const size = this.formConfig.model.sale_return_items[currentRowIndex]?.size;
-                        const size_id = size?.size_id || null
-                        // Make sure size exists, if exists then assign the drop down options for 'color' filed.
-                        if (size) {
-                          let url = `products/product_variations/?product_id=${product.product_id}&size_id=${size.size_id}`
-                          if (size_id == null) {
-                            url = `products/product_variations/?product_id=${product.product_id}&size_isnull=True`
-                          }
-                          // Fetch available colors based on the selected size
-                          this.http.get(url).subscribe((response: any) => {
-                            const availableColors = response.data.map((variation: any) => {
-                              return {
-                                label: variation.color?.color_name || '----', // Use 'color_name' as the label
-                                value: {
-                                  color_id: variation.color?.color_id || null,
-                                  color_name: variation.color?.color_name || '----'
-                                }
-                              };
-                            });
-                            // Filter unique colors (optional, if there's a chance of duplicate colors)
-                            const uniqueColors = availableColors.filter((item, index, self) => index === self.findIndex((t) => t.value.color_id === item.value.color_id));
-                            // Now, update the color field for the current row
-                            const colorField = parentArray.fieldGroup.find((f: any) => f.key === 'color');
-                            if (colorField) {
-                              // colorField.formControl.setValue(null); // Reset color field value
-                              colorField.templateOptions.options = []
-                              colorField.templateOptions.options = uniqueColors; // Update the options for the 'color' field
-                            }
-                          });
-                        } else {
-                          console.log('Size not selected or invalid.');
-                        };
-                        // -----------------Product Info------------------------
-                        if (product.product_id && selectedSizeId != undefined) {
-                          let url = `products/product_variations/?product_id=${product.product_id}&size_id=${size_id}`;
-                          if (size_id === null) {
-                            url = `products/product_variations/?product_id=${product.product_id}&size_isnull=True`
-                          }
-                          // Call the API using HttpClient (this.http.get)
-                          this.http.get(url).subscribe((data: any) => {
-                            function sumQuantities(dataObject: any): number {
-                              // First, check if the data object contains the array in the 'data' field
-                              if (dataObject && Array.isArray(dataObject.data)) {
-                                // Now we can safely use reduce on dataObject.data
-                                return dataObject.data.reduce((sum, item) => sum + (item.quantity || 0), 0);
-                              } else {
-                                console.error("Data is not an array:", dataObject);
-                                return 0;
-                              }
-                            }
-                            const totalBalance = sumQuantities(data);
-                            const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
-                            if (cardWrapper && data.data[0]) {
-                              // Remove existing product info if present
-                              cardWrapper.querySelector('.center-message')?.remove();
-                              // Display fetched product variation info
-                              const productInfoDiv = document.createElement('div');
-                              productInfoDiv.classList.add('center-message');
-                              productInfoDiv.innerHTML = `
-                                        <span style="color: red;">Product Info:</span>
-                                        <span style="color: blue;">${data.data[0]?.product.name || 'NA'}</span> |
-                                        <span style="color: red;">Balance:</span>
-                                        <span style="color: blue;">${totalBalance}</span> |
-                                        ${this.unitOptionOfProduct} `;
-                              cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
-                              console.log("Size :  Product Info Updated**")
-                            }
-                          },
-                            (error) => {
-                              console.error("Error fetching data:", error);
-                            });
-                        } else {
-                          console.log(`No valid product or size selected for Row ${currentRowIndex}.`);
-                        }
-                        //----------------- End of product info-----------------
-                      });
-                    } else {
+                    if (!parentArray) {
                       console.error('Parent array is undefined or not accessible');
-                    };
-                  },
-                  onChanges: (field: any) => {
-                    field.formControl.valueChanges.subscribe((data: any) => {
-                      const index = field.parent.key;
-                      if (this.formConfig && this.formConfig.model) {
-                        this.formConfig.model['sale_return_items'][index]['size_id'] = data?.size_id;
-                      } else {
-                        console.error('Form config or color model is not defined.');
+                      return;
+                    }
+              
+                    const currentRowIndex = +parentArray.key;
+                    const saleOrderItems = this.dataToPopulate?.sale_return_items?.[currentRowIndex];
+                    
+                    // Populate existing size if available
+                    const existingSize = saleOrderItems?.size;
+                    if (existingSize?.size_id) {
+                      field.formControl.setValue(existingSize);
+                    }
+
+                    // Subscribe to value changes (Merged from onInit & onChanges)
+                    field.formControl.valueChanges.subscribe((selectedSize: any) => {
+                      const product = this.formConfig.model.sale_return_items[currentRowIndex]?.product;
+                      if (!product?.product_id) {
+                        console.warn(`Product missing for row ${currentRowIndex}, skipping color fetch.`);
+                        return;
                       }
+                      this.formConfig.model['sale_return_items'][currentRowIndex]['size_id'] = selectedSize?.size_id;
+              
+                      const size_id = selectedSize?.size_id || null;
+                      const url = size_id
+                        ? `products/product_variations/?product_id=${product.product_id}&size_id=${size_id}`
+                        : `products/product_variations/?product_id=${product.product_id}&size_isnull=True`;
+              
+                      // Fetch available colors based on the selected size
+                      this.http.get(url).subscribe((response: any) => {
+                        if (response.data.length > 0) {
+                          const sizeCount = sumQuantities(response);
+                          const unit = getUnitData(product);
+                          displayInformation(product, selectedSize, null, unit, sizeCount, '');
+                        }
+                        const uniqueColors = response.data.map((variation: any) => ({
+                          label: variation.color?.color_name || '----',
+                          value: {
+                            color_id: variation.color?.color_id || null,
+                            color_name: variation.color?.color_name || '----'
+                          }
+                        })).filter((item, index, self) =>
+                          index === self.findIndex((t) => t.value.color_id === item.value.color_id)
+                        );
+              
+                        // Update color field options
+                        const colorField = parentArray.fieldGroup.find((f: any) => f.key === 'color');
+                        if (colorField) {
+                          colorField.templateOptions.options = uniqueColors;
+                        }
+                      });
                     });
                   }
                 }
@@ -1384,101 +1306,66 @@ export class SaleReturnsComponent {
                   placeholder: 'color',
                   options: [],
                   required: false,
-                  lazy: {
-                    lazyOneTime: true
-                  }
+                  lazy: { lazyOneTime: true }
                 },
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key;
-
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.sale_return_items.length > currentRowIndex) {
-                        const existingColor = this.dataToPopulate.sale_return_items[currentRowIndex].color;
-
-                        // Set the full product object instead of just the product_id
-                        if (existingColor) {
-                          field.formControl.setValue(existingColor);
-                        }
-                      }
-
-                      // Subscribe to value changes when the form field changes
-                      field.formControl.valueChanges.subscribe(selectedColorId => {
-                        const product = this.formConfig.model.sale_return_items[currentRowIndex]?.product;
-                        const size = this.formConfig.model.sale_return_items[currentRowIndex]?.size;
-                        const color = this.formConfig.model.sale_return_items[currentRowIndex]?.color;
-                        const product_id = product?.product_id;
-                        // Check if product_id, size_id, and color_id exist
-                        if (product_id && size && color) {
-                          const color_id = color?.color_id || null;
-                          let url = `products/product_variations/?product_id=${product.product_id}`;
-                          if (color.color_id === null) {
-                            url += '&color_isnull=True';
-                          } else if (color.color_id) {
-                            url += `&color_id=${color.color_id}`;
-                          }
-                          if (size.size_id === null) {
-                            url += '&size_isnull=True';
-                          } else if (size.size_id) {
-                            url += `&size_id=${size.size_id}`;
-                          }
-                          this.formConfig.model.sale_return_items[currentRowIndex].color_id = color.color_id;
-                          // Call the API using HttpClient (this.http.get)
-                          this.http.get(url).subscribe(
-                            (data: any) => {
-                              const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
-                              if (cardWrapper && data.data[0]) {
-                                cardWrapper.querySelector('.center-message')?.remove();
-                                const productInfoDiv = document.createElement('div');
-                                productInfoDiv.classList.add('center-message');
-                                productInfoDiv.innerHTML = `
-                                        <span style="color: red;">Product Info:</span>
-                                        <span style="color: blue;">${data.data[0].product.name}</span> |
-                                        <span style="color: red;">Size:</span>
-                                        <span style="color: blue;">${data.data[0].size?.size_name || 'NA'}</span> |
-                                        <span style="color: red;">Color:</span>
-                                        <span style="color: blue;">${data.data[0].color?.color_name || 'NA'}</span> |
-                                        <span style="color: red;">Balance:</span>
-                                        <span style="color: blue;">${data.data[0].quantity}</span> |
-                                        ${this.unitOptionOfProduct}`;
-                                cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
-                                console.log("Color :  Product Info Updated**")
-                              } else {
-                                console.log('Color : Data not available.')
-                              }
-                            },
-                            (error) => {
-                              console.error("Error fetching data:", error);
-                            });
-                        } else {
-                          console.log(`No valid Color selected for :${product.name} at Row ${currentRowIndex}.`);
-                          console.log({
-                            product: product?.name,
-                            size: size?.size_name,
-                            color: color?.color_name,
-                            selectedColorId: selectedColorId
-                          })
-                          if (color?.color_id === undefined) {
-                            this.formConfig.model.sale_return_items[currentRowIndex]['color'] = null
-                          }
-                        }
-                      });
+                    if (!parentArray?.key) {
+                      console.error('Parent array key is missing or inaccessible');
+                      return;
                     }
-                  },
-                  onChanges: (field: any) => {
-                    field.formControl.valueChanges.subscribe((data: any) => {
-                      const index = field.parent.key;
-                      if (this.formConfig && this.formConfig.model) {
-                        this.formConfig.model['sale_return_items'][index]['color_id'] = data?.color_id;
-                      } else {
-                        console.error('Form config or color model is not defined.');
+              
+                    const currentRowIndex = Number(parentArray.key);
+                    const saleOrderItems = this.dataToPopulate?.sale_return_items?.[currentRowIndex];
+                    const row = this.formConfig.model.sale_return_items[currentRowIndex];
+              
+                    if (!row) {
+                      console.error(`Row not found for index ${currentRowIndex}`);
+                      return;
+                    }
+              
+                    // Populate existing color if available
+                    if (saleOrderItems?.color) {
+                      field.formControl.setValue(saleOrderItems.color);
+                    }
+              
+                    // Subscribe to value changes & avoid unnecessary API calls
+                    field.formControl.valueChanges.subscribe((selectedColor: any) => {
+                      if (!row.product?.product_id) {
+                        console.warn(`Product missing for row ${currentRowIndex}, skipping color update.`);
+                        return;
                       }
+
+                      this.formConfig.model['sale_return_items'][currentRowIndex]['color_id'] = selectedColor?.color_id;
+              
+                      const color_id = selectedColor?.color_id || null;
+                      console.log('color_id :', color_id)
+              
+                      const url = `products/product_variations/?product_id=${row.product.product_id}`
+                        + (color_id ? `&color_id=${color_id}` : `&color_isnull=True`);
+              
+                      // Update selected color
+                      row.color_id = color_id;
+
+                      console.log('url:', url)
+              
+                      this.http.get(url).subscribe(
+                        (response: any) => {
+                          if (response?.data) {
+                            const colorCount = sumQuantities(response);
+                            console.log('Color count:', colorCount);
+                            displayInformation(row.product, row.size, selectedColor, '', '', colorCount);
+                          } else {
+                            console.log(`No data found for product_id ${row.product.product_id} and color_id ${color_id}`);
+                          }
+                        },
+                        (error) => console.error("API Error:", error)
+                      );
                     });
                   }
                 }
-              },
+              },              
               {
                 type: 'input',
                 key: 'code',
@@ -1741,6 +1628,75 @@ export class SaleReturnsComponent {
                   }
                 }
               },
+              {
+                type: 'input',
+                key: 'cgst',
+                templateOptions: {
+                  type: "number",
+                  label: 'CGST',
+                  hideLabel: true
+                },
+                hooks: {
+                  onInit: (field) => {
+                    // if (field.formControl && field.model) {
+                    //   field.formControl.setValue(
+                    //     field.model.billing_address?.includes('Andhra Pradesh') 
+                    //       ? (parseFloat(field.model.tax_amount) / 2).toFixed(2) 
+                    //       : '0.00'
+                    //   );
+                    // }
+                  }
+                },
+                expressionProperties: {
+                  'templateOptions.disabled': 'true' // Make it read-only
+                }
+              },              
+              {
+                type: 'input',
+                key: 'sgst',
+                templateOptions: {
+                  type: "number",
+                  label: 'SGST',
+                  hideLabel: true
+                },
+                hooks: {
+                  onInit: (field) => {
+                    // if (field.formControl && field.model) {
+                    //   field.formControl.setValue(
+                    //     field.model.billing_address?.includes('Andhra Pradesh') 
+                    //       ? (parseFloat(field.model.tax_amount) / 2).toFixed(2) 
+                    //       : '0.00'
+                    //   );
+                    // }
+                  }
+                },
+                expressionProperties: {
+                  'templateOptions.disabled': 'true' // Make it read-only
+                }
+              },              
+              {
+                type: 'input',
+                key: 'igst',
+                templateOptions: {
+                  type: "number",
+                  label: 'IGST',
+                  hideLabel: true
+                },
+                hooks: {
+                  onInit: (field) => {
+                    // if (field.formControl && field.model) {
+                    //   field.formControl.setValue(
+                    //     field.model.billing_address?.includes('Andhra Pradesh') 
+                    //       ? (parseFloat(field.model.tax_amount) / 2).toFixed(2) 
+                    //       : '0.00'
+                    //   );
+                    // }
+                  }
+                },
+                expressionProperties: {
+                  'templateOptions.disabled': 'true' // Make it read-only
+                }
+              }, 
               {
                 type: 'input',
                 key: 'total_boxes',
@@ -2393,46 +2349,9 @@ export class SaleReturnsComponent {
       ]
     };
   }
-
-  totalAmountCal() {
-    const data = this.formConfig.model;
-    console.log('data', data);
-    if (data) {
-      const products = data.sale_return_items || [];
-      let totalAmount = 0;
-      let totalDiscount = 0;
-      let totalRate = 0;
-      let total_amount = 0;
-      if (products) {
-        products.forEach(product => {
-          if (product) {
-            if (product.amount)
-              totalAmount += parseFloat(product.amount || 0);
-            if (product.discount)
-              totalDiscount += parseFloat(product.discount || 0);
-          }
-          // totalRate += parseFloat(product.rate) * parseFloat(product.quantity || 0);
-        });
-      }
-
-
-      if (this.salereturnForm && this.salereturnForm.form && this.salereturnForm.form.controls) {
-        const controls: any = this.salereturnForm.form.controls;
-        controls.sale_return_order.controls.item_value.setValue(totalAmount);
-        controls.sale_return_order.controls.dis_amt.setValue(totalDiscount);
-        const cessAmount = parseFloat(data.sale_return_order.cess_amount || 0);
-        const taxAmount = parseFloat(data.sale_return_order.tax_amount || 0);
-        // const advanceAmount = parseFloat(data.sale_return_order.advance_amount || 0);
-
-        const total_amount = (totalAmount + cessAmount + taxAmount) - totalDiscount;
-        controls.sale_return_order.controls.total_amount.setValue(total_amount);
-
-      }
-    }
-  }
-
   //========================================
-
+  showSuccessToast = false;
+  toastMessage = '';
   submitForm() {
     // Prepare the payload for Sale Return Order creation
     const saleReturnPayload = {
@@ -2441,14 +2360,17 @@ export class SaleReturnsComponent {
       order_attachments: this.formConfig.model.order_attachments,  // Attachments if applicable
       order_shipments: this.formConfig.model.order_shipments,      // Shipment info if applicable
     };
-    console.log("Response of payload in returns : ", saleReturnPayload);
     // First, create the Sale Return record
     this.http.post('sales/sale_return_order/', saleReturnPayload).subscribe(
       (response: any) => {
-        console.log("response in returns : ", response);
-        console.log("sale_return_id_1 in returns : ", response?.data?.sale_return_order?.sale_return_id)
+        this.showSuccessToast = true;
+        this.toastMessage = 'Record created successfully';
+        this.ngOnInit();
+        setTimeout(() => {
+          this.showSuccessToast = false;
+        }, 3000);
         const sale_return_id = response?.data?.sale_return_order?.sale_return_id; // Get the sale_return_id from the response
-        console.log("sale_return_id in returns : ", sale_return_id)
+
 
         if (sale_return_id) {
           console.log('Sale Return created successfully. ID:', sale_return_id);
@@ -2460,14 +2382,12 @@ export class SaleReturnsComponent {
           // Create Sale Order, Credit Note, or Debit Note based on the selection
           if (returnOption === 'Credit Note') {
             this.createCreditNote(sale_return_id);
-            // this.createSaleOrder(sale_return_id);
           } else if (returnOption === 'Sale Order') {
             this.createSaleOrder(sale_return_id);
-          } else if (returnOption === 'Debit Note') {
-            this.createDebitNote(sale_return_id);
-          } else {
-            console.error('Invalid return_option selected');
           }
+          // else if (returnOption === 'Debit Note') {
+          //   this.createDebitNote(sale_return_id);
+          // } 
         }
       },
       (error) => {
@@ -2494,6 +2414,7 @@ export class SaleReturnsComponent {
       }
       const saleOrderPayload = {
         sale_order: {
+          sale_type_id: "d7feff55-a421-44c7-8c16-442e76541713",
           email: SaleOrderpayload.email,
           sale_return_id: sale_return_id,
           order_type: SaleOrderpayload.order_type || 'sale_order',
@@ -2504,15 +2425,15 @@ export class SaleReturnsComponent {
           tax: SaleOrderpayload.tax || 'Inclusive',
           remarks: SaleOrderpayload.remarks,
           advance_amount: SaleOrderpayload.advance_amount,
-          item_value: SaleOrderpayload.item_value,
-          discount: SaleOrderpayload.discount,
-          dis_amt: SaleOrderpayload.dis_amt,
+          item_value: 0.00,
+          discount: 0.00,
+          dis_amt: 0.00,
           taxable: SaleOrderpayload.taxable,
-          tax_amount: SaleOrderpayload.tax_amount,
-          cess_amount: SaleOrderpayload.cess_amount,
+          tax_amount: 0.00,
+          cess_amount: 0.00,
           transport_charges: SaleOrderpayload.transport_charges,
           round_off: SaleOrderpayload.round_off,
-          total_amount: SaleOrderpayload.total_amount,
+          total_amount: 0.00,
           vehicle_name: SaleOrderpayload.vehicle_name,
           total_boxes: SaleOrderpayload.total_boxes,
           shipping_address: SaleOrderpayload.shipping_address,
@@ -2525,13 +2446,13 @@ export class SaleReturnsComponent {
         },
         sale_order_items: SaleOrderItems.map(item => ({
           quantity: item.quantity,
-          unit_price: item.unit_price0,
-          rate: item.rate,
-          amount: item.amount,
+          unit_price: item.unit_price,
+          rate: 0.00,
+          amount: 0.00,
           total_boxes: item.total_boxes,
           discount_percentage: item.discount_percentage,
-          discount: item.discount,
-          dis_amt: item.dis_amt,
+          discount: 0.00,
+          dis_amt: 0.00,
           tax: item.tax || '',
           print_name: item.print_name,
           remarks: item.remarks,
@@ -2550,7 +2471,12 @@ export class SaleReturnsComponent {
       // POST request to create Sale Order
       this.http.post('sales/sale_order/', saleOrderPayload).subscribe(
         (response) => {
-          console.log('Sale Order created successfully');
+          this.showSuccessToast = true;
+          this.toastMessage = 'Sale-Order created successfully';
+          this.ngOnInit();
+          setTimeout(() => {
+            this.showSuccessToast = false;
+          }, 3000);
         },
         (error) => {
           console.error('Error creating Sale Order:', error);
@@ -2584,7 +2510,12 @@ export class SaleReturnsComponent {
     // POST request to create Credit Note
     this.http.post('sales/sale_credit_notes/', creditNotePayload).subscribe(
       (response) => {
-        console.log('Credit Note created successfully');
+        this.showSuccessToast = true;
+        this.toastMessage = 'Credit-Note created successfully';
+        this.ngOnInit();
+        setTimeout(() => {
+          this.showSuccessToast = false;
+        }, 3000);
       },
       (error) => {
         console.error('Error creating Credit Note:', error);
@@ -2594,37 +2525,10 @@ export class SaleReturnsComponent {
     this.ngOnInit();
   }
 
-  // Function to create Debit Note using the sale_return_id
-  createDebitNote(sale_return_id: string) {
-    const debitNotePayload = {
-      sale_debit_note: {
-        customer_id: this.formConfig.model.sale_return_order.customer_id,
-        sale_invoice_id: this.formConfig.model.sale_return_order.sale_invoice_id,
-        sale_return_id: sale_return_id,
-        total_amount: this.formConfig.model.sale_return_order.total_amount,
-        reason: this.formConfig.model.sale_return_order.return_reason,
-        order_status_id: this.formConfig.model.sale_return_order.order_status_id,
-        debit_date: this.nowDate()
-      },
-      sale_debit_note_items: this.formConfig.model.sale_return_items.map(item => ({
-        quantity: item.quantity,
-        price_per_unit: item.rate,
-        total_price: item.amount,
-        product_id: item.product_id
-      }))
-    };
+//===============================================
 
-    // POST request to create Debit Note
-    this.http.post('sales/sale_debit_notes/', debitNotePayload).subscribe(
-      (response) => {
-        console.log('Debit Note created successfully');
-      },
-      (error) => {
-        console.error('Error creating Debit Note:', error);
-      }
-    );
-    this.ngOnInit();
+  totalAmountCal() {
+    calculateTotalAmount(this.formConfig.model, 'sale_return_items', this.salereturnForm?.form);
   }
-
 
 }
