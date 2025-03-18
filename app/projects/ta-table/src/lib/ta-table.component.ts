@@ -572,6 +572,16 @@ export class TaTableComponent implements OnDestroy {
     this.globalSearch();
   }
 
+  refreshIcon() {
+    // Clear any active filters and global search values
+    this.filters = [];
+    this.globalSearchValue = '';
+    if (this.options.globalSearch) {
+      this.options.globalSearch.value = null;
+    }
+    // Reload data starting from page 1 if not already on page 1
+    (this.pageIndex === 1) ? this.loadDataFromServer() : this.pageIndex = 1;
+  }
 
   filterFun(event: any) {
     // console.log(event);

@@ -53,6 +53,9 @@ export class LoginComponent {
           type: 'password',
           placeholder: 'Enter Password',
           required: true,
+          attributes: {
+            style: 'padding-left: 10px;' // Add your padding here
+          }
         }
       }
     ]
