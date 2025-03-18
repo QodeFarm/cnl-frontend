@@ -11,6 +11,7 @@ import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { TaFormlyUiZeroModule } from '../ta-formly-ui-zero/ta-formly-ui-zero.module';
 import { TaFormSharedModule } from './ta-form-shared.module';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'ta-form',
@@ -99,7 +100,7 @@ export class TaFormComponent implements OnInit {
   formlyOptions: FormlyFormOptions | any = {
     formState: { user: TaLocalStorage.getItem('user') }
   };
-  constructor(private formS: TaFormService, private taAction: TaActionService, private notification: NzNotificationService) { }
+  constructor(private formS: TaFormService, private taAction: TaActionService, private notification: NzNotificationService ,private router: Router) { }
 
   ngOnInit(): void {
     //this.options.model = {};
@@ -135,62 +136,140 @@ export class TaFormComponent implements OnInit {
   }
 
 
+  // onSubmit() {
+  //   if (this.form.valid) {
+  //     if (this.options.url) {
+  //       this.isLoading = true;
+  //       if (this.options.exParams && this.options.exParams.length > 0) {
+  //         this.options.model = { ...this.options.model, ...this.taAction.getParams(this.options.exParams, this.options.model) };
+  //       }
+  //       this.formS.saveForm(this.options.url, this.options.model, this.options).subscribe((res: any) => {
+  //         this.isLoading = false;
+  //         if (res.success || res) {
+
+
+  //           let msg = res.message || 'Save Successfull';
+  //           if (this.options.submit) {
+  //             if (this.options.submit.submittedFn) {
+  //               this.options.submit.submittedFn(res);
+  //             }
+
+  //             if (this.options.submit.actions) {
+  //               this.taAction.doActions(this.options.submit.actions, { res: res, result: res.data });
+  //             }
+
+  //             if (this.options.submit.successMsg)
+  //               msg = this.options.submit.successMsg;
+  //           }
+  //           this.notification.success(msg, '');
+  //           this.formlyOptions.resetModel();
+  //         } else {
+  //           // if (res.error && res.error.message) {
+  //           //   this.notification.error(res.error.message, '')
+  //           // } else if (res.message) {
+  //           //   this.notification.error(res.message, '')
+  //           // } else {
+  //           //   this.notification.error('Failure Error', '')
+  //           // }
+  //         }
+
+  //         // this.form.reset();
+  //       }, error => {
+  //         // debugger;
+  //         this.isLoading = false;
+  //         if (error.error) {
+  //           const e = Object.keys(error.error);
+  //           const erors = error.error;
+  //           if (e) {
+  //             e.forEach(er => {
+  //               if (erors[er] && erors[er][0]) {
+  //                 // this.notification.error(erors[er][0], '');
+  //               }
+  //             });
+  //           }
+  //         }
+
+  //         // this.notification.error('Failure Error', '')
+
+  //       });
+  //     } else {
+  //       if (this.options.submit && this.options.submit.submittedFn) {
+  //         this.options.submit.submittedFn(this.options.model);
+  //       }
+  //     }
+  //   }
+  // }
+
   onSubmit() {
     if (this.form.valid) {
       if (this.options.url) {
         this.isLoading = true;
         if (this.options.exParams && this.options.exParams.length > 0) {
-          this.options.model = { ...this.options.model, ...this.taAction.getParams(this.options.exParams, this.options.model) };
+          this.options.model = {
+            ...this.options.model,
+            ...this.taAction.getParams(this.options.exParams, this.options.model)
+          };
         }
-        this.formS.saveForm(this.options.url, this.options.model, this.options).subscribe((res: any) => {
-          this.isLoading = false;
-          if (res.success || res) {
+  
+        this.formS.saveForm(this.options.url, this.options.model, this.options).subscribe(
+          (res: any) => {
+            this.isLoading = false;
+            if (res.success || res) {
+              let msg = res.message || 'Save Successful';
+  
+              // Store authentication token if login is successful
+              if (res.data && res.data.length > 0) {
+                const token = res.data[0];  // Assuming token is in res.data[0]
+                localStorage.setItem('authToken', token);
+                msg = 'Login Successful';
 
+                // this.form.reset();
 
-            let msg = res.message || 'Save Successfull';
-            if (this.options.submit) {
-              if (this.options.submit.submittedFn) {
-                this.options.submit.submittedFn(res);
+  
+                //Redirect to dashboard after successful login
+                setTimeout(() => {
+                  this.router.navigate(['/dashboard']);
+
+                }, 1000);
               }
-
-              if (this.options.submit.actions) {
-                this.taAction.doActions(this.options.submit.actions, { res: res, result: res.data });
-              }
-
-              if (this.options.submit.successMsg)
-                msg = this.options.submit.successMsg;
-            }
-            this.notification.success(msg, '');
-            this.formlyOptions.resetModel();
-          } else {
-            // if (res.error && res.error.message) {
-            //   this.notification.error(res.error.message, '')
-            // } else if (res.message) {
-            //   this.notification.error(res.message, '')
-            // } else {
-            //   this.notification.error('Failure Error', '')
-            // }
-          }
-
-          // this.form.reset();
-        }, error => {
-          // debugger;
-          this.isLoading = false;
-          if (error.error) {
-            const e = Object.keys(error.error);
-            const erors = error.error;
-            if (e) {
-              e.forEach(er => {
-                if (erors[er] && erors[er][0]) {
-                  // this.notification.error(erors[er][0], '');
+  
+              if (this.options.submit) {
+                if (this.options.submit.submittedFn) {
+                  this.options.submit.submittedFn(res);
                 }
-              });
+  
+                if (this.options.submit.actions) {
+                  this.taAction.doActions(this.options.submit.actions, { res: res, result: res.data });
+                }
+  
+                if (this.options.submit.successMsg) {
+                  msg = this.options.submit.successMsg;
+                }
+              }
+  
+              this.notification.success(msg, '');
+              this.formlyOptions.resetModel();
+            } else {
+              this.notification.error('Login Failed', res.message || 'Invalid credentials');
+            }
+
+          },
+          (error) => {
+            this.isLoading = false;
+            console.log('API Error:', error);
+  
+            this.notification.remove();
+  
+            //  Show the correct error message
+            if (error.status === 401 && error.error && error.error.msg) {
+              this.notification.error('Login Failed', error.error.msg);  
+            } else if (error.status === 404) {
+              this.notification.error('Server Error', 'Login API not found! Check the backend URL.');
+            } else {
+              this.notification.error('Unexpected Error', 'An unexpected error occurred. Please try again.');
             }
           }
-
-          // this.notification.error('Failure Error', '')
-
-        });
+        );
       } else {
         if (this.options.submit && this.options.submit.submittedFn) {
           this.options.submit.submittedFn(this.options.model);

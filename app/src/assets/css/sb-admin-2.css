@@ -5976,6 +5976,7 @@ a.close.disabled {
     height: 100%;
     overflow: hidden;
     outline: 0;
+    pointer-events: none;
 }
 
 .modal-dialog {
@@ -5988,8 +5989,12 @@ a.close.disabled {
 .modal.fade .modal-dialog {
     transition: transform 0.3s ease-out;
     transform: translate(0, -50px);
-    border: solid 2px white;
+   
     border-radius: 0.3rem;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    margin-block: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -6062,7 +6067,7 @@ a.close.disabled {
     pointer-events: auto;
     background-color: #fff;
     background-clip: padding-box;
-    border: 1px solid rgba(0, 0, 0, 0.2);
+    border: solid 2px white;
     border-radius: 0.3rem;
     outline: 0;
 }

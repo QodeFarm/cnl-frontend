@@ -97,8 +97,10 @@ export class AdminLayoutComponent {
   layertoggleMenu() {
     document.body.classList.remove("sidebar-toggled");
     const sidebarElement = this.elementRef.nativeElement.querySelector('.sidebar');
+    const menuOverlayElement = this.elementRef.nativeElement.querySelector('.menu-overlay'); 
     if (sidebarElement) {
       this.renderer.removeClass(sidebarElement, 'toggled');
+      this.renderer.removeClass(menuOverlayElement, 'menuBglayer');
     }
   }
   ngOnInit() {
@@ -392,6 +394,7 @@ export class AdminLayoutComponent {
     if (windowWidth < 480 && this.elementRef.nativeElement.querySelector('.sidebar').classList.contains('toggled')) {
       this.renderer.removeClass(document.body, 'sidebar-toggled');
       this.renderer.removeClass(this.elementRef.nativeElement.querySelector('.sidebar'), 'toggled');
+      this.renderer.removeClass(this.elementRef.nativeElement.querySelector('.menu-overlay'), 'menuBglayer');
       //this.hideSidebarCollapse();
     }
     // if (windowWidth < 480 && !this.elementRef.nativeElement.querySelector('.sidebar').classList.contains('toggled')) {
@@ -417,8 +420,9 @@ export class AdminLayoutComponent {
 
     // Toggle the class on the element with class "sidebar"
     const sidebar: any = document.querySelector(".sidebar");
+    const menuOverlay: any = document.querySelector(".menu-overlay");
     sidebar.classList.toggle("toggled");
-
+    menuOverlay.classList.toggle("menuBglayer");
     // Check if the "sidebar" element has the class "toggled"
     if (sidebar.classList.contains("toggled")) {
       // Get all elements with class "collapse" that are descendants of the "sidebar" element
@@ -634,7 +638,7 @@ export class AdminLayoutComponent {
       description: roleDescription // Set the role description in the payload
     };
 
-    this.http.post('http://195.35.20.172:8000/api/v1/users/role/', payload)
+    this.http.post('https://apicore.cnlerp.com/api/v1/users/role/', payload)
       .subscribe(
         response => console.log('Role created:', response),
         error => console.error('Error creating role:', error)
@@ -646,7 +650,7 @@ export class AdminLayoutComponent {
     endpoint = endpoint.replace(/\s+/g, '_'); // Convert endpoint name to snake_case
     const payload = { group_name: name }; // Set the name in the payload
 
-    this.http.post(`http://195.35.20.172:8000/api/v1/products/${endpoint}/`, payload)
+    this.http.post(`https://apicore.cnlerp.com/api/v1/products/${endpoint}/`, payload)
       .subscribe(
         response => console.log('Data Created:', response),
         error => console.error('Error creating item:', error)
@@ -670,12 +674,12 @@ export class AdminLayoutComponent {
       // Submit the form after speech recognition is complete
       this.recognition.onend = () => {
         console.log('Submitting form with data:', formData);
-        this.http.post('http://195.35.20.172:8000/api/v1/sale_order/', formData)
+        this.http.post('https://apicore.cnlerp.com/api/v1/sale_order/', formData)
           .subscribe(
             response => {
               console.log('Form submitted successfully:', response);
               // Call the users/role API after form submission
-              this.http.post('http://195.35.20.172:8000/api/v1/users/role/', formData)
+              this.http.post('https://apicore.cnlerp.com/api/v1/users/role/', formData)
                 .subscribe(
                   roleResponse => console.log('Role API called successfully:', roleResponse),
                   roleError => console.error('Error calling Role API:', roleError)
