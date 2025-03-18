@@ -128,17 +128,15 @@ export class FinancialReportComponent {
             {
               className: 'col-12 custom-form-card-block w-100 p-0',
               fieldGroup: [
-                // {
-                //   template: '<div class="custom-form-card-title"> Order Attachments </div>',
-                //   fieldGroupClassName: "ant-row",
-                // },
                 {
                   key: 'file_path',
                   type: 'file',
                   className: 'ta-cell col-12 col-md-6 custom-file-attachement',
                   props: {
+                    label: 'File Path',
                     "displayStyle": "files",
-                    "multiple": false
+                    "multiple": false,
+                    
                   },
                 }
               ]
