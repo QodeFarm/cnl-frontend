@@ -468,7 +468,7 @@ export class ProductsComponent implements OnInit {
                     {
                       key: 'product_variations',
                       type: 'table',
-                      className: 'custom-form-list no-ant-card',
+                      className: 'custom-form-list product-table',
                       templateOptions: {
                         // title: 'Product Variations',
                         addText: 'Add New Variations',
@@ -564,7 +564,7 @@ export class ProductsComponent implements OnInit {
                       {
                         key: 'product_item_balance',
                         type: 'table',
-                        className: 'custom-form-list no-ant-card',
+                        className: 'custom-form-list product-table',
                         templateOptions: {
                         addText: 'Add Warehouse Locations',
                         tableCols: [

@@ -208,7 +208,7 @@ export class BomComponent {
         {
           key: 'bill_of_material',
           type: 'table',
-          className: 'custom-form-list',
+          className: 'custom-form-list product-table',
           templateOptions: {
             title: 'Bill Of Material',
             addText: 'Add Materials',

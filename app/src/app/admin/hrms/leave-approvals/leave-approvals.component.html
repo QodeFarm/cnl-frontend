@@ -5,12 +5,12 @@
                 <div class="after-search me-2" after-search>
                     <button class="btn btn-primary text-nowrap" *ngIf="curdConfig?.tableConfig?.checkedRows && curdConfig.tableConfig?.checkedRows?.length > 0" (click)="bulkApproval()">Bulk Approval ({{curdConfig?.tableConfig?.checkedRows?.length}})</button>
                 </div>
-                <div class="before-search me-2" before-search>
+                <!-- <div class="before-search me-2" before-search>
                     <button (click)="curdConfig.tableConfig.reload()"  class="btn btn-primary text-nowrap">Reload Table</button>
                 </div>
                 <div class="bottom-left me-2" bottom-left>
                     <button (click)="curdConfig.tableConfig.reload()" class="btn btn-primary text-nowrap">reload</button>
-                </div>
+                </div> -->
             </ta-curd-modal>
         </div>
     </div>

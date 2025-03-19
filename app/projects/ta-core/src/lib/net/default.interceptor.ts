@@ -161,10 +161,36 @@ export class DefaultInterceptor implements HttpInterceptor {
     }
 
     // Fallback for other HTTP status codes
-    const errortext = "An error occurred. Please try again.";
+    let errorText = "An unexpected error occurred. Please try again.";
+    if (ev.error && ev.error.message) {
+        errorText = ev.error.message; // Use API-provided message if available
+    } else {
+        // Handle Specific Error Codes
+        switch (ev.status) {
+            case 400:
+                errorText = "Bad Request! Please check your input.";
+                break;
+            case 401:
+                errorText = "Unauthorized! The username or password entered is invalid!";
+                break;
+            case 403:
+                errorText = "Access Denied! You do not have permission.";
+                break;
+            case 404:
+                errorText = "The requested resource was not found.";
+                break;
+            case 500:
+                errorText = "Server Error! Something went wrong on our end.";
+                break;
+            default:
+                errorText = "An error occurred. Please try again.";
+        }
+    }
+    console.warn(' Showing Notification:', errorText);
+
     this.notification.error(
-      errorMsg,
-      errortext,
+      'Error',
+      errorText,
       { nzDuration: 5000, nzStyle: { backgroundColor: '#fff9f9', border: '1px solid #ffa39e', maxWidth: '600px' } }
     );
   }

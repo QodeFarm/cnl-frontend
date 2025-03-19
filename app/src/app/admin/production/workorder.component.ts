@@ -842,7 +842,7 @@ curdConfig: TaCurdConfig = {
                 {
                   key: 'bom',
                   type: 'table',
-                  className: 'custom-form-list',
+                  className: 'custom-form-list product-table',
                   templateOptions: {
                     addText: 'Add Materials',
                     tableCols: [
@@ -1121,7 +1121,7 @@ curdConfig: TaCurdConfig = {
                   {
                     key: 'workers',
                     type: 'table',
-                    className: 'custom-form-list',
+                    className: 'custom-form-list product-table',
                     templateOptions: {
                       addText: 'Add Worker',
                       tableCols: [
@@ -1186,7 +1186,7 @@ curdConfig: TaCurdConfig = {
                   {
                     key: 'work_order_machines',
                     type: 'table',
-                    className: 'custom-form-list',
+                    className: 'custom-form-list product-table',
                     templateOptions: {
                       addText: 'Add Machine',
                       tableCols: [
@@ -1239,7 +1239,7 @@ curdConfig: TaCurdConfig = {
                   {
                     key: 'work_order_stages',
                     type: 'table',
-                    className: 'custom-form-list',
+                    className: 'custom-form-list product-table',
                     templateOptions: {
                       addText: 'Add Work Level',
                       tableCols: [
