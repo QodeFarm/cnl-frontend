@@ -12,8 +12,8 @@ import { SaleinvoiceorderlistComponent } from '../saleinvoiceorderlist/saleinvoi
 import { SaleReturnsListComponent } from './sale-returns-list/sale-returns-list.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { calculateTotalAmount, displayInformation, getUnitData, sumQuantities } from 'src/app/utils/display.utils';
 import { CustomFieldHelper } from '../../utils/custom_field_fetch';
-import { displayInformation, getUnitData, sumQuantities } from 'src/app/utils/display.utils';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 declare var bootstrap;
 
@@ -340,7 +340,7 @@ export class SaleReturnsComponent {
     const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
 
     // Determine the entity type and ID dynamically
-    const entityId = '7323d24c-50e9-4546-a161-bbb160ffa127'; // Since we're in the Sale Order form
+    const entityId ='7323d24c-50e9-4546-a161-bbb160ffa127'; //'7323d24c-50e9-4546-a161-bbb160ffa127'; // Since we're in the Sale Order form
     const customId = this.formConfig.model.sale_return_order?.sale_return_id || null; // Ensure correct sale_order_id
 
     // Construct payload for custom fields based on updated values
@@ -393,6 +393,7 @@ export class SaleReturnsComponent {
         // Show necessary fields for editing
         this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[6].hide = false;
 
+        this.totalAmountCal() //calling calculation in edit mode.
         // Ensure custom_field_values are correctly populated in the model
         if (res.data.custom_field_values) {
           this.formConfig.model['custom_field_values'] = res.data.custom_field_values.reduce((acc: any, fieldValue: any) => {
@@ -1008,16 +1009,16 @@ export class SaleReturnsComponent {
                   },
                   defaultValue: '0.00'
                 },
-                // {
-                //   key: 'texable_amt',
-                //   type: 'text',
-                //   className: 'col-12',
-                //   templateOptions: {
-                //     label: 'Texable Amt',
-                //     required: false,                    
-                //   },
-                //   defaultValue: '0.00'
-                // },
+                {
+                  key: 'discount',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Discount Amount',
+                    required: false
+                  },
+                  defaultValue: '0.00',
+                },
                 {
                   key: 'cess_amount',
                   type: 'text',
@@ -1029,26 +1030,6 @@ export class SaleReturnsComponent {
                   defaultValue: '0.00',
                 },
                 {
-                  key: 'tax_amount',
-                  type: 'text',
-                  className: 'col-12',
-                  templateOptions: {
-                    label: 'Tax Amount',
-                    required: false
-                  },
-                  defaultValue: '0.00',
-                },
-                // {
-                //   key: 'item_value',
-                //   type: 'text',
-                //   className: 'col-12',
-                //   templateOptions: {
-                //     label: 'Total Value',
-                //      required: false
-                //   },
-                //      defaultValue: '0.00'
-                // },
-                {
                   key: 'dis_amt',
                   type: 'text',
                   className: 'col-12',
@@ -1059,16 +1040,75 @@ export class SaleReturnsComponent {
                   defaultValue: '0.00'
 
                 },
-                // {
-                //   key: 'advance_amount',
-                //   type: 'text',
-                //   className: 'col-12',
-                //   templateOptions: {
-                //     label: 'Advance Amount',
-                //     required: false
-                //   },
-                //   defaultValue: '0.00'
-                // },
+                {
+                  key: 'cgst',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Output CGST',
+                    required: false
+                  },
+                  defaultValue: '0.00',
+                  expressionProperties: {
+                    'model.cgst': (model, field) => {
+                      if (!field._lastValue || field._lastValue !== model.tax_amount) {
+                        const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
+                        field._lastValue = model.tax_amount; // Store last value to avoid infinite logs
+                      }
+                      return model.billing_address?.includes('Andhra Pradesh') 
+                        ? (parseFloat(model.tax_amount) / 2).toFixed(2) 
+                        : '0.00';
+                    },
+                    'templateOptions.disabled': 'true' // Make it read-only
+                  },
+                  hideExpression: (model) => !model.billing_address || !model.billing_address?.includes('Andhra Pradesh') // Hide CGST for inter-state
+                },
+                {
+                  key: 'sgst',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Output SGST',
+                    required: false
+                  },
+                  defaultValue: '0.00',
+                  expressionProperties: {
+                    'model.sgst': (model, field) => {
+                      if (!field._lastValue || field._lastValue !== model.tax_amount) {
+                        const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
+                        field._lastValue = model.tax_amount;
+                      }
+                      return model.billing_address?.includes('Andhra Pradesh') 
+                        ? (parseFloat(model.tax_amount) / 2).toFixed(2) 
+                        : '0.00';
+                    },
+                    'templateOptions.disabled': 'true' // Make it read-only
+                  },
+                  hideExpression: (model) => !model.billing_address || !model.billing_address?.includes('Andhra Pradesh') // Hide CGST for inter-state
+                },
+                {
+                  key: 'igst',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Output IGST',
+                    required: false
+                  },
+                  defaultValue: '0.00',
+                  expressionProperties: {
+                    'model.igst': (model, field) => {
+                      if (!field._lastValue || field._lastValue !== model.tax_amount) {
+                        const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
+                        field._lastValue = model.tax_amount;
+                      }
+                      return !model.billing_address?.includes('Andhra Pradesh') 
+                        ? parseFloat(model.tax_amount).toFixed(2) 
+                        : '0.00';
+                    },
+                    'templateOptions.disabled': 'true' // Make it read-only
+                  },
+                  hideExpression: (model) => !model.billing_address || model.billing_address?.includes('Andhra Pradesh') // Hide if intra-state
+                },
                 {
                   key: 'total_amount',
                   type: 'text',
@@ -1616,6 +1656,75 @@ export class SaleReturnsComponent {
                   }
                 }
               },
+              {
+                type: 'input',
+                key: 'cgst',
+                templateOptions: {
+                  type: "number",
+                  label: 'CGST',
+                  hideLabel: true
+                },
+                hooks: {
+                  onInit: (field) => {
+                    // if (field.formControl && field.model) {
+                    //   field.formControl.setValue(
+                    //     field.model.billing_address?.includes('Andhra Pradesh') 
+                    //       ? (parseFloat(field.model.tax_amount) / 2).toFixed(2) 
+                    //       : '0.00'
+                    //   );
+                    // }
+                  }
+                },
+                expressionProperties: {
+                  'templateOptions.disabled': 'true' // Make it read-only
+                }
+              },              
+              {
+                type: 'input',
+                key: 'sgst',
+                templateOptions: {
+                  type: "number",
+                  label: 'SGST',
+                  hideLabel: true
+                },
+                hooks: {
+                  onInit: (field) => {
+                    // if (field.formControl && field.model) {
+                    //   field.formControl.setValue(
+                    //     field.model.billing_address?.includes('Andhra Pradesh') 
+                    //       ? (parseFloat(field.model.tax_amount) / 2).toFixed(2) 
+                    //       : '0.00'
+                    //   );
+                    // }
+                  }
+                },
+                expressionProperties: {
+                  'templateOptions.disabled': 'true' // Make it read-only
+                }
+              },              
+              {
+                type: 'input',
+                key: 'igst',
+                templateOptions: {
+                  type: "number",
+                  label: 'IGST',
+                  hideLabel: true
+                },
+                hooks: {
+                  onInit: (field) => {
+                    // if (field.formControl && field.model) {
+                    //   field.formControl.setValue(
+                    //     field.model.billing_address?.includes('Andhra Pradesh') 
+                    //       ? (parseFloat(field.model.tax_amount) / 2).toFixed(2) 
+                    //       : '0.00'
+                    //   );
+                    // }
+                  }
+                },
+                expressionProperties: {
+                  'templateOptions.disabled': 'true' // Make it read-only
+                }
+              }, 
               {
                 type: 'input',
                 key: 'total_boxes',
@@ -2268,44 +2377,6 @@ export class SaleReturnsComponent {
       ]
     };
   }
-
-  totalAmountCal() {
-    const data = this.formConfig.model;
-    console.log('data', data);
-    if (data) {
-      const products = data.sale_return_items || [];
-      let totalAmount = 0;
-      let totalDiscount = 0;
-      let totalRate = 0;
-      let total_amount = 0;
-      if (products) {
-        products.forEach(product => {
-          if (product) {
-            if (product.amount)
-              totalAmount += parseFloat(product.amount || 0);
-            if (product.discount)
-              totalDiscount += parseFloat(product.discount || 0);
-          }
-          // totalRate += parseFloat(product.rate) * parseFloat(product.quantity || 0);
-        });
-      }
-
-
-      if (this.salereturnForm && this.salereturnForm.form && this.salereturnForm.form.controls) {
-        const controls: any = this.salereturnForm.form.controls;
-        controls.sale_return_order.controls.item_value.setValue(totalAmount);
-        controls.sale_return_order.controls.dis_amt.setValue(totalDiscount);
-        const cessAmount = parseFloat(data.sale_return_order.cess_amount || 0);
-        const taxAmount = parseFloat(data.sale_return_order.tax_amount || 0);
-        // const advanceAmount = parseFloat(data.sale_return_order.advance_amount || 0);
-
-        const total_amount = (totalAmount + cessAmount + taxAmount) - totalDiscount;
-        controls.sale_return_order.controls.total_amount.setValue(total_amount);
-
-      }
-    }
-  }
-
   //========================================
   showSuccessToast = false;
   toastMessage = '';
@@ -2324,7 +2395,7 @@ export class SaleReturnsComponent {
     const customFieldValues = this.formConfig.model['custom_field_values']
 
     // Determine the entity type and ID dynamically
-    const entityId = '7323d24c-50e9-4546-a161-bbb160ffa127'; // Since we're in the Sale Invoice form
+    const entityId = '7323d24c-50e9-4546-a161-bbb160ffa127'; //'7323d24c-50e9-4546-a161-bbb160ffa127'; // Since we're in the Sale Invoice form
     const customId = this.formConfig.model.sale_return_order?.sale_return_id || null; // Ensure correct sale_order_id
   
     // Construct payload for custom fields
@@ -2350,19 +2421,23 @@ export class SaleReturnsComponent {
     // First, create the Sale Return record
     this.http.post('sales/sale_return_order/', payload).subscribe(
       (response: any) => {
-        console.log("response in returns : ", response);
-        console.log("sale_return_id_1 in returns : ", response?.data?.sale_return_order?.sale_return_id)
+        // this.showSuccessToast = true;
+        // this.toastMessage = 'Record created successfully';
+        // this.ngOnInit();
+        // setTimeout(() => {
+        //   this.showSuccessToast = false;
+        // }, 3000);
         const sale_return_id = response?.data?.sale_return_order?.sale_return_id; // Get the sale_return_id from the response
-        console.log("sale_return_id in returns : ", sale_return_id)
+
 
         if (sale_return_id) {
-          console.log('Sale Return created successfully. ID:', sale_return_id);
-          this.showSuccessToast = true;
-            this.toastMessage = 'Record created successfully';
-            this.ngOnInit();
-            setTimeout(() => {
-              this.showSuccessToast = false;
-            }, 3000);
+          // console.log('Sale Return created successfully. ID:', sale_return_id);
+          // this.showSuccessToast = true;
+          //   this.toastMessage = 'Record created successfully';
+          //   this.ngOnInit();
+          //   setTimeout(() => {
+          //     this.showSuccessToast = false;
+          //   }, 3000);
 
           // Now based on the return_option, create the respective entity
           const returnOption = this.formConfig.model.sale_return_order.return_option.name;
@@ -2371,32 +2446,12 @@ export class SaleReturnsComponent {
           // Create Sale Order, Credit Note, or Debit Note based on the selection
           if (returnOption === 'Credit Note') {
             this.createCreditNote(sale_return_id);
-            this.showSuccessToast = true;
-            this.toastMessage = 'Credit Note Record created successfully';
-            this.ngOnInit();
-            setTimeout(() => {
-              this.showSuccessToast = false;
-            }, 3000);
-            // this.createSaleOrder(sale_return_id);
           } else if (returnOption === 'Sale Order') {
             this.createSaleOrder(sale_return_id);
-            this.showSuccessToast = true;
-            this.toastMessage = 'Sale Order Record created successfully';
-            this.ngOnInit();
-            setTimeout(() => {
-              this.showSuccessToast = false;
-            }, 3000);
-          } else if (returnOption === 'Debit Note') {
-            this.createDebitNote(sale_return_id);
-            this.showSuccessToast = true;
-            this.toastMessage = 'Debit Note Record created successfully';
-            this.ngOnInit();
-            setTimeout(() => {
-              this.showSuccessToast = false;
-            }, 3000);
-          } else {
-            console.error('Invalid return_option selected');
           }
+          // else if (returnOption === 'Debit Note') {
+          //   this.createDebitNote(sale_return_id);
+          // } 
         }
       },
       (error) => {
@@ -2407,6 +2462,7 @@ export class SaleReturnsComponent {
 
   // Function to create Sale Order using the sale_return_id
   createSaleOrder(sale_return_id: string) {
+    console.log("We entered into method sale order ...");
     const SaleOrderpayload = this.formConfig.model.sale_return_order
     const SaleOrderItems = this.formConfig.model.sale_return_items
     const OrderAttachments = this.formConfig.model.order_attachments
@@ -2423,6 +2479,7 @@ export class SaleReturnsComponent {
       }
       const saleOrderPayload = {
         sale_order: {
+          sale_type_id: "d7feff55-a421-44c7-8c16-442e76541713",
           email: SaleOrderpayload.email,
           sale_return_id: sale_return_id,
           order_type: SaleOrderpayload.order_type || 'sale_order',
@@ -2432,16 +2489,17 @@ export class SaleReturnsComponent {
           ref_date: SaleOrderpayload.ref_date || this.nowDate(),
           tax: SaleOrderpayload.tax || 'Inclusive',
           remarks: SaleOrderpayload.remarks,
-          advance_amount: SaleOrderpayload.advance_amount,
-          item_value: SaleOrderpayload.item_value,
-          discount: SaleOrderpayload.discount,
-          dis_amt: SaleOrderpayload.dis_amt,
+          // advance_amount: SaleOrderpayload.advance_amount,
+          item_value: 0.00,
+          discount: 0.00,
+          dis_amt: 0.00,
           taxable: SaleOrderpayload.taxable,
-          tax_amount: SaleOrderpayload.tax_amount,
-          cess_amount: SaleOrderpayload.cess_amount,
+          tax_amount: 0.00,
+          cess_amount: 0.00,
+          advance_amount: SaleOrderpayload.total_amount,
           transport_charges: SaleOrderpayload.transport_charges,
           round_off: SaleOrderpayload.round_off,
-          total_amount: SaleOrderpayload.total_amount,
+          total_amount: 0.00,
           vehicle_name: SaleOrderpayload.vehicle_name,
           total_boxes: SaleOrderpayload.total_boxes,
           shipping_address: SaleOrderpayload.shipping_address,
@@ -2454,13 +2512,13 @@ export class SaleReturnsComponent {
         },
         sale_order_items: SaleOrderItems.map(item => ({
           quantity: item.quantity,
-          unit_price: item.unit_price0,
-          rate: item.rate,
-          amount: item.amount,
+          unit_price: item.unit_price,
+          rate: 0.00,
+          amount: 0.00,
           total_boxes: item.total_boxes,
           discount_percentage: item.discount_percentage,
-          discount: item.discount,
-          dis_amt: item.dis_amt,
+          discount: 0.00,
+          dis_amt: 0.00,
           tax: item.tax || '',
           print_name: item.print_name,
           remarks: item.remarks,
@@ -2479,7 +2537,13 @@ export class SaleReturnsComponent {
       // POST request to create Sale Order
       this.http.post('sales/sale_order/', saleOrderPayload).subscribe(
         (response) => {
-          console.log('Sale Order created successfully');
+          // console.log("response sale order : ", response);
+          this.showSuccessToast = true;
+          this.toastMessage = 'Sale-Order created successfully';
+          this.ngOnInit();
+          setTimeout(() => {
+            this.showSuccessToast = false;
+          }, 3000);
         },
         (error) => {
           console.error('Error creating Sale Order:', error);
@@ -2513,7 +2577,12 @@ export class SaleReturnsComponent {
     // POST request to create Credit Note
     this.http.post('sales/sale_credit_notes/', creditNotePayload).subscribe(
       (response) => {
-        console.log('Credit Note created successfully');
+        this.showSuccessToast = true;
+        this.toastMessage = 'Credit-Note created successfully';
+        this.ngOnInit();
+        setTimeout(() => {
+          this.showSuccessToast = false;
+        }, 3000);
       },
       (error) => {
         console.error('Error creating Credit Note:', error);
@@ -2523,37 +2592,10 @@ export class SaleReturnsComponent {
     this.ngOnInit();
   }
 
-  // Function to create Debit Note using the sale_return_id
-  createDebitNote(sale_return_id: string) {
-    const debitNotePayload = {
-      sale_debit_note: {
-        customer_id: this.formConfig.model.sale_return_order.customer_id,
-        sale_invoice_id: this.formConfig.model.sale_return_order.sale_invoice_id,
-        sale_return_id: sale_return_id,
-        total_amount: this.formConfig.model.sale_return_order.total_amount,
-        reason: this.formConfig.model.sale_return_order.return_reason,
-        order_status_id: this.formConfig.model.sale_return_order.order_status_id,
-        debit_date: this.nowDate()
-      },
-      sale_debit_note_items: this.formConfig.model.sale_return_items.map(item => ({
-        quantity: item.quantity,
-        price_per_unit: item.rate,
-        total_price: item.amount,
-        product_id: item.product_id
-      }))
-    };
+//===============================================
 
-    // POST request to create Debit Note
-    this.http.post('sales/sale_debit_notes/', debitNotePayload).subscribe(
-      (response) => {
-        console.log('Debit Note created successfully');
-      },
-      (error) => {
-        console.error('Error creating Debit Note:', error);
-      }
-    );
-    this.ngOnInit();
+  totalAmountCal() {
+    calculateTotalAmount(this.formConfig.model, 'sale_return_items', this.salereturnForm?.form);
   }
-
 
 }

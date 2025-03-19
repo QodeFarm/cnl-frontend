@@ -8,6 +8,7 @@ import { BudgetComponent } from './budget/budget.component';
 import { ExpenseClaimComponent } from './expense-claim/expense-claim.component';
 import { FinancialReportComponent } from './financial-report/financial-report.component';
 import { JournalEntryComponent } from './journal-entry/journal-entry.component';
+import { GstDetailsComponent } from './gst-details/gst-details.component';
 
 const routes: Routes = [
   {
@@ -41,6 +42,10 @@ const routes: Routes = [
   {
     path: 'journal-entry',
     component: JournalEntryComponent,
+  },
+  {
+    path: 'gst',
+    component: GstDetailsComponent,
   }
 ];
 

@@ -370,13 +370,48 @@ export class ProductsComponent implements OnInit {
                 {
                   className: 'col-md-4 col-sm-6 col-12',
                   key: 'hsn_code',
-                  type: 'input',
+                  type: 'select',
                   templateOptions: {
-                  label: 'HSN',
-                  placeholder: 'Enter HSN Code',
-                  required: false
+                    label: 'HSN',
+                    placeholder: 'Enter or Select HSN Code',
+                    required: false,
+                    options: [
+                      { value: '0101', label: '0101' },
+                      { value: '0201', label: '0201' },
+                      { value: '0301', label: '0301' },
+                      { value: '0401', label: '0401' },
+                      { value: '0501', label: '0501' }
+                    ],
+                    // allowCustomValue: true // Allow users to enter their own value
                   }
-                },
+                }, 
+                {
+                  className: 'col-md-4 col-sm-6 col-12',
+                  key: 'gst_input',
+                  type: 'select',
+                  templateOptions: {
+                    label: 'GST Percentage',
+                    placeholder: 'Select GST Percentage',
+                    required: false,
+                    options: [
+                      { value: 3, label: '3%' },
+                      { value: 5, label: '5%' },
+                      { value: 9, label: '9%' },
+                      { value: 12, label: '12%' },
+                      { value: 18, label: '18%' }
+                    ]
+                  }
+                },                                               
+                // {
+                //   className: 'col-md-4 col-sm-6 col-12',
+                //   key: 'hsn_code',
+                //   type: 'input',
+                //   templateOptions: {
+                //   label: 'HSN',
+                //   placeholder: 'Enter HSN Code',
+                //   required: false
+                //   }
+                // },
                 
                 {
                   className: 'col-md-4 col-sm-6 col-12',
@@ -626,15 +661,15 @@ export class ProductsComponent implements OnInit {
                                 }
                               }
                             },
-                            {
-                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                              key: 'gst_input',
-                              type: 'input',
-                              templateOptions: {
-                                label: 'GST Input',
-                                placeholder: 'Enter GST Input'
-                              }
-                            },                            
+                            // {
+                            //   className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                            //   key: 'gst_input',
+                            //   type: 'input',
+                            //   templateOptions: {
+                            //     label: 'GST Input',
+                            //     placeholder: 'Enter GST Input'
+                            //   }
+                            // },                            
                           ]
                         },
                       ]

@@ -143,8 +143,8 @@ export class SalesListComponent {
         sort: true
       },
       {
-        fieldKey: 'amount',
-        name: 'Amount',
+        fieldKey: 'total_amount',
+        name: 'Total Amount',
         sort: true
       },
       {

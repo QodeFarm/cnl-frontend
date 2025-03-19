@@ -90,6 +90,7 @@ const routes: Routes = [
       { path: 'finance/budget', data: { title: 'Budget', moduleName: 'budget' }, canActivate: [], loadComponent: () => import('./admin/finance/budget/budget.component').then(m => m.BudgetComponent) },
       { path: 'finance/expense-claim', data: { title: 'Expense Claim', moduleName: 'expense-claim' }, canActivate: [], loadComponent: () => import('./admin/finance/expense-claim/expense-claim.component').then(m => m.ExpenseClaimComponent) },
       { path: 'finance/financial-report', data: { title: 'Financial Report', moduleName: 'financial-report' }, canActivate: [], loadComponent: () => import('./admin/finance/financial-report/financial-report.component').then(m => m.FinancialReportComponent) },
+      { path: 'finance/gst', data: { title: 'GST', moduleName: 'gst-details' }, canActivate: [], loadComponent: () => import('./admin/finance/gst-details/gst-details.component').then(m => m.GstDetailsComponent) },
 
       //Company Module
       { path: 'company', data: { title: 'Company', moduleName: 'company' }, canActivate: [], loadComponent: () => import('./admin/company/company.component').then(m => m.CompanyComponent) },

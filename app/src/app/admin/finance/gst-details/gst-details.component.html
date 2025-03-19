@@ -1,0 +1,20 @@
+<div class="gst-summary">
+    <h2>GST Summary</h2>
+  
+    <div class="gst-info">
+      <p><strong>Total Invoices:</strong> {{ totalInvoices }}</p>
+      <p><strong>Total Tax Collected:</strong> ₹{{ totalTaxCollected }}</p>
+    </div>
+  
+    <div class="gst-info">
+      <p><strong>Total Purchases:</strong> {{ totalPurchases }}</p>
+      <p><strong>Total Tax Paid:</strong> ₹{{ totalTaxPaid }}</p>
+    </div>
+  
+    <div class="gst-info">
+      <p><strong>Tax Amount:</strong> ₹{{ taxAmount }}</p>
+    </div>
+  
+    <button (click)="fileGST()" class="btn-primary">File GST</button>
+  </div>
+  

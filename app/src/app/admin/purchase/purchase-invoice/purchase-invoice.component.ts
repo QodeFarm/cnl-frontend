@@ -8,7 +8,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder } from '@angular/forms';
 import { CustomFieldHelper } from '../../utils/custom_field_fetch';
 import { FormlyFieldConfig } from '@ngx-formly/core';
-import { displayInformation, getUnitData, sumQuantities } from 'src/app/utils/display.utils';
+import { calculateTotalAmount, displayInformation, getUnitData, sumQuantities } from 'src/app/utils/display.utils';
 
 @Component({
   selector: 'app-purchase-invoice',
@@ -328,6 +328,7 @@ export class PurchaseInvoiceComponent {
         // show form after setting form values
         this.formConfig.model['purchase_invoice_id'] = this.PurchaseInvoiceEditID;
         this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = false;
+        this.totalAmountCal();
         this.showForm = true;
 
         // Ensure custom_field_values are correctly populated in the model
@@ -770,16 +771,6 @@ loadQuickpackProducts() {
                   }, 
                   defaultValue: '0.00'                    
                 },
-                // {
-                //   key: 'texable_amt',
-                //   type: 'text',
-                //   className: 'col-12',
-                //   templateOptions: {
-                //     label: 'Texable Amt',
-                //     required: false,                    
-                //   },
-                //   defaultValue: '0.00'
-                // },
                 {
                   key: 'cess_amount',
                   type: 'text',
@@ -791,25 +782,16 @@ loadQuickpackProducts() {
                   defaultValue: '0.00',
                 },
                 {
-                  key: 'tax_amount',
+                  key: 'discount',
                   type: 'text',
                   className: 'col-12',
                   templateOptions: {
-                    label: 'Tax Amount',
-                    required: false
+                    label: 'Product Disocunt',
+                     required: false
                   },
-                  defaultValue: '0.00',
+                  defaultValue: '0.00'
+
                 },
-                // {
-                //   key: 'item_value',
-                //   type: 'text',
-                //   className: 'col-12',
-                //   templateOptions: {
-                //     label: 'Total Value',
-                //      required: false
-                //   },
-                //      defaultValue: '0.00'
-                // },
                 {
                   key: 'dis_amt',
                   type: 'text',
@@ -819,8 +801,76 @@ loadQuickpackProducts() {
                      required: false
                   },
                   defaultValue: '0.00'
-
                 },
+                {
+                  key: 'cgst',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Output CGST',
+                    required: false
+                  },
+                  defaultValue: '0.00',
+                  expressionProperties: {
+                    'model.cgst': (model, field) => {
+                      if (!field._lastValue || field._lastValue !== model.tax_amount) {
+                        const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
+                        field._lastValue = model.tax_amount; // Store last value to avoid infinite logs
+                      }
+                      return model.billing_address?.includes('Andhra Pradesh') 
+                        ? (parseFloat(model.tax_amount) / 2).toFixed(2) 
+                        : '0.00';
+                    },
+                    'templateOptions.disabled': 'true' // Make it read-only
+                  },
+                  hideExpression: (model) => !model.billing_address || !model.billing_address?.includes('Andhra Pradesh') // Hide CGST for inter-state
+                },
+                {
+                  key: 'sgst',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Output SGST',
+                    required: false
+                  },
+                  defaultValue: '0.00',
+                  expressionProperties: {
+                    'model.sgst': (model, field) => {
+                      if (!field._lastValue || field._lastValue !== model.tax_amount) {
+                        const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
+                        field._lastValue = model.tax_amount;
+                      }
+                      return model.billing_address?.includes('Andhra Pradesh') 
+                        ? (parseFloat(model.tax_amount) / 2).toFixed(2) 
+                        : '0.00';
+                    },
+                    'templateOptions.disabled': 'true' // Make it read-only
+                  },
+                  hideExpression: (model) => !model.billing_address || !model.billing_address?.includes('Andhra Pradesh') // Hide CGST for inter-state
+                },
+                {
+                  key: 'igst',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Output IGST',
+                    required: false
+                  },
+                  defaultValue: '0.00',
+                  expressionProperties: {
+                    'model.igst': (model, field) => {
+                      if (!field._lastValue || field._lastValue !== model.tax_amount) {
+                        const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
+                        field._lastValue = model.tax_amount;
+                      }
+                      return !model.billing_address?.includes('Andhra Pradesh') 
+                        ? parseFloat(model.tax_amount).toFixed(2) 
+                        : '0.00';
+                    },
+                    'templateOptions.disabled': 'true' // Make it read-only
+                  },
+                  hideExpression: (model) => !model.billing_address || model.billing_address?.includes('Andhra Pradesh') // Hide if intra-state
+                }, 
                 {
                   key: 'advance_amount',
                   type: 'text',
@@ -1182,11 +1232,14 @@ loadQuickpackProducts() {
               
                     // Subscribe to value changes
                     field.formControl.valueChanges.subscribe(data => {
+                      // this.totalAmountCal();
                       if (field.form && field.form.controls && field.form.controls.rate && data) {
                         const rate = field.form.controls.rate.value;
+                        const discount = field.form.controls.discount.value;
                         const quantity = data;
+                        const productDiscount = parseInt(rate) * parseInt(quantity) * parseInt(discount)/ 100
                         if (rate && quantity) {
-                          field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity));
+                          field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity) - productDiscount) ;
                         }
                       }
                     });
@@ -1318,35 +1371,6 @@ loadQuickpackProducts() {
                 },
               },
               {
-                type: 'input',
-                key: 'print_name',
-                templateOptions: {
-                  label: 'Print name',
-                  placeholder: 'name',
-                  hideLabel: true
-                },
-                hooks: {
-                  onInit: (field: any) => {
-                    const parentArray = field.parent;
-              
-                    // Check if parentArray exists and proceed
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
-              
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_items.length > currentRowIndex) {
-                        const existingName = this.dataToPopulate.purchase_invoice_items[currentRowIndex].print_name;
-                        
-                        // Set the full product object instead of just the product_id
-                        if (existingName) {
-                          field.formControl.setValue(existingName); // Set full product object (not just product_id)
-                        }
-                      }
-                    }
-                  }
-                }
-              },
-              {
                 type: 'select',
                 key: 'unit_options_id',
                 templateOptions: {
@@ -1381,6 +1405,104 @@ loadQuickpackProducts() {
                       }
                     }
                   }
+                }
+              },
+              {
+                type: 'input',
+                key: 'print_name',
+                templateOptions: {
+                  label: 'Print name',
+                  placeholder: 'name',
+                  hideLabel: true
+                },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_items.length > currentRowIndex) {
+                        const existingName = this.dataToPopulate.purchase_invoice_items[currentRowIndex].print_name;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingName) {
+                          field.formControl.setValue(existingName); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                type: 'input',
+                key: 'cgst',
+                templateOptions: {
+                  type: "number",
+                  label: 'CGST',
+                  hideLabel: true
+                },
+                hooks: {
+                  onInit: (field) => {
+                    // if (field.formControl && field.model) {
+                    //   field.formControl.setValue(
+                    //     field.model.billing_address?.includes('Andhra Pradesh') 
+                    //       ? (parseFloat(field.model.tax_amount) / 2).toFixed(2) 
+                    //       : '0.00'
+                    //   );
+                    // }
+                  }
+                },
+                expressionProperties: {
+                  'templateOptions.disabled': 'true' // Make it read-only
+                }
+              },              
+              {
+                type: 'input',
+                key: 'sgst',
+                templateOptions: {
+                  type: "number",
+                  label: 'SGST',
+                  hideLabel: true
+                },
+                hooks: {
+                  onInit: (field) => {
+                    // if (field.formControl && field.model) {
+                    //   field.formControl.setValue(
+                    //     field.model.billing_address?.includes('Andhra Pradesh') 
+                    //       ? (parseFloat(field.model.tax_amount) / 2).toFixed(2) 
+                    //       : '0.00'
+                    //   );
+                    // }
+                  }
+                },
+                expressionProperties: {
+                  'templateOptions.disabled': 'true' // Make it read-only
+                }
+              },              
+              {
+                type: 'input',
+                key: 'igst',
+                templateOptions: {
+                  type: "number",
+                  label: 'IGST',
+                  hideLabel: true
+                },
+                hooks: {
+                  onInit: (field) => {
+                    // if (field.formControl && field.model) {
+                    //   field.formControl.setValue(
+                    //     field.model.billing_address?.includes('Andhra Pradesh') 
+                    //       ? (parseFloat(field.model.tax_amount) / 2).toFixed(2) 
+                    //       : '0.00'
+                    //   );
+                    // }
+                  }
+                },
+                expressionProperties: {
+                  'templateOptions.disabled': 'true' // Make it read-only
                 }
               },
               {
@@ -1518,6 +1640,7 @@ loadQuickpackProducts() {
                                 onInit: (field: any) => {
                                   if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders && this.dataToPopulate.purchase_invoice_orders.tax_amount && field.formControl) {
                                     field.formControl.setValue(this.dataToPopulate.purchase_invoice_orders.tax_amount);
+                                    this.totalAmountCal();
                                   }
                                   field.formControl.valueChanges.subscribe(data => {
                                     this.totalAmountCal();
@@ -2047,39 +2170,7 @@ loadQuickpackProducts() {
   }
 
   totalAmountCal() {
-    const data = this.formConfig.model;
-    if (data) {
-      const products = data.purchase_invoice_items || [];
-      let totalAmount = 0;
-      let totalDiscount = 0;
-      let totalRate = 0;
-      let total_amount = 0;
-      if (products) {
-        products.forEach(product => {
-          if (product) {
-            if (product.amount)
-              totalAmount += parseFloat(product.amount || 0);
-            if (product.discount)
-              totalDiscount += parseFloat(product.discount || 0);
-          }
-          // totalRate += parseFloat(product.rate) * parseFloat(product.quantity || 0);
-        });
-      }
-
-
-      if (this.purchaseinvoiceForm && this.purchaseinvoiceForm.form && this.purchaseinvoiceForm.form.controls) {
-        const controls: any = this.purchaseinvoiceForm.form.controls;
-        controls.purchase_invoice_orders.controls.item_value.setValue(totalAmount);
-        controls.purchase_invoice_orders.controls.dis_amt.setValue(totalDiscount);
-        const cessAmount = parseFloat(data.purchase_invoice_orders.cess_amount || 0);
-        const taxAmount = parseFloat(data.purchase_invoice_orders.tax_amount || 0);
-        const advanceAmount = parseFloat(data.purchase_invoice_orders.advance_amount || 0);
-
-        const total_amount = (totalAmount + cessAmount + taxAmount) - totalDiscount - advanceAmount;
-        controls.purchase_invoice_orders.controls.total_amount.setValue(total_amount);
-
-      }
-    }
+    calculateTotalAmount(this.formConfig.model, 'purchase_invoice_items', this.purchaseinvoiceForm?.form);
   }
 
 }

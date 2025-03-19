@@ -12,6 +12,7 @@ import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { SalesinvoiceComponent } from './salesinvoice/salesinvoice.component';
 import { BindingType } from '@angular/compiler';
 import { FormlyField, FormlyFieldConfig } from '@ngx-formly/core';
+import { calculateTotalAmount } from 'src/app/utils/display.utils';
 import { CustomFieldHelper } from '../utils/custom_field_fetch';
 declare var bootstrap;
 @Component({
@@ -415,18 +416,14 @@ export class SalesComponent {
         // show form after setting form values
         this.formConfig.pkId = 'sale_order_id';
         this.formConfig.model['flow_status'] = res.data.sale_order.flow_status;
-        console.log("flow_status in edit  : ", this.formConfig.model['sale_order']['flow_status']);
+        this.formConfig.model['tax_amount'] = res.data.sale_order.tax_amount;
         this.formConfig.submit.label = 'Update';
         this.formConfig.model['sale_order_id'] = this.SaleOrderEditID;
         this.showForm = true;
         this.formConfig.fields[0].fieldGroup[0].fieldGroup[8].hide = false;
         this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = false;
-        // this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[9].hide = false;
-        // Load sale_order_items with selected status
-        //   this.saleOrderItems = res.data.sale_order.sale_order_items.map(item => ({
-        //     ...item,
-        //     selected: false
-        // }));
+
+        this.totalAmountCal();
 
         // Ensure custom_field_values are correctly populated in the model
         if (res.data.custom_field_values) {
@@ -1421,10 +1418,6 @@ export class SalesComponent {
           const customer = this.formConfig.model.sale_order.customer; // Get the customer details
           console.log("Customer in formconfig : ", customer);
           console.log("Customer.credit_limit : ", customer.credit_limit);
-          // if (!customer || !customer.credit_limit) {
-          //   console.error("Customer information or credit limit is missing.");
-          //   return;
-          // }
 
           const maxLimit = parseFloat(customer.credit_limit); // Convert credit limit to number
           console.log(`Total Amount: ${totalAmount}, Credit Limit: ${maxLimit}`);
@@ -1669,6 +1662,7 @@ export class SalesComponent {
                         const saleOrderItems = this.formConfig.model['sale_order_items'];
                         const orderAttachments = this.formConfig.model['order_attachments'];
                         const orderShipments = this.formConfig.model['order_shipments'];
+
                         const totalAmount = () => {
                           if (!Array.isArray(saleOrderItems) || saleOrderItems.length === 0) {
                             console.log("No items found, returning 0");
@@ -1695,11 +1689,11 @@ export class SalesComponent {
                             tax: saleOrder.tax || 'Inclusive',
                             remarks: saleOrder.remarks,
                             advance_amount: saleOrder.advance_amount || '0',
-                            item_value: saleOrder.item_value,
+                            item_value: totalAmount(),
                             discount: saleOrder.discount,
                             dis_amt: saleOrder.dis_amt,
                             taxable: saleOrder.taxable,
-                            tax_amount: saleOrder.tax_amount,
+                            // tax_amount: saleOrder.tax_amount,
                             cess_amount: saleOrder.cess_amount,
                             transport_charges: saleOrder.transport_charges,
                             round_off: saleOrder.round_off,
@@ -1762,16 +1756,16 @@ export class SalesComponent {
                   },
                   defaultValue: '0.00'
                 },
-                // {
-                //   key: 'texable_amt',
-                //   type: 'text',
-                //   className: 'col-12',
-                //   templateOptions: {
-                //     label: 'Texable Amt',
-                //     required: false,                    
-                //   },
-                //   defaultValue: '0.00'
-                // },
+                {
+                  key: 'discount',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Product disocunt',
+                    required: false
+                  },
+                  defaultValue: '0.00'
+                },
                 {
                   key: 'cess_amount',
                   type: 'text',
@@ -1783,26 +1777,6 @@ export class SalesComponent {
                   defaultValue: '0.00',
                 },
                 {
-                  key: 'tax_amount',
-                  type: 'text',
-                  className: 'col-12',
-                  templateOptions: {
-                    label: 'Tax Amount',
-                    required: false
-                  },
-                  defaultValue: '0.00',
-                },
-                // {
-                //   key: 'item_value',
-                //   type: 'text',
-                //   className: 'col-12',
-                //   templateOptions: {
-                //     label: 'Total Value',
-                //      required: false
-                //   },
-                //      defaultValue: '0.00'
-                // },
-                {
                   key: 'dis_amt',
                   type: 'text',
                   className: 'col-12',
@@ -1812,7 +1786,76 @@ export class SalesComponent {
                   },
                   defaultValue: '0.00'
 
+                },              
+                {
+                  key: 'cgst',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Output CGST',
+                    required: false
+                  },
+                  defaultValue: '0.00',
+                  expressionProperties: {
+                    'model.cgst': (model, field) => {
+                      if (!field._lastValue || field._lastValue !== model.tax_amount) {
+                        const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
+                        field._lastValue = model.tax_amount; // Store last value to avoid infinite logs
+                      }
+                      return model.billing_address?.includes('Andhra Pradesh') 
+                        ? (parseFloat(model.tax_amount) / 2).toFixed(2) 
+                        : '0.00';
+                    },
+                    'templateOptions.disabled': 'true' // Make it read-only
+                  },
+                  hideExpression: (model) => !model.billing_address || !model.billing_address?.includes('Andhra Pradesh') // Hide CGST for inter-state
                 },
+                {
+                  key: 'sgst',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Output SGST',
+                    required: false
+                  },
+                  defaultValue: '0.00',
+                  expressionProperties: {
+                    'model.sgst': (model, field) => {
+                      if (!field._lastValue || field._lastValue !== model.tax_amount) {
+                        const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
+                        field._lastValue = model.tax_amount;
+                      }
+                      return model.billing_address?.includes('Andhra Pradesh') 
+                        ? (parseFloat(model.tax_amount) / 2).toFixed(2) 
+                        : '0.00';
+                    },
+                    'templateOptions.disabled': 'true' // Make it read-only
+                  },
+                  hideExpression: (model) => !model.billing_address || !model.billing_address?.includes('Andhra Pradesh') // Hide CGST for inter-state
+                },
+                {
+                  key: 'igst',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Output IGST',
+                    required: false
+                  },
+                  defaultValue: '0.00',
+                  expressionProperties: {
+                    'model.igst': (model, field) => {
+                      if (!field._lastValue || field._lastValue !== model.tax_amount) {
+                        const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
+                        field._lastValue = model.tax_amount;
+                      }
+                      return !model.billing_address?.includes('Andhra Pradesh') 
+                        ? parseFloat(model.tax_amount).toFixed(2) 
+                        : '0.00';
+                    },
+                    'templateOptions.disabled': 'true' // Make it read-only
+                  },
+                  hideExpression: (model) => !model.billing_address || model.billing_address?.includes('Andhra Pradesh') // Hide if intra-state
+                },                                                                                         
                 {
                   key: 'advance_amount',
                   type: 'text',
@@ -2166,23 +2209,23 @@ export class SalesComponent {
                         if (existingQuan) {
                           field.formControl.setValue(existingQuan); // Set full product object (not just product_id)
                         }
-                      }
+                      } 
                     }
 
                     // Subscribe to value changes
                     field.formControl.valueChanges.subscribe(data => {
+                      // this.totalAmountCal();
                       if (field.form && field.form.controls && field.form.controls.rate && data) {
                         const rate = field.form.controls.rate.value;
+                        const discount = field.form.controls.discount.value;
                         const quantity = data;
+                        const productDiscount = parseInt(rate) * parseInt(quantity) * parseInt(discount)/ 100
                         if (rate && quantity) {
-                          field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity));
+                          field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity) - productDiscount);
                         }
                       }
                     });
                   },
-                  onChanges: (field: any) => {
-                    // You can handle any changes here if needed
-                  }
                 }
               },
               {
@@ -2225,14 +2268,14 @@ export class SalesComponent {
                     });
                   }
                 }
-              },
+              },            
               {
                 type: 'input',
                 key: 'discount',
                 templateOptions: {
                   type: 'number',
                   placeholder: 'Enter Disc',
-                  label: 'Disc',
+                  label: 'Discount (%)',
                   hideLabel: true,
                 },
                 hooks: {
@@ -2253,8 +2296,18 @@ export class SalesComponent {
                         }
                       }
                     }
-                    field.formControl.valueChanges.subscribe(data => {
+                    // Subscribe to discount value changes
+                    field.formControl.valueChanges.subscribe(discount => {
                       this.totalAmountCal();
+                      // if (field.form && field.form.controls) {
+                      //   const quantity = field.form.controls.quantity?.value || 0;
+                      //   const rate = field.form.controls.rate?.value || 0;
+                      //   const discountValue = discount || 0;
+
+                      //   if (quantity && rate) {
+                      //     field.form.controls.amount.setValue((parseFloat(rate) * parseFloat(quantity)) - parseFloat(discountValue));
+                      //   }
+                      // }
                     });
                   }
                 }
@@ -2431,6 +2484,75 @@ export class SalesComponent {
               },
               {
                 type: 'input',
+                key: 'cgst',
+                templateOptions: {
+                  type: "number",
+                  label: 'CGST',
+                  hideLabel: true
+                },
+                hooks: {
+                  onInit: (field) => {
+                    // if (field.formControl && field.model) {
+                    //   field.formControl.setValue(
+                    //     field.model.billing_address?.includes('Andhra Pradesh') 
+                    //       ? (parseFloat(field.model.tax_amount) / 2).toFixed(2) 
+                    //       : '0.00'
+                    //   );
+                    // }
+                  }
+                },
+                expressionProperties: {
+                  'templateOptions.disabled': 'true' // Make it read-only
+                }
+              },              
+              {
+                type: 'input',
+                key: 'sgst',
+                templateOptions: {
+                  type: "number",
+                  label: 'SGST',
+                  hideLabel: true
+                },
+                hooks: {
+                  onInit: (field) => {
+                    // if (field.formControl && field.model) {
+                    //   field.formControl.setValue(
+                    //     field.model.billing_address?.includes('Andhra Pradesh') 
+                    //       ? (parseFloat(field.model.tax_amount) / 2).toFixed(2) 
+                    //       : '0.00'
+                    //   );
+                    // }
+                  }
+                },
+                expressionProperties: {
+                  'templateOptions.disabled': 'true' // Make it read-only
+                }
+              },              
+              {
+                type: 'input',
+                key: 'igst',
+                templateOptions: {
+                  type: "number",
+                  label: 'IGST',
+                  hideLabel: true
+                },
+                hooks: {
+                  onInit: (field) => {
+                    // if (field.formControl && field.model) {
+                    //   field.formControl.setValue(
+                    //     field.model.billing_address?.includes('Andhra Pradesh') 
+                    //       ? (parseFloat(field.model.tax_amount) / 2).toFixed(2) 
+                    //       : '0.00'
+                    //   );
+                    // }
+                  }
+                },
+                expressionProperties: {
+                  'templateOptions.disabled': 'true' // Make it read-only
+                },
+              },               
+              {
+                type: 'input',
                 key: 'remarks',
                 templateOptions: {
                   label: 'Remarks',
@@ -2512,15 +2634,72 @@ export class SalesComponent {
                               },
                               hooks: {
                                 onInit: (field: any) => {
-                                  if (this.dataToPopulate && this.dataToPopulate.sale_order && this.dataToPopulate.sale_order.tax_amount && field.formControl) {
+                                  // Initialize with existing tax_amount if available
+                                  if (
+                                    this.dataToPopulate &&
+                                    this.dataToPopulate.sale_order &&
+                                    this.dataToPopulate.sale_order.tax_amount &&
+                                    field.formControl
+                                  ) {
                                     field.formControl.setValue(this.dataToPopulate.sale_order.tax_amount);
                                   }
-                                  field.formControl.valueChanges.subscribe(data => {
-                                    this.totalAmountCal();
-                                  })
+                            
+                                  // Store initial tax_amount as a float value
+                                  let previousTaxAmount = parseFloat(this.dataToPopulate?.sale_order?.tax_amount || "0");
+                            
+                                  // Subscribe to value changes on the tax_amount field
+                                  field.formControl.valueChanges.subscribe(newTaxAmount => {
+                                    if (field.form && field.form.controls && field.form.controls.total_amount) {
+                                      // Parse the current total amount as a float
+                                      const totalAmount = parseFloat(field.form.controls.total_amount.value || "0");
+                                      // Parse the new tax amount as a float
+                                      const currentNewTaxAmount = parseFloat(newTaxAmount || "0");
+                                      // Calculate the updated total by subtracting the previous tax value and adding the new one
+                                      const updatedTotal = totalAmount - previousTaxAmount + currentNewTaxAmount;
+                                      // Update the total_amount field with the new total, fixed to two decimals
+                                      field.form.controls.total_amount.setValue(parseFloat(updatedTotal.toFixed(2)));
+                                      // Update previousTaxAmount for future changes
+                                      previousTaxAmount = currentNewTaxAmount;
+                                      console.log("Updated total_amount:", updatedTotal);
+                                    }
+                                  });
                                 }
                               }
-                            },
+                            },                            
+                            // {
+                            //   key: 'tax_amount',
+                            //   type: 'input',
+                            //   defaultValue: "0",
+                            //   className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                            //   templateOptions: {
+                            //     type: 'number',
+                            //     label: 'Tax amount',
+                            //     placeholder: 'Enter Tax amount'
+                            //   },
+                            //   hooks: {
+                            //     onInit: (field: any) => {
+                            //       if (this.dataToPopulate && this.dataToPopulate.sale_order && this.dataToPopulate.sale_order.tax_amount && field.formControl) {
+                            //         field.formControl.setValue(this.dataToPopulate.sale_order.tax_amount);
+                            //         // this.totalAmountCal();
+                            //       } 
+                                  
+                            //       // Subscribe to value changes
+                            //       field.formControl.valueChanges.subscribe(data => {
+                            //         console.log("we are in method...")
+                            //         if (field.form && field.form.controls && field.form.controls.total_amount && data) {
+                            //           console.log("checking controles : ", field.form.controls);
+                            //           const total_amount = field.form.controls.total_amount.value;
+                            //           // const discount = field.form.controls.discount.value;
+                            //           const tax_amount = data;
+                            //           // const productDiscount = parseInt(tax_amount) + parseInt(total_amount)
+                            //           if (tax_amount && total_amount) {
+                            //             field.form.controls.total_amount.setValue(parseInt(tax_amount) + parseInt(total_amount));
+                            //           }
+                            //         }
+                            //       });
+                            //     }
+                            //   }
+                            // },                                                      
                             {
                               key: 'cess_amount',
                               type: 'input',
@@ -2727,7 +2906,6 @@ export class SalesComponent {
                                 type: 'input',
                                 label: 'Overall Discount',
                                 placeholder: 'Enter Discount amount',
-                                readonly: true
                                 // required: true
                               },
                               hooks: {
@@ -2736,7 +2914,12 @@ export class SalesComponent {
                                   if (this.dataToPopulate && this.dataToPopulate.sale_order && this.dataToPopulate.sale_order.dis_amt && field.formControl) {
                                     field.formControl.setValue(this.dataToPopulate.sale_order.dis_amt);
                                   }
+
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    this.totalAmountCal();
+                                  });
                                 }
+                                
                               }
                             },
                             {
@@ -2745,7 +2928,7 @@ export class SalesComponent {
                               defaultValue: "0",
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
-                                type: 'input',
+                                type: 'number',
                                 label: 'Total amount',
                                 placeholder: 'Enter Total amount',
                                 readonly: true
@@ -2755,7 +2938,12 @@ export class SalesComponent {
                                   // Set the initial value from dataToPopulate if available
                                   if (this.dataToPopulate && this.dataToPopulate.sale_order && this.dataToPopulate.sale_order.total_amount && field.formControl) {
                                     field.formControl.setValue(this.dataToPopulate.sale_order.total_amount);
+                                    // this.totalAmountCal();
                                   }
+
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    // this.totalAmountCal();
+                                  });
                                 }
                               }
                             }
@@ -3042,42 +3230,10 @@ export class SalesComponent {
     }
   }
 
+
   totalAmountCal() {
-    const data = this.formConfig.model;
-    if (data) {
-      const products = data.sale_order_items || [];
-      let totalAmount = 0;
-      let totalDiscount = 0;
-      let totalRate = 0;
-      let total_amount = 0;
-      if (products) {
-        products.forEach(product => {
-          if (product) {
-            if (product.amount)
-              totalAmount += parseFloat(product.amount || 0);
-            if (product.discount)
-              totalDiscount += parseFloat(product.discount || 0);
-          }
-          // totalRate += parseFloat(product.rate) * parseFloat(product.quantity || 0);
-        });
-      }
-
-
-      if (this.salesForm && this.salesForm.form && this.salesForm.form.controls) {
-        const controls: any = this.salesForm.form.controls;
-        controls.sale_order.controls.item_value.setValue(totalAmount);
-        controls.sale_order.controls.dis_amt.setValue(totalDiscount);
-        // const doc_amount = (totalAmount + parseFloat(data.sale_order.cess_amount || 0) + parseFloat(data.sale_order.tax_amount || 0)) - totalDiscount;
-        // controls.sale_order.controls.doc_amount.setValue(doc_amount);
-        const cessAmount = parseFloat(data.sale_order.cess_amount || 0);
-        const taxAmount = parseFloat(data.sale_order.tax_amount || 0);
-        const advanceAmount = parseFloat(data.sale_order.advance_amount || 0);
-
-        const total_amount = (totalAmount + cessAmount + taxAmount) - totalDiscount - advanceAmount;
-        controls.sale_order.controls.total_amount.setValue(total_amount);
-
-      }
-    }
+    calculateTotalAmount(this.formConfig.model, 'sale_order_items', this.salesForm?.form);
   }
-
+  
+  
 }
