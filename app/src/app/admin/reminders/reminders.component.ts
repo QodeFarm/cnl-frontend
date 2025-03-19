@@ -181,7 +181,7 @@ export class RemindersComponent {
         {
           key: 'reminder_recipients',
           type: 'table',
-          className: 'custom-form-list no-ant-card',
+          className: 'custom-form-list product-table',
           templateOptions: {
             title: 'Reminder Recipients',
             addText: 'Add Recipients',
