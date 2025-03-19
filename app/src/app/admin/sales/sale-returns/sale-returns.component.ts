@@ -340,7 +340,7 @@ export class SaleReturnsComponent {
     const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
 
     // Determine the entity type and ID dynamically
-    const entityId = '7323d24c-50e9-4546-a161-bbb160ffa127'; // Since we're in the Sale Order form
+    const entityId ='7323d24c-50e9-4546-a161-bbb160ffa127'; //'7323d24c-50e9-4546-a161-bbb160ffa127'; // Since we're in the Sale Order form
     const customId = this.formConfig.model.sale_return_order?.sale_return_id || null; // Ensure correct sale_order_id
 
     // Construct payload for custom fields based on updated values
@@ -2395,7 +2395,7 @@ export class SaleReturnsComponent {
     const customFieldValues = this.formConfig.model['custom_field_values']
 
     // Determine the entity type and ID dynamically
-    const entityId = '7323d24c-50e9-4546-a161-bbb160ffa127'; // Since we're in the Sale Invoice form
+    const entityId = '7323d24c-50e9-4546-a161-bbb160ffa127'; //'7323d24c-50e9-4546-a161-bbb160ffa127'; // Since we're in the Sale Invoice form
     const customId = this.formConfig.model.sale_return_order?.sale_return_id || null; // Ensure correct sale_order_id
   
     // Construct payload for custom fields
@@ -2421,23 +2421,23 @@ export class SaleReturnsComponent {
     // First, create the Sale Return record
     this.http.post('sales/sale_return_order/', payload).subscribe(
       (response: any) => {
-        this.showSuccessToast = true;
-        this.toastMessage = 'Record created successfully';
-        this.ngOnInit();
-        setTimeout(() => {
-          this.showSuccessToast = false;
-        }, 3000);
+        // this.showSuccessToast = true;
+        // this.toastMessage = 'Record created successfully';
+        // this.ngOnInit();
+        // setTimeout(() => {
+        //   this.showSuccessToast = false;
+        // }, 3000);
         const sale_return_id = response?.data?.sale_return_order?.sale_return_id; // Get the sale_return_id from the response
 
 
         if (sale_return_id) {
-          console.log('Sale Return created successfully. ID:', sale_return_id);
-          this.showSuccessToast = true;
-            this.toastMessage = 'Record created successfully';
-            this.ngOnInit();
-            setTimeout(() => {
-              this.showSuccessToast = false;
-            }, 3000);
+          // console.log('Sale Return created successfully. ID:', sale_return_id);
+          // this.showSuccessToast = true;
+          //   this.toastMessage = 'Record created successfully';
+          //   this.ngOnInit();
+          //   setTimeout(() => {
+          //     this.showSuccessToast = false;
+          //   }, 3000);
 
           // Now based on the return_option, create the respective entity
           const returnOption = this.formConfig.model.sale_return_order.return_option.name;
@@ -2462,6 +2462,7 @@ export class SaleReturnsComponent {
 
   // Function to create Sale Order using the sale_return_id
   createSaleOrder(sale_return_id: string) {
+    console.log("We entered into method sale order ...");
     const SaleOrderpayload = this.formConfig.model.sale_return_order
     const SaleOrderItems = this.formConfig.model.sale_return_items
     const OrderAttachments = this.formConfig.model.order_attachments
@@ -2488,13 +2489,14 @@ export class SaleReturnsComponent {
           ref_date: SaleOrderpayload.ref_date || this.nowDate(),
           tax: SaleOrderpayload.tax || 'Inclusive',
           remarks: SaleOrderpayload.remarks,
-          advance_amount: SaleOrderpayload.advance_amount,
+          // advance_amount: SaleOrderpayload.advance_amount,
           item_value: 0.00,
           discount: 0.00,
           dis_amt: 0.00,
           taxable: SaleOrderpayload.taxable,
           tax_amount: 0.00,
           cess_amount: 0.00,
+          advance_amount: SaleOrderpayload.total_amount,
           transport_charges: SaleOrderpayload.transport_charges,
           round_off: SaleOrderpayload.round_off,
           total_amount: 0.00,
@@ -2535,6 +2537,7 @@ export class SaleReturnsComponent {
       // POST request to create Sale Order
       this.http.post('sales/sale_order/', saleOrderPayload).subscribe(
         (response) => {
+          // console.log("response sale order : ", response);
           this.showSuccessToast = true;
           this.toastMessage = 'Sale-Order created successfully';
           this.ngOnInit();
