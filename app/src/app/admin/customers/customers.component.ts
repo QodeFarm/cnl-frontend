@@ -93,7 +93,7 @@ export class CustomersComponent {
       (response: any) => {
         this.showSuccessToast = true;
           this.toastMessage = "Record Created successfully"; // Set the toast message for update
-          // this.ngOnInit();
+          this.ngOnInit();
           setTimeout(() => {
             this.showSuccessToast = false;
           }, 3000);
