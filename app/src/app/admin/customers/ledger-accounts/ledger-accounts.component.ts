@@ -157,9 +157,9 @@ export class LedgerAccountsComponent {
               templateOptions: {
                 label: 'Type',
                 options: [
-                  { value: 'customer', label: 'Customer' },
+                  { value: 'Customer', label: 'Customer' },
                   { value: 'Bank', label: 'Bank' },
-                  { value: 'cash', label: 'cash' },
+                  { value: 'Cash', label: 'cash' },
                   { value: 'Vendor', label: 'Vendor'}
                 ],
               },
