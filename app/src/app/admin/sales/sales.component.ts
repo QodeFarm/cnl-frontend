@@ -279,70 +279,85 @@ export class SalesComponent {
     this.invoiceCreationHandler(); // Proceed with the invoice creation logic
   }
 
+
   invoiceCreationHandler() {
     console.log("Invoice Data at handler start:", this.invoiceData);
 
-    // Log each item to confirm the checkbox status
-    this.invoiceData.sale_invoice_items.forEach((item, index) => {
-      console.log(`Item ${index}:`, item, "Select Item:", item.selectItem);
-    });
-
-    // Filter for items where selectItem is true (checkbox selected)
+    // Filter selected items
     const selectedItems = this.invoiceData.sale_invoice_items.filter(item => item.selectItem);
 
-    // If selectedItems > 0, use selected items; else use all sale_invoice_items
+    // If at least one item is selected, use those; otherwise, use all
     const itemsToInvoice = selectedItems.length > 0 ? selectedItems : this.invoiceData.sale_invoice_items;
 
+    let items_value = 0;
+    let tax_amount = 0;
+    let discount = 0;
+    let total_amount = 0;
+
+    itemsToInvoice.forEach(item => {
+        const itemValue = parseFloat(item.quantity) * parseFloat(item.rate);
+        const discountValue = itemValue * parseFloat(item.discount) / 100;
+        const Amount = itemValue - discountValue;
+        const taxAmount = parseFloat(item.cgst) + parseFloat(item.sgst) + parseFloat(item.igst);
+        const totalAmount = (Amount + taxAmount);
+
+        items_value += itemValue;
+        tax_amount += taxAmount;
+        // discount += discountValue;
+        total_amount += totalAmount;
+
+        // Update each item with calculated values
+        item.item_value = itemValue;
+        item.tax_amount = taxAmount;
+        // item.discount = discountValue;
+        item.total_amount = totalAmount;
+    });
+
+    // Override calculated fields in invoice data
     const invoiceData = {
-      ...this.invoiceData,
-      sale_invoice_items: itemsToInvoice
+        ...this.invoiceData,
+        sale_invoice_order: {
+            ...this.invoiceData.sale_invoice_order,
+            item_value: items_value,
+            tax_amount: tax_amount,
+            discount: discount,
+            total_amount: total_amount
+        },
+        sale_invoice_items: itemsToInvoice
     };
+
     console.log("Invoice Data with selected items:", invoiceData);
 
-    // Check if there are items to invoice
     if (itemsToInvoice.length > 0) {
-      this.createSaleInvoice(invoiceData).subscribe(
-        response => {
-          console.log('Sale invoice created successfully', response);
-          this.showInvoiceCreatedMessage();
+        this.createSaleInvoice(invoiceData).subscribe(
+            response => {
+                console.log('Sale invoice created successfully', response);
+                this.showInvoiceCreatedMessage();
 
-          // Add invoiced product IDs to `previouslyInvoicedProductIds` set
-          // itemsToInvoice.forEach(item => this.previouslyInvoicedProductIds.add(item.product_id)); 
+                itemsToInvoice.forEach(item => {
+                    if (item.invoiced === 'NO') {
+                        item.invoiced = 'YES';
+                        this.updateInvoicedStatusDirectly(item.sale_order_item_id, 'YES');
+                    }
+                });
 
-          itemsToInvoice.forEach(item => {
-            console.log("Item data:", item);
-            console.log("Invoice data:", this.invoiceData);
-
-            if (item.invoiced === 'NO') {
-              console.log("We are in log...")
-              item.invoiced = 'YES'; // Update locally
-              this.updateInvoicedStatusDirectly(item.sale_order_item_id, 'YES'); // Send the HTTP request directly
+                const saleOrderId = this.invoiceData.sale_invoice_order.sale_order_id;
+                const allInvoiced = this.invoiceData.sale_invoice_items.every(item => item.invoiced === 'YES');
+                if (allInvoiced) {
+                    this.triggerWorkflowPipeline(saleOrderId);
+                }
+            },
+            error => {
+                console.error('Error creating sale invoice', error);
             }
-          });
-
-          const saleOrderId = this.invoiceData.sale_invoice_order.sale_order_id;
-          this.triggerWorkflowPipeline(saleOrderId);
-          // this.triggerWorkflowPipeline(saleOrderId);
-          // Check if all products are invoiced
-          const allInvoiced = this.invoiceData.sale_invoice_items.every(item => item.invoiced === 'YES');
-          if (allInvoiced) {
-            console.log("All products are invoiced, triggering workflow pipeline...");
-            this.triggerWorkflowPipeline(saleOrderId);
-          } else {
-            console.log("Some products are still pending, workflow pipeline not triggered.");
-          }
-        },
-        error => {
-          console.error('Error creating sale invoice', error);
-        }
-      );
+        );
     } else {
-      console.warn('No items selected for invoicing');
+        console.warn('No items selected for invoicing');
     }
 
-    // Re-initialize the form if needed
-    this.ngOnInit();
-  }
+    this.ngOnInit();  // Re-initialize the form if needed
+}
+
 
   // Method to update invoiced status using HttpClient
   updateInvoicedStatusDirectly(itemId: number, status: string) {
@@ -423,8 +438,6 @@ export class SalesComponent {
         this.formConfig.fields[0].fieldGroup[0].fieldGroup[8].hide = false;
         this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = false;
 
-        this.totalAmountCal();
-
         // Ensure custom_field_values are correctly populated in the model
         if (res.data.custom_field_values) {
           this.formConfig.model['custom_field_values'] = res.data.custom_field_values.reduce((acc: any, fieldValue: any) => {
@@ -433,6 +446,8 @@ export class SalesComponent {
           }, {});
         }
       }
+
+      this.totalAmountCal();
     });
     this.hide();
   }
@@ -1662,6 +1677,8 @@ export class SalesComponent {
                         const saleOrderItems = this.formConfig.model['sale_order_items'];
                         const orderAttachments = this.formConfig.model['order_attachments'];
                         const orderShipments = this.formConfig.model['order_shipments'];
+                        // const CustomFields = this.formConfig.model['custom_field_values'];
+                        // console.log("CustomFields : ", CustomFields)
 
                         const totalAmount = () => {
                           if (!Array.isArray(saleOrderItems) || saleOrderItems.length === 0) {
