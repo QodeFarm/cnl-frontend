@@ -183,7 +183,7 @@ export class SaleReturnsComponent {
     this.setFormConfig();
     this.checkAndPopulateData();
     //custom fields logic...
-    CustomFieldHelper.fetchCustomFields(this.http, 'sale_returns', (customFields: any, customFieldMetadata: any) => {
+    CustomFieldHelper.fetchCustomFields(this.http, 'sale_return', (customFields: any, customFieldMetadata: any) => {
       CustomFieldHelper.addCustomFieldsToFormConfig_2(customFields, customFieldMetadata, this.formConfig);
     });
 
@@ -340,7 +340,7 @@ export class SaleReturnsComponent {
     const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
 
     // Determine the entity type and ID dynamically
-    const entityId ='7323d24c-50e9-4546-a161-bbb160ffa127'; //'7323d24c-50e9-4546-a161-bbb160ffa127'; // Since we're in the Sale Order form
+    const entityId ='7c059d6f-7b0c-474a-8d6f-accc64855a0a'; //'7c059d6f-7b0c-474a-8d6f-accc64855a0a'; // Since we're in the Sale Order form
     const customId = this.formConfig.model.sale_return_order?.sale_return_id || null; // Ensure correct sale_order_id
 
     // Construct payload for custom fields based on updated values
@@ -2395,7 +2395,7 @@ export class SaleReturnsComponent {
     const customFieldValues = this.formConfig.model['custom_field_values']
 
     // Determine the entity type and ID dynamically
-    const entityId = '7323d24c-50e9-4546-a161-bbb160ffa127'; //'7323d24c-50e9-4546-a161-bbb160ffa127'; // Since we're in the Sale Invoice form
+    const entityId = '7c059d6f-7b0c-474a-8d6f-accc64855a0a'; //'7c059d6f-7b0c-474a-8d6f-accc64855a0a'; // Since we're in the Sale Invoice form
     const customId = this.formConfig.model.sale_return_order?.sale_return_id || null; // Ensure correct sale_order_id
   
     // Construct payload for custom fields

@@ -749,7 +749,7 @@ loadQuickpackProducts() {
     const customFieldValues = this.formConfig.model['custom_field_values']
 
     // Determine the entity type and ID dynamically
-    const entityId = '73549956-b503-4910-b24c-630a8e88b423'; // Since we're in the Sale Invoice form
+    const entityId = 'cdd20c1c-1958-4b9b-b239-20619e7ae99c'; // Since we're in the Sale Invoice form
     const customId = this.formConfig.model.purchase_order_data?.purchase_order_id || null; // Ensure correct purchase_order_id
   
     // Construct payload for custom fields
@@ -783,7 +783,7 @@ loadQuickpackProducts() {
     const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
 
     // Determine the entity type and ID dynamically
-    const entityId = '73549956-b503-4910-b24c-630a8e88b423'; // Since we're in the Sale Order form
+    const entityId = 'cdd20c1c-1958-4b9b-b239-20619e7ae99c'; // Since we're in the Sale Order form
     const customId = this.formConfig.model.purchase_order_data?.purchase_order_id || null; // Ensure correct purchase_order_id
 
     // Construct payload for custom fields based on updated values

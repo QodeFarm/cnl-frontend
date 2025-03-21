@@ -154,7 +154,7 @@ export class TasksComponent implements OnInit {
     const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
 
     // Determine the entity type and ID dynamically
-    const entityId = '6d91143f-e599-428d-90ee-7ffd3945d88d'; // Since we're in the Sale Order form
+    const entityId = '8f525989-b238-45e3-bca7-c8b1c22c0c77'; // Since we're in the Sale Order form
     const customId = this.formConfig.model.task?.task_id || null; //
 
     // Construct payload for one custom field at a time
@@ -190,7 +190,7 @@ export class TasksComponent implements OnInit {
   updateTasks() {
     const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
 
-    const entityId = '6d91143f-e599-428d-90ee-7ffd3945d88d'; // Since we're in the Sale Order form
+    const entityId = '8f525989-b238-45e3-bca7-c8b1c22c0c77'; // Since we're in the Sale Order form
     const customId = this.formConfig.model.task?.task_id || null; //
   
     // Construct payload for custom fields based on updated values

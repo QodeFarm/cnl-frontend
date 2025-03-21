@@ -693,7 +693,7 @@ export class SalesinvoiceComponent {
     const customFieldValues = this.formConfig.model['custom_field_values']
 
     // Determine the entity type and ID dynamically
-    const entityId = '51c907a2-e1a5-43c5-95d7-4e58227776ab'; // Since we're in the Sale Invoice form
+    const entityId = '97ca2f54-7036-4ae1-9515-894f676c58aa'; // Since we're in the Sale Invoice form
     const customId = this.formConfig.model.sale_invoice_order?.sale_invoice_id || null; // Ensure correct sale_order_id
   
     // Construct payload for custom fields
@@ -727,7 +727,7 @@ export class SalesinvoiceComponent {
     const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
 
     // Determine the entity type and ID dynamically
-    const entityId = '51c907a2-e1a5-43c5-95d7-4e58227776ab'; // Since we're in the Sale Order form
+    const entityId = '97ca2f54-7036-4ae1-9515-894f676c58aa'; // Since we're in the Sale Order form
     const customId = this.formConfig.model.sale_invoice_order?.sale_invoice_id || null; // Ensure correct sale_order_id
 
     // Construct payload for custom fields based on updated values
