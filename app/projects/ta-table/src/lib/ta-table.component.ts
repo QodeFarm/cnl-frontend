@@ -607,13 +607,15 @@ export class TaTableComponent implements OnDestroy {
     // console.log('this.pageIndex', this.pageIndex);
     // console.log('this.pageSize', this.pageSize);
   }
-  export() {
+  exportExcel() {
     let _rows = cloneDeep(this.rows);
-    if (this.options.export && this.options.export.cols && this.options.export.cols.length > 0) {
+    if (this.options.export) {
       _rows = _rows.map((r: any) => {
         const _r: any = <any>{};
-        this.options.export.cols.forEach((col: any) => {
-
+        let _cols = []
+        _cols = (this.options.export.cols) ? this.options.export.cols : this.options.cols;
+        _cols.forEach((col: any) => {
+          if (col.type == 'action') return;
           _r[col.name] = getValue(r, col.fieldKey);
 
           if (col.type === 'date') {
@@ -624,12 +626,12 @@ export class TaTableComponent implements OnDestroy {
       });
 
     }
-    // this.taTableS.exportDataAsExcelFile(_rows, this.options.export.downloadName || this.options.title);
+    this.taTableS.exportDataAsExcelFile(_rows, this.options.export.downloadName || this.options.title || 'list-data');
 
-    // console.log('_rows', _rows);
-    // getValue()
-    // const tableElementref:ElementRef = this.taTable.elementRef as ElementRef;
-    // this.taTableS.exportTableAsExcelFile(tableElementref.nativeElement,'test');
+    console.log('_rows', _rows);
+    //getValue()
+    // const tableElementref: ElementRef = this.taTable.elementRef as ElementRef;
+    // this.taTableS.exportTableAsExcelFile(tableElementref.nativeElement, 'test');
   }
   actionClick(event) {
     if (event && event.action && event.action.type === 'delete') {

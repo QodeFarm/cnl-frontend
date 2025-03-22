@@ -25,8 +25,11 @@ export class CustomersListComponent {
 
   tableConfig: TaTableConfig = {
     apiUrl: 'customers/customers/?summary=true',
-    showCheckbox:true,
+    showCheckbox: true,
     pkId: "customer_id",
+    export: {
+      downloadName: 'customers'
+    },
     fixedFilters: [
       {
         key: 'summary',
@@ -35,7 +38,7 @@ export class CustomersListComponent {
     ],
     pageSize: 10,
     "globalSearch": {
-      keys: ['created_at','name','email','phone','gst','city_id','ledger_account_id']
+      keys: ['created_at', 'name', 'email', 'phone', 'gst', 'city_id', 'ledger_account_id']
     },
     defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
@@ -76,7 +79,7 @@ export class CustomersListComponent {
         mapFn: (currentValue: any, row: any, col: any) => {
           return row.ledger_account.name;
         },
-      },      
+      },
       {
         fieldKey: "code",
         name: "Action",
@@ -97,12 +100,12 @@ export class CustomersListComponent {
               console.log(row);
               this.edit.emit(row.customer_id);
             }
-          }       
+          }
         ]
       },
     ]
   };
-  
+
   constructor(private router: Router) {
 
   }

@@ -4,11 +4,10 @@ import { CondOperator, RequestQueryBuilder } from '@nestjsx/crud-request';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { TaParamsConfig } from './ta-table-config';
-// import * as XLSX from 'xlsx';
-// const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
-// const EXCEL_EXTENSION = '.xlsx';
-// import * as FileSaver from 'file-saver';
-
+import * as XLSX from 'xlsx';
+const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+const EXCEL_EXTENSION = '.xlsx';
+import * as FileSaver from 'file-saver';
 
 @Injectable()
 export class TaTableService {
@@ -171,7 +170,7 @@ export class TaTableService {
   filterChange(filter: any) {
     this.filterSubject.next(filter);
   }
-  /**
+
 
   public exportDataAsExcelFile(json: any[], excelFileName: string): void {
 
@@ -194,6 +193,6 @@ export class TaTableService {
     });
     FileSaver.saveAs(data, fileName + '_exported' + EXCEL_EXTENSION);
   }
-   */
+
 
 }
