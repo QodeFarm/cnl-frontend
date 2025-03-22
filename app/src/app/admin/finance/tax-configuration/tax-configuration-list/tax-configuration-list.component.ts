@@ -28,6 +28,7 @@ export class TaxConfigurationListComponent {
     "globalSearch": {
       keys: ['created_at','tax_name','tax_rate','tax_type','is_active']
     },
+    export: {downloadName: 'TaxList'},
     defaultSort: { key: 'created_at', value: 'descend' }, 
     cols: [
       {

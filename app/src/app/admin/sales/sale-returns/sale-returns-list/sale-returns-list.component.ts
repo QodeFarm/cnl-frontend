@@ -101,6 +101,8 @@ export class SaleReturnsListComponent {
     "globalSearch": {
       keys: ['return_date','customer','return_no','status_name','tax','return_reason','due_date','tax_amount','total_amount','remarks']
     },
+    export: {downloadName: 'SaleReturnsList'},
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {
         fieldKey: 'return_date',

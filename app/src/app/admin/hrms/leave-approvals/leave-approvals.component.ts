@@ -29,7 +29,7 @@ export class LeaveApprovalsComponent {
       "globalSearch": {
         keys: ['approval_id', 'leave_id','name','status_id','approval_date']
       },
-      // defaultSort: { key: 'approval_date', value: 'descend' },
+      export: {downloadName: 'LeaveApprovals'},
       defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {

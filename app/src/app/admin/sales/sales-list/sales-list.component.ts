@@ -100,7 +100,11 @@ export class SalesListComponent {
         key: 'summary',
         value: 'true'
       }
+      
     ],
+    export: {
+      downloadName: 'SalesList'
+    },
     pageSize: 10,
     "globalSearch": {
       keys: ['order_date','order_no','sale_type','customer','sale_estimate','amount','tax','advance_amount','status_name','flow_status_name']

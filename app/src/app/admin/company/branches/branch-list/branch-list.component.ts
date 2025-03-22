@@ -30,6 +30,8 @@ export class BranchListComponent {
     "globalSearch": {
       keys: ['name','code','phone','email','address','city_id','state_id','status_id']
     },
+    export: {downloadName: 'BranchList'},
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {
         fieldKey: 'name',

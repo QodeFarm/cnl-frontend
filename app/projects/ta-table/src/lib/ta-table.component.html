@@ -64,8 +64,8 @@
                 <button nz-button nzType="primary" nzSearch (click)="globalSearch()"><i nz-icon
                         nzType="search"></i></button>
             </ng-template>
-            <button nz-button (click)="exportExcel()" *ngIf="options.export"> <i nz-icon nzType="file-excel"
-                    nzTheme="outline"></i> Export</button>
+            <!-- <button nz-button (click)="exportExcel()" *ngIf="options.export"> <i nz-icon nzType="file-excel"
+                    nzTheme="outline"></i> Export</button> -->
             <ng-content nz-col select="[after-search]">
             </ng-content>
             <!-- Apply Filters OK Button -->
@@ -83,9 +83,16 @@
             </div>
 
             <!-- Download Button -->
-            <div class="filter-group" *ngIf="isButtonVisible">
+            <!-- <div class="filter-group" *ngIf="isButtonVisible">
                 <button nz-button nzType="primary" (click)="downloadData($event)">
                     <i nz-icon nzType="download" nzTheme="outline"></i>
+                </button>
+            </div> -->
+            
+            <!--  Excel Export Button -->
+            <div class="filter-group" *ngIf="options.export">
+                <button nz-button nzType="primary" (click)="exportExcel()">
+                  <i nz-icon nzType="file-excel" nzTheme="outline"></i>
                 </button>
             </div>
 

@@ -101,6 +101,7 @@ export class PurchasereturnordersListComponent {
     globalSearch: {
       keys: ['purchase_type', 'return_no', 'return_reason', 'due_date', 'tax', 'tax_amount', 'total_amount', 'vendor', 'status_name', 'remarks']
     },
+    export: {downloadName: 'PurchaseReturnList'},
     defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {

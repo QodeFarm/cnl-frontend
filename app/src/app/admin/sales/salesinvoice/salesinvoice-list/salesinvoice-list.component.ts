@@ -108,6 +108,9 @@ export class SalesInvoiceListComponent implements OnInit {
         value: 'true'
       }
     ],
+    export: {
+      downloadName: 'SalesInvoiceList'
+    },
     pageSize: 10,
     "globalSearch": {
       keys: ['invoice_date','customer','invoice_no','created_at','total_amount','tax_amount','advance_amount','status_name','remarks']

@@ -29,6 +29,7 @@ export class BudgetListComponent {
     "globalSearch": {
       keys: ['created_at','account_id','fiscal_year','allocated_amount','spent_amount']
     },
+    export: {downloadName: 'BudgetList'},
     defaultSort: { key: 'created_at', value: 'descend' }, 
     cols: [
       {

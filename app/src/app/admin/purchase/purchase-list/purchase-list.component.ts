@@ -102,6 +102,7 @@ export class PurchaseListComponent {
     "globalSearch": {
       keys: ['order_date','purchase_type_id','order_no','tax','tax_amount','total_amount','vendor','status_name','remarks']
     },
+    export: {downloadName: 'PurchaseList'},
     defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {

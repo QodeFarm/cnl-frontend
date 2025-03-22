@@ -31,6 +31,7 @@ export class AssetsListComponent {
     "globalSearch": {
       keys: ['purchase_date','name','price','asset_category_id','unit_options_id','location_id','asset_status_id']
     },
+    export: {downloadName: 'AssetsList'},
     defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {

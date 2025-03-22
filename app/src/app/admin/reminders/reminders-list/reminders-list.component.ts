@@ -29,6 +29,8 @@ export class RemindersListComponent {
     "globalSearch": {
       keys: ['reminder_type_id','subject','description','reminder_date','recurring_frequency']
     },
+    export: {downloadName: 'RemindersList'},
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {
         fieldKey: 'reminder_type_id',

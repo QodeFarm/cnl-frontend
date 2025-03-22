@@ -31,6 +31,7 @@ export class AssetMaintenanceListComponent {
     "globalSearch": {
       keys: ['asset_id','maintenance_date','asset_id','cost','maintenance_description']
     },
+    export: {downloadName: 'AssetMaintenanceList'},
     defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {

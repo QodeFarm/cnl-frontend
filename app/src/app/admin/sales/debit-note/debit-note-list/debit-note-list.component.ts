@@ -29,6 +29,7 @@ export class DebitNoteListComponent {
     "globalSearch": {
       keys: ['customer','debit_date','sale_invoice_id','debit_note_number','reason','total_amount','status_name']
     },
+    export: {downloadName: 'DebitNoteList'},
     defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {

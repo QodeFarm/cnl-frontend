@@ -32,6 +32,7 @@ export class LeadsListComponent {
     "globalSearch": {
       keys: ['interaction_date','name','email','phone','lead_status','score','assignee','notes']
     },
+    export: {downloadName: 'PaymentRecepitList'},
     defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {
@@ -75,24 +76,53 @@ export class LeadsListComponent {
           return `${firstName} ${lastName}`.trim();
         },
       },
+      // {
+      //   fieldKey: 'interaction_date',
+      //   name: 'Interaction Date',
+      //   displayType: "map",
+      //   mapFn: (currentValue: any, row: any, col: any) => {
+      //     const interactionDate = row.interaction[0].interaction_date;
+      //     const [date, time] = interactionDate.split('T');
+      //     return `${date}<br>${time}`;
+      //   },
+      //   sort: false
+      // },
       {
         fieldKey: 'interaction_date',
         name: 'Interaction Date',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          const interactionDate = row.interaction[0].interaction_date;
-          const [date, time] = interactionDate.split('T');
-          return `${date}<br>${time}`;
+          if (row.interaction && row.interaction.length > 0 && row.interaction[0].interaction_date) {
+            const interactionDate = row.interaction[0].interaction_date;
+            const [date, time] = interactionDate.split('T');
+            return `${date}<br>${time}`;
+          } else {
+            return ''; // or return a default value like 'N/A'
+          }
         },
         sort: false
-      },
+      },      
+      
+      // {
+      //   fieldKey: 'notes',
+      //   name: 'Notes',
+      //   displayType: "map",
+      //   mapFn: (currentValue: any, row: any, col: any) => {
+      //     console.log("row",row)
+      //     return `${row.interaction[0].notes}`;
+      //   },
+      //   sort: false
+      // },
       {
         fieldKey: 'notes',
         name: 'Notes',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          console.log("row",row)
-          return `${row.interaction[0].notes}`;
+          if (row.interaction && row.interaction.length > 0 && row.interaction[0].notes) {
+            return `${row.interaction[0].notes}`;
+          } else {
+            return ''; // or a default like 'No Notes'
+          }
         },
         sort: false
       },

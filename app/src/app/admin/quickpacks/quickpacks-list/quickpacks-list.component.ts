@@ -29,6 +29,7 @@ export class QuickpacksListComponent {
     globalSearch: {
       keys: ['created_at','name','lot_qty','description','active']
     },
+    export: {downloadName: 'QuickpackList'},
     defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {
