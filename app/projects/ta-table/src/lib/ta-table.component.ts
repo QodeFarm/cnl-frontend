@@ -303,7 +303,8 @@ export class TaTableComponent implements OnDestroy {
     }
 
     // Return the query string by joining all the filters
-    return '?&' + queryParts.join('&');
+    // return '?&' + queryParts.join('&');
+    return '&' + queryParts.join('&'); //before, it returns a string starting with "?&", which then gets concatenated to your API URL and ends up creating an extra "?". Now, fix this by modifying the function.
   }
   formatDate(date: Date): string {
     // Format date as 'yyyy-MM-dd'
@@ -406,7 +407,12 @@ export class TaTableComponent implements OnDestroy {
       '/admin/sales/sale-returns',
       '/admin/hrms/employee-attendance',
       '/admin/employees',
-      '/admin/hrms/employee-leave-balance'
+      '/admin/hrms/employee-leave-balance',
+      '/admin/reports/sales-reports',
+      '/admin/reports/production-reports',
+      '/admin/reports/purchase-reports',
+      '/admin/reports/vendor-reports',
+      '/admin/reports/customer-reports'
     ]
     this.loadStatuses();
     this.loadEmployees();

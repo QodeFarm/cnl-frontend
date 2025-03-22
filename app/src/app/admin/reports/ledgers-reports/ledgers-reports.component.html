@@ -1,0 +1,51 @@
+<div class="container-fluid mt-2">
+    <!-- Accordion for Sales Reports -->
+    <div class="accordion" id="reportAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="reportHeading">
+                <button class="accordion-button" type="button" (click)="toggleAccordion()">
+                    Ledgers Reports
+                </button>
+            </h2>
+            <div id="reportCollapse" class="accordion-collapse collapse show" *ngIf="isAccordionOpen">
+                <div class="accordion-body">
+                    <!-- Report Buttons -->
+                    <div class="d-flex gap-3">
+                        <a class="report-link" (click)="selectReport('GeneralLedgerReport')">
+                            General Ledger Report
+                        </a>
+                        <a class="report-link" (click)="selectReport('salesInvoice')">
+                            Trial Balance Report
+                        </a>
+                        <a class="report-link" (click)="selectReport('SalesbyProductReport')">
+                            Profit & Loss Statement
+                        </a>
+                        <a class="report-link" (click)="selectReport('SalesByCustomerReport')">
+                            Balance Sheet Report
+                        </a>
+                        <a class="report-link" (click)="selectReport('SalesReturnReport')">
+                            Cash Flow Statement
+                        </a>
+                        <a class="report-link" (click)="selectReport('SalesReturnReport')">
+                           Aging Report
+                        </a>
+                        <a class="report-link" (click)="selectReport('SalesReturnReport')">
+                            Bank Reconciliation Report
+                        </a>
+                        <a class="report-link" (click)="selectReport('SalesReturnReport')">
+                            Journal Entry Report
+                        </a>
+                       
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Table Component for Selected Report -->
+    <!-- <div *ngIf="loading">Loading...</div> -->
+    <div *ngIf="!loading && !error && tableConfig" class="mt-3 custom-list">
+        <ta-table [options]="tableConfig" (dataLoaded)="onDataLoaded($event)"></ta-table>
+    </div>
+</div>

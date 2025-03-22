@@ -1,0 +1,53 @@
+<div class="container-fluid mt-2">
+    <!-- Accordion for Sales Reports -->
+    <div class="accordion" id="reportAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="reportHeading">
+                <button class="accordion-button" type="button" (click)="toggleAccordion()">
+                    Purchase Reports
+                </button>
+            </h2>
+            <div id="reportCollapse" class="accordion-collapse collapse show" *ngIf="isAccordionOpen">
+                <div class="accordion-body">
+                    <!-- Report Buttons -->
+                    <div class="d-flex gap-3">
+                        <a class="report-link" (click)="selectReport('purchaseReport')">
+                            Purchase Report
+                        </a>
+                        <a class="report-link" (click)="selectReport('PurchaseInvoiceReport')">
+                            Purchase Invoice Report
+                        </a>
+                        <a class="report-link" (click)="selectReport('PurchasesbyVendorReport')">
+                            Purchases by Vendor Report
+                        </a>
+                        <a class="report-link" (click)="selectReport('PurchaseReturnReport')">
+                            Purchase Return Report
+                        </a>
+                        <a class="report-link" (click)="selectReport('OutstandingPurchaseReport')">
+                            Outstanding Purchase Report
+                        </a>
+                        <!-- <a class="report-link" (click)="selectReport('PurchaseOrderStatusReport')">
+                            Purchase Order Status Report
+                        </a> -->
+                        <a class="report-link" (click)="selectReport('LandedCostReport')">
+                            Landed Cost Report
+                        </a>
+                        <a class="report-link" (click)="selectReport('PurchasePriceVarianceReport')">
+                            Purchase Price Variance Report
+                        </a>
+                        <!-- <a class="report-link" (click)="selectReport('SalesReturnReport')">
+                            Stock Replenishment Report
+                        </a> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <!-- Table Component for Selected Report -->
+    <!-- <div *ngIf="loading">Loading...</div> -->
+<div *ngIf="!loading && !error && tableConfig" class="mt-3 custom-list">
+  <ta-table [options]="tableConfig" (dataLoaded)="onDataLoaded($event)"></ta-table>
+</div>
+</div>
