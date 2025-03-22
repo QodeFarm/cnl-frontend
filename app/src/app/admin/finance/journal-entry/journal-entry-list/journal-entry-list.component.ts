@@ -29,6 +29,7 @@ export class JournalEntryListComponent {
     "globalSearch": {
       keys: ['entry_date','reference','description']
     },
+    export: {downloadName: 'JournalEntryList'},
     defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {

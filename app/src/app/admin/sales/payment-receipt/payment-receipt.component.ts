@@ -144,6 +144,7 @@ export class PaymentReceiptComponent {
       pkId: "voucher_no",
       pageSize: 10,
       globalSearch: { keys: ['voucher_no', 'customer', 'amount'] },
+      export: {downloadName: 'PaymentRecepitList'},
       defaultSort: { key: 'date', value: 'descend' },
       cols: [
         { fieldKey: 'bill_no', name: 'Bill No', sort: true },

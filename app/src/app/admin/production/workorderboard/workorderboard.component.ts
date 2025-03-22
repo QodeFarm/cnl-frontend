@@ -126,6 +126,7 @@ export class WorkorderboardComponent implements OnInit {
         pkId: "work_order_id",
         pageSize: 10,
         globalSearch: { keys: ['product', 'quantity', 'status_id', 'start_date', 'end_date'] },
+        export: {downloadName: 'WorkOrderBoard'},
         defaultSort: { key: 'created_at', value: 'descend' },
         cols: [
           { fieldKey: 'product', name: 'Product', displayType: "map", mapFn: (cv, row) => `${row.product.name}`, sort: true },

@@ -29,6 +29,7 @@ export class FinancialReportListComponent {
     "globalSearch": {
       keys: ['generated_at','report_name','report_type']
     },
+    export: {downloadName: 'FinancialReportList'},
     defaultSort: { key: 'created_at', value: 'descend' }, 
     cols: [
       {

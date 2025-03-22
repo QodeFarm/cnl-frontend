@@ -29,6 +29,7 @@ export class SwipesListComponent {
     "globalSearch": {
       keys: ['swipe_time','employee_id']
     },
+    export: {downloadName: 'SwipesList'},
     defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {

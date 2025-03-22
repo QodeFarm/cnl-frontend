@@ -37,6 +37,7 @@ export class WorkOrderListComponent {
     globalSearch: {
       keys: ['start_date','product','size','color','quantity', 'completed_qty','pending_qty','status_id','end_date']
     },
+    export: {downloadName: 'WorkOrderList'},
     defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {

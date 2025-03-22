@@ -40,6 +40,9 @@ export class SalesDispatchComponent implements OnInit {
         globalSearch: {
           keys: ['customer', 'order_no','products']
         },
+        export: {
+          downloadName: 'SalesDispatch'
+        },
         defaultSort: { key: 'created_at', value: 'descend' },
         cols: [
           {

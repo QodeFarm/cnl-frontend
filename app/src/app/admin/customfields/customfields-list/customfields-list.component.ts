@@ -23,6 +23,8 @@ export class CustomfieldsListComponent {
     globalSearch: {
       keys: ['field_name', 'entity_id','field_type_id','is_required']
     },
+    export: {downloadName: 'Customfields'},
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {
         fieldKey: 'field_name',

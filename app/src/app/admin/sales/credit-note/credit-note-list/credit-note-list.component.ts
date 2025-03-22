@@ -29,6 +29,7 @@ export class CreditNoteListComponent {
     "globalSearch": {
       keys: ['customer','credit_date','sale_invoice_id','credit_note_number','reason','total_amount','status_name']
     },
+    export: {downloadName: 'CreditNoteList'},
     defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {

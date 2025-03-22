@@ -29,6 +29,7 @@ export class TasksListComponent {
     "globalSearch": {
       keys: ['title','user_id','group_id','description','priority_id','due_date','status_id']
     },
+    export: {downloadName: 'TasksList'},
     defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {

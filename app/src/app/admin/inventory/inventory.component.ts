@@ -23,6 +23,7 @@ export class InventoryComponent {
       "globalSearch": {
         keys: ['name', 'code','category','barcode','stock_unit','mrp','purchase_rate','sales_rate','wholesale_rate','dealer_rate','balance','updated_at']
       },
+      export: {downloadName: 'Inventory'},
       defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {

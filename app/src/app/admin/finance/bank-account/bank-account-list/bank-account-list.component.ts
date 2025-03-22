@@ -30,6 +30,7 @@ export class BankAccountListComponent {
     "globalSearch": {
       keys: ['created_at','account_type','account_name','account_number','bank_name','branch_name',]
     },
+    export: {downloadName: 'BankAccountList'},
     defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {

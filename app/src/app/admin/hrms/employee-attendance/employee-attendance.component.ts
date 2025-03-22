@@ -23,6 +23,7 @@ export class EmployeeAttendanceComponent {
       "globalSearch": {
         keys: ['employee','attendance_date','absent','leave_duration']
       },
+      export: {downloadName: 'EmployeeAttendance'},
       defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {

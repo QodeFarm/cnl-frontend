@@ -29,6 +29,7 @@ export class PaymentTransactionListComponent {
     "globalSearch": {
       keys: ['payment_date','invoice_id','order_type','payment_method','payment_status','amount','reference_number','currency','transaction_type','notes']
     },
+    export: {downloadName: 'PayamentTransactionList'},
     defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {
