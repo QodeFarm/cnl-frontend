@@ -37,6 +37,7 @@ export class VendorsListComponent {
     globalSearch: {
       keys: ['created_at','name','gst_no','email','phone','vendor_category_id','ledger_account','city_id']
     },
+    export: {downloadName: 'VendorList'},
     defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {

@@ -28,6 +28,7 @@ export class WarehousesListComponent {
     "globalSearch": {
       keys: ['created_at','name','code','phone','city_id','state_id']
     },
+    export: {downloadName: 'WarehousesList'},
     defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {

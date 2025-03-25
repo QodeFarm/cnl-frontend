@@ -102,6 +102,7 @@ export class PurchaseInvoiceListComponent {
     "globalSearch": {
       keys: ['invoice_date','vendor','purchase_type','invoice_no','supplier_invoice_no','tax','total_amount','tax_amount','advance_amount','status_name','remarks']
     },
+    export: {downloadName: 'PurchaseInvoiceList'},
     defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {

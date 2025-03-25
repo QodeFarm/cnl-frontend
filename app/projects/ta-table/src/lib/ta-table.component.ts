@@ -615,12 +615,21 @@ export class TaTableComponent implements OnDestroy {
         let _cols = []
         _cols = (this.options.export.cols) ? this.options.export.cols : this.options.cols;
         _cols.forEach((col: any) => {
-          if (col.type == 'action') return;
-          _r[col.name] = getValue(r, col.fieldKey);
+          // Skip 'action' type columns
+        if (col.type === 'action') return;
 
-          if (col.type === 'date') {
-            _r[col.name] = moment(_r[col.name]).format('MMMM Do YYYY, h:mm:ss a')
-          }
+        // 1) Check if displayType=map and mapFn is a function
+        if (col.displayType === 'map' && typeof col.mapFn === 'function') {
+          _r[col.name] = col.mapFn(r[col.fieldKey], r, col);
+        } else {
+          // 2) Otherwise just use the raw value
+          _r[col.name] = getValue(r, col.fieldKey);
+        }
+
+        // 3) If it's a date type, format it
+        if (col.type === 'date') {
+          _r[col.name] = moment(_r[col.name]).format('MMMM Do YYYY, h:mm:ss a');
+        }
         });
         return _r;
       });

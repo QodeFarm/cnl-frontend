@@ -29,6 +29,7 @@ export class ExpenseClaimListComponent {
     "globalSearch": {
       keys: ['created_at','employee_id','claim_date','description','total_amount','status']
     },
+    export: {downloadName: 'ExpenseClaimList'},
     defaultSort: { key: 'created_at', value: 'descend' }, 
     cols: [
       {

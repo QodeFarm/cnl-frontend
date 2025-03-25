@@ -37,6 +37,7 @@ export class ProductsListComponent {
     globalSearch: {
       keys: ['created_at','name','code','unit_options','balance','sales_rate','mrp','dis_amount','print_name','hsn_code','barcode']
     },
+    export: {downloadName: 'ProductsList'},
     defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {

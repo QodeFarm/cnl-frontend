@@ -39,6 +39,7 @@ export class SaleReceiptComponent implements OnInit {
         globalSearch: {
           keys: ['customer','order_no','invoice_no','products']
         },
+        export: {downloadName: 'SaleReceiptList'},
         defaultSort: { key: 'created_at', value: 'descend' },
         cols: [
           {

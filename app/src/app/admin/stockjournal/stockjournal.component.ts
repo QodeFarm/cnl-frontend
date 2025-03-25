@@ -43,6 +43,8 @@ export class StockjournalComponent implements OnInit {
       "globalSearch": {
         keys: ['id', 'name']
       },
+      export: {downloadName: 'StockJournal'},
+      defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'finished_product',
