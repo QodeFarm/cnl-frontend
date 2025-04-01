@@ -611,19 +611,19 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
       if (response && response.data && response.data.length > 0) {
         response.data.forEach((item: any) => {
           if (this.currentWeekPurchase === undefined && item.current_week_purchases !== undefined) {
-            this.currentWeekPurchase = item.current_week_purchases;
+            this.currentWeekPurchase = item.current_week_purchases !== null ? item.current_week_purchases : 0;
           }
     
           if (this.percentagePurchaseChange === undefined && item.percentage_purchase_change !== undefined) {
-            this.percentagePurchaseChange = item.percentage_purchase_change;
+            this.percentagePurchaseChange = item.percentage_purchase_change !== null ? item.percentage_purchase_change : 0;
           }
     
           if (this.currentWeekSales1 === undefined && item.current_week_sales !== undefined) {
-            this.currentWeekSales1 = item.current_week_sales;
+            this.currentWeekSales1 = item.current_week_sales !== null ? item.current_week_sales : 0;
           }
     
           if (this.percentageChange1 === undefined && item.percentage_change !== undefined) {
-            this.percentageChange1 = item.percentage_change;
+            this.percentageChange1 = item.percentage_change !== null ? item.percentage_change : 0; 
           }
         });
       }    
