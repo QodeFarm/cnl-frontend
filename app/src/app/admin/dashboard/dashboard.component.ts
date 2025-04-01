@@ -13,7 +13,7 @@ import { HttpClient } from '@angular/common/http'; // Import HttpClient
 })
 export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
 
-  //for  
+  //for sale and purchase cards (Rs. 0 and 00% from last week)
   currentWeekSales: any;
   percentageChange: any;
   currentWeekPurchase: any;
