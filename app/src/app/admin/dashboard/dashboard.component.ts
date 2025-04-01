@@ -15,7 +15,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
 
   //for sale and purchase cards (Rs. 0 and 00% from last week)
   currentWeekSales: any;
-  percentageChange: any;
+  percentageSalesChange: any;
   currentWeekPurchase: any;
   percentagePurchaseChange: any;
   
@@ -624,8 +624,8 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
             this.currentWeekSales = item.current_week_sales !== null ? item.current_week_sales : 0;
           }
     
-          if (this.percentageChange === undefined && item.percentage_change !== undefined) {
-            this.percentageChange = item.percentage_change !== null ? item.percentage_change : 0; 
+          if (this.percentageSalesChange === undefined && item.percentage_change !== undefined) {
+            this.percentageSalesChange = item.percentage_change !== null ? item.percentage_change : 0; 
           }
         });
       }    
