@@ -12,8 +12,10 @@ import { HttpClient } from '@angular/common/http'; // Import HttpClient
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
-  currentWeekSales1: any;
-  percentageChange1: any;
+
+  //for  
+  currentWeekSales: any;
+  percentageChange: any;
   currentWeekPurchase: any;
   percentagePurchaseChange: any;
   
@@ -618,12 +620,12 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
             this.percentagePurchaseChange = item.percentage_purchase_change !== null ? item.percentage_purchase_change : 0;
           }
     
-          if (this.currentWeekSales1 === undefined && item.current_week_sales !== undefined) {
-            this.currentWeekSales1 = item.current_week_sales !== null ? item.current_week_sales : 0;
+          if (this.currentWeekSales === undefined && item.current_week_sales !== undefined) {
+            this.currentWeekSales = item.current_week_sales !== null ? item.current_week_sales : 0;
           }
     
-          if (this.percentageChange1 === undefined && item.percentage_change !== undefined) {
-            this.percentageChange1 = item.percentage_change !== null ? item.percentage_change : 0; 
+          if (this.percentageChange === undefined && item.percentage_change !== undefined) {
+            this.percentageChange = item.percentage_change !== null ? item.percentage_change : 0; 
           }
         });
       }    
