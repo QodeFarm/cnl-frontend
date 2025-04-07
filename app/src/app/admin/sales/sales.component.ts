@@ -1087,7 +1087,7 @@ export class SalesComponent {
     const fieldMappings = {
       code: data.code,
       rate: data.sales_rate || field.form.controls.rate.value,
-      discount: parseFloat(data.dis_amount) || 0,
+      discount: parseFloat(data.discount) || 0,
       unit_options_id: data.unit_options?.unit_options_id,
       print_name: data.print_name,
       mrp: data.mrp

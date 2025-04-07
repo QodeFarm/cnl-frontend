@@ -4,15 +4,15 @@
         <div class="d-flex align-items-center">
             <!-- Mail Dropdown -->
             <select class="form-select me-2" (change)="onSelect($event)">
-                <option value="" disabled selected aria-disabled="true">Mail</option>
-                <option value="email">Email link</option>
+                <option value="" disabled selected hidden>Sending Mail</option>
+                <option value="email">Email</option>
                 <option value="whatsapp">WhatsApp</option>
             </select>
-            <!-- Other Dropdown -->
-            <select class="form-select me-2">
-                <option value="option1">Option 1</option>
-                <option value="option2">Option 2</option>
-                <option value="option3">Option 3</option>
+            <!-- Print Dropdown -->
+            <select class="form-select me-2" (change)="onPrintSelect($event)">
+                <option value="" disabled selected hidden>Print Document</option>
+                <option value="preview">Preview</option>
+                <option value="print">Print</option>
             </select>
             <!-- Reload Button -->
             <!-- <button class="btn btn-primary text-nowrap">reload</button> -->
@@ -26,6 +26,12 @@
     </div>
     <span class="toast-message-text">{{ toastMessage }}</span>
     <span class="toast-close" onclick="this.parentElement.style.display='none'">x</span>
+</div>
+
+<!-- Loading Indicator -->
+<div class="loading-overlay" *ngIf="showLoading">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Generating preview...</div>
 </div>
 
 <div id="customDialog" class="custom-dialog-overlay" style="display: none;">
