@@ -1741,6 +1741,16 @@ export class SalesComponent {
                   }
                 },
                 {
+                  key: 'use_workflow',
+                  type: 'checkbox',
+                  className: 'col-md-4 col-sm-6 col-12',
+                  defaultValue: true,
+                  templateOptions: {
+                    label: 'Use Workflow',
+                    placeholder: 'Enable Workflow',
+                  },
+                },                                
+                {
                   key: 'remarks',
                   type: 'textarea',
                   className: 'col-md-4 col-sm-6 col-12',
