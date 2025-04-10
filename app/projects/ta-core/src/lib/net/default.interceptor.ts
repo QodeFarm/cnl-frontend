@@ -170,9 +170,6 @@ export class DefaultInterceptor implements HttpInterceptor {
             case 400:
                 errorText = "Bad Request! Please check your input.";
                 break;
-            case 401:
-                errorText = "Unauthorized! The username or password entered is invalid!";
-                break;
             case 403:
                 errorText = "Access Denied! You do not have permission.";
                 break;
