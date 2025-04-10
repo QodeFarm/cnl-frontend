@@ -1087,7 +1087,7 @@ export class SalesComponent {
     const fieldMappings = {
       code: data.code,
       rate: data.sales_rate || field.form.controls.rate.value,
-      discount: parseFloat(data.dis_amount) || 0,
+      discount: parseFloat(data.discount) || 0,
       unit_options_id: data.unit_options?.unit_options_id,
       print_name: data.print_name,
       mrp: data.mrp
@@ -1740,6 +1740,16 @@ export class SalesComponent {
                     }
                   }
                 },
+                {
+                  key: 'use_workflow',
+                  type: 'checkbox',
+                  className: 'col-md-4 col-sm-6 col-12',
+                  defaultValue: true,
+                  templateOptions: {
+                    label: 'Use Workflow',
+                    placeholder: 'Enable Workflow',
+                  },
+                },                                
                 {
                   key: 'remarks',
                   type: 'textarea',
