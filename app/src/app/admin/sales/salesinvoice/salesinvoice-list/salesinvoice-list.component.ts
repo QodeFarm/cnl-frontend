@@ -98,6 +98,173 @@ export class SalesInvoiceListComponent implements OnInit {
     );
   }
 
+  //----------print & preview ------------------------
+  onPrintSelect(event: Event): void {
+    const selectElement = event.target as HTMLSelectElement;
+    const selectedValue = selectElement.value;
+
+    switch (selectedValue) {
+        case 'preview':
+            this.onPreviewClick();
+            break;
+        case 'print':
+            this.onPrintClick();
+            break;
+        default:
+            // Handle default case
+            break;
+    }
+
+    // Reset the dropdown to the default option
+    selectElement.value = '';
+}
+
+// onPreviewClick(): void {
+//     const selectedIds = this.taTableComponent.options.checkedRows;
+//     if (selectedIds.length === 0) {
+//         return this.showDialog();
+//     }
+    
+//     // Add your preview logic here
+//     console.log('Preview clicked for selected documents');
+// }
+
+onPreviewClick(): void {
+  const selectedIds = this.taTableComponent.options.checkedRows;
+  if (selectedIds.length === 0) {
+      return this.showDialog();
+  }
+
+  const saleInvoiceId = selectedIds[0];
+  const url = `masters/document_generator/${saleInvoiceId}/sale_invoice/`;
+  
+  // Show loading indicator
+  this.showLoading = true;
+  
+  // Send request with preview flag
+  this.http.post(url, { flag: 'preview' }, { responseType: 'blob' }).subscribe(
+      (pdfBlob: Blob) => {
+          this.showLoading = false;
+          
+          // Create blob URL and open in new window
+          const blobUrl = URL.createObjectURL(pdfBlob);
+          window.open(blobUrl, '_blank');
+          
+          // Clean up the blob URL after use
+          setTimeout(() => {
+              URL.revokeObjectURL(blobUrl);
+          }, 1000);
+      },
+      (error) => {
+          this.showLoading = false;
+          console.error('Error generating preview', error);
+          
+          // Show error toast
+          this.showSuccessToast = true;
+          this.toastMessage = "Error generating document preview";
+          setTimeout(() => {
+              this.showSuccessToast = false;
+          }, 2000);
+      }
+  );
+}
+
+// Add this property to your component class
+showLoading = false;
+
+// onPrintClick(): void {
+//     const selectedIds = this.taTableComponent.options.checkedRows;
+//     if (selectedIds.length === 0) {
+//         return this.showDialog();
+//     }
+    
+//     // Add your print logic here
+//     console.log('Print clicked for selected documents');
+// }
+
+onPrintClick(): void {
+  const selectedIds = this.taTableComponent.options.checkedRows;
+  if (selectedIds.length === 0) {
+      return this.showDialog();
+  }
+
+  const saleInvoiceId = selectedIds[0];
+  const url = `masters/document_generator/${saleInvoiceId}/sale_invoice/`;
+  
+  this.showLoading = true;
+  
+  this.http.post(url, { flag: 'preview' }, { responseType: 'blob' }).subscribe(
+      (pdfBlob: Blob) => {
+          this.showLoading = false;
+          this.openAndPrintPdf(pdfBlob);
+      },
+      (error) => {
+          this.showLoading = false;
+          console.error('Error generating print document', error);
+          this.showSuccessToast = true;
+          this.toastMessage = "Error generating document for printing";
+          setTimeout(() => {
+              this.showSuccessToast = false;
+          }, 2000);
+      }
+  );
+}
+
+private openAndPrintPdf(pdfBlob: Blob): void {
+  // Create blob URL
+  const blobUrl = URL.createObjectURL(pdfBlob);
+  
+  // Open in new window first
+  const printWindow = window.open(blobUrl, '_blank');
+  
+  // Wait for window to load
+  if (printWindow) {
+      printWindow.onload = () => {
+          try {
+              // Give it a small delay to ensure PDF is rendered
+              setTimeout(() => {
+                  printWindow.print();
+                  // Clean up after printing
+                  URL.revokeObjectURL(blobUrl);
+              }, 500);
+          } catch (e) {
+              console.error('Print error:', e);
+              // Fallback to iframe if window.print() fails
+              this.fallbackPrint(pdfBlob);
+          }
+      };
+  } else {
+      // If popup was blocked, fallback to iframe
+      this.fallbackPrint(pdfBlob);
+  }
+}
+
+private fallbackPrint(pdfBlob: Blob): void {
+  const blobUrl = URL.createObjectURL(pdfBlob);
+  const iframe = document.createElement('iframe');
+  iframe.style.display = 'none';
+  iframe.src = blobUrl;
+  
+  document.body.appendChild(iframe);
+  
+  iframe.onload = () => {
+      setTimeout(() => {
+          try {
+              iframe.contentWindow?.print();
+          } catch (e) {
+              console.error('Iframe print error:', e);
+              // Final fallback - open in new tab
+              window.open(blobUrl, '_blank');
+          }
+          // Clean up
+          setTimeout(() => {
+              document.body.removeChild(iframe);
+              URL.revokeObjectURL(blobUrl);
+          }, 100);
+      }, 1000);
+  };
+}
+//---------------print & Preview - end --------------------------
   tableConfig: TaTableConfig = {
     apiUrl: 'sales/sale_invoice_order/?summary=true',
     showCheckbox: true,
