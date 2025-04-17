@@ -8,7 +8,7 @@
             </button>
             <div class="row custom-form">
                 <div class="col-12 px-1">
-                    <ta-form [options]="formConfig"></ta-form>
+                    <ta-form #paymentreceiptForm [options]="formConfig"></ta-form>
                 </div>
             </div>
         </div>
@@ -19,6 +19,24 @@
             </div>
         </div>
     </div>
+</div>
+
+<!-- Success Toast Message -->
+<div id="customToast" class="toast-message" *ngIf="showSuccessToast">
+    <div class="tick-circle">
+        <span class="tick-mark">✓</span>
+    </div>
+    <span class="toast-message-text">{{ toastMessage }}</span>
+    <span class="toast-close" (click)="showSuccessToast = false">x</span>
+</div>
+
+<!-- Error Toast Message -->
+<div id="errorToast" class="toast-message error-toast" *ngIf="showErrorToast">
+    <div class="error-circle">
+        <span class="error-mark">!</span>
+    </div>
+    <span class="toast-message-text">{{ errorMessage }}</span>
+    <span class="toast-close" (click)="showErrorToast = false">x</span>
 </div>
 
 
