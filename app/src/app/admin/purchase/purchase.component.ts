@@ -191,6 +191,7 @@ export class PurchaseComponent {
     // to get PurchaseOrder number for save
     this.getOrderNo();
     this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide =true;
+    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide =true;
     // console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
   }
 
@@ -350,6 +351,7 @@ export class PurchaseComponent {
         this.totalAmountCal();
         this.showForm = true;
         this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = false;
+        this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide =true;
         // Ensure custom_field_values are correctly populated in the model
         if (res.data.custom_field_values) {
           this.formConfig.model['custom_field_values'] = res.data.custom_field_values.reduce((acc: any, fieldValue: any) => {
@@ -915,12 +917,13 @@ loadQuickpackProducts() {
                           this.formConfig.model['purchase_order_data']['purchase_type_id'] = data.purchase_type_id;
                         }
                       });
-                    },
-                    onChanges: (field: any) => {
                       if (this.dataToPopulate && this.dataToPopulate.purchase_order_data.purchase_type && field.formControl) {
                         field.formControl.setValue(this.dataToPopulate.purchase_order_data.purchase_type);
                       }
-                    }
+                    },
+                    // onChanges: (field: any) => {
+                      
+                    // }
                   }
                 },
                 {
@@ -958,7 +961,7 @@ loadQuickpackProducts() {
                       });
                       if (this.dataToPopulate && this.dataToPopulate.purchase_order_data.vendor && field.formControl) {
                         field.formControl.setValue(this.dataToPopulate.purchase_order_data.vendor);
-                      }
+                      };
                     }
                   }
                 },
@@ -2153,27 +2156,27 @@ loadQuickpackProducts() {
                                 }
                               }
                             },
-                            // {
-                            //   key: 'item_value',
-                            //   type: 'input',
-                            //   defaultValue: "0",
-                            //   className: 'col-md-4 col-lg-3 col-sm-6 col-12',
-                            //   templateOptions: {
-                            //     type: 'input',
-                            //     label: 'Items value',
-                            //     placeholder: 'Enter Item value',
-                            //     readonly: true
-                            //     // required: true
-                            //   },
-                            //   hooks: {
-                            //     onInit: (field: any) => {
-                            //       // Set the initial value from dataToPopulate if available
-                            //       if (this.dataToPopulate && this.dataToPopulate.purchase_order_data && this.dataToPopulate.purchase_order_data.item_value && field.formControl) {
-                            //         field.formControl.setValue(this.dataToPopulate.purchase_order_data.item_value);
-                            //       }
-                            //     }
-                            //   }
-                            // },
+                            {
+                              key: 'item_value',
+                              type: 'input',
+                              defaultValue: "0",
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                              templateOptions: {
+                                type: 'input',
+                                label: 'Items value',
+                                placeholder: 'Enter Item value',
+                                readonly: true
+                                // required: true
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  // Set the initial value from dataToPopulate if available
+                                  if (this.dataToPopulate && this.dataToPopulate.purchase_order_data && this.dataToPopulate.purchase_order_data.item_value && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.purchase_order_data.item_value);
+                                  }
+                                }
+                              }
+                            },
                             {
                               key: 'dis_amt',
                               type: 'input',
@@ -2183,7 +2186,7 @@ loadQuickpackProducts() {
                                 type: 'input',
                                 label: 'Overall Discount',
                                 placeholder: 'Enter Discount amount',
-                                readonly: true
+                                readonly: false
                                 // required: true
                               },
                               hooks: {
@@ -2192,6 +2195,10 @@ loadQuickpackProducts() {
                                   if (this.dataToPopulate && this.dataToPopulate.purchase_order_data && this.dataToPopulate.purchase_order_data.dis_amt && field.formControl) {
                                     field.formControl.setValue(this.dataToPopulate.purchase_order_data.dis_amt);
                                   }
+
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    this.totalAmountCal();
+                                  });
                                 }
                               }
                             },

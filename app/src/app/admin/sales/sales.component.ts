@@ -107,7 +107,12 @@ export class SalesComponent {
       }
     }
   };
-  sizeOptions: any[] = [];
+  // sizeOptions: any[] = [];
+
+  // Initialize the copy modal options dynamically
+  openCopyModal() {
+    this.availableTables = this.tables.filter(table => table !== this.currentTable);
+  }
 
   copyToTable() {
     const selectedMapping = this.fieldMapping[this.selectedTable];
@@ -158,11 +163,6 @@ export class SalesComponent {
   }
 
 
-  // Initialize the copy modal options dynamically
-  openCopyModal() {
-    this.availableTables = this.tables.filter(table => table !== this.currentTable);
-  }
-
   constructor(
     private http: HttpClient,
     private cdRef: ChangeDetectorRef,
@@ -182,8 +182,9 @@ export class SalesComponent {
     this.showForm = false;
     this.SaleOrderEditID = null;
     // set form config
-    this.setFormConfig();
     this.checkAndPopulateData();
+    this.setFormConfig();
+    
     this.loadQuickpackOptions(); // Fetch Quickpack options
     console.log("data in load : ", this.loadQuickpackOptions())
     CustomFieldHelper.fetchCustomFields(this.http, 'sale order', (customFields: any, customFieldMetadata: any) => {
@@ -196,6 +197,7 @@ export class SalesComponent {
     this.getOrderNo();
     this.formConfig.fields[0].fieldGroup[0].fieldGroup[8].hide = true; //flow_status hiding in create page 
     this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = true;
+    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide = true;
 
     // this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[9].hide = true;
     // //console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
@@ -437,6 +439,7 @@ export class SalesComponent {
         this.showForm = true;
         this.formConfig.fields[0].fieldGroup[0].fieldGroup[8].hide = false;
         this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = false;
+        this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide = true;
 
         // Ensure custom_field_values are correctly populated in the model
         if (res.data.custom_field_values) {
@@ -1083,6 +1086,7 @@ export class SalesComponent {
 
   async autoFillProductDetails(field, data) {
     this.productOptions = data;
+    console.log("Autofill data : ", this.productOptions)
     if (!field.form?.controls || !data) return;
     const fieldMappings = {
       code: data.code,
@@ -2008,6 +2012,7 @@ export class SalesComponent {
               
                     // Populate product if data exists
                     const existingProduct = this.dataToPopulate?.sale_order_items?.[currentRowIndex]?.product;
+                    console.log("existingProduct : ", existingProduct);
                     if (existingProduct) {
                       field.formControl.setValue(existingProduct);
                     }
@@ -2903,27 +2908,30 @@ export class SalesComponent {
                                 }
                               }
                             },
-                            // {
-                            //   key: 'item_value',
-                            //   type: 'input',
-                            //   defaultValue: "0",
-                            //   className: 'col-md-4 col-lg-3 col-sm-6 col-12',
-                            //   templateOptions: {
-                            //     type: 'input',
-                            //     label: 'Items value',
-                            //     placeholder: 'Enter Item value',
-                            //     readonly: true
-                            //     // required: true
-                            //   },
-                            //   hooks: {
-                            //     onInit: (field: any) => {
-                            //       // Set the initial value from dataToPopulate if available
-                            //       if (this.dataToPopulate && this.dataToPopulate.sale_order && this.dataToPopulate.sale_order.item_value && field.formControl) {
-                            //         field.formControl.setValue(this.dataToPopulate.sale_order.item_value);
-                            //       }
-                            //     }
-                            //   }
-                            // },
+                            {
+                              key: 'item_value',
+                              type: 'input',
+                              defaultValue: "0",
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                              templateOptions: {
+                                type: 'input',
+                                label: 'Items value',
+                                placeholder: 'Enter Item value',
+                                readonly: true,
+                                expressions: {
+                                  hide: '!model.sale_order_id',
+                                },
+                                // required: true
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  // Set the initial value from dataToPopulate if available
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_order && this.dataToPopulate.sale_order.item_value && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.sale_order.item_value);
+                                  }
+                                }
+                              }
+                            },
                             {
                               key: 'dis_amt',
                               type: 'input',
