@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { TaCurdConfig } from '@ta/ta-curd';
 import { TaTableConfig } from '@ta/ta-table';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 declare var bootstrap: any;
@@ -156,9 +157,11 @@ export class RolesComponent {
   selectedRow: any;
   moduleList: any = [];
   actionList: any;
+  showSuccessToast = false;
+  toastMessage = '';
 
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private notification: NzNotificationService) {
 
   }
 
@@ -264,14 +267,30 @@ export class RolesComponent {
 
     console.log('this.selectedList', selectedList);
 
-    this.http.post('users/role_permissions/', selectedList).subscribe((res: any) => {
-      console.log(res);
-      // close modal
-      document.getElementById('modalClose').click();
-    })
-
-
-
+    this.http.post('users/role_permissions/', selectedList).subscribe(
+      (res: any) => {
+        console.log(res);
+        
+        // Show success notification
+        this.notification.success('Success', 'Role permissions saved successfully');
+        
+        // Show toast message
+        this.showSuccessToast = true;
+        this.toastMessage = 'Role permissions updated successfully';
+        
+        // Auto-hide the toast after 3 seconds
+        setTimeout(() => {
+          this.showSuccessToast = false;
+        }, 3000);
+        
+        // close modal
+        document.getElementById('modalClose').click();
+      },
+      (error) => {
+        console.error('Error saving permissions:', error);
+        
+      }
+    );
   }
 
 }
