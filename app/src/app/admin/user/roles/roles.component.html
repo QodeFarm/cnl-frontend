@@ -6,6 +6,15 @@
     </div>
 </div>
 
+<!-- Success Toast Message -->
+<div id="customToast" class="toast-message" *ngIf="showSuccessToast">
+    <div class="tick-circle">
+        <span class="tick-mark">✓</span>
+    </div>
+    <span class="toast-message-text">{{ toastMessage }}</span>
+    <span class="toast-close" (click)="showSuccessToast = false">x</span>
+</div>
+
 <!-- Config Modal -->
 
 <div class="modal fade custom-modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">

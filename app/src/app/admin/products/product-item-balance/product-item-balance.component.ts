@@ -14,7 +14,7 @@ export class ProductItemBalanceComponent {
       apiUrl: 'products/product_item_balance/',
       title: 'Product Item Balences',
       
-      pkId: "product_balance_id",
+      pkId: "product_item_balance_id",
       pageSize: 10,
       "globalSearch": {
         keys: ['product','warehouse_location_id','quantity']
@@ -67,7 +67,7 @@ export class ProductItemBalanceComponent {
     formConfig: {
       url: 'products/product_item_balance/',
       title: 'Product Item Balence',
-      pkId: "product_balance_id",
+      pkId: "product_item_balance_id",
       exParams: [
         {
           key: 'product_id',
@@ -77,7 +77,7 @@ export class ProductItemBalanceComponent {
         {
           key: 'warehouse_location_id',
           type: 'script',
-          value: 'data.warehouse_location.warehouse_location_id'
+          value: 'data.warehouse_location.location_id'
         },
       ],
       fields: 
@@ -114,7 +114,7 @@ export class ProductItemBalanceComponent {
             templateOptions: {
               label: 'Warehouse Location',
               placeholder: 'Enter Location',
-              dataKey: 'warehouse_location_id',
+              dataKey: 'location_id',
               dataLabel: 'location_name',
               required: true, // Consider setting required to true if necessary
               lazy: {
@@ -148,4 +148,3 @@ export class ProductItemBalanceComponent {
     }]
   }}
 }
- 

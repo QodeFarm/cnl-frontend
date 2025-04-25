@@ -41,13 +41,13 @@ export class StockjournalComponent implements OnInit {
       pkId: "product_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['id', 'name']
+        keys: ['product', 'size', 'color', 'status']
       },
       export: {downloadName: 'StockJournal'},
       defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
-          fieldKey: 'finished_product',
+          fieldKey: 'product',
           name: 'Finished Product',
           sort: true,
           displayType: 'map',
@@ -85,7 +85,7 @@ export class StockjournalComponent implements OnInit {
         {
           fieldKey: 'bom_name',
           name: 'Bom Name',
-          sort: true
+          sort: false
         },            
         {
           fieldKey: 'material',
