@@ -423,6 +423,33 @@ export class ProductsComponent implements OnInit {
                   }
                 },
                 {
+                  key: 'unit_options',
+                  type: 'select',
+                  className: 'col-md-4 col-sm-6 col-12',
+                  templateOptions: {
+                  label: 'Unit Options',
+                  dataKey: 'unit_options_id',
+                  dataLabel: "unit_name",
+                  options: [],
+                  required: true,
+                  lazy: {
+                    url: 'masters/unit_options/',
+                    lazyOneTime: true
+                  }
+                  },
+                  hooks: {
+                  onChanges: (field: any) => {
+                    field.formControl.valueChanges.subscribe((data: any) => {
+                    if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                      this.formConfig.model['products']['unit_options_id'] = data?.unit_options_id;
+                    } else {
+                      console.error('Form config or lead_status data model is not defined.');
+                    }
+                    });
+                  }
+                  }
+                },
+                {
                   className: 'col-md-4 col-sm-6 col-12',
                   key: 'print_barcode',
                   type: 'checkbox',

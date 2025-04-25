@@ -89,11 +89,11 @@ export class CustomfieldsComponent {
               }
             },
             {
-              key: 'entitiy',
+              key: 'entity',
               type: 'select',
               className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
-                dataKey: 'entitiy_id',
+                dataKey: 'entity_id',
                 dataLabel: "entity_name",
                 label: 'Entity Name',
                 placeholder: 'Select Entity Name',
@@ -105,8 +105,8 @@ export class CustomfieldsComponent {
               hooks: {
                 onChanges: (field: any) => {
                   field.formControl.valueChanges.subscribe((data: any) => {
-                    console.log("entity_id", data);
-                    if (data && data.entity_id) {
+                    console.log("data in entity", data);
+                    if (data && data.entity && data.entity.entity_id) {
                       this.formConfig.model['custom_field']['entity_id'] = data.entity_id;
                     }
                   });

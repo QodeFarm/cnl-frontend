@@ -2,27 +2,33 @@
   position: fixed;
   top: 20px;
   right: 20px;
-  background-color: white; /* White background */
-  color: black; /* Black text */
-  padding: 10px 20px;
-  border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  display: flex; /* Use flexbox to align items */
-  align-items: center; /* Center vertically */
-  z-index: 1000;
+  background-color: #fff; /* Pure white background */
+  color: #0e0d0d; /* Dark grey text */
+  padding: 12px 30px;
+  width: 370px; /* Wider box */
+  height: 60px;
+  border-radius: 0px; /* No rounded corners */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Soft shadow */
+  display: flex;
+  align-items: center;
+  font-family: Arial, sans-serif;
   font-size: 16px;
+  font-weight: 500;
+  z-index: 1000;
+  animation: fadeIn 0.4s ease-in-out;
+  border: 2px solid #dcdcdc; /* Subtle border */
 }
   
 .checkmark-circle {
-  width: 30px;
-  height: 30px;
-  background-color: white; /* Green circle */
-  border: 2px solid #008044;
-  border-radius: 50%; /* Make it a circle */
-  display: flex; /* Center the tick mark */
+  width: 23px; /* Slightly smaller */
+  height: 23px;
+  background-color: #fff; /* White inside */
+  border: 2px solid #28a745; /* Green border */
+  border-radius: 50%; /* Perfect circle */
+  display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 10px; /* Space between circle and text */
+  margin-right: 12px; /* Space between icon and text */
 }
 
 
@@ -98,31 +104,63 @@
   position: fixed;
   top: 20px;
   right: 20px;
-  background-color: white; /* White background */
-  color: black; /* Black text */
-  padding: 10px 20px;
-  border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  display: flex; /* Use flexbox to align items */
-  align-items: center; /* Center vertically */
-  z-index: 1000;
+  background-color: #fff; /* Pure white background */
+  color: #0e0d0d; /* Dark grey text */
+  padding: 12px 30px;
+  width: 370px; /* Wider box */
+  height: 60px;
+  border-radius: 0px; /* No rounded corners */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Soft shadow */
+  display: flex;
+  align-items: center;
+  font-family: Arial, sans-serif;
   font-size: 16px;
+  font-weight: 500;
+  z-index: 1000;
+  animation: fadeIn 0.4s ease-in-out;
+  border: 2px solid #dcdcdc; /* Subtle border */
 }
 
 .tick-circle {
-  width: 30px;
-  height: 30px;
-  background-color: white; /* Green circle */
-  border: 2px solid #008044;
-  border-radius: 50%; /* Make it a circle */
-  display: flex; /* Center the tick mark */
+  width: 23px; /* Slightly smaller */
+  height: 23px;
+  background-color: #fff; /* White inside */
+  border: 2px solid #28a745; /* Green border */
+  border-radius: 50%; /* Perfect circle */
+  display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 10px; /* Space between circle and text */
+  margin-right: 12px; /* Space between icon and text */
 }
 
 .tick-mark {
-  color: rgb(0, 128, 79); 
-  font-size: 20px; /* Adjust size as needed */
+  color: #28a745; /* Green tick */
+  font-size: 12px; /* Smaller size */
+  // font-weight: bold;
+  line-height: 1; /* Perfectly centered */
+}
+
+.toast-message-text {
+  flex: 1;
+  color: rgb(41, 41, 41);
+  font-size: 16px;
+  font-weight: 500; /* Medium weight */
+}
+
+/* Close button (X symbol) */
+.toast-close {
+  font-size: 16px;
+  color: rgb(73, 73, 73);
+  cursor: pointer;
+  margin-left: 12px; /* Space between text and close button */
+}
+
+.toast-close:hover {
+  color: #000; /* Darker on hover */
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
   
