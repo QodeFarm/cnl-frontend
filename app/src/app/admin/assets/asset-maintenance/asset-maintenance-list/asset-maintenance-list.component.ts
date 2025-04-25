@@ -66,6 +66,8 @@ export class AssetMaintenanceListComponent {
           {
             type: 'delete',
             label: 'Delete',
+            confirm: true,
+            confirmMsg: "Sure to delete?",
             apiUrl: this.baseUrl + 'assets/asset_maintenance'
           },
           {

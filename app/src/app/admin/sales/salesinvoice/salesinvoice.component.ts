@@ -190,6 +190,7 @@ export class SalesinvoiceComponent {
     // To get SaleInvoice number for save
     this.getInvoiceNo();
     this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = true;
+    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide = true;
   }
 
   loadProductVariations(field: FormlyFieldConfig, productValuechange: boolean = false) {
@@ -344,6 +345,7 @@ export class SalesinvoiceComponent {
         this.totalAmountCal();
         this.showForm = true;
         this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = false;
+        this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide = true;
 
         // Ensure custom_field_values are correctly populated in the model
         if (res.data.custom_field_values) {
@@ -469,6 +471,7 @@ export class SalesinvoiceComponent {
     this.http.get(`sales/sale_order/${saleOrderId}`).subscribe((res: any) => {
       if (res && res.data) {
         const orderData = res.data.sale_order;
+        console.log("orderData : ", orderData);
         const orderItems = res.data.sale_order_items;
         // const invoiceShipments = res.data.order_shipments;
 
@@ -496,16 +499,19 @@ export class SalesinvoiceComponent {
               gst_type_id: orderData.gst_type?.gst_type_id,
               name: orderData.gst_type?.name
             },
+            gst_type_id: orderData.gst_type?.gst_type_id,
             payment_term: {
               payment_term_id: orderData.payment_term?.payment_term_id,
               name: orderData.payment_term?.name,
               code: orderData.payment_term?.code,
             },
+            payment_term_id: orderData.payment_term?.payment_term_id,
             ledger_account: {
               ledger_account_id: orderData.ledger_account?.ledger_account_id,
               name: orderData.ledger_account?.name,
               code: orderData.ledger_account?.code,
             },
+            ledger_account_id: orderData.ledger_account?.ledger_account_id,
             customer: {
               customer_id: orderData.customer?.customer_id,
               name: orderData.customer?.name
@@ -712,6 +718,7 @@ export class SalesinvoiceComponent {
 
     this.http.post('sales/sale_invoice_order/', payload)
       .subscribe(response => {
+        console.log("Entered...")
         this.showSuccessToast = true;
         this.toastMessage = 'Record created successfully';
         this.ngOnInit();
@@ -744,6 +751,7 @@ export class SalesinvoiceComponent {
     // console.log("Updating sale order:", this.formConfig.model);
     this.http.put(`sales/sale_invoice_order/${this.SaleInvoiceEditID}/`, payload)
       .subscribe(response => {
+        console.log("ENtered 2 .....")
         this.showSuccessToast = true;
         this.toastMessage = "Record updated successfully"; // Set the toast message for update
         this.ngOnInit();
@@ -754,6 +762,7 @@ export class SalesinvoiceComponent {
       }, error => {
         console.error('Error updating record:', error);
       });
+      
   }
   //=====================================================
   setFormConfig() {
@@ -2096,27 +2105,27 @@ export class SalesinvoiceComponent {
                                 }
                               }
                             },
-                            // {
-                            //   key: 'item_value',
-                            //   type: 'input',
-                            //   defaultValue: "0",
-                            //   className: 'col-md-4 col-lg-3 col-sm-6 col-12',
-                            //   templateOptions: {
-                            //     type: 'input',
-                            //     label: 'Items value',
-                            //     placeholder: 'Enter Item value',
-                            //     readonly: true
-                            //     // required: true
-                            //   },
-                            //   hooks: {
-                            //     onInit: (field: any) => {
-                            //       // Set the initial value from dataToPopulate if available
-                            //       if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order && this.dataToPopulate.sale_invoice_order.item_value && field.formControl) {
-                            //         field.formControl.setValue(this.dataToPopulate.sale_invoice_order.item_value);
-                            //       }
-                            //     }
-                            //   }
-                            // },
+                            {
+                              key: 'item_value',
+                              type: 'input',
+                              defaultValue: "0",
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                              templateOptions: {
+                                type: 'input',
+                                label: 'Items value',
+                                placeholder: 'Enter Item value',
+                                readonly: true
+                                // required: true
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  // Set the initial value from dataToPopulate if available
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order && this.dataToPopulate.sale_invoice_order.item_value && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.item_value);
+                                  }
+                                }
+                              }
+                            },
                             {
                               key: 'dis_amt',
                               type: 'input',
