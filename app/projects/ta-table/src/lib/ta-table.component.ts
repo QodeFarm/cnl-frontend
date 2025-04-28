@@ -412,7 +412,8 @@ export class TaTableComponent implements OnDestroy {
       '/admin/reports/production-reports',
       '/admin/reports/purchase-reports',
       '/admin/reports/vendor-reports',
-      '/admin/reports/customer-reports'
+      '/admin/reports/customer-reports',
+      '/admin/reports/ledgers-reports'
     ]
     this.loadStatuses();
     this.loadEmployees();

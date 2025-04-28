@@ -19,91 +19,328 @@ export class LedgersReportsComponent {
   reportsConfig: { [key: string]: TaTableConfig } = {
 
     GeneralLedgerReport: {
-      apiUrl: 'customers/ledger_accounts/',
-      // title: 'Ledger Accounts',
-      pkId: "ledger_account_id",
+      apiUrl: 'finance/financial_reports/general_ledger/', // Assuming you have a corresponding API endpoint for General Ledger
       pageSize: 10,
-      "globalSearch": {
-        keys: ['order_date', 'purchase_type_id', 'order_no', 'tax', 'tax_amount', 'total_amount', 'vendor', 'status_name', 'remarks']
+      globalSearch: {
+        keys: ['date', 'account_name', 'description', 'debit', 'credit', 'transaction_date']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'date', value: 'descend' },
       cols: [
         {
-          fieldKey: 'name',
-          name: 'Name',
-          // sort: true
-        },
-        {
-          fieldKey: 'code', 
-          name: 'Code',
-          // sort: true
-        },
-        // {
-        //   fieldKey: 'is_subledger',
-        //   name: 'Is Subledger',
-        //   sort: false,
-        //   type: 'boolean'
-        // },
-        {
-          fieldKey: 'inactive',
-          name: 'Inactive',
-          sort: true,
-          type: 'boolean'
-        },
-        {
-          fieldKey: 'type', 
-          name: 'Type',
+          fieldKey: 'date',
+          name: 'Date',
           sort: true
         },
         {
-          fieldKey: 'account_no',
-          name: 'Account No',
-          sort: true,
-          isEncrypted: true
-        },
-        // {
-        //   fieldKey: 'rtgs_ifsc_code', 
-        //   name: 'RTGS-IFSC',
-        //   sort: false
-        // },
-        // {
-        //   fieldKey: 'classification',
-        //   name: 'Classification',
-        //   sort: false,
-        // },
-        {
-          fieldKey: 'is_loan_account',
-          name: 'Loan Account',
-          sort: true,
-          type: 'boolean'
-        },
-        // {
-        //   fieldKey: 'tds_applicable',
-        //   name: 'TDS',
-        //   sort: false,
-        //   type: 'boolean'
-        // },
-        {
-          fieldKey: 'address', 
-          name: 'Address',
+          fieldKey: 'reference',
+          name: 'Reference',
           sort: true
         },
         {
-          fieldKey: 'pan',
-          name: 'PAN',
-          sort: true,
+          fieldKey: 'account',
+          name: 'Account Name',
+          sort: true
         },
         {
-          fieldKey: 'ledger_group_id',
-          name: 'Ledger Group',
-          // sort: true,
-          displayType: "map",
-          mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.ledger_group.name}`;
-          },
+          fieldKey: 'debit',
+          name: 'Debit Amount',
+          sort: true
+        },
+        {
+          fieldKey: 'credit',
+          name: 'Credit Amount',
+          sort: true
+        },
+        {
+          fieldKey: 'description',
+          name: 'Description',
+          sort: true
         },
       ]
     },
+
+  TrialBalanceReport: {
+    apiUrl: 'finance/financial_reports/trial_balance/',
+    pageSize: 10,
+    globalSearch: {
+      keys: ['account_code', 'account_name', 'account_type']
+    },
+    defaultSort: { key: 'account_code', value: 'ascend' },
+    cols: [
+      {
+        fieldKey: 'account_code',
+        name: 'Account Code',
+        sort: true
+      },
+      {
+        fieldKey: 'account_name',
+        name: 'Account Name',
+        sort: true
+      },
+      {
+        fieldKey: 'account_type',
+        name: 'Account Type',
+        sort: true
+      },
+      {
+        fieldKey: 'total_debit',
+        name: 'Total Debit',
+        sort: true
+      },
+      {
+        fieldKey: 'total_credit',
+        name: 'Total Credit',
+        sort: true
+      },
+      // {
+      //   fieldKey: 'balance',
+      //   name: 'Balance',
+      //   sort: true
+      // }
+    ]
+  },
+  ProfitLossStatement: {
+    apiUrl: 'finance/financial_reports/profit_and_loss/',
+    pageSize: 10,
+    globalSearch: {
+      keys: ['account_code', 'account_name', 'account_type']
+    },
+    defaultSort: { key: 'account_code', value: 'ascend' },
+    cols: [
+      {
+        fieldKey: 'total_revenue',
+        name: 'Total Revenue',
+        sort: true
+      },
+      {
+        fieldKey: 'total_expense',
+        name: 'Total Expense',
+        sort: true
+      },
+      {
+        fieldKey: 'net_profit',
+        name: 'Net Profit',
+        sort: true
+      }, 
+    ]
+  },
+  BalanceSheetReport: {
+    apiUrl: 'finance/financial_reports/balance_sheet/',
+    pageSize: 10,
+    globalSearch: {
+      keys: ['account_code', 'account_name', 'account_type']
+    },
+    defaultSort: { key: 'account_code', value: 'ascend' },
+    cols: [
+      {
+        fieldKey: 'account_code',
+        name: 'Account Code',
+        sort: true
+      },
+      {
+        fieldKey: 'account_name',
+        name: 'Account Name',
+        sort: true
+      },
+      {
+        fieldKey: 'account_type',
+        name: 'Account Type',
+        sort: true
+      }, 
+      {
+        fieldKey: 'balance',
+        name: 'Balance',
+        sort: true
+      }, 
+    ]
+  },
+  
+  CashFlowStatement: {
+    apiUrl: 'finance/financial_reports/cash_flow/',
+    pageSize: 10,
+    globalSearch: {
+      keys: ['account_code', 'account_name', 'account_type']
+    },
+    defaultSort: { key: 'account_code', value: 'ascend' },
+    cols: [
+      {
+        fieldKey: 'account_code',
+        name: 'Account Code',
+        sort: true
+      },
+      {
+        fieldKey: 'account_name',
+        name: 'Account Name',
+        sort: true
+      },
+      {
+        fieldKey: 'account_type',
+        name: 'Account Type',
+        sort: true
+      }, 
+      {
+        fieldKey: 'cash_inflow',
+        name: 'Cash Inflow',
+        sort: true
+      }, 
+      {
+        fieldKey: 'cash_outflow',
+        name: 'Cash Outflow',
+        sort: true
+      }, 
+    ]
+  },
+  AgingReport: {
+    apiUrl: 'finance/financial_reports/aging_report/',
+    pageSize: 10,
+    globalSearch: {
+      keys: ['account_code', 'account_name', 'account_type']
+    },
+    defaultSort: { key: 'account_code', value: 'ascend' },
+    cols: [
+      {
+        fieldKey: 'invoice_id',
+        name: 'Invoice',
+        sort: true
+      },
+      {
+        fieldKey: 'order_type',
+        name: 'Order Type',
+        sort: true
+      },
+      {
+        fieldKey: 'payment_date',
+        name: 'Payment Data',
+        sort: true
+      }, 
+      {
+        fieldKey: 'payment_status',
+        name: 'Payment Status',
+        sort: true
+      }, 
+      {
+        fieldKey: 'due_days',
+        name: 'Due Days',
+        sort: true
+      }, 
+      {
+        fieldKey: 'pending_amount',
+        name: 'Pending Amount',
+        sort: true
+      }, 
+    ]
+  },
+  JournalEntryReport: {
+    apiUrl: 'finance/financial_reports/journal_entry_report/',
+    pageSize: 10,
+    globalSearch: {
+      keys: ['entry_date', 'reference', 'description']
+    },
+    defaultSort: { key: 'entry_date', value: 'descend' },
+    cols: [
+      {
+        fieldKey: 'entry_date',
+        name: 'Entry Date',
+        sort: true
+      },
+      {
+        fieldKey: 'reference',
+        name: 'Reference',
+        sort: true
+      },
+      {
+        fieldKey: 'description',
+        name: 'Journal Description',
+        sort: true
+      },
+      {
+        fieldKey: 'account',
+        name: 'Account',
+        displayType: 'map',
+        mapFn: (currentValue: any, row: any) => {
+          return row.lines?.map((line: any) => line.account).join('<br>');
+        },
+        sort: true
+      },
+      {
+        fieldKey: 'debit',
+        name: 'Debit',
+        displayType: 'map',
+        mapFn: (currentValue: any, row: any) => {
+          return row.lines?.map((line: any) => line.debit).join('<br>');
+        },
+        sort: true
+      },
+      {
+        fieldKey: 'credit',
+        name: 'Credit',
+        displayType: 'map',
+        mapFn: (currentValue: any, row: any) => {
+          return row.lines?.map((line: any) => line.credit).join('<br>');
+        },
+        sort: true
+      },
+      {
+        fieldKey: 'line_description',
+        name: 'Line Description',
+        displayType: 'map',
+        mapFn: (currentValue: any, row: any) => {
+          return row.lines?.map((line: any) => line.description).join('<br>');
+        },
+        sort: false
+      }
+    ]
+  },
+  BankReconciliationReport: {
+    apiUrl: 'finance/financial_reports/bank_reconciliation/',
+    pageSize: 10,
+    globalSearch: {
+      keys: ['account_name', 'account_number', 'bank_name', 'branch_name', 'ifsc_code', 'balance', 'ledger_balance', 'difference']
+    },
+    // defaultSort: { key: 'account_name', value: 'ascend' },
+    cols: [
+      {
+        fieldKey: 'account_name',
+        name: 'Account Name',
+        sort: true
+      },
+      {
+        fieldKey: 'account_number',
+        name: 'Account Number',
+        sort: true
+      },
+      {
+        fieldKey: 'bank_name',
+        name: 'Bank Name',
+        sort: true
+      },
+      {
+        fieldKey: 'branch_name',
+        name: 'Branch',
+        sort: true
+      },
+      {
+        fieldKey: 'ifsc_code',
+        name: 'IFSC Code',
+        sort: true
+      },
+      {
+        fieldKey: 'balance',
+        name: 'Bank Balance',
+        sort: true
+      },
+      {
+        fieldKey: 'ledger_balance',
+        name: 'Ledger Balance',
+        sort: true
+      },
+      {
+        fieldKey: 'difference',
+        name: 'Difference',
+        sort: true
+      }
+    ]
+  }
   }
   toggleAccordion() {
     this.isAccordionOpen = !this.isAccordionOpen;

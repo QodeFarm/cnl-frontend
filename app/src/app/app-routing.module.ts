@@ -120,6 +120,7 @@ const routes: Routes = [
       { path: 'reports/vendor-reports', data: { title: 'Vendor Reports', moduleName: 'vendor-reports' }, canActivate: [], loadComponent: () => import('./admin/reports/vendor-reports/vendor-reports.component').then(m => m.VendorReportsComponent) },
       { path: 'reports/customer-reports', data: { title: 'Customer Reports', moduleName: 'customer-reports' }, canActivate: [], loadComponent: () => import('./admin/reports/customer-reports/customer-reports.component').then(m => m.CustomerReportsComponent) },
       { path: 'reports/production-reports', data: { title: 'Production Reports', moduleName: 'production-reports' }, canActivate: [], loadComponent: () => import('./admin/reports/production-reports/production-reports.component').then(m => m.ProductionReportsComponent) },
+      { path: 'reports/gst-reports', data: { title: 'Gst Reports', moduleName: 'gst-reports' }, canActivate: [], loadComponent: () => import('./admin/reports/gst-reports/gst-reports.component').then(m => m.GstReportsComponent) },
 
 
 

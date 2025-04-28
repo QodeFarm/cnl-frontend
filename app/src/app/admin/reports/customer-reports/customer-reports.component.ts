@@ -53,9 +53,55 @@ export class CustomerReportsComponent {
         apiUrl: 'customers/customers/?customer_ledger_report=true',
         pageSize: 10,
         globalSearch: {
-          keys: ['name', 'invoice_no', 'invoice_date', 'order_status']
+          keys: ['transaction_date', 'reference_number', 'description', 'debit', 'credit', 'running_balance', 'transaction_type']
         },
         defaultSort: { key: 'name', value: 'ascend' },
+        cols: [
+          {
+            fieldKey: 'transaction_date',
+            name: 'Transaction Date',
+            sort: true
+          },
+          {
+            fieldKey: 'reference_number',
+            name: 'Reference Number',
+            sort: true
+          },
+          {
+            fieldKey: 'description',
+            name: 'Description',
+            sort: true
+          },
+          {
+            fieldKey: 'debit',
+            name: 'Debit',
+            sort: true
+          },
+          {
+            fieldKey: 'credit',
+            name: 'credit',
+            sort: true
+          },
+          {
+            fieldKey: 'running_balance',
+            name: 'Running Balance',
+            sort: true
+          },
+          {
+            fieldKey: 'transaction_type',
+            name: 'Transaction Type',
+            sort: true
+          }
+        ]
+      },
+       //====================================== Customer Outstanding Report ===========================
+       CustomerOutstandingReport: {
+        apiUrl: 'customers/customers/?customer_outstanding_report=true',
+        pageSize: 10,
+        globalSearch: {
+          keys: ['name', 'total_sales', 'total_paid', 'total_pending', 'last_payment_date', 'phone', 'email']
+        },
+        defaultSort: { key: 'total_pending', value: 'descend' },
         cols: [
           {
             fieldKey: 'name',
@@ -63,42 +109,34 @@ export class CustomerReportsComponent {
             sort: true
           },
           {
-            fieldKey: 'invoice_no',
-            name: 'Invoice No',
-            displayType: 'map',
-            mapFn: (currentValue: any, row: any) => {
-              // If there's at least one transaction, show its invoice_no; else N/A
-              return row.transactions?.length ? row.transactions[0].invoice_no : '-';
-            },
+            fieldKey: 'total_sales',
+            name: 'Total Sales',
             sort: true
           },
           {
-            fieldKey: 'invoice_date',
-            name: 'Invoice Date',
-            displayType: 'map',
-            mapFn: (currentValue: any, row: any) => {
-              return row.transactions?.length ? row.transactions[0].invoice_date : '-';
-            },
+            fieldKey: 'total_paid',
+            name: 'Total Paid',
             sort: true
           },
           {
-            fieldKey: 'order_status',
-            name: 'Status',
-            displayType: 'map',
-            mapFn: (currentValue: any, row: any) => {
-              const status = row.transactions?.length ? row.transactions[0].order_status : null;
-              return status?.status_name || '-';
-            },
+            fieldKey: 'total_pending',
+            name: 'Outstanding Amount',
             sort: true
           },
           {
-            fieldKey: 'total_amount',
-            name: 'Total Amount',
-            displayType: 'map',
-            mapFn: (currentValue: any, row: any) => {
-              return row.transactions?.length ? row.transactions[0].total_amount : '-';
-            },
+            fieldKey: 'last_payment_date',
+            name: 'Last Payment Date',
             sort: true
+          },
+          {
+            fieldKey: 'phone',
+            name: 'Phone Number',
+            sort: false
+          },
+          {
+            fieldKey: 'email',
+            name: 'Email',
+            sort: false
           }
         ]
       },
@@ -182,6 +220,64 @@ export class CustomerReportsComponent {
           },
         ]
       },
+      //====================================== Customer Payment Report ===========================
+      CustomerPaymentReport: {
+        apiUrl: 'customers/customers/?customer_payment_report=true',
+        pkId: "payment_id",
+        pageSize: 10,
+        globalSearch: {
+          keys: ['payment_date', 'payment_amount', 'payment_method', 'payment_status', 
+                'reference_number', 'invoice_id', 'customer_name', 'customer_gst', 'notes']
+        },
+        defaultSort: { key: 'payment_date', value: 'descend' },
+        cols: [
+          {
+            fieldKey: 'payment_date',
+            name: 'Payment Date',
+            sort: true
+          },
+          {
+            fieldKey: 'customer_name',
+            name: 'Customer Name',
+            sort: true
+          },
+          {
+            fieldKey: 'payment_amount',
+            name: 'Amount',
+            sort: true
+          },
+          {
+            fieldKey: 'payment_method',
+            name: 'Payment Method',
+            sort: true
+          },
+          {
+            fieldKey: 'payment_status',
+            name: 'Status',
+            sort: true
+          },
+          {
+            fieldKey: 'reference_number',
+            name: 'Reference Number',
+            sort: true
+          },
+          {
+            fieldKey: 'invoice_id',
+            name: 'Invoice ID',
+            sort: true
+          },
+          {
+            fieldKey: 'customer_gst',
+            name: 'GST Number',
+            sort: true
+          },
+          {
+            fieldKey: 'notes',
+            name: 'Notes',
+            sort: false
+          }
+        ]
+      }
     }
     toggleAccordion() {
       this.isAccordionOpen = !this.isAccordionOpen;

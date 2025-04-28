@@ -10,10 +10,12 @@ import { LedgerAccountsComponent } from '../customers/ledger-accounts/ledger-acc
 import { VendorReportsComponent } from './vendor-reports/vendor-reports.component';
 import { CustomerReportsComponent } from './customer-reports/customer-reports.component';
 import { ProductionReportsComponent } from './production-reports/production-reports.component';
+import { GstReportsComponent } from './gst-reports/gst-reports.component';
 
 
 @NgModule({
-  declarations: [],
+  declarations: [
+  ],
   imports: [
     CommonModule,
     AdminCommmonModule,
@@ -23,7 +25,9 @@ import { ProductionReportsComponent } from './production-reports/production-repo
     LedgersReportsComponent,
     VendorReportsComponent,
     CustomerReportsComponent,
-    ProductionReportsComponent
+    ProductionReportsComponent,
+    GstReportsComponent
+
   ]
 })
 export class ReportsModule { }

@@ -503,6 +503,37 @@ export class PurchaseReportsComponent {
           },
         ]
       },
+      // ========================= Stock Replenishment Report ==============================
+      StockReplenishmentReport: {
+        apiUrl: 'purchase/purchase_order/?stock_replenishment_report=true',
+        pageSize: 10,
+        globalSearch: {
+          keys: ['name', 'current_stock', 'minimum_stock', 'reorder_quantity']
+        },
+        defaultSort: { key: 'reorder_quantity', value: 'descend' },
+        cols: [
+          {
+            fieldKey: 'name',
+            name: 'Product Name',
+            sort: true
+          },
+          {
+            fieldKey: 'current_stock',
+            name: 'Current Stock',
+            sort: true
+          },
+          {
+            fieldKey: 'minimum_stock',
+            name: 'Minimum Stock',
+            sort: true
+          },
+          {
+            fieldKey: 'reorder_quantity',
+            name: 'Suggested Order Quantity',
+            sort: true
+          }
+        ]
+      }
     };
   
     toggleAccordion() {

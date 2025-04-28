@@ -9,30 +9,29 @@
             </h2>
             <div id="reportCollapse" class="accordion-collapse collapse show" *ngIf="isAccordionOpen">
                 <div class="accordion-body">
-                    <!-- Report Buttons -->
                     <div class="d-flex gap-3">
                         <a class="report-link" (click)="selectReport('GeneralLedgerReport')">
                             General Ledger Report
                         </a>
-                        <a class="report-link" (click)="selectReport('salesInvoice')">
+                        <a class="report-link" (click)="selectReport('TrialBalanceReport')">
                             Trial Balance Report
                         </a>
-                        <a class="report-link" (click)="selectReport('SalesbyProductReport')">
+                        <a class="report-link" (click)="selectReport('ProfitLossStatement')">
                             Profit & Loss Statement
                         </a>
-                        <a class="report-link" (click)="selectReport('SalesByCustomerReport')">
+                        <a class="report-link" (click)="selectReport('BalanceSheetReport')">
                             Balance Sheet Report
                         </a>
-                        <a class="report-link" (click)="selectReport('SalesReturnReport')">
+                        <a class="report-link" (click)="selectReport('CashFlowStatement')">
                             Cash Flow Statement
                         </a>
-                        <a class="report-link" (click)="selectReport('SalesReturnReport')">
+                        <a class="report-link" (click)="selectReport('AgingReport')">
                            Aging Report
                         </a>
-                        <a class="report-link" (click)="selectReport('SalesReturnReport')">
+                        <a class="report-link" (click)="selectReport('BankReconciliationReport')">
                             Bank Reconciliation Report
                         </a>
-                        <a class="report-link" (click)="selectReport('SalesReturnReport')">
+                        <a class="report-link" (click)="selectReport('JournalEntryReport')">
                             Journal Entry Report
                         </a>
                        

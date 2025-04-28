@@ -117,14 +117,14 @@ export class SalesRepotsComponent {
           sort: true
         },
         {
-        fieldKey: 'status_name',
-        name: 'Status',
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row?.order_status?.status_name}`;
+          fieldKey: 'status_name',
+          name: 'Status',
+          displayType: "map",
+          mapFn: (currentValue: any, row: any, col: any) => {
+            return `${row?.order_status?.status_name}`;
+          },
+          sort: true
         },
-        sort: true
-      },
       {
         fieldKey: 'total_amount',
         name: 'Total Amount',
