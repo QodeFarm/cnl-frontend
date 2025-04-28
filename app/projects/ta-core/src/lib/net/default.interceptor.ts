@@ -71,93 +71,77 @@ export class DefaultInterceptor implements HttpInterceptor {
     setTimeout(() => this.injector.get(Router).navigateByUrl(url));
   }
 
-  // private checkStatus(ev: HttpErrorResponse): void {
-  //   let errorMsg = `Request error ${ev.status}: `;
-  //   if (ev.status == 400) {
-  //     const errortext = CODEMESSAGE[ev.status] || ev.statusText;
-  //     this.notification.error('', errortext);
-  //     return;
-  //   }
-  //   if ((ev.status >= 200 && ev.status < 300) || ev.status === 401) {
-  //     return;
-  //   }
-
-  //   const errortext = "Username or Password is not valid" //CODEMESSAGE[ev.status] || ev.statusText;
-  //   this.notification.error(errorMsg, errortext);
-  // }
-
   private checkStatus(ev: HttpErrorResponse): void {
-    let errorMsg = `Request error ${ev.status}: `;
+    // Skip showing any error for login attempts - those will be handled by the form component
+    const isLoginAttempt = ev.url?.includes('users/login');
+    if (isLoginAttempt && ev.status === 401) {
+      return; // Exit early for login 401 errors
+    }
 
-    if (ev.status == 400) {
-      const responseBody = ev.error;  // Assuming response is in `ev.error` (adjust as necessary)
+    // Handle 400 errors specifically
+    if (ev.status === 400) {
+      const responseBody = ev.error;  // Response is in `ev.error`
 
-      // Case 0: If the error is due to form validation at model level (viewsets - not API View), show the validation errors
-      if (ev.status == 400 && ev.error?.message?.includes('Form validation failed')) {
-        if (ev.error.errors) {
+      // Case 1: Handle field-level validation errors first (highest priority)
+      if (responseBody && typeof responseBody === 'object') {
+        // Check for typical Django/DRF validation error format
+        const hasFieldErrors = Object.keys(responseBody).some(key => 
+          Array.isArray(responseBody[key]) && responseBody[key].length > 0
+        );
+        
+        if (hasFieldErrors) {
           let errorMessages: string[] = [];
-      
-          Object.keys(responseBody.errors).forEach((key) => {
-            // Remove underscores and make the key bold
-            const formattedKey = key.replace(/_/g, ' ').toUpperCase();
-            errorMessages.push(`<strong>${formattedKey}:</strong> ${ev.error.errors[key].join(', ')}`);
+          
+          Object.keys(responseBody).forEach((key) => {
+            if (Array.isArray(responseBody[key])) {
+              const formattedKey = key.replace(/_/g, ' ').toUpperCase();
+              errorMessages.push(`<strong>${formattedKey}:</strong> ${responseBody[key].join(', ')}`);
+            }
           });
+          
+          if (errorMessages.length > 0) {
+            this.showError(errorMessages.join('<br>'));
+            return;
+          }
+        }
+      }
       
+      // Case 2: Handle form validation errors with nested 'errors' object
+      if (responseBody?.errors && typeof responseBody.errors === 'object') {
+        let errorMessages: string[] = [];
+        
+        Object.keys(responseBody.errors).forEach((key) => {
+          const formattedKey = key.replace(/_/g, ' ').toUpperCase();
+          errorMessages.push(`<strong>${formattedKey}:</strong> ${responseBody.errors[key].join(', ')}`);
+        });
+        
+        if (errorMessages.length > 0) {
           this.showError(errorMessages.join('<br>'));
-          return
-        } else {
-          this.showError('Form validation failed, but no specific errors were provided.');
-          return
+          return;
         }
       }
       
-      // Case 1: If the message is available, show it directly
-      if (responseBody && responseBody.message && responseBody.data.length === 0) {
-        // If only message is present (no detailed error data)
-        const errortext = responseBody.message;
-        // -- old notification error type is commented below -- 
-        // this.notification.error(
-        //   `<div style="font-size: 12px; color: #333;">${errortext}</div>`,
-        //   '',
-        //   { nzDuration: 5000, nzStyle: { backgroundColor: '#fff9f9', border: '1px solid #ffa39e', maxWidth: '800px' } }
-        // );
-        this.showError(errortext)
-        return;
-      }
-
-      // Case 2: If detailed validation errors are present in `data`
-      if (responseBody && responseBody.data && Object.keys(responseBody.data).length > 0 && Object.values(responseBody.data).every(value => typeof value === 'string')
-      ) {
-        let detailedError = '';
-        for (const [key, message] of Object.entries(responseBody.data)) {
-          // For each validation error, format it as "KEY: Error message"
-          detailedError += `<strong>${key.toUpperCase()}:</strong> ${message}<br>`;
-
-        }
-        // -- old notification error type is commented below -- 
-        // this.notification.error(
-        //   `${detailedError}`,
-        //   '',
-        //   { 
-        //     nzDuration: 5000, 
-        //     nzStyle: { 
-        //       backgroundColor: '#fff9f9', 
-        //       border: '1px solid #ffa39e', 
-        //       maxWidth: '1000px'
-        //     } 
-        //   }
-        // );
-        this.showError(detailedError);
+      // Case 3: If there's a message in the response
+      if (responseBody?.message) {
+        this.showError(responseBody.message);
         return;
       }
       
-
-      // if more backend requirements not satisfied.
-      if (responseBody?.data && Object.keys(responseBody.data).length) {
+      // Case 4: If we have data with errors
+      if (responseBody?.data && Object.keys(responseBody.data).length > 0) {
         const errorText = this.formatErrors(responseBody);
         this.showError(errorText);
         return;
       }
+      
+      // Case 5: Generic 400 error with no specific details
+      this.showError("Bad Request! Please check your input.");
+      return;
+    }
+
+    // Skip showing generic errors for login attempts
+    if (isLoginAttempt) {
+      return;
     }
 
     // Fallback for other HTTP status codes
@@ -167,9 +151,6 @@ export class DefaultInterceptor implements HttpInterceptor {
     } else {
         // Handle Specific Error Codes
         switch (ev.status) {
-            case 400:
-                errorText = "Bad Request! Please check your input.";
-                break;
             case 403:
                 errorText = "Access Denied! You do not have permission.";
                 break;
@@ -179,12 +160,9 @@ export class DefaultInterceptor implements HttpInterceptor {
             case 500:
                 errorText = "Server Error! Something went wrong on our end.";
                 break;
-            default:
-                errorText = "An error occurred. Please try again.";
         }
     }
-    console.warn(' Showing Notification:', errorText);
-
+    
     this.notification.error(
       'Error',
       errorText,
@@ -284,14 +262,23 @@ export class DefaultInterceptor implements HttpInterceptor {
   // #endregion
 
   private toLogin(errorMsg?: any): void {
-    // console.log('ev', errorMsg.error.message);
-    let msg = 'Not logged in or login has expired, please log in again.';
-    if (errorMsg && errorMsg.error && errorMsg.error.message) {
-      msg = errorMsg.error.message;
-    }
+    // Check if this is a login attempt by examining the URL in the error
+    const isLoginAttempt = errorMsg?.url?.includes('users/login');
+    
+    // Clear user data from storage
     localStorage.removeItem('user');
     localStorage.removeItem('accessToken');
-    this.notification.error(msg, ``);
+    
+    // Only show notification if this is not a login attempt
+    // For login attempts, the form component will handle the error display
+    if (!isLoginAttempt) {
+      let msg = 'Not logged in or login has expired, please log in again.';
+      if (errorMsg && errorMsg.error && errorMsg.error.message) {
+        msg = errorMsg.error.message;
+      }
+      this.notification.error(msg, ``);
+    }
+    
     this.goTo('/login');
   }
 

@@ -77,7 +77,7 @@ export class PurchaseInvoiceComponent {
     },
     'Purchase Order': {
       sourceModel: 'purchase_invoice_orders',
-      targetModel: 'purchase_order',
+      targetModel: 'purchase_order_data',
       nestedModels: {
         purchase_invoice_items: 'purchase_order_items',
         order_attachments: 'order_attachments',
@@ -178,6 +178,7 @@ export class PurchaseInvoiceComponent {
     // to get PurchaseOrder number for save
     this.getInvoiceNo();
     this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide =true;  //Hiding order status in create field
+    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide =true;  //Hiding order status in create field
   }
 
   checkAndPopulateData() {
@@ -328,6 +329,7 @@ export class PurchaseInvoiceComponent {
         // show form after setting form values
         this.formConfig.model['purchase_invoice_id'] = this.PurchaseInvoiceEditID;
         this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = false;
+        this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide =true;  //Hiding order status in create field
         this.totalAmountCal();
         this.showForm = true;
 
@@ -1824,27 +1826,27 @@ loadQuickpackProducts() {
                                 }
                               }
                             },
-                            // {
-                            //   key: 'item_value',
-                            //   type: 'input',
-                            //   defaultValue: "0",
-                            //   className: 'col-md-4 col-lg-3 col-sm-6 col-12',
-                            //   templateOptions: {
-                            //     type: 'input',
-                            //     label: 'Items value',
-                            //     placeholder: 'Enter Item value',
-                            //     readonly: true
-                            //     // required: true
-                            //   },
-                            //   hooks: {
-                            //     onInit: (field: any) => {
-                            //       // Set the initial value from dataToPopulate if available
-                            //       if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders && this.dataToPopulate.purchase_invoice_orders.item_value && field.formControl) {
-                            //         field.formControl.setValue(this.dataToPopulate.purchase_invoice_orders.item_value);
-                            //       }
-                            //     }
-                            //   }
-                            // },
+                            {
+                              key: 'item_value',
+                              type: 'input',
+                              defaultValue: "0",
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                              templateOptions: {
+                                type: 'input',
+                                label: 'Items value',
+                                placeholder: 'Enter Item value',
+                                readonly: true
+                                // required: true
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  // Set the initial value from dataToPopulate if available
+                                  if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders && this.dataToPopulate.purchase_invoice_orders.item_value && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.purchase_invoice_orders.item_value);
+                                  }
+                                }
+                              }
+                            },
                             {
                               key: 'dis_amt',
                               type: 'input',
@@ -1853,8 +1855,7 @@ loadQuickpackProducts() {
                               templateOptions: {
                                 type: 'input',
                                 label: 'Overall Discount',
-                                placeholder: 'Enter Discount amount',
-                                readonly: true
+                                placeholder: 'Enter Discount amount'
                                 // required: true
                               },
                               hooks: {
@@ -1863,6 +1864,10 @@ loadQuickpackProducts() {
                                   if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders && this.dataToPopulate.purchase_invoice_orders.dis_amt && field.formControl) {
                                     field.formControl.setValue(this.dataToPopulate.purchase_invoice_orders.dis_amt);
                                   }
+
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    this.totalAmountCal();
+                                  });
                                 }
                               }
                             },

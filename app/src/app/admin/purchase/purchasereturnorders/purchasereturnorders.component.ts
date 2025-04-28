@@ -177,7 +177,8 @@ export class PurchasereturnordersComponent {
     this.formConfig.model['purchase_return_orders']['order_type'] = 'purchase_return';
 
     this.getOrderNo();
-    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = true;
+    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[5].hide = true;
+    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[6].hide = true;
     // console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
   }
 
@@ -326,8 +327,8 @@ export class PurchasereturnordersComponent {
         this.formConfig.model['purchase_return_id'] = this.PurchaseReturnOrderEditID;
         this.totalAmountCal();
         this.showForm = true;
-        this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = false;
-      
+        this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[5].hide = false;
+        this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[6].hide = true;
         // Ensure custom_field_values are correctly populated in the model
         if (res.data.custom_field_values) {
           this.formConfig.model['custom_field_values'] = res.data.custom_field_values.reduce((acc: any, fieldValue: any) => {
@@ -1712,66 +1713,6 @@ showSuccessToast = false;
                             //   placeholder: 'Enter total boxes',
                             //   }
                             // },
-                            // {
-                            //   key: 'item_value',
-                            //   type: 'input',
-                            //   defaultValue: "0",
-                            //   className: 'col-md-4 col-lg-3 col-sm-6 col-12',
-                            //   templateOptions: {
-                            //   type: 'input',
-                            //   label: 'Items value',
-                            //   placeholder: 'Enter Item value',
-                            //   // required: true
-                            //   },
-                            //   hooks: {
-                            //   onInit: (field: any) => {
-                            //     // Set the initial value from dataToPopulate if available
-                            //     if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders && this.dataToPopulate.purchase_return_orders.item_value && field.formControl) {
-                            //     field.formControl.setValue(this.dataToPopulate.purchase_return_orders.item_value);
-                            //     }
-                            //   }
-                            //   }
-                            // },
-                            {
-                              key: 'dis_amt',
-                              type: 'input',
-                              // defaultValue: "777770",
-                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
-                              templateOptions: {
-                              type: 'input',
-                              label: 'Overall Discount',
-                              placeholder: 'Enter Discount amount',
-                              // required: true
-                              },
-                              hooks: {
-                              onInit: (field: any) => {
-                                // Set the initial value from dataToPopulate if available
-                                if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders && this.dataToPopulate.purchase_return_orders.dis_amt && field.formControl) {
-                                field.formControl.setValue(this.dataToPopulate.purchase_return_orders.dis_amt);
-                                }
-                              }
-                              }
-                            },
-                            {
-                              key: 'total_amount',
-                              type: 'input',
-                              defaultValue: "0",
-                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
-                              templateOptions: {
-                              type: 'input',
-                              label: 'Total amount',
-                              placeholder: 'Enter Total amount',
-                              readonly: true
-                              },
-                              hooks: {
-                              onInit: (field: any) => {
-                                // Set the initial value from dataToPopulate if available
-                                if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders && this.dataToPopulate.purchase_return_orders.total_amount && field.formControl) {
-                                field.formControl.setValue(this.dataToPopulate.purchase_return_orders.total_amount);
-                                }
-                              }
-                              }
-                            }, 
                             {
                               key: 'order_status',
                               type: 'select',
@@ -1800,7 +1741,71 @@ showSuccessToast = false;
                                 });
                               }
                               }
-                            },  
+                            },
+                            {
+                              key: 'item_value',
+                              type: 'input',
+                              defaultValue: "0",
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                              templateOptions: {
+                              type: 'input',
+                              label: 'Items value',
+                              placeholder: 'Enter Item value',
+                              // required: true
+                              },
+                              hooks: {
+                              onInit: (field: any) => {
+                                // Set the initial value from dataToPopulate if available
+                                if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders && this.dataToPopulate.purchase_return_orders.item_value && field.formControl) {
+                                field.formControl.setValue(this.dataToPopulate.purchase_return_orders.item_value);
+                                }
+                              }
+                              }
+                            },
+                            {
+                              key: 'dis_amt',
+                              type: 'input',
+                              // defaultValue: "777770",
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                              templateOptions: {
+                              type: 'input',
+                              label: 'Overall Discount',
+                              placeholder: 'Enter Discount amount',
+                              // required: true
+                              },
+                              hooks: {
+                              onInit: (field: any) => {
+                                // Set the initial value from dataToPopulate if available
+                                if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders && this.dataToPopulate.purchase_return_orders.dis_amt && field.formControl) {
+                                field.formControl.setValue(this.dataToPopulate.purchase_return_orders.dis_amt);
+                                }
+
+                                field.formControl.valueChanges.subscribe(data => {
+                                  this.totalAmountCal();
+                                });
+                              }
+                              }
+                            },
+                            {
+                              key: 'total_amount',
+                              type: 'input',
+                              defaultValue: "0",
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                              templateOptions: {
+                              type: 'input',
+                              label: 'Total amount',
+                              placeholder: 'Enter Total amount',
+                              readonly: true
+                              },
+                              hooks: {
+                              onInit: (field: any) => {
+                                // Set the initial value from dataToPopulate if available
+                                if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders && this.dataToPopulate.purchase_return_orders.total_amount && field.formControl) {
+                                field.formControl.setValue(this.dataToPopulate.purchase_return_orders.total_amount);
+                                }
+                              }
+                              }
+                            },   
                           ]
                         },
                       ]

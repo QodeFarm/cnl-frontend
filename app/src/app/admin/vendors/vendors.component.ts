@@ -835,7 +835,7 @@ export class VendorsComponent {
                             },
                             {
                               className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                              key: 'gst',
+                              key: 'gst_no',
                               type: 'input',
                               templateOptions: {
                                 label: 'GST No',

@@ -190,6 +190,7 @@ export class SaleReturnsComponent {
     this.formConfig.model['sale_return_order']['order_type'] = 'sale_return';
 
     this.getReturnNo();
+    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[5].hide = true;
     this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[6].hide = true;
     // console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])  }
   }
@@ -391,7 +392,8 @@ export class SaleReturnsComponent {
         this.formConfig.model['sale_return_id'] = this.SaleReturnOrderEditID;
         this.showForm = true; // Show form for editing
         // Show necessary fields for editing
-        this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[6].hide = false;
+        this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[5].hide = false;
+        this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[6].hide = true;
 
         this.totalAmountCal() //calling calculation in edit mode.
         // Ensure custom_field_values are correctly populated in the model
@@ -1975,36 +1977,36 @@ export class SaleReturnsComponent {
                                 }
                               }
                             },
-                            {
-                              key: 'ledger_account',
-                              type: 'select',
-                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
-                              templateOptions: {
-                                label: 'Ledger account',
-                                placeholder: 'Select Ledger account',
-                                dataKey: 'ledger_account_id', // Assuming ledger_account_id is the key for the selected value
-                                dataLabel: 'name',
-                                lazy: {
-                                  url: 'customers/ledger_accounts/',
-                                  lazyOneTime: true
-                                }
-                              },
-                              hooks: {
-                                onInit: (field: any) => {
-                                  // Subscribe to value changes
-                                  field.formControl.valueChanges.subscribe(data => {
-                                    if (data && data.ledger_account_id) {
-                                      this.formConfig.model['sale_return_order']['ledger_account_id'] = data.ledger_account_id; // Update the model with the selected ledger_account_id
-                                    }
-                                  });
-                                  // Set the default value for Ledger Account if it exists
-                                  if (this.dataToPopulate && this.dataToPopulate.sale_return_order.ledger_account && field.formControl) {
-                                    const LedgerField = this.dataToPopulate.sale_return_order.ledger_account
-                                    field.formControl.setValue(LedgerField);
-                                  }
-                                }
-                              }
-                            },
+                            // {
+                            //   key: 'ledger_account',
+                            //   type: 'select',
+                            //   className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                            //   templateOptions: {
+                            //     label: 'Ledger account',
+                            //     placeholder: 'Select Ledger account',
+                            //     dataKey: 'ledger_account_id', // Assuming ledger_account_id is the key for the selected value
+                            //     dataLabel: 'name',
+                            //     lazy: {
+                            //       url: 'customers/ledger_accounts/',
+                            //       lazyOneTime: true
+                            //     }
+                            //   },
+                            //   hooks: {
+                            //     onInit: (field: any) => {
+                            //       // Subscribe to value changes
+                            //       field.formControl.valueChanges.subscribe(data => {
+                            //         if (data && data.ledger_account_id) {
+                            //           this.formConfig.model['sale_return_order']['ledger_account_id'] = data.ledger_account_id; // Update the model with the selected ledger_account_id
+                            //         }
+                            //       });
+                            //       // Set the default value for Ledger Account if it exists
+                            //       if (this.dataToPopulate && this.dataToPopulate.sale_return_order.ledger_account && field.formControl) {
+                            //         const LedgerField = this.dataToPopulate.sale_return_order.ledger_account
+                            //         field.formControl.setValue(LedgerField);
+                            //       }
+                            //     }
+                            //   }
+                            // },
                             {
                               key: 'order_status',
                               type: 'select',
@@ -2033,27 +2035,27 @@ export class SaleReturnsComponent {
                                 }
                               }
                             },
-                            // {
-                            //   key: 'item_value',
-                            //   type: 'input',
-                            //   defaultValue: "0",
-                            //   className: 'col-md-4 col-lg-3 col-sm-6 col-12',
-                            //   templateOptions: {
-                            //     type: 'input',
-                            //     label: 'Items value',
-                            //     placeholder: 'Enter Item value',
-                            //     readonly: true
-                            //     // required: true
-                            //   },
-                            //   hooks: {
-                            //     onInit: (field: any) => {
-                            //       // Set the initial value from dataToPopulate if available
-                            //       if (this.dataToPopulate && this.dataToPopulate.sale_return_order && this.dataToPopulate.sale_return_order.item_value && field.formControl) {
-                            //         field.formControl.setValue(this.dataToPopulate.sale_return_order.item_value);
-                            //       }
-                            //     }
-                            //   }
-                            // },
+                            {
+                              key: 'item_value',
+                              type: 'input',
+                              defaultValue: "0",
+                              className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                              templateOptions: {
+                                type: 'input',
+                                label: 'Items value',
+                                placeholder: 'Enter Item value',
+                                readonly: true
+                                // required: true
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                                  // Set the initial value from dataToPopulate if available
+                                  if (this.dataToPopulate && this.dataToPopulate.sale_return_order && this.dataToPopulate.sale_return_order.item_value && field.formControl) {
+                                    field.formControl.setValue(this.dataToPopulate.sale_return_order.item_value);
+                                  }
+                                }
+                              }
+                            },
                             {
                               key: 'dis_amt',
                               type: 'input',
@@ -2448,10 +2450,14 @@ export class SaleReturnsComponent {
             this.createCreditNote(sale_return_id);
           } else if (returnOption === 'Sale Order') {
             this.createSaleOrder(sale_return_id);
-          }
-          // else if (returnOption === 'Debit Note') {
-          //   this.createDebitNote(sale_return_id);
-          // } 
+          } else if (returnOption === 'Cash') {
+            this.showSuccessToast = true;
+            this.toastMessage = 'Record created successfully';
+            this.ngOnInit();
+            setTimeout(() => {
+              this.showSuccessToast = false;
+            }, 3000);
+          } 
         }
       },
       (error) => {
@@ -2479,7 +2485,7 @@ export class SaleReturnsComponent {
       }
       const saleOrderPayload = {
         sale_order: {
-          sale_type_id: "d7feff55-a421-44c7-8c16-442e76541713",
+          sale_type_id: "a0718928-0fb5-4e04-8712-b91c3f023eda",
           email: SaleOrderpayload.email,
           sale_return_id: sale_return_id,
           order_type: SaleOrderpayload.order_type || 'sale_order',
@@ -2539,7 +2545,7 @@ export class SaleReturnsComponent {
         (response) => {
           // console.log("response sale order : ", response);
           this.showSuccessToast = true;
-          this.toastMessage = 'Sale-Order created successfully';
+          this.toastMessage = 'Sale-Return & Sale-Order created successfully';
           this.ngOnInit();
           setTimeout(() => {
             this.showSuccessToast = false;
@@ -2578,7 +2584,7 @@ export class SaleReturnsComponent {
     this.http.post('sales/sale_credit_notes/', creditNotePayload).subscribe(
       (response) => {
         this.showSuccessToast = true;
-        this.toastMessage = 'Credit-Note created successfully';
+        this.toastMessage = 'Sale-returns & Credit-Note created successfully';
         this.ngOnInit();
         setTimeout(() => {
           this.showSuccessToast = false;
