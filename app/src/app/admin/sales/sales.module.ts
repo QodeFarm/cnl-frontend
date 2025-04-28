@@ -40,7 +40,7 @@ import { PurchasereturnordersComponent } from '../purchase/purchasereturnorders/
     SaleReturnsListComponent,
     SaleinvoiceorderlistComponent,
     SalesDispatchComponent,
-    CreditNoteListComponent
+    CreditNoteListComponent,
 
     
   ],
