@@ -101,7 +101,7 @@ export class WorkOrderListComponent {
         sort: true
       },
       {
-        fieldKey: 'status_name',
+        fieldKey: 'status',
         name: 'Flow Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {

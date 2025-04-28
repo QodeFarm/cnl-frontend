@@ -117,6 +117,18 @@ const routes: Routes = [
 
       //Reporting Tool
       { path: 'reports/custome-reports', data: { title: 'Reports', moduleName: 'reports' }, canActivate: [], loadComponent: () => import('./admin/reports/reports.component').then(m => m.ReportsComponent) },
+      { path: 'reports/sales-reports', data: { title: 'Sales Reports', moduleName: 'sales-reports' }, canActivate: [], loadComponent: () => import('./admin/reports/sales-reports/sales-reports.component').then(m => m.SalesRepotsComponent) },
+      { path: 'reports/purchase-reports', data: { title: 'Purchase Reports', moduleName: 'purchase-reports' }, canActivate: [], loadComponent: () => import('./admin/reports/purchase-reports/purchase-reports.component').then(m => m.PurchaseReportsComponent) },
+      { path: 'reports/ledgers-reports', data: { title: 'Ledgers Reports', moduleName: 'ledgers-reports' }, canActivate: [], loadComponent: () => import('./admin/reports/ledgers-reports/ledgers-reports.component').then(m => m.LedgersReportsComponent) },
+      { path: 'reports/vendor-reports', data: { title: 'Vendor Reports', moduleName: 'vendor-reports' }, canActivate: [], loadComponent: () => import('./admin/reports/vendor-reports/vendor-reports.component').then(m => m.VendorReportsComponent) },
+      { path: 'reports/customer-reports', data: { title: 'Customer Reports', moduleName: 'customer-reports' }, canActivate: [], loadComponent: () => import('./admin/reports/customer-reports/customer-reports.component').then(m => m.CustomerReportsComponent) },
+      { path: 'reports/production-reports', data: { title: 'Production Reports', moduleName: 'production-reports' }, canActivate: [], loadComponent: () => import('./admin/reports/production-reports/production-reports.component').then(m => m.ProductionReportsComponent) },
+      { path: 'reports/gst-reports', data: { title: 'Gst Reports', moduleName: 'gst-reports' }, canActivate: [], loadComponent: () => import('./admin/reports/gst-reports/gst-reports.component').then(m => m.GstReportsComponent) },
+
+
+
+
+
 
       //Customfields Tool
       { path: 'customfields', data: { title: 'customfields', moduleName: 'customfields' }, canActivate: [], loadChildren: () => import('./admin/customfields/customfields.module').then(m => m.CustomfieldsModule) },

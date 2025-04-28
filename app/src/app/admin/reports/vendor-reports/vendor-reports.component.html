@@ -1,0 +1,38 @@
+<div class="container-fluid mt-2">
+    <!-- Accordion for Sales Reports -->
+    <div class="accordion" id="reportAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="reportHeading">
+                <button class="accordion-button" type="button" (click)="toggleAccordion()">
+                    Vendor Report
+                </button>
+            </h2>
+            <div id="reportCollapse" class="accordion-collapse collapse show" *ngIf="isAccordionOpen">
+                <div class="accordion-body">
+                    <!-- Report Buttons -->
+                    <div class="d-flex gap-3">
+                        <a class="report-link" (click)="selectReport('VendorSummaryReport')">
+                            Vendor Summary 
+                        </a>
+                        <a class="report-link" (click)="selectReport('VendorLedgerReport')">
+                            Vendor Ledger
+                        </a>
+                        <a class="report-link" (click)="selectReport('VendorOutstandingReport')">
+                            Vendor Outstanding 
+                        </a>
+                        <a class="report-link" (click)="selectReport('VendorPaymentReport')">
+                            Vendor Payment 
+                        </a>
+                        <a class="report-link" (click)="selectReport('VendorPerformanceReport')">
+                            Vendor Performance 
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> 
+    <!-- Table Component for Selected Report -->
+<div *ngIf="!loading && !error && tableConfig" class="mt-3 custom-list">
+  <ta-table [options]="tableConfig" (dataLoaded)="onDataLoaded($event)"></ta-table>
+</div>
+</div>
