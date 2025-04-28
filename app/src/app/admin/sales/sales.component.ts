@@ -1518,8 +1518,29 @@ export class SalesComponent {
                         console.log('Selected sale_type:', data);
                         if (data && data.sale_type_id) {
                           this.formConfig.model['sale_order']['sale_type_id'] = data.sale_type_id;
+                      
+                          // 👇 Add this block to dynamically fetch order number with updated type
+                          let prefix = data.name === 'Other' ? 'SOO' : 'SO';
+                          // this.orderNumber = null;
+                          this.http.get(`masters/generate_order_no/?type=${prefix}`).subscribe((res: any) => {
+                            if (res?.data?.order_number) {
+                              // this.orderNumber = null;
+                              this.orderNumber = res.data.order_number;
+                              this.formConfig.model['sale_order']['order_no'] = this.orderNumber;
+                              field.form.controls.order_no.setValue(this.orderNumber); // optional
+                              console.log("Order no updated to:", this.orderNumber);
+                              // short delay to override any late reset
+                              this.cdRef.detectChanges()
+                            }
+                          });                          
                         }
-                      });
+                      });                      
+                      // field.formControl.valueChanges.subscribe((data: any) => {
+                      //   console.log('Selected sale_type:', data);
+                      //   if (data && data.sale_type_id) {
+                      //     this.formConfig.model['sale_order']['sale_type_id'] = data.sale_type_id;
+                      //   }
+                      // });
                     }
                   }
                 },
