@@ -4,18 +4,21 @@ import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { TaFormComponent } from '@ta/ta-form';
 import { TaTableComponent } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { PaymentReceiptListComponent } from './payment-receipt-list.component';
 
 @Component({
   selector: 'app-payment-receipt',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule],
+  imports: [CommonModule, AdminCommmonModule, PaymentReceiptListComponent],
   templateUrl: './payment-receipt.component.html',
   styleUrls: ['./payment-receipt.component.scss']
 })
 export class PaymentReceiptComponent implements OnInit {
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
   @ViewChild('paymentreceiptForm', { static: false }) paymentreceiptForm: TaFormComponent | undefined;
+  @ViewChild(PaymentReceiptListComponent) paymentReceiptListComponent!: PaymentReceiptListComponent;
 
+  showPaymentReceiptList: boolean = false;
   SaleOrderEditID: any = null;
   showSuccessToast = false;
   showErrorToast = false;
@@ -482,5 +485,36 @@ export class PaymentReceiptComponent implements OnInit {
         ]
       }
     ];
+  }
+
+  showPaymentReceiptListFn() {
+    this.showPaymentReceiptList = true;
+    this.paymentReceiptListComponent?.refreshTable();
+  }
+
+  editPaymentReceipt(event) {
+    console.log('event', event);
+    // Add logic to edit a payment receipt here
+    this.SaleOrderEditID = event;
+    this.http.get(`sales/payment_transactions/${event}`).subscribe((res: any) => {
+      console.log('Payment receipt data:', res);
+      if (res && res.data) {
+        // Populate the form with the data
+        this.formConfig.model = res.data;
+        this.selectedCustomerId = res.data.customer;
+        this.selectedAccountId = res.data.account;
+        
+        // Update form action to update
+        this.formConfig.showActionBtn = true;
+        this.formConfig.submit.label = 'Update';
+        
+        // Close the modal
+        this.hide();
+      }
+    });
+  }
+
+  hide() {
+    document.getElementById('modalClose')?.click();
   }
 }
