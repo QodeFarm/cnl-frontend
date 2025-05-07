@@ -44,6 +44,9 @@ import { Router } from '@angular/router';
       .search-button {
         margin-right: 8px;
       }
+      .nzValue{
+        display:flex;
+      }
     `,
   ],
 })
@@ -65,12 +68,24 @@ export class TaTableComponent implements OnDestroy {
   isStatusButtonVisible = false;
   isEmployeeFilterVisible = false;
   setOfCheckedId = new Set<number>();
+  selectedAccountType: string | null = null;
+  selectedAccountId: number | null = null;
+  isAccountLedgerPage: boolean;
+
 
   statusOptions: Array<{ value: string, label: string }> = []; // Store the statuses here
 
   employeeOptions: Array<{ value: number; label: string }> = [];// Add this for employee filter
 
+  accountOptions: Array<{ value: number; label: string }> = [];
 
+ 
+  accountTypeOptions = [
+    { value: 'customer', label: 'Customer' },
+    { value: 'vendor', label: 'Vendor' },
+    { value: 'general', label: 'General' }
+  ];
+ 
   // List of quick period options like 'Today', 'Last Week', etc.
   quickPeriodOptions = [
     { value: 'today', label: 'Today' },
@@ -186,6 +201,50 @@ export class TaTableComponent implements OnDestroy {
     // this.applyFilters(); // Apply the filter immediately
   }
 
+  loadAccounts() {
+    if (!this.selectedAccountType) {
+      this.accountOptions = [];
+      return;
+    }
+
+    let url = '';
+    switch (this.selectedAccountType) {
+      case 'customer':
+        url = 'customers/customer/'; 
+        break;
+      case 'vendor':
+        url = 'vendors/vendor_get/'; 
+        break;
+      case 'general':
+        url = 'finance/general-accounts/'; 
+        break;
+    }
+
+    this.http.get<any>(url).subscribe(
+      (response) => {
+        if (response && response.data) {
+          console.log('=====',response)
+          this.accountOptions = response.data.map(item => ({
+            value: item.name,
+            label: item.name
+          }));
+        }
+      },
+      (error) => {
+        console.error('Error fetching accounts:', error);
+      }
+    );
+  }
+
+  onAccountTypeChange() {
+    this.selectedAccountId = null; 
+    this.loadAccounts(); 
+  }
+
+  onAccountChange() {
+    this.applyFilters();
+  }
+
   // Apply filters like quick period, date range, and status to fetch filtered data
   applyFilters() {
     // Construct the filters object
@@ -195,6 +254,8 @@ export class TaTableComponent implements OnDestroy {
       toDate: this.toDate,
       status: this.selectedStatus,
       employee: this.selectedEmployee,
+      accountType: this.selectedAccountType,
+      accountId: this.selectedAccountId
     };
 
     // Generate query string from filters
@@ -234,7 +295,7 @@ export class TaTableComponent implements OnDestroy {
     // return queryString;
     return finalQueryString;
   }
-
+  
   // Clear all filters like quick period, date range, and status
   clearFilters() {
     // Reset all filter values
@@ -396,6 +457,11 @@ export class TaTableComponent implements OnDestroy {
       this.options.paginationPosition = 'bottom';
     // this.loadDataFromServer();
     const currentUrl = this.router.url;
+    this.isAccountLedgerPage = this.router.url === '/admin/finance/account-ledger';
+
+    if (this.isAccountLedgerPage) {
+      this.loadAccounts();
+    }
     // console.log('Current URL:', currentUrl); 
     const visibleUrls = [
       '/admin/purchase',
@@ -413,7 +479,8 @@ export class TaTableComponent implements OnDestroy {
       '/admin/reports/purchase-reports',
       '/admin/reports/vendor-reports',
       '/admin/reports/customer-reports',
-      '/admin/reports/ledgers-reports'
+      '/admin/reports/ledgers-reports',
+      '/admin/finance/account-ledger'
     ]
     this.loadStatuses();
     this.loadEmployees();
@@ -425,7 +492,8 @@ export class TaTableComponent implements OnDestroy {
     const hideStatusUrls = [
       '/admin/hrms/employee-attendance',
       '/admin/employees',// Added employees URL
-      '/admin/hrms/employee-leave-balance'
+      '/admin/hrms/employee-leave-balance',
+      '/admin/finance/account-ledger'
     ];
     this.isStatusButtonVisible = !hideStatusUrls.includes(currentUrl);
 
