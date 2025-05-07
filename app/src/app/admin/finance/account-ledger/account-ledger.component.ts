@@ -24,6 +24,7 @@ export class AccountLedgerComponent {
         keys: ['employee', 'attendance_date', 'absent', 'leave_duration']
       },
       defaultSort: { key: 'created_at', value: 'descend' },
+      export: {downloadName: 'AccountLedgerList'},
       cols: [
         {
           fieldKey: 'name',
