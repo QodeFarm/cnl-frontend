@@ -91,6 +91,7 @@ const routes: Routes = [
       { path: 'finance/expense-claim', data: { title: 'Expense Claim', moduleName: 'expense-claim' }, canActivate: [], loadComponent: () => import('./admin/finance/expense-claim/expense-claim.component').then(m => m.ExpenseClaimComponent) },
       { path: 'finance/financial-report', data: { title: 'Financial Report', moduleName: 'financial-report' }, canActivate: [], loadComponent: () => import('./admin/finance/financial-report/financial-report.component').then(m => m.FinancialReportComponent) },
       { path: 'finance/gst', data: { title: 'GST', moduleName: 'gst-details' }, canActivate: [], loadComponent: () => import('./admin/finance/gst-details/gst-details.component').then(m => m.GstDetailsComponent) },
+      { path: 'finance/account-ledger', data: { title: 'Account ledger', moduleName: 'account-ledger' }, canActivate: [], loadComponent: () => import('./admin/finance/account-ledger/account-ledger.component').then(m => m.AccountLedgerComponent) },
 
       //Company Module
       { path: 'company', data: { title: 'Company', moduleName: 'company' }, canActivate: [], loadComponent: () => import('./admin/company/company.component').then(m => m.CompanyComponent) },
