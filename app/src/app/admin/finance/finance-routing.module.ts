@@ -8,6 +8,7 @@ import { BudgetComponent } from './budget/budget.component';
 import { ExpenseClaimComponent } from './expense-claim/expense-claim.component';
 import { FinancialReportComponent } from './financial-report/financial-report.component';
 import { JournalEntryComponent } from './journal-entry/journal-entry.component';
+import { AccountLedgerComponent } from './account-ledger/account-ledger.component';
 
 const routes: Routes = [
   {
@@ -41,6 +42,10 @@ const routes: Routes = [
   {
     path: 'journal-entry',
     component: JournalEntryComponent,
+  },
+  {
+    path: 'account-ledger',
+    component: AccountLedgerComponent,
   }
 ];
 

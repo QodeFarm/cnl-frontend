@@ -19,6 +19,8 @@ import { BudgetListComponent } from './budget/budget-list/budget-list.component'
 import { JournalEntryListComponent } from './journal-entry/journal-entry-list/journal-entry-list.component';
 import { JournalEntryComponent } from './journal-entry/journal-entry.component';
 import { PaymentTransactionListComponent } from './payment-transaction/payment-transaction-list/payment-transaction-list.component';
+import { AccountLedgerComponent } from './account-ledger/account-ledger.component';
+import { AccountLedgerModule } from './account-ledger/account-ledger.module';
 
 
 @NgModule({
@@ -31,6 +33,8 @@ import { PaymentTransactionListComponent } from './payment-transaction/payment-t
     // ExpenseClaimComponent,
     // FinancialReportComponent,
     // JournalEntryComponent,
+    // AccountLedgerComponent
+
   ],
   imports: [
     CommonModule,
@@ -43,7 +47,8 @@ import { PaymentTransactionListComponent } from './payment-transaction/payment-t
     ExpenseClaimListComponent,
     BudgetListComponent,
     JournalEntryListComponent,
-    PaymentTransactionListComponent
+    PaymentTransactionListComponent,
+    AccountLedgerComponent
   ]
 })
 export class FinanceModule { }
