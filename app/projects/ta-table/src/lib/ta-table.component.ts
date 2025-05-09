@@ -223,11 +223,25 @@ export class TaTableComponent implements OnDestroy {
     this.http.get<any>(url).subscribe(
       (response) => {
         if (response && response.data) {
-          console.log('=====',response)
-          this.accountOptions = response.data.map(item => ({
-            value: item.name,
-            label: item.name
-          }));
+          console.log('Account options loaded:', response);
+          // For customer and vendor, use customer_id/vendor_id as the value
+          if (this.selectedAccountType === 'customer') {
+            this.accountOptions = response.data.map(item => ({
+              value: item.customer_id,
+              label: item.name
+            }));
+          } else if (this.selectedAccountType === 'vendor') {
+            this.accountOptions = response.data.map(item => ({
+              value: item.vendor_id,
+              label: item.name
+            }));
+          } else {
+            // For general accounts, use account_id
+            this.accountOptions = response.data.map(item => ({
+              value: item.account_id,
+              label: item.name
+            }));
+          }
         }
       },
       (error) => {
@@ -242,7 +256,46 @@ export class TaTableComponent implements OnDestroy {
   }
 
   onAccountChange() {
-    this.applyFilters();
+    if (this.selectedAccountType && this.selectedAccountId) {
+      console.log("Account selected:", this.selectedAccountType, this.selectedAccountId);
+      
+      // For account ledger page
+      if (this.router.url === '/admin/finance/account-ledger') {
+        console.log("On account ledger page, looking for accountLedgerComponentInstance");
+        
+        // Check if we have the global reference to the AccountLedgerComponent
+        if (window['accountLedgerComponentInstance'] && 
+            typeof window['accountLedgerComponentInstance'].loadLedgerData === 'function') {
+          console.log("Using global reference to AccountLedgerComponent");
+          window['accountLedgerComponentInstance'].loadLedgerData(
+            this.selectedAccountType, 
+            this.selectedAccountId
+          );
+          return;
+        }
+        
+        // Make the API call directly from here as a fallback
+        console.log("Making API call directly from table component");
+        const apiUrl = `finance/journal_entry_lines_list/${this.selectedAccountId}/`;
+        
+        this.http.get(apiUrl).subscribe(
+          (response: any) => {
+            console.log("API response received directly:", response);
+            if (response && response.data) {
+              this.rows = response.data;
+              this.total = response.count || response.data.length;
+              console.log("Data loaded directly in table component", this.rows);
+            }
+          },
+          error => {
+            console.error("Error loading data:", error);
+          }
+        );
+        return;
+      }
+    }
+    
+    this.applyFilters(); // Fall back to the default behavior
   }
 
   // Apply filters like quick period, date range, and status to fetch filtered data
@@ -280,6 +333,8 @@ export class TaTableComponent implements OnDestroy {
     const full_path = this.options.apiUrl;
     const url = `${full_path}${finalQueryString}`;
 
+    console.log("Making API request to:", url);
+    
     // Fetch filtered data from the server using the constructed URL
     this.http.get(url).subscribe(
       response => {
@@ -365,7 +420,7 @@ export class TaTableComponent implements OnDestroy {
 
     // Return the query string by joining all the filters
     // return '?&' + queryParts.join('&');
-    return '&' + queryParts.join('&'); //before, it returns a string starting with "?&", which then gets concatenated to your API URL and ends up creating an extra "?". Now, fix this by modifying the function.
+    return '?' + queryParts.join('&'); //before, it returns a string starting with "?&", which then gets concatenated to your API URL and ends up creating an extra "?". Now, fix this by modifying the function.
   }
   formatDate(date: Date): string {
     // Format date as 'yyyy-MM-dd'
@@ -424,7 +479,8 @@ export class TaTableComponent implements OnDestroy {
   constructor(
     public taTableS: TaTableService,
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private elementRef: ElementRef
   ) {
     this.actionObservable$ = this.taTableS.actionObserval().subscribe((res: any) => {
       // if (res && res.action && res.action.type === 'delete') {
