@@ -21,6 +21,7 @@ export class TasksComponent implements OnInit {
   TasksEditID: any;
   formConfig: TaFormConfig = {};
   @ViewChild(TasksListComponent) TasksListComponent!: TasksListComponent;
+  entitiesList: any[] = [];
 
   // constructor(private http: HttpClient) {}
   constructor(private http: HttpClient, private userService: UserService) { }  // Inject UserService
@@ -46,6 +47,10 @@ export class TasksComponent implements OnInit {
     this.set_default_status_id(); // lead_status_id = 'Open'
     
     //fetching customfields entity='tasks'.
+    this.http.get('masters/entities/')
+      .subscribe((res: any) => {
+        this.entitiesList = res.data || []; // Adjust if the response format differs
+      });
     CustomFieldHelper.fetchCustomFields(this.http, 'tasks', (customFields: any, customFieldMetadata: any) => {
       CustomFieldHelper.addCustomFieldsToFormConfig(customFields, customFieldMetadata, this.formConfig);
     });
@@ -149,17 +154,30 @@ export class TasksComponent implements OnInit {
       dialog.style.display = 'flex'; // Show the dialog
     }
   }
-
+  customFieldMetadata: any = {};
   submitTasksForm() {
     const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
 
     // Determine the entity type and ID dynamically
-    const entityId = '8f525989-b238-45e3-bca7-c8b1c22c0c77'; // Since we're in the Sale Order form
+    const entityName = 'tasks'; // Since we're in the Sale Order form
     const customId = this.formConfig.model.task?.task_id || null; //
 
-    // Construct payload for one custom field at a time
-    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityId, customId);
+    // Find entity record from list
+    const entity = this.entitiesList.find(e => e.entity_name === entityName);
 
+    if (!entity) {
+      console.error(`Entity not found for: ${entityName}`);
+      return;
+    }
+
+    const entityId = entity.entity_id;
+    // Inject entity_id into metadata temporarily
+    Object.keys(this.customFieldMetadata).forEach((key) => {
+      this.customFieldMetadata[key].entity_id = entityId;
+    });
+    // Construct payload for custom fields
+    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
+  
     if (!customFieldsPayload) {
       this.showDialog(); // Stop execution if required fields are missing
     }
@@ -190,13 +208,26 @@ export class TasksComponent implements OnInit {
   updateTasks() {
     const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
 
-    const entityId = '8f525989-b238-45e3-bca7-c8b1c22c0c77'; // Since we're in the Sale Order form
+    // Determine the entity type and ID dynamically
+    const entityName = 'tasks'; // Since we're in the Sale Order form
     const customId = this.formConfig.model.task?.task_id || null; //
+
+    // Find entity record from list
+    const entity = this.entitiesList.find(e => e.entity_name === entityName);
+
+    if (!entity) {
+      console.error(`Entity not found for: ${entityName}`);
+      return;
+    }
+
+    const entityId = entity.entity_id;
+    // Inject entity_id into metadata temporarily
+    Object.keys(this.customFieldMetadata).forEach((key) => {
+      this.customFieldMetadata[key].entity_id = entityId;
+    });
+    // Construct payload for custom fields
+    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
   
-    // Construct payload for custom fields based on updated values
-    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityId, customId);
-    console.log("Testing the data in customFieldsPayload: ", customFieldsPayload);
-    
     // Construct the final payload for update
     const payload = {
       ...this.formConfig.model,

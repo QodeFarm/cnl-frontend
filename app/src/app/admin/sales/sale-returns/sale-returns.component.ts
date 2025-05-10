@@ -174,7 +174,7 @@ export class SaleReturnsComponent {
 
   dataToPopulate: any;
   salesReturnForm: FormGroup;
-
+  entitiesList: any[] = [];
   ngOnInit() {
 
     this.showSaleReturnOrderList = false;
@@ -183,6 +183,11 @@ export class SaleReturnsComponent {
     this.setFormConfig();
     this.checkAndPopulateData();
     //custom fields logic...
+    this.http.get('masters/entities/')
+      .subscribe((res: any) => {
+        this.entitiesList = res.data || []; // Adjust if the response format differs
+      });
+
     CustomFieldHelper.fetchCustomFields(this.http, 'sale_return', (customFields: any, customFieldMetadata: any) => {
       CustomFieldHelper.addCustomFieldsToFormConfig_2(customFields, customFieldMetadata, this.formConfig);
     });
@@ -341,12 +346,24 @@ export class SaleReturnsComponent {
     const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
 
     // Determine the entity type and ID dynamically
-    const entityId ='7c059d6f-7b0c-474a-8d6f-accc64855a0a'; //'7c059d6f-7b0c-474a-8d6f-accc64855a0a'; // Since we're in the Sale Order form
+    const entityName = 'sale_returns'; // Since we're in the Sale Order form
     const customId = this.formConfig.model.sale_return_order?.sale_return_id || null; // Ensure correct sale_order_id
 
-    // Construct payload for custom fields based on updated values
-    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityId, customId);
-    console.log("Testing the data in customFieldsPayload: ", customFieldsPayload);
+    // Find entity record from list
+    const entity = this.entitiesList.find(e => e.entity_name === entityName);
+
+    if (!entity) {
+      console.error(`Entity not found for: ${entityName}`);
+      return;
+    }
+
+    const entityId = entity.entity_id;
+    // Inject entity_id into metadata temporarily
+    Object.keys(this.customFieldMetadata).forEach((key) => {
+      this.customFieldMetadata[key].entity_id = entityId;
+    });
+    // Construct payload for custom fields
+    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
     
     // Construct the final payload for update
     const payload = {
@@ -2392,16 +2409,29 @@ export class SaleReturnsComponent {
   closeToast() {
     this.showSuccessToast = false;
   }
-
+  customFieldMetadata: any = {};
   submitForm() {
     const customFieldValues = this.formConfig.model['custom_field_values']
 
     // Determine the entity type and ID dynamically
-    const entityId = '7c059d6f-7b0c-474a-8d6f-accc64855a0a'; //'7c059d6f-7b0c-474a-8d6f-accc64855a0a'; // Since we're in the Sale Invoice form
+    const entityName = 'sale_returns'; // Since we're in the Sale Order form
     const customId = this.formConfig.model.sale_return_order?.sale_return_id || null; // Ensure correct sale_order_id
-  
+
+    // Find entity record from list
+    const entity = this.entitiesList.find(e => e.entity_name === entityName);
+
+    if (!entity) {
+      console.error(`Entity not found for: ${entityName}`);
+      return;
+    }
+
+    const entityId = entity.entity_id;
+    // Inject entity_id into metadata temporarily
+    Object.keys(this.customFieldMetadata).forEach((key) => {
+      this.customFieldMetadata[key].entity_id = entityId;
+    });
     // Construct payload for custom fields
-    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityId, customId);
+    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
   
     if (!customFieldsPayload) {
       this.showDialog(); // Stop execution if required fields are missing
