@@ -180,7 +180,7 @@ export class CustomFieldHelper {
       console.log("Updated Form Config:", formConfig);
     }
 
-    static constructCustomFieldsPayload(customFieldValues: any, entityId: string, customId: string | null) {
+    static constructCustomFieldsPayload(customFieldValues: any, entityName: string, customId: string | null) {
       if (!customFieldValues) {
         console.warn('No custom field values provided.');
         return {
@@ -196,7 +196,8 @@ export class CustomFieldHelper {
       // Iterate over all custom field keys and construct values
       Object.keys(customFieldValues).forEach((fieldKey) => {
         const metadata = this.customFieldMetadata[fieldKey.toLowerCase()] || {}; // Fetch metadata for each field
-  
+        const entityId = metadata.entity_id;
+
         // Check if the field is required and missing
         if (metadata.is_required &&
           (customFieldValues[fieldKey] === '' || customFieldValues[fieldKey] === null || customFieldValues[fieldKey] === undefined)) {
@@ -208,7 +209,8 @@ export class CustomFieldHelper {
           customFieldValuesArray.push({
             field_value: customFieldValues[fieldKey], // User-entered value
             field_value_type: typeof customFieldValues[fieldKey] === "number" ? "number" : "string", // Determine type
-            entity_id: entityId, // Use dynamic entity ID
+            entity_id: entityId,
+            entity_name: entityName, // Use dynamic entity ID
             custom_field_id: fieldKey, // Field name as custom_field_id
             custom_id: customId // Use dynamic custom ID
           });
@@ -220,17 +222,37 @@ export class CustomFieldHelper {
         console.error("Required fields missing:", missingRequiredFields);
         return null; // Prevent submission
       }
+
+      const customFieldArray = Object.keys(customFieldValues).map((fieldKey) => {
+        const metadata = this.customFieldMetadata[fieldKey.toLowerCase()] || {};
+        return {
+          field_name: fieldKey,
+          is_required: metadata.is_required || false,
+          validation_rules: metadata.validation_rules || null,
+          field_type_id: metadata.field_type_id || null,
+          entity_id: metadata.entity_id, //Pre-injected
+          entity_name: entityName
+        };
+      });
+    
+      return {
+        custom_field: customFieldArray,
+        custom_field_values: customFieldValuesArray
+      };
   
       // Construct payload for multiple custom fields
-      return {
-        custom_field: Object.keys(customFieldValues).map((fieldKey) => ({
-          field_name: fieldKey,
-          is_required: this.customFieldMetadata[fieldKey.toLowerCase()]?.is_required || false,
-          validation_rules: this.customFieldMetadata[fieldKey.toLowerCase()]?.validation_rules || null,
-          field_type_id: this.customFieldMetadata[fieldKey.toLowerCase()]?.field_type_id || null,
-          entity_id: entityId // Assign dynamic entity_id
-        })),
-        custom_field_values: customFieldValuesArray // Include only entered values
-      };
+      // return {
+      //   custom_field: Object.keys(customFieldValues).map((fieldKey) => ({
+      //     field_name: fieldKey,
+      //     is_required: this.customFieldMetadata[fieldKey.toLowerCase()]?.is_required || false,
+      //     validation_rules: this.customFieldMetadata[fieldKey.toLowerCase()]?.validation_rules || null,
+      //     field_type_id: this.customFieldMetadata[fieldKey.toLowerCase()]?.field_type_id || null,
+      //     //entity_id: entityName // Assign dynamic entity_id
+      //     entity_id: metadata.entity_id, // ✅ Pre-injected
+      //     entity_name: entityName
+      //     // entity_id: this.customFieldMetadata[fieldKey.toLowerCase()]?.entity_id || entityName
+      //   })),
+      //   custom_field_values: customFieldValuesArray // Include only entered values
+      // };
     }
 }

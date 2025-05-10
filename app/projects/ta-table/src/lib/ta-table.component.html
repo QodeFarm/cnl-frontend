@@ -5,6 +5,24 @@
     <div class="ta-cell filter-alignments">
         <div class="ta-row p-0 justify-content-end">
 
+            <!-- Show only if isAccountLedgerPage is true -->
+            <div class="filter-group col p-0 mt-2" style="margin-right: 10px; display:flex" *ngIf="isAccountLedgerPage">
+                <!-- First Select Box: Customer / Vendor / General -->
+                <nz-select [(ngModel)]="selectedAccountType" (ngModelChange)="onAccountTypeChange()"
+                    nzPlaceHolder="Select Ledger" style="width: 200px; margin-right: 8px">
+                    <nz-option *ngFor="let option of accountTypeOptions" [nzValue]="option.value"
+                        [nzLabel]="option.label"></nz-option>
+                </nz-select>
+
+                <!-- Second Select Box: Names Based on Selection -->
+                <nz-select [(ngModel)]="selectedAccountId" (ngModelChange)="onAccountChange()"
+                    nzPlaceHolder="Select Resource" style="width: 200px" [nzDisabled]="!selectedAccountType">
+                    <nz-option *ngFor="let option of accountOptions" [nzValue]="option.value"
+                        [nzLabel]="option.label"></nz-option>
+                </nz-select>
+            </div>
+
+
             <!-- Employee Filter -->
             <div class="filter-group col p-0 mt-2" *ngIf="isEmployeeFilterVisible">
                 <nz-select [(ngModel)]="selectedEmployee" nzPlaceHolder="Select Employee" class="select-field" (ngModelChange)="onEmployeeChange($event)">
@@ -57,7 +75,8 @@
             <ng-content nz-col select="[before-search]">
             </ng-content>
             <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton">
-                <input type="text" nz-input placeholder="Search" [(ngModel)]="globalSearchValue" (keyup.enter)="globalSearch()" />
+                <input type="text" nz-input placeholder="Search" [(ngModel)]="globalSearchValue"
+                    (keyup.enter)="globalSearch()" />
             </nz-input-group>
             <ng-template #suffixIconButton>
                 <i nz-icon class="ant-input-clear-icon" style="position: absolute;z-index: 9;right: 40px;top:12px" nzTheme="fill" nzType="close-circle" *ngIf="globalSearchValue" (click)="globalSearchClear()"></i>
@@ -111,7 +130,8 @@
     [nzShowTotal]="totalTemplate" [nzFooter]="footerTemplate" [nzLoading]="loading" [nzTotal]="total" [nzPageSize]="options.pageSize" (nzQueryParams)="onQueryParamsChange($event)" [nzPageIndex]="pageIndex" [nzPaginationPosition]="options.paginationPosition">
     <thead>
         <tr>
-            <th *ngIf="options.showCheckbox" style="width: 50px;" [nzIndeterminate]="indeterminate" [nzChecked]="checked" nzLabel="Select all" (nzCheckedChange)="onAllChecked($event)"></th>
+            <th *ngIf="options.showCheckbox" style="width: 50px;" [nzIndeterminate]="indeterminate"
+                [nzChecked]="checked" nzLabel="Select all" (nzCheckedChange)="onAllChecked($event)"></th>
 
             <ng-container *ngFor="let c of options.cols">
 
@@ -138,7 +158,9 @@
     </thead>
     <tbody>
         <tr *ngFor="let data of rows">
-            <td *ngIf="options.showCheckbox" style="width: 50px;" [nzChecked]="setOfCheckedId.has(data[options.pkId])" (nzCheckedChange)="onItemChecked(data[options.pkId], $event)" [nzDisabled]="false" [nzLabel]="data.name"></td>
+            <td *ngIf="options.showCheckbox" style="width: 50px;" [nzChecked]="setOfCheckedId.has(data[options.pkId])"
+                (nzCheckedChange)="onItemChecked(data[options.pkId], $event)" [nzDisabled]="false"
+                [nzLabel]="data.name"></td>
 
             <td style="min-width: 150px;" [ngClass]="c.tdClassName" *ngFor="let c of options.cols" [nzEllipsis]="c.ellipsis">
                 <label class="col-name">{{c.name}} :</label>
@@ -164,7 +186,8 @@
 
                 <!-- Existing content for other column types -->
                 <ng-template #defaultContent>
-                    <ng-container *ngTemplateOutlet="(c.type === 'action') ? actions : datalable; context: { col: c, row: data }">
+                    <ng-container
+                        *ngTemplateOutlet="(c.type === 'action') ? actions : datalable; context: { col: c, row: data }">
                     </ng-container>
                 </ng-template>
             </td>

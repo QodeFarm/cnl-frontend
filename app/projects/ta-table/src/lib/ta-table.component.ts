@@ -44,6 +44,9 @@ import { Router } from '@angular/router';
       .search-button {
         margin-right: 8px;
       }
+      .nzValue{
+        display:flex;
+      }
     `,
   ],
 })
@@ -65,12 +68,24 @@ export class TaTableComponent implements OnDestroy {
   isStatusButtonVisible = false;
   isEmployeeFilterVisible = false;
   setOfCheckedId = new Set<number>();
+  selectedAccountType: string | null = null;
+  selectedAccountId: number | null = null;
+  isAccountLedgerPage: boolean;
+
 
   statusOptions: Array<{ value: string, label: string }> = []; // Store the statuses here
 
   employeeOptions: Array<{ value: number; label: string }> = [];// Add this for employee filter
 
+  accountOptions: Array<{ value: number; label: string }> = [];
 
+ 
+  accountTypeOptions = [
+    { value: 'customer', label: 'Customer' },
+    { value: 'vendor', label: 'Vendor' },
+    { value: 'general', label: 'General' }
+  ];
+ 
   // List of quick period options like 'Today', 'Last Week', etc.
   quickPeriodOptions = [
     { value: 'today', label: 'Today' },
@@ -186,6 +201,103 @@ export class TaTableComponent implements OnDestroy {
     // this.applyFilters(); // Apply the filter immediately
   }
 
+  loadAccounts() {
+    if (!this.selectedAccountType) {
+      this.accountOptions = [];
+      return;
+    }
+
+    let url = '';
+    switch (this.selectedAccountType) {
+      case 'customer':
+        url = 'customers/customer/'; 
+        break;
+      case 'vendor':
+        url = 'vendors/vendor_get/'; 
+        break;
+      case 'general':
+        url = 'finance/general-accounts/'; 
+        break;
+    }
+
+    this.http.get<any>(url).subscribe(
+      (response) => {
+        if (response && response.data) {
+          console.log('Account options loaded:', response);
+          // For customer and vendor, use customer_id/vendor_id as the value
+          if (this.selectedAccountType === 'customer') {
+            this.accountOptions = response.data.map(item => ({
+              value: item.customer_id,
+              label: item.name
+            }));
+          } else if (this.selectedAccountType === 'vendor') {
+            this.accountOptions = response.data.map(item => ({
+              value: item.vendor_id,
+              label: item.name
+            }));
+          } else {
+            // For general accounts, use account_id
+            this.accountOptions = response.data.map(item => ({
+              value: item.account_id,
+              label: item.name
+            }));
+          }
+        }
+      },
+      (error) => {
+        console.error('Error fetching accounts:', error);
+      }
+    );
+  }
+
+  onAccountTypeChange() {
+    this.selectedAccountId = null; 
+    this.loadAccounts(); 
+  }
+
+  onAccountChange() {
+    if (this.selectedAccountType && this.selectedAccountId) {
+      console.log("Account selected:", this.selectedAccountType, this.selectedAccountId);
+      
+      // For account ledger page
+      if (this.router.url === '/admin/finance/account-ledger') {
+        console.log("On account ledger page, looking for accountLedgerComponentInstance");
+        
+        // Check if we have the global reference to the AccountLedgerComponent
+        if (window['accountLedgerComponentInstance'] && 
+            typeof window['accountLedgerComponentInstance'].loadLedgerData === 'function') {
+          console.log("Using global reference to AccountLedgerComponent");
+          window['accountLedgerComponentInstance'].loadLedgerData(
+            this.selectedAccountType, 
+            this.selectedAccountId
+          );
+          return;
+        }
+        
+        // Make the API call directly from here as a fallback
+        console.log("Making API call directly from table component");
+        const apiUrl = `finance/journal_entry_lines_list/${this.selectedAccountId}/`;
+        
+        this.http.get(apiUrl).subscribe(
+          (response: any) => {
+            console.log("API response received directly:", response);
+            if (response && response.data) {
+              this.rows = response.data;
+              this.total = response.count || response.data.length;
+              console.log("Data loaded directly in table component", this.rows);
+            }
+          },
+          error => {
+            console.error("Error loading data:", error);
+          }
+        );
+        return;
+      }
+    }
+    
+    this.applyFilters(); // Fall back to the default behavior
+  }
+
   // Apply filters like quick period, date range, and status to fetch filtered data
   applyFilters() {
     // Construct the filters object
@@ -195,6 +307,8 @@ export class TaTableComponent implements OnDestroy {
       toDate: this.toDate,
       status: this.selectedStatus,
       employee: this.selectedEmployee,
+      accountType: this.selectedAccountType,
+      accountId: this.selectedAccountId
     };
 
     // Generate query string from filters
@@ -219,6 +333,8 @@ export class TaTableComponent implements OnDestroy {
     const full_path = this.options.apiUrl;
     const url = `${full_path}${finalQueryString}`;
 
+    console.log("Making API request to:", url);
+    
     // Fetch filtered data from the server using the constructed URL
     this.http.get(url).subscribe(
       response => {
@@ -234,7 +350,7 @@ export class TaTableComponent implements OnDestroy {
     // return queryString;
     return finalQueryString;
   }
-
+  
   // Clear all filters like quick period, date range, and status
   clearFilters() {
     // Reset all filter values
@@ -304,7 +420,7 @@ export class TaTableComponent implements OnDestroy {
 
     // Return the query string by joining all the filters
     // return '?&' + queryParts.join('&');
-    return '&' + queryParts.join('&'); //before, it returns a string starting with "?&", which then gets concatenated to your API URL and ends up creating an extra "?". Now, fix this by modifying the function.
+    return '?' + queryParts.join('&'); //before, it returns a string starting with "?&", which then gets concatenated to your API URL and ends up creating an extra "?". Now, fix this by modifying the function.
   }
   formatDate(date: Date): string {
     // Format date as 'yyyy-MM-dd'
@@ -363,7 +479,8 @@ export class TaTableComponent implements OnDestroy {
   constructor(
     public taTableS: TaTableService,
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private elementRef: ElementRef
   ) {
     this.actionObservable$ = this.taTableS.actionObserval().subscribe((res: any) => {
       // if (res && res.action && res.action.type === 'delete') {
@@ -396,6 +513,11 @@ export class TaTableComponent implements OnDestroy {
       this.options.paginationPosition = 'bottom';
     // this.loadDataFromServer();
     const currentUrl = this.router.url;
+    this.isAccountLedgerPage = this.router.url === '/admin/finance/account-ledger';
+
+    if (this.isAccountLedgerPage) {
+      this.loadAccounts();
+    }
     // console.log('Current URL:', currentUrl); 
     const visibleUrls = [
       '/admin/purchase',
@@ -413,7 +535,8 @@ export class TaTableComponent implements OnDestroy {
       '/admin/reports/purchase-reports',
       '/admin/reports/vendor-reports',
       '/admin/reports/customer-reports',
-      '/admin/reports/ledgers-reports'
+      '/admin/reports/ledgers-reports',
+      '/admin/finance/account-ledger'
     ]
     this.loadStatuses();
     this.loadEmployees();
@@ -425,7 +548,8 @@ export class TaTableComponent implements OnDestroy {
     const hideStatusUrls = [
       '/admin/hrms/employee-attendance',
       '/admin/employees',// Added employees URL
-      '/admin/hrms/employee-leave-balance'
+      '/admin/hrms/employee-leave-balance',
+      '/admin/finance/account-ledger'
     ];
     this.isStatusButtonVisible = !hideStatusUrls.includes(currentUrl);
 

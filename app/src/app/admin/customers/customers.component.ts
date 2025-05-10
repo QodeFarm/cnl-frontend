@@ -33,13 +33,17 @@ export class CustomersComponent {
 
   constructor(private http: HttpClient, private cdref:ChangeDetectorRef) {}
   customFieldFormConfig: any = {};
+  entitiesList: any[] = [];
   ngOnInit() {
     this.showCustomerList = false;
     this.showForm = true;  //temporary change 'true'
     this.CustomerEditID = null;
     // Set form config
     this.setFormConfig();
-    
+    this.http.get('masters/entities/')
+      .subscribe((res: any) => {
+        this.entitiesList = res.data || []; // Adjust if the response format differs
+      });
     CustomFieldHelper.fetchCustomFields(this.http, 'customers', (customFields: any, customFieldMetadata: any) => {
       CustomFieldHelper.addCustomFieldsToFormConfig(customFields, customFieldMetadata, this.formConfig);
     });
@@ -66,17 +70,29 @@ export class CustomersComponent {
   }
   
   customFieldMetadata: any = {}; // To store mapping of field names to metadata
-
   submitCustomerForm() {
     const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
   
     // Determine the entity type and ID dynamically
-    const entityId = 'e1fba6d0-23a0-4ae3-a2df-a6d563510042'; // Since we're in the Sale Order form
+    const entityName = 'customers'; // Since we're in the Sale Order form
     const customId = this.formConfig.model.customer_data?.customer_id || null; //
   
-    // Construct payload for one custom field at a time
-    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityId, customId);
+    // Find entity record from list
+    const entity = this.entitiesList.find(e => e.entity_name === entityName);
 
+    if (!entity) {
+      console.error(`Entity not found for: ${entityName}`);
+      return;
+    }
+
+    const entityId = entity.entity_id;
+    // Inject entity_id into metadata temporarily
+    Object.keys(this.customFieldMetadata).forEach((key) => {
+      this.customFieldMetadata[key].entity_id = entityId;
+    });
+    // Construct payload for custom fields
+    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
+  
     if (!customFieldsPayload) {
       this.showDialog(); // Stop execution if required fields are missing
     }
@@ -205,13 +221,26 @@ export class CustomersComponent {
   updateCustomer() {
     const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
 
-    const entityId = 'e1fba6d0-23a0-4ae3-a2df-a6d563510042'; // Since we're in the Sale Order form
+    // Determine the entity type and ID dynamically
+    const entityName = 'customers'; // Since we're in the Sale Order form
     const customId = this.formConfig.model.customer_data?.customer_id || null; //
   
-    // Construct payload for custom fields based on updated values
-    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityId, customId);
-    console.log("Testing the data in customFieldsPayload: ", customFieldsPayload);
-    
+    // Find entity record from list
+    const entity = this.entitiesList.find(e => e.entity_name === entityName);
+
+    if (!entity) {
+      console.error(`Entity not found for: ${entityName}`);
+      return;
+    }
+
+    const entityId = entity.entity_id;
+    // Inject entity_id into metadata temporarily
+    Object.keys(this.customFieldMetadata).forEach((key) => {
+      this.customFieldMetadata[key].entity_id = entityId;
+    });
+    // Construct payload for custom fields
+    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
+  
     // Construct the final payload for update
     const payload = {
       ...this.formConfig.model,

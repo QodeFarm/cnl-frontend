@@ -157,7 +157,7 @@ export class PurchaseInvoiceComponent {
 
   dataToPopulate: any;
   hasDataPopulated: boolean = false;
-  
+  entitiesList: any[] = [];
   ngOnInit() {
 
     this.showPurchaseInvoiceList = false;
@@ -169,6 +169,11 @@ export class PurchaseInvoiceComponent {
     this.loadQuickpackOptions();
 
     //custom fields logic...
+    this.http.get('masters/entities/')
+      .subscribe((res: any) => {
+        this.entitiesList = res.data || []; // Adjust if the response format differs
+      });
+
     CustomFieldHelper.fetchCustomFields(this.http, 'purchase_invoice', (customFields: any, customFieldMetadata: any) => {
       CustomFieldHelper.addCustomFieldsToFormConfig_2(customFields, customFieldMetadata, this.formConfig);
     });
@@ -432,16 +437,29 @@ loadQuickpackProducts() {
   closeToast() {
     this.showSuccessToast = false;
   }
-
+  customFieldMetadata: any = {};
   createPurchaseInvoice(){
     const customFieldValues = this.formConfig.model['custom_field_values']
 
     // Determine the entity type and ID dynamically
-    const entityId = 'daf1ad5a-f497-413f-9fcf-be2f4f6052b7'; // Since we're in the Sale Invoice form
+    const entityName = 'purchase_invoice'; // Since we're in the Sale Order form
     const customId = this.formConfig.model.purchase_invoice_orders?.purchase_invoice_id || null; // Ensure correct purchase_order_id
   
+    // Find entity record from list
+    const entity = this.entitiesList.find(e => e.entity_name === entityName);
+
+    if (!entity) {
+      console.error(`Entity not found for: ${entityName}`);
+      return;
+    }
+
+    const entityId = entity.entity_id;
+    // Inject entity_id into metadata temporarily
+    Object.keys(this.customFieldMetadata).forEach((key) => {
+      this.customFieldMetadata[key].entity_id = entityId;
+    });
     // Construct payload for custom fields
-    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityId, customId);
+    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
   
     if (!customFieldsPayload) {
       this.showDialog(); // Stop execution if required fields are missing
@@ -471,12 +489,24 @@ loadQuickpackProducts() {
     const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
 
     // Determine the entity type and ID dynamically
-    const entityId = 'daf1ad5a-f497-413f-9fcf-be2f4f6052b7'; // Since we're in the Sale Order form
+    const entityName = 'purchase_invoice'; // Since we're in the Sale Order form
     const customId = this.formConfig.model.purchase_invoice_orders?.purchase_invoice_id || null; // Ensure correct purchase_order_id
+  
+    // Find entity record from list
+    const entity = this.entitiesList.find(e => e.entity_name === entityName);
 
-    // Construct payload for custom fields based on updated values
-    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityId, customId);
-    console.log("Testing the data in customFieldsPayload: ", customFieldsPayload);
+    if (!entity) {
+      console.error(`Entity not found for: ${entityName}`);
+      return;
+    }
+
+    const entityId = entity.entity_id;
+    // Inject entity_id into metadata temporarily
+    Object.keys(this.customFieldMetadata).forEach((key) => {
+      this.customFieldMetadata[key].entity_id = entityId;
+    });
+    // Construct payload for custom fields
+    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
     
     // Construct the final payload for update
     const payload = {
