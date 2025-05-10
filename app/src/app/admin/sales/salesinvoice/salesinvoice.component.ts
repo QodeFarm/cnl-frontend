@@ -172,7 +172,7 @@ export class SalesinvoiceComponent {
 
   dataToPopulate: any;
   salesInvoiceForm: FormGroup;
-
+  entitiesList: any[] = [];
   ngOnInit() {
     this.showSaleInvoiceList = false;
     this.showForm = true;
@@ -181,6 +181,11 @@ export class SalesinvoiceComponent {
     this.checkAndPopulateData();
     this.loadQuickpackOptions(); // Fetch Quickpack options
     //custom fields logic...
+    this.http.get('masters/entities/')
+      .subscribe((res: any) => {
+        this.entitiesList = res.data || []; // Adjust if the response format differs
+      });
+
     CustomFieldHelper.fetchCustomFields(this.http, 'sale_invoice', (customFields: any, customFieldMetadata: any) => {
       CustomFieldHelper.addCustomFieldsToFormConfig_2(customFields, customFieldMetadata, this.formConfig);
     });
@@ -695,15 +700,33 @@ export class SalesinvoiceComponent {
     this.showSuccessToast = false;
   }
 
+  customFieldMetadata: any = {};
   createSaleInovice(){
     const customFieldValues = this.formConfig.model['custom_field_values']
 
     // Determine the entity type and ID dynamically
-    const entityId = '97ca2f54-7036-4ae1-9515-894f676c58aa'; // Since we're in the Sale Invoice form
-    const customId = this.formConfig.model.sale_invoice_order?.sale_invoice_id || null; // Ensure correct sale_order_id
+    // const entityId = '97ca2f54-7036-4ae1-9515-894f676c58aa'; // Since we're in the Sale Invoice form
+    
   
+    // Determine the entity type and ID dynamically
+    const entityName = 'sale_invoice'; // Since we're in the Sale Order form
+    const customId = this.formConfig.model.sale_invoice_order?.sale_invoice_id || null;
+  
+    // Find entity record from list
+    const entity = this.entitiesList.find(e => e.entity_name === entityName);
+
+    if (!entity) {
+      console.error(`Entity not found for: ${entityName}`);
+      return;
+    }
+
+    const entityId = entity.entity_id;
+    // Inject entity_id into metadata temporarily
+    Object.keys(this.customFieldMetadata).forEach((key) => {
+      this.customFieldMetadata[key].entity_id = entityId;
+    });
     // Construct payload for custom fields
-    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityId, customId);
+    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
   
     if (!customFieldsPayload) {
       this.showDialog(); // Stop execution if required fields are missing
@@ -734,13 +757,25 @@ export class SalesinvoiceComponent {
     const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
 
     // Determine the entity type and ID dynamically
-    const entityId = '97ca2f54-7036-4ae1-9515-894f676c58aa'; // Since we're in the Sale Order form
-    const customId = this.formConfig.model.sale_invoice_order?.sale_invoice_id || null; // Ensure correct sale_order_id
+    const entityName = 'sale_invoice'; // Since we're in the Sale Order form
+    const customId = this.formConfig.model.sale_invoice_order?.sale_invoice_id || null;
+  
+    // Find entity record from list
+    const entity = this.entitiesList.find(e => e.entity_name === entityName);
 
-    // Construct payload for custom fields based on updated values
-    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityId, customId);
-    console.log("Testing the data in customFieldsPayload: ", customFieldsPayload);
-    
+    if (!entity) {
+      console.error(`Entity not found for: ${entityName}`);
+      return;
+    }
+
+    const entityId = entity.entity_id;
+    // Inject entity_id into metadata temporarily
+    Object.keys(this.customFieldMetadata).forEach((key) => {
+      this.customFieldMetadata[key].entity_id = entityId;
+    });
+    // Construct payload for custom fields
+    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
+  
     // Construct the final payload for update
     const payload = {
       ...this.formConfig.model,
