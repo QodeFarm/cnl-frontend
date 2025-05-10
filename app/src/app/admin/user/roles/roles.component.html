@@ -38,7 +38,8 @@
                                     <div>
                                         <input type="checkbox" [(ngModel)]="section.selected" (change)="toggleSection(module, section, section.selected)"> {{section.section_name}}
                                     </div>
-                                    <div style="margin-left: 20px;" *ngFor="let action of section.actions">
+                                    <!-- CRUD operations checkboxes are hidden but still processed in the background -->
+                                    <div style="margin-left: 20px; display: none;" *ngFor="let action of section.actions">
                                         <input type="checkbox" [(ngModel)]="action.selected" (change)="toggleAction(module, section, action, action.selected)"> {{action.action_name}}
                                     </div>
                                 </div>
