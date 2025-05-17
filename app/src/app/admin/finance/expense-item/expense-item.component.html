@@ -1,0 +1,35 @@
+<div class="container-fluid p-3">
+    <div class="expense-item-banner">
+      <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
+         <button (click)="ExpenseItemEditID = null" type="button" class="btn pl-0" style="color: black;">
+            <span *ngIf="ExpenseItemEditID" class="custom-heading">Update Expense</span>
+            <span *ngIf="!ExpenseItemEditID" class="custom-heading">Record New Expense</span>
+            </button>
+            <button (click)="showExpenseItemListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#itemModal">
+            Expense List
+            </button>
+        </div>
+    </div>
+    <div class="row custom-form">
+        <div class="col-12 px-1" *ngIf="showForm">
+            <ta-form [options]="formConfig"></ta-form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade custom-modal" id="itemModal" tabindex="-1" aria-labelledby="itemModalLabel" aria-hidden="true">
+   <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title" id="itemModalLabel">Expenses List</h5>
+            <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+         </div>
+         <div class="modal-body" *ngIf="showExpenseItemList">
+            <app-expense-item-list (edit)="editExpenseItem($event)" class="custom-list"></app-expense-item-list>
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+         </div>
+      </div>
+   </div>
+</div>
