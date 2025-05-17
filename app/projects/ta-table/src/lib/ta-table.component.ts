@@ -536,7 +536,8 @@ export class TaTableComponent implements OnDestroy {
       '/admin/reports/vendor-reports',
       '/admin/reports/customer-reports',
       '/admin/reports/ledgers-reports',
-      '/admin/finance/account-ledger'
+      '/admin/finance/account-ledger',
+      '/admin/finance/expense-item'
     ]
     this.loadStatuses();
     this.loadEmployees();
@@ -549,7 +550,8 @@ export class TaTableComponent implements OnDestroy {
       '/admin/hrms/employee-attendance',
       '/admin/employees',// Added employees URL
       '/admin/hrms/employee-leave-balance',
-      '/admin/finance/account-ledger'
+      '/admin/finance/account-ledger',
+      '/admin/finance/expense-item'
     ];
     this.isStatusButtonVisible = !hideStatusUrls.includes(currentUrl);
 

@@ -36,8 +36,7 @@ import { AccountLedgerModule } from './account-ledger/account-ledger.module';
     // JournalEntryComponent,
     // AccountLedgerComponent
 
-  ],
-  imports: [
+  ],  imports: [
     CommonModule,
     AdminCommmonModule,
     FinanceRoutingModule,
