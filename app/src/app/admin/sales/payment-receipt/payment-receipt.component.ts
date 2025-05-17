@@ -87,7 +87,7 @@ export class PaymentReceiptComponent implements OnInit {
           mapFn: (val: any) => val || '0.00'
         },
         { 
-          fieldKey: 'balance_amount', 
+          fieldKey: 'pending_amount', 
           name: 'Outstanding (₹)', 
           sort: true,
           displayType: 'map',
