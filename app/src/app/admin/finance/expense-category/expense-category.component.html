@@ -1,0 +1,35 @@
+<div class="container-fluid p-3">
+    <div class="expense-category-banner">
+      <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
+         <button (click)="ExpenseCategoryEditID = null" type="button" class="btn pl-0" style="color: black;">
+            <span *ngIf="ExpenseCategoryEditID" class="custom-heading">Update Expense Category</span>
+            <span *ngIf="!ExpenseCategoryEditID" class="custom-heading">Create Expense Category</span>
+            </button>
+            <button (click)="showExpenseCategoryListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#categoryModal">
+            Category List
+            </button>
+        </div>
+    </div>
+    <div class="row custom-form">
+        <div class="col-12 px-1" *ngIf="showForm">
+            <ta-form [options]="formConfig"></ta-form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade custom-modal" id="categoryModal" tabindex="-1" aria-labelledby="categoryModalLabel" aria-hidden="true">
+   <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title" id="categoryModalLabel">Expense Categories</h5>
+            <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+         </div>
+         <div class="modal-body" *ngIf="showExpenseCategoryList">
+            <app-expense-category-list (edit)="editExpenseCategory($event)" class="custom-list"></app-expense-category-list>
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+         </div>
+      </div>
+   </div>
+</div>

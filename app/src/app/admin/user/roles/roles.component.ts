@@ -275,8 +275,8 @@ export class RolesComponent {
         this.notification.success('Success', 'Role permissions saved successfully');
         
         // Show toast message
-        this.showSuccessToast = true;
-        this.toastMessage = 'Role permissions updated successfully';
+        // this.showSuccessToast = true;
+        // this.toastMessage = 'Role permissions updated successfully';
         
         // Auto-hide the toast after 3 seconds
         setTimeout(() => {

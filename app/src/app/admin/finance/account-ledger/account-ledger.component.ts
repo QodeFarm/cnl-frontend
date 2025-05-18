@@ -136,7 +136,7 @@ export class AccountLedgerComponent implements OnInit, AfterViewInit {
       pkId: "journal_entry_line_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['account', 'debit', 'credit', 'balance', 'created_at']
+        keys: ['account', 'debit', 'credit', 'balance', 'created_at', 'voucher_no']
       },
       defaultSort: { key: 'created_at', value: 'descend' },
       export: { downloadName: 'AccountLedgerList' },
@@ -149,6 +149,11 @@ export class AccountLedgerComponent implements OnInit, AfterViewInit {
           mapFn: (currentValue: any, row: any, col: any) => {
             return `${row.account?.account_name || ''}`;
           },
+        },
+        {
+          fieldKey: 'voucher_no',
+          name: 'voucher',
+          sort: true,
         },
         {
           fieldKey: 'created_at',
