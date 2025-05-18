@@ -266,7 +266,7 @@ private fallbackPrint(pdfBlob: Blob): void {
 }
 //---------------print & Preview - end --------------------------
   tableConfig: TaTableConfig = {
-    apiUrl: 'sales/sale_invoice_order/?summary=true',
+    apiUrl: 'sales/sale_invoice_order/?records_all=true',
     showCheckbox: true,
     pkId: "sale_invoice_id",
     fixedFilters: [

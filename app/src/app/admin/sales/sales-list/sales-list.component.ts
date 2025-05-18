@@ -260,7 +260,7 @@ private fallbackPrint(pdfBlob: Blob): void {
 }
 //---------------print & Preview - end --------------------------
   tableConfig: TaTableConfig = {
-    apiUrl: 'sales/sale_order/?summary=true',
+    apiUrl: 'sales/sale_order/?records_all=true',
     // title: 'Edit Sales Order List',
     showCheckbox: true,
     pkId: "sale_order_id",

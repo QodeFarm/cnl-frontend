@@ -715,10 +715,10 @@ export class SalesinvoiceComponent {
     // Find entity record from list
     const entity = this.entitiesList.find(e => e.entity_name === entityName);
 
-    if (!entity) {
-      console.error(`Entity not found for: ${entityName}`);
-      return;
-    }
+    // if (!entity) {
+    //   console.error(`Entity not found for: ${entityName}`);
+    //   return;
+    // }
 
     const entityId = entity.entity_id;
     // Inject entity_id into metadata temporarily
@@ -868,7 +868,6 @@ export class SalesinvoiceComponent {
                 {
                   key: 'bill_type',
                   type: 'select',
-                  // defaultValue: 'Exclusive',
                   className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'Bill type',
@@ -879,17 +878,72 @@ export class SalesinvoiceComponent {
                     ],
                     required: true
                   },
+                  // hooks: {
+                  //   onInit: (field: any) => {
+                  //     if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.bill_type && field.formControl) {
+                  //       field.formControl.setValue(this.dataToPopulate.sale_invoice_order.bill_type);
+                  //     } else {
+                  //       field.formControl.setValue('CASH');
+                  //     }
+                
+                  //     // 🆕 Add this to handle invoice number based on bill_type
+                  //     field.formControl.valueChanges.subscribe((billType: string) => {
+                  //       console.log('Selected bill_type:', billType);
+                  //       if (billType) {
+                  //         let prefix = billType === 'OTHERS' ? 'SOO-INV' : 'SO-INV';
+                  //         this.http.get(`masters/generate_order_no/?type=${prefix}`).subscribe((res: any) => {
+                  //           if (res?.data?.order_number) {
+                  //             this.invoiceNumber = res.data.order_number;
+                  //             this.formConfig.model['sale_invoice_order']['invoice_no'] = this.invoiceNumber;
+                  //             field.form.controls.invoice_no.setValue(this.invoiceNumber); // optional
+                  //             this.cdRef.detectChanges();
+                  //             console.log("Invoice no updated to:", this.invoiceNumber);
+                  //           }
+                  //         });
+                  //       }
+                  //     });
+                  //   }
+                  // }
                   hooks: {
                     onInit: (field: any) => {
-                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.bill_type && field.formControl) {
-                        field.formControl.setValue(this.dataToPopulate.sale_invoice_order.bill_type);
+                      const billTypeControl = field.formControl;
+                  
+                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.bill_type && billTypeControl) {
+                        billTypeControl.setValue(this.dataToPopulate.sale_invoice_order.bill_type);
                       } else {
-                        // If no data to populate, set 'CASH' as default
-                        field.formControl.setValue('CASH');
+                        billTypeControl.setValue('CASH');
                       }
+                  
+                      billTypeControl.valueChanges.subscribe((billType: string) => {
+                        console.log('Selected bill_type:', billType);
+                  
+                        // 👇 Update invoice no
+                        let prefix = billType === 'OTHERS' ? 'SOO-INV' : 'SO-INV';
+                        this.http.get(`masters/generate_order_no/?type=${prefix}`).subscribe((res: any) => {
+                          if (res?.data?.order_number) {
+                            this.invoiceNumber = res.data.order_number;
+                            this.formConfig.model['sale_invoice_order']['invoice_no'] = this.invoiceNumber;
+                            field.form.controls.invoice_no.setValue(this.invoiceNumber);
+                            this.cdRef.detectChanges();
+                          }
+                        });
+                  
+                        // 👇 Update customer lazy URL
+                        const customerField = field.parent?.fieldGroup?.find(f => f.key === 'customer');
+                        if (customerField && customerField.props && customerField.props.lazy) {
+                          const baseUrl = 'customers/customers/?summary=true';
+                          customerField.props.lazy.url = billType === 'OTHERS'
+                            ? `${baseUrl}&bill_type=Other`
+                            : baseUrl;
+                            
+                          customerField.props.lazy.lazyOneTime = false; // Important to allow it to re-fetch
+                          customerField.props.options = []; // Clear previous options
+                          this.cdRef.detectChanges();
+                        }
+                      });
                     }
-                  }
-                },
+                  }                  
+                },                
                 {
                   key: 'customer',
                   type: 'select',
@@ -901,7 +955,7 @@ export class SalesinvoiceComponent {
                     options: [],
                     lazy: {
                       url: 'customers/customers/?summary=true',
-                      lazyOneTime: true
+                      lazyOneTime: false
                     },
                     required: true
                   },
@@ -978,7 +1032,7 @@ export class SalesinvoiceComponent {
                     type: 'date',
                     label: 'Due Date',
                     readonly: true,
-                    required: true,
+                    required: false,
                   }
                 },
                 {

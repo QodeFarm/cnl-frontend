@@ -28,6 +28,7 @@ export class SalesComponent {
   @ViewChild(SalesListComponent) SalesListComponent!: SalesListComponent;
   orderNumber: any;
   invoiceData: any;
+  invoiceNumber: string = '';
   salesReceiptForm: FormGroup;
   showSaleOrderList: boolean = false;
   showForm: boolean = false;
@@ -283,8 +284,11 @@ export class SalesComponent {
 
   // Function to handle confirmation of invoice creation
   confirmInvoiceCreation() {
+    console.log("Invoice confirmation started");
     this.isConfirmationInvoiceOpen = false; // Close the modal
+    console.log("Triggering point ...");
     this.invoiceCreationHandler(); // Proceed with the invoice creation logic
+    console.log("After Triggering ...");
   }
 
 
@@ -321,11 +325,19 @@ export class SalesComponent {
         item.total_amount = totalAmount;
     });
 
+    console.log("This.Invoice data before : ", this.invoiceData);
+    // const saleOrderId = this.invoiceData.sale_invoice_order?.sale_order_id;
+    // const customerId = this.invoiceData.sale_invoice_order?.customer?.customer_id;
+
+    // console.log("sale order id : ", saleOrderId);
+    // console.log("Customer id : ", customerId);
     // Override calculated fields in invoice data
     const invoiceData = {
         ...this.invoiceData,
         sale_invoice_order: {
             ...this.invoiceData.sale_invoice_order,
+            // sale_order_id: this.invoiceData.sale_invoice_order.sale_order_id, // ✅ correct
+            // customer_id: this.invoiceData.sale_invoice_order.customer.customer_id, // ✅ correct
             item_value: items_value,
             tax_amount: tax_amount,
             discount: discount,
@@ -382,13 +394,37 @@ export class SalesComponent {
     );
   }
 
-  // This function triggers the workflow pipeline API call using POST method
-  private triggerWorkflowPipeline(saleOrderId: string) {
-    const apiUrl = 'sales/SaleOrder/{saleOrderId}/move_next_stage/'; //correct url
-    const url = apiUrl.replace('{saleOrderId}', saleOrderId); // Replace placeholder with saleOrderId
+  // // This function triggers the workflow pipeline API call using POST method
+  // private triggerWorkflowPipeline(saleOrderId: string, saleType: string) {
 
-    // POST request without any additional payload
-    this.http.post(url, {}).subscribe(
+  //   // Don't trigger workflow if saleType is "Others"
+  //   if (saleType === 'Others') {
+  //     console.log('Workflow trigger skipped: saleType is "Others"');
+  //     return;
+  //   }
+  //   const apiUrl = 'sales/SaleOrder/{saleOrderId}/move_next_stage/'; //correct url
+  //   const url = apiUrl.replace('{saleOrderId}', saleOrderId); // Replace placeholder with saleOrderId
+
+  //   // POST request without any additional payload
+  //   this.http.post(url, {}).subscribe(
+  //     response => {
+  //       console.log('POST request successful:', response);
+  //     },
+  //     error => {
+  //       console.error('Error triggering workflow pipeline:', error);
+  //     }
+  //   );
+  // }
+
+  private triggerWorkflowPipeline(saleOrderId: string) {
+    // if (!saleOrderId) {
+    //   console.warn('Sale Order ID is undefined. Skipping workflow trigger.');
+    //   return;
+    // }
+  
+    const apiUrl = `sales/SaleOrder/${saleOrderId}/move_next_stage/`;
+  
+    this.http.post(apiUrl, {}).subscribe(
       response => {
         console.log('POST request successful:', response);
       },
@@ -397,6 +433,7 @@ export class SalesComponent {
       }
     );
   }
+  
 
   createSaleInvoice(invoiceData: any): Observable<any> {
     return this.http.post('sales/sale_invoice_order/', invoiceData);
@@ -1518,7 +1555,7 @@ export class SalesComponent {
                     dataKey: 'sale_type_id',
                     dataLabel: 'name',
                     required: true,
-                    options: [], // Options will be populated dynamically
+                    options: [],
                     lazy: {
                       url: 'masters/sale_types/',
                       lazyOneTime: true
@@ -1526,56 +1563,124 @@ export class SalesComponent {
                   },
                   hooks: {
                     onInit: (field: any) => {
-                      // Fetch data from the API
                       const lazyUrl = field.templateOptions.lazy.url;
                       this.http.get(lazyUrl).subscribe((response: any) => {
                         const saleTypes = response.data;
-
-                        // Populate the options dynamically
                         field.templateOptions.options = saleTypes;
-
-                        // Find the option with name "Advance Order"
-                        const defaultOption = saleTypes.find(
-                          (option: any) => option.name === 'Advance Order'
-                        );
-
-                        // Set the default value if "Advance Order" exists
-                        if (defaultOption) {
-                          field.formControl.setValue(defaultOption);
+                
+                        // Set default value if needed
+                        if (!field.formControl.value) {
+                          const defaultOption = saleTypes.find((option: any) => option.name === 'Advance Order');
+                          if (defaultOption) {
+                            field.formControl.setValue(defaultOption);
+                          }
                         }
                       });
-
-                      // Handle value changes
+                
+                      // 🧠 Handle changes
                       field.formControl.valueChanges.subscribe((data: any) => {
                         console.log('Selected sale_type:', data);
-                        if (data && data.sale_type_id) {
+                
+                        if (data && data.name) {
+                          const saleTypeName = data.name;
+                
+                          // Set sale_type_id in model
                           this.formConfig.model['sale_order']['sale_type_id'] = data.sale_type_id;
-                      
-                          // 👇 Add this block to dynamically fetch order number with updated type
-                          let prefix = data.name === 'Other' ? 'SOO' : 'SO';
-                          // this.orderNumber = null;
+                
+                          // 🔄 Generate order number
+                          const prefix = saleTypeName === 'Other' ? 'SOO' : 'SO';
                           this.http.get(`masters/generate_order_no/?type=${prefix}`).subscribe((res: any) => {
                             if (res?.data?.order_number) {
-                              // this.orderNumber = null;
                               this.orderNumber = res.data.order_number;
                               this.formConfig.model['sale_order']['order_no'] = this.orderNumber;
-                              field.form.controls.order_no.setValue(this.orderNumber); // optional
-                              console.log("Order no updated to:", this.orderNumber);
-                              // short delay to override any late reset
-                              this.cdRef.detectChanges()
+                              field.form.controls.order_no.setValue(this.orderNumber);
+                              this.cdRef.detectChanges();
                             }
-                          });                          
+                          });
+                
+                          // 🔽 Update customer lazy URL
+                          const customerField = field.parent?.fieldGroup?.find(f => f.key === 'customer');
+                          if (customerField && customerField.props && customerField.props.lazy) {
+                            const baseUrl = 'customers/customers/?summary=true';
+                            customerField.props.lazy.url = saleTypeName === 'Other'
+                              ? `${baseUrl}&sale_type=Other`
+                              : baseUrl;
+                            customerField.props.lazy.lazyOneTime = false;
+                            customerField.props.options = [];
+                            this.cdRef.detectChanges();
+                          }
                         }
-                      });                      
-                      // field.formControl.valueChanges.subscribe((data: any) => {
-                      //   console.log('Selected sale_type:', data);
-                      //   if (data && data.sale_type_id) {
-                      //     this.formConfig.model['sale_order']['sale_type_id'] = data.sale_type_id;
-                      //   }
-                      // });
+                      });
                     }
                   }
-                },
+                },                               
+                // {
+                //   key: 'sale_type',
+                //   type: 'select',
+                //   className: 'col-md-4 col-sm-6 col-12',
+                //   templateOptions: {
+                //     label: 'Sale type',
+                //     dataKey: 'sale_type_id',
+                //     dataLabel: 'name',
+                //     required: true,
+                //     options: [], // Options will be populated dynamically
+                //     lazy: {
+                //       url: 'masters/sale_types/',
+                //       lazyOneTime: true
+                //     }
+                //   },
+                //   hooks: {
+                //     onInit: (field: any) => {
+                //       // Fetch data from the API
+                //       const lazyUrl = field.templateOptions.lazy.url;
+                //       this.http.get(lazyUrl).subscribe((response: any) => {
+                //         const saleTypes = response.data;
+
+                //         // Populate the options dynamically
+                //         field.templateOptions.options = saleTypes;
+
+                //         // Find the option with name "Advance Order"
+                //         const defaultOption = saleTypes.find(
+                //           (option: any) => option.name === 'Advance Order'
+                //         );
+
+                //         // Set the default value if "Advance Order" exists
+                //         if (defaultOption) {
+                //           field.formControl.setValue(defaultOption);
+                //         }
+                //       });
+
+                //       // Handle value changes
+                //       field.formControl.valueChanges.subscribe((data: any) => {
+                //         console.log('Selected sale_type:', data);
+                //         if (data && data.sale_type_id) {
+                //           this.formConfig.model['sale_order']['sale_type_id'] = data.sale_type_id;
+                      
+                //           // Add this block to dynamically fetch order number with updated type
+                //           let prefix = data.name === 'Other' ? 'SOO' : 'SO';
+                //           // this.orderNumber = null;
+                //           this.http.get(`masters/generate_order_no/?type=${prefix}`).subscribe((res: any) => {
+                //             if (res?.data?.order_number) {
+                //               // this.orderNumber = null;
+                //               this.orderNumber = res.data.order_number;
+                //               this.formConfig.model['sale_order']['order_no'] = this.orderNumber;
+                //               field.form.controls.order_no.setValue(this.orderNumber); // optional
+                //               console.log("Order no updated to:", this.orderNumber);
+                //               // short delay to override any late reset
+                //               this.cdRef.detectChanges()
+                //             }
+                //           });                          
+                //         }
+                //       });                      
+                //       // field.formControl.valueChanges.subscribe((data: any) => {
+                //       //   console.log('Selected sale_type:', data);
+                //       //   if (data && data.sale_type_id) {
+                //       //     this.formConfig.model['sale_order']['sale_type_id'] = data.sale_type_id;
+                //       //   }
+                //       // });
+                //     }
+                //   }
+                // },
                 {
                   key: 'customer',
                   type: 'select',
@@ -1709,94 +1814,297 @@ export class SalesComponent {
                     label: 'Flow status',
                     dataKey: 'flow_status_id',
                     dataLabel: 'flow_status_name',
-                    // placeholder: 'Select Order status type',
                     lazy: {
                       url: 'masters/flow_status/',
                       lazyOneTime: true
-                    },
-                    // expressions: {
-                    //   hide: '!model.sale_order_id',
-                    // },
+                    }
                   },
                   hooks: {
                     onChanges: (field: any) => {
                       field.formControl.valueChanges.subscribe(data => {
-                        //console.log("ledger_account", data);
                         if (data && data.flow_status_id) {
                           this.formConfig.model['sale_order']['flow_status_id'] = data.flow_status_id;
                         }
                       });
+                
                       const valueChangesSubscription = field.formControl.valueChanges.subscribe(data => {
                         const saleOrder = this.formConfig.model['sale_order'];
-                        console.log("Sale order: ", saleOrder);
-
-                        // Prepare invoice data
                         const saleOrderItems = this.formConfig.model['sale_order_items'];
                         const orderAttachments = this.formConfig.model['order_attachments'];
                         const orderShipments = this.formConfig.model['order_shipments'];
-                        // const CustomFields = this.formConfig.model['custom_field_values'];
-                        // console.log("CustomFields : ", CustomFields)
-
-                        const totalAmount = () => {
-                          if (!Array.isArray(saleOrderItems) || saleOrderItems.length === 0) {
-                            console.log("No items found, returning 0");
-                            return 0;
+                
+                        const saleTypeObj = saleOrder.sale_type;
+                        const saleTypeName = saleTypeObj?.name || '';
+                        const billType = (saleTypeName === 'Other') ? 'OTHERS' : 'CASH';
+                        const invoicePrefix = (saleTypeName === 'Other') ? 'SOO-INV' : 'SO-INV';
+                
+                        this.http.get(`masters/generate_order_no/?type=${invoicePrefix}`).subscribe((res: any) => {
+                          if (res?.data?.order_number) {
+                            this.invoiceNumber = res.data.order_number;
+                
+                            // ✅ Fetch order_status_id by status_name = "Completed"
+                            this.http.get('masters/order_status/?status_name=Completed').subscribe((statusRes: any) => {
+                              const completedStatus = statusRes?.data?.[0];
+                              const completedStatusId = completedStatus?.order_status_id;
+                
+                              const totalAmount = () => {
+                                if (!Array.isArray(saleOrderItems) || saleOrderItems.length === 0) return 0;
+                                return saleOrderItems.reduce((sum, item) => {
+                                  const quantity = Number(item.quantity) || 0;
+                                  const rate = Number(item.rate) || 0;
+                                  return sum + (quantity * rate);
+                                }, 0);
+                              };
+                
+                              this.invoiceData = {
+                                sale_invoice_order: {
+                                  invoice_no: this.invoiceNumber,
+                                  bill_type: billType,
+                                  invoice_date: this.nowDate(),
+                                  email: saleOrder.email,
+                                  ref_no: saleOrder.ref_no,
+                                  ref_date: this.nowDate(),
+                                  tax: saleOrder.tax || 'Inclusive',
+                                  remarks: saleOrder.remarks,
+                                  advance_amount: saleOrder.advance_amount || '0',
+                                  item_value: totalAmount(),
+                                  discount: saleOrder.discount,
+                                  dis_amt: saleOrder.dis_amt,
+                                  taxable: saleOrder.taxable,
+                                  cess_amount: saleOrder.cess_amount,
+                                  transport_charges: saleOrder.transport_charges,
+                                  round_off: saleOrder.round_off,
+                                  total_amount: totalAmount(),
+                                  vehicle_name: saleOrder.vehicle_name,
+                                  total_boxes: saleOrder.total_boxes,
+                                  shipping_address: saleOrder.shipping_address,
+                                  billing_address: saleOrder.billing_address,
+                                  customer_id: saleOrder.customer_id,
+                                  gst_type_id: saleOrder.gst_type_id,
+                                  order_type: saleOrder.order_type || 'sale_invoice',
+                                  order_salesman_id: saleOrder.order_salesman_id,
+                                  customer_address_id: saleOrder.customer_address_id,
+                                  payment_term_id: saleOrder.payment_term_id,
+                                  payment_link_type_id: saleOrder.payment_link_type_id,
+                                  ledger_account_id: saleOrder.ledger_account_id,
+                                  flow_status: saleOrder.flow_status,
+                                  order_status_id: completedStatusId,
+                                  ...(saleTypeName !== 'Other' && { sale_order_id: saleOrder.sale_order_id })
+                                },
+                                sale_invoice_items: saleOrderItems,
+                                order_attachments: orderAttachments,
+                                order_shipments: orderShipments
+                              };
+                
+                              console.log('invoiceData:', this.invoiceData);
+                            });
                           }
-                        
-                          return saleOrderItems.reduce((sum, item) => {
-                            const quantity = Number(item.quantity) || 0;
-                            const rate = Number(item.rate) || 0; // Convert rate to a number
-                        
-                            // console.log(`Calculating: ${quantity} * ${rate} = ${quantity * rate}`);
-                            return sum + (quantity * rate);
-                          }, 0);
-                        };
-                        
-                        this.invoiceData = {
-                          sale_invoice_order: {
-                            bill_type: saleOrder.bill_type || 'CASH',
-                            sale_order_id: saleOrder.sale_order_id,
-                            invoice_date: this.nowDate(),
-                            email: saleOrder.email,
-                            ref_no: saleOrder.ref_no,
-                            ref_date: this.nowDate(),
-                            tax: saleOrder.tax || 'Inclusive',
-                            remarks: saleOrder.remarks,
-                            advance_amount: saleOrder.advance_amount || '0',
-                            item_value: totalAmount(),
-                            discount: saleOrder.discount,
-                            dis_amt: saleOrder.dis_amt,
-                            taxable: saleOrder.taxable,
-                            // tax_amount: saleOrder.tax_amount,
-                            cess_amount: saleOrder.cess_amount,
-                            transport_charges: saleOrder.transport_charges,
-                            round_off: saleOrder.round_off,
-                            total_amount: totalAmount(),
-                            vehicle_name: saleOrder.vehicle_name,
-                            total_boxes: saleOrder.total_boxes,
-                            shipping_address: saleOrder.shipping_address,
-                            billing_address: saleOrder.billing_address,
-                            customer_id: saleOrder.customer_id,
-                            gst_type_id: saleOrder.gst_type_id,
-                            order_type: saleOrder.order_type || 'sale_invoice',
-                            order_salesman_id: saleOrder.order_salesman_id,
-                            customer_address_id: saleOrder.customer_address_id,
-                            payment_term_id: saleOrder.payment_term_id,
-                            payment_link_type_id: saleOrder.payment_link_type_id,
-                            ledger_account_id: saleOrder.ledger_account_id,
-                            flow_status: saleOrder.flow_status,
-                            order_status_id: '717c922f-c092-4d40-94e7-6a12d7095600'
-                          },
-                          sale_invoice_items: saleOrderItems,
-                          order_attachments: orderAttachments,
-                          order_shipments: orderShipments
-                        };
-
-                        console.log('invoiceData:', this.invoiceData);
+                        });
                       });
                     }
                   }
-                },
+                },      
+                // {
+                //   key: 'flow_status',
+                //   type: 'select',
+                //   className: 'col-md-4 col-sm-6 col-12',
+                //   templateOptions: {
+                //     label: 'Flow status',
+                //     dataKey: 'flow_status_id',
+                //     dataLabel: 'flow_status_name',
+                //     lazy: {
+                //       url: 'masters/flow_status/',
+                //       lazyOneTime: true
+                //     }
+                //   },
+                //   hooks: {
+                //     onChanges: (field: any) => {
+                //       field.formControl.valueChanges.subscribe(data => {
+                //         if (data && data.flow_status_id) {
+                //           this.formConfig.model['sale_order']['flow_status_id'] = data.flow_status_id;
+                //         }
+                //       });
+                
+                //       const valueChangesSubscription = field.formControl.valueChanges.subscribe(data => {
+                //         const saleOrder = this.formConfig.model['sale_order'];
+                //         console.log("saleOrder : ", saleOrder);
+                //         const saleOrderItems = this.formConfig.model['sale_order_items'];
+                //         const orderAttachments = this.formConfig.model['order_attachments'];
+                //         const orderShipments = this.formConfig.model['order_shipments'];
+                
+                //         const saleTypeObj = saleOrder.sale_type;
+                //         const saleTypeName = saleTypeObj?.name || '';
+                //         const billType = (saleTypeName === 'Other') ? 'OTHERS' : 'CASH';
+                //         const invoicePrefix = (saleTypeName === 'Other') ? 'SOO-INV' : 'SO-INV';
+                
+                //         this.http.get(`masters/generate_order_no/?type=${invoicePrefix}`).subscribe((res: any) => {
+                //           if (res?.data?.order_number) {
+                //             this.invoiceNumber = res.data.order_number;
+                
+                //             // Fetch order_status_id by status_name = "Completed"
+                //             this.http.get('masters/order_status/?status_name=Completed').subscribe((statusRes: any) => {
+                //               const completedStatus = statusRes?.data?.[0];
+                //               const completedStatusId = completedStatus?.order_status_id;
+                
+                //               const totalAmount = () => {
+                //                 if (!Array.isArray(saleOrderItems) || saleOrderItems.length === 0) return 0;
+                //                 return saleOrderItems.reduce((sum, item) => {
+                //                   const quantity = Number(item.quantity) || 0;
+                //                   const rate = Number(item.rate) || 0;
+                //                   return sum + (quantity * rate);
+                //                 }, 0);
+                //               };
+                
+                //               this.invoiceData = {
+                //                 sale_invoice_order: {
+                //                   ...(saleTypeName === 'Other' && { invoice_no: this.invoiceNumber }),
+                //                   bill_type: billType,
+                //                   invoice_date: this.nowDate(),
+                //                   email: saleOrder.email,
+                //                   customer: saleOrder.customer,
+                //                   ref_no: saleOrder.ref_no,
+                //                   ref_date: this.nowDate(),
+                //                   tax: saleOrder.tax || 'Inclusive',
+                //                   remarks: saleOrder.remarks,
+                //                   advance_amount: saleOrder.advance_amount || '0',
+                //                   item_value: totalAmount(),
+                //                   discount: saleOrder.discount,
+                //                   dis_amt: saleOrder.dis_amt,
+                //                   taxable: saleOrder.taxable,
+                //                   cess_amount: saleOrder.cess_amount,
+                //                   transport_charges: saleOrder.transport_charges,
+                //                   round_off: saleOrder.round_off,
+                //                   total_amount: totalAmount(),
+                //                   vehicle_name: saleOrder.vehicle_name,
+                //                   total_boxes: saleOrder.total_boxes,
+                //                   shipping_address: saleOrder.shipping_address,
+                //                   billing_address: saleOrder.billing_address,
+                //                   customer_id: saleOrder.customer?.customer_id,
+                //                   gst_type_id: saleOrder.gst_type_id,
+                //                   order_type: saleOrder.order_type || 'sale_invoice',
+                //                   order_salesman_id: saleOrder.order_salesman_id,
+                //                   customer_address_id: saleOrder.customer_address_id,
+                //                   payment_term_id: saleOrder.payment_term_id,
+                //                   payment_link_type_id: saleOrder.payment_link_type_id,
+                //                   ledger_account_id: saleOrder.ledger_account_id,
+                //                   flow_status: saleOrder.flow_status,
+                //                   order_status_id: completedStatusId,
+                //                   sale_order_id:saleOrder.sale_order_id,
+                //                   ...(saleTypeName !== 'Other' && { sale_order_id: saleOrder.sale_order_id }),
+                                  
+                //                   // ✅ Tell backend to create in mstcnl DB
+                //                   ...(saleTypeName === 'Other' && { db: 'mstcnl' })
+                //                 },
+                //                 sale_invoice_items: saleOrderItems,
+                //                 order_attachments: orderAttachments,
+                //                 order_shipments: orderShipments
+                //               };
+                
+                //               console.log('invoiceData:', this.invoiceData);
+                //             });
+                //           }
+                //         });
+                //       });
+                //     }
+                //   }
+                // },    
+                // {
+                //   key: 'flow_status',
+                //   type: 'select',
+                //   className: 'col-md-4 col-sm-6 col-12',
+                //   templateOptions: {
+                //     label: 'Flow status',
+                //     dataKey: 'flow_status_id',
+                //     dataLabel: 'flow_status_name',
+                //     // placeholder: 'Select Order status type',
+                //     lazy: {
+                //       url: 'masters/flow_status/',
+                //       lazyOneTime: true
+                //     },
+                //     // expressions: {
+                //     //   hide: '!model.sale_order_id',
+                //     // },
+                //   },
+                //   hooks: {
+                //     onChanges: (field: any) => {
+                //       field.formControl.valueChanges.subscribe(data => {
+                //         //console.log("ledger_account", data);
+                //         if (data && data.flow_status_id) {
+                //           this.formConfig.model['sale_order']['flow_status_id'] = data.flow_status_id;
+                //         }
+                //       });
+                //       const valueChangesSubscription = field.formControl.valueChanges.subscribe(data => {
+                //         const saleOrder = this.formConfig.model['sale_order'];
+                //         console.log("Sale order: ", saleOrder);
+
+                //         // Prepare invoice data
+                //         const saleOrderItems = this.formConfig.model['sale_order_items'];
+                //         const orderAttachments = this.formConfig.model['order_attachments'];
+                //         const orderShipments = this.formConfig.model['order_shipments'];
+                //         // const CustomFields = this.formConfig.model['custom_field_values'];
+                //         // console.log("CustomFields : ", CustomFields)
+
+                //         const totalAmount = () => {
+                //           if (!Array.isArray(saleOrderItems) || saleOrderItems.length === 0) {
+                //             console.log("No items found, returning 0");
+                //             return 0;
+                //           }
+                        
+                //           return saleOrderItems.reduce((sum, item) => {
+                //             const quantity = Number(item.quantity) || 0;
+                //             const rate = Number(item.rate) || 0; // Convert rate to a number
+                        
+                //             // console.log(`Calculating: ${quantity} * ${rate} = ${quantity * rate}`);
+                //             return sum + (quantity * rate);
+                //           }, 0);
+                //         };
+                        
+                //         this.invoiceData = {
+                //           sale_invoice_order: {
+                //             bill_type: saleOrder.bill_type || 'CASH',
+                //             sale_order_id: saleOrder.sale_order_id,
+                //             invoice_date: this.nowDate(),
+                //             email: saleOrder.email,
+                //             ref_no: saleOrder.ref_no,
+                //             ref_date: this.nowDate(),
+                //             tax: saleOrder.tax || 'Inclusive',
+                //             remarks: saleOrder.remarks,
+                //             advance_amount: saleOrder.advance_amount || '0',
+                //             item_value: totalAmount(),
+                //             discount: saleOrder.discount,
+                //             dis_amt: saleOrder.dis_amt,
+                //             taxable: saleOrder.taxable,
+                //             // tax_amount: saleOrder.tax_amount,
+                //             cess_amount: saleOrder.cess_amount,
+                //             transport_charges: saleOrder.transport_charges,
+                //             round_off: saleOrder.round_off,
+                //             total_amount: totalAmount(),
+                //             vehicle_name: saleOrder.vehicle_name,
+                //             total_boxes: saleOrder.total_boxes,
+                //             shipping_address: saleOrder.shipping_address,
+                //             billing_address: saleOrder.billing_address,
+                //             customer: saleOrder.customer,
+                //             customer_id: saleOrder.customer.customer_id,
+                //             gst_type_id: saleOrder.gst_type_id,
+                //             order_type: saleOrder.order_type || 'sale_invoice',
+                //             order_salesman_id: saleOrder.order_salesman_id,
+                //             customer_address_id: saleOrder.customer_address_id,
+                //             payment_term_id: saleOrder.payment_term_id,
+                //             payment_link_type_id: saleOrder.payment_link_type_id,
+                //             ledger_account_id: saleOrder.ledger_account_id,
+                //             flow_status: saleOrder.flow_status,
+                //             order_status_id: '717c922f-c092-4d40-94e7-6a12d7095600'
+                //           },
+                //           sale_invoice_items: saleOrderItems,
+                //           order_attachments: orderAttachments,
+                //           order_shipments: orderShipments
+                //         };
+
+                //         console.log('invoiceData:', this.invoiceData);
+                //       });
+                //     }
+                //   }
+                // },                                     
                 {
                   key: 'use_workflow',
                   type: 'checkbox',
