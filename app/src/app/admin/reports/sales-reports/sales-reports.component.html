@@ -38,6 +38,20 @@
                         <a class="report-link" (click)="selectReport('ProfitMarginReport')">
                             Profit Margin
                         </a>
+                        <!-- Conditionally show for superuser -->
+                        <a *ngIf="isSuperUser" class="report-link" (click)="selectReport('OtherSalesReport')">
+                            Other Sales
+                        </a>
+                        <a *ngIf="isSuperUser" class="report-link" (click)="selectReport('AllSalesReport')">
+                            All Sales
+                        </a>
+
+                        <a *ngIf="isSuperUser" class="report-link" (click)="selectReport('OtherInvoice')">
+                            Other Invoices
+                        </a>
+                        <a *ngIf="isSuperUser" class="report-link" (click)="selectReport('AllInvoice')">
+                            All Invoices
+                        </a>
                         <!-- 
                         
                          -->

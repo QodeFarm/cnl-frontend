@@ -346,16 +346,16 @@ export class SaleReturnsComponent {
     const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
 
     // Determine the entity type and ID dynamically
-    const entityName = 'sale_returns'; // Since we're in the Sale Order form
+    const entityName = 'sale_return'; // Since we're in the Sale Order form
     const customId = this.formConfig.model.sale_return_order?.sale_return_id || null; // Ensure correct sale_order_id
 
     // Find entity record from list
     const entity = this.entitiesList.find(e => e.entity_name === entityName);
 
-    if (!entity) {
-      console.error(`Entity not found for: ${entityName}`);
-      return;
-    }
+    // if (!entity) {
+    //   console.error(`Entity not found for: ${entityName}`);
+    //   return;
+    // }
 
     const entityId = entity.entity_id;
     // Inject entity_id into metadata temporarily
@@ -2414,16 +2414,16 @@ export class SaleReturnsComponent {
     const customFieldValues = this.formConfig.model['custom_field_values']
 
     // Determine the entity type and ID dynamically
-    const entityName = 'sale_returns'; // Since we're in the Sale Order form
+    const entityName = 'sale_return'; // Since we're in the Sale Order form
     const customId = this.formConfig.model.sale_return_order?.sale_return_id || null; // Ensure correct sale_order_id
 
     // Find entity record from list
     const entity = this.entitiesList.find(e => e.entity_name === entityName);
 
-    if (!entity) {
-      console.error(`Entity not found for: ${entityName}`);
-      return;
-    }
+    // if (!entity) {
+    //   console.error(`Entity not found for: ${entityName}`);
+    //   return;
+    // }
 
     const entityId = entity.entity_id;
     // Inject entity_id into metadata temporarily

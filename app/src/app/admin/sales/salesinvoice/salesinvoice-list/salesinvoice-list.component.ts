@@ -5,6 +5,7 @@ import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 import { HttpClient } from '@angular/common/http';
+import { LocalStorageService } from '@ta/ta-core';
 
 @Component({
   selector: 'app-salesinvoice-list',
@@ -266,7 +267,7 @@ private fallbackPrint(pdfBlob: Blob): void {
 }
 //---------------print & Preview - end --------------------------
   tableConfig: TaTableConfig = {
-    apiUrl: 'sales/sale_invoice_order/?summary=true',
+    apiUrl: 'sales/sale_invoice_order/?records_all=true',
     showCheckbox: true,
     pkId: "sale_invoice_id",
     fixedFilters: [
@@ -358,5 +359,7 @@ private fallbackPrint(pdfBlob: Blob): void {
     ]
   };
 
-  constructor(private router: Router, private http: HttpClient) {}
+  constructor(private router: Router, private http: HttpClient) {
+  }
+
 }
