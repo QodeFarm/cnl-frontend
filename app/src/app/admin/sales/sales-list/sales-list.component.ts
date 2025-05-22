@@ -5,6 +5,7 @@ import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 import { HttpClient } from '@angular/common/http';
+import { LocalStorageService } from '@ta/ta-core';
 
 @Component({
   selector: 'app-sales-list',
@@ -18,7 +19,9 @@ export class SalesListComponent {
   @Output('edit') edit = new EventEmitter<void>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
-  constructor(private router: Router, private http: HttpClient) { }
+  constructor(private router: Router, private http: HttpClient, private localStorage: LocalStorageService) { 
+    this.setApiUrlBasedOnUser();
+  }
 
   refreshTable() {
     this.taTableComponent?.refresh();
@@ -260,15 +263,15 @@ private fallbackPrint(pdfBlob: Blob): void {
 }
 //---------------print & Preview - end --------------------------
   tableConfig: TaTableConfig = {
-    apiUrl: 'sales/sale_order/?records_all=true',
+    apiUrl: '',//'sales/sale_order/?summary=true',
     // title: 'Edit Sales Order List',
     showCheckbox: true,
     pkId: "sale_order_id",
     fixedFilters: [
-      {
-        key: 'summary',
-        value: 'true'
-      }
+      // {
+      //   key: 'summary',
+      //   value: 'true'
+      // }
       
     ],
     export: {
@@ -376,5 +379,20 @@ private fallbackPrint(pdfBlob: Blob): void {
       }
     ]
   };
+
+  private setApiUrlBasedOnUser() {
+    const user = this.localStorage.getItem('user');
+    const isSuperUser = user?.is_sp_user === true;
+
+    // Set the API URL conditionally
+    this.tableConfig.apiUrl = isSuperUser
+      ? 'sales/sale_order/?records_all=true'
+      : 'sales/sale_order/?summary=true';
+
+    // Also set fixed filters accordingly (optional)
+    this.tableConfig.fixedFilters = isSuperUser
+      ? [{ key: 'records_all', value: 'true' }]
+      : [{ key: 'summary', value: 'true' }];
+  }
 
 }

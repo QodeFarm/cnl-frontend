@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, ViewChild } from '@angular/core';
+import { LocalStorageService } from '@ta/ta-core';
 import { TaTableComponent, TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
@@ -18,6 +19,14 @@ export class SalesRepotsComponent {
   tableConfig: TaTableConfig | null = null;
   // totalRecords: number | null = null; 
 
+  isSuperUser: boolean = false;
+
+  constructor(private localStorage: LocalStorageService) {
+    const user = this.localStorage.getItem('user');
+    this.isSuperUser = user?.is_sp_user === true;
+    // this.initReportsConfig();
+  }
+
   reportsConfig: { [key: string]: TaTableConfig } = {
 
     salesSummary: {
@@ -28,6 +37,100 @@ export class SalesRepotsComponent {
         keys: ['order_no', 'customer', 'order_date','sale_type','status', 'amount']
       },
       export: {downloadName: 'SalesSummaryReport'},
+      defaultSort: { key: 'created_at', value: 'descend' },
+      cols: [
+        {
+          fieldKey: 'order_no',
+          name: 'Order No',
+          sort: true
+        },
+        {
+          fieldKey: 'customer',
+          name: 'Customer',
+          sort: true
+        },
+        {
+          fieldKey: 'order_date',
+          name: 'Order Date',
+          sort: true
+        },
+        {
+          fieldKey: 'sale_type',
+          name: 'Sale Type',
+          sort: true,
+        },
+        {
+          fieldKey: 'status_name',
+          name: 'Status',
+          displayType: "map",
+          mapFn: (currentValue: any, row: any, col: any) => {
+            return `${row?.order_status?.status_name}`;
+          },
+          sort: true
+        },
+        {
+          fieldKey: 'amount',
+          name: 'Amount',
+          sort: true
+        }
+      ]
+    },
+
+    OtherSalesReport: {
+      apiUrl: 'sales/sale_order/?sales_order_report=true&report_type=other',
+      pkId: "sale_order_id",
+      pageSize: 10,
+      "globalSearch": {
+        keys: ['order_no', 'customer', 'order_date','sale_type','status', 'amount']
+      },
+      export: {downloadName: 'SalesOtherReport'},
+      defaultSort: { key: 'created_at', value: 'descend' },
+      cols: [
+        {
+          fieldKey: 'order_no',
+          name: 'Order No',
+          sort: true
+        },
+        {
+          fieldKey: 'customer',
+          name: 'Customer',
+          sort: true
+        },
+        {
+          fieldKey: 'order_date',
+          name: 'Order Date',
+          sort: true
+        },
+        {
+          fieldKey: 'sale_type',
+          name: 'Sale Type',
+          sort: true,
+        },
+        {
+          fieldKey: 'status_name',
+          name: 'Status',
+          displayType: "map",
+          mapFn: (currentValue: any, row: any, col: any) => {
+            return `${row?.order_status?.status_name}`;
+          },
+          sort: true
+        },
+        {
+          fieldKey: 'amount',
+          name: 'Amount',
+          sort: true
+        }
+      ]
+    },
+
+    AllSalesReport: {
+      apiUrl: 'sales/sale_order/?sales_order_report=true&report_type=all',
+      pkId: "sale_order_id",
+      pageSize: 10,
+      "globalSearch": {
+        keys: ['order_no', 'customer', 'order_date','sale_type','status', 'amount']
+      },
+      export: {downloadName: 'AllSalesordersReport'},
       defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
@@ -137,6 +240,142 @@ export class SalesRepotsComponent {
         //   name: 'created_at',
         //   sort: true
         // },
+      ]
+    },
+
+    OtherInvoice: {
+      apiUrl: 'sales/sale_order/?sales_invoice_report=true&invoice_type=other',
+      pkId: "sale_invoice_id",
+      pageSize: 10,
+      "globalSearch": {
+        keys: ['invoice_no','invoice_date','customer','created_at','bill_type','item_value','dis_amt','tax_amount','total_amount','due_date','payment_status','created_at']
+      },
+      export: {downloadName: 'OtherInvoiceReport'},
+      defaultSort: { key: 'created_at', value: 'descend' },
+      cols: [
+        {
+          fieldKey: 'invoice_no',
+          name: 'Invoice No',
+          sort: true
+        },
+        {
+          fieldKey: 'invoice_date',
+          name: 'Invoice Date',
+          sort: true
+        }, 
+        {
+          fieldKey: 'customer',
+          name: 'Customer',
+          sort: true
+        },
+        {
+          fieldKey: 'bill_type',
+          name: 'Bill Type',
+          sort: true
+        },
+        {
+          fieldKey: 'item_value',
+          name: 'Item Value',
+          sort: true
+        },
+        {
+          fieldKey: 'dis_amt',
+          name: 'Discount Amount',
+          sort: true
+        },
+        {
+          fieldKey: 'tax_amount',
+          name: 'Tax Amount',
+          
+          sort: true
+        },
+        {
+          fieldKey: 'due_date',
+          name: 'Due Date',
+          sort: true
+        },
+        {
+          fieldKey: 'status_name',
+          name: 'Status',
+          displayType: "map",
+          mapFn: (currentValue: any, row: any, col: any) => {
+            return `${row?.order_status?.status_name}`;
+          },
+          sort: true
+        },
+      {
+        fieldKey: 'total_amount',
+        name: 'Total Amount',
+        sort: true
+      },
+      ]
+    },
+
+    AllInvoice: {
+      apiUrl: 'sales/sale_order/?sales_invoice_report=true&invoice_type=all',
+      pkId: "sale_invoice_id",
+      pageSize: 10,
+      "globalSearch": {
+        keys: ['invoice_no','invoice_date','customer','created_at','bill_type','item_value','dis_amt','tax_amount','total_amount','due_date','payment_status','created_at']
+      },
+      export: {downloadName: 'AllInvoiceReport'},
+      defaultSort: { key: 'created_at', value: 'descend' },
+      cols: [
+        {
+          fieldKey: 'invoice_no',
+          name: 'Invoice No',
+          sort: true
+        },
+        {
+          fieldKey: 'invoice_date',
+          name: 'Invoice Date',
+          sort: true
+        }, 
+        {
+          fieldKey: 'customer',
+          name: 'Customer',
+          sort: true
+        },
+        {
+          fieldKey: 'bill_type',
+          name: 'Bill Type',
+          sort: true
+        },
+        {
+          fieldKey: 'item_value',
+          name: 'Item Value',
+          sort: true
+        },
+        {
+          fieldKey: 'dis_amt',
+          name: 'Discount Amount',
+          sort: true
+        },
+        {
+          fieldKey: 'tax_amount',
+          name: 'Tax Amount',
+          
+          sort: true
+        },
+        {
+          fieldKey: 'due_date',
+          name: 'Due Date',
+          sort: true
+        },
+        {
+          fieldKey: 'status_name',
+          name: 'Status',
+          displayType: "map",
+          mapFn: (currentValue: any, row: any, col: any) => {
+            return `${row?.order_status?.status_name}`;
+          },
+          sort: true
+        },
+      {
+        fieldKey: 'total_amount',
+        name: 'Total Amount',
+        sort: true
+      },
       ]
     },
 

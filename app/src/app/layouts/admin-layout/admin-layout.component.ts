@@ -47,6 +47,7 @@ export class AdminLayoutComponent {
   role: any;
   company_name: any;
   company_code: any;
+  is_sp_user: any;
   public currentHoverTabKey: string;
   public tabs: Tab[] = [];
   showContain = false;
@@ -114,6 +115,9 @@ export class AdminLayoutComponent {
       const role_Id = user.role_id;
       this.company_name = user.company_name;
       this.company_code = user.company_code;
+      this.is_sp_user = user.is_sp_user
+
+      console.log("is_sp_user : ", this.is_sp_user);
 
       // Using template literals to inject user_id dynamically into the URL
       this.http.get(`users/user_access/${role_Id}`).subscribe((res: any) => {
