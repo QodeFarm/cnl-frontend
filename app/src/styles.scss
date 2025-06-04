@@ -1751,3 +1751,126 @@ ta-form {
     width: auto !important;
     max-width: 90vw;
 }
+
+
+/* Reports Module UI Styles */
+.accordion-header .accordion-button {
+    background-color: #142768 !important; /* Dark blue color from project theme */
+    color: white !important; /* White text color */
+    font-weight: 600;
+    padding: 0.75rem 1.25rem;
+    border: none;
+    box-shadow: 0 0.15rem 0.5rem 0 rgba(243, 243, 245, 0.2);
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: #142768 !important; /* Keep dark blue when expanded */
+    color: white !important;
+}
+
+.report-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    margin: 0.3rem;
+    padding: 0.6rem 0.8rem;
+    cursor: pointer;
+    color: #142768;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-radius: 4px;
+    background-color: transparent;
+    border-left: 3px solid transparent;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    min-width: 160px;
+    height: 40px;
+}
+
+.report-link:hover {
+    text-decoration: none;
+    color: white;
+    background-color: #142768;
+    border-left: 3px solid #fff;
+    box-shadow: 0 3px 6px rgba(20, 39, 104, 0.2);
+    transform: translateY(-2px);
+    border-radius: 40px;
+}
+
+/* Improve spacing and formatting for report links container */
+.accordion-body .d-flex {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    margin: 0 -0.25rem;
+    padding: 0.25rem 0;
+}
+
+/* Media queries for responsive report links */
+@media (max-width: 1200px) {
+    .report-link {
+        max-width: calc(33.33% - 1rem);
+    }
+}
+
+@media (max-width: 992px) {
+    .report-link {
+        max-width: calc(50% - 1rem);
+    }
+}
+
+@media (max-width: 768px) {
+    .report-link {
+        max-width: 100%;
+        width: 100%;
+        margin: 0.3rem;
+        text-align: center;
+        padding: 0.6rem 0.8rem;
+    }
+    
+    .accordion-body .d-flex {
+        padding: 0.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .report-link {
+        height: auto;
+        padding: 0.75rem 0.5rem;
+        border-left: 3px solid transparent;
+        margin: 0.5rem;
+    }
+    
+    .report-link:hover {
+        border-left: 3px solid #fff;
+    }
+}
+
+/* Custom styling for reports section */
+.accordion-item {
+    border-color: #142768;
+    margin-bottom: 1rem;
+    box-shadow: 0 0.15rem 1.2rem 0 rgba(58, 59, 69, 0.15);
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.accordion-body {
+    // background-color: #f8f9fa;
+    padding: 0.8rem;
+    border-top: 1px solid rgba(20, 39, 104, 0.2);
+}
+
+/* Style for reports container */
+.container-fluid.mt-2 {
+    max-width: 1600px;
+}
+
+/* Better styling for report tables */
+.custom-list table thead th {
+    background-color: #142768;
+    color: white;
+    font-weight: 500;
+    vertical-align: middle;
+}
