@@ -2532,6 +2532,13 @@ loadQuickpackProducts() {
                         label: 'Email',
                         placeholder: 'Enter Email'
                       },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.purchase_order_data.email && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.purchase_order_data.email);
+                          }
+                        }
+                      }
                     },
                     {
                       key: 'billing_address',
@@ -2541,6 +2548,13 @@ loadQuickpackProducts() {
                         label: 'Billing address',
                         placeholder: 'Enter Billing address'
                       },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.purchase_order_data.billing_address && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.purchase_order_data.billing_address);
+                          }
+                        }
+                      }
                     },
                     {
                       key: 'shipping_address',
@@ -2550,6 +2564,13 @@ loadQuickpackProducts() {
                         label: 'Shipping address',
                         placeholder: 'Enter Shipping address'
                       },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.purchase_order_data.shipping_address && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.purchase_order_data.shipping_address);
+                          }
+                        }
+                      }
                     }, 
                   ]
                 },

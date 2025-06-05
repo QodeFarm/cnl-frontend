@@ -19,8 +19,8 @@ export class SalesListComponent {
   @Output('edit') edit = new EventEmitter<void>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
-  constructor(private router: Router, private http: HttpClient) { 
-    // this.setApiUrlBasedOnUser();
+  constructor(private router: Router, private http: HttpClient, private localStorage: LocalStorageService) { 
+    this.setApiUrlBasedOnUser();
   }
 
   refreshTable() {
@@ -116,16 +116,6 @@ export class SalesListComponent {
     selectElement.value = '';
 }
 
-// onPreviewClick(): void {
-//     const selectedIds = this.taTableComponent.options.checkedRows;
-//     if (selectedIds.length === 0) {
-//         return this.showDialog();
-//     }
-    
-//     // Add your preview logic here
-//     console.log('Preview clicked for selected documents');
-// }
-
 onPreviewClick(): void {
   const selectedIds = this.taTableComponent.options.checkedRows;
   if (selectedIds.length === 0) {
@@ -168,16 +158,6 @@ onPreviewClick(): void {
 
 // Add this property to your component class
 showLoading = false;
-
-// onPrintClick(): void {
-//     const selectedIds = this.taTableComponent.options.checkedRows;
-//     if (selectedIds.length === 0) {
-//         return this.showDialog();
-//     }
-    
-//     // Add your print logic here
-//     console.log('Print clicked for selected documents');
-// }
 
 onPrintClick(): void {
   const selectedIds = this.taTableComponent.options.checkedRows;
@@ -263,15 +243,15 @@ private fallbackPrint(pdfBlob: Blob): void {
 }
 //---------------print & Preview - end --------------------------
   tableConfig: TaTableConfig = {
-    apiUrl: 'sales/sale_order/?summary=true',
+    apiUrl: '',//'sales/sale_order/?summary=true',
     // title: 'Edit Sales Order List',
     showCheckbox: true,
     pkId: "sale_order_id",
     fixedFilters: [
-      {
-        key: 'summary',
-        value: 'true'
-      }
+      // {
+      //   key: 'summary',
+      //   value: 'true'
+      // }
       
     ],
     export: {
@@ -380,19 +360,19 @@ private fallbackPrint(pdfBlob: Blob): void {
     ]
   };
 
-  // private setApiUrlBasedOnUser() {
-  //   const user = this.localStorage.getItem('user');
-  //   const isSuperUser = user?.is_sp_user === true;
+  private setApiUrlBasedOnUser() {
+    const user = this.localStorage.getItem('user');
+    const isSuperUser = user?.is_sp_user === true;
 
-  //   // Set the API URL conditionally
-  //   this.tableConfig.apiUrl = isSuperUser
-  //     ? 'sales/sale_order/?records_all=true'
-  //     : 'sales/sale_order/?summary=true';
+    // Set the API URL conditionally
+    this.tableConfig.apiUrl = isSuperUser
+      ? 'sales/sale_order/?records_all=true'
+      : 'sales/sale_order/?summary=true';
 
-  //   // Also set fixed filters accordingly (optional)
-  //   this.tableConfig.fixedFilters = isSuperUser
-  //     ? [{ key: 'records_all', value: 'true' }]
-  //     : [{ key: 'summary', value: 'true' }];
-  // }
+    // Also set fixed filters accordingly (optional)
+    this.tableConfig.fixedFilters = isSuperUser
+      ? [{ key: 'records_all', value: 'true' }]
+      : [{ key: 'summary', value: 'true' }];
+  }
 
 }
