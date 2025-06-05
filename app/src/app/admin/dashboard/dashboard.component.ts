@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, ElementRef } fr
 import { CommonModule } from '@angular/common';
 import { Chart, ChartTypeRegistry, registerables } from 'chart.js';
 import { HttpClient } from '@angular/common/http'; // Import HttpClient
+import { SiteConfigService } from '@ta/ta-core'; // Import SiteConfigService
 
 
 @Component({
@@ -18,6 +19,11 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   percentageSalesChange: any;
   currentWeekPurchase: any;
   percentagePurchaseChange: any;
+
+    // Getter for baseUrl from SiteConfigService
+  get baseUrl(): string {
+    return this.siteConfigService.CONFIG?.baseUrl || '';
+  }
   
   ngOnInit() {
     Chart.register(...registerables);
@@ -28,8 +34,6 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     this.fourthRowSmallTableData('Pending_For_Table')
   }
 
-  // baseUrl: string = 'http://127.0.0.1:8000/api/v1/'; 
-  baseUrl: string = 'https://apicore.cnlerp.com/api/v1/'; 
 
   isSalesModalOpen: boolean = false;
   isPurchaseModalOpen: boolean = false;
@@ -69,7 +73,9 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('SalesOrderTrendChartCanvas') salesTrendsChartCanvas!: ElementRef<HTMLCanvasElement>;
 
 
-  constructor(private http: HttpClient) {} 
+  // constructor(private http: HttpClient) {} 
+  constructor(private http: HttpClient, private siteConfigService: SiteConfigService) {} 
+
 
   //For Charts
   private fetchDataAndInitializeChart(
