@@ -2089,6 +2089,13 @@ showSuccessToast = false;
                         label: 'Email',
                         placeholder: 'Enter Email'
                       },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders.email && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.purchase_return_orders.email);
+                          }
+                        }
+                      }
                     },
                     {
                       key: 'billing_address',
@@ -2098,6 +2105,13 @@ showSuccessToast = false;
                         label: 'Billing address',
                         placeholder: 'Enter Billing address'
                       },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders.billing_address && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.purchase_return_orders.billing_address);
+                          }
+                        }
+                      }
                     },
                     {
                       key: 'shipping_address',
@@ -2107,6 +2121,13 @@ showSuccessToast = false;
                         label: 'Shipping address',
                         placeholder: 'Enter Shipping address'
                       },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders.shipping_address && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.purchase_return_orders.shipping_address);
+                          }
+                        }
+                      }
                     }, 
                   ]
                 },

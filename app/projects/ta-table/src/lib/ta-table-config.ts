@@ -53,7 +53,7 @@ export interface ColumnItem {
 }
 interface Action {
   type?: string;
-  label?: string;
+  label?: string | ((row: any, action?: any) => string);  // <-- Update here;
   confirm?: boolean;
   confirmMsg?: string;
   icon?: string;

@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { TaCurdConfig } from '@ta/ta-curd';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { HttpClient } from '@angular/common/http';
+import { LocalStorageService } from '@ta/ta-core';
 
 @Component({
   standalone: true,
@@ -19,7 +20,9 @@ export class SalesDispatchComponent implements OnInit {
   // Initial curdConfig setup
   curdConfig: TaCurdConfig = this.getCurdConfig();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private localStorage: LocalStorageService) {
+    this.curdConfig = this.getCurdConfig();
+  }
 
   ngOnInit() {
     this.isLoading = true; // Set loading to false once initialized
@@ -28,12 +31,21 @@ export class SalesDispatchComponent implements OnInit {
 
   // Helper function to initialize curdConfig
   getCurdConfig(): TaCurdConfig {
+    const user = this.localStorage.getItem('user');
+    const isSuperUser = user?.is_sp_user === true;
+    const apiUrl = isSuperUser
+      ? 'sales/sale_order/?records_all=true&flow_status_name=dispatch'
+      : 'sales/sale_order/?summary=true&flow_status_name=dispatch';
+
+      const fixedFilters = isSuperUser
+      ? [{ key: 'records_all', value: 'true' }, { key: 'flow_status_name', value: 'dispatch' }]
+      : [{ key: 'summary', value: 'true' }, { key: 'flow_status_name', value: 'dispatch' }];
     return {
       drawerSize: 500,
       drawerPlacement: 'right',
       hideAddBtn: true,
       tableConfig: {
-        apiUrl: 'sales/sale_order/?summary=true&flow_status=dispatch',
+        apiUrl: apiUrl, //'sales/sale_order/?summary=true&flow_status_name=dispatch',
         title: 'Sales Dispatch',
         pkId: "sale_order_id",
         pageSize: 10,
@@ -85,20 +97,6 @@ export class SalesDispatchComponent implements OnInit {
       },
       formConfig: {
         url: 'sales/SaleOrder/{saleOrderId}/move_next_stage/',
-        // title: 'Sales Dispatch Confirmation',
-        // pkId: "sale_order_id",
-        // exParams: [],
-        // fields: [
-        //   {
-        //     key: 'sale_order_id',
-        //     type: 'text',
-        //   },
-        //   {
-        //     key: 'confirmation',
-        //     type: 'select',
-        //     defaultValue: 'yes'
-        //   }
-        // ]
       }
     };
   }
@@ -126,6 +124,7 @@ export class SalesDispatchComponent implements OnInit {
           console.log('Dispatch confirmed for order:', saleOrderId);
           this.closeModal(); // Close the modal after confirmation
           this.refreshCurdConfig(); // Refresh the data list in curdConfig
+          // this.ngOnInit();
         },
         error => {
           console.error('Error in confirming dispatch:', error);
@@ -133,7 +132,7 @@ export class SalesDispatchComponent implements OnInit {
         }
       );
     }
-    this.ngOnInit()
+    this.ngOnInit();
   }
 
   // Refresh the curdConfig object to reload the data in ta-curd-modal

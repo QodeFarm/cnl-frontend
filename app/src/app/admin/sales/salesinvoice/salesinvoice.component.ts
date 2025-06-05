@@ -2500,6 +2500,14 @@ export class SalesinvoiceComponent {
                         label: 'Email',
                         placeholder: 'Enter Email'
                       },
+                      hooks: {
+                        onInit: (field: any) => {
+                          // Set the initial value from dataToPopulate if available
+                          if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order && this.dataToPopulate.sale_invoice_order.email && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.sale_invoice_order.email);
+                          }
+                        }
+                      }
                     },
                     {
                       key: 'billing_address',
@@ -2509,6 +2517,14 @@ export class SalesinvoiceComponent {
                         label: 'Billing address',
                         placeholder: 'Enter Billing address'
                       },
+                      hooks: {
+                        onInit: (field: any) => {
+                          // Set the initial value from dataToPopulate if available
+                          if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order && this.dataToPopulate.sale_invoice_order.billing_address && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.sale_invoice_order.billing_address);
+                          }
+                        }
+                      }
                     },
                     {
                       key: 'shipping_address',
@@ -2518,6 +2534,14 @@ export class SalesinvoiceComponent {
                         label: 'Shipping address',
                         placeholder: 'Enter Shipping address'
                       },
+                      hooks: {
+                        onInit: (field: any) => {
+                          // Set the initial value from dataToPopulate if available
+                          if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order && this.dataToPopulate.sale_invoice_order.shipping_address && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.sale_invoice_order.shipping_address);
+                          }
+                        }
+                      }
                     },
                   ]
                 },

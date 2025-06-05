@@ -362,6 +362,10 @@ export class SalesComponent {
                 });
 
                 const saleOrderId = this.invoiceData.sale_invoice_order.sale_order_id;
+                // if (!saleOrderId) {
+                //   const saleOrderId = this.SaleOrderEditID
+                // }
+                console.log("saleOrderId i9n method : ", saleOrderId)
                 const allInvoiced = this.invoiceData.sale_invoice_items.every(item => item.invoiced === 'YES');
                 if (allInvoiced) {
                     this.triggerWorkflowPipeline(saleOrderId);
@@ -417,11 +421,8 @@ export class SalesComponent {
   // }
 
   private triggerWorkflowPipeline(saleOrderId: string) {
-    // if (!saleOrderId) {
-    //   console.warn('Sale Order ID is undefined. Skipping workflow trigger.');
-    //   return;
-    // }
   
+    console.log("saleOrderId : ", saleOrderId)
     const apiUrl = `sales/SaleOrder/${saleOrderId}/move_next_stage/`;
   
     this.http.post(apiUrl, {}).subscribe(
@@ -1559,7 +1560,7 @@ export class SalesComponent {
                     lazy: {
                       url: 'masters/sale_types/',
                       lazyOneTime: true
-                    }
+                    },
                   },
                   hooks: {
                     onInit: (field: any) => {
@@ -1568,26 +1569,32 @@ export class SalesComponent {
                         const saleTypes = response.data;
                         field.templateOptions.options = saleTypes;
                 
-                        // Set default value if needed
-                        if (!field.formControl.value) {
-                          const defaultOption = saleTypes.find((option: any) => option.name === 'Advance Order');
+                        const currentSaleTypeId = this.formConfig.model?.sale_order?.sale_type_id;
+                        if (currentSaleTypeId) {
+                          const matchedOption = saleTypes.find(opt => opt.sale_type_id === currentSaleTypeId);
+                          if (matchedOption) {
+                            field.formControl.setValue(matchedOption, { emitEvent: false });
+                          }
+                        } else {
+                          const defaultOption = saleTypes.find(option => option.name === 'Advance Order');
+                          console.log("defaultOption : ", defaultOption)
                           if (defaultOption) {
-                            field.formControl.setValue(defaultOption);
+                            field.formControl.setValue(defaultOption, { emitEvent: false });
+                            // Add this line to assign the default sale_type_id to the model
+                            this.formConfig.model['sale_order']['sale_type_id'] = defaultOption.sale_type_id;
                           }
                         }
                       });
                 
                       // Handle changes
                       field.formControl.valueChanges.subscribe((data: any) => {
-                        if (data && data.name && data.sale_type_id) {
-                          const saleTypeName = data.name;
-                          const saleTypeId = data.sale_type_id;
-                
+                        if (data && data.sale_type_id) {               
                           // Set sale_type_id in model
-                          this.formConfig.model['sale_order']['sale_type_id'] = saleTypeId;
+                          this.formConfig.model['sale_order']['sale_type_id'] = data.sale_type_id;
+
                 
                           // Generate order number
-                          const prefix = saleTypeName === 'Other' ? 'SOO' : 'SO';
+                          const prefix = data.name === 'Other' ? 'SOO' : 'SO';
                           this.http.get(`masters/generate_order_no/?type=${prefix}`).subscribe((res: any) => {
                             if (res?.data?.order_number) {
                               this.orderNumber = res.data.order_number;
@@ -1601,12 +1608,14 @@ export class SalesComponent {
                           const customerField = field.parent?.fieldGroup?.find(f => f.key === 'customer');
                           if (customerField?.props?.lazy) {
                             const baseUrl = 'customers/customers/?summary=true';
-                            const customerUrl = saleTypeName === 'Other' ? `${baseUrl}&sale_type=Other` : baseUrl;
+                            const customerUrl = data.name === 'Other' ? `${baseUrl}&sale_type=Other` : baseUrl;
                 
                             customerField.props.lazy.url = customerUrl;
                             customerField.props.lazy.lazyOneTime = false;
                             customerField.props.options = [];
-                            customerField.formControl.setValue(null);
+                            // customerField.formControl.setValue(null);
+                            const existingCustomer = this.formConfig.model?.sale_order?.customer;
+                            customerField.formControl.setValue(existingCustomer || null);
                 
                             // Force refresh
                             const customerKey = customerField.key;
@@ -1802,7 +1811,7 @@ export class SalesComponent {
                 
                               this.invoiceData = {
                                 sale_invoice_order: {
-                                  invoice_no: this.invoiceNumber,
+                                  // invoice_no: this.invoiceNumber,
                                   bill_type: billType,
                                   invoice_date: this.nowDate(),
                                   email: saleOrder.email,
@@ -1833,7 +1842,9 @@ export class SalesComponent {
                                   ledger_account_id: saleOrder.ledger_account_id,
                                   flow_status: saleOrder.flow_status,
                                   order_status_id: completedStatusId,
-                                  ...(saleTypeName !== 'Other' && { sale_order_id: saleOrder.sale_order_id })
+                                  sale_order: saleOrder.sale_order,
+                                  sale_order_id: saleOrder.sale_order_id,
+                                  ...(billType == 'OTHERS' && { invoice_no: this.invoiceNumber})
                                 },
                                 sale_invoice_items: saleOrderItems,
                                 order_attachments: orderAttachments,
@@ -3541,6 +3552,13 @@ export class SalesComponent {
                         label: 'Email',
                         placeholder: 'Enter Email'
                       },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.sale_order.email && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.sale_order.email);
+                          }
+                        }
+                      }
                     },
                     {
                       key: 'billing_address',
@@ -3550,6 +3568,13 @@ export class SalesComponent {
                         label: 'Billing address',
                         placeholder: 'Enter Billing address'
                       },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.sale_order.billing_address && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.sale_order.billing_address);
+                          }
+                        }
+                      }
                     },
                     {
                       key: 'shipping_address',
@@ -3559,6 +3584,13 @@ export class SalesComponent {
                         label: 'Shipping address',
                         placeholder: 'Enter Shipping address'
                       },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate && this.dataToPopulate.sale_order.shipping_address && field.formControl) {
+                            field.formControl.setValue(this.dataToPopulate.sale_order.shipping_address);
+                          }
+                        }
+                      }
                     },
                   ]
                 },
