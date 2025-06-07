@@ -617,6 +617,92 @@ export class SalesRepotsComponent {
         
       ]
     }, 
+    // Adding Sales Payment Receipts report
+    salesPaymentReceipts: {
+      apiUrl: 'sales/payment_transactions/',
+      pkId: "payment_transaction_id",
+      pageSize: 10,
+      "globalSearch": {
+        keys: ['invoice_no', 'payment_receipt_no', 'payment_date', 'payment_method', 'payment_status', 'customer_name']
+      },
+      export: {downloadName: 'SalesPaymentReceipts'},
+      defaultSort: { key: 'created_at', value: 'descend' },
+      cols: [
+        {
+          fieldKey: 'payment_receipt_no',
+          name: 'Receipt No',
+          sort: true
+        },
+        {
+          fieldKey: 'invoice_no',
+          name: 'Invoice No',
+          sort: true
+        },
+        {
+          fieldKey: 'customer_name',
+          name: 'Customer',
+          sort: true
+        },
+        {
+          fieldKey: 'invoice_date',
+          name: 'Invoice Date',
+          sort: true
+        },
+        {
+          fieldKey: 'payment_date',
+          name: 'Payment Date',
+          sort: true,
+          displayType : 'date',
+        },
+        {
+          fieldKey: 'due_date',
+          name: 'Due Date',
+          sort: true
+        },
+        {
+          fieldKey: 'payment_method',
+          name: 'Payment Method',
+          sort: true
+        },
+        {
+          fieldKey: 'status_name',
+          displayType: 'map',
+          mapFn: (currentValue: any, row: any, col: any) => {
+            return `${row?.payment_status?.status_name}`;
+          },
+          name: 'Status',
+          sort: true
+        },
+        {
+          fieldKey: 'total_amount',
+          name: 'Amount',
+          sort: true
+        },
+        {
+          fieldKey: 'adjusted_now',
+          name: 'Adjusted Now',
+          sort: true,
+          displayType: 'map',
+          mapFn: (currentValue: any) => {
+            return currentValue ? `₹${currentValue}` : '₹0.00';
+          }
+        },
+        {
+          fieldKey: 'outstanding_amount',
+          name: 'Outstanding',
+          sort: true,
+          displayType: 'map',
+          mapFn: (currentValue: any) => {
+            return currentValue ? `₹${currentValue}` : '₹0.00';
+          }
+        },
+        // {
+        //   fieldKey: 'remarks',
+        //   name: 'Remarks',
+        //   sort: true
+        // }
+      ]
+    },
   };
 
   toggleAccordion() {
