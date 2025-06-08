@@ -4,146 +4,120 @@ import { TaFormConfig } from '@ta/ta-form';
 import { FinancialReportListComponent } from './financial-report-list/financial-report-list.component';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { TaTableComponent } from '@ta/ta-table';
 
 @Component({
   selector: 'app-financial-report',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, FinancialReportListComponent],
+  imports: [CommonModule, AdminCommmonModule],
   templateUrl: './financial-report.component.html',
   styleUrls: ['./financial-report.component.scss']
 })
 export class FinancialReportComponent {
-  showFinancialReportList: boolean = false;
-  showForm: boolean = false;
-  FinancialReportEditID: any;
-  @ViewChild(FinancialReportListComponent) FinancialReportListComponent!: FinancialReportListComponent;
+  @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+// Date range inputs
+fromDate: string = '';
+toDate: string = '';
 
-  constructor(private http: HttpClient) {}
+// Financial values
+salesInvoices = 0;
+salesCreditNotes = 0;
+salesDebitNotes = 0;
 
-  ngOnInit() {
-    this.showFinancialReportList = false;
-    this.showForm = true;
-    this.FinancialReportEditID = null;
-    // set form config
-    this.setFormConfig();
-    console.log('this.formConfig', this.formConfig);
+purchaseInvoices = 0;
+generalExpenses = 0;
+salaries = 0;
 
-  };
-  formConfig: TaFormConfig = {};
+totalSales = 0;
+totalExpenses = 0;
+netProfit = 0;
 
-  hide() {
-    document.getElementById('modalClose').click();
-  };
+constructor(private http: HttpClient) {}
 
-  editFinancialReport(event) {
-    console.log('event', event);
-    this.FinancialReportEditID = event;
-    this.http.get('finance/financial_reports/' + event).subscribe((res: any) => {
-      if (res) {
-        this.formConfig.model = res;
-        this.formConfig.showActionBtn = true;
-        this.formConfig.pkId = 'report_id';
-        //set labels for update
-        this.formConfig.submit.label = 'Update';
-        this.showForm = true;
-      }
-    })
-    this.hide();
-  };
+ngOnInit() {
+  this.loadFinancialData();
+}
 
+loadFinancialData() {
+  const params = this.buildQueryParams();
 
-  showFinancialReportListFn() {
-    this.showFinancialReportList = true;
-    this.FinancialReportListComponent?.refreshTable();
-  };
-
-  setFormConfig() {
-    this.FinancialReportEditID = null;
-    this.formConfig = {
-      url: "finance/financial_reports/",
-      // title: 'warehouses',
-      formState: {
-        viewMode: false,
-      },
-      showActionBtn: true,
-      exParams: [],	  
-      submit: {
-        label: 'Submit',
-        submittedFn: () => this.ngOnInit()
-      },
-      reset: {
-        resetFn: () => {
-          this.ngOnInit();
-        }
-      },
-      model:{},	  
-      fields: [
-        {
-          fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
-          fieldGroup: [	  
-            {
-              key: 'report_name',
-              type: 'input',
-              className: 'col-md-4 col-sm-6 col-12',
-              templateOptions: {
-                label: 'Report Name',
-                placeholder: 'Enter Report Name',
-                required: true,
-              }
-            },
-            {
-              key: 'report_type',
-              type: 'select',
-              className: 'col-md-4 col-sm-6 col-12',
-              templateOptions: {
-                label: 'Report Type',
-                placeholder: 'Select Report Type',
-                required: false,
-                options: [
-                  { value: 'Balance Sheet', label: 'Balance Sheet' },
-                  { value: 'Profit & Loss', label: 'Profit & Loss' },
-                  { value: 'Cash Flow', label: 'Cash Flow' },
-                  { value: 'Trial Balance', label: 'Trial Balance' }
-                ]
-              }
-            },
-            // {
-            //   className: 'col-3 custom-form-card-block w-100',
-            //   fieldGroup: [
-            //     {
-            //       template: '<div class="custom-form-card-title">File Path</div>',
-            //       fieldGroupClassName: "ant-row",
-            //     },
-            //     {
-            //       key: 'file_path',
-            //       type: 'file',
-            //       className: 'ta-cell col-12 custom-file-attachement',
-            //       props: {
-            //         "displayStyle": "files",
-            //         "multiple": false
-            //       }
-            //     }
-            //   ]
-            // }
-            {
-              className: 'col-12 custom-form-card-block w-100 p-0',
-              fieldGroup: [
-                {
-                  key: 'file_path',
-                  type: 'file',
-                  className: 'ta-cell col-12 col-md-6 custom-file-attachement',
-                  props: {
-                    label: 'File Path',
-                    "displayStyle": "files",
-                    "multiple": false,
-                    
-                  },
-                }
-              ]
-            }
-          ]
-        }
-      ]
+  // 1. Sales Invoices
+  this.http.get<any>('sales/sale_invoice_order/?summary=true' + params).subscribe(res => {
+    if (res?.data) {
+      this.salesInvoices = res.data.reduce((sum: number, item: any) => sum + (+item.total_amount || 0), 0);
+      this.calculateResults();
     }
-  }
+  });
+
+  // 2. Sales Credit Notes
+  this.http.get<any>('sales/sale_credit_note/?summary=true' + params).subscribe(res => {
+    if (res?.data) {
+      this.salesCreditNotes = res.data.reduce((sum: number, item: any) => sum + (+item.total_amount || 0), 0);
+      this.calculateResults();
+    }
+  });
+
+  // 3. Sales Debit Notes
+  this.http.get<any>('sales/sale_debit_note/?summary=true' + params).subscribe(res => {
+    if (res?.data) {
+      this.salesDebitNotes = res.data.reduce((sum: number, item: any) => sum + (+item.total_amount || 0), 0);
+      this.calculateResults();
+    }
+  });
+
+  // 4. Purchase Invoices
+  this.http.get<any>('purchase/purchase_order/?summary=true' + params).subscribe(res => {
+    if (res?.data) {
+      this.purchaseInvoices = res.data.reduce((sum: number, item: any) => sum + (+item.total_amount || 0), 0);
+      this.calculateResults();
+    }
+  });
+
+  // 5. General Expenses
+  // this.http.get<any>('accounts/general_expense/?summary=true' + params).subscribe(res => {
+  //   if (res?.data) {
+  //     this.generalExpenses = res.data.reduce((sum: number, item: any) => sum + (+item.amount || 0), 0);
+  //     this.calculateResults();
+  //   }
+  // });
+
+  // 6. Salaries
+  // this.http.get<any>('hrm/salary_payment/?summary=true' + params).subscribe(res => {
+  //   if (res?.data) {
+  //     this.salaries = res.data.reduce((sum: number, item: any) => sum + (+item.amount || 0), 0);
+  //     this.calculateResults();
+  //   }
+  // });
+}
+
+calculateResults() {
+  this.totalSales = this.salesInvoices + this.salesDebitNotes - this.salesCreditNotes;
+  this.totalExpenses = this.purchaseInvoices + this.generalExpenses + this.salaries;
+  this.netProfit = this.totalSales - this.totalExpenses;
+}
+
+buildQueryParams(): string {
+  let query = '';
+  if (this.fromDate) query += `&from_date=${this.fromDate}`;
+  if (this.toDate) query += `&to_date=${this.toDate}`;
+  return query;
+}
+
+refreshReport() {
+  this.resetValues();
+  this.loadFinancialData();
+}
+
+resetValues() {
+  this.salesInvoices = 0;
+  this.salesCreditNotes = 0;
+  this.salesDebitNotes = 0;
+  this.purchaseInvoices = 0;
+  this.generalExpenses = 0;
+  this.salaries = 0;
+  this.totalSales = 0;
+  this.totalExpenses = 0;
+  this.netProfit = 0;
+}
 }
