@@ -45,7 +45,9 @@ loadFinancialData() {
   // 1. Sales Invoices
   this.http.get<any>('sales/sale_invoice_order/?summary=true' + params).subscribe(res => {
     if (res?.data) {
+      // console.log("sale invoice : ", res.data)
       this.salesInvoices = res.data.reduce((sum: number, item: any) => sum + (+item.total_amount || 0), 0);
+      console.log("this.salesInvoices : ", this.salesInvoices)
       this.calculateResults();
     }
   });
