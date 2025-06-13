@@ -32,6 +32,8 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     this.fourthRowSmallTableData('Product_Not_Sold_In_30_Days_For_Table')
     this.fourthRowSmallTableData('Customers_With_No_Sales_In_30_Days_For_Table')  
     this.fourthRowSmallTableData('Pending_For_Table')
+
+    this.loadCurrentYearFinancialData();
   }
 
 
@@ -733,4 +735,134 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+
+//Financial report in Dashboar 
+
+@ViewChild('financialPieChart') financialPieChart!: ElementRef;
+  financialChart: Chart | undefined;
+  
+  // Current year data
+  currentYear = new Date().getFullYear();
+  financialData = {
+    totalIncome: 0,
+    totalExpenses: 0,
+    netProfit: 0
+  };
+
+loadCurrentYearFinancialData() {
+    const fromDate = `${this.currentYear}-01-01`;
+    const toDate = `${this.currentYear}-12-31`;
+    
+    // 1. Fetch Sales Invoices
+    this.http.get<any>(`sales/sale_invoice_order/?summary=true&from_date=${fromDate}&to_date=${toDate}`).subscribe({
+      next: (res) => {
+        const salesInvoices = res?.data?.reduce((sum: number, item: any) => sum + (+item.total_amount || 0), 0) || 0;
+        
+        // 2. Fetch Sales Credit Notes (Refunds)
+        this.http.get<any>(`sales/sale_credit_note/?summary=true&from_date=${fromDate}&to_date=${toDate}`).subscribe({
+          next: (creditRes) => {
+            const salesCreditNotes = creditRes?.data?.reduce((sum: number, item: any) => sum + (+item.total_amount || 0), 0) || 0;
+            
+            // 3. Fetch Sales Debit Notes (Additional Charges)
+            this.http.get<any>(`sales/sale_debit_note/?summary=true&from_date=${fromDate}&to_date=${toDate}`).subscribe({
+              next: (debitRes) => {
+                const salesDebitNotes = debitRes?.data?.reduce((sum: number, item: any) => sum + (+item.total_amount || 0), 0) || 0;
+                
+                // 4. Fetch Purchase Invoices
+                this.http.get<any>(`purchase/purchase_order/?summary=true&from_date=${fromDate}&to_date=${toDate}`).subscribe({
+                  next: (purchaseRes) => {
+                    const purchaseInvoices = purchaseRes?.data?.reduce((sum: number, item: any) => sum + (+item.total_amount || 0), 0) || 0;
+                    
+                    // 5. Fetch General Expenses (if applicable)
+                    // this.http.get<any>(`expenses/general/?summary=true&from_date=${fromDate}&to_date=${toDate}`).subscribe({
+                    //   next: (expenseRes) => {
+                    //     const generalExpenses = expenseRes?.data?.reduce((sum: number, item: any) => sum + (+item.amount || 0), 0) || 0;
+                        
+                    //     // 6. Fetch Salaries (if applicable)
+                    //     this.http.get<any>(`payroll/salaries/?summary=true&from_date=${fromDate}&to_date=${toDate}`).subscribe({
+                    //       next: (salaryRes) => {
+                    //         const salaries = salaryRes?.data?.reduce((sum: number, item: any) => sum + (+item.amount || 0), 0) || 0;
+                            
+                            // Calculate final values
+                            this.financialData = {
+                              // salesInvoices: salesInvoices,
+                              // salesCreditNotes: salesCreditNotes,
+                              // salesDebitNotes: salesDebitNotes,
+                              // purchaseInvoices: purchaseInvoices,
+                              // generalExpenses: generalExpenses,
+                              // salaries: salaries,
+                              totalIncome: salesInvoices + salesDebitNotes - salesCreditNotes,
+                              totalExpenses: purchaseInvoices + 0 + 0,
+                              netProfit: (salesInvoices + salesDebitNotes - salesCreditNotes) - (purchaseInvoices + 0 + 0)
+                            };
+                            
+                            this.createFinancialPieChart();
+                          // },
+                      //     error: (err) => console.error('Error fetching salaries:', err)
+                      //   });
+                      // },
+                    //   error: (err) => console.error('Error fetching expenses:', err)
+                    // });
+                  },
+                  error: (err) => console.error('Error fetching purchases:', err)
+                });
+              },
+              error: (err) => console.error('Error fetching debit notes:', err)
+            });
+          },
+          error: (err) => console.error('Error fetching credit notes:', err)
+        });
+      },
+      error: (err) => console.error('Error fetching sales invoices:', err)
+    });
+  }
+
+  createFinancialPieChart() {
+    const ctx = this.financialPieChart.nativeElement.getContext('2d');
+    if (!ctx) return;
+
+    if (this.financialChart) {
+      this.financialChart.destroy();
+    }
+
+    this.financialChart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: ['Income', 'Expenses', 'Profit'],
+        datasets: [{
+          data: [
+            this.financialData.totalIncome, 
+            this.financialData.totalExpenses,
+            this.financialData.netProfit
+          ],
+          backgroundColor: [
+            'rgba(75, 192, 192, 0.7)',
+            'rgba(255, 99, 132, 0.7)',
+            'rgba(54, 162, 235, 0.7)'
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'top' },
+          tooltip: {
+            callbacks: {
+              label: (context) => {
+                const label = context.label || '';
+                const value = context.raw || 0;
+                return `${label}: ₹${value.toLocaleString()}`;
+              }
+            }
+          },
+          title: {
+            display: true,
+            text: `Financial Year (${this.currentYear})`,
+            font: { size: 16 }
+          }
+        }
+      }
+    });
+  }
 }
