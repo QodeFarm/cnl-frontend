@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Chart, ChartTypeRegistry, registerables } from 'chart.js';
+import { Chart, ChartTypeRegistry, Colors, registerables } from 'chart.js';
 import { HttpClient } from '@angular/common/http'; // Import HttpClient
 import { SiteConfigService } from '@ta/ta-core'; // Import SiteConfigService
 
@@ -828,7 +828,7 @@ loadCurrentYearFinancialData() {
     this.financialChart = new Chart(ctx, {
       type: 'pie',
       data: {
-        labels: ['Income', 'Expenses', 'Profit'],
+        // labels: ['Income', 'Expenses', 'Profit'],
         datasets: [{
           data: [
             this.financialData.totalIncome, 
@@ -859,7 +859,14 @@ loadCurrentYearFinancialData() {
           title: {
             display: true,
             text: `Financial Year (${this.currentYear})`,
-            font: { size: 16 }
+            // font: { size: 14 },
+            // color: '#000000' // Black color
+            color: '#2c2e35',  
+            font: {
+              size: 12,
+              family: 'tahoma',
+              weight: 'bold',
+            },
           }
         }
       }
