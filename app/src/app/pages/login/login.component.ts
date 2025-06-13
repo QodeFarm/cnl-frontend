@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { TaLocalStorage } from '@ta/ta-core';
@@ -116,7 +117,23 @@ export class LoginComponent {
 // }
 
 
-constructor(private router: Router, private userService: UserService) { }
+constructor(private router: Router, private userService: UserService, private http: HttpClient) { }
+
+  ngOnInit(): void {
+    this.sendDebugRequest();
+  }
+
+  sendDebugRequest(): void {
+    this.http.get('https://apicore.cnlerp.com/api/v1/users/clienthost/', {
+      headers: {
+        'X-Frontend-URL': window.location.href
+      }
+    }).subscribe(response => {
+      console.log('Debug API Response:', response);
+    }, error => {
+      console.error('Debug API Error:', error);
+    });
+  }
 
   formSubmiiterd(res: any) {
     // Log the complete response to check its structure
