@@ -134,7 +134,7 @@
                     <div class="chart-container">
                         <canvas #financialPieChart></canvas>
                     </div>
-                    <div class="financial-stats">
+                    <!-- <div class="financial-stats">
                         <div class="stat-item income">
                             <span>Total Income:</span>
                             <strong>₹{{ financialData.totalIncome | number }}</strong>
@@ -146,6 +146,21 @@
                         <div class="stat-item profit" [class.negative]="financialData.netProfit < 0">
                             <span>Net Profit:</span>
                             <strong>₹{{ financialData.netProfit | number }}</strong>
+                        </div>
+                    </div> -->
+                    <!-- Only modify the financial-stats div inside your financial-summary-card -->
+                    <div class="financial-stats compact-stats">
+                        <div class="stat-item income">
+                            <span class="stat-label">Income:</span>
+                            <strong class="stat-value">₹{{ financialData.totalIncome | number }}</strong>
+                        </div>
+                        <div class="stat-item expense">
+                            <span class="stat-label">Expenses:</span>
+                            <strong class="stat-value">₹{{ financialData.totalExpenses | number }}</strong>
+                        </div>
+                        <div class="stat-item profit" [class.negative]="financialData.netProfit < 0">
+                            <span class="stat-label">Profit:</span>
+                            <strong class="stat-value">₹{{ financialData.netProfit | number }}</strong>
                         </div>
                     </div>
                 </div>

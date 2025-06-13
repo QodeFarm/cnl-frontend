@@ -106,7 +106,7 @@ export class CustomfieldsComponent {
                 onChanges: (field: any) => {
                   field.formControl.valueChanges.subscribe((data: any) => {
                     console.log("data in entity", data);
-                    if (data && data.entity && data.entity.entity_id) {
+                    if (data && data.entity_id) {
                       this.formConfig.model['custom_field']['entity_id'] = data.entity_id;
                     }
                   });
