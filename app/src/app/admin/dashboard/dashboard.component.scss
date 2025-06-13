@@ -387,3 +387,81 @@ h4 {
   border-bottom-left-radius: 0px;
   border-bottom-right-radius: 0px;
 }
+
+// /* NEW: Financial Pie Chart Specific Styles */
+// .financial-pie-container {
+//   /* Special container for the financial pie chart */
+//   height: 300px; /* Taller than regular charts */
+//   // width: 300px;
+//   margin-bottom: 20px; /* Extra space below */
+//   background-color: #f1f1f1;
+//   border-radius: 10px;
+//   padding: 15px;
+// }
+
+// .financial-pie-container canvas {
+//   /* Ensures canvas fills container */
+//   width: 50% !important;
+//   height: 100% !important;
+//   min-height: 250px; /* Minimum height for visibility */
+// }
+
+// .chart-container {
+//   position: relative;
+//   margin: 0 auto;
+//   min-height: 300px;
+// }
+
+// canvas {
+//   display: block;
+//   width: 100% !important;
+//   height: 100% !important;
+// }
+
+.financial-summary-card {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+.chart-container {
+  position: relative;
+  height: 300px;
+  margin: 20px 0;
+}
+
+.financial-stats {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  padding: 10px 15px;
+  border-radius: 5px;
+  margin: 5px;
+  text-align: center;
+  min-width: 120px;
+}
+
+.stat-item.income {
+  background: rgba(75, 192, 192, 0.1);
+  border-left: 4px solid #4bc0c0;
+}
+
+.stat-item.expense {
+  background: rgba(255, 99, 132, 0.1);
+  border-left: 4px solid #ff6384;
+}
+
+.stat-item.profit {
+  background: rgba(54, 162, 235, 0.1);
+  border-left: 4px solid #36a2eb;
+}
+
+.stat-item.profit.negative {
+  background: rgba(255, 99, 132, 0.1);
+  border-left: 4px solid #ff6384;
+}
