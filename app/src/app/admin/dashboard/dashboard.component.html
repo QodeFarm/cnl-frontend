@@ -110,45 +110,30 @@
 <!-- second-row -->
 <div class="second-main-row">
     <div class="left-container col-lg-8 col-md-6 col-12">
-        <div class="row"> <!-- Added row wrapper -->
+        <div class="row g-1"> <!-- Added gutter spacing -->
             <!-- First Row - 3 charts -->
-            <div class="col-lg-4 col-md-6 col-12 pl-md-0 pr-md-1">
-                <div class="chart-container">
+            <div class="col-lg-4 col-md-4 col-12 px-1"> <!-- Equal column sizing -->
+                <div class="chart-container equal-height">
                     <canvas #chartTop5Items></canvas>
                 </div>
             </div>
-            <div class="col-lg-4 col-md-6 col-12 px-md-1">
-                <div class="chart-container">
+            <div class="col-lg-4 col-md-4 col-12 px-1">
+                <div class="chart-container equal-height">
                     <canvas #chartTop5CustomersOf6MonthsCanvas></canvas>
                 </div>
             </div>
-            <div class="col-lg-4 col-md-6 col-12 px-lg-1 ps-md-0 pe-md-1">
-                <div class="chart-container">
+            <div class="col-lg-4 col-md-4 col-12 px-1">
+                <div class="chart-container equal-height">
                     <canvas #chartTop5ProfitMakingItemsCanvas></canvas>
                 </div>
             </div>
 
             <!-- Second Row - Pie Chart and Sales Trend -->
-            <div class="col-lg-6 col-md-6 col-12 pl-lg-0 pr-lg-1 px-md-1">
-                <div class="financial-summary-card">
-                    <div class="chart-container">
+            <div class="col-lg-6 col-md-6 col-12 px-1">
+                <div class="financial-summary-card equal-height">
+                    <div class="chart-container pie-chart-container">
                         <canvas #financialPieChart></canvas>
                     </div>
-                    <!-- <div class="financial-stats">
-                        <div class="stat-item income">
-                            <span>Total Income:</span>
-                            <strong>₹{{ financialData.totalIncome | number }}</strong>
-                        </div>
-                        <div class="stat-item expense">
-                            <span>Total Expenses:</span>
-                            <strong>₹{{ financialData.totalExpenses | number }}</strong>
-                        </div>
-                        <div class="stat-item profit" [class.negative]="financialData.netProfit < 0">
-                            <span>Net Profit:</span>
-                            <strong>₹{{ financialData.netProfit | number }}</strong>
-                        </div>
-                    </div> -->
-                    <!-- Only modify the financial-stats div inside your financial-summary-card -->
                     <div class="financial-stats compact-stats">
                         <div class="stat-item income">
                             <span class="stat-label">Income:</span>
@@ -162,24 +147,21 @@
                             <span class="stat-label">Profit:</span>
                             <strong class="stat-value">₹{{ financialData.netProfit | number }}</strong>
                         </div>
+                    
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6 col-md-6 col-12 pl-lg-0 pr-lg-1 px-md-1">
-                <div class="chart-container">
+            <div class="col-lg-6 col-md-6 col-12 px-1">
+                <div class="chart-container equal-height">
                     <canvas #SalesOrderTrendChartCanvas></canvas>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="right-container col-lg-4 col-md-6 col-12">
-        <div class="row">
-            <div class="col-12">
-                <div class="right-side-chart">
-                    <canvas #chartLast6MonthsCashflowCanvas></canvas>
-                </div>
-            </div>
+    <div class="right-container col-lg-4 col-md-6 col-12 px-1">
+        <div class="chart-container right-equal-height">
+            <canvas #chartLast6MonthsCashflowCanvas></canvas>
         </div>
     </div>
 </div>

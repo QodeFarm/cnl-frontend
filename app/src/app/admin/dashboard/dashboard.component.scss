@@ -91,6 +91,7 @@
   @media(max-width:767px){
     flex-wrap: wrap;
   }
+  // margin: 0 -0.5rem;
 }
 
 // first & third row CSS
@@ -121,26 +122,25 @@
   align-items: center; /* Center-align the chart */
 }
 
-.chart-container {
-  margin-top: 10px;
+.right-container {
+  padding: 0 0.5rem; /* Better gutter alignment */
 }
 
-.right-container {
-  margin-top: 10px;
-  margin-left: 1px;
-  padding-left: 7px;
-  margin-bottom: 10px;
-}
 .right-side-chart {
-  position: relative;
-  // width: 495px; /* Maintain fixed width */
-  height: 450px; /* Explicit height to prevent uncontrolled scaling */
-  background-color: #f1f1f1;
+  height: 580px; /* Perfect 2x height of other boxes + gap */
+  background: white;
   border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 15px;
+  display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center; /* Center-align the chart */
-  padding: 10px;
+}
+
+/* For the chart canvas inside */
+.right-side-chart canvas {
+  flex-grow: 1; /* Takes all available space */
+  width: 100% !important;
+  height: 100% !important;
 }
 
 /* Chart Title */
@@ -354,19 +354,6 @@ h4 {
   border: 1px solid #ddd; /* Light border around the table cells */
 }
 
-/* Responsive design: Adjust layout on smaller screens */
-// @media (max-width: 768px) {
-//   .card {
-//     flex: 1 1 48%;
-//   }
-// }
-
-// @media (max-width: 480px) {
-//   .card {
-//     flex: 1 1 100%;
-//   }
-// }
-
 /* right corner for the first <th> */
 .small-4th-row-table th.rounded-left, .small-4th-row-table th.rounded-right {
   border-top-right-radius: 0px;
@@ -402,10 +389,10 @@ h4 {
 
 .stat-item {
   padding: 10px 15px;
-  border-radius: 5px;
-  margin: 5px;
+  border-radius: 2px;
+  margin: 1px;
   text-align: center;
-  min-width: 120px;
+  min-width: 160px;
 }
 
 
@@ -440,7 +427,7 @@ h4 {
 
 .compact-stats .stat-item {
   flex: 1;
-  padding: 8px 5px;
+  padding: 0px 10px;
   min-width: auto;
   text-align: center;
   display: flex;
@@ -454,13 +441,28 @@ h4 {
 }
 
 .compact-stats .stat-value {
+  // font-size: 12px;
+  // font-weight: 600;
   font-size: 12px;
-  font-weight: 600;
+  font-family: 'tahoma';
+  font-weight: 'bold';
 }
 
-// /* Keep existing colors and borders */
-// .compact-stats .stat-item.income,
-// .compact-stats .stat-item.expense,
-// .compact-stats .stat-item.profit {
-//   /* Inherits all original styles */
-// }
+
+.left-container, .right-container {
+    padding: 1rem; /* Consistent padding */
+}
+
+/* Equal Height Containers */
+.equal-height {
+    height: 280px; /* Fixed height for all boxes */
+    margin-bottom: 1rem;
+}
+
+.pie-chart-container {
+    height: 220px; /* Slightly smaller to accommodate stats */
+}
+
+.right-equal-height {
+    height: 600px; /* Double row height + gap */
+}

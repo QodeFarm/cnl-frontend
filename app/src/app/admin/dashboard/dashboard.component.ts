@@ -859,8 +859,14 @@ loadCurrentYearFinancialData() {
           title: {
             display: true,
             text: `Financial Year (${this.currentYear})`,
-            font: { size: 14 },
-            color: '#000000' // Black color
+            // font: { size: 14 },
+            // color: '#000000' // Black color
+            color: '#2c2e35',  
+            font: {
+              size: 12,
+              family: 'tahoma',
+              weight: 'bold',
+            },
           }
         }
       }
