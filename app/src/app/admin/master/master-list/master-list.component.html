@@ -111,6 +111,7 @@
                             <li><a [routerLink]="['/admin/master/ledger-accounts']">Ledger accounts</a></li>
                             <li><a [routerLink]="['/admin/master/ledger-groups']">Ledger groups</a></li>
                             <li><a [routerLink]="['/admin/master/customer-payment-terms']">Customer payment terms</a></li>
+                            <li><a [routerLink]="['/admin/master/customer-categories']">Customer Categories</a></li>
                         </ul>
                     </div>
                 </div>
@@ -124,6 +125,9 @@
                         </ng-container>
                         <ng-container *ngSwitchCase="'customer-payment-terms'">
                             <app-customer-payment-terms></app-customer-payment-terms>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'customer-categories'">
+                            <app-customer-categories></app-customer-categories>
                         </ng-container>
                         <!-- <div *ngSwitchDefault> -->
                     </ng-container>
