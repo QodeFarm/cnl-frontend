@@ -221,163 +221,158 @@ prepareFileMetadata(selectedFile: File): any {
     attachment_path: `${fileUID}_${selectedFile.name}`, // Hypothetical saved file path
   };
 }
+
   async confirmReceipt() {
-    if (this.selectedOrder) {
-      const childSaleOrderId = this.selectedOrder.sale_order_id;  // Child Sale Order ID
-      const parentOrderNo = this.selectedOrder.order_no.split('-').slice(0, 3).join('-'); // Extract Parent Order No (e.g., SO-2501-00002)
+  if (this.selectedOrder) {
+    const childSaleOrderId = this.selectedOrder.sale_order_id;
+    const parentOrderNo = this.selectedOrder.order_no.split('-').slice(0, 3).join('-');
 
-      console.log("Processing child sale order:", childSaleOrderId);
-      console.log("Parent Order No:", parentOrderNo);
+    console.log("Processing child sale order:", childSaleOrderId);
+    console.log("Parent Order No:", parentOrderNo);
 
-      // Step 1: Fetch the sale_invoice_id for the child sale order
-      const saleInvoiceId = await this.fetchSaleInvoiceId(childSaleOrderId);
-      if (!saleInvoiceId) {
-        console.error("Sale invoice ID is missing or couldn't be fetched.");
-        return;
-      }
-
-      const saleReceiptUrl = 'sales/sale_receipts/';
-      let receiptPath = [];
-
-      // Step 2: Check if a file has been selected for upload
-      if (this.selectedOrder.selectedFile) {
-        const selectedFile = this.selectedOrder.selectedFile;
-        receiptPath = [this.prepareFileMetadata(selectedFile)];
-      }
-
-      // Step 3: Prepare the payload for sale receipt
-      const payload = {
-        sale_invoice_id: saleInvoiceId,
-        receipt_name: `Receipt for Order ${childSaleOrderId}`,
-        description: 'Uploaded receipt for order confirmation',
-        receipt_path: receiptPath
-      };
-
-      // Step 4: Create the sale receipt
-      this.http.post(saleReceiptUrl, payload).subscribe(
-        (response: any) => {
-          console.log(' Sale receipt created successfully:', response);
-
-          //  Step 5: Update child sale order to flow_status = "Completed"
-          const updateChildStatusUrl = `sales/sale_order/${childSaleOrderId}/`;
-          const updateChildPayload = { flow_status_id: '595ae9ff-8806-4ca5-ba04-bcb572ee0194', order_status_id: '717c922f-c092-4d40-94e7-6a12d7095600' }; // Replace with actual ID for "Completed"
-
-          this.http.patch(updateChildStatusUrl, updateChildPayload).subscribe(
-            () => {
-              console.log(` Child Sale Order ${childSaleOrderId} updated to Completed.`);
-              this.closeModal(); // Close the modal after confirmation
-              this.refreshCurdConfig();
-
-              //  Step 6: Fetch all child sale orders for the parent
-              const childOrdersUrl = `sales/sale_order/?parent_order_no=${parentOrderNo}`;
-              console.log("Fetching child orders with URL:", childOrdersUrl);
-              this.http.get<any>(childOrdersUrl).subscribe(
-                (childOrdersResponse) => {
-                  console.log(" Fetched child sale orders:", childOrdersResponse);
-              
-                  console.log(" Checking all child orders' statuses:");
-                  childOrdersResponse.data.forEach((childOrder: any) => {
-                    console.log(`Order No: ${childOrder.order_no}, Flow Status: ${childOrder.flow_status.flow_status_name}`);
-                  });
-              
-                  //  Ignore Parent Sale Order when checking if all child orders are completed
-                  const allCompleted = childOrdersResponse.data
-                    .filter((order: any) => order.order_no !== parentOrderNo) //  Exclude Parent Order
-                    .every((childOrder: any) => childOrder.flow_status.flow_status_name === 'Completed');
-              
-                  console.log(" allCompleted:", allCompleted);
-              
-                  if (allCompleted) {
-                    console.log(` All child sale orders for ${parentOrderNo} are completed. Updating parent order.`);
-              
-                    //  Fetch the Parent Sale Order ID
-                    const parentSaleOrder = childOrdersResponse.data.find(
-                      (order: any) => order.order_no === parentOrderNo
-                    );
-              
-                    if (parentSaleOrder) {
-                      const parentSaleOrderId = parentSaleOrder.sale_order_id;
-                      console.log(" Parent Sale Order ID:", parentSaleOrderId);
-              
-                      //  Update Parent Sale Order flow_status to "Completed"
-                      const updateParentStatusUrl = `sales/sale_order/${parentSaleOrderId}/`;
-                      console.log(" updateParentStatusUrl:", updateParentStatusUrl);
-                      const updateParentPayload = { flow_status_id: '595ae9ff-8806-4ca5-ba04-bcb572ee0194', order_status_id: '717c922f-c092-4d40-94e7-6a12d7095600' }; // Replace with correct ID
-              
-                      this.http.patch(updateParentStatusUrl, updateParentPayload).subscribe(
-                        () => {
-                          console.log(` Parent Sale Order ${parentOrderNo} updated to Completed.`);
-                          this.closeModal();
-                          this.refreshCurdConfig();
-                        },
-                        error => {
-                          console.error(" Error updating parent sale order status:", error);
-                          alert("Failed to update parent sale order status. Please try again.");
-                        }
-                      );
-                    } else {
-                      console.error(` Parent Sale Order ${parentOrderNo} not found.`);
-                    }
-                  } else {
-                    console.log(`Some child sale orders are still pending. Updating parent order to "Partially Delivered".`);
-                  
-                    //  Fetch the Parent Sale Order ID
-                    const parentSaleOrder = childOrdersResponse.data.find(
-                      (order: any) => order.order_no === parentOrderNo
-                    );
-                  
-                    if (parentSaleOrder) {
-                      const parentSaleOrderId = parentSaleOrder.sale_order_id;
-                      console.log(" Parent Sale Order ID:", parentSaleOrderId);
-                  
-                      //  Update Parent Sale Order to "Partially Delivered"
-                      const updateParentStatusUrl = `sales/sale_order/${parentSaleOrderId}/`;
-                      console.log(" updateParentStatusUrl:", updateParentStatusUrl);
-                      const updateParentPayload = { 
-                        flow_status_id: '35ba9d92-dd2b-4adf-94ec-1391e50cfb30',  //  Partially Delivered
-                        order_status_id: 'e2079d63-2e5f-4f8e-9d8b-817cefa87398'
-                      };
-                  
-                      this.http.patch(updateParentStatusUrl, updateParentPayload).subscribe(
-                        () => {
-                          console.log(` Parent Sale Order ${parentOrderNo} updated to Partially Delivered.`);
-                          this.closeModal();
-                          this.refreshCurdConfig();
-                        },
-                        error => {
-                          console.error(" Error updating parent sale order status:", error);
-                          alert("Failed to update parent sale order status. Please try again.");
-                        }
-                      );
-                    } else {
-                      console.error(` Parent Sale Order ${parentOrderNo} not found.`);
-                    }
-                  }
-                },
-                (error) => {
-                  console.error(" Error fetching child sale orders:", error);
-                  alert("Failed to fetch child sale orders. Please try again.");
-                }
-              );
-              
-            },
-            error => {
-              console.error(" Error updating child sale order status:", error);
-              alert("Failed to update child sale order status. Please try again.");
-            }
-          );
-        },
-        error => {
-          console.error(' Error in creating sale receipt:', error);
-          alert('Failed to create sale receipt. Please try again.');
-        }
-      );
-    } else {
-      console.warn(" No order selected for confirmation.");
+    const saleInvoiceId = await this.fetchSaleInvoiceId(childSaleOrderId);
+    if (!saleInvoiceId) {
+      console.error("Sale invoice ID is missing or couldn't be fetched.");
+      return;
     }
-    this.ngOnInit();
+
+    const saleReceiptUrl = 'sales/sale_receipts/';
+    let receiptPath = [];
+
+    if (this.selectedOrder.selectedFile) {
+      const selectedFile = this.selectedOrder.selectedFile;
+      receiptPath = [this.prepareFileMetadata(selectedFile)];
+    }
+
+    const payload = {
+      sale_invoice_id: saleInvoiceId,
+      receipt_name: `Receipt for Order ${childSaleOrderId}`,
+      description: 'Uploaded receipt for order confirmation',
+      receipt_path: receiptPath
+    };
+
+    this.http.post(saleReceiptUrl, payload).subscribe(
+      (response: any) => {
+        console.log(' Sale receipt created successfully:', response);
+
+        const updateChildStatusUrl = `sales/sale_order/${childSaleOrderId}/`;
+
+        this.http.get('masters/flow_status/?flow_status_name=Completed').subscribe((flowRes: any) => {
+          const flow_status_id = flowRes?.data?.[0]?.flow_status_id;
+
+          this.http.get('masters/order_status/?status_name=Completed').subscribe((orderRes: any) => {
+            const order_status_id = orderRes?.data?.[0]?.order_status_id;
+
+            const updateChildPayload = { flow_status_id, order_status_id };
+
+            this.http.patch(updateChildStatusUrl, updateChildPayload).subscribe(
+              () => {
+                console.log(` Child Sale Order ${childSaleOrderId} updated to Completed.`);
+                this.closeModal();
+                this.refreshCurdConfig();
+
+                const childOrdersUrl = `sales/sale_order/?parent_order_no=${parentOrderNo}`;
+                console.log("Fetching child orders with URL:", childOrdersUrl);
+                this.http.get<any>(childOrdersUrl).subscribe(
+                  (childOrdersResponse) => {
+                    console.log(" Fetched child sale orders:", childOrdersResponse);
+
+                    console.log(" Checking all child orders' statuses:");
+                    childOrdersResponse.data.forEach((childOrder: any) => {
+                      console.log(`Order No: ${childOrder.order_no}, Flow Status: ${childOrder.flow_status.flow_status_name}`);
+                    });
+
+                    const allCompleted = childOrdersResponse.data
+                      .filter((order: any) => order.order_no !== parentOrderNo)
+                      .every((childOrder: any) => childOrder.flow_status.flow_status_name === 'Completed');
+
+                    console.log(" allCompleted:", allCompleted);
+
+                    const parentSaleOrder = childOrdersResponse.data.find(
+                      (order: any) => order.order_no === parentOrderNo
+                    );
+
+                    if (parentSaleOrder) {
+                      const parentSaleOrderId = parentSaleOrder.sale_order_id;
+                      console.log(" Parent Sale Order ID:", parentSaleOrderId);
+                      const updateParentStatusUrl = `sales/sale_order/${parentSaleOrderId}/`;
+                      console.log(" updateParentStatusUrl:", updateParentStatusUrl);
+
+                      if (allCompleted) {
+                        this.http.get('masters/flow_status/?flow_status_name=Completed').subscribe((flowRes: any) => {
+                          const flow_status_id = flowRes?.data?.[0]?.flow_status_id;
+
+                          this.http.get('masters/order_status/?status_name=Completed').subscribe((orderRes: any) => {
+                            const order_status_id = orderRes?.data?.[0]?.order_status_id;
+
+                            const updateParentPayload = { flow_status_id, order_status_id };
+
+                            this.http.patch(updateParentStatusUrl, updateParentPayload).subscribe(
+                              () => {
+                                console.log(` Parent Sale Order ${parentOrderNo} updated to Completed.`);
+                                this.closeModal();
+                                this.refreshCurdConfig();
+                              },
+                              error => {
+                                console.error(" Error updating parent sale order status:", error);
+                                alert("Failed to update parent sale order status. Please try again.");
+                              }
+                            );
+                          });
+                        });
+                      } else {
+                        this.http.get('masters/flow_status/?flow_status_name=Partially Delivered').subscribe((flowRes: any) => {
+                          const flow_status_id = flowRes?.data?.[0]?.flow_status_id;
+
+                          this.http.get('masters/order_status/?status_name=Partially Delivered').subscribe((orderRes: any) => {
+                            const order_status_id = orderRes?.data?.[0]?.order_status_id;
+
+                            const updateParentPayload = { flow_status_id, order_status_id };
+
+                            this.http.patch(updateParentStatusUrl, updateParentPayload).subscribe(
+                              () => {
+                                console.log(` Parent Sale Order ${parentOrderNo} updated to Partially Delivered.`);
+                                this.closeModal();
+                                this.refreshCurdConfig();
+                              },
+                              error => {
+                                console.error(" Error updating parent sale order status:", error);
+                                alert("Failed to update parent sale order status. Please try again.");
+                              }
+                            );
+                          });
+                        });
+                      }
+                    } else {
+                      console.error(` Parent Sale Order ${parentOrderNo} not found.`);
+                    }
+                  },
+                  (error) => {
+                    console.error(" Error fetching child sale orders:", error);
+                    alert("Failed to fetch child sale orders. Please try again.");
+                  }
+                );
+              },
+              error => {
+                console.error(" Error updating child sale order status:", error);
+                alert("Failed to update child sale order status. Please try again.");
+              }
+            );
+          });
+        });
+      },
+      error => {
+        console.error(' Error in creating sale receipt:', error);
+        alert('Failed to create sale receipt. Please try again.');
+      }
+    );
+  } else {
+    console.warn(" No order selected for confirmation.");
   }
-  
+  this.ngOnInit();
+}
+
+
   private updateChildAndParent(childSaleOrderId: string, parentOrderNo: string) {
     const updateChildStatusUrl = `sales/sale_order/${childSaleOrderId}/`;
     const updateChildPayload = {
