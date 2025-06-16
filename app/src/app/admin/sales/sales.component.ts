@@ -1579,93 +1579,6 @@ export class SalesComponent {
               className: 'col-lg-9 col-md-8 col-12 p-0',
               fieldGroupClassName: "ant-row mx-0 row align-items-end mt-2",
               fieldGroup: [
-                // {
-                //   key: 'sale_type',
-                //   type: 'select',
-                //   className: 'col-md-4 col-sm-6 col-12',
-                //   templateOptions: {
-                //     label: 'Sale type',
-                //     dataKey: 'sale_type_id',
-                //     dataLabel: 'name',
-                //     required: true,
-                //     options: [],
-                //     lazy: {
-                //       url: 'masters/sale_types/',
-                //       lazyOneTime: true
-                //     },
-                //   },
-                //   hooks: {
-                //     onInit: (field: any) => {
-                //       const lazyUrl = field.templateOptions.lazy.url;
-                //       this.http.get(lazyUrl).subscribe((response: any) => {
-                //         const saleTypes = response.data;
-                //         field.templateOptions.options = saleTypes;
-                
-                //         const currentSaleTypeId = this.formConfig.model?.sale_order?.sale_type_id;
-                //         if (currentSaleTypeId) {
-                //           const matchedOption = saleTypes.find(opt => opt.sale_type_id === currentSaleTypeId);
-                //           if (matchedOption) {
-                //             field.formControl.setValue(matchedOption, { emitEvent: false });
-                //           }
-                //         } else {
-                //           const defaultOption = saleTypes.find(option => option.name === 'Advance Order');
-                //           console.log("defaultOption : ", defaultOption)
-                //           if (defaultOption) {
-                //             field.formControl.setValue(defaultOption, { emitEvent: false });
-                //             // Add this line to assign the default sale_type_id to the model
-                //             this.formConfig.model['sale_order']['sale_type_id'] = defaultOption.sale_type_id;
-                //           }
-                //         }
-                //       });
-                
-                //       // Handle changes
-                //       field.formControl.valueChanges.subscribe((data: any) => {
-                //         if (data && data.sale_type_id) {               
-                //           // Set sale_type_id in model
-                //           this.formConfig.model['sale_order']['sale_type_id'] = data.sale_type_id;
-
-                
-                //           // Generate order number
-                //           const prefix = data.name === 'Other' ? 'SOO' : 'SO';
-                //           this.http.get(`masters/generate_order_no/?type=${prefix}`).subscribe((res: any) => {
-                //             if (res?.data?.order_number) {
-                //               this.orderNumber = res.data.order_number;
-                //               this.formConfig.model['sale_order']['order_no'] = this.orderNumber;
-                //               field.form.controls.order_no.setValue(this.orderNumber);
-                //               this.cdRef.detectChanges();
-                //             }
-                //           });
-                
-                //           // Update and refresh customer field
-                //           const customerField = field.parent?.fieldGroup?.find(f => f.key === 'customer');
-                //           if (customerField?.props?.lazy) {
-                //             const baseUrl = 'customers/customers/?summary=true';
-                //             const customerUrl = data.name === 'Other' ? `${baseUrl}&sale_type=Other` : baseUrl;
-                
-                //             customerField.props.lazy.url = customerUrl;
-                //             customerField.props.lazy.lazyOneTime = false;
-                //             customerField.props.options = [];
-                //             // customerField.formControl.setValue(null);
-                //             const existingCustomer = this.formConfig.model?.sale_order?.customer;
-                //             customerField.formControl.setValue(existingCustomer || null);
-                
-                //             // Force refresh
-                //             const customerKey = customerField.key;
-                //             const parentGroup = field.parent?.fieldGroup;
-                //             const index = parentGroup.findIndex(f => f.key === customerKey);
-                //             if (index !== -1) {
-                //               const removed = parentGroup.splice(index, 1)[0];
-                //               setTimeout(() => {
-                //                 parentGroup.splice(index, 0, removed);
-                //                 this.cdRef.detectChanges();
-                //               });
-                //             }
-                //           }
-                //         }
-                //       });
-                //     }
-                //   }
-                // },  
                 {
                   key: 'sale_type',
                   type: 'select',
@@ -1687,7 +1600,7 @@ export class SalesComponent {
                       this.http.get(lazyUrl).subscribe((response: any) => {
                         const saleTypes = response.data;
                         field.templateOptions.options = saleTypes;
-
+                
                         const currentSaleTypeId = this.formConfig.model?.sale_order?.sale_type_id;
                         if (currentSaleTypeId) {
                           const matchedOption = saleTypes.find(opt => opt.sale_type_id === currentSaleTypeId);
@@ -1696,21 +1609,34 @@ export class SalesComponent {
                           }
                         } else {
                           const defaultOption = saleTypes.find(option => option.name === 'Advance Order');
+                          console.log("defaultOption : ", defaultOption)
                           if (defaultOption) {
                             field.formControl.setValue(defaultOption, { emitEvent: false });
+                            // Add this line to assign the default sale_type_id to the model
                             this.formConfig.model['sale_order']['sale_type_id'] = defaultOption.sale_type_id;
                           }
                         }
                       });
-
+                
                       // Handle changes
                       field.formControl.valueChanges.subscribe((data: any) => {
-                        if (data && data.sale_type_id) {
-                          // Update model
+                        if (data && data.sale_type_id) {               
+                          // Set sale_type_id in model
                           this.formConfig.model['sale_order']['sale_type_id'] = data.sale_type_id;
 
-                          // Only generate new order number in create mode (i.e., if order_no is not set)
-                          if (!this.formConfig.model?.sale_order?.order_no) {
+                
+                          // // Generate order number
+                          // const prefix = data.name === 'Other' ? 'SOO' : 'SO';
+                          // this.http.get(`masters/generate_order_no/?type=${prefix}`).subscribe((res: any) => {
+                          //   if (res?.data?.order_number) {
+                          //     this.orderNumber = res.data.order_number;
+                          //     this.formConfig.model['sale_order']['order_no'] = this.orderNumber;
+                          //     field.form.controls.order_no.setValue(this.orderNumber);
+                          //     this.cdRef.detectChanges();
+                          //   }
+                          // });
+                          // Generate order number only if we are in create mode
+                          if (!this.SaleOrderEditID) {
                             const prefix = data.name === 'Other' ? 'SOO' : 'SO';
                             this.http.get(`masters/generate_order_no/?type=${prefix}`).subscribe((res: any) => {
                               if (res?.data?.order_number) {
@@ -1721,20 +1647,19 @@ export class SalesComponent {
                               }
                             });
                           }
-
                           // Update and refresh customer field
                           const customerField = field.parent?.fieldGroup?.find(f => f.key === 'customer');
                           if (customerField?.props?.lazy) {
                             const baseUrl = 'customers/customers/?summary=true';
                             const customerUrl = data.name === 'Other' ? `${baseUrl}&sale_type=Other` : baseUrl;
-
+                
                             customerField.props.lazy.url = customerUrl;
                             customerField.props.lazy.lazyOneTime = false;
                             customerField.props.options = [];
-
+                            // customerField.formControl.setValue(null);
                             const existingCustomer = this.formConfig.model?.sale_order?.customer;
                             customerField.formControl.setValue(existingCustomer || null);
-
+                
                             // Force refresh
                             const customerKey = customerField.key;
                             const parentGroup = field.parent?.fieldGroup;
@@ -1751,7 +1676,7 @@ export class SalesComponent {
                       });
                     }
                   }
-                },                                                                          
+                },                                                                           
                 {
                   key: 'customer',
                   type: 'select',
