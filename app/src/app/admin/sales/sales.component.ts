@@ -1796,7 +1796,7 @@ export class SalesComponent {
                             this.invoiceNumber = res.data.order_number;
                 
                             // ✅ Fetch order_status_id by status_name = "Completed"
-                            this.http.get('masters/order_status/?status_name=Completed').subscribe((statusRes: any) => {
+                            this.http.get('masters/order_status/?status_name=In Progress').subscribe((statusRes: any) => {
                               const completedStatus = statusRes?.data?.[0];
                               const completedStatusId = completedStatus?.order_status_id;
                 
