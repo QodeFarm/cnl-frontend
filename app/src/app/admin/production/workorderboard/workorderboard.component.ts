@@ -121,7 +121,7 @@ export class WorkorderboardComponent implements OnInit {
       drawerSize: 500,
       drawerPlacement: 'right',
       tableConfig: {
-        apiUrl: 'production/work_order/?summary=true&flow_status=Production',
+        apiUrl: 'production/work_order/?flow_status=Production',
         title: 'Work Order Board',
         pkId: "work_order_id",
         pageSize: 10,
