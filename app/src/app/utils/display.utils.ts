@@ -117,9 +117,9 @@ export function getUnitData(unitInfo) {
     if (products.length) {
       products.forEach((product: any) => {
         if (product) {
-          const quantity = parseFloat(product.quantity ?? '0');
-          const rate = parseFloat(product.rate ?? '0');
-          const discountPercentage = parseFloat(product.discount ?? '0');
+          const quantity = Number(product.quantity ?? 0);
+          const rate = Number(product.rate ?? 0);
+          const discountPercentage = Number(product.discount ?? 0);
   
           // Calculate individual product amounts
           const itemValue = quantity * rate;
@@ -138,17 +138,17 @@ export function getUnitData(unitInfo) {
   
             // Calculate GST values if applicable
             if (product.product?.gst_input) {
-              const gstValue = (amount * parseFloat(product.product.gst_input)) / 100;
+              const gstValue = (amount * Number(product.product.gst_input)) / 100;
   
               // Determine CGST, SGST, or IGST based on billing address
               if (billingAddress.includes('Andhra Pradesh')) {
                 product.cgst = (gstValue / 2).toFixed(2);
                 product.sgst = (gstValue / 2).toFixed(2);
-                product.igst = "0.00";
+                product.igst = 0.00;
               } else {
                 product.igst = gstValue.toFixed(2);
-                product.cgst = "0.00";
-                product.sgst = "0.00";
+                product.cgst = 0.00;
+                product.sgst = 0.00;
               }
             }
           }
@@ -157,7 +157,7 @@ export function getUnitData(unitInfo) {
   
       // Now calculate the total taxAmount from all products
       taxAmount = products.reduce((totalTax: number, product: any) => {
-        return totalTax + parseFloat(product.igst || '0') + parseFloat(product.sgst || '0') + parseFloat(product.cgst || '0');
+        return totalTax + Number(product.igst || 0) + Number(product.sgst || 0) + Number(product.cgst || 0);
       }, 0);
   
       // console.log("Final calculated tax_amount : ", taxAmount);
@@ -173,9 +173,9 @@ export function getUnitData(unitInfo) {
           // console.log("product sgst : ", product.sgst);
 
           // Set CGST, SGST, or IGST for each product
-          if (controls['cgst']) controls['cgst'].setValue(product.cgst || "0.00");
-          if (controls['sgst']) controls['sgst'].setValue(product.sgst || "0.00");
-          if (controls['igst']) controls['igst'].setValue(product.igst || "0.00");
+          if (controls['cgst']) controls['cgst'].setValue(product.cgst || 0.00);
+          if (controls['sgst']) controls['sgst'].setValue(product.sgst || 0.00);
+          if (controls['igst']) controls['igst'].setValue(product.igst || 0.00);
         }
       });
     }
@@ -190,9 +190,9 @@ export function getUnitData(unitInfo) {
       if (controls.discount) controls.discount.setValue(totalDiscount.toFixed(2));
   
       // Handle additional amounts
-      const cessAmount = parseFloat(data[parentModel]?.cess_amount ?? '0');
-      const advanceAmount = parseFloat(data[parentModel]?.advance_amount ?? '0');
-      const saleOrderDiscount = parseFloat(data[parentModel]?.dis_amt ?? '0');
+      const cessAmount = Number(data[parentModel]?.cess_amount ?? 0);
+      const advanceAmount = Number(data[parentModel]?.advance_amount ?? 0);
+      const saleOrderDiscount = Number(data[parentModel]?.dis_amt ?? 0);
   
       // Final total amount calculation
       const finalAmount = (totalAmount + taxAmount + cessAmount) - saleOrderDiscount - advanceAmount;
