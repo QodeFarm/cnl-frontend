@@ -1029,7 +1029,7 @@ export class SalesinvoiceComponent {
                     type: 'input',
                     label: 'Ref No',
                     placeholder: 'Enter Ref No',
-                    required: true,
+                    required: false,
                   },
                   hooks: {
                     onInit: (field: any) => {
@@ -1046,8 +1046,10 @@ export class SalesinvoiceComponent {
                   templateOptions: {
                     label: 'Tax',
                     required: true,
+                    disabled:true,
+                    // readonly: true,
                     options: [
-                      { 'label': "Inclusive", value: 'Inclusive' },
+                      // { 'label': "Inclusive", value: 'Inclusive' },
                       { 'label': "Exclusive", value: 'Exclusive' }
                     ]
                   },
@@ -1055,6 +1057,8 @@ export class SalesinvoiceComponent {
                     onInit: (field: any) => {
                       if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.tax && field.formControl) {
                         field.formControl.setValue(this.dataToPopulate.sale_invoice_order.tax);
+                      } else {
+                        field.formControl.setValue('Exclusive');
                       }
                     }
                   }
