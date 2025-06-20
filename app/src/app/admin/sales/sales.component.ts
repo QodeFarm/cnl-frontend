@@ -1772,7 +1772,7 @@ export class SalesComponent {
                     type: 'input',
                     label: 'Ref No',
                     placeholder: 'Enter Ref No',
-                    required: true,
+                    required: false,
                   },
                   hooks: {
                     onInit: (field: any) => {
@@ -1789,8 +1789,8 @@ export class SalesComponent {
                   templateOptions: {
                     label: 'Tax',
                     required: true,
+                    disabled:true,
                     options: [
-                      { 'label': "Inclusive", value: 'Inclusive' },
                       { 'label': "Exclusive", value: 'Exclusive' }
                     ]
                   },
@@ -1798,10 +1798,33 @@ export class SalesComponent {
                     onInit: (field: any) => {
                       if (this.dataToPopulate && this.dataToPopulate.sale_order.tax && field.formControl) {
                         field.formControl.setValue(this.dataToPopulate.sale_order.tax);
+                      } else {
+                        // Set default value to 'Exclusive'
+                        field.formControl.setValue('Exclusive');
                       }
                     }
                   }
                 },
+                // {
+                //   key: 'tax',
+                //   type: 'select',
+                //   className: 'col-md-4 col-sm-6 col-12',
+                //   templateOptions: {
+                //     label: 'Tax',
+                //     required: true,
+                //     options: [
+                //       { 'label': "Inclusive", value: 'Inclusive' },
+                //       { 'label': "Exclusive", value: 'Exclusive' }
+                //     ]
+                //   },
+                //   hooks: {
+                //     onInit: (field: any) => {
+                //       if (this.dataToPopulate && this.dataToPopulate.sale_order.tax && field.formControl) {
+                //         field.formControl.setValue(this.dataToPopulate.sale_order.tax);
+                //       }
+                //     }
+                //   }
+                // },
                 {
                   key: 'flow_status',
                   type: 'select',

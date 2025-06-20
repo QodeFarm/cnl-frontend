@@ -47,6 +47,13 @@ import { Router } from '@angular/router';
       .nzValue{
         display:flex;
       }
+      .file-action-buttons {
+        display: flex;
+        margin-top: 8px;
+      }
+      .file-action-buttons button {
+        margin-right: 8px;
+      }
     `,
   ],
 })
@@ -420,7 +427,7 @@ export class TaTableComponent implements OnDestroy {
 
     // Return the query string by joining all the filters
     // return '?&' + queryParts.join('&');
-    return '?' + queryParts.join('&'); //before, it returns a string starting with "?&", which then gets concatenated to your API URL and ends up creating an extra "?". Now, fix this by modifying the function.
+    return '?' + queryParts.join('&'); //before, it returns a string starting with "?&",which then gets concatenated to your API URL and ends up creating an extra "?". Now, fix this by modifying the function.
   }
   formatDate(date: Date): string {
     // Format date as 'yyyy-MM-dd'
@@ -793,6 +800,26 @@ export class TaTableComponent implements OnDestroy {
 
     // Optionally, emit the event to parent if needed
     this.doAction.emit({ action, row });
+  }
+
+  /**
+   * View the uploaded file
+   * @param rowData Row data containing file information
+   */
+  viewFile(rowData: any): void {
+    // Check if the row has the actual file path to view
+    if (rowData && rowData.receipt_path && rowData.receipt_path.length > 0) {
+      // If receipt_path is available in the data, use it to open the file
+      const fileUrl = rowData.receipt_path[0].attachment_path;
+      window.open(fileUrl, '_blank');
+    } else if (rowData && rowData.selectedFile) {
+      // If we have the actual file object (recent uploads that aren't saved yet)
+      const fileUrl = URL.createObjectURL(rowData.selectedFile);
+      window.open(fileUrl, '_blank');
+    } else {
+      // Show message if no file is available to view
+      alert('No viewable file found. The file might not be uploaded to the server yet.');
+    }
   }
 
   // getFilters(){

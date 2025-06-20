@@ -171,9 +171,15 @@
                     <div *ngIf="data.selectedFileName; else uploadButton">
                         <!-- Display the selected file name above the Replace button -->
                         <div>{{ data.selectedFileName }}</div>
-                        <button *ngFor="let action of c.actions" (click)="performAction(action, data)">
-                            Replace
-                        </button>
+                        <div class="file-action-buttons">
+                          <!-- View button to view the uploaded file -->
+                            <button nz-button nzType="primary" (click)="viewFile(data)" style="margin-right: 8px;">
+                                <i nz-icon nzType="eye" nzTheme="outline"></i> View
+                            </button>
+                            <button *ngFor="let action of c.actions" (click)="performAction(action, data)">
+                                Replace
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Initial Upload button when no file is selected -->

@@ -1055,7 +1055,7 @@ loadQuickpackProducts() {
                     type: 'input',
                     label: 'Ref No',
                     placeholder: 'Enter Ref No',
-                    required: true,
+                    required: false,
                   },
                   hooks: {
                     onInit: (field: any) => {
@@ -1072,8 +1072,9 @@ loadQuickpackProducts() {
                   templateOptions: {
                     label: 'Tax',
                     required: true,
+                    disabled:true,
                     options: [
-                      { 'label': "Inclusive", value: 'Inclusive' },
+                      // { 'label': "Inclusive", value: 'Inclusive' },
                       { 'label': "Exclusive", value: 'Exclusive' }
                     ]
                   },
@@ -1081,6 +1082,9 @@ loadQuickpackProducts() {
                     onInit: (field: any) => {
                       if (this.dataToPopulate && this.dataToPopulate.purchase_order_data.tax && field.formControl) {
                         field.formControl.setValue(this.dataToPopulate.purchase_order_data.tax);
+                      } 
+                      else {
+                        field.formControl.setValue('Exclusive');
                       }
                     }
                   }
