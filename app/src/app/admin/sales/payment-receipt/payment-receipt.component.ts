@@ -81,7 +81,7 @@ export class PaymentReceiptComponent implements OnInit {
         },
         { 
           fieldKey: 'total_amount', 
-          name: 'Cash/Credit Amount (₹)', 
+          name: 'Total Amount', 
           sort: true,
           displayType: 'map',
           mapFn: (val: any) => val || '0.00'
@@ -103,13 +103,6 @@ export class PaymentReceiptComponent implements OnInit {
         { 
           fieldKey: 'dis_amt', 
           name: 'Cash Discount (₹)', 
-          sort: true,
-          displayType: 'map',
-          mapFn: (val: any) => val || '0.00'
-        },
-        { 
-          fieldKey: 'item_value', 
-          name: 'Taxable (₹)', 
           sort: true,
           displayType: 'map',
           mapFn: (val: any) => val || '0.00'
