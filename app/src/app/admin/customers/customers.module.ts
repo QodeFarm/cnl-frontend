@@ -10,6 +10,9 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { CustomersListComponent } from './customers-list/customers-list.component';
 import { CustomerPaymentTermsComponent } from './customer-payment-terms/customer-payment-terms.component';
 import { CustomerCategoriesComponent } from './customer-categories/customer-categories.component';
+import { CountryComponent } from './country/country.component';
+import { StatesComponent } from './states/states.component';
+import { CitiesComponent } from './cities/cities.component';
 
 
 @NgModule({
@@ -20,6 +23,9 @@ import { CustomerCategoriesComponent } from './customer-categories/customer-cate
     TransportersComponent,
     CustomerPaymentTermsComponent,
     CustomerCategoriesComponent,
+    CountryComponent,
+    StatesComponent,
+    CitiesComponent,
   ],
   imports: [
     CommonModule,
@@ -33,7 +39,10 @@ import { CustomerCategoriesComponent } from './customer-categories/customer-cate
     TerritoryComponent,
     TransportersComponent,
     CustomerPaymentTermsComponent,
-    CustomerCategoriesComponent
+    CustomerCategoriesComponent,
+    CountryComponent,
+    StatesComponent,
+    CitiesComponent,
   ]
 })
 export class CustomersModule { }
