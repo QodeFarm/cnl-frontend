@@ -222,7 +222,7 @@ prepareFileMetadata(selectedFile: File): any {
   };
 }
 
-  async confirmReceipt() {
+async confirmReceipt() {
   if (this.selectedOrder) {
     const childSaleOrderId = this.selectedOrder.sale_order_id;
     const parentOrderNo = this.selectedOrder.order_no.split('-').slice(0, 3).join('-');
@@ -268,6 +268,44 @@ prepareFileMetadata(selectedFile: File): any {
             this.http.patch(updateChildStatusUrl, updateChildPayload).subscribe(
               () => {
                 console.log(` Child Sale Order ${childSaleOrderId} updated to Completed.`);
+                console.log("this.selectedOrder : ", this.selectedOrder);
+                // ✅ Trigger replication if sale_type is "Other"
+                if (this.selectedOrder.sale_type?.name === 'Other') {
+                  const getUrl = `sales/sale_order/${childSaleOrderId}/`;
+
+                  this.http.get(getUrl).subscribe(
+                    (res: any) => {
+                      const fullData = res?.data;
+                      console.log("fullData : ", fullData);
+
+                      if (!fullData?.sale_order || !fullData?.sale_order_items?.length) {
+                        alert('Sale order or items are missing for replication.');
+                        return;
+                      }
+
+                      const replicateUrl = `sales/sale_order/`;
+                      this.http.post(replicateUrl, {
+                                            sale_order: fullData.sale_order,
+                                            sale_order_items: fullData.sale_order_items,
+                                            order_attachments: fullData.order_attachments || [],
+                                            order_shipments: fullData.order_shipments || []
+                                            // custom_field_values: customFields
+                                          }).subscribe(
+                        (replicateRes: any) => {
+                          console.log('✅ Sale order replicated to mstcnl:', replicateRes);
+                        },
+                        (replicateErr) => {
+                          console.error('❌ Replication to mstcnl failed:', replicateErr);
+                          alert('Sale order was marked Completed, but replication to mstcnl failed.');
+                        }
+                      )
+                    },
+                    (err) => {
+                      console.error('❌ Failed to fetch full sale order data:', err);
+                      alert('Could not fetch sale order details for replication.');
+                    }
+                  );
+                }
                 this.closeModal();
                 this.refreshCurdConfig();
 
@@ -286,7 +324,7 @@ prepareFileMetadata(selectedFile: File): any {
                       .filter((order: any) => order.order_no !== parentOrderNo)
                       .every((childOrder: any) => childOrder.flow_status.flow_status_name === 'Completed');
 
-                    console.log(" allCompleted:", allCompleted);
+                    console.log("allCompleted:", allCompleted);
 
                     const parentSaleOrder = childOrdersResponse.data.find(
                       (order: any) => order.order_no === parentOrderNo

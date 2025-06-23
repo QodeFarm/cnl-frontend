@@ -257,11 +257,15 @@ export class SalesinvoiceComponent {
 
     async autoFillProductDetails(field, data) {
       this.productOptions = data;
+      console.log("this.productOptions : ", this.productOptions)
       if (!field.form?.controls || !data) return;
       const fieldMappings = {
-        code: data.code,
+        // code: data.code,
+        code: data.code !== undefined
+          ? data.code
+          : field.form.controls.code.value,
         rate: data.sales_rate || field.form.controls.rate.value,
-        discount: parseFloat(data.dis_amount) || 0,
+        discount: parseFloat(data.discount) || 0,
         unit_options_id: data.unit_options?.unit_options_id,
         print_name: data.print_name,
         mrp: data.mrp
@@ -670,7 +674,7 @@ export class SalesinvoiceComponent {
           color: item.color,
           print_name: item.product.print_name,
           rate: item.product.mrp,
-          discount: item.product.dis_amount,
+          discount: item.product.discount,
           unit_options_id: item.product.unit_options
 
         }));
@@ -1533,24 +1537,51 @@ export class SalesinvoiceComponent {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
+                    if (!parentArray) return;
 
-                    // Check if parentArray exists and proceed
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+                    const idx = +parentArray.key;
+                    console.log('Init code field for row', idx);
 
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
-                        const existingCode = this.dataToPopulate.sale_invoice_items[currentRowIndex].product?.code;
+                    // Use form model directly instead of dataToPopulate
+                    const rowData = this.formConfig.model.sale_invoice_items[idx];
+                    const existingCode = rowData ? rowData.product?.code : undefined;
+                    console.log(`Row ${idx} code from formConfig.model:`, existingCode);
 
-                        // Set the full product object instead of just the product_id
-                        if (existingCode) {
-                          field.formControl.setValue(existingCode); // Set full product object (not just product_id)
-                        }
-                      }
+                    if (existingCode !== undefined && existingCode !== null) {
+                      field.formControl.setValue(existingCode);
                     }
                   }
                 }
               },
+              // {
+              //   type: 'input',
+              //   key: 'code',
+              //   templateOptions: {
+              //     label: 'Code',
+              //     placeholder: 'code',
+              //     hideLabel: true,
+              //   },
+              //   hooks: {
+              //     onInit: (field: any) => {
+              //       const parentArray = field.parent;
+
+              //       // Check if parentArray exists and proceed
+              //       if (parentArray) {
+              //         const currentRowIndex = +parentArray.key; // Simplified number conversion
+
+              //         // Check if there is a product already selected in this row (when data is copied)
+              //         if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
+              //           const existingCode = this.dataToPopulate.sale_invoice_items[currentRowIndex].product?.code;
+
+              //           // Set the full product object instead of just the product_id
+              //           if (existingCode) {
+              //             field.formControl.setValue(existingCode); // Set full product object (not just product_id)
+              //           }
+              //         }
+              //       }
+              //     }
+              //   }
+              // },
               {
                 type: 'input',
                 key: 'quantity',

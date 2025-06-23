@@ -80,8 +80,8 @@ export class ProductsListComponent {
         sort: true
       },
       {
-        fieldKey: 'dis_amount',
-        name: 'Disc',
+        fieldKey: 'discount',
+        name: 'Disc(%)',
         sort: true
       },
       {
