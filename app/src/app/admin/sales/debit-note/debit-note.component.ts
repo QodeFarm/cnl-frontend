@@ -221,8 +221,10 @@ export class DebitNoteComponent {
               templateOptions: {
                 label: 'Sale Invoice',
                 placeholder: 'Select Sale Invoice',
-                dataKey: 'sale_invoice_id',
-                dataLabel: 'invoice_no',
+                // dataKey: 'sale_invoice_id',
+                // dataLabel: 'invoice_no',
+                valueProp: 'sale_invoice_id',  // Important - specify the value field
+                labelProp: 'invoice_no',   
                 required: true,
                 options: [] // Initialize with empty options
               }
@@ -499,10 +501,11 @@ export class DebitNoteComponent {
   loadSaleInvoices(customerId: string) {
     this.http.get(`sales/sale_invoice_order/?customer_id=${customerId}`).subscribe((res: any) => {
       if (res && Array.isArray(res.data)) {
-        this.invoiceOptions = res.data.map((invoice: any) => ({
-          value: invoice.sale_invoice_id,
-          label: invoice.invoice_no
-        }));
+        // this.invoiceOptions = res.data.map((invoice: any) => ({
+        //   value: invoice.sale_invoice_id,
+        //   label: invoice.invoice_no
+        // }));
+        this.invoiceOptions = res.data;
   
         const invoiceField = this.formConfig.fields.flatMap(field => field.fieldGroup || []).find(field => field.key === 'sale_invoice_id');
         console.log("Invoice Field: ", invoiceField);
