@@ -2091,6 +2091,10 @@ export class SaleReturnsComponent {
                                   if (this.dataToPopulate && this.dataToPopulate.sale_return_order && this.dataToPopulate.sale_return_order.dis_amt && field.formControl) {
                                     field.formControl.setValue(this.dataToPopulate.sale_return_order.dis_amt);
                                   }
+
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    this.totalAmountCal();
+                                  });
                                 }
                               }
                             },

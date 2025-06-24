@@ -869,71 +869,96 @@ export class SalesinvoiceComponent {
               className: 'col-lg-9 col-md-8 col-12 p-0',
               fieldGroupClassName: "ant-row mx-0 row align-items-end mt-2",
               fieldGroup: [
+                // {
+                //   key: 'bill_type',
+                //   type: 'select',
+                //   className: 'col-md-4 col-sm-6 col-12',
+                //   templateOptions: {
+                //     label: 'Bill type',
+                //     options: [
+                //       { label: 'Cash', value: 'CASH' },
+                //       { label: 'Credit', value: 'CREDIT' },
+                //       { label: 'Others', value: 'OTHERS' }
+                //     ],
+                //     required: true
+                //   },
+                //   hooks: {
+                //     onInit: (field: any) => {
+                //       const billTypeControl = field.formControl;
+                
+                //       // Set initial value
+                //       if (this.dataToPopulate?.sale_invoice_order?.bill_type && billTypeControl) {
+                //         billTypeControl.setValue(this.dataToPopulate.sale_invoice_order.bill_type);
+                //       } else {
+                //         billTypeControl.setValue('CASH');
+                //       }
+                
+                //       billTypeControl.valueChanges.subscribe((billType: string) => {
+                //         const isOtherType = billType?.toLowerCase() === 'others';
+                
+                //         // Update invoice number
+                //         const prefix = isOtherType ? 'SOO-INV' : 'SO-INV';
+                //         this.http.get(`masters/generate_order_no/?type=${prefix}`).subscribe((res: any) => {
+                //           if (res?.data?.order_number) {
+                //             this.invoiceNumber = res.data.order_number;
+                //             this.formConfig.model['sale_invoice_order']['invoice_no'] = this.invoiceNumber;
+                //             field.form.controls.invoice_no.setValue(this.invoiceNumber);
+                //             this.cdRef.detectChanges();
+                //           }
+                //         });
+                
+                //         // Update customer lazy URL
+                //         const customerField = field.parent?.fieldGroup?.find(f => f.key === 'customer');
+                //         if (customerField?.props?.lazy) {
+                //           const baseUrl = 'customers/customers/?summary=true';
+                //           const customerUrl = isOtherType ? `${baseUrl}&bill_type=OTHERS` : baseUrl;
+                
+                //           customerField.props.lazy.url = customerUrl;
+                //           customerField.props.lazy.lazyOneTime = false;
+                //           customerField.props.options = [];
+                //           customerField.formControl.setValue(null);
+                
+                //           // Force re-evaluation of customer field
+                //           const customerKey = customerField.key;
+                //           const parentGroup = field.parent?.fieldGroup;
+                //           const index = parentGroup.findIndex(f => f.key === customerKey);
+                //           if (index !== -1) {
+                //             const removed = parentGroup.splice(index, 1)[0];
+                //             setTimeout(() => {
+                //               parentGroup.splice(index, 0, removed);
+                //               this.cdRef.detectChanges();
+                //             });
+                //           }
+                //         }
+                //       });
+                //     }
+                //   }
+                // },          
                 {
                   key: 'bill_type',
                   type: 'select',
+                  // defaultValue: 'Exclusive',
                   className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'Bill type',
                     options: [
-                      { label: 'Cash', value: 'CASH' },
-                      { label: 'Credit', value: 'CREDIT' },
-                      { label: 'Others', value: 'OTHERS' }
+                      { 'label': "Cash", value: 'CASH' },
+                      { 'label': "Credit", value: 'CREDIT' },
+                      { 'label': "Others", value: 'OTHERS' }
                     ],
                     required: true
                   },
                   hooks: {
                     onInit: (field: any) => {
-                      const billTypeControl = field.formControl;
-                
-                      // Set initial value
-                      if (this.dataToPopulate?.sale_invoice_order?.bill_type && billTypeControl) {
-                        billTypeControl.setValue(this.dataToPopulate.sale_invoice_order.bill_type);
+                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.bill_type && field.formControl) {
+                        field.formControl.setValue(this.dataToPopulate.sale_invoice_order.bill_type);
                       } else {
-                        billTypeControl.setValue('CASH');
+                        // If no data to populate, set 'CASH' as default
+                        field.formControl.setValue('CASH');
                       }
-                
-                      billTypeControl.valueChanges.subscribe((billType: string) => {
-                        const isOtherType = billType?.toLowerCase() === 'others';
-                
-                        // Update invoice number
-                        const prefix = isOtherType ? 'SOO-INV' : 'SO-INV';
-                        this.http.get(`masters/generate_order_no/?type=${prefix}`).subscribe((res: any) => {
-                          if (res?.data?.order_number) {
-                            this.invoiceNumber = res.data.order_number;
-                            this.formConfig.model['sale_invoice_order']['invoice_no'] = this.invoiceNumber;
-                            field.form.controls.invoice_no.setValue(this.invoiceNumber);
-                            this.cdRef.detectChanges();
-                          }
-                        });
-                
-                        // Update customer lazy URL
-                        const customerField = field.parent?.fieldGroup?.find(f => f.key === 'customer');
-                        if (customerField?.props?.lazy) {
-                          const baseUrl = 'customers/customers/?summary=true';
-                          const customerUrl = isOtherType ? `${baseUrl}&bill_type=OTHERS` : baseUrl;
-                
-                          customerField.props.lazy.url = customerUrl;
-                          customerField.props.lazy.lazyOneTime = false;
-                          customerField.props.options = [];
-                          customerField.formControl.setValue(null);
-                
-                          // Force re-evaluation of customer field
-                          const customerKey = customerField.key;
-                          const parentGroup = field.parent?.fieldGroup;
-                          const index = parentGroup.findIndex(f => f.key === customerKey);
-                          if (index !== -1) {
-                            const removed = parentGroup.splice(index, 1)[0];
-                            setTimeout(() => {
-                              parentGroup.splice(index, 0, removed);
-                              this.cdRef.detectChanges();
-                            });
-                          }
-                        }
-                      });
                     }
                   }
-                },                                            
+                },                                  
                 {
                   key: 'customer',
                   type: 'select',
