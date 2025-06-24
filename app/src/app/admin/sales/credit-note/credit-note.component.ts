@@ -224,7 +224,7 @@ export class CreditNoteComponent {
                 placeholder: 'Select Sale Invoice',
                 dataKey: 'sale_invoice_id',
                 dataLabel: 'invoice_no',
-                required: false,
+                required: true,
                 options: [] // Initialize with empty options
               }
             },
