@@ -1585,13 +1585,10 @@ export class SalesComponent {
         const productDiscountPercent = Number(product.discount) || 0;
         const discountOnItems = (itemsValue * productDiscountPercent) / 100;
 
-        const totalCess = Number(saleOrderDetails.cess_amount) || 0;
-        const totalDiscount = Number(saleOrderDetails.dis_amt) || 0;
-        const selectedProductCount = productDetails.length;
-        const perOrderCess = selectedProductCount > 0 ? (totalCess / selectedProductCount) : 0;
-        const perOrderDiscount = selectedProductCount > 0 ? (totalDiscount / selectedProductCount) : 0;
+        const totalCess = 0;
+        const totalDiscount = 0;
 
-        const totalAmount = itemsValue - perOrderDiscount + taxAmount + perOrderCess - discountOnItems;
+        const totalAmount = itemsValue - totalDiscount  + taxAmount - discountOnItems + totalCess;
 
         const childSaleOrderPayload = {
           sale_order: {
@@ -1600,8 +1597,8 @@ export class SalesComponent {
             tax_amount: taxAmount,
             item_value: itemsValue,
             total_amount: totalAmount,
-            dis_amt: perOrderDiscount,
-            cess_amount: perOrderCess,
+            dis_amt: totalDiscount,
+            cess_amount: totalCess,
             flow_status: { flow_status_name: 'Production' }
           },
           sale_order_items: [product],
@@ -1668,12 +1665,12 @@ export class SalesComponent {
 
               const totalCess = Number(saleOrderDetails.cess_amount) || 0;
               const totalDiscount = Number(saleOrderDetails.dis_amt) || 0;
-              const totalItemCount = allProducts.length;
-              const remainingCount = remainingItems.length;
-              const updatedCessAmount = (totalCess / totalItemCount) * remainingCount;
-              const updatedOrderLevelDiscount = (totalDiscount / totalItemCount) * remainingCount;
+              // const totalItemCount = allProducts.length;
+              // const remainingCount = remainingItems.length;
+              // const updatedCessAmount = (totalCess / totalItemCount) * remainingCount;
+              // const updatedOrderLevelDiscount = (totalDiscount / totalItemCount) * remainingCount;
 
-              const updatedTotalAmount = updatedItemValue - updatedOrderLevelDiscount + updatedTaxAmount + updatedCessAmount - updatedProductDiscount;
+              const updatedTotalAmount = updatedItemValue - totalDiscount + updatedTaxAmount + totalCess - updatedProductDiscount;
 
               // ✅ Full PUT call to update parent sale order
               const finalPutPayload = {
@@ -1681,8 +1678,8 @@ export class SalesComponent {
                   ...saleOrderDetails,
                   item_value: updatedItemValue,
                   tax_amount: updatedTaxAmount,
-                  dis_amt: updatedOrderLevelDiscount,
-                  cess_amount: updatedCessAmount,
+                  dis_amt: totalDiscount,
+                  cess_amount: totalCess,
                   total_amount: updatedTotalAmount
                 },
                 sale_order_items: remainingItems,
