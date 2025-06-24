@@ -199,9 +199,9 @@ export class SalesComponent {
     });
     // set sale_order default value
     this.formConfig.model['sale_order']['order_type'] = 'sale_order';
-
-    // to get SaleOrder number for save 
+    
     this.getOrderNo();
+    // to get SaleOrder number for save 
     this.formConfig.fields[0].fieldGroup[0].fieldGroup[8].hide = true; //flow_status hiding in create page 
     this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = true;
     this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide = true;
@@ -1205,33 +1205,33 @@ export class SalesComponent {
   // }
 
   async autoFillProductDetails(field, data) {
-  this.productOptions = data;
-  console.log("Autofill data : ", this.productOptions)
-  if (!field.form?.controls || !data) return;
+    this.productOptions = data;
+    console.log("Autofill data : ", this.productOptions)
+    if (!field.form?.controls || !data) return;
 
-  const fieldMappings = {
-    // code: data.code,
-    code: data.code !== undefined
-      ? data.code
-      : field.form.controls.code.value,
-    rate: data.sales_rate ?? field.form.controls.rate.value,
-    // ✅ Key fix for discount:
-    discount: data.discount !== undefined
-      ? parseFloat(data.discount)
-      : field.form.controls.discount.value,
-    unit_options_id: data.unit_options?.unit_options_id,
-    print_name: data.print_name,
-    mrp: data.mrp
-  };
+    const fieldMappings = {
+      // code: data.code,
+      code: data.code !== undefined
+        ? data.code
+        : field.form.controls.code.value,
+      rate: data.sales_rate ?? field.form.controls.rate.value,
+      // ✅ Key fix for discount:
+      discount: data.discount !== undefined
+        ? parseFloat(data.discount)
+        : field.form.controls.discount.value,
+      unit_options_id: data.unit_options?.unit_options_id,
+      print_name: data.print_name,
+      mrp: data.mrp
+    };
 
-  Object.entries(fieldMappings).forEach(([key, value]) => {
-    if (value !== undefined) {
-      field.form.controls[key]?.setValue(value);
-    }
-  });
+    Object.entries(fieldMappings).forEach(([key, value]) => {
+      if (value !== undefined) {
+        field.form.controls[key]?.setValue(value);
+      }
+    });
 
-  this.totalAmountCal();
-}
+    this.totalAmountCal();
+  }
 
 
   createWorkOrder() {
@@ -1523,185 +1523,6 @@ export class SalesComponent {
     this.ngOnInit();
   }
 
-
-//=================================================================
-  // confirmWorkOrder() {
-  //   console.log("data1", this.selectedOrder);
-  //   if (this.selectedOrder) {
-  //       let { productDetails, saleOrderDetails, orderAttachments, orderShipments } = this.selectedOrder;
-
-  //       // 1. Check if all products are selected (auto-selection case)
-  //       const allProducts = this.formConfig.model.sale_order_items;
-  //       const isAllProductsSelected = productDetails.length === allProducts.length;
-
-  //       if (isAllProductsSelected) {
-  //           console.log("All products selected. Creating only work orders...");
-
-  //           this.http.post(`sales/SaleOrder/${saleOrderDetails.sale_order_id}/move_next_stage/`, {}).subscribe({
-  //               next: (updateResponse) => {
-  //                   console.log('Parent Sale Order updated to Production:', updateResponse);
-
-  //                   // Create Work Orders for all products (No child sale order)
-  //                   const processWorkOrders = productDetails.map((product) => {
-  //                       const workOrderPayload = {
-  //                           work_order: {
-  //                               product_id: product.product_id,
-  //                               quantity: product.quantity || 0,
-  //                               completed_qty: 0,
-  //                               pending_qty: product.quantity || 0,
-  //                               start_date: saleOrderDetails.order_date || new Date().toISOString().split('T')[0],
-  //                               sync_qty: true,
-  //                               size_id: product.size?.size_id || null,
-  //                               color_id: product.color?.color_id || null,
-  //                               status_id: '',
-  //                               sale_order_id: saleOrderDetails.sale_order_id // Link to parent sale order
-  //                           },
-  //                           bom: [
-  //                             {
-  //                               product_id: product.product_id,
-  //                               size_id: product.size?.size_id || null,
-  //                               color_id: product.color?.color_id || null,
-  //                             }
-  //                           ],
-  //                           work_order_machines: [],
-  //                           workers: [],
-  //                           work_order_stages: []
-  //                       };
-
-  //                       console.log('Work Order Payload:', workOrderPayload);
-
-  //                       return this.http.post('production/work_order/', workOrderPayload)
-                        
-  //                   });
-
-  //                   forkJoin(processWorkOrders).subscribe({
-  //                       next: () => {
-  //                           this.closeModalworkorder();
-  //                           console.log('Work Orders created successfully (without child sale orders)!');
-  //                       },
-  //                       error: (err) => {
-  //                           console.error('Error creating Work Orders:', err);
-  //                           alert('Failed to create Work Orders. Please try again.');
-  //                       }
-  //                   });
-  //               },
-  //               error: (err) => {
-  //                   console.error('Error updating Parent Sale Order:', err);
-  //               }
-  //           });
-  //       } else {
-  //           console.log("Partial products selected. Creating child sale orders & work orders...");
-
-  //           // If only some products are selected, create Child Sale Orders & Work Orders
-  //           const parentOrderNo = saleOrderDetails.order_no; // Parent order number
-  //           let childOrderCounter = 1;
-
-  //           const processProductRequests = productDetails.map((product) => {
-  //               const childOrderNo = `${parentOrderNo}-${childOrderCounter++}`;
-
-  //               // Create Child Sale Order
-  //               const childSaleOrderPayload = {
-  //                   sale_order: {
-  //                       order_no: childOrderNo,
-  //                       ref_no: saleOrderDetails.ref_no,
-  //                       sale_type_id: saleOrderDetails.sale_type_id,
-  //                       tax: saleOrderDetails.tax,
-  //                       cess_amount: saleOrderDetails.cess_amount,
-  //                       tax_amount: parseInt(product.igst) + parseInt(product.cgst) + parseInt(product.sgst),
-  //                       advance_amount: saleOrderDetails.advance_amount,
-  //                       total_amount: parseInt(product.amount) + parseInt(product.igst) + parseInt(product.cgst) + parseInt(product.sgst) - (parseInt(product.amount) * product.discount / 100),
-  //                       ledger_account_id: saleOrderDetails.ledger_account_id,
-  //                       order_status_id: saleOrderDetails.order_status_id,
-  //                       customer_id: saleOrderDetails.customer.customer_id,
-  //                       order_date: saleOrderDetails.order_date,
-  //                       ref_date: saleOrderDetails.ref_date,
-  //                       delivery_date: saleOrderDetails.delivery_date,
-  //                       order_type: 'sale_order',
-  //                       sale_estimate: saleOrderDetails.sale_estimate || 'No',
-  //                       flow_status: { flow_status_name: 'Production' }, // Set flow_status to 'Production'
-  //                       billing_address: saleOrderDetails.billing_address,
-  //                       shipping_address: saleOrderDetails.shipping_address,
-  //                       email: saleOrderDetails.email,
-  //                       remarks: saleOrderDetails.remarks || null
-  //                   },
-  //                   sale_order_items: [product], // Only selected product
-  //                   order_attachments: orderAttachments,
-  //                   order_shipments: orderShipments
-  //               };
-
-  //               console.log('Payload for child sale order:', childSaleOrderPayload);
-
-  //               return this.http.post('sales/sale_order/', childSaleOrderPayload).pipe(
-  //                   tap((childSaleOrderResponse: any) => {
-  //                       console.log(`Child Sale Order ${childOrderNo} created:`, childSaleOrderResponse);
-
-  //                       this.http.patch(`sales/sale_order_items/${product.sale_order_item_id}/`, { work_order_created: 'YES' })
-  //                           .subscribe({
-  //                               next: () => console.log(`Product ${product.product_id} marked as Work Order Created in Parent Sale Order`),
-  //                               error: (err) => console.error('Error updating work order status:', err)
-  //                           });
-
-  //                       // Create Work Order linked to Child Sale Order
-  //                       const workOrderPayload = {
-  //                           work_order: {
-  //                               product_id: product.product_id,
-  //                               quantity: product.quantity || 0,
-  //                               completed_qty: 0,
-  //                               pending_qty: product.quantity || 0,
-  //                               start_date: saleOrderDetails.order_date || new Date().toISOString().split('T')[0],
-  //                               sync_qty: true,
-  //                               size_id: product.size?.size_id || null,
-  //                               color_id: product.color?.color_id || null,
-  //                               status_id: '',
-  //                               sale_order_id: childSaleOrderResponse.data.sale_order.sale_order_id // Link to child sale order
-  //                           },
-  //                           bom: [
-  //                             {
-  //                               product_id: product.product_id,
-  //                               size_id: product.size?.size_id || null,
-  //                               color_id: product.color?.color_id || null,
-  //                             }
-  //                           ],
-  //                           work_order_machines: [],
-  //                           workers: [],
-  //                           work_order_stages: []
-  //                       };
-
-  //                       console.log('Work Order Payload:', workOrderPayload);
-
-  //                       this.http.post('production/work_order/', workOrderPayload).subscribe({
-  //                           next: (workOrderResponse) => {
-  //                               console.log('Work Order created:', workOrderResponse);
-  //                               this.showSuccessToast = true;
-  //                               this.toastMessage = "WorkOrder & Child Sale Order created"; // Set the toast message for update
-  //                               setTimeout(() => {
-  //                                 this.showSuccessToast = false;
-  //                               }, 3000);
-  //                           },
-  //                           error: (err) => {
-  //                               console.error('Error creating Work Order:', err);
-  //                           }
-  //                       });
-  //                   })
-  //               );
-  //           });
-
-  //           // 5. Process all child sale orders & work orders
-  //           forkJoin(processProductRequests).subscribe({
-  //               next: () => {
-  //                   this.closeModalworkorder();
-  //                   console.log('Child Sale Orders and Work Orders created successfully!');
-  //               },
-  //               error: (err) => {
-  //                   console.error('Error processing products:', err);
-  //                   alert('Failed to create Child Sale Orders or Work Orders. Please try again.');
-  //               }
-  //           });
-  //       }
-  //   }
-  //   this.ngOnInit();
-  // };
-
   getUnitData(unitInfo) {
     const unitOption = unitInfo.unit_options?.unit_name ?? 'NA';
     const stockUnit = unitInfo.stock_unit?.stock_unit_name ?? 'NA';
@@ -1859,92 +1680,6 @@ export class SalesComponent {
               className: 'col-lg-9 col-md-8 col-12 p-0',
               fieldGroupClassName: "ant-row mx-0 row align-items-end mt-2",
               fieldGroup: [
-                // {
-                //   key: 'sale_type',
-                //   type: 'select',
-                //   className: 'col-md-4 col-sm-6 col-12',
-                //   templateOptions: {
-                //     label: 'Sale type',
-                //     dataKey: 'sale_type_id',
-                //     dataLabel: 'name',
-                //     required: true,
-                //     options: [],
-                //     lazy: {
-                //       url: 'masters/sale_types/',
-                //       lazyOneTime: true
-                //     },
-                //   },
-                //   hooks: {
-                //     onInit: (field: any) => {
-                //       const lazyUrl = field.templateOptions.lazy.url;
-                //       this.http.get(lazyUrl).subscribe((response: any) => {
-                //         const saleTypes = response.data;
-                //         field.templateOptions.options = saleTypes;
-
-                //         const currentSaleTypeId = this.formConfig.model?.sale_order?.sale_type_id;
-                //         if (currentSaleTypeId) {
-                //           const matchedOption = saleTypes.find(opt => opt.sale_type_id === currentSaleTypeId);
-                //           if (matchedOption) {
-                //             field.formControl.setValue(matchedOption, { emitEvent: false });
-                //           }
-                //         } else {
-                //           const defaultOption = saleTypes.find(option => option.name === 'Advance Order');
-                //           if (defaultOption) {
-                //             field.formControl.setValue(defaultOption, { emitEvent: false });
-                //             this.formConfig.model['sale_order']['sale_type_id'] = defaultOption.sale_type_id;
-                //           }
-                //         }
-                //       });
-
-                //       let orderGenerated = false; // ensures single API call
-
-                //       field.formControl.valueChanges.subscribe((data: any) => {
-                //         if (data && data.sale_type_id) {
-                //           this.formConfig.model['sale_order']['sale_type_id'] = data.sale_type_id;
-
-                //           // Generate order_no once on create
-                //           if (!this.SaleOrderEditID && !orderGenerated) {
-                //             orderGenerated = true;
-                //             const prefix = data.name === 'Other' ? 'SOO' : 'SO';
-                //             this.http.get(`masters/generate_order_no/?type=${prefix}`).subscribe((res: any) => {
-                //               if (res?.data?.order_number) {
-                //                 this.orderNumber = res.data.order_number;
-                //                 this.formConfig.model['sale_order']['order_no'] = this.orderNumber;
-                //                 field.form.controls.order_no.setValue(this.orderNumber);
-                //                 this.cdRef.detectChanges();
-                //               }
-                //             });
-                //           }
-
-                //           // Update and refresh customer field
-                //           const customerField = field.parent?.fieldGroup?.find(f => f.key === 'customer');
-                //           if (customerField?.props?.lazy) {
-                //             const baseUrl = 'customers/customers/?summary=true';
-                //             const customerUrl = data.name === 'Other' ? `${baseUrl}&sale_type=Other` : baseUrl;
-
-                //             customerField.props.lazy.url = customerUrl;
-                //             customerField.props.lazy.lazyOneTime = false;
-                //             customerField.props.options = [];
-
-                //             const existingCustomer = this.formConfig.model?.sale_order?.customer;
-                //             customerField.formControl.setValue(existingCustomer || null);
-
-                //             const customerKey = customerField.key;
-                //             const parentGroup = field.parent?.fieldGroup;
-                //             const index = parentGroup.findIndex(f => f.key === customerKey);
-                //             if (index !== -1) {
-                //               const removed = parentGroup.splice(index, 1)[0];
-                //               setTimeout(() => {
-                //                 parentGroup.splice(index, 0, removed);
-                //                 this.cdRef.detectChanges();
-                //               });
-                //             }
-                //           }
-                //         }
-                //       });
-                //     }
-                //   }
-                // },  
                 {
                   key: 'sale_type',
                   type: 'select',
@@ -1954,43 +1689,104 @@ export class SalesComponent {
                     dataKey: 'sale_type_id',
                     dataLabel: 'name',
                     required: true,
-                    options: [], // Options will be populated dynamically
+                    options: [],
                     lazy: {
                       url: 'masters/sale_types/',
                       lazyOneTime: true
-                    }
+                    },
                   },
                   hooks: {
                     onInit: (field: any) => {
-                      // Fetch data from the API
                       const lazyUrl = field.templateOptions.lazy.url;
                       this.http.get(lazyUrl).subscribe((response: any) => {
                         const saleTypes = response.data;
-
-                        // Populate the options dynamically
                         field.templateOptions.options = saleTypes;
 
-                        // Find the option with name "Advance Order"
-                        const defaultOption = saleTypes.find(
-                          (option: any) => option.name === 'Advance Order'
-                        );
-
-                        // Set the default value if "Advance Order" exists
-                        if (defaultOption) {
-                          field.formControl.setValue(defaultOption);
+                        const currentSaleTypeId = this.formConfig.model?.sale_order?.sale_type_id;
+                        if (currentSaleTypeId) {
+                          const matchedOption = saleTypes.find(opt => opt.sale_type_id === currentSaleTypeId);
+                          if (matchedOption) {
+                            field.formControl.setValue(matchedOption, { emitEvent: false });
+                          }
+                        } else {
+                          const defaultOption = saleTypes.find(option => option.name === 'Advance Order');
+                          if (defaultOption) {
+                            field.formControl.setValue(defaultOption, { emitEvent: false });
+                            this.formConfig.model['sale_order']['sale_type_id'] = defaultOption.sale_type_id;
+                          }
                         }
                       });
 
-                      // Handle value changes
+                      let orderGenerated = false; // ensures single API call
+
                       field.formControl.valueChanges.subscribe((data: any) => {
-                        console.log('Selected sale_type:', data);
                         if (data && data.sale_type_id) {
                           this.formConfig.model['sale_order']['sale_type_id'] = data.sale_type_id;
+
+                          // Generate order_no once on create
+                          if (!this.SaleOrderEditID && !orderGenerated) {
+                            orderGenerated = true;
+                            const prefix = data.name === 'Other' ? 'SOO' : 'SO';
+                            this.http.get(`masters/generate_order_no/?type=${prefix}`).subscribe((res: any) => {
+                              if (res?.data?.order_number) {
+                                this.orderNumber = res.data.order_number;
+                                this.formConfig.model['sale_order']['order_no'] = this.orderNumber;
+                                field.form.controls.order_no.setValue(this.orderNumber);
+                                this.cdRef.detectChanges();
+                              }
+                            });
+                          }
                         }
                       });
                     }
                   }
-                },                                                                        
+                },  
+                // {
+                //   key: 'sale_type',
+                //   type: 'select',
+                //   className: 'col-md-4 col-sm-6 col-12',
+                //   templateOptions: {
+                //     label: 'Sale type',
+                //     dataKey: 'sale_type_id',
+                //     dataLabel: 'name',
+                //     required: true,
+                //     options: [], // Options will be populated dynamically
+                //     lazy: {
+                //       url: 'masters/sale_types/',
+                //       lazyOneTime: true
+                //     }
+                //   },
+                //   hooks: {
+                //     onInit: (field: any) => {
+                //       // Fetch data from the API
+                //       const lazyUrl = field.templateOptions.lazy.url;
+                //       this.http.get(lazyUrl).subscribe((response: any) => {
+                //         const saleTypes = response.data;
+
+                //         // Populate the options dynamically
+                //         field.templateOptions.options = saleTypes;
+
+                //         // Find the option with name "Advance Order"
+                //         const defaultOption = saleTypes.find(
+                //           (option: any) => option.name === 'Advance Order'
+                //         );
+
+                //         // Set the default value if "Advance Order" exists
+                //         if (defaultOption) {
+                //           field.formControl.setValue(defaultOption);
+                //         }
+                //       });
+
+                //       // Handle value changes
+                //       field.formControl.valueChanges.subscribe((data: any) => {
+                //         console.log('Selected sale_type:', data);
+                //         if (data && data.sale_type_id) {
+                //           this.formConfig.model['sale_order']['sale_type_id'] = data.sale_type_id;
+                //         }
+                //       });
+                //     }
+                //   }
+                // },                                                                        
                 {
                   key: 'customer',
                   type: 'select',
@@ -2180,14 +1976,46 @@ export class SalesComponent {
                               const completedStatus = statusRes?.data?.[0];
                               const completedStatusId = completedStatus?.order_status_id;
                 
-                              const totalAmount = () => {
-                                if (!Array.isArray(saleOrderItems) || saleOrderItems.length === 0) return 0;
-                                return saleOrderItems.reduce((sum, item) => {
+                              // ✅ Inline total calculation
+                              let itemValue = 0;
+                              let amountTotal = 0;
+
+                              if (Array.isArray(saleOrderItems)) {
+                                saleOrderItems.forEach(item => {
                                   const quantity = Number(item.quantity) || 0;
                                   const rate = Number(item.rate) || 0;
-                                  return sum + (quantity * rate);
-                                }, 0);
-                              };
+                                  const discountPercent = Number(item.discount) || 0;
+                                  console.log("discountPercent : ", discountPercent)
+                                  const itemVal = quantity * rate;
+                                  const itemDiscount = (itemVal * discountPercent) / 100;
+                                  const amount = itemVal - itemDiscount;
+                                  console.log("amount : ", amount)
+
+                                  item.amount = amount;
+
+                                  itemValue += itemVal;
+                                  amountTotal += amount;
+                                });
+                              }
+
+                              const totalTax = saleOrderItems.reduce((sum, item) => {
+                                const cgst = Number(item.cgst) || 0;
+                                const igst = Number(item.igst) || 0;
+                                const sgst = Number(item.sgst) || 0;
+                                return sum + cgst + igst + sgst;
+                              }, 0);
+
+                              // const cessAmount = Number(saleOrder.cess_amount) || 0;
+                              // const disAmt = Number(saleOrder.dis_amt) || 0;
+                              // console.log("disAmt : ", disAmt)
+
+                              const totalAmount = amountTotal + totalTax + saleOrder.cess_amount - saleOrder.dis_amt;
+
+                              // saleOrder.dis_amt = disAmt;
+                              saleOrder.item_value = itemValue;
+                              console.log("saleOrder.item_value : ", saleOrder.item_value)
+                              saleOrder.total_amount = totalAmount;
+                              console.log("saleOrder.total_amount : ", saleOrder.total_amount)
                 
                               this.invoiceData = {
                                 sale_invoice_order: {
@@ -2200,14 +2028,14 @@ export class SalesComponent {
                                   tax: saleOrder.tax || 'Inclusive',
                                   remarks: saleOrder.remarks,
                                   advance_amount: saleOrder.advance_amount || '0',
-                                  item_value: totalAmount(),
+                                  item_value: saleOrder.item_value,
                                   discount: saleOrder.discount,
                                   dis_amt: saleOrder.dis_amt,
                                   taxable: saleOrder.taxable,
                                   cess_amount: saleOrder.cess_amount,
                                   transport_charges: saleOrder.transport_charges,
                                   round_off: saleOrder.round_off,
-                                  total_amount: totalAmount(),
+                                  total_amount: totalAmount,
                                   vehicle_name: saleOrder.vehicle_name,
                                   total_boxes: saleOrder.total_boxes,
                                   shipping_address: saleOrder.shipping_address,
@@ -2226,7 +2054,11 @@ export class SalesComponent {
                                   sale_order_id: saleOrder.sale_order_id,
                                   ...(billType == 'OTHERS' && { invoice_no: this.invoiceNumber})
                                 },
-                                sale_invoice_items: saleOrderItems,
+                                // sale_invoice_items: saleOrderItems,
+                                sale_invoice_items: saleOrderItems.map(item => ({
+                                  ...item,
+                                  discount: item.discount
+                                })),
                                 order_attachments: orderAttachments,
                                 order_shipments: orderShipments
                               };
@@ -2238,208 +2070,7 @@ export class SalesComponent {
                       });
                     }
                   }
-                },      
-                // {
-                //   key: 'flow_status',
-                //   type: 'select',
-                //   className: 'col-md-4 col-sm-6 col-12',
-                //   templateOptions: {
-                //     label: 'Flow status',
-                //     dataKey: 'flow_status_id',
-                //     dataLabel: 'flow_status_name',
-                //     lazy: {
-                //       url: 'masters/flow_status/',
-                //       lazyOneTime: true
-                //     }
-                //   },
-                //   hooks: {
-                //     onChanges: (field: any) => {
-                //       field.formControl.valueChanges.subscribe(data => {
-                //         if (data && data.flow_status_id) {
-                //           this.formConfig.model['sale_order']['flow_status_id'] = data.flow_status_id;
-                //         }
-                //       });
-                
-                //       const valueChangesSubscription = field.formControl.valueChanges.subscribe(data => {
-                //         const saleOrder = this.formConfig.model['sale_order'];
-                //         console.log("saleOrder : ", saleOrder);
-                //         const saleOrderItems = this.formConfig.model['sale_order_items'];
-                //         const orderAttachments = this.formConfig.model['order_attachments'];
-                //         const orderShipments = this.formConfig.model['order_shipments'];
-                
-                //         const saleTypeObj = saleOrder.sale_type;
-                //         const saleTypeName = saleTypeObj?.name || '';
-                //         const billType = (saleTypeName === 'Other') ? 'OTHERS' : 'CASH';
-                //         const invoicePrefix = (saleTypeName === 'Other') ? 'SOO-INV' : 'SO-INV';
-                
-                //         this.http.get(`masters/generate_order_no/?type=${invoicePrefix}`).subscribe((res: any) => {
-                //           if (res?.data?.order_number) {
-                //             this.invoiceNumber = res.data.order_number;
-                
-                //             // Fetch order_status_id by status_name = "Completed"
-                //             this.http.get('masters/order_status/?status_name=Completed').subscribe((statusRes: any) => {
-                //               const completedStatus = statusRes?.data?.[0];
-                //               const completedStatusId = completedStatus?.order_status_id;
-                
-                //               const totalAmount = () => {
-                //                 if (!Array.isArray(saleOrderItems) || saleOrderItems.length === 0) return 0;
-                //                 return saleOrderItems.reduce((sum, item) => {
-                //                   const quantity = Number(item.quantity) || 0;
-                //                   const rate = Number(item.rate) || 0;
-                //                   return sum + (quantity * rate);
-                //                 }, 0);
-                //               };
-                
-                //               this.invoiceData = {
-                //                 sale_invoice_order: {
-                //                   ...(saleTypeName === 'Other' && { invoice_no: this.invoiceNumber }),
-                //                   bill_type: billType,
-                //                   invoice_date: this.nowDate(),
-                //                   email: saleOrder.email,
-                //                   customer: saleOrder.customer,
-                //                   ref_no: saleOrder.ref_no,
-                //                   ref_date: this.nowDate(),
-                //                   tax: saleOrder.tax || 'Inclusive',
-                //                   remarks: saleOrder.remarks,
-                //                   advance_amount: saleOrder.advance_amount || '0',
-                //                   item_value: totalAmount(),
-                //                   discount: saleOrder.discount,
-                //                   dis_amt: saleOrder.dis_amt,
-                //                   taxable: saleOrder.taxable,
-                //                   cess_amount: saleOrder.cess_amount,
-                //                   transport_charges: saleOrder.transport_charges,
-                //                   round_off: saleOrder.round_off,
-                //                   total_amount: totalAmount(),
-                //                   vehicle_name: saleOrder.vehicle_name,
-                //                   total_boxes: saleOrder.total_boxes,
-                //                   shipping_address: saleOrder.shipping_address,
-                //                   billing_address: saleOrder.billing_address,
-                //                   customer_id: saleOrder.customer?.customer_id,
-                //                   gst_type_id: saleOrder.gst_type_id,
-                //                   order_type: saleOrder.order_type || 'sale_invoice',
-                //                   order_salesman_id: saleOrder.order_salesman_id,
-                //                   customer_address_id: saleOrder.customer_address_id,
-                //                   payment_term_id: saleOrder.payment_term_id,
-                //                   payment_link_type_id: saleOrder.payment_link_type_id,
-                //                   ledger_account_id: saleOrder.ledger_account_id,
-                //                   flow_status: saleOrder.flow_status,
-                //                   order_status_id: completedStatusId,
-                //                   sale_order_id:saleOrder.sale_order_id,
-                //                   ...(saleTypeName !== 'Other' && { sale_order_id: saleOrder.sale_order_id }),
-                                  
-                //                   // ✅ Tell backend to create in mstcnl DB
-                //                   ...(saleTypeName === 'Other' && { db: 'mstcnl' })
-                //                 },
-                //                 sale_invoice_items: saleOrderItems,
-                //                 order_attachments: orderAttachments,
-                //                 order_shipments: orderShipments
-                //               };
-                
-                //               console.log('invoiceData:', this.invoiceData);
-                //             });
-                //           }
-                //         });
-                //       });
-                //     }
-                //   }
-                // },    
-                // {
-                //   key: 'flow_status',
-                //   type: 'select',
-                //   className: 'col-md-4 col-sm-6 col-12',
-                //   templateOptions: {
-                //     label: 'Flow status',
-                //     dataKey: 'flow_status_id',
-                //     dataLabel: 'flow_status_name',
-                //     // placeholder: 'Select Order status type',
-                //     lazy: {
-                //       url: 'masters/flow_status/',
-                //       lazyOneTime: true
-                //     },
-                //     // expressions: {
-                //     //   hide: '!model.sale_order_id',
-                //     // },
-                //   },
-                //   hooks: {
-                //     onChanges: (field: any) => {
-                //       field.formControl.valueChanges.subscribe(data => {
-                //         //console.log("ledger_account", data);
-                //         if (data && data.flow_status_id) {
-                //           this.formConfig.model['sale_order']['flow_status_id'] = data.flow_status_id;
-                //         }
-                //       });
-                //       const valueChangesSubscription = field.formControl.valueChanges.subscribe(data => {
-                //         const saleOrder = this.formConfig.model['sale_order'];
-                //         console.log("Sale order: ", saleOrder);
-
-                //         // Prepare invoice data
-                //         const saleOrderItems = this.formConfig.model['sale_order_items'];
-                //         const orderAttachments = this.formConfig.model['order_attachments'];
-                //         const orderShipments = this.formConfig.model['order_shipments'];
-                //         // const CustomFields = this.formConfig.model['custom_field_values'];
-                //         // console.log("CustomFields : ", CustomFields)
-
-                //         const totalAmount = () => {
-                //           if (!Array.isArray(saleOrderItems) || saleOrderItems.length === 0) {
-                //             console.log("No items found, returning 0");
-                //             return 0;
-                //           }
-                        
-                //           return saleOrderItems.reduce((sum, item) => {
-                //             const quantity = Number(item.quantity) || 0;
-                //             const rate = Number(item.rate) || 0; // Convert rate to a number
-                        
-                //             // console.log(`Calculating: ${quantity} * ${rate} = ${quantity * rate}`);
-                //             return sum + (quantity * rate);
-                //           }, 0);
-                //         };
-                        
-                //         this.invoiceData = {
-                //           sale_invoice_order: {
-                //             bill_type: saleOrder.bill_type || 'CASH',
-                //             sale_order_id: saleOrder.sale_order_id,
-                //             invoice_date: this.nowDate(),
-                //             email: saleOrder.email,
-                //             ref_no: saleOrder.ref_no,
-                //             ref_date: this.nowDate(),
-                //             tax: saleOrder.tax || 'Inclusive',
-                //             remarks: saleOrder.remarks,
-                //             advance_amount: saleOrder.advance_amount || '0',
-                //             item_value: totalAmount(),
-                //             discount: saleOrder.discount,
-                //             dis_amt: saleOrder.dis_amt,
-                //             taxable: saleOrder.taxable,
-                //             // tax_amount: saleOrder.tax_amount,
-                //             cess_amount: saleOrder.cess_amount,
-                //             transport_charges: saleOrder.transport_charges,
-                //             round_off: saleOrder.round_off,
-                //             total_amount: totalAmount(),
-                //             vehicle_name: saleOrder.vehicle_name,
-                //             total_boxes: saleOrder.total_boxes,
-                //             shipping_address: saleOrder.shipping_address,
-                //             billing_address: saleOrder.billing_address,
-                //             customer: saleOrder.customer,
-                //             customer_id: saleOrder.customer.customer_id,
-                //             gst_type_id: saleOrder.gst_type_id,
-                //             order_type: saleOrder.order_type || 'sale_invoice',
-                //             order_salesman_id: saleOrder.order_salesman_id,
-                //             customer_address_id: saleOrder.customer_address_id,
-                //             payment_term_id: saleOrder.payment_term_id,
-                //             payment_link_type_id: saleOrder.payment_link_type_id,
-                //             ledger_account_id: saleOrder.ledger_account_id,
-                //             flow_status: saleOrder.flow_status,
-                //             order_status_id: '717c922f-c092-4d40-94e7-6a12d7095600'
-                //           },
-                //           sale_invoice_items: saleOrderItems,
-                //           order_attachments: orderAttachments,
-                //           order_shipments: orderShipments
-                //         };
-
-                //         console.log('invoiceData:', this.invoiceData);
-                //       });
-                //     }
-                //   }
-                // },                                     
+                },                                          
                 {
                   key: 'use_workflow',
                   type: 'checkbox',
@@ -3045,7 +2676,7 @@ export class SalesComponent {
                       if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
                         const existingDisc = this.dataToPopulate.sale_order_items[currentRowIndex].discount;
                         console.log("existingDisc : ", existingDisc)
-                        // ✅ Just update this condition to include zeroes
+                        // Just update this condition to include zeroes
                         if (existingDisc) {
                           field.formControl.setValue(existingDisc);
                         }
