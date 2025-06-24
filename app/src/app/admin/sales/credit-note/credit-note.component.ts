@@ -39,10 +39,19 @@ export class CreditNoteComponent {
     this.showForm = true;
     this.SaleCreditnoteEditID = null;
 
+    // Clear invoice options
+    // this.invoiceOptions = [];
 
     this.setFormConfig();
     this.getOrderNo();
     this.formConfig.fields[0].fieldGroup[5].hide = true;
+
+    // // Reset form model
+    // if (this.formConfig.model && this.formConfig.model.sale_credit_note) {
+    //   this.formConfig.model.sale_credit_note = {
+    //     credit_note_number: this.orderNumber
+    //   };
+    // }
 
     // Check if there's a message in localStorage
     const message = localStorage.getItem('sidebarMessage');
@@ -222,10 +231,11 @@ export class CreditNoteComponent {
               templateOptions: {
                 label: 'Sale Invoice',
                 placeholder: 'Select Sale Invoice',
-                dataKey: 'sale_invoice_id',
-                dataLabel: 'invoice_no',
+                valueProp: 'sale_invoice_id',  // Important - specify the value field
+                labelProp: 'invoice_no',       // Important - specify the display field
                 required: true,
-                options: [] // Initialize with empty options
+                options: [],
+                // compareWith: this.compareWith  // Add the compare function
               }
             },
             {
@@ -492,12 +502,13 @@ export class CreditNoteComponent {
       (res: any) => {
         console.log("Response from API:", res);
         if (res && Array.isArray(res.data)) {
-          this.invoiceOptions = res.data.map((invoice: any) => ({
-            value: invoice.sale_invoice_id,
-            label: invoice.invoice_no
-          }));  
+          // this.invoiceOptions = res.data.map((invoice: any) => ({
+          //   value: invoice.sale_invoice_id,
+          //   label: invoice.invoice_no
+          // }));  
+          this.invoiceOptions = res.data;
           const invoiceField = this.formConfig.fields.flatMap(field => field.fieldGroup || []).find(field => field.key === 'sale_invoice_id');
-  
+
           if (invoiceField) {
             invoiceField.templateOptions.options = this.invoiceOptions;
             console.log("Updated Invoice Field Options: ", invoiceField.templateOptions.options);
