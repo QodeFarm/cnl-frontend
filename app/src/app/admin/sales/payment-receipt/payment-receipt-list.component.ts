@@ -37,28 +37,8 @@ export class PaymentReceiptListComponent {
         sort: true
       },
       {
-        fieldKey: 'invoice_date',
-        name: 'Invoice Date',
-        sort: true
-      },
-      {
-        fieldKey: 'due_date',
-        name: 'Due Date',
-        sort: true
-      },
-      {
         fieldKey: 'payment_receipt_no',
         name: 'Receipt No',
-        sort: true
-      },
-      {
-        fieldKey: 'payment_date',
-        name: 'Payment Date',
-        sort: true
-      },
-      {
-        fieldKey: 'payment_method',
-        name: 'Payment Method',
         sort: true
       },
       {
@@ -94,27 +74,9 @@ export class PaymentReceiptListComponent {
         sort: true
       },
       {
-        fieldKey: 'ref_date',
-        name: 'Reference Date',
+        fieldKey: 'payment_date',
+        name: 'Payment Date',
         sort: true
-      },
-      {
-        fieldKey: 'taxable',
-        name: 'Taxable',
-        sort: true,
-        displayType: 'map',
-        mapFn: (currentValue: any) => {
-          return currentValue ? `${currentValue}` : 'N/A';
-        }
-      },
-      {
-        fieldKey: 'tax_amount',
-        name: 'Tax Amount',
-        sort: true,
-        displayType: 'map',
-        mapFn: (currentValue: any) => {
-          return currentValue ? `₹${currentValue}` : '₹0.00';
-        }
       },
       {
         fieldKey: "code",
