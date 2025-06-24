@@ -73,13 +73,6 @@ export class PaymentReceiptComponent implements OnInit {
           mapFn: (val: any) => val || 'No due date'
         },
         { 
-          fieldKey: 'bill_type', 
-          name: 'Bill Type', 
-          sort: true,
-          displayType: 'map',
-          mapFn: (val: any) => val || 'N/A'
-        },
-        { 
           fieldKey: 'total_amount', 
           name: 'Total Amount', 
           sort: true,
@@ -106,13 +99,6 @@ export class PaymentReceiptComponent implements OnInit {
           sort: true,
           displayType: 'map',
           mapFn: (val: any) => val || '0.00'
-        },
-        { 
-          fieldKey: 'ref_no', 
-          name: 'Ref No', 
-          sort: true,
-          displayType: 'map',
-          mapFn: (val: any) => val || 'No reference'
         },
         { 
           fieldKey: 'ref_date', 
