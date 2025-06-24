@@ -22,7 +22,7 @@ export class CreditNoteComponent {
   loading = false;
   showForm: boolean = false;
   SaleCreditnoteEditID: any;
-  productOptions: any;
+  // productOptions: any;
   customerDetails: Object;
   customerOrders: any[] = []; 
   invoiceOptions: any[] = [];
@@ -68,7 +68,7 @@ export class CreditNoteComponent {
     console.log("Sale return id in edit : ", saleCreditId);
     const saleCreditPayload = {
       sale_credit_note: this.formConfig.model.sale_credit_note,
-      sale_credit_note_items: this.formConfig.model.sale_credit_note_items
+      // sale_credit_note_items: this.formConfig.model.sale_credit_note_items
     };
 
     // PUT request to update Sale Return Order
@@ -162,13 +162,13 @@ export class CreditNoteComponent {
         viewMode: false
       },
       showActionBtn: true,
-      exParams: [
-        {
-          key: 'sale_credit_note_items',
-          type: 'script',
-          value: 'data.sale_credit_note_items.map(m=> {m.product_id = m.product.product_id;  return m ;})'
-        }
-      ],
+      // exParams: [
+      //   {
+      //     key: 'sale_credit_note_items',
+      //     type: 'script',
+      //     value: 'data.sale_credit_note_items.map(m=> {m.product_id = m.product.product_id;  return m ;})'
+      //   }
+      // ],
       submit: {
         label: 'Submit',
         submittedFn: () => this.onSubmit()
@@ -180,7 +180,7 @@ export class CreditNoteComponent {
       },
       model: {
         sale_credit_note: {},
-        sale_credit_note_items: [{}]
+        // sale_credit_note_items: [{}]
       },
       fields: [
         {
@@ -224,7 +224,7 @@ export class CreditNoteComponent {
                 placeholder: 'Select Sale Invoice',
                 dataKey: 'sale_invoice_id',
                 dataLabel: 'invoice_no',
-                required: true,
+                required: false,
                 options: [] // Initialize with empty options
               }
             },
@@ -302,128 +302,128 @@ export class CreditNoteComponent {
             },
           ]
         },
-        {
-          key: 'sale_credit_note_items',
-          type: 'table',
-          className: 'custom-form-list product-table',
-          templateOptions: {
-            title: 'Products',
-            addText: 'Add Product',
-            tableCols: [
-              {
-                name: 'product',
-                label: 'Product'
-              },
-              {
-                name: 'quantity',
-                label: 'Quantity'
-              },
-              {
-                name: 'total_price',
-                label: 'Price'
-              },
-              {
-                name: 'price_per_unit',
-                label: 'Rate'
-              }
-            ]
-          },
-          fieldArray: {
-            fieldGroup: [
-              {
-                key: 'product',
-                type: 'select',
-                templateOptions: {
-                  label: 'Select Product',
-                  dataKey: 'product_id',
-                  hideLabel: true,
-                  dataLabel: 'name',
-                  options: [],
-                  required: true,
-                  lazy: {
-                    url: 'products/products/?summary=true',
-                    lazyOneTime: true
-                  }
-                },
-                hooks: {
-                  onInit: (field: any) => {
-                    field.formControl.valueChanges.subscribe(data => {
-                      // this.productOptions = data;
-                      if (field.form && field.form.controls && field.form.controls.price_per_unit && data && data.mrp) {
-                        field.form.controls.price_per_unit.setValue(field.form.controls.price_per_unit.value || data.sales_rate)
-                      }
-                    });
-                  }
-                }
-              },
-              {
-                type: 'input',
-                key: 'quantity',
-                templateOptions: {
-                  type: 'number',
-                  label: 'Qty',
-                  placeholder: 'Enter Qty',
-                  min: 1,
-                  hideLabel: true,
-                  required: true
-                },
-                hooks: {
-                  onInit: (field: any) => {
-                    field.formControl.valueChanges.subscribe(quantity => {
-                      const price_per_unit = field.form.controls.price_per_unit.value;
-                      if (price_per_unit && quantity) {
-                        const total_price = parseFloat(price_per_unit) * parseFloat(quantity);
-                        field.form.controls.total_price.setValue(total_price);
-                      }
-                    });
-                  }
-                }
-              },              
-              {
-                type: 'input',
-                key: 'price_per_unit',
-                templateOptions: {
-                  type: 'number',
-                  label: 'Rate',
-                  placeholder: 'Enter Rate',
-                  hideLabel: true,
-                },
-                hooks: {
-                  onInit: (field: any) => {
-                    field.formControl.valueChanges.subscribe(price_per_unit => {
-                      const quantity = field.form.controls.quantity.value;
-                      if (price_per_unit && quantity) {
-                        const total_price = parseFloat(price_per_unit) * parseFloat(quantity);
-                        field.form.controls.total_price.setValue(total_price);
-                      }
-                    });
-                  }
-                }
-              },              
-              {
-                key: 'total_price',
-                type: 'input',
-                templateOptions: {
-                  type: 'number',
-                  label: 'Amount',
-                  placeholder: 'Enter Amount',
-                  hideLabel: true,
-                  disabled: true
-                },
-              },
-            ]
-          },
-        },
+        // {
+        //   key: 'sale_credit_note_items',
+        //   type: 'table',
+        //   className: 'custom-form-list product-table',
+        //   templateOptions: {
+        //     title: 'Products',
+        //     addText: 'Add Product',
+        //     tableCols: [
+        //       {
+        //         name: 'product',
+        //         label: 'Product'
+        //       },
+        //       {
+        //         name: 'quantity',
+        //         label: 'Quantity'
+        //       },
+        //       {
+        //         name: 'total_price',
+        //         label: 'Price'
+        //       },
+        //       {
+        //         name: 'price_per_unit',
+        //         label: 'Rate'
+        //       }
+        //     ]
+        //   },
+        //   fieldArray: {
+        //     fieldGroup: [
+        //       {
+        //         key: 'product',
+        //         type: 'select',
+        //         templateOptions: {
+        //           label: 'Select Product',
+        //           dataKey: 'product_id',
+        //           hideLabel: true,
+        //           dataLabel: 'name',
+        //           options: [],
+        //           required: true,
+        //           lazy: {
+        //             url: 'products/products/?summary=true',
+        //             lazyOneTime: true
+        //           }
+        //         },
+        //         hooks: {
+        //           onInit: (field: any) => {
+        //             field.formControl.valueChanges.subscribe(data => {
+        //               // this.productOptions = data;
+        //               if (field.form && field.form.controls && field.form.controls.price_per_unit && data && data.mrp) {
+        //                 field.form.controls.price_per_unit.setValue(field.form.controls.price_per_unit.value || data.sales_rate)
+        //               }
+        //             });
+        //           }
+        //         }
+        //       },
+        //       {
+        //         type: 'input',
+        //         key: 'quantity',
+        //         templateOptions: {
+        //           type: 'number',
+        //           label: 'Qty',
+        //           placeholder: 'Enter Qty',
+        //           min: 1,
+        //           hideLabel: true,
+        //           required: true
+        //         },
+        //         hooks: {
+        //           onInit: (field: any) => {
+        //             field.formControl.valueChanges.subscribe(quantity => {
+        //               const price_per_unit = field.form.controls.price_per_unit.value;
+        //               if (price_per_unit && quantity) {
+        //                 const total_price = parseFloat(price_per_unit) * parseFloat(quantity);
+        //                 field.form.controls.total_price.setValue(total_price);
+        //               }
+        //             });
+        //           }
+        //         }
+        //       },              
+        //       {
+        //         type: 'input',
+        //         key: 'price_per_unit',
+        //         templateOptions: {
+        //           type: 'number',
+        //           label: 'Rate',
+        //           placeholder: 'Enter Rate',
+        //           hideLabel: true,
+        //         },
+        //         hooks: {
+        //           onInit: (field: any) => {
+        //             field.formControl.valueChanges.subscribe(price_per_unit => {
+        //               const quantity = field.form.controls.quantity.value;
+        //               if (price_per_unit && quantity) {
+        //                 const total_price = parseFloat(price_per_unit) * parseFloat(quantity);
+        //                 field.form.controls.total_price.setValue(total_price);
+        //               }
+        //             });
+        //           }
+        //         }
+        //       },              
+        //       {
+        //         key: 'total_price',
+        //         type: 'input',
+        //         templateOptions: {
+        //           type: 'number',
+        //           label: 'Amount',
+        //           placeholder: 'Enter Amount',
+        //           hideLabel: true,
+        //           disabled: true
+        //         },
+        //       },
+        //     ]
+        //   },
+        // },
       ]
     }
   }  
   
   // Method to calculate total price from sale_credit_note_items
-  calculateTotalPrice(): number {
-    return this.formConfig.model.sale_credit_note_items.reduce((total: number, item: any) => {
-      return total + (item.total_price || 0);
-    }, 0);
-  }
+  // calculateTotalPrice(): number {
+  //   return this.formConfig.model.sale_credit_note_items.reduce((total: number, item: any) => {
+  //     return total + (item.total_price || 0);
+  //   }, 0);
+  // }
 
   showDialog() {
     const dialog = document.getElementById('customDialog');
@@ -442,16 +442,16 @@ export class CreditNoteComponent {
 
   // Method to handle form submission and show disclaimer
   handleSubmission() {
-    const total_price = this.calculateTotalPrice();
+    // const total_price = this.calculateTotalPrice();
     const total_amount = this.formConfig.model.sale_credit_note.total_amount || 0;
 
     // Check if there's a mismatch
-    if (total_amount !== total_price) {
-      this.showDialog();
-    } else {
+    // if (total_amount !== total_price) {
+    //   this.showDialog();
+    // } else {
       // If total amounts match, create the record directly
       this.createRecord();
-    }
+    // }
   }
   toastMessage = '';
   showSuccessToast = false;
@@ -459,12 +459,12 @@ export class CreditNoteComponent {
   createRecord() {
     const recordData = {
       sale_credit_note: this.formConfig.model.sale_credit_note,
-      sale_credit_note_items: this.formConfig.model.sale_credit_note_items.map(item => ({
-        quantity: item.quantity,
-        price_per_unit: item.price_per_unit,
-        total_price: item.total_price,
-        product_id: item.product?.product_id
-      })),
+      // sale_credit_note_items: this.formConfig.model.sale_credit_note_items.map(item => ({
+      //   quantity: item.quantity,
+      //   price_per_unit: item.price_per_unit,
+      //   total_price: item.total_price,
+      //   product_id: item.product?.product_id
+      // })),
     }
     
     // Example of using Angular's HttpClient to post data
