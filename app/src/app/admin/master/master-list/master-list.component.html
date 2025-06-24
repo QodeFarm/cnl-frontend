@@ -40,6 +40,9 @@
                     <div class="custom-menu-card">
                         <h6 class="custom-sub-heading">Masters Data</h6>
                         <ul class="master-menu-list">
+                            <li><a [routerLink]="['/admin/master/country']">Country</a></li>
+                            <li><a [routerLink]="['/admin/master/state']">State</a></li>
+                            <li><a [routerLink]="['/admin/master/city']">City</a></li>
                             <li><a [routerLink]="['/admin/master/territory']">Territory</a></li>
                             <li><a [routerLink]="['/admin/master/transporters']">Transporters</a></li>
                             <li><a [routerLink]="['/admin/master/firm-statuses']">Firm status</a></li>
@@ -96,6 +99,15 @@
                         </ng-container> 
                         <ng-container *ngSwitchCase="'user-group-members'">
                             <app-user-group-members></app-user-group-members>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'country'">
+                            <app-country></app-country>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'state'">
+                            <app-states></app-states>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'city'">
+                            <app-cities></app-cities>
                         </ng-container>
                     </ng-container>
                 </div>
