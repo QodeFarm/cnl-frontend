@@ -4,7 +4,8 @@ import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { TaFormComponent } from '@ta/ta-form';
 import { TaTableComponent } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
-import { PaymentReceiptListComponent } from './payment-receipt-list.component';
+import { PaymentReceiptListComponent } from './payment-receipt-list/payment-receipt-list.component';
+ 
 
 @Component({
   selector: 'app-payment-receipt',
