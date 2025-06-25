@@ -350,7 +350,8 @@ export class PurchasereturnordersComponent {
     this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
       if (res && res.data && res.data.order_number) {
         this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
-        this.http.get('masters/generate_order_no/?type=SO').subscribe((res: any) => {
+
+        this.http.get('masters/generate_order_no/?type=PR').subscribe((res: any) => {
           if (res && res.data && res.data.order_number) {
             this.formConfig.model['purchase_return_orders']['return_no'] = res.data.order_number;
             this.orderNumber = res.data.order_number;

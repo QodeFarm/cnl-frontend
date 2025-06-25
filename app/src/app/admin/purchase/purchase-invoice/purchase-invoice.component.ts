@@ -356,7 +356,8 @@ export class PurchaseInvoiceComponent {
     this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
       if (res && res.data && res.data.order_number) {
         this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
-        this.http.get('masters/generate_order_no/?type=SO').subscribe((res: any) => {
+
+        this.http.get('masters/generate_order_no/?type=PO-INV').subscribe((res: any) => {
           if (res && res.data && res.data.order_number) {
             this.formConfig.model['purchase_invoice_orders']['invoice_no'] = res.data.order_number;
             this.invoiceNumber = res.data.order_number;

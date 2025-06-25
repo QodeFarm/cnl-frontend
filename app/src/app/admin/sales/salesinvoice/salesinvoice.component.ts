@@ -368,13 +368,39 @@ export class SalesinvoiceComponent {
     this.hide();
   }
 
+  // getInvoiceNo() {
+  //   this.invoiceNumber = null;
+  //   this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
+  //     if (res && res.data && res.data.order_number) {
+  //       this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
+
+  //       this.http.get('masters/generate_order_no/?type=SO-INV').subscribe((res: any) => {
+  //         if (res && res.data && res.data.order_number) {
+  //           this.formConfig.model['sale_invoice_order']['invoice_no'] = res.data.order_number;
+  //           this.invoiceNumber = res.data.order_number;
+  //           console.log("SaleInvoice NO: ", this.invoiceNumber);
+  //           console.log("get SaleInvoice number called");
+  //         }
+  //       });
+  //     }
+  //   });
+  // }
+
   getInvoiceNo() {
     this.invoiceNumber = null;
+
+    // Get bill_type from form model
+    const billType = this.formConfig.model?.sale_invoice_order?.bill_type || '';
+    const prefix = billType === 'OTHERS' ? 'SOO-INV' : 'SO-INV';
+
+    // First generate shipping number
     this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
-      if (res && res.data && res.data.order_number) {
+      if (res?.data?.order_number) {
         this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
-        this.http.get('masters/generate_order_no/?type=SO-INV').subscribe((res: any) => {
-          if (res && res.data && res.data.order_number) {
+
+        // Now generate invoice number based on bill_type
+        this.http.get(`masters/generate_order_no/?type=${prefix}`).subscribe((res: any) => {
+          if (res?.data?.order_number) {
             this.formConfig.model['sale_invoice_order']['invoice_no'] = res.data.order_number;
             this.invoiceNumber = res.data.order_number;
             console.log("SaleInvoice NO: ", this.invoiceNumber);
@@ -384,6 +410,7 @@ export class SalesinvoiceComponent {
       }
     });
   }
+
 
   showSaleInvoiceListFn() {
     this.showSaleInvoiceList = true;
@@ -934,31 +961,82 @@ export class SalesinvoiceComponent {
                 //     }
                 //   }
                 // },          
+                // {
+                //   key: 'bill_type',
+                //   type: 'select',
+                //   // defaultValue: 'Exclusive',
+                //   className: 'col-md-4 col-sm-6 col-12',
+                //   templateOptions: {
+                //     label: 'Bill type',
+                //     options: [
+                //       { 'label': "Cash", value: 'CASH' },
+                //       { 'label': "Credit", value: 'CREDIT' },
+                //       { 'label': "Others", value: 'OTHERS' }
+                //     ],
+                //     required: true
+                //   },
+                //   hooks: {
+                //     onInit: (field: any) => {
+                //       if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.bill_type && field.formControl) {
+                //         field.formControl.setValue(this.dataToPopulate.sale_invoice_order.bill_type);
+                //       } else {
+                //         // If no data to populate, set 'CASH' as default
+                //         field.formControl.setValue('CASH');
+                //       }
+                //     }
+                //   }
+                // },            
                 {
                   key: 'bill_type',
                   type: 'select',
-                  // defaultValue: 'Exclusive',
                   className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'Bill type',
                     options: [
-                      { 'label': "Cash", value: 'CASH' },
-                      { 'label': "Credit", value: 'CREDIT' },
-                      { 'label': "Others", value: 'OTHERS' }
+                      { label: 'Cash', value: 'CASH' },
+                      { label: 'Credit', value: 'CREDIT' },
+                      { label: 'Others', value: 'OTHERS' }
                     ],
                     required: true
                   },
                   hooks: {
                     onInit: (field: any) => {
-                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.bill_type && field.formControl) {
-                        field.formControl.setValue(this.dataToPopulate.sale_invoice_order.bill_type);
+                      const billTypeControl = field.formControl;
+                      const invoiceModel = this.formConfig.model?.sale_invoice_order || {};
+
+                      // Set default value or existing one
+                      if (this.dataToPopulate?.sale_invoice_order?.bill_type && billTypeControl) {
+                        billTypeControl.setValue(this.dataToPopulate.sale_invoice_order.bill_type, { emitEvent: false });
                       } else {
-                        // If no data to populate, set 'CASH' as default
-                        field.formControl.setValue('CASH');
+                        billTypeControl.setValue('CASH', { emitEvent: false });
+                        invoiceModel.bill_type = 'CASH';
                       }
+
+                      let invoiceGenerated = false;
+
+                      billTypeControl.valueChanges.subscribe((billType: string) => {
+                        invoiceModel.bill_type = billType;
+
+                        if (!this.SaleInvoiceEditID && !invoiceGenerated) {
+                          invoiceGenerated = true;
+                          const prefix = billType?.toLowerCase() === 'others' ? 'SOO-INV' : 'SO-INV';
+
+                          this.http.get(`masters/generate_order_no/?type=${prefix}`).subscribe((res: any) => {
+                            if (res?.data?.order_number) {
+                              this.invoiceNumber = res.data.order_number;
+                              invoiceModel.invoice_no = this.invoiceNumber;
+
+                              const invoiceNoControl = field.form.get('invoice_no');
+                              if (invoiceNoControl) {
+                                invoiceNoControl.setValue(this.invoiceNumber);
+                              }
+                            }
+                          });
+                        }
+                      });
                     }
                   }
-                },                                  
+                },                     
                 {
                   key: 'customer',
                   type: 'select',
