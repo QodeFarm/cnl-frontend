@@ -440,6 +440,7 @@ export class SaleReturnsComponent {
     this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
       if (res && res.data && res.data.order_number) {
         this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
+        
         this.http.get('masters/generate_order_no/?type=SR').subscribe((res: any) => {
           if (res && res.data && res.data.order_number) {
             this.formConfig.model['sale_return_order']['return_no'] = res.data.order_number;
