@@ -2357,6 +2357,10 @@ export class SalesinvoiceComponent {
                                   if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order && this.dataToPopulate.sale_invoice_order.dis_amt && field.formControl) {
                                     field.formControl.setValue(this.dataToPopulate.sale_invoice_order.dis_amt);
                                   }
+
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    this.totalAmountCal();
+                                  })
                                 }
                               }
                             },
@@ -2378,9 +2382,9 @@ export class SalesinvoiceComponent {
                                     field.formControl.setValue(this.dataToPopulate.sale_invoice_order.total_amount);
                                     this.totalAmountCal();
                                   }
-                                  field.formControl.valueChanges.subscribe(data => {
-                                    this.totalAmountCal();
-                                  })
+                                  // field.formControl.valueChanges.subscribe(data => {
+                                  //   this.totalAmountCal();
+                                  // })
                                 }
                               }
                             }
