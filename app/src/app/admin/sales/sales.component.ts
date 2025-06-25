@@ -2170,7 +2170,7 @@ getOrderNo() {
                   templateOptions: {
                     type: 'date',
                     label: 'Delivery date',
-                    readonly: true,
+                    readonly: false,
                     required: true
                   }
                 },
@@ -2182,7 +2182,7 @@ getOrderNo() {
                   templateOptions: {
                     type: 'date',
                     label: 'Order date',
-                    readonly: true,
+                    readonly: false,
                     required: true
                   }
                 },
@@ -2195,7 +2195,7 @@ getOrderNo() {
                     type: 'date',
                     label: 'Ref date',
                     placeholder: 'Select Ref date',
-                    readonly: true,
+                    readonly: false,
                     required: true,
                   }
                 },
@@ -2223,7 +2223,7 @@ getOrderNo() {
                   className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'Tax',
-                    required: true,
+                    required: false,
                     disabled:true,
                     options: [
                       { 'label': "Exclusive", value: 'Exclusive' }

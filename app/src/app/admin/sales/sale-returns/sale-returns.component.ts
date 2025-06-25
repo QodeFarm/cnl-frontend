@@ -898,7 +898,7 @@ export class SaleReturnsComponent {
                     label: 'Ref date',
                     placeholder: 'Select Ref date',
                     required: true,
-                    readonly: true
+                    readonly: false
                   }
                 },
                 {
@@ -921,7 +921,7 @@ export class SaleReturnsComponent {
                     type: 'input',
                     label: 'Ref No',
                     placeholder: 'Enter Ref No',
-                    required: true,
+                    required: false,
                   },
                   hooks: {
                     onInit: (field: any) => {
@@ -937,7 +937,7 @@ export class SaleReturnsComponent {
                   className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'Tax',
-                    required: true,
+                    required: false,
                     options: [
                       { 'label': "Inclusive", value: 'Inclusive' },
                       { 'label': "Exclusive", value: 'Exclusive' }

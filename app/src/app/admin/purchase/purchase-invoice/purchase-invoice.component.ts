@@ -708,7 +708,7 @@ loadQuickpackProducts() {
                   templateOptions: {
                     type: 'date',
                     label: 'Invoice date',
-                    readonly: true,
+                    readonly: false,
                     required: true
                   }
                 },
@@ -720,7 +720,7 @@ loadQuickpackProducts() {
                   templateOptions: {
                     type: 'date',
                     label: 'Delivery date',
-                    readonly: true,
+                    readonly: false,
                     required: true
                   }
                 },
@@ -731,7 +731,7 @@ loadQuickpackProducts() {
                   className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'Due Date',
-                    readonly: true,
+                    readonly: false,
                     required: true
                   }
                 },
@@ -744,7 +744,7 @@ loadQuickpackProducts() {
                     type: 'input',
                     label: 'Supiler invoice no',
                     placeholder: 'Enter Supiler invoice no',
-                    required: true
+                    required: false
                   },
                   hooks: {
                     onInit: (field: any) => { }
@@ -761,7 +761,7 @@ loadQuickpackProducts() {
                       { 'label': "Inclusive", value: 'Inclusive' },
                       { 'label': "Exclusive", value: 'Exclusive' }
                     ],
-                    required: true
+                    required: false
                   },
                   hooks: {
                     onInit: (field: any) => {

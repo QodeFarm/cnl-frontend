@@ -318,7 +318,7 @@ export class VendorsComponent {
                       templateOptions: {
                         label: 'Print Name',
                         placeholder: 'Enter Print Name',
-                        required: true,
+                        required: false,
                       }
                     },               
                     {
@@ -328,7 +328,7 @@ export class VendorsComponent {
                       templateOptions: {
                         label: 'Code',
                         placeholder: 'Enter Code',
-                        required: true,
+                        required: false,
                       }
                     },
                   
@@ -340,6 +340,7 @@ export class VendorsComponent {
                         label: 'Vendor Category',
                         dataKey: 'vendor_category_id',
                         dataLabel: 'name',
+                        required: true,
                         options: [],
                         lazy: {
                           url: 'vendors/vendor_category/',
@@ -367,7 +368,7 @@ export class VendorsComponent {
                         dataLabel: 'name',
                         label: 'Ledger Account',
                         placeholder: 'Ledger Account',
-                        required: true,
+                        required: false,
                         lazy: {
                           url: 'customers/ledger_accounts/',
                           lazyOneTime: true
@@ -397,7 +398,7 @@ export class VendorsComponent {
                           { value: 'Inclusive', label: 'Inclusive' },
                           { value: 'Exclusive', label: 'Exclusive' }
                         ],
-                        required: true,
+                        required: false,
                       }
                     },
                                                             
@@ -414,7 +415,7 @@ export class VendorsComponent {
                       className: 'ta-cell pr-md col d-flex justify-content-md-center pr-0',
                       templateOptions: {
                         label: 'Picture',
-                        required: true
+                        required: false
                       }
                     }                                
                   ]

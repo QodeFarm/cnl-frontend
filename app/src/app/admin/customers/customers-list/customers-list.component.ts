@@ -81,6 +81,21 @@ export class CustomersListComponent {
         },
       },
       {
+        fieldKey: 'pin_code',
+        name: 'Pin Code',
+        sort: true,
+      },
+      {
+        fieldKey: 'customer_addresses',
+        name: 'Shipping Address',
+        sort: true,
+        displayType: 'map',
+        mapFn: (currentValue: any, row: any, col: any) => {
+          return row.customer_addresses.shipping_address;
+        },
+      },  
+      
+      {
         fieldKey: "code",
         name: "Action",
         type: 'action',

@@ -336,7 +336,7 @@ export class PaymentReceiptComponent implements OnInit {
               dataKey: 'customer_id',
               dataLabel: 'name',
               lazy: {
-                url: 'customers/customers/',
+                url: 'customers/customer/',
                 lazyOneTime: true
               }
             },
