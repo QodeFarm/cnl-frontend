@@ -334,7 +334,7 @@ export class CustomersComponent {
                       templateOptions: {
                         label: 'Print Name',
                         placeholder: 'Enter Print Name',
-                        required: true,
+                        required: false,
                       }
                     },               
                     {
@@ -344,7 +344,7 @@ export class CustomersComponent {
                       templateOptions: {
                         label: 'Code',
                         placeholder: 'Enter Code',
-                        required: true,
+                        required: false,
                       }
                     },
                   
@@ -356,6 +356,7 @@ export class CustomersComponent {
                         label: 'Customer Category',
                         dataKey: 'customer_category_id',
                         dataLabel: 'name',
+                        required: true,
                         options: [],
                         lazy: {
                           url: 'masters/customer_categories/',
@@ -383,7 +384,7 @@ export class CustomersComponent {
                         dataLabel: 'name',
                         label: 'Ledger Account',
                         placeholder: 'Ledger Account',
-                        required: true,
+                        required: false,
                         lazy: {
                           url: 'customers/ledger_accounts/',
                           lazyOneTime: true
@@ -413,7 +414,7 @@ export class CustomersComponent {
                           { value: 'Inclusive', label: 'Inclusive' },
                           { value: 'Exclusive', label: 'Exclusive' }
                         ],
-                        required: true,
+                        required: false,
                       }
                     },
                                                             
@@ -430,7 +431,7 @@ export class CustomersComponent {
                       className: 'ta-cell pr-md col d-flex justify-content-md-center pr-0',
                       templateOptions: {
                         label: 'Picture',
-                        required: true
+                        required: false
                       }
                     }                                
                   ]

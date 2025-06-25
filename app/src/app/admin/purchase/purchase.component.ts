@@ -1018,7 +1018,7 @@ loadQuickpackProducts() {
                   templateOptions: {
                     type: 'date',
                     label: 'Delivery date',
-                    readonly: true,
+                    readonly: false,
                     required: true
                   }
                 },
@@ -1030,7 +1030,7 @@ loadQuickpackProducts() {
                   templateOptions: {
                     type: 'date',
                     label: 'Order date',
-                    readonly: true,
+                    readonly: false,
                     required: true
                   }
                 },
@@ -1044,7 +1044,7 @@ loadQuickpackProducts() {
                     label: 'Ref date',
                     placeholder: 'Select Ref date',
                     required: true,
-                    readonly: true
+                    readonly: false,
                   }
                 },
                 {
@@ -1071,7 +1071,7 @@ loadQuickpackProducts() {
                   className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'Tax',
-                    required: true,
+                    required: false,
                     disabled:true,
                     options: [
                       // { 'label': "Inclusive", value: 'Inclusive' },

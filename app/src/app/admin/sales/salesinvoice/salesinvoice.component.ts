@@ -1099,7 +1099,7 @@ export class SalesinvoiceComponent {
                   templateOptions: {
                     type: 'date',
                     label: 'Invoice Date',
-                    readonly: true,
+                    readonly: false,
                     required: true
                   }
                 },
@@ -1112,7 +1112,7 @@ export class SalesinvoiceComponent {
                     type: 'date',
                     label: 'Ref date',
                     placeholder: 'Select Ref date',
-                    readonly: true,
+                    readonly: false,
                     required: true,
                   }
                 },
@@ -1124,8 +1124,8 @@ export class SalesinvoiceComponent {
                   templateOptions: {
                     type: 'date',
                     label: 'Due Date',
-                    readonly: true,
-                    required: false,
+                    readonly: false,
+                    required: true,
                   }
                 },
                 {
@@ -1152,7 +1152,7 @@ export class SalesinvoiceComponent {
                   className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'Tax',
-                    required: true,
+                    required: false,
                     disabled:true,
                     // readonly: true,
                     options: [
