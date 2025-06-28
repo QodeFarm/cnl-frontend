@@ -140,6 +140,9 @@ export class OrderslistComponent implements OnChanges {
           amount: selectedItem.amount,
           unit_options_id: selectedItem.unit_options_id,
           quantity: selectedItem.quantity,
+          cgst:selectedItem.cgst,
+          sgst:selectedItem.sgst,
+          igst:selectedItem.igst,
           print_name: selectedItem.print_name || 'N/A',
           size: {
             size_id: selectedItem.size_id || null,

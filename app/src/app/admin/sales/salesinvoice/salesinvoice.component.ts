@@ -603,6 +603,9 @@ export class SalesinvoiceComponent {
         print_name: product.print_name || product.product_name || '', // Use print_name only if necessary
         amount: product.amount || 0,
         tax: product.tax || 0,
+        cgst: product.cgst || 0,
+        sgst: product.sgst || 0,
+        igst: product.igst || 0,
         remarks: product.remarks || ''
       }));
     } else {
@@ -630,6 +633,9 @@ export class SalesinvoiceComponent {
             print_name: newProduct.print_name || newProduct.product_name || '', // Use print_name only if necessary
             amount: newProduct.amount || 0,
             tax: newProduct.tax || 0,
+            cgst: newProduct.cgst || 0,
+            sgst: newProduct.sgst || 0,
+            igst: newProduct.igst || 0,
             remarks: newProduct.remarks || ''
           });
         } else {

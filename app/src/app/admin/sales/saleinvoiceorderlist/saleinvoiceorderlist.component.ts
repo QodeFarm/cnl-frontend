@@ -64,6 +64,9 @@ export class SaleinvoiceorderlistComponent {
         rate: product.rate || 0,
         amount: product.amount || 0,
         tax: product.tax || 0,
+        cgst: product.cgst || 0,
+        sgst: product.sgst || 0,
+        igst: product.igst || 0,
         remarks: product.remarks || '',
         // Add other required fields
       })));
@@ -79,6 +82,9 @@ export class SaleinvoiceorderlistComponent {
         rate: product.rate || 0,
         amount: product.amount || 0,
         tax: product.tax || 0,
+        cgst: product.cgst || 0,
+        sgst: product.sgst || 0,
+        igst: product.igst || 0,
         remarks: product.remarks || '',
         // Add other required fields
       })));
