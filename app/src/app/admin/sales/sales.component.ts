@@ -855,6 +855,9 @@ getOrderNo() {
         existingProduct.code === newProduct.code &&
         existingProduct.total_boxes === (newProduct.total_boxes || 0) &&
         existingProduct.unit_options_id === (newProduct.unit_options_id || null) &&
+        existingProduct.igst === (newProduct.igst || null) &&
+        existingProduct.cgst === (newProduct.cgst || null) &&
+        existingProduct.sgst === (newProduct.sgst || null) &&
         existingProduct.quantity === (newProduct.quantity || 1) &&
         existingProduct.size?.size_name === (newProduct.size?.size_name || 'Unspecified') &&
         existingProduct.color?.color_name === (newProduct.color?.color_name || 'Unspecified')
@@ -881,6 +884,9 @@ getOrderNo() {
           amount: parseFloat(newProduct.amount) || 0, // Ensure amount is a number
           tax: parseFloat(newProduct.tax) || 0,       // Ensure tax is a number
           remarks: newProduct.remarks || '',
+          cgst: parseFloat(newProduct.cgst) || 0,
+          sgst: parseFloat(newProduct.sgst) || 0,
+          igst: parseFloat(newProduct.igst) || 0,
 
           // Set size and color properties with defaults if not provided
           size: {

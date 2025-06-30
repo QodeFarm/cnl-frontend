@@ -330,7 +330,7 @@ export class SaleReturnsComponent {
 
   //--------------------------------------------------------
   getWorkflowId() {
-    return this.http.get('https://apicore.cnlerp.com/api/v1/sales/workflows/');
+    return this.http.get('sales/workflows/');
   }
 
 
@@ -494,6 +494,9 @@ export class SaleReturnsComponent {
                 discount: item.discount,
                 amount: item.amount,
                 tax: item.tax,
+                cgst: item.cgst || 0,
+                sgst: item.sgst || 0,
+                igst: item.igst || 0,
                 remarks: item.remarks
               }));
             })
@@ -681,6 +684,9 @@ export class SaleReturnsComponent {
         print_name: product.print_name || product.name || '',
         amount: product.amount || 0,
         tax: product.tax || 0,
+        cgst: product.cgst || 0,
+        sgst: product.sgst || 0,
+        igst: product.igst || 0,
         remarks: product.remarks || ''
       }));
     } else {
@@ -704,6 +710,9 @@ export class SaleReturnsComponent {
             print_name: newProduct.print_name || newProduct.name || '',
             amount: newProduct.amount || 0,
             tax: newProduct.tax || 0,
+            cgst: newProduct.cgst || 0,
+            sgst: newProduct.sgst || 0,
+            igst: newProduct.igst || 0,
             remarks: newProduct.remarks || ''
           });
         } else {
@@ -1256,6 +1265,12 @@ export class SaleReturnsComponent {
                         this.formConfig.model['sale_return_items'][currentRowIndex] = {};
                       }
                       this.formConfig.model['sale_return_items'][currentRowIndex]['product_id'] = data?.product_id;
+
+                      const currentItem = this.formConfig.model['sale_return_items'][currentRowIndex];
+                      currentItem['product_id'] = data?.product_id;
+
+                      // ✅ Store gst_input from product summary
+                      currentItem['gst_input'] = data?.gst_input || 0;
                       this.loadProductVariations(field);
                       this.autoFillProductDetails(field, data); // to fill the remaining fields when product is selected.
                     });
@@ -2525,95 +2540,200 @@ export class SaleReturnsComponent {
   // Function to create Sale Order using the sale_return_id
   createSaleOrder(sale_return_id: string) {
     console.log("We entered into method sale order ...");
-    const SaleOrderpayload = this.formConfig.model.sale_return_order
-    const SaleOrderItems = this.formConfig.model.sale_return_items
-    const OrderAttachments = this.formConfig.model.order_attachments
-    const OrderShippments = this.formConfig.model.order_shipments
+    const SaleOrderpayload = this.formConfig.model.sale_return_order;
+    const SaleOrderItems = this.formConfig.model.sale_return_items;
+    const OrderAttachments = this.formConfig.model.order_attachments;
+    const OrderShippments = this.formConfig.model.order_shipments;
+
     console.log("data in sale order customer : ", this.formConfig.model.sale_return_order.customer_id);
-    // Fetch workflow ID from API
-    this.getWorkflowId().subscribe((response: any) => {
-      console.log("Workflow_id data : ", response);
-      const workflowData = response?.data;
-      let workflow_id = null; // Initialize workflow_id
 
-      if (workflowData && workflowData.length > 0) {
-        workflow_id = workflowData[0].workflow_id; // Get the workflow_id
+    // Fetch sale_type_id for 'Other'
+    this.http.get<any>('masters/sale_types/?name=Advance Order').subscribe((saleTypeResponse) => {
+      const saleType = saleTypeResponse?.data[0];
+      console.log("saleType : ", saleType)
+
+      if (!saleType || !saleType.sale_type_id) {
+        console.error('Sale type "Advance Order" not found.');
+        return;
       }
-      const saleOrderPayload = {
-        sale_order: {
-          sale_type_id: "a0718928-0fb5-4e04-8712-b91c3f023eda",
-          email: SaleOrderpayload.email,
-          sale_return_id: sale_return_id,
-          order_type: SaleOrderpayload.order_type || 'sale_order',
-          delivery_date: this.nowDate(),
-          order_date: this.nowDate(),
-          ref_no: SaleOrderpayload.ref_no,
-          ref_date: SaleOrderpayload.ref_date || this.nowDate(),
-          tax: SaleOrderpayload.tax || 'Inclusive',
-          remarks: SaleOrderpayload.remarks,
-          // advance_amount: SaleOrderpayload.advance_amount,
-          item_value: 0.00,
-          discount: 0.00,
-          dis_amt: 0.00,
-          taxable: SaleOrderpayload.taxable,
-          tax_amount: 0.00,
-          cess_amount: 0.00,
-          advance_amount: SaleOrderpayload.total_amount,
-          transport_charges: SaleOrderpayload.transport_charges,
-          round_off: SaleOrderpayload.round_off,
-          total_amount: 0.00,
-          vehicle_name: SaleOrderpayload.vehicle_name,
-          total_boxes: SaleOrderpayload.total_boxes,
-          shipping_address: SaleOrderpayload.shipping_address,
-          billing_address: SaleOrderpayload.billing_address,
-          customer_id: SaleOrderpayload.customer_id,
-          gst_type_id: SaleOrderpayload.gst_type_id,
-          payment_term_id: SaleOrderpayload.payment_term_id,
-          payment_link_type_id: SaleOrderpayload.payment_link_type_id,
-          workflow_id: workflow_id, // Add workflow_id to payload
-        },
-        sale_order_items: SaleOrderItems.map(item => ({
-          quantity: item.quantity,
-          unit_price: item.unit_price,
-          rate: 0.00,
-          amount: 0.00,
-          total_boxes: item.total_boxes,
-          discount_percentage: item.discount_percentage,
-          discount: 0.00,
-          dis_amt: 0.00,
-          tax: item.tax || '',
-          print_name: item.print_name,
-          remarks: item.remarks,
-          tax_rate: item.tax_rate,
-          unit_options_id: item.unit_options_id,
-          product_id: item.product_id,
-          size_id: item.size_id,
-          color_id: item.color_id
-        })),
-        order_attachments: OrderAttachments,
-        order_shipments: OrderShippments
-      };
 
-      console.log("Sale order payload : ", saleOrderPayload);
+      // Now fetch workflow ID
+      this.getWorkflowId().subscribe((response: any) => {
+        console.log("Workflow_id data : ", response);
+        const workflowData = response?.data;
+        let workflow_id = null;
 
-      // POST request to create Sale Order
-      this.http.post('sales/sale_order/', saleOrderPayload).subscribe(
-        (response) => {
-          // console.log("response sale order : ", response);
-          this.showSuccessToast = true;
-          this.toastMessage = 'Sale-Return & Sale-Order created successfully';
-          this.ngOnInit();
-          setTimeout(() => {
-            this.showSuccessToast = false;
-          }, 3000);
-        },
-        (error) => {
-          console.error('Error creating Sale Order:', error);
+        if (workflowData && workflowData.length > 0) {
+          workflow_id = workflowData[0].workflow_id;
         }
-      );
+
+        const saleOrderPayload = {
+          sale_order: {
+            sale_type_id: saleType.sale_type_id, // dynamically inserted here
+            email: SaleOrderpayload.email,
+            sale_return_id: sale_return_id,
+            order_type: SaleOrderpayload.order_type || 'sale_order',
+            delivery_date: this.nowDate(),
+            order_date: this.nowDate(),
+            ref_no: SaleOrderpayload.ref_no,
+            ref_date: SaleOrderpayload.ref_date || this.nowDate(),
+            tax: SaleOrderpayload.tax || 'Inclusive',
+            remarks: SaleOrderpayload.remarks,
+            item_value: SaleOrderpayload.item_value,
+            discount: SaleOrderpayload.discount,
+            dis_amt: SaleOrderpayload.dis_amt,
+            taxable: SaleOrderpayload.taxable,
+            tax_amount: SaleOrderpayload.tax_amount,
+            cess_amount: SaleOrderpayload.cess_amount,
+            advance_amount: 0.00,
+            transport_charges: SaleOrderpayload.transport_charges,
+            round_off: SaleOrderpayload.round_off,
+            total_amount: SaleOrderpayload.total_amount,
+            vehicle_name: SaleOrderpayload.vehicle_name,
+            total_boxes: SaleOrderpayload.total_boxes,
+            shipping_address: SaleOrderpayload.shipping_address,
+            billing_address: SaleOrderpayload.billing_address,
+            customer_id: SaleOrderpayload.customer_id,
+            gst_type_id: SaleOrderpayload.gst_type_id,
+            payment_term_id: SaleOrderpayload.payment_term_id,
+            payment_link_type_id: SaleOrderpayload.payment_link_type_id,
+            workflow_id: workflow_id,
+          },
+          sale_order_items: SaleOrderItems.map(item => ({
+            quantity: parseInt(item.quantity),
+            unit_price: item.unit_price,
+            rate: item.rate,
+            amount: item.rate,
+            total_boxes: item.total_boxes,
+            discount_percentage: item.discount_percentage,
+            discount: item.discount,
+            dis_amt: item.dis_amt,
+            tax: item.tax || '',
+            print_name: item.print_name,
+            remarks: item.remarks,
+            tax_rate: item.tax_rate,
+            unit_options_id: item.unit_options_id,
+            product_id: item.product_id,
+            size_id: item.size_id,
+            color_id: item.color_id
+          })),
+          order_attachments: OrderAttachments,
+          order_shipments: OrderShippments
+        };
+
+        console.log("Sale order payload : ", saleOrderPayload);
+
+        this.http.post('sales/sale_order/', saleOrderPayload).subscribe(
+          (response) => {
+            this.showSuccessToast = true;
+            this.toastMessage = 'Sale-Return & Sale-Order created successfully';
+            this.ngOnInit();
+            setTimeout(() => {
+              this.showSuccessToast = false;
+            }, 3000);
+          },
+          (error) => {
+            console.error('Error creating Sale Order:', error);
+          }
+        );
+      });
+
+      this.ngOnInit(); // remains as is
     });
-    this.ngOnInit();
   }
+
+  // createSaleOrder(sale_return_id: string) {
+  //   console.log("We entered into method sale order ...");
+  //   const SaleOrderpayload = this.formConfig.model.sale_return_order
+  //   const SaleOrderItems = this.formConfig.model.sale_return_items
+  //   const OrderAttachments = this.formConfig.model.order_attachments
+  //   const OrderShippments = this.formConfig.model.order_shipments
+  //   console.log("data in sale order customer : ", this.formConfig.model.sale_return_order.customer_id);
+  //   // Fetch workflow ID from API
+  //   this.getWorkflowId().subscribe((response: any) => {
+  //     console.log("Workflow_id data : ", response);
+  //     const workflowData = response?.data;
+  //     let workflow_id = null; // Initialize workflow_id
+
+  //     if (workflowData && workflowData.length > 0) {
+  //       workflow_id = workflowData[0].workflow_id; // Get the workflow_id
+  //     }
+
+  //     const saleOrderPayload = {
+  //       sale_order: {
+  //         sale_type_id: 'Other',
+  //         email: SaleOrderpayload.email,
+  //         sale_return_id: sale_return_id,
+  //         order_type: SaleOrderpayload.order_type || 'sale_order',
+  //         delivery_date: this.nowDate(),
+  //         order_date: this.nowDate(),
+  //         ref_no: SaleOrderpayload.ref_no,
+  //         ref_date: SaleOrderpayload.ref_date || this.nowDate(),
+  //         tax: SaleOrderpayload.tax || 'Inclusive',
+  //         remarks: SaleOrderpayload.remarks,
+  //         // advance_amount: SaleOrderpayload.advance_amount,
+  //         item_value: SaleOrderpayload.item_value,
+  //         discount: SaleOrderpayload.discount,
+  //         dis_amt: SaleOrderpayload.dis_amt,
+  //         taxable: SaleOrderpayload.taxable,
+  //         tax_amount: SaleOrderpayload.tax_amount,
+  //         cess_amount: SaleOrderpayload.cess_amount,
+  //         advance_amount: 0.00,
+  //         transport_charges: SaleOrderpayload.transport_charges,
+  //         round_off: SaleOrderpayload.round_off,
+  //         total_amount: SaleOrderpayload.total_amount,
+  //         vehicle_name: SaleOrderpayload.vehicle_name,
+  //         total_boxes: SaleOrderpayload.total_boxes,
+  //         shipping_address: SaleOrderpayload.shipping_address,
+  //         billing_address: SaleOrderpayload.billing_address,
+  //         customer_id: SaleOrderpayload.customer_id,
+  //         gst_type_id: SaleOrderpayload.gst_type_id,
+  //         payment_term_id: SaleOrderpayload.payment_term_id,
+  //         payment_link_type_id: SaleOrderpayload.payment_link_type_id,
+  //         workflow_id: workflow_id, // Add workflow_id to payload
+  //       },
+  //       sale_order_items: SaleOrderItems.map(item => ({
+  //         quantity: parseInt(item.quantity),
+  //         unit_price: item.unit_price,
+  //         rate: item.rate,
+  //         amount: item.rate,
+  //         total_boxes: item.total_boxes,
+  //         discount_percentage: item.discount_percentage,
+  //         discount: item.discount,
+  //         dis_amt: item.dis_amt,
+  //         tax: item.tax || '',
+  //         print_name: item.print_name,
+  //         remarks: item.remarks,
+  //         tax_rate: item.tax_rate,
+  //         unit_options_id: item.unit_options_id,
+  //         product_id: item.product_id,
+  //         size_id: item.size_id,
+  //         color_id: item.color_id
+  //       })),
+  //       order_attachments: OrderAttachments,
+  //       order_shipments: OrderShippments
+  //     };
+
+  //     console.log("Sale order payload : ", saleOrderPayload);
+
+  //     // POST request to create Sale Order
+  //     this.http.post('sales/sale_order/', saleOrderPayload).subscribe(
+  //       (response) => {
+  //         // console.log("response sale order : ", response);
+  //         this.showSuccessToast = true;
+  //         this.toastMessage = 'Sale-Return & Sale-Order created successfully';
+  //         this.ngOnInit();
+  //         setTimeout(() => {
+  //           this.showSuccessToast = false;
+  //         }, 3000);
+  //       },
+  //       (error) => {
+  //         console.error('Error creating Sale Order:', error);
+  //       }
+  //     );
+  //   });
+  //   this.ngOnInit();
+  // }
 
 
   // Function to create Credit Note using the sale_return_id
