@@ -2233,9 +2233,11 @@ getOrderNo() {
                   templateOptions: {
                     label: 'Tax',
                     required: false,
-                    disabled:true,
+                    disabled: false,
                     options: [
+                      { 'label': "Inclusive", value: 'Inclusive' },
                       { 'label': "Exclusive", value: 'Exclusive' }
+
                     ]
                   },
                   hooks: {

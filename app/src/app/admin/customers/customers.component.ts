@@ -403,20 +403,20 @@ export class CustomersComponent {
                         }
                       }
                     },
-                    {
-                      className: 'col-md-4 col-sm-6 col-12',
-                      key: 'tax_type',
-                      type: 'select',
-                      templateOptions: {
-                        label: 'Tax Type',
-                        placeholder: 'Select Tax Type',
-                        options: [
-                          { value: 'Inclusive', label: 'Inclusive' },
-                          { value: 'Exclusive', label: 'Exclusive' }
-                        ],
-                        required: false,
-                      }
-                    },
+                    // {
+                    //   className: 'col-md-4 col-sm-6 col-12',
+                    //   key: 'tax_type',
+                    //   type: 'select',
+                    //   templateOptions: {
+                    //     label: 'Tax Type',
+                    //     placeholder: 'Select Tax Type',
+                    //     options: [
+                    //       { value: 'Inclusive', label: 'Inclusive' },
+                    //       { value: 'Exclusive', label: 'Exclusive' }
+                    //     ],
+                    //     required: false,
+                    //   }
+                    // },
                                                             
                   ]
                 },
