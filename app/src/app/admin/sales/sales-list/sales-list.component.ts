@@ -27,25 +27,95 @@ export class SalesListComponent {
     this.taTableComponent?.refresh();
   };
 
-  //-----------email sending links----------
-  onSelect(event: Event): void {
-    const selectElement = event.target as HTMLSelectElement;
-    const selectedValue = selectElement.value;
+selectedFormat: string = 'cnl-ex-sale-order';
+pendingAction: 'email' | 'preview' | 'print' | null = null;
 
-    switch (selectedValue) {
-      case 'email':
-        this.onMailLinkClick();
-        break;
-      case 'whatsapp':
-        break;
-      default:
-        // Handle default case (e.g., "Mail" selected)
-        break;
+// Show format selection popup
+private showFormatDialog(action: 'email' | 'preview' | 'print'): void {
+  this.pendingAction = action;
+  const dialog = document.getElementById('formatDialog');
+  if (dialog) dialog.style.display = 'flex';
+}
+
+closeFormatDialog(): void {
+  const dialog = document.getElementById('formatDialog');
+  if (dialog) dialog.style.display = 'none';
+  this.pendingAction = null;
+}
+
+// Inject format and proceed with existing method
+proceedWithSelectedAction(): void {
+  // this.closeFormatDialog();
+
+  // Inject format in request manually (monkey patch)
+  const originalPost = this.http.post.bind(this.http);
+  this.http.post = (url: string, body: any, options?: any) => {
+    if (typeof body === 'object' && body !== null && this.selectedFormat) {
+      body.format = this.selectedFormat;
     }
+    return originalPost(url, body, options);
+  };
 
-    // Reset the dropdown to the default option
-    selectElement.value = '';
+  switch (this.pendingAction) {
+    case 'email':
+      this.onMailLinkClick(); break;
+    case 'preview':
+      this.onPreviewClick(); break;
+    case 'print':
+      this.onPrintClick(); break;
   }
+
+  this.pendingAction = null;
+  this.closeFormatDialog();
+}
+
+
+  //-----------email sending links----------
+  // onSelect(event: Event): void {
+  //   const selectElement = event.target as HTMLSelectElement;
+  //   const selectedValue = selectElement.value;
+
+  //   switch (selectedValue) {
+  //     case 'email':
+  //       this.onMailLinkClick();
+  //       break;
+  //     case 'whatsapp':
+  //       break;
+  //     default:
+  //       // Handle default case (e.g., "Mail" selected)
+  //       break;
+  //   }
+
+  //   // Reset the dropdown to the default option
+  //   selectElement.value = '';
+  // }
+
+onSelect(event: Event): void {
+  const selectElement = event.target as HTMLSelectElement;
+  const selectedValue = selectElement.value;
+
+  if (selectedValue === 'email') {
+    this.showFormatDialog('email');
+  } else if (selectedValue === 'whatsapp') {
+    // Add WhatsApp logic if needed
+  }
+
+  selectElement.value = '';
+}
+
+onPrintSelect(event: Event): void {
+  const selectElement = event.target as HTMLSelectElement;
+  const selectedValue = selectElement.value;
+
+  if (selectedValue === 'preview') {
+    this.showFormatDialog('preview');
+  } else if (selectedValue === 'print') {
+    this.showFormatDialog('print');
+  }
+
+  selectElement.value = '';
+}
+
 
   showDialog() {
     const dialog = document.getElementById('customDialog');
@@ -96,25 +166,25 @@ export class SalesListComponent {
   //-----------email sending links - end ----------
 
   //----------print & preview ------------------------
-  onPrintSelect(event: Event): void {
-    const selectElement = event.target as HTMLSelectElement;
-    const selectedValue = selectElement.value;
+//   onPrintSelect(event: Event): void {
+//     const selectElement = event.target as HTMLSelectElement;
+//     const selectedValue = selectElement.value;
 
-    switch (selectedValue) {
-        case 'preview':
-            this.onPreviewClick();
-            break;
-        case 'print':
-            this.onPrintClick();
-            break;
-        default:
-            // Handle default case
-            break;
-    }
+//     switch (selectedValue) {
+//         case 'preview':
+//             this.onPreviewClick();
+//             break;
+//         case 'print':
+//             this.onPrintClick();
+//             break;
+//         default:
+//             // Handle default case
+//             break;
+//     }
 
-    // Reset the dropdown to the default option
-    selectElement.value = '';
-}
+//     // Reset the dropdown to the default option
+//     selectElement.value = '';
+// }
 
 onPreviewClick(): void {
   const selectedIds = this.taTableComponent.options.checkedRows;
