@@ -650,6 +650,9 @@ getOrderNo() {
                 color: item.color?.color_name ?? 'N/A',
                 remarks: item.remarks ?? '',
                 tax: item.tax ?? 0,
+                cgst: item.cgst ?? 0,
+                sgst: item.sgst ?? 0,
+                igst: item.igst ?? 0,
                 print_name: item.print_name ?? item.product?.name ?? 'N/A',
                 checked: false // Initialize checkbox as unchecked
               }));
