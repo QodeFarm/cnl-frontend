@@ -1,2 +1,19 @@
-<ta-table [options]="tableConfig" class="custom-list"> </ta-table>
+<ta-table [options]="tableConfig" class="custom-list">
+    <div class="bottom-left" bottom-left>
+        <div class="d-flex align-items-center">
+            <!-- Mail Dropdown - Same as sales-list -->
+            <select class="form-select me-2" (change)="onSelect($event)">
+                <option value="" disabled selected hidden>Sending Mail</option>
+                <option value="email">Email</option>
+                <option value="whatsapp">WhatsApp</option>
+            </select>
+            <!-- Print Dropdown - Same as sales-list -->
+            <select class="form-select me-2" (change)="onPrintSelect($event)">
+                <option value="" disabled selected hidden>Print Document</option>
+                <option value="preview">Preview</option>
+                <option value="print">Print</option>
+            </select>
+        </div>
+    </div>
+</ta-table>
 
