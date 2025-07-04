@@ -27,7 +27,7 @@ export class SalesListComponent {
     this.taTableComponent?.refresh();
   };
 
-selectedFormat: string = 'cnl-ex-sale-order';
+selectedFormat: string = 'CNL_Standard_Incl';
 pendingAction: 'email' | 'preview' | 'print' | null = null;
 
 // Show format selection popup
