@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { TaFormComponent } from '@ta/ta-form';
-import { TaTableComponent } from '@ta/ta-table';
+import { TaTableComponent, TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { PaymentReceiptListComponent } from './payment-receipt-list/payment-receipt-list.component';
  
@@ -40,11 +40,7 @@ export class PaymentReceiptComponent implements OnInit {
   selectedAccountId: string | null = null;
 
   // Table configuration for payment receipt data
-  curdConfig: any = {
-    drawerSize: 500,
-    drawerPlacement: 'right',
-    hideAddBtn: true,
-    tableConfig: {
+  tableConfig: TaTableConfig = {
       apiUrl: '', // We'll update this dynamically based on customer selection
       title: 'Payment Receipt',
       pkId: 'voucher_no',
@@ -109,7 +105,7 @@ export class PaymentReceiptComponent implements OnInit {
           mapFn: (val: any) => val || 'No date'
         }
       ]
-    }
+    
   };
 
   constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
@@ -161,10 +157,10 @@ export class PaymentReceiptComponent implements OnInit {
     console.log('Fetching payment data for customer:', customerId);
     
     // Update the API URL with the customer ID
-    this.curdConfig.tableConfig.apiUrl = `sales/data_for_payment_receipt_table/${customerId}/`;
+    this.tableConfig.apiUrl = `sales/data_for_payment_receipt_table/${customerId}/`;
     
     // Make an HTTP request to check if data exists for this customer
-    this.http.get(this.curdConfig.tableConfig.apiUrl).subscribe(
+    this.http.get(this.tableConfig.apiUrl).subscribe(
       (response: any) => {
         console.log('Customer payment data:', response);
         // If the response has data, refresh the table
@@ -259,7 +255,7 @@ export class PaymentReceiptComponent implements OnInit {
           this.showSuccessToastMessage('Payment transaction processed successfully!');
           
           // Clear the table data by resetting the API URL and clearing the table
-          this.curdConfig.tableConfig.apiUrl = '';
+          this.tableConfig.apiUrl = '';
           if (this.taTableComponent) {
             this.taTableComponent.rows = [];
             this.taTableComponent.total = 0;
