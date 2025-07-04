@@ -22,24 +22,74 @@ export class SaleReturnsListComponent {
     this.taTableComponent?.refresh();
   };
 
+selectedFormat: string;
+pendingAction: 'email' | 'preview' | 'print' | null = null;
+
+// Show format selection popup
+private showFormatDialog(action: 'email' | 'preview' | 'print'): void {
+  this.pendingAction = action;
+  const dialog = document.getElementById('formatDialog');
+  if (dialog) dialog.style.display = 'flex';
+}
+
+closeFormatDialog(): void {
+  const dialog = document.getElementById('formatDialog');
+  if (dialog) dialog.style.display = 'none';
+  this.pendingAction = null;
+}
+
+// Inject format and proceed with existing method
+proceedWithSelectedAction(): void {
+  // this.closeFormatDialog();
+
+  // Inject format in request manually (monkey patch)
+  const originalPost = this.http.post.bind(this.http);
+  this.http.post = (url: string, body: any, options?: any) => {
+    if (typeof body === 'object' && body !== null && this.selectedFormat) {
+      body.format = this.selectedFormat;
+    }
+    return originalPost(url, body, options);
+  };
+
+  switch (this.pendingAction) {
+    case 'email':
+      this.onMailLinkClick(); break;
+    case 'preview':
+      this.onPreviewClick(); break;
+    case 'print':
+      this.onPrintClick(); break;
+  }
+
+  this.pendingAction = null;
+  this.closeFormatDialog();
+}
+
   //-----------email sending links----------
   onSelect(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;
     const selectedValue = selectElement.value;
 
-    switch (selectedValue) {
-      case 'email':
-        this.onMailLinkClick();
-        break;
-      case 'whatsapp':
-        break;
-      default:
-        // Handle default case (e.g., "Mail" selected)
-        break;
+    if (selectedValue === 'email') {
+      this.showFormatDialog('email');
+    } else if (selectedValue === 'whatsapp') {
+      // Add WhatsApp logic if needed
     }
 
-    // Reset the dropdown to the default option
     selectElement.value = '';
+
+    // switch (selectedValue) {
+    //   case 'email':
+    //     this.onMailLinkClick();
+    //     break;
+    //   case 'whatsapp':
+    //     break;
+    //   default:
+    //     // Handle default case (e.g., "Mail" selected)
+    //     break;
+    // }
+
+    // // Reset the dropdown to the default option
+    // selectElement.value = '';
   }
 
   showDialog() {
@@ -91,20 +141,28 @@ export class SaleReturnsListComponent {
     const selectElement = event.target as HTMLSelectElement;
     const selectedValue = selectElement.value;
 
-    switch (selectedValue) {
-        case 'preview':
-            this.onPreviewClick();
-            break;
-        case 'print':
-            this.onPrintClick();
-            break;
-        default:
-            // Handle default case
-            break;
+    if (selectedValue === 'preview') {
+      this.showFormatDialog('preview');
+    } else if (selectedValue === 'print') {
+      this.showFormatDialog('print');
     }
 
-    // Reset the dropdown to the default option
     selectElement.value = '';
+
+    // switch (selectedValue) {
+    //     case 'preview':
+    //         this.onPreviewClick();
+    //         break;
+    //     case 'print':
+    //         this.onPrintClick();
+    //         break;
+    //     default:
+    //         // Handle default case
+    //         break;
+    // }
+
+    // // Reset the dropdown to the default option
+    // selectElement.value = '';
 }
 
 // onPreviewClick(): void {
@@ -141,6 +199,7 @@ onPreviewClick(): void {
           // Clean up the blob URL after use
           setTimeout(() => {
               URL.revokeObjectURL(blobUrl);
+              this.refreshTable();
           }, 1000);
       },
       (error) => {

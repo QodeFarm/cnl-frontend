@@ -27,7 +27,7 @@ export class SalesListComponent {
     this.taTableComponent?.refresh();
   };
 
-selectedFormat: string = 'cnl-ex-sale-order';
+selectedFormat: string;
 pendingAction: 'email' | 'preview' | 'print' | null = null;
 
 // Show format selection popup
@@ -202,6 +202,7 @@ onPreviewClick(): void {
   this.http.post(url, { flag: 'preview' }, { responseType: 'blob' }).subscribe(
       (pdfBlob: Blob) => {
           this.showLoading = false;
+          this.refreshTable();
           
           // Create blob URL and open in new window
           const blobUrl = URL.createObjectURL(pdfBlob);
@@ -210,6 +211,7 @@ onPreviewClick(): void {
           // Clean up the blob URL after use
           setTimeout(() => {
               URL.revokeObjectURL(blobUrl);
+              // this.refreshTable();
           }, 1000);
       },
       (error) => {

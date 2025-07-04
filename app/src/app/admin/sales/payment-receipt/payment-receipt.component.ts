@@ -121,7 +121,7 @@ export class PaymentReceiptComponent implements OnInit {
     this.voucherNumber = null;
 
     // Use a more specific type parameter (PR-NEW) to force the backend to generate a unique new number
-    this.http.get(`masters/generate_order_no/?type=PR`).subscribe(
+    this.http.get(`masters/generate_order_no/?type=PTR`).subscribe(
       (res: any) => {
         console.log('Voucher API response:', res);
         if (res?.data?.order_number) {
@@ -311,7 +311,7 @@ export class PaymentReceiptComponent implements OnInit {
             templateOptions: {
               label: 'Voucher No',
               required: true,
-              disabled: true
+              // disabled: true
             },
             hooks: {
               onInit: (field: any) => {
