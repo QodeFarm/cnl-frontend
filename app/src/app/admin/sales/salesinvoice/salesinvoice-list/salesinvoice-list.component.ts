@@ -36,7 +36,7 @@ export class SalesInvoiceListComponent implements OnInit {
   };
 
 
-  selectedFormat: string = 'CNL_Standard_Incl'; //CNL_Standard_Excl
+  selectedFormat: string; //CNL_Standard_Excl
   pendingAction: 'email' | 'preview' | 'print' | null = null;
 
   // Show format selection popup
@@ -212,6 +212,7 @@ onPreviewClick(): void {
           // Clean up the blob URL after use
           setTimeout(() => {
               URL.revokeObjectURL(blobUrl);
+              this.refreshTable();
           }, 1000);
       },
       (error) => {

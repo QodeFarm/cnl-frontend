@@ -71,6 +71,8 @@ export class PaymentReceiptListComponent {
       return this.showDialog();
     }
 
+    console.log("selectedIds : ", selectedIds);
+
     const saleInvoiceId = selectedIds[0]; // Assuming only one row can be selected
     const payload = { flag: "email" };
     const url = `masters/document_generator/${saleInvoiceId}/payment_receipt/`;
