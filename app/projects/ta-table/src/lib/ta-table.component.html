@@ -127,7 +127,7 @@
 
 <!-- [nzTitle]="options.title"  (nzQueryParams)="onQueryParamsChange($event)"-->
 <nz-table #taTable nzShowSizeChanger [nzPageSizeOptions]="options.pageSizeOptions" [nzTableLayout]="options.tableLayout" [nzBordered]="options.bordered" [nzScroll]="{ x: options.scrollX, y: options.scrollY }" [nzData]="rows" [nzFrontPagination]="false"
-    [nzShowTotal]="totalTemplate" [nzFooter]="footerTemplate" [nzLoading]="loading" [nzTotal]="total" [nzPageSize]="options.pageSize" (nzQueryParams)="onQueryParamsChange($event)" [nzPageIndex]="pageIndex" [nzPaginationPosition]="options.paginationPosition">
+    [nzShowTotal]="totalTemplate" [nzFooter]="footerTemplate" [nzLoading]="loading" [nzTotal]="total || 1" [nzPageSize]="options.pageSize" (nzQueryParams)="onQueryParamsChange($event)" [nzPageIndex]="pageIndex" [nzPaginationPosition]="options.paginationPosition">
     <thead>
         <tr>
             <th *ngIf="options.showCheckbox" style="width: 50px;" [nzIndeterminate]="indeterminate"
