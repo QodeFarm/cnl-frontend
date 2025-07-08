@@ -192,7 +192,6 @@ onPreviewClick(): void {
       (pdfBlob: Blob) => {
           this.showLoading = false;
           this.refreshTable();
-
           
           // Create blob URL and open in new window
           const blobUrl = URL.createObjectURL(pdfBlob);
