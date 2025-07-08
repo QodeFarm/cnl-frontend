@@ -1152,6 +1152,30 @@ export class SalesinvoiceComponent {
                     }
                   }
                 },
+                // {
+                //   key: 'tax',
+                //   type: 'select',
+                //   className: 'col-md-4 col-sm-6 col-12',
+                //   templateOptions: {
+                //     label: 'Tax',
+                //     required: false,
+                //     disabled:true,
+                //     // readonly: true,
+                //     options: [
+                //       // { 'label': "Inclusive", value: 'Inclusive' },
+                //       { 'label': "Exclusive", value: 'Exclusive' }
+                //     ]
+                //   },
+                //   hooks: {
+                //     onInit: (field: any) => {
+                //       if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.tax && field.formControl) {
+                //         field.formControl.setValue(this.dataToPopulate.sale_invoice_order.tax);
+                //       } else {
+                //         field.formControl.setValue('Exclusive');
+                //       }
+                //     }
+                //   }
+                // },
                 {
                   key: 'tax',
                   type: 'select',
@@ -1159,18 +1183,19 @@ export class SalesinvoiceComponent {
                   templateOptions: {
                     label: 'Tax',
                     required: false,
-                    disabled:true,
-                    // readonly: true,
+                    disabled: false,
                     options: [
-                      // { 'label': "Inclusive", value: 'Inclusive' },
+                      { 'label': "Inclusive", value: 'Inclusive' },
                       { 'label': "Exclusive", value: 'Exclusive' }
+
                     ]
                   },
                   hooks: {
                     onInit: (field: any) => {
-                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.tax && field.formControl) {
-                        field.formControl.setValue(this.dataToPopulate.sale_invoice_order.tax);
+                    if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.tax && field.formControl) {
+                      field.formControl.setValue(this.dataToPopulate.sale_invoice_order.tax);
                       } else {
+                        // Set default value to 'Exclusive'
                         field.formControl.setValue('Exclusive');
                       }
                     }
