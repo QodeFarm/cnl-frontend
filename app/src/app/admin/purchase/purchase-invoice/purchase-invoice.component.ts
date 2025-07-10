@@ -295,21 +295,50 @@ export class PurchaseInvoiceComponent {
     }
   };
 
+  // async autoFillProductDetails(field, data) {
+  //   this.productOptions = data;
+  //   if (!field.form?.controls || !data) return;
+  //   const fieldMappings = {
+  //     code: data.code,
+  //     rate: data.sales_rate || field.form.controls.rate.value,
+  //     discount: parseFloat(data.dis_amount) || 0,
+  //     unit_options_id: data.unit_options?.unit_options_id,
+  //     print_name: data.print_name,
+  //     mrp: data.mrp
+  //   };
+  
+  //   Object.entries(fieldMappings).forEach(([key, value]) => {
+  //     if (value !== undefined) field.form.controls[key]?.setValue(value);
+  //   });
+  //   this.totalAmountCal();
+  // }
+
   async autoFillProductDetails(field, data) {
     this.productOptions = data;
+    console.log("Autofill data : ", this.productOptions)
     if (!field.form?.controls || !data) return;
+
     const fieldMappings = {
-      code: data.code,
-      rate: data.sales_rate || field.form.controls.rate.value,
-      discount: parseFloat(data.dis_amount) || 0,
+      // code: data.code,
+      code: data.code !== undefined
+        ? data.code
+        : field.form.controls.code.value,
+      rate: data.sales_rate ?? field.form.controls.rate.value,
+      // ✅ Key fix for discount:
+      discount: data.discount !== undefined
+        ? parseFloat(data.discount)
+        : field.form.controls.discount.value,
       unit_options_id: data.unit_options?.unit_options_id,
       print_name: data.print_name,
       mrp: data.mrp
     };
-  
+
     Object.entries(fieldMappings).forEach(([key, value]) => {
-      if (value !== undefined) field.form.controls[key]?.setValue(value);
+      if (value !== undefined) {
+        field.form.controls[key]?.setValue(value);
+      }
     });
+
     this.totalAmountCal();
   }
 
@@ -768,6 +797,9 @@ loadQuickpackProducts() {
                       if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders.tax && field.formControl) {
                         field.formControl.setValue(this.dataToPopulate.purchase_invoice_orders.tax);
                       }
+                      else {
+                        field.formControl.setValue('Exclusive');
+                      }
                     }
                   }
                 },
@@ -805,16 +837,6 @@ loadQuickpackProducts() {
                   defaultValue: '0.00'                    
                 },
                 {
-                  key: 'cess_amount',
-                  type: 'text',
-                  className: 'col-12',
-                  templateOptions: {
-                    label: 'Cess Amount',
-                    required: false
-                  },
-                  defaultValue: '0.00',
-                },
-                {
                   key: 'discount',
                   type: 'text',
                   className: 'col-12',
@@ -824,6 +846,16 @@ loadQuickpackProducts() {
                   },
                   defaultValue: '0.00'
 
+                },
+                {
+                  key: 'cess_amount',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Cess Amount',
+                    required: false
+                  },
+                  defaultValue: '0.00',
                 },
                 {
                   key: 'dis_amt',
@@ -1201,6 +1233,35 @@ loadQuickpackProducts() {
                   }
                 }
               },           
+              // {
+              //   type: 'input',
+              //   key: 'code',
+              //   templateOptions: {
+              //     label: 'Code',
+              //     placeholder: 'code',
+              //     hideLabel: true,
+              //   },
+              //   hooks: {
+              //     onInit: (field: any) => {
+              //       const parentArray = field.parent;
+              
+              //       // Check if parentArray exists and proceed
+              //       if (parentArray) {
+              //         const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+              //         // Check if there is a product already selected in this row (when data is copied)
+              //         if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_items.length > currentRowIndex) {
+              //           const existingCode = this.dataToPopulate.purchase_invoice_items[currentRowIndex].product?.code;
+                        
+              //           // Set the full product object instead of just the product_id
+              //           if (existingCode) {
+              //             field.formControl.setValue(existingCode); // Set full product object (not just product_id)
+              //           }
+              //         }
+              //       }
+              //     }
+              //   }
+              // },
               {
                 type: 'input',
                 key: 'code',
@@ -1212,20 +1273,18 @@ loadQuickpackProducts() {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-              
-                    // Check if parentArray exists and proceed
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
-              
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_items.length > currentRowIndex) {
-                        const existingCode = this.dataToPopulate.purchase_invoice_items[currentRowIndex].product?.code;
-                        
-                        // Set the full product object instead of just the product_id
-                        if (existingCode) {
-                          field.formControl.setValue(existingCode); // Set full product object (not just product_id)
-                        }
-                      }
+                    if (!parentArray) return;
+
+                    const idx = +parentArray.key;
+                    console.log('Init code field for row', idx);
+
+                    // Use form model directly instead of dataToPopulate
+                    const rowData = this.formConfig.model.purchase_invoice_items[idx];
+                    const existingCode = rowData ? rowData.product?.code : undefined;
+                    console.log(`Row ${idx} code from formConfig.model:`, existingCode);
+
+                    if (existingCode !== undefined && existingCode !== null) {
+                      field.formControl.setValue(existingCode);
                     }
                   }
                 }
@@ -1277,9 +1336,6 @@ loadQuickpackProducts() {
                       }
                     });
                   },
-                  onChanges: (field: any) => {
-                    // You can handle any changes here if needed
-                  }
                 }
               },
               {
@@ -1659,6 +1715,28 @@ loadQuickpackProducts() {
                           fieldGroupClassName: "ant-row",
                           key: 'purchase_invoice_orders',
                           fieldGroup: [
+                            // {
+                            //   key: 'tax_amount',
+                            //   type: 'input',
+                            //   defaultValue: "0",
+                            //   className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                            //   templateOptions: {
+                            //     type: 'number',
+                            //     label: 'Tax amount',
+                            //     placeholder: 'Enter Tax amount'
+                            //   },
+                            //   hooks: {
+                            //     onInit: (field: any) => {
+                            //       if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders && this.dataToPopulate.purchase_invoice_orders.tax_amount && field.formControl) {
+                            //         field.formControl.setValue(this.dataToPopulate.purchase_invoice_orders.tax_amount);
+                            //         this.totalAmountCal();
+                            //       }
+                            //       field.formControl.valueChanges.subscribe(data => {
+                            //         this.totalAmountCal();
+                            //       })
+                            //     }
+                            //   }
+                            // },
                             {
                               key: 'tax_amount',
                               type: 'input',
@@ -1671,16 +1749,60 @@ loadQuickpackProducts() {
                               },
                               hooks: {
                                 onInit: (field: any) => {
-                                  if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders && this.dataToPopulate.purchase_invoice_orders.tax_amount && field.formControl) {
+                                  // Initialize with existing tax_amount if available
+                                  if (
+                                    this.dataToPopulate &&
+                                    this.dataToPopulate.purchase_invoice_orders &&
+                                    this.dataToPopulate.purchase_invoice_orders.tax_amount &&
+                                    field.formControl
+                                  ) {
                                     field.formControl.setValue(this.dataToPopulate.purchase_invoice_orders.tax_amount);
-                                    this.totalAmountCal();
                                   }
-                                  field.formControl.valueChanges.subscribe(data => {
-                                    this.totalAmountCal();
-                                  })
+                            
+                                  // Store initial tax_amount as a float value
+                                  let previousTaxAmount = parseFloat(this.dataToPopulate?.purchase_invoice_orders?.tax_amount || "0");
+                            
+                                  // Subscribe to value changes on the tax_amount field
+                                  field.formControl.valueChanges.subscribe(newTaxAmount => {
+                                    if (field.form && field.form.controls && field.form.controls.total_amount) {
+                                      // Parse the current total amount as a float
+                                      const totalAmount = parseFloat(field.form.controls.total_amount.value || "0");
+                                      // Parse the new tax amount as a float
+                                      const currentNewTaxAmount = parseFloat(newTaxAmount || "0");
+                                      // Calculate the updated total by subtracting the previous tax value and adding the new one
+                                      const updatedTotal = totalAmount - previousTaxAmount + currentNewTaxAmount;
+                                      // Update the total_amount field with the new total, fixed to two decimals
+                                      field.form.controls.total_amount.setValue(parseFloat(updatedTotal.toFixed(2)));
+                                      // Update previousTaxAmount for future changes
+                                      previousTaxAmount = currentNewTaxAmount;
+                                      console.log("Updated total_amount:", updatedTotal);
+                                    }
+                                  });
                                 }
                               }
                             },
+                            // {
+                            //   key: 'cess_amount',
+                            //   type: 'input',
+                            //   defaultValue: "0",
+                            //   className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                            //   templateOptions: {
+                            //     type: 'number',
+                            //     label: 'Cess amount',
+                            //     placeholder: 'Enter Cess amount'
+                            //   },
+                            //   hooks: {
+                            //     onInit: (field: any) => {
+                            //       if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders && this.dataToPopulate.purchase_invoice_orders.cess_amount && field.formControl) {
+                            //         field.formControl.setValue(this.dataToPopulate.purchase_invoice_orders.cess_amount);
+                            //       }
+                            //       field.formControl.valueChanges.subscribe(data => {
+                            //         this.totalAmountCal();
+
+                            //       })
+                            //     }
+                            //   }
+                            // },
                             {
                               key: 'cess_amount',
                               type: 'input',
@@ -1693,13 +1815,20 @@ loadQuickpackProducts() {
                               },
                               hooks: {
                                 onInit: (field: any) => {
-                                  if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders && this.dataToPopulate.purchase_invoice_orders.cess_amount && field.formControl) {
-                                    field.formControl.setValue(this.dataToPopulate.purchase_invoice_orders.cess_amount);
+                                  // Populate existing value (edit mode)
+                                  const existing = this.dataToPopulate?.purchase_invoice_orders?.cess_amount;
+                                  if (existing !== undefined && existing !== null && field.formControl) {
+                                    field.formControl.setValue(existing);
                                   }
-                                  field.formControl.valueChanges.subscribe(data => {
-                                    this.totalAmountCal();
 
-                                  })
+                                  // Subscribe to changes
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    // ✅ Coerce empty, null, or invalid to 0
+                                    const numeric = parseFloat(data);
+                                    field.formControl.setValue(isNaN(numeric) ? 0 : numeric, { emitEvent: false });
+
+                                    this.totalAmountCal(); // recalc totals
+                                  });
                                 }
                               }
                             },
@@ -1919,6 +2048,10 @@ loadQuickpackProducts() {
                                   if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders && this.dataToPopulate.purchase_invoice_orders.total_amount && field.formControl) {
                                     field.formControl.setValue(this.dataToPopulate.purchase_invoice_orders.total_amount);
                                   }
+
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    // this.totalAmountCal();
+                                  });
                                 }
                               }
                             }   

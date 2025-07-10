@@ -215,6 +215,9 @@ export class PurchasereturnordersComponent {
               total_boxes: item.total_boxes,
               quantity: item.quantity,
               amount: item.amount,
+              cgst: item.cgst,
+              sgst: item.sgst,
+              igst: item.igst,
               rate: item.rate,
               print_name: item.print_name,
               discount: item.discount
@@ -296,23 +299,52 @@ export class PurchasereturnordersComponent {
         }
       };
   
-      async autoFillProductDetails(field, data) {
-        this.productOptions = data;
-        if (!field.form?.controls || !data) return;
-        const fieldMappings = {
-          code: data.code,
-          rate: data.sales_rate || field.form.controls.rate.value,
-          discount: parseFloat(data.dis_amount) || 0,
-          unit_options_id: data.unit_options?.unit_options_id,
-          print_name: data.print_name,
-          mrp: data.mrp
-        };
+      // async autoFillProductDetails(field, data) {
+      //   this.productOptions = data;
+      //   if (!field.form?.controls || !data) return;
+      //   const fieldMappings = {
+      //     code: data.code,
+      //     rate: data.sales_rate || field.form.controls.rate.value,
+      //     discount: parseFloat(data.dis_amount) || 0,
+      //     unit_options_id: data.unit_options?.unit_options_id,
+      //     print_name: data.print_name,
+      //     mrp: data.mrp
+      //   };
       
-        Object.entries(fieldMappings).forEach(([key, value]) => {
-          if (value !== undefined) field.form.controls[key]?.setValue(value);
-        });
-        this.totalAmountCal();
+      //   Object.entries(fieldMappings).forEach(([key, value]) => {
+      //     if (value !== undefined) field.form.controls[key]?.setValue(value);
+      //   });
+      //   this.totalAmountCal();
+      // }
+
+  async autoFillProductDetails(field, data) {
+    this.productOptions = data;
+    console.log("Autofill data : ", this.productOptions)
+    if (!field.form?.controls || !data) return;
+
+    const fieldMappings = {
+      // code: data.code,
+      code: data.code !== undefined
+        ? data.code
+        : field.form.controls.code.value,
+      rate: data.sales_rate ?? field.form.controls.rate.value,
+      // ✅ Key fix for discount:
+      discount: data.discount !== undefined
+        ? parseFloat(data.discount)
+        : field.form.controls.discount.value,
+      unit_options_id: data.unit_options?.unit_options_id,
+      print_name: data.print_name,
+      mrp: data.mrp
+    };
+
+    Object.entries(fieldMappings).forEach(([key, value]) => {
+      if (value !== undefined) {
+        field.form.controls[key]?.setValue(value);
       }
+    });
+
+    this.totalAmountCal();
+  }
 //=====================================================================
   formConfig: TaFormConfig = {};
 
@@ -329,7 +361,6 @@ export class PurchasereturnordersComponent {
         this.formConfig.pkId = 'purchase_return_id';
         this.formConfig.submit.label = 'Update';
         this.formConfig.model['purchase_return_id'] = this.PurchaseReturnOrderEditID;
-        this.totalAmountCal();
         this.showForm = true;
         this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[5].hide = false;
         this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[6].hide = true;
@@ -341,6 +372,7 @@ export class PurchasereturnordersComponent {
           }, {});
         }
       }
+      this.totalAmountCal();
     });
     this.hide();
   }
@@ -704,6 +736,9 @@ showSuccessToast = false;
                       if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders.tax && field.formControl) {
                         field.formControl.setValue(this.dataToPopulate.purchase_return_orders.tax);
                       }
+                      else {
+                        field.formControl.setValue('Exclusive');
+                      }
                     }
                   }
                 },
@@ -751,6 +786,16 @@ showSuccessToast = false;
                   defaultValue: '0.00'                    
                 },
                 {
+                  key: 'discount',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Product Disocunt',
+                     required: false
+                  },
+                  defaultValue: '0.00'
+                },
+                {
                   key: 'cess_amount',
                   type: 'text',
                   className: 'col-12',
@@ -761,11 +806,11 @@ showSuccessToast = false;
                   defaultValue: '0.00',
                 },
                 {
-                  key: 'discount',
+                  key: 'dis_amt',
                   type: 'text',
                   className: 'col-12',
                   templateOptions: {
-                    label: 'Product Disocunt',
+                    label: 'Discount Amount',
                      required: false
                   },
                   defaultValue: '0.00'
@@ -839,16 +884,6 @@ showSuccessToast = false;
                   },
                   hideExpression: (model) => !model.billing_address || model.billing_address?.includes('Andhra Pradesh') // Hide if intra-state
                 }, 
-                {
-                  key: 'dis_amt',
-                  type: 'text',
-                  className: 'col-12',
-                  templateOptions: {
-                    label: 'Discount Amount',
-                     required: false
-                  },
-                  defaultValue: '0.00'
-                },
                 // {
                 //   key: 'advance_amount',
                 //   type: 'text',
@@ -1145,34 +1180,61 @@ showSuccessToast = false;
               {
                 type: 'input',
                 key: 'code',
-                // defaultValue: 0,
                 templateOptions: {
                   label: 'Code',
                   placeholder: 'code',
                   hideLabel: true,
-                  // // required: true
                 },
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-              
-                    // Check if parentArray exists and proceed
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
-              
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.purchase_return_items.length > currentRowIndex) {
-                        const existingCode = this.dataToPopulate.purchase_return_items[currentRowIndex].product?.code;
-                        
-                        // Set the full product object instead of just the product_id
-                        if (existingCode) {
-                          field.formControl.setValue(existingCode); // Set full product object (not just product_id)
-                        }
-                      }
+                    if (!parentArray) return;
+
+                    const idx = +parentArray.key;
+                    console.log('Init code field for row', idx);
+
+                    // Use form model directly instead of dataToPopulate
+                    const rowData = this.formConfig.model.purchase_return_items[idx];
+                    const existingCode = rowData ? rowData.product?.code : undefined;
+                    console.log(`Row ${idx} code from formConfig.model:`, existingCode);
+
+                    if (existingCode !== undefined && existingCode !== null) {
+                      field.formControl.setValue(existingCode);
                     }
                   }
                 }
               },
+              // {
+              //   type: 'input',
+              //   key: 'code',
+              //   // defaultValue: 0,
+              //   templateOptions: {
+              //     label: 'Code',
+              //     placeholder: 'code',
+              //     hideLabel: true,
+              //     // // required: true
+              //   },
+              //   hooks: {
+              //     onInit: (field: any) => {
+              //       const parentArray = field.parent;
+              
+              //       // Check if parentArray exists and proceed
+              //       if (parentArray) {
+              //         const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+              //         // Check if there is a product already selected in this row (when data is copied)
+              //         if (this.dataToPopulate && this.dataToPopulate.purchase_return_items.length > currentRowIndex) {
+              //           const existingCode = this.dataToPopulate.purchase_return_items[currentRowIndex].product?.code;
+                        
+              //           // Set the full product object instead of just the product_id
+              //           if (existingCode) {
+              //             field.formControl.setValue(existingCode); // Set full product object (not just product_id)
+              //           }
+              //         }
+              //       }
+              //     }
+              //   }
+              // },
               // quantity amount rate dsc
               {
                 type: 'input',
@@ -1209,16 +1271,15 @@ showSuccessToast = false;
                     field.formControl.valueChanges.subscribe(data => {
                       if (field.form && field.form.controls && field.form.controls.rate && data) {
                         const rate = field.form.controls.rate.value;
+                        const discount = field.form.controls.discount.value;
                         const quantity = data;
+                        const productDiscount = parseInt(rate) * parseInt(quantity) * parseInt(discount)/ 100
                         if (rate && quantity) {
-                          field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity));
+                          field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity)- productDiscount) ;
                         }
                       }
                     });
                   },
-                  onChanges: (field: any) => {
-                    // You can handle any changes here if needed
-                  }
                 }
               },
 
@@ -1615,48 +1676,121 @@ showSuccessToast = false;
                           fieldGroupClassName: "ant-row",
                           key: 'purchase_return_orders',
                           fieldGroup: [
+                            // {
+                            //   key: 'tax_amount',
+                            //   type: 'input',
+                            //   defaultValue: "0",
+                            //   className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                            //   templateOptions: {
+                            //   type: 'input',
+                            //   label: 'Tax amount',
+                            //   placeholder: 'Enter Tax amount',
+                            //   // required: true
+                            //   },
+                            //   hooks: {
+                            //   onInit: (field: any) => {
+                            //     if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders && this.dataToPopulate.purchase_return_orders.tax_amount && field.formControl) {
+                            //     field.formControl.setValue(this.dataToPopulate.purchase_return_orders.tax_amount);
+                            //     }
+                            //     field.formControl.valueChanges.subscribe(data => {
+                            //     this.totalAmountCal();
+                            //     })
+                            //   }
+                            //   }
+                            // },
                             {
                               key: 'tax_amount',
                               type: 'input',
                               defaultValue: "0",
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
-                              type: 'input',
-                              label: 'Tax amount',
-                              placeholder: 'Enter Tax amount',
-                              // required: true
+                                type: 'number',
+                                label: 'Tax amount',
+                                placeholder: 'Enter Tax amount'
                               },
                               hooks: {
-                              onInit: (field: any) => {
-                                if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders && this.dataToPopulate.purchase_return_orders.tax_amount && field.formControl) {
-                                field.formControl.setValue(this.dataToPopulate.purchase_return_orders.tax_amount);
+                                onInit: (field: any) => {
+                                  // Initialize with existing tax_amount if available
+                                  if (
+                                    this.dataToPopulate &&
+                                    this.dataToPopulate.purchase_return_orders &&
+                                    this.dataToPopulate.purchase_return_orders.tax_amount &&
+                                    field.formControl
+                                  ) {
+                                    field.formControl.setValue(this.dataToPopulate.purchase_return_orders.tax_amount);
+                                  }
+                            
+                                  // Store initial tax_amount as a float value
+                                  let previousTaxAmount = parseFloat(this.dataToPopulate?.purchase_return_orders?.tax_amount || "0");
+                            
+                                  // Subscribe to value changes on the tax_amount field
+                                  field.formControl.valueChanges.subscribe(newTaxAmount => {
+                                    if (field.form && field.form.controls && field.form.controls.total_amount) {
+                                      // Parse the current total amount as a float
+                                      const totalAmount = parseFloat(field.form.controls.total_amount.value || "0");
+                                      // Parse the new tax amount as a float
+                                      const currentNewTaxAmount = parseFloat(newTaxAmount || "0");
+                                      // Calculate the updated total by subtracting the previous tax value and adding the new one
+                                      const updatedTotal = totalAmount - previousTaxAmount + currentNewTaxAmount;
+                                      // Update the total_amount field with the new total, fixed to two decimals
+                                      field.form.controls.total_amount.setValue(parseFloat(updatedTotal.toFixed(2)));
+                                      // Update previousTaxAmount for future changes
+                                      previousTaxAmount = currentNewTaxAmount;
+                                      console.log("Updated total_amount:", updatedTotal);
+                                    }
+                                  });
                                 }
-                                field.formControl.valueChanges.subscribe(data => {
-                                this.totalAmountCal();
-                                })
-                              }
                               }
                             },
+                            // {
+                            //   key: 'cess_amount',
+                            //   type: 'input',
+                            //   defaultValue: "0",
+                            //   className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                            //   templateOptions: {
+                            //   type: 'input',
+                            //   label: 'Cess amount',
+                            //   placeholder: 'Enter Cess amount',
+                            //   // required: true
+                            //   },
+                            //   hooks: {
+                            //   onInit: (field: any) => {
+                            //     if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders && this.dataToPopulate.purchase_return_orders.cess_amount && field.formControl) {
+                            //     field.formControl.setValue(this.dataToPopulate.purchase_return_orders.cess_amount);
+                            //     }
+                            //     field.formControl.valueChanges.subscribe(data => {
+                            //     this.totalAmountCal();
+                            //     })
+                            //   }
+                            //   }
+                            // },
                             {
                               key: 'cess_amount',
                               type: 'input',
                               defaultValue: "0",
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
-                              type: 'input',
-                              label: 'Cess amount',
-                              placeholder: 'Enter Cess amount',
-                              // required: true
+                                type: 'number',
+                                label: 'Cess amount',
+                                placeholder: 'Enter Cess amount'
                               },
                               hooks: {
-                              onInit: (field: any) => {
-                                if (this.dataToPopulate && this.dataToPopulate.purchase_return_orders && this.dataToPopulate.purchase_return_orders.cess_amount && field.formControl) {
-                                field.formControl.setValue(this.dataToPopulate.purchase_return_orders.cess_amount);
+                                onInit: (field: any) => {
+                                  // Populate existing value (edit mode)
+                                  const existing = this.dataToPopulate?.purchase_return_orders?.cess_amount;
+                                  if (existing !== undefined && existing !== null && field.formControl) {
+                                    field.formControl.setValue(existing);
+                                  }
+
+                                  // Subscribe to changes
+                                  field.formControl.valueChanges.subscribe(data => {
+                                    // ✅ Coerce empty, null, or invalid to 0
+                                    const numeric = parseFloat(data);
+                                    field.formControl.setValue(isNaN(numeric) ? 0 : numeric, { emitEvent: false });
+
+                                    this.totalAmountCal(); // recalc totals
+                                  });
                                 }
-                                field.formControl.valueChanges.subscribe(data => {
-                                this.totalAmountCal();
-                                })
-                              }
                               }
                             },
                             {
