@@ -128,24 +128,24 @@ export class ProductsComponent implements OnInit {
     // Update model with cleaned variations
     this.formConfig.model.product_variations = productVariations;
   
-    const totalItemBalanceQuantity = calculateTotalQuantity(this.formConfig.model.product_item_balance);
-    const totalVariationQuantity = calculateTotalQuantity(productVariations);
+    // const totalItemBalanceQuantity = calculateTotalQuantity(this.formConfig.model.product_item_balance);
+    // const totalVariationQuantity = calculateTotalQuantity(productVariations);
   
-    // Validate variations match balance
-    if (productVariations.length && totalVariationQuantity !== balance) {
-      return this.showDialog(
-        `<b>Variations !</b><br>
-         Your sum of quantities are <b>${totalVariationQuantity}</b> not matching with overall balance <b>${balance}.</b>`
-      );
-    }
+    // // Validate variations match balance
+    // if (productVariations.length && totalVariationQuantity !== balance) {
+    //   return this.showDialog(
+    //     `<b>Variations !</b><br>
+    //      Your sum of quantities are <b>${totalVariationQuantity}</b> not matching with overall balance <b>${balance}.</b>`
+    //   );
+    // }
   
-    // Validate item balance matches
-    if (totalItemBalanceQuantity !== balance) {
-      return this.showDialog(
-        `<b>Warehouse Locations!</b><br>
-         Your sum of quantities are <b>${totalItemBalanceQuantity}</b> not matching with overall balance <b>${balance}.</b>`
-      );
-    }
+    // // Validate item balance matches
+    // if (totalItemBalanceQuantity !== balance) {
+    //   return this.showDialog(
+    //     `<b>Warehouse Locations!</b><br>
+    //      Your sum of quantities are <b>${totalItemBalanceQuantity}</b> not matching with overall balance <b>${balance}.</b>`
+    //   );
+    // }
   
     return true; // Everything matches
   }
@@ -247,7 +247,7 @@ export class ProductsComponent implements OnInit {
                   templateOptions: {
                   label: 'Code',
                   placeholder: 'Enter Code',
-                  required: true
+                  required: false
                   },
                   hooks: {
                   onInit: (field: any) => {
@@ -268,7 +268,7 @@ export class ProductsComponent implements OnInit {
                     dataKey: 'product_group_id',
                     dataLabel: "group_name",
                     options: [],
-                    required: true,
+                    required: false,
                     lazy: {
                       url: 'products/product_groups/',
                       lazyOneTime: true
@@ -295,7 +295,7 @@ export class ProductsComponent implements OnInit {
                   dataKey: 'stock_unit_id',
                   dataLabel: "stock_unit_name",
                   options: [],
-                  required: true,
+                  required: false,
                   lazy: {
                     url: 'products/product_stock_units/',
                     lazyOneTime: true
@@ -313,60 +313,60 @@ export class ProductsComponent implements OnInit {
                   }
                   }
                 },
-                {
-                  key: 'sales_gl',
-                  type: 'select',
-                  className: 'col-md-4 col-sm-6 col-12',
-                  templateOptions: {
-                  label: 'Sales GL',
-                  dataKey: 'sales_gl_id',
-                  dataLabel: "name",
-                  options: [],
-                  required: true,
-                  lazy: {
-                    url: 'products/product_sales_gl/',
-                    lazyOneTime: true
-                  }
-                  },
-                  hooks: {
-                  onChanges: (field: any) => {
-                    field.formControl.valueChanges.subscribe((data: any) => {
-                    if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
-                      this.formConfig.model['products']['sales_gl_id'] = data?.sales_gl_id;
-                    } else {
-                      console.error('Form config or lead_status data model is not defined.');
-                    }
-                    });
-                  }
-                  }
-                },
-                {
-                  key: 'purchase_gl',
-                  type: 'select',
-                  className: 'col-md-4 col-sm-6 col-12',
-                  templateOptions: {
-                  label: 'Purchase GL',
-                  dataKey: 'purchase_gl_id',
-                  dataLabel: "name",
-                  options: [],
-                  required: true,
-                  lazy: {
-                    url: 'products/product_purchase_gl/',
-                    lazyOneTime: true
-                  }
-                  },
-                  hooks: {
-                  onChanges: (field: any) => {
-                    field.formControl.valueChanges.subscribe((data: any) => {
-                    if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
-                      this.formConfig.model['products']['purchase_gl_id'] = data?.purchase_gl_id;
-                    } else {
-                      console.error('Form config or lead_status data model is not defined.');
-                    }
-                    });
-                  }
-                  }
-                },
+                // {
+                //   key: 'sales_gl',
+                //   type: 'select',
+                //   className: 'col-md-4 col-sm-6 col-12',
+                //   templateOptions: {
+                //   label: 'Sales GL',
+                //   dataKey: 'sales_gl_id',
+                //   dataLabel: "name",
+                //   options: [],
+                //   required: true,
+                //   lazy: {
+                //     url: 'products/product_sales_gl/',
+                //     lazyOneTime: true
+                //   }
+                //   },
+                //   hooks: {
+                //   onChanges: (field: any) => {
+                //     field.formControl.valueChanges.subscribe((data: any) => {
+                //     if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                //       this.formConfig.model['products']['sales_gl_id'] = data?.sales_gl_id;
+                //     } else {
+                //       console.error('Form config or lead_status data model is not defined.');
+                //     }
+                //     });
+                //   }
+                //   }
+                // },
+                // {
+                //   key: 'purchase_gl',
+                //   type: 'select',
+                //   className: 'col-md-4 col-sm-6 col-12',
+                //   templateOptions: {
+                //   label: 'Purchase GL',
+                //   dataKey: 'purchase_gl_id',
+                //   dataLabel: "name",
+                //   options: [],
+                //   required: true,
+                //   lazy: {
+                //     url: 'products/product_purchase_gl/',
+                //     lazyOneTime: true
+                //   }
+                //   },
+                //   hooks: {
+                //   onChanges: (field: any) => {
+                //     field.formControl.valueChanges.subscribe((data: any) => {
+                //     if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                //       this.formConfig.model['products']['purchase_gl_id'] = data?.purchase_gl_id;
+                //     } else {
+                //       console.error('Form config or lead_status data model is not defined.');
+                //     }
+                //     });
+                //   }
+                //   }
+                // },
                 {
                   className: 'col-md-4 col-sm-6 col-12',
                   key: 'hsn_code',
@@ -413,15 +413,16 @@ export class ProductsComponent implements OnInit {
                 //   }
                 // },
                 
-                {
-                  className: 'col-md-4 col-sm-6 col-12',
-                  key: 'balance',
-                  type: 'input',
-                  templateOptions: {
-                  label: 'Balance',
-                  required : true
-                  }
-                },
+                // {
+                //   className: 'col-md-4 col-sm-6 col-12',
+                //   key: 'balance',
+                //   type: 'input',
+                //   defaultValue: 0.00,
+                //   templateOptions: {
+                //   label: 'Balance',
+                //   required: false, 
+                //   }
+                // },
                 {
                   key: 'unit_options',
                   type: 'select',
@@ -431,7 +432,7 @@ export class ProductsComponent implements OnInit {
                   dataKey: 'unit_options_id',
                   dataLabel: "unit_name",
                   options: [],
-                  required: true,
+                  required: false,
                   lazy: {
                     url: 'masters/unit_options/',
                     lazyOneTime: true
@@ -471,7 +472,7 @@ export class ProductsComponent implements OnInit {
                   className: 'ta-cell pr-md col d-flex justify-content-md-center pr-0',
                   templateOptions: {
                     label: 'Picture',
-                    required: true
+                    required: false,                  
                   }
                 }                                
               ]
@@ -610,7 +611,7 @@ export class ProductsComponent implements OnInit {
                                 dataLabel: 'location_name',
                                 options: [], // This will be populated dynamically based on the warehouse selected
                                 hideLabel: true,
-                                required: true,
+                                required: false,
                                 lazy: {
                                 lazyOneTime: true,
                                 url: 'inventory/warehouse_locations/'
@@ -636,7 +637,7 @@ export class ProductsComponent implements OnInit {
                                 label: 'Quantity',
                                 placeholder: 'Enter Quantity',
                                 hideLabel: true,
-                                required: true
+                                required: false
                               }
                             }
                           ]
@@ -787,6 +788,7 @@ export class ProductsComponent implements OnInit {
                                 className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'discount',
                                 type: 'input',
+                                defaultValue: 0.00,
                                 templateOptions: {
                                   label: 'Discount',
                                   placeholder: 'Enter Discount'
@@ -796,6 +798,7 @@ export class ProductsComponent implements OnInit {
                                 className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                 key: 'dis_amount',
                                 type: 'input',
+                                defaultValue: 0.00,
                                 templateOptions: {
                                   label: 'Disc Amt',
                                   placeholder: 'Enter Disc Amt',
