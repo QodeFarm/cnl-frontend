@@ -163,11 +163,11 @@ export class DefaultInterceptor implements HttpInterceptor {
         }
     }
     
-    // this.notification.error(
-    //   'Error',
-    //   errorText,
-    //   { nzDuration: 5000, nzStyle: { backgroundColor: '#fff9f9', border: '1px solid #ffa39e', maxWidth: '600px' } }
-    // );
+    this.notification.error(
+      'Error',
+      errorText,
+      { nzDuration: 5000, nzStyle: { backgroundColor: '#fff9f9', border: '1px solid #ffa39e', maxWidth: '600px' } }
+    );
   }
 
   /**
