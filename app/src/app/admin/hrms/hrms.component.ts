@@ -177,7 +177,7 @@ export class EmployeesComponent  implements OnInit {
                   url: 'hrms/job_types/',
                   lazyOneTime: true
                 },
-                required: true
+                required: false
               },
               hooks: {
                 onChanges: (field: any) => {

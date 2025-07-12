@@ -27,13 +27,13 @@ export class EmployeeListComponent {
     pkId: "employee_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['hire_date','first_name','last_name','email','phone','address','hire_date','job_type_id','designation_id','department_id','shift_id','manager_id']
+      keys: ['hire_date','first_name','full_name','last_name','email','phone','address','hire_date','job_type_id','designation_id','department_id','shift_id','manager_id']
     },
     export: {downloadName: 'EmployeeList'},
     defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {
-        fieldKey: 'first_name',
+        fieldKey: 'full_name',
         name: 'Name',
         sort: true,
         displayType: "map",
