@@ -137,6 +137,11 @@ export class SalesRepotsComponent {
         {
           fieldKey: 'customer',
           name: 'Customer',
+          displayType: "map",
+          mapFn: (currentValue: any, row: any, col: any) => {
+            // return `${row.customer.name}`;
+            return row.customer?.name || row.customer_id || '';
+          },
           sort: true
         },
         {
@@ -144,17 +149,29 @@ export class SalesRepotsComponent {
           name: 'Order Date',
           sort: true
         },
+        // {
+        //   fieldKey: 'sale_type',
+        //   name: 'Sale Type',
+        //   sort: true,
+        // },
         {
           fieldKey: 'sale_type',
           name: 'Sale Type',
           sort: true,
+          displayType: "map",
+          mapFn: (currentValue: any, row: any, col: any) => {
+            // console.log("-->", currentValue);
+            // return `${row.sale_type?.name || ''}`;
+            return row.sale_type?.name || row.sale_type_id || '';
+          },
         },
         {
           fieldKey: 'status_name',
           name: 'Status',
           displayType: "map",
           mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row?.order_status?.status_name}`;
+            // return `${row?.order_status?.status_name}`;
+            return row.order_status?.status_name || row.order_status_id || '';
           },
           sort: true
         },
@@ -323,9 +340,19 @@ export class SalesRepotsComponent {
           name: 'Invoice Date',
           sort: true
         }, 
+        // {
+        //   fieldKey: 'customer',
+        //   name: 'Customer',
+        //   sort: true
+        // },
         {
           fieldKey: 'customer',
           name: 'Customer',
+          displayType: "map",
+          mapFn: (currentValue: any, row: any, col: any) => {
+            // return `${row.customer.name}`;
+            return row.customer?.name || row.customer_id || '';
+          },
           sort: true
         },
         {
@@ -359,7 +386,8 @@ export class SalesRepotsComponent {
           name: 'Status',
           displayType: "map",
           mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row?.order_status?.status_name}`;
+            // return `${row?.order_status?.status_name}`;
+            return row.order_status?.status_name || row.order_status_id || '';
           },
           sort: true
         },
