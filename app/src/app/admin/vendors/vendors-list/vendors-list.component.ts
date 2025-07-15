@@ -54,11 +54,20 @@ export class VendorsListComponent {
         fieldKey: 'email',
         name: 'Email',
         sort: false,
-      },
+      }, 
       {
         fieldKey: 'phone',
         name: 'Phone',
         sort: false,
+      },
+      {
+        fieldKey: 'city_id',
+        name: 'City Name',
+        sort: false,
+        displayType: 'map',
+        mapFn: (currentValue: any, row: any, col: any) => {
+          return row.city?.city_name;
+        },
       },
       {
         fieldKey: 'vendor_category_id',
@@ -79,12 +88,12 @@ export class VendorsListComponent {
         },
       },
       {
-        fieldKey: 'city_id',
-        name: 'City Name',
-        sort: false,
+        fieldKey: 'vendor_addresses',
+        name: 'Billing Address',
+        sort: true,
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
-          return row.city?.city_name;
+          return row.vendor_addresses.billing_address;
         },
       },
       {
