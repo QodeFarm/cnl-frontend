@@ -81,7 +81,7 @@ export class SalesRepotsComponent {
       pkId: "sale_order_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['order_no', 'customer', 'order_date','sale_type','status', 'amount']
+        keys: ['order_no', 'customer_id', 'order_date','sale_type_id','order_status_id', 'amount']
       },
       export: {downloadName: 'SalesOtherReport'},
       defaultSort: { key: 'created_at', value: 'descend' },
@@ -92,7 +92,7 @@ export class SalesRepotsComponent {
           sort: true
         },
         {
-          fieldKey: 'customer',
+          fieldKey: 'customer_id',
           name: 'Customer',
           sort: true
         },
@@ -102,17 +102,13 @@ export class SalesRepotsComponent {
           sort: true
         },
         {
-          fieldKey: 'sale_type',
+          fieldKey: 'sale_type_id',
           name: 'Sale Type',
           sort: true,
         },
         {
-          fieldKey: 'status_name',
+          fieldKey: 'order_status_id',
           name: 'Status',
-          displayType: "map",
-          mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row?.order_status?.status_name}`;
-          },
           sort: true
         },
         {
@@ -248,7 +244,7 @@ export class SalesRepotsComponent {
       pkId: "sale_invoice_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['invoice_no','invoice_date','customer','created_at','bill_type','item_value','dis_amt','tax_amount','total_amount','due_date','payment_status','created_at']
+        keys: ['invoice_no','invoice_date','customer_id','created_at','bill_type','item_value','dis_amt','tax_amount','total_amount','due_date','created_at']
       },
       export: {downloadName: 'OtherInvoiceReport'},
       defaultSort: { key: 'created_at', value: 'descend' },
@@ -264,7 +260,7 @@ export class SalesRepotsComponent {
           sort: true
         }, 
         {
-          fieldKey: 'customer',
+          fieldKey: 'customer_id',
           name: 'Customer',
           sort: true
         },
@@ -295,12 +291,8 @@ export class SalesRepotsComponent {
           sort: true
         },
         {
-          fieldKey: 'status_name',
+          fieldKey: 'order_status_id',
           name: 'Status',
-          displayType: "map",
-          mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row?.order_status?.status_name}`;
-          },
           sort: true
         },
       {

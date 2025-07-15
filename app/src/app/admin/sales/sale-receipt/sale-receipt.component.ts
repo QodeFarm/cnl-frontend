@@ -269,43 +269,107 @@ async confirmReceipt() {
               () => {
                 console.log(` Child Sale Order ${childSaleOrderId} updated to Completed.`);
                 console.log("this.selectedOrder : ", this.selectedOrder);
-                // ✅ Trigger replication if sale_type is "Other"
-                if (this.selectedOrder.sale_type?.name === 'Other') {
-                  const getUrl = `sales/sale_order/${childSaleOrderId}/`;
+                // Trigger replication if sale_type is "Other"
+                // if (this.selectedOrder.sale_type?.name === 'Other') {
+                //   const getUrl = `sales/sale_order/${childSaleOrderId}/`;
 
-                  this.http.get(getUrl).subscribe(
-                    (res: any) => {
-                      const fullData = res?.data;
-                      console.log("fullData : ", fullData);
+                //   this.http.get(getUrl).subscribe(
+                //     (res: any) => {
+                //       const fullData = res?.data;
+                //       console.log("fullData : ", fullData);
 
-                      if (!fullData?.sale_order || !fullData?.sale_order_items?.length) {
-                        alert('Sale order or items are missing for replication.');
-                        return;
-                      }
+                //       if (!fullData?.sale_order || !fullData?.sale_order_items?.length) {
+                //         alert('Sale order or items are missing for replication.');
+                //         return;
+                //       }
+                      
 
-                      const replicateUrl = `sales/sale_order/`;
-                      this.http.post(replicateUrl, {
-                                            sale_order: fullData.sale_order,
-                                            sale_order_items: fullData.sale_order_items,
-                                            order_attachments: fullData.order_attachments || [],
-                                            order_shipments: fullData.order_shipments || []
-                                            // custom_field_values: customFields
-                                          }).subscribe(
-                        (replicateRes: any) => {
-                          console.log('✅ Sale order replicated to mstcnl:', replicateRes);
-                        },
-                        (replicateErr) => {
-                          console.error('❌ Replication to mstcnl failed:', replicateErr);
-                          alert('Sale order was marked Completed, but replication to mstcnl failed.');
-                        }
-                      )
-                    },
-                    (err) => {
-                      console.error('❌ Failed to fetch full sale order data:', err);
-                      alert('Could not fetch sale order details for replication.');
-                    }
-                  );
-                }
+                //       const replicateUrl = `sales/sale_order/`;
+                //       this.http.post(replicateUrl, {
+                //                             sale_order: fullData.sale_order,
+                //                             sale_order_items: fullData.sale_order_items,
+                //                             order_attachments: fullData.order_attachments || [],
+                //                             order_shipments: fullData.order_shipments || []
+                //                             // custom_field_values: customFields
+                //                           }).subscribe(
+                //         (replicateRes: any) => {
+                //           console.log('Sale order replicated to mstcnl:', replicateRes);
+                //         },
+                //         (replicateErr) => {
+                //           console.error('Replication to mstcnl failed:', replicateErr);
+                //           alert('Sale order was marked Completed, but replication to mstcnl failed.');
+                //         }
+                //       )
+                //     },
+                //     (err) => {
+                //       console.error('Failed to fetch full sale order data:', err);
+                //       alert('Could not fetch sale order details for replication.');
+                //     }
+                //   );
+                // }
+                // if (this.selectedOrder.sale_type?.name === 'Other') {
+                //   const getUrl = `sales/sale_order/${childSaleOrderId}/`;
+
+                //   this.http.get(getUrl).subscribe(
+                //     (res: any) => {
+                //       const fullData = res?.data;
+                //       console.log("fullData : ", fullData);
+
+                //       if (!fullData?.sale_order || !fullData?.sale_order_items?.length) {
+                //         alert('Sale order or items are missing for replication.');
+                //         return;
+                //       }
+
+                //       //NEW: First check related sale invoice status
+                //       this.http.get(`sales/sale_invoice_order/?sale_order_id=${childSaleOrderId}`).subscribe(
+                //         (invoiceRes: any) => {
+                //           const saleInvoice = invoiceRes?.data?.[0];
+                //           if (!saleInvoice) {
+                //             alert('Sale invoice not found. Cannot replicate.');
+                //             return;
+                //           }
+
+                //           const invoiceStatusName = saleInvoice.order_status?.status_name;
+                //           console.log("Related Sale Invoice status:", invoiceStatusName);
+
+                //           if (invoiceStatusName !== 'Completed') {
+                //             alert('Related sale invoice is not Completed. Replication skipped.');
+                //             return;
+                //           }
+
+                //           //Invoice is Completed — do replicate
+                //           const replicateUrl = `sales/sale_order/`;
+                //           this.http.post(replicateUrl, {
+                //             sale_order: fullData.sale_order,
+                //             sale_order_items: fullData.sale_order_items,
+                //             order_attachments: fullData.order_attachments || [],
+                //             order_shipments: fullData.order_shipments || []
+                //             // custom_field_values: customFields
+                //           }).subscribe(
+                //             (replicateRes: any) => {
+                //               console.log('Sale order replicated to mstcnl:', replicateRes);
+                //             },
+                //             (replicateErr) => {
+                //               console.error('Replication to mstcnl failed:', replicateErr);
+                //               alert('Sale order was marked Completed, but replication to mstcnl failed.');
+                //             }
+                //           );
+
+                //         },
+                //         (err) => {
+                //           console.error('Failed to fetch related sale invoice:', err);
+                //           alert('Could not fetch related sale invoice. Replication aborted.');
+                //         }
+                //       );
+
+                //     },
+                //     (err) => {
+                //       console.error('Failed to fetch full sale order data:', err);
+                //       alert('Could not fetch sale order details for replication.');
+                //     }
+                //   );
+                // }
+
                 this.closeModal();
                 this.refreshCurdConfig();
 
