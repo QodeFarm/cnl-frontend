@@ -334,7 +334,7 @@ export class CustomersComponent {
                       templateOptions: {
                         label: 'Print Name',
                         placeholder: 'Enter Print Name',
-                        required: false,
+                        required: true,
                       }
                     },               
                     {
@@ -431,7 +431,7 @@ export class CustomersComponent {
                       className: 'ta-cell pr-md col d-flex justify-content-md-center pr-0',
                       templateOptions: {
                         label: 'Picture',
-                        required: false
+                        // required: false
                       }
                     }                                
                   ]

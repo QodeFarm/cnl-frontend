@@ -27,7 +27,7 @@ export class LeaveApprovalsComponent {
       pageSize: 10,
       showCheckbox: true,
       "globalSearch": {
-        keys: ['approval_id', 'leave_id','name','status_id','approval_date']
+        keys: ['approval_id',"approver", 'leave_id','name','status_id','approval_date']
       },
       export: {downloadName: 'LeaveApprovals'},
       defaultSort: { key: 'created_at', value: 'descend' },
