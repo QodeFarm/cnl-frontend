@@ -352,7 +352,8 @@ private fallbackPrint(pdfBlob: Blob): void {
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
           // console.log("-->", currentValue);
-          return `${row.sale_type?.name || ''}`;
+          // return `${row.sale_type?.name || ''}`;
+          return row.sale_type?.name || row.sale_type_id || '';
         },
       },
 
@@ -361,7 +362,8 @@ private fallbackPrint(pdfBlob: Blob): void {
         name: 'Customer',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.customer.name}`;
+          // return `${row.customer.name}`;
+          return row.customer?.name || row.customer_id || '';
         },
         sort: true
       },
@@ -390,7 +392,8 @@ private fallbackPrint(pdfBlob: Blob): void {
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.order_status.status_name}`;
+          // return `${row.order_status.status_name}`;
+          return row.order_status?.status_name || row.order_status_id || '';
         },
         sort: true
       },
@@ -399,9 +402,11 @@ private fallbackPrint(pdfBlob: Blob): void {
         name: 'Flow Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          if (row.flow_status)
-            return `${row.flow_status.flow_status_name}`
-          return '';
+          return row.flow_status?.flow_status_name || row.flow_status_id || '';
+          // if (row.flow_status)
+          //   // return `${row.flow_status.flow_status_name}`
+          // return row.flow_status?.flow_status_name || row.flow_status_id || '';
+          // return '';
         },
         sort: true
       },

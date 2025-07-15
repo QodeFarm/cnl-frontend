@@ -77,7 +77,7 @@ export class SalesRepotsComponent {
     },
 
     OtherSalesReport: {
-      apiUrl: 'sales/sale_order/?sales_order_report=true&report_type=other',
+      apiUrl: 'sales/sale_order/?records_mstcnl=true',
       pkId: "sale_order_id",
       pageSize: 10,
       "globalSearch": {
@@ -120,7 +120,7 @@ export class SalesRepotsComponent {
     },
 
     AllSalesReport: {
-      apiUrl: 'sales/sale_order/?sales_order_report=true&report_type=all',
+      apiUrl: 'sales/sale_order/?records_all=true', //sales_order_report=true&report_type=all',
       pkId: "sale_order_id",
       pageSize: 10,
       "globalSearch": {
@@ -137,6 +137,11 @@ export class SalesRepotsComponent {
         {
           fieldKey: 'customer',
           name: 'Customer',
+          displayType: "map",
+          mapFn: (currentValue: any, row: any, col: any) => {
+            // return `${row.customer.name}`;
+            return row.customer?.name || row.customer_id || '';
+          },
           sort: true
         },
         {
@@ -144,22 +149,34 @@ export class SalesRepotsComponent {
           name: 'Order Date',
           sort: true
         },
+        // {
+        //   fieldKey: 'sale_type',
+        //   name: 'Sale Type',
+        //   sort: true,
+        // },
         {
           fieldKey: 'sale_type',
           name: 'Sale Type',
           sort: true,
+          displayType: "map",
+          mapFn: (currentValue: any, row: any, col: any) => {
+            // console.log("-->", currentValue);
+            // return `${row.sale_type?.name || ''}`;
+            return row.sale_type?.name || row.sale_type_id || '';
+          },
         },
         {
           fieldKey: 'status_name',
           name: 'Status',
           displayType: "map",
           mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row?.order_status?.status_name}`;
+            // return `${row?.order_status?.status_name}`;
+            return row.order_status?.status_name || row.order_status_id || '';
           },
           sort: true
         },
         {
-          fieldKey: 'amount',
+          fieldKey: 'total_amount',
           name: 'Amount',
           sort: true
         }
@@ -167,7 +184,7 @@ export class SalesRepotsComponent {
     },
     //  =====================================sales_invoice_report=======================   
     salesInvoice: {
-      apiUrl: 'sales/sale_order/?sales_invoice_report=true',
+      apiUrl: 'sales/sale_invoice_order/?summary=true',
       pkId: "sale_invoice_id",
       pageSize: 10,
       "globalSearch": {
@@ -240,7 +257,7 @@ export class SalesRepotsComponent {
     },
 
     OtherInvoice: {
-      apiUrl: 'sales/sale_order/?sales_invoice_report=true&invoice_type=other',
+      apiUrl: 'sales/sale_invoice_order/?records_mstcnl=true',
       pkId: "sale_invoice_id",
       pageSize: 10,
       "globalSearch": {
@@ -304,7 +321,7 @@ export class SalesRepotsComponent {
     },
 
     AllInvoice: {
-      apiUrl: 'sales/sale_order/?sales_invoice_report=true&invoice_type=all',
+      apiUrl: 'sales/sale_invoice_order/?records_all=true',
       pkId: "sale_invoice_id",
       pageSize: 10,
       "globalSearch": {
@@ -323,9 +340,19 @@ export class SalesRepotsComponent {
           name: 'Invoice Date',
           sort: true
         }, 
+        // {
+        //   fieldKey: 'customer',
+        //   name: 'Customer',
+        //   sort: true
+        // },
         {
           fieldKey: 'customer',
           name: 'Customer',
+          displayType: "map",
+          mapFn: (currentValue: any, row: any, col: any) => {
+            // return `${row.customer.name}`;
+            return row.customer?.name || row.customer_id || '';
+          },
           sort: true
         },
         {
@@ -359,7 +386,8 @@ export class SalesRepotsComponent {
           name: 'Status',
           displayType: "map",
           mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row?.order_status?.status_name}`;
+            // return `${row?.order_status?.status_name}`;
+            return row.order_status?.status_name || row.order_status_id || '';
           },
           sort: true
         },
