@@ -353,9 +353,10 @@ private fallbackPrint(pdfBlob: Blob): void {
       {
         fieldKey: 'customer',
         name: 'Customer',
-        displayType: 'map',
+        displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row.customer.name}`;
+          // return `${row.customer.name}`;
+          return row.customer?.name || row.customer_id || '';
         },
         sort: true
       },

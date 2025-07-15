@@ -77,7 +77,7 @@ export class SalesRepotsComponent {
     },
 
     OtherSalesReport: {
-      apiUrl: 'sales/sale_order/?sales_order_report=true&report_type=other',
+      apiUrl: 'sales/sale_order/?records_mstcnl=true',
       pkId: "sale_order_id",
       pageSize: 10,
       "globalSearch": {
@@ -120,7 +120,7 @@ export class SalesRepotsComponent {
     },
 
     AllSalesReport: {
-      apiUrl: 'sales/sale_order/?sales_order_report=true&report_type=all',
+      apiUrl: 'sales/sale_order/?records_all=true', //sales_order_report=true&report_type=all',
       pkId: "sale_order_id",
       pageSize: 10,
       "globalSearch": {
@@ -176,7 +176,7 @@ export class SalesRepotsComponent {
           sort: true
         },
         {
-          fieldKey: 'amount',
+          fieldKey: 'total_amount',
           name: 'Amount',
           sort: true
         }
@@ -184,7 +184,7 @@ export class SalesRepotsComponent {
     },
     //  =====================================sales_invoice_report=======================   
     salesInvoice: {
-      apiUrl: 'sales/sale_order/?sales_invoice_report=true',
+      apiUrl: 'sales/sale_invoice_order/?summary=true',
       pkId: "sale_invoice_id",
       pageSize: 10,
       "globalSearch": {
@@ -257,7 +257,7 @@ export class SalesRepotsComponent {
     },
 
     OtherInvoice: {
-      apiUrl: 'sales/sale_order/?sales_invoice_report=true&invoice_type=other',
+      apiUrl: 'sales/sale_invoice_order/?records_mstcnl=true',
       pkId: "sale_invoice_id",
       pageSize: 10,
       "globalSearch": {
@@ -321,7 +321,7 @@ export class SalesRepotsComponent {
     },
 
     AllInvoice: {
-      apiUrl: 'sales/sale_order/?sales_invoice_report=true&invoice_type=all',
+      apiUrl: 'sales/sale_invoice_order/?records_all=true',
       pkId: "sale_invoice_id",
       pageSize: 10,
       "globalSearch": {
