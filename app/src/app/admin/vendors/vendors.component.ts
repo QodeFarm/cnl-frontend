@@ -509,6 +509,15 @@ export class VendorsComponent {
                             }
                           },
                           {
+                            type: 'textarea',
+                            key: 'address',
+                            templateOptions: {
+                              label: 'Full Address',
+                              hideLabel: true,
+                              placeholder: 'Address',
+                            }
+                          },
+                          {
                             key: 'city',
                             type: 'select',
                             templateOptions: {
@@ -517,7 +526,7 @@ export class VendorsComponent {
                               label: 'City',
                               placeholder: 'city',
                               hideLabel: true,
-                              required: true,
+                              required: false,
                               lazy: {
                                 url: 'masters/city/',
                                 lazyOneTime: true
@@ -547,7 +556,7 @@ export class VendorsComponent {
                               label: 'State',
                               placeholder: 'state',
                               hideLabel: true,
-                              required: true,
+                              required: false,
                               lazy: {
                                 url: 'masters/state/',
                                 lazyOneTime: true
@@ -576,7 +585,7 @@ export class VendorsComponent {
                               dataLabel: 'country_name',
                               label: 'Country',
                               hideLabel: true,
-                              required: true,
+                              required: false,
                               placeholder: 'country',
                               lazy: {
                                 url: 'masters/country/',
@@ -625,15 +634,6 @@ export class VendorsComponent {
                               placeholder: 'email',
                             }
                           },
-                          {
-                            type: 'textarea',
-                            key: 'address',
-                            templateOptions: {
-                              label: 'Address',
-                              hideLabel: true,
-                              placeholder: 'Address',
-                            }
-                          }
                         ]
                       }
                     },
