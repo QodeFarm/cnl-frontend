@@ -2308,7 +2308,7 @@ getOrderNo() {
                             this.invoiceNumber = res.data.order_number;
                 
                             // ✅ Fetch order_status_id by status_name = "Completed"
-                            this.http.get('masters/order_status/?status_name=In Progress').subscribe((statusRes: any) => {
+                            this.http.get('masters/order_status/?status_name=Pending').subscribe((statusRes: any) => {
                               const completedStatus = statusRes?.data?.[0];
                               const completedStatusId = completedStatus?.order_status_id;
                               console.log("Second time toal_amount : ", saleOrder.total_amount);
@@ -2367,6 +2367,7 @@ getOrderNo() {
                                   email: saleOrder.email,
                                   ref_no: saleOrder.ref_no,
                                   ref_date: this.nowDate(),
+                                  due_date: this.nowDate(),
                                   tax: saleOrder.tax || 'Inclusive',
                                   remarks: saleOrder.remarks,
                                   advance_amount: saleOrder.advance_amount || '0',
