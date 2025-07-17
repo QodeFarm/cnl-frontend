@@ -117,8 +117,13 @@ export function getUnitData(unitInfo) {
     if (products.length) {
       products.forEach((product: any) => {
         if (product) {
+          console.log("Product : ", product);
           const quantity = Number(product.quantity ?? 0);
-          const rate = Number(product.rate ?? 0);
+          console.log("quantity in calculation : ", quantity)
+          // 👇 Start with DB or user-entered rate
+          let rate = Number(product.rate ?? 0);
+          console.log("Rate in calculation : ", rate)
+
           const discountPercentage = Number(product.discount ?? 0);
   
           // Calculate individual product amounts

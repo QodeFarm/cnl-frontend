@@ -255,27 +255,81 @@ export class SalesinvoiceComponent {
       }
     };
 
-    async autoFillProductDetails(field, data) {
-      this.productOptions = data;
-      console.log("this.productOptions : ", this.productOptions)
-      if (!field.form?.controls || !data) return;
-      const fieldMappings = {
-        // code: data.code,
-        code: data.code !== undefined
-          ? data.code
-          : field.form.controls.code.value,
-        rate: data.sales_rate || field.form.controls.rate.value,
-        discount: parseFloat(data.discount) || 0,
-        unit_options_id: data.unit_options?.unit_options_id,
-        print_name: data.print_name,
-        mrp: data.mrp
-      };
+    // async autoFillProductDetails(field, data) {
+    //   this.productOptions = data;
+    //   console.log("this.productOptions : ", this.productOptions)
+    //   if (!field.form?.controls || !data) return;
+    //   const fieldMappings = {
+    //     // code: data.code,
+    //     code: data.code !== undefined
+    //       ? data.code
+    //       : field.form.controls.code.value,
+    //     rate: data.sales_rate || field.form.controls.rate.value,
+    //     discount: parseFloat(data.discount) || 0,
+    //     unit_options_id: data.unit_options?.unit_options_id,
+    //     print_name: data.print_name,
+    //     mrp: data.mrp
+    //   };
     
-      Object.entries(fieldMappings).forEach(([key, value]) => {
-        if (value !== undefined) field.form.controls[key]?.setValue(value);
-      });
-      this.totalAmountCal();
-    }    
+    //   Object.entries(fieldMappings).forEach(([key, value]) => {
+    //     if (value !== undefined) field.form.controls[key]?.setValue(value);
+    //   });
+    //   this.totalAmountCal();
+    // }    
+
+async autoFillProductDetails(field, data) {
+  this.productOptions = data;
+  console.log("Autofill data : ", this.productOptions);
+  if (!field.form?.controls || !data) return;
+
+  const customerCategory = this.formConfig.model?.sale_invoice_order?.customer?.customer_category?.name?.toLowerCase();
+
+  // ✅ Figure out the current row index safely
+  const parentArray = field.parent;
+  const currentRowIndex = +parentArray?.key;
+
+  // ✅ Get the rate on that row if it exists
+  const currentRowRate = this.formConfig.model?.sale_invoice_items?.[currentRowIndex]?.rate;
+
+  console.log("Current row rate value : ", currentRowRate);
+
+  let selectedRate = data.sales_rate; // default fallback
+
+  // ✅ Only override if current rate is 0 or empty
+  if (!currentRowRate || currentRowRate === 0) {
+    if (customerCategory === 'wholesalers') {
+      selectedRate = data.wholesale_rate ?? data.sales_rate;
+    } else if (customerCategory === 'retail') {
+      selectedRate = data.sales_rate;
+    } else if (customerCategory === 'e-commerce partners' || customerCategory === 'distributors' || customerCategory === 'e-commerce partners') {
+      selectedRate = data.dealer_rate ?? data.sales_rate;
+    }
+  } else {
+    // ✅ Keep the manually entered rate
+    selectedRate = currentRowRate;
+  }
+
+  const fieldMappings = {
+    code: data.code !== undefined
+      ? data.code
+      : field.form.controls.code.value,
+    rate: selectedRate,
+    discount: data.discount !== undefined
+      ? parseFloat(data.discount)
+      : field.form.controls.discount.value,
+    unit_options_id: data.unit_options?.unit_options_id,
+    print_name: data.print_name,
+    mrp: data.mrp
+  };
+
+  Object.entries(fieldMappings).forEach(([key, value]) => {
+    if (value !== undefined) {
+      field.form.controls[key]?.setValue(value);
+    }
+  });
+
+  this.totalAmountCal();
+}
 
   checkAndPopulateData() {
     // Check if data has already been populated

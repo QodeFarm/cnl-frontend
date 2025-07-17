@@ -310,23 +310,77 @@ export class SaleReturnsComponent {
       }
     };
 
-    async autoFillProductDetails(field, data) {
-      this.productOptions = data;
-      if (!field.form?.controls || !data) return;
-      const fieldMappings = {
-        code: data.code,
-        rate: data.sales_rate || field.form.controls.rate.value,
-        discount: parseFloat(data.discount) || 0,
-        unit_options_id: data.unit_options?.unit_options_id,
-        print_name: data.print_name,
-        mrp: data.mrp
-      };
+    // async autoFillProductDetails(field, data) {
+    //   this.productOptions = data;
+    //   if (!field.form?.controls || !data) return;
+    //   const fieldMappings = {
+    //     code: data.code,
+    //     rate: data.sales_rate || field.form.controls.rate.value,
+    //     discount: parseFloat(data.discount) || 0,
+    //     unit_options_id: data.unit_options?.unit_options_id,
+    //     print_name: data.print_name,
+    //     mrp: data.mrp
+    //   };
     
-      Object.entries(fieldMappings).forEach(([key, value]) => {
-        if (value !== undefined) field.form.controls[key]?.setValue(value);
-      });
-      this.totalAmountCal();
+    //   Object.entries(fieldMappings).forEach(([key, value]) => {
+    //     if (value !== undefined) field.form.controls[key]?.setValue(value);
+    //   });
+    //   this.totalAmountCal();
+    // }
+
+async autoFillProductDetails(field, data) {
+  this.productOptions = data;
+  console.log("Autofill data : ", this.productOptions);
+  if (!field.form?.controls || !data) return;
+
+  const customerCategory = this.formConfig.model?.sale_return_order?.customer?.customer_category?.name?.toLowerCase();
+
+  // ✅ Figure out the current row index safely
+  const parentArray = field.parent;
+  const currentRowIndex = +parentArray?.key;
+
+  // ✅ Get the rate on that row if it exists
+  const currentRowRate = this.formConfig.model?.sale_return_items?.[currentRowIndex]?.rate;
+
+  console.log("Current row rate value : ", currentRowRate);
+
+  let selectedRate = data.sales_rate; // default fallback
+
+  // ✅ Only override if current rate is 0 or empty
+  if (!currentRowRate || currentRowRate === 0) {
+    if (customerCategory === 'wholesalers') {
+      selectedRate = data.wholesale_rate ?? data.sales_rate;
+    } else if (customerCategory === 'retail') {
+      selectedRate = data.sales_rate;
+    } else if (customerCategory === 'e-commerce partners' || customerCategory === 'distributors' || customerCategory === 'e-commerce partners') {
+      selectedRate = data.dealer_rate ?? data.sales_rate;
     }
+  } else {
+    // ✅ Keep the manually entered rate
+    selectedRate = currentRowRate;
+  }
+
+  const fieldMappings = {
+    code: data.code !== undefined
+      ? data.code
+      : field.form.controls.code.value,
+    rate: selectedRate,
+    discount: data.discount !== undefined
+      ? parseFloat(data.discount)
+      : field.form.controls.discount.value,
+    unit_options_id: data.unit_options?.unit_options_id,
+    print_name: data.print_name,
+    mrp: data.mrp
+  };
+
+  Object.entries(fieldMappings).forEach(([key, value]) => {
+    if (value !== undefined) {
+      field.form.controls[key]?.setValue(value);
+    }
+  });
+
+  this.totalAmountCal();
+}
 
   //--------------------------------------------------------
   getWorkflowId() {
@@ -1916,6 +1970,27 @@ export class SaleReturnsComponent {
                           fieldGroupClassName: "ant-row",
                           key: 'sale_return_order',
                           fieldGroup: [
+                            // {
+                            //   key: 'tax_amount',
+                            //   type: 'input',
+                            //   defaultValue: "0",
+                            //   className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                            //   templateOptions: {
+                            //     type: 'number',
+                            //     label: 'Tax amount',
+                            //     placeholder: 'Enter Tax amount'
+                            //   },
+                            //   hooks: {
+                            //     onInit: (field: any) => {
+                            //       if (this.dataToPopulate && this.dataToPopulate.sale_return_order && this.dataToPopulate.sale_return_order.tax_amount && field.formControl) {
+                            //         field.formControl.setValue(this.dataToPopulate.sale_return_order.tax_amount);
+                            //       }
+                            //       field.formControl.valueChanges.subscribe(data => {
+                            //         this.totalAmountCal();
+                            //       })
+                            //     }
+                            //   }
+                            // },
                             {
                               key: 'tax_amount',
                               type: 'input',
@@ -1928,12 +2003,35 @@ export class SaleReturnsComponent {
                               },
                               hooks: {
                                 onInit: (field: any) => {
-                                  if (this.dataToPopulate && this.dataToPopulate.sale_return_order && this.dataToPopulate.sale_return_order.tax_amount && field.formControl) {
+                                  // Initialize with existing tax_amount if available
+                                  if (
+                                    this.dataToPopulate &&
+                                    this.dataToPopulate.sale_return_order &&
+                                    this.dataToPopulate.sale_return_order.tax_amount &&
+                                    field.formControl
+                                  ) {
                                     field.formControl.setValue(this.dataToPopulate.sale_return_order.tax_amount);
                                   }
-                                  field.formControl.valueChanges.subscribe(data => {
-                                    this.totalAmountCal();
-                                  })
+                            
+                                  // Store initial tax_amount as a float value
+                                  let previousTaxAmount = parseFloat(this.dataToPopulate?.sale_return_order?.tax_amount || "0");
+                            
+                                  // Subscribe to value changes on the tax_amount field
+                                  field.formControl.valueChanges.subscribe(newTaxAmount => {
+                                    if (field.form && field.form.controls && field.form.controls.total_amount) {
+                                      // Parse the current total amount as a float
+                                      const totalAmount = parseFloat(field.form.controls.total_amount.value || "0");
+                                      // Parse the new tax amount as a float
+                                      const currentNewTaxAmount = parseFloat(newTaxAmount || "0");
+                                      // Calculate the updated total by subtracting the previous tax value and adding the new one
+                                      const updatedTotal = totalAmount - previousTaxAmount + currentNewTaxAmount;
+                                      // Update the total_amount field with the new total, fixed to two decimals
+                                      field.form.controls.total_amount.setValue(parseFloat(updatedTotal.toFixed(2)));
+                                      // Update previousTaxAmount for future changes
+                                      previousTaxAmount = currentNewTaxAmount;
+                                      console.log("Updated total_amount:", updatedTotal);
+                                    }
+                                  });
                                 }
                               }
                             },
