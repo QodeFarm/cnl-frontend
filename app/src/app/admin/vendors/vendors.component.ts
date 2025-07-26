@@ -539,7 +539,7 @@ export class VendorsComponent {
                                   // const index = field.parent.parent.model.indexOf(field.parent.model);
                                   const index = field.parent.key;
                                   if (this.formConfig && this.formConfig.model) {
-                                    this.formConfig.model['vendor_addresses'][index]['city_id'] = data.city_id;
+                                    this.formConfig.model['vendor_addresses'][index]['city_id'] = data?.city_id ?? null;
                                   } else {
                                     console.error('Form config or Vendor addresses model is not defined.');
                                   }
@@ -569,7 +569,7 @@ export class VendorsComponent {
                                   // const index = field.parent.parent.model.indexOf(field.parent.model);
                                   const index = field.parent.key;
                                   if (this.formConfig && this.formConfig.model) {
-                                    this.formConfig.model['vendor_addresses'][index]['state_id'] = data.state_id;
+                                    this.formConfig.model['vendor_addresses'][index]['state_id'] = data?.state_id ?? null;
                                   } else {
                                     console.error('Form config or Vendor addresses model is not defined.');
                                   }
@@ -599,7 +599,7 @@ export class VendorsComponent {
                                   // const index = field.parent.parent.model.indexOf(field.parent.model);
                                   const index = field.parent.key;
                                   if (this.formConfig && this.formConfig.model) {
-                                    this.formConfig.model['vendor_addresses'][index]['country_id'] = data.country_id;
+                                    this.formConfig.model['vendor_addresses'][index]['country_id'] = data?.country_id ?? null;
                                   } else {
                                     console.error('Form config or Vendor addresses model is not defined.');
                                   }
@@ -614,8 +614,30 @@ export class VendorsComponent {
                               label: 'Pin Code',
                               hideLabel: true,
                               placeholder: 'Pin Code',
+                            },
+                            hooks: {
+                              onInit: (field: any) => {
+                                field.formControl.valueChanges.subscribe((value: any) => {
+                                  const index = field.parent.key;
+                                  if (this.formConfig && this.formConfig.model) {
+                                    this.formConfig.model['vendor_addresses'][index]['pin_code'] = value === '' ? null : value;
+                                  } else {
+                                    console.error('Form config or Customer addresses model is not defined.');
+                                  }
+                                });
+                              }
                             }
                           },
+
+                          // {
+                          //   type: 'input',
+                          //   key: 'pin_code',
+                          //   templateOptions: {
+                          //     label: 'Pin Code',
+                          //     hideLabel: true,
+                          //     placeholder: 'Pin Code',
+                          //   }
+                          // },
                           {
                             type: 'input',
                             key: 'phone',
@@ -623,6 +645,18 @@ export class VendorsComponent {
                               label: 'Phone',
                               hideLabel: true,
                               placeholder: 'Phone',
+                            },
+                            hooks: {
+                              onInit: (field: any) => {
+                                field.formControl.valueChanges.subscribe((value: any) => {
+                                  const index = field.parent.key;
+                                  if (this.formConfig && this.formConfig.model) {
+                                    this.formConfig.model['vendor_addresses'][index]['phone'] = value === '' ? null : value;
+                                  } else {
+                                    console.error('Form config or Customer addresses model is not defined.');
+                                  }
+                                });
+                              }
                             }
                           },
                           {
@@ -631,7 +665,19 @@ export class VendorsComponent {
                             templateOptions: {
                               label: 'Email',
                               hideLabel: true,
-                              placeholder: 'email',
+                              placeholder: 'Email',
+                            },
+                            hooks: {
+                              onInit: (field: any) => {
+                                field.formControl.valueChanges.subscribe((value: any) => {
+                                  const index = field.parent.key;
+                                  if (this.formConfig && this.formConfig.model) {
+                                    this.formConfig.model['vendor_addresses'][index]['email'] = value === '' ? null : value;
+                                  } else {
+                                    console.error('Form config or Customer addresses model is not defined.');
+                                  }
+                                });
+                              }
                             }
                           },
                         ]
