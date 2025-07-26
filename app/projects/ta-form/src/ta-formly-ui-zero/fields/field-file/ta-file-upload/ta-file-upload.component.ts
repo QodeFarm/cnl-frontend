@@ -114,6 +114,7 @@ export class TaFileUploadComponent implements OnInit {
               const _file = {
                 uid: originFileObj.uid,
                 name: resObje.attachment_name,
+                rawFile: originFileObj,
                 ...resObje
               }
               return _file;
