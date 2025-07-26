@@ -540,7 +540,7 @@ export class CustomersComponent {
                               dataKey: 'city_id',
                               dataLabel: 'city_name',
                               label: 'City',
-                              placeholder: 'city',
+                              placeholder: 'City',
                               hideLabel: true,
                               required: false,
                               lazy: {
@@ -552,10 +552,9 @@ export class CustomersComponent {
                               onChanges: (field: any) => {
                                 field.formControl.valueChanges.subscribe((data: any) => {
                                   console.log('city', data);
-                                  // const index = field.parent.parent.model.indexOf(field.parent.model);
                                   const index = field.parent.key;
                                   if (this.formConfig && this.formConfig.model) {
-                                    this.formConfig.model['customer_addresses'][index]['city_id'] = data.city_id;
+                                    this.formConfig.model['customer_addresses'][index]['city_id'] = data?.city_id ?? null;
                                   } else {
                                     console.error('Form config or Customer addresses model is not defined.');
                                   }
@@ -570,7 +569,7 @@ export class CustomersComponent {
                               dataKey: 'state_id',
                               dataLabel: 'state_name',
                               label: 'State',
-                              placeholder: 'state',
+                              placeholder: 'State',
                               hideLabel: true,
                               required: false,
                               lazy: {
@@ -582,10 +581,9 @@ export class CustomersComponent {
                               onChanges: (field: any) => {
                                 field.formControl.valueChanges.subscribe((data: any) => {
                                   console.log('state', data);
-                                  // const index = field.parent.parent.model.indexOf(field.parent.model);
                                   const index = field.parent.key;
                                   if (this.formConfig && this.formConfig.model) {
-                                    this.formConfig.model['customer_addresses'][index]['state_id'] = data.state_id;
+                                    this.formConfig.model['customer_addresses'][index]['state_id'] = data?.state_id ?? null;
                                   } else {
                                     console.error('Form config or Customer addresses model is not defined.');
                                   }
@@ -600,9 +598,9 @@ export class CustomersComponent {
                               dataKey: 'country_id',
                               dataLabel: 'country_name',
                               label: 'Country',
+                              placeholder: 'Country',
                               hideLabel: true,
                               required: false,
-                              placeholder: 'country',
                               lazy: {
                                 url: 'masters/country/',
                                 lazyOneTime: true
@@ -612,10 +610,9 @@ export class CustomersComponent {
                               onChanges: (field: any) => {
                                 field.formControl.valueChanges.subscribe((data: any) => {
                                   console.log('country', data);
-                                  // const index = field.parent.parent.model.indexOf(field.parent.model);
                                   const index = field.parent.key;
                                   if (this.formConfig && this.formConfig.model) {
-                                    this.formConfig.model['customer_addresses'][index]['country_id'] = data.country_id;
+                                    this.formConfig.model['customer_addresses'][index]['country_id'] = data?.country_id ?? null;
                                   } else {
                                     console.error('Form config or Customer addresses model is not defined.');
                                   }
@@ -630,8 +627,30 @@ export class CustomersComponent {
                               label: 'Pin Code',
                               hideLabel: true,
                               placeholder: 'Pin Code',
+                            },
+                            hooks: {
+                              onInit: (field: any) => {
+                                field.formControl.valueChanges.subscribe((value: any) => {
+                                  const index = field.parent.key;
+                                  if (this.formConfig && this.formConfig.model) {
+                                    this.formConfig.model['customer_addresses'][index]['pin_code'] = value === '' ? null : value;
+                                  } else {
+                                    console.error('Form config or Customer addresses model is not defined.');
+                                  }
+                                });
+                              }
                             }
                           },
+
+                          // {
+                          //   type: 'input',
+                          //   key: 'pin_code',
+                          //   templateOptions: {
+                          //     label: 'Pin Code',
+                          //     hideLabel: true,
+                          //     placeholder: 'Pin Code',
+                          //   }
+                          // },
                           {
                             type: 'input',
                             key: 'phone',
@@ -639,6 +658,18 @@ export class CustomersComponent {
                               label: 'Phone',
                               hideLabel: true,
                               placeholder: 'Phone',
+                            },
+                            hooks: {
+                              onInit: (field: any) => {
+                                field.formControl.valueChanges.subscribe((value: any) => {
+                                  const index = field.parent.key;
+                                  if (this.formConfig && this.formConfig.model) {
+                                    this.formConfig.model['customer_addresses'][index]['phone'] = value === '' ? null : value;
+                                  } else {
+                                    console.error('Form config or Customer addresses model is not defined.');
+                                  }
+                                });
+                              }
                             }
                           },
                           {
@@ -647,9 +678,40 @@ export class CustomersComponent {
                             templateOptions: {
                               label: 'Email',
                               hideLabel: true,
-                              placeholder: 'email',
+                              placeholder: 'Email',
+                            },
+                            hooks: {
+                              onInit: (field: any) => {
+                                field.formControl.valueChanges.subscribe((value: any) => {
+                                  const index = field.parent.key;
+                                  if (this.formConfig && this.formConfig.model) {
+                                    this.formConfig.model['customer_addresses'][index]['email'] = value === '' ? null : value;
+                                  } else {
+                                    console.error('Form config or Customer addresses model is not defined.');
+                                  }
+                                });
+                              }
                             }
                           },
+
+                          // {
+                          //   type: 'input',
+                          //   key: 'phone',
+                          //   templateOptions: {
+                          //     label: 'Phone',
+                          //     hideLabel: true,
+                          //     placeholder: 'Phone',
+                          //   }
+                          // },
+                          // {
+                          //   type: 'input',
+                          //   key: 'email',
+                          //   templateOptions: {
+                          //     label: 'Email',
+                          //     hideLabel: true,
+                          //     placeholder: 'email',
+                          //   }
+                          // },
                           
                         ]
                       }
