@@ -54,71 +54,11 @@ export class FieldAdvSelectComponent extends FieldType implements OnInit {
       }
     })
   }
-  ngDoCheck(): void {
-    console.log('FieldAdvSelectComponent initialized with field:', this.field);
-  }
-  selectedItem: any = null;
 
-  pickItem(item: any) {
-    this.selectedItem = item;
-  }
-
-
-  // You can add more methods or properties specific to this component if needed
-  onSelectionChange(value: any): void {
-    // Handle selection change if necessary
-    console.log('Selected value:', value);
-  }
-  newItem: string = '';
-
-  items = [
-    { name: 'Item A' },
-    { name: 'Item B' },
-    { name: 'Item C' },
-  ];
-
-  selectItem(item: any) {
-    this.selectedItem = item.name;
-  }
-
-  addItem() {
-    if (this.newItem.trim()) {
-      this.items.push({ name: this.newItem.trim() });
-      this.selectedItem = this.newItem.trim();
-      this.newItem = '';
-    }
-  }
-  // Store dropdown reference for closing
-  isDropdownOpen = false;
-
-  onDropdownVisibleChange(visible: boolean) {
-    this.isDropdownOpen = visible;
-  }
-
-  closeDropdown() {
-    this.isDropdownOpen = false;
-  }
-
-  onCurrentPageDataChange(data: any[]) {
-    // Optional: Handle page data if using pagination
-  }
   toggleDropdown() {
     this.dropdownOpen = !this.dropdownOpen;
   }
 
-  onOptionSelect(value: string): void {
-    // this.selectedValue = value;
-    // Don't auto-close — user will close manually
-    console.log('Selected:', value);
-  }
-
-  onDropdownChange(open: boolean): void {
-    // prevent nz-select from auto-closing
-    if (!open && this.dropdownOpen) {
-      // block close
-      this.dropdownOpen = true;
-    }
-  }
   compareFn = (o1: any, o2: any) => {
     if (this.props.dataKey && o1 && o2 && !this.props.bindId) {
       return o1[this.props.dataKey] === o2[this.props.dataKey];
@@ -155,7 +95,6 @@ export class FieldAdvSelectComponent extends FieldType implements OnInit {
     this.props.curdConfig.formConfig.model = {};
     if (row) {
       this.props.curdConfig.formConfig.model = row;
-      console.log('row', row);
     }
     this.visible = true;
   }
