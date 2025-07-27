@@ -21,7 +21,9 @@ export interface TaTableConfig {
   showCheckbox?: boolean;
   defaultSort?: { key?: string, value?: 'ascend' | 'descend' },
   checkedRows?: any[],
-  reload?: () => any
+  reload?: () => any,
+  rowSelectionEnabled?: boolean
+  rowSelection?: (row: any) => any;
 }
 
 export interface Export {

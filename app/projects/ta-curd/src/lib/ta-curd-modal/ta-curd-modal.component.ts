@@ -1,13 +1,30 @@
-import { Component, Input, OnInit, ViewChild, TemplateRef  } from '@angular/core';
-import { TaActionService } from '@ta/ta-core';
+import { Component, Input, OnInit, ViewChild, TemplateRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { TaActionService, TaCoreModule } from '@ta/ta-core';
 import { TaFormComponent } from '@ta/ta-form';
-import { TaTableComponent } from '@ta/ta-table';
+import { TaTableComponent, TaTableModule } from '@ta/ta-table';
 import { TaCurdConfig } from '../ta-curd-config';
+import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { CommonModule } from '@angular/common';
+import { NzGridModule } from 'ng-zorro-antd/grid';
+import { NzCardModule } from 'ng-zorro-antd/card';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 
 @Component({
   selector: 'ta-curd-modal',
   templateUrl: './ta-curd-modal.component.html',
-  styleUrls: ['./ta-curd-modal.component.css']
+  styleUrls: ['./ta-curd-modal.component.css'],
+  standalone: true,
+  imports: [CommonModule,
+    TaCoreModule,
+    TaTableModule,
+    NzGridModule,
+    NzCardModule,
+    NzIconModule,
+    NzDrawerModule,
+    NzButtonModule,
+    NzModalModule]
 })
 export class TaCurdModalComponent implements OnInit {
   @Input() options: TaCurdConfig | any;
@@ -16,7 +33,7 @@ export class TaCurdModalComponent implements OnInit {
   @Input() customProductTemplate!: TemplateRef<any>; //Added this customProductTemplate
   visible = false;
   formTitle = "Create";
-  constructor(private taAction: TaActionService) { }
+  constructor(private taAction: TaActionService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     //// console.log('tacurdConfig', this.options);
