@@ -45,6 +45,8 @@ export class DefaultInterceptor implements HttpInterceptor {
   private refreshTokenType: 're-request' | 'auth-refresh' | any = 're-request'; //environment.api.refreshTokenType;
   private refreshToking = false;
   private refreshToken$: BehaviorSubject<any> = new BehaviorSubject<any>(null);
+  // Track requests that should skip error handling
+  private skipErrorUrls = new Set<string>();
 
   constructor(private injector: Injector, private siteConfig: SiteConfigService, private loadingS: LoadingService) {
     if (this.refreshTokenType === 'auth-refresh') {
@@ -72,6 +74,11 @@ export class DefaultInterceptor implements HttpInterceptor {
   }
 
   private checkStatus(ev: HttpErrorResponse): void {
+    // Skip error handling if URL is in our skip list or has skipErrorInterceptor flag
+    if (ev.error?.skipErrorInterceptor === true || 
+        (ev.url && this.skipErrorUrls.has(ev.url))) {
+      return;
+    }
     // Skip showing any error for login attempts - those will be handled by the form component
     const isLoginAttempt = ev.url?.includes('users/login');
     if (isLoginAttempt && ev.status === 401) {
@@ -284,7 +291,14 @@ export class DefaultInterceptor implements HttpInterceptor {
 
   private handleData(ev: HttpErrorResponse, req: HttpRequest<any>, next: HttpHandler): Observable<any> {
     this.loadingS.hide();
-    this.checkStatus(ev);
+    
+    // Check if this request URL is in our skip list
+    const skipErrorHandling = req.url && this.skipErrorUrls.has(req.url);
+    
+    // Only call checkStatus if we're not skipping error handling
+    if (!skipErrorHandling) {
+      this.checkStatus(ev);
+    }
     //Business processing: some common operations
     switch (ev.status) {
       case 200:
@@ -356,8 +370,16 @@ export class DefaultInterceptor implements HttpInterceptor {
       const baseUrl = this.siteConfig.CONFIG.baseUrl;
       url = baseUrl + url//environment.api.baseUrl + url;
     }
-    // alert(url);
-
+    
+    // Check if this request should skip error handling
+    const shouldSkipErrors = req.headers.has('X-Skip-Error-Interceptor');
+    if (shouldSkipErrors) {
+      // Add the full URL to our skip list
+      this.skipErrorUrls.add(url);
+      // Clean up the URL from our skip list after 10 seconds
+      setTimeout(() => this.skipErrorUrls.delete(url), 10000);
+    }
+    
     // const myheaders = {
     //   'Content-Type': 'application/x-www-form-urlencoded',
     //   'Authorization': 'Basic YW5ndWxhcjphbmd1bGFy'

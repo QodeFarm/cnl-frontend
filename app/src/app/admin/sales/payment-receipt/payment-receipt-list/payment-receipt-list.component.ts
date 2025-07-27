@@ -19,6 +19,7 @@ export class PaymentReceiptListComponent {
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
    constructor(private router: Router, private http: HttpClient, private localStorage: LocalStorageService) {
+    this.setApiUrlBasedOnUser();
   }
 
   refreshTable() {
@@ -259,7 +260,7 @@ private fallbackPrint(pdfBlob: Blob): void {
 }
 
   tableConfig: TaTableConfig = {
-    apiUrl: 'sales/payment_transactions/',
+    apiUrl: '', //'sales/payment_transactions/',
     showCheckbox: true,
     pkId: "transaction_id",
     pageSize: 10,
@@ -340,5 +341,21 @@ private fallbackPrint(pdfBlob: Blob): void {
       // }
     ]
   };
+
+  private setApiUrlBasedOnUser() {
+    const user = this.localStorage.getItem('user');
+    const isSuperUser = user?.is_sp_user === true;
+
+    // ✅ Correct URL for payment_transactions
+    this.tableConfig.apiUrl = isSuperUser
+      ? 'sales/payment_transactions/?records_all=true'
+      : 'sales/payment_transactions/';
+
+    // ✅ If you really want, you can keep this too — but it's optional now
+    this.tableConfig.fixedFilters = isSuperUser
+      ? [{ key: 'records_all', value: 'true' }]
+      : [];
+  }
+
 }
 
