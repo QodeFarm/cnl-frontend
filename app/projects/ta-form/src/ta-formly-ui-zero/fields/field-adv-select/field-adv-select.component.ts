@@ -91,9 +91,11 @@ export class FieldAdvSelectComponent extends FieldType implements OnInit {
     this.visible = false;
   }
   openDrawer(row?: any) {
+    debugger;
     this.formTitle = 'Create ' + this.props.curdConfig.formConfig.title;
     this.props.curdConfig.formConfig.model = {};
     if (row) {
+      this.formTitle = 'Update ' + this.props.curdConfig.formConfig.title;
       this.props.curdConfig.formConfig.model = row;
     }
     this.visible = true;

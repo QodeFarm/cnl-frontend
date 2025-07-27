@@ -67,7 +67,7 @@ export const customerCudConfig: TaCurdConfig = {
     },
     formConfig: {
         // url: "customers/customers/",
-        title: '',
+        title: 'Customer',
         formState: {
             viewMode: false
         },

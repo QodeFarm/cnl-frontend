@@ -33,6 +33,7 @@ export interface Export {
 export interface ColumnItem {
   fieldKey?: string;
   name?: string;
+  isEdit?: boolean;
   filterValue?: any;
   sort?: boolean | undefined;
   sortKey?: string;
