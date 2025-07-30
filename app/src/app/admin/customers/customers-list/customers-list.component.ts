@@ -91,7 +91,7 @@ export class CustomersListComponent {
         sort: true,
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
-          return row.customer_addresses.shipping_address;
+          return row.customer_addresses.custom_shipping_address;
         },
       },  
       
