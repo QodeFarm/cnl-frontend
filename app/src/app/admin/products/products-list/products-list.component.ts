@@ -61,7 +61,17 @@ export class ProductsListComponent {
       },
       {
         fieldKey: 'sales_rate',
-        name: 'Sale Rate',
+        name: 'Sales Rate',
+        sort: true
+      },
+      {
+        fieldKey: 'wholesale_rate',
+        name: 'WholeSale Rate',
+        sort: true
+      },
+      {
+        fieldKey: 'dealer_rate',
+        name: 'Dealer Rate',
         sort: true
       },
       // {
@@ -74,11 +84,11 @@ export class ProductsListComponent {
       //   name: 'Dealer',
       //   sort: false
       // },
-      {
-        fieldKey: 'mrp',
-        name: 'MRP',
-        sort: true
-      },
+      // {
+      //   fieldKey: 'mrp',
+      //   name: 'MRP',
+      //   sort: true
+      // },
       {
         fieldKey: 'discount',
         name: 'Disc(%)',
@@ -89,21 +99,21 @@ export class ProductsListComponent {
         name: 'Balance',
         sort: true
       },
-      {
-        fieldKey: 'print_name',
-        name: 'Print Name',
-        sort: true
-      },
+      // {
+      //   fieldKey: 'print_name',
+      //   name: 'Print Name',
+      //   sort: true
+      // },
       {
         fieldKey: 'hsn_code',
         name: 'HSN',
         sort: true
       },
-      {
-        fieldKey: 'barcode',
-        name: 'Barcode',
-        sort: true
-      },
+      // {
+      //   fieldKey: 'barcode',
+      //   name: 'Barcode',
+      //   sort: true
+      // },
       {
         fieldKey: "code",
         name: "Action",
