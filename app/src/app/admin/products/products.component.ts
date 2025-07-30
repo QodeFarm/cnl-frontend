@@ -23,6 +23,7 @@ export class ProductsComponent implements OnInit {
   dialogMessage: string = '';
   @ViewChild(ProductsListComponent) ProductsListComponent!: ProductsListComponent;
   @ViewChild(TaFormComponent) taFormComponent!: TaFormComponent;
+  isDownloading: boolean;
 
   constructor(private http: HttpClient, private notification: NzNotificationService) {}
 
@@ -888,4 +889,184 @@ export class ProductsComponent implements OnInit {
       ]
     }
   }
+  downloadExcelTemplate() {
+  this.isDownloading = true;
+  this.http.get('products/download-template/', {
+    responseType: 'blob'
+  }).subscribe({
+    next: (res: Blob) => {
+      this.isDownloading = false;
+      const a = document.createElement('a');
+      const url = window.URL.createObjectURL(res);
+      a.href = url;
+      a.download = 'Product_Import_Template.xlsx';
+      a.click();
+      window.URL.revokeObjectURL(url);
+      this.notification.success('Success', 'Template downloaded successfully');
+    },
+    error: (error) => {
+      this.isDownloading = false;
+      console.error('Download error', error);
+      this.notification.error('Error', 'Failed to download template. Please try again.');
+    }
+  });
 }
+
+// Close modal using Bootstrap instance
+closeModal() {
+  const modal = document.getElementById('importModal');
+  if (modal) {
+    const modalInstance = (window as any).bootstrap.Modal.getInstance(modal);
+    if (modalInstance) {
+      modalInstance.hide();
+    }
+  }
+}
+
+showImportModal() {
+  // Reset the import form model to ensure fresh start
+  this.importFormConfig.model = {};
+  
+  // Force reset the fields to clear any cached file
+  this.importFormConfig.fields = [
+    {
+      key: 'file',
+      type: 'file',
+      label: 'Select Excel File',
+      props: {
+        displayStyle: 'files',
+        multiple: false,
+        acceptedTypes: '.xlsx,.xls'
+      },
+      required: true
+    }
+  ];
+  
+  // Show the modal after resetting
+  const modal = document.getElementById('importModal');
+  if (modal) {
+    // Bootstrap 5 modal show
+    const modalInstance = new (window as any).bootstrap.Modal(modal);
+    modalInstance.show();
+  }
+}
+
+// Define the initial import form configuration 
+importFormConfig: any = {
+  fields: [
+    {
+      key: 'file',
+      type: 'file',
+      label: 'Select Excel File',
+      props: {
+        displayStyle: 'files',
+        multiple: false,
+        acceptedTypes: '.xlsx,.xls'
+      },
+      required: true
+    }
+  ],
+  submit: {
+    label: 'Import',
+    submittedFn: (formData: any) => {
+      const rawFile = formData.file[0]?.rawFile;
+      if (!rawFile || !(rawFile instanceof File)) {
+        this.notification.error('Error', 'No valid file selected!');
+        return;
+      }
+      const uploadData = new FormData();
+      uploadData.append('file', rawFile);
+
+      // Add headers to skip the default error interceptor
+      const headers = { 'X-Skip-Error-Interceptor': 'true' };
+
+      this.http.post('products/upload-excel/', uploadData, { headers }).subscribe({
+        next: (res: any) => {
+          console.log('Upload success', res);
+          
+          if (res.errors && res.errors.length > 0) {
+            // Handle partial success/errors
+            const successCount = res.message ? res.message.split(' ')[0] : '0';
+            const errorCount = res.errors.length;
+            
+            // Check if errors are related to missing required fields
+            const missingFieldErrors = res.errors.filter((e: any) => 
+              e.error && e.error.includes('Missing required field:')
+            );
+            
+            if (missingFieldErrors.length > 0) {
+              // Extract the missing field names from the error messages
+              const missingFields = missingFieldErrors.map((e: any) => {
+                const match = e.error.match(/Missing required field: (.+)/);
+                return match ? match[1] : '';
+              }).filter(Boolean);
+              
+              // Create a clear message about required fields
+              const message = `Required fields missing: ${missingFields.join(', ')}`;
+              this.notification.error(
+                'Import Failed', 
+                message,
+                { nzDuration: 6000 }
+              );
+            } else {
+              // Generic partial import message for other types of errors
+              this.notification.warning(
+                'Partial Import',
+                `${successCount} products imported, ${errorCount} failed.`,
+                { nzDuration: 5000 }
+              );
+            }
+          } else {
+            // Complete success
+            this.notification.success(
+              'Success', 
+              res.message || 'Products imported successfully', 
+              { nzDuration: 3000 }
+            );
+          }
+          
+          this.closeModal();
+          this.showProductsListFn();
+        },
+        error: (error) => {
+          console.error('Upload error', error);
+          
+          // Extract the error response structure
+          const errorResponse = error.error || {};
+          
+          // Access the message property directly
+          const errorMessage = errorResponse.message || 'Import failed';
+          
+          // Check for specific error messages to determine the error type
+          if (errorMessage.includes('Excel template format mismatch')) {
+            this.notification.error(
+              'Excel Template Error', 
+              'Excel template format mismatch. Please download the correct template.',
+              { nzDuration: 5000 }
+            );
+          } else if (errorMessage.includes('missing required data')) {
+            this.notification.error(
+              'Import Failed', 
+              'Some rows are missing required data. Please check your Excel file.',
+              { nzDuration: 5000 }
+            );
+          } else {
+            // Generic error
+            this.notification.error(
+              'Import Failed', 
+              errorMessage, 
+              { nzDuration: 5000 }
+            );
+          }
+        }
+      });
+    }
+  },
+  model: {}
+};
+
+// Rest of the code would be similar to your customer import component
+}
+
+
+

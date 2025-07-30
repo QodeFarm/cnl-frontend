@@ -5,7 +5,22 @@
         <span *ngIf="VendorEditID" class="custom-heading">Update Vendor</span>
         <span *ngIf="!VendorEditID" class="custom-heading">Create Vendor</span>
       </button>
-      <button (click)="showVendorListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#vendorListModal">Vendor List
+      <!-- <button (click)="showVendorListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#vendorListModal">Vendor List
+      </button> -->
+       <!-- Button Group: Import + Customer List -->
+      <div class="d-flex gap-2">
+        <!-- Import Button with Dropdown -->
+        <div class="btn-group">
+          <button type="button" class="btn btn-primary" (click)="showImportModal()">Import</button>
+          <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false"></button>
+          <ul class="dropdown-menu">
+            <!-- <li><a class="dropdown-item" href="assets/import-template.xlsx" download>Download Excel Format</a></li> -->
+              <a class="dropdown-item" (click)="downloadExcelTemplate()">Download Excel Format</a>
+          </ul>
+        </div>
+
+        <!-- Vendor List Button -->
+        <button (click)="showVendorListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#vendorListModal">Vendor List
       </button>
     </div>
   </div>
@@ -31,6 +46,33 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
         <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Import Modal -->
+<div class="modal fade custom-modal" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="importModalLabel">Import Vendor from Excel</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="modalClose"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Add this somewhere in your HTML -->
+        <button id="downloadTemplateBtn" (click)="downloadExcelTemplate()" style="display: none;"></button>
+        <!-- Update the import modal info section -->
+        <div class="alert alert-info mb-3">
+          <p class="mb-1"><strong>Instructions:</strong></p>
+          <ul class="mb-0">
+            <li>Download and use the official <a href="#" (click)="downloadExcelTemplate(); $event.preventDefault()">Excel Template</a></li>
+            <li>Required fields: Name, Print Name, Customer Category</li>
+            <!-- <li>All column names must match exactly as in the template</li> -->
+            <li>Only Excel files (.xlsx, .xls) are supported</li>
+          </ul>
+        </div>
+        <ta-form [options]="importFormConfig"></ta-form>
       </div>
     </div>
   </div>
