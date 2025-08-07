@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormlyModule } from '@ngx-formly/core';
-import { customerCudConfig } from '../utils/master-curd-config';
+import { customerCategoryConfig, customerCudConfig } from '../utils/master-curd-config';
 
 
 
@@ -23,6 +23,21 @@ import { customerCudConfig } from '../utils/master-curd-config';
               dataLabel: 'name',
               required: true,
               curdConfig: customerCudConfig
+            }
+          }
+        },
+        {
+          name: 'customer-cagtegory-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Category Select',
+              label: 'Customer Category Category',
+              dataKey: 'customer_category_id',
+              dataLabel: 'name',
+              required: true,
+              curdConfig: customerCategoryConfig
             }
           }
         }

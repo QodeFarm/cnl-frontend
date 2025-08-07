@@ -46,7 +46,10 @@ export class CustomersListComponent {
         fieldKey: 'name',
         name: 'Name',
         sort: true,
-        isEdit: true
+        isEdit: true,
+        isEditSumbmit: (row, value) => {
+
+        }
       },
       {
         fieldKey: 'email',

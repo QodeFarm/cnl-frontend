@@ -2,8 +2,9 @@
 </ngx-dynamic-hooks> -->
 <ng-container *ngIf="showEditContain; else showName">
     <input [(ngModel)]="value" class="form-control" />
-    <button nz-button nzType="link" nzSize="small" (click)="saveCell()">Update</button>
-    <button nz-button nzType="link" nzSize="small" (click)="showEditContain = false">Cancel</button>
+    <button nz-button nzType="link" nzSize="small" (click)="saveCell()"> <span nz-icon nzType="check"></span></button>
+    <button nz-button nzType="link" nzSize="small" (click)="showEditContain = false"> <span nz-icon
+            nzType="close"></span></button>
 </ng-container>
 <ng-template #showName>
     <span [innerHTML]="html"></span>

@@ -26,6 +26,7 @@ import { Router } from '@angular/router';
     NzFormModule,
     TaFormSharedModule,
     TaFormlyUiZeroModule
+
   ],
   styles: [
   ]
@@ -33,7 +34,6 @@ import { Router } from '@angular/router';
 export class TaFormComponent implements OnInit {
   @ViewChild("formlyForm", { static: false })
   formlyForm: FormlyForm | any;
-
   @Input() options: TaFormConfig | any;
   showForm = true;
   form = new UntypedFormGroup({});

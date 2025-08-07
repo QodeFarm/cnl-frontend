@@ -1,6 +1,6 @@
-import { Component, Input, OnInit, ViewChild, TemplateRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, OnInit, ViewChild, TemplateRef, ChangeDetectionStrategy, ChangeDetectorRef, forwardRef } from '@angular/core';
 import { TaActionService, TaCoreModule } from '@ta/ta-core';
-import { TaFormComponent } from '@ta/ta-form';
+import { TaFormComponent, TaFormModule } from '@ta/ta-form';
 import { TaTableComponent, TaTableModule } from '@ta/ta-table';
 import { TaCurdConfig } from '../ta-curd-config';
 import { NzModalModule } from 'ng-zorro-antd/modal';
@@ -23,6 +23,7 @@ import { NzDrawerModule } from 'ng-zorro-antd/drawer';
     NzCardModule,
     NzIconModule,
     NzDrawerModule,
+    forwardRef(() => TaFormComponent),
     NzButtonModule,
     NzModalModule]
 })

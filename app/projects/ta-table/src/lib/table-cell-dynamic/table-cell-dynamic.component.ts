@@ -50,6 +50,10 @@ export class TableCellDynamicComponent implements OnInit {
     }
   }
   saveCell() {
+    this.row[this.col.fieldKey] = this.value;
+    if (this.col.isEditSumbmit) {
+      this.col.isEditSumbmit(this.row, this.value);
+    }
     this.showEditContain = false;
   }
 }

@@ -3,20 +3,29 @@
 </nz-select> -->
 <div class="row">
     <div class="col">
-        <nz-select style="width: 100%;" [nzCustomTemplate]="defaultTemplate" [nzDropdownRender]="renderTemplate"
-            [nzBackdrop]="false" [nzOpen]="dropdownOpen" (nzOpenChange)="dropdownOpen = $event"
-            [compareWith]="compareFn" [nzDropdownMatchSelectWidth]="false" [class.ng-dirty]="showError" nzAllowClear
-            [formControl]="formControl" [formlyAttributes]="field"
-            [nzMode]="to.multiple ? 'multiple' :(to.mode)?to.mode: 'default'" [nzDropdownClassName]="'select-adv-field'"
-            [nzPlaceHolder]="props?.placeholder || 'Please Select'" [nzSelectOnTab]="true">
+        <nz-select style="width: 100%;" [nzCustomTemplate]="defaultTemplate" [nzBackdrop]="false"
+            [nzOpen]="dropdownOpen" (nzOpenChange)="onOpenChange($event)" [compareWith]="compareFn"
+            [nzDropdownMatchSelectWidth]="false" [class.ng-dirty]="showError" nzAllowClear [formControl]="formControl"
+            [formlyAttributes]="field" [nzMode]="to.multiple ? 'multiple' :(to.mode)?to.mode: 'default'"
+            [nzDropdownClassName]="'select-adv-field'" [nzPlaceHolder]="props?.placeholder || 'Please Select'"
+            [nzSelectOnTab]="true" (clickOutside)="onClickOutside($event)">
             <nz-option *ngIf="formControl.value" nzDisabled [nzValue]="formControl.value"
                 [nzLabel]="lazySelectedItem.label"></nz-option>
             <nz-option></nz-option>
         </nz-select>
+        <div class="adv-select-curd-container-main" *ngIf="props.curdConfig && showCurdDiv;">
+            <div class="adv-select-curd-container ant-select-dropdown"
+                style="position: absolute; background: white;padding: 5px; width: auto;z-index: 999;">
+                <div style="padding: 8px 12px; max-height: 400px; overflow: scroll; background-color: white;">
+                    <ta-curd-modal [options]="props.curdConfig"></ta-curd-modal>
+                    <!-- <ta-table [options]="props.curdConfig?.tableConfig"></ta-table> -->
+                </div>
+            </div>
+        </div>
     </div>
-    <button class="ant-btn ant-btn-primer col-2" (click)="openDrawer()"><i class="fa fa-plus"></i></button>
-    <button class="ant-btn ant-btn-primer col-2" *ngIf="formControl.value" (click)="openDrawer(formControl.value)"><i
-            class="fa fa-pen"></i></button>
+
+    <!-- <button class="ant-btn ant-btn-primer col-2" *ngIf="formControl.value" (click)="openDrawer(formControl.value)"><i
+            class="fa fa-pen"></i></button> -->
 </div>
 <ng-template #defaultTemplate let-selected>
     {{ selected.nzLabel }}
@@ -24,12 +33,14 @@
 
 <ng-template #renderTemplate>
     <nz-divider></nz-divider>
-    <div class="container" *ngIf="props.curdConfig && dropdownOpen; else dropdownRender2">
+    <!-- <button class="ant-btn ant-btn-primer col-2" (click)="openDrawer()"><i class="fa fa-plus"></i></button> -->
+    <div class="container" *ngIf="props.curdConfig && dropdownOpen;">
         <div style="padding: 8px 12px; max-height: 400px; overflow: scroll; background-color: white;">
-            <!-- <ta-curd-modal [options]="props.curdConfig"></ta-curd-modal> -->
-            <ta-table [options]="props.curdConfig?.tableConfig"></ta-table>
+            <ta-curd-modal [options]="props.curdConfig"></ta-curd-modal>
+            <!-- <ta-table [options]="props.curdConfig?.tableConfig"></ta-table> -->
         </div>
     </div>
+
 </ng-template>
 <ng-template #labelRender let-selected>
     {{ selected?.name || selected?.label || 'Selected' }}
@@ -101,9 +112,9 @@
 
 </ng-template>
 
-<nz-drawer [nzClosable]="false" [nzHeight]="props.curdConfig.formConfig.drawerHeight || '100%'"
-    [nzWidth]="props.curdConfig.formConfig.drawerSize || 'auto'" [nzVisible]="visible" [nzClosable]="true"
-    [nzPlacement]="props.curdConfig.formConfig.drawerPlacement || 'right'" [nzTitle]="formTitle" (nzOnClose)="close()">
+<nz-drawer [nzClosable]="false" [nzHeight]="props.curdConfig.drawerHeight || '100%'"
+    [nzWidth]="props.curdConfig.drawerSize || 'auto'" [nzVisible]="visible" [nzClosable]="true"
+    [nzPlacement]="props.curdConfig.drawerPlacement || 'right'" [nzTitle]="formTitle" (nzOnClose)="close()">
     <ng-template nzDrawerContent>
         <ta-form *ngIf="visible" #form [options]="props.curdConfig.formConfig"></ta-form>
     </ng-template>

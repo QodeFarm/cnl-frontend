@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, OnInit } from '@angular/core';
 import { FieldType } from '@ngx-formly/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NzSelectModule } from 'ng-zorro-antd/select';
@@ -13,7 +13,8 @@ import { TaCurdComponent } from '@ta/ta-curd';
 import { TaCurdModalComponent } from 'projects/ta-curd/src/lib/ta-curd-modal/ta-curd-modal.component';
 import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 import { TaFormComponent, TaFormModule } from '@ta/ta-form';
-
+import { ClickOutsideDirective } from './click-outside.directive';
+import { NzPopoverModule } from 'ng-zorro-antd/popover';
 @Component({
   selector: 'ta-field-adv-select',
   templateUrl: './field-adv-select.component.html',
@@ -27,16 +28,35 @@ import { TaFormComponent, TaFormModule } from '@ta/ta-form';
     NzDropDownModule,
     NzDrawerModule,
     TaTableModule,
+    TaCurdModalComponent,
+    ClickOutsideDirective,
+    NzPopoverModule,
     forwardRef(() => TaFormComponent),
     NzIconModule]
 })
-export class FieldAdvSelectComponent extends FieldType implements OnInit {
+export class FieldAdvSelectComponent extends FieldType implements OnInit, AfterViewInit {
   dropdownOpen = false;
   lazySelectedItem: any;
   visible = false;
   formTitle = "Create";
+  showCurdDiv = false;
   constructor(private cdr: ChangeDetectorRef) {
     super();
+  }
+  ngAfterViewInit(): void {
+    const overlayPane = document.querySelector('.cdk-overlay-pane.select-adv-field');
+    const drawerContent = document.querySelector('.curd-modal-form');
+
+    document.addEventListener('click', (event: MouseEvent) => {
+      const clickTarget = event.target as HTMLElement;
+      const isSelectClick = overlayPane?.contains(clickTarget);
+      const isDrawerClick = drawerContent?.contains(clickTarget);
+
+      // If clicked outside both select and drawer, close it
+      if (isDrawerClick) {
+        this.dropdownOpen = true;
+      }
+    });
   }
   ngOnInit(): void {
     // Initialize any additional properties or methods if needed
@@ -46,6 +66,7 @@ export class FieldAdvSelectComponent extends FieldType implements OnInit {
       this.props.curdConfig.tableConfig.rowSelection = (row) => {
         this.formControl.setValue(row);
         this.dropdownOpen = false;
+        this.showCurdDiv = false;
       }
     }
     this.formControl.valueChanges.subscribe(res => {
@@ -89,6 +110,39 @@ export class FieldAdvSelectComponent extends FieldType implements OnInit {
 
   close(): void {
     this.visible = false;
+  }
+  onOpenChange(open: boolean) {
+    this.dropdownOpen = true;
+    this.showCurdDiv = true;
+
+  }
+  onClickOutside(event: MouseEvent): void {
+    console.log('click------------', event);
+    // Don't close dropdown
+    // event.preventDefault();
+    // event.stopPropagation();
+    //this.dropdownOpen = true;
+    //const overlayPane = document.querySelector('.cdk-overlay-pane.select-adv-field');
+    const overlayPane = document.querySelector('.adv-select-curd-container');
+    const drawerContent = document.querySelector('.curd-modal-form');
+    const popoverContent = document.querySelector('.table-action-conformation');
+
+    const target = event.target as Node;
+
+    const isInsideOverlay = overlayPane?.contains(target);
+    const isInsideDrawer = drawerContent?.contains(target);
+    const isPoverContent = popoverContent?.contains(target);
+
+    if (!isInsideOverlay && !isInsideDrawer && !isPoverContent) {
+      // event.stopPropagation();
+      // event.preventDefault();
+      this.dropdownOpen = false;
+      this.showCurdDiv = false;
+      console.log('Click blocked outside allowed areas');
+    } else {
+
+      console.log('Click allowed inside overlay or drawer');
+    }
   }
   openDrawer(row?: any) {
     debugger;
