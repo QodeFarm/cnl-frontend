@@ -93,7 +93,7 @@ export class VendorsListComponent {
         sort: true,
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
-          return row.vendor_addresses.billing_address;
+          return row.vendor_addresses.custom_billing_address;
         },
       },
       {
