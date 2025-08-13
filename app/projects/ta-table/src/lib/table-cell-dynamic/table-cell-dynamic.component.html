@@ -1,4 +1,14 @@
 <!-- <ngx-dynamic-hooks [context]="{col:options.col}" [content]="options.col.html">
 </ngx-dynamic-hooks> -->
-
-<span [innerHTML]="html"></span>
+<ng-container *ngIf="showEditContain; else showName">
+    <input [(ngModel)]="value" class="form-control" />
+    <button nz-button nzType="link" nzSize="small" (click)="saveCell()"> <span nz-icon nzType="check"></span></button>
+    <button nz-button nzType="link" nzSize="small" (click)="showEditContain = false"> <span nz-icon
+            nzType="close"></span></button>
+</ng-container>
+<ng-template #showName>
+    <span [innerHTML]="html"></span>
+    <button *ngIf="col.isEdit" nz-button nzType="link" nzSize="small" (click)="showEditContain = true">
+        <span nz-icon nzType="edit"></span>
+    </button>
+</ng-template>

@@ -14,6 +14,7 @@ export class TableCellDynamicComponent implements OnInit {
   @Input() row: any;
   @Input() value: any;
   html!: any;
+  showEditContain = false;
   constructor(public datepipe: DatePipe, public currency: CurrencyPipe) { }
 
   ngOnInit(): void {
@@ -47,5 +48,12 @@ export class TableCellDynamicComponent implements OnInit {
         this.html = this.row[this.col.fieldKey];
         break;
     }
+  }
+  saveCell() {
+    this.row[this.col.fieldKey] = this.value;
+    if (this.col.isEditSumbmit) {
+      this.col.isEditSumbmit(this.row, this.value);
+    }
+    this.showEditContain = false;
   }
 }

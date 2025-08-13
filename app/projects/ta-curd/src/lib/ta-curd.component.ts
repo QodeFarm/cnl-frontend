@@ -1,7 +1,14 @@
-import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, forwardRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { TaFormComponent } from '@ta/ta-form';
-import { TaTableComponent } from '@ta/ta-table';
+import { TaTableComponent, TaTableModule } from '@ta/ta-table';
 import { TaCurdConfig } from './ta-curd-config';
+import { CommonModule } from '@angular/common';
+import { TaCoreModule } from '@ta/ta-core';
+import { NzGridModule } from 'ng-zorro-antd/grid';
+import { NzCardModule } from 'ng-zorro-antd/card';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 
 @Component({
   selector: 'ta-curd',
@@ -23,7 +30,17 @@ import { TaCurdConfig } from './ta-curd-config';
 </div>
   `,
   styles: [
-  ]
+  ],
+  standalone: true,
+  imports: [CommonModule,
+    TaCoreModule,
+    TaTableModule,
+    forwardRef(() => TaFormComponent),
+    NzGridModule,
+    NzCardModule,
+    NzIconModule,
+    NzDrawerModule,
+    NzButtonModule]
 })
 export class TaCurdComponent implements OnInit, OnDestroy {
   @Input() options: TaCurdConfig | any;

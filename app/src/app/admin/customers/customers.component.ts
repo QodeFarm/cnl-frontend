@@ -32,7 +32,7 @@ export class CustomersComponent {
   customFieldConfig: any;
   customFields: any[] = [];
 
-  constructor(private http: HttpClient, private cdref:ChangeDetectorRef,private notification: NzNotificationService ) {}
+  constructor(private http: HttpClient, private cdref: ChangeDetectorRef, private notification: NzNotificationService) { }
   customFieldFormConfig: any = {};
   entitiesList: any[] = [];
   ngOnInit() {
@@ -48,7 +48,7 @@ export class CustomersComponent {
     CustomFieldHelper.fetchCustomFields(this.http, 'customers', (customFields: any, customFieldMetadata: any) => {
       CustomFieldHelper.addCustomFieldsToFormConfig(customFields, customFieldMetadata, this.formConfig);
     });
-    
+
   }
 
 
@@ -69,15 +69,15 @@ export class CustomersComponent {
       });
     }
   }
-  
+
   customFieldMetadata: any = {}; // To store mapping of field names to metadata
   submitCustomerForm() {
     const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
-  
+
     // Determine the entity type and ID dynamically
     const entityName = 'customers'; // Since we're in the Sale Order form
     const customId = this.formConfig.model.customer_data?.customer_id || null; //
-  
+
     // Find entity record from list
     const entity = this.entitiesList.find(e => e.entity_name === entityName);
 
@@ -93,7 +93,7 @@ export class CustomersComponent {
     });
     // Construct payload for custom fields
     const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
-  
+
     if (!customFieldsPayload) {
       this.showDialog(); // Stop execution if required fields are missing
     }
@@ -102,26 +102,26 @@ export class CustomersComponent {
       ...this.formConfig.model,
       custom_field_values: customFieldsPayload.custom_field_values // Array of dictionaries
     };
-  
+
     console.log('Final Payload:', payload); // Debugging to verify the payload
-  
+
     // Submit the payload
     this.http.post('customers/customers/', payload).subscribe(
       (response: any) => {
         this.showSuccessToast = true;
-          this.toastMessage = "Record Created successfully"; // Set the toast message for update
-          this.ngOnInit();
-          setTimeout(() => {
-            this.showSuccessToast = false;
-          }, 3000);
+        this.toastMessage = "Record Created successfully"; // Set the toast message for update
+        this.ngOnInit();
+        setTimeout(() => {
+          this.showSuccessToast = false;
+        }, 3000);
       },
       (error) => {
         console.error('Error creating customer and custom fields:', error);
       }
     );
   }
-  
- 
+
+
   showDialog() {
     const dialog = document.getElementById('customDialog');
     if (dialog) {
@@ -178,7 +178,7 @@ export class CustomersComponent {
 
   editCustomer(event: string) {
     this.CustomerEditID = event;
-  
+
     // Fetch customer details
     this.http.get(`customers/customers/${event}`).subscribe(
       (res: any) => {
@@ -187,7 +187,7 @@ export class CustomersComponent {
           // Set customer data in the form model
           this.formConfig.model = res.data;
           this.formConfig.model['customer_id'] = this.CustomerEditID;
-          
+
           // Ensure custom_field_values are correctly populated in the model
           if (res.data.custom_field_values) {
             this.formConfig.model['custom_field_values'] = res.data.custom_field_values.reduce((acc: any, fieldValue: any) => {
@@ -206,10 +206,10 @@ export class CustomersComponent {
         console.error('Error fetching customer data:', error);
       }
     );
-  
+
     // Close the customer list modal
     this.hide();
-  } 
+  }
 
   showCustomerListFn() {
     this.showCustomerList = true;
@@ -225,7 +225,7 @@ export class CustomersComponent {
     // Determine the entity type and ID dynamically
     const entityName = 'customers'; // Since we're in the Sale Order form
     const customId = this.formConfig.model.customer_data?.customer_id || null; //
-  
+
     // Find entity record from list
     const entity = this.entitiesList.find(e => e.entity_name === entityName);
 
@@ -241,24 +241,24 @@ export class CustomersComponent {
     });
     // Construct payload for custom fields
     const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
-  
+
     // Construct the final payload for update
     const payload = {
       ...this.formConfig.model,
       custom_field_values: customFieldsPayload.custom_field_values // Array of dictionaries
     };
-  
+
     console.log('Final Payload for Update:', payload); // Debugging to verify the payload
-  
+
     // Send the update request with the payload
     this.http.put(`customers/customers/${this.CustomerEditID}/`, payload).subscribe(
       (response: any) => {
         this.showSuccessToast = true;
-          this.toastMessage = "Record updated successfully"; // Set the toast message for update
-          this.ngOnInit();
-          setTimeout(() => {
-            this.showSuccessToast = false;
-          }, 3000);
+        this.toastMessage = "Record updated successfully"; // Set the toast message for update
+        this.ngOnInit();
+        setTimeout(() => {
+          this.showSuccessToast = false;
+        }, 3000);
         // this.showCustomerListFn(); // Redirect or refresh the customer list
         // this.ngOnInit();
       },
@@ -267,7 +267,7 @@ export class CustomersComponent {
       }
     );
   }
-  
+
 
   setFormConfig() {
     this.CustomerEditID = null;
@@ -286,7 +286,7 @@ export class CustomersComponent {
             this.submitCustomerForm();
           } else {
             this.updateCustomer();
-             // Otherwise, create a new record
+            // Otherwise, create a new record
           }
         }
       },
@@ -305,18 +305,18 @@ export class CustomersComponent {
         }],
         custom_field_values: []
       },
-      fields:[
+      fields: [
         {
           fieldGroup: [
             {
               className: 'col-12 custom-form-card-block p-0',
               key: 'customer_data',
-              fieldGroupClassName:'row m-0 pr-0 responsive-row',
+              fieldGroupClassName: 'row m-0 pr-0 responsive-row',
               fieldGroup: [
                 // Left Section (col-9 for form fields)
                 {
                   className: 'col-sm-9 col-12 p-0',
-                  fieldGroupClassName:'row m-0 p-0',
+                  fieldGroupClassName: 'row m-0 p-0',
                   fieldGroup: [
                     {
                       className: 'col-md-4 col-sm-6 col-12',
@@ -337,7 +337,7 @@ export class CustomersComponent {
                         placeholder: 'Enter Print Name',
                         required: true,
                       }
-                    },               
+                    },
                     {
                       className: 'col-md-4 col-sm-6 col-12',
                       key: 'code',
@@ -348,11 +348,11 @@ export class CustomersComponent {
                         required: false,
                       }
                     },
-                  
+
                     {
                       className: 'col-md-4 col-sm-6 col-12',
                       key: 'customer_category',
-                      type: 'select',
+                      type: 'customer-cagtegory-dropdown',
                       templateOptions: {
                         label: 'Customer Category',
                         dataKey: 'customer_category_id',
@@ -418,7 +418,7 @@ export class CustomersComponent {
                     //     required: false,
                     //   }
                     // },
-                                                            
+
                   ]
                 },
                 {
@@ -434,7 +434,7 @@ export class CustomersComponent {
                         label: 'Picture',
                         // required: false
                       }
-                    }                                
+                    }
                   ]
                 },
               ]
@@ -713,13 +713,13 @@ export class CustomersComponent {
                           //     placeholder: 'email',
                           //   }
                           // },
-                          
+
                         ]
                       }
                     },
-                      ]
-                    }
                   ]
+                }
+              ]
             },
             {
               className: 'col-12 custom-form-card-block',
@@ -733,110 +733,110 @@ export class CustomersComponent {
                       className: 'col-12 p-0',
                       key: 'customer_data',
                       fieldGroupClassName: "ant-row row align-items-end mt-3",
-                          fieldGroup: [
-                            {
-                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                              key: 'payment_term',
-                              type: 'select',
-                              templateOptions: {
-                                label: 'Payment Term',
-                                dataKey: 'payment_term_id',
-                                dataLabel: 'name',
-                                options: [],
-                                lazy: {
-                                  url: 'masters/customer_payment_terms/',
-                                  lazyOneTime: true
+                      fieldGroup: [
+                        {
+                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                          key: 'payment_term',
+                          type: 'select',
+                          templateOptions: {
+                            label: 'Payment Term',
+                            dataKey: 'payment_term_id',
+                            dataLabel: 'name',
+                            options: [],
+                            lazy: {
+                              url: 'masters/customer_payment_terms/',
+                              lazyOneTime: true
+                            }
+                          },
+                          hooks: {
+                            onChanges: (field: any) => {
+                              field.formControl.valueChanges.subscribe((data: any) => {
+                                if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
+                                  this.formConfig.model['customer_data']['payment_term_id'] = data.payment_term_id;
+                                } else {
+                                  console.error('Form config or Customer data model is not defined.');
                                 }
-                              },
-                              hooks: {
-                                onChanges: (field: any) => {
-                                  field.formControl.valueChanges.subscribe((data: any) => {
-                                    if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
-                                      this.formConfig.model['customer_data']['payment_term_id'] = data.payment_term_id;
-                                    } else {
-                                      console.error('Form config or Customer data model is not defined.');
-                                    }
-                                  });
+                              });
+                            }
+                          }
+                        },
+                        {
+                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                          key: 'interest_rate_yearly',
+                          type: 'input',
+                          templateOptions: {
+                            label: 'Interest Rate Yearly',
+                            placeholder: 'Enter Interest Rate Yearly',
+                            type: 'number',
+                          }
+                        },
+                        {
+                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                          key: 'price_category',
+                          type: 'select',
+                          templateOptions: {
+                            label: 'Price Category',
+                            dataKey: 'price_category_id',
+                            dataLabel: 'name',
+                            options: [],
+                            lazy: {
+                              url: 'masters/price_categories/',
+                              lazyOneTime: true
+                            }
+                          },
+                          hooks: {
+                            onChanges: (field: any) => {
+                              field.formControl.valueChanges.subscribe((data: any) => {
+                                if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
+                                  this.formConfig.model['customer_data']['price_category_id'] = data.price_category_id;
+                                } else {
+                                  console.error('Form config or Customer data model is not defined.');
                                 }
-                              }
-                            },
-                            {
-                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                              key: 'interest_rate_yearly',
-                              type: 'input',
-                              templateOptions: {
-                                label: 'Interest Rate Yearly',
-                                placeholder: 'Enter Interest Rate Yearly',
-                                type: 'number',
-                              }
-                            },                          
-                            {
-                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                              key: 'price_category',
-                              type: 'select',
-                              templateOptions: {
-                                label: 'Price Category',
-                                dataKey: 'price_category_id',
-                                dataLabel: 'name',
-                                options: [],
-                                lazy: {
-                                  url: 'masters/price_categories/',
-                                  lazyOneTime: true
-                                }
-                              },
-                              hooks: {
-                                onChanges: (field: any) => {
-                                  field.formControl.valueChanges.subscribe((data: any) => {
-                                    if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
-                                      this.formConfig.model['customer_data']['price_category_id'] = data.price_category_id;
-                                    } else {
-                                      console.error('Form config or Customer data model is not defined.');
-                                    }
-                                  });
-                                }
-                              }
-                            },
-                            {
-                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                              key: 'credit_limit',
-                              type: 'input',
-                              templateOptions: {
-                                label: 'Credit Limit',
-                                placeholder: 'Enter Credit Limit',
-                                type: 'number',
-                              }
-                            },
-                            {
-                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                              key: 'max_credit_days',
-                              type: 'input',
-                              templateOptions: {
-                                label: 'Max Credit Days',
-                                placeholder: 'Enter Max Credit Days',
-                                type: 'number',
-                              }
-                            },
-                            {
-                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                              key: 'is_sub_customer',
-                              type: 'checkbox',
-                              templateOptions: {
-                                label: 'Is Sub Customer',
-                              }
-                            },
-                            {
-                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                              key: 'customer_common_for_sales_purchase',
-                              type: 'checkbox',
-                              templateOptions: {
-                                label: 'Customer common for Sales and Purchase',
-                              }
-                            },
-                          ]
+                              });
+                            }
+                          }
+                        },
+                        {
+                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                          key: 'credit_limit',
+                          type: 'input',
+                          templateOptions: {
+                            label: 'Credit Limit',
+                            placeholder: 'Enter Credit Limit',
+                            type: 'number',
+                          }
+                        },
+                        {
+                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                          key: 'max_credit_days',
+                          type: 'input',
+                          templateOptions: {
+                            label: 'Max Credit Days',
+                            placeholder: 'Enter Max Credit Days',
+                            type: 'number',
+                          }
+                        },
+                        {
+                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                          key: 'is_sub_customer',
+                          type: 'checkbox',
+                          templateOptions: {
+                            label: 'Is Sub Customer',
+                          }
+                        },
+                        {
+                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                          key: 'customer_common_for_sales_purchase',
+                          type: 'checkbox',
+                          templateOptions: {
+                            label: 'Customer common for Sales and Purchase',
+                          }
                         },
                       ]
-                    }               
-                ]
+                    },
+                  ]
+                }
+              ]
             },
             {
               className: 'col-12 pb-0',
@@ -852,57 +852,57 @@ export class CustomersComponent {
                       className: 'col-12 p-0',
                       key: 'customer_data',
                       fieldGroupClassName: "ant-row row align-items-end mt-3",
-                          fieldGroup: [
-                              {
-                                className: 'ta-cell pr-md col-lg-3 col-md-4 col-sm-6 col-12',
-                                key: 'website',
-                                type: 'input',
-                                templateOptions: {
-                                  label: 'Website',
-                                  placeholder: 'Enter Website URL',
-                                }
-                              },                                  
-                              {
-                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                                key: 'facebook',
-                                type: 'input',
-                                templateOptions: {
-                                  label: 'Facebook',
-                                  placeholder: 'Enter Facebook URL',
-                                }
-                              },
-                              {
-                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                                key: 'skype',
-                                type: 'input',
-                                templateOptions: {
-                                  label: 'Skype',
-                                  placeholder: 'Enter Skype ID',
-                                }
-                              },
-                              {
-                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                                key: 'twitter',
-                                type: 'input',
-                                templateOptions: {
-                                  label: 'Twitter',
-                                  placeholder: 'Enter Twitter URL',
-                                }
-                              },
-                              {
-                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                                key: 'linked_in',
-                                type: 'input',
-                                templateOptions: {
-                                  label: 'LinkedIn',
-                                  placeholder: 'Enter LinkedIn URL',
-                                }
-                              },
-                          ]
+                      fieldGroup: [
+                        {
+                          className: 'ta-cell pr-md col-lg-3 col-md-4 col-sm-6 col-12',
+                          key: 'website',
+                          type: 'input',
+                          templateOptions: {
+                            label: 'Website',
+                            placeholder: 'Enter Website URL',
+                          }
+                        },
+                        {
+                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                          key: 'facebook',
+                          type: 'input',
+                          templateOptions: {
+                            label: 'Facebook',
+                            placeholder: 'Enter Facebook URL',
+                          }
+                        },
+                        {
+                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                          key: 'skype',
+                          type: 'input',
+                          templateOptions: {
+                            label: 'Skype',
+                            placeholder: 'Enter Skype ID',
+                          }
+                        },
+                        {
+                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                          key: 'twitter',
+                          type: 'input',
+                          templateOptions: {
+                            label: 'Twitter',
+                            placeholder: 'Enter Twitter URL',
+                          }
+                        },
+                        {
+                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                          key: 'linked_in',
+                          type: 'input',
+                          templateOptions: {
+                            label: 'LinkedIn',
+                            placeholder: 'Enter LinkedIn URL',
+                          }
                         },
                       ]
-                    }
+                    },
                   ]
+                }
+              ]
             },
             {
               className: 'col-12 pb-0',
@@ -918,89 +918,89 @@ export class CustomersComponent {
                       className: 'col-12 p-0',
                       key: 'customer_data',
                       fieldGroupClassName: "ant-row row align-items-end mt-3",
-                          fieldGroup: [
-                            {
-                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                              key: 'gst_category',
-                              type: 'select',
-                              templateOptions: {
-                                label: 'GST Category',
-                                dataKey: 'gst_category_id',
-                                dataLabel: 'name',
-                                options: [],
-                                lazy: {
-                                  url: 'masters/gst_categories/',
-                                  lazyOneTime: true
+                      fieldGroup: [
+                        {
+                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                          key: 'gst_category',
+                          type: 'select',
+                          templateOptions: {
+                            label: 'GST Category',
+                            dataKey: 'gst_category_id',
+                            dataLabel: 'name',
+                            options: [],
+                            lazy: {
+                              url: 'masters/gst_categories/',
+                              lazyOneTime: true
+                            }
+                          },
+                          hooks: {
+                            onChanges: (field: any) => {
+                              field.formControl.valueChanges.subscribe((data: any) => {
+                                if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
+                                  this.formConfig.model['customer_data']['gst_category_id'] = data.gst_category_id;
+                                } else {
+                                  console.error('Form config or Customer data model is not defined.');
                                 }
-                              },
-                              hooks: {
-                                onChanges: (field: any) => {
-                                  field.formControl.valueChanges.subscribe((data: any) => {
-                                    if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
-                                      this.formConfig.model['customer_data']['gst_category_id'] = data.gst_category_id;
-                                    } else {
-                                      console.error('Form config or Customer data model is not defined.');
-                                    }
-                                  });
-                                }
-                              }
-                            },
-                            {
-                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                              key: 'gst',
-                              type: 'input',
-                              templateOptions: {
-                                label: 'GST No',
-                                placeholder: 'Enter GST',
-                              }
-                            },
-                            {
-                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                              key: 'cin',
-                              type: 'input',
-                              templateOptions: {
-                                label: 'CIN',
-                                placeholder: 'Enter CIN',
-                              }
-                            },
-                            {
-                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                              key: 'pan',
-                              type: 'input',
-                              templateOptions: {
-                                label: 'PAN',
-                                placeholder: 'Enter PAN',
-                              }
-                            },
-                            {
-                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                              key: 'gst_suspend',
-                              type: 'checkbox',
-                              templateOptions: {
-                                label: 'GST Suspend',
-                              }
-                            },
-                            {
-                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                              key: 'tds_on_gst_applicable',
-                              type: 'checkbox',
-                              templateOptions: {
-                                label: 'TDS on GST Applicable',
-                              }
-                            },
-                            {
-                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                              key: 'tds_applicable',
-                              type: 'checkbox',
-                              templateOptions: {
-                                label: 'TDS Applicable',
-                              }
-                            },
-                          ]
+                              });
+                            }
+                          }
+                        },
+                        {
+                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                          key: 'gst',
+                          type: 'input',
+                          templateOptions: {
+                            label: 'GST No',
+                            placeholder: 'Enter GST',
+                          }
+                        },
+                        {
+                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                          key: 'cin',
+                          type: 'input',
+                          templateOptions: {
+                            label: 'CIN',
+                            placeholder: 'Enter CIN',
+                          }
+                        },
+                        {
+                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                          key: 'pan',
+                          type: 'input',
+                          templateOptions: {
+                            label: 'PAN',
+                            placeholder: 'Enter PAN',
+                          }
+                        },
+                        {
+                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                          key: 'gst_suspend',
+                          type: 'checkbox',
+                          templateOptions: {
+                            label: 'GST Suspend',
+                          }
+                        },
+                        {
+                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                          key: 'tds_on_gst_applicable',
+                          type: 'checkbox',
+                          templateOptions: {
+                            label: 'TDS on GST Applicable',
+                          }
+                        },
+                        {
+                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                          key: 'tds_applicable',
+                          type: 'checkbox',
+                          templateOptions: {
+                            label: 'TDS Applicable',
+                          }
                         },
                       ]
-                    }
+                    },
                   ]
+                }
+              ]
             },
             {
               className: 'col-12 pb-0',
@@ -1016,48 +1016,48 @@ export class CustomersComponent {
                       className: 'col-12 p-0',
                       key: 'customer_data',
                       fieldGroupClassName: "ant-row row align-items-end mt-3",
-                          fieldGroup: [
-                            {
-                              className: 'col-md-4 col-sm-6 col-12',
-                              key: 'transporter',
-                              type: 'select',
-                              templateOptions: {
-                                label: 'Transporter',
-                                dataKey: 'transporter_id',
-                                dataLabel: 'name',
-                                options: [],
-                                lazy: {
-                                  url: 'masters/transporters/',
-                                  lazyOneTime: true
+                      fieldGroup: [
+                        {
+                          className: 'col-md-4 col-sm-6 col-12',
+                          key: 'transporter',
+                          type: 'select',
+                          templateOptions: {
+                            label: 'Transporter',
+                            dataKey: 'transporter_id',
+                            dataLabel: 'name',
+                            options: [],
+                            lazy: {
+                              url: 'masters/transporters/',
+                              lazyOneTime: true
+                            }
+                          },
+                          hooks: {
+                            onChanges: (field: any) => {
+                              field.formControl.valueChanges.subscribe((data: any) => {
+                                if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
+                                  this.formConfig.model['customer_data']['transporter_id'] = data.transporter_id;
+                                } else {
+                                  console.error('Form config or Customer data model is not defined.');
                                 }
-                              },
-                              hooks: {
-                                onChanges: (field: any) => {
-                                  field.formControl.valueChanges.subscribe((data: any) => {
-                                    if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
-                                      this.formConfig.model['customer_data']['transporter_id'] = data.transporter_id;
-                                    } else {
-                                      console.error('Form config or Customer data model is not defined.');
-                                    }
-                                  });
-                                }
-                              }
-                            },
-                            {
-                              className: 'col-md-4 col-sm-6 col-12',
-                              key: 'distance',
-                              type: 'input',
-                              templateOptions: {
-                                label: 'Distance',
-                                placeholder: 'Enter Distance',
-                                type: 'number',
-                              }
-                            },
-                          ]
+                              });
+                            }
+                          }
+                        },
+                        {
+                          className: 'col-md-4 col-sm-6 col-12',
+                          key: 'distance',
+                          type: 'input',
+                          templateOptions: {
+                            label: 'Distance',
+                            placeholder: 'Enter Distance',
+                            type: 'number',
+                          }
                         },
                       ]
-                    }
+                    },
                   ]
+                }
+              ]
             },
             {
               className: 'col-12 px-0 pt-3',
@@ -1088,7 +1088,7 @@ export class CustomersComponent {
             },
             {
               className: 'col-12 custom-form-card-block p-0',
-              fieldGroupClassName:'row m-0 pr-0',
+              fieldGroupClassName: 'row m-0 pr-0',
               props: {
                 label: 'Other Details'
               },
@@ -1132,7 +1132,7 @@ export class CustomersComponent {
                           });
                         }
                       }
-                    }, 
+                    },
                     {
                       className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                       key: 'registration_date',
@@ -1144,7 +1144,7 @@ export class CustomersComponent {
                         type: 'date',
                         readonly: true
                       }
-                    }, 
+                    },
                     {
                       className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                       key: 'territory',
@@ -1170,11 +1170,11 @@ export class CustomersComponent {
                           });
                         }
                       }
-                    },              
+                    },
                   ]
                 },
-              ]            
-            },                    
+              ]
+            },
           ]
         },
         // {
@@ -1191,54 +1191,54 @@ export class CustomersComponent {
     }
   }
 
-//   downloadExcelTemplate() {
-//   this.http.get('customers/import/template/', {
-//     responseType: 'blob'
-//   }).subscribe((res: Blob) => {
-//     const a = document.createElement('a');
-//     const url = window.URL.createObjectURL(res);
-//     a.href = url;
-//     a.download = 'Customer_Import_Template.xlsx';
-//     a.click();
-//     window.URL.revokeObjectURL(url);
-//   });
-// }
+  //   downloadExcelTemplate() {
+  //   this.http.get('customers/import/template/', {
+  //     responseType: 'blob'
+  //   }).subscribe((res: Blob) => {
+  //     const a = document.createElement('a');
+  //     const url = window.URL.createObjectURL(res);
+  //     a.href = url;
+  //     a.download = 'Customer_Import_Template.xlsx';
+  //     a.click();
+  //     window.URL.revokeObjectURL(url);
+  //   });
+  // }
 
-downloadExcelTemplate() {
-this.http.get('customers/download-template/', {
-  responseType: 'blob'
-}).subscribe({
-  next: (res: Blob) => {
-    const a = document.createElement('a');
-    const url = window.URL.createObjectURL(res);
-    a.href = url;
-    a.download = 'Customer_Import_Template.xlsx';
-    a.click();
-    window.URL.revokeObjectURL(url);
-    this.notification.success('Success', 'Template downloaded successfully');
-  },
-  error: (error) => {
-    console.error('Download error', error);
-    this.notification.error('Error', 'Failed to download template');
+  downloadExcelTemplate() {
+    this.http.get('customers/download-template/', {
+      responseType: 'blob'
+    }).subscribe({
+      next: (res: Blob) => {
+        const a = document.createElement('a');
+        const url = window.URL.createObjectURL(res);
+        a.href = url;
+        a.download = 'Customer_Import_Template.xlsx';
+        a.click();
+        window.URL.revokeObjectURL(url);
+        this.notification.success('Success', 'Template downloaded successfully');
+      },
+      error: (error) => {
+        console.error('Download error', error);
+        this.notification.error('Error', 'Failed to download template');
+      }
+    });
   }
-});
-}
 
-// Close modal using Bootstrap instance
-closeModal() {
-  const modal = document.getElementById('importModal');
-  if (modal) {
-    const modalInstance = (window as any).bootstrap.Modal.getInstance(modal);
-    if (modalInstance) {
-      modalInstance.hide();
+  // Close modal using Bootstrap instance
+  closeModal() {
+    const modal = document.getElementById('importModal');
+    if (modal) {
+      const modalInstance = (window as any).bootstrap.Modal.getInstance(modal);
+      if (modalInstance) {
+        modalInstance.hide();
+      }
     }
   }
-}
 
-showImportModal() {
+  showImportModal() {
     // Reset the import form model to ensure fresh start
     this.importFormConfig.model = {};
-    
+
     // Force reset the fields to clear any cached file by creating a fresh configuration
     this.importFormConfig.fields = [
       {
@@ -1253,7 +1253,7 @@ showImportModal() {
         required: true
       }
     ];
-    
+
     // Show the modal after resetting
     const modal = document.getElementById('importModal');
     if (modal) {
@@ -1277,103 +1277,103 @@ showImportModal() {
         required: true
       }
     ],
-  submit: {
-    label: 'Import',
-    submittedFn: (formData: any) => {
-      const rawFile = formData.file[0]?.rawFile;
-      if (!rawFile || !(rawFile instanceof File)) {
-        this.notification.error('Error', 'No valid file selected!');
-        return;
-      }
-      const uploadData = new FormData();
-      uploadData.append('file', rawFile);
+    submit: {
+      label: 'Import',
+      submittedFn: (formData: any) => {
+        const rawFile = formData.file[0]?.rawFile;
+        if (!rawFile || !(rawFile instanceof File)) {
+          this.notification.error('Error', 'No valid file selected!');
+          return;
+        }
+        const uploadData = new FormData();
+        uploadData.append('file', rawFile);
 
-      // Add headers to skip the default error interceptor
-      const headers = { 'X-Skip-Error-Interceptor': 'true' };
+        // Add headers to skip the default error interceptor
+        const headers = { 'X-Skip-Error-Interceptor': 'true' };
 
-      this.http.post('customers/upload-excel/', uploadData, { headers }).subscribe({
-        next: (res: any) => {
-          console.log('Upload success', res);
-          
-          if (res.errors && res.errors.length > 0) {
-            // Handle partial success/errors
-            const successCount = res.message ? res.message.split(' ')[0] : '0';
-            const errorCount = res.errors.length;
-            
-            // Check if errors are related to missing required fields
-            const missingFieldErrors = res.errors.filter((e: any) => 
-              e.error && e.error.includes('Missing required field:')
-            );
-            
-            if (missingFieldErrors.length > 0) {
-              // Extract the missing field names from the error messages
-              const missingFields = missingFieldErrors.map((e: any) => {
-                const match = e.error.match(/Missing required field: (.+)/);
-                return match ? match[1] : '';
-              }).filter(Boolean);
-              
-              // Create a clear message about required fields
-              const message = `Required fields missing: ${missingFields.join(', ')}`;
+        this.http.post('customers/upload-excel/', uploadData, { headers }).subscribe({
+          next: (res: any) => {
+            console.log('Upload success', res);
+
+            if (res.errors && res.errors.length > 0) {
+              // Handle partial success/errors
+              const successCount = res.message ? res.message.split(' ')[0] : '0';
+              const errorCount = res.errors.length;
+
+              // Check if errors are related to missing required fields
+              const missingFieldErrors = res.errors.filter((e: any) =>
+                e.error && e.error.includes('Missing required field:')
+              );
+
+              if (missingFieldErrors.length > 0) {
+                // Extract the missing field names from the error messages
+                const missingFields = missingFieldErrors.map((e: any) => {
+                  const match = e.error.match(/Missing required field: (.+)/);
+                  return match ? match[1] : '';
+                }).filter(Boolean);
+
+                // Create a clear message about required fields
+                const message = `Required fields missing: ${missingFields.join(', ')}`;
+                this.notification.error(
+                  'Import Failed',
+                  message,
+                  { nzDuration: 6000 }
+                );
+              } else {
+                // Generic partial import message for other types of errors
+                this.notification.warning(
+                  'Partial Import',
+                  `${successCount} customers imported, ${errorCount} failed.`,
+                  { nzDuration: 5000 }
+                );
+              }
+            } else {
+              // Complete success
+              this.notification.success(
+                'Success',
+                res.message || 'Customers imported successfully',
+                { nzDuration: 3000 }
+              );
+            }
+
+            this.closeModal();
+            this.showCustomerListFn();
+          },
+          error: (error) => {
+            console.error('Upload error', error);
+
+            // Extract the error response structure from your build_response function
+            const errorResponse = error.error || {};
+
+            // Access the message property directly from your build_response structure
+            const errorMessage = errorResponse.message || 'Import failed';
+
+            // Check for specific error messages to determine the error type
+            if (errorMessage.includes('Excel template format mismatch')) {
               this.notification.error(
-                'Import Failed', 
-                message,
-                { nzDuration: 6000 }
+                'Excel Template Error',
+                'Excel template format mismatch. Please download the correct template.',
+                {
+                  nzDuration: 5000,
+                }
+              );
+            } else if (errorMessage.includes('missing required data')) {
+              this.notification.error(
+                'Import Failed',
+                'Some rows are missing required data. Please check your Excel file.',
+                { nzDuration: 5000 }
               );
             } else {
-              // Generic partial import message for other types of errors
-              this.notification.warning(
-                'Partial Import',
-                `${successCount} customers imported, ${errorCount} failed.`,
+              // Generic error
+              this.notification.error(
+                'Import Failed',
+                errorMessage,
                 { nzDuration: 5000 }
               );
             }
-          } else {
-            // Complete success
-            this.notification.success(
-              'Success', 
-              res.message || 'Customers imported successfully', 
-              { nzDuration: 3000 }
-            );
           }
-          
-          this.closeModal();
-          this.showCustomerListFn();
-        },
-        error: (error) => {
-        console.error('Upload error', error);
-        
-        // Extract the error response structure from your build_response function
-        const errorResponse = error.error || {};
-        
-        // Access the message property directly from your build_response structure
-        const errorMessage = errorResponse.message || 'Import failed';
-        
-        // Check for specific error messages to determine the error type
-        if (errorMessage.includes('Excel template format mismatch')) {
-          this.notification.error(
-            'Excel Template Error', 
-            'Excel template format mismatch. Please download the correct template.',
-            { 
-              nzDuration: 5000,
-            }
-          );
-        } else if (errorMessage.includes('missing required data')) {
-          this.notification.error(
-            'Import Failed', 
-            'Some rows are missing required data. Please check your Excel file.',
-            { nzDuration: 5000 }
-          );
-        } else {
-          // Generic error
-          this.notification.error(
-            'Import Failed', 
-            errorMessage, 
-            { nzDuration: 5000 }
-          );
-        }
+        });
       }
-      });
-    }
 
     },
     model: {}
