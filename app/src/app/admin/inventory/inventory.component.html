@@ -1,7 +1,46 @@
-<div class="container-fluid pt-3">
-    <div class="row">
-        <div class="col-12 px-2 py-1">
-            <ta-curd-modal [options]="curdConfig" class="custom-list"></ta-curd-modal>
+<div class="container-fluid mt-4 custom-tabs">
+  <!-- Tabs Navigation -->
+  <ul class="nav nav-tabs nav-justified">
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="selectedTabKey === 'inventory'" (click)="switchTab('inventory')">
+        Inventory
+        <small class="d-block text-muted small">Manage stock items</small>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link"[class.active]="selectedTabKey === 'nonInventory'"(click)="switchTab('nonInventory')">
+        Non Inventory
+        <small class="d-block text-muted small">No stock management</small>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="selectedTabKey === 'services'" (click)="switchTab('services')">
+        Service
+        <small class="d-block text-muted small">Manage services</small>
+      </a>
+    </li>
+  </ul>
+
+  <!-- Tab Content -->
+  <div class="tab-content">
+    <div class="tab-pane fade show active">
+      <!-- Loading spinner -->
+      <div *ngIf="loading" class="p-3 text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
         </div>
+      </div>
+
+      <!-- Error message -->
+      <div *ngIf="error" class="alert alert-danger m-3">
+        {{ error }}
+      </div>
+
+      <!-- Curd modal -->
+      <ng-container *ngIf="curdConfig && !loading && !error">
+        <ta-curd-modal [options]="curdConfig" class="custom-list"></ta-curd-modal>
+      </ng-container>
     </div>
+  </div>
 </div>
+
