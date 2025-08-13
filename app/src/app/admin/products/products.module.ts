@@ -79,7 +79,7 @@ import { NzNotificationModule } from 'ng-zorro-antd/notification';
     ColorComponent,
     WarehouseLocationsComponent,
     PackageUnitsComponent,
-    GPackageUnitsComponent
+    GPackageUnitsComponent,
   ]
 })
 export class ProductsModule { }
