@@ -25,27 +25,33 @@
 
             <!-- Employee Filter -->
             <div class="filter-group col p-0 mt-2" *ngIf="isEmployeeFilterVisible">
-                <nz-select [(ngModel)]="selectedEmployee" nzPlaceHolder="Select Employee" class="select-field" (ngModelChange)="onEmployeeChange($event)">
-                    <nz-option *ngFor="let employee of employeeOptions" [nzValue]="employee.value" [nzLabel]="employee.label">
+                <nz-select [(ngModel)]="selectedEmployee" nzPlaceHolder="Select Employee" class="select-field"
+                    (ngModelChange)="onEmployeeChange($event)">
+                    <nz-option *ngFor="let employee of employeeOptions" [nzValue]="employee.value"
+                        [nzLabel]="employee.label">
                     </nz-option>
                 </nz-select>
             </div>
 
             <!-- Quick Period Dropdown -->
             <div class="filter-group col p-0 mt-2" style="margin-left: 5px;" *ngIf="isButtonVisible">
-                <nz-select id="quickPeriod" [(ngModel)]="selectedQuickPeriod" (ngModelChange)="onQuickPeriodChange()" nzPlaceHolder="Quick Period" class="quick-period-select">
-                    <nz-option *ngFor="let period of quickPeriodOptions" [nzValue]="period.value" [nzLabel]="period.label"></nz-option>
+                <nz-select id="quickPeriod" [(ngModel)]="selectedQuickPeriod" (ngModelChange)="onQuickPeriodChange()"
+                    nzPlaceHolder="Quick Period" class="quick-period-select">
+                    <nz-option *ngFor="let period of quickPeriodOptions" [nzValue]="period.value"
+                        [nzLabel]="period.label"></nz-option>
                 </nz-select>
             </div>
 
             <!-- From Date Picker -->
             <div class="filter-group col p-0 mt-2" style="margin-left: 5px;" *ngIf="isButtonVisible">
-                <nz-date-picker id="fromDate" [(ngModel)]="fromDate" nzPlaceHolder="From date" class="date-picker" style="width: 130px;"></nz-date-picker>
+                <nz-date-picker id="fromDate" [(ngModel)]="fromDate" nzPlaceHolder="From date" class="date-picker"
+                    style="width: 130px;"></nz-date-picker>
             </div>
 
             <!-- To Date Picker -->
             <div class="filter-group col p-0 mt-2" style="margin-left: 5px;" *ngIf="isButtonVisible">
-                <nz-date-picker id="toDate" [(ngModel)]="toDate" nzPlaceHolder="To date" class="date-picker" style="width: 130px;"></nz-date-picker>
+                <nz-date-picker id="toDate" [(ngModel)]="toDate" nzPlaceHolder="To date" class="date-picker"
+                    style="width: 130px;"></nz-date-picker>
             </div>
 
             <!-- Apply Filters status DropDown -->
@@ -59,8 +65,10 @@
 
             <div *ngIf="isButtonVisible" class="filter-group col p-0" style="margin-left: 5px;">
                 <div class="filter-group mt-2" *ngIf="isStatusButtonVisible">
-                    <nz-select [(ngModel)]="selectedStatus" nzPlaceHolder="Select Status" class="select-field" (ngModelChange)="onStatusChange($event)">
-                        <nz-option *ngFor="let status of statusOptions" [nzValue]="status.value" [nzLabel]="status.label">
+                    <nz-select [(ngModel)]="selectedStatus" nzPlaceHolder="Select Status" class="select-field"
+                        (ngModelChange)="onStatusChange($event)">
+                        <nz-option *ngFor="let status of statusOptions" [nzValue]="status.value"
+                            [nzLabel]="status.label">
                         </nz-option>
                     </nz-select>
                 </div>
@@ -79,7 +87,8 @@
                     (keyup.enter)="globalSearch()" />
             </nz-input-group>
             <ng-template #suffixIconButton>
-                <i nz-icon class="ant-input-clear-icon" style="position: absolute;z-index: 9;right: 40px;top:12px" nzTheme="fill" nzType="close-circle" *ngIf="globalSearchValue" (click)="globalSearchClear()"></i>
+                <i nz-icon class="ant-input-clear-icon" style="position: absolute;z-index: 9;right: 40px;top:12px"
+                    nzTheme="fill" nzType="close-circle" *ngIf="globalSearchValue" (click)="globalSearchClear()"></i>
                 <button nz-button nzType="primary" nzSearch (click)="globalSearch()"><i nz-icon
                         nzType="search"></i></button>
             </ng-template>
@@ -107,11 +116,11 @@
                     <i nz-icon nzType="download" nzTheme="outline"></i>
                 </button>
             </div> -->
-            
+
             <!--  Excel Export Button -->
             <div class="filter-group" *ngIf="options.export">
                 <button nz-button nzType="primary" (click)="exportExcel()">
-                  <i nz-icon nzType="file-excel" nzTheme="outline"></i>
+                    <i nz-icon nzType="file-excel" nzTheme="outline"></i>
                 </button>
             </div>
 
@@ -126,8 +135,11 @@
 </div>
 
 <!-- [nzTitle]="options.title"  (nzQueryParams)="onQueryParamsChange($event)"-->
-<nz-table #taTable nzShowSizeChanger [nzPageSizeOptions]="options.pageSizeOptions" [nzTableLayout]="options.tableLayout" [nzBordered]="options.bordered" [nzScroll]="{ x: options.scrollX, y: options.scrollY }" [nzData]="rows" [nzFrontPagination]="false"
-    [nzShowTotal]="totalTemplate" [nzFooter]="footerTemplate" [nzLoading]="loading" [nzTotal]="total || 1" [nzPageSize]="options.pageSize" (nzQueryParams)="onQueryParamsChange($event)" [nzPageIndex]="pageIndex" [nzPaginationPosition]="options.paginationPosition">
+<nz-table #taTable nzShowSizeChanger [nzPageSizeOptions]="options.pageSizeOptions" [nzTableLayout]="options.tableLayout"
+    [nzBordered]="options.bordered" [nzScroll]="{ x: options.scrollX, y: options.scrollY }" [nzData]="rows"
+    [nzFrontPagination]="false" [nzShowTotal]="totalTemplate" [nzFooter]="footerTemplate" [nzLoading]="loading"
+    [nzTotal]="total || 1" [nzPageSize]="options.pageSize" (nzQueryParams)="onQueryParamsChange($event)"
+    [nzPageIndex]="pageIndex" [nzPaginationPosition]="options.paginationPosition">
     <thead>
         <tr>
             <th *ngIf="options.showCheckbox" style="width: 50px;" [nzIndeterminate]="indeterminate"
@@ -135,8 +147,11 @@
 
             <ng-container *ngFor="let c of options.cols">
 
-                <th style="min-width: 150px;" (nzSortOrderChange)="nzSortOrderChange($event)" [nzColumnKey]="c.sortKey || c.fieldKey" [nzFilterFn]="false" [nzSortDirections]="(c.sort)?[]:[null]" [nzSortOrder]="c.sortOrder" [nzSortFn]="c.sort" [nzWidth]="c.width" nzCustomFilter>{{c.name}}
-                    <nz-filter-trigger *ngIf="c.filter" [(nzVisible)]="c.visible" [nzActive]="c.filterValue && c.filterValue.length > 0" [nzDropdownMenu]="menu">
+                <th style="min-width: 150px;" (nzSortOrderChange)="nzSortOrderChange($event)"
+                    [nzColumnKey]="c.sortKey || c.fieldKey" [nzFilterFn]="false" [nzSortDirections]="(c.sort)?[]:[null]"
+                    [nzSortOrder]="c.sortOrder" [nzSortFn]="c.sort" [nzWidth]="c.width" nzCustomFilter>{{c.name}}
+                    <nz-filter-trigger *ngIf="c.filter" [(nzVisible)]="c.visible"
+                        [nzActive]="c.filterValue && c.filterValue.length > 0" [nzDropdownMenu]="menu">
                         <i nz-icon nzType="filter"></i>
                     </nz-filter-trigger>
 
@@ -157,46 +172,48 @@
         </tr> -->
     </thead>
     <tbody>
-        <tr *ngFor="let data of rows">
+        <tr *ngFor="let data of rows" [class.selectable-row]="options.rowSelectionEnabled">
             <td *ngIf="options.showCheckbox" style="width: 50px;" [nzChecked]="setOfCheckedId.has(data[options.pkId])"
                 (nzCheckedChange)="onItemChecked(data[options.pkId], $event)" [nzDisabled]="false"
                 [nzLabel]="data.name"></td>
+            <ng-container *ngFor="let c of options.cols">
+                <td style="min-width: 150px;" [ngClass]="c.tdClassName" [nzEllipsis]="c.ellipsis"
+                    (click)="options.rowSelectionEnabled && c.type != 'action' && onRowSelect(data)">
+                    <label class="col-name">{{c.name}} :</label>
 
-            <td style="min-width: 150px;" [ngClass]="c.tdClassName" *ngFor="let c of options.cols" [nzEllipsis]="c.ellipsis">
-                <label class="col-name">{{c.name}} :</label>
-
-                <!-- Display selected file name and Replace button -->
-                <!-- New code to handle displayType: 'file' and render file name above Replace button -->
-                <ng-container *ngIf="c.displayType === 'file'; else defaultContent">
-                    <div *ngIf="data.selectedFileName; else uploadButton">
-                        <!-- Display the selected file name above the Replace button -->
-                        <div>{{ data.selectedFileName }}</div>
-                        <div class="file-action-buttons">
-                          <!-- View button to view the uploaded file -->
-                            <button nz-button nzType="primary" (click)="viewFile(data)" style="margin-right: 8px;">
-                                <i nz-icon nzType="eye" nzTheme="outline"></i> View
-                            </button>
-                            <button *ngFor="let action of c.actions" (click)="performAction(action, data)">
-                                Replace
-                            </button>
+                    <!-- Display selected file name and Replace button -->
+                    <!-- New code to handle displayType: 'file' and render file name above Replace button -->
+                    <ng-container *ngIf="c.displayType === 'file'; else defaultContent">
+                        <div *ngIf="data.selectedFileName; else uploadButton">
+                            <!-- Display the selected file name above the Replace button -->
+                            <div>{{ data.selectedFileName }}</div>
+                            <div class="file-action-buttons">
+                                <!-- View button to view the uploaded file -->
+                                <button nz-button nzType="primary" (click)="viewFile(data)" style="margin-right: 8px;">
+                                    <i nz-icon nzType="eye" nzTheme="outline"></i> View
+                                </button>
+                                <button *ngFor="let action of c.actions" (click)="performAction(action, data)">
+                                    Replace
+                                </button>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Initial Upload button when no file is selected -->
-                    <ng-template #uploadButton>
-                        <button *ngFor="let action of c.actions" (click)="performAction(action, data)">
-                            {{ action.label }}
-                        </button>
-                    </ng-template>
-                </ng-container>
-
-                <!-- Existing content for other column types -->
-                <ng-template #defaultContent>
-                    <ng-container
-                        *ngTemplateOutlet="(c.type === 'action') ? actions : datalable; context: { col: c, row: data }">
+                        <!-- Initial Upload button when no file is selected -->
+                        <ng-template #uploadButton>
+                            <button *ngFor="let action of c.actions" (click)="performAction(action, data)">
+                                {{ action.label }}
+                            </button>
+                        </ng-template>
                     </ng-container>
-                </ng-template>
-            </td>
+
+                    <!-- Existing content for other column types -->
+                    <ng-template #defaultContent>
+                        <ng-container
+                            *ngTemplateOutlet="(c.type === 'action') ? actions : datalable; context: { col: c, row: data }">
+                        </ng-container>
+                    </ng-template>
+                </td>
+            </ng-container>
         </tr>
     </tbody>
 

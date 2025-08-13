@@ -16,7 +16,8 @@ export class TableActionsComponent implements OnInit {
   ngOnInit(): void {
 
   }
-  action(action: any) {
+  action(action: any, event) {
+    //event.stopPropagation();
     if (action.type == 'callBackFn') {
       return action.callBackFn(this.row, action);
     }

@@ -17,6 +17,7 @@ import { TaCurdModule } from '@ta/ta-curd';
 import { TaFormComponent, TaFormModule } from '@ta/ta-form';
 import { RouterModule } from '@angular/router';
 import { HasPermissionDirective } from './permision.directive';
+import { FomrlyMasterAdvSelectFieldsModule } from './fomrly-master-adv-select-fields.module';
 const module = [NzListModule,
   CommonModule,
   RouterModule,
@@ -33,7 +34,8 @@ const module = [NzListModule,
   ReactiveFormsModule,
   TaTableModule,
   TaFormComponent,
-  TaCurdModule
+  TaCurdModule,
+  FomrlyMasterAdvSelectFieldsModule
 ];
 
 @NgModule({

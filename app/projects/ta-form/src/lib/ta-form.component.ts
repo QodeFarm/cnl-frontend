@@ -26,6 +26,7 @@ import { Router } from '@angular/router';
     NzFormModule,
     TaFormSharedModule,
     TaFormlyUiZeroModule
+
   ],
   styles: [
   ]
@@ -33,7 +34,6 @@ import { Router } from '@angular/router';
 export class TaFormComponent implements OnInit {
   @ViewChild("formlyForm", { static: false })
   formlyForm: FormlyForm | any;
-
   @Input() options: TaFormConfig | any;
   showForm = true;
   form = new UntypedFormGroup({});
@@ -42,7 +42,7 @@ export class TaFormComponent implements OnInit {
   formlyOptions: FormlyFormOptions | any = {
     formState: { user: TaLocalStorage.getItem('user') }
   };
-  constructor(private formS: TaFormService, private taAction: TaActionService, private notification: NzNotificationService ,private router: Router) { }
+  constructor(private formS: TaFormService, private taAction: TaActionService, private notification: NzNotificationService, private router: Router) { }
 
   ngOnInit(): void {
     if (!this.options.model) {
@@ -81,13 +81,13 @@ export class TaFormComponent implements OnInit {
             ...this.taAction.getParams(this.options.exParams, this.options.model)
           };
         }
-  
+
         this.formS.saveForm(this.options.url, this.options.model, this.options).subscribe(
           (res: any) => {
             this.isLoading = false;
             if (res.success || res) {
               let msg = res.message || 'Save Successful';
-  
+
               // Only handle login-specific behavior if this is actually a login form
               const isLoginForm = this.options.url?.includes('users/login');
               if (isLoginForm && res.data && res.data.length > 0) {
@@ -100,21 +100,21 @@ export class TaFormComponent implements OnInit {
                   this.router.navigate(['/dashboard']);
                 }, 1000);
               }
-  
+
               if (this.options.submit) {
                 if (this.options.submit.submittedFn) {
                   this.options.submit.submittedFn(res);
                 }
-  
+
                 if (this.options.submit.actions) {
                   this.taAction.doActions(this.options.submit.actions, { res: res, result: res.data });
                 }
-  
+
                 if (this.options.submit.successMsg) {
                   msg = this.options.submit.successMsg;
                 }
               }
-  
+
               this.notification.success(msg, '');
               this.formlyOptions.resetModel();
             } else {
@@ -125,10 +125,10 @@ export class TaFormComponent implements OnInit {
           (error) => {
             this.isLoading = false;
             console.log('API Error:', error);
-            
+
             // Special handling for login errors
             const isLoginForm = this.options.url?.includes('users/login');
-            
+
             // Handle field-level validation errors
             if (error.status === 400) {
               // Field validation errors (status name already exists, etc.)
@@ -139,10 +139,10 @@ export class TaFormComponent implements OnInit {
             // Handle login-specific errors with a clean message
             else if (isLoginForm && error.status === 401) {
               this.notification.error('Login Failed', 'Username or Password is not valid');
-            } 
+            }
             else if (error.status === 404) {
               this.notification.error('Server Error', 'Login API not found! Check the backend URL.');
-            } 
+            }
             // Only show errors for non-400 status codes that aren't already handled
             else if (!isLoginForm && error.status !== 400) {
               this.notification.error('Error', error.error?.message || 'An unexpected error occurred. Please try again.');
