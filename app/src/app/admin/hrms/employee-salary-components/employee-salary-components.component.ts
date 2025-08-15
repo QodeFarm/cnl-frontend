@@ -83,7 +83,7 @@ export class EmployeeSalaryComponentsComponent {
         fieldGroup: [
           {
             key: 'component',
-            type: 'select',
+            type: 'salaryComponent-dropdown',
             className: 'col-md-6 col-12 px-1 mb-3',
             templateOptions: {
               label: 'Component',

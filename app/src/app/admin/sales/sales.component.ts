@@ -3209,7 +3209,7 @@ export class SalesComponent {
                 }
               },
               {
-                type: 'select',
+                type: 'productUnitOptions-dropdown',
                 key: 'unit_options_id',
                 templateOptions: {
                   label: 'Unit',

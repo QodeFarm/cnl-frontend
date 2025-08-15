@@ -29,6 +29,11 @@ export class ProductTypesComponent {
           sort: true
         },
         {
+          fieldKey: 'mode_type',
+          name: 'Mode Type',
+          sort: true,
+        },
+        {
           fieldKey: "code",
           name: "Action",
           type: 'action',
@@ -61,64 +66,82 @@ export class ProductTypesComponent {
       pkId: "type_id",
       exParams: [
       ],
-      fields: 
-      [ 
-        {
-        fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
-        fieldGroup: 
+      fields:
         [
-         {
-          key: 'type_name',
-          type: 'input',
-          className: 'col-md-6 col-12 p-0',
-          templateOptions: {
-            label: 'Type Name',
-            placeholder: 'Enter Type Name',
-            required: true,
+          {
+            fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
+            fieldGroup:
+              [
+                {
+                  key: 'type_name',
+                  type: 'input',
+                  className: 'col-md-6 col-12 p-0',
+                  templateOptions: {
+                    label: 'Type Name',
+                    placeholder: 'Enter Type Name',
+                    required: true,
+                  }
+                },
+                {
+                  key: 'mode_type',
+                  type: 'select',
+                  className: 'col-md-6 col-12 p-0',
+                  templateOptions: {
+                    label: 'Mode Type',
+                    options: [
+                      { value: 'Inventory', label: 'Inventory' },
+                      { value: 'Non Inventory', label: 'Non Inventory' },
+                      { value: 'Service', label: 'Service' },
+                      { value: 'All', label: 'All' }
+                    ],
+                    required: true
+                  }
+                }
+
+
+
+              ]
           }
-        },
-      ]
-    }
-      ]
+        ]
     }
 
   }
 
 
-  tableConfig: TaTableConfig = {
-    apiUrl: 'masters/product_types/',
-    title: 'Product Types',
-    pkId: "type_id",
-    pageSize: 10,
-    "globalSearch": {
-      keys: ['type_id', 'type_name']
-    },
-    cols: [
-      {
-        fieldKey: 'type_name',
-        name: 'Name'
-      },
-      {
-        fieldKey: "code",
-        name: "Action",
-        type: 'action',
-        actions: [
-          {
-            type: 'delete',
-            label: 'Delete',
-            confirm: true,
-            confirmMsg: "Sure to delete?",
-            apiUrl: 'api/masters/product_types'
-          },
-          {
-            type: 'callBackFn',
-            label: 'Edit',
-            // callBackFn: (row, action) => {
-            //   this.router.navigateByUrl('/admin/employee/create/' + row.employee_id);
-            // }
-          }
-        ]
-      }
-    ]
-  };
+  // tableConfig: TaTableConfig = {
+  //   apiUrl: 'masters/product_types/',
+  //   title: 'Product Types',
+  //   pkId: "type_id",
+  //   pageSize: 10,
+  //   "globalSearch": {
+  //     keys: ['type_id', 'type_name']
+  //   },
+  //   cols: [
+  //     {
+  //       fieldKey: 'type_name',
+  //       name: 'Name'
+  //     },
+  //     {
+  //       fieldKey: "code",
+  //       name: "Action",
+  //       type: 'action',
+  //       actions: [
+  //         {
+  //           type: 'delete',
+  //           label: 'Delete',
+  //           confirm: true,
+  //           confirmMsg: "Sure to delete?",
+  //           apiUrl: 'api/masters/product_types'
+  //         },
+  //         {
+  //           type: 'callBackFn',
+  //           label: 'Edit',
+  //           // callBackFn: (row, action) => {
+  //           //   this.router.navigateByUrl('/admin/employee/create/' + row.employee_id);
+  //           // }
+  //         }
+  //       ]
+  //     }
+  //   ]
+  // };
 }

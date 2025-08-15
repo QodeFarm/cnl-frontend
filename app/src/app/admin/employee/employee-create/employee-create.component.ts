@@ -124,7 +124,7 @@ export class EmployeeCreateComponent implements OnInit {
           },
           {
             key: 'job_type_id',
-            type: 'select',
+            type: 'JobTypes-dropdown',
             className: 'ta-cell pr-md col-4',
             templateOptions: {
               label: 'Job Type',
@@ -145,7 +145,7 @@ export class EmployeeCreateComponent implements OnInit {
           },
           {
             key: 'designation_id',
-            type: 'select',
+            type: 'designations-dropdown',
             className: 'ta-cell pr-md col-4',
             templateOptions: {
               label: 'Designation',
@@ -171,7 +171,7 @@ export class EmployeeCreateComponent implements OnInit {
         fieldGroup: [
           {
             key: 'job_code_id',
-            type: 'select',
+            type: 'jobCode-dropdown',
             className: 'ta-cell pr-md col-4',
             templateOptions: {
               label: 'Job Code',
@@ -192,7 +192,7 @@ export class EmployeeCreateComponent implements OnInit {
           },
           {
             key: 'department_id',
-            type: 'select',
+            type: 'departments-dropdown',
             className: 'ta-cell pr-md col-4',
             templateOptions: {
               label: 'Department',
@@ -213,7 +213,7 @@ export class EmployeeCreateComponent implements OnInit {
           },
           {
             key: 'shift_id',
-            type: 'select',
+            type: 'shifts-dropdown',
             className: 'ta-cell pr-md col-4',
             templateOptions: {
               label: 'Shift',
