@@ -161,7 +161,7 @@
                 </div>
             </li>
             <!-- Nav Item - Configuration -->
-            <li class="nav-item dropdown no-arrow mx-1">
+            <li class="nav-item dropdown no-arrow mx-1" *ngIf="role === 'Admin'">
                 <a class="nav-link dropdown-toggle" id="configDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-cog fa-fw" title="Configuration"></i>
                 </a>

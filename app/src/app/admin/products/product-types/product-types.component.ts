@@ -15,7 +15,7 @@ export class ProductTypesComponent {
     tableConfig: {
       apiUrl: 'masters/product_types/',
       title: 'Product Types',
-      
+
       pkId: "type_id",
       pageSize: 10,
       "globalSearch": {
@@ -108,40 +108,40 @@ export class ProductTypesComponent {
   }
 
 
-  // tableConfig: TaTableConfig = {
-  //   apiUrl: 'masters/product_types/',
-  //   title: 'Product Types',
-  //   pkId: "type_id",
-  //   pageSize: 10,
-  //   "globalSearch": {
-  //     keys: ['type_id', 'type_name']
-  //   },
-  //   cols: [
-  //     {
-  //       fieldKey: 'type_name',
-  //       name: 'Name'
-  //     },
-  //     {
-  //       fieldKey: "code",
-  //       name: "Action",
-  //       type: 'action',
-  //       actions: [
-  //         {
-  //           type: 'delete',
-  //           label: 'Delete',
-  //           confirm: true,
-  //           confirmMsg: "Sure to delete?",
-  //           apiUrl: 'api/masters/product_types'
-  //         },
-  //         {
-  //           type: 'callBackFn',
-  //           label: 'Edit',
-  //           // callBackFn: (row, action) => {
-  //           //   this.router.navigateByUrl('/admin/employee/create/' + row.employee_id);
-  //           // }
-  //         }
-  //       ]
-  //     }
-  //   ]
-  // };
+  tableConfig: TaTableConfig = {
+    apiUrl: 'masters/product_types/',
+    title: 'Product Types',
+    pkId: "type_id",
+    pageSize: 10,
+    "globalSearch": {
+      keys: ['type_id', 'type_name']
+    },
+    cols: [
+      {
+        fieldKey: 'type_name',
+        name: 'Name'
+      },
+      {
+        fieldKey: "code",
+        name: "Action",
+        type: 'action',
+        actions: [
+          {
+            type: 'delete',
+            label: 'Delete',
+            confirm: true,
+            confirmMsg: "Sure to delete?",
+            apiUrl: 'api/masters/product_types'
+          },
+          {
+            type: 'callBackFn',
+            label: 'Edit',
+            // callBackFn: (row, action) => {
+            //   this.router.navigateByUrl('/admin/employee/create/' + row.employee_id);
+            // }
+          }
+        ]
+      }
+    ]
+  };
 }

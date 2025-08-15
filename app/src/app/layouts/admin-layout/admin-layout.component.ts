@@ -104,6 +104,8 @@ export class AdminLayoutComponent {
       this.renderer.removeClass(menuOverlayElement, 'menuBglayer');
     }
   }
+
+  isAdmin: boolean = false;
   ngOnInit() {
     const user = this.taLoacal.getItem('user');
     this.menulList = [];
@@ -111,6 +113,8 @@ export class AdminLayoutComponent {
     if (user) {
       this.userName = user.username;
       this.role = user.role_name;
+      this.isAdmin = (this.role === 'Admin'); // <-- Flag for template use
+
       const userId = user.user_id; // Extracting the user_id dynamically
       const role_Id = user.role_id;
       this.company_name = user.company_name;
