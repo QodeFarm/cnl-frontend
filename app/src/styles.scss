@@ -4,6 +4,9 @@
 .select-adv-field .cdk-virtual-scroll-viewport{
     display: none;
 }
+.cdk-overlay-connected-position-bounding-box{
+    z-index: 888 !important;
+}
 
 .login-page {
     background-color: #efefef;
