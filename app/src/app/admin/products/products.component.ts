@@ -150,24 +150,24 @@ export class ProductsComponent implements OnInit {
     // Update model with cleaned variations
     this.formConfig.model.product_variations = productVariations;
 
-    // const totalItemBalanceQuantity = calculateTotalQuantity(this.formConfig.model.product_item_balance);
-    // const totalVariationQuantity = calculateTotalQuantity(productVariations);
+    const totalItemBalanceQuantity = calculateTotalQuantity(this.formConfig.model.product_item_balance);
+    const totalVariationQuantity = calculateTotalQuantity(productVariations);
 
-    // // Validate variations match balance
-    // if (productVariations.length && totalVariationQuantity !== balance) {
-    //   return this.showDialog(
-    //     `<b>Variations !</b><br>
-    //      Your sum of quantities are <b>${totalVariationQuantity}</b> not matching with overall balance <b>${balance}.</b>`
-    //   );
-    // }
+    // Validate variations match balance
+    if (productVariations.length && totalVariationQuantity !== balance) {
+      return this.showDialog(
+        `<b>Variations !</b><br>
+         Your sum of quantities are <b>${totalVariationQuantity}</b> not matching with overall balance <b>${balance}.</b>`
+      );
+    }
 
-    // // Validate item balance matches
-    // if (totalItemBalanceQuantity !== balance) {
-    //   return this.showDialog(
-    //     `<b>Warehouse Locations!</b><br>
-    //      Your sum of quantities are <b>${totalItemBalanceQuantity}</b> not matching with overall balance <b>${balance}.</b>`
-    //   );
-    // }
+    // Validate item balance matches
+    if (totalItemBalanceQuantity !== balance) {
+      return this.showDialog(
+        `<b>Warehouse Locations!</b><br>
+         Your sum of quantities are <b>${totalItemBalanceQuantity}</b> not matching with overall balance <b>${balance}.</b>`
+      );
+    }
 
     return true; // Everything matches
   }
@@ -509,6 +509,16 @@ export class ProductsComponent implements OnInit {
                         }
                       }
                     },
+                    {
+                      className: 'col-md-4 col-sm-6 col-12',
+                      key: 'balance',
+                      type: 'input',
+                      defaultValue: 0.00,
+                      templateOptions: {
+                      label: 'Balance',
+                      required: false, 
+                    }
+                  },
                   ]
                 },
                 {
