@@ -50,6 +50,7 @@ export interface ColumnItem {
   thClassName?: string;
   html?: string;
   mapFn?: (currentValue: any, row: any, col: any) => any;
+  isEditSumbmit?: (row: any, value: any, col: any) => any;
   ellipsis?: boolean;
   width?: any;
   [any: string]: any;
