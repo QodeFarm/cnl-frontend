@@ -1571,7 +1571,7 @@ export const productGroupsConfig: TaCurdConfig = {
 }
 
 export const productStockUnitsConfig: TaCurdConfig = {
-    drawerSize: 500,
+    drawerSize: 'auto',
     drawerPlacement: 'top',
     tableConfig: {
         apiUrl: 'products/product_stock_units/',
@@ -2863,7 +2863,7 @@ export const jobTypesConfig: TaCurdConfig = {
 }
 
 export const designationsConfig: TaCurdConfig = {
-    drawerSize: 500,
+    drawerSize: 'auto',
     drawerPlacement: 'top',
     tableConfig: {
         apiUrl: 'hrms/designations/',

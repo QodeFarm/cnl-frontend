@@ -6,11 +6,10 @@
 </button> -->
 
 <ng-template cdkConnectedOverlay [cdkConnectedOverlayOrigin]="trigger" [cdkConnectedOverlayOpen]="showCurdDiv"
-    [cdkConnectedOverlayHasBackdrop]="false" [cdkConnectedOverlayWidth]="500" [cdkConnectedOverlayPositions]="positions"
-    cdkConnectedOverlayPanelClass="adv-select-custom-overlay-panel">
-    <div class="adv-select-curd-container ant-select-dropdown"
-        style="background: white;padding: 5px; width: auto;z-index: 999;">
-        <div style="padding: 8px 12px; max-height: 400px; overflow: scroll; background-color: white;">
+    [cdkConnectedOverlayHasBackdrop]="false" [cdkConnectedOverlayWidth]="props.curdConfig.drawerSize || 'auto'"
+    [cdkConnectedOverlayPositions]="positions" cdkConnectedOverlayPanelClass="adv-select-custom-overlay-panel">
+    <div class="adv-select-curd-container ant-select-dropdown" style="background: white;padding: 5px; z-index: 999;">
+        <div style="padding: 8px 12px; max-height: 400px; overflow-y: scroll; background-color: white;">
             <ta-curd-modal [options]="props.curdConfig"></ta-curd-modal>
         </div>
     </div>

@@ -44,15 +44,15 @@ export class FieldAdvSelectComponent extends FieldType implements OnInit, AfterV
   showCurdDiv = false;
   positions = [
     {
-      originX: 'start',
+      originX: 'center',
       originY: 'bottom',
-      overlayX: 'start',
+      overlayX: 'center',
       overlayY: 'top'
     },
     {
-      originX: 'start',
+      originX: 'center',
       originY: 'top',
-      overlayX: 'start',
+      overlayX: 'center',
       overlayY: 'bottom'
     }
   ];
@@ -141,7 +141,7 @@ export class FieldAdvSelectComponent extends FieldType implements OnInit, AfterV
     // event.stopPropagation();
     //this.dropdownOpen = true;
     //const overlayPane = document.querySelector('.cdk-overlay-pane.select-adv-field');
-    const overlayPane = document.querySelector('.adv-select-curd-container');
+    const overlayPane = document.querySelector('.cdk-overlay-container');
     const drawerContent = document.querySelector('.curd-modal-form');
     const popoverContent = document.querySelector('.table-action-conformation');
 
