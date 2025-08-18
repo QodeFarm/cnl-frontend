@@ -43,6 +43,24 @@ export class WorkorderComponent implements OnInit {
       this.showForm = true; // Ensure the form is displayed
     }
     this.hideFields(true); // Hides fields at indexes 5, 4, and 9
+      // Add this line to initialize the material cost display
+  setTimeout(() => this.displayMaterialCost(), 500);
+  
+  // Add tab change listener to update the display when the tab is activated
+  setTimeout(() => {
+    const tabElements = this.el.nativeElement.querySelectorAll('.ant-tabs-tab');
+    if (tabElements) {
+      tabElements.forEach((tab: HTMLElement) => {
+        tab.addEventListener('click', () => {
+          if (tab.textContent?.includes('Bill Of Material')) {
+            // Try multiple times in case of DOM rendering delays
+            setTimeout(() => this.displayMaterialCost(), 100);
+            setTimeout(() => this.displayMaterialCost(), 500);
+          }
+        });
+      });
+    }
+  }, 1000);
   }
 
   hideFields(hide: boolean): void {
@@ -84,6 +102,17 @@ export class WorkorderComponent implements OnInit {
     this.http.get('production/work_order/' + event).subscribe((res: any) => {
       if (res) {
         this.formConfig.model = res.data;
+          // --- Ensure arrays have at least one row for Formly tables ---
+      if (!Array.isArray(this.formConfig.model.workers) || this.formConfig.model.workers.length === 0) {
+        this.formConfig.model.workers = [{}];
+      }
+      if (!Array.isArray(this.formConfig.model.work_order_machines) || this.formConfig.model.work_order_machines.length === 0) {
+        this.formConfig.model.work_order_machines = [{}];
+      }
+      if (!Array.isArray(this.formConfig.model.work_order_stages) || this.formConfig.model.work_order_stages.length === 0) {
+        this.formConfig.model.work_order_stages = [{}];
+      }
+
         this.formConfig.model.work_order['completed_qty'] = 0
         this.formConfig.showActionBtn = true;
         // Set labels for update
@@ -144,44 +173,124 @@ submitWorkOrder() {
   });
 }
 
-populateBom(product_id:any){
-    const url = `production/bom/?product_id=${product_id}` // To get 'bom_id', filter by  selected product_id
-    let bom_data = {}
-    this.http.get(url).subscribe((response: any) => {
-      let bom_id = null
-      if (response.data[0]){
-        bom_id  = response.data[0].bom_id // fetch 'bom_id'
-        this.http.get(`production/bom/${bom_id}`).subscribe((data: any) => { // go to the URL with fetched 'bom_id' and get the 'data'.
-          const bom = {
-            'work_order':this.formConfig.model.work_order,
-            'bom': data.data.bill_of_material, // asign fetched 'bill_of_material' to BOM
-            'work_order_machines': this.formConfig.model.work_order_machines,
-            'workers': this.formConfig.model.workers,
-            'work_order_stages': this.formConfig.model.work_order_stages,
-          }
-          this.showCreateBomButton = false; 
-          // this.isBomButtonDisabled = true;
-          this.formConfig.model = bom // fill the form with data.
-        });
-      } else { // "If a user selects products that do not contain a BOM, the BOM will be refreshed with an empty form."
-        const bom = {
-          'work_order': this.formConfig.model.work_order,
-          'bom': [{}],
-          'work_order_machines': this.formConfig.model.work_order_machines,
-          'workers': this.formConfig.model.workers,
-          'work_order_stages': this.formConfig.model.work_order_stages,
-        }
-        this.formConfig.model = bom // fill the form with data.
+// populateBom(product_id:any){
+//     const url = `production/bom/?product_id=${product_id}` // To get 'bom_id', filter by  selected product_id
+//     let bom_data = {}
+//     this.http.get(url).subscribe((response: any) => {
+//       let bom_id = null
+//       if (response.data[0]){
+//         bom_id  = response.data[0].bom_id // fetch 'bom_id'
+//         this.http.get(`production/bom/${bom_id}`).subscribe((data: any) => { // go to the URL with fetched 'bom_id' and get the 'data'.
+//           const mainQty = Number(this.formConfig?.model?.work_order?.quantity) || 1;
+
+//         // Enrich each BOM row with base qty + calculated qty + cost
+//         const enrichedBom = (data.data.bill_of_material || []).map((item: any) => {
+//           const requiredPerUnit = Number(item.quantity || 1);
+//           const newQty = requiredPerUnit * mainQty;
+
+//           return {
+//             ...item,
+//             quantity_required: requiredPerUnit,                // store base qty for 1 product
+//             quantity: newQty,                                  // scaled qty
+//             total_cost: item.unit_cost ? (newQty * Number(item.unit_cost)).toFixed(2) : 0
+//           };
+//         });
+//           const bom = {
+//             'work_order':this.formConfig.model.work_order,
+//             'enrichedbom': enrichedBom, // assign enriched BOM to 'enrichedbom'
+//             'bom': data.data.bill_of_material, // asign fetched 'bill_of_material' to BOM
+//             'work_order_machines': this.formConfig.model.work_order_machines,
+//             'workers': this.formConfig.model.workers,
+//             'work_order_stages': this.formConfig.model.work_order_stages,
+//           }
+//           this.showCreateBomButton = false; 
+//           // this.isBomButtonDisabled = true;
+//           this.formConfig.model = bom // fill the form with data.
+          
+//           // Update the total cost display after BOM is loaded
+//           setTimeout(() => this.displayMaterialCost(), 500);
+//         });
+//       } else { // "If a user selects products that do not contain a BOM, the BOM will be refreshed with an empty form."
+//         const bom = {
+//           'work_order': this.formConfig.model.work_order,
+//           'bom': [{}],
+//           'work_order_machines': this.formConfig.model.work_order_machines,
+//           'workers': this.formConfig.model.workers,
+//           'work_order_stages': this.formConfig.model.work_order_stages,
+//         }
+//         this.formConfig.model = bom // fill the form with data.
         
-        this.isBomButtonDisabled = false;
-        if (!this.formConfig.model.work_order.product_id){
-          this.showCreateBomButton = false
-        } else {
-          this.showCreateBomButton = true // No BOM for selected product - show the 'Create BOM' Button.
-        }
-      }
-    })
-};
+//         this.isBomButtonDisabled = false;
+//         if (!this.formConfig.model.work_order.product_id){
+//           this.showCreateBomButton = false
+//         } else {
+//           this.showCreateBomButton = true // No BOM for selected product - show the 'Create BOM' Button.
+//         }
+        
+//         // Update the total cost display after empty BOM is set
+//         setTimeout(() => this.displayMaterialCost(), 500);
+//       }
+//     })
+// };
+
+populateBom(product_id: any) {
+  const url = `production/bom/?product_id=${product_id}`;
+
+  this.http.get(url).subscribe((response: any) => {
+    if (response.data[0]) {
+      const bom_id = response.data[0].bom_id;
+
+      this.http.get(`production/bom/${bom_id}`).subscribe((data: any) => {
+        const mainQty = Number(this.formConfig?.model?.work_order?.quantity) || 1;
+
+        // Enrich each BOM row with base qty + calculated qty + cost
+        const enrichedBom = (data.data.bill_of_material || []).map((item: any) => {
+          const requiredPerUnit = Number(item.quantity || 1);
+          const newQty = requiredPerUnit * mainQty;
+
+          return {
+            ...item,
+            quantity_required: requiredPerUnit,                // store base qty for 1 product
+            quantity: newQty,                                  // scaled qty
+            total_cost: item.unit_cost ? (newQty * Number(item.unit_cost)).toFixed(2) : 0
+          };
+        });
+
+        // Assign NEW object reference so Formly updates UI
+        this.formConfig.model = {
+          ...this.formConfig.model,
+          work_order: this.formConfig.model.work_order,
+          bom: enrichedBom,
+          work_order_machines: this.formConfig.model.work_order_machines,
+          workers: this.formConfig.model.workers,
+          work_order_stages: this.formConfig.model.work_order_stages,
+        };
+
+        this.showCreateBomButton = false;
+
+        setTimeout(() => this.displayMaterialCost(), 200);
+      });
+
+    } else {
+      // No BOM case
+      this.formConfig.model = {
+        ...this.formConfig.model,
+        work_order: this.formConfig.model.work_order,
+        bom: [{}],
+        work_order_machines: this.formConfig.model.work_order_machines,
+        workers: this.formConfig.model.workers,
+        work_order_stages: this.formConfig.model.work_order_stages,
+      };
+
+      this.isBomButtonDisabled = false;
+      this.showCreateBomButton = !!this.formConfig.model.work_order.product_id;
+
+      setTimeout(() => this.displayMaterialCost(), 200);
+    }
+  });
+}
+
+
 
 
 createBom(){
@@ -202,6 +311,9 @@ createBom(){
       this.showCreateBomButton = true;  // Ensure the button is still visible
       this.isBomButtonDisabled = true;  // Disable the button after success
       alert('BOM created successfully!');
+      
+      // Update the total material cost display after BOM is created
+      setTimeout(() => this.displayMaterialCost(), 500);
     },
     error: (error) => {
       console.error('Error creating BOM:', error);
@@ -212,6 +324,22 @@ createBom(){
   });
 
 };
+
+// Calculate the total material cost
+calculateTotalMaterialCost(): number {
+  if (!this.formConfig?.model?.bom || !Array.isArray(this.formConfig.model.bom)) {
+    return 0;
+  }
+  
+  let totalCost = 0;
+  this.formConfig.model.bom.forEach((item: any) => {
+    if (item?.total_cost) {
+      totalCost += parseFloat(item.total_cost);
+    }
+  });
+  
+  return totalCost;
+}
 
 updateInventory() {
   const data = this.formConfig.model.work_order
@@ -472,6 +600,8 @@ curdConfig: TaCurdConfig = {
   }
 }
 
+
+
  loadProductVariations(field: FormlyFieldConfig, productValuechange: boolean = false) {
       const parentArray = field.parent;
   
@@ -528,6 +658,149 @@ curdConfig: TaCurdConfig = {
         console.info('Product not selected or invalid.');
       }
     };
+
+// Display the total material cost similar to sales order product info
+// Only show when product is selected
+displayMaterialCost() {
+  // First check if a product is selected
+  const hasProduct = this.formConfig?.model?.work_order?.product_id;
+  if (!hasProduct) {
+    // No product selected, remove the cost display if it exists
+    this.removeMaterialCostDisplay();
+    return;
+  }
+  
+  const totalCost = this.calculateTotalMaterialCost();
+  console.log('Total material cost calculated:', totalCost);
+  
+  // Find the button container - this should get the area with the "Add Materials" button
+  const buttonContainer = this.el.nativeElement.querySelector('.custom-form-list button');
+  if (!buttonContainer) {
+    console.log('Add Materials button not found');
+    return;
+  }
+  
+  // Get the parent element containing the button (the button container/toolbar)
+  const containerElement = buttonContainer.parentElement;
+  if (!containerElement) {
+    console.log('Button container not found');
+    return;
+  }
+  
+  // Find or create the cost display element
+  let costDisplay = containerElement.querySelector('.total-material-cost');
+  
+  if (!costDisplay) {
+    // Create a new element that will be displayed inline with the button
+    costDisplay = document.createElement('div');
+    costDisplay.className = 'total-material-cost';
+    
+    // Style it to appear to the left of the button (like in sales order component)
+    costDisplay.style.cssText = 'display: inline-block; margin-right: 15px; float: left; padding: 8px 0;';
+    
+    // Insert before the button in the same container
+    containerElement.insertBefore(costDisplay, buttonContainer);
+  }
+  
+  // Format the cost with the red/blue styling as requested
+  costDisplay.innerHTML = `<span style="color: red;">Total Material Cost:</span> <span style="color: blue;">₹${totalCost.toFixed(2)}</span>`;
+}
+
+// Remove the material cost display when no product is selected
+removeMaterialCostDisplay() {
+  const costDisplay = this.el.nativeElement.querySelector('.total-material-cost');
+  if (costDisplay) {
+    costDisplay.remove();
+  }
+}
+
+// Update material costs whenever items change
+updateMaterialCosts() {
+  setTimeout(() => this.displayMaterialCost(), 100);
+}
+
+// Display product information when a product is selected in BOM
+// displayBomProductInfo(product: any) {
+//   if (!product?.product_id) return;
+  
+//   // Fetch detailed product information
+//   this.http.get(`products/products/${product.product_id}`).subscribe((response: any) => {
+//     if (!response?.data) return;
+    
+//     const productData = response.data;
+    
+//     // Create a product info container that will be displayed above the Bill of Material tab
+//     const tabPanel = this.el.nativeElement.querySelector('.tab-form-list [role="tabpanel"]');
+//     if (!tabPanel) return;
+    
+//     // Remove any existing product info
+//     const existingInfo = tabPanel.querySelector('.bom-product-info');
+//     if (existingInfo) existingInfo.remove();
+    
+//     // Create product info element - style similar to sales order component
+//     const productInfoDiv = document.createElement('div');
+//     productInfoDiv.className = 'bom-product-info';
+//     productInfoDiv.style.cssText = 'margin: 10px 0; padding: 5px 10px; background-color: #f9f9f9; border-radius: 4px; display: flex; align-items: center;';
+    
+//     // Format the product information similar to the sales order component
+//     let infoHTML = `
+//       <span style="color: red; font-weight: bold;">Raw Material:</span> <span style="color: blue; font-weight: bold;">${productData.name || 'N/A'}</span> |
+//       <span style="color: red; font-weight: bold;">Balance:</span> <span style="color: blue; font-weight: bold;">${productData.balance || 0}</span>`;
+    
+//     // Add unit info if available
+//     if (productData.stock_unit?.stock_unit_name) {
+//       infoHTML += ` | <span style="color: red; font-weight: bold;">Stock Unit:</span> <span style="color: blue; font-weight: bold;">${productData.stock_unit.stock_unit_name}</span>`;
+//     }
+    
+//     // Add price if available
+//     if (productData.purchase_rate) {
+//       infoHTML += ` | <span style="color: red; font-weight: bold;">Purchase Rate:</span> <span style="color: blue; font-weight: bold;">₹${productData.purchase_rate}</span>`;
+//     }
+    
+//     productInfoDiv.innerHTML = infoHTML;
+    
+//     // Insert at the top of the tab panel
+//     if (tabPanel.firstChild) {
+//       tabPanel.insertBefore(productInfoDiv, tabPanel.firstChild);
+//     } else {
+//       tabPanel.appendChild(productInfoDiv);
+//     }
+//   });
+// }
+
+
+
+updateBomQuantitiesOnMainQuantityChange() {
+  const mainQty = Number(this.formConfig?.model?.work_order?.quantity) || 0;
+  if (!Array.isArray(this.formConfig?.model?.bom)) return;
+
+  // Create a NEW array so Angular/Formly detects changes
+  const updatedBom = this.formConfig.model.bom.map((item: any) => {
+    const baseQty = Number(item.quantity_required || 1);
+    const newQty = baseQty * mainQty;
+
+    return {
+      ...item,
+      quantity: newQty,
+      total_cost: item.unit_cost ? (newQty * Number(item.unit_cost)).toFixed(2) : 0
+    };
+  });
+
+  // Replace with a new reference
+  this.formConfig.model = {
+    ...this.formConfig.model,
+    bom: updatedBom
+  };
+
+  this.updateMaterialCosts();
+}
+
+
+
+// Now, add a valueChanges subscription to the main Quantity field in setFormConfig
+// Find the main Quantity field config and add this to its hooks.onInit:
+
+    
 
   setFormConfig() {
     this.WorkOrdrEditID =null,
@@ -586,6 +859,9 @@ curdConfig: TaCurdConfig = {
                     }
                     if (this.formConfig && this.formConfig.model && this.formConfig.model['work_order']) {
                       this.formConfig.model['work_order']['product_id'] = data;
+                      
+                      // Update the material cost display based on product selection
+                      setTimeout(() => this.displayMaterialCost(), 500);
             
                       if (data) {
                         const lastSelectedSize = this.formConfig.model.work_order.size_id;
@@ -593,6 +869,8 @@ curdConfig: TaCurdConfig = {
                       } else {
                         // Clear size and color fields if product ID is cleared
                         // this.clearSize(field);
+                        // Remove the cost display when no product is selected
+                        this.removeMaterialCostDisplay();
                       }
                       
                       // Clear the size and color fields if the product ID changes
@@ -707,6 +985,14 @@ curdConfig: TaCurdConfig = {
                 required: true,
                 placeholder: 'Enter Quantity',
               },
+               hooks: {
+              onInit: (field: any) => {
+                field.formControl.valueChanges.subscribe((qty: any) => {
+                  // Update BOM quantities and costs when main quantity changes
+                  this.updateBomQuantitiesOnMainQuantityChange();
+                });
+              }
+            }
             },
             {
               key: 'completed_qty',
@@ -779,20 +1065,20 @@ curdConfig: TaCurdConfig = {
                 required: false
               }
             },
-            {
-              key: 'selectionType',
-              type: 'radio',
-              className: 'col-md-4 col-sm-6 col-12',
-              defaultValue: 'no', // Set default selection to 'user'
-              templateOptions: {
-                label: 'Creating for Sale Order ?',
-                options: [
-                  { label: 'Yes', value: 'yes' },
-                  { label: 'No', value: 'no' }
-                ],
-                required: true,
-              }
-            },
+            // {
+            //   key: 'selectionType',
+            //   type: 'radio',
+            //   className: 'col-md-4 col-sm-6 col-12',
+            //   defaultValue: 'no', // Set default selection to 'user'
+            //   templateOptions: {
+            //     label: 'Creating for Sale Order ?',
+            //     options: [
+            //       { label: 'Yes', value: 'yes' },
+            //       { label: 'No', value: 'no' }
+            //     ],
+            //     required: true,
+            //   }
+            // },
             {
               key: 'sale_order',
               type: 'select',
@@ -899,6 +1185,11 @@ curdConfig: TaCurdConfig = {
                               }
                               this.formConfig.model['bom'][currentRowIndex]['product_id'] = data?.product_id;
                               this.loadProductVariations(field);
+                              
+                              // Display product info when a product is selected (similar to Sales Order)
+                              if (data?.product_id) {
+                                this.displayMaterialCost();
+                              }
                             });
                           }
                         }
@@ -1040,7 +1331,8 @@ curdConfig: TaCurdConfig = {
                           placeholder: 'Enter Quantity',
                           hideLabel: true,
                           required: true,
-                          type: 'number'
+                          type: 'number',
+                          defaultValue: 1
                         },
                         hooks:{
                           onInit: (field: any) => {
@@ -1050,9 +1342,12 @@ curdConfig: TaCurdConfig = {
                                 const unit_cost = field.form.controls.unit_cost.value;
                                 if (quantity && unit_cost) {
                                   field.form.controls.total_cost.setValue((parseFloat(quantity) * parseFloat(unit_cost)).toFixed(2));
+                                  this.updateMaterialCosts();
                                 }
+
                               } else {
                                 field.form.controls.total_cost.setValue(0);
+                                this.updateMaterialCosts();
                               }
                             })
                           },
@@ -1076,10 +1371,12 @@ curdConfig: TaCurdConfig = {
                                 const unit_cost = field.form.controls.unit_cost.value;
                                 if (quantity && unit_cost) {
                                   field.form.controls.total_cost.setValue((parseFloat(quantity) * parseFloat(unit_cost)).toFixed(2));
+                                  this.updateMaterialCosts();
         
                                 }
                               } else {
                                 field.form.controls.total_cost.setValue(0);
+                                this.updateMaterialCosts();
                               }
                             })
                           },

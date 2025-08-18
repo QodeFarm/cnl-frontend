@@ -30,57 +30,80 @@ export class InventoryComponent {
       hideAddBtn: true,
       tableConfig: {
         apiUrl: 'products/products/?view=inventory',
-        title: 'Inventory',
+        // title: 'Inventory',
         pkId: "product_id",
         pageSize: 10,
         globalSearch: {
-          keys: ['name', 'code','category','barcode','stock_unit','mrp','purchase_rate','sales_rate','wholesale_rate','dealer_rate','balance','updated_at']
+          keys: ['name', 'code', 'stock_unit', 'mrp', 'purchase_rate', 'sales_rate', 'wholesale_rate', 'dealer_rate', 'balance', 'updated_at']
         },
         export: { downloadName: 'Inventory' },
         defaultSort: { key: 'created_at', value: 'descend' },
         cols: [
-          { fieldKey: 'name',
-             name: 'Name',
-              sort: true 
+          { 
+            fieldKey: 'name',
+            name: 'Name',
+            sort: true 
           },
-          { fieldKey: 'code', name: 'Code', sort: true },
+          { 
+            fieldKey: 'code', 
+            name: 'Code', 
+            sort: true 
+          },
+          { 
+            fieldKey: 'product_group', 
+            name: 'Group', 
+            sort: true,
+            displayType: "map", 
+            mapFn: (v, row) => row?.product_group?.group_name || ''
+          },
           { 
             fieldKey: 'category', 
-            name: 'Category', sort: true,
+            name: 'Category', 
+            sort: true,
             displayType: "map", 
-            mapFn: (v, row) => row.category.category_name 
+            mapFn: (v, row) => row?.category?.category_name || ''
           },
-          { fieldKey: 'barcode',
-            name: 'Barcode', 
-            sort: true
+          { 
+            fieldKey: 'type', 
+            name: 'Type', 
+            sort: true,
+            displayType: "map", 
+            mapFn: (v, row) => row?.type?.type_name || ''
           },
           { 
             fieldKey: 'stock_unit', 
-            name: 'Unit', sort: true,
+            name: 'Unit', 
+            sort: true,
             displayType: "map", 
-            mapFn: (v, row) => row.stock_unit.stock_unit_name 
+            mapFn: (v, row) => row?.stock_unit?.stock_unit_name || ''
           },
-          { fieldKey: 'mrp', 
+          { 
+            fieldKey: 'mrp', 
             name: 'MRP', 
             sort: true 
           },
-          { fieldKey: 'purchase_rate', 
+          { 
+            fieldKey: 'purchase_rate', 
             name: 'Purchase Rate', 
             sort: true 
           },
-          { fieldKey: 'sales_rate', 
+          { 
+            fieldKey: 'sales_rate', 
             name: 'Sales Rate', 
             sort: true 
           },
-          { fieldKey: 'wholesale_rate', 
+          { 
+            fieldKey: 'wholesale_rate', 
             name: 'Wholesale Rate', 
             sort: true 
           },
-          { fieldKey: 'dealer_rate', 
+          { 
+            fieldKey: 'dealer_rate', 
             name: 'Dealer Rate', 
             sort: true 
           },
-          { fieldKey: 'balance', 
+          { 
+            fieldKey: 'balance', 
             name: 'Balance', 
             sort: true 
           },
@@ -110,7 +133,7 @@ export class InventoryComponent {
       hideAddBtn: true,
       tableConfig: {
         apiUrl: 'products/products/?view=non-inventory',
-        title: 'Non Inventory',
+        // title: 'Non Inventory',
         pkId: "product_id",
         pageSize: 10,
         globalSearch: {
@@ -149,7 +172,7 @@ export class InventoryComponent {
       hideAddBtn: true,
       tableConfig: {
         apiUrl: 'products/products/?view=service',
-        title: 'Services',
+        // title: 'Services',
         pkId: "product_id",
         pageSize: 10,
         globalSearch: {
