@@ -550,8 +550,8 @@ export class ProductsComponent implements OnInit {
                       templateOptions: {
                       label: 'Balance',
                       required: false, 
-                     }
-                    },
+                    }
+                  },
                   ]
                 },
                 {
