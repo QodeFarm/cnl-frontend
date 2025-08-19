@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, Renderer2, AfterViewInit, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, Renderer2, AfterViewInit, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule, DatePipe, formatDate } from '@angular/common';
@@ -27,7 +27,7 @@ export class WorkorderComponent implements OnInit {
   editMode: boolean = false;
   dataToPopulate: any;
 
-  constructor(private http: HttpClient, private el: ElementRef, private renderer: Renderer2) {}
+  constructor(private http: HttpClient, private el: ElementRef, private renderer: Renderer2, private cdRef: ChangeDetectorRef,) {}
   
   ngOnInit() {
     this.showWorkorderList = false;
@@ -103,16 +103,16 @@ export class WorkorderComponent implements OnInit {
       if (res) {
         this.formConfig.model = res.data;
           // --- Ensure arrays have at least one row for Formly tables ---
-      if (!Array.isArray(this.formConfig.model.workers) || this.formConfig.model.workers.length === 0) {
-        this.formConfig.model.workers = [{}];
-      }
-      if (!Array.isArray(this.formConfig.model.work_order_machines) || this.formConfig.model.work_order_machines.length === 0) {
-        this.formConfig.model.work_order_machines = [{}];
-      }
-      if (!Array.isArray(this.formConfig.model.work_order_stages) || this.formConfig.model.work_order_stages.length === 0) {
-        this.formConfig.model.work_order_stages = [{}];
-      }
-
+      // if (!Array.isArray(this.formConfig.model.workers) || this.formConfig.model.workers.length === 0) {
+      //   this.formConfig.model.workers = [{}];
+      // }
+      // if (!Array.isArray(this.formConfig.model.work_order_machines) || this.formConfig.model.work_order_machines.length === 0) {
+      //   this.formConfig.model.work_order_machines = [{}];
+      // }
+      // if (!Array.isArray(this.formConfig.model.work_order_stages) || this.formConfig.model.work_order_stages.length === 0) {
+      //   this.formConfig.model.work_order_stages = [{}];
+      // }
+ 
         this.formConfig.model.work_order['completed_qty'] = 0
         this.formConfig.showActionBtn = true;
         // Set labels for update
@@ -122,10 +122,23 @@ export class WorkorderComponent implements OnInit {
         this.formConfig.model['work_order_id'] = this.WorkOrdrEditID;
         this.showForm = true;
         // this.formConfig.fields[0].fieldGroup[2].hide = false
+ 
+        // --- FIX: Calculate per-unit quantity from BOM ---
+      const mainQty = Number(this.formConfig.model.work_order.quantity) || 1;
+      if (Array.isArray(this.formConfig.model.bom)) {
+        this.formConfig.model.bom = this.formConfig.model.bom.map((item: any) => ({
+          ...item,
+          // Calculate per-unit quantity from already multiplied value
+          quantity_required: mainQty > 0 ? Number(item.quantity) / mainQty : Number(item.quantity),
+        }));
+      }
+      this.updateBomQuantitiesOnMainQuantityChange();
+   
       }
     })
     this.hide();
   }
+ 
 
   showWorkorderListFn() {
     this.showWorkorderList = true;
@@ -341,77 +354,169 @@ calculateTotalMaterialCost(): number {
   return totalCost;
 }
 
-updateInventory() {
-  const data = this.formConfig.model.work_order
-  data['work_order_id'] = this.WorkOrdrEditID
-  // update the work order
-  this.http.put(`production/work_orders_get/${this.WorkOrdrEditID}/`, data || {})
-  .subscribe({
-    next: (response) => {
-      alert('Inventory Updated successfully!');
-    },
-    error: (error) => {
-      console.error('Error Updating the Inventory:', error);
-      alert('Error Updating the Inventory.');
-    }
-  });
+// updateInventory() {
+//   const data = this.formConfig.model.work_order
+//   data['work_order_id'] = this.WorkOrdrEditID
+//   // update the work order
+//   this.http.put(`production/work_orders_get/${this.WorkOrdrEditID}/`, data || {})
+//   .subscribe({
+//     next: (response) => {
+//       alert('Inventory Updated successfully!');
+//     },
+//     error: (error) => {
+//       console.error('Error Updating the Inventory:', error);
+//       alert('Error Updating the Inventory.');
+//     }
+//   });
 
-  // update the product balance
-  const product = this.formConfig.model.work_order.product_id
-  const color = this.formConfig.model.work_order.color_id || null
-  const size = this.formConfig.model.work_order.size_id || null
-  const completed_qty = this.formConfig.model.work_order.completed_qty
+//   // update the product balance
+//   const product = this.formConfig.model.work_order.product_id
+//   const color = this.formConfig.model.work_order.color_id || null
+//   const size = this.formConfig.model.work_order.size_id || null
+//   const completed_qty = this.formConfig.model.work_order.completed_qty
 
-  // Fetch existing product balance from Products table
-  const product_url = `products/products_get/${product}/`
-  this.http.get(product_url).subscribe((data: any) => {
-    if (data) {
-      const existing_product_balance = data.balance
+//   // Fetch existing product balance from Products table
+//   const product_url = `products/products_get/${product}/`
+//   this.http.get(product_url).subscribe((data: any) => {
+//     if (data) {
+//       const existing_product_balance = data.balance
 
-      // sum the balance by adding existing balance with completed quantity.
-      const total = parseInt(existing_product_balance, 10) + parseInt(completed_qty, 10);  // this.formConfig.model.work_order?.completed_qty
-      console.log('Total product bal :', total)
-      const new_product_balance = { 'balance': total}
-      console.log({'old balance':existing_product_balance, 'new bal': total})
+//       // sum the balance by adding existing balance with completed quantity.
+//       const total = parseInt(existing_product_balance, 10) + parseInt(completed_qty, 10);  // this.formConfig.model.work_order?.completed_qty
+//       console.log('Total product bal :', total)
+//       const new_product_balance = { 'balance': total}
+//       console.log({'old balance':existing_product_balance, 'new bal': total})
 
-      // Update new product balance
-      this.http.patch(product_url, new_product_balance).subscribe({
-        next: (response) => {
-          console.log('response :', response)
-          alert('Product Balance Updated successfully!');
-        },
-        error: (error) => {
-          console.error('Error Fetching Products:', error);
-          alert('Error Fetching Products.');
-        }
-      });
-    }
-  })
+//       // Update new product balance
+//       this.http.patch(product_url, new_product_balance).subscribe({
+//         next: (response) => {
+//           console.log('response :', response)
+//           alert('Product Balance Updated successfully!');
+//         },
+//         error: (error) => {
+//           console.error('Error Fetching Products:', error);
+//           alert('Error Fetching Products.');
+//         }
+//       });
+//     }
+//   })
 
-  let variation_url = `products/product_variations/?product_id=${product}&color_id=${color}&size_id=${size}`;
-  this.http.get(variation_url).subscribe((data: any) => {
-    if (data && Array.isArray(data.data) && data.data.length == 1) {
-      const variation_id = data.data[0].product_variation_id
-      const existing_qty = data.data[0].quantity || 0
-      const new_qty = { 'quantity': parseInt(existing_qty, 10) + parseInt(completed_qty, 10)}
+//   let variation_url = `products/product_variations/?product_id=${product}&color_id=${color}&size_id=${size}`;
+//   this.http.get(variation_url).subscribe((data: any) => {
+//     if (data && Array.isArray(data.data) && data.data.length == 1) {
+//       const variation_id = data.data[0].product_variation_id
+//       const existing_qty = data.data[0].quantity || 0
+//       const new_qty = { 'quantity': parseInt(existing_qty, 10) + parseInt(completed_qty, 10)}
 
-      console.log('var-url : ', variation_url)
+//       console.log('var-url : ', variation_url)
 
-      this.http.patch(`products/product_variations/${variation_id}/`, new_qty).subscribe({
-        next: (response) => {
-          alert('Product Variation Balance Updated successfully!');
-          console.log('Variation updated : ', response)
-        },
-        error: (error) => {
-          console.error('Error Fetching Product Variation:', error);
-          alert('Error Fetching Product Variation.');
-        }
-      });
-    } else {
-      console.log('NO variations . it is Direct Product ***')
-    }
-  });
-}
+//       this.http.patch(`products/product_variations/${variation_id}/`, new_qty).subscribe({
+//         next: (response) => {
+//           alert('Product Variation Balance Updated successfully!');
+//           console.log('Variation updated : ', response)
+//         },
+//         error: (error) => {
+//           console.error('Error Fetching Product Variation:', error);
+//           alert('Error Fetching Product Variation.');
+//         }
+//       });
+//     } else {
+//       console.log('NO variations . it is Direct Product ***')
+//     }
+//   });
+// }
+
+// updateInventory() {
+//   const data = this.formConfig.model.work_order;
+//   data['work_order_id'] = this.WorkOrdrEditID;
+  
+//   // Only proceed with balance updates if we're in edit mode
+//   const isEditMode = !!this.WorkOrdrEditID;
+
+//   // update the work order
+//   this.http.put(`production/work_orders_get/${this.WorkOrdrEditID}/`, data || {})
+//   .subscribe({
+//     next: (response) => {
+//       if (isEditMode) {
+//         // update the product balance only in edit mode
+//         const product = this.formConfig.model.work_order.product_id;
+//         const color = this.formConfig.model.work_order.color_id || null;
+//         const size = this.formConfig.model.work_order.size_id || null;
+//         const completed_qty = this.formConfig.model.work_order.completed_qty;
+//         const original_qty = this.formConfig.model.work_order.quantity;
+        
+//         // Calculate remaining quantity to be produced
+//         const remaining_qty = original_qty - completed_qty;
+
+//         // Update BOM quantities based on remaining quantity
+//         if (Array.isArray(this.formConfig?.model?.bom)) {
+//           const updatedBom = this.formConfig.model.bom.map((item: any) => {
+//             const baseQty = Number(item.quantity_required || 1);
+//             const newQty = baseQty * remaining_qty;
+
+//             return {
+//               ...item,
+//               quantity: newQty,
+//               total_cost: item.unit_cost ? (newQty * Number(item.unit_cost)).toFixed(2) : 0
+//             };
+//           });
+
+//           this.formConfig.model = {
+//             ...this.formConfig.model,
+//             bom: updatedBom
+//           };
+//           this.updateMaterialCosts();
+//         }
+
+//         // Fetch existing product balance from Products table
+//         const product_url = `products/products_get/${product}/`;
+//         this.http.get(product_url).subscribe((data: any) => {
+//           if (data) {
+//             const existing_product_balance = data.balance;
+//             const total = parseInt(existing_product_balance, 10) + parseInt(completed_qty, 10);
+//             const new_product_balance = { 'balance': total };
+
+//             // Update new product balance
+//             this.http.patch(product_url, new_product_balance).subscribe({
+//               next: (response) => {
+//                 console.log('Product balance updated:', response);
+//               },
+//               error: (error) => {
+//                 console.error('Error updating product balance:', error);
+//               }
+//             });
+//           }
+//         });
+
+//         // Update product variation if exists
+//         let variation_url = `products/product_variations/?product_id=${product}&color_id=${color}&size_id=${size}`;
+//         this.http.get(variation_url).subscribe((data: any) => {
+//           if (data && Array.isArray(data.data) && data.data.length == 1) {
+//             const variation_id = data.data[0].product_variation_id;
+//             const existing_qty = data.data[0].quantity || 0;
+//             const new_qty = { 'quantity': parseInt(existing_qty, 10) + parseInt(completed_qty, 10)};
+
+//             this.http.patch(`products/product_variations/${variation_id}/`, new_qty).subscribe({
+//               next: (response) => {
+//                 console.log('Product variation updated:', response);
+//               },
+//               error: (error) => {
+//                 console.error('Error updating product variation:', error);
+//               }
+//             });
+//           }
+//         });
+//       }
+      
+//       alert('Inventory Updated successfully!');
+//     },
+//     error: (error) => {
+//       console.error('Error Updating the Inventory:', error);
+//       alert('Error Updating the Inventory.');
+//     }
+//   });
+// }
+
 
 fetchSizeOptions(productId: string, productField: any, lastSelectedSize?: any) {
   const apiUrl = `products/product_variations/?product_id=${productId}`;
@@ -800,7 +905,64 @@ updateBomQuantitiesOnMainQuantityChange() {
 // Now, add a valueChanges subscription to the main Quantity field in setFormConfig
 // Find the main Quantity field config and add this to its hooks.onInit:
 
-    
+checkExistingWorkOrder(productId: any) {
+  return this.http.get<any[]>(`production/work_order/?product_id=${productId}&status=open`);
+}
+
+// showWorkOrderExistsModal() {
+//   return window.confirm("Work order already in progress for this product. Do you want to continue?");
+// }
+
+showConfirmModal = false;
+
+showWorkOrderExistsModal() {
+  this.showConfirmModal = true; // open modal
+}
+
+onConfirm() {
+  this.showConfirmModal = false; // close modal
+  this.ngOnInit();              // refresh form
+}
+
+onCancel() {
+  this.showConfirmModal = false; // just close modal
+}
+
+isResetting: boolean = false;
+resetFormData() {
+  // First, prevent any pending operations that might reload data
+  this.isResetting = true; // Add this flag to your component
+  
+  this.showWorkorderList = false;
+  this.showForm = true;
+
+  // Create a deep copy of the empty model structure
+  const emptyModel = {
+    work_order: {},
+    bom: [{}],
+    work_order_machines: [{}],
+    workers: [{}],
+    work_order_stages: [{}]
+  };
+
+  // Reinitialize formConfig with clean model
+  this.setFormConfig();
+
+  // Assign the empty model
+  this.formConfig.model = JSON.parse(JSON.stringify(emptyModel));
+
+  // Hide required fields
+  this.hideFields(true);
+
+  // Force UI update
+  this.cdRef.detectChanges();
+
+  // Reset the flag after a short delay to ensure all operations complete
+  setTimeout(() => {
+    this.isResetting = false;
+  }, 100);
+}
+   
 
   setFormConfig() {
     this.WorkOrdrEditID =null,
@@ -818,7 +980,7 @@ updateBomQuantitiesOnMainQuantityChange() {
       },
       reset: {
         resetFn: () => {
-          this.ngOnInit();
+          this.resetFormData();
         }
       },
       model: {
@@ -835,7 +997,7 @@ updateBomQuantitiesOnMainQuantityChange() {
           key: 'work_order',
           fieldGroup: [
             {
-              key: 'product_id',
+              key: 'product',
               type: 'select',
               className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
@@ -852,39 +1014,98 @@ updateBomQuantitiesOnMainQuantityChange() {
               },
               hooks: {
                 onInit: (field: any) => {
-                  // let previousProductId: any = null; // Keep track of the previously selected product ID                  
-                  field.formControl.valueChanges.subscribe((data: any) => {
+                  field.formControl.valueChanges.subscribe((productId: any) => {
+                    if (!productId) return;
+
+                    // Run this check only in CREATE mode
                     if (!this.editMode) {
-                      this.populateBom(data);
-                    }
-                    if (this.formConfig && this.formConfig.model && this.formConfig.model['work_order']) {
-                      this.formConfig.model['work_order']['product_id'] = data;
-                      
-                      // Update the material cost display based on product selection
-                      setTimeout(() => this.displayMaterialCost(), 500);
-            
-                      if (data) {
-                        const lastSelectedSize = this.formConfig.model.work_order.size_id;
-                        this.fetchSizeOptions(data, field, lastSelectedSize);
-                      } else {
-                        // Clear size and color fields if product ID is cleared
-                        // this.clearSize(field);
-                        // Remove the cost display when no product is selected
-                        this.removeMaterialCostDisplay();
-                      }
-                      
-                      // Clear the size and color fields if the product ID changes
-                      // if (data !== previousProductId) {
-                      //   this.clearSize(field);
-                      //   previousProductId = data; // Update the previously selected product ID
-                      // }
+                      // console.log("We are in the method")
+                      this.http.get<any>(`production/work_order/?product_id=${productId}&status=open`)
+                        .subscribe((res: any) => {
+                          if (res && res.data.length > 0) {
+                            // Work order exists → show custom modal
+                            this.showWorkOrderExistsModal();
+
+                            // Reset product so user cannot proceed
+                            field.formControl.setValue(null);
+
+                            // Optionally reset BOM
+                            if (this.formConfig.model.bom) {
+                              this.formConfig.model.bom = [{}];
+                            }
+                          } else {
+                            // No existing work order → normal flow
+                            this.populateBom(productId);
+
+                            const lastSelectedSize = this.formConfig.model.work_order.size_id;
+                            this.fetchSizeOptions(productId, field, lastSelectedSize);
+                          }
+
+                          // Update model
+                          if (this.formConfig?.model?.work_order) {
+                            this.formConfig.model.work_order.product_id = productId;
+                          }
+                        });
                     } else {
-                      console.error('Form config or work_order data model is not defined.');
+                      // 🛠 In Edit Mode → skip modal, just run normal flow
+                      const lastSelectedSize = this.formConfig.model.work_order.size_id;
+                      this.fetchSizeOptions(productId, field, lastSelectedSize);
                     }
                   });
                 }
               }
-            },            
+            },
+            // {
+            //   key: 'product_id',
+            //   type: 'select',
+            //   className: 'col-md-4 col-sm-6 col-12',
+            //   templateOptions: {
+            //     label: 'Product',
+            //     placeholder: 'Select Product',
+            //     dataKey: 'product_id',
+            //     dataLabel: 'name',
+            //     required: true,
+            //     bindId: true,
+            //     lazy: {
+            //       url: 'products/products/',
+            //       lazyOneTime: true
+            //     },
+            //   },
+            //   hooks: {
+            //     onInit: (field: any) => {
+            //       // let previousProductId: any = null; // Keep track of the previously selected product ID                  
+            //       field.formControl.valueChanges.subscribe((data: any) => {
+            //         if (!this.editMode) {
+            //           this.populateBom(data);
+            //         }
+            //         if (this.formConfig && this.formConfig.model && this.formConfig.model['work_order']) {
+            //           this.formConfig.model['work_order']['product_id'] = data;
+                      
+            //           // Update the material cost display based on product selection
+            //           setTimeout(() => this.displayMaterialCost(), 500);
+            
+            //           if (data) {
+            //             const lastSelectedSize = this.formConfig.model.work_order.size_id;
+            //             this.fetchSizeOptions(data, field, lastSelectedSize);
+            //           } else {
+            //             // Clear size and color fields if product ID is cleared
+            //             // this.clearSize(field);
+            //             // Remove the cost display when no product is selected
+            //             this.removeMaterialCostDisplay();
+            //           }
+                      
+            //           // Clear the size and color fields if the product ID changes
+            //           // if (data !== previousProductId) {
+            //           //   this.clearSize(field);
+            //           //   previousProductId = data; // Update the previously selected product ID
+            //           // }
+            //         } else {
+            //           console.error('Form config or work_order data model is not defined.');
+            //         }
+            //       });
+            //     }
+            //   }
+            // },            
             {
               key: 'size',
               type: 'select',
