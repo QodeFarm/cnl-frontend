@@ -1875,34 +1875,101 @@ async autoFillProductDetails(field, data) {
   }
 }
 
+  // displayInformation(product: any, size: any, color: any, unitData : any, sizeBalance: any, colorBalance: any) {
+  //   const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
+  //   let data = '';
+
+  //   const stockInfo = `
+  //     <span style="color: red;">Stock Unit:</span> <span style="color: blue;">${unitData?.stock_unit_id || 'NA'}</span> |
+  //     <span style="color: red;">Pack Unit:</span> <span style="color: blue;">${unitData?.pack_unit_id || 'NA'}</span> |
+  //     <span style="color: red;">PackVsStock:</span> <span style="color: blue;">${unitData?.pack_vs_stock || 'NA'}</span> |
+  //     <span style="color: red;">GPack Unit:</span> <span style="color: blue;">${unitData?.g_pack_unit_id || 'NA'}</span> |
+  //     <span style="color: red;">GPackVsPack:</span> <span style="color: blue;">${unitData?.g_pack_vs_pack || 'NA'}</span>
+  //   `;
+
+  //   if (product && !size && !color) {
+  //     data = `
+  //     <span style="font-size: 12px;">
+  //       <span style="color: red;">Product Info:</span> <span style="color: blue;">${product?.name || 'N/A'}</span> |                            
+  //       <span style="color: red;">Balance:</span> <span style="color: blue;">${product?.balance || 0}</span> | ${stockInfo}
+  //     </span>`;
+
+  //   }
+
+  //   if (size && !color) {
+  //     data = `
+  //       <span style="font-size: 12px;">
+  //         <span style="color: red;">Product Info:</span> <span style="color: blue;">${product?.name || 'N/A'}</span> | 
+  //         <span style="color: red;">Size:</span> <span style="color: blue;">${size.size_name}</span> | 
+  //         <span style="color: red;">Balance:</span> <span style="color: blue;">${sizeBalance || 0}</span> | 
+  //         ${stockInfo}
+  //       </span>`;
+  //   }
+
+  //   if (color) {
+  //     data = `
+  //       <span style="font-size: 12px;">
+  //         <span style="color: red;">Product Info:</span> <span style="color: blue;">${product?.name || 'N/A'}</span> | 
+  //         <span style="color: red;">Size:</span> <span style="color: blue;">${size.size_name}</span> | 
+  //         <span style="color: red;">Color:</span> <span style="color: blue;">${color.color_name}</span> | 
+  //         <span style="color: red;">Balance:</span> <span style="color: blue;">${colorBalance || 0}</span> | 
+  //         ${stockInfo}
+  //       </span>`;
+  //   }
+
+  //   // data += ` | ${unitData}`;
+
+  //   cardWrapper.querySelector('.center-message')?.remove();
+  //   const productInfoDiv = document.createElement('div');
+  //   productInfoDiv.classList.add('center-message');
+  //   productInfoDiv.innerHTML = data;
+  //   cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
+  // };
+
   displayInformation(product: any, size: any, color: any, unitData : any, sizeBalance: any, colorBalance: any) {
     const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
     let data = '';
+    console.log('Product data in html : ', product)
+    console.log('unitData data in html : ', unitData)
 
-    if (product) {
+    // format unitData fields in correct order
+    const stockInfo = `
+      <span style="color: red;">Stock Unit:</span> <span style="color: blue;">${product?.stock_unit.stock_unit_name || 'NA'}</span> |
+      <span style="color: red;">Pack Unit:</span> <span style="color: blue;">${product?.pack_unit_id || 'NA'}</span> |
+      <span style="color: red;">PackVsStock:</span> <span style="color: blue;">${product?.pack_vs_stock || 'NA'}</span> |
+      <span style="color: red;">GPack Unit:</span> <span style="color: blue;">${product?.g_pack_unit_id || 'NA'}</span> |
+      <span style="color: red;">GPackVsPack:</span> <span style="color: blue;">${product?.g_pack_vs_pack || 'NA'}</span>
+    `;
+
+    if (product && !size && !color) {
       data = `
-        <span style="color: red;">Product Info:</span> <span style="color: blue;">${product?.name || 'N/A'}</span> |                            
-        <span style="color: red;">Balance:</span> <span style="color: blue;">${product?.balance || 0}</span>`;
+        <span style="font-size: 12px;">
+          <span style="color: red;">Product Info:</span> <span style="color: blue;">${product?.name || 'N/A'}</span> | 
+          <span style="color: red;">Balance:</span> <span style="color: blue;">${product?.balance || 0}</span> | 
+          ${stockInfo}
+        </span>`;
     }
 
-    if (size) {
+    if (size && !color) {
       data = `
-        <span style="color: red;">Product Info:</span> <span style="color: blue;">${product?.name || 'N/A'}</span> |                            
-        <span style="color: red;">Size:</span> <span style="color: blue;">${size.size_name}</span> |
-        <span style="color: red;">Balance:</span> <span style="color: blue;">${sizeBalance || 0}</span>
-        `;
+        <span style="font-size: 12px;">
+          <span style="color: red;">Product Info:</span> <span style="color: blue;">${product?.name || 'N/A'}</span> | 
+          <span style="color: red;">Balance:</span> <span style="color: blue;">${sizeBalance || 0}</span> | 
+          <span style="color: red;">Size:</span> <span style="color: blue;">${size.size_name}</span> | 
+          ${stockInfo}
+        </span>`;
     }
 
     if (color) {
       data = `
-        <span style="color: red;">Product Info:</span> <span style="color: blue;">${product?.name || 'N/A'}</span> |                            
-        <span style="color: red;">Size:</span> <span style="color: blue;">${size.size_name}</span> |
-        <span style="color: red;">Color:</span> <span style="color: blue;">${color.color_name}</span> |
-        <span style="color: red;">Balance:</span> <span style="color: blue;">${colorBalance || 0}</span>
-        `;
+        <span style="font-size: 12px;">
+          <span style="color: red;">Product Info:</span> <span style="color: blue;">${product?.name || 'N/A'}</span> | 
+          <span style="color: red;">Balance:</span> <span style="color: blue;">${colorBalance || 0}</span> | 
+          <span style="color: red;">Size:</span> <span style="color: blue;">${size?.size_name || 'NA'}</span> | 
+          <span style="color: red;">Color:</span> <span style="color: blue;">${color.color_name}</span> | 
+          ${stockInfo}
+        </span>`;
     }
-
-    data += ` | ${unitData}`;
 
     cardWrapper.querySelector('.center-message')?.remove();
     const productInfoDiv = document.createElement('div');
@@ -1910,6 +1977,7 @@ async autoFillProductDetails(field, data) {
     productInfoDiv.innerHTML = data;
     cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
   };
+
 
   hasOrderNoLoaded = false;
   //=======================================================

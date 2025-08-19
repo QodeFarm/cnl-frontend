@@ -34,7 +34,21 @@ export class InventoryComponent {
         pkId: "product_id",
         pageSize: 10,
         globalSearch: {
-          keys: ['name', 'code','category','barcode','stock_unit','mrp','purchase_rate','sales_rate','wholesale_rate','dealer_rate','balance','updated_at']
+          keys: ['name', 'code','category','barcode','stock_unit','mrp','purchase_rate','sales_rate','wholesale_rate', 'warehouse_name','location_name', 'dealer_rate','balance','updated_at'],
+          // customFn: (term: string, row: any) => {
+          //   term = term.toLowerCase();
+          //   const warehouses = row.warehouse_locations?.map(
+          //     (loc: any) => loc.warehouse?.name || ''
+          //   ).join(', ') || '';
+          //   const locations = row.warehouse_locations?.map(
+          //     (loc: any) => loc.location_name || ''
+          //   ).join(', ') || '';
+
+          //   return (
+          //     warehouses.toLowerCase().includes(term) ||
+          //     locations.toLowerCase().includes(term)
+          //   );
+          // }
         },
         export: { downloadName: 'Inventory' },
         defaultSort: { key: 'created_at', value: 'descend' },
@@ -50,10 +64,10 @@ export class InventoryComponent {
             displayType: "map", 
             mapFn: (v, row) => row.category.category_name 
           },
-          { fieldKey: 'barcode',
-            name: 'Barcode', 
-            sort: true
-          },
+          // { fieldKey: 'barcode',
+          //   name: 'Barcode', 
+          //   sort: true
+          // },
           { 
             fieldKey: 'stock_unit', 
             name: 'Unit', sort: true,
@@ -84,6 +98,35 @@ export class InventoryComponent {
             name: 'Balance', 
             sort: true 
           },
+          {
+            fieldKey: 'warehouse_name',
+            name: 'Warehouse',
+            displayType: "map",
+            mapFn: (v, row) => {
+              if (!row.warehouse_locations || row.warehouse_locations.length === 0) {
+                return "-";
+              }
+              // collect all warehouse names
+              return row.warehouse_locations
+                .map(loc => loc.warehouse?.name || "-")
+                .join(", ");
+            }
+          },
+          {
+            fieldKey: 'location_name',
+            name: 'Location',
+            displayType: "map",
+            mapFn: (v, row) => {
+              if (!row.warehouse_locations || row.warehouse_locations.length === 0) {
+                return "-";
+              }
+              // collect all location names
+              return row.warehouse_locations
+                .map(loc => loc.location_name || "-")
+                .join(", ");
+            }
+          },
+
           { 
             fieldKey: 'updated_at', 
             name: 'Last Updated', 
