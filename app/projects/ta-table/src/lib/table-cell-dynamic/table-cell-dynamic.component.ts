@@ -1,4 +1,5 @@
 import { CurrencyPipe, DatePipe } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { Component, Input, OnInit, Output } from '@angular/core';
 import { evalFn } from '@ta/ta-core';
 
@@ -13,10 +14,15 @@ export class TableCellDynamicComponent implements OnInit {
   @Input() col: any;
   @Input() row: any;
   @Input() value: any;
+  loading = false;
   html!: any;
-  constructor(public datepipe: DatePipe, public currency: CurrencyPipe) { }
+  showEditContain = false;
+  inputValue = '';
+  constructor(public datepipe: DatePipe, public currency: CurrencyPipe, private http: HttpClient) { }
 
   ngOnInit(): void {
+    this.loading = false;
+    this.inputValue = this.value;
     switch (this.col.displayType) {
       case 'map':
         try {
@@ -47,5 +53,38 @@ export class TableCellDynamicComponent implements OnInit {
         this.html = this.row[this.col.fieldKey];
         break;
     }
+  }
+    saveCell() {
+    if (this.col && this.col.autoSave && this.col.autoSave.apiUrl) {
+      this.loading = true;
+      const body = this.col.autoSave.body ? this.col.autoSave.body(this.row, this.inputValue, this.col) : this.row;
+      let apiUrl = this.col.autoSave.apiUrl;
+      if (typeof apiUrl === 'function') {
+        apiUrl = apiUrl(this.row);
+      }
+      this.http[this.col.autoSave.method || 'patch'](apiUrl, body).subscribe((res: any) => {
+        this.loading = false;
+        if (res && res.status === 'success' || res.data) {
+          this.value = this.inputValue;
+          this.row[this.col.fieldKey] = this.value;
+          this.cancelCell();
+          // Handle success response
+        }
+      }, (error) => {
+        this.loading = false;
+        console.error('Error saving cell:', error);
+      });
+    } else {
+      this.value = this.inputValue;
+      this.row[this.col.fieldKey] = this.value;
+      if (this.col.isEditSumbmit) {
+        this.col.isEditSumbmit(this.row, this.value, this.col);
+        this.cancelCell();
+      }
+    }
+  }
+  cancelCell() {
+    this.showEditContain = false;
+    this.ngOnInit();
   }
 }

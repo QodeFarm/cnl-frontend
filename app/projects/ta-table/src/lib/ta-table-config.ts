@@ -34,6 +34,7 @@ export interface ColumnItem {
   filterValue?: any;
   sort?: boolean | undefined;
   sortKey?: string;
+  isEdit?: boolean;
   filter?: Filter | any;
   sortOrder?: NzTableSortOrder | null;
   sortFn?: NzTableSortFn | null;

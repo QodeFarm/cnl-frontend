@@ -356,7 +356,6 @@ verifyBalance(): any {
                   className: 'col-sm-9 col-12 p-0',
                   fieldGroupClassName: 'row m-0 p-0',
                   fieldGroup: [
-
                     {
                       className: 'col-md-4 col-sm-6 col-12',
                       key: 'product_mode_id',
@@ -484,6 +483,22 @@ verifyBalance(): any {
                                         typeField.templateOptions.disabled = false;
                                         typeField.templateOptions.placeholder = 'Select Type';
                                         typeField.templateOptions = { ...typeField.templateOptions };
+                                        
+                                        // Find the "Finished Product" option
+                                        const finishedProductOption = formattedOptions.find(
+                                          (option: any) => option.label.toLowerCase() === 'finished product'
+                                        );
+                                        
+                                        if (finishedProductOption) {
+                                          // Set it as the default value
+                                          typeField.formControl.setValue(finishedProductOption.value);
+                                          
+                                          // Update the model
+                                          if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                                            this.formConfig.model['products']['type_id'] = finishedProductOption.value;
+                                            console.log("Default Type set to Finished Product:", finishedProductOption.value);
+                                          }
+                                        }
                                       } else {
                                         typeField.templateOptions.options = [];
                                         typeField.templateOptions.disabled = false;
@@ -594,7 +609,7 @@ verifyBalance(): any {
                           { value: 18, label: '18%' }
                         ]
                       }
-                    },
+                    },   
                     {
                       key: 'stock_unit',
                       type: 'select',
@@ -624,13 +639,32 @@ verifyBalance(): any {
                     },
                     {
                       className: 'col-md-4 col-sm-6 col-12',
+                      key: 'hsn_code',
+                      type: 'select',
+                      templateOptions: {
+                        label: 'HSN',
+                        placeholder: 'Enter or Select HSN Code',
+                        required: false,
+                        options: [
+                          { value: '0101', label: '0101' },
+                          { value: '0201', label: '0201' },
+                          { value: '0301', label: '0301' },
+                          { value: '0401', label: '0401' },
+                          { value: '0501', label: '0501' }
+                        ],
+                        // allowCustomValue: true // Allow users to enter their own value
+                      }
+                    }, 
+                    {
+                      className: 'col-md-4 col-sm-6 col-12',
                       key: 'balance',
                       type: 'input',
+                      defaultValue: 0.00,
                       templateOptions: {
-                        label: 'Balance',
-                        placeholder: 'Enter Balance'
-                      }
-                    },
+                      label: 'Balance',
+                      required: false, 
+                    }
+                  },
                   ]
                 },
                 {
@@ -741,33 +775,33 @@ verifyBalance(): any {
                                 }
                               }
                             },
-                            {
-                              key: 'item_type',
-                              type: 'select',
-                              className: 'col-3',
-                              templateOptions: {
-                                label: 'Item Type',
-                                dataKey: 'item_type_id',
-                                dataLabel: "item_name",
-                                options: [],
-                                required: false,
-                                lazy: {
-                                  url: 'masters/product_item_type/',
-                                  lazyOneTime: true
-                                }
-                              },
-                              hooks: {
-                                onChanges: (field: any) => {
-                                  field.formControl.valueChanges.subscribe((data: any) => {
-                                    if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
-                                      this.formConfig.model['products']['item_type_id'] = data?.item_type_id;
-                                    } else {
-                                      console.error('Form config or lead_status data model is not defined.');
-                                    }
-                                  });
-                                }
-                              }
-                            },
+                            // {
+                            //   key: 'item_type',
+                            //   type: 'select',
+                            //   className: 'col-3',
+                            //   templateOptions: {
+                            //     label: 'Item Type',
+                            //     dataKey: 'item_type_id',
+                            //     dataLabel: "item_name",
+                            //     options: [],
+                            //     required: false,
+                            //     lazy: {
+                            //       url: 'masters/product_item_type/',
+                            //       lazyOneTime: true
+                            //     }
+                            //   },
+                            //   hooks: {
+                            //     onChanges: (field: any) => {
+                            //       field.formControl.valueChanges.subscribe((data: any) => {
+                            //         if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                            //           this.formConfig.model['products']['item_type_id'] = data?.item_type_id;
+                            //         } else {
+                            //           console.error('Form config or lead_status data model is not defined.');
+                            //         }
+                            //       });
+                            //     }
+                            //   }
+                            // },
                             {
                               key: 'type',
                               type: 'select',
@@ -790,6 +824,33 @@ verifyBalance(): any {
                                       console.error('Form config or type_id data model is not defined.');
                                     }
                                   });
+                                },
+                                onInit: (field: any) => {
+                                  // We need to wait for the Product Mode to load type options first
+                                  const checkForOptions = setInterval(() => {
+                                    if (field.templateOptions.options && field.templateOptions.options.length > 0) {
+                                      clearInterval(checkForOptions);
+                                      
+                                      // Find the "Finished Product" option
+                                      const finishedProductOption = field.templateOptions.options.find(
+                                        (option: any) => option.label.toLowerCase() === 'finished product'
+                                      );
+                                      
+                                      if (finishedProductOption) {
+                                        // Set the default value
+                                        field.formControl.setValue(finishedProductOption.value);
+                                        
+                                        // Update the model
+                                        if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                                          this.formConfig.model['products']['type_id'] = finishedProductOption.value;
+                                          console.log("Default Type set to Finished Product:", finishedProductOption.value);
+                                        }
+                                      }
+                                    }
+                                  }, 500); // Check every 500ms
+                                  
+                                  // Clear the interval after 10 seconds to prevent infinite checking
+                                  setTimeout(() => clearInterval(checkForOptions), 10000);
                                 }
                               }
                             },
@@ -1317,6 +1378,43 @@ verifyBalance(): any {
                               templateOptions: {
                                 label: 'Purchase Description',
                                 placeholder: 'Enter Purchase Description'
+                              }
+                            },
+                            {
+                              key: 'purchase_gl',
+                              type: 'select',
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              templateOptions: {
+                                label: 'Purchase GL',
+                                dataKey: 'purchase_gl_id',
+                                dataLabel: "name",
+                                options: [],
+                                required: false,
+                                lazy: {
+                                  url: 'products/product_purchase_gl/',
+                                  lazyOneTime: true
+                                }
+                              },
+                              hooks: {
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe((data: any) => {
+                                    if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                                      this.formConfig.model['products']['purchase_gl_id'] = data?.purchase_gl_id;
+                                    } else {
+                                      console.error('Form config or lead_status data model is not defined.');
+                                    }
+                                  });
+                                }
+                              }
+                            },
+
+                            {
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              key: 'minimum_purchase_price',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'Min Purchase Price',
+                                placeholder: 'Enter Minimum Purchase Price'
                               }
                             },
                             {
