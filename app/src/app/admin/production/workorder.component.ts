@@ -103,16 +103,16 @@ export class WorkorderComponent implements OnInit {
       if (res) {
         this.formConfig.model = res.data;
           // --- Ensure arrays have at least one row for Formly tables ---
-      // if (!Array.isArray(this.formConfig.model.workers) || this.formConfig.model.workers.length === 0) {
-      //   this.formConfig.model.workers = [{}];
-      // }
-      // if (!Array.isArray(this.formConfig.model.work_order_machines) || this.formConfig.model.work_order_machines.length === 0) {
-      //   this.formConfig.model.work_order_machines = [{}];
-      // }
-      // if (!Array.isArray(this.formConfig.model.work_order_stages) || this.formConfig.model.work_order_stages.length === 0) {
-      //   this.formConfig.model.work_order_stages = [{}];
-      // }
- 
+          if (this.formConfig.model.workers.length==0){
+          this.formConfig.model.workers = [{}]
+        }
+        if (this.formConfig.model.work_order_machines.length==0){
+          this.formConfig.model.work_order_machines = [{}]
+        }
+        if (this.formConfig.model.work_order_stages.length==0){
+          this.formConfig.model.work_order_stages = [{}]
+        }
+
         this.formConfig.model.work_order['completed_qty'] = 0
         this.formConfig.showActionBtn = true;
         // Set labels for update
@@ -248,15 +248,14 @@ submitWorkOrder() {
 
 populateBom(product_id: any) {
   const url = `production/bom/?product_id=${product_id}`;
-
+ 
   this.http.get(url).subscribe((response: any) => {
     if (response.data[0]) {
       const bom_id = response.data[0].bom_id;
-
+ 
       this.http.get(`production/bom/${bom_id}`).subscribe((data: any) => {
-        const mainQty = Number(this.formConfig?.model?.work_order?.quantity) || 1;
-
-        // Enrich each BOM row with base qty + calculated qty + cost
+         const mainQty = Number(this.formConfig?.model?.work_order?.quantity) || 1;
+ 
         const enrichedBom = (data.data.bill_of_material || []).map((item: any) => {
           const requiredPerUnit = Number(item.quantity || 1);
           const newQty = requiredPerUnit * mainQty;
@@ -272,8 +271,8 @@ populateBom(product_id: any) {
             total_cost: item.unit_cost ? (newQty * Number(item.unit_cost)).toFixed(2) : 0
           };
         });
-
-        // Assign NEW object reference so Formly updates UI
+ 
+        // Assign new reference so Formly re-renders
         this.formConfig.model = {
           ...this.formConfig.model,
           work_order: this.formConfig.model.work_order,
@@ -282,12 +281,11 @@ populateBom(product_id: any) {
           workers: this.formConfig.model.workers,
           work_order_stages: this.formConfig.model.work_order_stages,
         };
-
-        this.showCreateBomButton = false;
-
-        setTimeout(() => this.displayMaterialCost(), 200);
+ 
+        //immediately update total cost (no setTimeout needed)
+        this.updateMaterialCosts();
       });
-
+ 
     } else {
       // No BOM case
       this.formConfig.model = {
@@ -298,11 +296,12 @@ populateBom(product_id: any) {
         workers: this.formConfig.model.workers,
         work_order_stages: this.formConfig.model.work_order_stages,
       };
-
+ 
       this.isBomButtonDisabled = false;
       this.showCreateBomButton = !!this.formConfig.model.work_order.product_id;
-
-      setTimeout(() => this.displayMaterialCost(), 200);
+ 
+      // ✅ Recalculate cost safely
+      this.updateMaterialCosts();
     }
   });
 }
@@ -880,27 +879,25 @@ updateMaterialCosts() {
 
 
 updateBomQuantitiesOnMainQuantityChange() {
-  const mainQty = Number(this.formConfig?.model?.work_order?.quantity) || 0;
+  const mainQty = Number(this.formConfig?.model?.work_order?.quantity) || 1;
   if (!Array.isArray(this.formConfig?.model?.bom)) return;
-
-  // Create a NEW array so Angular/Formly detects changes
+ 
   const updatedBom = this.formConfig.model.bom.map((item: any) => {
-    const baseQty = Number(item.quantity_required || 1);
+    const baseQty = Number(item.quantity_required || 1); // per-unit value
     const newQty = baseQty * mainQty;
-
+ 
     return {
       ...item,
       quantity: newQty,
       total_cost: item.unit_cost ? (newQty * Number(item.unit_cost)).toFixed(2) : 0
     };
   });
-
-  // Replace with a new reference
+ 
   this.formConfig.model = {
     ...this.formConfig.model,
     bom: updatedBom
   };
-
+ 
   this.updateMaterialCosts();
 }
 
