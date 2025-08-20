@@ -51,13 +51,6 @@ export class WorkflowListComponent {
         name: "Actions",
         type: 'action',
         actions: [
-          // {
-          //   type: 'delete',
-          //   label: 'Delete',
-          //   confirm: true,
-          //   confirmMsg: "Sure to delete?",
-          //   apiUrl: 'sales/work_flow' // The endpoint for deleting a workflow
-          // },
           {
             type: 'callBackFn',
             icon: 'fa fa-pen',

@@ -25,12 +25,12 @@ export class FieldRepeatComponent extends FieldArrayType {
     // Check if the current URL matches any restricted URL
     this.isRestrictedPage = restrictedUrls.some(url => currentUrl.includes(url));
 
-    console.log('Is Restricted Page:', this.isRestrictedPage);
+    // console.log('Is Restricted Page:', this.isRestrictedPage);
 
     // Additional logic for specific pages
-    if (this.isRestrictedPage) {
-      console.log(`Restricted page detected: ${currentUrl}`);
-    }
+    // if (this.isRestrictedPage) {
+    //   console.log(`Restricted page detected: ${currentUrl}`);
+    // }
   }
 
 

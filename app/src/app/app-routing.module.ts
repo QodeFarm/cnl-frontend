@@ -63,7 +63,7 @@ const routes: Routes = [
 
       //Products Module
       { path: 'inventory', data: { title: 'Inventory', moduleName: 'inventory' }, canActivate: [], loadComponent: () => import('./admin/inventory/inventory.component').then(m => m.InventoryComponent) },
-      { path: 'production/stockjournal', data: { title: 'Stock Journal', moduleName: 'stockjournal' }, canActivate: [], loadComponent: () => import('./admin/stockjournal/stockjournal.component').then(m => m.StockjournalComponent) },
+      // { path: 'production/stockjournal', data: { title: 'Stock Journal', moduleName: 'stockjournal' }, canActivate: [], loadComponent: () => import('./admin/stockjournal/stockjournal.component').then(m => m.StockjournalComponent) },
       // { path: 'products', data: { title: 'Products', moduleName: 'products' }, canActivate: [], loadComponent: () => import('./admin/products/products.component').then(m => m.ProductsComponent) },
       { path: 'warehouses', data: { title: 'Warehouses', moduleName: 'warehouses' }, canActivate: [], loadComponent: () => import('./admin/warehouses/warehouses.component').then(m => m.WarehousesComponent) },
       { path: 'quickpacks', data: { title: 'Quick Packs', moduleName: 'quickpacks' }, canActivate: [], loadComponent: () => import('./admin/quickpacks/quickpacks.component').then(m => m.QuickpacksComponent) },
