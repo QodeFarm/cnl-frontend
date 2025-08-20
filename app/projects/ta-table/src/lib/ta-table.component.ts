@@ -307,56 +307,48 @@ export class TaTableComponent implements OnDestroy {
 
   // Apply filters like quick period, date range, and status to fetch filtered data
   applyFilters() {
-    // Construct the filters object
-    const filters = {
-      quickPeriod: this.selectedQuickPeriod,
-      fromDate: this.fromDate,
-      toDate: this.toDate,
-      status: this.selectedStatus,
-      employee: this.selectedEmployee,
-      accountType: this.selectedAccountType,
-      accountId: this.selectedAccountId
-    };
+  const filters = {
+    quickPeriod: this.selectedQuickPeriod,
+    fromDate: this.fromDate,
+    toDate: this.toDate,
+    status: this.selectedStatus,
+    employee: this.selectedEmployee,
+    accountType: this.selectedAccountType,
+    accountId: this.selectedAccountId
+  };
 
-    // Generate query string from filters
-    const queryString = this.generateQueryString(filters);
+  const queryString = this.generateQueryString(filters);
+  const page = this.pageIndex;
+  const limit = this.pageSize;
 
-    // Add page and limit parameters
-    const page = this.pageIndex;
-    const limit = this.pageSize;
-
-    const tableParamConfig: TaParamsConfig = {
-      apiUrl: this.options.apiUrl,
-      pageIndex: this.pageIndex,
-      pageSize: this.pageSize,
-      filters: this.filters,
-      fixedFilters: this.options.fixedFilters
-    }
-
-    // Append page and limit to the query string
-    // Construct final URL with filters and pagination
-    const finalQueryString = `${queryString}&page=${page}&limit=${limit}`;
-
-    const full_path = this.options.apiUrl;
-    const url = `${full_path}${finalQueryString}`;
-
-    console.log("Making API request to:", url);
-    
-    // Fetch filtered data from the server using the constructed URL
-    this.http.get(url).subscribe(
-      response => {
-        this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
-          this.loading = false;
-          this.rows = response['data'] || data;
-        });
-      },
-      error => {
-        console.error('Error executing URL:', `${full_path}${queryString}`, error);
-      }
-    );
-    // return queryString;
-    return finalQueryString;
+  const tableParamConfig: TaParamsConfig = {
+    apiUrl: this.options.apiUrl,
+    pageIndex: this.pageIndex,
+    pageSize: this.pageSize,
+    filters: this.filters,
+    fixedFilters: this.options.fixedFilters
   }
+
+  // Check if apiUrl already has a '?'
+  let url = this.options.apiUrl;
+  let connector = url.includes('?') ? '&' : '?';
+  url = `${url}${connector}summary=true${queryString ? '&' + queryString.slice(1) : ''}&page=${page}&limit=${limit}`;
+
+  console.log("Making API request to:", url);
+
+  this.http.get(url).subscribe(
+    response => {
+      this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
+        this.loading = false;
+        this.rows = response['data'] || data;
+      });
+    },
+    error => {
+      console.error('Error executing URL:', url, error);
+    }
+  );
+  return url;
+}
   
   // Clear all filters like quick period, date range, and status
   clearFilters() {
@@ -426,8 +418,10 @@ export class TaTableComponent implements OnDestroy {
     }
 
     // Return the query string by joining all the filters
+    // return '?' + queryParts.join('&'); 
+    // Return the query string by joining all the filters
     // return '?&' + queryParts.join('&');
-    return '?' + queryParts.join('&'); //before, it returns a string starting with "?&",which then gets concatenated to your API URL and ends up creating an extra "?". Now, fix this by modifying the function.
+     return queryParts.length ? '&' + queryParts.join('&') : '';
   }
   formatDate(date: Date): string {
     // Format date as 'yyyy-MM-dd'
@@ -437,34 +431,34 @@ export class TaTableComponent implements OnDestroy {
     return `${year}-${month}-${day}`;
   }
 
-  downloadData(event: any) {
-    const tableParamConfig: TaParamsConfig = {
-      apiUrl: this.options.apiUrl,
-      pageIndex: this.pageIndex,
-      pageSize: this.pageSize,
-    }
+  // Also update downloadData to use the same logic
+downloadData(event: any) {
+  const tableParamConfig: TaParamsConfig = {
+    apiUrl: this.options.apiUrl,
+    pageIndex: this.pageIndex,
+    pageSize: this.pageSize,
+  }
 
-    this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
-      this.loading = false;
-      const full_path = this.options.apiUrl
-      const name_of_file = full_path.split('/')[1]
-      let fullUrl = `${this.options.apiUrl}`;
-      const query = this.applyFilters()
-      if (query.length > 1) {
-        fullUrl = `${fullUrl}${query}&`
-      }
+  this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
+    this.loading = false;
+    const full_path = this.options.apiUrl
+    const name_of_file = full_path.split('/')[1]
+    let url = full_path;
+    let connector = url.includes('?') ? '&' : '?';
+    const query = this.applyFilters();
+    url = `${url}${connector}summary=true${query ? '&' + query.split('?')[1] : ''}&download=excel`;
 
-      const download_url = `${fullUrl}download/excel/`
-      this.http.get(download_url, { responseType: 'blob' }).subscribe((blob: Blob) => {
-        const a = document.createElement('a');
-        const objectUrl = URL.createObjectURL(blob);
-        a.href = objectUrl;
-        a.download = `${name_of_file}.xlsx`
-        a.click();
-        URL.revokeObjectURL(objectUrl);
-      });
-    })
-  };
+    const download_url = url;
+    this.http.get(download_url, { responseType: 'blob' }).subscribe((blob: Blob) => {
+      const a = document.createElement('a');
+      const objectUrl = URL.createObjectURL(blob);
+      a.href = objectUrl;
+      a.download = `${name_of_file}.xlsx`
+      a.click();
+      URL.revokeObjectURL(objectUrl);
+    });
+  })
+};
 
   searchValue = '';
   visible = false;
@@ -544,7 +538,10 @@ export class TaTableComponent implements OnDestroy {
       '/admin/reports/customer-reports',
       '/admin/reports/ledgers-reports',
       '/admin/finance/account-ledger',
-      '/admin/finance/expense-item'
+      '/admin/finance/expense-item',
+      '/admin/inventory',
+      '/admin/products',
+      '/admin/production/stockjournal'
     ]
     this.loadStatuses();
     this.loadEmployees();
@@ -558,7 +555,11 @@ export class TaTableComponent implements OnDestroy {
       '/admin/employees',// Added employees URL
       '/admin/hrms/employee-leave-balance',
       '/admin/finance/account-ledger',
-      '/admin/finance/expense-item'
+      '/admin/finance/expense-item',
+      '/admin/inventory',
+      
+      
+
     ];
     this.isStatusButtonVisible = !hideStatusUrls.includes(currentUrl);
 
