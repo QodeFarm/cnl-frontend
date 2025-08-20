@@ -39,6 +39,8 @@ export class ProductsComponent implements OnInit {
     // Reset selectedProductMode to default "Inventory" to ensure Attributes tab is visible by default
     this.selectedProductMode = "Inventory";
     this.setFormConfig();
+    // console.log('Check field : ',this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[7])
+    this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = true;
   }
 
   hide() {
@@ -61,6 +63,7 @@ export class ProductsComponent implements OnInit {
         // Show form after setting form values
         this.formConfig.model['product_id'] = this.ProductEditID;
         this.showForm = true;
+        this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = false;
 
         // If we're editing a product, get the product mode name from the API to set selectedProductMode
         // if (this.formConfig.model.products?.product_mode_id) {
@@ -135,42 +138,152 @@ export class ProductsComponent implements OnInit {
   }
 
   // Method to calculate and verify the balance
-  verifyBalance(): any {
-    const balance = parseInt(this.formConfig.model.products.balance, 10);
+  // verifyBalance(): any {
+  //   const balance = parseInt(this.formConfig.model.products.balance, 10);
 
-    // Helper function to calculate total quantity
-    const calculateTotalQuantity = (items) =>
-      items?.reduce((sum, item) => sum + (parseInt(item.quantity, 10) || 0), 0) || 0;
+  //   // Helper function to calculate total quantity
+  //   const calculateTotalQuantity = (items) =>
+  //     items?.reduce((sum, item) => sum + (parseInt(item.quantity, 10) || 0), 0) || 0;
 
-    // Filter out empty/null variations
-    const productVariations = (this.formConfig.model.product_variations ?? []).filter(
-      (obj) => obj && Object.keys(obj).length
-    );
+  //   // Filter out empty/null variations
+  //   const productVariations = (this.formConfig.model.product_variations ?? []).filter(
+  //     (obj) => obj && Object.keys(obj).length
+  //   );
 
-    // Update model with cleaned variations
-    this.formConfig.model.product_variations = productVariations;
+  //   // Update model with cleaned variations
+  //   this.formConfig.model.product_variations = productVariations;
 
-    const totalItemBalanceQuantity = calculateTotalQuantity(this.formConfig.model.product_item_balance);
-    const totalVariationQuantity = calculateTotalQuantity(productVariations);
+  //   const totalVariationQuantity = calculateTotalQuantity(productVariations);
+  //   const totalWarehouseQuantity  = calculateTotalQuantity(this.formConfig.model.product_item_balance);
 
-    // Validate variations match balance
-    if (productVariations.length && totalVariationQuantity !== balance) {
-      return this.showDialog(
-        `<b>Variations !</b><br>
-         Your sum of quantities are <b>${totalVariationQuantity}</b> not matching with overall balance <b>${balance}.</b>`
-      );
-    }
+  //   // Validate variations match balance
+  //   if (totalVariationQuantity !== balance) {
+  //     return this.showDialog(
+  //       `<b>Variations !</b><br>
+  //        Your sum of quantities are <b>${totalVariationQuantity}</b> not matching with overall balance <b>${balance}.</b>`
+  //     );
+  //   }
 
-    // Validate item balance matches
-    if (totalItemBalanceQuantity !== balance) {
-      return this.showDialog(
-        `<b>Warehouse Locations!</b><br>
-         Your sum of quantities are <b>${totalItemBalanceQuantity}</b> not matching with overall balance <b>${balance}.</b>`
-      );
-    }
+  //   // Validate item balance matches
+  //   if (totalWarehouseQuantity  !== balance) {
+  //     return this.showDialog(
+  //       `<b>Warehouse Locations!</b><br>
+  //        Your sum of quantities are <b>${totalWarehouseQuantity }</b> not matching with overall balance <b>${balance}.</b>`
+  //     );
+  //   }
 
-    return true; // Everything matches
+  //   return true; // Everything matches
+  // }
+
+// verifyBalance(): any {
+//   const isEditMode = this.formConfig.formState.viewMode; // true = edit, false = create
+
+//   // Helper to sum quantities
+//   const calculateTotalQuantity = (items) =>
+//     items?.reduce((sum, item) => sum + (parseInt(item.quantity, 10) || 0), 0) || 0;
+
+//   const productVariations = (this.formConfig.model.product_variations ?? []).filter(
+//     (obj) => obj && Object.keys(obj).length
+//   );
+//   this.formConfig.model.product_variations = productVariations;
+
+//   const totalVariationQuantity = calculateTotalQuantity(productVariations);
+//   const totalWarehouseQuantity = calculateTotalQuantity(this.formConfig.model.product_item_balance);
+
+//   if (!isEditMode) {
+//     // ✅ Create Mode: balance should auto-sync with variations
+//     this.formConfig.model.products.balance = totalVariationQuantity;
+
+//     if (totalVariationQuantity !== totalWarehouseQuantity) {
+//       return this.showDialog(
+//         `<b>Mismatch!</b><br>
+//          Variations = <b>${totalVariationQuantity}</b>, 
+//          Warehouse = <b>${totalWarehouseQuantity}</b>. They must match.`
+//       );
+//     }
+//   } else {
+//     // ✅ Edit Mode: balance must match both
+//     const balance = parseInt(this.formConfig.model.products?.balance, 10) || 0;
+
+//     if (totalVariationQuantity !== balance) {
+//       return this.showDialog(
+//         `<b>Variations!</b><br>
+//          Sum of variation quantities <b>${totalVariationQuantity}</b> 
+//          is not matching with Balance <b>${balance}</b>.`
+//       );
+//     }
+
+//     if (totalWarehouseQuantity !== balance) {
+//       return this.showDialog(
+//         `<b>Warehouse!</b><br>
+//          Sum of warehouse quantities <b>${totalWarehouseQuantity}</b> 
+//          is not matching with Balance <b>${balance}</b>.`
+//       );
+//     }
+//   }
+
+//   return true;
+// }
+
+verifyBalance(): any {
+  const isEditMode = this.formConfig.formState.viewMode; // true = edit, false = create
+
+  // Helper to sum quantities
+  const calculateTotalQuantity = (items) =>
+    items?.reduce((sum, item) => sum + (parseInt(item.quantity, 10) || 0), 0) || 0;
+
+  const productVariations = (this.formConfig.model.product_variations ?? []).filter(
+    (obj) => obj && Object.keys(obj).length
+  );
+  this.formConfig.model.product_variations = productVariations;
+
+  const totalVariationQuantity = calculateTotalQuantity(productVariations);
+  const totalWarehouseQuantity = calculateTotalQuantity(this.formConfig.model.product_item_balance);
+
+  // --- CASE 1: Both empty → balance = 0
+  if (totalVariationQuantity === 0 && totalWarehouseQuantity === 0) {
+    this.formConfig.model.products.balance = 0;
+    return true;
   }
+
+  // --- CASE 2: Only variations entered
+  if (totalVariationQuantity > 0 && totalWarehouseQuantity === 0) {
+    this.formConfig.model.products.balance = totalVariationQuantity;
+    return true;
+  }
+
+  // --- CASE 3: Only warehouses entered
+  if (totalWarehouseQuantity > 0 && totalVariationQuantity === 0) {
+    this.formConfig.model.products.balance = totalWarehouseQuantity;
+    return true;
+  }
+
+  // --- CASE 4: Both entered → must match
+  if (totalVariationQuantity !== totalWarehouseQuantity) {
+    return this.showDialog(
+      `<b>Mismatch!</b><br>
+       Variations = <b>${totalVariationQuantity}</b>, 
+       Warehouse = <b>${totalWarehouseQuantity}</b>. They must match.`
+    );
+  }
+
+  // ✅ If both match → set balance
+  this.formConfig.model.products.balance = totalVariationQuantity;
+
+  return true;
+}
+
+
+
+  // On every change in product_variations update balance
+  updateBalanceFromVariations() {
+    const productVariations = this.formConfig.model.product_variations ?? [];
+    const balance = productVariations.reduce(
+      (sum, item) => sum + (parseInt(item.quantity, 10) || 0), 0
+    );
+    this.formConfig.model.products.balance = balance;
+  }
+
 
   showDialog(message: string): void {
     this.dialogMessage = message;  // Set the dynamic message
@@ -199,7 +312,7 @@ export class ProductsComponent implements OnInit {
         this.createRecord();
       }
     }
-  }; z
+  };
 
   setFormConfig() {
     this.ProductEditID = null
@@ -1024,6 +1137,13 @@ export class ProductsComponent implements OnInit {
                                   placeholder: 'Enter Quantity',
                                   required: false,
                                   type: 'number'
+                                },
+                                hooks: {
+                                  onChanges: (field: any) => {
+                                    field.formControl.valueChanges.subscribe(() => {
+                                      this.updateBalanceFromVariations();
+                                    });
+                                  }
                                 }
                               }
                             ]
