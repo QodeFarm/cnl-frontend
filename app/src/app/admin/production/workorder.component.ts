@@ -260,9 +260,13 @@ populateBom(product_id: any) {
         const enrichedBom = (data.data.bill_of_material || []).map((item: any) => {
           const requiredPerUnit = Number(item.quantity || 1);
           const newQty = requiredPerUnit * mainQty;
+          const OriginalQty = item.original_quantity;
+          console.log('item : ', item)
+          console.log('OriginalQty : ', OriginalQty)
 
           return {
             ...item,
+            original_quantity: OriginalQty,
             quantity_required: requiredPerUnit,                // store base qty for 1 product
             quantity: newQty,                                  // scaled qty
             total_cost: item.unit_cost ? (newQty * Number(item.unit_cost)).toFixed(2) : 0
@@ -997,7 +1001,7 @@ resetFormData() {
           key: 'work_order',
           fieldGroup: [
             {
-              key: 'product',
+              key: 'product_id',
               type: 'select',
               className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
@@ -1020,9 +1024,9 @@ resetFormData() {
                     // Run this check only in CREATE mode
                     if (!this.editMode) {
                       // console.log("We are in the method")
-                      this.http.get<any>(`production/work_order/?product_id=${productId}&status=open`)
-                        .subscribe((res: any) => {
-                          if (res && res.data.length > 0) {
+                      this.http.get<any[]>(`production/work_order/?product_id=${productId}&status=open`)
+                        .subscribe((res: any[]) => {
+                          if (res && res.length > 0) {
                             // Work order exists → show custom modal
                             this.showWorkOrderExistsModal();
 
@@ -1107,7 +1111,7 @@ resetFormData() {
             //   }
             // },            
             {
-              key: 'size',
+              key: 'size_id',
               type: 'select',
               className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
@@ -1159,7 +1163,7 @@ resetFormData() {
               }
             },
             {
-              key: 'color',
+              key: 'color_id',
               type: 'select',
               className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
@@ -1220,7 +1224,7 @@ resetFormData() {
               type: 'input',
               className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
-                label: 'Completed Quantity',
+                label: 'Enter Completed Quantity',
                 required: false,
                 placeholder: 'Enter Completed Quantity'
               },
@@ -1357,6 +1361,7 @@ resetFormData() {
                       { name: 'size_id', label: 'Size' },
                       { name: 'color_id', label: 'Color' },
                       { name: 'quantity', label: 'Quantity' },
+                      { name: 'original_quantity', label: 'Original Quantity' },
                       { name: 'unit_cost', label: 'Unit Cost' },
                       { name: 'total_cost', label: 'Total Cost' },
                       { name: 'notes', label: 'Notes' },
@@ -1544,6 +1549,17 @@ resetFormData() {
                           }
                         }
                       }, 
+                      {
+                        key: 'original_quantity',
+                        type: 'input',
+                        templateOptions: {
+                          label: 'Original Quantity',
+                          // placeholder: 'Enter Total Cost',
+                          hideLabel: true,
+                          required: true,
+                          disabled: true
+                        },
+                      },
                       {
                         key: 'quantity',
                         type: 'input',
