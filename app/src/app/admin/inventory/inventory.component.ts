@@ -34,7 +34,7 @@ export class InventoryComponent {
         pkId: "product_id",
         pageSize: 10,
         globalSearch: {
-          keys: ['name', 'code','category','barcode','stock_unit','mrp','purchase_rate','sales_rate','wholesale_rate', 'warehouse_name','location_name', 'dealer_rate','balance','updated_at'],
+          keys: [ 'name', 'code', 'group_name', 'category_name', 'type_name', 'stock_unit', 'warehouse_name', 'location_name' ],
           // customFn: (term: string, row: any) => {
           //   term = term.toLowerCase();
           //   const warehouses = row.warehouse_locations?.map(
@@ -64,14 +64,14 @@ export class InventoryComponent {
             sort: true 
           },
           { 
-            fieldKey: 'product_group', 
+            fieldKey: 'group_name', 
             name: 'Group', 
             sort: true,
             displayType: "map", 
             mapFn: (v, row) => row?.product_group?.group_name || ''
           },
           { 
-            fieldKey: 'category', 
+            fieldKey: 'category_name', 
             name: 'Category', 
             sort: true,
             displayType: "map", 
@@ -82,7 +82,7 @@ export class InventoryComponent {
           //   sort: true
           // },
           { 
-            fieldKey: 'type', 
+            fieldKey: 'type_name', 
             name: 'Type', 
             sort: true,
             displayType: "map", 
@@ -184,7 +184,7 @@ export class InventoryComponent {
         pkId: "product_id",
         pageSize: 10,
         globalSearch: {
-          keys: ['name','code','category','barcode']
+          keys: [ 'name', 'code', 'category' ]
         },
         export: { downloadName: 'NonInventory' },
         defaultSort: { key: 'created_at', value: 'descend' },
