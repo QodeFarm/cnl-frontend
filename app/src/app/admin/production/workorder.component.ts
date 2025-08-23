@@ -832,7 +832,12 @@ displayMaterialCost() {
   }
   
   // Format the cost with the red/blue styling as requested
-  costDisplay.innerHTML = `<span style="color: red;">Total Material Cost:</span> <span style="color: blue;">₹${totalCost.toFixed(2)}</span>`;
+  // costDisplay.innerHTML = `<span style="color: red;">Total Material Cost:</span> <span style="color: blue;">₹${totalCost.toFixed(2)}</span>`;
+  costDisplay.innerHTML = `
+  <span style="color: red; font-size:14px;">Total Material Cost:</span> 
+  <span style="color: blue; font-size:14px;">₹${totalCost.toFixed(2)}</span>
+`;
+
 }
 
 // Remove the material cost display when no product is selected
@@ -1008,12 +1013,13 @@ handleSubmit() {
       .subscribe((res: any) => {
         this.showSuccessToast = true;
         this.toastMessage = "Record updated successfully"; // Set the toast message for update
-        // this.ngOnInit();
-        this.resetFormData()
+        this.ngOnInit();
+        this.resetFormData();
         this.showForm = true; // show clean form
         setTimeout(() => {
           this.showSuccessToast = false;
         }, 3000);
+        
 
 
       }, error => {
@@ -1029,6 +1035,7 @@ handleSubmit() {
         setTimeout(() => {
           this.showSuccessToast = false;
         }, 3000);
+        this.resetFormData();
 
       }, error => {
         console.error('Error updating record:', error);
