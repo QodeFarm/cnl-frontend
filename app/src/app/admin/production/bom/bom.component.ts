@@ -224,6 +224,52 @@ export class BomComponent {
           },
           fieldArray: {
             fieldGroup: [
+              // {
+              //   key: 'product',
+              //   type: 'select',
+              //   templateOptions: {
+              //     label: 'Product',
+              //     dataKey: 'product_id',
+              //     hideLabel: true,
+              //     dataLabel: 'name',
+              //     placeholder: 'product',
+              //     options: [],
+              //     required: true,
+              //     lazy: {
+              //       url: 'products/products/?summary=true',
+              //       lazyOneTime: true
+              //     }
+              //   },
+              //   hooks: {
+              //     onInit: (field: any) => {
+              //       const parentArray = field.parent;
+              //       if (!parentArray) {
+              //         console.error('Parent array is undefined or not accessible');
+              //         return;
+              //       }
+              
+              //       const currentRowIndex = +parentArray.key;
+              
+              //       // Populate product if data exists
+              //       const existingProduct = this.dataToPopulate?.bill_of_material?.[currentRowIndex]?.product;
+              //       if (existingProduct) {
+              //         field.formControl.setValue(existingProduct);
+              //       }
+              
+              //       this.loadProductVariations(field);
+              
+              //       // Subscribe to value changes (to update sizes dynamically)
+              //       field.formControl.valueChanges.subscribe((data: any) => {
+              //         if (!this.formConfig.model['bill_of_material'][currentRowIndex]) {
+              //           console.error(`Products at index ${currentRowIndex} is not defined. Initializing...`);
+              //           this.formConfig.model['bill_of_material'][currentRowIndex] = {};
+              //         }
+              //         this.formConfig.model['bill_of_material'][currentRowIndex]['product_id'] = data?.product_id;
+              //         this.loadProductVariations(field);
+              //       });
+              //     }
+              //   }
+              // },
               {
                 key: 'product',
                 type: 'select',
@@ -247,24 +293,35 @@ export class BomComponent {
                       console.error('Parent array is undefined or not accessible');
                       return;
                     }
-              
+
                     const currentRowIndex = +parentArray.key;
-              
+
                     // Populate product if data exists
                     const existingProduct = this.dataToPopulate?.bill_of_material?.[currentRowIndex]?.product;
                     if (existingProduct) {
                       field.formControl.setValue(existingProduct);
                     }
-              
+
                     this.loadProductVariations(field);
-              
-                    // Subscribe to value changes (to update sizes dynamically)
-                    field.formControl.valueChanges.subscribe((data: any) => {
+
+                    // Subscribe to value changes (to update sizes dynamically and populate unit cost)
+                    field.formControl.valueChanges.subscribe((selectedProduct: any) => {
                       if (!this.formConfig.model['bill_of_material'][currentRowIndex]) {
                         console.error(`Products at index ${currentRowIndex} is not defined. Initializing...`);
                         this.formConfig.model['bill_of_material'][currentRowIndex] = {};
                       }
-                      this.formConfig.model['bill_of_material'][currentRowIndex]['product_id'] = data?.product_id;
+                      
+                      // Set product_id in the model
+                      this.formConfig.model['bill_of_material'][currentRowIndex]['product_id'] = selectedProduct?.product_id;
+                      
+                      // Auto-populate unit_cost with purchase_rate if available
+                      if (selectedProduct?.purchase_rate) {
+                        const unitCostField = parentArray.fieldGroup.find((f: any) => f.key === 'unit_cost');
+                        if (unitCostField) {
+                          unitCostField.formControl.setValue(selectedProduct.purchase_rate);
+                        }
+                      }
+                      
                       this.loadProductVariations(field);
                     });
                   }
@@ -410,6 +467,43 @@ export class BomComponent {
                   type: 'number'
                 }
               },
+              // {
+              //   key: 'unit_cost',
+              //   type: 'input',
+              //   templateOptions: {
+              //     label: 'Unit Cost',
+              //     placeholder: 'Enter Unit Cost',
+              //     hideLabel: true,
+              //     required: true,
+              //     type: 'number'
+              //   },
+              //   hooks:{
+              //     onInit: (field: any) => {
+              //       field.formControl.valueChanges.subscribe(data => {
+              //         if (field.form && field.form.controls && field.form.controls.quantity && field.form.controls.unit_cost && data) {
+              //           const quantity = field.form.controls.quantity.value;
+              //           const unit_cost = field.form.controls.unit_cost.value;
+              //           if (quantity && unit_cost) {
+              //             field.form.controls.total_cost.setValue(parseInt(quantity) * parseInt(unit_cost));
+              //           }
+              //         } else {
+              //           field.form.controls.total_cost.setValue(0);
+              //         }
+              //       })
+              //     },
+              //   }
+              // },
+              // {
+              //   key: 'total_cost',
+              //   type: 'input',
+              //   templateOptions: {
+              //     label: 'Total Cost',
+              //     placeholder: 'Enter Total Cost',
+              //     hideLabel: true,
+              //     required: true,
+              //     disabled: true
+              //   },
+              // },   
               {
                 key: 'unit_cost',
                 type: 'input',
@@ -420,20 +514,31 @@ export class BomComponent {
                   required: true,
                   type: 'number'
                 },
-                hooks:{
+                hooks: {
                   onInit: (field: any) => {
-                    field.formControl.valueChanges.subscribe(data => {
-                      if (field.form && field.form.controls && field.form.controls.quantity && field.form.controls.unit_cost && data) {
-                        const quantity = field.form.controls.quantity.value;
-                        const unit_cost = field.form.controls.unit_cost.value;
+                    const form = field.form;
+
+                    const calculateTotal = () => {
+                      if (form && form.controls && form.controls.quantity && form.controls.unit_cost) {
+                        const quantity = form.controls.quantity.value;
+                        const unit_cost = form.controls.unit_cost.value;
                         if (quantity && unit_cost) {
-                          field.form.controls.total_cost.setValue(parseInt(quantity) * parseInt(unit_cost));
+                          form.controls.total_cost.setValue(Number(quantity) * Number(unit_cost));
+                        } else {
+                          form.controls.total_cost.setValue(0);
                         }
-                      } else {
-                        field.form.controls.total_cost.setValue(0);
                       }
-                    })
-                  },
+                    };
+
+                    // existing: recalc on unit_cost changes
+                    field.formControl.valueChanges.subscribe(() => calculateTotal());
+
+                    // new: recalc also on quantity changes
+                    form.controls.quantity.valueChanges.subscribe(() => calculateTotal());
+
+                    // run once on init (edit mode fix)
+                    calculateTotal();
+                  }
                 }
               },
               {
@@ -446,7 +551,7 @@ export class BomComponent {
                   required: true,
                   disabled: true
                 },
-              },              
+              },          
               {
                 key: 'notes',
                 type: 'text',

@@ -68,15 +68,6 @@ export class ProductsListComponent {
           return row?.product_group?.group_name || '';
         },
       },
-      // {
-      //   fieldKey: 'unit_options',
-      //   name: 'Unit',
-      //   sort: true,
-      //   displayType: 'map',
-      //   mapFn: (currentValue: any, row: any, col: any) => {
-      //     return row?.unit_options?.unit_name;
-      //   },
-      // },
       {
         fieldKey: 'stock_unit',
         name: 'Stock Unit',
@@ -86,7 +77,6 @@ export class ProductsListComponent {
           return row?.stock_unit?.stock_unit_name || '';
         },
       },
-
       {
         fieldKey: 'sales_rate',
         name: 'Sales Rate',

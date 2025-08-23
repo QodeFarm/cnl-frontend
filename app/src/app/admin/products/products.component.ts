@@ -40,7 +40,7 @@ export class ProductsComponent implements OnInit {
     this.selectedProductMode = "Inventory";
     this.setFormConfig();
     // console.log('Check field : ',this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[7])
-    this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = true;
+    // this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = true;
   }
 
   hide() {
@@ -56,6 +56,17 @@ export class ProductsComponent implements OnInit {
     this.http.get('products/products/' + event).subscribe((res: any) => {
       if (res) {
         this.formConfig.model = res.data;
+
+        // ✅ Ensure product_variations always has at least one row
+        if (!this.formConfig.model.product_variations || this.formConfig.model.product_variations.length === 0) {
+          this.formConfig.model.product_variations = [{}];
+        }
+
+        // ✅ Always ensure balance array exists with at least one row
+        if (!this.formConfig.model.product_item_balance || this.formConfig.model.product_item_balance.length === 0) {
+          this.formConfig.model.product_item_balance = [{}];
+        }
+
         this.formConfig.showActionBtn = true;
         // Set labels for update
         this.formConfig.pkId = 'product_id';
@@ -63,7 +74,7 @@ export class ProductsComponent implements OnInit {
         // Show form after setting form values
         this.formConfig.model['product_id'] = this.ProductEditID;
         this.showForm = true;
-        this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = false;
+        // this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = false;
 
         // If we're editing a product, get the product mode name from the API to set selectedProductMode
         // if (this.formConfig.model.products?.product_mode_id) {
