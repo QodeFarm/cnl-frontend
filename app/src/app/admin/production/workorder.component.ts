@@ -29,7 +29,7 @@ export class WorkorderComponent implements OnInit {
 
   constructor(private http: HttpClient, private el: ElementRef, private renderer: Renderer2, private cdRef: ChangeDetectorRef,) {}
   
-  ngOnInit() {
+  ngOnInit(isReset = false) {
     this.showWorkorderList = false;
     this.showForm = true;
     this.setFormConfig();
@@ -42,6 +42,7 @@ export class WorkorderComponent implements OnInit {
       this.populateFormWithData(history.state);
       this.showForm = true; // Ensure the form is displayed
     }
+
     this.hideFields(true); // Hides fields at indexes 5, 4, and 9
       // Add this line to initialize the material cost display
   setTimeout(() => this.displayMaterialCost(), 500);
@@ -65,7 +66,7 @@ export class WorkorderComponent implements OnInit {
 
   hideFields(hide: boolean): void {
     // Array of indexes to hide or show
-    const fieldsToToggle = [5, 6, 4, 9];
+    const fieldsToToggle = [5, 6, 4, 9, 11];
   
     // Loop through the array and toggle the `hide` property based on the argument
     fieldsToToggle.forEach(index => {
@@ -95,6 +96,7 @@ export class WorkorderComponent implements OnInit {
     this.showCreateBomButton = false
     this.hideFields(false); // Shows fields at indexes 5, 4, and 9
     this.formConfig.fields[0].fieldGroup[10].hide = true;
+    this.formConfig.fields[0].fieldGroup[11].hide = true;
     this.makeFieldsNotTouchable([0, 1, 2]);
     this.disableMaterials()
     console.log('event', event);
@@ -631,20 +633,39 @@ fetchColorOptions(sizeId: string, productId: string, sizeField: any, lastSelecte
   );
 };
 
- clearColor(field : any) {
-  const colorField = field.parent.fieldGroup.find(f => f.key === 'color');
-  colorField.formControl.setValue(null); // Clear value
-  colorField.templateOptions.options = []; // Clear options
-  colorField.templateOptions.required = false;
-}
+//  clearColor(field : any) {
+//   const colorField = field.parent.fieldGroup.find(f => f.key === 'color');
+//   colorField.formControl.setValue(null); // Clear value
+//   colorField.templateOptions.options = []; // Clear options
+//   colorField.templateOptions.required = false;
+// }
 
 
-clearSize(field : any){
-  const sizeField = field.parent.fieldGroup.find(f => f.key === 'size');
-  sizeField.formControl.setValue(null); // Clear value
-  sizeField.templateOptions.options = []; // Clear options
-  sizeField.templateOptions.required = false;
+// clearSize(field : any){
+//   const sizeField = field.parent.fieldGroup.find(f => f.key === 'size');
+//   sizeField.formControl.setValue(null); // Clear value
+//   sizeField.templateOptions.options = []; // Clear options
+//   sizeField.templateOptions.required = false;
+// }
+
+clearColor(field: any) {
+  const colorField = field.parent.fieldGroup.find(f => f.key === 'color_id');
+  if (colorField && colorField.formControl) {
+    colorField.formControl.setValue(null); // Clear value
+    colorField.templateOptions.options = []; // Clear options
+    colorField.templateOptions.required = false;
+  }
 }
+
+clearSize(field: any) {
+  const sizeField = field.parent.fieldGroup.find(f => f.key === 'size_id');
+  if (sizeField && sizeField.formControl) {
+    sizeField.formControl.setValue(null); // Clear value
+    sizeField.templateOptions.options = []; // Clear options
+    sizeField.templateOptions.required = false;
+  }
+}
+
 
 disableMaterials() {
   if (this.editMode) {
@@ -811,7 +832,12 @@ displayMaterialCost() {
   }
   
   // Format the cost with the red/blue styling as requested
-  costDisplay.innerHTML = `<span style="color: red;">Total Material Cost:</span> <span style="color: blue;">₹${totalCost.toFixed(2)}</span>`;
+  // costDisplay.innerHTML = `<span style="color: red;">Total Material Cost:</span> <span style="color: blue;">₹${totalCost.toFixed(2)}</span>`;
+  costDisplay.innerHTML = `
+  <span style="color: red; font-size:14px;">Total Material Cost:</span> 
+  <span style="color: blue; font-size:14px;">₹${totalCost.toFixed(2)}</span>
+`;
+
 }
 
 // Remove the material cost display when no product is selected
@@ -931,14 +957,23 @@ onCancel() {
 
 isResetting: boolean = false;
 resetFormData() {
-  // First, prevent any pending operations that might reload data
-  this.isResetting = true; // Add this flag to your component
-  
+  window.location.reload();
+}
+
+hardReset() {
+  // ✅ Clear history.state so old data is gone
+  history.replaceState({}, document.title);
+
+  // ✅ Reset component-level flags
   this.showWorkorderList = false;
   this.showForm = true;
+  this.editMode = false;
+  this.WorkOrdrEditID = null;
+  this.dataToPopulate = undefined;
 
-  // Create a deep copy of the empty model structure
-  const emptyModel = {
+  // ✅ Reset form config
+  this.setFormConfig();
+  this.formConfig.model = {
     work_order: {},
     bom: [{}],
     work_order_machines: [{}],
@@ -946,30 +981,80 @@ resetFormData() {
     work_order_stages: [{}]
   };
 
-  // Reinitialize formConfig with clean model
-  this.setFormConfig();
-
-  // Assign the empty model
-  this.formConfig.model = JSON.parse(JSON.stringify(emptyModel));
-
-  // Hide required fields
-  this.hideFields(true);
-
-  // Force UI update
+  // ✅ Force UI refresh
   this.cdRef.detectChanges();
-
-  // Reset the flag after a short delay to ensure all operations complete
-  setTimeout(() => {
-    this.isResetting = false;
-  }, 100);
 }
+
+
+
+showSuccessToast = false;
+toastMessage = '';
+handleSubmit() {
+ 
+  const workOrder = this.formConfig.model
    
+  const payload = {
+    work_order: workOrder.work_order,
+    bom: workOrder.bom,
+    work_order_machines: workOrder.work_order_machines,
+    workers: workOrder.workers,
+    work_order_stages: workOrder.work_order_stages
+  };
+
+  // ✅ Modal check first
+  if (!payload.work_order.sync_qty && payload.work_order.temp_quantity === payload.work_order.quantity) {
+    this.showSyncModal = true;
+    return;
+  }
+
+  if (this.editMode) {
+    // Update mode
+    this.http.put(`production/work_order/${this.WorkOrdrEditID}/`, payload)
+      .subscribe((res: any) => {
+        this.showSuccessToast = true;
+        this.toastMessage = "Record updated successfully"; // Set the toast message for update
+        this.ngOnInit();
+        this.resetFormData();
+        this.showForm = true; // show clean form
+        setTimeout(() => {
+          this.showSuccessToast = false;
+        }, 3000);
+        
+
+
+      }, error => {
+        console.error('Error updating record:', error);
+      });
+  } else {
+    // Create mode
+    this.http.post(`production/work_order/`, payload)
+      .subscribe((res: any) => {
+        this.showSuccessToast = true;
+        this.toastMessage = "Record created successfully"; // Set the toast message for update
+        this.ngOnInit();
+        setTimeout(() => {
+          this.showSuccessToast = false;
+        }, 3000);
+        this.resetFormData();
+
+      }, error => {
+        console.error('Error updating record:', error);
+      });
+  }
+}
+
+showSyncModal = false;
+
+closeSyncModal() {
+  this.showSyncModal = false;
+}
+
 
   setFormConfig() {
     this.WorkOrdrEditID =null,
     this.dataToPopulate != undefined;
     this.formConfig = {
-      url: "production/work_order/",
+      // url: "production/work_order/",
       formState: {
         viewMode: false,
       },
@@ -977,12 +1062,10 @@ resetFormData() {
       exParams: [],
       submit: {
         label: 'Submit',
-        submittedFn: () => this.ngOnInit()
+        submittedFn: () => this.handleSubmit()
       },
       reset: {
-        resetFn: () => {
-          this.resetFormData();
-        }
+        resetFn: () => this.resetFormData()   // important
       },
       model: {
         work_order: {},
@@ -1021,9 +1104,9 @@ resetFormData() {
                     // Run this check only in CREATE mode
                     if (!this.editMode) {
                       // console.log("We are in the method")
-                      this.http.get<any[]>(`production/work_order/?product_id=${productId}&status=open`)
-                        .subscribe((res: any[]) => {
-                          if (res && res.length > 0) {
+                      this.http.get<any>(`production/work_order/?product_id=${productId}&status=open`)
+                        .subscribe((res: any) => {
+                          if (res && res.data.length > 0) {
                             // Work order exists → show custom modal
                             this.showWorkOrderExistsModal();
 
@@ -1330,6 +1413,17 @@ resetFormData() {
                     }
                   });
                 }
+              }
+            },
+            {
+              key: 'temp_quantity',
+              type: 'input',
+              className: 'col-md-4 col-sm-6 col-12',
+              templateOptions: {
+                label: 'Temperory Quantity',
+                required: false,
+                readonly: true,
+                placeholder: 'Temperory Quantity'
               }
             },
           ]
@@ -1686,7 +1780,7 @@ resetFormData() {
                                   console.error(`Machine at index ${index} is not defined. Initializing...`);
                                   this.formConfig.model['workers'][index] = {};
                                 }
-                                this.formConfig.model['workers'][index]['employee_id'] = data.employee_id;
+                                this.formConfig.model['workers'][index]['employee_id'] = data.employee_id || data;
                               });
                             }
                           }
@@ -1750,7 +1844,7 @@ resetFormData() {
                                   console.error(`Machine at index ${index} is not defined. Initializing...`);
                                   this.formConfig.model['work_order_machines'][index] = {};
                                 }
-                                this.formConfig.model['work_order_machines'][index]['machine_id'] = data.machine_id;
+                                this.formConfig.model['work_order_machines'][index]['machine_id'] = data.machine_id || data;
                               });
                             }
                           }

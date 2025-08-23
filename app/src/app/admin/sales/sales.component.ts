@@ -1831,37 +1831,50 @@ async autoFillProductDetails(field, data) {
   }
 
 
-  getUnitData(unitInfo) {
-    const unitOption = unitInfo.unit_options?.unit_name ?? 'NA';
-    const stockUnit = unitInfo.stock_unit?.stock_unit_name ?? 'NA';
-    const packUnit = unitInfo.pack_unit?.unit_name ?? 'NA';
-    const gPackUnit = unitInfo.g_pack_unit?.unit_name ?? 'NA';
-    const packVsStock = unitInfo.pack_vs_stock ?? 0;
-    const gPackVsPack = unitInfo.g_pack_vs_pack ?? 0;
+//   getUnitData(unitInfo) {
+//     console.log("unitinfo : ", unitInfo);
+//     const unitOption = unitInfo.unit_options?.unit_name ?? 'NA';
+//     const stockUnit = unitInfo.stock_unit?.stock_unit_name ?? 'NA';
+//     // const packUnit = unitInfo.pack_unit?.unit_name ?? 'NA';
+//     // const gPackUnit = unitInfo.g_pack_unit?.unit_name ?? 'NA';
+//     // const packVsStock = unitInfo.pack_vs_stock ?? 0;
+//     // const gPackVsPack = unitInfo.g_pack_vs_pack ?? 0;
+//     const packUnit = unitInfo.pack_unit?.unit_name ?? (unitInfo.pack_unit_id === null ? 'NA' : unitInfo.pack_unit);
+//     const gPackUnit = unitInfo.g_pack_unit?.unit_name ?? (unitInfo.g_pack_unit_id === null ? 'NA' : unitInfo.g_pack_unit);
+
+//     // ✅ Explicit check so 0 stays 0
+//     const packVsStock = unitInfo.pack_vs_stock !== null && unitInfo.pack_vs_stock !== undefined
+//       ? unitInfo.pack_vs_stock
+//       : 'NA';
+
+//     const gPackVsPack = unitInfo.g_pack_vs_pack !== null && unitInfo.g_pack_vs_pack !== undefined
+//       ? unitInfo.g_pack_vs_pack
+//       : 'NA';
+
   
-    const stockUnitReg = /\b[sS][tT][oO][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
-    const GpackReg = /\b(?:[sS]tock[_ ]?[pP]ack[_ ]?)?[gG][pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
-    const stockPackReg = /\b[sS][tT][oO][cC][kK][_ ]?[pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
+//     const stockUnitReg = /\b[sS][tT][oO][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
+//     const GpackReg = /\b(?:[sS]tock[_ ]?[pP]ack[_ ]?)?[gG][pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
+//     const stockPackReg = /\b[sS][tT][oO][cC][kK][_ ]?[pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
   
-    if (stockUnitReg.test(unitOption)) {
-      return `<span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> | &nbsp;`;
-    } else if (GpackReg.test(unitOption)) {
-      return `
-        <span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> |
-        <span style="color: red;">Pck Unit:</span> <span style="color: blue;">${packUnit}</span> |
-        <span style="color: red;">PackVsStock:</span> <span style="color: blue;">${packVsStock}</span> |
-        <span style="color: red;">GPackUnit:</span> <span style="color: blue;">${gPackUnit}</span> |
-        <span style="color: red;">GPackVsStock:</span> <span style="color: blue;">${gPackVsPack}</span> | &nbsp;`;
-    } else if (stockPackReg.test(unitOption)) {
-      return `
-        <span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> |
-        <span style="color: red;">Pack Unit:</span> <span style="color: blue;">${packUnit}</span> |
-        <span style="color: red;">PackVsStock:</span> <span style="color: blue;">${packVsStock}</span> | &nbsp;`;
-    } else {
-      console.log('No Unit Option match found');
-      return "";
-    }
-  }
+//     if (stockUnitReg.test(unitOption)) {
+//       return `<span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> | &nbsp;`;
+//     } else if (GpackReg.test(unitOption)) {
+//       return `
+//         <span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> |
+//         <span style="color: red;">Pck Unit:</span> <span style="color: blue;">${packUnit}</span> |
+//         <span style="color: red;">PackVsStock:</span> <span style="color: blue;">${packVsStock}</span> |
+//         <span style="color: red;">GPackUnit:</span> <span style="color: blue;">${gPackUnit}</span> |
+//         <span style="color: red;">GPackVsStock:</span> <span style="color: blue;">${gPackVsPack}</span> | &nbsp;`;
+//     } else if (stockPackReg.test(unitOption)) {
+//       return `
+//         <span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> |
+//         <span style="color: red;">Pack Unit:</span> <span style="color: blue;">${packUnit}</span> |
+//         <span style="color: red;">PackVsStock:</span> <span style="color: blue;">${packVsStock}</span> | &nbsp;`;
+//     } else {
+//       console.log('No Unit Option match found');
+//       return "";
+//     }
+//   }
 
 // product info text when size is selected
   sumQuantities(dataObject: any): number {
@@ -1874,6 +1887,45 @@ async autoFillProductDetails(field, data) {
     return 0;
   }
 }
+
+getUnitData(unitInfo) {
+  console.log("unitinfo : ", unitInfo);
+
+  const unitOption = unitInfo.unit_options?.unit_name ?? 'NA';
+  const stockUnit = unitInfo.stock_unit?.stock_unit_name ?? 'NA';
+
+  // ✅ Only null/undefined → NA, keep 0 or string
+  const packUnit = unitInfo.pack_unit?.unit_name ?? (unitInfo.pack_unit_id == null ? 'NA' : unitInfo.pack_unit_id);
+  const gPackUnit = unitInfo.g_pack_unit?.unit_name ?? (unitInfo.g_pack_unit_id == null ? 'NA' : unitInfo.g_pack_unit_id);
+
+  const packVsStock = unitInfo.pack_vs_stock == null ? 'NA' : unitInfo.pack_vs_stock;
+  const gPackVsPack = unitInfo.g_pack_vs_pack == null ? 'NA' : unitInfo.g_pack_vs_pack;
+
+  const stockUnitReg = /\b[sS][tT][oO][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
+  const GpackReg = /\b(?:[sS]tock[_ ]?[pP]ack[_ ]?)?[gG][pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
+  const stockPackReg = /\b[sS][tT][oO][cC][kK][_ ]?[pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
+
+  if (stockUnitReg.test(unitOption)) {
+    return `<span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> | &nbsp;`;
+  } else if (GpackReg.test(unitOption)) {
+    return `
+      <span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> |
+      <span style="color: red;">Pck Unit:</span> <span style="color: blue;">${packUnit}</span> |
+      <span style="color: red;">PackVsStock:</span> <span style="color: blue;">${packVsStock}</span> |
+      <span style="color: red;">GPackUnit:</span> <span style="color: blue;">${gPackUnit}</span> |
+      <span style="color: red;">GPackVsPack:</span> <span style="color: blue;">${gPackVsPack}</span> | &nbsp;`;
+  } else if (stockPackReg.test(unitOption)) {
+    return `
+      <span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> |
+      <span style="color: red;">Pack Unit:</span> <span style="color: blue;">${packUnit}</span> |
+      <span style="color: red;">PackVsStock:</span> <span style="color: blue;">${packVsStock}</span> | &nbsp;`;
+  } else {
+    console.log('No Unit Option match found');
+    return "";
+  }
+}
+
+
 
   // displayInformation(product: any, size: any, color: any, unitData : any, sizeBalance: any, colorBalance: any) {
   //   const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
