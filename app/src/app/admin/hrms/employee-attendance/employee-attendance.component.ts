@@ -68,6 +68,13 @@ export class EmployeeAttendanceComponent {
               apiUrl: 'hrms/employee_attendance'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'hrms/employee_attendance'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }

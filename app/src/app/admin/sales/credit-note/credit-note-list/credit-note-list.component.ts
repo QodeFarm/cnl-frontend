@@ -92,6 +92,13 @@ export class CreditNoteListComponent {
             apiUrl: 'sales/sale_credit_notes'
           },
           {
+            type: 'restore',
+            label: 'Restore',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
+            apiUrl: 'sales/sale_credit_notes'
+          },
+          {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',

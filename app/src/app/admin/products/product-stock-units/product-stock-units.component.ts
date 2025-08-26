@@ -54,6 +54,13 @@ export class ProductStockUnitsComponent {
               apiUrl: 'products/product_stock_units'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'products/product_stock_units'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }

@@ -72,6 +72,15 @@ export class WarehousesListComponent {
           {
             type: 'delete',
             label: 'Delete',
+            confirm: true,
+            confirmMsg: "Sure to delete?",
+            apiUrl: 'inventory/warehouses'
+          },
+          {
+            type: 'restore',
+            label: 'Restore',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
             apiUrl: 'inventory/warehouses'
           },
           {

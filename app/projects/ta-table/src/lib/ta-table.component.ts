@@ -782,9 +782,18 @@ export class TaTableComponent implements OnDestroy {
     // const tableElementref: ElementRef = this.taTable.elementRef as ElementRef;
     // this.taTableS.exportTableAsExcelFile(tableElementref.nativeElement, 'test');
   }
+
+  restoreRow(action: any) {
+  this.taTableS.restorerow(action.action.apiUrl, action.data, this.options).subscribe(res => {
+    this.loadDataFromServer();
+  });
+}
+
   actionClick(event) {
     if (event && event.action && event.action.type === 'delete') {
       this.deleteRow(event);
+    } else if (event.action.type === 'restore') {
+      this.restoreRow(event);
     }
     this.doAction.emit(event);
   }

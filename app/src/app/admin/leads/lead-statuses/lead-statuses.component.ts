@@ -37,6 +37,13 @@ export class LeadStatusesComponent {
               apiUrl: 'leads/lead_statuses'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'leads/lead_statuses'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }

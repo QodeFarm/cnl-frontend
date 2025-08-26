@@ -51,6 +51,13 @@ export class WarehouseLocationsComponent {
               apiUrl: 'inventory/warehouse_locations'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'inventory/warehouse_locations'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }

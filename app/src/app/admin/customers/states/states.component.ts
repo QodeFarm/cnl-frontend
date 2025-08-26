@@ -52,6 +52,13 @@ export class StatesComponent {
               apiUrl: 'masters/state'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/state'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }

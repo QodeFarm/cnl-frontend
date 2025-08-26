@@ -74,6 +74,13 @@ export class BomListComponent {
             apiUrl: 'production/bom'
           },
           {
+            type: 'restore',
+            label: 'Restore',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
+            apiUrl: 'production/bom'
+          },
+          {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',

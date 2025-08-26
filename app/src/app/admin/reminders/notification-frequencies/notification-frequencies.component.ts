@@ -37,6 +37,13 @@ export class NotificationFrequenciesComponent {
               apiUrl: 'reminders/notification_frequencies'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'reminders/notification_frequencies'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }

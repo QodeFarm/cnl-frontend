@@ -38,6 +38,13 @@ export class ColorComponent {
               apiUrl: 'products/colors'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'products/colors'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }

@@ -54,6 +54,13 @@ export class ProductGstClassificationsComponent {
               apiUrl: 'products/product_gst_classifications'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'products/product_gst_classifications'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }

@@ -16,6 +16,19 @@ export class TableActionsComponent implements OnInit {
   ngOnInit(): void {
 
   }
+
+  getFilteredActions(): any[] {
+    return this.actions.filter(action => {
+      if (action.type === 'delete' && this.row.is_deleted) {
+        return false; // hide delete if is_deleted = true
+      }
+      if (action.type === 'restore' && !this.row.is_deleted) {
+        return false; // hide restore if is_deleted = false
+      }
+      return true; // keep all other actions
+    });
+  }
+
   action(action: any) {
     if (action.type == 'callBackFn') {
       return action.callBackFn(this.row, action);
@@ -31,4 +44,5 @@ export class TableActionsComponent implements OnInit {
     }
     return true;
   }
+  
 }

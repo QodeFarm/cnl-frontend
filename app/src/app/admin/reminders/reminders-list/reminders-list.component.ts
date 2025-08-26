@@ -75,6 +75,13 @@ export class RemindersListComponent {
             confirmMsg: "Sure to delete?",
           },
           {
+            type: 'restore',
+            label: 'Restore',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
+            apiUrl: 'reminders/reminders',
+          },
+          {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',

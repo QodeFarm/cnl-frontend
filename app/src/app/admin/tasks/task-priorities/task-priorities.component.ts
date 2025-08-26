@@ -38,6 +38,13 @@ export class TaskPrioritiesComponent {
               apiUrl: 'masters/task_priorities'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/task_priorities'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }

@@ -60,6 +60,13 @@ export class JournalEntryListComponent {
             confirmMsg: "Sure to delete?",
           },
           {
+            type: 'restore',
+            label: 'Restore',
+            apiUrl: 'finance/journal_entries',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
+          },
+          {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',

@@ -107,6 +107,13 @@ export class LedgerAccountsComponent {
               apiUrl: 'customers/ledger_accounts'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'customers/ledger_accounts'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }

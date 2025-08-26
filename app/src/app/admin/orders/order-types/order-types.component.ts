@@ -39,6 +39,13 @@ export class OrderTypesComponent {
               apiUrl: 'masters/order_types'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/order_types'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             },

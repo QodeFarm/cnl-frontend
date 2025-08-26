@@ -62,6 +62,13 @@ export class ReminderSettingsComponent {
               apiUrl: 'reminders/reminder_settings'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'reminders/reminder_settings'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }

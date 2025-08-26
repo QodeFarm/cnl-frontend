@@ -109,6 +109,13 @@ export class VendorsListComponent {
             apiUrl: 'vendors/vendors'
           },
           {
+            type: 'restore',
+            label: 'Restore',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
+            apiUrl: 'vendors/vendors'
+          },
+          {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             callBackFn: (row, action) => {

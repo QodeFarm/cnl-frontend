@@ -66,6 +66,13 @@ export class CustomfieldsListComponent {
             apiUrl: 'customfields/customfieldscreate' // The endpoint for deleting a custom field
           },
           {
+            type: 'restore',
+            label: 'Restore',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
+            apiUrl: 'customfields/customfieldscreate' // The endpoint for deleting a custom field
+          },
+          {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',

@@ -68,6 +68,13 @@ export class SaleReceiptListComponent {
             apiUrl: 'sales/sale_receipts'
           },
           {
+            type: 'restore',
+            label: 'Restore',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
+            apiUrl: 'sales/sale_receipts'
+          },
+          {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',
