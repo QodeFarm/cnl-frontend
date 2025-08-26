@@ -78,6 +78,20 @@ export class TaTableComponent implements OnDestroy {
   selectedAccountType: string | null = null;
   selectedAccountId: number | null = null;
   isAccountLedgerPage: boolean;
+  // Filters for product/inventory pages
+isProductFilterVisible = false;
+isInventoryFilterVisible = false;
+
+selectedGroup: string | null = null;
+selectedCategory: string | null = null;
+selectedType: string | null = null;
+selectedWarehouse: string | null = null;
+
+groupOptions: Array<{ value: string; label: string }> = [];
+categoryOptions: Array<{ value: string; label: string }> = [];
+typeOptions: Array<{ value: string; label: string }> = [];
+warehouseOptions: Array<{ value: string; label: string }> = [];
+
 
 
   statusOptions: Array<{ value: string, label: string }> = []; // Store the statuses here
@@ -177,6 +191,89 @@ export class TaTableComponent implements OnDestroy {
     this.selectedStatus = status;
     // this.applyFilters();
   }
+
+ 
+
+loadWarehouses() {
+    const url = 'inventory/warehouses/'; 
+    this.http.get<any>(url).subscribe(
+      (response) => {
+        if (response && response.data && response.data.length > 0) {
+          this.warehouseOptions = response.data.map(warehouse => ({
+            value: warehouse.warehouse_id,
+            label: warehouse.name
+          }));
+        } else {
+          console.warn('No warehouses found in the API response.');
+        }
+      },
+      (error) => {
+        console.error('Error fetching warehouses:', error);
+      }
+    );
+  }
+
+loadGroups() {
+    const url = 'products/product_groups'; // Replace with your actual product group API endpoint
+
+    this.http.get<any>(url).subscribe(
+      (response) => {
+        if (response && response.data && response.data.length > 0) {
+          this.groupOptions = response.data.map(group => ({
+            value: group.product_group_id,
+            label: group.group_name
+          }));
+        } else {
+          console.warn('No product groups found in the API response.');
+        }
+      },
+      (error) => {
+        console.error('Error fetching product groups:', error);
+      }
+    );
+  } 
+
+loadCategories() {
+    const url = 'products/product_categories/'; // Replace with your actual product category API endpoint
+
+    this.http.get<any>(url).subscribe(
+      (response) => {
+        if (response && response.data && response.data.length > 0) {
+          this.categoryOptions = response.data.map(category => ({
+            value: category.category_id,
+            label: category.category_name
+          }));
+        } else {
+          console.warn('No product categories found in the API response.');
+        }
+      },
+      (error) => {
+        console.error('Error fetching product categories:', error);
+      }
+    );
+  } 
+
+
+loadTypes() {
+    const url = 'masters/product_types/'; // Replace with your actual product type API endpoint
+
+    this.http.get<any>(url).subscribe(
+      (response) => {
+        if (response && response.data && response.data.length > 0) {
+          this.typeOptions = response.data.map(type => ({
+            value: type.type_id,
+            label: type.type_name
+          }));
+        } else {
+          console.warn('No product types found in the API response.');
+        }
+      },
+      (error) => {
+        console.error('Error fetching product types:', error);
+      }
+    );
+  }
+  
 
   loadEmployees() {
     const url = 'hrms/employees/'; // Replace with your actual employee API endpoint
@@ -307,57 +404,53 @@ export class TaTableComponent implements OnDestroy {
 
   // Apply filters like quick period, date range, and status to fetch filtered data
   applyFilters() {
-    // Construct the filters object
-    const filters = {
-      quickPeriod: this.selectedQuickPeriod,
-      fromDate: this.fromDate,
-      toDate: this.toDate,
-      status: this.selectedStatus,
-      employee: this.selectedEmployee,
-      accountType: this.selectedAccountType,
-      accountId: this.selectedAccountId
-    };
+  const filters = {
+    quickPeriod: this.selectedQuickPeriod,
+    fromDate: this.fromDate,
+    toDate: this.toDate,
+    status: this.selectedStatus,
+    employee: this.selectedEmployee,
+    accountType: this.selectedAccountType,
+    accountId: this.selectedAccountId,
+    group: this.selectedGroup,        
+    category: this.selectedCategory,  
+    type: this.selectedType,          
+    warehouse: this.selectedWarehouse 
+  };
 
-    // Generate query string from filters
-    const queryString = this.generateQueryString(filters);
+  const queryString = this.generateQueryString(filters);
+  const page = this.pageIndex;
+  const limit = this.pageSize;
 
-    // Add page and limit parameters
-    const page = this.pageIndex;
-    const limit = this.pageSize;
-
-    const tableParamConfig: TaParamsConfig = {
-      apiUrl: this.options.apiUrl,
-      pageIndex: this.pageIndex,
-      pageSize: this.pageSize,
-      filters: this.filters,
-      fixedFilters: this.options.fixedFilters
-    }
-
-    // Append page and limit to the query string
-    // Construct final URL with filters and pagination
-    const finalQueryString = `${queryString}&page=${page}&limit=${limit}`;
-
-    const full_path = this.options.apiUrl;
-    const url = `${full_path}${finalQueryString}`;
-
-    console.log("Making API request to:", url);
-
-    // Fetch filtered data from the server using the constructed URL
-    this.http.get(url).subscribe(
-      response => {
-        this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
-          this.loading = false;
-          this.rows = response['data'] || data;
-        });
-      },
-      error => {
-        console.error('Error executing URL:', `${full_path}${queryString}`, error);
-      }
-    );
-    // return queryString;
-    return finalQueryString;
+  const tableParamConfig: TaParamsConfig = {
+    apiUrl: this.options.apiUrl,
+    pageIndex: this.pageIndex,
+    pageSize: this.pageSize,
+    filters: this.filters,
+    fixedFilters: this.options.fixedFilters
   }
 
+  // Check if apiUrl already has a '?'
+  let url = this.options.apiUrl;
+  let connector = url.includes('?') ? '&' : '?';
+  url = `${url}${connector}summary=true${queryString ? '&' + queryString.slice(1) : ''}&page=${page}&limit=${limit}`;
+
+  console.log("Making API request to:", url);
+
+  this.http.get(url).subscribe(
+    response => {
+      this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
+        this.loading = false;
+        this.rows = response['data'] || data;
+      });
+    },
+    error => {
+      console.error('Error executing URL:', url, error);
+    }
+  );
+  return url;
+}
+  
   // Clear all filters like quick period, date range, and status
   clearFilters() {
     // Reset all filter values
@@ -366,6 +459,12 @@ export class TaTableComponent implements OnDestroy {
     this.toDate = null;
     this.selectedStatus = null;
     this.selectedEmployee = null; // Clear employee filter
+    this.selectedAccountType = null;
+    this.selectedAccountId = null;
+    this.selectedGroup = null;       
+    this.selectedCategory = null;    
+    this.selectedType = null;         
+    this.selectedWarehouse = null;   
 
     // Optionally, you might want to clear other filters or reset pagination if necessary
     this.pageIndex = 1;
@@ -400,7 +499,63 @@ export class TaTableComponent implements OnDestroy {
   }
 
   // Generate query string for the API call based on the applied filters
-  generateQueryString(filters: { quickPeriod: string, fromDate: Date, toDate: Date, status: string, employee: string }): string {
+  // generateQueryString(filters: { quickPeriod: string, fromDate: Date, toDate: Date, status: string, employee: string, group:string,category:string,type:string,warehouse:string }): string {
+  //   const queryParts: string[] = [];
+
+  //   // Add filter for 'fromDate' if available
+  //   if (filters.fromDate) {
+  //     const fromDateStr = this.formatDate(filters.fromDate);
+  //     queryParts.push(`created_at_after=${encodeURIComponent(fromDateStr)}`);
+  //   }
+
+  //   // Add filter for 'toDate' if available
+  //   if (filters.toDate) {
+  //     const toDateStr = this.formatDate(filters.toDate);
+  //     queryParts.push(`created_at_before=${encodeURIComponent(toDateStr)}`);
+  //   }
+
+  //   // Add filter for status if available
+  //   if (filters.status) {
+  //     queryParts.push(`status_name=${encodeURIComponent(filters.status)}`);
+  //   }
+
+  //   // Add filter for status if available
+  //   if (filters.employee) {
+  //     queryParts.push(`employee_id=${encodeURIComponent(filters.employee)}`);
+  //   }
+
+  //   if (filters.group) {
+  //     queryParts.push(`group_id=${encodeURIComponent(filters.group)}`);
+  //   }
+  //   if (filters.category) {
+  //     queryParts.push(`category_id=${encodeURIComponent(filters.category)}`);
+  //   }
+  //   if (filters.type) {
+  //     queryParts.push(`type_id=${encodeURIComponent(filters.type)}`);
+  //   }
+  //   if (filters.warehouse) {
+  //     queryParts.push(`warehouse_id=${encodeURIComponent(filters.warehouse)}`);
+  //   }
+
+
+  //   // Return the query string by joining all the filters
+  //   // return '?' + queryParts.join('&'); 
+  //   // Return the query string by joining all the filters
+  //   // return '?&' + queryParts.join('&');
+  //    return queryParts.length ? '&' + queryParts.join('&') : '';
+  // }
+
+  generateQueryString(filters: { 
+    quickPeriod?: string | null, 
+    fromDate?: Date | null, 
+    toDate?: Date | null, 
+    status?: string | null, 
+    employee?: string | number | null, 
+    group?: string | number | null, 
+    category?: string | number | null, 
+    type?: string | number | null, 
+    warehouse?: string | number | null 
+    }): string {
     const queryParts: string[] = [];
 
     // Add filter for 'fromDate' if available
@@ -425,10 +580,25 @@ export class TaTableComponent implements OnDestroy {
       queryParts.push(`employee_id=${encodeURIComponent(filters.employee)}`);
     }
 
-    // Return the query string by joining all the filters
-    // return '?&' + queryParts.join('&');
-    return '?' + queryParts.join('&'); //before, it returns a string starting with "?&",which then gets concatenated to your API URL and ends up creating an extra "?". Now, fix this by modifying the function.
-  }
+    if (filters.group) {
+      queryParts.push(`product_group_id=${encodeURIComponent(filters.group.toString())}`);
+    }
+
+    if (filters.category) {
+      queryParts.push(`category_id=${encodeURIComponent(filters.category.toString())}`);
+    }
+
+    if (filters.type) {
+      queryParts.push(`type_id=${encodeURIComponent(filters.type.toString())}`);
+    }
+
+    if (filters.warehouse) {
+      queryParts.push(`warehouse_id=${encodeURIComponent(filters.warehouse.toString())}`);
+    }
+
+    return queryParts.length ? '&' + queryParts.join('&') : '';
+    }
+
   formatDate(date: Date): string {
     // Format date as 'yyyy-MM-dd'
     const year = date.getFullYear();
@@ -437,34 +607,34 @@ export class TaTableComponent implements OnDestroy {
     return `${year}-${month}-${day}`;
   }
 
-  downloadData(event: any) {
-    const tableParamConfig: TaParamsConfig = {
-      apiUrl: this.options.apiUrl,
-      pageIndex: this.pageIndex,
-      pageSize: this.pageSize,
-    }
+  // Also update downloadData to use the same logic
+downloadData(event: any) {
+  const tableParamConfig: TaParamsConfig = {
+    apiUrl: this.options.apiUrl,
+    pageIndex: this.pageIndex,
+    pageSize: this.pageSize,
+  }
 
-    this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
-      this.loading = false;
-      const full_path = this.options.apiUrl
-      const name_of_file = full_path.split('/')[1]
-      let fullUrl = `${this.options.apiUrl}`;
-      const query = this.applyFilters()
-      if (query.length > 1) {
-        fullUrl = `${fullUrl}${query}&`
-      }
+  this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
+    this.loading = false;
+    const full_path = this.options.apiUrl
+    const name_of_file = full_path.split('/')[1]
+    let url = full_path;
+    let connector = url.includes('?') ? '&' : '?';
+    const query = this.applyFilters();
+    url = `${url}${connector}summary=true${query ? '&' + query.split('?')[1] : ''}&download=excel`;
 
-      const download_url = `${fullUrl}download/excel/`
-      this.http.get(download_url, { responseType: 'blob' }).subscribe((blob: Blob) => {
-        const a = document.createElement('a');
-        const objectUrl = URL.createObjectURL(blob);
-        a.href = objectUrl;
-        a.download = `${name_of_file}.xlsx`
-        a.click();
-        URL.revokeObjectURL(objectUrl);
-      });
-    })
-  };
+    const download_url = url;
+    this.http.get(download_url, { responseType: 'blob' }).subscribe((blob: Blob) => {
+      const a = document.createElement('a');
+      const objectUrl = URL.createObjectURL(blob);
+      a.href = objectUrl;
+      a.download = `${name_of_file}.xlsx`
+      a.click();
+      URL.revokeObjectURL(objectUrl);
+    });
+  })
+};
 
   searchValue = '';
   visible = false;
@@ -501,6 +671,8 @@ export class TaTableComponent implements OnDestroy {
     });
   }
 
+
+
   ngOnInit(): void {
     // // console.log('table otpions', this.options);
     this.options.checkedRows = [];
@@ -526,6 +698,8 @@ export class TaTableComponent implements OnDestroy {
     if (this.isAccountLedgerPage) {
       this.loadAccounts();
     }
+
+    
     // console.log('Current URL:', currentUrl); 
     const visibleUrls = [
       '/admin/purchase',
@@ -545,10 +719,14 @@ export class TaTableComponent implements OnDestroy {
       '/admin/reports/customer-reports',
       '/admin/reports/ledgers-reports',
       '/admin/finance/account-ledger',
-      '/admin/finance/expense-item'
+      '/admin/finance/expense-item',
     ]
     this.loadStatuses();
     this.loadEmployees();
+    this.loadGroups();
+    this.loadCategories();
+    this.loadTypes();
+    this.loadWarehouses();
 
     // Show status filter for specific URLs    
     this.isButtonVisible = visibleUrls.includes(currentUrl);
@@ -559,7 +737,11 @@ export class TaTableComponent implements OnDestroy {
       '/admin/employees',// Added employees URL
       '/admin/hrms/employee-leave-balance',
       '/admin/finance/account-ledger',
-      '/admin/finance/expense-item'
+      '/admin/finance/expense-item',
+      '/admin/inventory',
+      
+      
+
     ];
     this.isStatusButtonVisible = !hideStatusUrls.includes(currentUrl);
 
@@ -571,6 +753,11 @@ export class TaTableComponent implements OnDestroy {
     ];
     this.isEmployeeFilterVisible = employeeFilterUrls.includes(currentUrl);
 
+    const productFilterUrls = ['/admin/products',];
+    this.isProductFilterVisible = productFilterUrls.includes(currentUrl);
+    const inventoryFilterUrls = ['/admin/inventory'];  
+    this.isInventoryFilterVisible = inventoryFilterUrls.includes(currentUrl);
+   
     // // Check if current URL is '/admin/hrms/employee-attendance' to show employee filter
     // this.isEmployeeFilterVisible = currentUrl === '/admin/hrms/employee-attendance';
 

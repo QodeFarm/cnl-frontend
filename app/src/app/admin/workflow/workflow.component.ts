@@ -21,7 +21,7 @@ export class WorkflowComponent {
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
-    this.showWorkflowList = false;
+    this.showWorkflowList = true;
     this.showForm = false;
     this.workflowEditID = null;
     // Initialize form configuration
@@ -45,10 +45,18 @@ export class WorkflowComponent {
         this.formConfig.pkId = 'workflow_id';
         this.formConfig.submit.label = 'Update';
         this.formConfig.model['workflow_id'] = this.workflowEditID;
+
+        this.showWorkflowList = false;
         this.showForm = true;
       }
     });
     this.hide();
+  }
+
+  backToList() {
+    this.showForm = false;
+    this.showWorkflowList = true;
+    this.WorkflowListComponent?.refreshTable(); // reload the list
   }
 
   // Show workflow list modal

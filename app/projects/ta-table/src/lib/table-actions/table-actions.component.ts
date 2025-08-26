@@ -30,6 +30,9 @@ export class TableActionsComponent implements OnInit {
     if (a.conditionFn) {
       return a.conditionFn(this.row, a);
     }
+    if (a.isVisible) {
+      return a.isVisible(this.row);
+    }
     return true;
   }
 }

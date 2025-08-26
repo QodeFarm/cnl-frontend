@@ -200,6 +200,7 @@
                             <li><a [routerLink]="['/admin/master/warehouse-locations']">Warehouse Locations</a></li>
                             <li><a [routerLink]="['/admin/master/package-units']">Pack Units</a></li>
                             <li><a [routerLink]="['/admin/master/g-package-units']">GPack Units</a></li>
+                            <li><a [routerLink]="['/admin/master/item-master']">Product Mode</a></li>
                         </ul>
                     </div>
                 </div>
@@ -256,6 +257,9 @@
                         <ng-container *ngSwitchCase="'g-package-units'">
                             <app-g-package-units></app-g-package-units>
                         </ng-container>
+                        <ng-container *ngSwitchCase="'item-master'">
+                            <app-item-master></app-item-master>
+                        </ng-container>    
                     </ng-container>
 
                 </div>

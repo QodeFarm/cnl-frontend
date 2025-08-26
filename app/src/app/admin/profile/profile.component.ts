@@ -176,23 +176,23 @@ export class ProfileComponent {
                   required: false,
                 }
               },
-              {
-                key: 'status',
-                type: 'status-dropdown',
-                className: 'col-md-4 col-sm-6 col-12',
-                templateOptions: {
-                  label: 'Status',
-                  // bindId: true,
-                  dataKey: 'status_name',
-                  dataLabel: "status_name",
-                  options: [],
-                  // required: true,
-                  lazy: {
-                    url: 'masters/statuses/',
-                    lazyOneTime: true
-                  }
-                }
-              },
+              // {
+              //   key: 'status',
+              //   type: 'select',
+              //   className: 'col-md-4 col-sm-6 col-12',
+              //   templateOptions: {
+              //     label: 'Status',
+              //     // bindId: true,
+              //     dataKey: 'status_name',
+              //     dataLabel: "status_name",
+              //     options: [],
+              //     // required: true,
+              //     lazy: {
+              //       url: 'masters/statuses/',
+              //       lazyOneTime: true
+              //     }
+              //   }
+              // },
             ]
           },
 

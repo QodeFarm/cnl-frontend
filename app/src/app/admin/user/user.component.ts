@@ -48,7 +48,25 @@ export class UserComponent {
           name: 'Mobile No.',
           sort: true
         },
-        {
+        // {
+        //   fieldKey: "code",
+        //   name: "Action",
+        //   type: 'action',
+        //   actions: [
+        //     {
+        //       type: 'delete',
+        //       label: 'Delete',
+        //       confirm: true,
+        //       confirmMsg: "Sure to delete?",
+        //       apiUrl: 'users/create_user'
+        //     },
+        //     {
+        //       type: 'edit',
+        //       label: 'Edit'
+        //     }
+        //   ]
+        // }
+         {
           fieldKey: "code",
           name: "Action",
           type: 'action',
@@ -58,7 +76,13 @@ export class UserComponent {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
-              apiUrl: 'users/create_user'
+              apiUrl: 'users/create_user',
+              isVisible: (row: any) => {
+                // Get logged in user details
+                const loggedInUser = this.taLocal.getItem('user');
+                // Hide delete if current row is admin user
+                return row.role?.role_name !== 'Admin';
+              }
             },
             {
               type: 'edit',
@@ -355,7 +379,11 @@ export class UserComponent {
   ngOnInit(): void {
     const user = this.taLocal.getItem('user');
     if (user && user.user_id) {
-      this.curdConfig.tableConfig.apiUrl = `users/user?exclude_id=${user.user_id}`;
+        // This component shows all users including the admin (logged in user)
+        // But prevents deletion of the logged in user and any user with Admin role
+        this.curdConfig.tableConfig.apiUrl = 'users/user';
+        // Uncomment the line below if you want to exclude the logged-in user from the list
+      // this.curdConfig.tableConfig.apiUrl = `users/user?exclude_id=${user.user_id}`;
     }
   }
 }

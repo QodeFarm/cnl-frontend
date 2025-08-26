@@ -105,3 +105,252 @@
         color: #142768;
     }
 }
+
+.reminder-item {
+  display: block;   /* makes each item go to a new line */
+  margin-bottom: 5px; /* optional spacing between items */
+}
+
+.reminder-item {
+  padding: 6px 8px;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.reminder-item:last-child {
+  border-bottom: none;
+}
+
+.reminder-link {
+  display: block;
+  text-decoration: none;
+  color: #333;
+}
+
+.reminder-link:hover {
+  background-color: #f8f9fa;
+  border-radius: 4px;
+}
+
+.reminder-subject {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.reminder-date {
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.unread-box {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.unread-box:hover {
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+// .read-box {
+//   background: #f9f9f9;
+//   border: 1px solid #ddd;
+//   padding: 10px 12px;
+//   margin-bottom: 8px;
+//   border-radius: 6px;
+//   cursor: pointer;
+// }
+
+.subject-text {
+  color: #000; /* black subject text */
+}
+
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.3); /* dim effect */
+  z-index: 1040; /* below dropdown but above form */
+}
+.dropdown-menu.show {
+  display: block;
+}
+
+// /* Overlay */
+// .modal-overlay {
+//   position: fixed;
+//   top: 0;
+//   left: 0;
+//   width: 100%;
+//   height: 100%;
+//   background: rgba(0,0,0,0.5); /* dim background */
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   z-index: 1050; /* above navbar */
+// }
+
+/* Modal box */
+// .modal-box {
+//   background: #fff;
+//   width: 400px;
+//   max-height: 80vh;
+//   overflow-y: auto;
+//   border-radius: 10px;
+//   animation: fadeIn 0.3s ease-in-out;
+// }
+
+// .modal-header {
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+//   border-bottom: 1px solid #dee2e6;
+//   padding: 10px 15px;
+// }
+
+// .modal-body {
+//   padding: 15px;
+// }
+
+/* Unread Reminder */
+.unread-box {
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin: 5px 0;
+  box-shadow: 0px 4px 6px rgba(0,0,0,0.15);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+.unread-box:hover {
+  background: #e9ecef;
+}
+
+// /* Read Reminder */
+// .read-box {
+//   background: #ffffff;
+//   border-radius: 8px;
+//   margin: 5px 0;
+//   cursor: pointer;
+// }
+
+/* Subject always black */
+.subject-text {
+  color: #000;
+  font-weight: 600;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+
+/* Unread Reminder */
+.unread-box {
+  background: #f8f9fa;
+  border: 2px solid #0d2c7a;   /* Blue border */
+  border-radius: 8px;
+  margin: 5px 0;
+  box-shadow: 0px 4px 6px rgba(0,0,0,0.15);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+// .unread-box:hover {
+//   background: #e9ecef;
+// }
+
+/* Read Reminder */
+.read-box {
+  background: #ffffff;
+  border: 2px solid #0d2c7a;   /* Same blue border */
+  border-radius: 8px;
+  margin: 5px 0;
+  cursor: pointer;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent; /* remove dim background if you want dropdown style */
+  z-index: 1050;
+  pointer-events: none; /* let clicks pass except modal */
+}
+
+/* Modal Box under bell icon */
+.modal-box {
+  position: absolute;
+  top: 50px; /* adjust: space below the navbar height */
+  right: 20px; /* adjust: aligns with bell icon */
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden; 
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  pointer-events: auto; /* keep clickable */
+}
+
+/* Modal Body */
+.modal-body {
+  padding: 16px;
+}
+
+
+/* Reminder Items */
+.unread-box {
+  background: #f8f9fa;
+//   border: 2px solid #0d6efd;  /* 👈 blue border for each reminder */
+  border-radius: 8px;
+  margin: 5px 0;
+  padding: 8px;
+  box-shadow: 0px 2px 4px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.read-box {
+  background: #ffffff;
+  border: 2px solid #0d6efd;  /* 👈 keep same border color for consistency */
+  border-radius: 8px;
+  margin: 5px 0;
+  padding: 8px;
+}
+
+.subject-text {
+  color: #000;
+  font-weight: 600;
+}
+
+/* Modal Header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #0c3470; /* 👈 theme blue background */
+  color: #fff;              /* white text */
+//   border-top-left-radius: 10px;
+//   border-top-right-radius: 10px;
+}
+
+.modal-title {
+  font-weight: bold;
+  margin: 0;
+  color: #fff; /* keep text white */
+}
+
+/* Close button */
+.modal-header .btn-close {
+  filter: brightness(0) invert(1); /* makes the close icon white */
+}

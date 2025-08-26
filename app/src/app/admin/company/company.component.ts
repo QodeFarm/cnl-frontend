@@ -59,8 +59,8 @@ export class CompanyComponent {
                 type: 'file',
                 className: 'ta-cell col-12 d-sm-none d-block',
                 templateOptions: {
-                  label: 'Logo',
-                  placeholder: 'Upload',
+                  label: 'Company Logo',
+                  placeholder: 'Upload logo',
                   // required: true
                 }
               },
@@ -69,8 +69,8 @@ export class CompanyComponent {
                 type: 'input',
                 className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
-                  label: 'Name',
-                  placeholder: 'Enter name',
+                  label: 'Company Name',
+                  placeholder: 'Enter company name',
                   required: true,
                 }
               },
@@ -79,7 +79,7 @@ export class CompanyComponent {
                 type: 'input',
                 className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
-                  label: 'Print name',
+                  label: 'Print Name',
                   placeholder: 'Enter print name',
                   required: true,
                 }
@@ -89,7 +89,7 @@ export class CompanyComponent {
                 type: 'input',
                 className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
-                  label: 'Short name',
+                  label: 'Short Name',
                   placeholder: 'Enter short name',
                   required: false,
                 }
@@ -100,7 +100,7 @@ export class CompanyComponent {
                 className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Phone',
-                  placeholder: 'Enter number',
+                  placeholder: 'Enter phone number',
                   required: false,
                 }
               },
@@ -119,8 +119,8 @@ export class CompanyComponent {
                 type: 'input',
                 className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
-                  label: 'Code',
-                  placeholder: 'Enter code',
+                  label: 'Company Code',
+                  placeholder: 'Enter company code',
                   required: false,
                 }
               },
@@ -129,8 +129,8 @@ export class CompanyComponent {
                 type: 'input',
                 className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
-                  label: 'Num branches',
-                  placeholder: 'Enter number',
+                  label: 'Number of Branches',
+                  placeholder: 'Enter number of branches',
                   required: false,
                 }
               },
@@ -139,8 +139,8 @@ export class CompanyComponent {
                 type: 'input',
                 className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
-                  label: 'Num employees',
-                  placeholder: 'Enter number',
+                  label: 'Number of Employees',
+                  placeholder: 'Enter number of employees',
                   required: false,
                 }
               },
@@ -149,8 +149,8 @@ export class CompanyComponent {
                 type: 'input',
                 className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
-                  label: 'Pin code',
-                  placeholder: 'Enter pin code',
+                  label: 'PIN Code',
+                  placeholder: 'Enter PIN code',
                   required: false,
                 }
               },
@@ -223,7 +223,7 @@ export class CompanyComponent {
                 className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Website',
-                  placeholder: 'Enter URL',
+                  placeholder: 'Enter website URL',
                   required: false,
                 }
               },
@@ -233,10 +233,11 @@ export class CompanyComponent {
                 className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Facebook URL',
-                  placeholder: 'Enter URL',
+                  placeholder: 'Enter Facebook URL',
                   required: false,
                 }
               },
+              /* Removed as per requirements
               {
                 key: 'skype_id',
                 type: 'input',
@@ -257,13 +258,14 @@ export class CompanyComponent {
                   required: false,
                 }
               },
+              */
               {
                 key: 'pan',
                 type: 'input',
                 className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'PAN',
-                  placeholder: 'Enter pan',
+                  placeholder: 'Enter PAN number',
                   required: false,
                 }
               },
@@ -273,7 +275,7 @@ export class CompanyComponent {
                 className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'TAN',
-                  placeholder: 'Enter tan',
+                  placeholder: 'Enter TAN number',
                   required: false,
                 }
               },
@@ -283,7 +285,7 @@ export class CompanyComponent {
                 className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'CIN',
-                  placeholder: 'Enter cin',
+                  placeholder: 'Enter CIN number',
                   required: false,
                 }
               },
@@ -293,11 +295,12 @@ export class CompanyComponent {
                 className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'GST TIN',
-                  placeholder: 'Enter gst tin',
+                  placeholder: 'Enter GST TIN number',
                   required: false,
                 }
               },
-              {
+              /* Removed as per requirements
+                {
                   key: 'esi_no',
                   type: 'input',
                   className: 'col-lg-3 col-md-4 col-sm-6 col-12',
@@ -317,16 +320,18 @@ export class CompanyComponent {
                     required: false,
                   }
                 },
+                */
                 {
                   key: 'authorized_person',
                   type: 'input',
                   className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                   templateOptions: {
-                    label: 'Authorized person',
+                    label: 'Authorized Person',
                     placeholder: 'Enter name',
                     required: false,
                   }
                 },
+                /* Removed as per requirements
                 {
                   key: 'iec_code',
                   type: 'input',
@@ -337,6 +342,8 @@ export class CompanyComponent {
                     required: false,
                   }
                 },
+                */
+                /* Removed as per requirements
                 {
                   key: 'eway_username',
                   type: 'input',
@@ -377,13 +384,14 @@ export class CompanyComponent {
                     required: false,
                   }
                 },
+                */
                 {
                   key: 'vat_gst_status',
                   type: 'select',
                   className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                   templateOptions: {
-                    label: 'Vat GST status',
-                    placeholder: 'select',
+                    label: 'VAT/GST Status',
+                    placeholder: 'Select status',
                     required: false,
                     options: [
                       { value: 'Active', label: 'Active' },
@@ -397,8 +405,8 @@ export class CompanyComponent {
                   type: 'select',
                   className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                   templateOptions: {
-                    label: 'GST type',
-                    placeholder: 'select',
+                    label: 'GST Type',
+                    placeholder: 'Select type',
                     required: false,
                     options: [
                       { value: 'Goods', label: 'Goods' },
@@ -413,10 +421,11 @@ export class CompanyComponent {
                   className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'Marketplace URL',
-                    placeholder: 'Enter URL',
+                    placeholder: 'Enter marketplace URL',
                     required: false,
                   }
                 },
+                /* Removed as per requirements
                 {
                   key: 'drug_license_no',
                   type: 'input',
@@ -427,13 +436,14 @@ export class CompanyComponent {
                     required: false,
                   }
                 },
+                */
                 {
                   key: 'address',
                   type: 'textarea',
                   className: 'col-md-6 col-12',
                   templateOptions: {
-                    label: 'Address',
-                    placeholder: 'Enter address',
+                    label: 'Company Address',
+                    placeholder: 'Enter company address',
                     required: false,
                   }
                 },
@@ -442,21 +452,21 @@ export class CompanyComponent {
                   type:  'textarea',
                   className: 'col-md-6 col-12',
                   templateOptions: {
-                    label: 'Print Address',
-                    placeholder: 'Enter address',
+                    label: 'Billing Address',
+                    placeholder: 'Enter address for billing/printing',
                     required: false,
                   }
                 },
                 {
                   key: 'turnover_less_than_5cr',
                   type: 'checkbox',
-                  className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                  className: 'col-lg-6 col-md-6 col-sm-6 col-12',
                   templateOptions: {
-                    label: 'Turnover less than 5cr',
-                    placeholder: 'Enter Name',
+                    label: 'Turnover Less Than 5 Crores',
                     required: false,
                   }
                 },
+                /* Removed as per requirements
                 {
                   key: 'einvoice_approved_only',
                   type: 'checkbox',
@@ -477,6 +487,7 @@ export class CompanyComponent {
                     required: false,
                   }
                 },
+                */
               ]
             },
 
@@ -487,33 +498,34 @@ export class CompanyComponent {
                 {
                   key: 'logo',
                   type: 'file',
-                  className: 'ta-cell col-12 d-sm-block d-none',
+                  className: 'ta-cell col-12 d-sm-block d-none mb-4',
                   templateOptions: {
-                    label: 'Logo',
-                    placeholder: 'Upload',
+                    label: 'Company Logo',
+                    placeholder: 'Upload logo',
                     // required: true
                   }
                 },
                 {
                   key: 'linkedin_url',
                   type: 'input',
-                  className: 'col-12 mt-',
+                  className: 'col-12 mt-3',
                   templateOptions: {
-                    label: 'Linkedin URL',
-                    placeholder: 'Enter Name',
+                    label: 'LinkedIn URL',
+                    placeholder: 'Enter LinkedIn URL',
                     required: false,
                   }
                 },
                 {
                   key: 'establishment_code',
                   type: 'input',
-                  className: 'col-12 mt-',
+                  className: 'col-12 mt-3',
                   templateOptions: {
-                    label: 'Establishment code',
-                    placeholder: 'Enter code',
+                    label: 'Establishment Code',
+                    placeholder: 'Enter establishment code',
                     required: false,
                   }
                 },
+                /* Removed as per requirements - Longitude and Latitude
                 {
                   key: 'longitude',
                   type: 'input',
@@ -534,16 +546,18 @@ export class CompanyComponent {
                     required: false,
                   }
                 },
+                */
                 {
                   key: 'other_license_1',
                   type: 'input',
-                  className: 'col-12 mt-',
+                  className: 'col-12 mt-3',
                   templateOptions: {
-                    label: 'Other license 1',
-                    placeholder: 'Enter license',
+                    label: 'License Number',
+                    placeholder: 'Enter license number',
                     required: false,
                   }
                 },
+                /* Removed as per requirements - Other license 2
                 {
                   key: 'other_license_2',
                   type: 'input',
@@ -554,6 +568,7 @@ export class CompanyComponent {
                     required: false,
                   }
                 },
+                */
               ]
             }
           ]
@@ -570,7 +585,7 @@ export class CompanyComponent {
           return of(null); // Return an observable with null value
         } else {
           const id = res.data[0].company_id;
-          this.title = 'company';
+          this.title = 'Company';
           const url = `company/companies/${id}/`;
           return this.http.get(url);
         }

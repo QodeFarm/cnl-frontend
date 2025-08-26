@@ -25,6 +25,7 @@ import { WarehouseLocationsComponent } from './warehouse-locations/warehouse-loc
 import { PackageUnitsComponent } from './package-units/package-units.component';
 import { GPackageUnitsComponent } from './g-package-units/g-package-units.component';
 import { NzNotificationModule } from 'ng-zorro-antd/notification';
+import { ItemMasterComponent } from './item-master/item-master.component';
 
 
 @NgModule({
@@ -49,7 +50,8 @@ import { NzNotificationModule } from 'ng-zorro-antd/notification';
     ColorComponent,
     WarehouseLocationsComponent,
     PackageUnitsComponent,
-    GPackageUnitsComponent
+    GPackageUnitsComponent,
+    ItemMasterComponent
     // ProductsListComponent
   ],
   imports: [
@@ -79,7 +81,8 @@ import { NzNotificationModule } from 'ng-zorro-antd/notification';
     ColorComponent,
     WarehouseLocationsComponent,
     PackageUnitsComponent,
-    GPackageUnitsComponent
+    GPackageUnitsComponent,
+    ItemMasterComponent
   ]
 })
 export class ProductsModule { }
