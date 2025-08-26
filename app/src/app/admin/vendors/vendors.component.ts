@@ -339,7 +339,7 @@ export class VendorsComponent {
                     {
                       className: 'col-md-4 col-sm-6 col-12',
                       key: 'vendor_category',
-                      type: 'select',
+                      type: 'vendor-cat-dropdown',
                       templateOptions: {
                         label: 'Vendor Category',
                         dataKey: 'vendor_category_id',
@@ -365,7 +365,7 @@ export class VendorsComponent {
                     },
                     {
                       key: 'ledger_account',
-                      type: 'select',
+                      type: 'ledger-account-dropdown',
                       className: 'col-md-4 col-sm-6 col-12',
                       templateOptions: {
                         dataKey: 'ledger_account_id',
@@ -523,7 +523,7 @@ export class VendorsComponent {
                           },
                           {
                             key: 'city',
-                            type: 'select',
+                            type: 'city-dropdown',
                             templateOptions: {
                               dataKey: 'city_id',
                               dataLabel: 'city_name',
@@ -553,7 +553,7 @@ export class VendorsComponent {
                           },
                           {
                             key: 'state',
-                            type: 'select',
+                            type: 'state-dropdown',
                             templateOptions: {
                               dataKey: 'state_id',
                               dataLabel: 'state_name',
@@ -583,7 +583,7 @@ export class VendorsComponent {
                           },
                           {
                             key: 'country',
-                            type: 'select',
+                            type: 'country-dropdown',
                             templateOptions: {
                               dataKey: 'country_id',
                               dataLabel: 'country_name',
@@ -707,7 +707,7 @@ export class VendorsComponent {
                             {
                               className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                               key: 'payment_term',
-                              type: 'select',
+                              type: 'vendor-payment-dropdown',
                               templateOptions: {
                                 label: 'Payment Term',
                                 dataKey: 'payment_term_id',
@@ -892,7 +892,7 @@ export class VendorsComponent {
                             {
                               className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                               key: 'gst_category',
-                              type: 'select',
+                              type: 'gst-cat-dropdown',
                               templateOptions: {
                                 label: 'GST Category',
                                 dataKey: 'gst_category_id',
@@ -990,7 +990,7 @@ export class VendorsComponent {
                             {
                               className: 'col-md-4 col-sm-6 col-12',
                               key: 'transporter',
-                              type: 'select',
+                              type: 'transport-dropdown',
                               templateOptions: {
                                 label: 'Transporter',
                                 dataKey: 'transporter_id',
@@ -1080,7 +1080,7 @@ export class VendorsComponent {
                     {
                       className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                       key: 'firm_status',
-                      type: 'select',
+                      type: 'firm-status-dropdown',
                       templateOptions: {
                         label: 'Firm Status',
                         dataKey: 'firm_status_id',
@@ -1118,7 +1118,7 @@ export class VendorsComponent {
                     {
                       className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                       key: 'territory',
-                      type: 'select',
+                      type: 'territory-dropdown',
                       templateOptions: {
                         label: 'Territory',
                         dataKey: 'territory_id',

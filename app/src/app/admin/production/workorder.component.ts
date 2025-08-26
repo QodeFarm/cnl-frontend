@@ -1821,7 +1821,7 @@ closeSyncModal() {
                       fieldGroup: [
                         {
                           key: 'machine',
-                          type: 'select',
+                          type: 'machine-dropdown',
                           className: 'col',
                           templateOptions: {
                             label: 'Machine',

@@ -2290,7 +2290,7 @@ async autoFillProductDetails(field, data) {
                             },
                             {
                               key: 'gst_type',
-                              type: 'select',
+                              type: 'gst-types-dropdown',
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 label: 'Gst type',
@@ -2320,7 +2320,7 @@ async autoFillProductDetails(field, data) {
                             },
                             {
                               key: 'payment_term',
-                              type: 'select',
+                              type: 'customer-payment-dropdown',
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 label: 'Payment term',
@@ -2349,7 +2349,7 @@ async autoFillProductDetails(field, data) {
                             },
                             {
                               key: 'ledger_account',
-                              type: 'select',
+                              type: 'ledger-account-dropdown',
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 label: 'Ledger account',
@@ -2379,7 +2379,7 @@ async autoFillProductDetails(field, data) {
                             },
                             {
                               key: 'order_status',
-                              type: 'select',
+                              type: 'order-status-dropdown',
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 label: 'Order status',

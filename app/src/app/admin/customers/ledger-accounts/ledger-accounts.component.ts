@@ -232,7 +232,7 @@ export class LedgerAccountsComponent {
             },
             {
               key: 'ledger_group',
-              type: 'select',
+              type: 'ledger-group-dropdown',
               className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'Ledger Group',

@@ -86,7 +86,7 @@ export class UserGroupMembersComponent {
           fieldGroup: [                  
             {
               key: 'group',
-              type: 'select',
+              type: 'user-groups-dropdown',
               className: 'col-md-6 col-12 px-1 pb-3 pb-md-0',
               templateOptions: {
                 label: 'Groups',

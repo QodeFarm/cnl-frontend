@@ -1,4 +1,4 @@
 {
-  "baseUrl": "https://apicore.cnlerp.com/api/v1/",
+  "baseUrl": "https://apicore-demo.cnlerp.com/api/v1/",
   "cdnPath": "https://apicore.cnlerp.com/cdn/"
 }

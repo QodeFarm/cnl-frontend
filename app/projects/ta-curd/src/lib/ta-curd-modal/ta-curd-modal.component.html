@@ -6,7 +6,8 @@
 
 
 </div> -->
-<ta-table #table [options]="options.tableConfig" (doAction)="tableAction($event)" [customProductTemplate]="customProductTemplate">
+<ta-table #table [options]="options.tableConfig" (doAction)="tableAction($event)"
+    [customProductTemplate]="customProductTemplate">
     <!--Added this customProductTemplate -->
     <ng-container before-search>
         <ng-content select="[before-search]">
@@ -30,7 +31,9 @@
     </ng-container>
     <div *nzModalFooter></div>
 </nz-modal> -->
-<nz-drawer [nzClosable]="false" [nzHeight]="options.drawerHeight || '100%'" [nzWidth]="options.drawerSize || 'auto'" [nzVisible]="visible" [nzClosable]="true" [nzPlacement]="options.drawerPlacement || 'right'" [nzTitle]="formTitle" (nzOnClose)="close()">
+<nz-drawer [nzWrapClassName]="'curd-modal-form'" [nzClosable]="false" [nzHeight]="options.drawerHeight || '100%'"
+    [nzWidth]="options.drawerSize || 'auto'" [nzVisible]="visible" [nzClosable]="true"
+    [nzPlacement]="options.drawerPlacement || 'right'" [nzTitle]="formTitle" (nzOnClose)="close()">
     <ng-template nzDrawerContent>
         <ta-form *ngIf="visible" #form [options]="options.formConfig"></ta-form>
     </ng-template>

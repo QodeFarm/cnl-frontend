@@ -76,7 +76,7 @@ export class CitiesComponent {
           fieldGroup: [
             {
               key: 'state',
-              type: 'select',
+              type: 'state-dropdown',
               className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'State',
