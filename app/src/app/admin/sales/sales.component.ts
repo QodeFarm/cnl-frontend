@@ -991,6 +991,7 @@ export class SalesComponent {
   isAmountModalOpen: boolean = false; // Controls Amount modal
   totalAmount: number = 0; // Replace this with the actual total amount from your logic
   amountExceedMessage: string = ''; // Dynamic message for the modal
+
   updateProductInfo(currentRowIndex, product, unitData = '') {
     // Select the card wrapper element
     const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
@@ -1041,10 +1042,13 @@ export class SalesComponent {
     // Construct the final payload
     const payload = {
       ...this.formConfig.model,
-      // custom_field: customFieldsPayload.custom_field, // Dictionary of custom fields
       custom_field_values: customFieldsPayload.custom_field_values // Array of custom field values
     };
 
+    if (!payload) {
+      this.showDialog(); // Stop execution if required fields are missing
+    }
+  
     this.http.post('sales/sale_order/', payload)
       .subscribe(response => {
         this.showSuccessToast = true;
@@ -1054,7 +1058,10 @@ export class SalesComponent {
           this.showSuccessToast = false;
         }, 3000); // Hide toast after 3 seconds
       }, error => {
-        console.error('Error creating record:', error);
+        if (error.status === 400) { 
+          this.showDialog();
+        }
+        // console.error('Error creating record:', error);
       });
   }
 

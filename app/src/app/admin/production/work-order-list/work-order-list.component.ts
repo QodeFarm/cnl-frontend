@@ -127,6 +127,13 @@ export class WorkOrderListComponent {
             apiUrl: 'production/work_order'
           },
           {
+            type: 'restore',
+            label: 'Restore',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
+            apiUrl: 'production/work_order'
+          },
+          {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',

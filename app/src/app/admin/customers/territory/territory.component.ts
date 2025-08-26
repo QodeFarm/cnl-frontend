@@ -46,6 +46,13 @@ export class TerritoryComponent {
               apiUrl: 'masters/territory'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/territory'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }

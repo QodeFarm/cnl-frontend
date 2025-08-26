@@ -52,6 +52,13 @@ export class RolesComponent {
               apiUrl: 'users/role'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'users/role'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             },

@@ -45,6 +45,13 @@ export class VendorCategoryComponent {
               apiUrl: 'vendors/vendor_category'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'vendors/vendor_category'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             },

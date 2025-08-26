@@ -97,6 +97,13 @@ export class TasksListComponent {
             confirmMsg: "Sure to delete?",
           },
           {
+            type: 'restore',
+            label: 'Restore',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
+            apiUrl: 'tasks/task',
+          },
+          {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',

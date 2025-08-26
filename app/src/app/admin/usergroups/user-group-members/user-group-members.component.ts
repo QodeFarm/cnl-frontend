@@ -57,6 +57,13 @@ export class UserGroupMembersComponent {
               apiUrl: 'masters/user_group_members'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/user_group_members'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }

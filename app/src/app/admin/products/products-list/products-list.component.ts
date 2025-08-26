@@ -198,6 +198,13 @@ export class ProductsListComponent {
             apiUrl: 'products/products'
           },
           {
+            type: 'restore',
+            label: 'Restore',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
+            apiUrl: 'products/products'
+          },
+          {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',

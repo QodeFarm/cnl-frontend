@@ -65,6 +65,13 @@ export class QuickpacksListComponent {
             apiUrl: 'sales/quick_pack'
           },
           {
+            type: 'restore',
+            label: 'Restore',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
+            apiUrl: 'sales/quick_pack'
+          },
+          {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',

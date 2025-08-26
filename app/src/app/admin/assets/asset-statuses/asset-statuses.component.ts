@@ -41,6 +41,13 @@ export class AssetStatusesComponent {
               apiUrl: this.baseUrl + 'assets/asset_statuses'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: this.baseUrl + 'assets/asset_statuses'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }

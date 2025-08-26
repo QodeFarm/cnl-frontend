@@ -74,6 +74,13 @@ export class SizeComponent {
               apiUrl: 'products/sizes'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'products/sizes'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }

@@ -51,6 +51,13 @@ export class CitiesComponent {
               apiUrl: 'masters/city'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/city'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }

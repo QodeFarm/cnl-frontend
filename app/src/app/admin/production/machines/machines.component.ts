@@ -51,6 +51,13 @@ export class MachinesComponent {
               apiUrl: 'production/machines'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'production/machines'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }

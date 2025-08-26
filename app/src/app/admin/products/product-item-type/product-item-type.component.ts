@@ -110,6 +110,13 @@ export class ProductItemTypeComponent {
             apiUrl: 'api/masters'
           },
           {
+            type: 'restore',
+            label: 'Restore',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
+            apiUrl: 'api/masters'
+          },
+          {
             type: 'callBackFn',
             label: 'Edit',
             // callBackFn: (row, action) => {

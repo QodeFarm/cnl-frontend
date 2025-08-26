@@ -65,6 +65,13 @@ export class CustomerPaymentTermsComponent {
               apiUrl: 'masters/customer_payment_terms'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/customer_payment_terms'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }

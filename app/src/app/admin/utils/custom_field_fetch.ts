@@ -257,6 +257,63 @@ export class CustomFieldHelper {
       console.log("Updated Form Config:", formConfig);
     }
 
+  static addCustomFieldsToFormConfig_3(customFields: any[], customFieldMetadata: any, formConfig: any) {
+    console.log("Custom Fields to Add:", customFields);
+
+    const customFieldConfigs = customFields.map((field: any) => {
+      const key = field.custom_field_id?.toLowerCase?.() || '';
+      const fieldMetadata = customFieldMetadata?.[key] || {};
+
+      return {
+        key: key,
+        type: (fieldMetadata.options && Array.isArray(fieldMetadata.options) && fieldMetadata.options.length > 0)
+          ? 'select'
+          : 'input',
+        className: 'col-md-4',
+        defaultValue: formConfig?.model?.custom_field_values?.[key] || '',
+        templateOptions: {
+          label: field.field_name || '',
+          placeholder: field.field_name || '',
+          required: fieldMetadata.is_required || false,
+          options: Array.isArray(fieldMetadata.options) ? fieldMetadata.options : [],
+        },
+      };
+    });
+
+    console.log('Final Custom Field Config:', customFieldConfigs);
+
+    // Add visible section for custom fields
+    formConfig.fields[2].fieldGroup = [
+      ...formConfig.fields[2].fieldGroup,
+      {
+        className: 'col-12 custom-form-card-block p-0',
+        fieldGroupClassName: 'row m-0 pr-0',
+        props: { label: 'Custom Fields' },
+        fieldGroup: [
+          {
+            className: 'col-9 p-0',
+            key: 'custom_field_values',
+            fieldGroupClassName: "ant-row mx-0 row align-items-end mt-2",
+            fieldGroup: customFieldConfigs
+          },
+        ]
+      },
+    ];
+
+    // Add hidden field for storing values
+    formConfig.fields = [
+      ...formConfig.fields,
+      {
+        key: 'custom_field_values',
+        fieldGroup: customFieldConfigs,
+        hide: true
+      },
+    ];
+
+    console.log("Updated Form Config:", formConfig);
+  }
+
+
     static constructCustomFieldsPayload(customFieldValues: any, entityName: string, customId: string | null) {
       if (!customFieldValues) {
         console.warn('No custom field values provided.');

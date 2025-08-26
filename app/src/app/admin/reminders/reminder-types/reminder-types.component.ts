@@ -38,6 +38,13 @@ export class ReminderTypesComponent {
               apiUrl: 'reminders/reminder_types'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'reminders/reminder_types'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }

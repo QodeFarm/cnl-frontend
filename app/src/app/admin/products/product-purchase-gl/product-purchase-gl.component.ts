@@ -110,6 +110,13 @@ export class ProductPurchaseGlComponent {
               apiUrl: 'products/product_purchase_gl'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'products/product_purchase_gl'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }

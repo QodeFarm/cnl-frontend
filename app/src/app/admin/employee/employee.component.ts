@@ -362,6 +362,13 @@ export class EmployeeComponent implements OnInit {
             apiUrl: 'api/users'
           },
           {
+            type: 'restore',
+            label: 'Restore',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
+            apiUrl: 'api/users'
+          },
+          {
             type: 'callBackFn',
             label: 'Edit',
             callBackFn: (row, action) => {

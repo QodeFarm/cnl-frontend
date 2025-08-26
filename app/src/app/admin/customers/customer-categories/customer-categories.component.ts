@@ -43,11 +43,19 @@ curdConfig: TaCurdConfig = {
               apiUrl: 'masters/customer_categories'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/customer_categories'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }
           ]
         }
+
       ]
     },
     formConfig: {

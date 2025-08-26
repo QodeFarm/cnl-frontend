@@ -109,6 +109,13 @@ export class ProductDrugTypesComponent {
             apiUrl: 'api/masters'
           },
           {
+            type: 'restore',
+            label: 'Restore',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
+            apiUrl: 'api/masters'
+          },
+          {
             type: 'callBackFn',
             label: 'Edit',
             // callBackFn: (row, action) => {

@@ -29,6 +29,43 @@ export class TaTableService {
     }
     return null;
   }
+
+restorerow(apiUrl: string, row: any, options?: any) {
+  if (row[options.pkId]) {
+    console.log("apiUrl : ", apiUrl);
+    const payload = { is_deleted: false };
+    // Using PUT for restore – can be adjusted based on API
+    return this.http.patch(apiUrl + '/' + row[options.pkId], payload);
+  }
+  return null;
+}
+
+onAction(event: any) {
+  if (event.action.type === 'restore') {
+    this.restoreRecord(event.row.id, event.action.apiUrl);
+  }
+}
+
+restoreRecord(id: string, apiUrl: string) {
+  // Step 1: Get existing record details
+  this.http.get(`masters/customer_categories/${id}/`).subscribe((existingData: any) => {
+    console.log("existingData : ", existingData)
+    // Step 2: Change only is_deleted to false
+    const updatedData = { ...existingData, is_deleted: false };
+
+    // Step 3: Send PUT request with updated data
+    this.http.patch(`masters/customer_categories/${id}/`, { is_deleted: false }).subscribe({
+      next: (res) => {
+        console.log("Record restored successfully", res);
+        // this.loadData(); // reload your table after restore
+      },
+      error: (err) => {
+        console.error("Error restoring record", err);
+      }
+    });
+  });
+}
+
   getParamsQuery(qParams: TaParamsConfig): string {
     let queryString = RequestQueryBuilder.create();
     // RequestQueryBuilder.setOptions({

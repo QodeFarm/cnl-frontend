@@ -43,6 +43,13 @@ export class PaymentLinkTypeComponent {
               apiUrl: 'masters/payment_link_type'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/payment_link_type'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             },
