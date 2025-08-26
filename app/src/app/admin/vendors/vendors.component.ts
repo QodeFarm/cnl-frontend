@@ -138,7 +138,9 @@ export class VendorsComponent {
     });
     // Construct payload for custom fields
     const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
-  
+    if (!customFieldsPayload) {
+        this.showDialog(); // Stop execution if required fields are missing
+      }
     // Construct the final payload for update
     const payload = {
       ...this.formConfig.model, // Array or empty

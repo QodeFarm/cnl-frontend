@@ -818,16 +818,16 @@ async autoFillProductDetails(field, data) {
     });
     // Construct payload for custom fields
     const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
-  
-    if (!customFieldsPayload) {
-      this.showDialog(); // Stop execution if required fields are missing
-    }
+    console.log("customFieldsPayload : ", customFieldsPayload);
+    // if (!customFieldsPayload) {
+    //   this.showDialog(); // Stop execution if required fields are missing
+    // }
 
     // Construct the final payload
     const payload = {
       ...this.formConfig.model,
       // custom_field: customFieldsPayload.custom_field, // Dictionary of custom fields
-      custom_field_values: customFieldsPayload.custom_field_values // Array of custom field values
+      custom_field_values: customFieldsPayload // Array of custom field values
     };
 
     this.http.post('sales/sale_invoice_order/', payload)
@@ -866,7 +866,9 @@ async autoFillProductDetails(field, data) {
     });
     // Construct payload for custom fields
     const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
-  
+    if (!customFieldsPayload) {
+      this.showDialog(); // Stop execution if required fields are missing
+    }
     // Construct the final payload for update
     const payload = {
       ...this.formConfig.model,

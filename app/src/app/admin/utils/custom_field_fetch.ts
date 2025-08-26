@@ -3,6 +3,83 @@ import { HttpClient } from '@angular/common/http';
 export class CustomFieldHelper {
     private static customFieldMetadata: any = {};
 
+    // --- CUSTOM POPUP HANDLER --- //
+    private static ensurePopupElements() {
+      if (!document.getElementById("customPopupOverlay")) {
+        const style = document.createElement("style");
+        style.innerHTML = `
+          .custom-popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+          }
+          .custom-popup {
+            background: #fff;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            animation: fadeIn 0.3s ease-in-out;
+          }
+          .custom-popup h2 {
+            margin-top: 0;
+            color: #d9534f;
+            font-size: 20px;
+          }
+          .custom-popup p {
+            margin: 15px 0;
+            font-size: 16px;
+            color: #333;
+          }
+          .custom-popup button {
+            padding: 8px 16px;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+          }
+          .custom-popup button:hover { background: #0056b3; }
+          @keyframes fadeIn { from {opacity:0; transform:scale(0.9);} to {opacity:1; transform:scale(1);} }
+        `;
+        document.head.appendChild(style);
+
+        const overlay = document.createElement("div");
+        overlay.id = "customPopupOverlay";
+        overlay.className = "custom-popup-overlay";
+        overlay.innerHTML = `
+          <div class="custom-popup">
+            <p id="missingFieldsText">Please fill all required fields.</p>
+            <button id="customPopupCloseBtn">OK</button>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+
+        // ✅ Attach click handler for OK button
+        const closeBtn = document.getElementById("customPopupCloseBtn");
+        closeBtn?.addEventListener("click", () => {
+          (document.getElementById("customPopupOverlay") as HTMLElement).style.display = "none";
+        });
+        // if (closeBtn) {
+        //   (document.getElementById("customPopupOverlay") as HTMLElement).style.display = "none";
+        // }
+      }
+    }
+
+    private static showPopup(message: string) {
+      this.ensurePopupElements();
+      (document.getElementById("missingFieldsText") as HTMLElement).innerText = message;
+      (document.getElementById("customPopupOverlay") as HTMLElement).style.display = "flex";
+    }
+
     // Fetch custom fields based on entity name
     static fetchCustomFields(http: HttpClient, entityName: string, callback: Function) {
       http.get('customfields/customfieldscreate/').subscribe(
@@ -219,8 +296,8 @@ export class CustomFieldHelper {
   
       // If any required fields are missing, show an alert and stop submission
       if (missingRequiredFields.length > 0) {
-        console.error("Required fields missing:", missingRequiredFields);
-        return null; // Prevent submission
+        this.showPopup("Custom fields required fields are missing");
+        return null;
       }
 
       const customFieldArray = Object.keys(customFieldValues).map((fieldKey) => {
