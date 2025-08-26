@@ -3613,7 +3613,7 @@ export class SalesComponent {
                             },
                             {
                               key: 'gst_type',
-                              type: 'select',
+                              type: 'gst-types-dropdown',
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 label: 'Gst type',
@@ -3643,7 +3643,7 @@ export class SalesComponent {
                             },
                             {
                               key: 'payment_term',
-                              type: 'select',
+                              type: 'customer-payment-dropdown',
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 label: 'Payment term',
@@ -3672,7 +3672,7 @@ export class SalesComponent {
                             },
                             {
                               key: 'ledger_account',
-                              type: 'select',
+                              type: 'ledger-account-dropdown',
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 label: 'Ledger account',
@@ -3702,7 +3702,7 @@ export class SalesComponent {
                             },
                             {
                               key: 'order_status',
-                              type: 'select',
+                              type: 'order-status-dropdown',
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 label: 'Order status',

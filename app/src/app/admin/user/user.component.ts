@@ -261,7 +261,7 @@ export class UserComponent {
                 },
                 {
                   key: 'status',
-                  type: 'select',
+                  type: 'status-dropdown',
                   className: 'ta-cell pr-md col-md-6 col-12',
                   templateOptions: {
                     label: 'Status',

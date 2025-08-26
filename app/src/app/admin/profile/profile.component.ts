@@ -178,7 +178,7 @@ export class ProfileComponent {
               },
               {
                 key: 'status',
-                type: 'select',
+                type: 'status-dropdown',
                 className: 'col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Status',

@@ -563,7 +563,7 @@ showSuccessToast = false;
               fieldGroup: [
                 {
                   key: 'purchase_type',
-                  type: 'select',
+                  type: 'purchase-types-dropdown',
                   className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'Purchase Type',
@@ -1812,7 +1812,7 @@ showSuccessToast = false;
                             },
                             {
                               key: 'gst_type',
-                              type: 'select',
+                              type: 'gst-types-dropdown',
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                               label: 'Gst Type',
@@ -1841,7 +1841,7 @@ showSuccessToast = false;
                             },
                             {
                               key: 'payment_term',
-                              type: 'select',
+                              type: 'vendor-payment-dropdown',
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                               label: 'Payment Term',
@@ -1879,7 +1879,7 @@ showSuccessToast = false;
                             // },
                             {
                               key: 'order_status',
-                              type: 'select',
+                              type: 'order-status-dropdown',
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                               label: 'Order Status',
