@@ -161,7 +161,7 @@
                 </div>
             </li>
             <!-- Nav Item - Configuration -->
-            <li class="nav-item dropdown no-arrow mx-1">
+            <li class="nav-item dropdown no-arrow mx-1" *ngIf="role === 'Admin'">
                 <a class="nav-link dropdown-toggle" id="configDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-cog fa-fw" title="Configuration"></i>
                 </a>
@@ -196,20 +196,22 @@
                 </div>
             </li>
             <!-- Nav Item - Favourite -->
-            <li class="nav-item dropdown no-arrow mx-1 d-none">
+            <!-- <li class="nav-item dropdown no-arrow mx-1">
                 <a class="nav-link dropdown-toggle" id="favouriteDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-star fa-fw" title="Favourite"></i>
 
+                </a> -->
+            <!-- <li class="nav-item dropdown no-arrow mx-1">
+                <a class="nav-link dropdown-toggle" id="favouriteDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-bell fa-fw" title="Notifications"></i>
                 </a>
-                <!-- Dropdown - Favourite -->
                 <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="configDropdown">
                     <h6 class="dropdown-header">
                         Favourite
                     </h6>
                     <ul class="custom-header-drop-list">
                         No Favourites Added
-                        <!-- Enable the below for the future use -->
-                        <!-- <li>
+                        <li>
                             <a href="javascript:;">Favourite 1</a>
                         </li>
                         <li>
@@ -220,10 +222,46 @@
                         </li>
                         <li>
                             <a href="javascript:;">Favourite 4</a>
-                        </li> -->
+                        </li>
                     </ul>
                 </div>
+            </li> -->
+
+            <!-- Bell icon -->
+            <li class="nav-item no-arrow mx-1">
+            <a class="nav-link" role="button" (click)="openReminders()">
+                <i class="fas fa-bell fa-fw" title="Notifications"></i>
+                <span *ngIf="remindersCount > 0" class="badge badge-danger badge-counter">
+                {{ remindersCount }}
+                </span>
+            </a>
             </li>
+
+            <!-- Reminders Modal -->
+            <div *ngIf="isReminderOpen" class="modal-overlay">
+            <div class="modal-box shadow-lg rounded">
+                <div class="modal-header">
+                <h6 class="modal-title">Reminders</h6>
+                <button type="button" class="btn-close" (click)="closeReminders()"></button>
+                </div>
+                <div class="modal-body">
+                <div *ngIf="remindersList.length === 0" class="text-center small">No Reminders</div>
+
+                <ul class="list-unstyled">
+                    <li *ngFor="let reminder of remindersList"
+                        [ngClass]="{ 'unread-box': !reminder.read, 'read-box': reminder.read }"
+                        (click)="markAsRead(reminder)">
+                    <a href="javascript:;" class="d-block">
+                        <strong class="subject-text">{{ reminder.subject }}</strong>
+                        <small class="text-muted">
+                        ({{ reminder.reminder_date | date:'short' }})
+                        </small>
+                    </a>
+                    </li>
+                </ul>
+                </div>
+            </div>
+            </div>
 
             <div class="topbar-divider d-none d-sm-block"></div>
 

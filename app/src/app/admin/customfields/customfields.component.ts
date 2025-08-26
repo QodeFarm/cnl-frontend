@@ -142,16 +142,16 @@ export class CustomfieldsComponent {
                 }
               }
             },
-            {
-              key: 'validation_rules',
-              type: 'textarea',
-              className: 'col-md-4 col-sm-6 col-12',
-              templateOptions: {
-                label: 'Validation Rules',
-                placeholder: 'Enter validation rules as JSON',
-                rows: 4,
-              }
-            },
+            // {
+            //   key: 'validation_rules',
+            //   type: 'textarea',
+            //   className: 'col-md-4 col-sm-6 col-12',
+            //   templateOptions: {
+            //     label: 'Validation Rules',
+            //     placeholder: 'Enter validation rules as JSON',
+            //     rows: 4,
+            //   }
+            // },
             {
               key: 'is_required',
               type: 'checkbox',

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, Renderer2, AfterViewInit, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, Renderer2, AfterViewInit, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule, DatePipe, formatDate } from '@angular/common';
@@ -27,9 +27,9 @@ export class WorkorderComponent implements OnInit {
   editMode: boolean = false;
   dataToPopulate: any;
 
-  constructor(private http: HttpClient, private el: ElementRef, private renderer: Renderer2) {}
+  constructor(private http: HttpClient, private el: ElementRef, private renderer: Renderer2, private cdRef: ChangeDetectorRef,) {}
   
-  ngOnInit() {
+  ngOnInit(isReset = false) {
     this.showWorkorderList = false;
     this.showForm = true;
     this.setFormConfig();
@@ -42,12 +42,31 @@ export class WorkorderComponent implements OnInit {
       this.populateFormWithData(history.state);
       this.showForm = true; // Ensure the form is displayed
     }
+
     this.hideFields(true); // Hides fields at indexes 5, 4, and 9
+      // Add this line to initialize the material cost display
+  setTimeout(() => this.displayMaterialCost(), 500);
+  
+  // Add tab change listener to update the display when the tab is activated
+  setTimeout(() => {
+    const tabElements = this.el.nativeElement.querySelectorAll('.ant-tabs-tab');
+    if (tabElements) {
+      tabElements.forEach((tab: HTMLElement) => {
+        tab.addEventListener('click', () => {
+          if (tab.textContent?.includes('Bill Of Material')) {
+            // Try multiple times in case of DOM rendering delays
+            setTimeout(() => this.displayMaterialCost(), 100);
+            setTimeout(() => this.displayMaterialCost(), 500);
+          }
+        });
+      });
+    }
+  }, 1000);
   }
 
   hideFields(hide: boolean): void {
     // Array of indexes to hide or show
-    const fieldsToToggle = [5, 6, 4, 9];
+    const fieldsToToggle = [5, 6, 4, 9, 11];
   
     // Loop through the array and toggle the `hide` property based on the argument
     fieldsToToggle.forEach(index => {
@@ -77,6 +96,7 @@ export class WorkorderComponent implements OnInit {
     this.showCreateBomButton = false
     this.hideFields(false); // Shows fields at indexes 5, 4, and 9
     this.formConfig.fields[0].fieldGroup[10].hide = true;
+    this.formConfig.fields[0].fieldGroup[11].hide = true;
     this.makeFieldsNotTouchable([0, 1, 2]);
     this.disableMaterials()
     console.log('event', event);
@@ -84,6 +104,17 @@ export class WorkorderComponent implements OnInit {
     this.http.get('production/work_order/' + event).subscribe((res: any) => {
       if (res) {
         this.formConfig.model = res.data;
+          // --- Ensure arrays have at least one row for Formly tables ---
+          if (this.formConfig.model.workers.length==0){
+          this.formConfig.model.workers = [{}]
+        }
+        if (this.formConfig.model.work_order_machines.length==0){
+          this.formConfig.model.work_order_machines = [{}]
+        }
+        if (this.formConfig.model.work_order_stages.length==0){
+          this.formConfig.model.work_order_stages = [{}]
+        }
+
         this.formConfig.model.work_order['completed_qty'] = 0
         this.formConfig.showActionBtn = true;
         // Set labels for update
@@ -93,10 +124,23 @@ export class WorkorderComponent implements OnInit {
         this.formConfig.model['work_order_id'] = this.WorkOrdrEditID;
         this.showForm = true;
         // this.formConfig.fields[0].fieldGroup[2].hide = false
+ 
+        // --- FIX: Calculate per-unit quantity from BOM ---
+      const mainQty = Number(this.formConfig.model.work_order.quantity) || 1;
+      if (Array.isArray(this.formConfig.model.bom)) {
+        this.formConfig.model.bom = this.formConfig.model.bom.map((item: any) => ({
+          ...item,
+          // Calculate per-unit quantity from already multiplied value
+          quantity_required: mainQty > 0 ? Number(item.quantity) / mainQty : Number(item.quantity),
+        }));
+      }
+      this.updateBomQuantitiesOnMainQuantityChange();
+   
       }
     })
     this.hide();
   }
+ 
 
   showWorkorderListFn() {
     this.showWorkorderList = true;
@@ -144,44 +188,127 @@ submitWorkOrder() {
   });
 }
 
-populateBom(product_id:any){
-    const url = `production/bom/?product_id=${product_id}` // To get 'bom_id', filter by  selected product_id
-    let bom_data = {}
-    this.http.get(url).subscribe((response: any) => {
-      let bom_id = null
-      if (response.data[0]){
-        bom_id  = response.data[0].bom_id // fetch 'bom_id'
-        this.http.get(`production/bom/${bom_id}`).subscribe((data: any) => { // go to the URL with fetched 'bom_id' and get the 'data'.
-          const bom = {
-            'work_order':this.formConfig.model.work_order,
-            'bom': data.data.bill_of_material, // asign fetched 'bill_of_material' to BOM
-            'work_order_machines': this.formConfig.model.work_order_machines,
-            'workers': this.formConfig.model.workers,
-            'work_order_stages': this.formConfig.model.work_order_stages,
-          }
-          this.showCreateBomButton = false; 
-          // this.isBomButtonDisabled = true;
-          this.formConfig.model = bom // fill the form with data.
-        });
-      } else { // "If a user selects products that do not contain a BOM, the BOM will be refreshed with an empty form."
-        const bom = {
-          'work_order': this.formConfig.model.work_order,
-          'bom': [{}],
-          'work_order_machines': this.formConfig.model.work_order_machines,
-          'workers': this.formConfig.model.workers,
-          'work_order_stages': this.formConfig.model.work_order_stages,
-        }
-        this.formConfig.model = bom // fill the form with data.
+// populateBom(product_id:any){
+//     const url = `production/bom/?product_id=${product_id}` // To get 'bom_id', filter by  selected product_id
+//     let bom_data = {}
+//     this.http.get(url).subscribe((response: any) => {
+//       let bom_id = null
+//       if (response.data[0]){
+//         bom_id  = response.data[0].bom_id // fetch 'bom_id'
+//         this.http.get(`production/bom/${bom_id}`).subscribe((data: any) => { // go to the URL with fetched 'bom_id' and get the 'data'.
+//           const mainQty = Number(this.formConfig?.model?.work_order?.quantity) || 1;
+
+//         // Enrich each BOM row with base qty + calculated qty + cost
+//         const enrichedBom = (data.data.bill_of_material || []).map((item: any) => {
+//           const requiredPerUnit = Number(item.quantity || 1);
+//           const newQty = requiredPerUnit * mainQty;
+
+//           return {
+//             ...item,
+//             quantity_required: requiredPerUnit,                // store base qty for 1 product
+//             quantity: newQty,                                  // scaled qty
+//             total_cost: item.unit_cost ? (newQty * Number(item.unit_cost)).toFixed(2) : 0
+//           };
+//         });
+//           const bom = {
+//             'work_order':this.formConfig.model.work_order,
+//             'enrichedbom': enrichedBom, // assign enriched BOM to 'enrichedbom'
+//             'bom': data.data.bill_of_material, // asign fetched 'bill_of_material' to BOM
+//             'work_order_machines': this.formConfig.model.work_order_machines,
+//             'workers': this.formConfig.model.workers,
+//             'work_order_stages': this.formConfig.model.work_order_stages,
+//           }
+//           this.showCreateBomButton = false; 
+//           // this.isBomButtonDisabled = true;
+//           this.formConfig.model = bom // fill the form with data.
+          
+//           // Update the total cost display after BOM is loaded
+//           setTimeout(() => this.displayMaterialCost(), 500);
+//         });
+//       } else { // "If a user selects products that do not contain a BOM, the BOM will be refreshed with an empty form."
+//         const bom = {
+//           'work_order': this.formConfig.model.work_order,
+//           'bom': [{}],
+//           'work_order_machines': this.formConfig.model.work_order_machines,
+//           'workers': this.formConfig.model.workers,
+//           'work_order_stages': this.formConfig.model.work_order_stages,
+//         }
+//         this.formConfig.model = bom // fill the form with data.
         
-        this.isBomButtonDisabled = false;
-        if (!this.formConfig.model.work_order.product_id){
-          this.showCreateBomButton = false
-        } else {
-          this.showCreateBomButton = true // No BOM for selected product - show the 'Create BOM' Button.
-        }
-      }
-    })
-};
+//         this.isBomButtonDisabled = false;
+//         if (!this.formConfig.model.work_order.product_id){
+//           this.showCreateBomButton = false
+//         } else {
+//           this.showCreateBomButton = true // No BOM for selected product - show the 'Create BOM' Button.
+//         }
+        
+//         // Update the total cost display after empty BOM is set
+//         setTimeout(() => this.displayMaterialCost(), 500);
+//       }
+//     })
+// };
+
+populateBom(product_id: any) {
+  const url = `production/bom/?product_id=${product_id}`;
+ 
+  this.http.get(url).subscribe((response: any) => {
+    if (response.data[0]) {
+      const bom_id = response.data[0].bom_id;
+ 
+      this.http.get(`production/bom/${bom_id}`).subscribe((data: any) => {
+         const mainQty = Number(this.formConfig?.model?.work_order?.quantity) || 1;
+ 
+        const enrichedBom = (data.data.bill_of_material || []).map((item: any) => {
+          const requiredPerUnit = Number(item.quantity || 1);
+          const newQty = requiredPerUnit * mainQty;
+          const OriginalQty = item.original_quantity;
+          console.log('item : ', item)
+          console.log('OriginalQty : ', OriginalQty)
+
+          return {
+            ...item,
+            original_quantity: OriginalQty,
+            quantity_required: requiredPerUnit,                // store base qty for 1 product
+            quantity: newQty,                                  // scaled qty
+            total_cost: item.unit_cost ? (newQty * Number(item.unit_cost)).toFixed(2) : 0
+          };
+        });
+ 
+        // Assign new reference so Formly re-renders
+        this.formConfig.model = {
+          ...this.formConfig.model,
+          work_order: this.formConfig.model.work_order,
+          bom: enrichedBom,
+          work_order_machines: this.formConfig.model.work_order_machines,
+          workers: this.formConfig.model.workers,
+          work_order_stages: this.formConfig.model.work_order_stages,
+        };
+ 
+        //immediately update total cost (no setTimeout needed)
+        this.updateMaterialCosts();
+      });
+ 
+    } else {
+      // No BOM case
+      this.formConfig.model = {
+        ...this.formConfig.model,
+        work_order: this.formConfig.model.work_order,
+        bom: [{}],
+        work_order_machines: this.formConfig.model.work_order_machines,
+        workers: this.formConfig.model.workers,
+        work_order_stages: this.formConfig.model.work_order_stages,
+      };
+ 
+      this.isBomButtonDisabled = false;
+      this.showCreateBomButton = !!this.formConfig.model.work_order.product_id;
+ 
+      // ✅ Recalculate cost safely
+      this.updateMaterialCosts();
+    }
+  });
+}
+
+
 
 
 createBom(){
@@ -202,6 +329,9 @@ createBom(){
       this.showCreateBomButton = true;  // Ensure the button is still visible
       this.isBomButtonDisabled = true;  // Disable the button after success
       alert('BOM created successfully!');
+      
+      // Update the total material cost display after BOM is created
+      setTimeout(() => this.displayMaterialCost(), 500);
     },
     error: (error) => {
       console.error('Error creating BOM:', error);
@@ -213,77 +343,185 @@ createBom(){
 
 };
 
-updateInventory() {
-  const data = this.formConfig.model.work_order
-  data['work_order_id'] = this.WorkOrdrEditID
-  // update the work order
-  this.http.put(`production/work_orders_get/${this.WorkOrdrEditID}/`, data || {})
-  .subscribe({
-    next: (response) => {
-      alert('Inventory Updated successfully!');
-    },
-    error: (error) => {
-      console.error('Error Updating the Inventory:', error);
-      alert('Error Updating the Inventory.');
+// Calculate the total material cost
+calculateTotalMaterialCost(): number {
+  if (!this.formConfig?.model?.bom || !Array.isArray(this.formConfig.model.bom)) {
+    return 0;
+  }
+  
+  let totalCost = 0;
+  this.formConfig.model.bom.forEach((item: any) => {
+    if (item?.total_cost) {
+      totalCost += parseFloat(item.total_cost);
     }
   });
-
-  // update the product balance
-  const product = this.formConfig.model.work_order.product_id
-  const color = this.formConfig.model.work_order.color_id || null
-  const size = this.formConfig.model.work_order.size_id || null
-  const completed_qty = this.formConfig.model.work_order.completed_qty
-
-  // Fetch existing product balance from Products table
-  const product_url = `products/products_get/${product}/`
-  this.http.get(product_url).subscribe((data: any) => {
-    if (data) {
-      const existing_product_balance = data.balance
-
-      // sum the balance by adding existing balance with completed quantity.
-      const total = parseInt(existing_product_balance, 10) + parseInt(completed_qty, 10);  // this.formConfig.model.work_order?.completed_qty
-      console.log('Total product bal :', total)
-      const new_product_balance = { 'balance': total}
-      console.log({'old balance':existing_product_balance, 'new bal': total})
-
-      // Update new product balance
-      this.http.patch(product_url, new_product_balance).subscribe({
-        next: (response) => {
-          console.log('response :', response)
-          alert('Product Balance Updated successfully!');
-        },
-        error: (error) => {
-          console.error('Error Fetching Products:', error);
-          alert('Error Fetching Products.');
-        }
-      });
-    }
-  })
-
-  let variation_url = `products/product_variations/?product_id=${product}&color_id=${color}&size_id=${size}`;
-  this.http.get(variation_url).subscribe((data: any) => {
-    if (data && Array.isArray(data.data) && data.data.length == 1) {
-      const variation_id = data.data[0].product_variation_id
-      const existing_qty = data.data[0].quantity || 0
-      const new_qty = { 'quantity': parseInt(existing_qty, 10) + parseInt(completed_qty, 10)}
-
-      console.log('var-url : ', variation_url)
-
-      this.http.patch(`products/product_variations/${variation_id}/`, new_qty).subscribe({
-        next: (response) => {
-          alert('Product Variation Balance Updated successfully!');
-          console.log('Variation updated : ', response)
-        },
-        error: (error) => {
-          console.error('Error Fetching Product Variation:', error);
-          alert('Error Fetching Product Variation.');
-        }
-      });
-    } else {
-      console.log('NO variations . it is Direct Product ***')
-    }
-  });
+  
+  return totalCost;
 }
+
+// updateInventory() {
+//   const data = this.formConfig.model.work_order
+//   data['work_order_id'] = this.WorkOrdrEditID
+//   // update the work order
+//   this.http.put(`production/work_orders_get/${this.WorkOrdrEditID}/`, data || {})
+//   .subscribe({
+//     next: (response) => {
+//       alert('Inventory Updated successfully!');
+//     },
+//     error: (error) => {
+//       console.error('Error Updating the Inventory:', error);
+//       alert('Error Updating the Inventory.');
+//     }
+//   });
+
+//   // update the product balance
+//   const product = this.formConfig.model.work_order.product_id
+//   const color = this.formConfig.model.work_order.color_id || null
+//   const size = this.formConfig.model.work_order.size_id || null
+//   const completed_qty = this.formConfig.model.work_order.completed_qty
+
+//   // Fetch existing product balance from Products table
+//   const product_url = `products/products_get/${product}/`
+//   this.http.get(product_url).subscribe((data: any) => {
+//     if (data) {
+//       const existing_product_balance = data.balance
+
+//       // sum the balance by adding existing balance with completed quantity.
+//       const total = parseInt(existing_product_balance, 10) + parseInt(completed_qty, 10);  // this.formConfig.model.work_order?.completed_qty
+//       console.log('Total product bal :', total)
+//       const new_product_balance = { 'balance': total}
+//       console.log({'old balance':existing_product_balance, 'new bal': total})
+
+//       // Update new product balance
+//       this.http.patch(product_url, new_product_balance).subscribe({
+//         next: (response) => {
+//           console.log('response :', response)
+//           alert('Product Balance Updated successfully!');
+//         },
+//         error: (error) => {
+//           console.error('Error Fetching Products:', error);
+//           alert('Error Fetching Products.');
+//         }
+//       });
+//     }
+//   })
+
+//   let variation_url = `products/product_variations/?product_id=${product}&color_id=${color}&size_id=${size}`;
+//   this.http.get(variation_url).subscribe((data: any) => {
+//     if (data && Array.isArray(data.data) && data.data.length == 1) {
+//       const variation_id = data.data[0].product_variation_id
+//       const existing_qty = data.data[0].quantity || 0
+//       const new_qty = { 'quantity': parseInt(existing_qty, 10) + parseInt(completed_qty, 10)}
+
+//       console.log('var-url : ', variation_url)
+
+//       this.http.patch(`products/product_variations/${variation_id}/`, new_qty).subscribe({
+//         next: (response) => {
+//           alert('Product Variation Balance Updated successfully!');
+//           console.log('Variation updated : ', response)
+//         },
+//         error: (error) => {
+//           console.error('Error Fetching Product Variation:', error);
+//           alert('Error Fetching Product Variation.');
+//         }
+//       });
+//     } else {
+//       console.log('NO variations . it is Direct Product ***')
+//     }
+//   });
+// }
+
+// updateInventory() {
+//   const data = this.formConfig.model.work_order;
+//   data['work_order_id'] = this.WorkOrdrEditID;
+  
+//   // Only proceed with balance updates if we're in edit mode
+//   const isEditMode = !!this.WorkOrdrEditID;
+
+//   // update the work order
+//   this.http.put(`production/work_orders_get/${this.WorkOrdrEditID}/`, data || {})
+//   .subscribe({
+//     next: (response) => {
+//       if (isEditMode) {
+//         // update the product balance only in edit mode
+//         const product = this.formConfig.model.work_order.product_id;
+//         const color = this.formConfig.model.work_order.color_id || null;
+//         const size = this.formConfig.model.work_order.size_id || null;
+//         const completed_qty = this.formConfig.model.work_order.completed_qty;
+//         const original_qty = this.formConfig.model.work_order.quantity;
+        
+//         // Calculate remaining quantity to be produced
+//         const remaining_qty = original_qty - completed_qty;
+
+//         // Update BOM quantities based on remaining quantity
+//         if (Array.isArray(this.formConfig?.model?.bom)) {
+//           const updatedBom = this.formConfig.model.bom.map((item: any) => {
+//             const baseQty = Number(item.quantity_required || 1);
+//             const newQty = baseQty * remaining_qty;
+
+//             return {
+//               ...item,
+//               quantity: newQty,
+//               total_cost: item.unit_cost ? (newQty * Number(item.unit_cost)).toFixed(2) : 0
+//             };
+//           });
+
+//           this.formConfig.model = {
+//             ...this.formConfig.model,
+//             bom: updatedBom
+//           };
+//           this.updateMaterialCosts();
+//         }
+
+//         // Fetch existing product balance from Products table
+//         const product_url = `products/products_get/${product}/`;
+//         this.http.get(product_url).subscribe((data: any) => {
+//           if (data) {
+//             const existing_product_balance = data.balance;
+//             const total = parseInt(existing_product_balance, 10) + parseInt(completed_qty, 10);
+//             const new_product_balance = { 'balance': total };
+
+//             // Update new product balance
+//             this.http.patch(product_url, new_product_balance).subscribe({
+//               next: (response) => {
+//                 console.log('Product balance updated:', response);
+//               },
+//               error: (error) => {
+//                 console.error('Error updating product balance:', error);
+//               }
+//             });
+//           }
+//         });
+
+//         // Update product variation if exists
+//         let variation_url = `products/product_variations/?product_id=${product}&color_id=${color}&size_id=${size}`;
+//         this.http.get(variation_url).subscribe((data: any) => {
+//           if (data && Array.isArray(data.data) && data.data.length == 1) {
+//             const variation_id = data.data[0].product_variation_id;
+//             const existing_qty = data.data[0].quantity || 0;
+//             const new_qty = { 'quantity': parseInt(existing_qty, 10) + parseInt(completed_qty, 10)};
+
+//             this.http.patch(`products/product_variations/${variation_id}/`, new_qty).subscribe({
+//               next: (response) => {
+//                 console.log('Product variation updated:', response);
+//               },
+//               error: (error) => {
+//                 console.error('Error updating product variation:', error);
+//               }
+//             });
+//           }
+//         });
+//       }
+      
+//       alert('Inventory Updated successfully!');
+//     },
+//     error: (error) => {
+//       console.error('Error Updating the Inventory:', error);
+//       alert('Error Updating the Inventory.');
+//     }
+//   });
+// }
+
 
 fetchSizeOptions(productId: string, productField: any, lastSelectedSize?: any) {
   const apiUrl = `products/product_variations/?product_id=${productId}`;
@@ -395,20 +633,39 @@ fetchColorOptions(sizeId: string, productId: string, sizeField: any, lastSelecte
   );
 };
 
- clearColor(field : any) {
-  const colorField = field.parent.fieldGroup.find(f => f.key === 'color');
-  colorField.formControl.setValue(null); // Clear value
-  colorField.templateOptions.options = []; // Clear options
-  colorField.templateOptions.required = false;
-}
+//  clearColor(field : any) {
+//   const colorField = field.parent.fieldGroup.find(f => f.key === 'color');
+//   colorField.formControl.setValue(null); // Clear value
+//   colorField.templateOptions.options = []; // Clear options
+//   colorField.templateOptions.required = false;
+// }
 
 
-clearSize(field : any){
-  const sizeField = field.parent.fieldGroup.find(f => f.key === 'size');
-  sizeField.formControl.setValue(null); // Clear value
-  sizeField.templateOptions.options = []; // Clear options
-  sizeField.templateOptions.required = false;
+// clearSize(field : any){
+//   const sizeField = field.parent.fieldGroup.find(f => f.key === 'size');
+//   sizeField.formControl.setValue(null); // Clear value
+//   sizeField.templateOptions.options = []; // Clear options
+//   sizeField.templateOptions.required = false;
+// }
+
+clearColor(field: any) {
+  const colorField = field.parent.fieldGroup.find(f => f.key === 'color_id');
+  if (colorField && colorField.formControl) {
+    colorField.formControl.setValue(null); // Clear value
+    colorField.templateOptions.options = []; // Clear options
+    colorField.templateOptions.required = false;
+  }
 }
+
+clearSize(field: any) {
+  const sizeField = field.parent.fieldGroup.find(f => f.key === 'size_id');
+  if (sizeField && sizeField.formControl) {
+    sizeField.formControl.setValue(null); // Clear value
+    sizeField.templateOptions.options = []; // Clear options
+    sizeField.templateOptions.required = false;
+  }
+}
+
 
 disableMaterials() {
   if (this.editMode) {
@@ -472,6 +729,8 @@ curdConfig: TaCurdConfig = {
   }
 }
 
+
+
  loadProductVariations(field: FormlyFieldConfig, productValuechange: boolean = false) {
       const parentArray = field.parent;
   
@@ -529,11 +788,273 @@ curdConfig: TaCurdConfig = {
       }
     };
 
+// Display the total material cost similar to sales order product info
+// Only show when product is selected
+displayMaterialCost() {
+  // First check if a product is selected
+  const hasProduct = this.formConfig?.model?.work_order?.product_id;
+  if (!hasProduct) {
+    // No product selected, remove the cost display if it exists
+    this.removeMaterialCostDisplay();
+    return;
+  }
+  
+  const totalCost = this.calculateTotalMaterialCost();
+  console.log('Total material cost calculated:', totalCost);
+  
+  // Find the button container - this should get the area with the "Add Materials" button
+  const buttonContainer = this.el.nativeElement.querySelector('.custom-form-list button');
+  if (!buttonContainer) {
+    console.log('Add Materials button not found');
+    return;
+  }
+  
+  // Get the parent element containing the button (the button container/toolbar)
+  const containerElement = buttonContainer.parentElement;
+  if (!containerElement) {
+    console.log('Button container not found');
+    return;
+  }
+  
+  // Find or create the cost display element
+  let costDisplay = containerElement.querySelector('.total-material-cost');
+  
+  if (!costDisplay) {
+    // Create a new element that will be displayed inline with the button
+    costDisplay = document.createElement('div');
+    costDisplay.className = 'total-material-cost';
+    
+    // Style it to appear to the left of the button (like in sales order component)
+    costDisplay.style.cssText = 'display: inline-block; margin-right: 15px; float: left; padding: 8px 0;';
+    
+    // Insert before the button in the same container
+    containerElement.insertBefore(costDisplay, buttonContainer);
+  }
+  
+  // Format the cost with the red/blue styling as requested
+  // costDisplay.innerHTML = `<span style="color: red;">Total Material Cost:</span> <span style="color: blue;">₹${totalCost.toFixed(2)}</span>`;
+  costDisplay.innerHTML = `
+  <span style="color: red; font-size:14px;">Total Material Cost:</span> 
+  <span style="color: blue; font-size:14px;">₹${totalCost.toFixed(2)}</span>
+`;
+
+}
+
+// Remove the material cost display when no product is selected
+removeMaterialCostDisplay() {
+  const costDisplay = this.el.nativeElement.querySelector('.total-material-cost');
+  if (costDisplay) {
+    costDisplay.remove();
+  }
+}
+
+// Update material costs whenever items change
+updateMaterialCosts() {
+  setTimeout(() => this.displayMaterialCost(), 100);
+}
+
+// Display product information when a product is selected in BOM
+// displayBomProductInfo(product: any) {
+//   if (!product?.product_id) return;
+  
+//   // Fetch detailed product information
+//   this.http.get(`products/products/${product.product_id}`).subscribe((response: any) => {
+//     if (!response?.data) return;
+    
+//     const productData = response.data;
+    
+//     // Create a product info container that will be displayed above the Bill of Material tab
+//     const tabPanel = this.el.nativeElement.querySelector('.tab-form-list [role="tabpanel"]');
+//     if (!tabPanel) return;
+    
+//     // Remove any existing product info
+//     const existingInfo = tabPanel.querySelector('.bom-product-info');
+//     if (existingInfo) existingInfo.remove();
+    
+//     // Create product info element - style similar to sales order component
+//     const productInfoDiv = document.createElement('div');
+//     productInfoDiv.className = 'bom-product-info';
+//     productInfoDiv.style.cssText = 'margin: 10px 0; padding: 5px 10px; background-color: #f9f9f9; border-radius: 4px; display: flex; align-items: center;';
+    
+//     // Format the product information similar to the sales order component
+//     let infoHTML = `
+//       <span style="color: red; font-weight: bold;">Raw Material:</span> <span style="color: blue; font-weight: bold;">${productData.name || 'N/A'}</span> |
+//       <span style="color: red; font-weight: bold;">Balance:</span> <span style="color: blue; font-weight: bold;">${productData.balance || 0}</span>`;
+    
+//     // Add unit info if available
+//     if (productData.stock_unit?.stock_unit_name) {
+//       infoHTML += ` | <span style="color: red; font-weight: bold;">Stock Unit:</span> <span style="color: blue; font-weight: bold;">${productData.stock_unit.stock_unit_name}</span>`;
+//     }
+    
+//     // Add price if available
+//     if (productData.purchase_rate) {
+//       infoHTML += ` | <span style="color: red; font-weight: bold;">Purchase Rate:</span> <span style="color: blue; font-weight: bold;">₹${productData.purchase_rate}</span>`;
+//     }
+    
+//     productInfoDiv.innerHTML = infoHTML;
+    
+//     // Insert at the top of the tab panel
+//     if (tabPanel.firstChild) {
+//       tabPanel.insertBefore(productInfoDiv, tabPanel.firstChild);
+//     } else {
+//       tabPanel.appendChild(productInfoDiv);
+//     }
+//   });
+// }
+
+
+
+updateBomQuantitiesOnMainQuantityChange() {
+  const mainQty = Number(this.formConfig?.model?.work_order?.quantity) || 1;
+  if (!Array.isArray(this.formConfig?.model?.bom)) return;
+ 
+  const updatedBom = this.formConfig.model.bom.map((item: any) => {
+    const baseQty = Number(item.quantity_required || 1); // per-unit value
+    const newQty = baseQty * mainQty;
+ 
+    return {
+      ...item,
+      quantity: newQty,
+      total_cost: item.unit_cost ? (newQty * Number(item.unit_cost)).toFixed(2) : 0
+    };
+  });
+ 
+  this.formConfig.model = {
+    ...this.formConfig.model,
+    bom: updatedBom
+  };
+ 
+  this.updateMaterialCosts();
+}
+
+
+
+// Now, add a valueChanges subscription to the main Quantity field in setFormConfig
+// Find the main Quantity field config and add this to its hooks.onInit:
+
+checkExistingWorkOrder(productId: any) {
+  return this.http.get<any[]>(`production/work_order/?product_id=${productId}&status=open`);
+}
+
+// showWorkOrderExistsModal() {
+//   return window.confirm("Work order already in progress for this product. Do you want to continue?");
+// }
+
+showConfirmModal = false;
+
+showWorkOrderExistsModal() {
+  this.showConfirmModal = true; // open modal
+}
+
+onConfirm() {
+  this.showConfirmModal = false; // close modal
+  this.ngOnInit();              // refresh form
+}
+
+onCancel() {
+  this.showConfirmModal = false; // just close modal
+}
+
+isResetting: boolean = false;
+resetFormData() {
+  window.location.reload();
+}
+
+hardReset() {
+  // ✅ Clear history.state so old data is gone
+  history.replaceState({}, document.title);
+
+  // ✅ Reset component-level flags
+  this.showWorkorderList = false;
+  this.showForm = true;
+  this.editMode = false;
+  this.WorkOrdrEditID = null;
+  this.dataToPopulate = undefined;
+
+  // ✅ Reset form config
+  this.setFormConfig();
+  this.formConfig.model = {
+    work_order: {},
+    bom: [{}],
+    work_order_machines: [{}],
+    workers: [{}],
+    work_order_stages: [{}]
+  };
+
+  // ✅ Force UI refresh
+  this.cdRef.detectChanges();
+}
+
+
+
+showSuccessToast = false;
+toastMessage = '';
+handleSubmit() {
+ 
+  const workOrder = this.formConfig.model
+   
+  const payload = {
+    work_order: workOrder.work_order,
+    bom: workOrder.bom,
+    work_order_machines: workOrder.work_order_machines,
+    workers: workOrder.workers,
+    work_order_stages: workOrder.work_order_stages
+  };
+
+  // ✅ Modal check first
+  if (!payload.work_order.sync_qty && payload.work_order.temp_quantity === payload.work_order.quantity) {
+    this.showSyncModal = true;
+    return;
+  }
+
+  if (this.editMode) {
+    // Update mode
+    this.http.put(`production/work_order/${this.WorkOrdrEditID}/`, payload)
+      .subscribe((res: any) => {
+        this.showSuccessToast = true;
+        this.toastMessage = "Record updated successfully"; // Set the toast message for update
+        this.ngOnInit();
+        this.resetFormData();
+        this.showForm = true; // show clean form
+        setTimeout(() => {
+          this.showSuccessToast = false;
+        }, 3000);
+        
+
+
+      }, error => {
+        console.error('Error updating record:', error);
+      });
+  } else {
+    // Create mode
+    this.http.post(`production/work_order/`, payload)
+      .subscribe((res: any) => {
+        this.showSuccessToast = true;
+        this.toastMessage = "Record created successfully"; // Set the toast message for update
+        this.ngOnInit();
+        setTimeout(() => {
+          this.showSuccessToast = false;
+        }, 3000);
+        this.resetFormData();
+
+      }, error => {
+        console.error('Error updating record:', error);
+      });
+  }
+}
+
+showSyncModal = false;
+
+closeSyncModal() {
+  this.showSyncModal = false;
+}
+
+
   setFormConfig() {
     this.WorkOrdrEditID =null,
     this.dataToPopulate != undefined;
     this.formConfig = {
-      url: "production/work_order/",
+      // url: "production/work_order/",
       formState: {
         viewMode: false,
       },
@@ -541,12 +1062,10 @@ curdConfig: TaCurdConfig = {
       exParams: [],
       submit: {
         label: 'Submit',
-        submittedFn: () => this.ngOnInit()
+        submittedFn: () => this.handleSubmit()
       },
       reset: {
-        resetFn: () => {
-          this.ngOnInit();
-        }
+        resetFn: () => this.resetFormData()   // important
       },
       model: {
         work_order: {},
@@ -579,36 +1098,100 @@ curdConfig: TaCurdConfig = {
               },
               hooks: {
                 onInit: (field: any) => {
-                  // let previousProductId: any = null; // Keep track of the previously selected product ID                  
-                  field.formControl.valueChanges.subscribe((data: any) => {
+                  field.formControl.valueChanges.subscribe((productId: any) => {
+                    if (!productId) return;
+
+                    // Run this check only in CREATE mode
                     if (!this.editMode) {
-                      this.populateBom(data);
-                    }
-                    if (this.formConfig && this.formConfig.model && this.formConfig.model['work_order']) {
-                      this.formConfig.model['work_order']['product_id'] = data;
-            
-                      if (data) {
-                        const lastSelectedSize = this.formConfig.model.work_order.size_id;
-                        this.fetchSizeOptions(data, field, lastSelectedSize);
-                      } else {
-                        // Clear size and color fields if product ID is cleared
-                        // this.clearSize(field);
-                      }
-                      
-                      // Clear the size and color fields if the product ID changes
-                      // if (data !== previousProductId) {
-                      //   this.clearSize(field);
-                      //   previousProductId = data; // Update the previously selected product ID
-                      // }
+                      // console.log("We are in the method")
+                      this.http.get<any>(`production/work_order/?product_id=${productId}&status=open`)
+                        .subscribe((res: any) => {
+                          if (res && res.data.length > 0) {
+                            // Work order exists → show custom modal
+                            this.showWorkOrderExistsModal();
+
+                            // Reset product so user cannot proceed
+                            field.formControl.setValue(null);
+
+                            // Optionally reset BOM
+                            if (this.formConfig.model.bom) {
+                              this.formConfig.model.bom = [{}];
+                            }
+                          } else {
+                            // No existing work order → normal flow
+                            this.populateBom(productId);
+
+                            const lastSelectedSize = this.formConfig.model.work_order.size_id;
+                            this.fetchSizeOptions(productId, field, lastSelectedSize);
+                          }
+
+                          // Update model
+                          if (this.formConfig?.model?.work_order) {
+                            this.formConfig.model.work_order.product_id = productId;
+                          }
+                        });
                     } else {
-                      console.error('Form config or work_order data model is not defined.');
+                      // 🛠 In Edit Mode → skip modal, just run normal flow
+                      const lastSelectedSize = this.formConfig.model.work_order.size_id;
+                      this.fetchSizeOptions(productId, field, lastSelectedSize);
                     }
                   });
                 }
               }
-            },            
+            },
+            // {
+            //   key: 'product_id',
+            //   type: 'select',
+            //   className: 'col-md-4 col-sm-6 col-12',
+            //   templateOptions: {
+            //     label: 'Product',
+            //     placeholder: 'Select Product',
+            //     dataKey: 'product_id',
+            //     dataLabel: 'name',
+            //     required: true,
+            //     bindId: true,
+            //     lazy: {
+            //       url: 'products/products/',
+            //       lazyOneTime: true
+            //     },
+            //   },
+            //   hooks: {
+            //     onInit: (field: any) => {
+            //       // let previousProductId: any = null; // Keep track of the previously selected product ID                  
+            //       field.formControl.valueChanges.subscribe((data: any) => {
+            //         if (!this.editMode) {
+            //           this.populateBom(data);
+            //         }
+            //         if (this.formConfig && this.formConfig.model && this.formConfig.model['work_order']) {
+            //           this.formConfig.model['work_order']['product_id'] = data;
+                      
+            //           // Update the material cost display based on product selection
+            //           setTimeout(() => this.displayMaterialCost(), 500);
+            
+            //           if (data) {
+            //             const lastSelectedSize = this.formConfig.model.work_order.size_id;
+            //             this.fetchSizeOptions(data, field, lastSelectedSize);
+            //           } else {
+            //             // Clear size and color fields if product ID is cleared
+            //             // this.clearSize(field);
+            //             // Remove the cost display when no product is selected
+            //             this.removeMaterialCostDisplay();
+            //           }
+                      
+            //           // Clear the size and color fields if the product ID changes
+            //           // if (data !== previousProductId) {
+            //           //   this.clearSize(field);
+            //           //   previousProductId = data; // Update the previously selected product ID
+            //           // }
+            //         } else {
+            //           console.error('Form config or work_order data model is not defined.');
+            //         }
+            //       });
+            //     }
+            //   }
+            // },            
             {
-              key: 'size',
+              key: 'size_id',
               type: 'select',
               className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
@@ -660,7 +1243,7 @@ curdConfig: TaCurdConfig = {
               }
             },
             {
-              key: 'color',
+              key: 'color_id',
               type: 'select',
               className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
@@ -707,13 +1290,21 @@ curdConfig: TaCurdConfig = {
                 required: true,
                 placeholder: 'Enter Quantity',
               },
+               hooks: {
+              onInit: (field: any) => {
+                field.formControl.valueChanges.subscribe((qty: any) => {
+                  // Update BOM quantities and costs when main quantity changes
+                  this.updateBomQuantitiesOnMainQuantityChange();
+                });
+              }
+            }
             },
             {
               key: 'completed_qty',
               type: 'input',
               className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
-                label: 'Completed Quantity',
+                label: 'Enter Completed Quantity',
                 required: false,
                 placeholder: 'Enter Completed Quantity'
               },
@@ -779,20 +1370,20 @@ curdConfig: TaCurdConfig = {
                 required: false
               }
             },
-            {
-              key: 'selectionType',
-              type: 'radio',
-              className: 'col-md-4 col-sm-6 col-12',
-              defaultValue: 'no', // Set default selection to 'user'
-              templateOptions: {
-                label: 'Creating for Sale Order ?',
-                options: [
-                  { label: 'Yes', value: 'yes' },
-                  { label: 'No', value: 'no' }
-                ],
-                required: true,
-              }
-            },
+            // {
+            //   key: 'selectionType',
+            //   type: 'radio',
+            //   className: 'col-md-4 col-sm-6 col-12',
+            //   defaultValue: 'no', // Set default selection to 'user'
+            //   templateOptions: {
+            //     label: 'Creating for Sale Order ?',
+            //     options: [
+            //       { label: 'Yes', value: 'yes' },
+            //       { label: 'No', value: 'no' }
+            //     ],
+            //     required: true,
+            //   }
+            // },
             {
               key: 'sale_order',
               type: 'select',
@@ -824,6 +1415,17 @@ curdConfig: TaCurdConfig = {
                 }
               }
             },
+            {
+              key: 'temp_quantity',
+              type: 'input',
+              className: 'col-md-4 col-sm-6 col-12',
+              templateOptions: {
+                label: 'Temperory Quantity',
+                required: false,
+                readonly: true,
+                placeholder: 'Temperory Quantity'
+              }
+            },
           ]
         },
         // ----------------*** Tab menu starts here ***--------------------
@@ -850,6 +1452,7 @@ curdConfig: TaCurdConfig = {
                       { name: 'size_id', label: 'Size' },
                       { name: 'color_id', label: 'Color' },
                       { name: 'quantity', label: 'Quantity' },
+                      { name: 'original_quantity', label: 'Original Quantity' },
                       { name: 'unit_cost', label: 'Unit Cost' },
                       { name: 'total_cost', label: 'Total Cost' },
                       { name: 'notes', label: 'Notes' },
@@ -899,6 +1502,11 @@ curdConfig: TaCurdConfig = {
                               }
                               this.formConfig.model['bom'][currentRowIndex]['product_id'] = data?.product_id;
                               this.loadProductVariations(field);
+                              
+                              // Display product info when a product is selected (similar to Sales Order)
+                              if (data?.product_id) {
+                                this.displayMaterialCost();
+                              }
                             });
                           }
                         }
@@ -1033,6 +1641,17 @@ curdConfig: TaCurdConfig = {
                         }
                       }, 
                       {
+                        key: 'original_quantity',
+                        type: 'input',
+                        templateOptions: {
+                          label: 'Original Quantity',
+                          // placeholder: 'Enter Total Cost',
+                          hideLabel: true,
+                          required: true,
+                          disabled: true
+                        },
+                      },
+                      {
                         key: 'quantity',
                         type: 'input',
                         templateOptions: {
@@ -1040,7 +1659,8 @@ curdConfig: TaCurdConfig = {
                           placeholder: 'Enter Quantity',
                           hideLabel: true,
                           required: true,
-                          type: 'number'
+                          type: 'number',
+                          defaultValue: 1
                         },
                         hooks:{
                           onInit: (field: any) => {
@@ -1050,9 +1670,12 @@ curdConfig: TaCurdConfig = {
                                 const unit_cost = field.form.controls.unit_cost.value;
                                 if (quantity && unit_cost) {
                                   field.form.controls.total_cost.setValue((parseFloat(quantity) * parseFloat(unit_cost)).toFixed(2));
+                                  this.updateMaterialCosts();
                                 }
+
                               } else {
                                 field.form.controls.total_cost.setValue(0);
+                                this.updateMaterialCosts();
                               }
                             })
                           },
@@ -1076,10 +1699,12 @@ curdConfig: TaCurdConfig = {
                                 const unit_cost = field.form.controls.unit_cost.value;
                                 if (quantity && unit_cost) {
                                   field.form.controls.total_cost.setValue((parseFloat(quantity) * parseFloat(unit_cost)).toFixed(2));
+                                  this.updateMaterialCosts();
         
                                 }
                               } else {
                                 field.form.controls.total_cost.setValue(0);
+                                this.updateMaterialCosts();
                               }
                             })
                           },
@@ -1155,7 +1780,7 @@ curdConfig: TaCurdConfig = {
                                   console.error(`Machine at index ${index} is not defined. Initializing...`);
                                   this.formConfig.model['workers'][index] = {};
                                 }
-                                this.formConfig.model['workers'][index]['employee_id'] = data.employee_id;
+                                this.formConfig.model['workers'][index]['employee_id'] = data.employee_id || data;
                               });
                             }
                           }
@@ -1219,7 +1844,7 @@ curdConfig: TaCurdConfig = {
                                   console.error(`Machine at index ${index} is not defined. Initializing...`);
                                   this.formConfig.model['work_order_machines'][index] = {};
                                 }
-                                this.formConfig.model['work_order_machines'][index]['machine_id'] = data.machine_id;
+                                this.formConfig.model['work_order_machines'][index]['machine_id'] = data.machine_id || data;
                               });
                             }
                           }

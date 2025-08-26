@@ -1838,37 +1838,50 @@ async autoFillProductDetails(field, data) {
   }
 
 
-  getUnitData(unitInfo) {
-    const unitOption = unitInfo.unit_options?.unit_name ?? 'NA';
-    const stockUnit = unitInfo.stock_unit?.stock_unit_name ?? 'NA';
-    const packUnit = unitInfo.pack_unit?.unit_name ?? 'NA';
-    const gPackUnit = unitInfo.g_pack_unit?.unit_name ?? 'NA';
-    const packVsStock = unitInfo.pack_vs_stock ?? 0;
-    const gPackVsPack = unitInfo.g_pack_vs_pack ?? 0;
+//   getUnitData(unitInfo) {
+//     console.log("unitinfo : ", unitInfo);
+//     const unitOption = unitInfo.unit_options?.unit_name ?? 'NA';
+//     const stockUnit = unitInfo.stock_unit?.stock_unit_name ?? 'NA';
+//     // const packUnit = unitInfo.pack_unit?.unit_name ?? 'NA';
+//     // const gPackUnit = unitInfo.g_pack_unit?.unit_name ?? 'NA';
+//     // const packVsStock = unitInfo.pack_vs_stock ?? 0;
+//     // const gPackVsPack = unitInfo.g_pack_vs_pack ?? 0;
+//     const packUnit = unitInfo.pack_unit?.unit_name ?? (unitInfo.pack_unit_id === null ? 'NA' : unitInfo.pack_unit);
+//     const gPackUnit = unitInfo.g_pack_unit?.unit_name ?? (unitInfo.g_pack_unit_id === null ? 'NA' : unitInfo.g_pack_unit);
+
+//     // ✅ Explicit check so 0 stays 0
+//     const packVsStock = unitInfo.pack_vs_stock !== null && unitInfo.pack_vs_stock !== undefined
+//       ? unitInfo.pack_vs_stock
+//       : 'NA';
+
+//     const gPackVsPack = unitInfo.g_pack_vs_pack !== null && unitInfo.g_pack_vs_pack !== undefined
+//       ? unitInfo.g_pack_vs_pack
+//       : 'NA';
+
   
-    const stockUnitReg = /\b[sS][tT][oO][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
-    const GpackReg = /\b(?:[sS]tock[_ ]?[pP]ack[_ ]?)?[gG][pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
-    const stockPackReg = /\b[sS][tT][oO][cC][kK][_ ]?[pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
+//     const stockUnitReg = /\b[sS][tT][oO][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
+//     const GpackReg = /\b(?:[sS]tock[_ ]?[pP]ack[_ ]?)?[gG][pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
+//     const stockPackReg = /\b[sS][tT][oO][cC][kK][_ ]?[pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
   
-    if (stockUnitReg.test(unitOption)) {
-      return `<span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> | &nbsp;`;
-    } else if (GpackReg.test(unitOption)) {
-      return `
-        <span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> |
-        <span style="color: red;">Pck Unit:</span> <span style="color: blue;">${packUnit}</span> |
-        <span style="color: red;">PackVsStock:</span> <span style="color: blue;">${packVsStock}</span> |
-        <span style="color: red;">GPackUnit:</span> <span style="color: blue;">${gPackUnit}</span> |
-        <span style="color: red;">GPackVsStock:</span> <span style="color: blue;">${gPackVsPack}</span> | &nbsp;`;
-    } else if (stockPackReg.test(unitOption)) {
-      return `
-        <span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> |
-        <span style="color: red;">Pack Unit:</span> <span style="color: blue;">${packUnit}</span> |
-        <span style="color: red;">PackVsStock:</span> <span style="color: blue;">${packVsStock}</span> | &nbsp;`;
-    } else {
-      console.log('No Unit Option match found');
-      return "";
-    }
-  }
+//     if (stockUnitReg.test(unitOption)) {
+//       return `<span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> | &nbsp;`;
+//     } else if (GpackReg.test(unitOption)) {
+//       return `
+//         <span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> |
+//         <span style="color: red;">Pck Unit:</span> <span style="color: blue;">${packUnit}</span> |
+//         <span style="color: red;">PackVsStock:</span> <span style="color: blue;">${packVsStock}</span> |
+//         <span style="color: red;">GPackUnit:</span> <span style="color: blue;">${gPackUnit}</span> |
+//         <span style="color: red;">GPackVsStock:</span> <span style="color: blue;">${gPackVsPack}</span> | &nbsp;`;
+//     } else if (stockPackReg.test(unitOption)) {
+//       return `
+//         <span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> |
+//         <span style="color: red;">Pack Unit:</span> <span style="color: blue;">${packUnit}</span> |
+//         <span style="color: red;">PackVsStock:</span> <span style="color: blue;">${packVsStock}</span> | &nbsp;`;
+//     } else {
+//       console.log('No Unit Option match found');
+//       return "";
+//     }
+//   }
 
 // product info text when size is selected
   sumQuantities(dataObject: any): number {
@@ -1882,34 +1895,140 @@ async autoFillProductDetails(field, data) {
   }
 }
 
+getUnitData(unitInfo) {
+  console.log("unitinfo : ", unitInfo);
+
+  const unitOption = unitInfo.unit_options?.unit_name ?? 'NA';
+  const stockUnit = unitInfo.stock_unit?.stock_unit_name ?? 'NA';
+
+  // ✅ Only null/undefined → NA, keep 0 or string
+  const packUnit = unitInfo.pack_unit?.unit_name ?? (unitInfo.pack_unit_id == null ? 'NA' : unitInfo.pack_unit_id);
+  const gPackUnit = unitInfo.g_pack_unit?.unit_name ?? (unitInfo.g_pack_unit_id == null ? 'NA' : unitInfo.g_pack_unit_id);
+
+  const packVsStock = unitInfo.pack_vs_stock == null ? 'NA' : unitInfo.pack_vs_stock;
+  const gPackVsPack = unitInfo.g_pack_vs_pack == null ? 'NA' : unitInfo.g_pack_vs_pack;
+
+  const stockUnitReg = /\b[sS][tT][oO][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
+  const GpackReg = /\b(?:[sS]tock[_ ]?[pP]ack[_ ]?)?[gG][pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
+  const stockPackReg = /\b[sS][tT][oO][cC][kK][_ ]?[pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
+
+  if (stockUnitReg.test(unitOption)) {
+    return `<span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> | &nbsp;`;
+  } else if (GpackReg.test(unitOption)) {
+    return `
+      <span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> |
+      <span style="color: red;">Pck Unit:</span> <span style="color: blue;">${packUnit}</span> |
+      <span style="color: red;">PackVsStock:</span> <span style="color: blue;">${packVsStock}</span> |
+      <span style="color: red;">GPackUnit:</span> <span style="color: blue;">${gPackUnit}</span> |
+      <span style="color: red;">GPackVsPack:</span> <span style="color: blue;">${gPackVsPack}</span> | &nbsp;`;
+  } else if (stockPackReg.test(unitOption)) {
+    return `
+      <span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> |
+      <span style="color: red;">Pack Unit:</span> <span style="color: blue;">${packUnit}</span> |
+      <span style="color: red;">PackVsStock:</span> <span style="color: blue;">${packVsStock}</span> | &nbsp;`;
+  } else {
+    console.log('No Unit Option match found');
+    return "";
+  }
+}
+
+
+
+  // displayInformation(product: any, size: any, color: any, unitData : any, sizeBalance: any, colorBalance: any) {
+  //   const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
+  //   let data = '';
+
+  //   const stockInfo = `
+  //     <span style="color: red;">Stock Unit:</span> <span style="color: blue;">${unitData?.stock_unit_id || 'NA'}</span> |
+  //     <span style="color: red;">Pack Unit:</span> <span style="color: blue;">${unitData?.pack_unit_id || 'NA'}</span> |
+  //     <span style="color: red;">PackVsStock:</span> <span style="color: blue;">${unitData?.pack_vs_stock || 'NA'}</span> |
+  //     <span style="color: red;">GPack Unit:</span> <span style="color: blue;">${unitData?.g_pack_unit_id || 'NA'}</span> |
+  //     <span style="color: red;">GPackVsPack:</span> <span style="color: blue;">${unitData?.g_pack_vs_pack || 'NA'}</span>
+  //   `;
+
+  //   if (product && !size && !color) {
+  //     data = `
+  //     <span style="font-size: 12px;">
+  //       <span style="color: red;">Product Info:</span> <span style="color: blue;">${product?.name || 'N/A'}</span> |                            
+  //       <span style="color: red;">Balance:</span> <span style="color: blue;">${product?.balance || 0}</span> | ${stockInfo}
+  //     </span>`;
+
+  //   }
+
+  //   if (size && !color) {
+  //     data = `
+  //       <span style="font-size: 12px;">
+  //         <span style="color: red;">Product Info:</span> <span style="color: blue;">${product?.name || 'N/A'}</span> | 
+  //         <span style="color: red;">Size:</span> <span style="color: blue;">${size.size_name}</span> | 
+  //         <span style="color: red;">Balance:</span> <span style="color: blue;">${sizeBalance || 0}</span> | 
+  //         ${stockInfo}
+  //       </span>`;
+  //   }
+
+  //   if (color) {
+  //     data = `
+  //       <span style="font-size: 12px;">
+  //         <span style="color: red;">Product Info:</span> <span style="color: blue;">${product?.name || 'N/A'}</span> | 
+  //         <span style="color: red;">Size:</span> <span style="color: blue;">${size.size_name}</span> | 
+  //         <span style="color: red;">Color:</span> <span style="color: blue;">${color.color_name}</span> | 
+  //         <span style="color: red;">Balance:</span> <span style="color: blue;">${colorBalance || 0}</span> | 
+  //         ${stockInfo}
+  //       </span>`;
+  //   }
+
+  //   // data += ` | ${unitData}`;
+
+  //   cardWrapper.querySelector('.center-message')?.remove();
+  //   const productInfoDiv = document.createElement('div');
+  //   productInfoDiv.classList.add('center-message');
+  //   productInfoDiv.innerHTML = data;
+  //   cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
+  // };
+
   displayInformation(product: any, size: any, color: any, unitData : any, sizeBalance: any, colorBalance: any) {
     const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
     let data = '';
+    console.log('Product data in html : ', product)
+    console.log('unitData data in html : ', unitData)
 
-    if (product) {
+    // format unitData fields in correct order
+    const stockInfo = `
+      <span style="color: red;">Stock Unit:</span> <span style="color: blue;">${product?.stock_unit.stock_unit_name || 'NA'}</span> |
+      <span style="color: red;">Pack Unit:</span> <span style="color: blue;">${product?.pack_unit_id || 'NA'}</span> |
+      <span style="color: red;">PackVsStock:</span> <span style="color: blue;">${product?.pack_vs_stock || 'NA'}</span> |
+      <span style="color: red;">GPack Unit:</span> <span style="color: blue;">${product?.g_pack_unit_id || 'NA'}</span> |
+      <span style="color: red;">GPackVsPack:</span> <span style="color: blue;">${product?.g_pack_vs_pack || 'NA'}</span>
+    `;
+
+    if (product && !size && !color) {
       data = `
-        <span style="color: red;">Product Info:</span> <span style="color: blue;">${product?.name || 'N/A'}</span> |                            
-        <span style="color: red;">Balance:</span> <span style="color: blue;">${product?.balance || 0}</span>`;
+        <span style="font-size: 12px;">
+          <span style="color: red;">Product Info:</span> <span style="color: blue;">${product?.name || 'N/A'}</span> | 
+          <span style="color: red;">Balance:</span> <span style="color: blue;">${product?.balance || 0}</span> | 
+          ${stockInfo}
+        </span>`;
     }
 
-    if (size) {
+    if (size && !color) {
       data = `
-        <span style="color: red;">Product Info:</span> <span style="color: blue;">${product?.name || 'N/A'}</span> |                            
-        <span style="color: red;">Size:</span> <span style="color: blue;">${size.size_name}</span> |
-        <span style="color: red;">Balance:</span> <span style="color: blue;">${sizeBalance || 0}</span>
-        `;
+        <span style="font-size: 12px;">
+          <span style="color: red;">Product Info:</span> <span style="color: blue;">${product?.name || 'N/A'}</span> | 
+          <span style="color: red;">Balance:</span> <span style="color: blue;">${sizeBalance || 0}</span> | 
+          <span style="color: red;">Size:</span> <span style="color: blue;">${size.size_name}</span> | 
+          ${stockInfo}
+        </span>`;
     }
 
     if (color) {
       data = `
-        <span style="color: red;">Product Info:</span> <span style="color: blue;">${product?.name || 'N/A'}</span> |                            
-        <span style="color: red;">Size:</span> <span style="color: blue;">${size.size_name}</span> |
-        <span style="color: red;">Color:</span> <span style="color: blue;">${color.color_name}</span> |
-        <span style="color: red;">Balance:</span> <span style="color: blue;">${colorBalance || 0}</span>
-        `;
+        <span style="font-size: 12px;">
+          <span style="color: red;">Product Info:</span> <span style="color: blue;">${product?.name || 'N/A'}</span> | 
+          <span style="color: red;">Balance:</span> <span style="color: blue;">${colorBalance || 0}</span> | 
+          <span style="color: red;">Size:</span> <span style="color: blue;">${size?.size_name || 'NA'}</span> | 
+          <span style="color: red;">Color:</span> <span style="color: blue;">${color.color_name}</span> | 
+          ${stockInfo}
+        </span>`;
     }
-
-    data += ` | ${unitData}`;
 
     cardWrapper.querySelector('.center-message')?.remove();
     const productInfoDiv = document.createElement('div');
@@ -1917,6 +2036,7 @@ async autoFillProductDetails(field, data) {
     productInfoDiv.innerHTML = data;
     cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
   };
+
 
   hasOrderNoLoaded = false;
   //=======================================================

@@ -119,7 +119,7 @@ export class QuickpacksComponent implements OnInit {
               templateOptions: {
                 label: 'Lot Quantity',
                 placeholder: 'Enter Lot Quantity',
-                required: true
+                required: false
               }
             },
             {

@@ -1,11 +1,11 @@
 <div class="activation-screen">
     <div class="card">
-        <div class="card-body text-center">
-            <div class="alert alert-success" role="alert">
-                <i class="fas fa-check-circle fa-3x"></i>
-                <h5 class="card-title mt-3">Activation Successful!</h5>
-                <p class="card-text">Your activation code has been successfully verified.</p>
-                <a class="btn btn-primary mt-3" [routerLink]="['/login']" routerLinkActive="router-link-active">Continue</a>
+        <div class="card-body text-center ">
+            <div [class]="getAlertClass()" role="alert" class="">
+                <i [class]="getIconClass()"></i>
+                <h5 class="card-title mt-3">{{title}}</h5>
+                <p class="card-text">{{message}}</p>
+                <a class="btn btn-primary mt-3" [routerLink]="['/login']">Continue to Login</a>
             </div>
         </div>
     </div>

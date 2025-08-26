@@ -9,8 +9,8 @@
                 <button (click)="showWorkorderListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productionModal">Work Order List
                 </button>
                 <!-- <button (click)="updateInventory()" *ngIf="WorkOrdrEditID" type="button" class="btn btn-primary">Update Inventory</button> -->
-                <button (click)="createBom()" *ngIf="showCreateBomButton" type="button" class="btn btn-danger ms-auto blink-twice" [disabled]="isBomButtonDisabled" data-bs-toggle="modal" data-bs-target="#bomModal">Create BOM
-                </button>
+                <!-- <button (click)="createBom()" *ngIf="showCreateBomButton" type="button" class="btn btn-danger ms-auto blink-twice" [disabled]="isBomButtonDisabled" data-bs-toggle="modal" data-bs-target="#bomModal">Create BOM
+                </button> -->
             </div>
         </div>
     </div>
@@ -38,3 +38,42 @@
        </div>
     </div>
  </div>
+
+<div class="custom-modal_1" *ngIf="showConfirmModal" (click)="onCancel()">
+  <div class="custom-modal-content" (click)="$event.stopPropagation()">
+    <p>Work order already in progress for this product.</p>
+    <div class="modal-actions">
+      <button class="btn-sky" (click)="onConfirm()">Ok</button>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop" *ngIf="showConfirmModal"></div>
+
+<!-- 📌 Custom Modal: Sync Quantity Warning -->
+<div
+  class="custom-modal_1"
+  *ngIf="showSyncModal"
+  (click)="closeSyncModal()"
+>
+  <div
+    class="custom-modal-content"
+    (click)="$event.stopPropagation()"
+  >
+    <p>
+      Your quantities are ready to sync with inventory!.<br />
+      Please check <b>Sync QTY</b> and update again.
+    </p>
+    <div class="modal-actions">
+      <button class="btn-sky" (click)="closeSyncModal()">Ok</button>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop" *ngIf="showSyncModal"></div>
+
+<div id="customToast" class="toast-message" *ngIf="showSuccessToast">
+    <div class="tick-circle">
+        <span class="tick-mark">✓</span>
+    </div>
+    <span class="toast-message-text">{{ toastMessage }}</span>
+    <span class="toast-close" onclick="this.parentElement.style.display='none'">x</span>
+</div>
