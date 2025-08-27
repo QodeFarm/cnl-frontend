@@ -62,6 +62,13 @@ export class SwipesListComponent {
             confirmMsg: "Sure to delete?",
           },
           {
+            type: 'restore',
+            label: 'Restore',
+            apiUrl: 'hrms/swipes',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
+          },
+          {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',

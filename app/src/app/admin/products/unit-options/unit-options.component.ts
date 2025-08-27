@@ -40,6 +40,13 @@ export class UnitOptionsComponent {
               apiUrl: 'masters/unit_options'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/unit_options'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             },

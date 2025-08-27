@@ -43,6 +43,13 @@ export class CountryComponent {
               apiUrl: 'masters/country'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/country'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }

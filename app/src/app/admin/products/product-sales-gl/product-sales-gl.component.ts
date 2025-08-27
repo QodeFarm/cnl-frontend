@@ -110,6 +110,13 @@ export class ProductSalesGlComponent {
               apiUrl: 'products/product_sales_gl'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'products/product_sales_gl'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }

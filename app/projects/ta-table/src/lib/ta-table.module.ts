@@ -49,7 +49,7 @@ import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
   ]
 })
 export class TaTableModule {
-  static rootComponent = TaTableComponent;
+  // static rootComponent = TaTableComponent;
   // constructor(private componentFactoryResolver: ComponentFactoryResolver) { }
   // public resolveComponent(): ComponentFactory<TaTableComponent> {
   //   return this.componentFactoryResolver.resolveComponentFactory(TaTableComponent);

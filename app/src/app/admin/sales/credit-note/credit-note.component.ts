@@ -274,7 +274,7 @@ export class CreditNoteComponent {
             },
             {
               key: 'order_status',
-              type: 'select',
+              type: 'order-status-dropdown',
               defaultValue: '085266c9-5020-41b3-ab58-1e4d88f4ff19',
               className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {

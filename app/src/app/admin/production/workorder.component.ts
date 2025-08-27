@@ -960,31 +960,30 @@ resetFormData() {
   window.location.reload();
 }
 
-hardReset() {
-  // ✅ Clear history.state so old data is gone
-  history.replaceState({}, document.title);
+// hardReset() {
+//   // ✅ Clear history.state so old data is gone
+//   history.replaceState({}, document.title);
 
-  // ✅ Reset component-level flags
-  this.showWorkorderList = false;
-  this.showForm = true;
-  this.editMode = false;
-  this.WorkOrdrEditID = null;
-  this.dataToPopulate = undefined;
+//   // ✅ Reset component-level flags
+//   this.showWorkorderList = false;
+//   this.showForm = true;
+//   this.editMode = false;
+//   this.WorkOrdrEditID = null;
+//   this.dataToPopulate = undefined;
 
-  // ✅ Reset form config
-  this.setFormConfig();
-  this.formConfig.model = {
-    work_order: {},
-    bom: [{}],
-    work_order_machines: [{}],
-    workers: [{}],
-    work_order_stages: [{}]
-  };
+//   // ✅ Reset form config
+//   this.setFormConfig();
+//   this.formConfig.model = {
+//     work_order: {},
+//     bom: [{}],
+//     work_order_machines: [{}],
+//     workers: [{}],
+//     work_order_stages: [{}]
+//   };
 
-  // ✅ Force UI refresh
-  this.cdRef.detectChanges();
-}
-
+//   // ✅ Force UI refresh
+//   this.cdRef.detectChanges();
+// }
 
 
 showSuccessToast = false;
@@ -1822,7 +1821,7 @@ closeSyncModal() {
                       fieldGroup: [
                         {
                           key: 'machine',
-                          type: 'select',
+                          type: 'machine-dropdown',
                           className: 'col',
                           templateOptions: {
                             label: 'Machine',

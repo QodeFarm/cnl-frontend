@@ -52,6 +52,13 @@ export class StatesComponent {
               apiUrl: 'masters/state'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/state'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }
@@ -77,7 +84,7 @@ export class StatesComponent {
           fieldGroup: [
             {
               key: 'country',
-              type: 'select',
+              type: 'country-dropdown',
               className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'Country',

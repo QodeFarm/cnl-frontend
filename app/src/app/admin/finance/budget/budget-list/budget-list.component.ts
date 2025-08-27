@@ -69,6 +69,13 @@ export class BudgetListComponent {
             confirmMsg: "Sure to delete?",
           },
           {
+            type: 'restore',
+            label: 'Restore',
+            apiUrl: 'finance/budgets',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
+          },
+          {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',

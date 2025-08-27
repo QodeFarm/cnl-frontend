@@ -375,6 +375,13 @@ private fallbackPrint(pdfBlob: Blob): void {
             apiUrl: 'purchase/purchase_order'
           },
           {
+            type: 'restore',
+            label: 'Restore',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
+            apiUrl: 'purchase/purchase_order'
+          },
+          {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',

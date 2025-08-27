@@ -265,7 +265,7 @@ export class DebitNoteComponent {
             },
             {
               key: 'order_status',
-              type: 'select',
+              type: 'order-status-dropdown',
               className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
               label: 'Order status',

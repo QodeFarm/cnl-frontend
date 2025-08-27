@@ -39,6 +39,13 @@ export class StatusesComponent {
               apiUrl: 'masters/statuses'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/statuses'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             },

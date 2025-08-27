@@ -44,6 +44,13 @@ export class PriceCategoriesComponent {
               apiUrl: 'masters/price_categories'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/price_categories'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             },

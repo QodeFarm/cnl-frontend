@@ -38,6 +38,13 @@ export class PackageUnitsComponent {
               apiUrl: 'masters/package_units'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/package_units'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }

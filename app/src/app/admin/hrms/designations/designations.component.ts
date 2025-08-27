@@ -35,11 +35,19 @@ export class DesignationsComponent {
           fieldKey: "code",
           name: "Action",
           type: 'action',
-          actions: [{
+          actions: [
+            {
               type: 'delete',
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'hrms/designations'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'hrms/designations'
             },
             {

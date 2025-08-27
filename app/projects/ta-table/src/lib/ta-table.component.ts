@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, Output, ViewChild, EventEmitter, ElementRef, TemplateRef } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, Output, ViewChild, EventEmitter, ElementRef, TemplateRef, ChangeDetectorRef } from '@angular/core';
 import { getValue } from '@ta/ta-core';
 import { cloneDeep } from 'lodash';
 import {
@@ -100,13 +100,13 @@ warehouseOptions: Array<{ value: string; label: string }> = [];
 
   accountOptions: Array<{ value: number; label: string }> = [];
 
- 
+
   accountTypeOptions = [
     { value: 'customer', label: 'Customer' },
     { value: 'vendor', label: 'Vendor' },
     { value: 'general', label: 'General' }
   ];
- 
+
   // List of quick period options like 'Today', 'Last Week', etc.
   quickPeriodOptions = [
     { value: 'today', label: 'Today' },
@@ -314,13 +314,13 @@ loadTypes() {
     let url = '';
     switch (this.selectedAccountType) {
       case 'customer':
-        url = 'customers/customer/'; 
+        url = 'customers/customer/';
         break;
       case 'vendor':
-        url = 'vendors/vendor_get/'; 
+        url = 'vendors/vendor_get/';
         break;
       case 'general':
-        url = 'finance/general-accounts/'; 
+        url = 'finance/general-accounts/';
         break;
     }
 
@@ -355,33 +355,33 @@ loadTypes() {
   }
 
   onAccountTypeChange() {
-    this.selectedAccountId = null; 
-    this.loadAccounts(); 
+    this.selectedAccountId = null;
+    this.loadAccounts();
   }
 
   onAccountChange() {
     if (this.selectedAccountType && this.selectedAccountId) {
       console.log("Account selected:", this.selectedAccountType, this.selectedAccountId);
-      
+
       // For account ledger page
       if (this.router.url === '/admin/finance/account-ledger') {
         console.log("On account ledger page, looking for accountLedgerComponentInstance");
-        
+
         // Check if we have the global reference to the AccountLedgerComponent
-        if (window['accountLedgerComponentInstance'] && 
-            typeof window['accountLedgerComponentInstance'].loadLedgerData === 'function') {
+        if (window['accountLedgerComponentInstance'] &&
+          typeof window['accountLedgerComponentInstance'].loadLedgerData === 'function') {
           console.log("Using global reference to AccountLedgerComponent");
           window['accountLedgerComponentInstance'].loadLedgerData(
-            this.selectedAccountType, 
+            this.selectedAccountType,
             this.selectedAccountId
           );
           return;
         }
-        
+
         // Make the API call directly from here as a fallback
         console.log("Making API call directly from table component");
         const apiUrl = `finance/journal_entry_lines_list/${this.selectedAccountId}/`;
-        
+
         this.http.get(apiUrl).subscribe(
           (response: any) => {
             console.log("API response received directly:", response);
@@ -398,7 +398,7 @@ loadTypes() {
         return;
       }
     }
-    
+
     this.applyFilters(); // Fall back to the default behavior
   }
 
@@ -657,7 +657,8 @@ downloadData(event: any) {
     public taTableS: TaTableService,
     private http: HttpClient,
     private router: Router,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
+    private cdr: ChangeDetectorRef
   ) {
     this.actionObservable$ = this.taTableS.actionObserval().subscribe((res: any) => {
       // if (res && res.action && res.action.type === 'delete') {
@@ -790,6 +791,7 @@ downloadData(event: any) {
         if (this.options.showCheckbox) {
           this.refreshCheckedStatus();
         }
+        this.cdr.detectChanges();
       }, (error) => {
         this.loading = false;
       });
@@ -943,20 +945,20 @@ downloadData(event: any) {
         _cols = (this.options.export.cols) ? this.options.export.cols : this.options.cols;
         _cols.forEach((col: any) => {
           // Skip 'action' type columns
-        if (col.type === 'action') return;
+          if (col.type === 'action') return;
 
-        // 1) Check if displayType=map and mapFn is a function
-        if (col.displayType === 'map' && typeof col.mapFn === 'function') {
-          _r[col.name] = col.mapFn(r[col.fieldKey], r, col);
-        } else {
-          // 2) Otherwise just use the raw value
-          _r[col.name] = getValue(r, col.fieldKey);
-        }
+          // 1) Check if displayType=map and mapFn is a function
+          if (col.displayType === 'map' && typeof col.mapFn === 'function') {
+            _r[col.name] = col.mapFn(r[col.fieldKey], r, col);
+          } else {
+            // 2) Otherwise just use the raw value
+            _r[col.name] = getValue(r, col.fieldKey);
+          }
 
-        // 3) If it's a date type, format it
-        if (col.type === 'date') {
-          _r[col.name] = moment(_r[col.name]).format('MMMM Do YYYY, h:mm:ss a');
-        }
+          // 3) If it's a date type, format it
+          if (col.type === 'date') {
+            _r[col.name] = moment(_r[col.name]).format('MMMM Do YYYY, h:mm:ss a');
+          }
         });
         return _r;
       });
@@ -969,9 +971,18 @@ downloadData(event: any) {
     // const tableElementref: ElementRef = this.taTable.elementRef as ElementRef;
     // this.taTableS.exportTableAsExcelFile(tableElementref.nativeElement, 'test');
   }
+
+  restoreRow(action: any) {
+  this.taTableS.restorerow(action.action.apiUrl, action.data, this.options).subscribe(res => {
+    this.loadDataFromServer();
+  });
+}
+
   actionClick(event) {
     if (event && event.action && event.action.type === 'delete') {
       this.deleteRow(event);
+    } else if (event.action.type === 'restore') {
+      this.restoreRow(event);
     }
     this.doAction.emit(event);
   }
@@ -1006,6 +1017,11 @@ downloadData(event: any) {
     } else {
       // Show message if no file is available to view
       alert('No viewable file found. The file might not be uploaded to the server yet.');
+    }
+  }
+  onRowSelect(row) {
+    if (this.options.rowSelection) {
+      this.options.rowSelection(row);
     }
   }
 

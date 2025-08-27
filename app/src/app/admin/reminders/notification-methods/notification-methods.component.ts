@@ -37,6 +37,13 @@ export class NotificationMethodsComponent {
               apiUrl: 'reminders/notification_methods'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'reminders/notification_methods'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }

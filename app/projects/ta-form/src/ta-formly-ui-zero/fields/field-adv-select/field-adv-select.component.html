@@ -1,0 +1,121 @@
+<!-- <nz-select [formControl]="formControl" [nzDropdownRender]="dropdownRender" nzPlaceHolder="Select or add item"
+    style="width: 300px;">
+</nz-select> -->
+<div class="row">
+    <div class="col">
+        <nz-select style="width: 100%;" [nzCustomTemplate]="defaultTemplate" [nzBackdrop]="false"
+            [nzOpen]="dropdownOpen" (nzOpenChange)="onOpenChange($event)" [compareWith]="compareFn"
+            [nzDropdownMatchSelectWidth]="false" [class.ng-dirty]="showError" nzAllowClear [formControl]="formControl"
+            [formlyAttributes]="field" [nzMode]="to.multiple ? 'multiple' :(to.mode)?to.mode: 'default'"
+            [nzDropdownClassName]="'select-adv-field'" [nzPlaceHolder]="props?.placeholder || 'Please Select'"
+            [nzSelectOnTab]="true" (clickOutside)="onClickOutside($event)">
+            <nz-option *ngIf="formControl.value" nzDisabled [nzValue]="formControl.value"
+                [nzLabel]="lazySelectedItem.label"></nz-option>
+            <nz-option></nz-option>
+        </nz-select>
+        <div class="adv-select-curd-container-main" *ngIf="props.curdConfig && showCurdDiv;">
+            <div class="adv-select-curd-container ant-select-dropdown"
+                style="position: absolute; background: white;padding: 5px; width: auto;z-index: 999;">
+                <div style="padding: 8px 12px; max-height: 400px; overflow: scroll; background-color: white;">
+                    <ta-curd-modal [options]="props.curdConfig"></ta-curd-modal>
+                    <!-- <ta-table [options]="props.curdConfig?.tableConfig"></ta-table> -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- <button class="ant-btn ant-btn-primer col-2" *ngIf="formControl.value" (click)="openDrawer(formControl.value)"><i
+            class="fa fa-pen"></i></button> -->
+</div>
+<ng-template #defaultTemplate let-selected>
+    {{ selected.nzLabel }}
+</ng-template>
+
+<ng-template #renderTemplate>
+    <nz-divider></nz-divider>
+    <!-- <button class="ant-btn ant-btn-primer col-2" (click)="openDrawer()"><i class="fa fa-plus"></i></button> -->
+    <div class="container" *ngIf="props.curdConfig && dropdownOpen;">
+        <div style="padding: 8px 12px; max-height: 400px; overflow: scroll; background-color: white;">
+            <ta-curd-modal [options]="props.curdConfig"></ta-curd-modal>
+            <!-- <ta-table [options]="props.curdConfig?.tableConfig"></ta-table> -->
+        </div>
+    </div>
+
+</ng-template>
+<ng-template #labelRender let-selected>
+    {{ selected?.name || selected?.label || 'Selected' }}
+</ng-template>
+
+
+<!-- <div class="dropdown" [ngClass]="{ show: dropdownOpen }">
+    <button class="btn btn-primary dropdown-toggle" type="button" (click)="toggleDropdown()" aria-expanded="false">
+        {{ selectedItem?.name || props?.placeholder || 'Please Select' }}
+    </button>
+
+    <div class="dropdown-menu p-2" [ngClass]="{ show: dropdownOpen }">
+        <div style="padding: 8px 12px;  max-height: 400px; overflow: scroll; background-color: white;">
+            <ng-container *ngIf="props.curdConfig && dropdownOpen; else dropdownRender2">
+                <ta-curd-modal [options]="props.curdConfig"></ta-curd-modal>
+            </ng-container>
+
+        </div>
+    </div>
+</div> -->
+<!-- <ta-table [options]="props.curdConfig?.tableConfig"></ta-table> -->
+<!-- <nz-dropdown nz-dropdown [nzDropdownMenu]="menu" [nzTrigger]="'click'"
+    (nzVisibleChange)="onDropdownVisibleChange($event)">
+    <button nz-button type="button">
+        {{ selectedItem?.name || props?.placeholder || 'Please Select' }}
+        <span nz-icon nzType="down"></span>
+    </button>
+</nz-dropdown>
+<nz-dropdown-menu #menu="nzDropdownMenu">
+    <div class="container" *ngIf="props.curdConfig && isDropdownOpen; else dropdownRender2">
+        <div style="padding: 8px 12px;  max-height: 400px; overflow: scroll; background-color: white;">
+            <ta-table [options]="props.curdConfig?.tableConfig"></ta-table>
+        </div>
+    </div>
+</nz-dropdown-menu>
+
+<ng-template #dropdownRender2>
+
+    <div style="padding: 8px 12px;">
+        <nz-table [nzData]="items" [nzSize]="'small'" [nzPagination]="false" [nzScroll]="{ y: '150px' }"
+            [nzBordered]="true">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th style="text-align: right;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let item of items">
+                    <td>{{ item.name }}</td>
+                    <td style="text-align: right;">
+                        <a (click)="selectItem(item)">Select</a>
+                    </td>
+                </tr>
+            </tbody>
+        </nz-table>
+
+        <div style="margin-top: 8px;">
+            <input nz-input [(ngModel)]="newItem" placeholder="Add new item" style="width: 70%; margin-right: 8px;" />
+            <button nz-button nzType="primary" (click)="addItem()">Add</button>
+        </div>
+    </div>
+</ng-template> -->
+
+<ng-template #errorTemplate>
+    <div class="error-message">
+        <p>Error loading items. Please check your configuration.</p>
+    </div>
+
+</ng-template>
+
+<nz-drawer [nzClosable]="false" [nzHeight]="props.curdConfig.drawerHeight || '100%'"
+    [nzWidth]="props.curdConfig.drawerSize || 'auto'" [nzVisible]="visible" [nzClosable]="true"
+    [nzPlacement]="props.curdConfig.drawerPlacement || 'right'" [nzTitle]="formTitle" (nzOnClose)="close()">
+    <ng-template nzDrawerContent>
+        <ta-form *ngIf="visible" #form [options]="props.curdConfig.formConfig"></ta-form>
+    </ng-template>
+</nz-drawer>

@@ -95,6 +95,13 @@ export class PaymentTransactionListComponent {
             confirmMsg: "Sure to delete?",
           },
           {
+            type: 'restore',
+            label: 'Restore',
+            apiUrl: 'finance/payment_transactions',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
+          },
+          {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',

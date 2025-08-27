@@ -39,6 +39,13 @@ export class GstCategoriesComponent {
                 apiUrl: 'masters/gst_categories'
               },
               {
+                type: 'restore',
+                label: 'Restore',
+                confirm: true,
+                confirmMsg: "Sure to restore?",
+                apiUrl: 'masters/gst_categories'
+              },
+              {
                 type: 'edit',
                 label: 'Edit'
               },

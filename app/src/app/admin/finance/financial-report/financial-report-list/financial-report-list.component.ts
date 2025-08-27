@@ -60,6 +60,13 @@ export class FinancialReportListComponent {
             confirmMsg: "Sure to delete?",
           },
           {
+            type: 'restore',
+            label: 'Restore',
+            apiUrl: 'finance/financial_reports',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
+          },
+          {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',

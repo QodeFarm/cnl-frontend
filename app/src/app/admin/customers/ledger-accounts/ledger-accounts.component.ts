@@ -107,6 +107,13 @@ export class LedgerAccountsComponent {
               apiUrl: 'customers/ledger_accounts'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'customers/ledger_accounts'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }
@@ -232,7 +239,7 @@ export class LedgerAccountsComponent {
             },
             {
               key: 'ledger_group',
-              type: 'select',
+              type: 'ledger-group-dropdown',
               className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'Ledger Group',

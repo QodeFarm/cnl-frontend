@@ -45,12 +45,16 @@ export class CustomersListComponent {
       {
         fieldKey: 'name',
         name: 'Name',
-        sort: true
+        sort: true,
+        isEdit: true,
+        isEditSumbmit: (row, value) => {
+
+        }
       },
       {
         fieldKey: 'email',
         name: 'Email',
-        sort: false,
+        sort: false
       },
       {
         fieldKey: 'phone',
@@ -93,8 +97,8 @@ export class CustomersListComponent {
         mapFn: (currentValue: any, row: any, col: any) => {
           return row.customer_addresses.custom_shipping_address;
         },
-      },  
-      
+      },
+
       {
         fieldKey: "code",
         name: "Action",
@@ -105,6 +109,13 @@ export class CustomersListComponent {
             label: 'Delete',
             confirm: true,
             confirmMsg: "Sure to delete?",
+            apiUrl: 'customers/customers'
+          },
+          {
+            type: 'restore',
+            label: 'Restore',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
             apiUrl: 'customers/customers'
           },
           {

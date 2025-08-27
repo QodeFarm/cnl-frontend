@@ -41,6 +41,13 @@ export class ProductUniqueQuantityCodesComponent {
               apiUrl: 'masters/product_unique_quantity_codes'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/product_unique_quantity_codes'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             },

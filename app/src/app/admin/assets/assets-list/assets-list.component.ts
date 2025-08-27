@@ -99,6 +99,13 @@ export class AssetsListComponent {
             apiUrl: this.baseUrl + 'assets/assets'
           },
           {
+            type: 'restore',
+            label: 'Restore',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
+            apiUrl: this.baseUrl + 'assets/assets'
+          },
+          {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',

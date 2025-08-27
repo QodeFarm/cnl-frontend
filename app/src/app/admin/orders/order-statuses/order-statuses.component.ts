@@ -44,6 +44,13 @@ export class OrderStatusesComponent {
               apiUrl: 'masters/order_status'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/order_status'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             },
