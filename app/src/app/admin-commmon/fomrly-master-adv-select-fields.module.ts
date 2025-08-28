@@ -51,7 +51,7 @@ import { cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, C
               label: 'Ledger Accounts',
               dataKey: 'ledger_account_id',
               dataLabel: 'name',
-              required: true,
+              required: false,
               curdConfig: ledgerAccountsConfig
             }
           }
@@ -66,7 +66,7 @@ import { cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, C
               label: 'City',
               dataKey: 'city_id',
               dataLabel: 'city_name',
-              required: true,
+              required: false,
               curdConfig: cityConfig
             }
           }
@@ -81,7 +81,7 @@ import { cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, C
               label: 'State',
               dataKey: 'state_id',
               dataLabel: 'state_name',
-              required: true,
+              required: false,
               curdConfig: StateConfig
             }
           }
@@ -96,7 +96,7 @@ import { cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, C
               label: 'Country',
               dataKey: 'country_id',
               dataLabel: 'country_name',
-              required: true,
+              required: false,
               curdConfig: CountryConfig
             }
           }
@@ -111,7 +111,7 @@ import { cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, C
               label: 'Category',
               dataKey: 'vendor_category_id',
               dataLabel: 'name',
-              required: true,
+              required: false,
               curdConfig: vendorCategeoryConfig
             }
           }
@@ -141,7 +141,7 @@ import { cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, C
               label: 'Transport',
               dataKey: 'transporter_id',
               dataLabel: 'name',
-              required: true,
+              required: false,
               curdConfig: TransportConfig
             }
           }
@@ -156,7 +156,7 @@ import { cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, C
               label: 'Firmstatus',
               dataKey: 'firm_status_id',
               dataLabel: 'name',
-              required: true,
+              required: false,
               curdConfig: FirmStatusConfig
             }
           }
@@ -171,7 +171,7 @@ import { cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, C
               label: 'GST Categeory',
               dataKey: 'gst_category_id',
               dataLabel: 'name',
-              required: true,
+              required: false,
               curdConfig: GstCatConfig
             }
           }
@@ -186,7 +186,7 @@ import { cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, C
               label: 'Price Categeory',
               dataKey: 'price_category_id',
               dataLabel: 'name',
-              required: true,
+              required: false,
               curdConfig: PriceCatConfig
             }
           }
@@ -201,7 +201,7 @@ import { cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, C
               label: 'VendorAgent',
               dataKey: 'vendor_agent_id',
               dataLabel: 'name',
-              required: true,
+              required: false,
               curdConfig: VendorAgentConfig
             }
           }
@@ -216,7 +216,7 @@ import { cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, C
               label: 'Vendor Payment Terms',
               dataKey: 'payment_term_id',
               dataLabel: 'name',
-              required: true,
+              required: false,
               curdConfig: VendorPaymentTermsConfig
             }
           }
@@ -231,7 +231,7 @@ import { cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, C
               label: 'Customer Payment Terms',
               dataKey: 'payment_term_id',
               dataLabel: 'name',
-              required: true,
+              required: false,
               curdConfig: CustomerPaymentConfig
             }
           }
@@ -246,7 +246,7 @@ import { cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, C
               label: 'Ledger Group',
               dataKey: 'ledger_group_id',
               dataLabel: 'name',
-              required: true,
+              required: false,
               curdConfig: LedgerGroupsConfig
             }
           }
@@ -261,7 +261,7 @@ import { cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, C
               label: 'Territory',
               dataKey: 'territory_id',
               dataLabel: 'name',
-              required: true,
+              required: false,
               curdConfig: TerritoryConfig
             }
           }
@@ -276,7 +276,7 @@ import { cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, C
               label: 'Machine',
               dataKey: 'machine_id',
               dataLabel: 'machine_name',
-              required: true,
+              required: false,
               curdConfig: MachineConfig
             }
           }
@@ -291,26 +291,26 @@ import { cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, C
               label: 'Production Status',
               dataKey: 'status_id',
               dataLabel: 'status_name',
-              required: true,
+              required: false,
               curdConfig: ProductionStatusesConfig
             }
           }
         },
-        {
-          name: 'order-status-dropdown',
-          extends: 'adv-select',
-          wrappers: ['ta-field'],
-          defaultOptions: {
-            templateOptions: {
-              placeholder: 'Please Select Order Status',
-              label: 'Order Status',
-              dataKey: 'order_status_id',
-              dataLabel: 'status_name',
-              required: true,
-              curdConfig: OrderStatusConfig
-            }
-          }
-        },
+        // {
+        //   name: 'order-status-dropdown',
+        //   extends: 'adv-select',
+        //   wrappers: ['ta-field'],
+        //   defaultOptions: {
+        //     templateOptions: {
+        //       placeholder: 'Please Select Order Status',
+        //       label: 'Order Status',
+        //       dataKey: 'order_status_id',
+        //       dataLabel: 'status_name',
+        //       required: false,
+        //       curdConfig: OrderStatusConfig
+        //     }
+        //   }
+        // },
         {
           name: 'gst-types-dropdown',
           extends: 'adv-select',
@@ -321,7 +321,7 @@ import { cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, C
               label: 'Gst Types',
               dataKey: 'gst_type_id',
               dataLabel: 'name',
-              required: true,
+              required: false,
               curdConfig: GstTypesConfig
             }
           }
@@ -336,7 +336,7 @@ import { cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, C
               label: 'Order Types',
               dataKey: 'order_type_id',
               dataLabel: 'name',
-              required: true,
+              required: false,
               curdConfig: OrderTypesConfig
             }
           }
@@ -351,7 +351,7 @@ import { cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, C
               label: 'Purchase Types',
               dataKey: 'purchase_type_id',
               dataLabel: 'name',
-              required: true,
+              required: false,
               curdConfig: PurchaseTypesConfig
             }
           }
@@ -366,7 +366,7 @@ import { cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, C
               label: 'Sale Types',
               dataKey: 'sale_type_id',
               dataLabel: 'name',
-              required: true,
+              required: false,
               curdConfig: SaleTypesConfig
             }
           }
@@ -381,7 +381,7 @@ import { cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, C
               label: 'User Groups',
               dataKey: 'group_id',
               dataLabel: 'group_name',
-              required: true,
+              required: false,
               curdConfig: UserGroupsConfig
             }
           }
@@ -396,7 +396,7 @@ import { cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, C
               label: 'Reminder Types',
               dataKey: 'reminder_type_id',
               dataLabel: 'type_name',
-              required: true,
+              required: false,
               curdConfig: ReminderTypesConfig
             }
           }
@@ -411,7 +411,7 @@ import { cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, C
               label: 'payment Links',
               dataKey: 'payment_link_type_id',
               dataLabel: 'name',
-              required: true,
+              required: false,
               curdConfig: PaymentLinkConfig
             }
           }
