@@ -1022,10 +1022,10 @@ export class SalesComponent {
     // Find entity record from list
     const entity = this.entitiesList.find(e => e.entity_name === entityName);
 
-    if (!entity) {
-      console.error(`Entity not found for: ${entityName}`);
-      return;
-    }
+    // if (!entity) {
+    //   console.error(`Entity not found for: ${entityName}`);
+    //   return;
+    // }
 
     const entityId = entity.entity_id;
     // Inject entity_id into metadata temporarily
@@ -1363,6 +1363,7 @@ export class SalesComponent {
       const saleOrderDetails = this.formConfig.model.sale_order;
       const orderAttachmentsDetails = this.formConfig.model.order_attachments;
       const orderShipmentsDetails = this.formConfig.model.order_shipments;
+      const customFieldValues = this.formConfig.model.custom_field_values;
 
       // 4. Proceed only if sale order details exist
       if (saleOrderDetails && orderAttachmentsDetails && orderShipmentsDetails) {
@@ -1370,7 +1371,8 @@ export class SalesComponent {
           productDetails: selectedProducts,
           saleOrderDetails: saleOrderDetails,
           orderAttachments: orderAttachmentsDetails,
-          orderShipments: orderShipmentsDetails
+          orderShipments: orderShipmentsDetails,
+          customFieldsValues: customFieldValues,
         };
 
         // 5. Open the modal
@@ -1393,7 +1395,7 @@ export class SalesComponent {
   // confirmWorkOrder() {
   //   console.log("data1", this.selectedOrder);
   //   if (this.selectedOrder) {
-  //     let { productDetails, saleOrderDetails, orderAttachments, orderShipments } = this.selectedOrder;
+  //     let { productDetails, saleOrderDetails, orderAttachments, orderShipments, customFieldsValues } = this.selectedOrder;
 
   //     const allProducts = this.formConfig.model.sale_order_items;
   //     const isAllProductsSelected = productDetails.length === allProducts.length;
@@ -1531,7 +1533,8 @@ export class SalesComponent {
   //           },
   //           sale_order_items: [product],
   //           order_attachments: orderAttachments,
-  //           order_shipments: orderShipments
+  //           order_shipments: orderShipments,
+  //           custom_field_values: customFieldsValues
   //         };
 
   //         console.log('Payload for child sale order:', childSaleOrderPayload);
@@ -1637,11 +1640,11 @@ export class SalesComponent {
   //   this.ngOnInit();
   // }
 
-  confirmWorkOrder() {
-    console.log("data1", this.selectedOrder);
-    if (!this.selectedOrder) return;
+confirmWorkOrder() {
+  console.log("data1", this.selectedOrder);
+  if (this.selectedOrder) {
+    let { productDetails, saleOrderDetails, orderAttachments, orderShipments, customFieldsValues } = this.selectedOrder;
 
-    const { productDetails, saleOrderDetails, orderAttachments, orderShipments } = this.selectedOrder;
     const allProducts = this.formConfig.model.sale_order_items;
     const isAllProductsSelected = productDetails.length === allProducts.length;
 
@@ -1649,8 +1652,10 @@ export class SalesComponent {
       console.log("All products selected. Creating only work orders...");
 
       this.http.post(`sales/SaleOrder/${saleOrderDetails.sale_order_id}/move_next_stage/`, {}).subscribe({
-        next: () => {
-          const workOrders = productDetails.map(product => {
+        next: (updateResponse) => {
+          console.log('Parent Sale Order updated to Production:', updateResponse);
+
+          const processWorkOrders = productDetails.map((product) => {
             const workOrderPayload = {
               work_order: {
                 product_id: product.product_id,
@@ -1664,74 +1669,139 @@ export class SalesComponent {
                 status_id: '',
                 sale_order_id: saleOrderDetails.sale_order_id
               },
-              bom: [{ product_id: product.product_id, size_id: product.size?.size_id || null, color_id: product.color?.color_id || null }],
+              bom: [
+                {
+                  product_id: product.product_id,
+                  size_id: product.size?.size_id || null,
+                  color_id: product.color?.color_id || null,
+                }
+              ],
               work_order_machines: [],
               workers: [],
               work_order_stages: []
             };
+
+            console.log('Work Order Payload:', workOrderPayload);
+
             return this.http.post('production/work_order/', workOrderPayload);
           });
 
-          forkJoin(workOrders).subscribe({
+          forkJoin(processWorkOrders).subscribe({
             next: () => {
               this.closeModalworkorder();
-              console.log('Work Orders created successfully!');
+              console.log('Work Orders created successfully (without child sale orders)!');
             },
-            error: err => {
+            error: (err) => {
               console.error('Error creating Work Orders:', err);
-              alert('Failed to create Work Orders.');
+              alert('Failed to create Work Orders. Please try again.');
             }
           });
         },
-        error: err => console.error('Error updating Parent Sale Order:', err)
+        error: (err) => {
+          console.error('Error updating Parent Sale Order:', err);
+        }
       });
-
     } else {
       console.log("Partial products selected. Creating child sale orders & work orders...");
 
       const parentOrderNo = saleOrderDetails.order_no;
       let childOrderCounter = 1;
 
-      const removedItemIds = productDetails.map(p => p.sale_order_item_id);
+      const removedItemIds = productDetails.map(p => p.sale_order_item_id);  // selected ones
       const parentAllItems = this.formConfig.model.sale_order_items || [];
       const remainingItems = parentAllItems.filter(item => !removedItemIds.includes(item.sale_order_item_id));
 
-      const processProductRequests = productDetails.map(product => {
+      // 🔹 Custom Fields Payload Construction (same as createSaleOrder)
+      const entityName = 'sale_order';
+      const customId = null; // child is new
+      const entity = this.entitiesList.find(e => e.entity_name === entityName);
+
+      if (entity) {
+        const entityId = entity.entity_id;
+        Object.keys(this.customFieldMetadata).forEach((key) => {
+          this.customFieldMetadata[key].entity_id = entityId;
+        });
+      }
+
+      const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(
+        customFieldsValues,
+        entityName,
+        customId
+      );
+
+      const processProductRequests = productDetails.map((product) => {
         const childOrderNo = `${parentOrderNo}-${childOrderCounter++}`;
+
         const quantity = Number(product.quantity) || 0;
         const rate = Number(product.rate) || 0;
         const itemsValue = quantity * rate;
+
         const igst = Number(product.igst) || 0;
         const cgst = Number(product.cgst) || 0;
         const sgst = Number(product.sgst) || 0;
         const taxAmount = igst + cgst + sgst;
+
         const productDiscountPercent = Number(product.discount) || 0;
         const discountOnItems = (itemsValue * productDiscountPercent) / 100;
 
-        const totalCess = 0;
-        const totalDiscount = 0;
+        const totalCess = Number(saleOrderDetails.cess_amount) || 0;
+        const totalDiscount = Number(saleOrderDetails.dis_amt) || 0;
+        const selectedProductCount = productDetails.length;
 
-        const totalAmount = itemsValue - totalDiscount + taxAmount - discountOnItems + totalCess;
+        const perOrderCess = selectedProductCount > 0 ? (totalCess / selectedProductCount) : 0;
+        const perOrderDiscount = selectedProductCount > 0 ? (totalDiscount / selectedProductCount) : 0;
+
+        const totalAmount = itemsValue
+          - perOrderDiscount
+          + taxAmount + perOrderCess
+          - discountOnItems;
+
+        console.log(`Computed for product ${product.product_id}:`,
+          { itemsValue, taxAmount, perOrderDiscount, discountOnItems, totalAmount });
 
         const childSaleOrderPayload = {
           sale_order: {
-            ...saleOrderDetails,
             order_no: childOrderNo,
+            ref_no: saleOrderDetails.ref_no,
+            sale_type_id: saleOrderDetails.sale_type_id,
+            tax: saleOrderDetails.tax,
+            cess_amount: perOrderCess.toFixed(2),
             tax_amount: taxAmount,
+            advance_amount: saleOrderDetails.advance_amount,
             item_value: itemsValue,
             total_amount: totalAmount,
-            dis_amt: totalDiscount,
-            cess_amount: totalCess,
-            flow_status: { flow_status_name: 'Production' }
+            ledger_account_id: saleOrderDetails.ledger_account_id,
+            order_status_id: saleOrderDetails.order_status_id,
+            customer_id: saleOrderDetails.customer.customer_id,
+            order_date: saleOrderDetails.order_date,
+            ref_date: saleOrderDetails.ref_date,
+            delivery_date: saleOrderDetails.delivery_date,
+            order_type: 'sale_order',
+            sale_estimate: saleOrderDetails.sale_estimate || 'No',
+            flow_status: { flow_status_name: 'Production' },
+            billing_address: saleOrderDetails.billing_address,
+            shipping_address: saleOrderDetails.shipping_address,
+            email: saleOrderDetails.email,
+            remarks: saleOrderDetails.remarks || null,
+            dis_amt: perOrderDiscount,
           },
           sale_order_items: [product],
           order_attachments: orderAttachments,
-          order_shipments: orderShipments
+          order_shipments: orderShipments,
+          custom_field_values: customFieldsPayload?.custom_field_values || []   // ✅ fixed
         };
+
+        console.log('Payload for child sale order:', childSaleOrderPayload);
 
         return this.http.post('sales/sale_order/', childSaleOrderPayload).pipe(
           tap((childSaleOrderResponse: any) => {
-            this.http.patch(`sales/sale_order_items/${product.sale_order_item_id}/`, { work_order_created: 'YES' }).subscribe();
+            console.log(`Child Sale Order ${childOrderNo} created:`, childSaleOrderResponse);
+
+            this.http.patch(`sales/sale_order_items/${product.sale_order_item_id}/`, { work_order_created: 'YES' })
+              .subscribe({
+                next: () => console.log(`Product ${product.product_id} marked as Work Order Created in Parent Sale Order`),
+                error: (err) => console.error('Error updating work order status:', err)
+              });
 
             const workOrderPayload = {
               work_order: {
@@ -1746,96 +1816,269 @@ export class SalesComponent {
                 status_id: '',
                 sale_order_id: childSaleOrderResponse.data.sale_order.sale_order_id
               },
-              bom: [{ product_id: product.product_id, size_id: product.size?.size_id || null, color_id: product.color?.color_id || null }],
+              bom: [
+                {
+                  product_id: product.product_id,
+                  size_id: product.size?.size_id || null,
+                  color_id: product.color?.color_id || null,
+                }
+              ],
               work_order_machines: [],
               workers: [],
               work_order_stages: []
             };
 
-            this.http.post('production/work_order/', workOrderPayload).subscribe();
+            console.log('Work Order Payload:', workOrderPayload);
+
+            this.http.post('production/work_order/', workOrderPayload).subscribe({
+              next: (workOrderResponse) => {
+                console.log('Work Order created:', workOrderResponse);
+                this.showSuccessToast = true;
+                this.toastMessage = "WorkOrder & Child Sale Order created";
+                setTimeout(() => {
+                  this.showSuccessToast = false;
+                }, 3000);
+              },
+              error: (err) => {
+                console.error('Error creating Work Order:', err);
+              }
+            });
           })
         );
       });
 
       forkJoin(processProductRequests).subscribe({
         next: () => {
+          console.log("patch started here....")
+          console.log("saleOrderDetails : ", saleOrderDetails)
+          console.log("remainingItems : ", remainingItems)
+
           const patchPayload = {
             sale_order_items: productDetails.map(p => ({ sale_order_item_id: p.sale_order_item_id }))
           };
-
           this.http.patch(`sales/sale_order/${saleOrderDetails.sale_order_id}/`, patchPayload).subscribe({
             next: () => {
-              // ✅ Recalculate parent totals from remainingItems
-              let updatedItemValue = 0;
-              let updatedTaxAmount = 0;
-              let updatedProductDiscount = 0;
-
-              remainingItems.forEach(item => {
-                const quantity = Number(item.quantity) || 0;
-                const rate = Number(item.rate) || 0;
-                const itemValue = quantity * rate;
-                const igst = Number(item.igst) || 0;
-                const cgst = Number(item.cgst) || 0;
-                const sgst = Number(item.sgst) || 0;
-                const taxAmount = igst + cgst + sgst;
-                const discount = Number(item.discount) || 0;
-                const discountAmount = (itemValue * discount) / 100;
-
-                updatedItemValue += itemValue;
-                updatedTaxAmount += taxAmount;
-                updatedProductDiscount += discountAmount;
-              });
-
-              const totalCess = Number(saleOrderDetails.cess_amount) || 0;
-              const totalDiscount = Number(saleOrderDetails.dis_amt) || 0;
-              // const totalItemCount = allProducts.length;
-              // const remainingCount = remainingItems.length;
-              // const updatedCessAmount = (totalCess / totalItemCount) * remainingCount;
-              // const updatedOrderLevelDiscount = (totalDiscount / totalItemCount) * remainingCount;
-
-              const updatedTotalAmount = updatedItemValue - totalDiscount + updatedTaxAmount + totalCess - updatedProductDiscount;
-
-              // ✅ Full PUT call to update parent sale order
-              const finalPutPayload = {
-                sale_order: {
-                  ...saleOrderDetails,
-                  item_value: updatedItemValue,
-                  tax_amount: updatedTaxAmount,
-                  dis_amt: totalDiscount,
-                  cess_amount: totalCess,
-                  total_amount: updatedTotalAmount
-                },
-                sale_order_items: remainingItems,
-                order_attachments: orderAttachments,
-                order_shipments: orderShipments
-              };
-
-              this.http.put(`sales/sale_order/${saleOrderDetails.sale_order_id}/`, finalPutPayload).subscribe({
-                next: () => {
-                  console.log("✅ Parent sale order fully updated via PUT.");
-                  this.closeModalworkorder();
-                },
-                error: err => {
-                  console.error("❌ Failed to update parent sale order:", err);
-                  this.closeModalworkorder();
-                }
-              });
+              console.log('Parent sale order updated after removing selected items');
+              this.closeModalworkorder();
             },
             error: (err) => {
-              console.error('Failed to patch parent sale order:', err);
+              console.error('Failed to update parent sale order:', err);
               this.closeModalworkorder();
             }
           });
         },
-        error: err => {
-          console.error('Error creating child sale orders or work orders:', err);
-          alert('Child Sale Order creation failed.');
+        error: (err) => {
+          console.error('Error processing products:', err);
+          alert('Failed to create Child Sale Orders or Work Orders. Please try again.');
         }
       });
     }
-
-    this.ngOnInit();
   }
+  this.ngOnInit();
+}
+
+
+  // confirmWorkOrder() {
+  //   console.log("data1", this.selectedOrder);
+  //   if (!this.selectedOrder) return;
+
+  //   const { productDetails, saleOrderDetails, orderAttachments, orderShipments, customFieldsValues } = this.selectedOrder;
+  //   const allProducts = this.formConfig.model.sale_order_items;
+  //   const isAllProductsSelected = productDetails.length === allProducts.length;
+
+  //   if (isAllProductsSelected) {
+  //     console.log("All products selected. Creating only work orders...");
+
+  //     this.http.post(`sales/SaleOrder/${saleOrderDetails.sale_order_id}/move_next_stage/`, {}).subscribe({
+  //       next: () => {
+  //         const workOrders = productDetails.map(product => {
+  //           const workOrderPayload = {
+  //             work_order: {
+  //               product_id: product.product_id,
+  //               quantity: product.quantity || 0,
+  //               completed_qty: 0,
+  //               pending_qty: product.quantity || 0,
+  //               start_date: saleOrderDetails.order_date || new Date().toISOString().split('T')[0],
+  //               sync_qty: true,
+  //               size_id: product.size?.size_id || null,
+  //               color_id: product.color?.color_id || null,
+  //               status_id: '',
+  //               sale_order_id: saleOrderDetails.sale_order_id
+  //             },
+  //             bom: [{ product_id: product.product_id, size_id: product.size?.size_id || null, color_id: product.color?.color_id || null }],
+  //             work_order_machines: [],
+  //             workers: [],
+  //             work_order_stages: []
+  //           };
+  //           return this.http.post('production/work_order/', workOrderPayload);
+  //         });
+
+  //         forkJoin(workOrders).subscribe({
+  //           next: () => {
+  //             this.closeModalworkorder();
+  //             console.log('Work Orders created successfully!');
+  //           },
+  //           error: err => {
+  //             console.error('Error creating Work Orders:', err);
+  //             alert('Failed to create Work Orders.');
+  //           }
+  //         });
+  //       },
+  //       error: err => console.error('Error updating Parent Sale Order:', err)
+  //     });
+
+  //   } else {
+  //     console.log("Partial products selected. Creating child sale orders & work orders...");
+
+  //     const parentOrderNo = saleOrderDetails.order_no;
+  //     let childOrderCounter = 1;
+
+  //     const removedItemIds = productDetails.map(p => p.sale_order_item_id);
+  //     const parentAllItems = this.formConfig.model.sale_order_items || [];
+  //     const remainingItems = parentAllItems.filter(item => !removedItemIds.includes(item.sale_order_item_id));
+
+  //     const processProductRequests = productDetails.map(product => {
+  //       const childOrderNo = `${parentOrderNo}-${childOrderCounter++}`;
+  //       const quantity = Number(product.quantity) || 0;
+  //       const rate = Number(product.rate) || 0;
+  //       const itemsValue = quantity * rate;
+  //       const igst = Number(product.igst) || 0;
+  //       const cgst = Number(product.cgst) || 0;
+  //       const sgst = Number(product.sgst) || 0;
+  //       const taxAmount = igst + cgst + sgst;
+  //       const productDiscountPercent = Number(product.discount) || 0;
+  //       const discountOnItems = (itemsValue * productDiscountPercent) / 100;
+
+  //       const totalCess = 0;
+  //       const totalDiscount = 0;
+
+  //       const totalAmount = itemsValue - totalDiscount + taxAmount - discountOnItems + totalCess;
+
+  //       const childSaleOrderPayload = {
+  //         sale_order: {
+  //           ...saleOrderDetails,
+  //           order_no: childOrderNo,
+  //           tax_amount: taxAmount,
+  //           item_value: itemsValue,
+  //           total_amount: totalAmount,
+  //           dis_amt: totalDiscount,
+  //           cess_amount: totalCess,
+  //           flow_status: { flow_status_name: 'Production' }
+  //         },
+  //         sale_order_items: [product],
+  //         order_attachments: orderAttachments,
+  //         order_shipments: orderShipments,
+  //         custom_field_values: customFieldsValues
+  //       };
+
+  //       return this.http.post('sales/sale_order/', childSaleOrderPayload).pipe(
+  //         tap((childSaleOrderResponse: any) => {
+  //           this.http.patch(`sales/sale_order_items/${product.sale_order_item_id}/`, { work_order_created: 'YES' }).subscribe();
+
+  //           const workOrderPayload = {
+  //             work_order: {
+  //               product_id: product.product_id,
+  //               quantity: product.quantity || 0,
+  //               completed_qty: 0,
+  //               pending_qty: product.quantity || 0,
+  //               start_date: saleOrderDetails.order_date || new Date().toISOString().split('T')[0],
+  //               sync_qty: true,
+  //               size_id: product.size?.size_id || null,
+  //               color_id: product.color?.color_id || null,
+  //               status_id: '',
+  //               sale_order_id: childSaleOrderResponse.data.sale_order.sale_order_id
+  //             },
+  //             bom: [{ product_id: product.product_id, size_id: product.size?.size_id || null, color_id: product.color?.color_id || null }],
+  //             work_order_machines: [],
+  //             workers: [],
+  //             work_order_stages: []
+  //           };
+
+  //           this.http.post('production/work_order/', workOrderPayload).subscribe();
+  //         })
+  //       );
+  //     });
+
+  //     forkJoin(processProductRequests).subscribe({
+  //       next: () => {
+  //         const patchPayload = {
+  //           sale_order_items: productDetails.map(p => ({ sale_order_item_id: p.sale_order_item_id }))
+  //         };
+
+  //         this.http.patch(`sales/sale_order/${saleOrderDetails.sale_order_id}/`, patchPayload).subscribe({
+  //           next: () => {
+  //             // ✅ Recalculate parent totals from remainingItems
+  //             let updatedItemValue = 0;
+  //             let updatedTaxAmount = 0;
+  //             let updatedProductDiscount = 0;
+
+  //             remainingItems.forEach(item => {
+  //               const quantity = Number(item.quantity) || 0;
+  //               const rate = Number(item.rate) || 0;
+  //               const itemValue = quantity * rate;
+  //               const igst = Number(item.igst) || 0;
+  //               const cgst = Number(item.cgst) || 0;
+  //               const sgst = Number(item.sgst) || 0;
+  //               const taxAmount = igst + cgst + sgst;
+  //               const discount = Number(item.discount) || 0;
+  //               const discountAmount = (itemValue * discount) / 100;
+
+  //               updatedItemValue += itemValue;
+  //               updatedTaxAmount += taxAmount;
+  //               updatedProductDiscount += discountAmount;
+  //             });
+
+  //             const totalCess = Number(saleOrderDetails.cess_amount) || 0;
+  //             const totalDiscount = Number(saleOrderDetails.dis_amt) || 0;
+  //             // const totalItemCount = allProducts.length;
+  //             // const remainingCount = remainingItems.length;
+  //             // const updatedCessAmount = (totalCess / totalItemCount) * remainingCount;
+  //             // const updatedOrderLevelDiscount = (totalDiscount / totalItemCount) * remainingCount;
+
+  //             const updatedTotalAmount = updatedItemValue - totalDiscount + updatedTaxAmount + totalCess - updatedProductDiscount;
+
+  //             // ✅ Full PUT call to update parent sale order
+  //             const finalPutPayload = {
+  //               sale_order: {
+  //                 ...saleOrderDetails,
+  //                 item_value: updatedItemValue,
+  //                 tax_amount: updatedTaxAmount,
+  //                 dis_amt: totalDiscount,
+  //                 cess_amount: totalCess,
+  //                 total_amount: updatedTotalAmount
+  //               },
+  //               sale_order_items: remainingItems,
+  //               order_attachments: orderAttachments,
+  //               order_shipments: orderShipments,
+  //               custom_field_values: customFieldsValues
+  //             };
+
+  //             this.http.put(`sales/sale_order/${saleOrderDetails.sale_order_id}/`, finalPutPayload).subscribe({
+  //               next: () => {
+  //                 console.log("✅ Parent sale order fully updated via PUT.");
+  //                 this.closeModalworkorder();
+  //               },
+  //               error: err => {
+  //                 console.error("❌ Failed to update parent sale order:", err);
+  //                 this.closeModalworkorder();
+  //               }
+  //             });
+  //           },
+  //           error: (err) => {
+  //             console.error('Failed to patch parent sale order:', err);
+  //             this.closeModalworkorder();
+  //           }
+  //         });
+  //       },
+  //       error: err => {
+  //         console.error('Error creating child sale orders or work orders:', err);
+  //         alert('Child Sale Order creation failed.');
+  //       }
+  //     });
+  //   }
+
+  //   this.ngOnInit();
+  // }
 
 
 //   getUnitData(unitInfo) {
@@ -3829,7 +4072,7 @@ getUnitData(unitInfo) {
                             },
                             {
                               key: 'order_status',
-                              type: 'order-status-dropdown',
+                              type: 'select',
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 label: 'Order status',
