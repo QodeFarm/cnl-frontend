@@ -46,6 +46,13 @@ export class ProductTypesComponent {
               apiUrl: 'masters/product_types'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/product_types'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             },

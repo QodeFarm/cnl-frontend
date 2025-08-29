@@ -62,7 +62,7 @@ export class TableCellDynamicComponent implements OnInit {
       if (typeof apiUrl === 'function') {
         apiUrl = apiUrl(this.row);
       }
-      this.http[this.col.autoSave.method || 'put'](apiUrl, body).subscribe((res: any) => {
+      this.http[this.col.autoSave.method || 'patch'](apiUrl, body).subscribe((res: any) => {
         this.loading = false;
         if (res && res.status === 'success' || res.data) {
           this.value = this.inputValue;

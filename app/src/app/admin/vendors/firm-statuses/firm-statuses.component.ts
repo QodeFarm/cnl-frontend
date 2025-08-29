@@ -39,6 +39,13 @@ export class FirmStatusesComponent {
               apiUrl: 'masters/firm_statuses'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/firm_statuses'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             },

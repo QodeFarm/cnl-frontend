@@ -42,6 +42,9 @@ export class ResetPasswordComponent {
           addonRight: {
             text: '$',
           },
+          attributes: {
+            style: 'padding-left: 10px;' // Add your padding here
+          },
           label: 'Password',
           placeholder: 'Enter Password',
           required: true,
@@ -60,6 +63,9 @@ export class ResetPasswordComponent {
           },
           addonRight: {
             text: '$',
+          },
+          attributes: {
+            style: 'padding-left: 10px;' // Add your padding here
           },
           label: 'Confirm Password',
           placeholder: 'Enter Confirm Password',

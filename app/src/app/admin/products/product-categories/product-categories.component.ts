@@ -45,6 +45,13 @@ export class ProductCategoriesComponent  {
             apiUrl: 'products/product_categories'
           },
           {
+            type: 'restore',
+            label: 'Restore',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
+            apiUrl: 'products/product_categories'
+          },
+          {
             type: 'edit',
             label: 'Edit'
           }

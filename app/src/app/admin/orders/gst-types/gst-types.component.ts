@@ -39,6 +39,13 @@ export class GstTypesComponent {
               apiUrl: 'masters/gst_types'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/gst_types'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             },

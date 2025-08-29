@@ -132,6 +132,13 @@ export class CustomersListComponent {
             apiUrl: 'customers/customers'
           },
           {
+            type: 'restore',
+            label: 'Restore',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
+            apiUrl: 'customers/customers'
+          },
+          {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',

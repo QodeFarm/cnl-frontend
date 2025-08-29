@@ -125,6 +125,13 @@ export class EmployeeListComponent {
             apiUrl: 'hrms/employees'
           },
           {
+            type: 'restore',
+            label: 'Restore',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
+            apiUrl: 'hrms/employees'
+          },
+          {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',

@@ -38,6 +38,13 @@ export class GPackageUnitsComponent {
               apiUrl: 'masters/g_package_units'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/g_package_units'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }

@@ -39,11 +39,19 @@ export class ShiftsComponent {
           fieldKey: "code",
           name: "Action",
           type: 'action',
-          actions: [{
+          actions: [
+            {
               type: 'delete',
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'hrms/shifts'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'hrms/shifts'
             },
             {

@@ -59,6 +59,13 @@ export class LedgerGroupsComponent {
               apiUrl: 'masters/ledger_groups'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/ledger_groups'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }

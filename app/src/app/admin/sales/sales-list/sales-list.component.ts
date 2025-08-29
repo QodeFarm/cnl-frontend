@@ -441,6 +441,13 @@ export class SalesListComponent {
             apiUrl: 'sales/sale_order'
           },
           {
+            type: 'restore',
+            label: 'Restore',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
+            apiUrl: 'sales/sale_order'
+          },
+          {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',

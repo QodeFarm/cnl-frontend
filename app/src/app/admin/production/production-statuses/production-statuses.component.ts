@@ -41,6 +41,13 @@ export class ProductionStatusesComponent {
               apiUrl: 'production/production_statuses'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'production/production_statuses'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }

@@ -186,6 +186,13 @@ export class PurchaseInvoiceListComponent {
             apiUrl: 'purchase/purchase_invoice_order'
           },
           {
+            type: 'restore',
+            label: 'Restore',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
+            apiUrl: 'purchase/purchase_invoice_order'
+          },
+          {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',

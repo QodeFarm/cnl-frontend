@@ -946,7 +946,7 @@ loadQuickpackProducts() {
               fieldGroup: [
                 {
                   key: 'purchase_type',
-                  type: 'select',
+                  type: 'purchase-types-dropdown',
                   className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'Purchase type',
@@ -2211,7 +2211,7 @@ loadQuickpackProducts() {
                             // },
                             {
                               key: 'gst_type',
-                              type: 'select',
+                              type: 'gst-types-dropdown',
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 label: 'Gst type',
@@ -2241,7 +2241,7 @@ loadQuickpackProducts() {
                             },                                                                                    
                             {
                               key: 'payment_term',
-                              type: 'select',
+                              type: 'vendor-payment-dropdown',
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 label: 'Payment term',
@@ -2270,7 +2270,7 @@ loadQuickpackProducts() {
                             },                            
                             {
                               key: 'ledger_account',
-                              type: 'select',
+                              type: 'ledger-account-dropdown',
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 label: 'Ledger account',
@@ -2643,7 +2643,7 @@ loadQuickpackProducts() {
                   fieldGroup: [
                     {
                       key: 'vendor_agent',
-                      type: 'select',
+                      type: 'vendor-agent-dropdown',
                       className: 'col-md-4 col-sm-6 col-12',
                       templateOptions: {
                         label: 'Vendor agent',

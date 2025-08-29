@@ -171,6 +171,13 @@ tableConfig: TaTableConfig = {
             apiUrl: 'api/masters/brand_salesman/'
           },
           {
+            type: 'restore',
+            label: 'Restore',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
+            apiUrl: 'api/masters/brand_salesman/'
+          },
+          {
             type: 'callBackFn',
             label: 'Edit',
             // callBackFn: (row, action) => {

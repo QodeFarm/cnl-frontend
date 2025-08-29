@@ -64,6 +64,13 @@ export class VendorPaymentTermsComponent {
               apiUrl: 'vendors/vendor_payment_terms'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'vendors/vendor_payment_terms'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             },

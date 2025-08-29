@@ -139,6 +139,13 @@ export class LeadsListComponent {
             apiUrl: 'leads/leads'
           },
           {
+            type: 'restore',
+            label: 'Restore',
+            apiUrl: 'leads/leads',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
+          },
+          {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',

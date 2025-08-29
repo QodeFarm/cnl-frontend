@@ -39,6 +39,8 @@ export class ProductsComponent implements OnInit {
     // Reset selectedProductMode to default "Inventory" to ensure Attributes tab is visible by default
     this.selectedProductMode = "Inventory";
     this.setFormConfig();
+    // console.log('Check field : ',this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[7])
+    // this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = true;
   }
 
   hide() {
@@ -54,6 +56,17 @@ export class ProductsComponent implements OnInit {
     this.http.get('products/products/' + event).subscribe((res: any) => {
       if (res) {
         this.formConfig.model = res.data;
+
+        // ✅ Ensure product_variations always has at least one row
+        if (!this.formConfig.model.product_variations || this.formConfig.model.product_variations.length === 0) {
+          this.formConfig.model.product_variations = [{}];
+        }
+
+        // ✅ Always ensure balance array exists with at least one row
+        if (!this.formConfig.model.product_item_balance || this.formConfig.model.product_item_balance.length === 0) {
+          this.formConfig.model.product_item_balance = [{}];
+        }
+
         this.formConfig.showActionBtn = true;
         // Set labels for update
         this.formConfig.pkId = 'product_id';
@@ -61,6 +74,7 @@ export class ProductsComponent implements OnInit {
         // Show form after setting form values
         this.formConfig.model['product_id'] = this.ProductEditID;
         this.showForm = true;
+        // this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = false;
 
         // If we're editing a product, get the product mode name from the API to set selectedProductMode
         // if (this.formConfig.model.products?.product_mode_id) {
@@ -135,42 +149,152 @@ export class ProductsComponent implements OnInit {
   }
 
   // Method to calculate and verify the balance
-  verifyBalance(): any {
-    const balance = parseInt(this.formConfig.model.products.balance, 10);
+  // verifyBalance(): any {
+  //   const balance = parseInt(this.formConfig.model.products.balance, 10);
 
-    // Helper function to calculate total quantity
-    const calculateTotalQuantity = (items) =>
-      items?.reduce((sum, item) => sum + (parseInt(item.quantity, 10) || 0), 0) || 0;
+  //   // Helper function to calculate total quantity
+  //   const calculateTotalQuantity = (items) =>
+  //     items?.reduce((sum, item) => sum + (parseInt(item.quantity, 10) || 0), 0) || 0;
 
-    // Filter out empty/null variations
-    const productVariations = (this.formConfig.model.product_variations ?? []).filter(
-      (obj) => obj && Object.keys(obj).length
-    );
+  //   // Filter out empty/null variations
+  //   const productVariations = (this.formConfig.model.product_variations ?? []).filter(
+  //     (obj) => obj && Object.keys(obj).length
+  //   );
 
-    // Update model with cleaned variations
-    this.formConfig.model.product_variations = productVariations;
+  //   // Update model with cleaned variations
+  //   this.formConfig.model.product_variations = productVariations;
 
-    // const totalItemBalanceQuantity = calculateTotalQuantity(this.formConfig.model.product_item_balance);
-    // const totalVariationQuantity = calculateTotalQuantity(productVariations);
+  //   const totalVariationQuantity = calculateTotalQuantity(productVariations);
+  //   const totalWarehouseQuantity  = calculateTotalQuantity(this.formConfig.model.product_item_balance);
 
-    // // Validate variations match balance
-    // if (productVariations.length && totalVariationQuantity !== balance) {
-    //   return this.showDialog(
-    //     `<b>Variations !</b><br>
-    //      Your sum of quantities are <b>${totalVariationQuantity}</b> not matching with overall balance <b>${balance}.</b>`
-    //   );
-    // }
+  //   // Validate variations match balance
+  //   if (totalVariationQuantity !== balance) {
+  //     return this.showDialog(
+  //       `<b>Variations !</b><br>
+  //        Your sum of quantities are <b>${totalVariationQuantity}</b> not matching with overall balance <b>${balance}.</b>`
+  //     );
+  //   }
 
-    // // Validate item balance matches
-    // if (totalItemBalanceQuantity !== balance) {
-    //   return this.showDialog(
-    //     `<b>Warehouse Locations!</b><br>
-    //      Your sum of quantities are <b>${totalItemBalanceQuantity}</b> not matching with overall balance <b>${balance}.</b>`
-    //   );
-    // }
+  //   // Validate item balance matches
+  //   if (totalWarehouseQuantity  !== balance) {
+  //     return this.showDialog(
+  //       `<b>Warehouse Locations!</b><br>
+  //        Your sum of quantities are <b>${totalWarehouseQuantity }</b> not matching with overall balance <b>${balance}.</b>`
+  //     );
+  //   }
 
-    return true; // Everything matches
+  //   return true; // Everything matches
+  // }
+
+// verifyBalance(): any {
+//   const isEditMode = this.formConfig.formState.viewMode; // true = edit, false = create
+
+//   // Helper to sum quantities
+//   const calculateTotalQuantity = (items) =>
+//     items?.reduce((sum, item) => sum + (parseInt(item.quantity, 10) || 0), 0) || 0;
+
+//   const productVariations = (this.formConfig.model.product_variations ?? []).filter(
+//     (obj) => obj && Object.keys(obj).length
+//   );
+//   this.formConfig.model.product_variations = productVariations;
+
+//   const totalVariationQuantity = calculateTotalQuantity(productVariations);
+//   const totalWarehouseQuantity = calculateTotalQuantity(this.formConfig.model.product_item_balance);
+
+//   if (!isEditMode) {
+//     // ✅ Create Mode: balance should auto-sync with variations
+//     this.formConfig.model.products.balance = totalVariationQuantity;
+
+//     if (totalVariationQuantity !== totalWarehouseQuantity) {
+//       return this.showDialog(
+//         `<b>Mismatch!</b><br>
+//          Variations = <b>${totalVariationQuantity}</b>, 
+//          Warehouse = <b>${totalWarehouseQuantity}</b>. They must match.`
+//       );
+//     }
+//   } else {
+//     // ✅ Edit Mode: balance must match both
+//     const balance = parseInt(this.formConfig.model.products?.balance, 10) || 0;
+
+//     if (totalVariationQuantity !== balance) {
+//       return this.showDialog(
+//         `<b>Variations!</b><br>
+//          Sum of variation quantities <b>${totalVariationQuantity}</b> 
+//          is not matching with Balance <b>${balance}</b>.`
+//       );
+//     }
+
+//     if (totalWarehouseQuantity !== balance) {
+//       return this.showDialog(
+//         `<b>Warehouse!</b><br>
+//          Sum of warehouse quantities <b>${totalWarehouseQuantity}</b> 
+//          is not matching with Balance <b>${balance}</b>.`
+//       );
+//     }
+//   }
+
+//   return true;
+// }
+
+verifyBalance(): any {
+  const isEditMode = this.formConfig.formState.viewMode; // true = edit, false = create
+
+  // Helper to sum quantities
+  const calculateTotalQuantity = (items) =>
+    items?.reduce((sum, item) => sum + (parseInt(item.quantity, 10) || 0), 0) || 0;
+
+  const productVariations = (this.formConfig.model.product_variations ?? []).filter(
+    (obj) => obj && Object.keys(obj).length
+  );
+  this.formConfig.model.product_variations = productVariations;
+
+  const totalVariationQuantity = calculateTotalQuantity(productVariations);
+  const totalWarehouseQuantity = calculateTotalQuantity(this.formConfig.model.product_item_balance);
+
+  // --- CASE 1: Both empty → balance = 0
+  if (totalVariationQuantity === 0 && totalWarehouseQuantity === 0) {
+    this.formConfig.model.products.balance = 0;
+    return true;
   }
+
+  // --- CASE 2: Only variations entered
+  if (totalVariationQuantity > 0 && totalWarehouseQuantity === 0) {
+    this.formConfig.model.products.balance = totalVariationQuantity;
+    return true;
+  }
+
+  // --- CASE 3: Only warehouses entered
+  if (totalWarehouseQuantity > 0 && totalVariationQuantity === 0) {
+    this.formConfig.model.products.balance = totalWarehouseQuantity;
+    return true;
+  }
+
+  // --- CASE 4: Both entered → must match
+  if (totalVariationQuantity !== totalWarehouseQuantity) {
+    return this.showDialog(
+      `<b>Mismatch!</b><br>
+       Variations = <b>${totalVariationQuantity}</b>, 
+       Warehouse = <b>${totalWarehouseQuantity}</b>. They must match.`
+    );
+  }
+
+  // ✅ If both match → set balance
+  this.formConfig.model.products.balance = totalVariationQuantity;
+
+  return true;
+}
+
+
+
+  // On every change in product_variations update balance
+  updateBalanceFromVariations() {
+    const productVariations = this.formConfig.model.product_variations ?? [];
+    const balance = productVariations.reduce(
+      (sum, item) => sum + (parseInt(item.quantity, 10) || 0), 0
+    );
+    this.formConfig.model.products.balance = balance;
+  }
+
 
   showDialog(message: string): void {
     this.dialogMessage = message;  // Set the dynamic message
@@ -199,7 +323,7 @@ export class ProductsComponent implements OnInit {
         this.createRecord();
       }
     }
-  }; z
+  };
 
   setFormConfig() {
     this.ProductEditID = null
@@ -243,7 +367,6 @@ export class ProductsComponent implements OnInit {
                   className: 'col-sm-9 col-12 p-0',
                   fieldGroupClassName: 'row m-0 p-0',
                   fieldGroup: [
-
                     {
                       className: 'col-md-4 col-sm-6 col-12',
                       key: 'product_mode_id',
@@ -254,6 +377,7 @@ export class ProductsComponent implements OnInit {
                         required: true,
                         options: []
                       },
+                      
                       hooks: {
                         onInit: (field: any) => {
                           // Load the dropdown data from the API
@@ -371,6 +495,22 @@ export class ProductsComponent implements OnInit {
                                         typeField.templateOptions.disabled = false;
                                         typeField.templateOptions.placeholder = 'Select Type';
                                         typeField.templateOptions = { ...typeField.templateOptions };
+                                        
+                                        // Find the "Finished Product" option
+                                        const finishedProductOption = formattedOptions.find(
+                                          (option: any) => option.label.toLowerCase() === 'finished product'
+                                        );
+                                        
+                                        if (finishedProductOption) {
+                                          // Set it as the default value
+                                          typeField.formControl.setValue(finishedProductOption.value);
+                                          
+                                          // Update the model
+                                          if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                                            this.formConfig.model['products']['type_id'] = finishedProductOption.value;
+                                            console.log("Default Type set to Finished Product:", finishedProductOption.value);
+                                          }
+                                        }
                                       } else {
                                         typeField.templateOptions.options = [];
                                         typeField.templateOptions.disabled = false;
@@ -481,7 +621,7 @@ export class ProductsComponent implements OnInit {
                           { value: 18, label: '18%' }
                         ]
                       }
-                    },
+                    },   
                     {
                       key: 'stock_unit',
                       type: 'productStockUnits-dropdown',
@@ -509,6 +649,34 @@ export class ProductsComponent implements OnInit {
                         }
                       }
                     },
+                    {
+                      className: 'col-md-4 col-sm-6 col-12',
+                      key: 'hsn_code',
+                      type: 'select',
+                      templateOptions: {
+                        label: 'HSN',
+                        placeholder: 'Enter or Select HSN Code',
+                        required: false,
+                        options: [
+                          { value: '0101', label: '0101' },
+                          { value: '0201', label: '0201' },
+                          { value: '0301', label: '0301' },
+                          { value: '0401', label: '0401' },
+                          { value: '0501', label: '0501' }
+                        ],
+                        // allowCustomValue: true // Allow users to enter their own value
+                      }
+                    }, 
+                    {
+                      className: 'col-md-4 col-sm-6 col-12',
+                      key: 'balance',
+                      type: 'input',
+                      defaultValue: 0.00,
+                      templateOptions: {
+                      label: 'Balance',
+                      required: false, 
+                    }
+                  },
                   ]
                 },
                 {
@@ -619,33 +787,33 @@ export class ProductsComponent implements OnInit {
                                 }
                               }
                             },
-                            {
-                              key: 'item_type',
-                              type: 'productItemType-dropdown',
-                              className: 'col-3',
-                              templateOptions: {
-                                label: 'Item Type',
-                                dataKey: 'item_type_id',
-                                dataLabel: "item_name",
-                                options: [],
-                                required: false,
-                                lazy: {
-                                  url: 'masters/product_item_type/',
-                                  lazyOneTime: true
-                                }
-                              },
-                              hooks: {
-                                onChanges: (field: any) => {
-                                  field.formControl.valueChanges.subscribe((data: any) => {
-                                    if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
-                                      this.formConfig.model['products']['item_type_id'] = data?.item_type_id;
-                                    } else {
-                                      console.error('Form config or lead_status data model is not defined.');
-                                    }
-                                  });
-                                }
-                              }
-                            },
+                            // {
+                            //   key: 'item_type',
+                            //   type: 'select',
+                            //   className: 'col-3',
+                            //   templateOptions: {
+                            //     label: 'Item Type',
+                            //     dataKey: 'item_type_id',
+                            //     dataLabel: "item_name",
+                            //     options: [],
+                            //     required: false,
+                            //     lazy: {
+                            //       url: 'masters/product_item_type/',
+                            //       lazyOneTime: true
+                            //     }
+                            //   },
+                            //   hooks: {
+                            //     onChanges: (field: any) => {
+                            //       field.formControl.valueChanges.subscribe((data: any) => {
+                            //         if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                            //           this.formConfig.model['products']['item_type_id'] = data?.item_type_id;
+                            //         } else {
+                            //           console.error('Form config or lead_status data model is not defined.');
+                            //         }
+                            //       });
+                            //     }
+                            //   }
+                            // },
                             {
                               key: 'type_id',
                               type: 'select',
@@ -670,6 +838,33 @@ export class ProductsComponent implements OnInit {
                                       console.error('Form config or type_id data model is not defined.');
                                     }
                                   });
+                                },
+                                onInit: (field: any) => {
+                                  // We need to wait for the Product Mode to load type options first
+                                  const checkForOptions = setInterval(() => {
+                                    if (field.templateOptions.options && field.templateOptions.options.length > 0) {
+                                      clearInterval(checkForOptions);
+                                      
+                                      // Find the "Finished Product" option
+                                      const finishedProductOption = field.templateOptions.options.find(
+                                        (option: any) => option.label.toLowerCase() === 'finished product'
+                                      );
+                                      
+                                      if (finishedProductOption) {
+                                        // Set the default value
+                                        field.formControl.setValue(finishedProductOption.value);
+                                        
+                                        // Update the model
+                                        if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                                          this.formConfig.model['products']['type_id'] = finishedProductOption.value;
+                                          console.log("Default Type set to Finished Product:", finishedProductOption.value);
+                                        }
+                                      }
+                                    }
+                                  }, 500); // Check every 500ms
+                                  
+                                  // Clear the interval after 10 seconds to prevent infinite checking
+                                  setTimeout(() => clearInterval(checkForOptions), 10000);
                                 }
                               }
                             },
@@ -956,6 +1151,13 @@ export class ProductsComponent implements OnInit {
                                   placeholder: 'Enter Quantity',
                                   required: false,
                                   type: 'number'
+                                },
+                                hooks: {
+                                  onChanges: (field: any) => {
+                                    field.formControl.valueChanges.subscribe(() => {
+                                      this.updateBalanceFromVariations();
+                                    });
+                                  }
                                 }
                               }
                             ]
@@ -1217,6 +1419,16 @@ export class ProductsComponent implements OnInit {
                                     }
                                   });
                                 }
+                              }
+                            },
+
+                            {
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              key: 'minimum_purchase_price',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'Min Purchase Price',
+                                placeholder: 'Enter Minimum Purchase Price'
                               }
                             },
                             {

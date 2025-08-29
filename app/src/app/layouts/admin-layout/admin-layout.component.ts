@@ -7,6 +7,7 @@ import { HttpClient } from '@angular/common/http';
 import { filter, map, mergeMap } from 'rxjs/operators';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { CustomfieldsModule } from 'src/app/admin/customfields/customfields.module';
+declare var bootstrap;
 interface SpeechRecognitionResult {
   transcript: string; // Holds the recognized speech as text
 }
@@ -51,6 +52,11 @@ export class AdminLayoutComponent {
   public currentHoverTabKey: string;
   public tabs: Tab[] = [];
   showContain = false;
+
+  // Reminders logic
+  remindersCount: number = 0;
+  remindersList: any[] = [];
+
   private recognition: SpeechRecognitionEvent | null = null;
   constructor(private activatedRoute: ActivatedRoute, private cd: ChangeDetectorRef, private elementRef: ElementRef, private http: HttpClient, private renderer: Renderer2, private router: Router, private taLoacal: LocalStorageService, private aS: AdminCommonService) {
     this.aS.action$.subscribe(res => {
@@ -129,6 +135,9 @@ export class AdminLayoutComponent {
         this.aS.accessModuleList = this.menulList;
         this.showContain = true;
       });
+
+      // Load reminders here
+      this.loadReminders(user.user_id);
     }
     // this.menulList = [
     //   {
@@ -392,6 +401,57 @@ export class AdminLayoutComponent {
     // ]
     this.closeMenu();
   }
+  
+
+// API call for reminders
+loadReminders(userId: number) {
+  this.http.get(`reminders/reminders/?user_id=${userId}`).subscribe((res: any) => {
+    if (res.data && Array.isArray(res.data)) {
+      const today = new Date();
+      this.remindersList = res.data.filter((r: any) => new Date(r.reminder_date) <= today);
+      this.remindersCount = this.remindersList.length;
+    } else {
+      this.remindersList = [];
+      this.remindersCount = 0;
+    }
+  }, (err) => {
+    console.error('Error loading reminders:', err);
+    this.remindersList = [];
+    this.remindersCount = 0;
+  });
+}
+
+markAsRead(reminder: any) {
+  reminder.read = true;
+}
+
+isReminderOpen = false;
+
+// Open modal
+openReminders() {
+  this.isReminderOpen = true;
+}
+
+// Close modal
+closeReminders() {
+  this.isReminderOpen = false;
+}
+
+
+// markAsRead(reminder: any) {
+//   reminder.read = true;
+//   // You can also call API to mark as read in backend
+// }
+
+
+openReminder() {
+    const modalEl = document.getElementById('reminderModal');
+    if (modalEl) {
+      const reminderModal = new bootstrap.Modal(modalEl, { backdrop: 'static' });
+      reminderModal.show();
+    }
+  }
+
 
   closeMenu() {
     const windowWidth = window.innerWidth;

@@ -93,7 +93,7 @@ export class VendorsListComponent {
         sort: true,
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
-          return row.vendor_addresses.billing_address;
+          return row.vendor_addresses.custom_billing_address;
         },
       },
       {
@@ -106,6 +106,13 @@ export class VendorsListComponent {
             label: 'Delete',
             confirm: true,
             confirmMsg: "Sure to delete?",
+            apiUrl: 'vendors/vendors'
+          },
+          {
+            type: 'restore',
+            label: 'Restore',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
             apiUrl: 'vendors/vendors'
           },
           {

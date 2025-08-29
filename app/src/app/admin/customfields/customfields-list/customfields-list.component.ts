@@ -63,6 +63,15 @@ export class CustomfieldsListComponent {
           {
             type: 'delete',
             label: 'Delete',
+            confirm: true,
+            confirmMsg: "Sure to delete?",
+            apiUrl: 'customfields/customfieldscreate' // The endpoint for deleting a custom field
+          },
+          {
+            type: 'restore',
+            label: 'Restore',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
             apiUrl: 'customfields/customfieldscreate' // The endpoint for deleting a custom field
           },
           {

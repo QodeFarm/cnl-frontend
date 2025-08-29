@@ -57,6 +57,13 @@ export class ProductItemBalanceComponent {
               apiUrl: 'products/product_item_balance'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'products/product_item_balance'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }
