@@ -990,6 +990,97 @@ export const customerCategoryConfig: TaCurdConfig = {
 
 }
 
+export const productModesConfig: TaCurdConfig = {
+    drawerSize: 500,
+    drawerPlacement: 'top',
+    tableConfig: {
+        apiUrl: 'products/item-master/', // relative to base API
+        //   title: 'Product Modes',
+        pkId: "item_master_id",
+        pageSize: 10,
+        globalSearch: {
+            keys: ['item_master_id', 'mode_name', 'description']
+        },
+        defaultSort: { key: 'created_at', value: 'descend' },
+        cols: [
+            {
+                fieldKey: 'mode_name',
+                name: 'Mode Name',
+                sort: true
+            },
+            {
+                fieldKey: 'description',
+                name: 'Description',
+                sort: false
+            },
+            // {
+            //   fieldKey: 'created_at',
+            //   name: 'Created At',
+            //   type: 'date',
+            //   sort: true
+            // },
+            {
+                fieldKey: "item_master_id",
+                name: "Action",
+                type: 'action',
+                actions: [
+                    {
+                        type: 'delete',
+                        label: 'Delete',
+                        confirm: true,
+                        confirmMsg: "Sure to delete this Item Master?",
+                        apiUrl: 'products/item-master'
+                    },
+                    {
+                        type: 'edit',
+                        label: 'Edit'
+                    }
+                ]
+            }
+        ]
+    },
+    formConfig: {
+        url: 'products/item-master/',
+        title: 'Item Master',
+        pkId: "item_master_id",
+        fields: [
+            {
+                className: 'col-12 p-0',
+                fieldGroupClassName: "ant-row",
+                fieldGroup: [
+                    {
+                        key: 'mode_name',
+                        type: 'input',
+                        className: 'col-md-6 col-12 pb-3 px-1',
+                        templateOptions: {
+                            label: 'Mode Name',
+                            placeholder: 'Enter Mode Name',
+                            required: true,
+                        }
+                    },
+                    {
+                        key: 'description',
+                        type: 'textarea',
+                        className: 'col-md-6 col-12 pb-3 px-1',
+                        templateOptions: {
+                            label: 'Description',
+                            placeholder: 'Enter Description'
+                        }
+                    },
+                    // {
+                    //   key: 'is_deleted',
+                    //   type: 'checkbox',
+                    //   className: 'col-md-6 col-12 pb-3 px-1',
+                    //   templateOptions: {
+                    //     label: 'Is Deleted'
+                    //   }
+                    // }
+                ]
+            }
+        ]
+    }
+};
+
 export const productSalesGLConfig: TaCurdConfig = {
     drawerSize: 500,
     drawerPlacement: 'top',
@@ -1571,6 +1662,8 @@ export const productGroupsConfig: TaCurdConfig = {
 }
 
 export const productStockUnitsConfig: TaCurdConfig = {
+    // drawerSize: 500,
+    // drawerPlacement: 'top',
     drawerSize: 'auto',
     drawerPlacement: 'top',
     tableConfig: {
@@ -1697,7 +1790,7 @@ export const productStockUnitsConfig: TaCurdConfig = {
 }
 
 export const productCategoriesConfig: TaCurdConfig = {
-    drawerSize: 500,
+    drawerSize: 'auto',
     drawerPlacement: 'top',
     tableConfig: {
         apiUrl: 'products/product_categories/',
@@ -2276,11 +2369,11 @@ export const productPurchaseGLConfig: TaCurdConfig = {
 
 
 export const unitOptionsConfig: TaCurdConfig = {
-    drawerSize: 500,
+    drawerSize: 'auto',
     drawerPlacement: 'top',
     tableConfig: {
         apiUrl: 'masters/unit_options/',
-        title: 'Unit Options',
+        // title: 'Unit Options',
 
         pkId: "unit_options_id",
         pageSize: 10,
@@ -3056,7 +3149,7 @@ export const departmentsConfig: TaCurdConfig = {
 }
 
 export const shiftsConfig: TaCurdConfig = {
-    drawerSize: 500,
+    drawerSize: 'auto',
     drawerPlacement: 'top',
     tableConfig: {
         apiUrl: 'hrms/shifts/',
@@ -3437,7 +3530,7 @@ export const leadStatusesConfig: TaCurdConfig = {
     drawerPlacement: 'top',
     tableConfig: {
         apiUrl: 'leads/lead_statuses/',
-        title: 'Lead statuses',
+        // title: 'Lead statuses',
         pkId: "lead_status_id",
         pageSize: 10,
         "globalSearch": {
@@ -3484,6 +3577,127 @@ export const leadStatusesConfig: TaCurdConfig = {
                         templateOptions: {
                             label: 'Status Name',
                             placeholder: 'Enter Status Name',
+                            required: true,
+                        }
+                    },
+                ]
+            }
+        ]
+    }
+}
+
+export const interactionTypesConfig: TaCurdConfig = {
+    drawerSize: 500,
+    drawerPlacement: 'top',
+    tableConfig: {
+        apiUrl: 'leads/interaction_types/',
+        //   title: 'Interaction type',
+        pkId: "interaction_type_id",
+        pageSize: 10,
+        "globalSearch": {
+            keys: ['interaction_type_id', 'interaction_type']
+        },
+        defaultSort: { key: 'created_at', value: 'descend' },
+        cols: [
+            {
+                fieldKey: 'interaction_type',
+                name: 'Interaction type',
+                sort: true
+            },
+            {
+                fieldKey: "code",
+                name: "Action",
+                type: 'action',
+                actions: [
+                    {
+                        type: 'delete',
+                        label: 'Delete',
+                        confirm: true,
+                        confirmMsg: "Sure to delete?",
+                        apiUrl: 'leads/interaction_types'
+                    },
+                    {
+                        type: 'edit',
+                        label: 'Edit'
+                    }
+                ]
+            }
+        ]
+    },
+    formConfig: {
+        url: 'leads/interaction_types/',
+        title: 'Interaction type',
+        pkId: "interaction_type_id",
+        exParams: [],
+        fields: [{
+            fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
+            fieldGroup: [{
+                key: 'interaction_type',
+                type: 'input',
+                className: 'col-md-6 col-12 p-0',
+                templateOptions: {
+                    label: 'Interaction type',
+                    placeholder: 'Enter Interaction type',
+                    required: true,
+                }
+            }]
+        }]
+    }
+}
+
+export const taskPrioritiesConfig: TaCurdConfig = {
+    drawerSize: 500,
+    drawerPlacement: 'top',
+    tableConfig: {
+        apiUrl: 'masters/task_priorities/',
+        title: 'Task Priorities',
+        pkId: "priority_id",
+        pageSize: 10,
+        "globalSearch": {
+            keys: ['priority_id', 'priority_name']
+        },
+        defaultSort: { key: 'created_at', value: 'descend' },
+        cols: [
+            {
+                fieldKey: 'priority_name',
+                name: 'Priority Name',
+                sort: true
+            },
+            {
+                fieldKey: "code",
+                name: "Action",
+                type: 'action',
+                actions: [
+                    {
+                        type: 'delete',
+                        label: 'Delete',
+                        confirm: true,
+                        confirmMsg: "Sure to delete?",
+                        apiUrl: 'masters/task_priorities'
+                    },
+                    {
+                        type: 'edit',
+                        label: 'Edit'
+                    }
+                ]
+            }
+        ]
+    },
+    formConfig: {
+        url: 'masters/task_priorities/',
+        title: 'Task Priorities',
+        pkId: "priority_id",
+        fields: [
+            {
+                fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
+                fieldGroup: [
+                    {
+                        key: 'priority_name',
+                        type: 'input',
+                        className: 'col-md-6 col-12 p-0',
+                        templateOptions: {
+                            label: 'Priority Name',
+                            placeholder: 'Enter Name',
                             required: true,
                         }
                     },

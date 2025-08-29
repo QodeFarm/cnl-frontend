@@ -6,6 +6,7 @@ import { TaTableConfig } from '@ta/ta-table';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
+import { collapseMotion } from 'ng-zorro-antd/core/animation';
 
 @Component({
   selector: 'app-customers-list',
@@ -18,6 +19,7 @@ export class CustomersListComponent {
 
   @Output('edit') edit = new EventEmitter<void>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+  constructor(private http: HttpClient, private router: Router, private message: NzMessageService) { }
 
   refreshTable() {
     this.taTableComponent?.refresh();
@@ -47,9 +49,27 @@ export class CustomersListComponent {
         name: 'Name',
         sort: true,
         isEdit: true,
-        isEditSumbmit: (row, value) => {
+        isEditSumbmit: (row, value, col) => {
+          console.log("isEditSumbmit", row, value, col );
+          // Implement your logic here
+          // For example, you can make an API call to save the edited value
+          // this.http.put(`api/sales/${row.sale_order_id}`, { total_amount: value }).subscribe(...);
+          
 
+        },
+        autoSave: {
+        apiUrl: row => `customers/customers/${row.customer_id}`,
+        method: 'patch',
+        body: (row: any, value: any, col: any) => {
+          return {
+            customer_id: row.customer_id,
+            name: value,
+            customer_addresses: row.customer_addresses // <-- add this line
+          };
         }
+      }
+          
+       
       },
       {
         fieldKey: 'email',
@@ -125,9 +145,6 @@ export class CustomersListComponent {
     ]
   };
 
-  constructor(private router: Router) {
-
-  }
 }
 
 

@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormlyModule } from '@ngx-formly/core';
-import { customerCategoryConfig, customerCudConfig, designationsConfig, employeeSalaryComponentsConfig, gPackageUnitsConfig, jobTypesConfig, leadStatusesConfig, leaveTypesConfig, packUnitConfig, productBrandsConfig, productCategoriesConfig, productColorsConfig, productGroupsConfig, productGstClassificationsConfig, productPurchaseGLConfig, productSalesGLConfig, productSizesConfig, productStockUnitsConfig, productTypesConfig, shiftsConfig, warehouseLocationsConfig } from '../utils/master-curd-config';
+import { customerCategoryConfig, customerCudConfig, designationsConfig, employeeSalaryComponentsConfig, gPackageUnitsConfig, interactionTypesConfig, jobTypesConfig, leadStatusesConfig, leaveTypesConfig, packUnitConfig, productBrandsConfig, productCategoriesConfig, productColorsConfig, productGroupsConfig, productGstClassificationsConfig, productModesConfig, productPurchaseGLConfig, productSalesGLConfig, productSizesConfig, productStockUnitsConfig, productTypesConfig, shiftsConfig, taskPrioritiesConfig, unitOptionsConfig, warehouseLocationsConfig } from '../utils/master-curd-config';
 
 
 
@@ -38,6 +38,22 @@ import { customerCategoryConfig, customerCudConfig, designationsConfig, employee
               dataLabel: 'name',
               required: true,
               curdConfig: customerCategoryConfig
+            }
+          }
+        },
+
+        {
+          name: 'productModes-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: ' Please Select Product Mode',
+              label: ' Product Mode',
+              dataKey: 'product_mode_id',
+              dataLabel: 'mode_name',
+              required: true,
+              curdConfig: productModesConfig
             }
           }
         },
@@ -187,7 +203,7 @@ import { customerCategoryConfig, customerCudConfig, designationsConfig, employee
               dataKey: 'unit_options_id',
               dataLabel: 'unit_name',
               required: true,
-              curdConfig: productStockUnitsConfig
+              curdConfig: unitOptionsConfig
             }
           }
         },
@@ -292,7 +308,7 @@ import { customerCategoryConfig, customerCudConfig, designationsConfig, employee
               dataKey: 'designation_id',
               dataLabel: 'designation_name',
               required: true,
-              curdConfig: designationsConfig  
+              curdConfig: designationsConfig
             }
           }
         },
@@ -307,7 +323,7 @@ import { customerCategoryConfig, customerCudConfig, designationsConfig, employee
               dataKey: 'job_code_id',
               dataLabel: 'job_code',
               required: true,
-              curdConfig: jobTypesConfig  
+              curdConfig: jobTypesConfig
             }
           }
         },
@@ -322,7 +338,7 @@ import { customerCategoryConfig, customerCudConfig, designationsConfig, employee
               dataKey: 'department_id',
               dataLabel: 'department_name',
               required: true,
-              curdConfig: designationsConfig  
+              curdConfig: designationsConfig
             }
           }
         },
@@ -337,7 +353,7 @@ import { customerCategoryConfig, customerCudConfig, designationsConfig, employee
               dataKey: 'shift_id',
               dataLabel: 'shift_name',
               required: true,
-              curdConfig: shiftsConfig  
+              curdConfig: shiftsConfig
             }
           }
         },
@@ -352,7 +368,7 @@ import { customerCategoryConfig, customerCudConfig, designationsConfig, employee
               dataKey: 'component_id',
               dataLabel: 'component_name',
               required: true,
-              curdConfig: shiftsConfig  
+              curdConfig: shiftsConfig
             }
           }
         },
@@ -367,7 +383,7 @@ import { customerCategoryConfig, customerCudConfig, designationsConfig, employee
               dataKey: 'employee_component_id',
               dataLabel: 'component_name',
               required: true,
-              curdConfig: employeeSalaryComponentsConfig  
+              curdConfig: employeeSalaryComponentsConfig
             }
           }
         },
@@ -382,7 +398,7 @@ import { customerCategoryConfig, customerCudConfig, designationsConfig, employee
               dataKey: 'leave_type_id',
               dataLabel: 'leave_type_name',
               required: true,
-              curdConfig: leaveTypesConfig  
+              curdConfig: leaveTypesConfig
             }
           }
         },
@@ -397,12 +413,42 @@ import { customerCategoryConfig, customerCudConfig, designationsConfig, employee
               dataKey: 'lead_status_id',
               dataLabel: 'status_name',
               required: true,
-              curdConfig: leadStatusesConfig  
+              curdConfig: leadStatusesConfig
             }
           }
         },
-        
-        
+        {
+          name: 'interactionTypes-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Select Interaction Types',
+              label: 'Interaction Types',
+              dataKey: 'interaction_type_id',
+              dataLabel: 'interaction_type',
+              required: true,
+              curdConfig: interactionTypesConfig
+            }
+          }
+        },
+        {
+          name: 'taskPriorities-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Select Task Priorities',
+              label: 'Task Priorities',
+              dataKey: 'priority_id',
+              dataLabel: 'priority_name',
+              required: true,
+              curdConfig: taskPrioritiesConfig
+            }
+          }
+        },
+
+
 
       ],
     })

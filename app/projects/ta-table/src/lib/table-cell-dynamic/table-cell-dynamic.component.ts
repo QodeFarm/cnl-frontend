@@ -54,12 +54,15 @@ export class TableCellDynamicComponent implements OnInit {
         break;
     }
   }
-  saveCell() {
-
-    if (this.col && this.col.autoSave && typeof this.col.autoSave.apiUrl) {
+    saveCell() {
+    if (this.col && this.col.autoSave && this.col.autoSave.apiUrl) {
       this.loading = true;
       const body = this.col.autoSave.body ? this.col.autoSave.body(this.row, this.inputValue, this.col) : this.row;
-      this.http[this.col.autoSave.method || 'put'](this.col.autoSave.apiUrl, body).subscribe((res: any) => {
+      let apiUrl = this.col.autoSave.apiUrl;
+      if (typeof apiUrl === 'function') {
+        apiUrl = apiUrl(this.row);
+      }
+      this.http[this.col.autoSave.method || 'put'](apiUrl, body).subscribe((res: any) => {
         this.loading = false;
         if (res && res.status === 'success' || res.data) {
           this.value = this.inputValue;
@@ -77,7 +80,7 @@ export class TableCellDynamicComponent implements OnInit {
       if (this.col.isEditSumbmit) {
         this.col.isEditSumbmit(this.row, this.value, this.col);
         this.cancelCell();
-      };
+      }
     }
   }
   cancelCell() {

@@ -734,7 +734,7 @@ curdConfig: TaCurdConfig = {
             },            
             {
               key: 'status_id',
-              type: 'select',
+              type: 'productionStatuses-dropdown',
               className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Status',
@@ -1197,7 +1197,7 @@ curdConfig: TaCurdConfig = {
                       fieldGroup: [
                         {
                           key: 'machine',
-                          type: 'select',
+                          type: 'machines-dropdown',
                           className: 'col',
                           templateOptions: {
                             label: 'Machine',

@@ -67,7 +67,28 @@ export class ProductsListComponent {
       {
         fieldKey: 'wholesale_rate',
         name: 'WholeSale Rate',
-        sort: true
+        sort: true,
+        isEdit: true,
+        isEditSumbmit:
+        (row, value, col) => {
+          console.log("isEditSumbmit", row, value, col );
+          // Implement your logic here
+          // For example, you can make an API call to save the edited value
+          // this.http.put(`api/sales/${row.sale_order_id}`, { total_amount: value }).subscribe(...);
+          
+
+        },
+        autoSave: true,
+        apiUrl: row => `products/products/${row.product_id}/wholesale_rate/`,
+        method: 'patch',
+        body: (row: any, value: any, col: any) => {
+          return {
+            product_id: row.product_id,
+            wholesale_rate: value
+          };
+        }
+        
+        
       },
       {
         fieldKey: 'dealer_rate',

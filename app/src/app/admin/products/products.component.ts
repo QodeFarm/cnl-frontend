@@ -247,7 +247,7 @@ export class ProductsComponent implements OnInit {
                     {
                       className: 'col-md-4 col-sm-6 col-12',
                       key: 'product_mode_id',
-                      type: 'select',
+                      type: 'productModes-dropdown',
                       templateOptions: {
                         label: 'Product Mode',
                         placeholder: 'Select Product Mode',
