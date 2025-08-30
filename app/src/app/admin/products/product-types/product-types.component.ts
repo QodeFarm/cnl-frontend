@@ -15,27 +15,32 @@ export class ProductTypesComponent {
     tableConfig: {
       apiUrl: 'masters/product_types/',
       title: 'Product Types',
-
       pkId: "type_id",
       pageSize: 10,
-      "globalSearch": {
-        keys: ['type_id', 'type_name']
+      globalSearch: {
+        keys: ['type_id', 'type_name', 'mode_type']
       },
       defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
           fieldKey: 'type_name',
-          name: 'Name',
+          name: 'Type Name',
           sort: true
         },
         {
           fieldKey: 'mode_type',
           name: 'Mode Type',
-          sort: true,
+          sort: true
         },
+        // {
+        //   fieldKey: 'created_at',
+        //   name: 'Created At',
+        //   type: 'date',
+        //   sort: true
+        // },
         {
-          fieldKey: "code",
-          name: "Action",
+          fieldKey: 'type_id', // fixed: use pkId here
+          name: 'Action',
           type: 'action',
           actions: [
             {
@@ -46,23 +51,9 @@ export class ProductTypesComponent {
               apiUrl: 'masters/product_types'
             },
             {
-              type: 'restore',
-              label: 'Restore',
-              confirm: true,
-              confirmMsg: "Sure to restore?",
-              apiUrl: 'masters/product_types'
-            },
-            {
               type: 'edit',
               label: 'Edit'
-            },
-            // {
-            //   type: 'callBackFn',
-            //   label: 'Edit',
-            //   // callBackFn: (row, action) => {
-            //   //   this.router.navigateByUrl('/admin/employee/create/' + row.employee_id);
-            //   // }
-            // }
+            }
           ]
         }
       ]
@@ -71,84 +62,78 @@ export class ProductTypesComponent {
       url: 'masters/product_types/',
       title: 'Product Types',
       pkId: "type_id",
-      exParams: [
-      ],
-      fields:
-        [
-          {
-            fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
-            fieldGroup:
-              [
-                {
-                  key: 'type_name',
-                  type: 'input',
-                  className: 'col-md-6 col-12 p-0',
-                  templateOptions: {
-                    label: 'Type Name',
-                    placeholder: 'Enter Type Name',
-                    required: true,
-                  }
-                },
-                {
-                  key: 'mode_type',
-                  type: 'select',
-                  className: 'col-md-6 col-12 p-0',
-                  templateOptions: {
-                    label: 'Mode Type',
-                    options: [
-                      { value: 'Inventory', label: 'Inventory' },
-                      { value: 'Non Inventory', label: 'Non Inventory' },
-                      { value: 'Service', label: 'Service' },
-                      { value: 'All', label: 'All' }
-                    ],
-                    required: true
-                  }
-                }
-
-
-
-              ]
-          }
-        ]
+      fields: [
+        {
+          className: 'col-12 p-0',
+          fieldGroupClassName: "ant-row",
+          fieldGroup: [
+            {
+              key: 'type_name',
+              type: 'input',
+              className: 'col-md-6 col-12 pb-3 px-1',
+              templateOptions: {
+                label: 'Type Name',
+                placeholder: 'Enter Type Name',
+                required: true,
+              }
+            },
+            {
+              key: 'mode_type',
+              type: 'select',
+              className: 'col-md-6 col-12 pb-3 px-1',
+              templateOptions: {
+                label: 'Mode Type',
+                placeholder: 'Select Mode Type',
+                required: true,
+                options: [
+                  { label: 'Inventory', value: 'Inventory' },
+                  { label: 'Non Inventory', value: 'Non Inventory' },
+                  { label: 'Service', value: 'Service' },
+                  { label: 'All', value: 'all' }
+                ]
+              }
+            },
+          ]
+        }
+      ]
     }
-
-  }
-
-
-  tableConfig: TaTableConfig = {
-    apiUrl: 'masters/product_types/',
-    title: 'Product Types',
-    pkId: "type_id",
-    pageSize: 10,
-    "globalSearch": {
-      keys: ['type_id', 'type_name']
-    },
-    cols: [
-      {
-        fieldKey: 'type_name',
-        name: 'Name'
-      },
-      {
-        fieldKey: "code",
-        name: "Action",
-        type: 'action',
-        actions: [
-          {
-            type: 'delete',
-            label: 'Delete',
-            confirm: true,
-            confirmMsg: "Sure to delete?",
-            apiUrl: 'api/masters/product_types'
-          },
-          {
-            type: 'callBackFn',
-            label: 'Edit',
-            // callBackFn: (row, action) => {
-            //   this.router.navigateByUrl('/admin/employee/create/' + row.employee_id);
-            // }
-          }
-        ]
-      }
-    ]
   };
+
+
+  // tableConfig: TaTableConfig = {
+  //   apiUrl: 'masters/product_types/',
+  //   title: 'Product Types',
+  //   pkId: "type_id",
+  //   pageSize: 10,
+  //   "globalSearch": {
+  //     keys: ['type_id', 'type_name']
+  //   },
+  //   cols: [
+  //     {
+  //       fieldKey: 'type_name',
+  //       name: 'Name'
+  //     },
+  //     {
+  //       fieldKey: "code",
+  //       name: "Action",
+  //       type: 'action',
+  //       actions: [
+  //         {
+  //           type: 'delete',
+  //           label: 'Delete',
+  //           confirm: true,
+  //           confirmMsg: "Sure to delete?",
+  //           apiUrl: 'api/masters/product_types'
+  //         },
+  //         {
+  //           type: 'callBackFn',
+  //           label: 'Edit',
+  //           // callBackFn: (row, action) => {
+  //           //   this.router.navigateByUrl('/admin/employee/create/' + row.employee_id);
+  //           // }
+  //         }
+  //       ]
+  //     }
+  //   ]
+  // };
 }

@@ -816,7 +816,7 @@ verifyBalance(): any {
                             // },
                             {
                               key: 'type_id',
-                              type: 'select',
+                              type: 'productType-dropdown',
                               className: 'col-3',
                               templateOptions: {
                                 label: 'Type',

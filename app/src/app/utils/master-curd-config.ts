@@ -3452,7 +3452,6 @@ export const productModesConfig: TaCurdConfig = {
     //   title: 'Product Modes',
       pkId: "item_master_id",
       pageSize: 10,
-      showFilters: false,
       globalSearch: {
         keys: ['item_master_id', 'mode_name', 'description']
       },
@@ -3463,11 +3462,11 @@ export const productModesConfig: TaCurdConfig = {
           name: 'Mode Name',
           sort: true
         },
-        {
-          fieldKey: 'description',
-          name: 'Description',
-          sort: false
-        },
+        // {
+        //   fieldKey: 'description',
+        //   name: 'Description',
+        //   sort: false
+        // },
         // {
         //   fieldKey: 'created_at',
         //   name: 'Created At',
@@ -3597,34 +3596,34 @@ export const productSalesGLConfig: TaCurdConfig = {
             //   name: 'Classification',
             //   sort: false
             // },
-            {
-                fieldKey: 'is_loan_account',
-                name: 'Is Loan Account',
-                sort: true,
-                type: 'boolean'
-            },
+            // {
+            //     fieldKey: 'is_loan_account',
+            //     name: 'Is Loan Account',
+            //     sort: true,
+            //     type: 'boolean'
+            // },
             // {
             //   fieldKey: 'tds_applicable', 
             //   name: 'TDS Applicable',
             //   sort: false,
             //   type: 'boolean'
             // },
-            {
-                fieldKey: 'address',
-                name: 'Address',
-                sort: true
-            },
-            {
-                fieldKey: 'employee',
-                name: 'Employee',
-                sort: true,
-                type: 'boolean'
-            },
-            {
-                fieldKey: 'pan',
-                name: 'PAN',
-                sort: true
-            },
+            // {
+            //     fieldKey: 'address',
+            //     name: 'Address',
+            //     sort: true
+            // },
+            // {
+            //     fieldKey: 'employee',
+            //     name: 'Employee',
+            //     sort: true,
+            //     type: 'boolean'
+            // },
+            // {
+            //     fieldKey: 'pan',
+            //     name: 'PAN',
+            //     sort: true
+            // },
             {
                 fieldKey: "code",
                 name: "Action",
@@ -3821,76 +3820,91 @@ export const productTypesConfig: TaCurdConfig = {
     drawerSize: 500,
     drawerPlacement: 'top',
     tableConfig: {
-        apiUrl: 'masters/product_types/',
-        // title: 'Product Types',
-
-        pkId: "type_id",
-        pageSize: 10,
-        "globalSearch": {
-            keys: ['type_id', 'type_name']
+      apiUrl: 'masters/product_types/',
+      title: 'Product Types',
+      pkId: "type_id",
+      pageSize: 10,
+      globalSearch: {
+        keys: ['type_id', 'type_name', 'mode_type']
+      },
+      defaultSort: { key: 'created_at', value: 'descend' },
+      cols: [
+        {
+          fieldKey: 'type_name',
+          name: 'Type Name',
+          sort: true
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
-        cols: [
+        {
+          fieldKey: 'mode_type',
+          name: 'Mode Type',
+          sort: true
+        },
+        // {
+        //   fieldKey: 'created_at',
+        //   name: 'Created At',
+        //   type: 'date',
+        //   sort: true
+        // },
+        {
+          fieldKey: 'type_id', // fixed: use pkId here
+          name: 'Action',
+          type: 'action',
+          actions: [
             {
-                fieldKey: 'type_name',
-                name: 'Name',
-                sort: true
+              type: 'delete',
+              label: 'Delete',
+              confirm: true,
+              confirmMsg: "Sure to delete?",
+              apiUrl: 'masters/product_types'
             },
             {
-                fieldKey: "code",
-                name: "Action",
-                type: 'action',
-                actions: [
-                    {
-                        type: 'delete',
-                        label: 'Delete',
-                        confirm: true,
-                        confirmMsg: "Sure to delete?",
-                        apiUrl: 'masters/product_types'
-                    },
-                    {
-                        type: 'edit',
-                        label: 'Edit'
-                    },
-                    // {
-                    //   type: 'callBackFn',
-                    //   label: 'Edit',
-                    //   // callBackFn: (row, action) => {
-                    //   //   this.router.navigateByUrl('/admin/employee/create/' + row.employee_id);
-                    //   // }
-                    // }
-                ]
+              type: 'edit',
+              label: 'Edit'
             }
-        ]
+          ]
+        }
+      ]
     },
     formConfig: {
-        url: 'masters/product_types/',
-        title: 'Product Types',
-        pkId: "type_id",
-        exParams: [
-        ],
-        fields:
-            [
-                {
-                    fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
-                    fieldGroup:
-                        [
-                            {
-                                key: 'type_name',
-                                type: 'input',
-                                className: 'col-md-6 col-12 p-0',
-                                templateOptions: {
-                                    label: 'Type Name',
-                                    placeholder: 'Enter Type Name',
-                                    required: true,
-                                }
-                            },
-                        ]
-                }
-            ]
+      url: 'masters/product_types/',
+      title: 'Product Types',
+      pkId: "type_id",
+      fields: [
+        {
+          className: 'col-12 p-0',
+          fieldGroupClassName: "ant-row",
+          fieldGroup: [
+            {
+              key: 'type_name',
+              type: 'input',
+              className: 'col-md-6 col-12 pb-3 px-1',
+              templateOptions: {
+                label: 'Type Name',
+                placeholder: 'Enter Type Name',
+                required: true,
+              }
+            },
+            {
+              key: 'mode_type',
+              type: 'select',
+              className: 'col-md-6 col-12 pb-3 px-1',
+              templateOptions: {
+                label: 'Mode Type',
+                placeholder: 'Select Mode Type',
+                required: true,
+                options: [
+                  { label: 'Inventory', value: 'Inventory' },
+                  { label: 'Non Inventory', value: 'Non Inventory' },
+                  { label: 'Service', value: 'Service' },
+                  { label: 'All', value: 'all' }
+                ]
+              }
+            },
+          ]
+        }
+      ]
     }
-
-}
+  };
 
 
 
@@ -4046,11 +4060,11 @@ export const productGroupsConfig: TaCurdConfig = {
                 name: 'Name',
                 sort: true
             },
-            {
-                fieldKey: 'description',
-                name: 'Description',
-                sort: true
-            },
+            // {
+            //     fieldKey: 'description',
+            //     name: 'Description',
+            //     sort: true
+            // },
             {
                 fieldKey: "code",
                 name: "Action",
@@ -4102,7 +4116,7 @@ export const productGroupsConfig: TaCurdConfig = {
                                 className: 'col-md-6 col-12 px-1',
                                 templateOptions: {
                                     label: 'Description',
-                                    required: true
+                                    required: false
                                 },
                                 hooks: {
                                     onInit: (field: any) => {
@@ -4117,10 +4131,10 @@ export const productGroupsConfig: TaCurdConfig = {
 }
 
 export const productStockUnitsConfig: TaCurdConfig = {
-    // drawerSize: 500,
-    // drawerPlacement: 'top',
-    drawerSize: 'auto',
+    drawerSize: 500,
     drawerPlacement: 'top',
+    // drawerSize: '500',
+    // drawerPlacement: 'top',
     tableConfig: {
         apiUrl: 'products/product_stock_units/',
         //   title: 'Product Stock Units',
@@ -4146,11 +4160,11 @@ export const productStockUnitsConfig: TaCurdConfig = {
                     return `${row.quantity_code.quantity_code_name}`;
                 },
             },
-            {
-                fieldKey: 'description',
-                name: 'Description',
-                sort: true
-            },
+            // {
+            //     fieldKey: 'description',
+            //     name: 'Description',
+            //     sort: true
+            // },
 
             {
                 fieldKey: "code",
@@ -4230,7 +4244,7 @@ export const productStockUnitsConfig: TaCurdConfig = {
                                 className: 'col-md-6 col-12 px-1',
                                 templateOptions: {
                                     label: 'Description',
-                                    required: true
+                                    required: false
                                 },
                                 hooks: {
                                     onInit: (field: any) => {
@@ -4245,7 +4259,7 @@ export const productStockUnitsConfig: TaCurdConfig = {
 }
 
 export const productCategoriesConfig: TaCurdConfig = {
-    drawerSize: 'auto',
+     drawerSize: 500,
     drawerPlacement: 'top',
     tableConfig: {
         apiUrl: 'products/product_categories/',
@@ -4560,39 +4574,39 @@ export const productPurchaseGLConfig: TaCurdConfig = {
                 name: 'Name',
                 sort: true
             },
-            {
-                fieldKey: 'purchase_accounts',
-                name: 'Purchase Accounts',
-                sort: true,
-            },
-            {
-                fieldKey: 'code',
-                name: 'Code',
-                sort: true,
-            },
+            // {
+            //     fieldKey: 'purchase_accounts',
+            //     name: 'Purchase Accounts',
+            //     sort: true,
+            // },
+            // {
+            //     fieldKey: 'code',
+            //     name: 'Code',
+            //     sort: true,
+            // },
             // {
             //   fieldKey: 'is_subledger',
             //   name: 'Is Subledger',
             //   sort: false,
             //   type: 'boolean'
             // },
-            {
-                fieldKey: 'inactive',
-                name: 'Inactive',
-                sort: true,
-                type: 'boolean'
-            },
-            {
-                fieldKey: 'type',
-                name: 'Type',
-                sort: true
-            },
-            {
-                fieldKey: 'account_no',
-                name: 'Account No',
-                sort: true,
-                isEncrypted: true
-            },
+            // {
+            //     fieldKey: 'inactive',
+            //     name: 'Inactive',
+            //     sort: true,
+            //     type: 'boolean'
+            // },
+            // {
+            //     fieldKey: 'type',
+            //     name: 'Type',
+            //     sort: true
+            // },
+            // {
+            //     fieldKey: 'account_no',
+            //     name: 'Account No',
+            //     sort: true,
+            //     isEncrypted: true
+            // },
             // {
             //   fieldKey: 'rtgs_ifsc_code', 
             //   name: 'RTGS IFSC Code',
@@ -4603,34 +4617,34 @@ export const productPurchaseGLConfig: TaCurdConfig = {
             //   name: 'Classification',
             //   sort: false
             // },
-            {
-                fieldKey: 'is_loan_account',
-                name: 'Is Loan Account',
-                sort: true,
-                type: 'boolean'
-            },
+            // {
+            //     fieldKey: 'is_loan_account',
+            //     name: 'Is Loan Account',
+            //     sort: true,
+            //     type: 'boolean'
+            // },
             // {
             //   fieldKey: 'tds_applicable', 
             //   name: 'TDS Applicable',
             //   sort: false,
             //   type: 'boolean'
             // },
-            {
-                fieldKey: 'address',
-                name: 'Address',
-                sort: true
-            },
-            {
-                fieldKey: 'employee',
-                name: 'Employee',
-                sort: true,
-                type: 'boolean'
-            },
-            {
-                fieldKey: 'pan',
-                name: 'PAN',
-                sort: true
-            },
+            // {
+            //     fieldKey: 'address',
+            //     name: 'Address',
+            //     sort: true
+            // },
+            // {
+            //     fieldKey: 'employee',
+            //     name: 'Employee',
+            //     sort: true,
+            //     type: 'boolean'
+            // },
+            // {
+            //     fieldKey: 'pan',
+            //     name: 'PAN',
+            //     sort: true
+            // },
             {
                 fieldKey: "code",
                 name: "Action",
@@ -4824,7 +4838,7 @@ export const productPurchaseGLConfig: TaCurdConfig = {
 
 
 export const unitOptionsConfig: TaCurdConfig = {
-    drawerSize: 'auto',
+    drawerSize: 500,
     drawerPlacement: 'top',
     tableConfig: {
         apiUrl: 'masters/unit_options/',
@@ -4920,36 +4934,36 @@ export const productSizesConfig: TaCurdConfig = {
                 name: 'Size Category',
                 sort: true
             },
-            {
-                fieldKey: 'size_system',
-                name: 'Size System',
-                sort: true
-            },
-            {
-                fieldKey: 'length',
-                name: 'Length',
-                sort: true
-            },
-            {
-                fieldKey: 'height',
-                name: 'Height',
-                sort: true
-            },
-            {
-                fieldKey: 'width',
-                name: 'Width',
-                sort: true
-            },
-            {
-                fieldKey: 'size_unit',
-                name: 'Size Unit',
-                sort: true
-            },
-            {
-                fieldKey: 'description',
-                name: 'Description',
-                sort: true
-            },
+            // {
+            //     fieldKey: 'size_system',
+            //     name: 'Size System',
+            //     sort: true
+            // },
+            // {
+            //     fieldKey: 'length',
+            //     name: 'Length',
+            //     sort: true
+            // },
+            // {
+            //     fieldKey: 'height',
+            //     name: 'Height',
+            //     sort: true
+            // },
+            // {
+            //     fieldKey: 'width',
+            //     name: 'Width',
+            //     sort: true
+            // },
+            // {
+            //     fieldKey: 'size_unit',
+            //     name: 'Size Unit',
+            //     sort: true
+            // },
+            // {
+            //     fieldKey: 'description',
+            //     name: 'Description',
+            //     sort: true
+            // },
             {
                 fieldKey: "code",
                 name: "Action",
@@ -5004,7 +5018,7 @@ export const productSizesConfig: TaCurdConfig = {
                     templateOptions: {
                         label: 'Size System',
                         placeholder: 'Enter Size System',
-                        required: true,
+                        required: false,
                     }
                 },
                 {
@@ -5014,7 +5028,7 @@ export const productSizesConfig: TaCurdConfig = {
                     templateOptions: {
                         label: 'Length',
                         placeholder: 'Enter Length',
-                        required: true,
+                        required: false,
                     }
                 },
                 {
@@ -5024,7 +5038,7 @@ export const productSizesConfig: TaCurdConfig = {
                     templateOptions: {
                         label: 'Height',
                         placeholder: 'Enter Height',
-                        required: true,
+                        required: false,
                     }
                 },
                 {
@@ -5034,7 +5048,7 @@ export const productSizesConfig: TaCurdConfig = {
                     templateOptions: {
                         label: 'Width',
                         placeholder: 'Enter Width',
-                        required: true,
+                        required: false,
                     }
                 },
                 {
@@ -5044,7 +5058,7 @@ export const productSizesConfig: TaCurdConfig = {
                     templateOptions: {
                         label: 'Designation Size Unit',
                         placeholder: 'Enter Size Unit',
-                        required: true,
+                        required: false,
                     }
                 },
                 {
@@ -5054,7 +5068,7 @@ export const productSizesConfig: TaCurdConfig = {
                     templateOptions: {
                         label: 'Description',
                         placeholder: 'Enter Description',
-                        required: true,
+                        required: false,
                     }
                 }
             ]
@@ -5140,11 +5154,11 @@ export const warehouseLocationsConfig: TaCurdConfig = {
                 name: 'Location Name',
                 sort: true
             },
-            {
-                fieldKey: 'description',
-                name: 'Description',
-                sort: true
-            },
+            // {
+            //     fieldKey: 'description',
+            //     name: 'Description',
+            //     sort: true
+            // },
             {
                 fieldKey: 'warehouse',
                 name: 'Ware house',
@@ -5204,7 +5218,7 @@ export const warehouseLocationsConfig: TaCurdConfig = {
                     templateOptions: {
                         label: 'Description',
                         placeholder: 'Enter Location Description',
-                        required: true,
+                        required: false,
                     }
                 },
                 {
@@ -5411,7 +5425,7 @@ export const jobTypesConfig: TaCurdConfig = {
 }
 
 export const designationsConfig: TaCurdConfig = {
-    drawerSize: 'auto',
+    drawerSize: 500,
     drawerPlacement: 'top',
     tableConfig: {
         apiUrl: 'hrms/designations/',
@@ -5428,11 +5442,11 @@ export const designationsConfig: TaCurdConfig = {
                 name: 'Designation Name',
                 sort: true
             },
-            {
-                fieldKey: 'responsibilities',
-                name: 'Responsibilities',
-                sort: true
-            },
+            // {
+            //     fieldKey: 'responsibilities',
+            //     name: 'Responsibilities',
+            //     sort: true
+            // },
             {
                 fieldKey: "code",
                 name: "Action",
@@ -5604,7 +5618,7 @@ export const departmentsConfig: TaCurdConfig = {
 }
 
 export const shiftsConfig: TaCurdConfig = {
-    drawerSize: 'auto',
+    drawerSize: 500,
     drawerPlacement: 'top',
     tableConfig: {
         apiUrl: 'hrms/shifts/',
@@ -6105,7 +6119,7 @@ export const taskPrioritiesConfig: TaCurdConfig = {
     drawerPlacement: 'top',
     tableConfig: {
       apiUrl: 'masters/task_priorities/',
-      title: 'Task Priorities',
+      // title: 'Task Priorities',
       pkId: "priority_id",
       pageSize: 10,
       "globalSearch": {
