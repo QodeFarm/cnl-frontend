@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormlyModule } from '@ngx-formly/core';
-import { cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, CustomerPaymentConfig, FirmStatusConfig, GstCatConfig, GstTypesConfig, ledgerAccountsConfig, LedgerGroupsConfig, MachineConfig, OrderStatusConfig, OrderTypesConfig, PaymentLinkConfig, PriceCatConfig, ProductionStatusesConfig, PurchaseTypesConfig, ReminderTypesConfig, SaleTypesConfig, StateConfig, statusConfig, TerritoryConfig, TransportConfig, UserGroupsConfig, VendorAgentConfig, vendorCategeoryConfig, VendorPaymentTermsConfig } from '../utils/master-curd-config';
+import { cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, CustomerPaymentConfig, designationsConfig, employeeSalaryComponentsConfig, FirmStatusConfig, gPackageUnitsConfig, GstCatConfig, GstTypesConfig, interactionTypesConfig, jobTypesConfig, leadStatusesConfig, leaveTypesConfig, ledgerAccountsConfig, LedgerGroupsConfig, MachineConfig, OrderStatusConfig, OrderTypesConfig, packUnitConfig, PaymentLinkConfig, PriceCatConfig, productBrandsConfig, productCategoriesConfig, productColorsConfig, productGroupsConfig, productGstClassificationsConfig, ProductionStatusesConfig, productModesConfig, productPurchaseGLConfig, productSalesGLConfig, productSizesConfig, productStockUnitsConfig, productTypesConfig, PurchaseTypesConfig, ReminderTypesConfig, SaleTypesConfig, shiftsConfig, StateConfig, statusConfig, taskPrioritiesConfig, TerritoryConfig, TransportConfig, unitOptionsConfig, UserGroupsConfig, VendorAgentConfig, vendorCategeoryConfig, VendorPaymentTermsConfig, warehouseLocationsConfig } from '../utils/master-curd-config';
 
 
 
@@ -21,7 +21,7 @@ import { cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, C
               label: 'Customer Category',
               dataKey: 'customer_category_id',
               dataLabel: 'name',
-              required: true,
+              required: false,
               curdConfig: customerCudConfig
             }
           }
@@ -36,7 +36,7 @@ import { cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, C
               label: 'Customer Category Category',
               dataKey: 'customer_category_id',
               dataLabel: 'name',
-              required: true,
+              required: false,
               curdConfig: customerCategoryConfig
             }
           }
@@ -415,7 +415,413 @@ import { cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, C
               curdConfig: PaymentLinkConfig
             }
           }
-        }
+        },
+        {
+          name: 'productModes-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: ' Please Select Product Mode',
+              label: ' Product Mode',
+              dataKey: 'product_mode_id',
+              dataLabel: 'mode_name',
+              required: false,
+              curdConfig: productModesConfig  
+            }
+          }
+        },
+        {
+          name: 'productSalesGL-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Select productSalesGL',
+              label: 'productSalesGL',
+              dataKey: 'sales_gl_id',
+              dataLabel: 'name',
+              required: false,
+              curdConfig: productSalesGLConfig
+            }
+          }
+        },
+        {
+          name: 'productType-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Select Product Type',
+              label: 'Product Type',
+              dataKey: 'type_id',
+              dataLabel: 'name',
+              required: false,
+              curdConfig: productTypesConfig
+            }
+          }
+        },
+        {
+          name: 'productBrands-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: ' Please Select Product Brand',
+              label: 'Product Brand',
+              dataKey: 'brand_id',
+              dataLabel: 'name',
+              required: false,
+              curdConfig: productBrandsConfig
+            }
+          }
+        },
+        {
+          name: 'productGroups-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Select Product Groups',
+              label: 'Product Groups',
+              dataKey: 'product_group_id',
+              dataLabel: 'name',
+              required: false,
+              curdConfig: productGroupsConfig
+            }
+          }
+        },
+        {
+          name: 'productStockUnits-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Select Product Stock Units',
+              label: 'Product Stock Units',
+              dataKey: 'stock_unit_id',
+              dataLabel: 'name',
+              required: false,
+              curdConfig: productStockUnitsConfig
+            }
+          }
+        },
+        {
+          name: 'productCategories-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Select Product Categories',
+              label: 'Product Categories',
+              dataKey: 'category_id',
+              dataLabel: 'name',
+              required: false,
+              curdConfig: productCategoriesConfig
+            }
+          }
+        },
+        {
+          name: 'productGstClassifications-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Select Product GST Classifications',
+              label: 'Product GST Classifications',
+              dataKey: 'gst_classification_id',
+              dataLabel: 'name',
+              required: false,
+              curdConfig: productGstClassificationsConfig
+            }
+          }
+        },
+        {
+          name: 'productItemType-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Select Product Item Type',
+              label: 'Product Item Type',
+              dataKey: 'item_type_id',
+              dataLabel: 'item_name',
+              required: false,
+              curdConfig: productGstClassificationsConfig
+            }
+          }
+        },
+        {
+          name: 'productPurchaseGL-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Select Product Purchase GL',
+              label: 'Product Purchase GL',
+              dataKey: 'purchase_gl_id',
+              dataLabel: 'name',
+              required: false,
+              curdConfig: productPurchaseGLConfig
+            }
+          }
+        },
+        {
+          name: 'productUnitOptions-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Select Product Unit Options',
+              label: 'Product Unit Options',
+              dataKey: 'unit_options_id',
+              dataLabel: 'unit_name',
+              required: false,
+              curdConfig: unitOptionsConfig
+            }
+          }
+        },
+        {
+          name: 'productSizes-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Select Product Sizes',
+              label: 'Product Sizes',
+              dataKey: 'size_id',
+              dataLabel: 'size_name',
+              required: false,
+              curdConfig: productSizesConfig
+            }
+          }
+        },
+        {
+          name: 'productColors-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Select Product Colors',
+              label: 'Product Colors',
+              dataKey: 'color_id',
+              dataLabel: 'color_name',
+              required: false,
+              curdConfig: productColorsConfig
+            }
+          }
+        },
+        {
+          name: 'warehouseLocations-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Select Warehouse Locations',
+              label: 'Warehouse Locations',
+              dataKey: 'location_id',
+              dataLabel: 'location_name',
+              required: false,
+              curdConfig: warehouseLocationsConfig
+            }
+          }
+        },
+        {
+          name: 'packUnits-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Select Pack Units',
+              label: 'Pack Units',
+              dataKey: 'pack_unit_id',
+              dataLabel: 'pack_unit_name',
+              required: false,
+              curdConfig: packUnitConfig
+            }
+          }
+        },
+        {
+          name: 'GpackUnits-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Select GPack Units',
+              label: 'GPack Units',
+              dataKey: 'g_pack_unit_id',
+              dataLabel: 'g_pack_unit_name',
+              required: false,
+              curdConfig: gPackageUnitsConfig
+            }
+          }
+        },
+        {
+          name: 'JobTypes-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Select Job Types',
+              label: 'Job Types',
+              dataKey: 'job_type_id',
+              dataLabel: 'job_type_name',
+              required: false,
+              curdConfig: jobTypesConfig
+            }
+          }
+        },
+        {
+          name: 'designations-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Select Designations',
+              label: 'Designations',
+              dataKey: 'designation_id',
+              dataLabel: 'designation_name',
+              required: false,
+              curdConfig: designationsConfig  
+            }
+          }
+        },
+        {
+          name: 'jobCode-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Select Job Codes',
+              label: 'Job Codes',
+              dataKey: 'job_code_id',
+              dataLabel: 'job_code',
+              required: false,
+              curdConfig: jobTypesConfig  
+            }
+          }
+        },
+        {
+          name: 'departments-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Select Departments',
+              label: 'Departments',
+              dataKey: 'department_id',
+              dataLabel: 'department_name',
+              required: false,
+              curdConfig: designationsConfig  
+            }
+          }
+        },
+        {
+          name: 'shifts-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Select Shifts',
+              label: 'Shifts',
+              dataKey: 'shift_id',
+              dataLabel: 'shift_name',
+              required: false,
+              curdConfig: shiftsConfig  
+            }
+          }
+        },
+        {
+          name: 'salaryComponents-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Select Salary Components',
+              label: 'Salary Components',
+              dataKey: 'component_id',
+              dataLabel: 'component_name',
+              required: false,
+              curdConfig: shiftsConfig  
+            }
+          }
+        },
+        {
+          name: 'employeeSalaryComponents-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Select Salary Components',
+              label: 'Employee Salary Components',
+              dataKey: 'employee_component_id',
+              dataLabel: 'component_name',
+              required: false,
+              curdConfig: employeeSalaryComponentsConfig  
+            }
+          }
+        },
+        {
+          name: 'leaveTypes-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Select Leave Types',
+              label: 'Leave Types',
+              dataKey: 'leave_type_id',
+              dataLabel: 'leave_type_name',
+              required: false,
+              curdConfig: leaveTypesConfig  
+            }
+          }
+        },
+        {
+          name: 'leadStatuses-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Select Lead Statuses',
+              label: 'Lead Statuses',
+              dataKey: 'lead_status_id',
+              dataLabel: 'status_name',
+              required: false,
+              curdConfig: leadStatusesConfig  
+            }
+          }
+        },
+        {
+          name: 'interactionTypes-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Select Interaction Types',
+              label: 'Interaction Types',
+              dataKey: 'interaction_type_id',
+              dataLabel: 'interaction_type',
+              required: false,
+              curdConfig: interactionTypesConfig  
+            }
+          }
+        },
+        {
+          name: 'taskPriorities-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Select Task Priorities',
+              label: 'Task Priorities',
+              dataKey: 'priority_id',
+              dataLabel: 'priority_name',
+              required: false,
+              curdConfig: taskPrioritiesConfig  
+            }
+          }
+        },
+        
       ],
     })
   ]

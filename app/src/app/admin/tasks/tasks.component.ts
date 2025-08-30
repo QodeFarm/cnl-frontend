@@ -373,7 +373,7 @@ export class TasksComponent implements OnInit {
             },
             {
               key: 'priority',
-              type: 'select',
+              type: 'taskPriorities-dropdown',
               className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Priorities',

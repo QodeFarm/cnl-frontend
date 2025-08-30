@@ -15,12 +15,14 @@ import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 import { TaFormComponent, TaFormModule } from '@ta/ta-form';
 import { ClickOutsideDirective } from './click-outside.directive';
 import { NzPopoverModule } from 'ng-zorro-antd/popover';
+import { OverlayModule } from '@angular/cdk/overlay';
 @Component({
   selector: 'ta-field-adv-select',
   templateUrl: './field-adv-select.component.html',
   styleUrls: ['./field-adv-select.component.css'],
   standalone: true,
   imports: [CommonModule, FormlyModule,
+    OverlayModule,
     ReactiveFormsModule,
     NzSelectModule,
     FormlySelectModule,
@@ -40,6 +42,20 @@ export class FieldAdvSelectComponent extends FieldType implements OnInit, AfterV
   visible = false;
   formTitle = "Create";
   showCurdDiv = false;
+  positions = [
+    {
+      originX: 'center',
+      originY: 'bottom',
+      overlayX: 'center',
+      overlayY: 'top'
+    },
+    {
+      originX: 'center',
+      originY: 'top',
+      overlayX: 'center',
+      overlayY: 'bottom'
+    }
+  ];
   constructor(private cdr: ChangeDetectorRef) {
     super();
   }
@@ -71,7 +87,10 @@ export class FieldAdvSelectComponent extends FieldType implements OnInit, AfterV
     }
     this.formControl.valueChanges.subscribe(res => {
       if (this.formControl.value) {
-        this.lazySelectedItem = this.itemMapping(this.formControl.value);
+        const data = this.itemMapping(this.formControl.value);
+        if (data) {
+          this.lazySelectedItem = data;
+        }
       }
     })
   }
@@ -117,13 +136,12 @@ export class FieldAdvSelectComponent extends FieldType implements OnInit, AfterV
 
   }
   onClickOutside(event: MouseEvent): void {
-    console.log('click------------', event);
     // Don't close dropdown
     // event.preventDefault();
     // event.stopPropagation();
     //this.dropdownOpen = true;
     //const overlayPane = document.querySelector('.cdk-overlay-pane.select-adv-field');
-    const overlayPane = document.querySelector('.adv-select-curd-container');
+    const overlayPane = document.querySelector('.cdk-overlay-container');
     const drawerContent = document.querySelector('.curd-modal-form');
     const popoverContent = document.querySelector('.table-action-conformation');
 
@@ -138,10 +156,8 @@ export class FieldAdvSelectComponent extends FieldType implements OnInit, AfterV
       // event.preventDefault();
       this.dropdownOpen = false;
       this.showCurdDiv = false;
-      console.log('Click blocked outside allowed areas');
     } else {
 
-      console.log('Click allowed inside overlay or drawer');
     }
   }
   openDrawer(row?: any) {

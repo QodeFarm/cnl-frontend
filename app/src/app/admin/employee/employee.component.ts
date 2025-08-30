@@ -191,7 +191,7 @@ export class EmployeeComponent implements OnInit {
         },
         {
           key: 'job_type_id',
-          type: 'select',
+          type: 'JobTypes-dropdown',
           className: 'ta-cell pr-md',
           templateOptions: {
             label: 'Job Type',
@@ -212,7 +212,7 @@ export class EmployeeComponent implements OnInit {
         },
         {
           key: 'designation_id',
-          type: 'select',
+          type: 'designations-dropdown',
           className: 'ta-cell pr-md',
           templateOptions: {
             label: 'Designation',
@@ -233,7 +233,7 @@ export class EmployeeComponent implements OnInit {
         },
         {
           key: 'job_code_id',
-          type: 'select',
+          type: 'jobCode-dropdown',
           className: 'ta-cell pr-md',
           templateOptions: {
             label: 'Job Code',
@@ -254,7 +254,7 @@ export class EmployeeComponent implements OnInit {
         },
         {
           key: 'department_id',
-          type: 'select',
+          type: 'departments-dropdown',
           className: 'ta-cell pr-md',
           templateOptions: {
             label: 'Department',
@@ -275,7 +275,7 @@ export class EmployeeComponent implements OnInit {
         },
         {
           key: 'shift_id',
-          type: 'select',
+          type: 'shifts-dropdown',
           className: 'ta-cell pr-md',
           templateOptions: {
             label: 'Shift',
