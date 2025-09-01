@@ -775,7 +775,7 @@ export class CustomersComponent {
                         {
                           className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                           key: 'price_category',
-                          type: 'select',
+                          type: 'price-cat-dropdown',
                           templateOptions: {
                             label: 'Price Category',
                             dataKey: 'price_category_id',

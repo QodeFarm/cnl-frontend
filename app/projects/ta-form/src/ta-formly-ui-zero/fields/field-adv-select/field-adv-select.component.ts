@@ -42,18 +42,32 @@ export class FieldAdvSelectComponent extends FieldType implements OnInit, AfterV
   visible = false;
   formTitle = "Create";
   showCurdDiv = false;
+  Math = Math; // Make Math available in the template
+  window = window; // Make window available in the template
   positions = [
     {
-      originX: 'center',
+      originX: 'start',
       originY: 'bottom',
-      overlayX: 'center',
-      overlayY: 'top'
+      overlayX: 'start',
+      overlayY: 'top',
     },
     {
-      originX: 'center',
+      originX: 'start',
       originY: 'top',
-      overlayX: 'center',
-      overlayY: 'bottom'
+      overlayX: 'start',
+      overlayY: 'bottom',
+    },
+    {
+      originX: 'end',
+      originY: 'bottom',
+      overlayX: 'end',
+      overlayY: 'top',
+    },
+    {
+      originX: 'end',
+      originY: 'top',
+      overlayX: 'end',
+      overlayY: 'bottom',
     }
   ];
   constructor(private cdr: ChangeDetectorRef) {

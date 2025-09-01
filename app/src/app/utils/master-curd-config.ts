@@ -1,10 +1,13 @@
 import { TaCurdConfig } from "@ta/ta-curd";
 
 export const customerCudConfig: TaCurdConfig = {
+    drawerSize: 500,
+    drawerPlacement: 'top',
     tableConfig: {
         apiUrl: 'customers/customers/?summary=true',
         showCheckbox: false,
         pkId: "customer_id",
+        hideFilters: true,
         export: {
             downloadName: 'customers'
         },
@@ -25,21 +28,21 @@ export const customerCudConfig: TaCurdConfig = {
                 name: 'Name',
                 sort: true
             },
-            {
-                fieldKey: 'email',
-                name: 'Email',
-                sort: false,
-            },
+            // {
+            //     fieldKey: 'email',
+            //     name: 'Email',
+            //     sort: false,
+            // },
             {
                 fieldKey: 'phone',
                 name: 'Phone',
                 sort: false,
             },
-            {
-                fieldKey: 'gst',
-                name: 'GST',
-                sort: true,
-            },
+            // {
+            //     fieldKey: 'gst',
+            //     name: 'GST',
+            //     sort: true,
+            // },
             {
                 fieldKey: 'city_id',
                 name: 'City Name',
@@ -49,20 +52,20 @@ export const customerCudConfig: TaCurdConfig = {
                     return row.city.city_name;
                 },
             },
-            {
-                fieldKey: 'ledger_account_id',
-                name: 'Ledger Account',
-                sort: true,
-                displayType: 'map',
-                mapFn: (currentValue: any, row: any, col: any) => {
-                    return row.ledger_account.name;
-                },
-            },
-            {
-                fieldKey: 'pin_code',
-                name: 'Pin Code',
-                sort: true,
-            }
+            // {
+            //     fieldKey: 'ledger_account_id',
+            //     name: 'Ledger Account',
+            //     sort: true,
+            //     displayType: 'map',
+            //     mapFn: (currentValue: any, row: any, col: any) => {
+            //         return row.ledger_account.name;
+            //     },
+            // },
+            // {
+            //     fieldKey: 'pin_code',
+            //     name: 'Pin Code',
+            //     sort: true,
+            // }
         ]
     },
     formConfig: {
@@ -919,6 +922,7 @@ export const customerCategoryConfig: TaCurdConfig = {
         apiUrl: 'masters/customer_categories/',
         // title: 'Customer Categories',
         pkId: "customer_category_id",
+        hideFilters: true,
         pageSize: 10,
         "globalSearch": {
             keys: ['customer_category_id', 'name', 'code']
@@ -997,6 +1001,7 @@ export const ledgerAccountsConfig: TaCurdConfig = {
       apiUrl: 'customers/ledger_accounts/',
     //   title: 'Ledger Accounts',
       pkId: "ledger_account_id",
+      hideFilters: true,
       pageSize: 10,
       "globalSearch": {
         keys: ['ledger_account_id', 'name','code','inactive','type','account_no','is_loan_account', 'address','pan','ledger_group_id']
@@ -1232,6 +1237,7 @@ export const cityConfig: TaCurdConfig = {
     //   title: 'City List',
       pkId: 'city_id',
       pageSize: 10,
+      hideFilters: true,
       "globalSearch": {
         keys: ['state_name', 'city_name', 'city_code']
       },
@@ -1339,6 +1345,7 @@ export const StateConfig: TaCurdConfig = {
     tableConfig: {
       apiUrl: 'masters/state/',
     //   title: 'State List',
+      hideFilters: true,
       pkId: 'state_id',
       pageSize: 10,
       "globalSearch": {
@@ -1455,6 +1462,7 @@ export const CountryConfig: TaCurdConfig = {
       apiUrl: 'masters/country/',
     //   title: 'Country List',
       pkId: 'country_id',
+      hideFilters: true,
       pageSize: 10,
       "globalSearch": {
         keys: ['country_name', 'country_code']
@@ -1535,7 +1543,7 @@ export const vendorCategeoryConfig: TaCurdConfig = {
     tableConfig: {
       apiUrl: 'vendors/vendor_category/',
     //   title: 'Vendor Category List',
-      
+      hideFilters: true,
       pkId: "vendor_category_id",
       pageSize: 10,
       "globalSearch": {
@@ -1626,6 +1634,7 @@ export const statusConfig: TaCurdConfig = {
     //   title: 'Statuses',
       
       pkId: "status_id",
+      hideFilters: true,
       pageSize: 10,
       "globalSearch": {
         keys: ['status_id', 'status_name']
@@ -1701,6 +1710,7 @@ export const TransportConfig: TaCurdConfig = {
     //   title: 'Transporters',
       
       pkId: "transporter_id",
+      hideFilters: true,
       pageSize: 10,
       "globalSearch": {
         keys: ['transporter_id', 'name', 'code','gst_no','website_url']
@@ -1811,6 +1821,7 @@ export const FirmStatusConfig: TaCurdConfig = {
     //   title: 'Firm Statuses',
       
       pkId: "firm_status_id",
+      hideFilters: true,
       pageSize: 10,
       "globalSearch": {
         keys: ['firm_status_id', 'name']
@@ -1884,6 +1895,7 @@ export const GstCatConfig: TaCurdConfig = {
         // title: 'Gst Categories',
         
         pkId: "gst_category_id",
+        hideFilters: true,
         pageSize: 10,
         "globalSearch": {
           keys: ['gst_category_id', 'name']
@@ -1932,7 +1944,7 @@ export const GstCatConfig: TaCurdConfig = {
           {
             fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
             fieldGroup: [
-      {
+          {
             key: 'name',
             type: 'input',
             className: 'col-md-6 col-12 p-0',
@@ -1954,7 +1966,7 @@ export const PriceCatConfig: TaCurdConfig = {
     drawerPlacement: 'top',
     tableConfig: {
       apiUrl: 'masters/price_categories/',
-      title: 'Price Categories',
+      // title: 'Price Categories',
       
       pkId: "price_category_id",
       pageSize: 10,
@@ -2042,7 +2054,7 @@ export const VendorAgentConfig: TaCurdConfig = {
     drawerPlacement: 'top',
     tableConfig: {
       apiUrl: 'vendors/vendor_agent/',
-      title: 'Vendor Agent List',
+      // title: 'Vendor Agent List',
       
       pkId: "vendor_agent_id",
       pageSize: 10,
@@ -2182,8 +2194,8 @@ export const VendorPaymentTermsConfig: TaCurdConfig = {
     drawerPlacement: 'top',
     tableConfig: {
       apiUrl: 'vendors/vendor_payment_terms/',
-      title: 'Vendor Payment Terms List',
-      
+      // title: 'Vendor Payment Terms List',
+      hideFilters: true,
       pkId: "payment_term_id",
       pageSize: 10,
       "globalSearch": {
@@ -2333,6 +2345,7 @@ export const CustomerPaymentConfig: TaCurdConfig = {
       // title: 'Customer Payment Terms',
       // 
       pkId: "payment_term_id",
+      hideFilters: true,
       pageSize: 10,
       // "globalSearch": {
       //   keys: ['payment_term_id', 'name','code','fixed_days','no_of_fixed_days','payment_cycle', 'run_on']
@@ -2471,8 +2484,9 @@ export const LedgerGroupsConfig: TaCurdConfig = {
     drawerPlacement: 'top',
     tableConfig: {
       apiUrl: 'masters/ledger_groups/',
-      title: 'Ledger Groups',
+      // title: 'Ledger Groups',
       pkId: "ledger_group_id",
+      hideFilters: true,
       pageSize: 10,
       "globalSearch": {
         keys: ['ledger_group_id', 'name','code','inactive','under_group','nature']
@@ -2591,7 +2605,8 @@ export const TerritoryConfig: TaCurdConfig = {
     drawerPlacement: 'top',
     tableConfig: {
       apiUrl: 'masters/territory/',
-      title: 'Territory',
+      hideFilters: true,
+      // title: 'Territory',
       
       pkId: "territory_id",
       pageSize: 10,
@@ -2673,6 +2688,7 @@ export const MachineConfig: TaCurdConfig = {
       apiUrl: 'production/machines/',
     //   title: 'Machines',
       pkId: "machine_id",
+      hideFilters: true,
       pageSize: 10,
       "globalSearch": {
         keys: ['machine_id', 'machine_name', 'description', 'status']
@@ -2770,6 +2786,7 @@ export const ProductionStatusesConfig: TaCurdConfig = {
       apiUrl: 'production/production_statuses/',
     //   title: 'Production Statuses',
       pkId: "status_id",
+      hideFilters: true,
       pageSize: 10,
       "globalSearch": {
         keys: ['status_id', 'status_name']
@@ -2830,8 +2847,8 @@ export const OrderStatusConfig: TaCurdConfig = {
     drawerPlacement: 'top',
     tableConfig: {
       apiUrl: 'masters/order_status/',
-      title: 'Order Statuses',
-      
+      // title: 'Order Statuses',
+      hideFilters: true,
       pkId: "order_status_id",
       pageSize: 10,
       "globalSearch": {
@@ -2921,7 +2938,7 @@ export const GstTypesConfig: TaCurdConfig = {
     tableConfig: {
       apiUrl: 'masters/gst_types/',
       // title: 'Gst Types',
-      
+      hideFilters: true,
       pkId: "gst_type_id",
       pageSize: 10,
       "globalSearch": {
@@ -2996,7 +3013,7 @@ export const OrderTypesConfig: TaCurdConfig = {
     tableConfig: {
       apiUrl: 'masters/order_types/',
     //   title: 'Order Types',
-      
+      hideFilters: true,
       pkId: "order_type_id",
       pageSize: 10,
       "globalSearch": {
@@ -3071,7 +3088,7 @@ export const PurchaseTypesConfig: TaCurdConfig = {
     tableConfig: {
       apiUrl: 'masters/purchase_types/',
     //   title: 'Purchase types',
-      
+      hideFilters: true,
       pkId: "purchase_type_id",
       pageSize: 10,
       "globalSearch": {
@@ -3146,7 +3163,7 @@ export const SaleTypesConfig: TaCurdConfig = {
     tableConfig: {
       apiUrl: 'masters/sale_types/',
     //   title: 'Sale types',
-      
+      hideFilters: true,
       pkId: "sale_type_id",
       pageSize: 10,
       "globalSearch": {
@@ -3221,6 +3238,7 @@ export const UserGroupsConfig: TaCurdConfig = {
     tableConfig: {
       apiUrl: 'masters/user_groups/',
     //   title: 'User Groups',
+     hideFilters: true,
       pkId: "group_id",
       pageSize: 10,
       "globalSearch": {
@@ -3300,6 +3318,7 @@ export const ReminderTypesConfig: TaCurdConfig = {
     //   title: 'Reminder Types',
       pkId: "reminder_type_id",
       pageSize: 10,
+      hideFilters: true,
       "globalSearch": {
         keys: ['reminder_type_id', 'type_name']
       },
@@ -3362,6 +3381,7 @@ export const PaymentLinkConfig: TaCurdConfig = {
       // title: 'Payment link type',
       pkId: "payment_link_type_id",
       pageSize: 10,
+      hideFilters: true,
       "globalSearch": {
         keys: ['payment_link_type_id', 'name', 'description']
       },
@@ -3452,6 +3472,7 @@ export const productModesConfig: TaCurdConfig = {
     //   title: 'Product Modes',
       pkId: "item_master_id",
       pageSize: 10,
+      hideFilters: true, // Hide all filters for this table
       globalSearch: {
         keys: ['item_master_id', 'mode_name', 'description']
       },
@@ -3495,7 +3516,7 @@ export const productModesConfig: TaCurdConfig = {
     },
     formConfig: {
       url: 'products/item-master/',
-      title: 'Item Master',
+      title: 'Product Modes',
       pkId: "item_master_id",
       fields: [
         {
@@ -3543,6 +3564,7 @@ export const productSalesGLConfig: TaCurdConfig = {
         //   title: 'Product Sales GL',      
         pkId: "sales_gl_id",
         pageSize: 10,
+        hideFilters: true, // Hide all filters for this table
         "globalSearch": {
             keys: ['name', 'sales_accounts', 'code', 'inactive', 'type', 'account_no', 'is_loan_account', 'address', 'employee', 'pan']
         },
@@ -3821,9 +3843,10 @@ export const productTypesConfig: TaCurdConfig = {
     drawerPlacement: 'top',
     tableConfig: {
       apiUrl: 'masters/product_types/',
-      title: 'Product Types',
+      // title: 'Product Types',
       pkId: "type_id",
       pageSize: 10,
+      hideFilters: true, // Hide all filters for this table
       globalSearch: {
         keys: ['type_id', 'type_name', 'mode_type']
       },
@@ -3917,6 +3940,7 @@ export const productBrandsConfig: TaCurdConfig = {
 
         pkId: "brand_id",
         pageSize: 10,
+        hideFilters: true, // Hide all filters for this table
         "globalSearch": {
             keys: ['brand_id', 'brand_name', 'code', 'brand_salesman']
         },
@@ -4050,6 +4074,7 @@ export const productGroupsConfig: TaCurdConfig = {
 
         pkId: "product_group_id",
         pageSize: 10,
+        hideFilters: true, // Hide all filters for this table
         "globalSearch": {
             keys: ['group_name', 'description']
         },
@@ -4141,6 +4166,7 @@ export const productStockUnitsConfig: TaCurdConfig = {
 
         pkId: "stock_unit_id",
         pageSize: 10,
+        hideFilters: true, // Hide all filters for this table
         "globalSearch": {
             keys: ['stock_unit_name', 'quantity_code_id', 'description']
         },
@@ -4267,6 +4293,7 @@ export const productCategoriesConfig: TaCurdConfig = {
 
         pkId: "category_id",
         pageSize: 10,
+        hideFilters: true, // Hide all filters for this table
         "globalSearch": {
             keys: ['category_name', 'code']
         },
@@ -4357,6 +4384,7 @@ export const productGstClassificationsConfig: TaCurdConfig = {
 
         pkId: "gst_classification_id",
         pageSize: 10,
+        hideFilters: true, // Hide all filters for this table
         "globalSearch": {
             keys: ['id', 'type', 'code', 'hsn_or_sac_code', 'hsn_description']
         },
@@ -4489,6 +4517,7 @@ export const productItemTypeConfig: TaCurdConfig = {
 
         pkId: "item_type_id",
         pageSize: 10,
+        hideFilters: true, // Hide all filters for this table
         "globalSearch": {
             keys: ['item_type_id', 'item_name']
         },
@@ -4564,6 +4593,7 @@ export const productPurchaseGLConfig: TaCurdConfig = {
 
         pkId: "purchase_gl_id",
         pageSize: 10,
+        hideFilters: true, // Hide all filters for this table
         "globalSearch": {
             keys: ['name', 'purchase_accounts', 'code', 'inactive', 'type', 'account_no', 'is_loan_account', 'address', 'employee', 'pan']
         },
@@ -4843,6 +4873,7 @@ export const unitOptionsConfig: TaCurdConfig = {
     tableConfig: {
         apiUrl: 'masters/unit_options/',
         // title: 'Unit Options',
+        hideFilters: true,
 
         pkId: "unit_options_id",
         pageSize: 10,
@@ -4919,6 +4950,7 @@ export const productSizesConfig: TaCurdConfig = {
         //   title: 'Size',
         pkId: "size_id",
         pageSize: 10,
+        hideFilters: true, // Hide all filters for this table
         "globalSearch": {
             keys: ['size_id', 'size_name', 'size_category', 'size_system', 'length', 'height', 'width', 'size_unit', 'description']
         },
@@ -5081,9 +5113,10 @@ export const productColorsConfig: TaCurdConfig = {
     drawerPlacement: 'top',
     tableConfig: {
         apiUrl: 'products/colors/',
-        title: 'Color',
+        // title: 'Color',
         pkId: "color_id",
         pageSize: 10,
+        hideFilters: true, // Hide all filters for this table
         "globalSearch": {
             keys: ['color_id', 'color_name']
         },
@@ -5141,8 +5174,9 @@ export const warehouseLocationsConfig: TaCurdConfig = {
     drawerPlacement: 'top',
     tableConfig: {
         apiUrl: 'inventory/warehouse_locations/',
-        title: 'Warehouse Locations',
+        // title: 'Warehouse Locations',
         pkId: "location_id",
+        hideFilters: true,
         pageSize: 10,
         "globalSearch": {
             keys: ['location_id', 'location_name', 'description', 'warehouse']
@@ -5252,8 +5286,9 @@ export const packUnitConfig: TaCurdConfig = {
     drawerPlacement: 'top',
     tableConfig: {
         apiUrl: 'masters/package_units/',
-        title: 'Pack Unit',
+        // title: 'Pack Unit',
         pkId: "pack_unit_id",
+        hideFilters: true,
         pageSize: 10,
         "globalSearch": {
             keys: ['pack_unit_id', 'unit_name']
@@ -5312,8 +5347,9 @@ export const gPackageUnitsConfig: TaCurdConfig = {
     drawerPlacement: 'top',
     tableConfig: {
         apiUrl: 'masters/g_package_units/',
-        title: 'GPack Unit',
+        // title: 'GPack Unit',
         pkId: "g_pack_unit_id",
+        hideFilters: true,
         pageSize: 10,
         "globalSearch": {
             keys: ['g_pack_unit_id', 'unit_name']
@@ -5374,6 +5410,7 @@ export const jobTypesConfig: TaCurdConfig = {
         apiUrl: 'hrms/job_types/',
         //   title: 'Job Types',
         pkId: "job_type_id",
+        hideFilters: true,
         pageSize: 10,
         "globalSearch": {
             keys: ['job_type_id', 'job_type_name']
@@ -5431,6 +5468,7 @@ export const designationsConfig: TaCurdConfig = {
         apiUrl: 'hrms/designations/',
         //   title: 'Designation',
         pkId: "designation_id",
+        hideFilters: true,
         pageSize: 10,
         "globalSearch": {
             keys: ['designation_id', 'designation_name', 'responsibilities']
@@ -5506,8 +5544,9 @@ export const jobCodesConfig: TaCurdConfig = {
     drawerPlacement: 'top',
     tableConfig: {
         apiUrl: 'hrms/job_codes/',
-        title: 'Job Codes',
+        // title: 'Job Codes',
         pkId: "job_code_id",
+        hideFilters: true,
         pageSize: 10,
         "globalSearch": {
             keys: ['job_code_id', 'job_code']
@@ -5567,6 +5606,7 @@ export const departmentsConfig: TaCurdConfig = {
         //   title: 'Departments',
         pkId: "department_id",
         pageSize: 10,
+        hideFilters: true,
         "globalSearch": {
             keys: ['department_id', 'department_name', 'designation_name']
         },
@@ -5625,6 +5665,7 @@ export const shiftsConfig: TaCurdConfig = {
         // title: 'Shifts',
         pkId: "shift_id",
         pageSize: 10,
+        hideFilters: true,
         "globalSearch": {
             keys: ['shift_id', 'shift_name', 'start_time', 'end_time']
         },
@@ -5719,6 +5760,7 @@ export const salaryComponentsConfig: TaCurdConfig = {
         apiUrl: 'hrms/salary_components/',
         //   title: 'Salary Components',
         pkId: "component_id",
+        hideFilters: true,
         pageSize: 10,
         "globalSearch": {
             keys: ['component_id', 'component_name']
@@ -5777,6 +5819,7 @@ export const employeeSalaryComponentsConfig: TaCurdConfig = {
         apiUrl: 'hrms/employee_salary_components/',
         // title: 'Employee Salary Components',
         pkId: "employee_component_id",
+        hideFilters: true,
         pageSize: 10,
         "globalSearch": {
             keys: ['employee_component_id', 'component_id', 'component_amount', 'salary_id']
@@ -5908,6 +5951,7 @@ export const leaveTypesConfig: TaCurdConfig = {
         apiUrl: 'hrms/leave_types/',
         //   title: 'Leave Types',
         pkId: "leave_type_id",
+        hideFilters: true,
         pageSize: 10,
         "globalSearch": {
             keys: ['leave_type_id', 'leave_type_name', 'description', 'max_days_allowed']
@@ -6001,6 +6045,7 @@ export const leadStatusesConfig: TaCurdConfig = {
         apiUrl: 'leads/lead_statuses/',
         // title: 'Lead statuses',
         pkId: "lead_status_id",
+        hideFilters: true,
         pageSize: 10,
         "globalSearch": {
             keys: ['lead_status_id', 'status_name']
@@ -6121,6 +6166,7 @@ export const taskPrioritiesConfig: TaCurdConfig = {
       apiUrl: 'masters/task_priorities/',
       // title: 'Task Priorities',
       pkId: "priority_id",
+      hideFilters: true,
       pageSize: 10,
       "globalSearch": {
         keys: ['priority_id', 'priority_name']

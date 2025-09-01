@@ -24,6 +24,7 @@ export interface TaTableConfig {
   reload?: () => any,
   rowSelectionEnabled?: boolean
   rowSelection?: (row: any) => any;
+  hideFilters?: boolean; // Controls whether to hide filters regardless of URL
 }
 
 export interface Export {
