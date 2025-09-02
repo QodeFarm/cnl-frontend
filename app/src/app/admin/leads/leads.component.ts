@@ -181,7 +181,7 @@ export class LeadsComponent {
             },            
             {
               key: 'lead_status',
-              type: 'select',
+              type: 'leadStatuses-dropdown',
               className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Lead Status',
@@ -227,7 +227,7 @@ export class LeadsComponent {
             fieldGroup: [
               {
                 key: 'interaction_type',
-                type: 'select',
+                type: 'interactionTypes-dropdown',
                 templateOptions: {
                   label: 'Interaction Type',
                   dataKey: 'interaction_type_id',

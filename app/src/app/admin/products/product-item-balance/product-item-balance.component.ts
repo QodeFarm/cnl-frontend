@@ -116,7 +116,7 @@ export class ProductItemBalanceComponent {
           },
           {
             key: 'warehouse_location',
-            type: 'select',
+            type: 'warehouseLocations-dropdown',
             className: 'col-md-6 col-12 px-1 pb-3',
             templateOptions: {
               label: 'Warehouse Location',
