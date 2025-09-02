@@ -114,7 +114,6 @@ export class CreditNoteListComponent {
             confirm: true,
             confirmMsg: "Sure to Approve?",
             callBackFn: (row, action) => {
-              console.log(row);
               this.circle.emit(row.credit_note_id);
             }
           }

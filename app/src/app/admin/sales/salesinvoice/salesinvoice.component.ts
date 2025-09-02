@@ -818,10 +818,10 @@ async autoFillProductDetails(field, data) {
     });
     // Construct payload for custom fields
     const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
-    console.log("customFieldsPayload : ", customFieldsPayload);
-    // if (!customFieldsPayload) {
-    //   this.showDialog(); // Stop execution if required fields are missing
-    // }
+    // console.log("customFieldsPayload : ", customFieldsPayload);
+    if (!customFieldsPayload) {
+      this.showDialog(); // Stop execution if required fields are missing
+    }
 
     // Construct the final payload
     const payload = {
