@@ -119,7 +119,7 @@ export class EmployeeLeavesComponent implements OnInit {
             },
             {
               key: 'leave_type',
-              type: 'select',
+              type: 'leaveTypes-dropdown',
               className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Leave Type',

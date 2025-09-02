@@ -370,13 +370,14 @@ verifyBalance(): any {
                     {
                       className: 'col-md-4 col-sm-6 col-12',
                       key: 'product_mode_id',
-                      type: 'select',
+                      type: 'productModes-dropdown',
                       templateOptions: {
                         label: 'Product Mode',
                         placeholder: 'Select Product Mode',
                         required: true,
                         options: []
                       },
+                      
                       hooks: {
                         onInit: (field: any) => {
                           // Load the dropdown data from the API
@@ -442,7 +443,7 @@ verifyBalance(): any {
                               };
 
                               // Find the type field in the form structure
-                              const typeField = findFieldByKey(this.formConfig.fields[0].fieldGroup, 'type');
+                              const typeField = findFieldByKey(this.formConfig.fields[0].fieldGroup, 'type_id');
 
                               if (typeField && data) {
                                 console.log("Found Type field:", typeField);
@@ -580,7 +581,7 @@ verifyBalance(): any {
                     {
                       className: 'col-md-4 col-sm-6 col-12',
                       key: 'product_group',
-                      type: 'select',
+                      type: 'productGroups-dropdown',
                       templateOptions: {
                         label: 'Product Group',
                         dataKey: 'product_group_id',
@@ -623,7 +624,7 @@ verifyBalance(): any {
                     },   
                     {
                       key: 'stock_unit',
-                      type: 'select',
+                      type: 'productStockUnits-dropdown',
                       className: 'col-md-4 col-sm-6 col-12',
                       templateOptions: {
                         label: 'Stock Unit',
@@ -717,7 +718,7 @@ verifyBalance(): any {
                           fieldGroup: [
                             {
                               key: 'category',
-                              type: 'select',
+                              type: 'productCategories-dropdown',
                               className: 'col-3',
                               templateOptions: {
                                 label: 'Category',
@@ -761,7 +762,7 @@ verifyBalance(): any {
                             // },    
                             {
                               key: 'brand',
-                              type: 'select',
+                              type: 'productBrands-dropdown',
                               className: 'col-3',
                               templateOptions: {
                                 label: 'Brand',
@@ -814,11 +815,13 @@ verifyBalance(): any {
                             //   }
                             // },
                             {
-                              key: 'type',
-                              type: 'select',
+                              key: 'type_id',
+                              type: 'productType-dropdown',
                               className: 'col-3',
                               templateOptions: {
                                 label: 'Type',
+                                dataKey: 'type_id',
+                                dataLabel: "type_name",
                                 placeholder: 'Select Product Mode first',
                                 options: [],
                                 required: false,
@@ -867,7 +870,7 @@ verifyBalance(): any {
                             },
                             {
                               key: 'unit_options',
-                              type: 'select',
+                              type: 'productUnitOptions-dropdown',
                               className: 'col-3',
                               templateOptions: {
                                 label: 'Unit Options',
@@ -931,7 +934,7 @@ verifyBalance(): any {
                             },
                             {
                               key: 'pack_unit',
-                              type: 'select',
+                              type: 'packUnits-dropdown',
                               className: 'col-3',
                               templateOptions: {
                                 label: 'Pack Unit',
@@ -978,7 +981,7 @@ verifyBalance(): any {
                             },
                             {
                               key: 'g_pack_unit',
-                              type: 'select',
+                              type: 'GpackUnits-dropdown',
                               className: 'col-3',
                               templateOptions: {
                                 label: 'GPack Unit',
@@ -1087,7 +1090,7 @@ verifyBalance(): any {
                             fieldGroup: [
                               {
                                 key: 'size_id',
-                                type: 'select',
+                                type: 'productSizes-dropdown',
                                 templateOptions: {
                                   label: 'Size',
                                   placeholder: 'Select Size',
@@ -1103,7 +1106,7 @@ verifyBalance(): any {
                               },
                               {
                                 key: 'color_id',
-                                type: 'select',
+                                type: 'productColors-dropdown',
                                 templateOptions: {
                                   label: 'Color',
                                   placeholder: 'Select Color',
@@ -1189,7 +1192,7 @@ verifyBalance(): any {
                             fieldGroup: [
                               {
                                 key: 'warehouse_location',
-                                type: 'select',
+                                type: 'warehouseLocations-dropdown',
                                 templateOptions: {
                                   label: 'Location',
                                   dataKey: 'location_id',
@@ -1258,7 +1261,7 @@ verifyBalance(): any {
                             },
                             {
                               key: 'sales_gl',
-                              type: 'select',
+                              type: 'productSalesGL-dropdown',
                               className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                               templateOptions: {
                                 label: 'Sales GL',
@@ -1393,7 +1396,7 @@ verifyBalance(): any {
                             },
                             {
                               key: 'purchase_gl',
-                              type: 'select',
+                              type: 'productPurchaseGL-dropdown',
                               className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                               templateOptions: {
                                 label: 'Purchase GL',

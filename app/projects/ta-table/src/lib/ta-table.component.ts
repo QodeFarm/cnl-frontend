@@ -729,7 +729,7 @@ downloadData(event: any) {
     this.loadWarehouses();
 
     // Show status filter for specific URLs    
-    this.isButtonVisible = visibleUrls.includes(currentUrl);
+    this.isButtonVisible = this.options.hideFilters ? false : visibleUrls.includes(currentUrl);
 
     // Hide status button for specific URLs
     const hideStatusUrls = [
@@ -739,11 +739,8 @@ downloadData(event: any) {
       '/admin/finance/account-ledger',
       '/admin/finance/expense-item',
       '/admin/inventory',
-      
-      
-
     ];
-    this.isStatusButtonVisible = !hideStatusUrls.includes(currentUrl);
+    this.isStatusButtonVisible = this.options.hideFilters ? false : !hideStatusUrls.includes(currentUrl);
 
     // Show employee filter for specific URLs
     const employeeFilterUrls = [
@@ -751,12 +748,13 @@ downloadData(event: any) {
       '/admin/employees', // Added employees URL
       '/admin/hrms/employee-leave-balance'
     ];
-    this.isEmployeeFilterVisible = employeeFilterUrls.includes(currentUrl);
+    this.isEmployeeFilterVisible = this.options.hideFilters ? false : employeeFilterUrls.includes(currentUrl);
 
     const productFilterUrls = ['/admin/products',];
-    this.isProductFilterVisible = productFilterUrls.includes(currentUrl);
+    // Check if filters should be explicitly hidden
+    this.isProductFilterVisible = this.options.hideFilters ? false : productFilterUrls.includes(currentUrl);
     const inventoryFilterUrls = ['/admin/inventory'];  
-    this.isInventoryFilterVisible = inventoryFilterUrls.includes(currentUrl);
+    this.isInventoryFilterVisible = this.options.hideFilters ? false : inventoryFilterUrls.includes(currentUrl);
    
     // // Check if current URL is '/admin/hrms/employee-attendance' to show employee filter
     // this.isEmployeeFilterVisible = currentUrl === '/admin/hrms/employee-attendance';
