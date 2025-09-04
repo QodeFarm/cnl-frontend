@@ -468,9 +468,13 @@ async autoFillProductDetails(field, data) {
 
   showSaleInvoiceListFn() {
     this.showSaleInvoiceList = true;
-    // this.SalesInvoiceListComponent.refreshTable()
+    if (this.SalesInvoiceListComponent) {
+      if (this.SalesInvoiceListComponent.taTableComponent) {
+        this.SalesInvoiceListComponent.taTableComponent.resetFilterValues();
+      }
+      this.SalesInvoiceListComponent.refreshTable();
+   }
   }
-
   showPendingOrdersList() {
     console.log("We are selecting customer here : ");
     const selectedCustomerId = this.formConfig.model.sale_invoice_order.customer_id;

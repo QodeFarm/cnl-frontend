@@ -60,7 +60,12 @@ export class EmployeesComponent  implements OnInit {
 
   showEmployeesListFn() {
     this.showEmployeesList = true;
-    this.EmployeeListComponent?.refreshTable();
+    if (this.EmployeeListComponent) {
+      if (this.EmployeeListComponent.taTableComponent) {
+        this.EmployeeListComponent.taTableComponent.resetFilterValues();
+      }
+      this.EmployeeListComponent.refreshTable();
+    }
   };
 
   setFormConfig() {

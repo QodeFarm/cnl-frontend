@@ -9,14 +9,14 @@
             <div class="filter-group col p-0 mt-2" style="margin-right: 10px; display:flex" *ngIf="isAccountLedgerPage">
                 <!-- First Select Box: Customer / Vendor / General -->
                 <nz-select [(ngModel)]="selectedAccountType" (ngModelChange)="onAccountTypeChange()"
-                    nzPlaceHolder="Select Ledger" style="width: 200px; margin-right: 8px">
+                    nzPlaceHolder="Select Ledger" style="width: 200px; margin-right: 8px" nzAllowClear>
                     <nz-option *ngFor="let option of accountTypeOptions" [nzValue]="option.value"
                         [nzLabel]="option.label"></nz-option>
                 </nz-select>
 
                 <!-- Second Select Box: Names Based on Selection -->
                 <nz-select [(ngModel)]="selectedAccountId" (ngModelChange)="onAccountChange()"
-                    nzPlaceHolder="Select Resource" style="width: 200px" [nzDisabled]="!selectedAccountType">
+                    nzPlaceHolder="Select Resource" style="width: 200px" [nzDisabled]="!selectedAccountType" nzAllowClear>
                     <nz-option *ngFor="let option of accountOptions" [nzValue]="option.value"
                         [nzLabel]="option.label"></nz-option>
                 </nz-select>
@@ -26,7 +26,7 @@
             <!-- Employee Filter -->
             <div class="filter-group col p-0 mt-2" *ngIf="isEmployeeFilterVisible">
                 <nz-select [(ngModel)]="selectedEmployee" nzPlaceHolder="Select Employee" class="select-field"
-                    (ngModelChange)="onEmployeeChange($event)">
+                    (ngModelChange)="applyFilters($event)" nzAllowClear>
                     <nz-option *ngFor="let employee of employeeOptions" [nzValue]="employee.value"
                         [nzLabel]="employee.label">
                     </nz-option>
@@ -35,9 +35,19 @@
 
             
             <!-- PRODUCT / INVENTORY FILTERS -->
+             <!-- Type Filter -->
+            <div class="filter-group col p-0 mt-2" style="margin-right: 10px; display:flex" *ngIf="isProductFilterVisible || isInventoryFilterVisible">
+                <nz-select [(ngModel)]="selectedType" nzPlaceHolder="Select Type" class="select-field" 
+                  (ngModelChange)="applyFilters($event)" nzAllowClear>
+                    <nz-option *ngFor="let type of typeOptions" [nzValue]="type.value" [nzLabel]="type.label"></nz-option>
+                </nz-select>
+            </div>
+
+
             <div class="filter-group col p-0 mt-2" style="margin-right: 10px; display:flex"*ngIf="isProductFilterVisible || isInventoryFilterVisible">
             <!-- Group Filter -->
-                <nz-select [(ngModel)]="selectedGroup" nzPlaceHolder="Select Group" class="select-field">
+                <nz-select [(ngModel)]="selectedGroup" nzPlaceHolder="Select Group" class="select-field" 
+                  (ngModelChange)="applyFilters($event)" nzAllowClear>
                     <nz-option *ngFor="let group of groupOptions" [nzValue]="group.value" [nzLabel]="group.label"></nz-option>
                 </nz-select>
 
@@ -45,21 +55,18 @@
 
            <div class="filter-group col p-0 mt-2" style="margin-right: 10px; display:flex" *ngIf="isProductFilterVisible || isInventoryFilterVisible">
             <!-- Category Filter -->
-                <nz-select [(ngModel)]="selectedCategory" nzPlaceHolder="Select Category" class="select-field">
+                <nz-select [(ngModel)]="selectedCategory" nzPlaceHolder="Select Category" class="select-field" 
+                  (ngModelChange)="applyFilters($event)" nzAllowClear>
                     <nz-option *ngFor="let category of categoryOptions" [nzValue]="category.value" [nzLabel]="category.label"></nz-option>
                 </nz-select>
             </div>
 
-            <!-- Type Filter -->
-            <div class="filter-group col p-0 mt-2" style="margin-right: 10px; display:flex" *ngIf="isProductFilterVisible || isInventoryFilterVisible">
-                <nz-select [(ngModel)]="selectedType" nzPlaceHolder="Select Type" class="select-field">
-                    <nz-option *ngFor="let type of typeOptions" [nzValue]="type.value" [nzLabel]="type.label"></nz-option>
-                </nz-select>
-            </div>
+            
 
             <!-- Warehouse Filter (only for inventory) -->
             <div class="filter-group col p-0 mt-2" style="margin-right: 10px; display:flex" *ngIf="isInventoryFilterVisible">
-                <nz-select [(ngModel)]="selectedWarehouse" nzPlaceHolder="Select Warehouse" class="select-field">
+                <nz-select [(ngModel)]="selectedWarehouse" nzPlaceHolder="Select Warehouse" class="select-field" 
+                  (ngModelChange)="applyFilters($event)" nzAllowClear>
                     <nz-option *ngFor="let warehouse of warehouseOptions" [nzValue]="warehouse.value" [nzLabel]="warehouse.label"></nz-option>
                 </nz-select>
             </div>
@@ -68,8 +75,8 @@
 
             <!-- Quick Period Dropdown -->
             <div class="filter-group col p-0 mt-2" style="margin-left: 5px;" *ngIf="isButtonVisible">
-                <nz-select id="quickPeriod" [(ngModel)]="selectedQuickPeriod" (ngModelChange)="onQuickPeriodChange()"
-                    nzPlaceHolder="Quick Period" class="quick-period-select">
+                <nz-select id="quickPeriod" [(ngModel)]="selectedQuickPeriod" (ngModelChange)="onQuickPeriodChange(); applyFilters()"
+                    nzPlaceHolder="Quick Period" class="quick-period-select" nzAllowClear>
                     <nz-option *ngFor="let period of quickPeriodOptions" [nzValue]="period.value"
                         [nzLabel]="period.label"></nz-option>
                 </nz-select>
@@ -78,13 +85,13 @@
             <!-- From Date Picker -->
             <div class="filter-group col p-0 mt-2" style="margin-left: 5px;" *ngIf="isButtonVisible">
                 <nz-date-picker id="fromDate" [(ngModel)]="fromDate" nzPlaceHolder="From date" class="date-picker"
-                    style="width: 130px;"></nz-date-picker>
+                    style="width: 130px;" (ngModelChange)="applyFilters()" nzAllowClear></nz-date-picker>
             </div>
 
             <!-- To Date Picker -->
             <div class="filter-group col p-0 mt-2" style="margin-left: 5px;" *ngIf="isButtonVisible">
                 <nz-date-picker id="toDate" [(ngModel)]="toDate" nzPlaceHolder="To date" class="date-picker"
-                    style="width: 130px;"></nz-date-picker>
+                    style="width: 130px;" (ngModelChange)="applyFilters()" nzAllowClear></nz-date-picker>
             </div>
 
             <!-- Apply Filters status DropDown -->
@@ -99,7 +106,7 @@
             <div *ngIf="isButtonVisible" class="filter-group col p-0" style="margin-left: 5px;">
                 <div class="filter-group mt-2" *ngIf="isStatusButtonVisible">
                     <nz-select [(ngModel)]="selectedStatus" nzPlaceHolder="Select Status" class="select-field"
-                        (ngModelChange)="onStatusChange($event)">
+                        (ngModelChange)="onStatusChange($event)" nzAllowClear>
                         <nz-option *ngFor="let status of statusOptions" [nzValue]="status.value"
                             [nzLabel]="status.label">
                         </nz-option>
@@ -117,7 +124,7 @@
             </ng-content>
             <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton">
                 <input type="text" nz-input placeholder="Search" [(ngModel)]="globalSearchValue"
-                    (keyup.enter)="globalSearch()" />
+                    (ngModelChange)="globalSearch()" />
             </nz-input-group>
             <ng-template #suffixIconButton>
                 <i nz-icon class="ant-input-clear-icon" style="position: absolute;z-index: 9;right: 40px;top:12px"
@@ -130,18 +137,18 @@
             <ng-content nz-col select="[after-search]">
             </ng-content>
             <!-- Apply Filters OK Button -->
-            <div class="filter-group" style="margin-inline: 5px;" *ngIf="isButtonVisible || isProductFilterVisible || isInventoryFilterVisible  ">
+            <!-- <div class="filter-group" style="margin-inline: 5px;" *ngIf="isButtonVisible || isProductFilterVisible || isInventoryFilterVisible  ">
                 <button nz-button nzType="primary" (click)="applyFilters()" class="apply-filters-button">
                     <i nz-icon nzType="check" nzTheme="outline"></i>
                 </button>
-            </div>
+            </div> -->
 
             <!-- Apply Filters Clear Button -->
-            <div class="filter-group" style="margin-right: 5px;" *ngIf="isButtonVisible || isProductFilterVisible || isInventoryFilterVisible">
+            <!-- <div class="filter-group" style="margin-right: 5px;" *ngIf="isButtonVisible || isProductFilterVisible || isInventoryFilterVisible">
                 <button nz-button nzType="primary" (click)="clearFilters()" class="clear-filters-button">
                     <i nz-icon nzType="close" nzTheme="outline"></i>
                 </button>
-            </div>
+            </div> -->
 
             <!-- Download Button -->
             <!-- <div class="filter-group" *ngIf="isButtonVisible">
