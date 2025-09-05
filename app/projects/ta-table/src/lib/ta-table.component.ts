@@ -122,6 +122,13 @@ warehouseOptions: Array<{ value: string; label: string }> = [];
   formConfig: any;
 
   onQuickPeriodChange() {
+    // If the quick period is cleared, clear both date fields
+    if (!this.selectedQuickPeriod) {
+      this.fromDate = null;
+      this.toDate = null;
+      return;
+    }
+    
     const today = new Date();
     let startDate: Date | null = null;
     let endDate: Date | null = today;
@@ -189,7 +196,7 @@ warehouseOptions: Array<{ value: string; label: string }> = [];
   }
   onStatusChange(status: string) {
     this.selectedStatus = status;
-    // this.applyFilters();
+    this.applyFilters(); // Auto-apply filter when status changes
   }
 
  
@@ -357,6 +364,7 @@ loadTypes() {
   onAccountTypeChange() {
     this.selectedAccountId = null;
     this.loadAccounts();
+    this.applyFilters();
   }
 
   onAccountChange() {
@@ -755,6 +763,10 @@ downloadData(event: any) {
     this.isProductFilterVisible = this.options.hideFilters ? false : productFilterUrls.includes(currentUrl);
     const inventoryFilterUrls = ['/admin/inventory'];  
     this.isInventoryFilterVisible = this.options.hideFilters ? false : inventoryFilterUrls.includes(currentUrl);
+    
+    // Reset filter values when component is initialized
+    // This ensures filters are cleared when modal is reopened
+    this.resetFilterValues();
    
     // // Check if current URL is '/admin/hrms/employee-attendance' to show employee filter
     // this.isEmployeeFilterVisible = currentUrl === '/admin/hrms/employee-attendance';
@@ -933,6 +945,29 @@ downloadData(event: any) {
   loadTableData() {
     // console.log('this.pageIndex', this.pageIndex);
     // console.log('this.pageSize', this.pageSize);
+  }
+  
+  // Reset all filter values without reloading data
+  // This is used to reset the UI state when component is initialized
+  resetFilterValues() {
+    // Clear all filter values to ensure they are reset completely
+    this.selectedQuickPeriod = null;
+    this.fromDate = null;
+    this.toDate = null;
+    this.selectedStatus = null;
+    this.selectedEmployee = null; // Clear employee filter
+    this.selectedAccountType = null;
+    this.selectedAccountId = null;
+    this.selectedGroup = null;       
+    this.selectedCategory = null;    
+    this.selectedType = null;         
+    this.selectedWarehouse = null;
+    
+    // Also clear global search to ensure complete reset
+    this.globalSearchValue = '';
+    
+    // Force UI update
+    this.cdr.detectChanges();
   }
   exportExcel() {
     let _rows = cloneDeep(this.rows);

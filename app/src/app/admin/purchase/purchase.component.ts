@@ -422,8 +422,13 @@ export class PurchaseComponent {
 
   showPurchaseOrderListFn() {
     this.showPurchaseOrderList = true;
-    this.PurchaseListComponent?.refreshTable();
+    if (this.PurchaseListComponent) {
+      if (this.PurchaseListComponent.taTableComponent) {
+        this.PurchaseListComponent.taTableComponent.resetFilterValues();
+      }
+      this.PurchaseListComponent.refreshTable();
   }
+} 
 
 //=====================================================
 quickpackOptions: any[] = []; // To store available Quickpack options

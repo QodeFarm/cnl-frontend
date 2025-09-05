@@ -30,11 +30,11 @@ export class InventoryComponent {
       hideAddBtn: true,
       tableConfig: {
         apiUrl: 'products/products/?view=inventory',
-        // title: 'Inventory',
+        // title: 'Inventory', 
         pkId: "product_id",
         pageSize: 10,
         globalSearch: {
-          keys: [ 'name', 'code', 'group_name', 'category_name', 'type_name', 'stock_unit', 'warehouse_name', 'location_name' ],
+          keys: [ 'name', 'code', 'category', 'warehouse_name', 'location_name', 'group_name' ,'type_name', 'stock_unit',' mrp', 'purchase_rate', 'sales_rate', 'wholesale_rate', 'dealer_rate', 'balance' ]
           // customFn: (term: string, row: any) => {
           //   term = term.toLowerCase();
           //   const warehouses = row.warehouse_locations?.map(
@@ -64,6 +64,13 @@ export class InventoryComponent {
             sort: true 
           },
           { 
+            fieldKey: 'type_name', 
+            name: 'Type', 
+            sort: true,
+            displayType: "map", 
+            mapFn: (v, row) => row?.type?.type_name || ''
+          },
+          { 
             fieldKey: 'group_name', 
             name: 'Group', 
             sort: true,
@@ -71,7 +78,7 @@ export class InventoryComponent {
             mapFn: (v, row) => row?.product_group?.group_name || ''
           },
           { 
-            fieldKey: 'category_name', 
+            fieldKey: 'category', 
             name: 'Category', 
             sort: true,
             displayType: "map", 
@@ -81,13 +88,6 @@ export class InventoryComponent {
           //   name: 'Barcode', 
           //   sort: true
           // },
-          { 
-            fieldKey: 'type_name', 
-            name: 'Type', 
-            sort: true,
-            displayType: "map", 
-            mapFn: (v, row) => row?.type?.type_name || ''
-          },
           { 
             fieldKey: 'stock_unit', 
             name: 'Unit', 

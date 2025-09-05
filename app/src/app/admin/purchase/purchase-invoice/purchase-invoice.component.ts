@@ -398,7 +398,12 @@ export class PurchaseInvoiceComponent {
 
   showPurchaseInvoiceListFn() {
     this.showPurchaseInvoiceList = true;
+    if (this.PurchaseInvoiceListComponent) {
+      if (this.PurchaseInvoiceListComponent.taTableComponent) {
+        this.PurchaseInvoiceListComponent.taTableComponent.resetFilterValues();
+      }
     this.PurchaseInvoiceListComponent?.refreshTable();
+   }
   }
 
 //=====================================================

@@ -597,7 +597,14 @@ export class SalesComponent {
   // Displays the sales order list modal
   showSaleOrderListFn() {
     this.showSaleOrderList = true;
-    this.SalesListComponent?.refreshTable();
+    // Ensure filters are reset and table is refreshed when showing the sales order list
+    if (this.SalesListComponent) {
+      if (this.SalesListComponent.taTableComponent) {
+        this.SalesListComponent.taTableComponent.resetFilterValues();
+      }
+      this.SalesListComponent.refreshTable();
+    }
+    
   }
 
   // Shows the past orders list modal and fetches orders based on the selected customer
