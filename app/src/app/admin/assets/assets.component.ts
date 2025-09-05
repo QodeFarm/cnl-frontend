@@ -14,7 +14,8 @@ import { AssetsListComponent } from './assets-list/assets-list.component';
 })
 export class AssetsComponent{
   
-  baseUrl: string = 'https://apicore.cnlerp.com/api/v1/';
+  // baseUrl: string = 'https://apicore.cnlerp.com/api/v1/';
+  baseUrl: string = 'http://127.0.0.1:8000/api/v1/';
 
   showAssetsList: boolean = false;
   showForm: boolean = false;
@@ -144,7 +145,7 @@ export class AssetsComponent{
               },
               {
                 key: 'asset_category',
-                type: 'select',
+                type: 'asset-cat-dropdown',
                 className: 'col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Asset Category',
@@ -171,7 +172,7 @@ export class AssetsComponent{
               },
               {
                 key: 'asset_status',
-                type: 'select',
+                type: 'asset-status-dropdown',
                 className: 'col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Asset Status',
@@ -198,7 +199,7 @@ export class AssetsComponent{
               },
               {
                 key: 'unit_options',
-                type: 'select',
+                type: 'productUnitOptions-dropdown',
                 className: 'col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Unit Options',
@@ -225,7 +226,7 @@ export class AssetsComponent{
               },
               {
                 key: 'location',
-                type: 'select',
+                type: 'location-dropdown',
                 className: 'col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Location',

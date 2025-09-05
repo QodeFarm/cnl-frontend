@@ -98,9 +98,17 @@ export class BranchListComponent {
             apiUrl: 'company/branches'
           },
           {
+            type: 'restore',
+            label: 'Restore',
+            apiUrl: 'company/branches',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
+          },
+          {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',
+            tooltip: "Edit this record",
             callBackFn: (row, action) => {
               this.edit.emit(row.branch_id);
               // this.router.navigateByUrl('company/branches' + row.branch_id);

@@ -14,7 +14,8 @@ import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 })
 export class AssetsListComponent {
   
-  baseUrl: string = 'https://apicore.cnlerp.com/api/v1/';
+  // baseUrl: string = 'https://apicore.cnlerp.com/api/v1/';
+  baseUrl: string = 'http://127.0.0.1:8000/api/v1/';
 
   @Output('edit') edit = new EventEmitter<void>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
@@ -109,6 +110,7 @@ export class AssetsListComponent {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',
+            tooltip: "Edit this record",
             callBackFn: (row, action) => {
               console.log(row);
               this.edit.emit(row.asset_id);

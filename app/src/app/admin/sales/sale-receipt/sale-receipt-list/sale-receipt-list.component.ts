@@ -78,6 +78,7 @@ export class SaleReceiptListComponent {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',
+            tooltip: "Edit this record",
             callBackFn: (row, action) => {
               this.edit.emit(row.sale_receipt_id);
             }

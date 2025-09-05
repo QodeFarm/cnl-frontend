@@ -1012,58 +1012,99 @@ export class SalesComponent {
     }
   };
 
-  createSaleOrder() {
-    const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
+  // createSaleOrder() {
+  //   const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
 
-    // Determine the entity type and ID dynamically
-    const entityName = 'sale_order'; // Since we're in the Sale Order form
-    const customId = this.formConfig.model.sale_order?.sale_order_id || null; // Ensure correct sale_order_id
+  //   // Determine the entity type and ID dynamically
+  //   const entityName = 'sale_order'; // Since we're in the Sale Order form
+  //   const customId = this.formConfig.model.sale_order?.sale_order_id || null; // Ensure correct sale_order_id
 
-    // Find entity record from list
-    const entity = this.entitiesList.find(e => e.entity_name === entityName);
+  //   // Find entity record from list
+  //   const entity = this.entitiesList.find(e => e.entity_name === entityName);
 
-    // if (!entity) {
-    //   console.error(`Entity not found for: ${entityName}`);
-    //   return;
-    // }
+  //   // if (!entity) {
+  //   //   console.error(`Entity not found for: ${entityName}`);
+  //   //   return;
+  //   // }
 
-    const entityId = entity.entity_id;
-    // Inject entity_id into metadata temporarily
-    Object.keys(this.customFieldMetadata).forEach((key) => {
-      this.customFieldMetadata[key].entity_id = entityId;
-    });
-    // Construct payload for custom fields
-    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
+  //   const entityId = entity.entity_id;
+  //   // Inject entity_id into metadata temporarily
+  //   Object.keys(this.customFieldMetadata).forEach((key) => {
+  //     this.customFieldMetadata[key].entity_id = entityId;
+  //   });
+  //   // Construct payload for custom fields
+  //   const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
 
-    if (!customFieldsPayload) {
-      this.showDialog(); // Stop execution if required fields are missing
-    }
+  //   if (!customFieldsPayload) {
+  //     this.showDialog(); // Stop execution if required fields are missing
+  //   }
 
-    // Construct the final payload
-    const payload = {
-      ...this.formConfig.model,
-      custom_field_values: customFieldsPayload.custom_field_values // Array of custom field values
-    };
+  //   // Construct the final payload
+  //   const payload = {
+  //     ...this.formConfig.model,
+  //     custom_field_values: customFieldsPayload.custom_field_values // Array of custom field values
+  //   };
 
-    if (!payload) {
-      this.showDialog(); // Stop execution if required fields are missing
-    }
+  //   if (!payload) {
+  //     this.showDialog(); // Stop execution if required fields are missing
+  //   }
   
-    this.http.post('sales/sale_order/', payload)
-      .subscribe(response => {
-        this.showSuccessToast = true;
-        this.toastMessage = 'Record created successfully';
-        this.ngOnInit();
-        setTimeout(() => {
-          this.showSuccessToast = false;
-        }, 3000); // Hide toast after 3 seconds
-      }, error => {
-        if (error.status === 400) { 
-          this.showDialog();
-        }
-        // console.error('Error creating record:', error);
-      });
+  //   this.http.post('sales/sale_order/', payload)
+  //     .subscribe(response => {
+  //       this.showSuccessToast = true;
+  //       this.toastMessage = 'Record created successfully';
+  //       this.ngOnInit();
+  //       setTimeout(() => {
+  //         this.showSuccessToast = false;
+  //       }, 3000); // Hide toast after 3 seconds
+  //     }, error => {
+  //       if (error.status === 400) { 
+  //         this.showDialog();
+  //       }
+  //       // console.error('Error creating record:', error);
+  //     });
+  // }
+
+  validatedCustomFieldsPayload: any = null;
+  validateCustomFields(): boolean {
+  const customFieldValues = this.formConfig.model['custom_field_values'];
+  const entityName = 'sale_order';
+  const customId = this.formConfig.model.sale_order?.sale_order_id || null;
+
+  const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
+
+  if (!customFieldsPayload) {
+    this.showDialog(); // Show custom fields popup
+    return false; // Validation failed
   }
+
+  // Save payload for use in create
+  this.validatedCustomFieldsPayload = customFieldsPayload;
+  return true; // Validation passed
+}
+
+createSaleOrder() {
+  // Use the already validated payload
+  const customFieldsPayload = this.validatedCustomFieldsPayload;
+
+  const payload = {
+    ...this.formConfig.model,
+    custom_field_values: customFieldsPayload.custom_field_values
+  };
+
+  this.http.post('sales/sale_order/', payload)
+    .subscribe(response => {
+      this.showSuccessToast = true;
+      this.toastMessage = 'Record created successfully';
+      this.ngOnInit();
+      setTimeout(() => this.showSuccessToast = false, 3000);
+    }, error => {
+      if (error.status === 400) { 
+        this.showDialog();
+      }
+    });
+}
+
 
   closeToast() {
     this.showSuccessToast = false;
@@ -1135,6 +1176,10 @@ export class SalesComponent {
       ...this.formConfig.model,
       custom_field_values: customFieldsPayload.custom_field_values // Array of dictionaries
     };
+
+    if (!payload) {
+      this.showDialog(); // Stop execution if required fields are missing
+    }
 
     // Define logic here for updating the sale order without modal pop-up
     console.log("Updating sale order:", this.formConfig.model);
@@ -2282,6 +2327,8 @@ getUnitData(unitInfo) {
 
 
   hasOrderNoLoaded = false;
+  
+
   //=======================================================
   setFormConfig() {
     this.SaleOrderEditID = null;
@@ -2327,6 +2374,13 @@ getUnitData(unitInfo) {
             // Exceeds credit limit: show the Amount Exceed modal
             this.openAmountModal(totalAmount, maxLimit);
           } else {
+
+            // Validate custom fields BEFORE proceeding
+            if (!this.validateCustomFields()) {
+              console.log("Custom field validation failed. Showing dialog.");
+              return; // Stop here if validation failed
+            }
+
             // Within credit limit: check if a new sale order or existing
             if (!this.SaleOrderEditID) {
               console.log("Within credit limit: Opening Sale Order/Estimate modal.");
@@ -3082,7 +3136,7 @@ getUnitData(unitInfo) {
               },
               {
                 key: 'product',
-                type: 'select',
+                type: 'products-dropdown',
                 templateOptions: {
                   label: 'Product',
                   dataKey: 'product_id',

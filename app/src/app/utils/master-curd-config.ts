@@ -52,6 +52,31 @@ export const customerCudConfig: TaCurdConfig = {
                     return row.city.city_name;
                 },
             },
+            {
+              fieldKey: "code",
+              name: "Action",
+              type: 'action',
+              actions: [
+                {
+                  type: 'delete',
+                  label: 'Delete',
+                  confirm: true,
+                  confirmMsg: "Sure to delete?",
+                  apiUrl: 'customers/customers'
+                },
+                {
+                  type: 'restore',
+                  label: 'Restore',
+                  confirm: true,
+                  confirmMsg: "Sure to restore?",
+                  apiUrl: 'customers/customers'
+                },
+                {
+                  type: 'edit',
+                  label: 'Edit'
+                }
+              ]
+            },
             // {
             //     fieldKey: 'ledger_account_id',
             //     name: 'Ledger Account',
@@ -952,6 +977,13 @@ export const customerCategoryConfig: TaCurdConfig = {
                         apiUrl: 'masters/customer_categories'
                     },
                     {
+                      type: 'restore',
+                      label: 'Restore',
+                      confirm: true,
+                      confirmMsg: "Sure to restore?",
+                      apiUrl: 'masters/customer_categories'
+                    },
+                    {
                         type: 'edit',
                         label: 'Edit'
                     }
@@ -1013,17 +1045,17 @@ export const ledgerAccountsConfig: TaCurdConfig = {
           name: 'Name',
           // sort: true
         },
-        {
-          fieldKey: 'inactive',
-          name: 'Inactive',
-          sort: true,
-          type: 'boolean'
-        },
-        {
-          fieldKey: 'type', 
-          name: 'Type',
-          sort: true
-        },
+        // {
+        //   fieldKey: 'inactive',
+        //   name: 'Inactive',
+        //   sort: true,
+        //   type: 'boolean'
+        // },
+        // {
+        //   fieldKey: 'type', 
+        //   name: 'Type',
+        //   sort: true
+        // },
         {
           fieldKey: 'ledger_group_id',
           name: 'Ledger Group',
@@ -1043,6 +1075,13 @@ export const ledgerAccountsConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'customers/ledger_accounts'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'customers/ledger_accounts'
             },
             {
@@ -1275,6 +1314,13 @@ export const cityConfig: TaCurdConfig = {
               apiUrl: 'masters/city'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/city'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }
@@ -1385,6 +1431,13 @@ export const StateConfig: TaCurdConfig = {
               apiUrl: 'masters/state'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/state'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }
@@ -1492,6 +1545,13 @@ export const CountryConfig: TaCurdConfig = {
               apiUrl: 'masters/country'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/country'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }
@@ -1571,6 +1631,13 @@ export const vendorCategeoryConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'vendors/vendor_category'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'vendors/vendor_category'
             },
             {
@@ -1656,6 +1723,13 @@ export const statusConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'masters/statuses'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'masters/statuses'
             },
             {
@@ -1747,6 +1821,13 @@ export const TransportConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'masters/transporters'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'masters/transporters'
             },
             {
@@ -1846,6 +1927,13 @@ export const FirmStatusConfig: TaCurdConfig = {
               apiUrl: 'masters/firm_statuses'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/firm_statuses'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             },
@@ -1917,6 +2005,13 @@ export const GstCatConfig: TaCurdConfig = {
                 label: 'Delete',
                 confirm: true,
                 confirmMsg: "Sure to delete?",
+                apiUrl: 'masters/gst_categories'
+              },
+              {
+                type: 'restore',
+                label: 'Restore',
+                confirm: true,
+                confirmMsg: "Sure to restore?",
                 apiUrl: 'masters/gst_categories'
               },
               {
@@ -1995,6 +2090,13 @@ export const PriceCatConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'masters/price_categories'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'masters/price_categories'
             },
             {
@@ -2098,6 +2200,13 @@ export const VendorAgentConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'vendors/vendor_agent'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'vendors/vendor_agent'
             },
             {
@@ -2243,6 +2352,13 @@ export const VendorPaymentTermsConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'vendors/vendor_payment_terms'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'vendors/vendor_payment_terms'
             },
             {
@@ -2396,6 +2512,13 @@ export const CustomerPaymentConfig: TaCurdConfig = {
               apiUrl: 'masters/customer_payment_terms'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/customer_payment_terms'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }
@@ -2532,6 +2655,13 @@ export const LedgerGroupsConfig: TaCurdConfig = {
               apiUrl: 'masters/ledger_groups'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/ledger_groups'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }
@@ -2638,6 +2768,13 @@ export const TerritoryConfig: TaCurdConfig = {
               apiUrl: 'masters/territory'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/territory'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }
@@ -2719,6 +2856,13 @@ export const MachineConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'production/machines'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'production/machines'
             },
             {
@@ -2810,6 +2954,13 @@ export const ProductionStatusesConfig: TaCurdConfig = {
               apiUrl: 'production/production_statuses'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'production/production_statuses'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }
@@ -2876,6 +3027,13 @@ export const OrderStatusConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'masters/order_status'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'masters/order_status'
             },
             {
@@ -2964,6 +3122,13 @@ export const GstTypesConfig: TaCurdConfig = {
               apiUrl: 'masters/gst_types'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/gst_types'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             },
@@ -3036,6 +3201,13 @@ export const OrderTypesConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'masters/order_types'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'masters/order_types'
             },
             {
@@ -3114,6 +3286,13 @@ export const PurchaseTypesConfig: TaCurdConfig = {
               apiUrl: 'masters/purchase_types'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/purchase_types'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             },
@@ -3186,6 +3365,13 @@ export const SaleTypesConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'masters/sale_types'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'masters/sale_types'
             },
             {
@@ -3268,6 +3454,13 @@ export const UserGroupsConfig: TaCurdConfig = {
               apiUrl: 'masters/user_groups'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/user_groups'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }
@@ -3341,6 +3534,13 @@ export const ReminderTypesConfig: TaCurdConfig = {
               apiUrl: 'reminders/reminder_types'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'reminders/reminder_types'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }
@@ -3407,6 +3607,13 @@ export const PaymentLinkConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'masters/payment_link_type'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'masters/payment_link_type'
             },
             {
@@ -3504,6 +3711,13 @@ export const productModesConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete this Item Master?",
+              apiUrl: 'products/item-master'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'products/item-master'
             },
             {
@@ -3657,6 +3871,13 @@ export const productSalesGLConfig: TaCurdConfig = {
                         confirm: true,
                         confirmMsg: "Sure to delete?",
                         apiUrl: 'products/product_sales_gl'
+                    },
+                    {
+                      type: 'restore',
+                      label: 'Restore',
+                      confirm: true,
+                      confirmMsg: "Sure to restore?",
+                      apiUrl: 'products/product_sales_gl'
                     },
                     {
                         type: 'edit',
@@ -3881,6 +4102,13 @@ export const productTypesConfig: TaCurdConfig = {
               apiUrl: 'masters/product_types'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/product_types'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }
@@ -3981,6 +4209,13 @@ export const productBrandsConfig: TaCurdConfig = {
                         confirm: true,
                         confirmMsg: "Sure to delete?",
                         apiUrl: 'masters/product_brands'
+                    },
+                    {
+                      type: 'restore',
+                      label: 'Restore',
+                      confirm: true,
+                      confirmMsg: "Sure to restore?",
+                      apiUrl: 'masters/product_brands'
                     },
                     {
                         type: 'edit',
@@ -4103,6 +4338,13 @@ export const productGroupsConfig: TaCurdConfig = {
                         apiUrl: 'products/product_groups'
                     },
                     {
+                      type: 'restore',
+                      label: 'Restore',
+                      confirm: true,
+                      confirmMsg: "Sure to restore?",
+                      apiUrl: 'products/product_groups'
+                    },
+                    {
                         type: 'edit',
                         label: 'Edit'
                     }
@@ -4203,6 +4445,13 @@ export const productStockUnitsConfig: TaCurdConfig = {
                         confirm: true,
                         confirmMsg: "Sure to delete?",
                         apiUrl: 'products/product_stock_units'
+                    },
+                    {
+                      type: 'restore',
+                      label: 'Restore',
+                      confirm: true,
+                      confirmMsg: "Sure to restore?",
+                      apiUrl: 'products/product_stock_units'
                     },
                     {
                         type: 'edit',
@@ -4323,6 +4572,13 @@ export const productCategoriesConfig: TaCurdConfig = {
                         apiUrl: 'products/product_categories'
                     },
                     {
+                      type: 'restore',
+                      label: 'Restore',
+                      confirm: true,
+                      confirmMsg: "Sure to restore?",
+                      apiUrl: 'products/product_categories'
+                    },
+                    {
                         type: 'edit',
                         label: 'Edit'
                     }
@@ -4421,6 +4677,13 @@ export const productGstClassificationsConfig: TaCurdConfig = {
                         confirm: true,
                         confirmMsg: "Sure to delete?",
                         apiUrl: 'products/product_gst_classifications'
+                    },
+                    {
+                      type: 'restore',
+                      label: 'Restore',
+                      confirm: true,
+                      confirmMsg: "Sure to restore?",
+                      apiUrl: 'products/product_gst_classifications'
                     },
                     {
                         type: 'edit',
@@ -4539,6 +4802,13 @@ export const productItemTypeConfig: TaCurdConfig = {
                         confirm: true,
                         confirmMsg: "Sure to delete?",
                         apiUrl: 'masters/product_item_type'
+                    },
+                    {
+                      type: 'restore',
+                      label: 'Restore',
+                      confirm: true,
+                      confirmMsg: "Sure to restore?",
+                      apiUrl: 'masters/product_item_type'
                     },
                     {
                         type: 'edit',
@@ -4686,6 +4956,13 @@ export const productPurchaseGLConfig: TaCurdConfig = {
                         confirm: true,
                         confirmMsg: "Sure to delete?",
                         apiUrl: 'products/product_purchase_gl'
+                    },
+                    {
+                      type: 'restore',
+                      label: 'Restore',
+                      confirm: true,
+                      confirmMsg: "Sure to restore?",
+                      apiUrl: 'products/product_purchase_gl'
                     },
                     {
                         type: 'edit',
@@ -4900,6 +5177,13 @@ export const unitOptionsConfig: TaCurdConfig = {
                         apiUrl: 'masters/unit_options'
                     },
                     {
+                      type: 'restore',
+                      label: 'Restore',
+                      confirm: true,
+                      confirmMsg: "Sure to restore?",
+                      apiUrl: 'masters/unit_options'
+                    },
+                    {
                         type: 'edit',
                         label: 'Edit'
                     },
@@ -5006,6 +5290,13 @@ export const productSizesConfig: TaCurdConfig = {
                     confirm: true,
                     confirmMsg: "Sure to delete?",
                     apiUrl: 'products/sizes'
+                },
+                {
+                  type: 'restore',
+                  label: 'Restore',
+                  confirm: true,
+                  confirmMsg: "Sure to restore?",
+                  apiUrl: 'products/sizes'
                 },
                 {
                     type: 'edit',
@@ -5139,6 +5430,13 @@ export const productColorsConfig: TaCurdConfig = {
                     apiUrl: 'products/colors'
                 },
                 {
+                  type: 'restore',
+                  label: 'Restore',
+                  confirm: true,
+                  confirmMsg: "Sure to restore?",
+                  apiUrl: 'products/colors'
+                },
+                {
                     type: 'edit',
                     label: 'Edit'
                 }
@@ -5212,6 +5510,13 @@ export const warehouseLocationsConfig: TaCurdConfig = {
                     confirm: true,
                     confirmMsg: "Sure to delete?",
                     apiUrl: 'inventory/warehouse_locations'
+                },
+                {
+                  type: 'restore',
+                  label: 'Restore',
+                  confirm: true,
+                  confirmMsg: "Sure to restore?",
+                  apiUrl: 'inventory/warehouse_locations'
                 },
                 {
                     type: 'edit',
@@ -5312,6 +5617,13 @@ export const packUnitConfig: TaCurdConfig = {
                     apiUrl: 'masters/package_units'
                 },
                 {
+                  type: 'restore',
+                  label: 'Restore',
+                  confirm: true,
+                  confirmMsg: "Sure to restore?",
+                  apiUrl: 'masters/package_units'
+                },
+                {
                     type: 'edit',
                     label: 'Edit'
                 }
@@ -5373,6 +5685,13 @@ export const gPackageUnitsConfig: TaCurdConfig = {
                     apiUrl: 'masters/g_package_units'
                 },
                 {
+                  type: 'restore',
+                  label: 'Restore',
+                  confirm: true,
+                  confirmMsg: "Sure to restore?",
+                  apiUrl: 'masters/g_package_units'
+                },
+                {
                     type: 'edit',
                     label: 'Edit'
                 }
@@ -5431,6 +5750,13 @@ export const jobTypesConfig: TaCurdConfig = {
                 confirm: true,
                 confirmMsg: "Sure to delete?",
                 apiUrl: 'hrms/job_types'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'hrms/job_types'
             },
             {
                 type: 'edit',
@@ -5495,6 +5821,13 @@ export const designationsConfig: TaCurdConfig = {
                     confirm: true,
                     confirmMsg: "Sure to delete?",
                     apiUrl: 'hrms/designations'
+                },
+                {
+                  type: 'restore',
+                  label: 'Restore',
+                  confirm: true,
+                  confirmMsg: "Sure to restore?",
+                  apiUrl: 'hrms/designations'
                 },
                 {
                     type: 'edit',
@@ -5569,6 +5902,13 @@ export const jobCodesConfig: TaCurdConfig = {
                 apiUrl: 'hrms/job_codes'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'hrms/job_codes'
+            },
+            {
                 type: 'edit',
                 label: 'Edit'
             }
@@ -5627,6 +5967,13 @@ export const departmentsConfig: TaCurdConfig = {
                     confirm: true,
                     confirmMsg: "Sure to delete?",
                     apiUrl: 'hrms/departments'
+                },
+                {
+                  type: 'restore',
+                  label: 'Restore',
+                  confirm: true,
+                  confirmMsg: "Sure to restore?",
+                  apiUrl: 'hrms/departments'
                 },
                 {
                     type: 'edit',
@@ -5696,6 +6043,13 @@ export const shiftsConfig: TaCurdConfig = {
                     confirm: true,
                     confirmMsg: "Sure to delete?",
                     apiUrl: 'hrms/shifts'
+                },
+                {
+                  type: 'restore',
+                  label: 'Restore',
+                  confirm: true,
+                  confirmMsg: "Sure to restore?",
+                  apiUrl: 'hrms/shifts'
                 },
                 {
                     type: 'edit',
@@ -5783,6 +6137,13 @@ export const salaryComponentsConfig: TaCurdConfig = {
                 apiUrl: 'hrms/salary_components'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'hrms/salary_components'
+            },
+            {
                 type: 'edit',
                 label: 'Edit'
             }
@@ -5859,6 +6220,13 @@ export const employeeSalaryComponentsConfig: TaCurdConfig = {
                     confirm: true,
                     confirmMsg: "Sure to delete?",
                     apiUrl: 'hrms/employee_salary_components'
+                },
+                {
+                  type: 'restore',
+                  label: 'Restore',
+                  confirm: true,
+                  confirmMsg: "Sure to restore?",
+                  apiUrl: 'hrms/employee_salary_components'
                 },
                 {
                     type: 'edit',
@@ -5985,6 +6353,13 @@ export const leaveTypesConfig: TaCurdConfig = {
                     apiUrl: 'hrms/leave_types'
                 },
                 {
+                  type: 'restore',
+                  label: 'Restore',
+                  confirm: true,
+                  confirmMsg: "Sure to restore?",
+                  apiUrl: 'hrms/leave_types'
+                },
+                {
                     type: 'edit',
                     label: 'Edit'
                 }
@@ -6068,6 +6443,13 @@ export const leadStatusesConfig: TaCurdConfig = {
                 apiUrl: 'leads/lead_statuses'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'leads/lead_statuses'
+            },
+            {
                 type: 'edit',
                 label: 'Edit'
             }
@@ -6131,6 +6513,13 @@ drawerSize: 500,
               apiUrl: 'leads/interaction_types'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'leads/interaction_types'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }
@@ -6191,6 +6580,13 @@ export const taskPrioritiesConfig: TaCurdConfig = {
               apiUrl: 'masters/task_priorities'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/task_priorities'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }
@@ -6222,11 +6618,442 @@ export const taskPrioritiesConfig: TaCurdConfig = {
     }
   }
 
+// baseUrl: string = 'https://apicore.cnlerp.com/api/v1/';
+const baseUrl = 'http://127.0.0.1:8000/api/v1/';
+
+export const AssetCategoriesConfig:  TaCurdConfig = {
+    // baseUrl: string = 'http://127.0.0.1:8000/api/v1/';
+    drawerSize: 500,
+    drawerPlacement: 'top',
+    tableConfig: {
+      apiUrl: baseUrl + 'assets/asset_categories/',
+      // title: 'Asset Categories',
+      pkId: "asset_category_id",
+      pageSize: 10,
+      "globalSearch": {keys: ['asset_category_id', 'category_name']},
+      defaultSort: { key: 'created_at', value: 'descend' },
+      hideFilters: true,
+      cols: [
+        {
+          fieldKey: 'category_name',
+          name: 'Category Name',
+          sort: true
+        },
+        {
+          fieldKey: "code",
+          name: "Action",
+          type: 'action',
+          actions: [
+            {
+              type: 'delete',
+              label: 'Delete',
+              confirm: true,
+              confirmMsg: "Sure to delete?",
+              apiUrl: baseUrl + 'assets/asset_categories'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              apiUrl: baseUrl + 'assets/asset_categories',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+            },
+            {
+              type: 'edit',
+              label: 'Edit'
+            }
+          ]
+        }
+      ]
+    },
+    formConfig: {
+      url: baseUrl + 'assets/asset_categories/',
+      title: 'Asset Categories',
+      pkId: "asset_category_id",
+      fields: [
+        {
+          fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
+          fieldGroup: [
+            {
+              key: 'category_name',
+              type: 'input',
+              className: 'col-md-6 col-12 p-0',
+              templateOptions: {
+                label: 'Category Name',
+                placeholder: 'Enter Category Name',
+                required: true,
+              }
+            },
+          ]
+        }
+      ]
+    }
+  }
 
 
+export const AssetStatusConfig: TaCurdConfig = {
+    drawerSize: 500,
+    drawerPlacement: 'top',
+    tableConfig: {
+      apiUrl: baseUrl + 'assets/asset_statuses/',
+      // title: 'Asset Statuses',
+      pkId: "asset_status_id",
+      pageSize: 10,
+      "globalSearch": {
+        keys: ['asset_status_id', 'status_name']
+      },
+      hideFilters: true,
+      defaultSort: { key: 'created_at', value: 'descend' },
+      cols: [
+        {
+          fieldKey: 'status_name',
+          name: 'Status Name',
+          sort: true
+        },
+        {
+          fieldKey: "code",
+          name: "Action",
+          type: 'action',
+          actions: [
+            {
+              type: 'delete',
+              label: 'Delete',
+              confirm: true,
+              confirmMsg: "Sure to delete?",
+              apiUrl: baseUrl + 'assets/asset_statuses'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: baseUrl + 'assets/asset_statuses'
+            },
+            {
+              type: 'edit',
+              label: 'Edit'
+            }
+          ]
+        }
+      ]
+    },
+    formConfig: {
+      url: baseUrl + 'assets/asset_statuses/',
+      title: 'Asset Statuses',
+      pkId: "asset_status_id",
+      fields: [
+        {
+          fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
+          fieldGroup: [
+            {
+              key: 'status_name',
+              type: 'input',
+              className: 'col-md-6 col-12 p-0',
+              templateOptions: {
+                label: 'Status Name',
+                placeholder: 'Enter Status Name',
+                required: true,
+              }
+            },
+          ]
+        }
+      ]
+    }
+  }
 
+export const LocationsAssetConfig: TaCurdConfig = {
+    drawerSize: 500,
+    drawerPlacement: 'top',
+    tableConfig: {
+      apiUrl: baseUrl + 'assets/locations/',
+      // title: 'Locations',
+      pkId: "location_id",
+      pageSize: 10,
+      "globalSearch": {
+        keys: ['location_id', 'location_name']
+      },
+      hideFilters: true,
+      defaultSort: { key: 'created_at', value: 'descend' },
+      cols: [
+        {
+          fieldKey: 'location_name',
+          name: 'Location Name',
+          sort: true
+        },
+        {
+          fieldKey: 'address', 
+          name: 'Address',
+          sort: false
+        },
+        {
+          fieldKey: "code",
+          name: "Action",
+          type: 'action',
+          actions: [
+            {
+              type: 'delete',
+              label: 'Delete',
+              confirm: true,
+              confirmMsg: "Sure to delete?",
+              apiUrl: baseUrl + 'assets/locations'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: baseUrl + 'assets/locations'
+            },
+            {
+              type: 'edit',
+              label: 'Edit'
+            }
+          ]
+        }
+      ]
+    },
+    formConfig: {
+      url: baseUrl + 'assets/locations/',
+      title: 'Locations',
+      pkId: "location_id",
+      fields: [
+        {
+          fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
+          fieldGroup: [
+            {
+              key: 'location_name',
+              type: 'input',
+              className: 'col-md-6 col-12 px-1 mb-md-0 mb-3',
+              templateOptions: {
+                label: 'Location Name',
+                placeholder: 'Enter Location Name',
+                required: true,
+              }
+            },
+            {
+              key: 'address',
+              type: 'textarea',
+              className: 'col-md-6 col-12 px-1',
+              templateOptions: {
+                label: 'Address',
+                placeholder: 'Enter Address',
+                required: false,
+              },
+            },
+          ]
+        }
+      ]
+    }
+  }
 
+export const productsCrudConfig: TaCurdConfig = {
+    drawerSize: 500,
+    drawerPlacement: 'top',
+    tableConfig: {
+      apiUrl: 'products/products/?summary=true',
+      showCheckbox: false,
+      // title: 'Products',
+      pkId: "product_id",
+      hideFilters: true,
+      fixedFilters: [
+        {
+          key: 'summary',
+          value: 'true'
+        }
+      ],
+      pageSize: 10,
+      globalSearch: {
+        keys: ['created_at', 'name', 'code', 'unit_options', 'balance', 'sales_rate', 'mrp', 'dis_amount', 'print_name', 'hsn_code', 'barcode']
+      },
+      export: { downloadName: 'ProductsList' },
+      defaultSort: { key: 'code', value: 'descend' },
+      cols: [
+        {
+          fieldKey: 'name',
+          name: 'Name',
+          sort: true
+        },
+        // {
+        //   fieldKey: 'code',
+        //   name: 'Code',
+        //   sort: true
+        // },
+        // {
+        //   fieldKey: 'type',
+        //   name: 'Type',
+        //   sort: true,
+        //   displayType: 'map',
+        //   mapFn: (currentValue: any, row: any, col: any) => {
+        //     return row?.type?.type_name || '';
+        //   },
+        // },
+        // {
+        //   fieldKey: 'product_group',
+        //   name: 'Group',
+        //   sort: true,
+        //   displayType: 'map',
+        //   mapFn: (currentValue: any, row: any, col: any) => {
+        //     return row?.product_group?.group_name || '';
+        //   },
+        // },
+        // {
+        //   fieldKey: 'stock_unit',
+        //   name: 'Stock Unit',
+        //   sort: true,
+        //   displayType: 'map',
+        //   mapFn: (currentValue: any, row: any, col: any) => {
+        //     return row?.stock_unit?.stock_unit_name || '';
+        //   },
+        // },
+        // {
+        //   fieldKey: 'sales_rate',
+        //   name: 'Sales Rate',
+        //   sort: true,
+        //   isEdit: true,
+        //   isEditSumbmit: (row, value, col) => {
+        //     console.log("isEditSumbmit", row, value, col);
+        //     // Implement your logic here
+        //     // For example, you can make an API call to save the edited value
+        //     // this.http.put(`api/sales/${row.sale_order_id}`, { total_amount: value }).subscribe(...);
+        //   },
+        //   autoSave: {
+        //     apiUrl: row => `products/products/${row.product_id}`,
+        //     method: 'patch',
+        //     body: (row: any, value: any, col: any) => {
+        //       console.log('PATCH value:', value); // Add this log
+        //       return {
+        //         [col.fieldKey]: value,
+        //         product_id: row.product_id
+        //       };
+        //     }
 
+        //   }
+        // },
+        // {
+        //   fieldKey: 'wholesale_rate',
+        //   name: 'WholeSale Rate',
+        //   sort: true,
+        //   isEdit: true,
+        //   isEditSumbmit: (row, value, col) => {
+        //     console.log("isEditSumbmit", row, value, col);
+        //     // Implement your logic here
+        //   },
+        //   autoSave: {
+        //     apiUrl: row => `products/products/${row.product_id}`,
+        //     method: 'patch',
+        //     body: (row: any, value: any, col: any) => {
+        //       console.log('PATCH value:', value); // Add this log
+        //       return {
+        //         [col.fieldKey]: value,
+        //         product_id: row.product_id
+        //       };
+        //     }
+        //   }
 
-
-
+        // },
+        // {
+        //   fieldKey: 'dealer_rate',
+        //   name: 'Dealer Rate',
+        //   sort: true,
+        //   isEdit: true,
+        //   isEditSumbmit: (row, value, col) => {
+        //     console.log("isEditSumbmit", row, value, col);
+        //     // Implement your logic here
+        //   },
+        //   autoSave: {
+        //     apiUrl: row => `products/products/${row.product_id}`,
+        //     method: 'patch',
+        //     body: (row: any, value: any, col: any) => {
+        //       console.log('PATCH value:', value); // Add this log
+        //       return {
+        //         [col.fieldKey]: value,
+        //         product_id: row.product_id
+        //       };
+        //     }
+        //   }
+        // },
+        // {
+        //   fieldKey: 'discount',
+        //   name: 'Disc(%)',
+        //   sort: true
+        // },
+        {
+          fieldKey: 'balance',
+          name: 'Balance',
+          sort: true,
+          isEdit: true,
+          isEditSumbmit: (row, value, col) => {
+            console.log("isEditSumbmit", row, value, col);
+            // Implement your logic here
+          },
+          autoSave: {
+            apiUrl: row => `products/products/${row.product_id}`,
+            method: 'patch',
+            body: (row: any, value: any, col: any) => {
+              console.log('PATCH value:', value); // Add this log
+              return {
+                [col.fieldKey]: value,
+                product_id: row.product_id
+              };
+            }
+          }
+        },
+        // {
+        //   fieldKey: 'print_name',
+        //   name: 'Print Name',
+        //   sort: true
+        // },
+        // {
+        //   fieldKey: 'hsn_code',
+        //   name: 'HSN',
+        //   sort: true
+        // },
+        // {
+        //   fieldKey: 'barcode',
+        //   name: 'Barcode',
+        //   sort: true
+        // },
+        {
+          fieldKey: "code",
+          name: "Action",
+          type: 'action',
+          actions: [
+            {
+              type: 'delete',
+              label: 'Delete',
+              confirm: true,
+              confirmMsg: "Sure to delete?",
+              apiUrl: 'products/products'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'products/products'
+            },
+            {
+              type: 'edit',
+              label: 'Edit'
+            }
+          ]
+        }
+            // {
+            //     fieldKey: 'ledger_account_id',
+            //     name: 'Ledger Account',
+            //     sort: true,
+            //     displayType: 'map',
+            //     mapFn: (currentValue: any, row: any, col: any) => {
+            //         return row.ledger_account.name;
+            //     },
+            // },
+            // {
+            //     fieldKey: 'pin_code',
+            //     name: 'Pin Code',
+            //     sort: true,
+            // }
+        ]
+    }, 
+    formConfig: {}
+  
+  }

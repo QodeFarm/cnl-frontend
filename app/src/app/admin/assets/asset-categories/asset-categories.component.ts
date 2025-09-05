@@ -8,7 +8,8 @@ import { TaCurdConfig } from '@ta/ta-curd';
 })
 export class AssetCategoriesComponent {
   
-  baseUrl: string = 'https://apicore.cnlerp.com/api/v1/';
+  // baseUrl: string = 'https://apicore.cnlerp.com/api/v1/';
+  baseUrl: string = 'http://127.0.0.1:8000/api/v1/';
 
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
@@ -37,6 +38,13 @@ export class AssetCategoriesComponent {
               confirm: true,
               confirmMsg: "Sure to delete?",
               apiUrl: this.baseUrl + 'assets/asset_categories'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              apiUrl: this.baseUrl + 'assets/asset_categories',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
             },
             {
               type: 'edit',

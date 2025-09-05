@@ -78,6 +78,7 @@ export class CustomfieldsListComponent {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',
+            tooltip: "Edit this record",
             callBackFn: (row, action) => {
               this.edit.emit(row.custom_field_id); // Emit the custom field ID for editing
             }

@@ -135,6 +135,7 @@ export class EmployeeListComponent {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',
+            tooltip: "Edit this record",
             callBackFn: (row, action) => {
               this.edit.emit(row.employee_id);
               // this.router.navigateByUrl('hrms/employees' + row.employee_id);

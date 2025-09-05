@@ -438,19 +438,22 @@ export class SalesListComponent {
             label: 'Delete',
             confirm: true,
             confirmMsg: "Sure to delete?",
-            apiUrl: 'sales/sale_order'
+            apiUrl: 'sales/sale_order',
+            // tooltip: "Delete this record"
           },
           {
             type: 'restore',
             label: 'Restore',
             confirm: true,
             confirmMsg: "Sure to restore?",
-            apiUrl: 'sales/sale_order'
+            apiUrl: 'sales/sale_order',
+            // tooltip: "Restore this record"
           },
           {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',
+            tooltip: "Edit this record",
             callBackFn: (row, action) => {
               console.log(row);
               this.edit.emit(row.sale_order_id);

@@ -14,7 +14,8 @@ import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 })
 export class AssetMaintenanceListComponent {
   
-  baseUrl: string = 'https://apicore.cnlerp.com/api/v1/';
+  // baseUrl: string = 'https://apicore.cnlerp.com/api/v1/';
+  baseUrl: string = 'http://127.0.0.1:8000/api/v1/';
 
   @Output('edit') edit = new EventEmitter<void>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
@@ -71,9 +72,17 @@ export class AssetMaintenanceListComponent {
             apiUrl: this.baseUrl + 'assets/asset_maintenance'
           },
           {
+            type: 'restore',
+            label: 'Restore',
+            apiUrl: this.baseUrl + 'assets/asset_maintenance',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
+          },
+          {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',
+            tooltip: "Edit this record",
             callBackFn: (row, action) => {
               console.log(row);
               this.edit.emit(row.asset_maintenance_id);

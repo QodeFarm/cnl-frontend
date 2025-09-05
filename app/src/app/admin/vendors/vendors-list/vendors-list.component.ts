@@ -118,6 +118,7 @@ export class VendorsListComponent {
           {
             type: 'callBackFn',
             icon: 'fa fa-pen',
+            tooltip: "Edit this record",
             callBackFn: (row, action) => {
               console.log(`vendor ID: ${row.vendor_id}`);
               this.edit.emit(row.vendor_id);
