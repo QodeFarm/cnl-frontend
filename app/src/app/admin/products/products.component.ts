@@ -102,7 +102,13 @@ export class ProductsComponent implements OnInit {
 
   showProductsListFn() {
     this.showProductsList = true;
-    this.ProductsListComponent?.refreshTable();
+    // Ensure filters are reset and table is refreshed when showing the products list
+    if (this.ProductsListComponent) {
+      if (this.ProductsListComponent.taTableComponent) {
+        this.ProductsListComponent.taTableComponent.resetFilterValues();
+      }
+      this.ProductsListComponent.refreshTable();
+    }
   }
 
   // Method to create the record
