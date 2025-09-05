@@ -25,16 +25,17 @@
         </ng-content>
     </ng-container>
 </ta-table>
-<!-- <nz-modal [nzWidth]="options.drawerSize || 'auto'" [(nzVisible)]="visible " [nzTitle]="formTitle " (nzOnCancel)="visible=false " [nzMaskClosable]="false ">
-    <ng-container *nzModalContent>
+<nz-modal [nzWrapClassName]="'curd-modal-form'" [nzWidth]="options.drawerSize || 'auto'" [(nzVisible)]="visible "
+    [nzTitle]="formTitle " (nzOnCancel)="close()" [nzMaskClosable]="false" [nzFooter]="null">
+    <ng-template nzModalContent>
         <ta-form *ngIf="visible" #form [options]="options.formConfig"></ta-form>
-    </ng-container>
-    <div *nzModalFooter></div>
-</nz-modal> -->
-<nz-drawer [nzWrapClassName]="'curd-modal-form'" [nzClosable]="false" [nzHeight]="options.drawerHeight || '100%'"
+    </ng-template>
+    <div *nzModalFooter class="d-none"></div>
+</nz-modal>
+<!-- <nz-drawer [nzWrapClassName]="'curd-modal-form'" [nzClosable]="false" [nzHeight]="options.drawerHeight || '100%'"
     [nzWidth]="options.drawerSize || 'auto'" [nzVisible]="visible" [nzClosable]="true"
     [nzPlacement]="options.drawerPlacement || 'right'" [nzTitle]="formTitle" (nzOnClose)="close()">
     <ng-template nzDrawerContent>
         <ta-form *ngIf="visible" #form [options]="options.formConfig"></ta-form>
     </ng-template>
-</nz-drawer>
+</nz-drawer> -->
