@@ -796,57 +796,191 @@ async autoFillProductDetails(field, data) {
   }
 
   customFieldMetadata: any = {};
-  createSaleInovice(){
-    const customFieldValues = this.formConfig.model['custom_field_values']
+  // createSaleInovice(){
+  //   const customFieldValues = this.formConfig.model['custom_field_values']
 
-    // Determine the entity type and ID dynamically
-    // const entityId = '97ca2f54-7036-4ae1-9515-894f676c58aa'; // Since we're in the Sale Invoice form
+  //   // Determine the entity type and ID dynamically
+  //   // const entityId = '97ca2f54-7036-4ae1-9515-894f676c58aa'; // Since we're in the Sale Invoice form
     
   
-    // Determine the entity type and ID dynamically
-    const entityName = 'sale_invoice'; // Since we're in the Sale Order form
-    const customId = this.formConfig.model.sale_invoice_order?.sale_invoice_id || null;
+  //   // Determine the entity type and ID dynamically
+  //   const entityName = 'sale_invoice'; // Since we're in the Sale Order form
+  //   const customId = this.formConfig.model.sale_invoice_order?.sale_invoice_id || null;
   
-    // Find entity record from list
-    const entity = this.entitiesList.find(e => e.entity_name === entityName);
+  //   // Find entity record from list
+  //   const entity = this.entitiesList.find(e => e.entity_name === entityName);
 
-    // if (!entity) {
-    //   console.error(`Entity not found for: ${entityName}`);
-    //   return;
-    // }
+  //   // if (!entity) {
+  //   //   console.error(`Entity not found for: ${entityName}`);
+  //   //   return;
+  //   // }
 
-    const entityId = entity.entity_id;
-    // Inject entity_id into metadata temporarily
-    Object.keys(this.customFieldMetadata).forEach((key) => {
-      this.customFieldMetadata[key].entity_id = entityId;
-    });
-    // Construct payload for custom fields
-    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
-    // console.log("customFieldsPayload : ", customFieldsPayload);
-    if (!customFieldsPayload) {
-      this.showDialog(); // Stop execution if required fields are missing
+  //   const entityId = entity.entity_id;
+  //   // Inject entity_id into metadata temporarily
+  //   Object.keys(this.customFieldMetadata).forEach((key) => {
+  //     this.customFieldMetadata[key].entity_id = entityId;
+  //   });
+  //   // Construct payload for custom fields
+  //   const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
+  //   // console.log("customFieldsPayload : ", customFieldsPayload);
+  //   // if (!customFieldsPayload) {
+  //   //   this.showDialog(); // Stop execution if required fields are missing
+  //   // }
+
+  //   // Construct the final payload
+  //   const payload = {
+  //     ...this.formConfig.model,
+  //     // custom_field: customFieldsPayload.custom_field, // Dictionary of custom fields
+  //     custom_field_values: customFieldsPayload // Array of custom field values
+  //   };
+
+  //   this.http.post('sales/sale_invoice_order/', payload)
+  //     .subscribe(response => {
+  //       console.log("Entered...")
+  //       this.showSuccessToast = true;
+  //       this.toastMessage = 'Record created successfully';
+  //       this.ngOnInit();
+  //       setTimeout(() => {
+  //         this.showSuccessToast = false;
+  //       }, 3000); // Hide toast after 3 seconds
+  //     }, error => {
+  //       console.error('Error creating record:', error);
+  //     });
+  // }
+
+// createSaleInovice() {
+//   const customFieldValues = this.formConfig.model['custom_field_values'];
+
+//   const entityName = 'sale_invoice'; 
+//   const customId = this.formConfig.model.sale_invoice_order?.sale_invoice_id || null;
+
+//   const entity = this.entitiesList.find(e => e.entity_name === entityName);
+//   const entityId = entity?.entity_id;
+
+//   // Inject entity_id into metadata temporarily
+//   Object.keys(this.customFieldMetadata).forEach((key) => {
+//     this.customFieldMetadata[key].entity_id = entityId;
+//   });
+
+//   // 🔹 Auto-populate defaults for required fields if missing
+//   Object.keys(this.customFieldMetadata).forEach((fieldKey) => {
+//     const metadata = this.customFieldMetadata[fieldKey.toLowerCase()] || {};
+//     if (metadata.is_required) {
+//       const currentValue = customFieldValues[fieldKey];
+
+//       if (currentValue === '' || currentValue === null || currentValue === undefined) {
+//         if (metadata.field_type_id === "int" || metadata.field_type_id === "number") {
+//           customFieldValues[fieldKey] = 0;   // Default for numbers
+//         } else {
+//           customFieldValues[fieldKey] = "Auto"; // Default for strings/char
+//         }
+//       }
+//     }
+//   });
+
+//   // Construct payload for custom fields
+//   const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(
+//     customFieldValues,
+//     entityName,
+//     customId
+//   );
+
+//   // Construct the final payload
+//   const payload = {
+//     ...this.formConfig.model,
+//     custom_field_values: customFieldsPayload.custom_field_values  
+//   };
+
+//   this.http.post('sales/sale_invoice_order/', payload)
+//     .subscribe(response => {
+//       console.log("Entered...");
+//       this.showSuccessToast = true;
+//       this.toastMessage = 'Record created successfully';
+//       this.ngOnInit();
+//       setTimeout(() => {
+//         this.showSuccessToast = false;
+//       }, 3000);
+//     }, error => {
+//       console.error('Error creating record:', error);
+//     });
+// }
+
+createSaleInovice() {
+  const customFieldValues = this.formConfig.model['custom_field_values'];
+
+  const entityName = 'sale_invoice'; 
+  const customId = this.formConfig.model.sale_invoice_order?.sale_invoice_id || null;
+
+  const entity = this.entitiesList.find(e => e.entity_name === entityName);
+  const entityId = entity?.entity_id;
+
+  // Inject entity_id into metadata temporarily
+  Object.keys(this.customFieldMetadata).forEach((key) => {
+    this.customFieldMetadata[key].entity_id = entityId;
+  });
+
+  // 🔹 Auto-populate defaults for required fields if missing
+  Object.keys(this.customFieldMetadata).forEach((fieldKey) => {
+    const metadata = this.customFieldMetadata[fieldKey.toLowerCase()] || {};
+    if (metadata.is_required) {
+      let currentValue = customFieldValues[fieldKey];
+
+      if (currentValue === '' || currentValue === null || currentValue === undefined) {
+        if (metadata.field_type_id === "int" || metadata.field_type_id === "number") {
+          currentValue = 0;
+        } else {
+          currentValue = "Auto";
+        }
+        customFieldValues[fieldKey] = currentValue;
+      }
     }
+  });
 
-    // Construct the final payload
-    const payload = {
-      ...this.formConfig.model,
-      // custom_field: customFieldsPayload.custom_field, // Dictionary of custom fields
-      custom_field_values: customFieldsPayload // Array of custom field values
-    };
+  // Construct payload for custom fields
+  let customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(
+    customFieldValues,
+    entityName,
+    customId
+  );
 
-    this.http.post('sales/sale_invoice_order/', payload)
-      .subscribe(response => {
-        console.log("Entered...")
-        this.showSuccessToast = true;
-        this.toastMessage = 'Record created successfully';
-        this.ngOnInit();
-        setTimeout(() => {
-          this.showSuccessToast = false;
-        }, 3000); // Hide toast after 3 seconds
-      }, error => {
-        console.error('Error creating record:', error);
-      });
+  // 🚨 Ensure defaults are pushed into payload even if user left fields blank
+  if (entityName === "sale_invoice") {
+    const requiredDefaults = Object.keys(this.customFieldMetadata).map((fieldKey) => {
+      const metadata = this.customFieldMetadata[fieldKey.toLowerCase()] || {};
+      return {
+        field_value: customFieldValues[fieldKey] ?? (metadata.field_type_id === "int" ? 0 : "Auto"),
+        field_value_type: (metadata.field_type_id === "int" ? "number" : "string"),
+        entity_id: metadata.entity_id,
+        entity_name: entityName,
+        custom_field_id: fieldKey,
+        custom_id: customId
+      };
+    });
+
+    customFieldsPayload.custom_field_values = requiredDefaults;
   }
+
+  // Final payload
+  const payload = {
+    ...this.formConfig.model,
+    custom_field_values: customFieldsPayload.custom_field_values
+  };
+
+  this.http.post('sales/sale_invoice_order/', payload)
+    .subscribe(response => {
+      console.log("Entered...");
+      this.showSuccessToast = true;
+      this.toastMessage = 'Record created successfully';
+      this.ngOnInit();
+      setTimeout(() => {
+        this.showSuccessToast = false;
+      }, 3000);
+    }, error => {
+      console.error('Error creating record:', error);
+    });
+}
+
+
 
   updateSaleInvoice(){
     const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
@@ -870,9 +1004,9 @@ async autoFillProductDetails(field, data) {
     });
     // Construct payload for custom fields
     const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
-    if (!customFieldsPayload) {
-      this.showDialog(); // Stop execution if required fields are missing
-    }
+    // if (!customFieldsPayload) {
+    //   this.showDialog(); // Stop execution if required fields are missing
+    // }
     // Construct the final payload for update
     const payload = {
       ...this.formConfig.model,
@@ -1523,7 +1657,7 @@ async autoFillProductDetails(field, data) {
               },
               {
                 key: 'product',
-                type: 'select',
+                type: 'products-dropdown',
                 templateOptions: {
                   label: 'Product',
                   dataKey: 'product_id',

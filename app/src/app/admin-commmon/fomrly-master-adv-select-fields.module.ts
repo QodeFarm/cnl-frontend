@@ -867,6 +867,21 @@ import { AssetCategoriesConfig, AssetStatusConfig, cityConfig, CountryConfig, cu
             }
           }
         },
+        {
+          name: 'products-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Select Products',
+              label: 'Products',
+              dataKey: 'product_id',
+              dataLabel: 'name',
+              required: true,
+              curdConfig: productsCrudConfig
+            }
+          }
+        },
         // {
         //   name: 'products-dropdown',
         //   extends: 'adv-select',
@@ -879,68 +894,53 @@ import { AssetCategoriesConfig, AssetStatusConfig, cityConfig, CountryConfig, cu
         //       dataLabel: 'name',
         //       required: true,
         //       curdConfig: productsCrudConfig
+        //     },
+        //     hooks: {
+        //       onInit: (field: any) => {
+        //         const parentArray = field.parent;
+        //         if (!parentArray) {
+        //           console.error('Parent array is undefined or not accessible');
+        //           return;
+        //         }
+
+        //         const currentRowIndex = +parentArray.key;
+
+        //         // Populate if editing existing data
+        //         const existingProduct = field?.form?.model?.sale_order_items?.[currentRowIndex]?.product;
+        //         if (existingProduct) {
+        //           field.formControl.setValue(existingProduct);
+        //         }
+
+        //         // Load variations initially
+        //         field.options.fieldComponent.loadProductVariations(field);
+
+        //         // Subscribe to value changes
+        //         field.formControl.valueChanges.subscribe((data: any) => {
+        //           if (!field.form.model['sale_order_items'][currentRowIndex]) {
+        //             field.form.model['sale_order_items'][currentRowIndex] = {};
+        //           }
+
+        //           field.form.model['sale_order_items'][currentRowIndex]['product_id'] = data?.product_id;
+
+        //           // Reload variations
+        //           field.options.fieldComponent.loadProductVariations(field, true);
+
+        //           // Auto-fill details
+        //           field.options.fieldComponent.autoFillProductDetails(field, data);
+        //         });
+
+        //         // Product info text
+        //         field.formControl.valueChanges.subscribe((selectedProduct: any) => {
+        //           const unit = field.options.fieldComponent.getUnitData(selectedProduct);
+        //           const row = field.form.model.sale_order_items[currentRowIndex];
+        //           field.options.fieldComponent.displayInformation(row.product, null, null, unit, '', '');
+        //         });
+        //       }
         //     }
         //   }
         // },
-{
-  name: 'products-dropdown',
-  extends: 'adv-select',
-  wrappers: ['ta-field'],
-  defaultOptions: {
-    templateOptions: {
-      placeholder: 'Please Select Products',
-      label: 'Products',
-      dataKey: 'product_id',
-      dataLabel: 'name',
-      required: true,
-      curdConfig: productsCrudConfig
-    },
-    hooks: {
-      onInit: (field: any) => {
-        const parentArray = field.parent;
-        if (!parentArray) {
-          console.error('Parent array is undefined or not accessible');
-          return;
-        }
-
-        const currentRowIndex = +parentArray.key;
-
-        // Populate if editing existing data
-        const existingProduct = field?.form?.model?.sale_order_items?.[currentRowIndex]?.product;
-        if (existingProduct) {
-          field.formControl.setValue(existingProduct);
-        }
-
-        // Load variations initially
-        field.options.fieldComponent.loadProductVariations(field);
-
-        // Subscribe to value changes
-        field.formControl.valueChanges.subscribe((data: any) => {
-          if (!field.form.model['sale_order_items'][currentRowIndex]) {
-            field.form.model['sale_order_items'][currentRowIndex] = {};
-          }
-
-          field.form.model['sale_order_items'][currentRowIndex]['product_id'] = data?.product_id;
-
-          // Reload variations
-          field.options.fieldComponent.loadProductVariations(field, true);
-
-          // Auto-fill details
-          field.options.fieldComponent.autoFillProductDetails(field, data);
-        });
-
-        // Product info text
-        field.formControl.valueChanges.subscribe((selectedProduct: any) => {
-          const unit = field.options.fieldComponent.getUnitData(selectedProduct);
-          const row = field.form.model.sale_order_items[currentRowIndex];
-          field.options.fieldComponent.displayInformation(row.product, null, null, unit, '', '');
-        });
-      }
-    }
-  }
-},
-      ],
-    })
-  ]
-})
-export class FomrlyMasterAdvSelectFieldsModule { }
+              ],
+            })
+          ]
+        })
+        export class FomrlyMasterAdvSelectFieldsModule { }

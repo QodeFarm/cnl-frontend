@@ -2166,30 +2166,30 @@ export const VendorAgentConfig: TaCurdConfig = {
       defaultSort: { key: 'created_at', value: 'descend' },
       cols: [
         {
-          fieldKey: 'code',
-          name: 'code',
-          sort: true
-        },
-		    {
           fieldKey: 'name',
           name: 'Name',
           sort: true
         },
-		    {
-          fieldKey: 'commission_rate',
-          name: 'Commission Rate',
+        {
+          fieldKey: 'code',
+          name: 'code',
           sort: true
         },
-		    {
-          fieldKey: 'rate_on',
-          name: 'Rate On',
-          sort: true
-        },
-		    {
-          fieldKey: 'amount_type',
-          name: 'Amount Type',
-          sort: true
-        },
+		    // {
+        //   fieldKey: 'commission_rate',
+        //   name: 'Commission Rate',
+        //   sort: true
+        // },
+		    // {
+        //   fieldKey: 'rate_on',
+        //   name: 'Rate On',
+        //   sort: true
+        // },
+		    // {
+        //   fieldKey: 'amount_type',
+        //   name: 'Amount Type',
+        //   sort: true
+        // },
         {
           fieldKey: "code",
           name: "Action",
@@ -2322,26 +2322,26 @@ export const VendorPaymentTermsConfig: TaCurdConfig = {
           name: 'code',
           sort: true
         },
-		    {
-          fieldKey: 'fixed_days',
-          name: 'Fixed Days',
-          sort: true
-        },
-		    {
-          fieldKey: 'no_of_fixed_days',
-          name: 'No of fixed days',
-          sort: true
-        },
+		    // {
+        //   fieldKey: 'fixed_days',
+        //   name: 'Fixed Days',
+        //   sort: true
+        // },
+		    // {
+        //   fieldKey: 'no_of_fixed_days',
+        //   name: 'No of fixed days',
+        //   sort: true
+        // },
         {
           fieldKey: 'payment_cycle',
           name: 'Payment Cycle',
           sort: true
         },
-		    {
-          fieldKey: 'run_on',
-          name: 'Run On',
-          sort: true
-        },
+		    // {
+        //   fieldKey: 'run_on',
+        //   name: 'Run On',
+        //   sort: true
+        // },
         {
           fieldKey: "code",
           name: "Action",
@@ -2473,32 +2473,32 @@ export const CustomerPaymentConfig: TaCurdConfig = {
           name: 'Name',
           // sort: true
         },
-        {
-          fieldKey: 'code', 
-          name: 'Code',
-          // sort: true
-        },
-        {
-          fieldKey: 'fixed_days', 
-          name: 'Fixed days',
-          type: 'number',
-          sort: true
-        },
-        {
-          fieldKey: 'no_of_fixed_days', 
-          name: 'No.of.fixed days',
-          sort: true
-        },
+        // {
+        //   fieldKey: 'code', 
+        //   name: 'Code',
+        //   // sort: true
+        // },
+        // {
+        //   fieldKey: 'fixed_days', 
+        //   name: 'Fixed days',
+        //   type: 'number',
+        //   sort: true
+        // },
+        // {
+        //   fieldKey: 'no_of_fixed_days', 
+        //   name: 'No.of.fixed days',
+        //   sort: true
+        // },
         {
           fieldKey: 'payment_cycle', 
           name: 'Payment Cycle',
           sort: true
         },
-        {
-          fieldKey: 'run_on', 
-          name: 'Run on',
-          sort: true
-        },
+        // {
+        //   fieldKey: 'run_on', 
+        //   name: 'Run on',
+        //   sort: true
+        // },
         {
           fieldKey: "code",
           name: "Action",
@@ -2621,27 +2621,27 @@ export const LedgerGroupsConfig: TaCurdConfig = {
           name: 'Name',
           sort: true
         },
-        {
-          fieldKey: 'code', 
-          name: 'Code',
-          sort: true
-        },
-        {
-          fieldKey: 'inactive',
-          name: 'Inactive',
-          sort: true,
-          type: 'boolean'
-        },
+        // {
+        //   fieldKey: 'code', 
+        //   name: 'Code',
+        //   sort: true
+        // },
+        // {
+        //   fieldKey: 'inactive',
+        //   name: 'Inactive',
+        //   sort: true,
+        //   type: 'boolean'
+        // },
         {
           fieldKey: 'under_group', 
           name: 'Under Group',
           sort: true
         },
-        {
-          fieldKey: 'nature',
-          name: 'Nature',
-          sort: true
-        },
+        // {
+        //   fieldKey: 'nature',
+        //   name: 'Nature',
+        //   sort: true
+        // },
         {
           fieldKey: "code",
           name: "Action",
@@ -2837,11 +2837,11 @@ export const MachineConfig: TaCurdConfig = {
           name: 'Machine Name',
           sort: true
         },
-        {
-          fieldKey: 'description',
-          name: 'Description',
-          sort: true
-        },
+        // {
+        //   fieldKey: 'description',
+        //   name: 'Description',
+        //   sort: true
+        // },
         {
           fieldKey: 'status',
           name: 'status',
@@ -7054,6 +7054,1232 @@ export const productsCrudConfig: TaCurdConfig = {
             // }
         ]
     }, 
-    formConfig: {}
+    formConfig: {
+      // url: "products/products/",
+      formState: {
+        viewMode: false,
+        // isEdit: false,
+      },
+      showActionBtn: true,
+      exParams: [
+        // {
+        //   key: 'products',
+        //   type: 'script',
+        //   value: 'data.products.map(m=> {m.pack_unit_id = m.pack_unit.stock_unit_id;  return m ;})'
+        // },
+      ],
+      submit: {
+        label: 'Submit',
+        submittedFn: () => {}
+      },
+      reset: {
+        resetFn: () => {
+          // this.ngOnInit();
+        }
+      },
+      model: {
+        products: {},
+        product_variations: [{}],
+        product_item_balance: [{}]
+      },
+      fields: [
+        {
+          fieldGroup: [
+            {
+              className: 'col-12 custom-form-card-block p-0',
+              key: 'products',
+              fieldGroupClassName: 'row m-0 pr-0 responsive-row',
+              fieldGroup: [
+                {
+                  className: 'col-sm-9 col-12 p-0',
+                  fieldGroupClassName: 'row m-0 p-0',
+                  fieldGroup: [
+                    {
+                      className: 'col-md-4 col-sm-6 col-12',
+                      key: 'product_mode_id',
+                      type: 'productModes-dropdown',
+                      templateOptions: {
+                        label: 'Product Mode',
+                        placeholder: 'Select Product Mode',
+                        required: true,
+                        options: []
+                      },
+                      
+                      hooks: {
+                        onInit: (field: any) => {
+                        //   // Load the dropdown data from the API
+                        //   this.http.get('products/item-master/').subscribe((response: any) => {
+                        //     if (response && response.data) {
+                        //       const options = response.data.map((item: any) => ({
+                        //         value: item.item_master_id,
+                        //         label: item.mode_name
+                        //       }));
+
+                        //       // Update the field's options
+                        //       field.templateOptions.options = options;
+
+                        //       // If in edit mode, select the current value
+                        //       if (this.ProductEditID && this.formConfig.model.products?.product_mode_id) {
+                        //         const currentId = this.formConfig.model.products.product_mode_id;
+                        //         const matchedOption = options.find((opt: any) => opt.value === currentId);
+                        //         if (matchedOption) {
+                        //           field.formControl.setValue(matchedOption.value);
+                        //         }
+                        //       }
+                        //     }
+                        //   });
+                        // },
+                        // onChanges: (field: any) => {
+                        //   if (field._subscription) {
+                        //     field._subscription.unsubscribe();
+                        //   }
+
+                        //   field._subscription = field.formControl.valueChanges.subscribe((data: any) => {
+                        //     if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                        //       // Store the selected product mode ID
+                        //       this.formConfig.model['products']['product_mode_id'] = data;
+                        //       console.log("Product Mode changed to:", data); // Added logging
+
+                        //        // Get the selected mode name for use in visibility conditions
+                        //             this.formConfig.model['products']['product_mode_id'] = data;
+        
+                        //         // Store the mode name for visibility conditions
+                        //         const selectedOption = field.templateOptions.options.find((option: any) => option.value === data);
+                        //         if (selectedOption) {
+                        //           this.selectedProductMode = selectedOption.label;
+                        //           console.log("Product Mode changed to:", selectedOption.label);
+                        //         }
+                            
+
+                        //       // Find the type field using a recursive search through all form fields
+                        //       const findFieldByKey = (fieldGroups: any[], key: string): any => {
+                        //         for (const fieldGroup of fieldGroups) {
+                        //           if (fieldGroup.key === key) return fieldGroup;
+
+                        //           if (fieldGroup.fieldGroup) {
+                        //             const found = findFieldByKey(fieldGroup.fieldGroup, key);
+                        //             if (found) return found;
+                        //           }
+
+                        //           if (fieldGroup.fieldArray && fieldGroup.fieldArray.fieldGroup) {
+                        //             const found = findFieldByKey(fieldGroup.fieldArray.fieldGroup, key);
+                        //             if (found) return found;
+                        //           }
+                        //         }
+                        //         return null;
+                        //       };
+
+                        //       // Find the type field in the form structure
+                        //       const typeField = findFieldByKey(this.formConfig.fields[0].fieldGroup, 'type_id');
+
+                        //       if (typeField && data) {
+                        //         console.log("Found Type field:", typeField);
+
+                        //         // Reset the Type field value
+                        //         typeField.formControl.setValue(null);
+
+                        //         // Enable the field if it was disabled
+                        //         typeField.templateOptions.disabled = false;
+
+                        //         // Find the selected Product Mode to get its name
+                        //         const selectedOption = field.templateOptions.options.find((option: any) => option.value === data);
+                        //         if (selectedOption) {
+                        //           console.log("Selected option:", selectedOption);
+
+                        //           const filterUrl = `masters/product_types/?mode_type=${encodeURIComponent(selectedOption.label)}`;
+                        //           console.log('Fetching type data from:', filterUrl);
+
+                        //           // Update the placeholder while loading
+                        //           typeField.templateOptions.placeholder = 'Loading types...';
+                        //           typeField.templateOptions = { ...typeField.templateOptions };
+
+                        //           // Directly fetch the filtered data
+                        //           this.http.get(filterUrl).subscribe(
+                        //             (response: any) => {
+                        //               console.log('API response for types:', response);
+
+                        //               let typeOptions = null;
+
+                        //               if (response && response.data && Array.isArray(response.data)) {
+                        //                 typeOptions = response.data;
+                        //               } else if (response && Array.isArray(response)) {
+                        //                 typeOptions = response;
+                        //               } else if (response && response.results && Array.isArray(response.results)) {
+                        //                 typeOptions = response.results;
+                        //               }
+
+                        //               if (typeOptions && typeOptions.length > 0) {
+                        //                 console.log(`Received ${typeOptions.length} type options`);
+
+                        //                 // Format options with simple value/label pairs like GST dropdown
+                        //                 const formattedOptions = typeOptions.map(item => ({
+                        //                   value: item.type_id, // Use just the ID as the value
+                        //                   label: item.type_name // Use the name as the label
+                        //                 }));
+
+                        //                 // Update the options
+                        //                 typeField.templateOptions.options = formattedOptions;
+                        //                 typeField.templateOptions.disabled = false;
+                        //                 typeField.templateOptions.placeholder = 'Select Type';
+                        //                 typeField.templateOptions = { ...typeField.templateOptions };
+                                        
+                        //                 // Find the "Finished Product" option
+                        //                 const finishedProductOption = formattedOptions.find(
+                        //                   (option: any) => option.label.toLowerCase() === 'finished product'
+                        //                 );
+                                        
+                        //                 if (finishedProductOption) {
+                        //                   // Set it as the default value
+                        //                   typeField.formControl.setValue(finishedProductOption.value);
+                                          
+                        //                   // Update the model
+                        //                   if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                        //                     this.formConfig.model['products']['type_id'] = finishedProductOption.value;
+                        //                     console.log("Default Type set to Finished Product:", finishedProductOption.value);
+                        //                   }
+                        //                 }
+                        //               } else {
+                        //                 typeField.templateOptions.options = [];
+                        //                 typeField.templateOptions.disabled = false;
+                        //                 typeField.templateOptions.placeholder = 'No types available';
+                        //                 typeField.templateOptions = { ...typeField.templateOptions };
+                        //               }
+                        //             },
+                        //             error => {
+                        //               console.error('Error fetching type options:', error);
+                        //               typeField.templateOptions.disabled = false;
+                        //               typeField.templateOptions.options = [];
+                        //               typeField.templateOptions.placeholder = 'Error loading types';
+                        //               typeField.templateOptions = { ...typeField.templateOptions };
+                        //             }
+                        //           );
+                        //         }
+                        //       }
+                        //     } else {
+                        //       console.error('Form config or product mode data model is not defined.');
+                        //     }
+                        //   });
+                        }
+                      }
+                    },
+                    {
+                      key: 'name',
+                      type: 'input',
+                      className: 'col-md-4 col-sm-6 col-12',
+                      templateOptions: {
+                        label: 'Name',
+                        placeholder: 'Enter Name',
+                        required: true,
+                        // disabled: true
+                      },
+                      hooks: {
+                        onInit: (field: any) => { }
+                      },
+                    },
+                    {
+                      className: 'col-md-4 col-sm-6 col-12',
+                      key: 'print_name',
+                      type: 'input',
+                      templateOptions: {
+                        label: 'Print Name',
+                        placeholder: 'Enter Print Name',
+                        required: true,
+                      }
+                    },
+                    {
+                      className: 'col-md-4 col-sm-6 col-12',
+                      key: 'code',
+                      type: 'input',
+                      templateOptions: {
+                        label: 'Code',
+                        placeholder: 'Enter Code',
+                        required: true
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          // this.http.get('masters/generate_order_no/?type=prd').subscribe((res: any) => {
+                          //   if (res && res.data && res.data?.order_number) {
+                          //     field.formControl.setValue(res.data?.order_number);
+                          //   }
+                          // });
+                        }
+                      }
+                    },
+                    {
+                      className: 'col-md-4 col-sm-6 col-12',
+                      key: 'product_group',
+                      type: 'productGroups-dropdown',
+                      templateOptions: {
+                        label: 'Product Group',
+                        dataKey: 'product_group_id',
+                        dataLabel: "group_name",
+                        options: [],
+                        required: true,
+                        lazy: {
+                          url: 'products/product_groups/',
+                          lazyOneTime: true
+                        }
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          field.formControl.valueChanges.subscribe((data: any) => {
+                            // if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                            //   this.formConfig.model['products']['product_group_id'] = data?.product_group_id;
+                            // } else {
+                            //   console.error('Form config or lead_status data model is not defined.');
+                            // }
+                          });
+                        }
+                      }
+                    },
+                    {
+                      className: 'col-md-4 col-sm-6 col-12',
+                      key: 'gst_input',
+                      type: 'select',
+                      templateOptions: {
+                        label: 'GST Percentage',
+                        placeholder: 'Select GST Percentage',
+                        required: false,
+                        options: [
+                          { value: 3, label: '3%' },
+                          { value: 5, label: '5%' },
+                          { value: 9, label: '9%' },
+                          { value: 12, label: '12%' },
+                          { value: 18, label: '18%' }
+                        ]
+                      }
+                    },   
+                    {
+                      key: 'stock_unit',
+                      type: 'productStockUnits-dropdown',
+                      className: 'col-md-4 col-sm-6 col-12',
+                      templateOptions: {
+                        label: 'Stock Unit',
+                        dataKey: 'stock_unit_id',
+                        dataLabel: "stock_unit_name",
+                        options: [],
+                        required: true,
+                        lazy: {
+                          url: 'products/product_stock_units/',
+                          lazyOneTime: true
+                        }
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          field.formControl.valueChanges.subscribe((data: any) => {
+                            // if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                            //   this.formConfig.model['products']['stock_unit_id'] = data?.stock_unit_id;
+                            // } else {
+                            //   console.error('Form config or lead_status data model is not defined.');
+                            // }
+                          });
+                        }
+                      }
+                    },
+                    {
+                      className: 'col-md-4 col-sm-6 col-12',
+                      key: 'hsn_code',
+                      type: 'select',
+                      templateOptions: {
+                        label: 'HSN',
+                        placeholder: 'Enter or Select HSN Code',
+                        required: false,
+                        options: [
+                          { value: '0101', label: '0101' },
+                          { value: '0201', label: '0201' },
+                          { value: '0301', label: '0301' },
+                          { value: '0401', label: '0401' },
+                          { value: '0501', label: '0501' }
+                        ],
+                        // allowCustomValue: true // Allow users to enter their own value
+                      }
+                    }, 
+                    {
+                      className: 'col-md-4 col-sm-6 col-12',
+                      key: 'balance',
+                      type: 'input',
+                      defaultValue: 0.00,
+                      templateOptions: {
+                      label: 'Balance',
+                      required: false, 
+                    }
+                  },
+                  ]
+                },
+                {
+                  className: 'col-sm-3 col-12 p-0',
+                  // key: 'products',
+                  fieldGroupClassName: "ant-row row mx-0 mt-2",
+                  fieldGroup: [
+                    {
+                      key: 'picture',
+                      type: 'file',
+                      className: 'ta-cell pr-md col d-flex justify-content-md-center pr-0',
+                      templateOptions: {
+                        label: 'Picture',
+                        required: false,
+                      }
+                    }
+                  ]
+                },
+              ]
+            },
+            {
+              className: "tab-form-list",
+              type: 'tabs',
+              fieldGroup: [
+                {
+                  className: 'col-12 pb-0',
+                  fieldGroupClassName: "field-no-bottom-space",
+                  props: {
+                    label: 'Advanced info'
+                  },
+                  fieldGroup: [
+                    {
+                      fieldGroupClassName: "",
+                      fieldGroup: [
+                        {
+                          className: 'col-12 p-0',
+                          key: 'products',
+                          fieldGroupClassName: "ant-row row align-items-end mt-3",
+                          fieldGroup: [
+                            {
+                              key: 'category',
+                              type: 'productCategories-dropdown',
+                              className: 'col-3',
+                              templateOptions: {
+                                label: 'Category',
+                                dataKey: 'category_id',
+                                dataLabel: "category_name",
+                                options: [],
+                                required: false,
+                                lazy: {
+                                  url: 'products/product_categories/',
+                                  lazyOneTime: true
+                                }
+                              },
+                              hooks: {
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe((data: any) => {
+                                    // if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                                    //   this.formConfig.model['products']['category_id'] = data?.category_id;
+                                    // } else {
+                                    //   console.error('Form config or lead_status data model is not defined.');
+                                    // }
+                                  });
+                                }
+                              }
+                            },
+                            // {
+                            //   className: 'col-md-4 col-sm-6 col-12',
+                            //   key: 'gst_input',
+                            //   type: 'select',
+                            //   templateOptions: {
+                            //     label: 'GST Percentage',
+                            //     placeholder: 'Select GST Percentage',
+                            //     required: false,
+                            //     options: [
+                            //       { value: 3, label: '3%' },
+                            //       { value: 5, label: '5%' },
+                            //       { value: 9, label: '9%' },
+                            //       { value: 12, label: '12%' },
+                            //       { value: 18, label: '18%' }
+                            //     ]
+                            //   }
+                            // },    
+                            {
+                              key: 'brand',
+                              type: 'productBrands-dropdown',
+                              className: 'col-3',
+                              templateOptions: {
+                                label: 'Brand',
+                                dataKey: 'brand_id',
+                                dataLabel: "brand_name",
+                                options: [],
+                                required: false,
+                                lazy: {
+                                  url: 'masters/product_brands/',
+                                  lazyOneTime: true
+                                }
+                              },
+                              hooks: {
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe((data: any) => {
+                                    // if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                                    //   this.formConfig.model['products']['brand_id'] = data?.brand_id;
+                                    // } else {
+                                    //   console.error('Form config or brand_id data model is not defined.');
+                                    // }
+                                  });
+                                }
+                              }
+                            },
+                            // {
+                            //   key: 'item_type',
+                            //   type: 'select',
+                            //   className: 'col-3',
+                            //   templateOptions: {
+                            //     label: 'Item Type',
+                            //     dataKey: 'item_type_id',
+                            //     dataLabel: "item_name",
+                            //     options: [],
+                            //     required: false,
+                            //     lazy: {
+                            //       url: 'masters/product_item_type/',
+                            //       lazyOneTime: true
+                            //     }
+                            //   },
+                            //   hooks: {
+                            //     onChanges: (field: any) => {
+                            //       field.formControl.valueChanges.subscribe((data: any) => {
+                            //         if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                            //           this.formConfig.model['products']['item_type_id'] = data?.item_type_id;
+                            //         } else {
+                            //           console.error('Form config or lead_status data model is not defined.');
+                            //         }
+                            //       });
+                            //     }
+                            //   }
+                            // },
+                            {
+                              key: 'type_id',
+                              type: 'productType-dropdown',
+                              className: 'col-3',
+                              templateOptions: {
+                                label: 'Type',
+                                dataKey: 'type_id',
+                                dataLabel: "type_name",
+                                placeholder: 'Select Product Mode first',
+                                options: [],
+                                required: false,
+                                disabled: true
+                              },
+                              hooks: {
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe((data: any) => {
+                                    // if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                                    //   // Store just the ID value
+                                    //   this.formConfig.model['products']['type_id'] = data;
+                                    //   console.log("Type changed to:", data);
+                                    // } else {
+                                    //   console.error('Form config or type_id data model is not defined.');
+                                    // }
+                                  });
+                                },
+                                onInit: (field: any) => {
+                                  // We need to wait for the Product Mode to load type options first
+                                  // const checkForOptions = setInterval(() => {
+                                  //   if (field.templateOptions.options && field.templateOptions.options.length > 0) {
+                                  //     clearInterval(checkForOptions);
+                                      
+                                  //     // Find the "Finished Product" option
+                                  //     const finishedProductOption = field.templateOptions.options.find(
+                                  //       (option: any) => option.label.toLowerCase() === 'finished product'
+                                  //     );
+                                      
+                                  //     if (finishedProductOption) {
+                                  //       // Set the default value
+                                  //       field.formControl.setValue(finishedProductOption.value);
+                                        
+                                  //       // Update the model
+                                  //       if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                                  //         this.formConfig.model['products']['type_id'] = finishedProductOption.value;
+                                  //         console.log("Default Type set to Finished Product:", finishedProductOption.value);
+                                  //       }
+                                  //     }
+                                  //   }
+                                  // }, 500); // Check every 500ms
+                                  
+                                  // // Clear the interval after 10 seconds to prevent infinite checking
+                                  // setTimeout(() => clearInterval(checkForOptions), 10000);
+                                }
+                              }
+                            },
+                            {
+                              key: 'unit_options',
+                              type: 'productUnitOptions-dropdown',
+                              className: 'col-3',
+                              templateOptions: {
+                                label: 'Unit Options',
+                                dataKey: 'unit_options_id',
+                                dataLabel: "unit_name",
+                                options: [],
+                                required: false,
+                                lazy: {
+                                  url: 'masters/unit_options/',
+                                  lazyOneTime: true
+                                }
+                              },
+                              hooks: {
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe((data: any) => {
+                                    // if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                                    //   this.formConfig.model['products']['unit_options_id'] = data?.unit_options_id;
+                                    // } else {
+                                    //   console.error('Form config or unit_options_id data model is not defined.');
+                                    // }
+                                  });
+                                },
+                                onInit: (field: any) => {
+                                  // const url = field.templateOptions.lazy.url;
+
+                                  // // Fetch the data using HttpClient
+                                  // this.http.get(url).subscribe(
+                                  //   (data: any) => {
+
+                                  //     // Map data to ensure each object has both label and value properties
+                                  //     field.templateOptions.options = data?.data?.map((option: any) => ({
+                                  //       label: option.unit_name,  // Display name in the UI
+                                  //       value: {
+                                  //         unit_options_id: option.unit_options_id,
+                                  //         unit_name: option.unit_name,
+                                  //       }
+                                  //     }));
+
+                                  //     // Find the default option where unit_name is 'Stock Unit'
+                                  //     const regex = /^stock\s*unit$/i; // Matches "stock unit" with optional whitespace, case insensitive
+                                  //     const defaultOption = field.templateOptions.options.find(option => regex.test(option.label));
+
+                                  //     if (defaultOption) {
+                                  //       // Set the default value to the unit_options_id of 'Stock Unit'
+                                  //       field.formControl.setValue(defaultOption.value);
+
+                                  //       // Update the model if necessary
+                                  //       if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                                  //         this.formConfig.model['products']['unit_options_id'] = defaultOption.value.unit_options_id;
+                                  //       }
+                                  //     } else {
+                                  //       console.warn('Default "Unit Option" option not found in options.');
+                                  //     }
+                                  //   },
+                                  //   (error) => {
+                                  //     console.error('Error fetching unit options:', error);
+                                  //   }
+                                  // );
+                                }
+                              }
+                            },
+                            {
+                              key: 'pack_unit',
+                              type: 'packUnits-dropdown',
+                              className: 'col-3',
+                              templateOptions: {
+                                label: 'Pack Unit',
+                                dataKey: 'stock_unit_id',
+                                dataLabel: 'stock_unit_name',
+                                options: [],
+                                required: true,
+                                lazy: {
+                                  url: 'products/product_stock_units/',
+                                  lazyOneTime: true
+                                }
+                              },
+                              hooks: {
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe((data: any) => {
+                                    // if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                                    //   this.formConfig.model['products']['pack_unit_id'] = data?.stock_unit_id;
+                                    // } else {
+                                    //   console.error('Form config or lead_status data model is not defined.');
+                                    // }
+                                  });
+                                }
+                              },
+                              hideExpression: (model) => {
+                                const unitName = model.unit_options ? model.unit_options.unit_name : undefined;
+                                // Hide if the `unitName` is not 'Stock Pack Unit' AND not 'Stock Pack GPack Unit'
+                                return unitName !== 'Stock Pack Unit' && unitName !== 'Stock Pack GPack Unit';
+                              },
+                            },
+                            {
+                              className: 'col-3',
+                              key: 'pack_vs_stock',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'Pack vs Stock',
+                                type: 'number',
+                                required: false
+                              },
+                              hideExpression: (model) => {
+                                // Check if `unit_options` exists, and check the value of `unit_name`
+                                const unitName = model.unit_options ? model.unit_options.unit_name : undefined;
+                                return unitName !== 'Stock Pack Unit' && unitName !== 'Stock Pack GPack Unit';
+                              }
+                            },
+                            {
+                              key: 'g_pack_unit',
+                              type: 'GpackUnits-dropdown',
+                              className: 'col-3',
+                              templateOptions: {
+                                label: 'GPack Unit',
+                                dataKey: 'stock_unit_id',
+                                dataLabel: 'stock_unit_name',
+                                options: [],
+                                required: true,
+                                lazy: {
+                                  url: 'products/product_stock_units/',
+                                  lazyOneTime: true
+                                }
+                              },
+                              hooks: {
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe((data: any) => {
+                                    // if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                                    //   this.formConfig.model['products']['g_pack_unit_id'] = data?.stock_unit_id;
+                                    // } else {
+                                    //   console.error('Form config or g_pack_unit data model is not defined.');
+                                    // }
+                                  });
+                                }
+                              },
+                              hideExpression: (model) => {
+                                // Check if `unit_options` exists, and check the value of `unit_name`
+                                const unitName = model.unit_options ? model.unit_options.unit_name : undefined;
+                                return unitName !== 'Stock Pack GPack Unit';  // Hide if it's not 'Stock Pack Unit'
+                              }
+                            },
+                            {
+                              className: 'col-3',
+                              key: 'g_pack_vs_pack',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'GPack vs Stock',
+                                type: 'number',
+                                required: false
+                              },
+                              hideExpression: (model) => {
+                                // Check if `unit_options` exists, and check the value of `unit_name`
+                                const unitName = model.unit_options ? model.unit_options.unit_name : undefined;
+                                return unitName !== 'Stock Pack GPack Unit';  // Hide if it's not 'Stock Pack Unit'
+                              }
+                            },
+                            {
+                              className: 'col-3',
+                              key: 'packet_barcode',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'Packet Barcode',
+                                required: false,
+                              },
+                              hideExpression: (model) => {
+                                // Check if `unit_options` exists, and check the value of `unit_name`
+                                const unitName = model.unit_options ? model.unit_options.unit_name : undefined;
+                                return unitName !== 'Stock Pack GPack Unit';  // Hide if it's not 'Stock Pack Unit'
+                              }
+                            },
+                            {
+                              className: 'col-3',
+                              key: 'barcode',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'Barcode',
+                                placeholder: 'Enter Barcode',
+                                required: false
+                              }
+                            },
+                            {
+                              className: 'col-3 d-flex align-items-center',
+                              key: 'print_barcode',
+                              type: 'checkbox',
+                              templateOptions: {
+                                label: 'Print Barcode'
+                              }
+                            }
+                          ]
+                        },
+                      ]
+                    }
+                  ]
+                },
+                {
+                  className: 'col-12 pb-0',
+                  fieldGroupClassName: "field-no-bottom-space",
+                  props: {
+                    label: 'Variations'
+                  },
+                  fieldGroup: [
+                    {
+                      fieldGroupClassName: "",
+                      fieldGroup: [
+                        {
+                          key: 'product_variations',
+                          type: 'table',
+                          className: 'custom-form-list product-table',
+                          templateOptions: {
+                            // title: 'Product Variations',
+                            addText: 'Add New Variations',
+                            tableCols: [
+                              { name: 'warehouse_location_id', label: 'Warehouse Location' },
+                              { name: 'quantity', label: 'Quantity' },
+                            ]
+                          },
+                          fieldArray: {
+                            fieldGroup: [
+                              {
+                                key: 'size_id',
+                                type: 'productSizes-dropdown',
+                                templateOptions: {
+                                  label: 'Size',
+                                  placeholder: 'Select Size',
+                                  dataKey: 'size_id',
+                                  dataLabel: 'size_name',
+                                  bindId: true,
+                                  hideLabel: true,
+                                  lazy: {
+                                    url: 'products/sizes/',
+                                    lazyOneTime: true
+                                  }
+                                },
+                              },
+                              {
+                                key: 'color_id',
+                                type: 'productColors-dropdown',
+                                templateOptions: {
+                                  label: 'Color',
+                                  placeholder: 'Select Color',
+                                  dataKey: 'color_id',
+                                  dataLabel: "color_name",
+                                  bindId: true,
+                                  hideLabel: true,
+                                  lazy: {
+                                    url: 'products/colors/',
+                                    lazyOneTime: true
+                                  }
+                                }
+                              },
+                              {
+                                key: 'sku',
+                                type: 'input',
+                                templateOptions: {
+                                  label: 'SKU',
+                                  hideLabel: true,
+                                  placeholder: 'Enter SKU'
+                                },
+                                expressionProperties: {
+                                  'templateOptions.required': (model) => !!model?.quantity  // SKU is required if quantity has a value
+                                }
+                              },
+                              {
+                                key: 'price',
+                                type: 'input',
+                                templateOptions: {
+                                  label: 'Price',
+                                  hideLabel: true,
+                                  placeholder: 'Enter Price',
+                                  required: false
+                                }
+                              },
+                              {
+                                key: 'quantity',
+                                type: 'input',
+                                templateOptions: {
+                                  label: 'Quantity',
+                                  hideLabel: true,
+                                  placeholder: 'Enter Quantity',
+                                  required: false,
+                                  type: 'number'
+                                },
+                                hooks: {
+                                  onChanges: (field: any) => {
+                                    field.formControl.valueChanges.subscribe(() => {
+                                      // this.updateBalanceFromVariations();
+                                    });
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        },
+                      ]
+                    }
+                  ]
+                },
+                {
+                  className: 'col-12 pb-0',
+                  fieldGroupClassName: "field-no-bottom-space",
+                  props: {
+                    label: 'Warehouse Locations'
+                  },
+                  fieldGroup: [
+                    {
+                      fieldGroupClassName: "",
+                      fieldGroup: [
+                        {
+                          key: 'product_item_balance',
+                          type: 'table',
+                          className: 'custom-form-list product-table',
+                          templateOptions: {
+                            addText: 'Add Warehouse Locations',
+                            tableCols: [
+                              { name: 'warehouse_location_id', label: 'Warehouse Location' },
+                              { name: 'quantity', label: 'Quantity' },
+                            ]
+                          },
+                          fieldArray: {
+                            fieldGroup: [
+                              {
+                                key: 'warehouse_location',
+                                type: 'warehouseLocations-dropdown',
+                                templateOptions: {
+                                  label: 'Location',
+                                  dataKey: 'location_id',
+                                  dataLabel: 'location_name',
+                                  options: [], // This will be populated dynamically based on the warehouse selected
+                                  hideLabel: true,
+                                  required: false,
+                                  lazy: {
+                                    lazyOneTime: true,
+                                    url: 'inventory/warehouse_locations/'
+                                  }
+                                },
+                                hooks: {
+                                  onChanges: (field: any) => {
+                                    field.formControl.valueChanges.subscribe((data: any) => {
+                                      // const index = field.parent.key;
+                                      // if (!this.formConfig.model['product_item_balance'][index]) {
+                                      //   console.error(`Task comments at index ${index} is not defined. Initializing...`);
+                                      //   this.formConfig.model['product_item_balance'][index] = {};
+                                      // }
+                                      // this.formConfig.model['product_item_balance'][index]['warehouse_location_id'] = data?.location_id;
+                                    });
+                                  }
+                                }
+                              },
+                              {
+                                key: 'quantity',
+                                type: 'input',
+                                templateOptions: {
+                                  label: 'Quantity',
+                                  placeholder: 'Enter Quantity',
+                                  hideLabel: true,
+                                  required: false
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  className: 'col-12 pb-0',
+                  fieldGroupClassName: "field-no-bottom-space",
+                  props: {
+                    label: 'Sale Info'
+                  },
+                  fieldGroup: [
+                    {
+                      fieldGroupClassName: "",
+                      fieldGroup: [
+                        {
+                          className: 'col-12 p-0',
+                          key: 'products',
+                          fieldGroupClassName: "ant-row row align-items-end mt-3",
+                          fieldGroup: [
+                            {
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              key: 'sales_description',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'Sales Description',
+                                placeholder: 'Enter Sales Description'
+                              }
+                            },
+                            {
+                              key: 'sales_gl',
+                              type: 'productSalesGL-dropdown',
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              templateOptions: {
+                                label: 'Sales GL',
+                                dataKey: 'sales_gl_id',
+                                dataLabel: "name",
+                                options: [],
+                                required: false,
+                                lazy: {
+                                  url: 'products/product_sales_gl/',
+                                  lazyOneTime: true
+                                }
+                              },
+                              hooks: {
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe((data: any) => {
+                                    // if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                                    //   this.formConfig.model['products']['sales_gl_id'] = data?.sales_gl_id;
+                                    // } else {
+                                    //   console.error('Form config or lead_status data model is not defined.');
+                                    // }
+                                  });
+                                }
+                              }
+                            },
+                            {
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              key: 'mrp',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'MRP',
+                                placeholder: 'Enter MRP',
+                                required: false
+                              }
+                            },
+                            {
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              key: 'minimum_price',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'Min Price',
+                                placeholder: 'Enter Minimum Price'
+                              }
+                            },
+                            {
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              key: 'sales_rate',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'Sales Rate',
+                                placeholder: 'Enter Sales Rate',
+                                required: false
+                              }
+                            },
+                            {
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              key: 'wholesale_rate',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'Wholesale Rate',
+                                placeholder: 'Enter Wholesale Rate'
+                              }
+                            },
+                            {
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              key: 'dealer_rate',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'Dealer Rate',
+                                placeholder: 'Enter Dealer Rate'
+                              }
+                            },
+                            {
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              key: 'rate_factor',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'Rate Factor',
+                                placeholder: 'Enter Rate Factor'
+                              }
+                            },
+                            {
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              key: 'discount',
+                              type: 'input',
+                              defaultValue: 0.00,
+                              templateOptions: {
+                                label: 'Discount',
+                                placeholder: 'Enter Discount'
+                              }
+                            },
+                            {
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              key: 'dis_amount',
+                              type: 'input',
+                              defaultValue: 0.00,
+                              templateOptions: {
+                                label: 'Disc Amt',
+                                placeholder: 'Enter Disc Amt',
+                                required: false
+                              }
+                            },
+                          ]
+                        },
+                      ]
+                    }
+                  ]
+                },
+                {
+                  className: 'col-12 pb-0',
+                  fieldGroupClassName: "field-no-bottom-space",
+                  props: {
+                    label: 'Purchase Info'
+                  },
+                  fieldGroup: [
+                    {
+                      fieldGroupClassName: "",
+                      fieldGroup: [
+                        {
+                          className: 'col-12 p-0',
+                          key: 'products',
+                          fieldGroupClassName: "ant-row row align-items-end mt-3",
+                          fieldGroup: [
+
+                            {
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              key: 'purchase_description',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'Purchase Description',
+                                placeholder: 'Enter Purchase Description'
+                              }
+                            },
+                            {
+                              key: 'purchase_gl',
+                              type: 'productPurchaseGL-dropdown',
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              templateOptions: {
+                                label: 'Purchase GL',
+                                dataKey: 'purchase_gl_id',
+                                dataLabel: "name",
+                                options: [],
+                                required: false,
+                                lazy: {
+                                  url: 'products/product_purchase_gl/',
+                                  lazyOneTime: true
+                                }
+                              },
+                              hooks: {
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe((data: any) => {
+                                    // if (formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                                    //   this.formConfig.model['products']['purchase_gl_id'] = data?.purchase_gl_id;
+                                    // } else {
+                                    //   console.error('Form config or lead_status data model is not defined.');
+                                    // }
+                                  });
+                                }
+                              }
+                            },
+
+                            {
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              key: 'minimum_purchase_price',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'Min Purchase Price',
+                                placeholder: 'Enter Minimum Purchase Price'
+                              }
+                            },
+                            {
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              key: 'purchase_rate',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'Purchase Rate',
+                                placeholder: 'Enter Purchase Rate'
+                              }
+                            },
+                            {
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              key: 'purchase_rate_factor',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'Purchase Rate Factor',
+                                placeholder: 'Enter Purchase Rate Factor'
+                              }
+                            },
+                            {
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              key: 'purchase_discount',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'Purchase Discount',
+                                placeholder: 'Enter Purchase Discount'
+                              }
+                            },
+                          ]
+                        },
+                      ]
+                    }
+                  ]
+                },
+                {
+                  className: 'col-12 custom-form-card-block p-0',
+                  fieldGroupClassName: 'row m-0 pr-0',
+                  props: {
+                    label: 'Attributes Info'
+                  },
+                  // hideExpression: () => {
+                  //     // Only hide if selectedProductMode is explicitly set to a non-Inventory value
+                  //     // return this.selectedProductMode && this.selectedProductMode !== 'Inventory';
+                  //   },
+
+                  fieldGroup: [
+                    {
+                      className: 'col-12 p-0',
+                      key: 'products',
+                      fieldGroupClassName: "ant-row mx-0 row align-items-end mt-2",
+                      fieldGroup: [
+                        {
+                          className: 'col-md-4 col-sm-6 col-12',
+                          key: 'minimum_level',
+                          type: 'input',
+                          templateOptions: {
+                            label: 'Minimum Level',
+                            placeholder: 'Enter Minimum Level'
+                          }
+                        },
+                        {
+                          className: 'col-md-4 col-sm-6 col-12',
+                          key: 'maximum_level',
+                          type: 'input',
+                          templateOptions: {
+                            label: 'Maximum Level',
+                            placeholder: 'Enter Maximum Level'
+                          }
+                        },
+                        {
+                          className: 'col-md-4 col-sm-6 col-12',
+                          key: 'weighscale_mapping_code',
+                          type: 'text',
+                          templateOptions: {
+                            label: 'Weighscale Mapping Code',
+                            placeholder: 'Enter Weighscale Mapping Code'
+                          }
+                        },
+                        {
+                          key: 'drug_type',
+                          type: 'select',
+                          className: 'col-md-4 col-sm-6 col-12',
+                          templateOptions: {
+                            label: 'Drug Type',
+                            dataKey: 'drug_type_id',
+                            dataLabel: "drug_type_name",
+                            options: [],
+                            required: false,
+                            lazy: {
+                              url: 'masters/product_drug_types/',
+                              lazyOneTime: true
+                            }
+                          },
+                          hooks: {
+                            onChanges: (field: any) => {
+                              field.formControl.valueChanges.subscribe((data: any) => {
+                                // if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                                //   this.formConfig.model['products']['drug_type_id'] = data?.drug_type_id;
+                                // } else {
+                                //   console.error('Form config or lead_status data model is not defined.');
+                                // }
+                              });
+                            }
+                          }
+                        },
+                        {
+                          className: 'col-md-4 col-sm-6 col-12',
+                          key: 'salt_composition',
+                          type: 'text',
+                          templateOptions: {
+                            label: 'Salt Composition',
+                            placeholder: 'Enter Salt Composition'
+                          }
+                        }
+                      ]
+                    },
+                  ]
+                },
+              ]
+            },
+          ]
+        }
+      ]
+    }
   
   }
