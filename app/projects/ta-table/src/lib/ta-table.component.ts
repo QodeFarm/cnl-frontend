@@ -539,10 +539,12 @@ downloadData(event: any) {
       '/admin/reports/ledgers-reports',
       '/admin/finance/account-ledger',
       '/admin/finance/expense-item',
-      '/admin/inventory',
-      '/admin/products',
-      '/admin/production/stockjournal'
-    ]
+      '/admin/production/material-issue',
+      '/admin/production/material-received',
+      '/admin/production/stockjournal',
+      '/admin/production/stock-summary',
+
+      ]
     this.loadStatuses();
     this.loadEmployees();
 
@@ -557,6 +559,11 @@ downloadData(event: any) {
       '/admin/finance/account-ledger',
       '/admin/finance/expense-item',
       '/admin/inventory',
+      '/admin/production/material-issue',
+      '/admin/production/material-received',
+      '/admin/production/stockjournal',
+      '/admin/production/stock-summary',
+
       
       
 

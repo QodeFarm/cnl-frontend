@@ -63,7 +63,6 @@ const routes: Routes = [
 
       //Products Module
       { path: 'inventory', data: { title: 'Inventory', moduleName: 'inventory' }, canActivate: [], loadComponent: () => import('./admin/inventory/inventory.component').then(m => m.InventoryComponent) },
-      // { path: 'production/stockjournal', data: { title: 'Stock Journal', moduleName: 'stockjournal' }, canActivate: [], loadComponent: () => import('./admin/stockjournal/stockjournal.component').then(m => m.StockjournalComponent) },
       // { path: 'products', data: { title: 'Products', moduleName: 'products' }, canActivate: [], loadComponent: () => import('./admin/products/products.component').then(m => m.ProductsComponent) },
       { path: 'warehouses', data: { title: 'Warehouses', moduleName: 'warehouses' }, canActivate: [], loadComponent: () => import('./admin/warehouses/warehouses.component').then(m => m.WarehousesComponent) },
       { path: 'quickpacks', data: { title: 'Quick Packs', moduleName: 'quickpacks' }, canActivate: [], loadComponent: () => import('./admin/quickpacks/quickpacks.component').then(m => m.QuickpacksComponent) },
@@ -81,6 +80,11 @@ const routes: Routes = [
       { path: 'production/machines', data: { title: 'Machines', moduleName: 'machines' }, canActivate: [], loadComponent: () => import('./admin/production/machines/machines.component').then(m => m.MachinesComponent) },
       { path: 'production/productionstatuses', data: { title: 'Production Statuses', moduleName: 'productionstatuses' }, canActivate: [], loadComponent: () => import('./admin/production/production-statuses/production-statuses.component').then(m => m.ProductionStatusesComponent) },
       { path: 'production/workorderboard', data: { title: 'Work Order Board', moduleName: 'workorderboard' }, canActivate: [], loadComponent: () => import('./admin/production/workorderboard/workorderboard.component').then(m => m.WorkorderboardComponent) },
+      { path: 'production/material-issue', data: { title: 'Materials Issue To Production Floor ', moduleName: 'material-issue' }, canActivate: [], loadComponent: () => import('./admin/production/material-issue/material-issue.component').then(m => m.MaterialIssueComponent) },
+      { path: 'production/material-received', data: { title: 'Materials Received From Production Floor ', moduleName: 'material-received' }, canActivate: [], loadComponent: () => import('./admin/production/material-received/material-received.component').then(m => m.MaterialReceivedComponent) },
+      { path: 'production/stockjournal', data: { title: 'Stock Journal', moduleName: 'stockjournal' }, canActivate: [], loadComponent: () => import('./admin/stockjournal/stockjournal.component').then(m => m.StockJournalComponent) },
+      { path: 'production/stock-summary', data: { title: 'Stock Summary', moduleName: 'stock-summary' }, canActivate: [], loadComponent: () => import('./admin/production/stock-summary/stock-summary.component').then(m => m.StockSummaryComponent) },
+
       //Finance Module
       { path: 'finance/bank-account', data: { title: 'Bank Account', moduleName: 'finance' }, canActivate: [], loadComponent: () => import('./admin/finance/bank-account/bank-account.component').then(m => m.BankAccountComponent) },
       { path: 'finance/chart-of-accounts', data: { title: 'Chart Of Accounts', moduleName: 'chart-of-accounts' }, canActivate: [], loadComponent: () => import('./admin/finance/chart-of-accounts/chart-of-accounts.component').then(m => m.ChartOfAccountsComponent) },

@@ -344,6 +344,7 @@
                         <ul class="master-menu-list">
                             <li><a [routerLink]="['/admin/master/productionstatuses']">Production Statuses</a></li>
                             <li><a [routerLink]="['/admin/master/machines/']">Machines</a></li>
+                            <li><a [routerLink]="['/admin/master/productionfloors/']">Production Floors</a></li>
                         </ul>
                     </div>
                 </div>
@@ -355,8 +356,11 @@
                         <ng-container *ngSwitchCase="'machines'">
                             <app-machines></app-machines>
                         </ng-container>
-                    </ng-container>
+                        <ng-container *ngSwitchCase="'productionfloors'">
+                            <app-production-floors></app-production-floors>
+                        </ng-container>     
 
+                    </ng-container>
                 </div>
             </div>
         </div>
