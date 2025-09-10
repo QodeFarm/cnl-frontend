@@ -60,7 +60,12 @@ export class EmployeesComponent  implements OnInit {
 
   showEmployeesListFn() {
     this.showEmployeesList = true;
-    this.EmployeeListComponent?.refreshTable();
+    if (this.EmployeeListComponent) {
+      if (this.EmployeeListComponent.taTableComponent) {
+        this.EmployeeListComponent.taTableComponent.resetFilterValues();
+      }
+      this.EmployeeListComponent.refreshTable();
+    }
   };
 
   setFormConfig() {
@@ -166,7 +171,7 @@ export class EmployeesComponent  implements OnInit {
             },
             {
               key: 'job_type',
-              type: 'select',
+              type: 'JobTypes-dropdown',
               className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Job Type',
@@ -193,7 +198,7 @@ export class EmployeesComponent  implements OnInit {
             },
             {
               key: 'designation',
-              type: 'select',
+              type: 'designations-dropdown',
               className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Designation',
@@ -220,7 +225,7 @@ export class EmployeesComponent  implements OnInit {
             },
             {
               key: 'job_code',
-              type: 'select',
+              type: 'jobCode-dropdown',
               className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Job Code',
@@ -247,7 +252,7 @@ export class EmployeesComponent  implements OnInit {
             },
             {
               key: 'department',
-              type: 'select',
+              type: 'departments-dropdown',
               className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Department',
@@ -274,7 +279,7 @@ export class EmployeesComponent  implements OnInit {
             },
             {
               key: 'shift',
-              type: 'select',
+              type: 'shifts-dropdown',
               className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Shift',

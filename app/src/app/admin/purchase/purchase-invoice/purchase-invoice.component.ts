@@ -398,7 +398,12 @@ export class PurchaseInvoiceComponent {
 
   showPurchaseInvoiceListFn() {
     this.showPurchaseInvoiceList = true;
+    if (this.PurchaseInvoiceListComponent) {
+      if (this.PurchaseInvoiceListComponent.taTableComponent) {
+        this.PurchaseInvoiceListComponent.taTableComponent.resetFilterValues();
+      }
     this.PurchaseInvoiceListComponent?.refreshTable();
+   }
   }
 
 //=====================================================
@@ -622,7 +627,7 @@ loadQuickpackProducts() {
               fieldGroup: [
                 {
                   key: 'purchase_type',
-                  type: 'select',
+                  type: 'purchase-types-dropdown',
                   className: 'col-md-4 col-sm-6 col-12',
                   // defaultValue: "d4d85a98-a703-4772-8b3c-736fc4cbf849",
                   templateOptions: {
@@ -1871,7 +1876,7 @@ loadQuickpackProducts() {
                             },							      
                             {
                               key: 'gst_type',
-                              type: 'select',
+                              type: 'gst-types-dropdown',
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 label: 'Gst type',
@@ -1901,7 +1906,7 @@ loadQuickpackProducts() {
                             },                                                                                    
                             {
                               key: 'payment_term',
-                              type: 'select',
+                              type: 'vendor-payment-dropdown',
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 label: 'Payment term',
@@ -1930,7 +1935,7 @@ loadQuickpackProducts() {
                             },                            
                             {
                               key: 'ledger_account',
-                              type: 'select',
+                              type: 'ledger-account-dropdown',
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 label: 'Ledger account',

@@ -60,8 +60,15 @@ export class QuickpacksListComponent {
           {
             type: 'delete',
             label: 'Delete',
-            // confirm: true,
-            // confirmMsg: "Sure to delete?",
+            confirm: true,
+            confirmMsg: "Sure to delete?",
+            apiUrl: 'sales/quick_pack'
+          },
+          {
+            type: 'restore',
+            label: 'Restore',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
             apiUrl: 'sales/quick_pack'
           },
           {

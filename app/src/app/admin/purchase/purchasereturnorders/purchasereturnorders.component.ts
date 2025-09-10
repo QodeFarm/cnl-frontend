@@ -174,8 +174,8 @@ export class PurchasereturnordersComponent {
       .subscribe((res: any) => {
         this.entitiesList = res.data || []; // Adjust if the response format differs
       });
-    CustomFieldHelper.fetchCustomFields(this.http, 'purchase_return', (customFields: any, customFieldMetadata: any) => {
-      CustomFieldHelper.addCustomFieldsToFormConfig_2(customFields, customFieldMetadata, this.formConfig);
+    CustomFieldHelper.fetchCustomFields(this.http, "purchase_returns", (customFields: any, customFieldMetadata: any) => {
+      CustomFieldHelper.addCustomFieldsToFormConfig_3(customFields, customFieldMetadata, this.formConfig);
     });
     
     this.formConfig.model['purchase_return_orders']['order_type'] = 'purchase_return';
@@ -415,7 +415,7 @@ showSuccessToast = false;
     const customFieldValues = this.formConfig.model['custom_field_values']
 
     // Determine the entity type and ID dynamically
-    const entityName = 'purchase_returns'; // Since we're in the Sale Order form
+    const entityName = "purchase_returns"; // Since we're in the Sale Order form
     const customId = this.formConfig.model.purchase_return_order?.purchase_return_id || null; // Ensure correct purchase_order_id
   
     // Find entity record from list
@@ -441,9 +441,12 @@ showSuccessToast = false;
     // Construct the final payload
     const payload = {
       ...this.formConfig.model,
-      // custom_field: customFieldsPayload.custom_field, // Dictionary of custom fields
       custom_field_values: customFieldsPayload.custom_field_values // Array of custom field values
     };
+
+    if (!payload) {
+      this.showDialog(); // Stop execution if required fields are missing
+    }
 
     this.http.post('purchase/purchase_return_order/', payload)
       .subscribe(response => {
@@ -462,7 +465,7 @@ showSuccessToast = false;
     const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
 
     // Determine the entity type and ID dynamically
-    const entityName = 'purchase_returns'; // Since we're in the Sale Order form
+    const entityName = "purchase_returns"; // Since we're in the Sale Order form
     const customId = this.formConfig.model.purchase_return_order?.purchase_return_id || null; // Ensure correct purchase_order_id
   
     // Find entity record from list
@@ -563,7 +566,7 @@ showSuccessToast = false;
               fieldGroup: [
                 {
                   key: 'purchase_type',
-                  type: 'select',
+                  type: 'purchase-types-dropdown',
                   className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     label: 'Purchase Type',
@@ -1812,7 +1815,7 @@ showSuccessToast = false;
                             },
                             {
                               key: 'gst_type',
-                              type: 'select',
+                              type: 'gst-types-dropdown',
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                               label: 'Gst Type',
@@ -1841,7 +1844,7 @@ showSuccessToast = false;
                             },
                             {
                               key: 'payment_term',
-                              type: 'select',
+                              type: 'vendor-payment-dropdown',
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                               label: 'Payment Term',

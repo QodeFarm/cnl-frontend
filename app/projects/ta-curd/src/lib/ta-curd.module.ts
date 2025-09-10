@@ -1,4 +1,4 @@
-import { ComponentFactory, ComponentFactoryResolver, NgModule } from '@angular/core';
+import { ComponentFactory, ComponentFactoryResolver, forwardRef, NgModule } from '@angular/core';
 import { TaFormComponent } from '@ta/ta-form';
 import { TaTableModule } from '@ta/ta-table';
 import { TaCurdComponent } from './ta-curd.component';
@@ -14,28 +14,19 @@ import { NzModalModule } from 'ng-zorro-antd/modal';
 
 @NgModule({
     declarations: [
-        TaCurdComponent,
-        TaCurdModalComponent
+
     ],
     imports: [
-        CommonModule,
-        TaCoreModule,
-        TaTableModule,
-        TaFormComponent,
-        NzGridModule,
-        NzCardModule,
-        NzIconModule,
-        NzDrawerModule,
-        NzButtonModule,
-        NzModalModule
+        TaCurdModalComponent,
+        TaCurdComponent
     ],
     exports: [
-        TaCurdComponent,
+        TaCurdModalComponent,
         TaCurdModalComponent
     ]
 })
 export class TaCurdModule {
-    static rootComponent = TaCurdModalComponent;
+    //static rootComponent = TaCurdModalComponent;
     // constructor(private componentFactoryResolver: ComponentFactoryResolver) { }
     // public resolveComponent(): ComponentFactory<TaCurdModalComponent> {
     //   return this.componentFactoryResolver.resolveComponentFactory(TaCurdModalComponent);

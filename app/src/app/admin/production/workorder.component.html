@@ -48,3 +48,32 @@
   </div>
 </div>
 <div class="modal-backdrop" *ngIf="showConfirmModal"></div>
+
+<!-- 📌 Custom Modal: Sync Quantity Warning -->
+<div
+  class="custom-modal_1"
+  *ngIf="showSyncModal"
+  (click)="closeSyncModal()"
+>
+  <div
+    class="custom-modal-content"
+    (click)="$event.stopPropagation()"
+  >
+    <p>
+      Your quantities are ready to sync with inventory!.<br />
+      Please check <b>Sync QTY</b> and update again.
+    </p>
+    <div class="modal-actions">
+      <button class="btn-sky" (click)="closeSyncModal()">Ok</button>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop" *ngIf="showSyncModal"></div>
+
+<div id="customToast" class="toast-message" *ngIf="showSuccessToast">
+    <div class="tick-circle">
+        <span class="tick-mark">✓</span>
+    </div>
+    <span class="toast-message-text">{{ toastMessage }}</span>
+    <span class="toast-close" onclick="this.parentElement.style.display='none'">x</span>
+</div>

@@ -30,11 +30,11 @@ export class InventoryComponent {
       hideAddBtn: true,
       tableConfig: {
         apiUrl: 'products/products/?view=inventory',
-        // title: 'Inventory',
+        // title: 'Inventory', 
         pkId: "product_id",
         pageSize: 10,
         globalSearch: {
-          keys: ['name', 'code','category','barcode','stock_unit','mrp','purchase_rate','sales_rate','wholesale_rate', 'warehouse_name','location_name', 'dealer_rate','balance','updated_at'],
+          keys: [ 'name', 'code', 'category', 'warehouse_name', 'location_name', 'group_name' ,'type_name', 'stock_unit',' mrp', 'purchase_rate', 'sales_rate', 'wholesale_rate', 'dealer_rate', 'balance' ]
           // customFn: (term: string, row: any) => {
           //   term = term.toLowerCase();
           //   const warehouses = row.warehouse_locations?.map(
@@ -64,7 +64,14 @@ export class InventoryComponent {
             sort: true 
           },
           { 
-            fieldKey: 'product_group', 
+            fieldKey: 'type_name', 
+            name: 'Type', 
+            sort: true,
+            displayType: "map", 
+            mapFn: (v, row) => row?.type?.type_name || ''
+          },
+          { 
+            fieldKey: 'group_name', 
             name: 'Group', 
             sort: true,
             displayType: "map", 
@@ -81,13 +88,6 @@ export class InventoryComponent {
           //   name: 'Barcode', 
           //   sort: true
           // },
-          { 
-            fieldKey: 'type', 
-            name: 'Type', 
-            sort: true,
-            displayType: "map", 
-            mapFn: (v, row) => row?.type?.type_name || ''
-          },
           { 
             fieldKey: 'stock_unit', 
             name: 'Unit', 
@@ -184,7 +184,7 @@ export class InventoryComponent {
         pkId: "product_id",
         pageSize: 10,
         globalSearch: {
-          keys: ['name','code','category','barcode']
+          keys: [ 'name', 'code', 'category' ]
         },
         export: { downloadName: 'NonInventory' },
         defaultSort: { key: 'created_at', value: 'descend' },

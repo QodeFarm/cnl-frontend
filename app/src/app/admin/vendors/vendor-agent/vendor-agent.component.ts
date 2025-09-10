@@ -59,6 +59,13 @@ export class VendorAgentComponent {
               apiUrl: 'vendors/vendor_agent'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'vendors/vendor_agent'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             },

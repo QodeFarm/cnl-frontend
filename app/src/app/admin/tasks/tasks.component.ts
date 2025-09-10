@@ -345,7 +345,7 @@ export class TasksComponent implements OnInit {
             },
             {
               key: 'group',
-              type: 'select',
+              type: 'user-groups-dropdown',
               className: 'col-md-4 col-sm-6 col-12',
               hideExpression: (model) => model.selectionType !== 'group', // Hide if not group selected
               templateOptions: {
@@ -373,7 +373,7 @@ export class TasksComponent implements OnInit {
             },
             {
               key: 'priority',
-              type: 'select',
+              type: 'taskPriorities-dropdown',
               className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Priorities',
@@ -420,7 +420,7 @@ export class TasksComponent implements OnInit {
             },
             {
               key: 'status',
-              type: 'select',
+              type: 'status-dropdown',
               className: 'col-3',
               templateOptions: {
                 label: 'Statuses',

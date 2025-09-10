@@ -57,6 +57,13 @@ export class ProductItemBalanceComponent {
               apiUrl: 'products/product_item_balance'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'products/product_item_balance'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }
@@ -109,7 +116,7 @@ export class ProductItemBalanceComponent {
           },
           {
             key: 'warehouse_location',
-            type: 'select',
+            type: 'warehouseLocations-dropdown',
             className: 'col-md-6 col-12 px-1 pb-3',
             templateOptions: {
               label: 'Warehouse Location',

@@ -35,7 +35,7 @@ export class ProductsListComponent {
     ],
     pageSize: 10,
     globalSearch: {
-      keys: ['created_at', 'name', 'code', 'unit_options', 'balance', 'sales_rate', 'mrp', 'dis_amount', 'print_name', 'hsn_code', 'barcode']
+      keys: ['created_at', 'name', 'code', 'type_name', 'group_name','category', 'stock_unit', 'balance', 'sales_rate', 'mrp', 'dis_amount', 'print_name', 'hsn_code', 'barcode']
     },
     export: { downloadName: 'ProductsList' },
     defaultSort: { key: 'code', value: 'descend' },
@@ -51,16 +51,14 @@ export class ProductsListComponent {
         sort: true
       },
       {
-        fieldKey: 'type',
+        fieldKey: 'type_name',
         name: 'Type',
         sort: true,
-        displayType: 'map',
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return row?.type?.type_name || '';
-        },
+        displayType: "map",
+        mapFn: (v, row) => row?.type?.type_name || ''
       },
       {
-        fieldKey: 'product_group',
+        fieldKey: 'group_name',
         name: 'Group',
         sort: true,
         displayType: 'map',
@@ -68,15 +66,13 @@ export class ProductsListComponent {
           return row?.product_group?.group_name || '';
         },
       },
-      // {
-      //   fieldKey: 'unit_options',
-      //   name: 'Unit',
-      //   sort: true,
-      //   displayType: 'map',
-      //   mapFn: (currentValue: any, row: any, col: any) => {
-      //     return row?.unit_options?.unit_name;
-      //   },
-      // },
+      {
+        fieldKey: 'category_name',
+        name: 'Category',
+        sort: true,
+        displayType: "map",
+        mapFn: (v, row) => row?.category?.category_name || ''
+      },
       {
         fieldKey: 'stock_unit',
         name: 'Stock Unit',
@@ -86,7 +82,6 @@ export class ProductsListComponent {
           return row?.stock_unit?.stock_unit_name || '';
         },
       },
-
       {
         fieldKey: 'sales_rate',
         name: 'Sales Rate',
@@ -205,6 +200,13 @@ export class ProductsListComponent {
             label: 'Delete',
             confirm: true,
             confirmMsg: "Sure to delete?",
+            apiUrl: 'products/products'
+          },
+          {
+            type: 'restore',
+            label: 'Restore',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
             apiUrl: 'products/products'
           },
           {

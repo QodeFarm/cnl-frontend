@@ -21,7 +21,10 @@ export interface TaTableConfig {
   showCheckbox?: boolean;
   defaultSort?: { key?: string, value?: 'ascend' | 'descend' },
   checkedRows?: any[],
-  reload?: () => any
+  reload?: () => any,
+  rowSelectionEnabled?: boolean
+  rowSelection?: (row: any) => any;
+  hideFilters?: boolean; // Controls whether to hide filters regardless of URL
 }
 
 export interface Export {
@@ -31,6 +34,7 @@ export interface Export {
 export interface ColumnItem {
   fieldKey?: string;
   name?: string;
+  // isEdit?: boolean;
   filterValue?: any;
   sort?: boolean | undefined;
   sortKey?: string;
@@ -48,6 +52,7 @@ export interface ColumnItem {
   thClassName?: string;
   html?: string;
   mapFn?: (currentValue: any, row: any, col: any) => any;
+  isEditSumbmit?: (row: any, value: any, col: any) => any;
   ellipsis?: boolean;
   width?: any;
   [any: string]: any;

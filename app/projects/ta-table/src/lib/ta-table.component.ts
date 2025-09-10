@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, Output, ViewChild, EventEmitter, ElementRef, TemplateRef } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, Output, ViewChild, EventEmitter, ElementRef, TemplateRef, ChangeDetectorRef } from '@angular/core';
 import { getValue } from '@ta/ta-core';
 import { cloneDeep } from 'lodash';
 import {
@@ -78,6 +78,20 @@ export class TaTableComponent implements OnDestroy {
   selectedAccountType: string | null = null;
   selectedAccountId: number | null = null;
   isAccountLedgerPage: boolean;
+  // Filters for product/inventory pages
+isProductFilterVisible = false;
+isInventoryFilterVisible = false;
+
+selectedGroup: string | null = null;
+selectedCategory: string | null = null;
+selectedType: string | null = null;
+selectedWarehouse: string | null = null;
+
+groupOptions: Array<{ value: string; label: string }> = [];
+categoryOptions: Array<{ value: string; label: string }> = [];
+typeOptions: Array<{ value: string; label: string }> = [];
+warehouseOptions: Array<{ value: string; label: string }> = [];
+
 
 
   statusOptions: Array<{ value: string, label: string }> = []; // Store the statuses here
@@ -86,13 +100,13 @@ export class TaTableComponent implements OnDestroy {
 
   accountOptions: Array<{ value: number; label: string }> = [];
 
- 
+
   accountTypeOptions = [
     { value: 'customer', label: 'Customer' },
     { value: 'vendor', label: 'Vendor' },
     { value: 'general', label: 'General' }
   ];
- 
+
   // List of quick period options like 'Today', 'Last Week', etc.
   quickPeriodOptions = [
     { value: 'today', label: 'Today' },
@@ -108,6 +122,13 @@ export class TaTableComponent implements OnDestroy {
   formConfig: any;
 
   onQuickPeriodChange() {
+    // If the quick period is cleared, clear both date fields
+    if (!this.selectedQuickPeriod) {
+      this.fromDate = null;
+      this.toDate = null;
+      return;
+    }
+    
     const today = new Date();
     let startDate: Date | null = null;
     let endDate: Date | null = today;
@@ -175,8 +196,91 @@ export class TaTableComponent implements OnDestroy {
   }
   onStatusChange(status: string) {
     this.selectedStatus = status;
-    // this.applyFilters();
+    this.applyFilters(); // Auto-apply filter when status changes
   }
+
+ 
+
+loadWarehouses() {
+    const url = 'inventory/warehouses/'; 
+    this.http.get<any>(url).subscribe(
+      (response) => {
+        if (response && response.data && response.data.length > 0) {
+          this.warehouseOptions = response.data.map(warehouse => ({
+            value: warehouse.warehouse_id,
+            label: warehouse.name
+          }));
+        } else {
+          console.warn('No warehouses found in the API response.');
+        }
+      },
+      (error) => {
+        console.error('Error fetching warehouses:', error);
+      }
+    );
+  }
+
+loadGroups() {
+    const url = 'products/product_groups'; // Replace with your actual product group API endpoint
+
+    this.http.get<any>(url).subscribe(
+      (response) => {
+        if (response && response.data && response.data.length > 0) {
+          this.groupOptions = response.data.map(group => ({
+            value: group.product_group_id,
+            label: group.group_name
+          }));
+        } else {
+          console.warn('No product groups found in the API response.');
+        }
+      },
+      (error) => {
+        console.error('Error fetching product groups:', error);
+      }
+    );
+  } 
+
+loadCategories() {
+    const url = 'products/product_categories/'; // Replace with your actual product category API endpoint
+
+    this.http.get<any>(url).subscribe(
+      (response) => {
+        if (response && response.data && response.data.length > 0) {
+          this.categoryOptions = response.data.map(category => ({
+            value: category.category_id,
+            label: category.category_name
+          }));
+        } else {
+          console.warn('No product categories found in the API response.');
+        }
+      },
+      (error) => {
+        console.error('Error fetching product categories:', error);
+      }
+    );
+  } 
+
+
+loadTypes() {
+    const url = 'masters/product_types/'; // Replace with your actual product type API endpoint
+
+    this.http.get<any>(url).subscribe(
+      (response) => {
+        if (response && response.data && response.data.length > 0) {
+          this.typeOptions = response.data.map(type => ({
+            value: type.type_id,
+            label: type.type_name
+          }));
+        } else {
+          console.warn('No product types found in the API response.');
+        }
+      },
+      (error) => {
+        console.error('Error fetching product types:', error);
+      }
+    );
+  }
+  
 
   loadEmployees() {
     const url = 'hrms/employees/'; // Replace with your actual employee API endpoint
@@ -217,13 +321,13 @@ export class TaTableComponent implements OnDestroy {
     let url = '';
     switch (this.selectedAccountType) {
       case 'customer':
-        url = 'customers/customer/'; 
+        url = 'customers/customer/';
         break;
       case 'vendor':
-        url = 'vendors/vendor_get/'; 
+        url = 'vendors/vendor_get/';
         break;
       case 'general':
-        url = 'finance/general-accounts/'; 
+        url = 'finance/general-accounts/';
         break;
     }
 
@@ -258,33 +362,34 @@ export class TaTableComponent implements OnDestroy {
   }
 
   onAccountTypeChange() {
-    this.selectedAccountId = null; 
-    this.loadAccounts(); 
+    this.selectedAccountId = null;
+    this.loadAccounts();
+    this.applyFilters();
   }
 
   onAccountChange() {
     if (this.selectedAccountType && this.selectedAccountId) {
       console.log("Account selected:", this.selectedAccountType, this.selectedAccountId);
-      
+
       // For account ledger page
       if (this.router.url === '/admin/finance/account-ledger') {
         console.log("On account ledger page, looking for accountLedgerComponentInstance");
-        
+
         // Check if we have the global reference to the AccountLedgerComponent
-        if (window['accountLedgerComponentInstance'] && 
-            typeof window['accountLedgerComponentInstance'].loadLedgerData === 'function') {
+        if (window['accountLedgerComponentInstance'] &&
+          typeof window['accountLedgerComponentInstance'].loadLedgerData === 'function') {
           console.log("Using global reference to AccountLedgerComponent");
           window['accountLedgerComponentInstance'].loadLedgerData(
-            this.selectedAccountType, 
+            this.selectedAccountType,
             this.selectedAccountId
           );
           return;
         }
-        
+
         // Make the API call directly from here as a fallback
         console.log("Making API call directly from table component");
         const apiUrl = `finance/journal_entry_lines_list/${this.selectedAccountId}/`;
-        
+
         this.http.get(apiUrl).subscribe(
           (response: any) => {
             console.log("API response received directly:", response);
@@ -301,7 +406,7 @@ export class TaTableComponent implements OnDestroy {
         return;
       }
     }
-    
+
     this.applyFilters(); // Fall back to the default behavior
   }
 
@@ -314,7 +419,11 @@ export class TaTableComponent implements OnDestroy {
     status: this.selectedStatus,
     employee: this.selectedEmployee,
     accountType: this.selectedAccountType,
-    accountId: this.selectedAccountId
+    accountId: this.selectedAccountId,
+    group: this.selectedGroup,        
+    category: this.selectedCategory,  
+    type: this.selectedType,          
+    warehouse: this.selectedWarehouse 
   };
 
   const queryString = this.generateQueryString(filters);
@@ -358,6 +467,12 @@ export class TaTableComponent implements OnDestroy {
     this.toDate = null;
     this.selectedStatus = null;
     this.selectedEmployee = null; // Clear employee filter
+    this.selectedAccountType = null;
+    this.selectedAccountId = null;
+    this.selectedGroup = null;       
+    this.selectedCategory = null;    
+    this.selectedType = null;         
+    this.selectedWarehouse = null;   
 
     // Optionally, you might want to clear other filters or reset pagination if necessary
     this.pageIndex = 1;
@@ -392,7 +507,63 @@ export class TaTableComponent implements OnDestroy {
   }
 
   // Generate query string for the API call based on the applied filters
-  generateQueryString(filters: { quickPeriod: string, fromDate: Date, toDate: Date, status: string, employee: string }): string {
+  // generateQueryString(filters: { quickPeriod: string, fromDate: Date, toDate: Date, status: string, employee: string, group:string,category:string,type:string,warehouse:string }): string {
+  //   const queryParts: string[] = [];
+
+  //   // Add filter for 'fromDate' if available
+  //   if (filters.fromDate) {
+  //     const fromDateStr = this.formatDate(filters.fromDate);
+  //     queryParts.push(`created_at_after=${encodeURIComponent(fromDateStr)}`);
+  //   }
+
+  //   // Add filter for 'toDate' if available
+  //   if (filters.toDate) {
+  //     const toDateStr = this.formatDate(filters.toDate);
+  //     queryParts.push(`created_at_before=${encodeURIComponent(toDateStr)}`);
+  //   }
+
+  //   // Add filter for status if available
+  //   if (filters.status) {
+  //     queryParts.push(`status_name=${encodeURIComponent(filters.status)}`);
+  //   }
+
+  //   // Add filter for status if available
+  //   if (filters.employee) {
+  //     queryParts.push(`employee_id=${encodeURIComponent(filters.employee)}`);
+  //   }
+
+  //   if (filters.group) {
+  //     queryParts.push(`group_id=${encodeURIComponent(filters.group)}`);
+  //   }
+  //   if (filters.category) {
+  //     queryParts.push(`category_id=${encodeURIComponent(filters.category)}`);
+  //   }
+  //   if (filters.type) {
+  //     queryParts.push(`type_id=${encodeURIComponent(filters.type)}`);
+  //   }
+  //   if (filters.warehouse) {
+  //     queryParts.push(`warehouse_id=${encodeURIComponent(filters.warehouse)}`);
+  //   }
+
+
+  //   // Return the query string by joining all the filters
+  //   // return '?' + queryParts.join('&'); 
+  //   // Return the query string by joining all the filters
+  //   // return '?&' + queryParts.join('&');
+  //    return queryParts.length ? '&' + queryParts.join('&') : '';
+  // }
+
+  generateQueryString(filters: { 
+    quickPeriod?: string | null, 
+    fromDate?: Date | null, 
+    toDate?: Date | null, 
+    status?: string | null, 
+    employee?: string | number | null, 
+    group?: string | number | null, 
+    category?: string | number | null, 
+    type?: string | number | null, 
+    warehouse?: string | number | null 
+    }): string {
     const queryParts: string[] = [];
 
     // Add filter for 'fromDate' if available
@@ -417,12 +588,25 @@ export class TaTableComponent implements OnDestroy {
       queryParts.push(`employee_id=${encodeURIComponent(filters.employee)}`);
     }
 
-    // Return the query string by joining all the filters
-    // return '?' + queryParts.join('&'); 
-    // Return the query string by joining all the filters
-    // return '?&' + queryParts.join('&');
-     return queryParts.length ? '&' + queryParts.join('&') : '';
-  }
+    if (filters.group) {
+      queryParts.push(`product_group_id=${encodeURIComponent(filters.group.toString())}`);
+    }
+
+    if (filters.category) {
+      queryParts.push(`category_id=${encodeURIComponent(filters.category.toString())}`);
+    }
+
+    if (filters.type) {
+      queryParts.push(`type_id=${encodeURIComponent(filters.type.toString())}`);
+    }
+
+    if (filters.warehouse) {
+      queryParts.push(`warehouse_id=${encodeURIComponent(filters.warehouse.toString())}`);
+    }
+
+    return queryParts.length ? '&' + queryParts.join('&') : '';
+    }
+
   formatDate(date: Date): string {
     // Format date as 'yyyy-MM-dd'
     const year = date.getFullYear();
@@ -481,7 +665,8 @@ downloadData(event: any) {
     public taTableS: TaTableService,
     private http: HttpClient,
     private router: Router,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
+    private cdr: ChangeDetectorRef
   ) {
     this.actionObservable$ = this.taTableS.actionObserval().subscribe((res: any) => {
       // if (res && res.action && res.action.type === 'delete') {
@@ -493,6 +678,8 @@ downloadData(event: any) {
       // // console.log('res', res);
     });
   }
+
+
 
   ngOnInit(): void {
     // // console.log('table otpions', this.options);
@@ -519,6 +706,8 @@ downloadData(event: any) {
     if (this.isAccountLedgerPage) {
       this.loadAccounts();
     }
+
+    
     // console.log('Current URL:', currentUrl); 
     const visibleUrls = [
       '/admin/purchase',
@@ -547,9 +736,13 @@ downloadData(event: any) {
       ]
     this.loadStatuses();
     this.loadEmployees();
+    this.loadGroups();
+    this.loadCategories();
+    this.loadTypes();
+    this.loadWarehouses();
 
     // Show status filter for specific URLs    
-    this.isButtonVisible = visibleUrls.includes(currentUrl);
+    this.isButtonVisible = this.options.hideFilters ? false : visibleUrls.includes(currentUrl);
 
     // Hide status button for specific URLs
     const hideStatusUrls = [
@@ -568,7 +761,7 @@ downloadData(event: any) {
       
 
     ];
-    this.isStatusButtonVisible = !hideStatusUrls.includes(currentUrl);
+    this.isStatusButtonVisible = this.options.hideFilters ? false : !hideStatusUrls.includes(currentUrl);
 
     // Show employee filter for specific URLs
     const employeeFilterUrls = [
@@ -576,8 +769,18 @@ downloadData(event: any) {
       '/admin/employees', // Added employees URL
       '/admin/hrms/employee-leave-balance'
     ];
-    this.isEmployeeFilterVisible = employeeFilterUrls.includes(currentUrl);
+    this.isEmployeeFilterVisible = this.options.hideFilters ? false : employeeFilterUrls.includes(currentUrl);
 
+    const productFilterUrls = ['/admin/products',];
+    // Check if filters should be explicitly hidden
+    this.isProductFilterVisible = this.options.hideFilters ? false : productFilterUrls.includes(currentUrl);
+    const inventoryFilterUrls = ['/admin/inventory'];  
+    this.isInventoryFilterVisible = this.options.hideFilters ? false : inventoryFilterUrls.includes(currentUrl);
+    
+    // Reset filter values when component is initialized
+    // This ensures filters are cleared when modal is reopened
+    this.resetFilterValues();
+   
     // // Check if current URL is '/admin/hrms/employee-attendance' to show employee filter
     // this.isEmployeeFilterVisible = currentUrl === '/admin/hrms/employee-attendance';
 
@@ -611,6 +814,7 @@ downloadData(event: any) {
         if (this.options.showCheckbox) {
           this.refreshCheckedStatus();
         }
+        this.cdr.detectChanges();
       }, (error) => {
         this.loading = false;
       });
@@ -755,6 +959,29 @@ downloadData(event: any) {
     // console.log('this.pageIndex', this.pageIndex);
     // console.log('this.pageSize', this.pageSize);
   }
+  
+  // Reset all filter values without reloading data
+  // This is used to reset the UI state when component is initialized
+  resetFilterValues() {
+    // Clear all filter values to ensure they are reset completely
+    this.selectedQuickPeriod = null;
+    this.fromDate = null;
+    this.toDate = null;
+    this.selectedStatus = null;
+    this.selectedEmployee = null; // Clear employee filter
+    this.selectedAccountType = null;
+    this.selectedAccountId = null;
+    this.selectedGroup = null;       
+    this.selectedCategory = null;    
+    this.selectedType = null;         
+    this.selectedWarehouse = null;
+    
+    // Also clear global search to ensure complete reset
+    this.globalSearchValue = '';
+    
+    // Force UI update
+    this.cdr.detectChanges();
+  }
   exportExcel() {
     let _rows = cloneDeep(this.rows);
     if (this.options.export) {
@@ -764,20 +991,20 @@ downloadData(event: any) {
         _cols = (this.options.export.cols) ? this.options.export.cols : this.options.cols;
         _cols.forEach((col: any) => {
           // Skip 'action' type columns
-        if (col.type === 'action') return;
+          if (col.type === 'action') return;
 
-        // 1) Check if displayType=map and mapFn is a function
-        if (col.displayType === 'map' && typeof col.mapFn === 'function') {
-          _r[col.name] = col.mapFn(r[col.fieldKey], r, col);
-        } else {
-          // 2) Otherwise just use the raw value
-          _r[col.name] = getValue(r, col.fieldKey);
-        }
+          // 1) Check if displayType=map and mapFn is a function
+          if (col.displayType === 'map' && typeof col.mapFn === 'function') {
+            _r[col.name] = col.mapFn(r[col.fieldKey], r, col);
+          } else {
+            // 2) Otherwise just use the raw value
+            _r[col.name] = getValue(r, col.fieldKey);
+          }
 
-        // 3) If it's a date type, format it
-        if (col.type === 'date') {
-          _r[col.name] = moment(_r[col.name]).format('MMMM Do YYYY, h:mm:ss a');
-        }
+          // 3) If it's a date type, format it
+          if (col.type === 'date') {
+            _r[col.name] = moment(_r[col.name]).format('MMMM Do YYYY, h:mm:ss a');
+          }
         });
         return _r;
       });
@@ -790,9 +1017,18 @@ downloadData(event: any) {
     // const tableElementref: ElementRef = this.taTable.elementRef as ElementRef;
     // this.taTableS.exportTableAsExcelFile(tableElementref.nativeElement, 'test');
   }
+
+  restoreRow(action: any) {
+  this.taTableS.restorerow(action.action.apiUrl, action.data, this.options).subscribe(res => {
+    this.loadDataFromServer();
+  });
+}
+
   actionClick(event) {
     if (event && event.action && event.action.type === 'delete') {
       this.deleteRow(event);
+    } else if (event.action.type === 'restore') {
+      this.restoreRow(event);
     }
     this.doAction.emit(event);
   }
@@ -827,6 +1063,11 @@ downloadData(event: any) {
     } else {
       // Show message if no file is available to view
       alert('No viewable file found. The file might not be uploaded to the server yet.');
+    }
+  }
+  onRowSelect(row) {
+    if (this.options.rowSelection) {
+      this.options.rowSelection(row);
     }
   }
 

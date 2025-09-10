@@ -54,6 +54,13 @@ export class TransportersComponent {
               apiUrl: 'masters/transporters'
             },
             {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'masters/transporters'
+            },
+            {
               type: 'edit',
               label: 'Edit'
             }

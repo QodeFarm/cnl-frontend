@@ -156,7 +156,7 @@ export class CompanyComponent {
               },
               {
                 key: 'city',
-                type: 'select',
+                type: 'city-dropdown',
                 className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'City',
@@ -177,7 +177,7 @@ export class CompanyComponent {
               },
               {
                 key: 'state',
-                type: 'select',
+                type: 'state-dropdown',
                 className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'State',
@@ -198,7 +198,7 @@ export class CompanyComponent {
               },
               {
                 key: 'country',
-                type: 'select',
+                type: 'country-dropdown',
                 className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                 templateOptions: {
                   label: 'Country',

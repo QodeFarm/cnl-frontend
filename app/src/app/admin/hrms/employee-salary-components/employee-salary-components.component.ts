@@ -47,11 +47,19 @@ export class EmployeeSalaryComponentsComponent {
           fieldKey: "code",
           name: "Action",
           type: 'action',
-          actions: [{
+          actions: [
+            {
               type: 'delete',
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'hrms/employee_salary_components'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'hrms/employee_salary_components'
             },
             {
@@ -83,7 +91,7 @@ export class EmployeeSalaryComponentsComponent {
         fieldGroup: [
           {
             key: 'component',
-            type: 'select',
+            type: 'salaryComponent-dropdown',
             className: 'col-md-6 col-12 px-1 mb-3',
             templateOptions: {
               label: 'Component',

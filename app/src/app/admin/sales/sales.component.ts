@@ -177,7 +177,7 @@ export class SalesComponent {
   saleForm: FormGroup;
 
   hasDataPopulated: boolean = false;
-  customFieldMetadata: any = {}; 
+  customFieldMetadata: any = {};
   entitiesList: any[] = [];
   ngOnInit() {
     this.showSaleOrderList = false;
@@ -186,7 +186,7 @@ export class SalesComponent {
     // set form config
     this.checkAndPopulateData();
     this.setFormConfig();
-    
+
     this.loadQuickpackOptions(); // Fetch Quickpack options
     console.log("data in load : ", this.loadQuickpackOptions())
 
@@ -199,7 +199,7 @@ export class SalesComponent {
     });
     // set sale_order default value
     this.formConfig.model['sale_order']['order_type'] = 'sale_order';
-    
+
     this.getOrderNo();
     // to get SaleOrder number for save 
     this.formConfig.fields[0].fieldGroup[0].fieldGroup[8].hide = true; //flow_status hiding in create page 
@@ -304,105 +304,105 @@ export class SalesComponent {
     let total_amount = 0;
 
     itemsToInvoice.forEach(item => {
-        const itemValue = parseFloat(item.quantity) * parseFloat(item.rate);
-        const discountValue = itemValue * parseFloat(item.discount) / 100;
-        const Amount = itemValue - discountValue;
-        const taxAmount = parseFloat(item.cgst) + parseFloat(item.sgst) + parseFloat(item.igst);
-        const totalAmount = (Amount + taxAmount);
+      const itemValue = parseFloat(item.quantity) * parseFloat(item.rate);
+      const discountValue = itemValue * parseFloat(item.discount) / 100;
+      const Amount = itemValue - discountValue;
+      const taxAmount = parseFloat(item.cgst) + parseFloat(item.sgst) + parseFloat(item.igst);
+      const totalAmount = (Amount + taxAmount);
 
-        items_value += itemValue;
-        tax_amount += taxAmount;
-        // discount += discountValue;
-        total_amount += totalAmount;
+      items_value += itemValue;
+      tax_amount += taxAmount;
+      // discount += discountValue;
+      total_amount += totalAmount;
 
-        // Update each item with calculated values
-        item.item_value = itemValue;
-        item.tax_amount = taxAmount;
-        // item.discount = discountValue;
-        item.total_amount = totalAmount;
+      // Update each item with calculated values
+      item.item_value = itemValue;
+      item.tax_amount = taxAmount;
+      // item.discount = discountValue;
+      item.total_amount = totalAmount;
     });
 
     console.log("This.Invoice data before : ", this.invoiceData);
     const invoiceData = {
-        ...this.invoiceData,
-        sale_invoice_order: {
-            ...this.invoiceData.sale_invoice_order,
-            // sale_order_id: this.invoiceData.sale_invoice_order.sale_order_id, // ✅ correct
-            // customer_id: this.invoiceData.sale_invoice_order.customer.customer_id, // ✅ correct
-            // item_value: items_value,
-            tax_amount: tax_amount,
-            // discount: discount,
-            // total_amount: total_amount
-        },
-        sale_invoice_items: itemsToInvoice
+      ...this.invoiceData,
+      sale_invoice_order: {
+        ...this.invoiceData.sale_invoice_order,
+        // sale_order_id: this.invoiceData.sale_invoice_order.sale_order_id, // ✅ correct
+        // customer_id: this.invoiceData.sale_invoice_order.customer.customer_id, // ✅ correct
+        // item_value: items_value,
+        tax_amount: tax_amount,
+        // discount: discount,
+        // total_amount: total_amount
+      },
+      sale_invoice_items: itemsToInvoice
     };
 
     console.log("Invoice Data with selected items:", invoiceData);
 
     if (itemsToInvoice.length > 0) {
-        this.createSaleInvoice(invoiceData).subscribe(
-            response => {
-                console.log('Sale invoice created successfully', response);
-                this.showInvoiceCreatedMessage();
+      this.createSaleInvoice(invoiceData).subscribe(
+        response => {
+          console.log('Sale invoice created successfully', response);
+          this.showInvoiceCreatedMessage();
 
-                itemsToInvoice.forEach(item => {
-                    if (item.invoiced === 'NO') {
-                        item.invoiced = 'YES';
-                        this.updateInvoicedStatusDirectly(item.sale_order_item_id, 'YES');
-                    }
-                });
-
-                const saleOrderId = this.invoiceData.sale_invoice_order.sale_order_id;
-                // if (!saleOrderId) {
-                //   const saleOrderId = this.SaleOrderEditID
-                // }
-                // console.log("saleOrderId i9n method : ", saleOrderId)
-                // const allInvoiced = this.invoiceData.sale_invoice_items.every(item => item.invoiced === 'YES');
-                // if (allInvoiced) {
-                //     this.triggerWorkflowPipeline(saleOrderId);
-                // }
-                const allInvoiced = this.invoiceData.sale_invoice_items.every(item => item.invoiced === 'YES');
-                if (allInvoiced) {
-                    this.triggerWorkflowPipeline(saleOrderId);  // Delivery in Progress
-                } else {
-                    this.http.get('masters/flow_status/?flow_status_name=Partially Delivered').subscribe(
-                      (res: any) => {
-                        console.log("We are in the method ... fetch")
-                        const status = res?.data?.[0];
-                        if (status && status.flow_status_id) {
-                          const patchUrl = `sales/sale_order/${saleOrderId}/`;
-                          const payload = { flow_status_id: status.flow_status_id };
-
-                          this.http.patch(patchUrl, payload).subscribe(
-                            (patchRes: any) => {
-                              console.log('Sale order flow status updated to Partially Delivered:', patchRes);
-                            },
-                            (patchErr: any) => {
-                              console.error('Error updating sale order flow status:', patchErr);
-                            }
-                          );
-                        } else {
-                          console.warn('Partially Delivered status not found in response:', res);
-                        }
-                      },
-                      (err: any) => {
-                        console.error('Error fetching flow status:', err);
-                      }
-                    );
-
-                }
-
-            },
-            error => {
-                console.error('Error creating sale invoice', error);
+          itemsToInvoice.forEach(item => {
+            if (item.invoiced === 'NO') {
+              item.invoiced = 'YES';
+              this.updateInvoicedStatusDirectly(item.sale_order_item_id, 'YES');
             }
-        );
+          });
+
+          const saleOrderId = this.invoiceData.sale_invoice_order.sale_order_id;
+          // if (!saleOrderId) {
+          //   const saleOrderId = this.SaleOrderEditID
+          // }
+          // console.log("saleOrderId i9n method : ", saleOrderId)
+          // const allInvoiced = this.invoiceData.sale_invoice_items.every(item => item.invoiced === 'YES');
+          // if (allInvoiced) {
+          //     this.triggerWorkflowPipeline(saleOrderId);
+          // }
+          const allInvoiced = this.invoiceData.sale_invoice_items.every(item => item.invoiced === 'YES');
+          if (allInvoiced) {
+            this.triggerWorkflowPipeline(saleOrderId);  // Delivery in Progress
+          } else {
+            this.http.get('masters/flow_status/?flow_status_name=Partially Delivered').subscribe(
+              (res: any) => {
+                console.log("We are in the method ... fetch")
+                const status = res?.data?.[0];
+                if (status && status.flow_status_id) {
+                  const patchUrl = `sales/sale_order/${saleOrderId}/`;
+                  const payload = { flow_status_id: status.flow_status_id };
+
+                  this.http.patch(patchUrl, payload).subscribe(
+                    (patchRes: any) => {
+                      console.log('Sale order flow status updated to Partially Delivered:', patchRes);
+                    },
+                    (patchErr: any) => {
+                      console.error('Error updating sale order flow status:', patchErr);
+                    }
+                  );
+                } else {
+                  console.warn('Partially Delivered status not found in response:', res);
+                }
+              },
+              (err: any) => {
+                console.error('Error fetching flow status:', err);
+              }
+            );
+
+          }
+
+        },
+        error => {
+          console.error('Error creating sale invoice', error);
+        }
+      );
     } else {
-        console.warn('No items selected for invoicing');
+      console.warn('No items selected for invoicing');
     }
 
     this.ngOnInit();  // Re-initialize the form if needed
-}
+  }
 
 
   // Method to update invoiced status using HttpClient
@@ -443,10 +443,10 @@ export class SalesComponent {
   // }
 
   private triggerWorkflowPipeline(saleOrderId: string) {
-  
+
     console.log("saleOrderId : ", saleOrderId)
     const apiUrl = `sales/SaleOrder/${saleOrderId}/move_next_stage/`;
-  
+
     this.http.post(apiUrl, {}).subscribe(
       response => {
         console.log('POST request successful:', response);
@@ -456,7 +456,7 @@ export class SalesComponent {
       }
     );
   }
-  
+
 
   createSaleInvoice(invoiceData: any): Observable<any> {
     return this.http.post('sales/sale_invoice_order/', invoiceData);
@@ -543,61 +543,68 @@ export class SalesComponent {
   //   });
   // }
 
-// getOrderNo() {
-//   this.orderNumber = null;
-//   this.shippingTrackingNumber = null;
+  // getOrderNo() {
+  //   this.orderNumber = null;
+  //   this.shippingTrackingNumber = null;
 
-//   const saleTypeName = this.formConfig.model['sale_order']?.sale_type_id?.name || '';
-//   const orderPrefix = saleTypeName.toLowerCase() === 'Other' ? 'SOO' : 'SO';
+  //   const saleTypeName = this.formConfig.model['sale_order']?.sale_type_id?.name || '';
+  //   const orderPrefix = saleTypeName.toLowerCase() === 'Other' ? 'SOO' : 'SO';
 
-//   // Get Shipping Tracking Number
-//   this.http.get('masters/generate_order_no/?type=SHIP').subscribe((shipRes: any) => {
-//     if (shipRes?.data?.order_number) {
-//       this.shippingTrackingNumber = shipRes.data.order_number;
-//       this.formConfig.model['order_shipments']['shipping_tracking_no'] = this.shippingTrackingNumber;
+  //   // Get Shipping Tracking Number
+  //   this.http.get('masters/generate_order_no/?type=SHIP').subscribe((shipRes: any) => {
+  //     if (shipRes?.data?.order_number) {
+  //       this.shippingTrackingNumber = shipRes.data.order_number;
+  //       this.formConfig.model['order_shipments']['shipping_tracking_no'] = this.shippingTrackingNumber;
 
-//       // Get Sales Order Number
-//       this.http.get(`masters/generate_order_no/?type=${orderPrefix}`).subscribe((orderRes: any) => {
-//         if (orderRes?.data?.order_number) {
-//           this.orderNumber = orderRes.data.order_number;
-//           this.formConfig.model['sale_order']['order_no'] = this.orderNumber;
-//         }
-//       });
-//     }
-//   });
-// }
+  //       // Get Sales Order Number
+  //       this.http.get(`masters/generate_order_no/?type=${orderPrefix}`).subscribe((orderRes: any) => {
+  //         if (orderRes?.data?.order_number) {
+  //           this.orderNumber = orderRes.data.order_number;
+  //           this.formConfig.model['sale_order']['order_no'] = this.orderNumber;
+  //         }
+  //       });
+  //     }
+  //   });
+  // }
 
-getOrderNo() {
-  this.orderNumber = null;
-  this.shippingTrackingNumber = null;
+  getOrderNo() {
+    this.orderNumber = null;
+    this.shippingTrackingNumber = null;
 
-  const saleTypeObj = this.formConfig.model['sale_order']?.sale_type_id;
-  const saleTypeName = saleTypeObj?.name?.toLowerCase() || '';
-  const orderPrefix = saleTypeName === 'Other' ? 'SOO' : 'SO';
+    const saleTypeObj = this.formConfig.model['sale_order']?.sale_type_id;
+    const saleTypeName = saleTypeObj?.name?.toLowerCase() || '';
+    const orderPrefix = saleTypeName === 'Other' ? 'SOO' : 'SO';
 
-  // 1. Shipping number
-  this.http.get('masters/generate_order_no/?type=SHIP').subscribe((shipRes: any) => {
-    if (shipRes?.data?.order_number) {
-      this.shippingTrackingNumber = shipRes.data.order_number;
-      this.formConfig.model['order_shipments']['shipping_tracking_no'] = this.shippingTrackingNumber;
+    // 1. Shipping number
+    this.http.get('masters/generate_order_no/?type=SHIP').subscribe((shipRes: any) => {
+      if (shipRes?.data?.order_number) {
+        this.shippingTrackingNumber = shipRes.data.order_number;
+        this.formConfig.model['order_shipments']['shipping_tracking_no'] = this.shippingTrackingNumber;
 
-      // 2. Sales order number
-      this.http.get(`masters/generate_order_no/?type=${orderPrefix}`).subscribe((orderRes: any) => {
-        if (orderRes?.data?.order_number) {
-          this.orderNumber = orderRes.data.order_number;
-          this.formConfig.model['sale_order']['order_no'] = this.orderNumber;
-        }
-      });
-    }
-  });
-}
+        // 2. Sales order number
+        this.http.get(`masters/generate_order_no/?type=${orderPrefix}`).subscribe((orderRes: any) => {
+          if (orderRes?.data?.order_number) {
+            this.orderNumber = orderRes.data.order_number;
+            this.formConfig.model['sale_order']['order_no'] = this.orderNumber;
+          }
+        });
+      }
+    });
+  }
 
 
-  
+
   // Displays the sales order list modal
   showSaleOrderListFn() {
     this.showSaleOrderList = true;
-    this.SalesListComponent?.refreshTable();
+    // Ensure filters are reset and table is refreshed when showing the sales order list
+    if (this.SalesListComponent) {
+      if (this.SalesListComponent.taTableComponent) {
+        this.SalesListComponent.taTableComponent.resetFilterValues();
+      }
+      this.SalesListComponent.refreshTable();
+    }
+    
   }
 
   // Shows the past orders list modal and fetches orders based on the selected customer
@@ -991,6 +998,7 @@ getOrderNo() {
   isAmountModalOpen: boolean = false; // Controls Amount modal
   totalAmount: number = 0; // Replace this with the actual total amount from your logic
   amountExceedMessage: string = ''; // Dynamic message for the modal
+
   updateProductInfo(currentRowIndex, product, unitData = '') {
     // Select the card wrapper element
     const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
@@ -1013,18 +1021,18 @@ getOrderNo() {
 
   createSaleOrder() {
     const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
-  
+
     // Determine the entity type and ID dynamically
     const entityName = 'sale_order'; // Since we're in the Sale Order form
     const customId = this.formConfig.model.sale_order?.sale_order_id || null; // Ensure correct sale_order_id
-  
+
     // Find entity record from list
     const entity = this.entitiesList.find(e => e.entity_name === entityName);
 
-    if (!entity) {
-      console.error(`Entity not found for: ${entityName}`);
-      return;
-    }
+    // if (!entity) {
+    //   console.error(`Entity not found for: ${entityName}`);
+    //   return;
+    // }
 
     const entityId = entity.entity_id;
     // Inject entity_id into metadata temporarily
@@ -1033,17 +1041,20 @@ getOrderNo() {
     });
     // Construct payload for custom fields
     const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
-  
+
     if (!customFieldsPayload) {
       this.showDialog(); // Stop execution if required fields are missing
     }
-  
+
     // Construct the final payload
     const payload = {
       ...this.formConfig.model,
-      // custom_field: customFieldsPayload.custom_field, // Dictionary of custom fields
       custom_field_values: customFieldsPayload.custom_field_values // Array of custom field values
     };
+
+    if (!payload) {
+      this.showDialog(); // Stop execution if required fields are missing
+    }
   
     this.http.post('sales/sale_order/', payload)
       .subscribe(response => {
@@ -1054,10 +1065,13 @@ getOrderNo() {
           this.showSuccessToast = false;
         }, 3000); // Hide toast after 3 seconds
       }, error => {
-        console.error('Error creating record:', error);
+        if (error.status === 400) { 
+          this.showDialog();
+        }
+        // console.error('Error creating record:', error);
       });
   }
-  
+
   closeToast() {
     this.showSuccessToast = false;
   }
@@ -1122,7 +1136,7 @@ getOrderNo() {
     // Construct payload for custom fields
     const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
 
-    
+
     // Construct the final payload for update
     const payload = {
       ...this.formConfig.model,
@@ -1249,13 +1263,13 @@ getOrderNo() {
   //     print_name: data.print_name,
   //     mrp: data.mrp
   //   };
-  
+
   //   Object.entries(fieldMappings).forEach(([key, value]) => {
   //     if (value !== undefined) field.form.controls[key]?.setValue(value);
   //   });
   //   this.totalAmountCal();
   // }
-//-------------------working---------------------------------------
+  //-------------------working---------------------------------------
   // async autoFillProductDetails(field, data) {
   //   this.productOptions = data;
   //   console.log("Autofill data : ", this.productOptions)
@@ -1284,97 +1298,99 @@ getOrderNo() {
 
   //   this.totalAmountCal();
   // }
-//--------------------------------------------------------
-async autoFillProductDetails(field, data) {
-  this.productOptions = data;
-  console.log("Autofill data : ", this.productOptions);
-  if (!field.form?.controls || !data) return;
+  //--------------------------------------------------------
+  async autoFillProductDetails(field, data) {
+    this.productOptions = data;
+    console.log("Autofill data : ", this.productOptions);
+    if (!field.form?.controls || !data) return;
 
-  const customerCategory = this.formConfig.model?.sale_order?.customer?.customer_category?.name?.toLowerCase();
+    const customerCategory = this.formConfig.model?.sale_order?.customer?.customer_category?.name?.toLowerCase();
 
-  // ✅ Figure out the current row index safely
-  const parentArray = field.parent;
-  const currentRowIndex = +parentArray?.key;
+    // ✅ Figure out the current row index safely
+    const parentArray = field.parent;
+    const currentRowIndex = +parentArray?.key;
 
-  // ✅ Get the rate on that row if it exists
-  const currentRowRate = this.formConfig.model?.sale_order_items?.[currentRowIndex]?.rate;
+    // ✅ Get the rate on that row if it exists
+    const currentRowRate = this.formConfig.model?.sale_order_items?.[currentRowIndex]?.rate;
 
-  console.log("Current row rate value : ", currentRowRate);
+    console.log("Current row rate value : ", currentRowRate);
 
-  let selectedRate = data.sales_rate; // default fallback
+    let selectedRate = data.sales_rate; // default fallback
 
-  // ✅ Only override if current rate is 0 or empty
-  if (!currentRowRate || currentRowRate === 0) {
-    if (customerCategory === 'wholesalers') {
-      selectedRate = data.wholesale_rate ?? data.sales_rate;
-    } else if (customerCategory === 'retail') {
-      selectedRate = data.sales_rate;
-    } else if (customerCategory === 'e-commerce partners' || customerCategory === 'distributors' || customerCategory === 'e-commerce partners') {
-      selectedRate = data.dealer_rate ?? data.sales_rate;
+    // ✅ Only override if current rate is 0 or empty
+    if (!currentRowRate || currentRowRate === 0) {
+      if (customerCategory === 'wholesalers') {
+        selectedRate = data.wholesale_rate ?? data.sales_rate;
+      } else if (customerCategory === 'retail') {
+        selectedRate = data.sales_rate;
+      } else if (customerCategory === 'e-commerce partners' || customerCategory === 'distributors' || customerCategory === 'e-commerce partners') {
+        selectedRate = data.dealer_rate ?? data.sales_rate;
+      }
+    } else {
+      // ✅ Keep the manually entered rate
+      selectedRate = currentRowRate;
     }
-  } else {
-    // ✅ Keep the manually entered rate
-    selectedRate = currentRowRate;
+
+    const fieldMappings = {
+      code: data.code !== undefined
+        ? data.code
+        : field.form.controls.code.value,
+      rate: selectedRate,
+      discount: data.discount !== undefined
+        ? parseFloat(data.discount)
+        : field.form.controls.discount.value,
+      unit_options_id: data.unit_options?.unit_options_id,
+      print_name: data.print_name,
+      mrp: data.mrp
+    };
+
+    Object.entries(fieldMappings).forEach(([key, value]) => {
+      if (value !== undefined) {
+        field.form.controls[key]?.setValue(value);
+      }
+    });
+
+    this.totalAmountCal();
   }
-
-  const fieldMappings = {
-    code: data.code !== undefined
-      ? data.code
-      : field.form.controls.code.value,
-    rate: selectedRate,
-    discount: data.discount !== undefined
-      ? parseFloat(data.discount)
-      : field.form.controls.discount.value,
-    unit_options_id: data.unit_options?.unit_options_id,
-    print_name: data.print_name,
-    mrp: data.mrp
-  };
-
-  Object.entries(fieldMappings).forEach(([key, value]) => {
-    if (value !== undefined) {
-      field.form.controls[key]?.setValue(value);
-    }
-  });
-
-  this.totalAmountCal();
-}
 
 
 
   createWorkOrder() {
     if (this.SaleOrderEditID) {
-        // 1. Check for selected items
-        let selectedProducts = this.formConfig.model.sale_order_items.filter(item => item.selectItem);
+      // 1. Check for selected items
+      let selectedProducts = this.formConfig.model.sale_order_items.filter(item => item.selectItem);
 
-        // 2. If no products are selected, select all products by default
-        if (selectedProducts.length === 0) {
-            selectedProducts = [...this.formConfig.model.sale_order_items]; // Select all products
-            console.log("No product selected. Defaulting to all products:", selectedProducts);
-        }
+      // 2. If no products are selected, select all products by default
+      if (selectedProducts.length === 0) {
+        selectedProducts = [...this.formConfig.model.sale_order_items]; // Select all products
+        console.log("No product selected. Defaulting to all products:", selectedProducts);
+      }
 
-        // 3. Get sale order details
-        const saleOrderDetails = this.formConfig.model.sale_order;
-        const orderAttachmentsDetails = this.formConfig.model.order_attachments;
-        const orderShipmentsDetails = this.formConfig.model.order_shipments;
+      // 3. Get sale order details
+      const saleOrderDetails = this.formConfig.model.sale_order;
+      const orderAttachmentsDetails = this.formConfig.model.order_attachments;
+      const orderShipmentsDetails = this.formConfig.model.order_shipments;
+      const customFieldValues = this.formConfig.model.custom_field_values;
 
-        // 4. Proceed only if sale order details exist
-        if (saleOrderDetails && orderAttachmentsDetails && orderShipmentsDetails) {
-            this.selectedOrder = {
-                productDetails: selectedProducts,
-                saleOrderDetails: saleOrderDetails,
-                orderAttachments: orderAttachmentsDetails,
-                orderShipments: orderShipmentsDetails
-            };
+      // 4. Proceed only if sale order details exist
+      if (saleOrderDetails && orderAttachmentsDetails && orderShipmentsDetails) {
+        this.selectedOrder = {
+          productDetails: selectedProducts,
+          saleOrderDetails: saleOrderDetails,
+          orderAttachments: orderAttachmentsDetails,
+          orderShipments: orderShipmentsDetails,
+          customFieldsValues: customFieldValues,
+        };
 
-            // 5. Open the modal
-            this.showModal = true;
-        } else {
-            console.warn('Sale order details or attachments/shipments are missing.');
-        }
+        // 5. Open the modal
+        this.showModal = true;
+      } else {
+        console.warn('Sale order details or attachments/shipments are missing.');
+      }
     } else {
-        console.warn('SaleOrderEditID is not set. Unable to create work order.');
+      console.warn('SaleOrderEditID is not set. Unable to create work order.');
     }
-}
+  }
 
 
   closeModalworkorder() {
@@ -1382,11 +1398,11 @@ async autoFillProductDetails(field, data) {
     this.selectedOrder = null;
   }
 
-//================================================================
+  //================================================================
   // confirmWorkOrder() {
   //   console.log("data1", this.selectedOrder);
   //   if (this.selectedOrder) {
-  //     let { productDetails, saleOrderDetails, orderAttachments, orderShipments } = this.selectedOrder;
+  //     let { productDetails, saleOrderDetails, orderAttachments, orderShipments, customFieldsValues } = this.selectedOrder;
 
   //     const allProducts = this.formConfig.model.sale_order_items;
   //     const isAllProductsSelected = productDetails.length === allProducts.length;
@@ -1524,7 +1540,8 @@ async autoFillProductDetails(field, data) {
   //           },
   //           sale_order_items: [product],
   //           order_attachments: orderAttachments,
-  //           order_shipments: orderShipments
+  //           order_shipments: orderShipments,
+  //           custom_field_values: customFieldsValues
   //         };
 
   //         console.log('Payload for child sale order:', childSaleOrderPayload);
@@ -1630,11 +1647,11 @@ async autoFillProductDetails(field, data) {
   //   this.ngOnInit();
   // }
 
-  confirmWorkOrder() {
-    console.log("data1", this.selectedOrder);
-    if (!this.selectedOrder) return;
+confirmWorkOrder() {
+  console.log("data1", this.selectedOrder);
+  if (this.selectedOrder) {
+    let { productDetails, saleOrderDetails, orderAttachments, orderShipments, customFieldsValues } = this.selectedOrder;
 
-    const { productDetails, saleOrderDetails, orderAttachments, orderShipments } = this.selectedOrder;
     const allProducts = this.formConfig.model.sale_order_items;
     const isAllProductsSelected = productDetails.length === allProducts.length;
 
@@ -1642,8 +1659,10 @@ async autoFillProductDetails(field, data) {
       console.log("All products selected. Creating only work orders...");
 
       this.http.post(`sales/SaleOrder/${saleOrderDetails.sale_order_id}/move_next_stage/`, {}).subscribe({
-        next: () => {
-          const workOrders = productDetails.map(product => {
+        next: (updateResponse) => {
+          console.log('Parent Sale Order updated to Production:', updateResponse);
+
+          const processWorkOrders = productDetails.map((product) => {
             const workOrderPayload = {
               work_order: {
                 product_id: product.product_id,
@@ -1657,74 +1676,139 @@ async autoFillProductDetails(field, data) {
                 status_id: '',
                 sale_order_id: saleOrderDetails.sale_order_id
               },
-              bom: [{ product_id: product.product_id, size_id: product.size?.size_id || null, color_id: product.color?.color_id || null }],
+              bom: [
+                {
+                  product_id: product.product_id,
+                  size_id: product.size?.size_id || null,
+                  color_id: product.color?.color_id || null,
+                }
+              ],
               work_order_machines: [],
               workers: [],
               work_order_stages: []
             };
+
+            console.log('Work Order Payload:', workOrderPayload);
+
             return this.http.post('production/work_order/', workOrderPayload);
           });
 
-          forkJoin(workOrders).subscribe({
+          forkJoin(processWorkOrders).subscribe({
             next: () => {
               this.closeModalworkorder();
-              console.log('Work Orders created successfully!');
+              console.log('Work Orders created successfully (without child sale orders)!');
             },
-            error: err => {
+            error: (err) => {
               console.error('Error creating Work Orders:', err);
-              alert('Failed to create Work Orders.');
+              alert('Failed to create Work Orders. Please try again.');
             }
           });
         },
-        error: err => console.error('Error updating Parent Sale Order:', err)
+        error: (err) => {
+          console.error('Error updating Parent Sale Order:', err);
+        }
       });
-
     } else {
       console.log("Partial products selected. Creating child sale orders & work orders...");
 
       const parentOrderNo = saleOrderDetails.order_no;
       let childOrderCounter = 1;
 
-      const removedItemIds = productDetails.map(p => p.sale_order_item_id);
+      const removedItemIds = productDetails.map(p => p.sale_order_item_id);  // selected ones
       const parentAllItems = this.formConfig.model.sale_order_items || [];
       const remainingItems = parentAllItems.filter(item => !removedItemIds.includes(item.sale_order_item_id));
 
-      const processProductRequests = productDetails.map(product => {
+      // 🔹 Custom Fields Payload Construction (same as createSaleOrder)
+      const entityName = 'sale_order';
+      const customId = null; // child is new
+      const entity = this.entitiesList.find(e => e.entity_name === entityName);
+
+      if (entity) {
+        const entityId = entity.entity_id;
+        Object.keys(this.customFieldMetadata).forEach((key) => {
+          this.customFieldMetadata[key].entity_id = entityId;
+        });
+      }
+
+      const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(
+        customFieldsValues,
+        entityName,
+        customId
+      );
+
+      const processProductRequests = productDetails.map((product) => {
         const childOrderNo = `${parentOrderNo}-${childOrderCounter++}`;
+
         const quantity = Number(product.quantity) || 0;
         const rate = Number(product.rate) || 0;
         const itemsValue = quantity * rate;
+
         const igst = Number(product.igst) || 0;
         const cgst = Number(product.cgst) || 0;
         const sgst = Number(product.sgst) || 0;
         const taxAmount = igst + cgst + sgst;
+
         const productDiscountPercent = Number(product.discount) || 0;
         const discountOnItems = (itemsValue * productDiscountPercent) / 100;
 
-        const totalCess = 0;
-        const totalDiscount = 0;
+        const totalCess = Number(saleOrderDetails.cess_amount) || 0;
+        const totalDiscount = Number(saleOrderDetails.dis_amt) || 0;
+        const selectedProductCount = productDetails.length;
 
-        const totalAmount = itemsValue - totalDiscount  + taxAmount - discountOnItems + totalCess;
+        const perOrderCess = selectedProductCount > 0 ? (totalCess / selectedProductCount) : 0;
+        const perOrderDiscount = selectedProductCount > 0 ? (totalDiscount / selectedProductCount) : 0;
+
+        const totalAmount = itemsValue
+          - perOrderDiscount
+          + taxAmount + perOrderCess
+          - discountOnItems;
+
+        console.log(`Computed for product ${product.product_id}:`,
+          { itemsValue, taxAmount, perOrderDiscount, discountOnItems, totalAmount });
 
         const childSaleOrderPayload = {
           sale_order: {
-            ...saleOrderDetails,
             order_no: childOrderNo,
+            ref_no: saleOrderDetails.ref_no,
+            sale_type_id: saleOrderDetails.sale_type_id,
+            tax: saleOrderDetails.tax,
+            cess_amount: perOrderCess.toFixed(2),
             tax_amount: taxAmount,
+            advance_amount: saleOrderDetails.advance_amount,
             item_value: itemsValue,
             total_amount: totalAmount,
-            dis_amt: totalDiscount,
-            cess_amount: totalCess,
-            flow_status: { flow_status_name: 'Production' }
+            ledger_account_id: saleOrderDetails.ledger_account_id,
+            order_status_id: saleOrderDetails.order_status_id,
+            customer_id: saleOrderDetails.customer.customer_id,
+            order_date: saleOrderDetails.order_date,
+            ref_date: saleOrderDetails.ref_date,
+            delivery_date: saleOrderDetails.delivery_date,
+            order_type: 'sale_order',
+            sale_estimate: saleOrderDetails.sale_estimate || 'No',
+            flow_status: { flow_status_name: 'Production' },
+            billing_address: saleOrderDetails.billing_address,
+            shipping_address: saleOrderDetails.shipping_address,
+            email: saleOrderDetails.email,
+            remarks: saleOrderDetails.remarks || null,
+            dis_amt: perOrderDiscount,
           },
           sale_order_items: [product],
           order_attachments: orderAttachments,
-          order_shipments: orderShipments
+          order_shipments: orderShipments,
+          custom_field_values: customFieldsPayload?.custom_field_values || []   // ✅ fixed
         };
+
+        console.log('Payload for child sale order:', childSaleOrderPayload);
 
         return this.http.post('sales/sale_order/', childSaleOrderPayload).pipe(
           tap((childSaleOrderResponse: any) => {
-            this.http.patch(`sales/sale_order_items/${product.sale_order_item_id}/`, { work_order_created: 'YES' }).subscribe();
+            console.log(`Child Sale Order ${childOrderNo} created:`, childSaleOrderResponse);
+
+            this.http.patch(`sales/sale_order_items/${product.sale_order_item_id}/`, { work_order_created: 'YES' })
+              .subscribe({
+                next: () => console.log(`Product ${product.product_id} marked as Work Order Created in Parent Sale Order`),
+                error: (err) => console.error('Error updating work order status:', err)
+              });
 
             const workOrderPayload = {
               work_order: {
@@ -1739,141 +1823,366 @@ async autoFillProductDetails(field, data) {
                 status_id: '',
                 sale_order_id: childSaleOrderResponse.data.sale_order.sale_order_id
               },
-              bom: [{ product_id: product.product_id, size_id: product.size?.size_id || null, color_id: product.color?.color_id || null }],
+              bom: [
+                {
+                  product_id: product.product_id,
+                  size_id: product.size?.size_id || null,
+                  color_id: product.color?.color_id || null,
+                }
+              ],
               work_order_machines: [],
               workers: [],
               work_order_stages: []
             };
 
-            this.http.post('production/work_order/', workOrderPayload).subscribe();
+            console.log('Work Order Payload:', workOrderPayload);
+
+            this.http.post('production/work_order/', workOrderPayload).subscribe({
+              next: (workOrderResponse) => {
+                console.log('Work Order created:', workOrderResponse);
+                this.showSuccessToast = true;
+                this.toastMessage = "WorkOrder & Child Sale Order created";
+                setTimeout(() => {
+                  this.showSuccessToast = false;
+                }, 3000);
+              },
+              error: (err) => {
+                console.error('Error creating Work Order:', err);
+              }
+            });
           })
         );
       });
 
       forkJoin(processProductRequests).subscribe({
         next: () => {
+          console.log("patch started here....")
+          console.log("saleOrderDetails : ", saleOrderDetails)
+          console.log("remainingItems : ", remainingItems)
+
           const patchPayload = {
             sale_order_items: productDetails.map(p => ({ sale_order_item_id: p.sale_order_item_id }))
           };
-
           this.http.patch(`sales/sale_order/${saleOrderDetails.sale_order_id}/`, patchPayload).subscribe({
             next: () => {
-              // ✅ Recalculate parent totals from remainingItems
-              let updatedItemValue = 0;
-              let updatedTaxAmount = 0;
-              let updatedProductDiscount = 0;
-
-              remainingItems.forEach(item => {
-                const quantity = Number(item.quantity) || 0;
-                const rate = Number(item.rate) || 0;
-                const itemValue = quantity * rate;
-                const igst = Number(item.igst) || 0;
-                const cgst = Number(item.cgst) || 0;
-                const sgst = Number(item.sgst) || 0;
-                const taxAmount = igst + cgst + sgst;
-                const discount = Number(item.discount) || 0;
-                const discountAmount = (itemValue * discount) / 100;
-
-                updatedItemValue += itemValue;
-                updatedTaxAmount += taxAmount;
-                updatedProductDiscount += discountAmount;
-              });
-
-              const totalCess = Number(saleOrderDetails.cess_amount) || 0;
-              const totalDiscount = Number(saleOrderDetails.dis_amt) || 0;
-              // const totalItemCount = allProducts.length;
-              // const remainingCount = remainingItems.length;
-              // const updatedCessAmount = (totalCess / totalItemCount) * remainingCount;
-              // const updatedOrderLevelDiscount = (totalDiscount / totalItemCount) * remainingCount;
-
-              const updatedTotalAmount = updatedItemValue - totalDiscount + updatedTaxAmount + totalCess - updatedProductDiscount;
-
-              // ✅ Full PUT call to update parent sale order
-              const finalPutPayload = {
-                sale_order: {
-                  ...saleOrderDetails,
-                  item_value: updatedItemValue,
-                  tax_amount: updatedTaxAmount,
-                  dis_amt: totalDiscount,
-                  cess_amount: totalCess,
-                  total_amount: updatedTotalAmount
-                },
-                sale_order_items: remainingItems,
-                order_attachments: orderAttachments,
-                order_shipments: orderShipments
-              };
-
-              this.http.put(`sales/sale_order/${saleOrderDetails.sale_order_id}/`, finalPutPayload).subscribe({
-                next: () => {
-                  console.log("✅ Parent sale order fully updated via PUT.");
-                  this.closeModalworkorder();
-                },
-                error: err => {
-                  console.error("❌ Failed to update parent sale order:", err);
-                  this.closeModalworkorder();
-                }
-              });
+              console.log('Parent sale order updated after removing selected items');
+              this.closeModalworkorder();
             },
             error: (err) => {
-              console.error('Failed to patch parent sale order:', err);
+              console.error('Failed to update parent sale order:', err);
               this.closeModalworkorder();
             }
           });
         },
-        error: err => {
-          console.error('Error creating child sale orders or work orders:', err);
-          alert('Child Sale Order creation failed.');
+        error: (err) => {
+          console.error('Error processing products:', err);
+          alert('Failed to create Child Sale Orders or Work Orders. Please try again.');
         }
       });
     }
-
-    this.ngOnInit();
   }
+  this.ngOnInit();
+}
 
 
-  getUnitData(unitInfo) {
-    const unitOption = unitInfo.unit_options?.unit_name ?? 'NA';
-    const stockUnit = unitInfo.stock_unit?.stock_unit_name ?? 'NA';
-    const packUnit = unitInfo.pack_unit?.unit_name ?? 'NA';
-    const gPackUnit = unitInfo.g_pack_unit?.unit_name ?? 'NA';
-    const packVsStock = unitInfo.pack_vs_stock ?? 0;
-    const gPackVsPack = unitInfo.g_pack_vs_pack ?? 0;
+  // confirmWorkOrder() {
+  //   console.log("data1", this.selectedOrder);
+  //   if (!this.selectedOrder) return;
+
+  //   const { productDetails, saleOrderDetails, orderAttachments, orderShipments, customFieldsValues } = this.selectedOrder;
+  //   const allProducts = this.formConfig.model.sale_order_items;
+  //   const isAllProductsSelected = productDetails.length === allProducts.length;
+
+  //   if (isAllProductsSelected) {
+  //     console.log("All products selected. Creating only work orders...");
+
+  //     this.http.post(`sales/SaleOrder/${saleOrderDetails.sale_order_id}/move_next_stage/`, {}).subscribe({
+  //       next: () => {
+  //         const workOrders = productDetails.map(product => {
+  //           const workOrderPayload = {
+  //             work_order: {
+  //               product_id: product.product_id,
+  //               quantity: product.quantity || 0,
+  //               completed_qty: 0,
+  //               pending_qty: product.quantity || 0,
+  //               start_date: saleOrderDetails.order_date || new Date().toISOString().split('T')[0],
+  //               sync_qty: true,
+  //               size_id: product.size?.size_id || null,
+  //               color_id: product.color?.color_id || null,
+  //               status_id: '',
+  //               sale_order_id: saleOrderDetails.sale_order_id
+  //             },
+  //             bom: [{ product_id: product.product_id, size_id: product.size?.size_id || null, color_id: product.color?.color_id || null }],
+  //             work_order_machines: [],
+  //             workers: [],
+  //             work_order_stages: []
+  //           };
+  //           return this.http.post('production/work_order/', workOrderPayload);
+  //         });
+
+  //         forkJoin(workOrders).subscribe({
+  //           next: () => {
+  //             this.closeModalworkorder();
+  //             console.log('Work Orders created successfully!');
+  //           },
+  //           error: err => {
+  //             console.error('Error creating Work Orders:', err);
+  //             alert('Failed to create Work Orders.');
+  //           }
+  //         });
+  //       },
+  //       error: err => console.error('Error updating Parent Sale Order:', err)
+  //     });
+
+  //   } else {
+  //     console.log("Partial products selected. Creating child sale orders & work orders...");
+
+  //     const parentOrderNo = saleOrderDetails.order_no;
+  //     let childOrderCounter = 1;
+
+  //     const removedItemIds = productDetails.map(p => p.sale_order_item_id);
+  //     const parentAllItems = this.formConfig.model.sale_order_items || [];
+  //     const remainingItems = parentAllItems.filter(item => !removedItemIds.includes(item.sale_order_item_id));
+
+  //     const processProductRequests = productDetails.map(product => {
+  //       const childOrderNo = `${parentOrderNo}-${childOrderCounter++}`;
+  //       const quantity = Number(product.quantity) || 0;
+  //       const rate = Number(product.rate) || 0;
+  //       const itemsValue = quantity * rate;
+  //       const igst = Number(product.igst) || 0;
+  //       const cgst = Number(product.cgst) || 0;
+  //       const sgst = Number(product.sgst) || 0;
+  //       const taxAmount = igst + cgst + sgst;
+  //       const productDiscountPercent = Number(product.discount) || 0;
+  //       const discountOnItems = (itemsValue * productDiscountPercent) / 100;
+
+  //       const totalCess = 0;
+  //       const totalDiscount = 0;
+
+  //       const totalAmount = itemsValue - totalDiscount + taxAmount - discountOnItems + totalCess;
+
+  //       const childSaleOrderPayload = {
+  //         sale_order: {
+  //           ...saleOrderDetails,
+  //           order_no: childOrderNo,
+  //           tax_amount: taxAmount,
+  //           item_value: itemsValue,
+  //           total_amount: totalAmount,
+  //           dis_amt: totalDiscount,
+  //           cess_amount: totalCess,
+  //           flow_status: { flow_status_name: 'Production' }
+  //         },
+  //         sale_order_items: [product],
+  //         order_attachments: orderAttachments,
+  //         order_shipments: orderShipments,
+  //         custom_field_values: customFieldsValues
+  //       };
+
+  //       return this.http.post('sales/sale_order/', childSaleOrderPayload).pipe(
+  //         tap((childSaleOrderResponse: any) => {
+  //           this.http.patch(`sales/sale_order_items/${product.sale_order_item_id}/`, { work_order_created: 'YES' }).subscribe();
+
+  //           const workOrderPayload = {
+  //             work_order: {
+  //               product_id: product.product_id,
+  //               quantity: product.quantity || 0,
+  //               completed_qty: 0,
+  //               pending_qty: product.quantity || 0,
+  //               start_date: saleOrderDetails.order_date || new Date().toISOString().split('T')[0],
+  //               sync_qty: true,
+  //               size_id: product.size?.size_id || null,
+  //               color_id: product.color?.color_id || null,
+  //               status_id: '',
+  //               sale_order_id: childSaleOrderResponse.data.sale_order.sale_order_id
+  //             },
+  //             bom: [{ product_id: product.product_id, size_id: product.size?.size_id || null, color_id: product.color?.color_id || null }],
+  //             work_order_machines: [],
+  //             workers: [],
+  //             work_order_stages: []
+  //           };
+
+  //           this.http.post('production/work_order/', workOrderPayload).subscribe();
+  //         })
+  //       );
+  //     });
+
+  //     forkJoin(processProductRequests).subscribe({
+  //       next: () => {
+  //         const patchPayload = {
+  //           sale_order_items: productDetails.map(p => ({ sale_order_item_id: p.sale_order_item_id }))
+  //         };
+
+  //         this.http.patch(`sales/sale_order/${saleOrderDetails.sale_order_id}/`, patchPayload).subscribe({
+  //           next: () => {
+  //             // ✅ Recalculate parent totals from remainingItems
+  //             let updatedItemValue = 0;
+  //             let updatedTaxAmount = 0;
+  //             let updatedProductDiscount = 0;
+
+  //             remainingItems.forEach(item => {
+  //               const quantity = Number(item.quantity) || 0;
+  //               const rate = Number(item.rate) || 0;
+  //               const itemValue = quantity * rate;
+  //               const igst = Number(item.igst) || 0;
+  //               const cgst = Number(item.cgst) || 0;
+  //               const sgst = Number(item.sgst) || 0;
+  //               const taxAmount = igst + cgst + sgst;
+  //               const discount = Number(item.discount) || 0;
+  //               const discountAmount = (itemValue * discount) / 100;
+
+  //               updatedItemValue += itemValue;
+  //               updatedTaxAmount += taxAmount;
+  //               updatedProductDiscount += discountAmount;
+  //             });
+
+  //             const totalCess = Number(saleOrderDetails.cess_amount) || 0;
+  //             const totalDiscount = Number(saleOrderDetails.dis_amt) || 0;
+  //             // const totalItemCount = allProducts.length;
+  //             // const remainingCount = remainingItems.length;
+  //             // const updatedCessAmount = (totalCess / totalItemCount) * remainingCount;
+  //             // const updatedOrderLevelDiscount = (totalDiscount / totalItemCount) * remainingCount;
+
+  //             const updatedTotalAmount = updatedItemValue - totalDiscount + updatedTaxAmount + totalCess - updatedProductDiscount;
+
+  //             // ✅ Full PUT call to update parent sale order
+  //             const finalPutPayload = {
+  //               sale_order: {
+  //                 ...saleOrderDetails,
+  //                 item_value: updatedItemValue,
+  //                 tax_amount: updatedTaxAmount,
+  //                 dis_amt: totalDiscount,
+  //                 cess_amount: totalCess,
+  //                 total_amount: updatedTotalAmount
+  //               },
+  //               sale_order_items: remainingItems,
+  //               order_attachments: orderAttachments,
+  //               order_shipments: orderShipments,
+  //               custom_field_values: customFieldsValues
+  //             };
+
+  //             this.http.put(`sales/sale_order/${saleOrderDetails.sale_order_id}/`, finalPutPayload).subscribe({
+  //               next: () => {
+  //                 console.log("✅ Parent sale order fully updated via PUT.");
+  //                 this.closeModalworkorder();
+  //               },
+  //               error: err => {
+  //                 console.error("❌ Failed to update parent sale order:", err);
+  //                 this.closeModalworkorder();
+  //               }
+  //             });
+  //           },
+  //           error: (err) => {
+  //             console.error('Failed to patch parent sale order:', err);
+  //             this.closeModalworkorder();
+  //           }
+  //         });
+  //       },
+  //       error: err => {
+  //         console.error('Error creating child sale orders or work orders:', err);
+  //         alert('Child Sale Order creation failed.');
+  //       }
+  //     });
+  //   }
+
+  //   this.ngOnInit();
+  // }
+
+
+//   getUnitData(unitInfo) {
+//     console.log("unitinfo : ", unitInfo);
+//     const unitOption = unitInfo.unit_options?.unit_name ?? 'NA';
+//     const stockUnit = unitInfo.stock_unit?.stock_unit_name ?? 'NA';
+//     // const packUnit = unitInfo.pack_unit?.unit_name ?? 'NA';
+//     // const gPackUnit = unitInfo.g_pack_unit?.unit_name ?? 'NA';
+//     // const packVsStock = unitInfo.pack_vs_stock ?? 0;
+//     // const gPackVsPack = unitInfo.g_pack_vs_pack ?? 0;
+//     const packUnit = unitInfo.pack_unit?.unit_name ?? (unitInfo.pack_unit_id === null ? 'NA' : unitInfo.pack_unit);
+//     const gPackUnit = unitInfo.g_pack_unit?.unit_name ?? (unitInfo.g_pack_unit_id === null ? 'NA' : unitInfo.g_pack_unit);
+
+//     // ✅ Explicit check so 0 stays 0
+//     const packVsStock = unitInfo.pack_vs_stock !== null && unitInfo.pack_vs_stock !== undefined
+//       ? unitInfo.pack_vs_stock
+//       : 'NA';
+
+//     const gPackVsPack = unitInfo.g_pack_vs_pack !== null && unitInfo.g_pack_vs_pack !== undefined
+//       ? unitInfo.g_pack_vs_pack
+//       : 'NA';
+
   
-    const stockUnitReg = /\b[sS][tT][oO][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
-    const GpackReg = /\b(?:[sS]tock[_ ]?[pP]ack[_ ]?)?[gG][pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
-    const stockPackReg = /\b[sS][tT][oO][cC][kK][_ ]?[pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
+//     const stockUnitReg = /\b[sS][tT][oO][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
+//     const GpackReg = /\b(?:[sS]tock[_ ]?[pP]ack[_ ]?)?[gG][pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
+//     const stockPackReg = /\b[sS][tT][oO][cC][kK][_ ]?[pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
   
-    if (stockUnitReg.test(unitOption)) {
-      return `<span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> | &nbsp;`;
-    } else if (GpackReg.test(unitOption)) {
-      return `
-        <span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> |
-        <span style="color: red;">Pck Unit:</span> <span style="color: blue;">${packUnit}</span> |
-        <span style="color: red;">PackVsStock:</span> <span style="color: blue;">${packVsStock}</span> |
-        <span style="color: red;">GPackUnit:</span> <span style="color: blue;">${gPackUnit}</span> |
-        <span style="color: red;">GPackVsStock:</span> <span style="color: blue;">${gPackVsPack}</span> | &nbsp;`;
-    } else if (stockPackReg.test(unitOption)) {
-      return `
-        <span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> |
-        <span style="color: red;">Pack Unit:</span> <span style="color: blue;">${packUnit}</span> |
-        <span style="color: red;">PackVsStock:</span> <span style="color: blue;">${packVsStock}</span> | &nbsp;`;
+//     if (stockUnitReg.test(unitOption)) {
+//       return `<span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> | &nbsp;`;
+//     } else if (GpackReg.test(unitOption)) {
+//       return `
+//         <span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> |
+//         <span style="color: red;">Pck Unit:</span> <span style="color: blue;">${packUnit}</span> |
+//         <span style="color: red;">PackVsStock:</span> <span style="color: blue;">${packVsStock}</span> |
+//         <span style="color: red;">GPackUnit:</span> <span style="color: blue;">${gPackUnit}</span> |
+//         <span style="color: red;">GPackVsStock:</span> <span style="color: blue;">${gPackVsPack}</span> | &nbsp;`;
+//     } else if (stockPackReg.test(unitOption)) {
+//       return `
+//         <span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> |
+//         <span style="color: red;">Pack Unit:</span> <span style="color: blue;">${packUnit}</span> |
+//         <span style="color: red;">PackVsStock:</span> <span style="color: blue;">${packVsStock}</span> | &nbsp;`;
+//     } else {
+//       console.log('No Unit Option match found');
+//       return "";
+//     }
+//   }
+
+  // product info text when size is selected
+  sumQuantities(dataObject: any): number {
+    // First, check if the data object contains the array in the 'data' field
+    if (dataObject && Array.isArray(dataObject.data)) {
+      // Now we can safely use reduce on dataObject.data
+      return dataObject.data.reduce((sum, item) => sum + (item.quantity || 0), 0);
     } else {
-      console.log('No Unit Option match found');
-      return "";
+      console.error("Data is not an array:", dataObject);
+      return 0;
     }
   }
 
-// product info text when size is selected
-  sumQuantities(dataObject: any): number {
-  // First, check if the data object contains the array in the 'data' field
-  if (dataObject && Array.isArray(dataObject.data)) {
-    // Now we can safely use reduce on dataObject.data
-    return dataObject.data.reduce((sum, item) => sum + (item.quantity || 0), 0);
+getUnitData(unitInfo) {
+  console.log("unitinfo : ", unitInfo);
+
+  const unitOption = unitInfo.unit_options?.unit_name ?? 'NA';
+  const stockUnit = unitInfo.stock_unit?.stock_unit_name ?? 'NA';
+
+  // ✅ Only null/undefined → NA, keep 0 or string
+  const packUnit = unitInfo.pack_unit?.unit_name ?? (unitInfo.pack_unit_id == null ? 'NA' : unitInfo.pack_unit_id);
+  const gPackUnit = unitInfo.g_pack_unit?.unit_name ?? (unitInfo.g_pack_unit_id == null ? 'NA' : unitInfo.g_pack_unit_id);
+
+  const packVsStock = unitInfo.pack_vs_stock == null ? 'NA' : unitInfo.pack_vs_stock;
+  const gPackVsPack = unitInfo.g_pack_vs_pack == null ? 'NA' : unitInfo.g_pack_vs_pack;
+
+  const stockUnitReg = /\b[sS][tT][oO][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
+  const GpackReg = /\b(?:[sS]tock[_ ]?[pP]ack[_ ]?)?[gG][pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
+  const stockPackReg = /\b[sS][tT][oO][cC][kK][_ ]?[pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
+
+  if (stockUnitReg.test(unitOption)) {
+    return `<span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> | &nbsp;`;
+  } else if (GpackReg.test(unitOption)) {
+    return `
+      <span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> |
+      <span style="color: red;">Pck Unit:</span> <span style="color: blue;">${packUnit}</span> |
+      <span style="color: red;">PackVsStock:</span> <span style="color: blue;">${packVsStock}</span> |
+      <span style="color: red;">GPackUnit:</span> <span style="color: blue;">${gPackUnit}</span> |
+      <span style="color: red;">GPackVsPack:</span> <span style="color: blue;">${gPackVsPack}</span> | &nbsp;`;
+  } else if (stockPackReg.test(unitOption)) {
+    return `
+      <span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> |
+      <span style="color: red;">Pack Unit:</span> <span style="color: blue;">${packUnit}</span> |
+      <span style="color: red;">PackVsStock:</span> <span style="color: blue;">${packVsStock}</span> | &nbsp;`;
   } else {
-    console.error("Data is not an array:", dataObject);
-    return 0;
+    console.log('No Unit Option match found');
+    return "";
   }
 }
+
+
 
   // displayInformation(product: any, size: any, color: any, unitData : any, sizeBalance: any, colorBalance: any) {
   //   const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
@@ -2229,7 +2538,7 @@ async autoFillProductDetails(field, data) {
                 //       // });
                 //       field.formControl.valueChanges.subscribe((data: any) => {
                 //         console.log('Selected sale_type:', data);
-                        
+
                 //         if (data && data.sale_type_id) {
                 //           this.formConfig.model['sale_order']['sale_type_id'] = data;
 
@@ -2246,7 +2555,7 @@ async autoFillProductDetails(field, data) {
                 // },                                                                        
                 {
                   key: 'customer',
-                  type: 'select',
+                  type: 'customer-dropdown',
                   className: 'col-md-4 col-sm-6 col-12',
                   props: {
                     label: 'Customer',
@@ -2414,7 +2723,7 @@ async autoFillProductDetails(field, data) {
                           this.formConfig.model['sale_order']['flow_status_id'] = data.flow_status_id;
                         }
                       });
-                
+
                       const valueChangesSubscription = field.formControl.valueChanges.subscribe(data => {
                         const saleOrder = this.formConfig.model['sale_order'];
                         const saleOrderItems = this.formConfig.model['sale_order_items'];
@@ -2425,17 +2734,17 @@ async autoFillProductDetails(field, data) {
                         const saleTypeName = saleTypeObj?.name || '';
                         const billType = (saleTypeName === 'Other') ? 'OTHERS' : 'CASH';
                         const invoicePrefix = (saleTypeName === 'Other') ? 'SOO-INV' : 'SO-INV';
-                
+
                         this.http.get(`masters/generate_order_no/?type=${invoicePrefix}`).subscribe((res: any) => {
                           if (res?.data?.order_number) {
                             this.invoiceNumber = res.data.order_number;
-                
+
                             // ✅ Fetch order_status_id by status_name = "Completed"
                             this.http.get('masters/order_status/?status_name=Pending').subscribe((statusRes: any) => {
                               const completedStatus = statusRes?.data?.[0];
                               const completedStatusId = completedStatus?.order_status_id;
                               console.log("Second time toal_amount : ", saleOrder.total_amount);
-                
+
                               // ✅ Inline total calculation
                               let itemValue = 0;
                               let amountTotal = 0;
@@ -2481,7 +2790,7 @@ async autoFillProductDetails(field, data) {
                               console.log("discount amount : ", saleOrder.dis_amt)
                               console.log("Total amount : ", saleOrder.total_amount)
                               saleOrder.total_amount = final_total_amount
-                
+
                               this.invoiceData = {
                                 sale_invoice_order: {
                                   // invoice_no: this.invoiceNumber,
@@ -2518,7 +2827,7 @@ async autoFillProductDetails(field, data) {
                                   order_status_id: completedStatusId,
                                   sale_order: saleOrder.sale_order,
                                   sale_order_id: saleOrder.sale_order_id,
-                                  ...(billType == 'OTHERS' && { invoice_no: this.invoiceNumber})
+                                  ...(billType == 'OTHERS' && { invoice_no: this.invoiceNumber })
                                 },
                                 // sale_invoice_items: saleOrderItems,
                                 sale_invoice_items: saleOrderItems.map(item => ({
@@ -2537,7 +2846,7 @@ async autoFillProductDetails(field, data) {
                       });
                     }
                   }
-                },                                          
+                },
                 {
                   key: 'use_workflow',
                   type: 'checkbox',
@@ -2547,7 +2856,7 @@ async autoFillProductDetails(field, data) {
                     label: 'Use Workflow',
                     placeholder: 'Enable Workflow',
                   },
-                },                                
+                },
                 {
                   key: 'remarks',
                   type: 'textarea',
@@ -2611,7 +2920,7 @@ async autoFillProductDetails(field, data) {
                   },
                   defaultValue: '0.00'
 
-                },              
+                },
                 {
                   key: 'cgst',
                   type: 'text',
@@ -2627,8 +2936,8 @@ async autoFillProductDetails(field, data) {
                         const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
                         field._lastValue = model.tax_amount; // Store last value to avoid infinite logs
                       }
-                      return model.billing_address?.includes('Andhra Pradesh') 
-                        ? (parseFloat(model.tax_amount) / 2).toFixed(2) 
+                      return model.billing_address?.includes('Andhra Pradesh')
+                        ? (parseFloat(model.tax_amount) / 2).toFixed(2)
                         : '0.00';
                     },
                     'templateOptions.disabled': 'true' // Make it read-only
@@ -2650,8 +2959,8 @@ async autoFillProductDetails(field, data) {
                         const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
                         field._lastValue = model.tax_amount;
                       }
-                      return model.billing_address?.includes('Andhra Pradesh') 
-                        ? (parseFloat(model.tax_amount) / 2).toFixed(2) 
+                      return model.billing_address?.includes('Andhra Pradesh')
+                        ? (parseFloat(model.tax_amount) / 2).toFixed(2)
                         : '0.00';
                     },
                     'templateOptions.disabled': 'true' // Make it read-only
@@ -2673,14 +2982,14 @@ async autoFillProductDetails(field, data) {
                         const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
                         field._lastValue = model.tax_amount;
                       }
-                      return !model.billing_address?.includes('Andhra Pradesh') 
-                        ? parseFloat(model.tax_amount).toFixed(2) 
+                      return !model.billing_address?.includes('Andhra Pradesh')
+                        ? parseFloat(model.tax_amount).toFixed(2)
                         : '0.00';
                     },
                     'templateOptions.disabled': 'true' // Make it read-only
                   },
                   hideExpression: (model) => !model.billing_address || model.billing_address?.includes('Andhra Pradesh') // Hide if intra-state
-                },                                                                                         
+                },
                 {
                   key: 'advance_amount',
                   type: 'text',
@@ -2774,10 +3083,10 @@ async autoFillProductDetails(field, data) {
                   hideLabel: true,
                 },
                 expressionProperties: {
-                    'templateOptions.hidden': () => !(this.SaleOrderEditID),
-                    'templateOptions.disabled': (model) => model.invoiced === 'YES' ||  model.work_order_created === 'YES' || !this.SaleOrderEditID
-                  }
-              },                                     
+                  'templateOptions.hidden': () => !(this.SaleOrderEditID),
+                  'templateOptions.disabled': (model) => model.invoiced === 'YES' || model.work_order_created === 'YES' || !this.SaleOrderEditID
+                }
+              },
               {
                 key: 'product',
                 type: 'select',
@@ -2801,18 +3110,18 @@ async autoFillProductDetails(field, data) {
                       console.error('Parent array is undefined or not accessible');
                       return;
                     }
-              
+
                     const currentRowIndex = +parentArray.key;
-              
+
                     // Populate product if data exists
                     const existingProduct = this.dataToPopulate?.sale_order_items?.[currentRowIndex]?.product;
                     // console.log("existingProduct : ", existingProduct);
                     if (existingProduct) {
                       field.formControl.setValue(existingProduct);
                     }
-              
+
                     this.loadProductVariations(field);
-              
+
                     // Subscribe to value changes (to update sizes dynamically)
                     field.formControl.valueChanges.subscribe((data: any) => {
                       if (!this.formConfig.model['sale_order_items'][currentRowIndex]) {
@@ -2825,15 +3134,15 @@ async autoFillProductDetails(field, data) {
                     });
 
                     // Product Info Text code
-                    field.formControl.valueChanges.subscribe( async selectedProductId => {
+                    field.formControl.valueChanges.subscribe(async selectedProductId => {
                       const unit = this.getUnitData(selectedProductId);
                       const row = this.formConfig.model.sale_order_items[currentRowIndex];
-                      this.displayInformation(row.product, null , null, unit, '', ''); 
-                      console.log('executed from product info text code');                         
+                      this.displayInformation(row.product, null, null, unit, '', '');
+                      console.log('executed from product info text code');
                     }); // end of product info text code
                   }
                 }
-              },          
+              },
               {
                 key: 'size',
                 type: 'select',
@@ -2856,10 +3165,10 @@ async autoFillProductDetails(field, data) {
                       console.error('Parent array is undefined or not accessible');
                       return;
                     }
-              
+
                     const currentRowIndex = +parentArray.key;
                     const saleOrderItems = this.dataToPopulate?.sale_order_items?.[currentRowIndex];
-                    
+
                     // Populate existing size if available
                     const existingSize = saleOrderItems?.size;
                     if (existingSize?.size_id) {
@@ -2874,12 +3183,12 @@ async autoFillProductDetails(field, data) {
                         return;
                       }
                       this.formConfig.model['sale_order_items'][currentRowIndex]['size_id'] = selectedSize?.size_id;
-              
+
                       const size_id = selectedSize?.size_id || null;
                       const url = size_id
                         ? `products/product_variations/?product_id=${product.product_id}&size_id=${size_id}`
                         : `products/product_variations/?product_id=${product.product_id}&size_isnull=True`;
-              
+
                       // Fetch available colors based on the selected size
                       this.http.get(url).subscribe((response: any) => {
                         if (response.data.length > 0) {
@@ -2896,7 +3205,7 @@ async autoFillProductDetails(field, data) {
                         })).filter((item, index, self) =>
                           index === self.findIndex((t) => t.value.color_id === item.value.color_id)
                         );
-              
+
                         // Update color field options
                         const colorField = parentArray.fieldGroup.find((f: any) => f.key === 'color');
                         if (colorField) {
@@ -2927,21 +3236,21 @@ async autoFillProductDetails(field, data) {
                       console.error('Parent array key is missing or inaccessible');
                       return;
                     }
-              
+
                     const currentRowIndex = Number(parentArray.key);
                     const saleOrderItems = this.dataToPopulate?.sale_order_items?.[currentRowIndex];
                     const row = this.formConfig.model.sale_order_items[currentRowIndex];
-              
+
                     if (!row) {
                       console.error(`Row not found for index ${currentRowIndex}`);
                       return;
                     }
-              
+
                     // Populate existing color if available
                     if (saleOrderItems?.color) {
                       field.formControl.setValue(saleOrderItems.color);
                     }
-              
+
                     // Subscribe to value changes & avoid unnecessary API calls
                     field.formControl.valueChanges.subscribe((selectedColor: any) => {
                       if (!row.product?.product_id) {
@@ -2950,18 +3259,18 @@ async autoFillProductDetails(field, data) {
                       }
 
                       this.formConfig.model['sale_order_items'][currentRowIndex]['color_id'] = selectedColor?.color_id;
-              
+
                       const color_id = selectedColor?.color_id || null;
                       console.log('color_id :', color_id)
-              
+
                       const url = `products/product_variations/?product_id=${row.product.product_id}`
                         + (color_id ? `&color_id=${color_id}` : `&color_isnull=True`);
-              
+
                       // Update selected color
                       row.color_id = color_id;
 
                       console.log('url:', url)
-              
+
                       this.http.get(url).subscribe(
                         (response: any) => {
                           if (response?.data) {
@@ -2977,7 +3286,7 @@ async autoFillProductDetails(field, data) {
                     });
                   }
                 }
-              },                       
+              },
               // {
               //   type: 'input',
               //   key: 'code',
@@ -3063,7 +3372,7 @@ async autoFillProductDetails(field, data) {
                         if (existingQuan) {
                           field.formControl.setValue(existingQuan); // Set full product object (not just product_id)
                         }
-                      } 
+                      }
                     }
 
                     // Subscribe to value changes
@@ -3074,7 +3383,7 @@ async autoFillProductDetails(field, data) {
                         console.log("Rate in quantity : ", rate)
                         const discount = field.form.controls.discount.value;
                         const quantity = data;
-                        const productDiscount = parseInt(rate) * parseInt(quantity) * parseInt(discount)/ 100
+                        const productDiscount = parseInt(rate) * parseInt(quantity) * parseInt(discount) / 100
                         if (rate && quantity) {
                           field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity) - productDiscount);
                         }
@@ -3123,7 +3432,7 @@ async autoFillProductDetails(field, data) {
                     });
                   }
                 }
-              },     
+              },
               {
                 type: 'input',
                 key: 'discount',
@@ -3159,7 +3468,7 @@ async autoFillProductDetails(field, data) {
                   }
                 }
               },
-       
+
               // {
               //   type: 'input',
               //   key: 'discount',
@@ -3277,7 +3586,7 @@ async autoFillProductDetails(field, data) {
                 }
               },
               {
-                type: 'select',
+                type: 'productUnitOptions-dropdown',
                 key: 'unit_options_id',
                 templateOptions: {
                   label: 'Unit',
@@ -3395,7 +3704,7 @@ async autoFillProductDetails(field, data) {
                 expressionProperties: {
                   'templateOptions.disabled': 'true' // Make it read-only
                 }
-              },              
+              },
               {
                 type: 'input',
                 key: 'sgst',
@@ -3418,7 +3727,7 @@ async autoFillProductDetails(field, data) {
                 expressionProperties: {
                   'templateOptions.disabled': 'true' // Make it read-only
                 }
-              },              
+              },
               {
                 type: 'input',
                 key: 'igst',
@@ -3441,7 +3750,7 @@ async autoFillProductDetails(field, data) {
                 expressionProperties: {
                   'templateOptions.disabled': 'true' // Make it read-only
                 },
-              },               
+              },
               {
                 type: 'input',
                 key: 'remarks',
@@ -3534,10 +3843,10 @@ async autoFillProductDetails(field, data) {
                                   ) {
                                     field.formControl.setValue(this.dataToPopulate.sale_order.tax_amount);
                                   }
-                            
+
                                   // Store initial tax_amount as a float value
                                   let previousTaxAmount = parseFloat(this.dataToPopulate?.sale_order?.tax_amount || "0");
-                            
+
                                   // Subscribe to value changes on the tax_amount field
                                   field.formControl.valueChanges.subscribe(newTaxAmount => {
                                     if (field.form && field.form.controls && field.form.controls.total_amount) {
@@ -3556,7 +3865,7 @@ async autoFillProductDetails(field, data) {
                                   });
                                 }
                               }
-                            },                            
+                            },
                             // {
                             //   key: 'tax_amount',
                             //   type: 'input',
@@ -3573,7 +3882,7 @@ async autoFillProductDetails(field, data) {
                             //         field.formControl.setValue(this.dataToPopulate.sale_order.tax_amount);
                             //         // this.totalAmountCal();
                             //       } 
-                                  
+
                             //       // Subscribe to value changes
                             //       field.formControl.valueChanges.subscribe(data => {
                             //         console.log("we are in method...")
@@ -3681,7 +3990,7 @@ async autoFillProductDetails(field, data) {
                             },
                             {
                               key: 'gst_type',
-                              type: 'select',
+                              type: 'gst-types-dropdown',
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 label: 'Gst type',
@@ -3711,7 +4020,7 @@ async autoFillProductDetails(field, data) {
                             },
                             {
                               key: 'payment_term',
-                              type: 'select',
+                              type: 'customer-payment-dropdown',
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 label: 'Payment term',
@@ -3740,7 +4049,7 @@ async autoFillProductDetails(field, data) {
                             },
                             {
                               key: 'ledger_account',
-                              type: 'select',
+                              type: 'ledger-account-dropdown',
                               className: 'col-md-4 col-lg-3 col-sm-6 col-12',
                               templateOptions: {
                                 label: 'Ledger account',
@@ -3842,7 +4151,7 @@ async autoFillProductDetails(field, data) {
                                     this.totalAmountCal();
                                   });
                                 }
-                                
+
                               }
                             },
                             {
@@ -4178,6 +4487,6 @@ async autoFillProductDetails(field, data) {
   totalAmountCal() {
     calculateTotalAmount(this.formConfig.model, 'sale_order_items', this.salesForm?.form);
   }
-  
-  
+
+
 }

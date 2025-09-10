@@ -28,10 +28,10 @@ export class WorkOrderListComponent {
     title: 'Work Order',
     pkId: "work_order_id",
     fixedFilters: [
-      // {
-      //   key: 'summary',
-      //   value: 'true'
-      // }
+      {
+        key: 'summary',
+        value: 'true'
+      }
     ],
     pageSize: 10,
     globalSearch: {
@@ -92,7 +92,7 @@ export class WorkOrderListComponent {
         sort: true
       },
       {
-        fieldKey: 'order_no',
+        fieldKey: 'sale_order',
         name: 'Sale Order',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
@@ -124,6 +124,13 @@ export class WorkOrderListComponent {
             label: 'Delete',
             confirm: true,
             confirmMsg: "Sure to delete?",
+            apiUrl: 'production/work_order'
+          },
+          {
+            type: 'restore',
+            label: 'Restore',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
             apiUrl: 'production/work_order'
           },
           {
