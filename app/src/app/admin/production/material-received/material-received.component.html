@@ -1,0 +1,36 @@
+<div class="container-fluid p-3">
+  <div class="material-received-banner page-component-header">
+    <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
+      <button type="button" class="btn pl-0">
+        <span *ngIf="MaterialReceivedEditID" class="custom-heading">Update Material Received</span>
+        <span *ngIf="!MaterialReceivedEditID" class="custom-heading">Create Material Received</span>
+      </button>
+      <button (click)="showMaterialReceivedListFn()" type="button" class="btn btn-primary header-right-btn" data-bs-toggle="modal" data-bs-target="#materialReceivedListModal">
+        Material Received List
+      </button>
+    </div>
+  </div>
+  <div class="row custom-form">
+    <div class="col-12 px-1" *ngIf="receiptNumber || showForm">
+      <ta-form #materialReceivedForm [options]="formConfig"></ta-form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Material Received List -->
+<div class="modal fade custom-modal" id="materialReceivedListModal" tabindex="-1" aria-labelledby="materialReceivedListModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl ">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="materialReceivedListModalLabel">Material Received List</h5>
+        <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" *ngIf="showMaterialReceivedList">
+        <app-material-received-list (edit)="editMaterialReceived($event)" class="custom-list"></app-material-received-list>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
