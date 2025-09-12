@@ -19,7 +19,8 @@ export class ProductStockUnitsComponent {
       "globalSearch": {
         keys: ['stock_unit_name','quantity_code_id','description']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+      defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'stock_unit_name',

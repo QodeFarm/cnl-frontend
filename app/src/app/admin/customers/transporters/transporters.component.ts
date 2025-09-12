@@ -19,7 +19,8 @@ export class TransportersComponent {
       "globalSearch": {
         keys: ['transporter_id', 'name', 'code','gst_no','website_url']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+      defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'name',

@@ -19,7 +19,8 @@ export class ColorComponent {
       "globalSearch": {
         keys: ['color_id','color_name']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+      defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'color_name',

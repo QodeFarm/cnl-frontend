@@ -20,7 +20,8 @@ export class VendorCategoryComponent {
       "globalSearch": {
         keys: ['vendor_category_id', 'code', 'name']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+      defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'code',

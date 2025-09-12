@@ -42,7 +42,8 @@ export class CustomersListComponent {
     "globalSearch": {
       keys: ['created_at', 'name', 'email', 'phone', 'gst', 'city_id', 'ledger_account_id']
     },
-    defaultSort: { key: 'created_at', value: 'descend' },
+    // defaultSort: { key: 'created_at', value: 'descend' },
+    defaultSort: { key: 'is_deleted', value: 'ascend' },
     cols: [
       {
         fieldKey: 'name',

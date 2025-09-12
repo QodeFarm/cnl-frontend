@@ -31,7 +31,8 @@ export class BranchListComponent {
       keys: ['name','code','phone','email','address','city_id','state_id','status_id']
     },
     export: {downloadName: 'BranchList'},
-    defaultSort: { key: 'created_at', value: 'descend' },
+    // defaultSort: { key: 'created_at', value: 'descend' },
+    defaultSort: { key: 'is_deleted', value: 'ascend' },
     cols: [
       {
         fieldKey: 'name',

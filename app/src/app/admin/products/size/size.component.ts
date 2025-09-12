@@ -20,7 +20,8 @@ export class SizeComponent {
       "globalSearch": {
         keys: ['size_id','size_name','size_category','size_system','length','height', 'width','size_unit','description']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+      defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'size_name',

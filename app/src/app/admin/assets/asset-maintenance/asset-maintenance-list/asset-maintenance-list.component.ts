@@ -33,7 +33,8 @@ export class AssetMaintenanceListComponent {
       keys: ['asset_id','maintenance_date','asset_id','cost','maintenance_description']
     },
     export: {downloadName: 'AssetMaintenanceList'},
-    defaultSort: { key: 'created_at', value: 'descend' },
+    // defaultSort: { key: 'created_at', value: 'descend' },
+    defaultSort: { key: 'is_deleted', value: 'ascend' },
     cols: [
       {
         fieldKey: 'asset_id',

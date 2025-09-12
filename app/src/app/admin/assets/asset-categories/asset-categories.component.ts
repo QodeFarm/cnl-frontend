@@ -20,7 +20,8 @@ export class AssetCategoriesComponent {
       pkId: "asset_category_id",
       pageSize: 10,
       "globalSearch": {keys: ['asset_category_id', 'category_name']},
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+      defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'category_name',

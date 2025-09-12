@@ -269,42 +269,81 @@ export class SaleReturnsComponent {
         // Clear previous options for both size and color fields before adding new ones
         if (sizeField) sizeField.templateOptions.options = [];
         if (colorField) colorField.templateOptions.options = [];
+        // this.http.get(`products/product_variations/?product_id=${product.product_id}`).subscribe((response: any) => {
+        //   if (response.data.length > 0) {
+  
+        //     let availableSizes, availableColors;
+        //     // Check if response data is non-empty for size
+        //     if (response.data && response.data.length > 0) {
+        //       availableSizes = response.data.map((variation: any) => ({
+        //         label: variation.size?.size_name || '----',
+        //         value: {
+        //           size_id: variation.size?.size_id || null,
+        //           size_name: variation.size?.size_name || '----'
+        //         }
+        //       }));
+        //       availableColors = response.data.map((variation: any) => ({
+        //         label: variation.color?.color_name || '----',
+        //         value: {
+        //           color_id: variation.color?.color_id || null,
+        //           color_name: variation.color?.color_name || '----'
+        //         }
+        //       }));
+        //       // Enable and update the size field options if sizes are available
+        //       if (sizeField) {
+        //         sizeField.formControl.enable(); // Ensure the field is enabled
+        //         sizeField.templateOptions.options = availableSizes.filter((item, index, self) => index === self.findIndex((t) => t.value.size_id === item.value.size_id)); // Ensure unique size options
+        //       }
+        //     } else {
+        //       // Clear options and keep the fields enabled, without any selection if no options exist
+        //       if (sizeField) {
+        //         sizeField.templateOptions.options = [];
+        //       }
+        //       if (colorField) {
+        //         colorField.templateOptions.options = [];
+        //       }
+        //     }
+        //   }
+        // });
         this.http.get(`products/product_variations/?product_id=${product.product_id}`).subscribe((response: any) => {
           if (response.data.length > 0) {
-  
-            let availableSizes, availableColors;
-            // Check if response data is non-empty for size
-            if (response.data && response.data.length > 0) {
-              availableSizes = response.data.map((variation: any) => ({
-                label: variation.size?.size_name || '----',
-                value: {
-                  size_id: variation.size?.size_id || null,
-                  size_name: variation.size?.size_name || '----'
-                }
-              }));
-              availableColors = response.data.map((variation: any) => ({
-                label: variation.color?.color_name || '----',
-                value: {
-                  color_id: variation.color?.color_id || null,
-                  color_name: variation.color?.color_name || '----'
-                }
-              }));
-              // Enable and update the size field options if sizes are available
-              if (sizeField) {
-                sizeField.formControl.enable(); // Ensure the field is enabled
-                sizeField.templateOptions.options = availableSizes.filter((item, index, self) => index === self.findIndex((t) => t.value.size_id === item.value.size_id)); // Ensure unique size options
+            const availableSizes = response.data.map((variation: any) => ({
+              label: variation.size?.size_name || '----',
+              value: {
+                size_id: variation.size?.size_id || null,
+                size_name: variation.size?.size_name || '----'
               }
-            } else {
-              // Clear options and keep the fields enabled, without any selection if no options exist
-              if (sizeField) {
-                sizeField.templateOptions.options = [];
+            })).filter((item, index, self) =>
+              index === self.findIndex((t) => t.value.size_id === item.value.size_id)
+            );
+
+            const availableColors = response.data.map((variation: any) => ({
+              label: variation.color?.color_name || '----',
+              value: {
+                color_id: variation.color?.color_id || null,
+                color_name: variation.color?.color_name || '----'
               }
-              if (colorField) {
-                colorField.templateOptions.options = [];
-              }
+            })).filter((item, index, self) =>
+              index === self.findIndex((t) => t.value.color_id === item.value.color_id)
+            );
+
+            if (sizeField) {
+              sizeField.formControl.enable();
+              sizeField.templateOptions.options = availableSizes;
             }
+
+            if (colorField) {
+              colorField.formControl.enable();
+              colorField.templateOptions.options = availableColors;
+            }
+
+            // 🔹 Restore selected size + color in edit mode
+            const row = this.formConfig.model.sale_return_items[+parentArray.key];
+            if (row?.size) sizeField.formControl.setValue(row.size, { emitEvent: false });
+            if (row?.color) colorField.formControl.setValue(row.color, { emitEvent: false });
           }
         });
+
       } else {
         console.error('Product not selected or invalid.');
       }
@@ -378,6 +417,7 @@ async autoFillProductDetails(field, data) {
       field.form.controls[key]?.setValue(value);
     }
   });
+
 
   this.totalAmountCal();
 }
@@ -892,7 +932,7 @@ async autoFillProductDetails(field, data) {
                 },
                 {
                   key: 'customer',
-                  type: 'select',
+                  type: 'customer-dropdown',
                   className: 'col-md-4 col-sm-6 col-12',
                   props: {
                     label: 'Customer',

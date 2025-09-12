@@ -19,7 +19,8 @@ export class OrderStatusesComponent {
       "globalSearch": {
         keys: ['order_status_id', 'status_name','description']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+      defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'status_name',

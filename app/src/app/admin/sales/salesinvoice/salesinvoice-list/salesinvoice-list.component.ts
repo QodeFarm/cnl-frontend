@@ -380,12 +380,22 @@ private fallbackPrint(pdfBlob: Blob): void {
         name: 'Advance Amount',
         sort: true
       },
+      // {
+      //   fieldKey: 'status_name',
+      //   name: 'Status',
+      //   displayType: "map",
+      //   mapFn: (currentValue: any, row: any, col: any) => {
+      //     return `${row?.order_status?.status_name}`;
+      //   },
+      //   sort: true
+      // },
       {
-        fieldKey: 'status_name',
+        fieldKey: 'order_status',
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row?.order_status?.status_name}`;
+          // return `${row.order_status.status_name}`;
+          return row.order_status?.status_name || row.order_status_id || '';
         },
         sort: true
       },

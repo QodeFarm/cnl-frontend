@@ -22,7 +22,8 @@ export class AssetStatusesComponent {
       "globalSearch": {
         keys: ['asset_status_id', 'status_name']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+      defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'status_name',

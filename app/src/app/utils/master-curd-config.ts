@@ -21,7 +21,8 @@ export const customerCudConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['created_at', 'name', 'email', 'phone', 'gst', 'city_id', 'ledger_account_id']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'name',
@@ -952,7 +953,8 @@ export const customerCategoryConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['customer_category_id', 'name', 'code']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'name',
@@ -1038,7 +1040,8 @@ export const ledgerAccountsConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['ledger_account_id', 'name','code','inactive','type','account_no','is_loan_account', 'address','pan','ledger_group_id']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'name',
@@ -1280,7 +1283,8 @@ export const cityConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['state_name', 'city_name', 'city_code']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         // {
         //   fieldKey: 'state_name',
@@ -1397,7 +1401,8 @@ export const StateConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['country_name', 'state_name', 'state_code']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         // {
         //   fieldKey: 'country_name',
@@ -1520,7 +1525,8 @@ export const CountryConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['country_name', 'country_code']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'country_name',
@@ -1609,7 +1615,8 @@ export const vendorCategeoryConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['vendor_category_id', 'code', 'name']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'code',
@@ -1706,7 +1713,8 @@ export const statusConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['status_id', 'status_name']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'status_name',
@@ -1789,7 +1797,8 @@ export const TransportConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['transporter_id', 'name', 'code','gst_no','website_url']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'name',
@@ -1907,7 +1916,8 @@ export const FirmStatusConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['firm_status_id', 'name']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
 		    {
           fieldKey: 'name',
@@ -1988,7 +1998,8 @@ export const GstCatConfig: TaCurdConfig = {
         "globalSearch": {
           keys: ['gst_category_id', 'name']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
       {
             fieldKey: 'name',
@@ -2068,7 +2079,8 @@ export const PriceCatConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['price_category_id', 'name', 'code']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
 		    {
           fieldKey: 'name',
@@ -2163,7 +2175,8 @@ export const VendorAgentConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['vendor_agent_id', 'name','code','commission_rate','rate_on','amount_type']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'name',
@@ -2310,7 +2323,8 @@ export const VendorPaymentTermsConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['payment_term_id', 'name', 'code','fixed_days','no_of_fixed_days','payment_cycle','run_on']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
 	      {
           fieldKey: 'name',
@@ -2466,7 +2480,8 @@ export const CustomerPaymentConfig: TaCurdConfig = {
       // "globalSearch": {
       //   keys: ['payment_term_id', 'name','code','fixed_days','no_of_fixed_days','payment_cycle', 'run_on']
       // },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'name',
@@ -2614,7 +2629,8 @@ export const LedgerGroupsConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['ledger_group_id', 'name','code','inactive','under_group','nature']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'name',
@@ -2743,7 +2759,8 @@ export const TerritoryConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['territory_id', 'name','code']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'name',
@@ -2830,7 +2847,8 @@ export const MachineConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['machine_id', 'machine_name', 'description', 'status']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'machine_name',
@@ -2935,7 +2953,8 @@ export const ProductionStatusesConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['status_id', 'status_name']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'status_name',
@@ -3005,7 +3024,8 @@ export const OrderStatusConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['order_status_id', 'status_name','description']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'status_name',
@@ -3102,7 +3122,8 @@ export const GstTypesConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['gst_type_id', 'name']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'name',
@@ -3184,7 +3205,8 @@ export const OrderTypesConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['order_type_id', 'name']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'name',
@@ -3266,7 +3288,8 @@ export const PurchaseTypesConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['purchase_type_id', 'name']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'name',
@@ -3348,7 +3371,8 @@ export const SaleTypesConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['sale_type_id', 'name']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'name',
@@ -3430,7 +3454,8 @@ export const UserGroupsConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['group_id', 'group_name', 'description']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'group_name',
@@ -3515,7 +3540,8 @@ export const ReminderTypesConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['reminder_type_id', 'type_name']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'type_name',
@@ -3585,7 +3611,8 @@ export const PaymentLinkConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['payment_link_type_id', 'name', 'description']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'name',
@@ -3683,7 +3710,8 @@ export const productModesConfig: TaCurdConfig = {
       globalSearch: {
         keys: ['item_master_id', 'mode_name', 'description']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'mode_name',
@@ -3782,7 +3810,8 @@ export const productSalesGLConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['name', 'sales_accounts', 'code', 'inactive', 'type', 'account_no', 'is_loan_account', 'address', 'employee', 'pan']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'name',
@@ -4071,7 +4100,8 @@ export const productTypesConfig: TaCurdConfig = {
       globalSearch: {
         keys: ['type_id', 'type_name', 'mode_type']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'type_name',
@@ -4172,7 +4202,8 @@ export const productBrandsConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['brand_id', 'brand_name', 'code', 'brand_salesman']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'brand_name',
@@ -4313,7 +4344,8 @@ export const productGroupsConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['group_name', 'description']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'group_name',
@@ -4412,7 +4444,8 @@ export const productStockUnitsConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['stock_unit_name', 'quantity_code_id', 'description']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'stock_unit_name',
@@ -4546,7 +4579,8 @@ export const productCategoriesConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['category_name', 'code']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'category_name',
@@ -4644,7 +4678,8 @@ export const productGstClassificationsConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['id', 'type', 'code', 'hsn_or_sac_code', 'hsn_description']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'type',
@@ -4784,7 +4819,8 @@ export const productItemTypeConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['item_type_id', 'item_name']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'item_name',
@@ -4867,7 +4903,8 @@ export const productPurchaseGLConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['name', 'purchase_accounts', 'code', 'inactive', 'type', 'account_no', 'is_loan_account', 'address', 'employee', 'pan']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'name',
@@ -5157,7 +5194,8 @@ export const unitOptionsConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['unit_options_id', 'unit_name']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'unit_name',
@@ -5238,7 +5276,8 @@ export const productSizesConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['size_id', 'size_name', 'size_category', 'size_system', 'length', 'height', 'width', 'size_unit', 'description']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'size_name',
@@ -5411,7 +5450,8 @@ export const productColorsConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['color_id', 'color_name']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'color_name',
@@ -5479,7 +5519,8 @@ export const warehouseLocationsConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['location_id', 'location_name', 'description', 'warehouse']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'location_name',
@@ -5734,7 +5775,8 @@ export const jobTypesConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['job_type_id', 'job_type_name']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [{
             fieldKey: 'job_type_name',
             name: 'Job Type Name',
@@ -5799,7 +5841,8 @@ export const designationsConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['designation_id', 'designation_name', 'responsibilities']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'designation_name',
@@ -5884,7 +5927,8 @@ export const jobCodesConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['job_code_id', 'job_code']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [{
             fieldKey: 'job_code',
             name: 'Job Code',
@@ -5950,7 +5994,8 @@ export const departmentsConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['department_id', 'department_name', 'designation_name']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'department_name',
@@ -6016,7 +6061,8 @@ export const shiftsConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['shift_id', 'shift_name', 'start_time', 'end_time']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'shift_name',
@@ -6119,7 +6165,8 @@ export const salaryComponentsConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['component_id', 'component_name']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [{
             fieldKey: 'component_name',
             name: 'Component Name',
@@ -6185,7 +6232,8 @@ export const employeeSalaryComponentsConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['employee_component_id', 'component_id', 'component_amount', 'salary_id']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'component_id',
@@ -6324,7 +6372,8 @@ export const leaveTypesConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['leave_type_id', 'leave_type_name', 'description', 'max_days_allowed']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'leave_type_name',
@@ -6425,7 +6474,8 @@ export const leadStatusesConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['lead_status_id', 'status_name']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [{
             fieldKey: 'status_name',
             name: 'Status Name',
@@ -6493,7 +6543,8 @@ drawerSize: 500,
       "globalSearch": {
         keys: ['interaction_type_id','interaction_type']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'interaction_type',
@@ -6560,7 +6611,8 @@ export const taskPrioritiesConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['priority_id', 'priority_name']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'priority_name',
@@ -6631,7 +6683,8 @@ export const AssetCategoriesConfig:  TaCurdConfig = {
       pkId: "asset_category_id",
       pageSize: 10,
       "globalSearch": {keys: ['asset_category_id', 'category_name']},
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       hideFilters: true,
       cols: [
         {
@@ -6703,7 +6756,8 @@ export const AssetStatusConfig: TaCurdConfig = {
         keys: ['asset_status_id', 'status_name']
       },
       hideFilters: true,
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'status_name',
@@ -6773,7 +6827,8 @@ export const LocationsAssetConfig: TaCurdConfig = {
         keys: ['location_id', 'location_name']
       },
       hideFilters: true,
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'location_name',
@@ -6866,7 +6921,8 @@ export const productsCrudConfig: TaCurdConfig = {
         keys: ['created_at', 'name', 'code', 'unit_options', 'balance', 'sales_rate', 'mrp', 'dis_amount', 'print_name', 'hsn_code', 'barcode']
       },
       export: { downloadName: 'ProductsList' },
-      defaultSort: { key: 'code', value: 'descend' },
+      // defaultSort: { key: 'code', value: 'descend' },
+      defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'name',
