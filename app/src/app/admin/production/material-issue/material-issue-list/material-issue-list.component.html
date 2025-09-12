@@ -1,0 +1,49 @@
+<ta-table [options]="tableConfig"> 
+    <div class="bottom-left" bottom-left>
+        <div class="d-flex align-items-center">
+            <!-- Mail Dropdown -->
+            <select class="form-select me-2" (change)="onSelect($event)">
+                <option value="" disabled selected hidden>Sending Mail</option>
+                <option value="email">Email</option>
+                <option value="whatsapp">WhatsApp</option>
+            </select>
+            <!-- Print Dropdown -->
+            <select class="form-select me-2" (change)="onPrintSelect($event)">
+                <option value="" disabled selected hidden>Print Document</option>
+                <option value="preview">Preview</option>
+                <option value="print">Print</option>
+            </select>
+        </div>
+    </div>
+</ta-table>
+
+<!-- Document Format Selection Dialog -->
+<div id="formatDialog" class="format-dialog">
+    <div class="dialog-content">
+        <h5>Select Document Format</h5>
+        <select [(ngModel)]="selectedFormat" class="form-select mb-3">
+            <option value="CNL_Standard_Excl">CNL_Standard_Excl</option>
+            <option value="CNL_Standard_Incl">CNL_Standard_Incl</option>
+        </select>
+        <div class="d-flex justify-content-end">
+            <button class="btn btn-secondary me-2" (click)="closeFormatDialog()">Cancel</button>
+            <button class="btn btn-primary" (click)="proceedWithSelectedAction()">Continue</button>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Loading Indicator -->
+<div class="loading-overlay" *ngIf="showLoading">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Generating preview...</div>
+</div>
+
+<!-- Custom Dialog -->
+<div id="customDialog" class="custom-dialog-overlay" style="display: none;">
+    <div class="custom-dialog-box">
+        <p> ⚠️ Please select a Material Issue </p>
+        <button id="dialogOkButton" (click)="closeDialog()">OK</button>
+    </div>
+</div>
