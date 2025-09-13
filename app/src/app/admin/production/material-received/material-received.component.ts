@@ -169,7 +169,7 @@ export class MaterialReceivedComponent implements OnInit {
           fieldGroup: [
             {
               key: 'production_floor',
-              type: 'select',
+              type: 'productionFloors-dropdown',
               className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Production Floor',
