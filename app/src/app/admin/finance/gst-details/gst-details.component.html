@@ -1,20 +1,22 @@
 <div class="gst-summary">
-    <h2>GST Summary</h2>
-  
-    <div class="gst-info">
-      <p><strong>Total Invoices:</strong> {{ totalInvoices }}</p>
-      <p><strong>Total Tax Collected:</strong> ₹{{ totalTaxCollected }}</p>
-    </div>
-  
-    <div class="gst-info">
-      <p><strong>Total Purchases:</strong> {{ totalPurchases }}</p>
-      <p><strong>Total Tax Paid:</strong> ₹{{ totalTaxPaid }}</p>
-    </div>
-  
-    <div class="gst-info">
-      <p><strong>Tax Amount:</strong> ₹{{ taxAmount }}</p>
-    </div>
-  
-    <button (click)="fileGST()" class="btn-primary">File GST</button>
+  <h2>GST Summary</h2>
+
+  <div class="gst-info">
+    <p><strong>Total Invoices:</strong> <span class="value">{{ totalInvoices }}</span></p>
+    <p><strong>Total Tax Collected:</strong> ₹<span class="value">{{ totalTaxCollected }}</span></p>
   </div>
-  
+
+  <div class="gst-info">
+    <p><strong>Total Purchases:</strong> <span class="value">{{ totalPurchases }}</span></p>
+    <p><strong>Total Tax Paid:</strong> ₹<span class="value">{{ totalTaxPaid }}</span></p>
+  </div>
+
+  <div class="gst-info">
+    <p>
+      <strong>Tax Amount:</strong>
+      ₹<span class="value" [ngClass]="taxAmount >= 0 ? 'positive' : 'negative'">{{ taxAmount }}</span>
+    </p>
+  </div>
+
+  <button (click)="fileGST()" class="btn-primary">File GST</button>
+</div>

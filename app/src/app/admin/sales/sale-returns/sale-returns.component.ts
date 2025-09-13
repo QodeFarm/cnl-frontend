@@ -688,6 +688,9 @@ async autoFillProductDetails(field, data) {
             billing_address: invoiceData.billing_address,
             shipping_address: invoiceData.shipping_address,
           },
+          customer_id: invoiceData.customer_id,
+          gst_type_id: invoiceData.gst_type_id,
+          payment_term_id: invoiceData.payment_term_id,
           sale_return_items: invoiceItems,
           order_attachments: res.data.order_attachments,
           order_shipments: res.data.order_shipments
@@ -728,6 +731,9 @@ async autoFillProductDetails(field, data) {
               customer_id: invoiceData.customer?.customer_id,
               name: invoiceData.customer?.name
             },
+            customer_id: invoiceData.customer_id,
+            gst_type_id: invoiceData.gst_type_id,
+            payment_term_id: invoiceData.payment_term_id,
             email: invoiceData.email,
             billing_address: invoiceData.billing_address,
             shipping_address: invoiceData.shipping_address,
