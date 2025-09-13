@@ -115,21 +115,36 @@ export class DebitNoteComponent {
 
   circleSaleDebitnote(event) {
     this.SaleDebitnoteEditID = event;
-    this.http.patch('sales/sale_debit_notes/' + event + '/', { order_status_id: '68ea000e-ce95-4145-a3c7-96efe6f9ff53' })
+    this.http.get<any>('masters/order_status/?status_name=Approved')
       .subscribe(
-        (res: any) => {
-          // Check if the response contains credit_note_id
-          if (res && res.debit_note_id) {
-            // Store the message in localStorage
-            localStorage.setItem('sidebarMessage', 'Order status Approved');
-            // Reload the page
-            window.location.reload();
+        (statusRes: any) => {
+          if (statusRes && statusRes.data.length > 0) {
+            // console.log("statusRes : ", statusRes)
+            const approvedStatusId = statusRes.data[0].order_status_id;  // dynamically fetch ID
+
+            // Now patch the sale_credit_note with the dynamic order_status_id
+            this.http.patch('sales/sale_debit_notes/' + event + '/', { order_status_id: approvedStatusId })
+              .subscribe(
+                (res: any) => {
+                  if (res && res.debit_note_id) {
+                    // localStorage.setItem('sidebarMessage', 'Order status Approved');
+                    // window.location.reload();
+                    // this.refreshTable();
+                    this.DebitNoteListComponent.refreshTable();
+                  } else {
+                    console.error("Error updating order status:", res);
+                  }
+                },
+                (error) => {
+                  console.error("HTTP error while patching:", error);
+                }
+              );
           } else {
-            console.error("Error updating order status:", res);
+            console.error("No status found for Approved");
           }
         },
         (error) => {
-          console.error("HTTP error:", error);
+          console.error("HTTP error while fetching status:", error);
         }
       );
   } 

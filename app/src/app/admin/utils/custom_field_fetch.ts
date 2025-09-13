@@ -352,7 +352,7 @@ export class CustomFieldHelper {
       });
   
       // If any required fields are missing, show an alert and stop submission
-      if (missingRequiredFields.length > 0) {
+      if (missingRequiredFields.length > 0 && entityName !== "sale_invoice") {
         this.showPopup("Custom fields required fields are missing");
         return null;
       }
@@ -373,20 +373,5 @@ export class CustomFieldHelper {
         custom_field: customFieldArray,
         custom_field_values: customFieldValuesArray
       };
-  
-      // Construct payload for multiple custom fields
-      // return {
-      //   custom_field: Object.keys(customFieldValues).map((fieldKey) => ({
-      //     field_name: fieldKey,
-      //     is_required: this.customFieldMetadata[fieldKey.toLowerCase()]?.is_required || false,
-      //     validation_rules: this.customFieldMetadata[fieldKey.toLowerCase()]?.validation_rules || null,
-      //     field_type_id: this.customFieldMetadata[fieldKey.toLowerCase()]?.field_type_id || null,
-      //     //entity_id: entityName // Assign dynamic entity_id
-      //     entity_id: metadata.entity_id, // ✅ Pre-injected
-      //     entity_name: entityName
-      //     // entity_id: this.customFieldMetadata[fieldKey.toLowerCase()]?.entity_id || entityName
-      //   })),
-      //   custom_field_values: customFieldValuesArray // Include only entered values
-      // };
     }
 }

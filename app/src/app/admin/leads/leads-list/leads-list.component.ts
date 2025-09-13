@@ -149,6 +149,7 @@ export class LeadsListComponent {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',
+            tooltip: "Edit this record",
             callBackFn: (row, action) => {
               this.edit.emit(row.lead_id);
               // this.router.navigateByUrl('leads/leads/' + row.lead_id);

@@ -8,7 +8,8 @@ import { TaCurdConfig } from '@ta/ta-curd';
 })
 export class LocationsComponent {
 
-  baseUrl: string = 'https://apicore.cnlerp.com/api/v1/';
+  // baseUrl: string = 'https://apicore.cnlerp.com/api/v1/';
+  baseUrl: string = 'http://127.0.0.1:8000/api/v1/';
   
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
@@ -21,7 +22,8 @@ export class LocationsComponent {
       "globalSearch": {
         keys: ['location_id', 'location_name']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+      defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'location_name',
@@ -43,6 +45,13 @@ export class LocationsComponent {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: this.baseUrl + 'assets/locations'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: this.baseUrl + 'assets/locations'
             },
             {

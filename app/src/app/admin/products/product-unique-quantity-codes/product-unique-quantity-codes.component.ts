@@ -21,7 +21,8 @@ export class ProductUniqueQuantityCodesComponent {
       "globalSearch": {
         keys: ['quantity_code_id', 'quantity_code_name']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+      defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'quantity_code_name',

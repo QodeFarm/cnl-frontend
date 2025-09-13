@@ -42,7 +42,8 @@ export class CustomersListComponent {
     "globalSearch": {
       keys: ['created_at', 'name', 'email', 'phone', 'gst', 'city_id', 'ledger_account_id']
     },
-    defaultSort: { key: 'created_at', value: 'descend' },
+    // defaultSort: { key: 'created_at', value: 'descend' },
+    defaultSort: { key: 'is_deleted', value: 'ascend' },
     cols: [
       {
         fieldKey: 'name',
@@ -142,6 +143,7 @@ export class CustomersListComponent {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',
+            tooltip: "Edit this record",
             callBackFn: (row, action) => {
               console.log(row);
               this.edit.emit(row.customer_id);

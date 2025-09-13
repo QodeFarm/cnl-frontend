@@ -26,7 +26,7 @@
             [nzPlaceHolder]="props?.placeholder || 'Please Select'" [nzSelectOnTab]="true"
             (clickOutside)="onClickOutside($event)">
             <nz-option *ngIf="formControl && formControl.value" nzDisabled [nzValue]="formControl.value"
-                [nzLabel]="lazySelectedItem.label"></nz-option>
+                [nzLabel]="lazySelectedItem?.label || formControl.value?.[props?.dataLabel || 'name']"></nz-option>
             <nz-option></nz-option>
         </nz-select>
         <div class="adv-select-curd-container-main" *ngIf="false && props.curdConfig && showCurdDiv;">

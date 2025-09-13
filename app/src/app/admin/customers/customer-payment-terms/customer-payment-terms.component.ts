@@ -19,7 +19,8 @@ export class CustomerPaymentTermsComponent {
       "globalSearch": {
         keys: ['payment_term_id', 'name','code','fixed_days','no_of_fixed_days','payment_cycle', 'run_on']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+      defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'name',

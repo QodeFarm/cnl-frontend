@@ -502,24 +502,33 @@ export class SalesComponent {
         this.formConfig.model['tax_amount'] = res.data.sale_order.tax_amount;
         this.formConfig.submit.label = 'Update';
         this.formConfig.model['sale_order_id'] = this.SaleOrderEditID;
-        this.showForm = true;
+        
         this.formConfig.fields[0].fieldGroup[0].fieldGroup[8].hide = false;
         this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = false;
         this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide = true;
 
         // Ensure custom_field_values are correctly populated in the model
-        if (res.data.custom_field_values) {
-          this.formConfig.model['custom_field_values'] = res.data.custom_field_values.reduce((acc: any, fieldValue: any) => {
-            acc[fieldValue.custom_field_id] = fieldValue.field_value; // Map custom_field_id to the corresponding value
+        // --- Custom Fields Handling ---
+        if (res.data.custom_field_values && Array.isArray(res.data.custom_field_values)) {
+          console.log("We are in the custom field values...")
+          console.log('Custom fields data : ', res.data.custom_field_values);
+          // Map API array to a form-friendly object
+          this.formConfig.model['custom_field_values'] = res.data.custom_field_values.reduce((acc: any, cf: any) => {
+            acc[cf.custom_field_id] = cf.field_value;
             return acc;
           }, {});
         }
+
+        this.showForm = true;
       }
+
+      
 
       this.totalAmountCal();
     });
     this.hide();
   }
+
 
   // Function to get a new order number and a shipping tracking number
   // getOrderNo() {
@@ -1019,58 +1028,99 @@ export class SalesComponent {
     }
   };
 
-  createSaleOrder() {
-    const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
+  // createSaleOrder() {
+  //   const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
 
-    // Determine the entity type and ID dynamically
-    const entityName = 'sale_order'; // Since we're in the Sale Order form
-    const customId = this.formConfig.model.sale_order?.sale_order_id || null; // Ensure correct sale_order_id
+  //   // Determine the entity type and ID dynamically
+  //   const entityName = 'sale_order'; // Since we're in the Sale Order form
+  //   const customId = this.formConfig.model.sale_order?.sale_order_id || null; // Ensure correct sale_order_id
 
-    // Find entity record from list
-    const entity = this.entitiesList.find(e => e.entity_name === entityName);
+  //   // Find entity record from list
+  //   const entity = this.entitiesList.find(e => e.entity_name === entityName);
 
-    // if (!entity) {
-    //   console.error(`Entity not found for: ${entityName}`);
-    //   return;
-    // }
+  //   // if (!entity) {
+  //   //   console.error(`Entity not found for: ${entityName}`);
+  //   //   return;
+  //   // }
 
-    const entityId = entity.entity_id;
-    // Inject entity_id into metadata temporarily
-    Object.keys(this.customFieldMetadata).forEach((key) => {
-      this.customFieldMetadata[key].entity_id = entityId;
-    });
-    // Construct payload for custom fields
-    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
+  //   const entityId = entity.entity_id;
+  //   // Inject entity_id into metadata temporarily
+  //   Object.keys(this.customFieldMetadata).forEach((key) => {
+  //     this.customFieldMetadata[key].entity_id = entityId;
+  //   });
+  //   // Construct payload for custom fields
+  //   const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
 
-    if (!customFieldsPayload) {
-      this.showDialog(); // Stop execution if required fields are missing
-    }
+  //   if (!customFieldsPayload) {
+  //     this.showDialog(); // Stop execution if required fields are missing
+  //   }
 
-    // Construct the final payload
-    const payload = {
-      ...this.formConfig.model,
-      custom_field_values: customFieldsPayload.custom_field_values // Array of custom field values
-    };
+  //   // Construct the final payload
+  //   const payload = {
+  //     ...this.formConfig.model,
+  //     custom_field_values: customFieldsPayload.custom_field_values // Array of custom field values
+  //   };
 
-    if (!payload) {
-      this.showDialog(); // Stop execution if required fields are missing
-    }
+  //   if (!payload) {
+  //     this.showDialog(); // Stop execution if required fields are missing
+  //   }
   
-    this.http.post('sales/sale_order/', payload)
-      .subscribe(response => {
-        this.showSuccessToast = true;
-        this.toastMessage = 'Record created successfully';
-        this.ngOnInit();
-        setTimeout(() => {
-          this.showSuccessToast = false;
-        }, 3000); // Hide toast after 3 seconds
-      }, error => {
-        if (error.status === 400) { 
-          this.showDialog();
-        }
-        // console.error('Error creating record:', error);
-      });
+  //   this.http.post('sales/sale_order/', payload)
+  //     .subscribe(response => {
+  //       this.showSuccessToast = true;
+  //       this.toastMessage = 'Record created successfully';
+  //       this.ngOnInit();
+  //       setTimeout(() => {
+  //         this.showSuccessToast = false;
+  //       }, 3000); // Hide toast after 3 seconds
+  //     }, error => {
+  //       if (error.status === 400) { 
+  //         this.showDialog();
+  //       }
+  //       // console.error('Error creating record:', error);
+  //     });
+  // }
+
+  validatedCustomFieldsPayload: any = null;
+  validateCustomFields(): boolean {
+  const customFieldValues = this.formConfig.model['custom_field_values'];
+  const entityName = 'sale_order';
+  const customId = this.formConfig.model.sale_order?.sale_order_id || null;
+
+  const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
+
+  if (!customFieldsPayload) {
+    this.showDialog(); // Show custom fields popup
+    return false; // Validation failed
   }
+
+  // Save payload for use in create
+  this.validatedCustomFieldsPayload = customFieldsPayload;
+  return true; // Validation passed
+}
+
+createSaleOrder() {
+  // Use the already validated payload
+  const customFieldsPayload = this.validatedCustomFieldsPayload;
+
+  const payload = {
+    ...this.formConfig.model,
+    custom_field_values: customFieldsPayload.custom_field_values
+  };
+
+  this.http.post('sales/sale_order/', payload)
+    .subscribe(response => {
+      this.showSuccessToast = true;
+      this.toastMessage = 'Record created successfully';
+      this.ngOnInit();
+      setTimeout(() => this.showSuccessToast = false, 3000);
+    }, error => {
+      if (error.status === 400) { 
+        this.showDialog();
+      }
+    });
+}
+
 
   closeToast() {
     this.showSuccessToast = false;
@@ -1116,12 +1166,20 @@ export class SalesComponent {
   updateSaleOrder() {
     const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
 
+    console.log("customFieldValues : ", customFieldValues);
+
+    const saleType = this.formConfig.model.sale_order?.sale_type;
+    const orderStatus = this.formConfig.model.sale_order?.order_status;
+
     // Determine the entity type and ID dynamically
     const entityName = 'sale_order'; // Since we're in the Sale Order form
     const customId = this.formConfig.model.sale_order?.sale_order_id || null; // Ensure correct sale_order_id
+    console.log("customId : ", customId);
 
     // Find entity record from list
     const entity = this.entitiesList.find(e => e.entity_name === entityName);
+
+    console.log("entity : ", entity);
 
     if (!entity) {
       console.error(`Entity not found for: ${entityName}`);
@@ -1136,12 +1194,16 @@ export class SalesComponent {
     // Construct payload for custom fields
     const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
 
-
+    console.log("customFieldsPayload : ", customFieldsPayload);
     // Construct the final payload for update
     const payload = {
       ...this.formConfig.model,
       custom_field_values: customFieldsPayload.custom_field_values // Array of dictionaries
     };
+
+    if (!payload) {
+      this.showDialog(); // Stop execution if required fields are missing
+    }
 
     // Define logic here for updating the sale order without modal pop-up
     console.log("Updating sale order:", this.formConfig.model);
@@ -1156,6 +1218,12 @@ export class SalesComponent {
 
       }, error => {
         console.error('Error updating record:', error);
+
+        const errorMessage = error?.error?.message || '';
+        if (errorMessage === "This record is from the mstcnl DB, not allowed to update.") {
+          // Re-run ngOnInit when this specific error occurs
+          this.ngOnInit();
+        }
       });
   }
 
@@ -1210,42 +1278,88 @@ export class SalesComponent {
       // Clear previous options for both size and color fields before adding new ones
       if (sizeField) sizeField.templateOptions.options = [];
       if (colorField) colorField.templateOptions.options = [];
+      // this.http.get(`products/product_variations/?product_id=${product.product_id}`).subscribe((response: any) => {
+      //   if (response.data.length > 0) {
+
+      //     let availableSizes, availableColors;
+      //     // Check if response data is non-empty for size
+      //     if (response.data && response.data.length > 0) {
+      //       availableSizes = response.data.map((variation: any) => ({
+      //         label: variation.size?.size_name || '----',
+      //         value: {
+      //           size_id: variation.size?.size_id || null,
+      //           size_name: variation.size?.size_name || '----'
+      //         }
+      //       }));
+      //       availableColors = response.data.map((variation: any) => ({
+      //         label: variation.color?.color_name || '----',
+      //         value: {
+      //           color_id: variation.color?.color_id || null,
+      //           color_name: variation.color?.color_name || '----'
+      //         }
+      //       }));
+      //       // Enable and update the size field options if sizes are available
+      //       if (sizeField) {
+      //         sizeField.formControl.enable(); // Ensure the field is enabled
+      //         sizeField.templateOptions.options = availableSizes.filter((item, index, self) => index === self.findIndex((t) => t.value.size_id === item.value.size_id)); // Ensure unique size options
+      //       }
+      //     } else {
+      //       // Clear options and keep the fields enabled, without any selection if no options exist
+      //       if (sizeField) {
+      //         sizeField.formControl.enable();
+      //         sizeField.templateOptions.options = [];
+      //       }
+      //       if (colorField) {
+      //         colorField.formControl.enable();
+      //         colorField.templateOptions.options = [];
+      //       }
+
+      //       // 🔹 Restore selected size + color in edit mode
+      //       const row = this.formConfig.model.sale_order_items[+parentArray.key];
+      //       if (row?.size) sizeField.formControl.setValue(row.size, { emitEvent: false });
+      //       if (row?.color) colorField.formControl.setValue(row.color, { emitEvent: false });
+      //     }
+      //   }
+      // });
       this.http.get(`products/product_variations/?product_id=${product.product_id}`).subscribe((response: any) => {
         if (response.data.length > 0) {
+          const availableSizes = response.data.map((variation: any) => ({
+            label: variation.size?.size_name || '----',
+            value: {
+              size_id: variation.size?.size_id || null,
+              size_name: variation.size?.size_name || '----'
+            }
+          })).filter((item, index, self) =>
+            index === self.findIndex((t) => t.value.size_id === item.value.size_id)
+          );
 
-          let availableSizes, availableColors;
-          // Check if response data is non-empty for size
-          if (response.data && response.data.length > 0) {
-            availableSizes = response.data.map((variation: any) => ({
-              label: variation.size?.size_name || '----',
-              value: {
-                size_id: variation.size?.size_id || null,
-                size_name: variation.size?.size_name || '----'
-              }
-            }));
-            availableColors = response.data.map((variation: any) => ({
-              label: variation.color?.color_name || '----',
-              value: {
-                color_id: variation.color?.color_id || null,
-                color_name: variation.color?.color_name || '----'
-              }
-            }));
-            // Enable and update the size field options if sizes are available
-            if (sizeField) {
-              sizeField.formControl.enable(); // Ensure the field is enabled
-              sizeField.templateOptions.options = availableSizes.filter((item, index, self) => index === self.findIndex((t) => t.value.size_id === item.value.size_id)); // Ensure unique size options
+          const availableColors = response.data.map((variation: any) => ({
+            label: variation.color?.color_name || '----',
+            value: {
+              color_id: variation.color?.color_id || null,
+              color_name: variation.color?.color_name || '----'
             }
-          } else {
-            // Clear options and keep the fields enabled, without any selection if no options exist
-            if (sizeField) {
-              sizeField.templateOptions.options = [];
-            }
-            if (colorField) {
-              colorField.templateOptions.options = [];
-            }
+          })).filter((item, index, self) =>
+            index === self.findIndex((t) => t.value.color_id === item.value.color_id)
+          );
+
+          if (sizeField) {
+            sizeField.formControl.enable();
+            sizeField.templateOptions.options = availableSizes;
           }
+
+          if (colorField) {
+            colorField.formControl.enable();
+            colorField.templateOptions.options = availableColors;
+          }
+
+          // 🔹 Restore selected size + color in edit mode
+          const row = this.formConfig.model.sale_order_items[+parentArray.key];
+          if (row?.size) sizeField.formControl.setValue(row.size, { emitEvent: false });
+          if (row?.color) colorField.formControl.setValue(row.color, { emitEvent: false });
         }
       });
+
     } else {
       console.error('Product not selected or invalid.');
     }
@@ -2289,6 +2403,8 @@ getUnitData(unitInfo) {
 
 
   hasOrderNoLoaded = false;
+  
+
   //=======================================================
   setFormConfig() {
     this.SaleOrderEditID = null;
@@ -2334,6 +2450,13 @@ getUnitData(unitInfo) {
             // Exceeds credit limit: show the Amount Exceed modal
             this.openAmountModal(totalAmount, maxLimit);
           } else {
+
+            // Validate custom fields BEFORE proceeding
+            if (!this.validateCustomFields()) {
+              console.log("Custom field validation failed. Showing dialog.");
+              return; // Stop here if validation failed
+            }
+
             // Within credit limit: check if a new sale order or existing
             if (!this.SaleOrderEditID) {
               console.log("Within credit limit: Opening Sale Order/Estimate modal.");
@@ -3089,7 +3212,7 @@ getUnitData(unitInfo) {
               },
               {
                 key: 'product',
-                type: 'select',
+                type: 'products-dropdown',
                 templateOptions: {
                   label: 'Product',
                   dataKey: 'product_id',
@@ -3287,35 +3410,6 @@ getUnitData(unitInfo) {
                   }
                 }
               },
-              // {
-              //   type: 'input',
-              //   key: 'code',
-              //   templateOptions: {
-              //     label: 'Code',
-              //     placeholder: 'code',
-              //     hideLabel: true,
-              //   },
-              //   hooks: {
-              //     onInit: (field: any) => {
-              //       const parentArray = field.parent;
-
-              //       // Check if parentArray exists and proceed
-              //       if (parentArray) {
-              //         const currentRowIndex = +parentArray.key; // Simplified number conversion
-
-              //         // Check if there is a product already selected in this row (when data is copied)
-              //         if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
-              //           const existingCode = this.dataToPopulate.sale_order_items[currentRowIndex].product?.code;
-
-              //           // Set the full product object instead of just the product_id
-              //           if (existingCode) {
-              //             field.formControl.setValue(existingCode); // Set full product object (not just product_id)
-              //           }
-              //         }
-              //       }
-              //     }
-              //   }
-              // },
               {
                 type: 'input',
                 key: 'code',
@@ -3327,22 +3421,51 @@ getUnitData(unitInfo) {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-                    if (!parentArray) return;
 
-                    const idx = +parentArray.key;
-                    console.log('Init code field for row', idx);
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
 
-                    // Use form model directly instead of dataToPopulate
-                    const rowData = this.formConfig.model.sale_order_items[idx];
-                    const existingCode = rowData ? rowData.product?.code : undefined;
-                    console.log(`Row ${idx} code from formConfig.model:`, existingCode);
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
+                        const existingCode = this.dataToPopulate.sale_order_items[currentRowIndex].product?.code;
 
-                    if (existingCode !== undefined && existingCode !== null) {
-                      field.formControl.setValue(existingCode);
+                        // Set the full product object instead of just the product_id
+                        if (existingCode) {
+                          field.formControl.setValue(existingCode); // Set full product object (not just product_id)
+                        }
+                      }
                     }
                   }
                 }
               },
+              // {
+              //   type: 'input',
+              //   key: 'code',
+              //   templateOptions: {
+              //     label: 'Code',
+              //     placeholder: 'code',
+              //     hideLabel: true,
+              //   },
+              //   hooks: {
+              //     onInit: (field: any) => {
+              //       const parentArray = field.parent;
+              //       if (!parentArray) return;
+
+              //       const idx = +parentArray.key;
+              //       console.log('Init code field for row', idx);
+
+              //       // Use form model directly instead of dataToPopulate
+              //       const rowData = this.formConfig.model.sale_order_items[idx];
+              //       const existingCode = rowData ? rowData.product?.code : undefined;
+              //       console.log(`Row ${idx} code from formConfig.model:`, existingCode);
+
+              //       if (existingCode !== undefined && existingCode !== null) {
+              //         field.formControl.setValue(existingCode);
+              //       }
+              //     }
+              //   }
+              // },
 
               {
                 type: 'input',
@@ -3586,7 +3709,7 @@ getUnitData(unitInfo) {
                 }
               },
               {
-                type: 'productUnitOptions-dropdown',
+                type: 'select',
                 key: 'unit_options_id',
                 templateOptions: {
                   label: 'Unit',

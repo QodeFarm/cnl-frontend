@@ -14,7 +14,8 @@ import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 })
 export class AssetsListComponent {
   
-  baseUrl: string = 'https://apicore.cnlerp.com/api/v1/';
+  // baseUrl: string = 'https://apicore.cnlerp.com/api/v1/';
+  baseUrl: string = 'http://127.0.0.1:8000/api/v1/';
 
   @Output('edit') edit = new EventEmitter<void>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
@@ -32,7 +33,8 @@ export class AssetsListComponent {
       keys: ['purchase_date','name','price','asset_category_id','unit_options_id','location_id','asset_status_id']
     },
     export: {downloadName: 'AssetsList'},
-    defaultSort: { key: 'created_at', value: 'descend' },
+    // defaultSort: { key: 'created_at', value: 'descend' },
+    defaultSort: { key: 'is_deleted', value: 'ascend' },
     cols: [
       {
         fieldKey: 'name',
@@ -109,6 +111,7 @@ export class AssetsListComponent {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',
+            tooltip: "Edit this record",
             callBackFn: (row, action) => {
               console.log(row);
               this.edit.emit(row.asset_id);

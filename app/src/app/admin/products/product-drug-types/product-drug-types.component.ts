@@ -21,6 +21,7 @@ export class ProductDrugTypesComponent {
       "globalSearch": {
         keys: ['drug_type_id', 'drug_type_name']
       },
+      defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'drug_type_name',

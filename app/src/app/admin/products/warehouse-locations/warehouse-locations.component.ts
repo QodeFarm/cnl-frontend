@@ -18,7 +18,8 @@ export class WarehouseLocationsComponent {
       "globalSearch": {
         keys: ['location_id','location_name','description','warehouse']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+      defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'location_name',

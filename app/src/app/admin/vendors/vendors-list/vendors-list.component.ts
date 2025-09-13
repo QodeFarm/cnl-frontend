@@ -38,7 +38,8 @@ export class VendorsListComponent {
       keys: ['created_at','name','gst_no','email','phone','vendor_category_id','ledger_account','city_id']
     },
     export: {downloadName: 'VendorList'},
-    defaultSort: { key: 'created_at', value: 'descend' },
+    // defaultSort: { key: 'created_at', value: 'descend' },
+    defaultSort: { key: 'is_deleted', value: 'ascend' },
     cols: [
       {
         fieldKey: 'name',
@@ -118,6 +119,7 @@ export class VendorsListComponent {
           {
             type: 'callBackFn',
             icon: 'fa fa-pen',
+            tooltip: "Edit this record",
             callBackFn: (row, action) => {
               console.log(`vendor ID: ${row.vendor_id}`);
               this.edit.emit(row.vendor_id);

@@ -18,7 +18,8 @@ export class LedgerAccountsComponent {
       "globalSearch": {
         keys: ['ledger_account_id', 'name','code','inactive','type','account_no','is_loan_account', 'address','pan','ledger_group_id']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+      defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'name',

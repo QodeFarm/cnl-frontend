@@ -20,7 +20,8 @@ export class ProductItemTypeComponent {
       "globalSearch": {
         keys: ['item_type_id', 'item_name']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+      defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'item_name',
@@ -107,14 +108,14 @@ export class ProductItemTypeComponent {
             label: 'Delete',
             confirm: true,
             confirmMsg: "Sure to delete?",
-            apiUrl: 'api/masters'
+            apiUrl: 'masters/product_item_type'
           },
           {
             type: 'restore',
             label: 'Restore',
             confirm: true,
             confirmMsg: "Sure to restore?",
-            apiUrl: 'api/masters'
+            apiUrl: 'masters/product_item_type'
           },
           {
             type: 'callBackFn',

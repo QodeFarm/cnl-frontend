@@ -203,9 +203,18 @@ export class SalesRepotsComponent {
           name: 'Invoice Date',
           sort: true
         }, 
+        // {
+        //   fieldKey: 'customer',
+        //   name: 'Customer',
+        //   sort: true
+        // },
         {
           fieldKey: 'customer',
           name: 'Customer',
+          displayType: "map",
+          mapFn: (currentValue: any, row: any, col: any) => {
+            return `${row?.customer?.name}`;
+          },
           sort: true
         },
         {
@@ -685,11 +694,7 @@ export class SalesRepotsComponent {
           sort: true
         },
         {
-          fieldKey: 'status_name',
-          displayType: 'map',
-          mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row?.payment_status?.status_name}`;
-          },
+          fieldKey: 'payment_status',
           name: 'Status',
           sort: true
         },

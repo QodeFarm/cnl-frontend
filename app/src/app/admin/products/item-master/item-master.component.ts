@@ -18,7 +18,8 @@ export class ItemMasterComponent {
       globalSearch: {
         keys: ['item_master_id', 'mode_name', 'description']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+      defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'mode_name',

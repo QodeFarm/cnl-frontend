@@ -21,7 +21,8 @@ export const customerCudConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['created_at', 'name', 'email', 'phone', 'gst', 'city_id', 'ledger_account_id']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'name',
@@ -51,6 +52,31 @@ export const customerCudConfig: TaCurdConfig = {
                 mapFn: (currentValue: any, row: any, col: any) => {
                     return row.city.city_name;
                 },
+            },
+            {
+              fieldKey: "code",
+              name: "Action",
+              type: 'action',
+              actions: [
+                {
+                  type: 'delete',
+                  label: 'Delete',
+                  confirm: true,
+                  confirmMsg: "Sure to delete?",
+                  apiUrl: 'customers/customers'
+                },
+                {
+                  type: 'restore',
+                  label: 'Restore',
+                  confirm: true,
+                  confirmMsg: "Sure to restore?",
+                  apiUrl: 'customers/customers'
+                },
+                {
+                  type: 'edit',
+                  label: 'Edit'
+                }
+              ]
             },
             // {
             //     fieldKey: 'ledger_account_id',
@@ -927,7 +953,8 @@ export const customerCategoryConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['customer_category_id', 'name', 'code']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'name',
@@ -950,6 +977,13 @@ export const customerCategoryConfig: TaCurdConfig = {
                         confirm: true,
                         confirmMsg: "Sure to delete?",
                         apiUrl: 'masters/customer_categories'
+                    },
+                    {
+                      type: 'restore',
+                      label: 'Restore',
+                      confirm: true,
+                      confirmMsg: "Sure to restore?",
+                      apiUrl: 'masters/customer_categories'
                     },
                     {
                         type: 'edit',
@@ -1006,24 +1040,25 @@ export const ledgerAccountsConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['ledger_account_id', 'name','code','inactive','type','account_no','is_loan_account', 'address','pan','ledger_group_id']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'name',
           name: 'Name',
           // sort: true
         },
-        {
-          fieldKey: 'inactive',
-          name: 'Inactive',
-          sort: true,
-          type: 'boolean'
-        },
-        {
-          fieldKey: 'type', 
-          name: 'Type',
-          sort: true
-        },
+        // {
+        //   fieldKey: 'inactive',
+        //   name: 'Inactive',
+        //   sort: true,
+        //   type: 'boolean'
+        // },
+        // {
+        //   fieldKey: 'type', 
+        //   name: 'Type',
+        //   sort: true
+        // },
         {
           fieldKey: 'ledger_group_id',
           name: 'Ledger Group',
@@ -1043,6 +1078,13 @@ export const ledgerAccountsConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'customers/ledger_accounts'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'customers/ledger_accounts'
             },
             {
@@ -1241,7 +1283,8 @@ export const cityConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['state_name', 'city_name', 'city_code']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         // {
         //   fieldKey: 'state_name',
@@ -1272,6 +1315,13 @@ export const cityConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'masters/city'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'masters/city'
             },
             {
@@ -1351,7 +1401,8 @@ export const StateConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['country_name', 'state_name', 'state_code']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         // {
         //   fieldKey: 'country_name',
@@ -1382,6 +1433,13 @@ export const StateConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'masters/state'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'masters/state'
             },
             {
@@ -1467,7 +1525,8 @@ export const CountryConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['country_name', 'country_code']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'country_name',
@@ -1489,6 +1548,13 @@ export const CountryConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'masters/country'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'masters/country'
             },
             {
@@ -1549,7 +1615,8 @@ export const vendorCategeoryConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['vendor_category_id', 'code', 'name']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'code',
@@ -1571,6 +1638,13 @@ export const vendorCategeoryConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'vendors/vendor_category'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'vendors/vendor_category'
             },
             {
@@ -1639,7 +1713,8 @@ export const statusConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['status_id', 'status_name']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'status_name',
@@ -1656,6 +1731,13 @@ export const statusConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'masters/statuses'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'masters/statuses'
             },
             {
@@ -1715,7 +1797,8 @@ export const TransportConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['transporter_id', 'name', 'code','gst_no','website_url']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'name',
@@ -1747,6 +1830,13 @@ export const TransportConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'masters/transporters'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'masters/transporters'
             },
             {
@@ -1826,7 +1916,8 @@ export const FirmStatusConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['firm_status_id', 'name']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
 		    {
           fieldKey: 'name',
@@ -1843,6 +1934,13 @@ export const FirmStatusConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'masters/firm_statuses'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'masters/firm_statuses'
             },
             {
@@ -1900,7 +1998,8 @@ export const GstCatConfig: TaCurdConfig = {
         "globalSearch": {
           keys: ['gst_category_id', 'name']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
       {
             fieldKey: 'name',
@@ -1917,6 +2016,13 @@ export const GstCatConfig: TaCurdConfig = {
                 label: 'Delete',
                 confirm: true,
                 confirmMsg: "Sure to delete?",
+                apiUrl: 'masters/gst_categories'
+              },
+              {
+                type: 'restore',
+                label: 'Restore',
+                confirm: true,
+                confirmMsg: "Sure to restore?",
                 apiUrl: 'masters/gst_categories'
               },
               {
@@ -1973,7 +2079,8 @@ export const PriceCatConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['price_category_id', 'name', 'code']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
 		    {
           fieldKey: 'name',
@@ -1995,6 +2102,13 @@ export const PriceCatConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'masters/price_categories'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'masters/price_categories'
             },
             {
@@ -2061,33 +2175,34 @@ export const VendorAgentConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['vendor_agent_id', 'name','code','commission_rate','rate_on','amount_type']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
+        {
+          fieldKey: 'name',
+          name: 'Name',
+          sort: true
+        },
         {
           fieldKey: 'code',
           name: 'code',
           sort: true
         },
-		    {
-          fieldKey: 'name',
-          name: 'Name',
-          sort: true
-        },
-		    {
-          fieldKey: 'commission_rate',
-          name: 'Commission Rate',
-          sort: true
-        },
-		    {
-          fieldKey: 'rate_on',
-          name: 'Rate On',
-          sort: true
-        },
-		    {
-          fieldKey: 'amount_type',
-          name: 'Amount Type',
-          sort: true
-        },
+		    // {
+        //   fieldKey: 'commission_rate',
+        //   name: 'Commission Rate',
+        //   sort: true
+        // },
+		    // {
+        //   fieldKey: 'rate_on',
+        //   name: 'Rate On',
+        //   sort: true
+        // },
+		    // {
+        //   fieldKey: 'amount_type',
+        //   name: 'Amount Type',
+        //   sort: true
+        // },
         {
           fieldKey: "code",
           name: "Action",
@@ -2098,6 +2213,13 @@ export const VendorAgentConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'vendors/vendor_agent'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'vendors/vendor_agent'
             },
             {
@@ -2201,7 +2323,8 @@ export const VendorPaymentTermsConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['payment_term_id', 'name', 'code','fixed_days','no_of_fixed_days','payment_cycle','run_on']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
 	      {
           fieldKey: 'name',
@@ -2213,26 +2336,26 @@ export const VendorPaymentTermsConfig: TaCurdConfig = {
           name: 'code',
           sort: true
         },
-		    {
-          fieldKey: 'fixed_days',
-          name: 'Fixed Days',
-          sort: true
-        },
-		    {
-          fieldKey: 'no_of_fixed_days',
-          name: 'No of fixed days',
-          sort: true
-        },
+		    // {
+        //   fieldKey: 'fixed_days',
+        //   name: 'Fixed Days',
+        //   sort: true
+        // },
+		    // {
+        //   fieldKey: 'no_of_fixed_days',
+        //   name: 'No of fixed days',
+        //   sort: true
+        // },
         {
           fieldKey: 'payment_cycle',
           name: 'Payment Cycle',
           sort: true
         },
-		    {
-          fieldKey: 'run_on',
-          name: 'Run On',
-          sort: true
-        },
+		    // {
+        //   fieldKey: 'run_on',
+        //   name: 'Run On',
+        //   sort: true
+        // },
         {
           fieldKey: "code",
           name: "Action",
@@ -2243,6 +2366,13 @@ export const VendorPaymentTermsConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'vendors/vendor_payment_terms'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'vendors/vendor_payment_terms'
             },
             {
@@ -2350,39 +2480,40 @@ export const CustomerPaymentConfig: TaCurdConfig = {
       // "globalSearch": {
       //   keys: ['payment_term_id', 'name','code','fixed_days','no_of_fixed_days','payment_cycle', 'run_on']
       // },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'name',
           name: 'Name',
           // sort: true
         },
-        {
-          fieldKey: 'code', 
-          name: 'Code',
-          // sort: true
-        },
-        {
-          fieldKey: 'fixed_days', 
-          name: 'Fixed days',
-          type: 'number',
-          sort: true
-        },
-        {
-          fieldKey: 'no_of_fixed_days', 
-          name: 'No.of.fixed days',
-          sort: true
-        },
+        // {
+        //   fieldKey: 'code', 
+        //   name: 'Code',
+        //   // sort: true
+        // },
+        // {
+        //   fieldKey: 'fixed_days', 
+        //   name: 'Fixed days',
+        //   type: 'number',
+        //   sort: true
+        // },
+        // {
+        //   fieldKey: 'no_of_fixed_days', 
+        //   name: 'No.of.fixed days',
+        //   sort: true
+        // },
         {
           fieldKey: 'payment_cycle', 
           name: 'Payment Cycle',
           sort: true
         },
-        {
-          fieldKey: 'run_on', 
-          name: 'Run on',
-          sort: true
-        },
+        // {
+        //   fieldKey: 'run_on', 
+        //   name: 'Run on',
+        //   sort: true
+        // },
         {
           fieldKey: "code",
           name: "Action",
@@ -2393,6 +2524,13 @@ export const CustomerPaymentConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'masters/customer_payment_terms'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'masters/customer_payment_terms'
             },
             {
@@ -2491,34 +2629,35 @@ export const LedgerGroupsConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['ledger_group_id', 'name','code','inactive','under_group','nature']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'name',
           name: 'Name',
           sort: true
         },
-        {
-          fieldKey: 'code', 
-          name: 'Code',
-          sort: true
-        },
-        {
-          fieldKey: 'inactive',
-          name: 'Inactive',
-          sort: true,
-          type: 'boolean'
-        },
+        // {
+        //   fieldKey: 'code', 
+        //   name: 'Code',
+        //   sort: true
+        // },
+        // {
+        //   fieldKey: 'inactive',
+        //   name: 'Inactive',
+        //   sort: true,
+        //   type: 'boolean'
+        // },
         {
           fieldKey: 'under_group', 
           name: 'Under Group',
           sort: true
         },
-        {
-          fieldKey: 'nature',
-          name: 'Nature',
-          sort: true
-        },
+        // {
+        //   fieldKey: 'nature',
+        //   name: 'Nature',
+        //   sort: true
+        // },
         {
           fieldKey: "code",
           name: "Action",
@@ -2529,6 +2668,13 @@ export const LedgerGroupsConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'masters/ledger_groups'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'masters/ledger_groups'
             },
             {
@@ -2613,7 +2759,8 @@ export const TerritoryConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['territory_id', 'name','code']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'name',
@@ -2635,6 +2782,13 @@ export const TerritoryConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'masters/territory'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'masters/territory'
             },
             {
@@ -2693,18 +2847,19 @@ export const MachineConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['machine_id', 'machine_name', 'description', 'status']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'machine_name',
           name: 'Machine Name',
           sort: true
         },
-        {
-          fieldKey: 'description',
-          name: 'Description',
-          sort: true
-        },
+        // {
+        //   fieldKey: 'description',
+        //   name: 'Description',
+        //   sort: true
+        // },
         {
           fieldKey: 'status',
           name: 'status',
@@ -2719,6 +2874,13 @@ export const MachineConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'production/machines'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'production/machines'
             },
             {
@@ -2791,7 +2953,8 @@ export const ProductionStatusesConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['status_id', 'status_name']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'status_name',
@@ -2807,6 +2970,13 @@ export const ProductionStatusesConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'production/production_statuses'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'production/production_statuses'
             },
             {
@@ -2854,7 +3024,8 @@ export const OrderStatusConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['order_status_id', 'status_name','description']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'status_name',
@@ -2876,6 +3047,13 @@ export const OrderStatusConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'masters/order_status'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'masters/order_status'
             },
             {
@@ -2944,7 +3122,8 @@ export const GstTypesConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['gst_type_id', 'name']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'name',
@@ -2961,6 +3140,13 @@ export const GstTypesConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'masters/gst_types'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'masters/gst_types'
             },
             {
@@ -3019,7 +3205,8 @@ export const OrderTypesConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['order_type_id', 'name']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'name',
@@ -3036,6 +3223,13 @@ export const OrderTypesConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'masters/order_types'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'masters/order_types'
             },
             {
@@ -3094,7 +3288,8 @@ export const PurchaseTypesConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['purchase_type_id', 'name']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'name',
@@ -3111,6 +3306,13 @@ export const PurchaseTypesConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'masters/purchase_types'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'masters/purchase_types'
             },
             {
@@ -3169,7 +3371,8 @@ export const SaleTypesConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['sale_type_id', 'name']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'name',
@@ -3186,6 +3389,13 @@ export const SaleTypesConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'masters/sale_types'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'masters/sale_types'
             },
             {
@@ -3244,7 +3454,8 @@ export const UserGroupsConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['group_id', 'group_name', 'description']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'group_name',
@@ -3265,6 +3476,13 @@ export const UserGroupsConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'masters/user_groups'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'masters/user_groups'
             },
             {
@@ -3322,7 +3540,8 @@ export const ReminderTypesConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['reminder_type_id', 'type_name']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'type_name',
@@ -3338,6 +3557,13 @@ export const ReminderTypesConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'reminders/reminder_types'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'reminders/reminder_types'
             },
             {
@@ -3385,7 +3611,8 @@ export const PaymentLinkConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['payment_link_type_id', 'name', 'description']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'name',
@@ -3407,6 +3634,13 @@ export const PaymentLinkConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'masters/payment_link_type'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'masters/payment_link_type'
             },
             {
@@ -3476,7 +3710,8 @@ export const productModesConfig: TaCurdConfig = {
       globalSearch: {
         keys: ['item_master_id', 'mode_name', 'description']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'mode_name',
@@ -3504,6 +3739,13 @@ export const productModesConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete this Item Master?",
+              apiUrl: 'products/item-master'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'products/item-master'
             },
             {
@@ -3568,7 +3810,8 @@ export const productSalesGLConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['name', 'sales_accounts', 'code', 'inactive', 'type', 'account_no', 'is_loan_account', 'address', 'employee', 'pan']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'name',
@@ -3657,6 +3900,13 @@ export const productSalesGLConfig: TaCurdConfig = {
                         confirm: true,
                         confirmMsg: "Sure to delete?",
                         apiUrl: 'products/product_sales_gl'
+                    },
+                    {
+                      type: 'restore',
+                      label: 'Restore',
+                      confirm: true,
+                      confirmMsg: "Sure to restore?",
+                      apiUrl: 'products/product_sales_gl'
                     },
                     {
                         type: 'edit',
@@ -3850,7 +4100,8 @@ export const productTypesConfig: TaCurdConfig = {
       globalSearch: {
         keys: ['type_id', 'type_name', 'mode_type']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'type_name',
@@ -3878,6 +4129,13 @@ export const productTypesConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'masters/product_types'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'masters/product_types'
             },
             {
@@ -3944,7 +4202,8 @@ export const productBrandsConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['brand_id', 'brand_name', 'code', 'brand_salesman']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'brand_name',
@@ -3981,6 +4240,13 @@ export const productBrandsConfig: TaCurdConfig = {
                         confirm: true,
                         confirmMsg: "Sure to delete?",
                         apiUrl: 'masters/product_brands'
+                    },
+                    {
+                      type: 'restore',
+                      label: 'Restore',
+                      confirm: true,
+                      confirmMsg: "Sure to restore?",
+                      apiUrl: 'masters/product_brands'
                     },
                     {
                         type: 'edit',
@@ -4078,7 +4344,8 @@ export const productGroupsConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['group_name', 'description']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'group_name',
@@ -4101,6 +4368,13 @@ export const productGroupsConfig: TaCurdConfig = {
                         confirm: true,
                         confirmMsg: "Sure to delete?",
                         apiUrl: 'products/product_groups'
+                    },
+                    {
+                      type: 'restore',
+                      label: 'Restore',
+                      confirm: true,
+                      confirmMsg: "Sure to restore?",
+                      apiUrl: 'products/product_groups'
                     },
                     {
                         type: 'edit',
@@ -4170,7 +4444,8 @@ export const productStockUnitsConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['stock_unit_name', 'quantity_code_id', 'description']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'stock_unit_name',
@@ -4203,6 +4478,13 @@ export const productStockUnitsConfig: TaCurdConfig = {
                         confirm: true,
                         confirmMsg: "Sure to delete?",
                         apiUrl: 'products/product_stock_units'
+                    },
+                    {
+                      type: 'restore',
+                      label: 'Restore',
+                      confirm: true,
+                      confirmMsg: "Sure to restore?",
+                      apiUrl: 'products/product_stock_units'
                     },
                     {
                         type: 'edit',
@@ -4297,7 +4579,8 @@ export const productCategoriesConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['category_name', 'code']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'category_name',
@@ -4321,6 +4604,13 @@ export const productCategoriesConfig: TaCurdConfig = {
                         confirm: true,
                         confirmMsg: "Sure to delete?",
                         apiUrl: 'products/product_categories'
+                    },
+                    {
+                      type: 'restore',
+                      label: 'Restore',
+                      confirm: true,
+                      confirmMsg: "Sure to restore?",
+                      apiUrl: 'products/product_categories'
                     },
                     {
                         type: 'edit',
@@ -4388,7 +4678,8 @@ export const productGstClassificationsConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['id', 'type', 'code', 'hsn_or_sac_code', 'hsn_description']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'type',
@@ -4421,6 +4712,13 @@ export const productGstClassificationsConfig: TaCurdConfig = {
                         confirm: true,
                         confirmMsg: "Sure to delete?",
                         apiUrl: 'products/product_gst_classifications'
+                    },
+                    {
+                      type: 'restore',
+                      label: 'Restore',
+                      confirm: true,
+                      confirmMsg: "Sure to restore?",
+                      apiUrl: 'products/product_gst_classifications'
                     },
                     {
                         type: 'edit',
@@ -4521,7 +4819,8 @@ export const productItemTypeConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['item_type_id', 'item_name']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'item_name',
@@ -4539,6 +4838,13 @@ export const productItemTypeConfig: TaCurdConfig = {
                         confirm: true,
                         confirmMsg: "Sure to delete?",
                         apiUrl: 'masters/product_item_type'
+                    },
+                    {
+                      type: 'restore',
+                      label: 'Restore',
+                      confirm: true,
+                      confirmMsg: "Sure to restore?",
+                      apiUrl: 'masters/product_item_type'
                     },
                     {
                         type: 'edit',
@@ -4597,7 +4903,8 @@ export const productPurchaseGLConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['name', 'purchase_accounts', 'code', 'inactive', 'type', 'account_no', 'is_loan_account', 'address', 'employee', 'pan']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'name',
@@ -4686,6 +4993,13 @@ export const productPurchaseGLConfig: TaCurdConfig = {
                         confirm: true,
                         confirmMsg: "Sure to delete?",
                         apiUrl: 'products/product_purchase_gl'
+                    },
+                    {
+                      type: 'restore',
+                      label: 'Restore',
+                      confirm: true,
+                      confirmMsg: "Sure to restore?",
+                      apiUrl: 'products/product_purchase_gl'
                     },
                     {
                         type: 'edit',
@@ -4880,7 +5194,8 @@ export const unitOptionsConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['unit_options_id', 'unit_name']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'unit_name',
@@ -4898,6 +5213,13 @@ export const unitOptionsConfig: TaCurdConfig = {
                         confirm: true,
                         confirmMsg: "Sure to delete?",
                         apiUrl: 'masters/unit_options'
+                    },
+                    {
+                      type: 'restore',
+                      label: 'Restore',
+                      confirm: true,
+                      confirmMsg: "Sure to restore?",
+                      apiUrl: 'masters/unit_options'
                     },
                     {
                         type: 'edit',
@@ -4954,7 +5276,8 @@ export const productSizesConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['size_id', 'size_name', 'size_category', 'size_system', 'length', 'height', 'width', 'size_unit', 'description']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'size_name',
@@ -5006,6 +5329,13 @@ export const productSizesConfig: TaCurdConfig = {
                     confirm: true,
                     confirmMsg: "Sure to delete?",
                     apiUrl: 'products/sizes'
+                },
+                {
+                  type: 'restore',
+                  label: 'Restore',
+                  confirm: true,
+                  confirmMsg: "Sure to restore?",
+                  apiUrl: 'products/sizes'
                 },
                 {
                     type: 'edit',
@@ -5120,7 +5450,8 @@ export const productColorsConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['color_id', 'color_name']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'color_name',
@@ -5137,6 +5468,13 @@ export const productColorsConfig: TaCurdConfig = {
                     confirm: true,
                     confirmMsg: "Sure to delete?",
                     apiUrl: 'products/colors'
+                },
+                {
+                  type: 'restore',
+                  label: 'Restore',
+                  confirm: true,
+                  confirmMsg: "Sure to restore?",
+                  apiUrl: 'products/colors'
                 },
                 {
                     type: 'edit',
@@ -5181,7 +5519,8 @@ export const warehouseLocationsConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['location_id', 'location_name', 'description', 'warehouse']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'location_name',
@@ -5212,6 +5551,13 @@ export const warehouseLocationsConfig: TaCurdConfig = {
                     confirm: true,
                     confirmMsg: "Sure to delete?",
                     apiUrl: 'inventory/warehouse_locations'
+                },
+                {
+                  type: 'restore',
+                  label: 'Restore',
+                  confirm: true,
+                  confirmMsg: "Sure to restore?",
+                  apiUrl: 'inventory/warehouse_locations'
                 },
                 {
                     type: 'edit',
@@ -5312,6 +5658,13 @@ export const packUnitConfig: TaCurdConfig = {
                     apiUrl: 'masters/package_units'
                 },
                 {
+                  type: 'restore',
+                  label: 'Restore',
+                  confirm: true,
+                  confirmMsg: "Sure to restore?",
+                  apiUrl: 'masters/package_units'
+                },
+                {
                     type: 'edit',
                     label: 'Edit'
                 }
@@ -5373,6 +5726,13 @@ export const gPackageUnitsConfig: TaCurdConfig = {
                     apiUrl: 'masters/g_package_units'
                 },
                 {
+                  type: 'restore',
+                  label: 'Restore',
+                  confirm: true,
+                  confirmMsg: "Sure to restore?",
+                  apiUrl: 'masters/g_package_units'
+                },
+                {
                     type: 'edit',
                     label: 'Edit'
                 }
@@ -5415,7 +5775,8 @@ export const jobTypesConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['job_type_id', 'job_type_name']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [{
             fieldKey: 'job_type_name',
             name: 'Job Type Name',
@@ -5431,6 +5792,13 @@ export const jobTypesConfig: TaCurdConfig = {
                 confirm: true,
                 confirmMsg: "Sure to delete?",
                 apiUrl: 'hrms/job_types'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'hrms/job_types'
             },
             {
                 type: 'edit',
@@ -5473,7 +5841,8 @@ export const designationsConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['designation_id', 'designation_name', 'responsibilities']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'designation_name',
@@ -5495,6 +5864,13 @@ export const designationsConfig: TaCurdConfig = {
                     confirm: true,
                     confirmMsg: "Sure to delete?",
                     apiUrl: 'hrms/designations'
+                },
+                {
+                  type: 'restore',
+                  label: 'Restore',
+                  confirm: true,
+                  confirmMsg: "Sure to restore?",
+                  apiUrl: 'hrms/designations'
                 },
                 {
                     type: 'edit',
@@ -5551,7 +5927,8 @@ export const jobCodesConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['job_code_id', 'job_code']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [{
             fieldKey: 'job_code',
             name: 'Job Code',
@@ -5567,6 +5944,13 @@ export const jobCodesConfig: TaCurdConfig = {
                 confirm: true,
                 confirmMsg: "Sure to delete?",
                 apiUrl: 'hrms/job_codes'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'hrms/job_codes'
             },
             {
                 type: 'edit',
@@ -5610,7 +5994,8 @@ export const departmentsConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['department_id', 'department_name', 'designation_name']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'department_name',
@@ -5627,6 +6012,13 @@ export const departmentsConfig: TaCurdConfig = {
                     confirm: true,
                     confirmMsg: "Sure to delete?",
                     apiUrl: 'hrms/departments'
+                },
+                {
+                  type: 'restore',
+                  label: 'Restore',
+                  confirm: true,
+                  confirmMsg: "Sure to restore?",
+                  apiUrl: 'hrms/departments'
                 },
                 {
                     type: 'edit',
@@ -5669,7 +6061,8 @@ export const shiftsConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['shift_id', 'shift_name', 'start_time', 'end_time']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'shift_name',
@@ -5696,6 +6089,13 @@ export const shiftsConfig: TaCurdConfig = {
                     confirm: true,
                     confirmMsg: "Sure to delete?",
                     apiUrl: 'hrms/shifts'
+                },
+                {
+                  type: 'restore',
+                  label: 'Restore',
+                  confirm: true,
+                  confirmMsg: "Sure to restore?",
+                  apiUrl: 'hrms/shifts'
                 },
                 {
                     type: 'edit',
@@ -5765,7 +6165,8 @@ export const salaryComponentsConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['component_id', 'component_name']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [{
             fieldKey: 'component_name',
             name: 'Component Name',
@@ -5781,6 +6182,13 @@ export const salaryComponentsConfig: TaCurdConfig = {
                 confirm: true,
                 confirmMsg: "Sure to delete?",
                 apiUrl: 'hrms/salary_components'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'hrms/salary_components'
             },
             {
                 type: 'edit',
@@ -5824,7 +6232,8 @@ export const employeeSalaryComponentsConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['employee_component_id', 'component_id', 'component_amount', 'salary_id']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'component_id',
@@ -5859,6 +6268,13 @@ export const employeeSalaryComponentsConfig: TaCurdConfig = {
                     confirm: true,
                     confirmMsg: "Sure to delete?",
                     apiUrl: 'hrms/employee_salary_components'
+                },
+                {
+                  type: 'restore',
+                  label: 'Restore',
+                  confirm: true,
+                  confirmMsg: "Sure to restore?",
+                  apiUrl: 'hrms/employee_salary_components'
                 },
                 {
                     type: 'edit',
@@ -5956,7 +6372,8 @@ export const leaveTypesConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['leave_type_id', 'leave_type_name', 'description', 'max_days_allowed']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
                 fieldKey: 'leave_type_name',
@@ -5983,6 +6400,13 @@ export const leaveTypesConfig: TaCurdConfig = {
                     confirm: true,
                     confirmMsg: "Sure to delete?",
                     apiUrl: 'hrms/leave_types'
+                },
+                {
+                  type: 'restore',
+                  label: 'Restore',
+                  confirm: true,
+                  confirmMsg: "Sure to restore?",
+                  apiUrl: 'hrms/leave_types'
                 },
                 {
                     type: 'edit',
@@ -6050,7 +6474,8 @@ export const leadStatusesConfig: TaCurdConfig = {
         "globalSearch": {
             keys: ['lead_status_id', 'status_name']
         },
-        defaultSort: { key: 'created_at', value: 'descend' },
+        // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [{
             fieldKey: 'status_name',
             name: 'Status Name',
@@ -6066,6 +6491,13 @@ export const leadStatusesConfig: TaCurdConfig = {
                 confirm: true,
                 confirmMsg: "Sure to delete?",
                 apiUrl: 'leads/lead_statuses'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'leads/lead_statuses'
             },
             {
                 type: 'edit',
@@ -6111,7 +6543,8 @@ drawerSize: 500,
       "globalSearch": {
         keys: ['interaction_type_id','interaction_type']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'interaction_type',
@@ -6128,6 +6561,13 @@ drawerSize: 500,
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'leads/interaction_types'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'leads/interaction_types'
             },
             {
@@ -6171,7 +6611,8 @@ export const taskPrioritiesConfig: TaCurdConfig = {
       "globalSearch": {
         keys: ['priority_id', 'priority_name']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'priority_name',
@@ -6188,6 +6629,13 @@ export const taskPrioritiesConfig: TaCurdConfig = {
               label: 'Delete',
               confirm: true,
               confirmMsg: "Sure to delete?",
+              apiUrl: 'masters/task_priorities'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
               apiUrl: 'masters/task_priorities'
             },
             {
@@ -6222,6 +6670,78 @@ export const taskPrioritiesConfig: TaCurdConfig = {
     }
   }
 
+// baseUrl: string = 'https://apicore.cnlerp.com/api/v1/';
+const baseUrl = 'http://127.0.0.1:8000/api/v1/';
+
+export const AssetCategoriesConfig:  TaCurdConfig = {
+    // baseUrl: string = 'http://127.0.0.1:8000/api/v1/';
+    drawerSize: 500,
+    drawerPlacement: 'top',
+    tableConfig: {
+      apiUrl: baseUrl + 'assets/asset_categories/',
+      // title: 'Asset Categories',
+      pkId: "asset_category_id",
+      pageSize: 10,
+      "globalSearch": {keys: ['asset_category_id', 'category_name']},
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
+      hideFilters: true,
+      cols: [
+        {
+          fieldKey: 'category_name',
+          name: 'Category Name',
+          sort: true
+        },
+        {
+          fieldKey: "code",
+          name: "Action",
+          type: 'action',
+          actions: [
+            {
+              type: 'delete',
+              label: 'Delete',
+              confirm: true,
+              confirmMsg: "Sure to delete?",
+              apiUrl: baseUrl + 'assets/asset_categories'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              apiUrl: baseUrl + 'assets/asset_categories',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+            },
+            {
+              type: 'edit',
+              label: 'Edit'
+            }
+          ]
+        }
+      ]
+    },
+    formConfig: {
+      url: baseUrl + 'assets/asset_categories/',
+      title: 'Asset Categories',
+      pkId: "asset_category_id",
+      fields: [
+        {
+          fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
+          fieldGroup: [
+            {
+              key: 'category_name',
+              type: 'input',
+              className: 'col-md-6 col-12 p-0',
+              templateOptions: {
+                label: 'Category Name',
+                placeholder: 'Enter Category Name',
+                required: true,
+              }
+            },
+          ]
+        }
+      ]
+    }
+  }
 
 export const productionFloorsConfig: TaCurdConfig = {
   
@@ -6333,9 +6853,1598 @@ export const productionFloorsConfig: TaCurdConfig = {
 
 
 
+export const AssetStatusConfig: TaCurdConfig = {
+    drawerSize: 500,
+    drawerPlacement: 'top',
+    tableConfig: {
+      apiUrl: baseUrl + 'assets/asset_statuses/',
+      // title: 'Asset Statuses',
+      pkId: "asset_status_id",
+      pageSize: 10,
+      "globalSearch": {
+        keys: ['asset_status_id', 'status_name']
+      },
+      hideFilters: true,
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
+      cols: [
+        {
+          fieldKey: 'status_name',
+          name: 'Status Name',
+          sort: true
+        },
+        {
+          fieldKey: "code",
+          name: "Action",
+          type: 'action',
+          actions: [
+            {
+              type: 'delete',
+              label: 'Delete',
+              confirm: true,
+              confirmMsg: "Sure to delete?",
+              apiUrl: baseUrl + 'assets/asset_statuses'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: baseUrl + 'assets/asset_statuses'
+            },
+            {
+              type: 'edit',
+              label: 'Edit'
+            }
+          ]
+        }
+      ]
+    },
+    formConfig: {
+      url: baseUrl + 'assets/asset_statuses/',
+      title: 'Asset Statuses',
+      pkId: "asset_status_id",
+      fields: [
+        {
+          fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
+          fieldGroup: [
+            {
+              key: 'status_name',
+              type: 'input',
+              className: 'col-md-6 col-12 p-0',
+              templateOptions: {
+                label: 'Status Name',
+                placeholder: 'Enter Status Name',
+                required: true,
+              }
+            },
+          ]
+        }
+      ]
+    }
+  }
 
+export const LocationsAssetConfig: TaCurdConfig = {
+    drawerSize: 500,
+    drawerPlacement: 'top',
+    tableConfig: {
+      apiUrl: baseUrl + 'assets/locations/',
+      // title: 'Locations',
+      pkId: "location_id",
+      pageSize: 10,
+      "globalSearch": {
+        keys: ['location_id', 'location_name']
+      },
+      hideFilters: true,
+      // defaultSort: { key: 'created_at', value: 'descend' },
+              defaultSort: { key: 'is_deleted', value: 'ascend' },
+      cols: [
+        {
+          fieldKey: 'location_name',
+          name: 'Location Name',
+          sort: true
+        },
+        {
+          fieldKey: 'address', 
+          name: 'Address',
+          sort: false
+        },
+        {
+          fieldKey: "code",
+          name: "Action",
+          type: 'action',
+          actions: [
+            {
+              type: 'delete',
+              label: 'Delete',
+              confirm: true,
+              confirmMsg: "Sure to delete?",
+              apiUrl: baseUrl + 'assets/locations'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: baseUrl + 'assets/locations'
+            },
+            {
+              type: 'edit',
+              label: 'Edit'
+            }
+          ]
+        }
+      ]
+    },
+    formConfig: {
+      url: baseUrl + 'assets/locations/',
+      title: 'Locations',
+      pkId: "location_id",
+      fields: [
+        {
+          fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
+          fieldGroup: [
+            {
+              key: 'location_name',
+              type: 'input',
+              className: 'col-md-6 col-12 px-1 mb-md-0 mb-3',
+              templateOptions: {
+                label: 'Location Name',
+                placeholder: 'Enter Location Name',
+                required: true,
+              }
+            },
+            {
+              key: 'address',
+              type: 'textarea',
+              className: 'col-md-6 col-12 px-1',
+              templateOptions: {
+                label: 'Address',
+                placeholder: 'Enter Address',
+                required: false,
+              },
+            },
+          ]
+        }
+      ]
+    }
+  }
 
+export const productsCrudConfig: TaCurdConfig = {
+    drawerSize: 500,
+    drawerPlacement: 'top',
+    tableConfig: {
+      apiUrl: 'products/products/?summary=true',
+      showCheckbox: false,
+      // title: 'Products',
+      pkId: "product_id",
+      hideFilters: true,
+      fixedFilters: [
+        {
+          key: 'summary',
+          value: 'true'
+        }
+      ],
+      pageSize: 10,
+      globalSearch: {
+        keys: ['created_at', 'name', 'code', 'unit_options', 'balance', 'sales_rate', 'mrp', 'dis_amount', 'print_name', 'hsn_code', 'barcode']
+      },
+      export: { downloadName: 'ProductsList' },
+      // defaultSort: { key: 'code', value: 'descend' },
+      defaultSort: { key: 'is_deleted', value: 'ascend' },
+      cols: [
+        {
+          fieldKey: 'name',
+          name: 'Name',
+          sort: true
+        },
+        // {
+        //   fieldKey: 'code',
+        //   name: 'Code',
+        //   sort: true
+        // },
+        // {
+        //   fieldKey: 'type',
+        //   name: 'Type',
+        //   sort: true,
+        //   displayType: 'map',
+        //   mapFn: (currentValue: any, row: any, col: any) => {
+        //     return row?.type?.type_name || '';
+        //   },
+        // },
+        // {
+        //   fieldKey: 'product_group',
+        //   name: 'Group',
+        //   sort: true,
+        //   displayType: 'map',
+        //   mapFn: (currentValue: any, row: any, col: any) => {
+        //     return row?.product_group?.group_name || '';
+        //   },
+        // },
+        // {
+        //   fieldKey: 'stock_unit',
+        //   name: 'Stock Unit',
+        //   sort: true,
+        //   displayType: 'map',
+        //   mapFn: (currentValue: any, row: any, col: any) => {
+        //     return row?.stock_unit?.stock_unit_name || '';
+        //   },
+        // },
+        // {
+        //   fieldKey: 'sales_rate',
+        //   name: 'Sales Rate',
+        //   sort: true,
+        //   isEdit: true,
+        //   isEditSumbmit: (row, value, col) => {
+        //     console.log("isEditSumbmit", row, value, col);
+        //     // Implement your logic here
+        //     // For example, you can make an API call to save the edited value
+        //     // this.http.put(`api/sales/${row.sale_order_id}`, { total_amount: value }).subscribe(...);
+        //   },
+        //   autoSave: {
+        //     apiUrl: row => `products/products/${row.product_id}`,
+        //     method: 'patch',
+        //     body: (row: any, value: any, col: any) => {
+        //       console.log('PATCH value:', value); // Add this log
+        //       return {
+        //         [col.fieldKey]: value,
+        //         product_id: row.product_id
+        //       };
+        //     }
 
+        //   }
+        // },
+        // {
+        //   fieldKey: 'wholesale_rate',
+        //   name: 'WholeSale Rate',
+        //   sort: true,
+        //   isEdit: true,
+        //   isEditSumbmit: (row, value, col) => {
+        //     console.log("isEditSumbmit", row, value, col);
+        //     // Implement your logic here
+        //   },
+        //   autoSave: {
+        //     apiUrl: row => `products/products/${row.product_id}`,
+        //     method: 'patch',
+        //     body: (row: any, value: any, col: any) => {
+        //       console.log('PATCH value:', value); // Add this log
+        //       return {
+        //         [col.fieldKey]: value,
+        //         product_id: row.product_id
+        //       };
+        //     }
+        //   }
 
+        // },
+        // {
+        //   fieldKey: 'dealer_rate',
+        //   name: 'Dealer Rate',
+        //   sort: true,
+        //   isEdit: true,
+        //   isEditSumbmit: (row, value, col) => {
+        //     console.log("isEditSumbmit", row, value, col);
+        //     // Implement your logic here
+        //   },
+        //   autoSave: {
+        //     apiUrl: row => `products/products/${row.product_id}`,
+        //     method: 'patch',
+        //     body: (row: any, value: any, col: any) => {
+        //       console.log('PATCH value:', value); // Add this log
+        //       return {
+        //         [col.fieldKey]: value,
+        //         product_id: row.product_id
+        //       };
+        //     }
+        //   }
+        // },
+        // {
+        //   fieldKey: 'discount',
+        //   name: 'Disc(%)',
+        //   sort: true
+        // },
+        {
+          fieldKey: 'balance',
+          name: 'Balance',
+          sort: true,
+          isEdit: true,
+          isEditSumbmit: (row, value, col) => {
+            console.log("isEditSumbmit", row, value, col);
+            // Implement your logic here
+          },
+          autoSave: {
+            apiUrl: row => `products/products/${row.product_id}`,
+            method: 'patch',
+            body: (row: any, value: any, col: any) => {
+              console.log('PATCH value:', value); // Add this log
+              return {
+                [col.fieldKey]: value,
+                product_id: row.product_id
+              };
+            }
+          }
+        },
+        // {
+        //   fieldKey: 'print_name',
+        //   name: 'Print Name',
+        //   sort: true
+        // },
+        // {
+        //   fieldKey: 'hsn_code',
+        //   name: 'HSN',
+        //   sort: true
+        // },
+        // {
+        //   fieldKey: 'barcode',
+        //   name: 'Barcode',
+        //   sort: true
+        // },
+        {
+          fieldKey: "code",
+          name: "Action",
+          type: 'action',
+          actions: [
+            {
+              type: 'delete',
+              label: 'Delete',
+              confirm: true,
+              confirmMsg: "Sure to delete?",
+              apiUrl: 'products/products'
+            },
+            {
+              type: 'restore',
+              label: 'Restore',
+              confirm: true,
+              confirmMsg: "Sure to restore?",
+              apiUrl: 'products/products'
+            },
+            {
+              type: 'edit',
+              label: 'Edit'
+            }
+          ]
+        }
+            // {
+            //     fieldKey: 'ledger_account_id',
+            //     name: 'Ledger Account',
+            //     sort: true,
+            //     displayType: 'map',
+            //     mapFn: (currentValue: any, row: any, col: any) => {
+            //         return row.ledger_account.name;
+            //     },
+            // },
+            // {
+            //     fieldKey: 'pin_code',
+            //     name: 'Pin Code',
+            //     sort: true,
+            // }
+        ]
+    }, 
+    formConfig: {
+      // url: "products/products/",
+      formState: {
+        viewMode: false,
+        // isEdit: false,
+      },
+      showActionBtn: true,
+      exParams: [
+        // {
+        //   key: 'products',
+        //   type: 'script',
+        //   value: 'data.products.map(m=> {m.pack_unit_id = m.pack_unit.stock_unit_id;  return m ;})'
+        // },
+      ],
+      submit: {
+        label: 'Submit',
+        submittedFn: () => {}
+      },
+      reset: {
+        resetFn: () => {
+          // this.ngOnInit();
+        }
+      },
+      model: {
+        products: {},
+        product_variations: [{}],
+        product_item_balance: [{}]
+      },
+      fields: [
+        {
+          fieldGroup: [
+            {
+              className: 'col-12 custom-form-card-block p-0',
+              key: 'products',
+              fieldGroupClassName: 'row m-0 pr-0 responsive-row',
+              fieldGroup: [
+                {
+                  className: 'col-sm-9 col-12 p-0',
+                  fieldGroupClassName: 'row m-0 p-0',
+                  fieldGroup: [
+                    {
+                      className: 'col-md-4 col-sm-6 col-12',
+                      key: 'product_mode_id',
+                      type: 'productModes-dropdown',
+                      templateOptions: {
+                        label: 'Product Mode',
+                        placeholder: 'Select Product Mode',
+                        required: true,
+                        options: []
+                      },
+                      
+                      hooks: {
+                        onInit: (field: any) => {
+                        //   // Load the dropdown data from the API
+                        //   this.http.get('products/item-master/').subscribe((response: any) => {
+                        //     if (response && response.data) {
+                        //       const options = response.data.map((item: any) => ({
+                        //         value: item.item_master_id,
+                        //         label: item.mode_name
+                        //       }));
 
+                        //       // Update the field's options
+                        //       field.templateOptions.options = options;
 
+                        //       // If in edit mode, select the current value
+                        //       if (this.ProductEditID && this.formConfig.model.products?.product_mode_id) {
+                        //         const currentId = this.formConfig.model.products.product_mode_id;
+                        //         const matchedOption = options.find((opt: any) => opt.value === currentId);
+                        //         if (matchedOption) {
+                        //           field.formControl.setValue(matchedOption.value);
+                        //         }
+                        //       }
+                        //     }
+                        //   });
+                        // },
+                        // onChanges: (field: any) => {
+                        //   if (field._subscription) {
+                        //     field._subscription.unsubscribe();
+                        //   }
+
+                        //   field._subscription = field.formControl.valueChanges.subscribe((data: any) => {
+                        //     if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                        //       // Store the selected product mode ID
+                        //       this.formConfig.model['products']['product_mode_id'] = data;
+                        //       console.log("Product Mode changed to:", data); // Added logging
+
+                        //        // Get the selected mode name for use in visibility conditions
+                        //             this.formConfig.model['products']['product_mode_id'] = data;
+        
+                        //         // Store the mode name for visibility conditions
+                        //         const selectedOption = field.templateOptions.options.find((option: any) => option.value === data);
+                        //         if (selectedOption) {
+                        //           this.selectedProductMode = selectedOption.label;
+                        //           console.log("Product Mode changed to:", selectedOption.label);
+                        //         }
+                            
+
+                        //       // Find the type field using a recursive search through all form fields
+                        //       const findFieldByKey = (fieldGroups: any[], key: string): any => {
+                        //         for (const fieldGroup of fieldGroups) {
+                        //           if (fieldGroup.key === key) return fieldGroup;
+
+                        //           if (fieldGroup.fieldGroup) {
+                        //             const found = findFieldByKey(fieldGroup.fieldGroup, key);
+                        //             if (found) return found;
+                        //           }
+
+                        //           if (fieldGroup.fieldArray && fieldGroup.fieldArray.fieldGroup) {
+                        //             const found = findFieldByKey(fieldGroup.fieldArray.fieldGroup, key);
+                        //             if (found) return found;
+                        //           }
+                        //         }
+                        //         return null;
+                        //       };
+
+                        //       // Find the type field in the form structure
+                        //       const typeField = findFieldByKey(this.formConfig.fields[0].fieldGroup, 'type_id');
+
+                        //       if (typeField && data) {
+                        //         console.log("Found Type field:", typeField);
+
+                        //         // Reset the Type field value
+                        //         typeField.formControl.setValue(null);
+
+                        //         // Enable the field if it was disabled
+                        //         typeField.templateOptions.disabled = false;
+
+                        //         // Find the selected Product Mode to get its name
+                        //         const selectedOption = field.templateOptions.options.find((option: any) => option.value === data);
+                        //         if (selectedOption) {
+                        //           console.log("Selected option:", selectedOption);
+
+                        //           const filterUrl = `masters/product_types/?mode_type=${encodeURIComponent(selectedOption.label)}`;
+                        //           console.log('Fetching type data from:', filterUrl);
+
+                        //           // Update the placeholder while loading
+                        //           typeField.templateOptions.placeholder = 'Loading types...';
+                        //           typeField.templateOptions = { ...typeField.templateOptions };
+
+                        //           // Directly fetch the filtered data
+                        //           this.http.get(filterUrl).subscribe(
+                        //             (response: any) => {
+                        //               console.log('API response for types:', response);
+
+                        //               let typeOptions = null;
+
+                        //               if (response && response.data && Array.isArray(response.data)) {
+                        //                 typeOptions = response.data;
+                        //               } else if (response && Array.isArray(response)) {
+                        //                 typeOptions = response;
+                        //               } else if (response && response.results && Array.isArray(response.results)) {
+                        //                 typeOptions = response.results;
+                        //               }
+
+                        //               if (typeOptions && typeOptions.length > 0) {
+                        //                 console.log(`Received ${typeOptions.length} type options`);
+
+                        //                 // Format options with simple value/label pairs like GST dropdown
+                        //                 const formattedOptions = typeOptions.map(item => ({
+                        //                   value: item.type_id, // Use just the ID as the value
+                        //                   label: item.type_name // Use the name as the label
+                        //                 }));
+
+                        //                 // Update the options
+                        //                 typeField.templateOptions.options = formattedOptions;
+                        //                 typeField.templateOptions.disabled = false;
+                        //                 typeField.templateOptions.placeholder = 'Select Type';
+                        //                 typeField.templateOptions = { ...typeField.templateOptions };
+                                        
+                        //                 // Find the "Finished Product" option
+                        //                 const finishedProductOption = formattedOptions.find(
+                        //                   (option: any) => option.label.toLowerCase() === 'finished product'
+                        //                 );
+                                        
+                        //                 if (finishedProductOption) {
+                        //                   // Set it as the default value
+                        //                   typeField.formControl.setValue(finishedProductOption.value);
+                                          
+                        //                   // Update the model
+                        //                   if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                        //                     this.formConfig.model['products']['type_id'] = finishedProductOption.value;
+                        //                     console.log("Default Type set to Finished Product:", finishedProductOption.value);
+                        //                   }
+                        //                 }
+                        //               } else {
+                        //                 typeField.templateOptions.options = [];
+                        //                 typeField.templateOptions.disabled = false;
+                        //                 typeField.templateOptions.placeholder = 'No types available';
+                        //                 typeField.templateOptions = { ...typeField.templateOptions };
+                        //               }
+                        //             },
+                        //             error => {
+                        //               console.error('Error fetching type options:', error);
+                        //               typeField.templateOptions.disabled = false;
+                        //               typeField.templateOptions.options = [];
+                        //               typeField.templateOptions.placeholder = 'Error loading types';
+                        //               typeField.templateOptions = { ...typeField.templateOptions };
+                        //             }
+                        //           );
+                        //         }
+                        //       }
+                        //     } else {
+                        //       console.error('Form config or product mode data model is not defined.');
+                        //     }
+                        //   });
+                        }
+                      }
+                    },
+                    {
+                      key: 'name',
+                      type: 'input',
+                      className: 'col-md-4 col-sm-6 col-12',
+                      templateOptions: {
+                        label: 'Name',
+                        placeholder: 'Enter Name',
+                        required: true,
+                        // disabled: true
+                      },
+                      hooks: {
+                        onInit: (field: any) => { }
+                      },
+                    },
+                    {
+                      className: 'col-md-4 col-sm-6 col-12',
+                      key: 'print_name',
+                      type: 'input',
+                      templateOptions: {
+                        label: 'Print Name',
+                        placeholder: 'Enter Print Name',
+                        required: true,
+                      }
+                    },
+                    {
+                      className: 'col-md-4 col-sm-6 col-12',
+                      key: 'code',
+                      type: 'input',
+                      templateOptions: {
+                        label: 'Code',
+                        placeholder: 'Enter Code',
+                        required: true
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          // this.http.get('masters/generate_order_no/?type=prd').subscribe((res: any) => {
+                          //   if (res && res.data && res.data?.order_number) {
+                          //     field.formControl.setValue(res.data?.order_number);
+                          //   }
+                          // });
+                        }
+                      }
+                    },
+                    {
+                      className: 'col-md-4 col-sm-6 col-12',
+                      key: 'product_group',
+                      type: 'productGroups-dropdown',
+                      templateOptions: {
+                        label: 'Product Group',
+                        dataKey: 'product_group_id',
+                        dataLabel: "group_name",
+                        options: [],
+                        required: true,
+                        lazy: {
+                          url: 'products/product_groups/',
+                          lazyOneTime: true
+                        }
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          field.formControl.valueChanges.subscribe((data: any) => {
+                            // if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                            //   this.formConfig.model['products']['product_group_id'] = data?.product_group_id;
+                            // } else {
+                            //   console.error('Form config or lead_status data model is not defined.');
+                            // }
+                          });
+                        }
+                      }
+                    },
+                    {
+                      className: 'col-md-4 col-sm-6 col-12',
+                      key: 'gst_input',
+                      type: 'select',
+                      templateOptions: {
+                        label: 'GST Percentage',
+                        placeholder: 'Select GST Percentage',
+                        required: false,
+                        options: [
+                          { value: 3, label: '3%' },
+                          { value: 5, label: '5%' },
+                          { value: 9, label: '9%' },
+                          { value: 12, label: '12%' },
+                          { value: 18, label: '18%' }
+                        ]
+                      }
+                    },   
+                    {
+                      key: 'stock_unit',
+                      type: 'productStockUnits-dropdown',
+                      className: 'col-md-4 col-sm-6 col-12',
+                      templateOptions: {
+                        label: 'Stock Unit',
+                        dataKey: 'stock_unit_id',
+                        dataLabel: "stock_unit_name",
+                        options: [],
+                        required: true,
+                        lazy: {
+                          url: 'products/product_stock_units/',
+                          lazyOneTime: true
+                        }
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          field.formControl.valueChanges.subscribe((data: any) => {
+                            // if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                            //   this.formConfig.model['products']['stock_unit_id'] = data?.stock_unit_id;
+                            // } else {
+                            //   console.error('Form config or lead_status data model is not defined.');
+                            // }
+                          });
+                        }
+                      }
+                    },
+                    {
+                      className: 'col-md-4 col-sm-6 col-12',
+                      key: 'hsn_code',
+                      type: 'select',
+                      templateOptions: {
+                        label: 'HSN',
+                        placeholder: 'Enter or Select HSN Code',
+                        required: false,
+                        options: [
+                          { value: '0101', label: '0101' },
+                          { value: '0201', label: '0201' },
+                          { value: '0301', label: '0301' },
+                          { value: '0401', label: '0401' },
+                          { value: '0501', label: '0501' }
+                        ],
+                        // allowCustomValue: true // Allow users to enter their own value
+                      }
+                    }, 
+                    {
+                      className: 'col-md-4 col-sm-6 col-12',
+                      key: 'balance',
+                      type: 'input',
+                      defaultValue: 0.00,
+                      templateOptions: {
+                      label: 'Balance',
+                      required: false, 
+                    }
+                  },
+                  ]
+                },
+                {
+                  className: 'col-sm-3 col-12 p-0',
+                  // key: 'products',
+                  fieldGroupClassName: "ant-row row mx-0 mt-2",
+                  fieldGroup: [
+                    {
+                      key: 'picture',
+                      type: 'file',
+                      className: 'ta-cell pr-md col d-flex justify-content-md-center pr-0',
+                      templateOptions: {
+                        label: 'Picture',
+                        required: false,
+                      }
+                    }
+                  ]
+                },
+              ]
+            },
+            {
+              className: "tab-form-list",
+              type: 'tabs',
+              fieldGroup: [
+                {
+                  className: 'col-12 pb-0',
+                  fieldGroupClassName: "field-no-bottom-space",
+                  props: {
+                    label: 'Advanced info'
+                  },
+                  fieldGroup: [
+                    {
+                      fieldGroupClassName: "",
+                      fieldGroup: [
+                        {
+                          className: 'col-12 p-0',
+                          key: 'products',
+                          fieldGroupClassName: "ant-row row align-items-end mt-3",
+                          fieldGroup: [
+                            {
+                              key: 'category',
+                              type: 'productCategories-dropdown',
+                              className: 'col-3',
+                              templateOptions: {
+                                label: 'Category',
+                                dataKey: 'category_id',
+                                dataLabel: "category_name",
+                                options: [],
+                                required: false,
+                                lazy: {
+                                  url: 'products/product_categories/',
+                                  lazyOneTime: true
+                                }
+                              },
+                              hooks: {
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe((data: any) => {
+                                    // if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                                    //   this.formConfig.model['products']['category_id'] = data?.category_id;
+                                    // } else {
+                                    //   console.error('Form config or lead_status data model is not defined.');
+                                    // }
+                                  });
+                                }
+                              }
+                            },
+                            // {
+                            //   className: 'col-md-4 col-sm-6 col-12',
+                            //   key: 'gst_input',
+                            //   type: 'select',
+                            //   templateOptions: {
+                            //     label: 'GST Percentage',
+                            //     placeholder: 'Select GST Percentage',
+                            //     required: false,
+                            //     options: [
+                            //       { value: 3, label: '3%' },
+                            //       { value: 5, label: '5%' },
+                            //       { value: 9, label: '9%' },
+                            //       { value: 12, label: '12%' },
+                            //       { value: 18, label: '18%' }
+                            //     ]
+                            //   }
+                            // },    
+                            {
+                              key: 'brand',
+                              type: 'productBrands-dropdown',
+                              className: 'col-3',
+                              templateOptions: {
+                                label: 'Brand',
+                                dataKey: 'brand_id',
+                                dataLabel: "brand_name",
+                                options: [],
+                                required: false,
+                                lazy: {
+                                  url: 'masters/product_brands/',
+                                  lazyOneTime: true
+                                }
+                              },
+                              hooks: {
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe((data: any) => {
+                                    // if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                                    //   this.formConfig.model['products']['brand_id'] = data?.brand_id;
+                                    // } else {
+                                    //   console.error('Form config or brand_id data model is not defined.');
+                                    // }
+                                  });
+                                }
+                              }
+                            },
+                            // {
+                            //   key: 'item_type',
+                            //   type: 'select',
+                            //   className: 'col-3',
+                            //   templateOptions: {
+                            //     label: 'Item Type',
+                            //     dataKey: 'item_type_id',
+                            //     dataLabel: "item_name",
+                            //     options: [],
+                            //     required: false,
+                            //     lazy: {
+                            //       url: 'masters/product_item_type/',
+                            //       lazyOneTime: true
+                            //     }
+                            //   },
+                            //   hooks: {
+                            //     onChanges: (field: any) => {
+                            //       field.formControl.valueChanges.subscribe((data: any) => {
+                            //         if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                            //           this.formConfig.model['products']['item_type_id'] = data?.item_type_id;
+                            //         } else {
+                            //           console.error('Form config or lead_status data model is not defined.');
+                            //         }
+                            //       });
+                            //     }
+                            //   }
+                            // },
+                            {
+                              key: 'type_id',
+                              type: 'productType-dropdown',
+                              className: 'col-3',
+                              templateOptions: {
+                                label: 'Type',
+                                dataKey: 'type_id',
+                                dataLabel: "type_name",
+                                placeholder: 'Select Product Mode first',
+                                options: [],
+                                required: false,
+                                disabled: true
+                              },
+                              hooks: {
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe((data: any) => {
+                                    // if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                                    //   // Store just the ID value
+                                    //   this.formConfig.model['products']['type_id'] = data;
+                                    //   console.log("Type changed to:", data);
+                                    // } else {
+                                    //   console.error('Form config or type_id data model is not defined.');
+                                    // }
+                                  });
+                                },
+                                onInit: (field: any) => {
+                                  // We need to wait for the Product Mode to load type options first
+                                  // const checkForOptions = setInterval(() => {
+                                  //   if (field.templateOptions.options && field.templateOptions.options.length > 0) {
+                                  //     clearInterval(checkForOptions);
+                                      
+                                  //     // Find the "Finished Product" option
+                                  //     const finishedProductOption = field.templateOptions.options.find(
+                                  //       (option: any) => option.label.toLowerCase() === 'finished product'
+                                  //     );
+                                      
+                                  //     if (finishedProductOption) {
+                                  //       // Set the default value
+                                  //       field.formControl.setValue(finishedProductOption.value);
+                                        
+                                  //       // Update the model
+                                  //       if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                                  //         this.formConfig.model['products']['type_id'] = finishedProductOption.value;
+                                  //         console.log("Default Type set to Finished Product:", finishedProductOption.value);
+                                  //       }
+                                  //     }
+                                  //   }
+                                  // }, 500); // Check every 500ms
+                                  
+                                  // // Clear the interval after 10 seconds to prevent infinite checking
+                                  // setTimeout(() => clearInterval(checkForOptions), 10000);
+                                }
+                              }
+                            },
+                            {
+                              key: 'unit_options',
+                              type: 'productUnitOptions-dropdown',
+                              className: 'col-3',
+                              templateOptions: {
+                                label: 'Unit Options',
+                                dataKey: 'unit_options_id',
+                                dataLabel: "unit_name",
+                                options: [],
+                                required: false,
+                                lazy: {
+                                  url: 'masters/unit_options/',
+                                  lazyOneTime: true
+                                }
+                              },
+                              hooks: {
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe((data: any) => {
+                                    // if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                                    //   this.formConfig.model['products']['unit_options_id'] = data?.unit_options_id;
+                                    // } else {
+                                    //   console.error('Form config or unit_options_id data model is not defined.');
+                                    // }
+                                  });
+                                },
+                                onInit: (field: any) => {
+                                  // const url = field.templateOptions.lazy.url;
+
+                                  // // Fetch the data using HttpClient
+                                  // this.http.get(url).subscribe(
+                                  //   (data: any) => {
+
+                                  //     // Map data to ensure each object has both label and value properties
+                                  //     field.templateOptions.options = data?.data?.map((option: any) => ({
+                                  //       label: option.unit_name,  // Display name in the UI
+                                  //       value: {
+                                  //         unit_options_id: option.unit_options_id,
+                                  //         unit_name: option.unit_name,
+                                  //       }
+                                  //     }));
+
+                                  //     // Find the default option where unit_name is 'Stock Unit'
+                                  //     const regex = /^stock\s*unit$/i; // Matches "stock unit" with optional whitespace, case insensitive
+                                  //     const defaultOption = field.templateOptions.options.find(option => regex.test(option.label));
+
+                                  //     if (defaultOption) {
+                                  //       // Set the default value to the unit_options_id of 'Stock Unit'
+                                  //       field.formControl.setValue(defaultOption.value);
+
+                                  //       // Update the model if necessary
+                                  //       if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                                  //         this.formConfig.model['products']['unit_options_id'] = defaultOption.value.unit_options_id;
+                                  //       }
+                                  //     } else {
+                                  //       console.warn('Default "Unit Option" option not found in options.');
+                                  //     }
+                                  //   },
+                                  //   (error) => {
+                                  //     console.error('Error fetching unit options:', error);
+                                  //   }
+                                  // );
+                                }
+                              }
+                            },
+                            {
+                              key: 'pack_unit',
+                              type: 'packUnits-dropdown',
+                              className: 'col-3',
+                              templateOptions: {
+                                label: 'Pack Unit',
+                                dataKey: 'stock_unit_id',
+                                dataLabel: 'stock_unit_name',
+                                options: [],
+                                required: true,
+                                lazy: {
+                                  url: 'products/product_stock_units/',
+                                  lazyOneTime: true
+                                }
+                              },
+                              hooks: {
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe((data: any) => {
+                                    // if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                                    //   this.formConfig.model['products']['pack_unit_id'] = data?.stock_unit_id;
+                                    // } else {
+                                    //   console.error('Form config or lead_status data model is not defined.');
+                                    // }
+                                  });
+                                }
+                              },
+                              hideExpression: (model) => {
+                                const unitName = model.unit_options ? model.unit_options.unit_name : undefined;
+                                // Hide if the `unitName` is not 'Stock Pack Unit' AND not 'Stock Pack GPack Unit'
+                                return unitName !== 'Stock Pack Unit' && unitName !== 'Stock Pack GPack Unit';
+                              },
+                            },
+                            {
+                              className: 'col-3',
+                              key: 'pack_vs_stock',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'Pack vs Stock',
+                                type: 'number',
+                                required: false
+                              },
+                              hideExpression: (model) => {
+                                // Check if `unit_options` exists, and check the value of `unit_name`
+                                const unitName = model.unit_options ? model.unit_options.unit_name : undefined;
+                                return unitName !== 'Stock Pack Unit' && unitName !== 'Stock Pack GPack Unit';
+                              }
+                            },
+                            {
+                              key: 'g_pack_unit',
+                              type: 'GpackUnits-dropdown',
+                              className: 'col-3',
+                              templateOptions: {
+                                label: 'GPack Unit',
+                                dataKey: 'stock_unit_id',
+                                dataLabel: 'stock_unit_name',
+                                options: [],
+                                required: true,
+                                lazy: {
+                                  url: 'products/product_stock_units/',
+                                  lazyOneTime: true
+                                }
+                              },
+                              hooks: {
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe((data: any) => {
+                                    // if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                                    //   this.formConfig.model['products']['g_pack_unit_id'] = data?.stock_unit_id;
+                                    // } else {
+                                    //   console.error('Form config or g_pack_unit data model is not defined.');
+                                    // }
+                                  });
+                                }
+                              },
+                              hideExpression: (model) => {
+                                // Check if `unit_options` exists, and check the value of `unit_name`
+                                const unitName = model.unit_options ? model.unit_options.unit_name : undefined;
+                                return unitName !== 'Stock Pack GPack Unit';  // Hide if it's not 'Stock Pack Unit'
+                              }
+                            },
+                            {
+                              className: 'col-3',
+                              key: 'g_pack_vs_pack',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'GPack vs Stock',
+                                type: 'number',
+                                required: false
+                              },
+                              hideExpression: (model) => {
+                                // Check if `unit_options` exists, and check the value of `unit_name`
+                                const unitName = model.unit_options ? model.unit_options.unit_name : undefined;
+                                return unitName !== 'Stock Pack GPack Unit';  // Hide if it's not 'Stock Pack Unit'
+                              }
+                            },
+                            {
+                              className: 'col-3',
+                              key: 'packet_barcode',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'Packet Barcode',
+                                required: false,
+                              },
+                              hideExpression: (model) => {
+                                // Check if `unit_options` exists, and check the value of `unit_name`
+                                const unitName = model.unit_options ? model.unit_options.unit_name : undefined;
+                                return unitName !== 'Stock Pack GPack Unit';  // Hide if it's not 'Stock Pack Unit'
+                              }
+                            },
+                            {
+                              className: 'col-3',
+                              key: 'barcode',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'Barcode',
+                                placeholder: 'Enter Barcode',
+                                required: false
+                              }
+                            },
+                            {
+                              className: 'col-3 d-flex align-items-center',
+                              key: 'print_barcode',
+                              type: 'checkbox',
+                              templateOptions: {
+                                label: 'Print Barcode'
+                              }
+                            }
+                          ]
+                        },
+                      ]
+                    }
+                  ]
+                },
+                {
+                  className: 'col-12 pb-0',
+                  fieldGroupClassName: "field-no-bottom-space",
+                  props: {
+                    label: 'Variations'
+                  },
+                  fieldGroup: [
+                    {
+                      fieldGroupClassName: "",
+                      fieldGroup: [
+                        {
+                          key: 'product_variations',
+                          type: 'table',
+                          className: 'custom-form-list product-table',
+                          templateOptions: {
+                            // title: 'Product Variations',
+                            addText: 'Add New Variations',
+                            tableCols: [
+                              { name: 'warehouse_location_id', label: 'Warehouse Location' },
+                              { name: 'quantity', label: 'Quantity' },
+                            ]
+                          },
+                          fieldArray: {
+                            fieldGroup: [
+                              {
+                                key: 'size_id',
+                                type: 'productSizes-dropdown',
+                                templateOptions: {
+                                  label: 'Size',
+                                  placeholder: 'Select Size',
+                                  dataKey: 'size_id',
+                                  dataLabel: 'size_name',
+                                  bindId: true,
+                                  hideLabel: true,
+                                  lazy: {
+                                    url: 'products/sizes/',
+                                    lazyOneTime: true
+                                  }
+                                },
+                              },
+                              {
+                                key: 'color_id',
+                                type: 'productColors-dropdown',
+                                templateOptions: {
+                                  label: 'Color',
+                                  placeholder: 'Select Color',
+                                  dataKey: 'color_id',
+                                  dataLabel: "color_name",
+                                  bindId: true,
+                                  hideLabel: true,
+                                  lazy: {
+                                    url: 'products/colors/',
+                                    lazyOneTime: true
+                                  }
+                                }
+                              },
+                              {
+                                key: 'sku',
+                                type: 'input',
+                                templateOptions: {
+                                  label: 'SKU',
+                                  hideLabel: true,
+                                  placeholder: 'Enter SKU'
+                                },
+                                expressionProperties: {
+                                  'templateOptions.required': (model) => !!model?.quantity  // SKU is required if quantity has a value
+                                }
+                              },
+                              {
+                                key: 'price',
+                                type: 'input',
+                                templateOptions: {
+                                  label: 'Price',
+                                  hideLabel: true,
+                                  placeholder: 'Enter Price',
+                                  required: false
+                                }
+                              },
+                              {
+                                key: 'quantity',
+                                type: 'input',
+                                templateOptions: {
+                                  label: 'Quantity',
+                                  hideLabel: true,
+                                  placeholder: 'Enter Quantity',
+                                  required: false,
+                                  type: 'number'
+                                },
+                                hooks: {
+                                  onChanges: (field: any) => {
+                                    field.formControl.valueChanges.subscribe(() => {
+                                      // this.updateBalanceFromVariations();
+                                    });
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        },
+                      ]
+                    }
+                  ]
+                },
+                {
+                  className: 'col-12 pb-0',
+                  fieldGroupClassName: "field-no-bottom-space",
+                  props: {
+                    label: 'Warehouse Locations'
+                  },
+                  fieldGroup: [
+                    {
+                      fieldGroupClassName: "",
+                      fieldGroup: [
+                        {
+                          key: 'product_item_balance',
+                          type: 'table',
+                          className: 'custom-form-list product-table',
+                          templateOptions: {
+                            addText: 'Add Warehouse Locations',
+                            tableCols: [
+                              { name: 'warehouse_location_id', label: 'Warehouse Location' },
+                              { name: 'quantity', label: 'Quantity' },
+                            ]
+                          },
+                          fieldArray: {
+                            fieldGroup: [
+                              {
+                                key: 'warehouse_location',
+                                type: 'warehouseLocations-dropdown',
+                                templateOptions: {
+                                  label: 'Location',
+                                  dataKey: 'location_id',
+                                  dataLabel: 'location_name',
+                                  options: [], // This will be populated dynamically based on the warehouse selected
+                                  hideLabel: true,
+                                  required: false,
+                                  lazy: {
+                                    lazyOneTime: true,
+                                    url: 'inventory/warehouse_locations/'
+                                  }
+                                },
+                                hooks: {
+                                  onChanges: (field: any) => {
+                                    field.formControl.valueChanges.subscribe((data: any) => {
+                                      // const index = field.parent.key;
+                                      // if (!this.formConfig.model['product_item_balance'][index]) {
+                                      //   console.error(`Task comments at index ${index} is not defined. Initializing...`);
+                                      //   this.formConfig.model['product_item_balance'][index] = {};
+                                      // }
+                                      // this.formConfig.model['product_item_balance'][index]['warehouse_location_id'] = data?.location_id;
+                                    });
+                                  }
+                                }
+                              },
+                              {
+                                key: 'quantity',
+                                type: 'input',
+                                templateOptions: {
+                                  label: 'Quantity',
+                                  placeholder: 'Enter Quantity',
+                                  hideLabel: true,
+                                  required: false
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  className: 'col-12 pb-0',
+                  fieldGroupClassName: "field-no-bottom-space",
+                  props: {
+                    label: 'Sale Info'
+                  },
+                  fieldGroup: [
+                    {
+                      fieldGroupClassName: "",
+                      fieldGroup: [
+                        {
+                          className: 'col-12 p-0',
+                          key: 'products',
+                          fieldGroupClassName: "ant-row row align-items-end mt-3",
+                          fieldGroup: [
+                            {
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              key: 'sales_description',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'Sales Description',
+                                placeholder: 'Enter Sales Description'
+                              }
+                            },
+                            {
+                              key: 'sales_gl',
+                              type: 'productSalesGL-dropdown',
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              templateOptions: {
+                                label: 'Sales GL',
+                                dataKey: 'sales_gl_id',
+                                dataLabel: "name",
+                                options: [],
+                                required: false,
+                                lazy: {
+                                  url: 'products/product_sales_gl/',
+                                  lazyOneTime: true
+                                }
+                              },
+                              hooks: {
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe((data: any) => {
+                                    // if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                                    //   this.formConfig.model['products']['sales_gl_id'] = data?.sales_gl_id;
+                                    // } else {
+                                    //   console.error('Form config or lead_status data model is not defined.');
+                                    // }
+                                  });
+                                }
+                              }
+                            },
+                            {
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              key: 'mrp',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'MRP',
+                                placeholder: 'Enter MRP',
+                                required: false
+                              }
+                            },
+                            {
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              key: 'minimum_price',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'Min Price',
+                                placeholder: 'Enter Minimum Price'
+                              }
+                            },
+                            {
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              key: 'sales_rate',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'Sales Rate',
+                                placeholder: 'Enter Sales Rate',
+                                required: false
+                              }
+                            },
+                            {
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              key: 'wholesale_rate',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'Wholesale Rate',
+                                placeholder: 'Enter Wholesale Rate'
+                              }
+                            },
+                            {
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              key: 'dealer_rate',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'Dealer Rate',
+                                placeholder: 'Enter Dealer Rate'
+                              }
+                            },
+                            {
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              key: 'rate_factor',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'Rate Factor',
+                                placeholder: 'Enter Rate Factor'
+                              }
+                            },
+                            {
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              key: 'discount',
+                              type: 'input',
+                              defaultValue: 0.00,
+                              templateOptions: {
+                                label: 'Discount',
+                                placeholder: 'Enter Discount'
+                              }
+                            },
+                            {
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              key: 'dis_amount',
+                              type: 'input',
+                              defaultValue: 0.00,
+                              templateOptions: {
+                                label: 'Disc Amt',
+                                placeholder: 'Enter Disc Amt',
+                                required: false
+                              }
+                            },
+                          ]
+                        },
+                      ]
+                    }
+                  ]
+                },
+                {
+                  className: 'col-12 pb-0',
+                  fieldGroupClassName: "field-no-bottom-space",
+                  props: {
+                    label: 'Purchase Info'
+                  },
+                  fieldGroup: [
+                    {
+                      fieldGroupClassName: "",
+                      fieldGroup: [
+                        {
+                          className: 'col-12 p-0',
+                          key: 'products',
+                          fieldGroupClassName: "ant-row row align-items-end mt-3",
+                          fieldGroup: [
+
+                            {
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              key: 'purchase_description',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'Purchase Description',
+                                placeholder: 'Enter Purchase Description'
+                              }
+                            },
+                            {
+                              key: 'purchase_gl',
+                              type: 'productPurchaseGL-dropdown',
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              templateOptions: {
+                                label: 'Purchase GL',
+                                dataKey: 'purchase_gl_id',
+                                dataLabel: "name",
+                                options: [],
+                                required: false,
+                                lazy: {
+                                  url: 'products/product_purchase_gl/',
+                                  lazyOneTime: true
+                                }
+                              },
+                              hooks: {
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe((data: any) => {
+                                    // if (formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                                    //   this.formConfig.model['products']['purchase_gl_id'] = data?.purchase_gl_id;
+                                    // } else {
+                                    //   console.error('Form config or lead_status data model is not defined.');
+                                    // }
+                                  });
+                                }
+                              }
+                            },
+
+                            {
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              key: 'minimum_purchase_price',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'Min Purchase Price',
+                                placeholder: 'Enter Minimum Purchase Price'
+                              }
+                            },
+                            {
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              key: 'purchase_rate',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'Purchase Rate',
+                                placeholder: 'Enter Purchase Rate'
+                              }
+                            },
+                            {
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              key: 'purchase_rate_factor',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'Purchase Rate Factor',
+                                placeholder: 'Enter Purchase Rate Factor'
+                              }
+                            },
+                            {
+                              className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                              key: 'purchase_discount',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'Purchase Discount',
+                                placeholder: 'Enter Purchase Discount'
+                              }
+                            },
+                          ]
+                        },
+                      ]
+                    }
+                  ]
+                },
+                {
+                  className: 'col-12 custom-form-card-block p-0',
+                  fieldGroupClassName: 'row m-0 pr-0',
+                  props: {
+                    label: 'Attributes Info'
+                  },
+                  // hideExpression: () => {
+                  //     // Only hide if selectedProductMode is explicitly set to a non-Inventory value
+                  //     // return this.selectedProductMode && this.selectedProductMode !== 'Inventory';
+                  //   },
+
+                  fieldGroup: [
+                    {
+                      className: 'col-12 p-0',
+                      key: 'products',
+                      fieldGroupClassName: "ant-row mx-0 row align-items-end mt-2",
+                      fieldGroup: [
+                        {
+                          className: 'col-md-4 col-sm-6 col-12',
+                          key: 'minimum_level',
+                          type: 'input',
+                          templateOptions: {
+                            label: 'Minimum Level',
+                            placeholder: 'Enter Minimum Level'
+                          }
+                        },
+                        {
+                          className: 'col-md-4 col-sm-6 col-12',
+                          key: 'maximum_level',
+                          type: 'input',
+                          templateOptions: {
+                            label: 'Maximum Level',
+                            placeholder: 'Enter Maximum Level'
+                          }
+                        },
+                        {
+                          className: 'col-md-4 col-sm-6 col-12',
+                          key: 'weighscale_mapping_code',
+                          type: 'text',
+                          templateOptions: {
+                            label: 'Weighscale Mapping Code',
+                            placeholder: 'Enter Weighscale Mapping Code'
+                          }
+                        },
+                        {
+                          key: 'drug_type',
+                          type: 'select',
+                          className: 'col-md-4 col-sm-6 col-12',
+                          templateOptions: {
+                            label: 'Drug Type',
+                            dataKey: 'drug_type_id',
+                            dataLabel: "drug_type_name",
+                            options: [],
+                            required: false,
+                            lazy: {
+                              url: 'masters/product_drug_types/',
+                              lazyOneTime: true
+                            }
+                          },
+                          hooks: {
+                            onChanges: (field: any) => {
+                              field.formControl.valueChanges.subscribe((data: any) => {
+                                // if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                                //   this.formConfig.model['products']['drug_type_id'] = data?.drug_type_id;
+                                // } else {
+                                //   console.error('Form config or lead_status data model is not defined.');
+                                // }
+                              });
+                            }
+                          }
+                        },
+                        {
+                          className: 'col-md-4 col-sm-6 col-12',
+                          key: 'salt_composition',
+                          type: 'text',
+                          templateOptions: {
+                            label: 'Salt Composition',
+                            placeholder: 'Enter Salt Composition'
+                          }
+                        }
+                      ]
+                    },
+                  ]
+                },
+              ]
+            },
+          ]
+        }
+      ]
+    }
+  
+  }

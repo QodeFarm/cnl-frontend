@@ -19,7 +19,8 @@ export class GstTypesComponent {
       "globalSearch": {
         keys: ['gst_type_id', 'name']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+      defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'name',
