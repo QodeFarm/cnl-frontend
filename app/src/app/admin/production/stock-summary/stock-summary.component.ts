@@ -100,6 +100,13 @@ export class StockSummaryComponent {
           name: 'Period End',
           type: 'date'
         },
+        {
+          fieldKey: 'created_at',
+          name: 'Created At',
+          type: 'datetime',
+          displayType: 'datetime'
+
+        }
       ]
     },
     formConfig: {
