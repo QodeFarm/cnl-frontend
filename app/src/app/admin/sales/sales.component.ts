@@ -1201,9 +1201,9 @@ createSaleOrder() {
       custom_field_values: customFieldsPayload.custom_field_values // Array of dictionaries
     };
 
-    if (!payload) {
-      this.showDialog(); // Stop execution if required fields are missing
-    }
+    // if (!payload) {
+    //   this.showDialog(); // Stop execution if required fields are missing
+    // }
 
     // Define logic here for updating the sale order without modal pop-up
     console.log("Updating sale order:", this.formConfig.model);

@@ -213,7 +213,7 @@ onPreviewClick(): void {
           // Clean up the blob URL after use
           setTimeout(() => {
               URL.revokeObjectURL(blobUrl);
-              this.refreshTable();
+              // this.refreshTable();
           }, 1000);
       },
       (error) => {
