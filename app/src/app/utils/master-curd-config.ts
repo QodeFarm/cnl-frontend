@@ -6670,8 +6670,8 @@ export const taskPrioritiesConfig: TaCurdConfig = {
     }
   }
 
-// baseUrl: string = 'https://apicore.cnlerp.com/api/v1/';
-const baseUrl = 'http://127.0.0.1:8000/api/v1/';
+ const baseUrl = 'https://apicore.cnlerp.com/api/v1/';
+// const baseUrl = 'http://127.0.0.1:8000/api/v1/';
 
 export const AssetCategoriesConfig:  TaCurdConfig = {
     // baseUrl: string = 'http://127.0.0.1:8000/api/v1/';
