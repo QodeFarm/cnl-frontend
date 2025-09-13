@@ -1220,7 +1220,7 @@ createSaleOrder() {
         console.error('Error updating record:', error);
 
         const errorMessage = error?.error?.message || '';
-        if (errorMessage === "This record is from the mstcnl DB, not allowed to update.") {
+        if (errorMessage === "Update is not allowed, please contact Product team.") {
           // Re-run ngOnInit when this specific error occurs
           this.ngOnInit();
         }
