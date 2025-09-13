@@ -23,7 +23,9 @@
        nz-popconfirm
        [nzCondition]="(a.confirm)?false:true"
        [nzPopconfirmTitle]="a.confirmMsg"
-       (nzOnConfirm)="action(a)">
+       (nzOnConfirm)="action(a)"
+       nz-tooltip
+      [nzTooltipTitle]="getTooltipText(a)">
        
       <i *ngIf="a.icon" [ngClass]="a.icon"></i>
       <ng-container [ngSwitch]="a.type">

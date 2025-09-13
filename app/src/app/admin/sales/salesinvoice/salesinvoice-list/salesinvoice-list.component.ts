@@ -213,7 +213,7 @@ onPreviewClick(): void {
           // Clean up the blob URL after use
           setTimeout(() => {
               URL.revokeObjectURL(blobUrl);
-              this.refreshTable();
+              // this.refreshTable();
           }, 1000);
       },
       (error) => {
@@ -380,12 +380,22 @@ private fallbackPrint(pdfBlob: Blob): void {
         name: 'Advance Amount',
         sort: true
       },
+      // {
+      //   fieldKey: 'status_name',
+      //   name: 'Status',
+      //   displayType: "map",
+      //   mapFn: (currentValue: any, row: any, col: any) => {
+      //     return `${row?.order_status?.status_name}`;
+      //   },
+      //   sort: true
+      // },
       {
-        fieldKey: 'status_name',
+        fieldKey: 'order_status',
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return `${row?.order_status?.status_name}`;
+          // return `${row.order_status.status_name}`;
+          return row.order_status?.status_name || row.order_status_id || '';
         },
         sort: true
       },
@@ -417,6 +427,7 @@ private fallbackPrint(pdfBlob: Blob): void {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',
+            tooltip: "Edit this record",
             callBackFn: (row, action) => {
               console.log(row);
               this.edit.emit(row.sale_invoice_id);

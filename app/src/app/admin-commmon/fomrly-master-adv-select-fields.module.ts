@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormlyModule } from '@ngx-formly/core';
-import { cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, CustomerPaymentConfig, designationsConfig, employeeSalaryComponentsConfig, FirmStatusConfig, gPackageUnitsConfig, GstCatConfig, GstTypesConfig, interactionTypesConfig, jobTypesConfig, leadStatusesConfig, leaveTypesConfig, ledgerAccountsConfig, LedgerGroupsConfig, MachineConfig, OrderStatusConfig, OrderTypesConfig, packUnitConfig, PaymentLinkConfig, PriceCatConfig, productBrandsConfig, productCategoriesConfig, productColorsConfig, productGroupsConfig, productGstClassificationsConfig, ProductionStatusesConfig, productModesConfig, productPurchaseGLConfig, productSalesGLConfig, productSizesConfig, productStockUnitsConfig, productTypesConfig, PurchaseTypesConfig, ReminderTypesConfig, SaleTypesConfig, shiftsConfig, StateConfig, statusConfig, taskPrioritiesConfig, TerritoryConfig, TransportConfig, unitOptionsConfig, UserGroupsConfig, VendorAgentConfig, vendorCategeoryConfig, VendorPaymentTermsConfig, warehouseLocationsConfig } from '../utils/master-curd-config';
+import { AssetCategoriesConfig, AssetStatusConfig, cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, CustomerPaymentConfig, designationsConfig, employeeSalaryComponentsConfig, FirmStatusConfig, gPackageUnitsConfig, GstCatConfig, GstTypesConfig, interactionTypesConfig, jobTypesConfig, leadStatusesConfig, leaveTypesConfig, ledgerAccountsConfig, LedgerGroupsConfig, LocationsAssetConfig, MachineConfig, OrderStatusConfig, OrderTypesConfig, packUnitConfig, PaymentLinkConfig, PriceCatConfig, productBrandsConfig, productCategoriesConfig, productColorsConfig, productGroupsConfig, productGstClassificationsConfig, ProductionStatusesConfig, productModesConfig, productPurchaseGLConfig, productSalesGLConfig, productsCrudConfig, productSizesConfig, productStockUnitsConfig, productTypesConfig, PurchaseTypesConfig, ReminderTypesConfig, SaleTypesConfig, shiftsConfig, StateConfig, statusConfig, taskPrioritiesConfig, TerritoryConfig, TransportConfig, unitOptionsConfig, UserGroupsConfig, VendorAgentConfig, vendorCategeoryConfig, VendorPaymentTermsConfig, warehouseLocationsConfig } from '../utils/master-curd-config';
 
 
 
@@ -18,8 +18,8 @@ import { cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, C
           defaultOptions: {
             templateOptions: {
               placeholder: 'Please Select',
-              label: 'Customer Category',
-              dataKey: 'customer_category_id',
+              label: 'Customers',
+              dataKey: 'customer_id',
               dataLabel: 'name',
               required: false,
               curdConfig: customerCudConfig
@@ -821,9 +821,123 @@ import { cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, C
             }
           }
         },
-        
-      ],
-    })
-  ]
-})
-export class FomrlyMasterAdvSelectFieldsModule { }
+
+        {
+          name: 'asset-cat-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Select Asset Categorey',
+              label: 'Asset Categorey',
+              dataKey: 'asset_category_id',
+              dataLabel: 'category_name',
+              required: true,
+              curdConfig: AssetCategoriesConfig
+            }
+          }
+        },
+        {
+          name: 'asset-status-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Select Asset Statuses',
+              label: 'Asset Statuses',
+              dataKey: 'asset_status_id',
+              dataLabel: 'status_name',
+              required: true,
+              curdConfig: AssetStatusConfig
+            }
+          }
+        },
+        {
+          name: 'location-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Select location',
+              label: 'Location',
+              dataKey: 'location_id',
+              dataLabel: 'location_name',
+              required: true,
+              curdConfig: LocationsAssetConfig
+            }
+          }
+        },
+        {
+          name: 'products-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: 'Please Select Products',
+              label: 'Products',
+              dataKey: 'product_id',
+              dataLabel: 'name',
+              required: true,
+              curdConfig: productsCrudConfig
+            }
+          }
+        },
+        //     {
+        //   name: 'products-dropdown',
+        //   extends: 'adv-select',
+        //   wrappers: ['ta-field'],
+        //   defaultOptions: {
+        //     templateOptions: {
+        //       placeholder: 'Please Select Products',
+        //       label: 'Products',
+        //       dataKey: 'product_id',
+        //       dataLabel: 'name',
+        //       valueProp: 'product_id',
+        //       labelProp: 'name',
+        //       required: true,
+        //       curdConfig: productsCrudConfig
+        //     },
+        //     hooks: {
+        //       onInit: (field: any) => {
+        //         const parentArray = field.parent;
+        //         if (!parentArray) return;
+
+        //         const currentRowIndex = +parentArray.key;
+        //         const modelRow = field?.form?.model?.sale_order_items?.[currentRowIndex];
+
+        //         // 🔹 Handle edit mode
+        //         let existingValue = modelRow?.product || modelRow?.product_id;
+
+        //         if (existingValue) {
+        //           if (typeof existingValue === 'string') {
+        //             // Look for option match
+        //             const match = field.templateOptions.options?.find(
+        //               opt => opt.product_id === existingValue
+        //             );
+
+        //             field.formControl.setValue(
+        //               match || { product_id: existingValue, name: modelRow?.product_name || '' },
+        //               { emitEvent: false }
+        //             );
+        //           } else {
+        //             // Already a product object
+        //             field.formControl.setValue(existingValue, { emitEvent: false });
+        //           }
+        //         }
+
+        //         // 🔹 Subscribe to changes globally
+        //         field.formControl.valueChanges.subscribe((data: any) => {
+        //           if (!modelRow) {
+        //             field.form.model.sale_order_items[currentRowIndex] = {};
+        //           }
+        //           field.form.model.sale_order_items[currentRowIndex]['product_id'] = data?.product_id;
+        //         });
+        //       }
+        //     }
+        //   }
+        // },
+              ],
+            })
+          ]
+        })
+        export class FomrlyMasterAdvSelectFieldsModule { }

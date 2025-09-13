@@ -55,6 +55,7 @@ export class WorkflowListComponent {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',
+            tooltip: "Edit this record",
             callBackFn: (row, action) => {
               this.edit.emit(row.workflow_id); // Emit the workflow ID for editing
             }

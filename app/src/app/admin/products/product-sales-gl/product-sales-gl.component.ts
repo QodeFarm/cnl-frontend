@@ -19,7 +19,8 @@ export class ProductSalesGlComponent {
       "globalSearch": {
         keys: ['name','sales_accounts','code','inactive','type','account_no','is_loan_account','address','employee','pan']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+      defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'name',

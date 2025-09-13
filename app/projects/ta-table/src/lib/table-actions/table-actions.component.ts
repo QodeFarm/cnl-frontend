@@ -47,5 +47,19 @@ export class TableActionsComponent implements OnInit {
     }
     return true;
   }
-  
+
+getTooltipText(a: any): string {
+
+  if (a.tooltip) {
+    return a.tooltip;
+  }
+    
+  switch (a.type) {
+    case 'edit': return 'Edit this record';
+    case 'delete': return 'Delete this record';
+    case 'restore': return 'Restore this record';
+    default: return typeof a.label === 'string' ? a.label : 'Action';
+  }
+}
+
 }

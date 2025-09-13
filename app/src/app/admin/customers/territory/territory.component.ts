@@ -21,7 +21,8 @@ export class TerritoryComponent {
       "globalSearch": {
         keys: ['territory_id', 'name','code']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+      defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'name',

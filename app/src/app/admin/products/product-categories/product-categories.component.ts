@@ -19,7 +19,8 @@ export class ProductCategoriesComponent  {
     "globalSearch": {
       keys: ['category_name','code']
     },
-    defaultSort: { key: 'created_at', value: 'descend' },
+    // defaultSort: { key: 'created_at', value: 'descend' },
+    defaultSort: { key: 'is_deleted', value: 'ascend' },
     cols: [
       {
         fieldKey: 'category_name',

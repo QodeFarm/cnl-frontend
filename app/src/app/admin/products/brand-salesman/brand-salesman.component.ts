@@ -20,6 +20,7 @@ export class BrandSalesmanComponent {
       "globalSearch": {
         keys: ['brand_salesman_id', 'name']
       },
+      defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'code',

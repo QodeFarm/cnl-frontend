@@ -19,7 +19,8 @@ export class ProductItemBalanceComponent {
       "globalSearch": {
         keys: ['product','warehouse_location_id','quantity']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+      defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'product',

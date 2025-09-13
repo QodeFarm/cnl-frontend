@@ -19,7 +19,8 @@ export class ProductGstClassificationsComponent {
       "globalSearch": {
         keys: ['id','type','code', 'hsn_or_sac_code','hsn_description']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // defaultSort: { key: 'created_at', value: 'descend' },
+      defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
         {
           fieldKey: 'type',

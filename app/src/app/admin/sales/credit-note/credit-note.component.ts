@@ -16,6 +16,7 @@ export class CreditNoteComponent {
   @ViewChild('salescreditnoteForm', { static: false }) salescreditnoteForm: TaFormComponent | undefined;
   @ViewChild(CreditNoteListComponent) CreditNoteListComponent!: CreditNoteListComponent;
   
+  
   sidebarMessage: string = '';
   showSaleCreditnoteList: boolean = false;
   orderNumber: any;
@@ -123,25 +124,66 @@ export class CreditNoteComponent {
     }
   }
 
+  // circleSaleCreditnote(event) {
+  //   this.SaleCreditnoteEditID = event;
+  //   this.http.patch('sales/sale_credit_notes/' + event + '/', { order_status_id: '68ea000e-ce95-4145-a3c7-96efe6f9ff53' })
+  //     .subscribe(
+  //       (res: any) => {
+  //         // Check if the response contains credit_note_id
+  //         if (res && res.credit_note_id) {
+  //           localStorage.setItem('sidebarMessage', 'Order status Approved');
+  //           // Reload the page
+  //           window.location.reload();
+  //         } else {
+  //           console.error("Error updating order status:", res);
+  //         }
+  //       },
+  //       (error) => {
+  //         console.error("HTTP error:", error);
+  //       }
+  //     );
+  // }  
+// refreshTable() {
+//    this.taTableComponent?.refresh();
+//   };
   circleSaleCreditnote(event) {
     this.SaleCreditnoteEditID = event;
-    this.http.patch('sales/sale_credit_notes/' + event + '/', { order_status_id: '68ea000e-ce95-4145-a3c7-96efe6f9ff53' })
+
+    // First fetch the Approved status from order_status API
+    this.http.get<any>('masters/order_status/?status_name=Approved')
       .subscribe(
-        (res: any) => {
-          // Check if the response contains credit_note_id
-          if (res && res.credit_note_id) {
-            localStorage.setItem('sidebarMessage', 'Order status Approved');
-            // Reload the page
-            window.location.reload();
+        (statusRes: any) => {
+          if (statusRes && statusRes.data.length > 0) {
+            // console.log("statusRes : ", statusRes)
+            const approvedStatusId = statusRes.data[0].order_status_id;  // dynamically fetch ID
+
+            // Now patch the sale_credit_note with the dynamic order_status_id
+            this.http.patch('sales/sale_credit_notes/' + event + '/', { order_status_id: approvedStatusId })
+              .subscribe(
+                (res: any) => {
+                  if (res && res.credit_note_id) {
+                    // localStorage.setItem('sidebarMessage', 'Order status Approved');
+                    // window.location.reload();
+                    // this.refreshTable();
+                    this.CreditNoteListComponent.refreshTable();
+                  } else {
+                    console.error("Error updating order status:", res);
+                  }
+                },
+                (error) => {
+                  console.error("HTTP error while patching:", error);
+                }
+              );
           } else {
-            console.error("Error updating order status:", res);
+            console.error("No status found for Approved");
           }
         },
         (error) => {
-          console.error("HTTP error:", error);
+          console.error("HTTP error while fetching status:", error);
         }
       );
-  }  
+  }
+
 
   getOrderNo() {
     this.orderNumber = null; 

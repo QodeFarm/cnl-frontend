@@ -137,6 +137,7 @@ export class WorkOrderListComponent {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',
+            tooltip: "Edit this record",
             callBackFn: (row, action) => {
               console.log(row);
               this.edit.emit(row.work_order_id);
