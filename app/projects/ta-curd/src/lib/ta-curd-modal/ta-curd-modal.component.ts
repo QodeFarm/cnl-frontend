@@ -10,6 +10,7 @@ import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzDrawerModule } from 'ng-zorro-antd/drawer';
+import { FomrlyMasterAdvSelectFieldsModule } from 'src/app/admin-commmon/fomrly-master-adv-select-fields.module';
 
 @Component({
   selector: 'ta-curd-modal',
@@ -24,6 +25,7 @@ import { NzDrawerModule } from 'ng-zorro-antd/drawer';
     NzIconModule,
     NzDrawerModule,
     forwardRef(() => TaFormComponent),
+    FomrlyMasterAdvSelectFieldsModule,
     NzButtonModule,
     NzModalModule]
 })
