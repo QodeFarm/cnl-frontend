@@ -488,6 +488,7 @@ export class SalesComponent {
 
   editSaleOrder(event) {
     this.SaleOrderEditID = event;
+    console.log("event : ", event);
     this.showForm = false;
     this.http.get('sales/sale_order/' + event).subscribe((res: any) => {
       if (res && res.data) {
