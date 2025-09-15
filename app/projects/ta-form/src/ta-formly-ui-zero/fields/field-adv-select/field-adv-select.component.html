@@ -6,34 +6,46 @@
 </button> -->
 
 <ng-template cdkConnectedOverlay [cdkConnectedOverlayOrigin]="trigger" [cdkConnectedOverlayOpen]="showCurdDiv"
-    [cdkConnectedOverlayHasBackdrop]="false" 
+    [cdkConnectedOverlayHasBackdrop]="false"
     [cdkConnectedOverlayWidth]="props.curdConfig.drawerSize ? Math.min(props.curdConfig.drawerSize, window.innerWidth - 40) : 'auto'"
-    [cdkConnectedOverlayPositions]="positions" 
-    cdkConnectedOverlayPanelClass="adv-select-custom-overlay-panel">
+    [cdkConnectedOverlayPositions]="positions" cdkConnectedOverlayPanelClass="adv-select-custom-overlay-panel">
+    <span (click)="showCurdDiv = false;dropdownOpen=false;"
+        style="position: absolute; top: 5px; right: 10px; cursor: pointer; z-index: 1000;"><i
+            class="fa fa-times"></i></span>
     <div class="adv-select-curd-container ant-select-dropdown" style="background: white;padding: 5px; z-index: 999;">
-        <div style="padding: 8px 12px; max-height: 70vh; overflow-y: auto; overflow-x: hidden; background-color: white; width: 100%;">
-            <ta-curd-modal [options]="props.curdConfig"  class="custom-list"></ta-curd-modal>
+        <div
+            style="padding: 8px 12px; max-height: 60vh; overflow-y: auto; overflow-x: hidden; background-color: white; width: 100%;">
+            <ta-curd-modal [options]="props.curdConfig" class="custom-list"></ta-curd-modal>
         </div>
     </div>
 </ng-template>
 <div class="row">
     <div class="col">
-        <nz-select style="width: 100%;" [nzCustomTemplate]="defaultTemplate" [nzBackdrop]="false" cdkOverlayOrigin
-            #trigger="cdkOverlayOrigin" [nzOpen]="dropdownOpen" (nzOpenChange)="onOpenChange($event)"
-            [compareWith]="compareFn" [nzDropdownMatchSelectWidth]="false" [class.ng-dirty]="showError" nzAllowClear
-            [formControl]="formControl" [formlyAttributes]="field"
-            [nzMode]="to.multiple ? 'multiple' :(to.mode)?to.mode: 'default'" [nzDropdownClassName]="'select-adv-field'"
-            [nzPlaceHolder]="props?.placeholder || 'Please Select'" [nzSelectOnTab]="true"
-            (clickOutside)="onClickOutside($event)">
+        <div class="btn btn-outline-secondary dropdown-toggle d-flex justify-content-between align-items-center w-100  dropdown-toggle"
+            cdkOverlayOrigin #trigger="cdkOverlayOrigin" (click)="
+            dropdownOpen = !dropdownOpen; showCurdDiv = !showCurdDiv;" style="position: relative;">
+
+            {{lazySelectedItem?.label || props?.placeholder || 'Please Select'}}
+            <i class="fa fa-times-circle d-none hover-show" *ngIf="lazySelectedItem?.label"
+                style="cursor: pointer;position: absolute; right: 24px;" (click)="clearValue($event)"></i>
+        </div>
+        <!-- <nz-select style="width: 100%;" [nzCustomTemplate]="defaultTemplate" [nzBackdrop]="false" cdkOverlayOrigin
+            #trigger="cdkOverlayOrigin" [nzOpen]="dropdownOpen" (nzOpenChange)="onOpenChange($event)" (click)="
+            dropdownOpen = !dropdownOpen; showCurdDiv = !showCurdDiv;" [compareWith]="compareFn"
+            [nzDropdownMatchSelectWidth]="false" [class.ng-dirty]="showError" nzAllowClear [formControl]="formControl"
+            [formlyAttributes]="field" [nzMode]="to.multiple ? 'multiple' :(to.mode)?to.mode: 'default'"
+            [nzDropdownClassName]="'select-adv-field'" [nzPlaceHolder]="props?.placeholder || 'Please Select'"
+            [nzSelectOnTab]="true" (clickOutside)="onClickOutside($event)">
             <nz-option *ngIf="formControl && formControl.value" nzDisabled [nzValue]="formControl.value"
-                [nzLabel]="lazySelectedItem.label"></nz-option>
+                [nzLabel]="lazySelectedItem?.label"></nz-option>
             <nz-option></nz-option>
-        </nz-select>
+        </nz-select> -->
         <div class="adv-select-curd-container-main" *ngIf="false && props.curdConfig && showCurdDiv;">
             <div class="adv-select-curd-container ant-select-dropdown"
                 style="position: absolute; background: white;padding: 5px; max-width: 95vw; z-index: 999;">
-                <div style="padding: 8px 12px; max-height: 70vh; overflow-y: auto; overflow-x: hidden; background-color: white;">
-                    <ta-curd-modal [options]="props.curdConfig"  class="custom-list"></ta-curd-modal>
+                <div
+                    style="padding: 8px 12px; max-height: 70vh; overflow-y: auto; overflow-x: hidden; background-color: white;">
+                    <ta-curd-modal [options]="props.curdConfig" class="custom-list"></ta-curd-modal>
                     <!-- <ta-table [options]="props.curdConfig?.tableConfig"></ta-table> -->
                 </div>
             </div>
@@ -132,6 +144,6 @@
     [nzWidth]="props.curdConfig.drawerSize || 'auto'" [nzVisible]="visible" [nzClosable]="true"
     [nzPlacement]="props.curdConfig.drawerPlacement || 'right'" [nzTitle]="formTitle" (nzOnClose)="close()">
     <ng-template nzDrawerContent>
-        <ta-form *ngIf="visible" #form [options]="props.curdConfig.formConfig"  class="custom-list"></ta-form>
+        <ta-form *ngIf="visible" #form [options]="props.curdConfig.formConfig" class="custom-list"></ta-form>
     </ng-template>
 </nz-drawer>
