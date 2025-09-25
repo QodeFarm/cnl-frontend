@@ -145,8 +145,8 @@ export class FieldAdvSelectComponent extends FieldType implements OnInit, AfterV
     this.visible = false;
   }
   onOpenChange(open: boolean) {
-    this.dropdownOpen = true;
-    this.showCurdDiv = true;
+    // this.dropdownOpen = true;
+    // this.showCurdDiv = true;
 
   }
   onClickOutside(event: MouseEvent): void {
@@ -173,6 +173,13 @@ export class FieldAdvSelectComponent extends FieldType implements OnInit, AfterV
     } else {
 
     }
+  }
+  clearValue(event: MouseEvent) {
+    event.stopPropagation();
+    event.preventDefault();
+    this.formControl.setValue(null);
+    this.lazySelectedItem = null;
+    this.cdr.detectChanges();
   }
   openDrawer(row?: any) {
     debugger;
