@@ -249,3 +249,84 @@
     margin: 2px;
   }
 } 
+
+//--------------------
+// /* Modal Overlay */
+// .modal-info {
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+//   position: fixed;
+//   z-index: 1050; /* higher than other UI elements */
+//   left: 0;
+//   top: 0;
+//   width: 100%;
+//   height: 100%;
+//   background-color: rgba(0,0,0,0.6);
+//   overflow-y: auto;
+//   padding: 20px 0;
+//   animation: fadeInOverlay 0.3s ease-in-out;
+// }
+
+// /* Fade-in overlay animation */
+// @keyframes fadeInOverlay {
+//   from { background-color: rgba(0,0,0,0); }
+//   to { background-color: rgba(0,0,0,0.6); }
+// }
+
+// /* Modal Content */
+// .modal-info .modal-content {
+//   background: #fff;
+//   padding: 15px;
+//   border-radius: 10px;
+//   width: 80%;
+//   max-width: 900px;
+//   box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+//   animation: fadeIn 0.3s ease-in-out;
+//   position: relative;
+// }
+
+// /* Modal content animation */
+// @keyframes fadeIn {
+//   from { opacity: 0; transform: translateY(-20px); }
+//   to { opacity: 1; transform: translateY(0); }
+// }
+
+// /* Close Button */
+// .modal-info .close {
+//   position: absolute;
+//   top: 10px;
+//   right: 10px;
+//   font-size: 28px;
+//   font-weight: bold;
+//   cursor: pointer;
+//   color: #333;
+//   transition: color 0.2s;
+// }
+// .modal-info .close:hover {
+//   color: red;
+// }
+
+.info-btn {
+  background-color: #07052e;   /* Violet */
+  color: #fff;
+  border: none;
+  border-radius: 20%;
+  width: 22px;
+  height: 22px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  transition: all .2s ease-in-out;
+}
+
+// .info-btn:hover {
+//   background-color: #140d61;   /* Darker violet */
+//   transform: scale(1.1);
+//   // box-shadow: 0 2px 6px rgba(6, 2, 68, 0.4);
+// }

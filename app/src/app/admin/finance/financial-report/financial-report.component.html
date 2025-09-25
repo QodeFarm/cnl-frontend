@@ -3,127 +3,213 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- <title>Financial Report</title> -->
-  <!-- <script src="https://cdn.tailwindcss.com"></script> -->
-</head>
-<body class="bg-white text-gray-800 p-6 font-sans">
-  <div class="max-w-4xl mx-auto">
-    <!-- Date Filters with Placeholder Style -->
-    <div class="flex items-center gap-4 mb-6">
-      <!-- Quick Period Dropdown -->
-    <select
-      class="border border-gray-300 rounded-md px-3 py-2 w-44 text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      aria-label="Quick Period"
-    >
-      <option disabled selected>Quick Period</option>
-      <option value="today">Today</option>
-      <option value="yesterday">Yesterday</option>
-      <option value="last_week">Last Week</option>
-      <option value="current_month">Current Month</option>
-      <option value="last_month">Last Month</option>
-      <option value="last_six_months">Last Six Months</option>
-      <option value="current_quarter">Current Quarter</option>
-      <option value="year_to_date">Year to Date</option>
-    </select>
+  
+  <!-- Google Font for modern look -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f9fafb;
+      color: #1f2937;
+      padding: 2rem;
+    }
 
-      <input
-        type="date"
-        class="border border-gray-300 rounded-md px-3 py-2 w-44 text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        placeholder="From date"
-        onfocus="this.showPicker && this.showPicker()"
-        aria-label="From date"
-      />
-    
-      <input
-        type="date"
-        class="border border-gray-300 rounded-md px-3 py-2 w-44 text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        placeholder="To date"
-        onfocus="this.showPicker && this.showPicker()"
-        aria-label="To date"
-      />
-    
-      <button type="button" class="btn btn-primary">
-        Generate Report
-      </button>
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      padding: 2rem;
+    }
+
+    /* Filters row */
+    .filters {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    select, input[type="date"] {
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+      font-size: 14px;
+      transition: all 0.2s;
+      color: #374151;
+      background: #fff;
+    }
+
+    select:focus, input[type="date"]:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37,99,235,0.2);
+      outline: none;
+    }
+
+    button.btn-primary {
+      background: #04256b;
+      color: white;
+      font-weight: 500;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button.btn-primary:hover {
+      background: #04256b;
+    }
+
+    /* Table */
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+
+    thead {
+      background: #1E3A8A;
+      color: white;
+    }
+
+    th, td {
+      padding: 12px 16px;
+      text-align: left;
+    }
+
+    td.text-right {
+      text-align: right;
+      font-weight: 500;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #f9fafb;
+    }
+
+    tbody tr:hover {
+      background: #eef2ff;
+      transition: background 0.2s ease-in-out;
+    }
+
+    /* Section headers */
+    .font-bold.text-black {
+      background: #f3f4f6;
+      font-weight: 600;
+    }
+
+    /* Colors for amounts */
+    .text-red-500, .text-red-600 {
+      color: #dc2626;
+      font-weight: 500;
+    }
+
+    .text-green-600 {
+      color: #16a34a;
+      font-weight: 500;
+    }
+
+    /* Separator */
+    hr {
+      border: 0;
+      border-top: 1px solid #e5e7eb;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Date Filters -->
+    <div class="filters">
+      <select [(ngModel)]="selectedPeriod" aria-label="Quick Period">
+        <option disabled selected>Quick Period</option>
+        <option value="today">Today</option>
+        <option value="yesterday">Yesterday</option>
+        <option value="last_week">Last Week</option>
+        <option value="current_month">Current Month</option>
+        <option value="last_month">Last Month</option>
+        <option value="last_six_months">Last Six Months</option>
+        <option value="current_quarter">Current Quarter</option>
+        <option value="year_to_date">Year to Date</option>
+      </select>
+
+      <input type="date" placeholder="From date" aria-label="From date" [(ngModel)]="fromDate" />
+      <input type="date" placeholder="To date" aria-label="To date" [(ngModel)]="toDate" />
+
+      <button type="button" class="btn-primary" (click)="refreshReport()">Generate Report</button>
     </div>   
- 
 
     <!-- Financial Table -->
     <div class="overflow-x-auto">
-      <table class="w-full border border-gray-200 rounded-lg text-sm">
-        <thead class="bg-gray-100 text-left">
+      <table>
+        <thead>
           <tr>
-            <th class="primary">Category</th>
-            <th class="px-4 py-2 text-right">Amount (₹)</th>
-            <th class="px-4 py-2">Remarks</th>
+            <th>Category</th>
+            <th class="text-right">Amount (₹)</th>
+            <th>Remarks</th>
           </tr>
         </thead>
         <tbody>
-          <!-- Income Section Header -->
-        <tr class="font-bold text-black">
-          <td class="px-4 py-2" colspan="3">Income</td>
-        </tr>
-
-          <!-- Sales Section -->
-          <tr>
-            <td class="px-4 py-2">Sales Invoices</td>
-            <td class="px-4 py-2 text-right">₹{{ salesInvoices | number:'1.0-2' }}</td>
-            <td class="px-4 py-2">Billed to customers</td>
+          <!-- Income Section -->
+          <tr class="font-bold text-black">
+            <td colspan="3">Income</td>
           </tr>
           <tr>
-            <td class="px-4 py-2">Sales Credit Notes</td>
-            <td class="px-4 py-2 text-right text-red-500">-₹{{ salesCreditNotes | number:'1.0-2' }}</td> 
-            <td class="px-4 py-2">Refunds/returns issued</td>
+            <td>Sales Invoices</td>
+            <td class="text-right">₹{{ salesInvoices | number:'1.0-2' }}</td>
+            <td>Billed to customers</td>
           </tr>
           <tr>
-            <td class="px-4 py-2">Sales Debit Notes</td>
-            <td class="px-4 py-2 text-right">₹{{salesDebitNotes | number:'1.0-2'}}</td>
-            <td class="px-4 py-2">Extra charges (late fees, interest, etc.)</td>
+            <td>Sales Credit Notes</td>
+            <td class="text-right text-red-500">-₹{{ salesCreditNotes | number:'1.0-2' }}</td>
+            <td>Refunds/returns issued</td>
+          </tr>
+          <tr>
+            <td>Sales Debit Notes</td>
+            <td class="text-right">₹{{ salesDebitNotes | number:'1.0-2' }}</td>
+            <td>Extra charges (late fees, interest, etc.)</td>
           </tr>
           <tr class="font-bold text-black">
-            <td class="px-4 py-2">Total Sales</td>
-            <td class="px-4 py-2 text-right">₹{{totalSales | number:'1.0-2'}}</td>
-            <td class="px-4 py-2">= {{ salesInvoices | number:'1.0-2' }} − {{ salesCreditNotes | number:'1.0-2' }} + {{salesDebitNotes | number:'1.0-2'}}</td>
+            <td>Total Sales</td>
+            <td class="text-right">₹{{ totalSales | number:'1.0-2' }}</td>
+            <td>= {{ salesInvoices | number:'1.0-2' }} − {{ salesCreditNotes | number:'1.0-2' }} + {{ salesDebitNotes | number:'1.0-2' }}</td>
           </tr>
-          <tr>
-            <td colspan="3"><hr class="border-t border-gray-300 my-2"></td>
-          </tr>
-
-            <!-- Income Section Header -->
-          <tr class="font-bold text-black">
-            <td class="px-4 py-2" colspan="3">Expenses</td>
-          </tr>
+          <tr><td colspan="3"><hr></td></tr>
 
           <!-- Expenses Section -->
-          <tr>
-            <td class="px-4 py-2">Purchase Invoices</td>
-            <td class="px-4 py-2 text-right">₹{{purchaseInvoices | number:'1.0-2'}}</td>
-            <td class="px-4 py-2">Materials, stock, etc.</td>
+          <tr class="font-bold text-black">
+            <td colspan="3">Expenses</td>
           </tr>
           <tr>
-            <td class="px-4 py-2">General Expenses</td>
-            <td class="px-4 py-2 text-right">₹0</td>
-            <td class="px-4 py-2">Rent, utilities, maintenance</td>
+            <td>Purchase Invoices</td>
+            <td class="text-right">₹{{ purchaseInvoices | number:'1.0-2' }}</td>
+            <td>Materials, stock, etc.</td>
           </tr>
           <tr>
-            <td class="px-4 py-2">Salaries</td>
-            <td class="px-4 py-2 text-right">₹0</td>
-            <td class="px-4 py-2">Payroll paid to staff</td>
+            <td>General Expenses</td>
+            <td class="text-right">₹{{ generalExpenses | number:'1.0-2' }}</td>
+            <td>Rent, utilities, maintenance</td>
+          </tr>
+          <tr>
+            <td>Salaries</td> 
+            <td class="text-right">₹{{ salaries | number:'1.0-2' }}</td>
+            <td>Payroll paid to staff</td>
           </tr>
           <tr class="font-bold text-black">
-            <td class="px-4 py-2">Total Expenses</td>
-            <td class="px-4 py-2 text-right">₹{{totalExpenses | number:'1.0-2'}}</td>
-            <td class="px-4 py-2">= {{purchaseInvoices | number:'1.0-2'}} + 0 + 0</td>
+            <td>Total Expenses</td>
+            <td class="text-right">₹{{ totalExpenses | number:'1.0-2' }}</td>
+            <td>= {{ purchaseInvoices | number:'1.0-2' }} + 0 + 0</td>
           </tr>
-          <tr>
-            <td colspan="3"><hr class="border-t border-gray-300 my-2"></td>
-          </tr>
+          <tr><td colspan="3"><hr></td></tr>
 
           <!-- Net Profit -->
           <tr class="font-bold text-black">
-            <td class="px-4 py-2">Net Profit</td>
-            <td class="px-4 py-2 text-right text-red-600">₹{{netProfit | number:'1.0-2'}}</td>
-            <td class="px-4 py-2">= {{totalSales | number:'1.0-2'}} − {{totalExpenses | number:'1.0-2'}}</td>
+            <td>Net Profit</td>
+            <td class="text-right text-red-600">₹{{ netProfit | number:'1.0-2' }}</td>
+            <td>= {{ totalSales | number:'1.0-2' }} − {{ totalExpenses | number:'1.0-2' }}</td>
           </tr>
         </tbody>
       </table>

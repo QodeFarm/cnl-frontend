@@ -108,8 +108,8 @@ export function getUnitData(unitInfo) {
   const stockUnit = unitInfo.stock_unit?.stock_unit_name ?? 'NA';
 
   // ✅ Only null/undefined → NA, keep 0 or string
-  const packUnit = unitInfo.pack_unit?.unit_name ?? (unitInfo.pack_unit_id == null ? 'NA' : unitInfo.pack_unit_id);
-  const gPackUnit = unitInfo.g_pack_unit?.unit_name ?? (unitInfo.g_pack_unit_id == null ? 'NA' : unitInfo.g_pack_unit_id);
+  const packUnit = unitInfo.pack_unit?.stock_unit_name ?? (unitInfo.pack_unit_id == null ? 'NA' : unitInfo.pack_unit_id);
+  const gPackUnit = unitInfo.g_pack_unit?.stock_unit_name ?? (unitInfo.g_pack_unit_id == null ? 'NA' : unitInfo.g_pack_unit_id);
 
   const packVsStock = unitInfo.pack_vs_stock == null ? 'NA' : unitInfo.pack_vs_stock;
   const gPackVsPack = unitInfo.g_pack_vs_pack == null ? 'NA' : unitInfo.g_pack_vs_pack;

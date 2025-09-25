@@ -375,11 +375,13 @@ verifyBalance(): any {
                   fieldGroup: [
                     {
                       className: 'col-md-4 col-sm-6 col-12',
-                      key: 'product_mode_id',
+                      key: 'product_mode',
                       type: 'productModes-dropdown',
                       templateOptions: {
                         label: 'Product Mode',
                         placeholder: 'Select Product Mode',
+                        dataKey: 'product_mode_id',
+                        dataLabel: 'mode_name',
                         required: true,
                         options: []
                       },
@@ -1095,7 +1097,7 @@ verifyBalance(): any {
                           fieldArray: {
                             fieldGroup: [
                               {
-                                key: 'size_id',
+                                key: 'size',
                                 type: 'productSizes-dropdown',
                                 templateOptions: {
                                   label: 'Size',
@@ -1111,7 +1113,7 @@ verifyBalance(): any {
                                 },
                               },
                               {
-                                key: 'color_id',
+                                key: 'color',
                                 type: 'productColors-dropdown',
                                 templateOptions: {
                                   label: 'Color',
