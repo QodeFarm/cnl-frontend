@@ -43,6 +43,182 @@ export class SalesComponent {
   unitOptionOfProduct: any[] | string = []; // Initialize as an array by default
   isModalOpen = false;  //Added line to fix past orders modal box correctly
   showModal = false;
+
+  showPreview: boolean = false;
+  docUrl: string = '';
+
+openDocPreview() {
+  //C:\Users\Pramod Kumar\CNL_frontend\sales_workflow_new\cnl-frontend\app\src\assets\img\sale_order_management_documentation.pdf
+  this.docUrl = 'assets/img/sale_order_management_documentation.pdf';
+
+  // create modal wrapper
+  const modal = document.createElement('div');
+  modal.classList.add('modal-info');
+
+  // inject styles so they apply even when modal is appended to body
+  const style = document.createElement('style');
+  style.textContent = `
+    .modal-info {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1050;
+      background: rgba(0,0,0,0.6);
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-y: auto;
+    }
+    .modal-info .modal-content {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      width: 80%;
+      height: 100%;
+      max-width: 900px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      animation: fadeIn .3s ease-in-out;
+      font-size: 18px;
+      line-height: 1.6;
+      color: #222;
+
+      /* ✅ Violet styling */
+      border: 3px solid rgb(38, 4, 70);                  /* Violet border */
+      box-shadow: 0 5px 25px rgb(34, 3, 63, 0.4); /* Violet glow */
+    }
+    .modal-info .modal-content iframe {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 6px;
+      display: block;
+    }
+    .modal-info .close {
+      position: absolute;
+      top: 12px;
+      right: 15px;
+      font-size: 32px;
+      font-weight: bold;
+      cursor: pointer;
+      color: #333;
+      transition: color .2s;
+    }
+    .modal-info .close:hover {
+      color: red;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (max-width: 600px) {
+      .modal-info .modal-content {
+        width: 95%;
+        max-width: 600px;
+        max-height: 80vh;
+        padding: 15px;
+        font-size: 16px;
+      }
+      .modal-info .modal-content iframe {
+        height: 65vh;
+      }
+    }
+  `;
+  modal.appendChild(style);
+
+  // modal content
+  const content = document.createElement('div');
+  content.classList.add('modal-content');
+  content.innerHTML = `
+    <span class="close">&times;</span>
+    <iframe src="${this.docUrl}" title="Documentation"></iframe>
+  `;
+
+  // close logic: click X
+  content.querySelector('.close')?.addEventListener('click', () => {
+    document.body.removeChild(modal);
+  });
+
+  // close on overlay click
+  modal.addEventListener('click', (ev) => {
+    if (ev.target === modal) {
+      document.body.removeChild(modal);
+    }
+  });
+
+  // close on ESC key
+  const escHandler = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      if (document.body.contains(modal)) document.body.removeChild(modal);
+      document.removeEventListener('keydown', escHandler);
+    }
+  };
+  document.addEventListener('keydown', escHandler);
+
+  modal.appendChild(content);
+  document.body.appendChild(modal);
+}
+
+
+// openDocPreview() {
+//   this.docUrl = 'assets/img/sale_order_management_documentation.pdf';
+
+//   // create modal wrapper
+//   const modal = document.createElement('div');
+//   modal.classList.add('modal-info');
+
+//   // inject styles so they apply even when modal is appended to body
+//   const style = document.createElement('style');
+//   style.textContent = `
+//     .modal-info{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:1050;background:rgba(0,0,0,0.6);padding:20px;box-sizing:border-box;overflow-y:auto;}
+//     .modal-info .modal-content{background:#fff;padding:15px;border-radius:10px;width:80%; height:100%;max-width:900px;max-height:90vh;display:flex;flex-direction:column;position:relative;overflow:hidden;box-shadow:0 5px 20px rgba(0,0,0,0.3);animation:fadeIn .3s ease-in-out;}
+//     .modal-info .modal-content iframe{flex:1;width:100%;height:100%;border:none;border-radius:5px;display:block;}
+//     .modal-info .close{position:absolute;top:10px;right:10px;font-size:28px;font-weight:bold;cursor:pointer;color:#333;transition:color .2s;}
+//     .modal-info .close:hover{color:red;}
+//     @keyframes fadeIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+//     @media (max-width:600px){ .modal-info .modal-content{width:95%;max-width:600px;max-height:80vh;padding:12px;} .modal-info .modal-content iframe{height:60vh;} }
+//   `;
+//   modal.appendChild(style);
+
+//   // modal content
+//   const content = document.createElement('div');
+//   content.classList.add('modal-content');
+//   content.innerHTML = `
+//     <span class="close">&times;</span>
+//     <iframe src="${this.docUrl}" width="100%" height="600px" style="border:1px solid #ccc;"></iframe>
+//   `;
+
+//   // close logic: click X
+//   content.querySelector('.close')?.addEventListener('click', () => {
+//     document.body.removeChild(modal);
+//   });
+
+//   // close on overlay click (but not when clicking the modal content)
+//   modal.addEventListener('click', (ev) => {
+//     if (ev.target === modal) {
+//       document.body.removeChild(modal);
+//     }
+//   });
+
+//   // close on ESC key
+//   const escHandler = (e: KeyboardEvent) => {
+//     if (e.key === 'Escape') {
+//       if (document.body.contains(modal)) document.body.removeChild(modal);
+//       document.removeEventListener('keydown', escHandler);
+//     }
+//   };
+//   document.addEventListener('keydown', escHandler);
+
+//   modal.appendChild(content);
+//   document.body.appendChild(modal);
+// }
+
+  
   //COPY ---------------------------------
   // List of all tables
   tables: string[] = ['Sale Order', 'Sale Invoice', 'Sale Return', 'Purchase Order', 'Purchase Invoice', 'Purchase Return'];
