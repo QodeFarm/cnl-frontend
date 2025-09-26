@@ -44,7 +44,7 @@
             </div>
 
 
-            <div class="filter-group col p-0 mt-2" style="margin-right: 10px; display:flex"*ngIf="isProductFilterVisible || isInventoryFilterVisible">
+            <div class="filter-group col p-0 mt-2" style="margin-right: 10px; display:flex"*ngIf="isProductFilterVisible || isInventoryFilterVisible || isStockSummaryFilterVisible">
             <!-- Group Filter -->
                 <nz-select [(ngModel)]="selectedGroup" nzPlaceHolder="Select Group" class="select-field" 
                   (ngModelChange)="applyFilters($event)" nzAllowClear>

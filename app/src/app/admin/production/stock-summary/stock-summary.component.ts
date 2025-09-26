@@ -24,9 +24,9 @@ export class StockSummaryComponent {
       pkId: 'summary_id',
       pageSize: 10,
       globalSearch: {
-        keys: ['product.name', 'group_name', 'category_name', 'hsn_code']
+        keys: ['product', 'group_name', 'category_name', 'hsn_code']
       },
-      defaultSort: { key: 'product.name', value: 'ascend' },
+      defaultSort: { key: 'product', value: 'ascend' },
       cols: [
         {
           fieldKey: 'product',
@@ -45,6 +45,16 @@ export class StockSummaryComponent {
           mapFn: (currentValue: any, row: any, col: any) => {
             return row.unit_options?.unit_name || 'N/A';
           },
+        },
+        {
+          fieldKey: 'group_name',
+          name: 'Group',
+          sort: true,
+          displayType: 'map',
+          mapFn: (currentValue: any, row: any, col: any) => {
+            return row.group_name?.group_name || 'N/A';
+          },
+        
         },
         {
           fieldKey: 'opening_quantity',
@@ -90,16 +100,16 @@ export class StockSummaryComponent {
           },
           displayAsHtml: true
         },
-        {
-          fieldKey: 'period_start',
-          name: 'Period Start',
-          type: 'date'
-        },
-        {
-          fieldKey: 'period_end',
-          name: 'Period End',
-          type: 'date'
-        },
+        // {
+        //   fieldKey: 'period_start',
+        //   name: 'Period Start',
+        //   type: 'date'
+        // },
+        // {
+        //   fieldKey: 'period_end',
+        //   name: 'Period End',
+        //   type: 'date'
+        // },
         {
           fieldKey: 'created_at',
           name: 'Created At',
