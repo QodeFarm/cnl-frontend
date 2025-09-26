@@ -16,7 +16,16 @@
 
 <div class="tab-inner">
     <nz-tabset [(nzSelectedIndex)]="activeTab">
-        <nz-tab *ngFor="let tab of field.fieldGroup; let i = index" [nzTitle]="tab?.templateOptions?.label" (nzClick)="selectTab(i)">
+
+        <nz-tab *ngFor="let tab of field.fieldGroup; let i = index" [nzTitle]="titleTemplate" (nzClick)="selectTab(i)">
+            <ng-template #titleTemplate>
+                <span [ngClass]="{ 'text-danger': hasError(tab) }">
+                    {{ tab.props?.label || 'Tab ' + (i + 1) }}
+                    <ng-container *ngIf="countErrors(tab) > 0">
+                        ({{ countErrors(tab) }} ⚠️)
+                    </ng-container>
+                </span>
+            </ng-template>
             <formly-field [field]="tab"></formly-field>
         </nz-tab>
     </nz-tabset>

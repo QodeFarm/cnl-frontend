@@ -8,8 +8,8 @@ import { TaCurdConfig } from '@ta/ta-curd';
 })
 export class AssetCategoriesComponent {
   
-  // baseUrl: string = 'https://apicore.cnlerp.com/api/v1/';
-  baseUrl: string = 'http://127.0.0.1:8000/api/v1/';
+  baseUrl: string = 'https://apicore.cnlerp.com/api/v1/';
+  // baseUrl: string = 'http://127.0.0.1:8000/api/v1/';
 
   curdConfig: TaCurdConfig = {
     drawerSize: 500,

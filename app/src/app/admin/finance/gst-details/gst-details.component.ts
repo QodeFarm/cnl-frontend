@@ -31,7 +31,7 @@ export class GstDetailsComponent {
       if (response && response.data) {
         console.log
         this.totalInvoices = response.data.length; // Count total invoices
-        this.totalTaxCollected = response.data.reduce((sum, item) => sum + (parseFloat(item.tax_amount) || 0), 0);
+        this.totalTaxCollected = response.data.reduce((sum, item) => sum + (parseFloat(item.tax_amount) || 0), 0).toFixed(2);
         this.calculateTaxAmount();
       }
     });
@@ -41,15 +41,19 @@ export class GstDetailsComponent {
     this.http.get<any>('purchase/purchase_order/?summary=true').subscribe(response => {
       if (response && response.data) {
         this.totalPurchases = response.data.length; // Count total purchases
-        this.totalTaxPaid = response.data.reduce((sum, item) => sum + (parseFloat(item.tax_amount) || 0), 0);
+        this.totalTaxPaid = response.data.reduce((sum, item) => sum + (parseFloat(item.tax_amount) || 0), 0).toFixed(2);
         this.calculateTaxAmount();
       }
     });
   }
   
 
+  // calculateTaxAmount() {
+  //   this.taxAmount = this.totalTaxCollected - this.totalTaxPaid;
+  // }
+
   calculateTaxAmount() {
-    this.taxAmount = this.totalTaxCollected - this.totalTaxPaid;
+    this.taxAmount = parseFloat((this.totalTaxCollected - this.totalTaxPaid).toFixed(2));
   }
 
   fileGST() {

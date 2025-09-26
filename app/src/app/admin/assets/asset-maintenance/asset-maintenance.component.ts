@@ -14,8 +14,8 @@ import { AssetMaintenanceListComponent } from './asset-maintenance-list/asset-ma
 })
 export class AssetMaintenanceComponent {
 
-  // baseUrl: string = 'https://apicore.cnlerp.com/api/v1/';
-  baseUrl: string = 'http://127.0.0.1:8000/api/v1/';
+  baseUrl: string = 'https://apicore.cnlerp.com/api/v1/';
+  // baseUrl: string = 'http://127.0.0.1:8000/api/v1/';
   
   showAssetMaintenanceList: boolean = false;
   showForm: boolean = false;

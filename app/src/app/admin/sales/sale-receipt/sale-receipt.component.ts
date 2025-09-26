@@ -85,6 +85,11 @@ export class SaleReceiptComponent implements OnInit {
             }
           },
           {
+            fieldKey: 'total_amount',
+            name: 'Total Amount',
+            // sort: true
+          },
+          {
             fieldKey: 'file_upload',
             name: 'Upload File',
             displayType: 'file',

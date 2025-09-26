@@ -676,91 +676,174 @@ async autoFillProductDetails(field, data) {
     this.hideModal();
   }
 
+  // handleProductPull(selectedProducts: any[]) {
+  //   let existingProducts = this.formConfig.model['sale_invoice_items'] || [];
+
+  //   // Clean up existing products by filtering out any undefined, null, or empty entries
+  //   existingProducts = existingProducts.filter((product: any) => product?.code && product.code.trim() !== "");
+
+  //   if (existingProducts.length === 0) {
+  //     // Initialize the product list if no products exist
+  //     this.formConfig.model['sale_invoice_items'] = selectedProducts.map(product => ({
+  //       product: {
+  //         product_id: product.product_id || null,
+  //         name: product.product_name || '',  // Ensure the actual product name is set
+  //         code: product.code || '',
+  //       },
+  //       product_id: product.product_id || null,
+  //       code: product.code || '',
+  //       total_boxes: product.total_boxes || 0,
+  //       unit_options_id: product.unit_options_id || null,
+  //       quantity: product.quantity || 1,
+  //       rate: product.rate || 0,
+  //       discount: product.discount || 0,
+  //       print_name: product.print_name || product.product_name || '', // Use print_name only if necessary
+  //       amount: product.amount || 0,
+  //       tax: product.tax || 0,
+  //       cgst: product.cgst || 0,
+  //       sgst: product.sgst || 0,
+  //       igst: product.igst || 0,
+  //       remarks: product.remarks || ''
+  //     }));
+  //   } else {
+  //     // Update existing products or add new products
+  //     selectedProducts.forEach(newProduct => {
+  //       const existingProductIndex = existingProducts.findIndex((product: any) =>
+  //         product.product_id === newProduct.product_id || product.code === newProduct.code
+  //       );
+
+  //       if (existingProductIndex === -1) {
+  //         // Add the product if it doesn't exist in the list
+  //         existingProducts.push({
+  //           product: {
+  //             product_id: newProduct.product_id || null,
+  //             name: newProduct.product_name || '',  // Ensure the actual product name is set
+  //             code: newProduct.code || '',
+  //           },
+  //           product_id: newProduct.product_id || null,
+  //           code: newProduct.code || '',
+  //           total_boxes: newProduct.total_boxes || 0,
+  //           unit_options_id: newProduct.unit_options_id || null,
+  //           quantity: newProduct.quantity || 1,
+  //           rate: newProduct.rate || 0,
+  //           discount: newProduct.discount || 0,
+  //           print_name: newProduct.print_name || newProduct.product_name || '', // Use print_name only if necessary
+  //           amount: newProduct.amount || 0,
+  //           tax: newProduct.tax || 0,
+  //           cgst: newProduct.cgst || 0,
+  //           sgst: newProduct.sgst || 0,
+  //           igst: newProduct.igst || 0,
+  //           remarks: newProduct.remarks || ''
+  //         });
+  //       } else {
+  //         // Update the existing product
+  //         existingProducts[existingProductIndex] = {
+  //           ...existingProducts[existingProductIndex],
+  //           ...newProduct,
+  //           product: {
+  //             product_id: newProduct.product_id || existingProducts[existingProductIndex].product.product_id,
+  //             name: newProduct.product_name || existingProducts[existingProductIndex].product.name, // Ensure correct name is set
+  //             code: newProduct.code || existingProducts[existingProductIndex].product.code,
+  //           },
+  //           print_name: newProduct.print_name || newProduct.product_name || existingProducts[existingProductIndex].product.name, // Ensure correct name is shown
+  //         };
+  //       }
+  //     });
+
+  //     // Assign the updated product list back to the model
+  //     this.formConfig.model['sale_invoice_items'] = [...existingProducts];
+  //   }
+
+  //   // Re-render the form
+  //   this.formConfig.model = { ...this.formConfig.model };
+
+  //   // Trigger UI update
+  //   this.cdRef.detectChanges();
+
+  //   //console.log("Final Products List:", this.formConfig.model['sale_order_items']);
+  // }
+
+// Handles the selected products and updates the form model with them
   handleProductPull(selectedProducts: any[]) {
+    console.log('Pulled selected products in OrdersListComponent:', selectedProducts);
+
+    // Retrieve or initialize the current sale_invoice_items list
     let existingProducts = this.formConfig.model['sale_invoice_items'] || [];
 
-    // Clean up existing products by filtering out any undefined, null, or empty entries
-    existingProducts = existingProducts.filter((product: any) => product?.code && product.code.trim() !== "");
+    // Filter out any empty entries from existing products
+    existingProducts = existingProducts.filter(product => product && product.product_id);
 
-    if (existingProducts.length === 0) {
-      // Initialize the product list if no products exist
-      this.formConfig.model['sale_invoice_items'] = selectedProducts.map(product => ({
-        product: {
-          product_id: product.product_id || null,
-          name: product.product_name || '',  // Ensure the actual product name is set
-          code: product.code || '',
-        },
-        product_id: product.product_id || null,
-        code: product.code || '',
-        total_boxes: product.total_boxes || 0,
-        unit_options_id: product.unit_options_id || null,
-        quantity: product.quantity || 1,
-        rate: product.rate || 0,
-        discount: product.discount || 0,
-        print_name: product.print_name || product.product_name || '', // Use print_name only if necessary
-        amount: product.amount || 0,
-        tax: product.tax || 0,
-        cgst: product.cgst || 0,
-        sgst: product.sgst || 0,
-        igst: product.igst || 0,
-        remarks: product.remarks || ''
-      }));
-    } else {
-      // Update existing products or add new products
-      selectedProducts.forEach(newProduct => {
-        const existingProductIndex = existingProducts.findIndex((product: any) =>
-          product.product_id === newProduct.product_id || product.code === newProduct.code
-        );
+    selectedProducts.forEach(newProduct => {
+      if (!newProduct || !newProduct.product_id || !newProduct.code) {
+        console.warn("Skipped an incomplete or undefined product:", newProduct);
+        return; // Skip if data is incomplete
+      }
 
-        if (existingProductIndex === -1) {
-          // Add the product if it doesn't exist in the list
-          existingProducts.push({
-            product: {
-              product_id: newProduct.product_id || null,
-              name: newProduct.product_name || '',  // Ensure the actual product name is set
-              code: newProduct.code || '',
-            },
-            product_id: newProduct.product_id || null,
+      // Check for duplicates by comparing all key fields
+      const isDuplicate = existingProducts.some(existingProduct => (
+        existingProduct.product_id === newProduct.product_id &&
+        existingProduct.code === newProduct.code &&
+        existingProduct.total_boxes === (newProduct.total_boxes || 0) &&
+        existingProduct.unit_options_id === (newProduct.unit_options_id || null) &&
+        existingProduct.igst === (newProduct.igst || null) &&
+        existingProduct.cgst === (newProduct.cgst || null) &&
+        existingProduct.sgst === (newProduct.sgst || null) &&
+        existingProduct.quantity === (newProduct.quantity || 1) &&
+        existingProduct.size?.size_name === (newProduct.size?.size_name || 'Unspecified') &&
+        existingProduct.color?.color_name === (newProduct.color?.color_name || 'Unspecified')
+      ));
+
+      if (!isDuplicate) {
+        console.log("Adding new product:", newProduct);
+
+        // Add valid, non-duplicate product to existingProducts list
+        existingProducts.push({
+          product: {
+            product_id: newProduct.product_id,
+            name: newProduct.name || '',
             code: newProduct.code || '',
-            total_boxes: newProduct.total_boxes || 0,
-            unit_options_id: newProduct.unit_options_id || null,
-            quantity: newProduct.quantity || 1,
-            rate: newProduct.rate || 0,
-            discount: newProduct.discount || 0,
-            print_name: newProduct.print_name || newProduct.product_name || '', // Use print_name only if necessary
-            amount: newProduct.amount || 0,
-            tax: newProduct.tax || 0,
-            cgst: newProduct.cgst || 0,
-            sgst: newProduct.sgst || 0,
-            igst: newProduct.igst || 0,
-            remarks: newProduct.remarks || ''
-          });
-        } else {
-          // Update the existing product
-          existingProducts[existingProductIndex] = {
-            ...existingProducts[existingProductIndex],
-            ...newProduct,
-            product: {
-              product_id: newProduct.product_id || existingProducts[existingProductIndex].product.product_id,
-              name: newProduct.product_name || existingProducts[existingProductIndex].product.name, // Ensure correct name is set
-              code: newProduct.code || existingProducts[existingProductIndex].product.code,
-            },
-            print_name: newProduct.print_name || newProduct.product_name || existingProducts[existingProductIndex].product.name, // Ensure correct name is shown
-          };
-        }
-      });
+          },
+          product_id: newProduct.product_id,
+          code: newProduct.code || '',
+          total_boxes: newProduct.total_boxes || 0,
+          unit_options_id: newProduct.unit_options_id || null,
+          quantity: newProduct.quantity,
+          rate: parseFloat(newProduct.rate) || 0,
+          discount: parseFloat(newProduct.discount) || 0,
+          print_name: newProduct.print_name || newProduct.name || '',
+          amount: parseFloat(newProduct.amount) || 0, // Ensure amount is a number
+          tax: parseFloat(newProduct.tax) || 0,       // Ensure tax is a number
+          remarks: newProduct.remarks || '',
+          cgst: parseFloat(newProduct.cgst) || 0,
+          sgst: parseFloat(newProduct.sgst) || 0,
+          igst: parseFloat(newProduct.igst) || 0,
 
-      // Assign the updated product list back to the model
-      this.formConfig.model['sale_invoice_items'] = [...existingProducts];
-    }
+          // Set size and color properties with defaults if not provided
+          size: {
+            size_id: newProduct.size?.size_id || null,
+            size_name: newProduct.size?.size_name || 'Unspecified'
+          },
+          color: {
+            color_id: newProduct.color?.color_id || null,
+            color_name: newProduct.color?.color_name || 'Unspecified'
+          },
+          size_id: newProduct.size?.size_id || null,
+          color_id: newProduct.color?.color_id || null
+        });
+      } else {
+        console.log("Duplicate detected, skipping product:", newProduct);
+      }
+    });
 
-    // Re-render the form
-    this.formConfig.model = { ...this.formConfig.model };
+    // Update the model with the final product list, ensuring there are no placeholder or duplicate rows
+    this.formConfig.model['sale_invoice_items'] = [...existingProducts];
 
-    // Trigger UI update
-    this.cdRef.detectChanges();
+    // Trigger change detection to update the UI immediately
+    this.formConfig.model = { ...this.formConfig.model }; // Refresh the formConfig model
+    setTimeout(() => this.cdRef.detectChanges(), 0); // Use async change detection for smooth UI update
 
-    //console.log("Final Products List:", this.formConfig.model['sale_order_items']);
+    // Log the final products to confirm the update
+    console.log("Final Products List in sale_invoice_items:", this.formConfig.model['sale_invoice_items']);
   }
 
   ngOnDestroy() {
@@ -1068,7 +1151,7 @@ createSaleInovice() {
         console.error('Error updating record:', error);
           // ✅ Check if backend error matches mstcnl restriction
           const errorMessage = error?.error?.message || '';
-          if (errorMessage === "This record is from the mstcnl DB, not allowed to update.") {
+          if (errorMessage === "Update is not allowed, please contact Product team.") {
             // Re-run ngOnInit when this specific error occurs
             this.ngOnInit();
           }
