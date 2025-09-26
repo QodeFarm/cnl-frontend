@@ -8448,3 +8448,131 @@ export const productsCrudConfig: TaCurdConfig = {
     }
   
   }
+
+export const expenseCategoryConfig: TaCurdConfig = {
+    drawerSize: 600,
+    drawerPlacement: 'right',
+    tableConfig: {
+      apiUrl: 'finance/expense_categories/',
+      // title: 'Expense Categories',
+      pkId: 'category_id',
+      hideFilters: true,
+      pageSize: 10,
+      globalSearch: {
+        keys: ['category_name', 'description', 'account.account_name']
+      },
+      defaultSort: { key: 'created_at', value: 'descend' },
+      cols: [
+        {
+        fieldKey: 'category_name',
+        name: 'Category Name',
+        sort: true
+      },
+      {
+        fieldKey: 'description',
+        name: 'Description',
+        sort: true
+      },
+      {
+        fieldKey: 'account',
+        name: 'Account',
+        sort: true,
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          return row.account?.account_name || '';
+        },
+      },
+      {
+        fieldKey: 'is_active', 
+        name: 'Status',
+        sort: true,
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          return currentValue ? 'Active' : 'Inactive';
+        },
+      },
+        {
+          fieldKey: 'category_id',
+          name: 'Action',
+          type: 'action',
+          actions: [
+            {
+              type: 'delete',
+              label: 'Delete',
+              confirm: true,
+              confirmMsg: 'Are you sure you want to delete this expense category?',
+              apiUrl: 'finance/expense_categories'
+            },
+            {
+              type: 'edit',
+              label: 'Edit'
+            }
+          ]
+        }
+      ]
+    },
+    formConfig: {
+      url: 'finance/expense_categories/',
+      title: 'Expense Categories',
+      pkId: 'category_id',
+      exParams: [
+        {
+          key: 'account_id',
+          type: 'script',
+          value: 'data.account.account_id'
+        }
+      ],
+      fields: [
+        {
+          className: 'col-12 p-0',
+          fieldGroupClassName: 'row',
+          fieldGroup: [
+           {
+              key: 'category_name',
+              type: 'input',
+              className: 'col-md-6 col-12 mb-3',
+              templateOptions: {
+                label: 'Category Name',
+                placeholder: 'Enter Category Name',
+                required: true
+              }
+            },
+            {
+              key: 'account',
+              type: 'select',
+              className: 'col-md-6 col-12 mb-3',
+              templateOptions: {
+                label: 'Chart of Account',
+                dataKey: 'account_id',
+                dataLabel: 'account_name',
+                options: [],
+                lazy: {
+                  url: 'finance/chart_of_accounts/',
+                  lazyOneTime: true
+                },
+                required: false
+              },
+            },
+            {
+              key: 'description',
+              type: 'textarea',
+               className: 'col-md-6 col-12 px-1 mb-3',
+              templateOptions: {
+                label: 'Description',
+                placeholder: 'Enter Description'
+              }
+            },
+            {
+              key: 'is_active',
+              type: 'checkbox',
+              className: 'col-12 mb-3',
+              templateOptions: {
+                label: 'Active'
+              }
+            }
+          ]
+        }
+      ]
+    }
+  };
+

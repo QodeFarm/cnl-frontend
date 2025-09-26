@@ -290,6 +290,26 @@ verifyBalance(): any {
   return true;
 }
 
+preprocessFormData() {
+  // Ensure product_mode_id is just the UUID
+  const products = this.formConfig.model.products;
+  if (products && typeof products.product_mode_id === 'object') {
+    products.product_mode_id = products.product_mode_id.item_master_id;
+  }
+  
+  // Process product variations to ensure size_id and color_id are just UUIDs
+  const variations = this.formConfig.model.product_variations || [];
+  variations.forEach(variation => {
+    if (variation) {
+      if (typeof variation.size_id === 'object') {
+        variation.size_id = variation.size_id.size_id;
+      }
+      if (typeof variation.color_id === 'object') {
+        variation.color_id = variation.color_id.color_id;
+      }
+    }
+  });
+}
 
 
   // On every change in product_variations update balance
@@ -323,6 +343,7 @@ verifyBalance(): any {
   onSubmit() {
     // Proceed only if verifyBalance() returns true
     if (this.verifyBalance()) {
+       this.preprocessFormData();
       if (this.formConfig.submit.label === 'Update') {
         this.updateProducts();
       } else if (this.formConfig.submit.label === 'Submit') {
@@ -420,7 +441,9 @@ verifyBalance(): any {
                               console.log("Product Mode changed to:", data); // Added logging
 
                                // Get the selected mode name for use in visibility conditions
-                                    this.formConfig.model['products']['product_mode_id'] = data;
+                                 // Extract just the UUID from the selected value
+                               this.formConfig.model['products']['product_mode_id'] = typeof data === 'object' ? data.item_master_id : data;
+        
         
                                 // Store the mode name for visibility conditions
                                 const selectedOption = field.templateOptions.options.find((option: any) => option.value === data);
@@ -1109,6 +1132,19 @@ verifyBalance(): any {
                                     lazyOneTime: true
                                   }
                                 },
+                                hooks: {
+        onChanges: (field: any) => {
+          field.formControl.valueChanges.subscribe((data: any) => {
+            const rowIndex = +field.parent.key;
+            if (!this.formConfig.model['product_variations'][rowIndex]) {
+              this.formConfig.model['product_variations'][rowIndex] = {};
+            }
+            // Extract just the UUID
+            this.formConfig.model['product_variations'][rowIndex]['size_id'] = 
+              data?.size_id || null;
+          });
+        }
+      }
                               },
                               {
                                 key: 'color_id',
@@ -1124,8 +1160,22 @@ verifyBalance(): any {
                                     url: 'products/colors/',
                                     lazyOneTime: true
                                   }
-                                }
+                                },
+                                hooks: {
+        onChanges: (field: any) => {
+          field.formControl.valueChanges.subscribe((data: any) => {
+            const rowIndex = +field.parent.key;
+            if (!this.formConfig.model['product_variations'][rowIndex]) {
+              this.formConfig.model['product_variations'][rowIndex] = {};
+            }
+            // Extract just the UUID
+            this.formConfig.model['product_variations'][rowIndex]['color_id'] = 
+              data?.color_id || null;
+          });
+        }
+      }
                               },
+                              
                               {
                                 key: 'sku',
                                 type: 'input',

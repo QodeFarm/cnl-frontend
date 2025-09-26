@@ -79,8 +79,10 @@ export class TaTableComponent implements OnDestroy {
   selectedAccountId: number | null = null;
   isAccountLedgerPage: boolean;
   // Filters for product/inventory pages
-isProductFilterVisible = false;
-isInventoryFilterVisible = false;
+  isProductFilterVisible = false;
+  isInventoryFilterVisible = false;
+  isStockSummaryFilterVisible: boolean;
+
 
 selectedGroup: string | null = null;
 selectedCategory: string | null = null;
@@ -776,6 +778,8 @@ downloadData(event: any) {
     this.isProductFilterVisible = this.options.hideFilters ? false : productFilterUrls.includes(currentUrl);
     const inventoryFilterUrls = ['/admin/inventory'];  
     this.isInventoryFilterVisible = this.options.hideFilters ? false : inventoryFilterUrls.includes(currentUrl);
+    const stockSummaryFilterUrls = ['/admin/production/stock-summary'];
+    this.isStockSummaryFilterVisible = this.options.hideFilters ? false : stockSummaryFilterUrls.includes(currentUrl);
     
     // Reset filter values when component is initialized
     // This ensures filters are cleared when modal is reopened
