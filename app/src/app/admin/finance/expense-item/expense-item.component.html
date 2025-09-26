@@ -3,7 +3,7 @@
       <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
          <button (click)="ExpenseItemEditID = null" type="button" class="btn pl-0" style="color: black;">
             <span *ngIf="ExpenseItemEditID" class="custom-heading">Update Expense</span>
-            <span *ngIf="!ExpenseItemEditID" class="custom-heading">Record New Expense</span>
+            <span *ngIf="!ExpenseItemEditID" class="custom-heading">Create Expense</span>
             </button>
             <button (click)="showExpenseItemListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#itemModal">
             Expense List

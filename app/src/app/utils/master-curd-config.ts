@@ -8482,15 +8482,15 @@ export const expenseCategoryConfig: TaCurdConfig = {
           return row.account?.account_name || '';
         },
       },
-      {
-        fieldKey: 'is_active', 
-        name: 'Status',
-        sort: true,
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return currentValue ? 'Active' : 'Inactive';
-        },
-      },
+      // {
+      //   fieldKey: 'is_active', 
+      //   name: 'Status',
+      //   sort: true,
+      //   displayType: "map",
+      //   mapFn: (currentValue: any, row: any, col: any) => {
+      //     return currentValue ? 'Active' : 'Inactive';
+      //   },
+      // },
         {
           fieldKey: 'category_id',
           name: 'Action',
