@@ -201,7 +201,7 @@
           <tr class="font-bold text-black">
             <td>Total Expenses</td>
             <td class="text-right">₹{{ totalExpenses | number:'1.0-2' }}</td>
-            <td>= {{ purchaseInvoices | number:'1.0-2' }} + 0 + 0</td>
+            <td>= {{ purchaseInvoices | number:'1.0-2' }} + ₹{{ generalExpenses | number:'1.0-2' }} + ₹{{ salaries | number:'1.0-2' }}</td>
           </tr>
           <tr><td colspan="3"><hr></td></tr>
 

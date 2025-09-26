@@ -201,11 +201,11 @@ export class FinancialReportComponent {
     });
 
     // 5. General Expenses
-    this.http.get<any>('finance/expense_claims/?summary=true' + params).subscribe(res => {
+    this.http.get<any>('finance/expense_items/?summary=true' + params).subscribe(res => {
       console.log("we are entering into the expenses...")
       if (res?.data) {
         console.log("data of expenses : ", res.data)
-        this.generalExpenses = res.data.reduce((sum: number, item: any) => sum + (+item.total_amount || 0), 0);
+        this.generalExpenses = res.data.reduce((sum: number, item: any) => sum + (+item.amount || 0), 0);
         this.calculateResults();
       }
     });
