@@ -135,9 +135,10 @@ export class ExpenseItemComponent {
                 placeholder: 'Enter Description',
                 required: false,
               }
-            },            {
+            },            
+            {
               key: 'category',
-              type: 'select',
+              type: 'expenseCategory-dropdown',
               className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Expense Category',

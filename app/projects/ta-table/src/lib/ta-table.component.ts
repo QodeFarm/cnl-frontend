@@ -79,8 +79,10 @@ export class TaTableComponent implements OnDestroy {
   selectedAccountId: number | null = null;
   isAccountLedgerPage: boolean;
   // Filters for product/inventory pages
-isProductFilterVisible = false;
-isInventoryFilterVisible = false;
+  isProductFilterVisible = false;
+  isInventoryFilterVisible = false;
+  isStockSummaryFilterVisible: boolean;
+
 
 selectedGroup: string | null = null;
 selectedCategory: string | null = null;
@@ -367,51 +369,42 @@ loadTypes() {
     this.applyFilters();
   }
 
+  
   onAccountChange() {
-    if (this.selectedAccountType && this.selectedAccountId) {
-      console.log("Account selected:", this.selectedAccountType, this.selectedAccountId);
+  if (this.selectedAccountType && this.selectedAccountId) {
+    console.log("Account selected:", this.selectedAccountType, this.selectedAccountId);
 
-      // For account ledger page
-      if (this.router.url === '/admin/finance/account-ledger') {
-        console.log("On account ledger page, looking for accountLedgerComponentInstance");
+    // For account ledger page
+    if (this.router.url === '/admin/finance/account-ledger') {
+      console.log("On account ledger page, looking for accountLedgerComponentInstance");
 
-        // Check if we have the global reference to the AccountLedgerComponent
-        if (window['accountLedgerComponentInstance'] &&
-          typeof window['accountLedgerComponentInstance'].loadLedgerData === 'function') {
-          console.log("Using global reference to AccountLedgerComponent");
-          window['accountLedgerComponentInstance'].loadLedgerData(
-            this.selectedAccountType,
-            this.selectedAccountId
-          );
-          return;
-        }
+      // Set the correct API URL first
+      const apiUrl = `finance/journal_entry_lines_list/${this.selectedAccountId}/`;
+      this.options.apiUrl = apiUrl;
+      console.log("Updated API URL to:", apiUrl);
 
-        // Make the API call directly from here as a fallback
-        console.log("Making API call directly from table component");
-        const apiUrl = `finance/journal_entry_lines_list/${this.selectedAccountId}/`;
-
-        this.http.get(apiUrl).subscribe(
-          (response: any) => {
-            console.log("API response received directly:", response);
-            if (response && response.data) {
-              this.rows = response.data;
-              this.total = response.count || response.data.length;
-              console.log("Data loaded directly in table component", this.rows);
-            }
-          },
-          error => {
-            console.error("Error loading data:", error);
-          }
+      // Then try to use the component instance if available
+      if (window['accountLedgerComponentInstance'] &&
+        typeof window['accountLedgerComponentInstance'].loadLedgerData === 'function') {
+        console.log("Using global reference to AccountLedgerComponent");
+        window['accountLedgerComponentInstance'].loadLedgerData(
+          this.selectedAccountType,
+          this.selectedAccountId
         );
         return;
       }
+      
+      // Otherwise, proceed with our own API call using the updated URL
+      this.applyFilters();
+      return;
     }
-
-    this.applyFilters(); // Fall back to the default behavior
   }
 
+  this.applyFilters(); // Fall back to the default behavior
+}
+
   // Apply filters like quick period, date range, and status to fetch filtered data
-  applyFilters() {
+applyFilters() {
   const filters = {
     quickPeriod: this.selectedQuickPeriod,
     fromDate: this.fromDate,
@@ -429,6 +422,12 @@ loadTypes() {
   const queryString = this.generateQueryString(filters);
   const page = this.pageIndex;
   const limit = this.pageSize;
+  
+  // Make sure we have a valid API URL before proceeding
+  if (!this.options.apiUrl) {
+    console.error("No valid API URL provided");
+    return "";
+  }
 
   const tableParamConfig: TaParamsConfig = {
     apiUrl: this.options.apiUrl,
@@ -447,13 +446,19 @@ loadTypes() {
 
   this.http.get(url).subscribe(
     response => {
-      this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
-        this.loading = false;
-        this.rows = response['data'] || data;
-      });
+      this.loading = false;
+      if (response && response['data']) {
+        this.rows = response['data'];
+        this.total = response['count'] || response['data'].length;
+      } else {
+        console.warn("API response contains no data");
+        this.rows = [];
+        this.total = 0;
+      }
     },
     error => {
       console.error('Error executing URL:', url, error);
+      this.loading = false;
     }
   );
   return url;
@@ -776,6 +781,8 @@ downloadData(event: any) {
     this.isProductFilterVisible = this.options.hideFilters ? false : productFilterUrls.includes(currentUrl);
     const inventoryFilterUrls = ['/admin/inventory'];  
     this.isInventoryFilterVisible = this.options.hideFilters ? false : inventoryFilterUrls.includes(currentUrl);
+    const stockSummaryFilterUrls = ['/admin/production/stock-summary'];
+    this.isStockSummaryFilterVisible = this.options.hideFilters ? false : stockSummaryFilterUrls.includes(currentUrl);
     
     // Reset filter values when component is initialized
     // This ensures filters are cleared when modal is reopened
