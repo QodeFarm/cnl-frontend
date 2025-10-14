@@ -1042,7 +1042,7 @@ loadQuickpackProducts() {
               }, 
               {
                 key: 'product',
-                type: 'select',
+                type: 'products-dropdown',
                 templateOptions: {
                   label: 'Product',
                   dataKey: 'product_id',
