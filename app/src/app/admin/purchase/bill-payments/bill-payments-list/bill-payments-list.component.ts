@@ -326,37 +326,37 @@ private fallbackPrint(pdfBlob: Blob): void {
           name: 'Vendor',
           sort: true
         },
-        // {
-        //   fieldKey: "code",
-        //   name: "Action",
-        //   type: 'action',
-        //   actions: [
-        //     {
-        //       type: 'delete',
-        //       label: 'Delete',
-        //       confirm: true,
-        //       confirmMsg: "Sure to delete?",
-        //       apiUrl: 'purchase/purchase_invoice_order'
-        //     },
-        //     {
-        //       type: 'restore',
-        //       label: 'Restore',
-        //       confirm: true,
-        //       confirmMsg: "Sure to restore?",
-        //       apiUrl: 'purchase/purchase_invoice_order'
-        //     },
-        //     {
-        //       type: 'callBackFn',
-        //       icon: 'fa fa-pen',
-        //       label: '',
-        //       tooltip: "Edit this record",
-        //       callBackFn: (row, action) => {
-        //         console.log(row);
-        //         this.edit.emit(row.purchase_invoice_id);
-        //       }
-        //     }
-        //   ]
-        // }
+        {
+          fieldKey: "code",
+          name: "Action",
+          type: 'action',
+          actions: [
+            // {
+            //   type: 'delete',
+            //   label: 'Delete',
+            //   confirm: true,
+            //   confirmMsg: "Sure to delete?",
+            //   apiUrl: 'purchase/purchase_invoice_order'
+            // },
+            // {
+            //   type: 'restore',
+            //   label: 'Restore',
+            //   confirm: true,
+            //   confirmMsg: "Sure to restore?",
+            //   apiUrl: 'purchase/purchase_invoice_order'
+            // },
+            {
+              type: 'callBackFn',
+              icon: 'fa fa-pen',
+              label: '',
+              tooltip: "Edit this record",
+              callBackFn: (row, action) => {
+                console.log(row);
+                this.edit.emit(row.transaction_id);
+              }
+            }
+          ]
+        }
       ]
     };
   
