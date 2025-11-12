@@ -317,28 +317,28 @@ private fallbackPrint(pdfBlob: Blob): void {
         name: 'Payment Date',
         sort: true
       },
-      // {
-      //   fieldKey: "code",
-      //   name: "Action",
-      //   type: 'action',
-      //   actions: [
-      //     {
-      //       type: 'delete',
-      //       label: 'Delete',
-      //       apiUrl: 'sales/payment_transactions',
-      //       confirm: true,
-      //       confirmMsg: "sure to delete?"
-      //     },
-      //     {
-      //       type: 'callBackFn',
-      //       icon: 'fa fa-pen',
-      //       label: '',
-      //       callBackFn: (row: any) => {
-      //         this.edit.emit(row.payment_transaction_id);
-      //       }
-      //     }
-      //   ]
-      // }
+      {
+        fieldKey: "code",
+        name: "Action",
+        type: 'action',
+        actions: [
+          // {
+          //   type: 'delete',
+          //   label: 'Delete',
+          //   apiUrl: 'sales/payment_transactions',
+          //   confirm: true,
+          //   confirmMsg: "sure to delete?"
+          // },
+          {
+            type: 'callBackFn',
+            icon: 'fa fa-pen',
+            label: '',
+            callBackFn: (row: any) => {
+              this.edit.emit(row.transaction_id);
+            }
+          }
+        ]
+      }
     ]
   };
 
