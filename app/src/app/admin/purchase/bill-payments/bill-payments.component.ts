@@ -174,12 +174,9 @@ fetchVendorPaymentData(vendorId: string) {
       console.error('Error fetching Vendor payment data:', error);
 
       // Show friendly message only when backend says "not found"
-      if (error.status === 404) {
-        this.showErrorToastMessage('No purchase invoices found for this vendor.');
-      } else {
-        this.showErrorToastMessage('Something went wrong while loading vendor invoices.');
-      }
-
+      // if (error.status === 400) {
+      //   this.showErrorToastMessage('No purchase invoices found for this vendor.');
+      // }
       // Clear any old table data
       if (this.taTableComponent) {
         this.taTableComponent.rows = [];
@@ -225,7 +222,7 @@ fetchVendorPaymentData(vendorId: string) {
   createBillPayment(payload: any) {
     this.http.post(this.apiEndpoint, payload).subscribe({
       next: (response: any) => this.handleSuccess(response),
-      error: (error: any) => this.handleError(error),
+      // error: (error: any) => this.handleError(error),
     });
   }
 
@@ -233,7 +230,7 @@ fetchVendorPaymentData(vendorId: string) {
   updateBillPayment(payload: any) {
     this.http.put(`${this.apiEndpoint}${this.PurchaseOrderEditID}/`, payload).subscribe({
       next: (response: any) => this.handleSuccess(response),
-      error: (error: any) => this.handleError(error),
+      // error: (error: any) => this.handleError(error),
     });
   }
 

@@ -731,6 +731,7 @@ downloadData(event: any) {
       '/admin/reports/vendor-reports',
       '/admin/reports/customer-reports',
       '/admin/reports/ledgers-reports',
+      '/admin/reports/audit-logs',
       '/admin/finance/account-ledger',
       '/admin/finance/expense-item',
       '/admin/production/material-issue',
@@ -761,6 +762,7 @@ downloadData(event: any) {
       '/admin/production/material-received',
       '/admin/production/stockjournal',
       '/admin/production/stock-summary',
+      '/admin/reports/audit-logs',
 
       
       
