@@ -1,4 +1,5 @@
 import { TaCurdConfig } from "@ta/ta-curd";
+import { HttpClient } from '@angular/common/http';
 
 export const customerCudConfig: TaCurdConfig = {
     drawerSize: 500,
@@ -1043,10 +1044,16 @@ export const ledgerAccountsConfig: TaCurdConfig = {
       // defaultSort: { key: 'created_at', value: 'descend' },
               defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [
+        // {
+        //   fieldKey: 'code',
+        //   name: 'Code',
+        //   sort: true
+        // },
+
         {
           fieldKey: 'name',
           name: 'Name',
-          // sort: true
+          sort: true
         },
         // {
         //   fieldKey: 'inactive',
@@ -1127,27 +1134,65 @@ export const ledgerAccountsConfig: TaCurdConfig = {
               className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'Code',
-                placeholder: 'Enter Code',
-                required: true,
+                placeholder: 'Auto-generated',
+                readonly: true
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  // Try to get HttpClient from options._injector or field._injector
+                  let http: HttpClient | null = null;
+                  
+                  try {
+                    if (field.options?._injector) {
+                      http = field.options._injector.get(HttpClient);
+                    } else if (field.options?.injector) {
+                      http = field.options.injector.get(HttpClient);
+                    } else if ((field as any)._injector) {
+                      http = (field as any)._injector.get(HttpClient);
+                    }
+                  } catch (e) {
+                    console.error('Could not inject HttpClient:', e);
+                  }
+                  
+                  // Only auto-generate for new records (no ledger_account_id means new record)
+                  if (!field.model?.ledger_account_id && http) {
+                    // Get ledger_group_id if already set
+                    const ledgerGroupId = field.model?.ledger_group_id;
+                    
+                    // Generate code only if ledger_group is selected
+                    if (ledgerGroupId) {
+                      const url = `masters/generate_ledger_code/?type=account&parent_id=${ledgerGroupId}`;
+                      
+                      http.get(url).subscribe((res: any) => {
+                        if (res?.data?.code) {
+                          field.formControl.setValue(res.data.code);
+                          if (field.model) {
+                            field.model['code'] = res.data.code;
+                          }
+                        }
+                      }, (error) => {
+                        console.error('Error generating code:', error);
+                      });
+                    }
+                  }
+                }
               }
             },
             {
               key: 'type',
               type: 'select',
               className: 'col-md-6 col-12 pb-3 px-1',
+              defaultValue: 'General', 
               templateOptions: {
                 label: 'Type',
                 options: [
-                  { value: 'Customer', label: 'Customer' },
                   { value: 'Bank', label: 'Bank' },
-                  { value: 'Cash', label: 'cash' },
-                  { value: 'Vendor', label: 'Vendor'}
+                  { value: 'Cash', label: 'Cash' },
+                  { value: 'General', label: 'General' },
+                  { value: 'Customer', label: 'Customer' },
+                  { value: 'Vendor', label: 'Vendor' },
                 ],
-              },
-              hooks: {
-                onInit: (field: any) => {
-                  //field.templateOptions.options = this.cs.getRole();
-                }
+                required: true
               }
             },
             {
@@ -1216,7 +1261,7 @@ export const ledgerAccountsConfig: TaCurdConfig = {
               type: 'ledger-group-dropdown',
               className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
-                label: 'Ledger Group',
+                label: 'Under Group',
                 dataKey: 'ledger_group_id',
                 dataLabel: "name",
                 options: [],
@@ -1228,7 +1273,44 @@ export const ledgerAccountsConfig: TaCurdConfig = {
               },
               hooks: {
                 onInit: (field: any) => {
-                  //field.templateOptions.options = this.cs.getRole();
+                  // Listen for changes to ledger_group selection
+                  field.formControl.valueChanges.subscribe((selectedGroup: any) => {
+                    if (selectedGroup && selectedGroup.ledger_group_id) {
+                      // Update ledger_group_id in the model
+                      if (field.model) {
+                        field.model['ledger_group_id'] = selectedGroup.ledger_group_id;
+                      }
+                      
+                      // Get HttpClient using injector
+                      let http: HttpClient | null = null;
+                      try {
+                        if (field.options?._injector) {
+                          http = field.options._injector.get(HttpClient);
+                        } else if (field.options?.injector) {
+                          http = field.options.injector.get(HttpClient);
+                        }
+                      } catch (e) {
+                        console.error('Could not inject HttpClient:', e);
+                      }
+                      
+                      // Auto-generate new code based on selected ledger_group
+                      const codeField = field.form.get('code');
+                      
+                      if (http && codeField) {
+                        const url = `masters/generate_ledger_code/?type=account&parent_id=${selectedGroup.ledger_group_id}`;
+                        http.get(url).subscribe((res: any) => {
+                          if (res?.data?.code) {
+                            codeField.setValue(res.data.code);
+                            if (field.model) {
+                              field.model['code'] = res.data.code;
+                            }
+                          }
+                        }, (error) => {
+                          console.error('Error generating code:', error);
+                        });
+                      }
+                    }
+                  });
                 }
               }
             },
@@ -2630,29 +2712,40 @@ export const LedgerGroupsConfig: TaCurdConfig = {
         keys: ['ledger_group_id', 'name','code','inactive','under_group','nature']
       },
       // defaultSort: { key: 'created_at', value: 'descend' },
-              defaultSort: { key: 'is_deleted', value: 'ascend' },
+      defaultSort: { key: 'is_deleted', value: 'ascend' },
+      
       cols: [
+        {
+          fieldKey: 'code', 
+          name: 'Code',
+          sort: true
+        },
         {
           fieldKey: 'name',
           name: 'Name',
           sort: true
         },
         // {
-        //   fieldKey: 'code', 
-        //   name: 'Code',
-        //   sort: true
-        // },
-        // {
         //   fieldKey: 'inactive',
         //   name: 'Inactive',
         //   sort: true,
         //   type: 'boolean'
         // },
+        // {
+        //   fieldKey: 'under_group', 
+        //   name: 'Under Group',
+        //   sort: true
+        // },
         {
-          fieldKey: 'under_group', 
+          fieldKey: 'ledger_group_id',
           name: 'Under Group',
-          sort: true
+          // sort: true,
+          displayType: "map",
+          mapFn: (currentValue: any, row: any, col: any) => {
+            return `${row.under_group.name}`;
+          },
         },
+
         // {
         //   fieldKey: 'nature',
         //   name: 'Nature',
@@ -2689,6 +2782,13 @@ export const LedgerGroupsConfig: TaCurdConfig = {
       url: 'masters/ledger_groups/',
       title: 'Ledger Groups',
       pkId: "ledger_group_id",
+      exParams: [
+        {
+          key: 'under_group_id',
+          type: 'script',
+          value: 'data.under_group.ledger_group_id'
+        }
+      ],
       fields: [
         {
           className: 'col-12 p-0',
@@ -2710,18 +2810,182 @@ export const LedgerGroupsConfig: TaCurdConfig = {
               className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'Code',
-                placeholder: 'Enter Code'
+                placeholder: 'Auto-generated',
+                readonly: true
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  // Try to get HttpClient from options._injector or field._injector
+                  let http: HttpClient | null = null;
+                  
+                  try {
+                    // Try different ways to access HttpClient
+                    if (field.options?._injector) {
+                      http = field.options._injector.get(HttpClient);
+                    } else if (field.options?.injector) {
+                      http = field.options.injector.get(HttpClient);
+                    } else if ((field as any)._injector) {
+                      http = (field as any)._injector.get(HttpClient);
+                    }
+                  } catch (e) {
+                    console.error('Could not inject HttpClient:', e);
+                  }
+                  
+                  // Only auto-generate for new records (no ledger_group_id means new record)
+                  if (!field.model?.ledger_group_id && http) {
+                    // Check if under_group is already set
+                    const underGroupId = field.model?.under_group_id;
+                    
+                    // Generate code: for root level or child level
+                    const url = underGroupId 
+                      ? `masters/generate_ledger_code/?type=group&parent_id=${underGroupId}`
+                      : `masters/generate_ledger_code/?type=group`;
+                    
+                    http.get(url).subscribe((res: any) => {
+                      if (res?.data?.code) {
+                        field.formControl.setValue(res.data.code);
+                        if (field.model) {
+                          field.model['code'] = res.data.code;
+                        }
+                      }
+                    }, (error) => {
+                      console.error('Error generating code:', error);
+                    });
+                  }
+                }
               }
             },
-            {
-              key: 'under_group',
-              type: 'text',
-              className: 'col-md-6 col-12 pb-3 px-1',
-              templateOptions: {
-                label: 'Under Group',
-                placeholder: 'Enter Under Group',
+            //  {
+            //   key: 'ledger_group',
+            //   type: 'ledger-group-dropdown',
+            //   className: 'col-md-4 col-sm-6 col-12',
+            //   templateOptions: {
+            //     label: 'Under Group',
+            //     dataKey: 'ledger_group_id',
+            //     dataLabel: "name",
+            //     options: [],
+            //     lazy: {
+            //       url: 'masters/ledger_groups/',
+            //       lazyOneTime: true
+            //     },
+            //     required: true
+            //   }
+            // },
+            
+           {
+  key: 'under_group',  // Use 'under_group' to match the serializer read field
+  type: 'ledger-group-dropdown',
+  className: 'col-md-6 col-12 pb-3 px-1',
+  templateOptions: {
+    label: 'Under Group',
+    dataKey: 'ledger_group_id',
+    dataLabel: 'name',
+    options: [],
+    lazy: {
+      url: 'masters/ledger_groups/',
+      lazyOneTime: true
+    },
+    required: false
+  },
+  hooks: {
+    onChanges: (field: any) => {
+      field.formControl.valueChanges.subscribe((selectedGroup: any) => {
+        // Get HttpClient using injector
+        let http: HttpClient | null = null;
+        try {
+          if (field.options?._injector) {
+            http = field.options._injector.get(HttpClient);
+          } else if (field.options?.injector) {
+            http = field.options.injector.get(HttpClient);
+          }
+        } catch (e) {
+          console.error('Could not inject HttpClient:', e);
+        }
+        
+        const codeField = field.form.get('code');
+        
+        if (selectedGroup && selectedGroup.ledger_group_id) {
+          // Update the model with the UUID for API submission
+          if (field.model) {
+            field.model['under_group_id'] = selectedGroup.ledger_group_id;
+          }
+          
+          // Regenerate code based on new parent
+          if (http && codeField) {
+            const url = `masters/generate_ledger_code/?type=group&parent_id=${selectedGroup.ledger_group_id}`;
+            http.get(url).subscribe((res: any) => {
+              if (res?.data?.code) {
+                codeField.setValue(res.data.code);
+                if (field.model) {
+                  field.model['code'] = res.data.code;
+                }
               }
-            },
+            }, (error) => {
+              console.error('Error generating code:', error);
+            });
+          }
+        } else if (selectedGroup === null || selectedGroup === undefined) {
+          // Handle clear/null case - regenerate root level code
+          if (field.model) {
+            field.model['under_group_id'] = null;
+          }
+          
+          // Regenerate code for root level
+          if (http && codeField) {
+            http.get('masters/generate_ledger_code/?type=group').subscribe((res: any) => {
+              if (res?.data?.code) {
+                codeField.setValue(res.data.code);
+                if (field.model) {
+                  field.model['code'] = res.data.code;
+                }
+              }
+            }, (error) => {
+              console.error('Error generating code:', error);
+            });
+          }
+        }
+      });
+    }
+  }
+},
+//           {
+//   key: 'under_group_id',
+//   type: 'select',  // Use standard select, not custom component
+//   className: 'col-md-6 col-12 pb-3 px-1',
+//   templateOptions: {
+//     label: 'Under Group',
+//     dataKey: 'ledger_group_id',
+//     dataLabel: 'name',
+//     options: [],
+//     lazy: { 
+//       url: 'masters/ledger_groups/', 
+//       lazyOneTime: true 
+//     },
+//     required: false
+//   },
+//   hooks: {
+//     onInit: (field: any) => {
+//       // Listen for changes
+//       field.formControl.valueChanges.subscribe((selectedGroup: any) => {
+//         if (selectedGroup && typeof selectedGroup === 'object') {
+//           // Set the UUID value directly (not the object)
+//           setTimeout(() => {
+//             // Replace the object with just the UUID
+//             field.formControl.setValue(selectedGroup.ledger_group_id, {emitEvent: false});
+            
+//             // If you need the nature and code, set those separately
+//             if (selectedGroup.nature) {
+//               field.form.get('nature')?.setValue(selectedGroup.nature);
+//             }
+//             if (selectedGroup.code) {
+//               field.form.get('code')?.setValue(selectedGroup.code);
+//             }
+//           }, 0);
+//         }
+//       });
+//     }
+//   }
+// },
             {
               key: 'nature',
               type: 'input',
@@ -2745,6 +3009,66 @@ export const LedgerGroupsConfig: TaCurdConfig = {
     }
 
 }
+
+// export const LedgerGroupsConfig: TaCurdConfig = {
+//   drawerSize: 500,
+//   drawerPlacement: 'top',
+//   tableConfig: {
+//     apiUrl: 'masters/ledger_groups/',
+//     pkId: "ledger_group_id",
+//     hideFilters: true,
+//     pageSize: 10,
+//     globalSearch: {
+//       keys: ['ledger_group_id', 'name','code','inactive','under_group','nature']
+//     },
+//     defaultSort: { key: 'is_deleted', value: 'ascend' },
+//     cols: [
+//       { fieldKey: 'code', name: 'Code', sort: true },
+//       { fieldKey: 'name', name: 'Name', sort: true },
+//       { fieldKey: 'under_group', name: 'Under Group', sort: true },
+//       { fieldKey: "code", name: "Action", type: 'action', actions: [/*...*/] }
+//     ]
+//   },
+//   formConfig: {
+//     url: 'masters/ledger_groups/',
+//     title: 'Ledger Groups',
+//     pkId: "ledger_group_id",
+//     fields: [
+//       {
+//         className: 'col-12 p-0',
+//         fieldGroupClassName: "ant-row",
+//         fieldGroup:[
+//           { key: 'name', type: 'input', className: 'col-md-6 col-12 pb-3 px-1', templateOptions: { label: 'Name', placeholder: 'Enter Name', required: true } },
+//           { key: 'code', type: 'input', className: 'col-md-6 col-12 pb-3 px-1', templateOptions: { label: 'Code', placeholder: 'Enter Code' } },
+//           {
+//             key: 'under_group_id', // <-- Use this key
+//             type: 'ledger-group-dropdown',
+//             className: 'col-md-6 col-12 pb-3 px-1',
+//             templateOptions: {
+//               label: 'Under Group',
+//               dataKey: 'ledger_group_id',
+//               dataLabel: 'name',
+//               options: [],
+//               lazy: { url: 'masters/ledger_groups/', lazyOneTime: true },
+//               required: false
+//             },
+//             hooks: {
+//               onChanges: (field: any) => {
+//                 field.formControl.valueChanges.subscribe((selectedGroup: any) => {
+//                   if (selectedGroup && selectedGroup.ledger_group_id) {
+//                     field.form.get('under_group_id').setValue(selectedGroup.ledger_group_id);
+//                   }
+//                 });
+//               }
+//             }
+//           },
+//           { key: 'nature', type: 'input', className: 'col-md-6 col-12 pb-3 pb-md-0 px-1', templateOptions: { label: 'Nature', placeholder: 'Enter Nature' } },
+//           { key: 'inactive', type: 'checkbox', className: 'col-md-6 col-12 px-1', templateOptions: { label: 'Inactive' } }
+//         ]
+//       }
+//     ]
+//   }
+// }
 
 export const TerritoryConfig: TaCurdConfig = {
     drawerSize: 500,
@@ -8517,9 +8841,9 @@ export const expenseCategoryConfig: TaCurdConfig = {
       pkId: 'category_id',
       exParams: [
         {
-          key: 'account_id',
+          key: 'ledger_group_id',
           type: 'script',
-          value: 'data.account.account_id'
+          value: 'data.ledger_group.ledger_group_id'
         }
       ],
       fields: [
@@ -8537,21 +8861,37 @@ export const expenseCategoryConfig: TaCurdConfig = {
                 required: true
               }
             },
+            // {
+            //   key: 'account',
+            //   type: 'select',
+            //   className: 'col-md-6 col-12 mb-3',
+            //   templateOptions: {
+            //     label: 'Chart of Account',
+            //     dataKey: 'account_id',
+            //     dataLabel: 'account_name',
+            //     options: [],
+            //     lazy: {
+            //       url: 'finance/chart_of_accounts/',
+            //       lazyOneTime: true
+            //     },
+            //     required: false
+            //   },
+            // },
             {
-              key: 'account',
-              type: 'select',
+              key: 'ledger_group',
+              type: 'ledger-group-dropdown',
               className: 'col-md-6 col-12 mb-3',
               templateOptions: {
-                label: 'Chart of Account',
-                dataKey: 'account_id',
-                dataLabel: 'account_name',
+                label: 'Ledger Group',
+                dataKey: 'ledger_group_id',
+                dataLabel: "name",
                 options: [],
                 lazy: {
-                  url: 'finance/chart_of_accounts/',
+                  url: 'masters/ledger_groups/',
                   lazyOneTime: true
                 },
-                required: false
-              },
+                required: true
+              }
             },
             {
               key: 'description',

@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, Injector } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { TaCurdConfig } from '@ta/ta-curd';
 
 @Component({
@@ -7,6 +8,9 @@ import { TaCurdConfig } from '@ta/ta-curd';
   styleUrls: ['./ledger-groups.component.scss']
 })
 export class LedgerGroupsComponent {
+  
+  constructor(private http: HttpClient, private injector: Injector) {}
+  
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
     drawerPlacement: 'top',
@@ -78,6 +82,13 @@ export class LedgerGroupsComponent {
       url: 'masters/ledger_groups/',
       title: 'Ledger Groups',
       pkId: "ledger_group_id",
+      exParams: [
+        {
+          key: 'under_group_id',
+          type: 'script',
+          value: 'data.under_group.ledger_group_id'
+        }
+      ],
       fields: [
         {
           className: 'col-12 p-0',
@@ -99,16 +110,105 @@ export class LedgerGroupsComponent {
               className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'Code',
-                placeholder: 'Enter Code'
+                placeholder: 'Auto-generated',
+                readonly: true
+              },
+              hooks: {
+                onInit: ((http) => {
+                  return (field: any) => {
+                    // Only auto-generate for new records (no ledger_group_id and no existing code)
+                    if (!field.model?.ledger_group_id && !field.model?.code) {
+                      const underGroupId = field.model?.under_group_id;
+                      
+                      const url = underGroupId 
+                        ? `masters/generate_ledger_code/?type=group&parent_id=${underGroupId}`
+                        : `masters/generate_ledger_code/?type=group`;
+                      
+                      http.get(url).subscribe((res: any) => {
+                        if (res?.data?.code) {
+                          field.formControl.setValue(res.data.code);
+                          if (field.model) {
+                            field.model['code'] = res.data.code;
+                          }
+                        }
+                      }, (error) => {
+                        console.error('Error generating code:', error);
+                      });
+                    } else if (!field.model?.ledger_group_id && field.model?.code) {
+                      // Clear old code if it's a new form but has stale code
+                      field.formControl.setValue('');
+                      if (field.model) {
+                        field.model['code'] = '';
+                      }
+                    }
+                  };
+                })(this.http)
               }
             },
             {
               key: 'under_group',
-              type: 'text',
+              type: 'ledger-group-dropdown',
               className: 'col-md-6 col-12 pb-3 px-1',
               templateOptions: {
                 label: 'Under Group',
-                placeholder: 'Enter Under Group',
+                placeholder: 'Select Under Group',
+                dataKey: 'ledger_group_id',
+                dataLabel: 'name',
+                options: [],
+                lazy: {
+                  url: 'masters/ledger_groups/',
+                  lazyOneTime: true
+                },
+                required: false
+              },
+              hooks: {
+                onInit: ((http) => {
+                  return (field: any) => {
+                    field.formControl.valueChanges.subscribe((selectedGroup: any) => {
+                      const codeField = field.form.get('code');
+                      
+                      if (selectedGroup && selectedGroup.ledger_group_id) {
+                        // Update under_group_id in model
+                        if (field.model) {
+                          field.model['under_group_id'] = selectedGroup.ledger_group_id;
+                        }
+                        
+                        // Regenerate code
+                        if (codeField) {
+                          const url = `masters/generate_ledger_code/?type=group&parent_id=${selectedGroup.ledger_group_id}`;
+                          http.get(url).subscribe((res: any) => {
+                            if (res?.data?.code) {
+                              codeField.setValue(res.data.code);
+                              if (field.model) {
+                                field.model['code'] = res.data.code;
+                              }
+                            }
+                          }, (error) => {
+                            console.error('Error generating code:', error);
+                          });
+                        }
+                      } else if (selectedGroup === null || selectedGroup === undefined) {
+                        // Clear case - regenerate root level code
+                        if (field.model) {
+                          field.model['under_group_id'] = null;
+                        }
+                        
+                        if (codeField) {
+                          http.get('masters/generate_ledger_code/?type=group').subscribe((res: any) => {
+                            if (res?.data?.code) {
+                              codeField.setValue(res.data.code);
+                              if (field.model) {
+                                field.model['code'] = res.data.code;
+                              }
+                            }
+                          }, (error) => {
+                            console.error('Error generating code:', error);
+                          });
+                        }
+                      }
+                    });
+                  };
+                })(this.http)
               }
             },
             {

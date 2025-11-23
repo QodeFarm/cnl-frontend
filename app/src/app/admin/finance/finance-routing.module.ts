@@ -12,6 +12,7 @@ import { FinancialReportComponent } from './financial-report/financial-report.co
 import { JournalEntryComponent } from './journal-entry/journal-entry.component';
 import { GstDetailsComponent } from './gst-details/gst-details.component';
 import { AccountLedgerComponent } from './account-ledger/account-ledger.component';
+import { LedgerAccountsComponent } from '../customers/ledger-accounts/ledger-accounts.component';
 
 const routes: Routes = [
   {
@@ -60,6 +61,11 @@ const routes: Routes = [
   {
     path: 'account-ledger',
     component: AccountLedgerComponent,
+  },
+
+  {
+    path: 'ledger-accounts',
+    component: LedgerAccountsComponent,
   }
 ];
 

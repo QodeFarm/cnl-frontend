@@ -82,6 +82,7 @@ export class TaTableComponent implements OnDestroy {
   isProductFilterVisible = false;
   isInventoryFilterVisible = false;
   isStockSummaryFilterVisible: boolean;
+  isLegerAccountFilterVisible: boolean;
 
 
 selectedGroup: string | null = null;
@@ -122,6 +123,8 @@ warehouseOptions: Array<{ value: string; label: string }> = [];
     { value: 'last_year', label: 'Last Year' }
   ];
   formConfig: any;
+  selectedLedgerAccount: any;
+  ledgerAccountOptions: any;
 
   onQuickPeriodChange() {
     // If the quick period is cleared, clear both date fields
@@ -284,6 +287,29 @@ loadTypes() {
   }
   
 
+ledgerAccount() {
+  const url = 'customers/ledger_accounts/'; // Replace with your actual endpoint
+
+  this.http.get<any>(url).subscribe(
+    (response) => {
+      if (response && response.data && response.data.length > 0) {
+        this.ledgerAccountOptions = response.data.map(type => ({
+          value: type.ledger_account_id,
+          label: type.name
+        }));
+        console.log('Ledger accounts loaded:', this.ledgerAccountOptions);
+      } else {
+        console.warn('No ledger accounts found in the API response.');
+      }
+    },
+    (error) => {
+      console.error('Error fetching ledger accounts:', error);
+    }
+  );
+}
+
+  
+
   loadEmployees() {
     const url = 'hrms/employees/'; // Replace with your actual employee API endpoint
 
@@ -329,7 +355,7 @@ loadTypes() {
         url = 'vendors/vendor_get/';
         break;
       case 'general':
-        url = 'finance/general-accounts/';
+        url = 'finance/general_accounts/';
         break;
     }
 
@@ -351,7 +377,7 @@ loadTypes() {
           } else {
             // For general accounts, use account_id
             this.accountOptions = response.data.map(item => ({
-              value: item.account_id,
+              value: item.ledger_account_id,
               label: item.name
             }));
           }
@@ -416,7 +442,9 @@ applyFilters() {
     group: this.selectedGroup,        
     category: this.selectedCategory,  
     type: this.selectedType,          
-    warehouse: this.selectedWarehouse 
+    warehouse: this.selectedWarehouse ,
+    ledgerAccount: this.selectedLedgerAccount
+
   };
 
   const queryString = this.generateQueryString(filters);
@@ -478,6 +506,7 @@ applyFilters() {
     this.selectedCategory = null;    
     this.selectedType = null;         
     this.selectedWarehouse = null;   
+    this.selectedLedgerAccount= null;
 
     // Optionally, you might want to clear other filters or reset pagination if necessary
     this.pageIndex = 1;
@@ -567,7 +596,8 @@ applyFilters() {
     group?: string | number | null, 
     category?: string | number | null, 
     type?: string | number | null, 
-    warehouse?: string | number | null 
+    warehouse?: string | number | null ,
+    ledgerAccount?: string | number | null
     }): string {
     const queryParts: string[] = [];
 
@@ -607,6 +637,10 @@ applyFilters() {
 
     if (filters.warehouse) {
       queryParts.push(`warehouse_id=${encodeURIComponent(filters.warehouse.toString())}`);
+    }
+
+    if (filters.ledgerAccount) {
+      queryParts.push(`ledger_account_id=${encodeURIComponent(filters.ledgerAccount.toString())}`);
     }
 
     return queryParts.length ? '&' + queryParts.join('&') : '';
@@ -745,6 +779,7 @@ downloadData(event: any) {
     this.loadCategories();
     this.loadTypes();
     this.loadWarehouses();
+    this.ledgerAccount();
 
     // Show status filter for specific URLs    
     this.isButtonVisible = this.options.hideFilters ? false : visibleUrls.includes(currentUrl);
@@ -761,6 +796,7 @@ downloadData(event: any) {
       '/admin/production/material-received',
       '/admin/production/stockjournal',
       '/admin/production/stock-summary',
+      '/admin/reports/ledgers-reports'
 
       
       
@@ -783,6 +819,9 @@ downloadData(event: any) {
     this.isInventoryFilterVisible = this.options.hideFilters ? false : inventoryFilterUrls.includes(currentUrl);
     const stockSummaryFilterUrls = ['/admin/production/stock-summary'];
     this.isStockSummaryFilterVisible = this.options.hideFilters ? false : stockSummaryFilterUrls.includes(currentUrl);
+
+    const ledgerAccountUrls = ['/admin/reports/ledgers-reports'];
+    this.isLegerAccountFilterVisible  = this.options.hideFilters ? false : ledgerAccountUrls.includes(currentUrl);
     
     // Reset filter values when component is initialized
     // This ensures filters are cleared when modal is reopened

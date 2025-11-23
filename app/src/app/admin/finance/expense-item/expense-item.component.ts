@@ -40,12 +40,13 @@ export class ExpenseItemComponent {
     console.log('event', event);
     this.ExpenseItemEditID = event;
     this.http.get('finance/expense_items/' + event).subscribe((res: any) => {
-      if (res) {
-        this.formConfig.model = res;
+      if (res && res.data) {
+        this.formConfig.model = res.data;
         this.formConfig.showActionBtn = true;
         this.formConfig.pkId = 'expense_item_id';
         //set labels for update
         this.formConfig.submit.label = 'Update';
+        this.formConfig.model['expense_item_id'] = this.ExpenseItemEditID;
         this.showForm = true;
       }
     })
@@ -66,9 +67,9 @@ export class ExpenseItemComponent {
       showActionBtn: true,
       exParams: [
         {
-          key: 'category_id',
+          key: 'ledger_account_id',
           type: 'script',
-          value: 'data.category.category_id'
+          value: 'data.ledger_account.ledger_account_id'
         },
         {
           key: 'vendor_id',
@@ -136,22 +137,64 @@ export class ExpenseItemComponent {
                 required: false,
               }
             },            
+            // {
+            //   key: 'category',
+            //   type: 'expenseCategory-dropdown',
+            //   className: 'col-md-4 col-sm-6 col-12',
+            //   templateOptions: {
+            //     label: 'Expense Category',
+            //     dataKey: 'category_id',
+            //     dataLabel: 'category_name',
+            //     options: [],
+            //     lazy: {
+            //       url: 'finance/expense_categories/',
+            //       lazyOneTime: true
+            //     },
+            //     required: true
+            //   }
+            // },    
             {
-              key: 'category',
-              type: 'expenseCategory-dropdown',
+              key: 'ledger_account',
+              type: 'select',
               className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
-                label: 'Expense Category',
-                dataKey: 'category_id',
-                dataLabel: 'category_name',
+                label: 'ledger Account',
+                dataKey: 'ledger_account_id',
+                dataLabel: "name",
                 options: [],
                 lazy: {
-                  url: 'finance/expense_categories/',
+                  url: 'customers/ledger_accounts/',
                   lazyOneTime: true
                 },
                 required: true
               }
-            },            {
+            }, 
+            // {
+            //   key: 'account',
+            //   type: 'select',
+            //   className: 'col-md-4 col-sm-6 col-12',
+            //   templateOptions: {
+            //     label: 'Chart of Account',
+            //     dataKey: 'account_id',
+            //     dataLabel: 'account_name',
+            //     options: [],
+            //     lazy: {
+            //       url: 'finance/chart_of_accounts/',
+            //       lazyOneTime: true
+            //     },
+            //     required: false
+            //   },
+            //   // hooks: {
+            //   //   onInit: (field: any) => {
+            //   //     field.formControl.valueChanges.subscribe(data => {
+            //   //       if (data && data.account_id) {
+            //   //         this.formConfig.model['account_id'] = data.account_id;
+            //   //       }
+            //   //     });
+            //   //   }
+            //   // } 
+            // },      
+             {
               key: 'vendor',
               type: 'select',
               className: 'col-md-4 col-sm-6 col-12',
@@ -181,22 +224,23 @@ export class ExpenseItemComponent {
                 },
                 required: false
               }
-            },            {
-              key: 'bank_account',
-              type: 'select',
-              className: 'col-md-4 col-sm-6 col-12',
-              templateOptions: {
-                label: 'Bank Account',
-                dataKey: 'bank_account_id',
-                dataLabel: 'bank_name',
-                options: [],
-                lazy: {
-                  url: 'finance/bank_accounts/',
-                  lazyOneTime: true
-                },
-                required: false
-              }
-            },
+            },            
+            // {
+            //   key: 'bank_account',
+            //   type: 'select',
+            //   className: 'col-md-4 col-sm-6 col-12',
+            //   templateOptions: {
+            //     label: 'Bank Account',
+            //     dataKey: 'bank_account_id',
+            //     dataLabel: 'bank_name',
+            //     options: [],
+            //     lazy: {
+            //       url: 'finance/bank_accounts/',
+            //       lazyOneTime: true
+            //     },
+            //     required: false
+            //   }
+            // },
             // {
             //   key: 'expense_claim_id',
             //   type: 'select',
@@ -228,22 +272,22 @@ export class ExpenseItemComponent {
                 ]
               }
             },
-            {
-              key: 'payment_method',
-              type: 'select',
-              className: 'col-md-4 col-sm-6 col-12',
-              templateOptions: {
-                label: 'Payment Method',
-                placeholder: 'Select Payment Method',
-                required: false,
-                options: [
-                  { value: 'Bank Transfer', label: 'Bank Transfer' },
-                  { value: 'Cash', label: 'Cash' },
-                  { value: 'Cheque', label: 'Cheque' },
-                  { value: 'Credit Card', label: 'Credit Card' }
-                ]
-              }
-            },
+            // {
+            //   key: 'payment_method',
+            //   type: 'select',
+            //   className: 'col-md-4 col-sm-6 col-12',
+            //   templateOptions: {
+            //     label: 'Payment Method',
+            //     placeholder: 'Select Payment Method',
+            //     required: false,
+            //     options: [
+            //       { value: 'Bank Transfer', label: 'Bank Transfer' },
+            //       { value: 'Cash', label: 'Cash' },
+            //       { value: 'Cheque', label: 'Cheque' },
+            //       { value: 'Credit Card', label: 'Credit Card' }
+            //     ]
+            //   }
+            // },
             {
               key: 'reference_number',
               type: 'input',

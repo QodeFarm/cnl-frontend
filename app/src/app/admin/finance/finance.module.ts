@@ -22,6 +22,7 @@ import { PaymentTransactionListComponent } from './payment-transaction/payment-t
 import { GstDetailsComponent } from './gst-details/gst-details.component';
 import { AccountLedgerComponent } from './account-ledger/account-ledger.component';
 import { AccountLedgerModule } from './account-ledger/account-ledger.module';
+import { LedgerAccountsComponent } from '../customers/ledger-accounts/ledger-accounts.component';
 
 
 @NgModule({
@@ -49,7 +50,10 @@ import { AccountLedgerModule } from './account-ledger/account-ledger.module';
     JournalEntryListComponent,
     PaymentTransactionListComponent,
     AccountLedgerComponent,
-    GstDetailsComponent
+    GstDetailsComponent,
+    AccountLedgerModule,
+    LedgerAccountsComponent
+    
   ]
 })
 export class FinanceModule { }

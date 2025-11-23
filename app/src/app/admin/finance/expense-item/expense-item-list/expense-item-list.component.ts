@@ -36,15 +36,15 @@ export class ExpenseItemListComponent {
         name: 'Date',
         sort: true
       },
-      {
-        fieldKey: 'category_id',
-        name: 'Category',
-        sort: true,
-        displayType: "map",
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return row.category?.category_name || '';
-        },
-      },
+      // {
+      //   fieldKey: 'category_id',
+      //   name: 'Category',
+      //   sort: true,
+      //   displayType: "map",
+      //   mapFn: (currentValue: any, row: any, col: any) => {
+      //     return row.category?.category_name || '';
+      //   },
+      // },
       {
         fieldKey: 'amount', 
         name: 'Amount',
