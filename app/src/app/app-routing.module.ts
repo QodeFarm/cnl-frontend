@@ -46,6 +46,7 @@ const routes: Routes = [
       { path: 'purchase/purchase-invoice', data: { title: 'Purchase Invoice', moduleName: "purchaseinvoice" }, loadComponent: () => import('./admin/purchase/purchase-invoice/purchase-invoice.component').then(m => m.PurchaseInvoiceComponent) },
       { path: 'purchase/purchasereturns', data: { title: 'Purchase Returns', moduleName: "purchasereturns" }, loadComponent: () => import('./admin/purchase/purchasereturnorders/purchasereturnorders.component').then(m => m.PurchasereturnordersComponent) },
       { path: 'vendors', data: { title: 'Vendors', moduleName: 'vendors' }, canActivate: [], loadComponent: () => import('./admin/vendors/vendors.component').then(m => m.VendorsComponent) },
+      { path: 'purchase/bill-payments', data: { title: 'Bill Payments', moduleName: "billpayments" }, loadComponent: () => import('./admin/purchase/bill-payments/bill-payments.component').then(m => m.BillPaymentsComponent) },
 
       // { path: 'employee', canActivate: [], loadChildren: () => import('./admin/employee/employee.module').then(m => m.EmployeeModule) },
 

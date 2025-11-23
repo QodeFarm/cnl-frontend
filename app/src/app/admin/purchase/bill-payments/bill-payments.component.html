@@ -1,0 +1,63 @@
+<div class="container-fluid p-3">
+    <div class="payment-receipt-banner">
+        <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
+            <button type="button" class="btn pl-0" style="color: black;">
+                <span class="custom-heading">Bill Payment Receipt</span>
+            </button>
+            <button (click)="showBillPaymentReceiptListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#billpaymentReceiptListModal">
+                Bill Payment Receipt List
+            </button>
+        </div>
+    </div>
+
+    <div class="row custom-form">
+        <div class="col-12 px-1">
+            <ta-form #billpaymentreceiptForm [options]="formConfig"></ta-form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 px-2 py-1 custom-list" >
+            <ta-table [options]="tableConfig"></ta-table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Payment Receipt List -->
+<div class="modal fade custom-modal" id="billpaymentReceiptListModal" tabindex="-1" aria-labelledby="billpaymentReceiptListModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="billpaymentReceiptListModalLabel"> Bill Payment Receipt List</h5>
+                <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" *ngIf="showBillPaymentReceiptList">
+                <app-bill-payments-list (edit)="editBillPaymentReceipt($event)" class="custom-list"></app-bill-payments-list>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Success toast notification -->
+<div id="customToast" class="toast-message" *ngIf="showSuccessToast">
+  <div class="tick-circle">
+    <span class="tick-mark">✓</span>
+  </div>
+  <span class="toast-message-text">{{ toastMessage }}</span>
+  <span class="toast-close" (click)="showSuccessToast = false">x</span>
+</div>
+
+<!-- Error toast notification -->
+<div id="errorToast" class="toast-message error-toast" *ngIf="showErrorToast">
+  <div class="error-circle">
+    <span class="error-mark">!</span>
+  </div>
+  <span class="toast-message-text">{{ errorMessage }}</span>
+  <span class="toast-close" (click)="showErrorToast = false">x</span>
+</div>
+
+
+
