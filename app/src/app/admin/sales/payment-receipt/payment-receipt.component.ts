@@ -349,33 +349,34 @@ export class PaymentReceiptComponent implements OnInit {
                 });
               }
             }
-          },
+          },       
           {
-            key: 'account',
+            key: 'ledger_account',
             type: 'select',
             className: 'col-md-4 col-sm-6 col-12',
             templateOptions: {
-              label: 'Cash/Bank A/c',
-              required: true,
-              placeholder: 'Select Account',
-              dataKey: 'account_id',
-              dataLabel: 'account_name',
+              label: 'Cash/Bank A/c ',
+              dataKey: 'ledger_account_id',
+              dataLabel: "name",
+              options: [],
               lazy: {
-                url: 'finance/chart_of_accounts/',
-                lazyOneTime: true
-              }
+                url: 'finance/general_accounts/',
+                lazyOneTime: true,
+              },
+              required: true
             },
             hooks: {
-              onInit: (field: any) => {
-                field.formControl.valueChanges.subscribe((data: any) => {
-                  if (data && data.account_id) {
-                    console.log('Selected account:', data);
-                    // Store the account ID for later use in API submission
-                    this.selectedAccountId = data.account_id;
-                  }
-                });
-              }
+            onChanges: (field: any) => {
+              field.formControl.valueChanges.subscribe((data: any) => {
+                // console.log('ledger_account', data);
+                if (this.formConfig && this.formConfig.model && this.formConfig.model['journal_entry']) {
+                  this.formConfig.model['journal_entry']['ledger_account_id'] = data.ledger_account_id;
+                } else {
+                  console.error('Form config or Customer data model is not defined.');
+                }
+              });
             }
+          }
           },
           {
             key: 'amount',
