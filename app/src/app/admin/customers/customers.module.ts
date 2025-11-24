@@ -17,7 +17,6 @@ import { CitiesComponent } from './cities/cities.component';
 
 @NgModule({
   declarations: [
-    LedgerAccountsComponent,
     LedgerGroupsComponent,
     TerritoryComponent,
     TransportersComponent,
@@ -31,7 +30,8 @@ import { CitiesComponent } from './cities/cities.component';
     CommonModule,
     AdminCommmonModule,
     CustomersRoutingModule,
-    CustomersListComponent
+    CustomersListComponent,
+    LedgerAccountsComponent
   ],
   exports: [
     LedgerAccountsComponent,

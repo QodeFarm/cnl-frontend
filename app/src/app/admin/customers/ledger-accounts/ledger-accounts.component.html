@@ -1,7 +1,35 @@
-<div class="container-fluid pt-3">
-    <div class="row">
-        <div class="col-12 p-0">
-            <ta-curd-modal [options]="curdConfig" class="custom-list"></ta-curd-modal>
+<div class="container-fluid p-3">
+    <div class="bank-account-banner">
+        <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
+            <button (click)="LedgerAccountsEditID = null" type="button" class="btn pl-0" style="color: black;">
+                <span *ngIf="LedgerAccountsEditID" class="custom-heading">Update Chart Accounts</span>
+                <span *ngIf="!LedgerAccountsEditID" class="custom-heading">Create Chart Accounts</span>
+            </button>
+            <button (click)="showLedgerAccountsListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ledgerAccountsModal">
+                Chart Accounts List
+            </button>
+        </div>
+    </div>
+    <div class="row custom-form">
+        <div class="col-12 px-1" *ngIf="showForm">
+            <ta-form [options]="formConfig"></ta-form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade custom-modal" id="ledgerAccountsModal" tabindex="-1" aria-labelledby="ledgerAccountsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ledgerAccountsModalLabel">Edit Chart Of Accounts List</h5>
+                <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" *ngIf="showLedgerAccountsList">
+                <app-ledger-account-list (edit)="editLedgerAccount($event)" class="custom-list"></app-ledger-account-list>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+            </div>
         </div>
     </div>
 </div>

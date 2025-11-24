@@ -99,6 +99,7 @@ const routes: Routes = [
       { path: 'finance/financial-report', data: { title: 'Financial Report', moduleName: 'financial-report' }, canActivate: [], loadComponent: () => import('./admin/finance/financial-report/financial-report.component').then(m => m.FinancialReportComponent) },
       { path: 'finance/gst', data: { title: 'GST', moduleName: 'gst-details' }, canActivate: [], loadComponent: () => import('./admin/finance/gst-details/gst-details.component').then(m => m.GstDetailsComponent) },
       { path: 'finance/account-ledger', data: { title: 'Account ledger', moduleName: 'account-ledger' }, canActivate: [], loadComponent: () => import('./admin/finance/account-ledger/account-ledger.component').then(m => m.AccountLedgerComponent) },
+      { path: 'finance/ledger-accounts', data: { title: 'Ledger Accounts', moduleName: 'ledger-accounts' }, canActivate: [], loadComponent: () => import('./admin/customers/ledger-accounts/ledger-accounts.component').then(m => m.LedgerAccountsComponent) },
 
       //Company Module
       { path: 'company', data: { title: 'Company', moduleName: 'company' }, canActivate: [], loadComponent: () => import('./admin/company/company.component').then(m => m.CompanyComponent) },

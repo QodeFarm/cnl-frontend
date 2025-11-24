@@ -10,6 +10,12 @@
             <div id="reportCollapse" class="accordion-collapse collapse show" *ngIf="isAccordionOpen">
                 <div class="accordion-body">
                     <div class="d-flex gap-3">
+                        <a class="report-link" (click)="selectReport('BankBookReport')">
+                            Bank Book
+                        </a>
+                        <a class="report-link" (click)="selectReport('CashBookReport')">
+                            Cash Book
+                        </a>
                         <a class="report-link" (click)="selectReport('GeneralLedgerReport')">
                             General Ledger 
                         </a>

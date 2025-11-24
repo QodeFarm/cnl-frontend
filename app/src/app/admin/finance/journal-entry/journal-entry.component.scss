@@ -1,0 +1,35 @@
+// Styling for ledger account info display
+::ng-deep .custom-form-list.product-table {
+  .ant-card-head-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start; // Changed from space-between
+    flex-wrap: nowrap; // Changed from wrap to prevent wrapping
+    
+    .ant-card-head-title {
+      flex: 0 0 auto;
+      margin-right: 15px;
+      order: 1; // Ensure title stays first
+    }
+    
+    .center-message {
+      flex: 0 1 auto; // Changed to allow shrinking if needed
+      padding: 8px 12px;
+      border-radius: 4px;
+      margin: 0 15px 0 0;
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.5;
+      order: 2; // Ensure message comes after title
+      white-space: nowrap; // Prevent text wrapping
+    }
+
+    .ant-card-extra {
+      flex: 0 0 auto;
+      margin-left: auto;
+      order: 3; // Ensure button stays at the end
+    }
+  }
+}

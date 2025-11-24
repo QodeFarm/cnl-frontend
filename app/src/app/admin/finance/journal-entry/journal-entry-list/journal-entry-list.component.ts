@@ -18,18 +18,18 @@ export class JournalEntryListComponent {
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   refreshTable() {
-   this.taTableComponent?.refresh();
- };
+    this.taTableComponent?.refresh();
+  };
 
   tableConfig: TaTableConfig = {
     apiUrl: 'finance/journal_entries/',
-    showCheckbox:true,
+    showCheckbox: true,
     pkId: "journal_entry_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['entry_date','reference','description']
+      keys: ['entry_date', 'reference', 'description']
     },
-    export: {downloadName: 'JournalEntryList'},
+    export: { downloadName: 'JournalEntryList' },
     defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {
@@ -38,15 +38,29 @@ export class JournalEntryListComponent {
         sort: true
       },
       {
-        fieldKey: 'reference',
-        name: 'Reference',
+        fieldKey: 'voucher_no',
+        name: 'Voucher No',
         sort: true
       },
       {
-        fieldKey: 'description', 
+        fieldKey: 'ledger_group_id',
+        name: 'Ledger Account',
+        // sort: true,
+        displayType: "map",
+        mapFn: (currentValue: any, row: any, col: any) => {
+          return `${row.ledger_account.name}`;
+        },
+      },
+      // {
+      //   fieldKey: 'reference',
+      //   name: 'Reference',
+      //   sort: true
+      // },
+      {
+        fieldKey: 'description',
         name: 'Description',
         sort: true
-      },         
+      },
       {
         fieldKey: "code",
         name: "Action",
@@ -80,5 +94,5 @@ export class JournalEntryListComponent {
       }
     ]
   };
-  constructor(private router: Router) {}
+  constructor(private router: Router) { }
 }

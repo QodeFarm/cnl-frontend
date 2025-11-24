@@ -94,6 +94,14 @@
                     style="width: 130px;" (ngModelChange)="applyFilters()" nzAllowClear></nz-date-picker>
             </div>
 
+             <div class="filter-group col p-0 mt-2" style="margin-left: 5px;" *ngIf="isLegerAccountFilterVisible">
+                <nz-select [(ngModel)]="selectedLedgerAccount" nzPlaceHolder="Select Ledger Account" class="select-field" 
+                  (ngModelChange)="applyFilters($event)" nzAllowClear>
+                    <nz-option *ngFor="let ledgerAccount of ledgerAccountOptions" [nzValue]="ledgerAccount.value" [nzLabel]="ledgerAccount.label"></nz-option>
+                </nz-select>
+            </div>
+
+
             <!-- Apply Filters status DropDown -->
 
             <!-- <div class="filter-group" style="margin-right: 10px;" *ngIf="isButtonVisible">
@@ -114,8 +122,9 @@
                 </div>
             </div>
 
+            </div>
 
-        </div>
+            
     </div>
 
     <div class="ta-cell mt-2 ms-2">

@@ -136,18 +136,18 @@ export class AccountLedgerComponent implements OnInit, AfterViewInit {
       pkId: "journal_entry_line_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['account', 'debit', 'credit', 'balance', 'created_at', 'voucher_no']
+        keys: ['ledger_account', 'debit', 'credit', 'balance', 'created_at', 'voucher_no']
       },
       defaultSort: { key: 'created_at', value: 'descend' },
       export: { downloadName: 'AccountLedgerList' },
       cols: [
         {
-          fieldKey: 'account',
+          fieldKey: 'ledger_account',
           name: 'Account',
           sort: true,
           displayType: "map",
           mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.account?.account_name || ''}`;
+            return `${row.ledger_account?.name || ''}`;
           },
         },
         {
