@@ -133,6 +133,7 @@ const routes: Routes = [
       { path: 'reports/customer-reports', data: { title: 'Customer Reports', moduleName: 'customer-reports' }, canActivate: [], loadComponent: () => import('./admin/reports/customer-reports/customer-reports.component').then(m => m.CustomerReportsComponent) },
       { path: 'reports/production-reports', data: { title: 'Production Reports', moduleName: 'production-reports' }, canActivate: [], loadComponent: () => import('./admin/reports/production-reports/production-reports.component').then(m => m.ProductionReportsComponent) },
       { path: 'reports/gst-reports', data: { title: 'Gst Reports', moduleName: 'gst-reports' }, canActivate: [], loadComponent: () => import('./admin/reports/gst-reports/gst-reports.component').then(m => m.GstReportsComponent) },
+      { path: 'reports/audit-logs', data: { title: 'User Activity', moduleName: 'audit-logs' }, canActivate: [], loadChildren: () => import('./admin/audit-logs/audit-logs.module').then(m => m.AuditLogsModule) },
 
 
 
@@ -173,7 +174,8 @@ const routes: Routes = [
       // { path: 'debit-note', data: { title: 'Debit Note', moduleName: 'debitnote' }, canActivate: [], loadChildren: () => import('./admin/sales/debit-note/debit-note.module').then(m => m.DebitNoteModule) },
       // { path: 'reminders', data: { title: 'reminders', moduleName: 'reminders' }, canActivate: [], loadChildren: () => import('./admin/reminders/reminders.module').then(m => m.RemindersModule) }
     ]
-  }
+  },
+  
 ];
 
 @NgModule({

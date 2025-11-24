@@ -163,10 +163,24 @@ export class PaymentReceiptComponent implements OnInit {
     this.http.get(this.tableConfig.apiUrl).subscribe(
       (response: any) => {
         console.log('Customer payment data:', response);
-        // If the response has data, refresh the table
-        if (this.taTableComponent) {
-          this.taTableComponent.refresh();
-        }
+
+        // ✅ Check the response structure properly
+        const hasData =
+          response &&
+          response.data &&
+          Array.isArray(response.data) &&
+          response.data.length > 0;
+
+        if (hasData) {
+          // ✅ Vendor has invoices → refresh table
+          if (this.taTableComponent) {
+            this.taTableComponent.refresh();
+          }
+        } 
+        // // If the response has data, refresh the table
+        // if (this.taTableComponent) {
+        //   this.taTableComponent.refresh();
+        // }
       },
       (error) => {
         console.error('Error fetching customer payment data:', error);
@@ -212,73 +226,8 @@ export class PaymentReceiptComponent implements OnInit {
     }, 4000);
   }
 
-  // Form configuration
-  formConfig: any = {
-    url: 'sales/payment_transactions/',
-    showActionBtn: true,
-    submit: {
-      label: 'Submit',
-      beforeSubmitFn: (model: any) => {
-        // Validation checks
-        if (!this.selectedCustomerId) {
-          this.showErrorToastMessage('Please select a customer');
-          return false; // Prevent submission
-        }
-    
-        if (!this.selectedAccountId) {
-          this.showErrorToastMessage('Please select an account');
-          return false; // Prevent submission
-        }
-    
-        const payload = {
-          payment_receipt_no: model.payment_receipt_no || this.voucherNumber,
-          payment_method: model.payment_method || 'Credit Card',
-          cheque_no: model.cheque_no || null,
-          date: model.date,
-          amount: parseFloat(model.amount),
-          payment_status: model.payment_status || 'PENDING',
-          customer: this.selectedCustomerId, // Already storing just the ID string
-          account: this.selectedAccountId,   // Already storing just the ID string
-          description: model.description 
-        };
-        
-        console.log('Final payload:', payload);
-        return payload;
-      },
-      submittedFn: (response: any) => {
-        console.log('API response:', response);
-        
-        if (response && response.message === "Payment transactions processed successfully") {
-          console.log('Payment transaction created:', response);
-          
-          // Display success notification
-          this.showSuccessToastMessage('Payment transaction processed successfully!');
-          
-          // Clear the table data by resetting the API URL and clearing the table
-          this.tableConfig.apiUrl = '';
-          if (this.taTableComponent) {
-            this.taTableComponent.rows = [];
-            this.taTableComponent.total = 0;
-            this.taTableComponent.loading = false;
-          }
-          
-          // Reset the form and stored values
-          this.paymentreceiptForm?.form.reset();
-          this.selectedCustomerId = null;
-          this.selectedAccountId = null;
-          
-          // Get a new voucher number
-          this.getVoucherNo();
-          
-          // Force Angular change detection to update the UI
-          this.cdr.detectChanges();
-        } else {
-          console.error('Error processing payment:', response);
-          this.showErrorToastMessage('Error processing payment: ' + (response.message || 'Unknown error'));
-        }
-      }
-    },
-    errorFn: (error: any) => {
+    /** ✅ Error handler */
+    handleError(error: any) {
       console.error('API error:', error);
       let errorMessage = 'Error submitting payment.';
       if (error && error.error && error.error.message) {
@@ -286,7 +235,162 @@ export class PaymentReceiptComponent implements OnInit {
       }
       this.showErrorToastMessage(errorMessage);
     }
+
+  /** ✅ Manual create or update handler */
+  onSubmit(model: any) {
+    if (!this.selectedCustomerId) {
+      this.showErrorToastMessage('Please select a Customer');
+      return false;
+    }
+    if (!this.selectedAccountId) {
+      this.showErrorToastMessage('Please select an Account');
+      return false;
+    }
+
+    const payload = {
+        payment_receipt_no: model.payment_receipt_no || this.voucherNumber,
+        payment_method: model.payment_method || 'Credit Card',
+        cheque_no: model.cheque_no || null,
+        date: model.date,
+        amount: parseFloat(model.amount),
+        payment_status: model.payment_status || 'PENDING',
+        customer: this.selectedCustomerId, // Already storing just the ID string
+        account: this.selectedAccountId,   // Already storing just the ID string
+        description: model.description 
+      };
+
+    if (this.SaleOrderEditID) {
+      console.log('🔄 Updating existing record...');
+      this.updateBillPayment(payload);
+      // this.ngOnInit();
+    } else {
+      console.log('🆕 Creating new record...');
+      this.createBillPayment(payload);
+    }
+
+    return false; // prevent default form auto-submit
+  }
+
+  /** ✅ Create new Bill Payment (POST) */
+  createBillPayment(payload: any) {
+    this.http.post(this.apiEndpoint, payload).subscribe({
+      next: (response: any) => this.handleSuccess(response),
+      // error: (error: any) => this.handleError(error),
+    });
+  }
+
+  /** ✅ Update existing Bill Payment (PUT) */
+  updateBillPayment(payload: any) {
+    this.http.put(`${this.apiEndpoint}${this.SaleOrderEditID}/`, payload).subscribe({
+      next: (response: any) => this.handleSuccess(response),
+      // error: (error: any) => this.handleError(error),
+    });
+  }
+
+  // Form configuration
+  formConfig: any = {
+    // url: 'sales/payment_transactions/',
+    showActionBtn: true,
+    submit: {
+      label: 'Submit',
+      submittedFn: (model: any) => this.onSubmit(model),     
+      // beforeSubmitFn: (model: any) => {
+      //   // Validation checks
+      //   if (!this.selectedCustomerId) {
+      //     this.showErrorToastMessage('Please select a customer');
+      //     return false; // Prevent submission
+      //   }
+    
+      //   if (!this.selectedAccountId) {
+      //     this.showErrorToastMessage('Please select an account');
+      //     return false; // Prevent submission
+      //   }
+    
+      //   const payload = {
+      //     payment_receipt_no: model.payment_receipt_no || this.voucherNumber,
+      //     payment_method: model.payment_method || 'Credit Card',
+      //     cheque_no: model.cheque_no || null,
+      //     date: model.date,
+      //     amount: parseFloat(model.amount),
+      //     payment_status: model.payment_status || 'PENDING',
+      //     customer: this.selectedCustomerId, // Already storing just the ID string
+      //     account: this.selectedAccountId,   // Already storing just the ID string
+      //     description: model.description 
+      //   };
+        
+      //   console.log('Final payload:', payload);
+      //   return payload;
+      // },
+      // submittedFn: (response: any) => {
+      //   console.log('API response:', response);
+        
+      //   if (response && response.message === "Payment transactions processed successfully") {
+      //     console.log('Payment transaction created:', response);
+          
+      //     // Display success notification
+      //     this.showSuccessToastMessage('Payment transaction processed successfully!');
+          
+      //     // Clear the table data by resetting the API URL and clearing the table
+      //     this.tableConfig.apiUrl = '';
+      //     if (this.taTableComponent) {
+      //       this.taTableComponent.rows = [];
+      //       this.taTableComponent.total = 0;
+      //       this.taTableComponent.loading = false;
+      //     }
+          
+      //     // Reset the form and stored values
+      //     this.paymentreceiptForm?.form.reset();
+      //     this.selectedCustomerId = null;
+      //     this.selectedAccountId = null;
+          
+      //     // Get a new voucher number
+      //     this.getVoucherNo();
+          
+      //     // Force Angular change detection to update the UI
+      //     this.cdr.detectChanges();
+      //   } else {
+      //     console.error('Error processing payment:', response);
+      //     this.showErrorToastMessage('Error processing payment: ' + (response.message || 'Unknown error'));
+      //   }
+      // }
+    },
+    // errorFn: (error: any) => {
+    //   console.error('API error:', error);
+    //   let errorMessage = 'Error submitting payment.';
+    //   if (error && error.error && error.error.message) {
+    //     errorMessage += ' ' + error.error.message;
+    //   }
+    //   this.showErrorToastMessage(errorMessage);
+    // }
   };
+
+  handleSuccess(response: any) {
+  if (response && response.message && response.message.toLowerCase().includes('successfully')) {
+    console.log('✅ Transaction success:', response);
+
+    // Reset table and form
+    this.tableConfig.apiUrl = '';
+    if (this.taTableComponent) {
+      this.taTableComponent.rows = [];
+      this.taTableComponent.total = 0;
+      this.taTableComponent.loading = false;
+    }
+
+    this.paymentreceiptForm?.form.reset();
+    this.selectedCustomerId = null;
+    this.selectedAccountId = null;
+    this.SaleOrderEditID = null;
+    this.getVoucherNo();
+
+    // Choose toast message dynamically
+    const toastMsg = response.message.includes('updated')
+      ? 'Payment transactions processed successfully'
+      : 'Payment Transaction updated successfully';
+
+    this.showSuccessToastMessage(toastMsg);
+    this.cdr.detectChanges();
+  }
+}
 
   setFormConfig() {
     this.formConfig.fields = [
@@ -323,7 +427,7 @@ export class PaymentReceiptComponent implements OnInit {
           },
           {
             key: 'customer',
-            type: 'customer-dropdown',
+            type: 'select' ,//'customer-dropdown',
             className: 'col-md-4 col-sm-6 col-12',
             templateOptions: {
               label: 'Customer',
@@ -332,7 +436,7 @@ export class PaymentReceiptComponent implements OnInit {
               dataKey: 'customer_id',
               dataLabel: 'name',
               lazy: {
-                url: 'customers/customer/',
+                url: 'customers/customers/?summary=true',
                 lazyOneTime: true
               }
             },
@@ -476,16 +580,36 @@ export class PaymentReceiptComponent implements OnInit {
     this.http.get(`sales/payment_transactions/${event}`).subscribe((res: any) => {
       console.log('Payment receipt data:', res);
       if (res && res.data) {
-        // Populate the form with the data
-        this.formConfig.model = res.data;
-        this.selectedCustomerId = res.data.customer;
-        this.selectedAccountId = res.data.account;
-        
-        // Update form action to update
+        // Prepare vendor and account fields properly for select binding
+        const customerObj = {
+          customer_id: res.data.customer_id,
+          name: res.data.customer_name
+        };
+
+        const accountObj = res.data.account_id
+          ? {
+              account_id: res.data.account_id,
+              account_name: res.data.account_name
+            }
+          : null;
+
+        // Populate the form model
+        this.formConfig.model = {
+          ...res.data,
+          customer: customerObj,       // 👈 Correctly formatted for select field
+          account: accountObj       // 👈 Same for account dropdown
+        };
+
+        // Store IDs for submission payload
+        this.selectedCustomerId = res.data.customer_id;
+        this.selectedAccountId = res.data.account_id || res.data.account;
+
+        // Switch to update mode
         this.formConfig.showActionBtn = true;
         this.formConfig.submit.label = 'Update';
-        
-        // Close the modal
+        // this.PurchaseOrderEditID = event;
+
+        // Close modal
         this.hide();
       }
     });

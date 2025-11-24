@@ -1,0 +1,14 @@
+<div class="container-fluid mt-3 custom-list">
+
+  <div class="report-title">
+    Audit Logs
+  </div>
+
+  <div *ngIf="!loading && !error && tableConfig">
+    <ta-table [options]="tableConfig" (dataLoaded)="onDataLoaded($event)"></ta-table>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger mt-3">
+    Failed to load audit logs. Please try again later.
+  </div>
+</div>
