@@ -163,10 +163,24 @@ export class PaymentReceiptComponent implements OnInit {
     this.http.get(this.tableConfig.apiUrl).subscribe(
       (response: any) => {
         console.log('Customer payment data:', response);
-        // If the response has data, refresh the table
-        if (this.taTableComponent) {
-          this.taTableComponent.refresh();
-        }
+
+        // ✅ Check the response structure properly
+        const hasData =
+          response &&
+          response.data &&
+          Array.isArray(response.data) &&
+          response.data.length > 0;
+
+        if (hasData) {
+          // ✅ Vendor has invoices → refresh table
+          if (this.taTableComponent) {
+            this.taTableComponent.refresh();
+          }
+        } 
+        // // If the response has data, refresh the table
+        // if (this.taTableComponent) {
+        //   this.taTableComponent.refresh();
+        // }
       },
       (error) => {
         console.error('Error fetching customer payment data:', error);
@@ -261,7 +275,7 @@ export class PaymentReceiptComponent implements OnInit {
   createBillPayment(payload: any) {
     this.http.post(this.apiEndpoint, payload).subscribe({
       next: (response: any) => this.handleSuccess(response),
-      error: (error: any) => this.handleError(error),
+      // error: (error: any) => this.handleError(error),
     });
   }
 
@@ -269,7 +283,7 @@ export class PaymentReceiptComponent implements OnInit {
   updateBillPayment(payload: any) {
     this.http.put(`${this.apiEndpoint}${this.SaleOrderEditID}/`, payload).subscribe({
       next: (response: any) => this.handleSuccess(response),
-      error: (error: any) => this.handleError(error),
+      // error: (error: any) => this.handleError(error),
     });
   }
 
@@ -413,7 +427,7 @@ export class PaymentReceiptComponent implements OnInit {
           },
           {
             key: 'customer',
-            type: 'customer-dropdown',
+            type: 'select' ,//'customer-dropdown',
             className: 'col-md-4 col-sm-6 col-12',
             templateOptions: {
               label: 'Customer',
@@ -422,7 +436,7 @@ export class PaymentReceiptComponent implements OnInit {
               dataKey: 'customer_id',
               dataLabel: 'name',
               lazy: {
-                url: 'customers/customer/',
+                url: 'customers/customers/?summary=true',
                 lazyOneTime: true
               }
             },
