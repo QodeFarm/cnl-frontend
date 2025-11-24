@@ -242,10 +242,10 @@ export class PaymentReceiptComponent implements OnInit {
       this.showErrorToastMessage('Please select a Customer');
       return false;
     }
-    if (!this.selectedAccountId) {
-      this.showErrorToastMessage('Please select an Account');
-      return false;
-    }
+    // if (!this.selectedAccountId) {
+    //   this.showErrorToastMessage('Please select an Account');
+    //   return false;
+    // }
 
     const payload = {
         payment_receipt_no: model.payment_receipt_no || this.voucherNumber,
@@ -254,8 +254,12 @@ export class PaymentReceiptComponent implements OnInit {
         date: model.date,
         amount: parseFloat(model.amount),
         payment_status: model.payment_status || 'PENDING',
-        customer: this.selectedCustomerId, // Already storing just the ID string
-        account: this.selectedAccountId,   // Already storing just the ID string
+        // customer: this.selectedCustomerId, // Already storing just the ID string
+        customer: {
+          customer_id: this.selectedCustomerId
+        },
+        // account: this.selectedAccountId,   // Already storing just the ID string
+        ledger_account_id: model.ledger_account.ledger_account_id,  
         description: model.description 
       };
 
@@ -470,17 +474,16 @@ export class PaymentReceiptComponent implements OnInit {
               required: true
             },
             hooks: {
-            onChanges: (field: any) => {
-              field.formControl.valueChanges.subscribe((data: any) => {
-                // console.log('ledger_account', data);
-                if (this.formConfig && this.formConfig.model && this.formConfig.model['journal_entry']) {
-                  this.formConfig.model['journal_entry']['ledger_account_id'] = data.ledger_account_id;
-                } else {
-                  console.error('Form config or Customer data model is not defined.');
-                }
-              });
+              onInit: (field) => {
+                field.templateOptions.optionsChange = (opts: any) => {
+                  if (opts && this.formConfig.model?.ledger_account) {
+                    // Re-assign value once options are loaded
+                    field.formControl.setValue(this.formConfig.model.ledger_account, { emitEvent: false });
+                  }
+                };
+              }
             }
-          }
+
           },
           {
             key: 'amount',
@@ -573,47 +576,92 @@ export class PaymentReceiptComponent implements OnInit {
     this.paymentReceiptListComponent?.refreshTable();
   }
 
-  editPaymentReceipt(event) {
-    console.log('event', event);
-    // Add logic to edit a payment receipt here
-    this.SaleOrderEditID = event;
-    this.http.get(`sales/payment_transactions/${event}`).subscribe((res: any) => {
-      console.log('Payment receipt data:', res);
-      if (res && res.data) {
-        // Prepare vendor and account fields properly for select binding
-        const customerObj = {
-          customer_id: res.data.customer_id,
-          name: res.data.customer_name
-        };
+  // editPaymentReceipt(event) {
+  //   console.log('event', event);
+  //   // Add logic to edit a payment receipt here
+  //   this.SaleOrderEditID = event;
+  //   this.http.get(`sales/payment_transactions/${event}`).subscribe((res: any) => {
+  //     console.log('Payment receipt data:', res);
+  //     if (res && res.data) {
+  //       // Prepare vendor and account fields properly for select binding
+  //       const customerObj = {
+  //         customer_id: res.data.customer_id,
+  //         name: res.data.customer_name
+  //       };
 
-        const accountObj = res.data.account_id
-          ? {
-              account_id: res.data.account_id,
-              account_name: res.data.account_name
-            }
-          : null;
+  //       // const accountObj = res.data.ledger_account_id
+  //       //   ? {
+  //       //       ledger_account_id: res.data.ledger_account_id,
+  //       //       name: res.data.name
+  //       //     }
+  //       //   : null;
 
-        // Populate the form model
-        this.formConfig.model = {
-          ...res.data,
-          customer: customerObj,       // 👈 Correctly formatted for select field
-          account: accountObj       // 👈 Same for account dropdown
-        };
+  //       // Populate the form model
+  //       this.formConfig.model = {
+  //         ...res.data,
+  //         customer: customerObj       // 👈 Correctly formatted for select field
+  //         // ledger_account_id: accountObj       // 👈 Same for account dropdown
+  //       };
 
-        // Store IDs for submission payload
-        this.selectedCustomerId = res.data.customer_id;
-        this.selectedAccountId = res.data.account_id || res.data.account;
+  //       // Store IDs for submission payload
+  //       this.selectedCustomerId = res.data.customer_id;
+  //       // this.selectedAccountId = res.data.ledger_account_id;
 
-        // Switch to update mode
-        this.formConfig.showActionBtn = true;
-        this.formConfig.submit.label = 'Update';
-        // this.PurchaseOrderEditID = event;
+  //       // Switch to update mode
+  //       this.formConfig.showActionBtn = true;
+  //       this.formConfig.submit.label = 'Update';
+  //       // this.PurchaseOrderEditID = event;
 
-        // Close modal
-        this.hide();
-      }
-    });
-  }
+  //       // Close modal
+  //       this.hide();
+  //     }
+  //   });
+  // }
+
+editPaymentReceipt(event) {
+  console.log('event', event);
+
+  this.SaleOrderEditID = event;
+
+  this.http.get(`sales/payment_transactions/${event}`).subscribe((res: any) => {
+    console.log('Payment receipt data:', res);
+
+    if (res && res.data) {
+      console.log("result in edit mode : ", res)
+      // Prepare CUSTOMER object for select
+      const customerObj = {
+        customer_id: res.data.customer_id,
+        name: res.data.customer_name
+      };
+
+      // Prepare LEDGER ACCOUNT object for select
+      const accountObj = res.data.ledger_account_id
+        ? {
+            ledger_account_id: res.data.ledger_account_id,
+            name: res.data.ledger_account_name   // <-- FIXED (this 'name' must come from API)
+          }
+        : null;
+
+      // Populate Form Model correctly
+      this.formConfig.model = {
+        ...res.data,
+        customer: customerObj,
+        ledger_account_id: accountObj        // <-- FIXED: key MUST match field.key
+      };
+
+      // Store for payload
+      this.selectedCustomerId = res.data.customer_id;
+      this.selectedAccountId = res.data.ledger_account_id;
+
+      // UI update
+      this.formConfig.showActionBtn = true;
+      this.formConfig.submit.label = 'Update';
+
+      this.hide();
+    }
+  });
+}
+
 
   hide() {
     document.getElementById('modalClose')?.click();
