@@ -280,10 +280,10 @@ fetchVendorPaymentData(vendorId: string) {
       this.showErrorToastMessage('Please select a Vendor');
       return false;
     }
-    if (!this.selectedAccountId) {
-      this.showErrorToastMessage('Please select an Account');
-      return false;
-    }
+    // if (!this.selectedAccountId) {
+    //   this.showErrorToastMessage('Please select an Account');
+    //   return false;
+    // }
 
     const payload = {
       payment_receipt_no: model.payment_receipt_no || this.voucherNumber,
@@ -292,8 +292,10 @@ fetchVendorPaymentData(vendorId: string) {
       date: model.date,
       amount: parseFloat(model.amount),
       payment_status: model.payment_status || 'PENDING',
-      vendor: this.selectedVendorId,
-      account: this.selectedAccountId,
+      vendor: {
+          vendor_id: this.selectedVendorId
+        },
+      ledger_account_id: model.ledger_account.ledger_account_id,  
       description: model.description,
     };
 
@@ -404,31 +406,31 @@ fetchVendorPaymentData(vendorId: string) {
             }
           },
           {
-            key: 'account',
+            key: 'ledger_account',
             type: 'select',
             className: 'col-md-4 col-sm-6 col-12',
             templateOptions: {
-              label: 'Cash/Bank A/c',
-              required: true,
-              placeholder: 'Select Account',
-              dataKey: 'account_id',
-              dataLabel: 'account_name',
+              label: 'Cash/Bank A/c ',
+              dataKey: 'ledger_account_id',
+              dataLabel: "name",
+              options: [],
               lazy: {
-                url: 'finance/chart_of_accounts/',
-                lazyOneTime: true
-              }
+                url: 'finance/general_accounts/',
+                lazyOneTime: true,
+              },
+              required: true
             },
             hooks: {
-              onInit: (field: any) => {
-                field.formControl.valueChanges.subscribe((data: any) => {
-                  if (data && data.account_id) {
-                    console.log('Selected account:', data);
-                    // Store the account ID for later use in API submission
-                    this.selectedAccountId = data.account_id;
+              onInit: (field) => {
+                field.templateOptions.optionsChange = (opts: any) => {
+                  if (opts && this.formConfig.model?.ledger_account) {
+                    // Re-assign value once options are loaded
+                    field.formControl.setValue(this.formConfig.model.ledger_account, { emitEvent: false });
                   }
-                });
+                };
               }
             }
+
           },
           {
             key: 'amount',
