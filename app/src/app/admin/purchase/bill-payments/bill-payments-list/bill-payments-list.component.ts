@@ -302,13 +302,43 @@ private fallbackPrint(pdfBlob: Blob): void {
           return currentValue ? `₹${currentValue}` : '₹0.00';
         }
       },
+      // {
+      //   fieldKey: 'adjusted_now',
+      //   name: 'Adjusted Now',
+      //   sort: true,
+      //   displayType: 'map',
+      //   mapFn: (currentValue: any) => {
+      //     return currentValue ? `₹${currentValue}` : '₹0.00';
+      //   }
+      // },
       {
-        fieldKey: 'adjusted_now',
-        name: 'Adjusted Now',
+        fieldKey: 'adjust_now',
+        name: 'Adjust Now (₹)',
         sort: true,
-        displayType: 'map',
-        mapFn: (currentValue: any) => {
-          return currentValue ? `₹${currentValue}` : '₹0.00';
+        isEdit: true,
+
+        autoSave: {
+          apiUrl: (row: any) => `purchase/bill_payments/${row.transaction_id}/`,
+          method: 'put',
+
+          body: (row: any, value: any, col: any) => {
+            const existingAmount = Number(row.amount) || 0;
+            const addValue = Number(value) || 0;
+            const finalAmount = existingAmount + addValue;
+
+            return {
+              amount: finalAmount,                // ⭐ Updated amount
+              payment_receipt_no: row.payment_receipt_no,
+              account: row.account_id,
+              vendor: row.vendor_id,
+              vendor_id: row.vendor_id,
+              payment_status: row.payment_status,
+              voucher_no: row.voucher_no,
+              invoice_no: row.invoice_no
+            };
+          }
+
+          // Note: onSaveSuccess and onSaveError are injected in ngAfterViewInit to ensure `this` is correct.
         }
       },
       {
