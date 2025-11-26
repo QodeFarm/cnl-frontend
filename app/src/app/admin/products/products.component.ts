@@ -846,7 +846,7 @@ preprocessFormData() {
                             //   }
                             // },
                             {
-                              key: 'type_id',
+                              key: 'type',
                               type: 'productType-dropdown',
                               className: 'col-3',
                               templateOptions: {
@@ -863,7 +863,7 @@ preprocessFormData() {
                                   field.formControl.valueChanges.subscribe((data: any) => {
                                     if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
                                       // Store just the ID value
-                                      this.formConfig.model['products']['type_id'] = data;
+                                      this.formConfig.model['products']['type_id'] = data.type_id;
                                       console.log("Type changed to:", data);
                                     } else {
                                       console.error('Form config or type_id data model is not defined.');
