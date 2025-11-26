@@ -147,41 +147,6 @@ export class BillPaymentsComponent implements OnInit {
     );
   }
 
-  // // Fetch payment data for the selected customer
-  // fetchVendorPaymentData(vendorId: string) {
-  //   console.log('Fetching payment data for customer:', vendorId);
-    
-  //   // Update the API URL with the customer ID
-  //   this.tableConfig.apiUrl = `purchase/data_for_payment_receipt_table/${vendorId}/`;
-    
-  //   // Make an HTTP request to check if data exists for this customer
-  //   this.http.get(this.tableConfig.apiUrl).subscribe(
-  //     (response: any) => {
-  //       console.log('Vendor payment data:', response);
-  //       // If the response has data, refresh the table
-  //       if (this.taTableComponent) {
-  //         this.taTableComponent.refresh();
-  //       }
-  //     },
-  //     (error) => {
-  //       console.error('Error fetching Vendor payment data:', error);
-  //       // Error indicates no data for this customer
-  //       // Clear the table data
-  //       this.billPaymentReceiptData = [];
-        
-  //       // Set empty data to the table
-  //       if (this.taTableComponent) {
-  //         // Since there's no clearData method, we'll set empty rows
-  //         this.taTableComponent.rows = [];
-  //         this.taTableComponent.total = 0;
-          
-  //         // This will trigger change detection in the table component
-  //         this.taTableComponent.loading = false;
-  //       }
-  //     }
-  //   );
-  // }
-
 fetchVendorPaymentData(vendorId: string) {
   console.log('Fetching payment data for vendor:', vendorId);
 
@@ -204,28 +169,14 @@ fetchVendorPaymentData(vendorId: string) {
           this.taTableComponent.refresh();
         }
       } 
-      // else {
-      //   // ❌ No invoices found for vendor
-      //   this.showErrorToastMessage('No purchase invoices found for this vendor.');
-
-      //   // Clear any old table data
-      //   if (this.taTableComponent) {
-      //     this.taTableComponent.rows = [];
-      //     this.taTableComponent.total = 0;
-      //     this.taTableComponent.loading = false;
-      //   }
-      // }
     },
     (error) => {
       console.error('Error fetching Vendor payment data:', error);
 
       // Show friendly message only when backend says "not found"
-      if (error.status === 404) {
-        this.showErrorToastMessage('No purchase invoices found for this vendor.');
-      } else {
-        this.showErrorToastMessage('Something went wrong while loading vendor invoices.');
-      }
-
+      // if (error.status === 400) {
+      //   this.showErrorToastMessage('No purchase invoices found for this vendor.');
+      // }
       // Clear any old table data
       if (this.taTableComponent) {
         this.taTableComponent.rows = [];
@@ -235,26 +186,6 @@ fetchVendorPaymentData(vendorId: string) {
     }
   );
 }
-
-
-// // ✅ Success Toast
-// showSuccessToastMessage(message: string) {
-//   this.toastMessage = message;
-//   this.showSuccessToast = true;
-//   setTimeout(() => {
-//     this.showSuccessToast = false;
-//   }, 3000);
-// }
-
-// // ✅ Error Toast
-// showErrorToastMessage(message: string) {
-//   this.errorMessage = message;
-//   this.showErrorToast = true;
-//   setTimeout(() => {
-//     this.showErrorToast = false;
-//   }, 4000);
-// }
-
 
   showDialog() {
     this.showSuccessToast = true;
@@ -287,116 +218,115 @@ fetchVendorPaymentData(vendorId: string) {
 
   }
 
+  /** ✅ Create new Bill Payment (POST) */
+  createBillPayment(payload: any) {
+    this.http.post(this.apiEndpoint, payload).subscribe({
+      next: (response: any) => this.handleSuccess(response),
+      // error: (error: any) => this.handleError(error),
+    });
+  }
+
+  /** ✅ Update existing Bill Payment (PUT) */
+  updateBillPayment(payload: any) {
+    this.http.put(`${this.apiEndpoint}${this.PurchaseOrderEditID}/`, payload).subscribe({
+      next: (response: any) => this.handleSuccess(response),
+      // error: (error: any) => this.handleError(error),
+    });
+  }
+
+  
+  handleSuccess(response: any) {
+  if (response && response.message && response.message.toLowerCase().includes('successfully')) {
+    console.log('✅ Transaction success:', response);
+
+    // Reset table and form
+    this.tableConfig.apiUrl = '';
+    if (this.taTableComponent) {
+      this.taTableComponent.rows = [];
+      this.taTableComponent.total = 0;
+      this.taTableComponent.loading = false;
+    }
+
+    this.billpaymentreceiptForm?.form.reset();
+    this.selectedVendorId = null;
+    this.selectedAccountId = null;
+    this.PurchaseOrderEditID = null;
+    this.getVoucherNo();
+
+    // Choose toast message dynamically
+    const toastMsg = response.message.includes('updated')
+      ? 'Bill payment updated successfully.'
+      : 'Bill payment saved successfully.';
+
+    this.showSuccessToastMessage(toastMsg);
+    this.cdr.detectChanges();
+  }
+}
+
+
+  /** ✅ Error handler */
+  handleError(error: any) {
+    console.error('API error:', error);
+    let errorMessage = 'Error submitting payment.';
+    if (error && error.error && error.error.message) {
+      errorMessage += ' ' + error.error.message;
+    }
+    this.showErrorToastMessage(errorMessage);
+  }
+
+  /** ✅ Manual create or update handler */
+  onSubmit(model: any) {
+    if (!this.selectedVendorId) {
+      this.showErrorToastMessage('Please select a Vendor');
+      return false;
+    }
+    // if (!this.selectedAccountId) {
+    //   this.showErrorToastMessage('Please select an Account');
+    //   return false;
+    // }
+
+    const payload = {
+      payment_receipt_no: model.payment_receipt_no || this.voucherNumber,
+      payment_method: model.payment_method || 'Credit Card',
+      cheque_no: model.cheque_no || null,
+      date: model.date,
+      amount: parseFloat(model.amount),
+      payment_status: model.payment_status || 'PENDING',
+      vendor: {
+          vendor_id: this.selectedVendorId
+        },
+      ledger_account_id: model.ledger_account.ledger_account_id,  
+      description: model.description,
+    };
+
+    if (this.PurchaseOrderEditID) {
+      console.log('🔄 Updating existing record...');
+      this.updateBillPayment(payload);
+      // this.ngOnInit();
+    } else {
+      console.log('🆕 Creating new record...');
+      this.createBillPayment(payload);
+    }
+
+    return false; // prevent default form auto-submit
+  }
+
   // Form configuration
   formConfig: any = {
-    url: 'purchase/bill_payments/',
+    // url: 'purchase/bill_payments/',
     showActionBtn: true,
     submit: {
-      label: 'Submit',
-      // beforeSubmitFn: (model: any) => {
-      //   // Validation checks
-      //   if (!this.selectedVendorId) {
-      //     this.showErrorToastMessage('Please select a Vendor');
-      //     return false; // Prevent submission
-      //   }
-    
-      //   if (!this.selectedAccountId) {
-      //     this.showErrorToastMessage('Please select an account');
-      //     return false; // Prevent submission
-      //   }
-    
-      //   const payload = {
-      //     payment_receipt_no: model.payment_receipt_no || this.voucherNumber,
-      //     payment_method: model.payment_method || 'Credit Card',
-      //     cheque_no: model.cheque_no || null,
-      //     date: model.date,
-      //     amount: parseFloat(model.amount),
-      //     payment_status: model.payment_status || 'PENDING',
-      //     vendor: this.selectedVendorId, // Already storing just the ID string
-      //     account: this.selectedAccountId,   // Already storing just the ID string
-      //     description: model.description 
-      //   };
-        
-      //   console.log('Final payload:', payload);
-      //   return payload;
-      // },
-      beforeSubmitFn: (model: any) => {
-        // Validation checks
-        if (!this.selectedVendorId) {
-          this.showErrorToastMessage('Please select a Vendor');
-          return false;
-        }
-
-        if (!this.selectedAccountId) {
-          this.showErrorToastMessage('Please select an Account');
-          return false;
-        }
-
-        // Build the payload
-        const payload = {
-          payment_receipt_no: model.payment_receipt_no || this.voucherNumber,
-          payment_method: model.payment_method || 'Credit Card',
-          cheque_no: model.cheque_no || null,
-          date: model.date,
-          amount: parseFloat(model.amount),
-          payment_status: model.payment_status || 'PENDING',
-          vendor: this.selectedVendorId,
-          account: this.selectedAccountId,
-          description: model.description
-        };
-
-        // 🔹 Check if we are updating (PUT) or creating (POST)
-        if (this.PurchaseOrderEditID) {
-          this.formConfig.url = `purchase/bill_payments/${this.PurchaseOrderEditID}/`;
-          this.formConfig.method = 'PUT';
-        } else {
-          this.formConfig.url = `purchase/bill_payments/`;
-          this.formConfig.method = 'POST';
-        }
-
-        console.log('Final payload (method:', this.formConfig.method, '):', payload);
-        return payload;
-      },
-      submittedFn: (response: any) => {
-        console.log('API response:', response);
-        
-        if (response && response.message === "Bill Payment transactions processed successfully") {
-          console.log('Payment transaction created:', response);
-          
-          // Clear the table data by resetting the API URL and clearing the table
-          this.tableConfig.apiUrl = '';
-          if (this.taTableComponent) {
-            this.taTableComponent.rows = [];
-            this.taTableComponent.total = 0;
-            this.taTableComponent.loading = false;
-          }
-          
-          // Reset the form and stored values
-          this.billpaymentreceiptForm?.form.reset();
-          this.selectedVendorId = null;
-          this.selectedAccountId = null;
-          
-          // Get a new voucher number
-          this.getVoucherNo();
-          
-          // Force Angular change detection to update the UI
-          this.cdr.detectChanges();
-        } 
-        // this.ngOnInit();
-        // else {
-        //   console.error('Error processing payment:', response);
-        //   this.showErrorToastMessage('Error processing payment: ' + (response.message || 'Unknown error'));
-        // }
-      }
+      label: 'Submit', 
+      submittedFn: (model: any) => this.onSubmit(model),     
     },
-    errorFn: (error: any) => {
-      console.error('API error:', error);
-      let errorMessage = 'Error submitting payment.';
-      if (error && error.error && error.error.message) {
-        errorMessage += ' ' + error.error.message;
-      }
-      this.showErrorToastMessage(errorMessage);
-    }
+    // errorFn: (error: any) => {
+    //   console.error('API error:', error);
+    //   let errorMessage = 'Error submitting payment.';
+    //   if (error && error.error && error.error.message) {
+    //     errorMessage += ' ' + error.error.message;
+    //   }
+    //   this.showErrorToastMessage(errorMessage);
+    // }
   };
 
 
@@ -476,31 +406,31 @@ fetchVendorPaymentData(vendorId: string) {
             }
           },
           {
-            key: 'account',
+            key: 'ledger_account',
             type: 'select',
             className: 'col-md-4 col-sm-6 col-12',
             templateOptions: {
-              label: 'Cash/Bank A/c',
-              required: true,
-              placeholder: 'Select Account',
-              dataKey: 'account_id',
-              dataLabel: 'account_name',
+              label: 'Cash/Bank A/c ',
+              dataKey: 'ledger_account_id',
+              dataLabel: "name",
+              options: [],
               lazy: {
-                url: 'finance/chart_of_accounts/',
-                lazyOneTime: true
-              }
+                url: 'finance/general_accounts/',
+                lazyOneTime: true,
+              },
+              required: true
             },
             hooks: {
-              onInit: (field: any) => {
-                field.formControl.valueChanges.subscribe((data: any) => {
-                  if (data && data.account_id) {
-                    console.log('Selected account:', data);
-                    // Store the account ID for later use in API submission
-                    this.selectedAccountId = data.account_id;
+              onInit: (field) => {
+                field.templateOptions.optionsChange = (opts: any) => {
+                  if (opts && this.formConfig.model?.ledger_account) {
+                    // Re-assign value once options are loaded
+                    field.formControl.setValue(this.formConfig.model.ledger_account, { emitEvent: false });
                   }
-                });
+                };
               }
             }
+
           },
           {
             key: 'amount',
@@ -605,7 +535,7 @@ fetchVendorPaymentData(vendorId: string) {
   }
 
   editBillPaymentReceipt(event) {
-    console.log('event', event);
+    console.log('📝 Edit mode triggered for ID:', event);
 
     this.PurchaseOrderEditID = event;
 
@@ -642,7 +572,7 @@ fetchVendorPaymentData(vendorId: string) {
         // Switch to update mode
         this.formConfig.showActionBtn = true;
         this.formConfig.submit.label = 'Update';
-        this.PurchaseOrderEditID = event;
+        // this.PurchaseOrderEditID = event;
 
         // Close modal
         this.hide();
