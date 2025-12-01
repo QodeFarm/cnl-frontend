@@ -14,10 +14,22 @@ export class FieldTabsComponent extends FieldType {
   selectTab(index: number) {
     this.activeTab = index;
   }
+
+  // Check if form has been submitted (not just touched)
+  isFormSubmitted(): boolean {
+    // Check formState for submitted flag (set by ta-form on submit)
+    if (this.options?.formState?.submitted) {
+      return true;
+    }
+    // Fallback: Check if form was submitted via the parent form's submitted state
+    if ((this.form as any)?.submitted) {
+      return true;
+    }
+    return false;
+  }
+
   hasError(field: any): boolean {
     if (!field) return false;
-
-    // Case 1: Direct control
 
     // Case 2: FieldGroup
     if (field.fieldGroup?.length) {
@@ -37,6 +49,12 @@ export class FieldTabsComponent extends FieldType {
 
     return false;
   }
+
+  // Show error only after form submission attempt
+  shouldShowError(field: any): boolean {
+    return this.isFormSubmitted() && this.hasError(field);
+  }
+
   countErrors(field: any): number {
     if (!field) return 0;
 

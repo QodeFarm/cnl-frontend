@@ -40,7 +40,7 @@ export class TaFormComponent implements OnInit {
   fields: FormlyFieldConfig[] = [];
   isLoading = false;
   formlyOptions: FormlyFormOptions | any = {
-    formState: { user: TaLocalStorage.getItem('user') }
+    formState: { user: TaLocalStorage.getItem('user'), submitted: false }
   };
   constructor(private formS: TaFormService, private taAction: TaActionService, private notification: NzNotificationService, private router: Router) { }
 
@@ -72,6 +72,9 @@ export class TaFormComponent implements OnInit {
   }
 
   onSubmit() {
+    // Mark form as submitted for validation display
+    this.formlyOptions.formState.submitted = true;
+    
     if (this.form.valid) {
       if (this.options.url) {
         this.isLoading = true;
@@ -158,6 +161,9 @@ export class TaFormComponent implements OnInit {
   }
 
   onReset() {
+    // Reset submitted flag
+    this.formlyOptions.formState.submitted = false;
+    
     this.formlyOptions.resetModel();
     if (this.options.reset) {
       if (this.options.reset.resetFn) {

@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, OnInit } from '@angular/core';
+import { AfterViewInit, AfterContentChecked, ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, OnInit } from '@angular/core';
 import { FieldType } from '@ngx-formly/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NzSelectModule } from 'ng-zorro-antd/select';
@@ -36,7 +36,7 @@ import { OverlayModule } from '@angular/cdk/overlay';
     forwardRef(() => TaFormComponent),
     NzIconModule]
 })
-export class FieldAdvSelectComponent extends FieldType implements OnInit, AfterViewInit {
+export class FieldAdvSelectComponent extends FieldType implements OnInit, AfterViewInit, AfterContentChecked {
   dropdownOpen = false;
   lazySelectedItem: any;
   visible = false;
@@ -44,6 +44,7 @@ export class FieldAdvSelectComponent extends FieldType implements OnInit, AfterV
   showCurdDiv = false;
   Math = Math; // Make Math available in the template
   window = window; // Make window available in the template
+  private lastValue: any = undefined; // Track last value to avoid redundant updates
   positions = [
     {
       originX: 'start',
@@ -99,14 +100,47 @@ export class FieldAdvSelectComponent extends FieldType implements OnInit, AfterV
         this.showCurdDiv = false;
       }
     }
+    
+    // Set initial value if form control already has a value
+    if (this.formControl.value) {
+      const data = this.itemMapping(this.formControl.value);
+      if (data) {
+        this.lazySelectedItem = data;
+      }
+    }
+    
     this.formControl.valueChanges.subscribe(res => {
       if (this.formControl.value) {
         const data = this.itemMapping(this.formControl.value);
         if (data) {
           this.lazySelectedItem = data;
         }
+      } else {
+        this.lazySelectedItem = null;
       }
     })
+  }
+
+  // Check for value changes that might have been missed
+  ngAfterContentChecked(): void {
+    if (this.formControl && this.formControl.value) {
+      // Only update if value has changed
+      const currentValueKey = this.props.dataKey ? this.formControl.value[this.props.dataKey] : this.formControl.value;
+      const lastValueKey = this.lastValue && this.props.dataKey ? this.lastValue[this.props.dataKey] : this.lastValue;
+      
+      if (currentValueKey !== lastValueKey) {
+        this.lastValue = this.formControl.value;
+        const data = this.itemMapping(this.formControl.value);
+        if (data && data.label) {
+          this.lazySelectedItem = data;
+          this.cdr.detectChanges();
+        }
+      }
+    } else if (this.lastValue !== null && this.lastValue !== undefined && !this.formControl.value) {
+      // Value was cleared
+      this.lastValue = null;
+      this.lazySelectedItem = null;
+    }
   }
 
   toggleDropdown() {
