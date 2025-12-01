@@ -3395,7 +3395,7 @@ getUnitData(unitInfo) {
                   dataKey: 'product_id',
                   hideLabel: true,
                   dataLabel: 'name',
-                  placeholder: 'product',
+                  placeholder: 'Product',
                   options: [],
                   required: true,
                   lazy: {
@@ -3860,8 +3860,8 @@ getUnitData(unitInfo) {
                 type: 'input',
                 key: 'print_name',
                 templateOptions: {
-                  label: 'Print name',
-                  placeholder: 'name',
+                  label: 'Print Name',
+                  placeholder: 'Print name',
                   hideLabel: true
                 },
                 hooks: {

@@ -558,51 +558,88 @@ ta-table {
 //     box-shadow: none;
 // }
 .ant-drawer {
+    z-index: 1050 !important;
+    position: fixed !important;
+    
     .ant-drawer-mask {
-        background-color: rgba(0, 0, 0, 0.9) !important;
+        background-color: rgba(0, 0, 0, 0.85) !important;
+        position: fixed !important;
+        inset: 0 !important;
+        z-index: 1050 !important;
     }
     .ant-drawer-content-wrapper {
-        // width: 65% !important;
-        // left: 50%;
-        // transform: translate(-50%, 20px);
         height: auto;
-        // max-height: calc(100% - 40px);
-        overflow-y: auto;
+        max-height: 90vh;
+        overflow: hidden;
         display: flex;
-        align-items: center;
+        align-items: flex-start;
+        justify-content: center;
+        padding-top: 20px;
+        z-index: 1051 !important;
+        
         .ant-drawer-content {
-            width: 50%;
+            width: 85%;
             margin: 0 auto;
             height: auto;
+            max-height: 85vh;
             border: solid 2px white;
-            border-radius: 5px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            background: #fff !important;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            
             @media(max-width:1400px){
-                width: 60%;
+                width: 90%;
             }
             @media(max-width:1199px){
-                width: 70%;
+                width: 95%;
             }
             @media(max-width:767px){
                 width: 98%;
             }
+            
             .ant-drawer-body{
-                 padding: 15px;
+                padding: 20px 25px;
+                overflow-y: auto;
+                overflow-x: hidden;
+                max-height: calc(85vh - 60px);
+                background: #fff;
+                
+                /* Custom scrollbar inside modal */
+                &::-webkit-scrollbar {
+                    width: 8px;
+                }
+                &::-webkit-scrollbar-track {
+                    background: #f1f1f1;
+                    border-radius: 4px;
+                }
+                &::-webkit-scrollbar-thumb {
+                    background: #888;
+                    border-radius: 4px;
+                }
+                &::-webkit-scrollbar-thumb:hover {
+                    background: #555;
+                }
             }
         }
         .ant-drawer-header {
             background-color: #142768;
-            padding: 12px 18px;
+            padding: 14px 20px;
+            flex-shrink: 0;
         }
         .ant-drawer-header-title {
             .ant-drawer-close {
                 position: absolute;
-                right: 0;
+                right: 10px;
+                top: 50%;
+                transform: translateY(-50%);
                 background-color: #fff;
                 opacity: 1;
-                border-radius: 50px;
-                margin-top: 0px;
-                padding: 5px 6px;
+                border-radius: 50%;
+                padding: 5px 7px;
                 color: #000;
+                z-index: 10;
             }
             .ant-drawer-title {
                 color: #fff;
@@ -610,35 +647,99 @@ ta-table {
                 font-weight: 500;
             }
         }
-        // .ant-drawer-body{
-        //     max-height: calc(100% - 100px); 
-        //     overflow-y: auto; 
-        //     overflow-x: hidden;
-        // }
     }
     .ant-drawer-body{
         .inner-content{
             overflow-y: auto;
-            max-height: calc(100vh - 155px);
+            max-height: calc(85vh - 120px);
             overflow-x: hidden;
         }
     }
 }
+
+/* Prevent body scroll when drawer is open */
+body.ant-scrolling-effect {
+    overflow: hidden !important;
+    position: fixed !important;
+    width: 100% !important;
+}
+
+/* Ensure dropdowns appear above modal */
+.ant-select-dropdown,
+.ant-dropdown,
+.cdk-overlay-container {
+    z-index: 1100 !important;
+}
+
+/* Product form modal styling */
+.ant-drawer .ant-drawer-body {
+    .formly-field {
+        margin-bottom: 15px;
+    }
+    
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    formly-wrapper-form-field {
+        display: block;
+        margin-bottom: 12px;
+    }
+    
+    label {
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 5px;
+        display: block;
+    }
+    
+    .ant-select,
+    .ant-input,
+    input.form-control,
+    select.form-control {
+        width: 100% !important;
+    }
+    
+    .ant-select-selector {
+        min-height: 38px !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+    
+    /* Tab styling */
+    .tab-form-list {
+        margin-top: 20px;
+        border-top: 1px solid #e8e8e8;
+        padding-top: 15px;
+    }
+    
+    .ant-tabs-nav {
+        margin-bottom: 15px !important;
+    }
+    
+    /* Row spacing */
+    .row.g-3 > [class*="col-"] {
+        padding-top: 8px;
+        padding-bottom: 8px;
+    }
+}
+
 .curd-modal-form .ant-modal{
     
         border-radius: 10px;
         overflow: hidden;
-         width: 50% !important;
+         width: 85% !important;
+         max-width: 1200px;
          padding-bottom: 0 !important;
             margin: 0 auto;
-            height: auto;
+            max-height: 90vh;
             border: solid 2px white;
             border-radius: 5px;
             @media(max-width:1400px){
-                width: 60%;
+                width: 90%;
             }
             @media(max-width:1199px){
-                width: 70%;
+                width: 95%;
             }
             @media(max-width:767px){
                 width: 98%;
@@ -669,6 +770,94 @@ ta-table {
             font-weight: 500;
         }
       
+    }
+
+    .ant-modal-body {
+        max-height: calc(90vh - 120px);
+        overflow-y: auto;
+        padding: 20px;
+    }
+
+    .ant-modal-footer {
+        border-top: 1px solid #e8e8e8;
+        padding: 12px 16px;
+    }
+}
+
+/* Modal wrapper and backdrop styling */
+.curd-modal-form {
+    &.ant-modal-wrap {
+        overflow: hidden !important;
+    }
+}
+
+/* Fix placeholder text overflow in ALL select fields globally */
+.ant-select {
+    max-width: 100%;
+    
+    .ant-select-selector {
+        max-width: 100% !important;
+        overflow: hidden !important;
+        
+        .ant-select-selection-placeholder,
+        .ant-select-selection-item,
+        .ant-select-selection-search-input {
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            white-space: nowrap !important;
+            max-width: 100% !important;
+            padding-right: 20px;
+        }
+    }
+}
+
+/* Fix ng-select and nz-select placeholder overflow */
+nz-select,
+ng-select {
+    max-width: 100%;
+    
+    .ant-select-selection-placeholder,
+    .ng-placeholder,
+    .ng-value {
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        max-width: calc(100% - 25px) !important;
+    }
+}
+
+/* Fix input field overflow */
+.ant-input,
+.form-control,
+input[type="text"],
+input[type="number"] {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Ensure form fields stay within bounds */
+.form-group,
+formly-field,
+formly-wrapper-form-field {
+    max-width: 100%;
+    overflow: hidden;
+}
+
+/* Ensure dropdowns in modal appear above everything */
+.ant-select-dropdown,
+.ant-picker-dropdown,
+.ant-dropdown,
+.cdk-overlay-container {
+    z-index: 1100 !important;
+}
+
+/* Prevent body scroll when modal is open */
+.ant-modal-open {
+    overflow: hidden !important;
+    
+    body {
+        overflow: hidden !important;
     }
 }
 

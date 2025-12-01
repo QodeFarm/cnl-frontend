@@ -19,11 +19,9 @@
 
         <nz-tab *ngFor="let tab of field.fieldGroup; let i = index" [nzTitle]="titleTemplate" (nzClick)="selectTab(i)">
             <ng-template #titleTemplate>
-                <span [ngClass]="{ 'text-danger': hasError(tab) }">
+                <span class="tab-title" [ngClass]="{ 'tab-error': shouldShowError(tab) }">
                     {{ tab.props?.label || 'Tab ' + (i + 1) }}
-                    <ng-container *ngIf="countErrors(tab) > 0">
-                        ({{ countErrors(tab) }} ⚠️)
-                    </ng-container>
+                    <span *ngIf="shouldShowError(tab) && countErrors(tab) > 0" class="error-count">{{ countErrors(tab) }}</span>
                 </span>
             </ng-template>
             <formly-field [field]="tab"></formly-field>
