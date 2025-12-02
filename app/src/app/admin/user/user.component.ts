@@ -66,7 +66,7 @@ export class UserComponent {
         //     }
         //   ]
         // }
-         {
+        {
           fieldKey: "code",
           name: "Action",
           type: 'action',
@@ -118,271 +118,178 @@ export class UserComponent {
         //   value: 'data.brach.branch_id'
         // }
       ],
+      // in component .ts
       fields: [
         {
-          fieldGroupClassName: "row col-12 p-0 m-0 custom-form",
+          fieldGroupClassName: 'row col-12 p-0 m-0 custom-form',
           fieldGroup: [
+            // LEFT: form area (9 cols on md+, full on xs)
             {
-              className: 'col-lg-9 col-md col-12 p-0',
+              className: 'col-lg-9 col-md-9 col-12 p-3',
+              fieldGroupClassName: 'row gx-3 gy-3', // bootstrap gap between cols/rows
               fieldGroup: [
-                {
-                  key: 'profile_picture_url',
-                  type: 'file',
-                  className: "ta-cell pr-md col d-md-none d-block",
-                  props: {
-                    displayStyle: 'avatar',
-                    storeFolder: "profile",
-                    label: 'Profile Pic',
-                    multiple: false,
-                    placeholder: 'Enter Profile Pic',
-                    required: true,
-                  }
-                },
                 {
                   key: 'title',
                   type: 'select',
-                  className: 'ta-cell pr-md col-12',
+                  className: 'col-12 col-md-6',
                   templateOptions: {
                     label: 'Title',
                     required: true,
-                    options: [
-                      { 'label': "Mr.", value: 'Mr.' },
-                      { 'label': "Ms.", value: 'Ms.' }
-                    ]
-                  },
-                  hooks: {
-                    onInit: (field: any) => {
-                      //field.templateOptions.options = this.cs.getRole();
-                    }
+                    options: [{ label: 'Mr.', value: 'Mr.' }, { label: 'Ms.', value: 'Ms.' }]
                   }
                 },
+
+                // First + Last name
                 {
-                  fieldGroupClassName: "row m-0",
-                  fieldGroup: [
-                    {
-                      key: 'first_name',
-                      type: 'text',
-                      className: 'ta-cell pr-md col-12 col-md-6',
-                      templateOptions: {
-                        label: 'First Name',
-                        required: true
-                      },
-                      hooks: {
-                        onInit: (field: any) => {
-                          //field.templateOptions.options = this.cs.getRole();
-                        }
-                      }
-                    },
-                    {
-                      key: 'last_name',
-                      type: 'text',
-                      className: 'ta-cell pr-md col-12 col-md-6',
-                      templateOptions: {
-                        label: 'Last Name',
-                        required: true
-                      }
-                    },
-                    {
-                      key: 'email',
-                      type: 'text',
-                      className: 'ta-cell pr-md col-12',
-                      templateOptions: {
-                        label: 'User Email',
-                        dataKey: 'user',
-                        dataLabel: "user",
-                        required: true
-                      },
-                      hooks: {
-                        onInit: (field: any) => {
-                          //field.templateOptions.options = this.cs.getRole();
-                        }
-                      }
-                    },
-                  ],
+                  key: 'first_name',
+                  type: 'text',
+                  className: 'col-12 col-md-6',
+                  templateOptions: { label: 'First Name', required: true }
                 },
-              ],
-            },
-            {
-              className: 'col-lg-3 col-md-auto col-12 p-0',
-              fieldGroup: [
                 {
-                  key: 'profile_picture_url',
-                  type: 'file',
-                  className: "ta-cell pr-md col d-md-block d-none",
-                  props: {
-                    displayStyle: 'avatar',
-                    storeFolder: "profile",
-                    label: 'Profile Pic',
-                    multiple: false,
-                    placeholder: 'Enter Profile Pic',
-                    required: true,
+                  key: 'last_name',
+                  type: 'text',
+                  className: 'col-12 col-md-6',
+                  templateOptions: { label: 'Last Name', required: true }
+                },
+
+                // Email + Mobile
+                {
+                  key: 'email',
+                  type: 'text',
+                  className: 'col-12 col-md-6',
+                  templateOptions: {
+                    label: 'User Email',
+                    dataKey: 'user',
+                    dataLabel: 'user',
+                    required: true
                   }
                 },
-              ],
-            },
-            {
-              fieldGroupClassName: "row m-0",
-              className: 'col-12 p-0',
-              fieldGroup: [
                 {
                   key: 'mobile',
                   type: 'text',
-                  className: 'ta-cell pr-md col-md-6 col-12',
-                  templateOptions: {
-                    label: 'Mobile',
-                    required: true
-                  }
+                  className: 'col-12 col-md-6',
+                  templateOptions: { label: 'Mobile', required: true }
                 },
+
+                // Role + Gender
                 {
                   key: 'role',
                   type: 'select',
-                  className: 'ta-cell pr-md col-md-6 col-12',
+                  className: 'col-12 col-md-6',
                   templateOptions: {
                     label: 'User Role',
                     dataKey: 'role_name',
-                    dataLabel: "role_name",
+                    dataLabel: 'role_name',
                     options: [],
-                    // bindId: true,
-                    lazy: {
-                      url: 'users/role/',
-                      lazyOneTime: true
-                    },
+                    lazy: { url: 'users/role/', lazyOneTime: true },
                     required: true
-                  },
-                  hooks: {
-                    onInit: (field: any) => {
-                      //field.templateOptions.options = this.cs.getRole();
-                    }
                   }
                 },
                 {
                   key: 'gender',
                   type: 'select',
-                  className: 'ta-cell pr-md col-md-6 col-12',
+                  className: 'col-12 col-md-6',
                   templateOptions: {
                     label: 'Gender',
                     required: true,
-                    options: [
-                      { 'label': "Male", value: 'Male' },
-                      { 'label': "Female", value: 'Female' }
-                    ]
-                  },
-                  hooks: {
-                    onInit: (field: any) => {
-                      //field.templateOptions.options = this.cs.getRole();
-                    }
+                    options: [{ label: 'Male', value: 'Male' }, { label: 'Female', value: 'Female' }]
                   }
                 },
+
+                // DOB + Status
                 {
                   key: 'date_of_birth',
                   type: 'date',
-                  className: 'ta-cell pr-md col-md-6 col-12',
-                  templateOptions: {
-                    label: 'Date Of Birth',
-                    placeholder: 'Enter Birth Date',
-                    required: false,
-                  }
+                  className: 'col-12 col-md-6',
+                  templateOptions: { label: 'Date Of Birth', placeholder: 'Select date' }
                 },
                 {
                   key: 'status',
                   type: 'status-dropdown',
-                  className: 'ta-cell pr-md col-md-6 col-12',
+                  className: 'col-12 col-md-6',
                   templateOptions: {
                     label: 'Status',
-                    // bindId: true,
                     dataKey: 'status_name',
-                    dataLabel: "status_name",
+                    dataLabel: 'status_name',
                     options: [],
-                    // required: true,
-                    lazy: {
-                      url: 'masters/statuses/',
-                      lazyOneTime: true
-                    }
+                    lazy: { url: 'masters/statuses/', lazyOneTime: true }
                   }
                 },
+
+                // Username (full-width on small, half on md if you want)
                 {
                   key: 'username',
                   type: 'text',
-                  className: 'ta-cell pr-md col-md-6 col-12',
-                  templateOptions: {
-                    label: 'User Name',
-                    dataKey: 'user',
-                    dataLabel: "user",
-                    required: true
-                  },
-                  hooks: {
-                    onInit: (field: any) => {
-                      //field.templateOptions.options = this.cs.getRole();
-                    }
-                  }
+                  className: 'col-12 col-md-6',
+                  templateOptions: { label: 'User Name', required: true }
                 },
+
+                // Hidden flag
                 {
                   key: 'flag',
                   type: 'input',
                   defaultValue: 'admin_update',
-                  className: 'ta-cell pr-md col-12',
-                  templateOptions: {
-                    type: 'hidden' // Hides the input field
-                  },
+                  className: 'd-none',
+                  templateOptions: { type: 'hidden' },
                   hooks: {
-                    onInit: (field: any) => {
-                      field.formControl.setValue('admin_update'); // Ensures value is always 'admin_update'
-                    }
+                    onInit: (field: any) => field.formControl.setValue('admin_update')
                   }
                 },
+
+                // Password and Re-password (show only when creating)
                 {
                   key: 'password',
                   type: 'text',
-                  className: 'ta-cell pr-md col-md-6 col-12',
-                  templateOptions: {
-                    type: 'password',
-                    label: 'Password',
-                    required: true
-                  },
-                  expressions: {
-                    hide: "(model.user_id)?true:false"
-                  },
-                  hooks: {
-                    onInit: (field: any) => {
-                      //field.templateOptions.options = this.cs.getRole();
-                    }
-                  }
+                  className: 'col-12 col-md-6',
+                  templateOptions: { type: 'password', label: 'Password', required: true },
+                  expressions: { hide: '(model.user_id)?true:false' }
                 },
                 {
                   key: 're_password',
                   type: 'text',
-                  className: 'ta-cell pr-md col-md-6 col-12',
-                  templateOptions: {
-                    type: 'password',
-                    label: 'Re Password',
-                    required: true
-                  },
-                  expressions: {
-                    hide: "(model.user_id)?true:false"
-                  },
-                  hooks: {
-                    onInit: (field: any) => {
-                      //field.templateOptions.options = this.cs.getRole();
-                    }
-                  }
+                  className: 'col-12 col-md-6',
+                  templateOptions: { type: 'password', label: 'Re Password', required: true },
+                  expressions: { hide: '(model.user_id)?true:false' }
                 }
               ]
             },
 
+            // RIGHT: avatar column (3 cols on md+, full width stacked on xs)
+            {
+              className: 'col-lg-3 col-md-3 col-12 p-3 d-flex',
+              fieldGroupClassName: 'w-100 align-items-start justify-content-center',
+              fieldGroup: [
+                {
+                  key: 'profile_picture_url',
+                  type: 'file',
+                  className: 'col-12 d-flex justify-content-center avatar-wrapper',
+                  props: {
+                    displayStyle: 'avatar',
+                    storeFolder: 'profile',
+                    label: 'Profile Pic',
+                    multiple: false,
+                    placeholder: 'Enter Profile Pic',
+                    required: true
+                  }
+                }
+              ]
+            }
           ]
         }
       ]
+
     }
   }
-  constructor(private taLocal: LocalStorageService) {}
+  constructor(private taLocal: LocalStorageService) { }
 
   ngOnInit(): void {
     const user = this.taLocal.getItem('user');
     if (user && user.user_id) {
-        // This component shows all users including the admin (logged in user)
-        // But prevents deletion of the logged in user and any user with Admin role
-        this.curdConfig.tableConfig.apiUrl = 'users/user';
-        // Uncomment the line below if you want to exclude the logged-in user from the list
+      // This component shows all users including the admin (logged in user)
+      // But prevents deletion of the logged in user and any user with Admin role
+      this.curdConfig.tableConfig.apiUrl = 'users/user';
+      // Uncomment the line below if you want to exclude the logged-in user from the list
       // this.curdConfig.tableConfig.apiUrl = `users/user?exclude_id=${user.user_id}`;
     }
   }

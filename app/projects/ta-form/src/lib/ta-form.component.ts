@@ -78,6 +78,10 @@ export class TaFormComponent implements OnInit {
     if (this.form.valid) {
       if (this.options.url) {
         this.isLoading = true;
+        
+        // Global fix: Extract IDs from nested objects before submission
+        this.options.model = this.extractNestedIds(this.options.model);
+        
         if (this.options.exParams && this.options.exParams.length > 0) {
           this.options.model = {
             ...this.options.model,
@@ -170,5 +174,67 @@ export class TaFormComponent implements OnInit {
         this.options.reset.resetFn();
       }
     }
+  }
+
+  /**
+   * Global helper to extract IDs from nested objects before form submission.
+   * This handles the common pattern where dropdowns bind to objects but API expects IDs.
+   * 
+   * For example:
+   * - product_group: { product_group_id: 'uuid', group_name: 'Bowls' } 
+   *   will set product_group_id: 'uuid'
+   * - ledger_account: { ledger_account_id: 'uuid', name: 'Account' }
+   *   will set ledger_account_id: 'uuid'
+   */
+  private extractNestedIds(data: any): any {
+    if (!data || typeof data !== 'object') return data;
+    
+    const result = Array.isArray(data) ? [...data] : { ...data };
+    
+    Object.keys(result).forEach(key => {
+      const value = result[key];
+      
+      // Skip null/undefined values
+      if (value === null || value === undefined) return;
+      
+      // If this key ends with _id and value is an object, extract the ID
+      if (key.endsWith('_id') && typeof value === 'object' && !Array.isArray(value)) {
+        // The value is an object but should be a UUID - extract the ID
+        // Look for a key in the object that matches this key name
+        if (value[key]) {
+          result[key] = value[key];
+        } else {
+          // Try to find any key ending with _id in the object
+          const idKey = Object.keys(value).find(k => k.endsWith('_id'));
+          if (idKey && value[idKey]) {
+            result[key] = value[idKey];
+          }
+        }
+      }
+      // If this is a non-_id object field, check for sibling _id field and sync
+      else if (typeof value === 'object' && !Array.isArray(value)) {
+        const idKey = key + '_id';
+        // Check if there's a sibling _id field OR if this object has an ID we should extract
+        if (result.hasOwnProperty(idKey) || value[idKey]) {
+          // Extract the ID from the nested object
+          const extractedId = value[idKey] || value[key + '_id'];
+          if (extractedId) {
+            result[idKey] = extractedId;
+          }
+        }
+        // Also check for special case: item_master_id for product_mode
+        if (key === 'product_mode' && value.item_master_id) {
+          result['product_mode_id'] = value.item_master_id;
+        }
+        // Recursively process nested objects
+        result[key] = this.extractNestedIds(value);
+      }
+      // If this is an array, process each item
+      else if (Array.isArray(value)) {
+        result[key] = value.map(item => this.extractNestedIds(item));
+      }
+    });
+    
+    return result;
   }
 }
