@@ -424,7 +424,7 @@ import { AssetCategoriesConfig, AssetStatusConfig, cityConfig, CountryConfig, cu
             templateOptions: {
               placeholder: '  Select Product Mode',
               label: ' Product Mode',
-              dataKey: 'product_mode_id',
+              dataKey: 'item_master_id',
               dataLabel: 'mode_name',
               required: false,
               curdConfig: productModesConfig  

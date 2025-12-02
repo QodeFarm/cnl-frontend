@@ -102,18 +102,7 @@ export const customerCudConfig: TaCurdConfig = {
             viewMode: false
         },
         showActionBtn: true,
-        exParams: [
-            {
-                key: 'customer_data.ledger_account_id',
-                type: 'script',
-                value: 'data.customer_data?.ledger_account?.ledger_account_id || data.customer_data?.ledger_account_id || null'
-            },
-            {
-                key: 'customer_data.customer_category_id',
-                type: 'script',
-                value: 'data.customer_data?.customer_category?.customer_category_id || data.customer_data?.customer_category_id || null'
-            }
-        ],
+        exParams: [],
         submit: {
             label: 'Submit',
             submittedFn: () => {
@@ -7563,13 +7552,7 @@ export const productsCrudConfig: TaCurdConfig = {
         // isEdit: false,
       },
       showActionBtn: true,
-      exParams: [
-        // {
-        //   key: 'products',
-        //   type: 'script',
-        //   value: 'data.products.map(m=> {m.pack_unit_id = m.pack_unit.stock_unit_id;  return m ;})'
-        // },
-      ],
+      exParams: [],
       submit: {
         label: 'Submit',
         submittedFn: () => {}
@@ -7604,7 +7587,7 @@ export const productsCrudConfig: TaCurdConfig = {
                       templateOptions: {
                         label: 'Product Mode',
                         placeholder: 'Select Product Mode',
-                        dataKey: 'product_mode_id',
+                        dataKey: 'item_master_id',
                         dataLabel: 'mode_name',
                         required: true,
                         options: [],
@@ -7893,7 +7876,7 @@ export const productsCrudConfig: TaCurdConfig = {
                             //   }
                             // },
                             {
-                              key: 'type_id',
+                              key: 'type',
                               type: 'productType-dropdown',
                               className: 'col-md-3 col-sm-6 col-12',
                               templateOptions: {
