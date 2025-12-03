@@ -7632,11 +7632,22 @@ export const productsCrudConfig: TaCurdConfig = {
                       },
                       hooks: {
                         onInit: (field: any) => {
-                          // this.http.get('masters/generate_order_no/?type=prd').subscribe((res: any) => {
-                          //   if (res && res.data && res.data?.order_number) {
-                          //     field.formControl.setValue(res.data?.order_number);
-                          //   }
-                          // });
+                          // Only auto-generate code for new products (not in edit mode)
+                          if (!field.model?.product_id) {
+                            let http: HttpClient;
+                            if (field.options?._injector) {
+                              http = field.options._injector.get(HttpClient);
+                            } else if (field.options?.injector) {
+                              http = field.options.injector.get(HttpClient);
+                            }
+                            if (http) {
+                              http.get('masters/generate_order_no/?type=prd').subscribe((res: any) => {
+                                if (res && res.data && res.data?.order_number) {
+                                  field.formControl.setValue(res.data?.order_number);
+                                }
+                              });
+                            }
+                          }
                         }
                       }
                     },
