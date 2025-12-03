@@ -47,6 +47,8 @@ export class DefaultInterceptor implements HttpInterceptor {
   private refreshToken$: BehaviorSubject<any> = new BehaviorSubject<any>(null);
   // Track requests that should skip error handling
   private skipErrorUrls = new Set<string>();
+  // Flag to prevent duplicate session expiration notifications
+  private isRedirectingToLogin = false;
 
   constructor(private injector: Injector, private siteConfig: SiteConfigService, private loadingS: LoadingService) {
     if (this.refreshTokenType === 'auth-refresh') {
@@ -269,6 +271,12 @@ export class DefaultInterceptor implements HttpInterceptor {
   // #endregion
 
   private toLogin(errorMsg?: any): void {
+    // Prevent duplicate notifications when multiple requests fail simultaneously
+    if (this.isRedirectingToLogin) {
+      return;
+    }
+    this.isRedirectingToLogin = true;
+    
     // Check if this is a login attempt by examining the URL in the error
     const isLoginAttempt = errorMsg?.url?.includes('users/login');
     
@@ -296,6 +304,11 @@ export class DefaultInterceptor implements HttpInterceptor {
     }
     
     this.goTo('/login');
+    
+    // Reset the flag after a short delay to allow future redirects
+    setTimeout(() => {
+      this.isRedirectingToLogin = false;
+    }, 1000);
   }
 
   private handleData(ev: HttpErrorResponse, req: HttpRequest<any>, next: HttpHandler): Observable<any> {
