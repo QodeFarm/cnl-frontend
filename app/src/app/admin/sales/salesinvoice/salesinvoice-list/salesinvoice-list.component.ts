@@ -20,13 +20,6 @@ export class SalesInvoiceListComponent implements OnInit {
   ngOnInit() {
     console.log('Sorting table columns by "created_at"...');
     
-    // this.tableConfig.cols.sort((a, b) => {
-    //   // Assuming 'created_at' is a field in the objects inside 'cols'
-    //   const dateA = new Date(a.created_at).getTime();
-    //   const dateB = new Date(b.created_at).getTime();
-      
-    //   return dateB - dateA; // Ascending order
-    // });
   }
   @Output('edit') edit = new EventEmitter<void>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
@@ -36,7 +29,7 @@ export class SalesInvoiceListComponent implements OnInit {
   };
 
 
-  selectedFormat: string; //CNL_Standard_Excl
+  selectedFormat: string = "CNL_Standard_Excl" //CNL_Standard_Excl
   pendingAction: 'email' | 'preview' | 'print' | null = null;
 
   // Show format selection popup
@@ -56,14 +49,14 @@ export class SalesInvoiceListComponent implements OnInit {
   proceedWithSelectedAction(): void {
     // this.closeFormatDialog();
 
-    // Inject format in request manually (monkey patch)
-    const originalPost = this.http.post.bind(this.http);
-    this.http.post = (url: string, body: any, options?: any) => {
-      if (typeof body === 'object' && body !== null && this.selectedFormat) {
-        body.format = this.selectedFormat;
-      }
-      return originalPost(url, body, options);
-    };
+    // // Inject format in request manually (monkey patch)
+    // const originalPost = this.http.post.bind(this.http);
+    // this.http.post = (url: string, body: any, options?: any) => {
+    //   if (typeof body === 'object' && body !== null && this.selectedFormat) {
+    //     body.format = this.selectedFormat;
+    //   }
+    //   return originalPost(url, body, options);
+    // };
 
     switch (this.pendingAction) {
       case 'email':
@@ -89,20 +82,6 @@ export class SalesInvoiceListComponent implements OnInit {
     }
 
     selectElement.value = '';
-
-    // switch (selectedValue) {
-    //   case 'email':
-    //     this.onMailLinkClick();
-    //     break;
-    //   case 'whatsapp':
-    //     break;
-    //   default:
-    //     // Handle default case (e.g., "Mail" selected)
-    //     break;
-    // }
-
-    // // Reset the dropdown to the default option
-    // selectElement.value = '';
   }
 
   showDialog() {
@@ -132,7 +111,7 @@ export class SalesInvoiceListComponent implements OnInit {
     }
 
     const saleInvoiceId = selectedIds[0]; // Assuming only one row can be selected
-    const payload = { flag: "email" };
+    const payload = { flag: "email", format: this.selectedFormat };
     const url = `masters/document_generator/${saleInvoiceId}/sale_invoice/`;
     this.http.post(url, payload).subscribe(
       (response) => {
@@ -162,31 +141,8 @@ export class SalesInvoiceListComponent implements OnInit {
 
     selectElement.value = '';
 
-    // switch (selectedValue) {
-    //     case 'preview':
-    //         this.onPreviewClick();
-    //         break;
-    //     case 'print':
-    //         this.onPrintClick();
-    //         break;
-    //     default:
-    //         // Handle default case
-    //         break;
-    // }
-
-    // // Reset the dropdown to the default option
-    // selectElement.value = '';
 }
 
-// onPreviewClick(): void {
-//     const selectedIds = this.taTableComponent.options.checkedRows;
-//     if (selectedIds.length === 0) {
-//         return this.showDialog();
-//     }
-    
-//     // Add your preview logic here
-//     console.log('Preview clicked for selected documents');
-// }
 
 onPreviewClick(): void {
   const selectedIds = this.taTableComponent.options.checkedRows;
@@ -201,7 +157,7 @@ onPreviewClick(): void {
   this.showLoading = true;
   
   // Send request with preview flag
-  this.http.post(url, { flag: 'preview' }, { responseType: 'blob' }).subscribe(
+  this.http.post(url, { flag: 'preview', format: this.selectedFormat }, { responseType: 'blob' }).subscribe(
       (pdfBlob: Blob) => {
           this.showLoading = false;
           this.refreshTable();
@@ -233,16 +189,6 @@ onPreviewClick(): void {
 // Add this property to your component class
 showLoading = false;
 
-// onPrintClick(): void {
-//     const selectedIds = this.taTableComponent.options.checkedRows;
-//     if (selectedIds.length === 0) {
-//         return this.showDialog();
-//     }
-    
-//     // Add your print logic here
-//     console.log('Print clicked for selected documents');
-// }
-
 onPrintClick(): void {
   const selectedIds = this.taTableComponent.options.checkedRows;
   if (selectedIds.length === 0) {
@@ -254,7 +200,7 @@ onPrintClick(): void {
   
   this.showLoading = true;
   
-  this.http.post(url, { flag: 'preview' }, { responseType: 'blob' }).subscribe(
+  this.http.post(url, { flag: 'preview', format: this.selectedFormat }, { responseType: 'blob' }).subscribe(
       (pdfBlob: Blob) => {
           this.showLoading = false;
           this.openAndPrintPdf(pdfBlob);
