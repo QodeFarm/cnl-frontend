@@ -96,7 +96,7 @@ export const customerCudConfig: TaCurdConfig = {
         ]
     },
     formConfig: {
-        // url: "customers/customers/",
+        url: "customers/customers/",
         title: 'Customer',
         formState: {
             viewMode: false
@@ -134,6 +134,7 @@ export const customerCudConfig: TaCurdConfig = {
                 fieldGroup: [
                     {
                         className: 'col-12 custom-form-card-block p-0',
+                        key: 'customer_data',
                         fieldGroupClassName: 'row m-0 pr-0 responsive-row',
                         fieldGroup: [
                             // Left Section (col-9 for form fields)
@@ -7335,12 +7336,12 @@ export const LocationsAssetConfig: TaCurdConfig = {
   }
 
 export const productsCrudConfig: TaCurdConfig = {
-    drawerSize: 500,
+    drawerSize: 600,
     drawerPlacement: 'top',
     tableConfig: {
       apiUrl: 'products/products/?summary=true',
       showCheckbox: false,
-      // title: 'Products',
+      title: 'Product',
       pkId: "product_id",
       hideFilters: true,
       fixedFilters: [
@@ -7544,19 +7545,14 @@ export const productsCrudConfig: TaCurdConfig = {
         ]
     }, 
     formConfig: {
-      // url: "products/products/",
+      title: 'Product',
+      url: "products/products/",
       formState: {
         viewMode: false,
         // isEdit: false,
       },
       showActionBtn: true,
-      exParams: [
-        // {
-        //   key: 'products',
-        //   type: 'script',
-        //   value: 'data.products.map(m=> {m.pack_unit_id = m.pack_unit.stock_unit_id;  return m ;})'
-        // },
-      ],
+      exParams: [],
       submit: {
         label: 'Submit',
         submittedFn: () => {}
@@ -7573,181 +7569,31 @@ export const productsCrudConfig: TaCurdConfig = {
       },
       fields: [
         {
+          className: 'w-100',
           fieldGroup: [
             {
-              className: 'col-12 custom-form-card-block p-0',
+              className: 'col-12 p-0',
               key: 'products',
-              fieldGroupClassName: 'row m-0 pr-0 responsive-row',
+              fieldGroupClassName: 'row m-0',
               fieldGroup: [
                 {
-                  className: 'col-sm-9 col-12 p-0',
-                  fieldGroupClassName: 'row m-0 p-0',
+                  className: 'col-lg-9 col-md-8 col-12 pe-md-3',
+                  fieldGroupClassName: 'row g-3',
                   fieldGroup: [
                     {
-                      className: 'col-md-4 col-sm-6 col-12',
-                      key: 'product_mode_id',
+                     className: 'col-md-4 col-sm-6 col-12',
+                      key: 'product_mode',
                       type: 'productModes-dropdown',
                       templateOptions: {
                         label: 'Product Mode',
                         placeholder: 'Select Product Mode',
+                        dataKey: 'item_master_id',
+                        dataLabel: 'mode_name',
                         required: true,
-                        options: []
-                      },
-                      
-                      hooks: {
-                        onInit: (field: any) => {
-                        //   // Load the dropdown data from the API
-                        //   this.http.get('products/item-master/').subscribe((response: any) => {
-                        //     if (response && response.data) {
-                        //       const options = response.data.map((item: any) => ({
-                        //         value: item.item_master_id,
-                        //         label: item.mode_name
-                        //       }));
-
-                        //       // Update the field's options
-                        //       field.templateOptions.options = options;
-
-                        //       // If in edit mode, select the current value
-                        //       if (this.ProductEditID && this.formConfig.model.products?.product_mode_id) {
-                        //         const currentId = this.formConfig.model.products.product_mode_id;
-                        //         const matchedOption = options.find((opt: any) => opt.value === currentId);
-                        //         if (matchedOption) {
-                        //           field.formControl.setValue(matchedOption.value);
-                        //         }
-                        //       }
-                        //     }
-                        //   });
-                        // },
-                        // onChanges: (field: any) => {
-                        //   if (field._subscription) {
-                        //     field._subscription.unsubscribe();
-                        //   }
-
-                        //   field._subscription = field.formControl.valueChanges.subscribe((data: any) => {
-                        //     if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
-                        //       // Store the selected product mode ID
-                        //       this.formConfig.model['products']['product_mode_id'] = data;
-                        //       console.log("Product Mode changed to:", data); // Added logging
-
-                        //        // Get the selected mode name for use in visibility conditions
-                        //             this.formConfig.model['products']['product_mode_id'] = data;
-        
-                        //         // Store the mode name for visibility conditions
-                        //         const selectedOption = field.templateOptions.options.find((option: any) => option.value === data);
-                        //         if (selectedOption) {
-                        //           this.selectedProductMode = selectedOption.label;
-                        //           console.log("Product Mode changed to:", selectedOption.label);
-                        //         }
-                            
-
-                        //       // Find the type field using a recursive search through all form fields
-                        //       const findFieldByKey = (fieldGroups: any[], key: string): any => {
-                        //         for (const fieldGroup of fieldGroups) {
-                        //           if (fieldGroup.key === key) return fieldGroup;
-
-                        //           if (fieldGroup.fieldGroup) {
-                        //             const found = findFieldByKey(fieldGroup.fieldGroup, key);
-                        //             if (found) return found;
-                        //           }
-
-                        //           if (fieldGroup.fieldArray && fieldGroup.fieldArray.fieldGroup) {
-                        //             const found = findFieldByKey(fieldGroup.fieldArray.fieldGroup, key);
-                        //             if (found) return found;
-                        //           }
-                        //         }
-                        //         return null;
-                        //       };
-
-                        //       // Find the type field in the form structure
-                        //       const typeField = findFieldByKey(this.formConfig.fields[0].fieldGroup, 'type_id');
-
-                        //       if (typeField && data) {
-                        //         console.log("Found Type field:", typeField);
-
-                        //         // Reset the Type field value
-                        //         typeField.formControl.setValue(null);
-
-                        //         // Enable the field if it was disabled
-                        //         typeField.templateOptions.disabled = false;
-
-                        //         // Find the selected Product Mode to get its name
-                        //         const selectedOption = field.templateOptions.options.find((option: any) => option.value === data);
-                        //         if (selectedOption) {
-                        //           console.log("Selected option:", selectedOption);
-
-                        //           const filterUrl = `masters/product_types/?mode_type=${encodeURIComponent(selectedOption.label)}`;
-                        //           console.log('Fetching type data from:', filterUrl);
-
-                        //           // Update the placeholder while loading
-                        //           typeField.templateOptions.placeholder = 'Loading types...';
-                        //           typeField.templateOptions = { ...typeField.templateOptions };
-
-                        //           // Directly fetch the filtered data
-                        //           this.http.get(filterUrl).subscribe(
-                        //             (response: any) => {
-                        //               console.log('API response for types:', response);
-
-                        //               let typeOptions = null;
-
-                        //               if (response && response.data && Array.isArray(response.data)) {
-                        //                 typeOptions = response.data;
-                        //               } else if (response && Array.isArray(response)) {
-                        //                 typeOptions = response;
-                        //               } else if (response && response.results && Array.isArray(response.results)) {
-                        //                 typeOptions = response.results;
-                        //               }
-
-                        //               if (typeOptions && typeOptions.length > 0) {
-                        //                 console.log(`Received ${typeOptions.length} type options`);
-
-                        //                 // Format options with simple value/label pairs like GST dropdown
-                        //                 const formattedOptions = typeOptions.map(item => ({
-                        //                   value: item.type_id, // Use just the ID as the value
-                        //                   label: item.type_name // Use the name as the label
-                        //                 }));
-
-                        //                 // Update the options
-                        //                 typeField.templateOptions.options = formattedOptions;
-                        //                 typeField.templateOptions.disabled = false;
-                        //                 typeField.templateOptions.placeholder = 'Select Type';
-                        //                 typeField.templateOptions = { ...typeField.templateOptions };
-                                        
-                        //                 // Find the "Finished Product" option
-                        //                 const finishedProductOption = formattedOptions.find(
-                        //                   (option: any) => option.label.toLowerCase() === 'finished product'
-                        //                 );
-                                        
-                        //                 if (finishedProductOption) {
-                        //                   // Set it as the default value
-                        //                   typeField.formControl.setValue(finishedProductOption.value);
-                                          
-                        //                   // Update the model
-                        //                   if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
-                        //                     this.formConfig.model['products']['type_id'] = finishedProductOption.value;
-                        //                     console.log("Default Type set to Finished Product:", finishedProductOption.value);
-                        //                   }
-                        //                 }
-                        //               } else {
-                        //                 typeField.templateOptions.options = [];
-                        //                 typeField.templateOptions.disabled = false;
-                        //                 typeField.templateOptions.placeholder = 'No types available';
-                        //                 typeField.templateOptions = { ...typeField.templateOptions };
-                        //               }
-                        //             },
-                        //             error => {
-                        //               console.error('Error fetching type options:', error);
-                        //               typeField.templateOptions.disabled = false;
-                        //               typeField.templateOptions.options = [];
-                        //               typeField.templateOptions.placeholder = 'Error loading types';
-                        //               typeField.templateOptions = { ...typeField.templateOptions };
-                        //             }
-                        //           );
-                        //         }
-                        //       }
-                        //     } else {
-                        //       console.error('Form config or product mode data model is not defined.');
-                        //     }
-                        //   });
+                        options: [],
+                        lazy: {
+                          url: 'products/item-master/',
+                          lazyOneTime: true
                         }
                       }
                     },
@@ -7786,11 +7632,22 @@ export const productsCrudConfig: TaCurdConfig = {
                       },
                       hooks: {
                         onInit: (field: any) => {
-                          // this.http.get('masters/generate_order_no/?type=prd').subscribe((res: any) => {
-                          //   if (res && res.data && res.data?.order_number) {
-                          //     field.formControl.setValue(res.data?.order_number);
-                          //   }
-                          // });
+                          // Only auto-generate code for new products (not in edit mode)
+                          if (!field.model?.product_id) {
+                            let http: HttpClient;
+                            if (field.options?._injector) {
+                              http = field.options._injector.get(HttpClient);
+                            } else if (field.options?.injector) {
+                              http = field.options.injector.get(HttpClient);
+                            }
+                            if (http) {
+                              http.get('masters/generate_order_no/?type=prd').subscribe((res: any) => {
+                                if (res && res.data && res.data?.order_number) {
+                                  field.formControl.setValue(res.data?.order_number);
+                                }
+                              });
+                            }
+                          }
                         }
                       }
                     },
@@ -7896,14 +7753,13 @@ export const productsCrudConfig: TaCurdConfig = {
                   ]
                 },
                 {
-                  className: 'col-sm-3 col-12 p-0',
-                  // key: 'products',
-                  fieldGroupClassName: "ant-row row mx-0 mt-2",
+                  className: 'col-lg-3 col-md-4 col-12 ps-md-3',
+                  fieldGroupClassName: "row m-0 justify-content-center",
                   fieldGroup: [
                     {
                       key: 'picture',
                       type: 'file',
-                      className: 'ta-cell pr-md col d-flex justify-content-md-center pr-0',
+                      className: 'col-12 text-center',
                       templateOptions: {
                         label: 'Picture',
                         required: false,
@@ -7930,12 +7786,12 @@ export const productsCrudConfig: TaCurdConfig = {
                         {
                           className: 'col-12 p-0',
                           key: 'products',
-                          fieldGroupClassName: "ant-row row align-items-end mt-3",
+                          fieldGroupClassName: "ant-row row m-0",
                           fieldGroup: [
                             {
                               key: 'category',
                               type: 'productCategories-dropdown',
-                              className: 'col-3',
+                              className: 'col-md-3 col-sm-6 col-12',
                               templateOptions: {
                                 label: 'Category',
                                 dataKey: 'category_id',
@@ -7979,7 +7835,7 @@ export const productsCrudConfig: TaCurdConfig = {
                             {
                               key: 'brand',
                               type: 'productBrands-dropdown',
-                              className: 'col-3',
+                              className: 'col-md-3 col-sm-6 col-12',
                               templateOptions: {
                                 label: 'Brand',
                                 dataKey: 'brand_id',
@@ -8031,9 +7887,9 @@ export const productsCrudConfig: TaCurdConfig = {
                             //   }
                             // },
                             {
-                              key: 'type_id',
+                              key: 'type',
                               type: 'productType-dropdown',
-                              className: 'col-3',
+                              className: 'col-md-3 col-sm-6 col-12',
                               templateOptions: {
                                 label: 'Type',
                                 dataKey: 'type_id',
@@ -8087,7 +7943,7 @@ export const productsCrudConfig: TaCurdConfig = {
                             {
                               key: 'unit_options',
                               type: 'productUnitOptions-dropdown',
-                              className: 'col-3',
+                              className: 'col-md-3 col-sm-6 col-12',
                               templateOptions: {
                                 label: 'Unit Options',
                                 dataKey: 'unit_options_id',
@@ -8151,7 +8007,7 @@ export const productsCrudConfig: TaCurdConfig = {
                             {
                               key: 'pack_unit',
                               type: 'packUnits-dropdown',
-                              className: 'col-3',
+                              className: 'col-md-3 col-sm-6 col-12',
                               templateOptions: {
                                 label: 'Pack Unit',
                                 dataKey: 'stock_unit_id',
@@ -8181,7 +8037,7 @@ export const productsCrudConfig: TaCurdConfig = {
                               },
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-md-3 col-sm-6 col-12',
                               key: 'pack_vs_stock',
                               type: 'input',
                               templateOptions: {
@@ -8198,7 +8054,7 @@ export const productsCrudConfig: TaCurdConfig = {
                             {
                               key: 'g_pack_unit',
                               type: 'GpackUnits-dropdown',
-                              className: 'col-3',
+                              className: 'col-md-3 col-sm-6 col-12',
                               templateOptions: {
                                 label: 'GPack Unit',
                                 dataKey: 'stock_unit_id',
@@ -8228,7 +8084,7 @@ export const productsCrudConfig: TaCurdConfig = {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-md-3 col-sm-6 col-12',
                               key: 'g_pack_vs_pack',
                               type: 'input',
                               templateOptions: {
@@ -8243,7 +8099,7 @@ export const productsCrudConfig: TaCurdConfig = {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-md-3 col-sm-6 col-12',
                               key: 'packet_barcode',
                               type: 'input',
                               templateOptions: {
@@ -8257,7 +8113,7 @@ export const productsCrudConfig: TaCurdConfig = {
                               }
                             },
                             {
-                              className: 'col-3',
+                              className: 'col-md-3 col-sm-6 col-12',
                               key: 'barcode',
                               type: 'input',
                               templateOptions: {
@@ -8267,7 +8123,7 @@ export const productsCrudConfig: TaCurdConfig = {
                               }
                             },
                             {
-                              className: 'col-3 d-flex align-items-center',
+                              className: 'col-md-3 col-sm-6 col-12 d-flex align-items-center',
                               key: 'print_barcode',
                               type: 'checkbox',
                               templateOptions: {
@@ -8298,14 +8154,17 @@ export const productsCrudConfig: TaCurdConfig = {
                             // title: 'Product Variations',
                             addText: 'Add New Variations',
                             tableCols: [
-                              { name: 'warehouse_location_id', label: 'Warehouse Location' },
+                              { name: 'size', label: 'Size' },
+                              { name: 'color', label: 'Color' },
+                              { name: 'sku', label: 'SKU' },
+                              { name: 'price', label: 'Price' },
                               { name: 'quantity', label: 'Quantity' },
                             ]
                           },
                           fieldArray: {
                             fieldGroup: [
                               {
-                                key: 'size_id',
+                                key: 'size',
                                 type: 'productSizes-dropdown',
                                 templateOptions: {
                                   label: 'Size',
@@ -8321,7 +8180,7 @@ export const productsCrudConfig: TaCurdConfig = {
                                 },
                               },
                               {
-                                key: 'color_id',
+                                key: 'color',
                                 type: 'productColors-dropdown',
                                 templateOptions: {
                                   label: 'Color',

@@ -47,6 +47,8 @@ export class DefaultInterceptor implements HttpInterceptor {
   private refreshToken$: BehaviorSubject<any> = new BehaviorSubject<any>(null);
   // Track requests that should skip error handling
   private skipErrorUrls = new Set<string>();
+  // Flag to prevent duplicate session expiration notifications
+  private isRedirectingToLogin = false;
 
   constructor(private injector: Injector, private siteConfig: SiteConfigService, private loadingS: LoadingService) {
     if (this.refreshTokenType === 'auth-refresh') {
@@ -269,8 +271,18 @@ export class DefaultInterceptor implements HttpInterceptor {
   // #endregion
 
   private toLogin(errorMsg?: any): void {
+    // Prevent duplicate notifications when multiple requests fail simultaneously
+    if (this.isRedirectingToLogin) {
+      return;
+    }
+    this.isRedirectingToLogin = true;
+    
     // Check if this is a login attempt by examining the URL in the error
     const isLoginAttempt = errorMsg?.url?.includes('users/login');
+    
+    // Check if token expired
+    const isTokenExpired = errorMsg?.error?.code === 'token_not_valid' ||
+                           (errorMsg?.error?.messages && errorMsg.error.messages.some((m: any) => m.message?.includes('expired')));
     
     // Clear user data from storage
     localStorage.removeItem('user');
@@ -280,13 +292,23 @@ export class DefaultInterceptor implements HttpInterceptor {
     // For login attempts, the form component will handle the error display
     if (!isLoginAttempt) {
       let msg = 'Not logged in or login has expired, please log in again.';
-      if (errorMsg && errorMsg.error && errorMsg.error.message) {
+      
+      // Show specific message for token expiration
+      if (isTokenExpired) {
+        msg = 'Your session has expired. Please log in again.';
+      } else if (errorMsg && errorMsg.error && errorMsg.error.message) {
         msg = errorMsg.error.message;
       }
-      this.notification.error(msg, ``);
+      
+      this.notification.error('Session Expired', msg);
     }
     
     this.goTo('/login');
+    
+    // Reset the flag after a short delay to allow future redirects
+    setTimeout(() => {
+      this.isRedirectingToLogin = false;
+    }, 1000);
   }
 
   private handleData(ev: HttpErrorResponse, req: HttpRequest<any>, next: HttpHandler): Observable<any> {
@@ -294,6 +316,17 @@ export class DefaultInterceptor implements HttpInterceptor {
     
     // Check if this request URL is in our skip list
     const skipErrorHandling = req.url && this.skipErrorUrls.has(req.url);
+    
+    // Check if token is expired (can come as 401 or 403 with token_not_valid code)
+    const isTokenExpired = ev.error?.code === 'token_not_valid' || 
+                           ev.error?.detail?.includes('token') ||
+                           (ev.error?.messages && ev.error.messages.some((m: any) => m.message?.includes('expired')));
+    
+    // If token is expired, redirect to login
+    if (isTokenExpired) {
+      this.toLogin(ev);
+      return throwError(() => ev);
+    }
     
     // Only call checkStatus if we're not skipping error handling
     if (!skipErrorHandling) {
@@ -330,6 +363,12 @@ export class DefaultInterceptor implements HttpInterceptor {
         this.toLogin(ev);
         break;
       case 403:
+        // Check if 403 is due to expired token
+        if (isTokenExpired) {
+          this.toLogin(ev);
+        }
+        // this.goTo(`/exception/${ev.status}`);
+        break;
       case 404:
       case 500:
         // this.goTo(`/exception/${ev.status}`);

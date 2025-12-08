@@ -361,13 +361,13 @@ private fallbackPrint(pdfBlob: Blob): void {
           name: "Action",
           type: 'action',
           actions: [
-            // {
-            //   type: 'delete',
-            //   label: 'Delete',
-            //   confirm: true,
-            //   confirmMsg: "Sure to delete?",
-            //   apiUrl: 'purchase/purchase_invoice_order'
-            // },
+            {
+              type: 'delete',
+              label: 'Delete',
+              confirm: true,
+              confirmMsg: "Sure to delete?",
+              apiUrl: 'purchase/purchase_invoice_order'
+            },
             // {
             //   type: 'restore',
             //   label: 'Restore',
