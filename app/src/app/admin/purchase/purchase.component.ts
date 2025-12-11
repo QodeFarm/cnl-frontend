@@ -394,6 +394,29 @@ export class PurchaseComponent {
             return acc;
           }, {});
         }
+
+        // ---------------------------------------------------
+        //  ENSURE PURCHASE ORDER ALWAYS HAS 5 ITEM ROWS 
+        // ---------------------------------------------------
+        let items = res.data.purchase_order_items ?? [];
+
+        // fill existing rows first, then make sure total is 5
+        while (items.length < 5) {
+          items.push({
+            sale_order_item_id: null,
+            product_id: null,
+            unit_options_id: null,
+            quantity: null,
+            rate: null,
+            amount: null
+          });
+        }
+
+        // assign back to form model
+        this.formConfig.model['purchase_order_items'] = items;
+
+        // finally show form
+        this.showForm = true;
       }
 
       this.totalAmountCal(); 
@@ -872,6 +895,22 @@ loadQuickpackProducts() {
       custom_field_values: customFieldsPayload.custom_field_values // Array of dictionaries
     };
 
+    //  FIX COLOR + SIZE ISSUE HERE
+    if (payload.purchase_order_items && Array.isArray(payload.purchase_order_items)) {
+      payload.purchase_order_items = payload.purchase_order_items.map(item => {
+
+        if (item.color && typeof item.color === 'object') {
+          item.color_id = item.color.color_id || null;
+        }
+
+        if (item.size && typeof item.size === 'object') {
+          item.size_id = item.size.size_id || null;
+        }
+
+        return item;
+      });
+    }
+
     // Define logic here for updating the sale order without modal pop-up
     // console.log("Updating sale order:", this.formConfig.model);
     this.http.put(`purchase/purchase_order/${this.PurchaseOrderEditID}/`, payload)
@@ -935,7 +974,7 @@ loadQuickpackProducts() {
       },
       model: {
         purchase_order_data: {},
-        purchase_order_items: [{}],
+        purchase_order_items: [{}, {}, {}, {}, {}],
         order_attachments: [],
         order_shipments: {},
         custom_field_values: []
@@ -1372,7 +1411,7 @@ loadQuickpackProducts() {
                   dataLabel: 'name',
                   placeholder: 'product',
                   options: [],
-                  required: true,
+                  required: false,
                   lazy: {
                     url: 'products/products/?summary=true',
                     lazyOneTime: true
@@ -1586,37 +1625,7 @@ loadQuickpackProducts() {
                     }
                   }
                 }
-              },
-              // {
-              //   type: 'input',
-              //   key: 'code',
-              //   templateOptions: {
-              //     label: 'Code',
-              //     placeholder: 'code',
-              //     hideLabel: true,
-              //   },
-              //   hooks: {
-              //     onInit: (field: any) => {
-              //       const parentArray = field.parent;
-              
-              //       // Check if parentArray exists and proceed
-              //       if (parentArray) {
-              //         const currentRowIndex = +parentArray.key; // Simplified number conversion
-              
-              //         // Check if there is a product already selected in this row (when data is copied)
-              //         if (this.dataToPopulate && this.dataToPopulate.purchase_order_items.length > currentRowIndex) {
-              //           const existingCode = this.dataToPopulate.purchase_order_items[currentRowIndex].product?.code;
-                        
-              //           // Set the full product object instead of just the product_id
-              //           if (existingCode) {
-              //             field.formControl.setValue(existingCode); // Set full product object (not just product_id)
-              //           }
-              //         }
-              //       }
-              //     }
-              //   }
-              // },
-             
+              },             
               {
                 type: 'input',
                 key: 'quantity',
@@ -1627,7 +1636,7 @@ loadQuickpackProducts() {
                   placeholder: 'Qty',
                   min: 1,
                   hideLabel: true,
-                  required: true
+                  required: false,
                 },
                 hooks: {
                   onInit: (field: any) => {
@@ -1802,7 +1811,7 @@ loadQuickpackProducts() {
                   dataLabel: 'unit_name',
                   dataKey: 'unit_options_id',
                   bindId: true,
-                  required: true,
+                  required: false,
                   lazy: {
                     url: 'masters/unit_options',
                     lazyOneTime: true

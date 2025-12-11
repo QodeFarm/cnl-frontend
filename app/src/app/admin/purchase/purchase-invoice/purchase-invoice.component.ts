@@ -373,7 +373,30 @@ export class PurchaseInvoiceComponent {
             acc[fieldValue.custom_field_id] = fieldValue.field_value; // Map custom_field_id to the corresponding value
             return acc;
           }, {});
-        }        
+        } 
+        
+        // ---------------------------------------------------
+        //  ENSURE PURCHASE INVOICE ORDER ALWAYS HAS 5 ITEM ROWS 
+        // ---------------------------------------------------
+        let items = res.data.purchase_invoice_items ?? [];
+
+        // fill existing rows first, then make sure total is 5
+        while (items.length < 5) {
+          items.push({
+            sale_order_item_id: null,
+            product_id: null,
+            unit_options_id: null,
+            quantity: null,
+            rate: null,
+            amount: null
+          });
+        }
+
+        // assign back to form model
+        this.formConfig.model['purchase_invoice_items'] = items;
+
+        // finally show form
+        this.showForm = true;
       }
     });
     this.hide();
@@ -549,6 +572,22 @@ loadQuickpackProducts() {
       custom_field_values: customFieldsPayload.custom_field_values // Array of dictionaries
     };
 
+    //  FIX COLOR + SIZE ISSUE HERE
+    if (payload.purchase_invoice_items && Array.isArray(payload.purchase_invoice_items)) {
+      payload.purchase_invoice_items = payload.purchase_invoice_items.map(item => {
+
+        if (item.color && typeof item.color === 'object') {
+          item.color_id = item.color.color_id || null;
+        }
+
+        if (item.size && typeof item.size === 'object') {
+          item.size_id = item.size.size_id || null;
+        }
+
+        return item;
+      });
+    }
+
     // Define logic here for updating the sale order without modal pop-up
     // console.log("Updating sale order:", this.formConfig.model);
     this.http.put(`purchase/purchase_invoice_order/${this.PurchaseInvoiceEditID}/`, payload)
@@ -611,7 +650,7 @@ loadQuickpackProducts() {
       },
       model: {
         purchase_invoice_orders: {},
-        purchase_invoice_items: [{}],
+        purchase_invoice_items: [{}, {}, {}, {}, {}],
         order_attachments: [],
         order_shipments: {},
         custom_field_values: []
@@ -1050,7 +1089,7 @@ loadQuickpackProducts() {
                   dataLabel: 'name',
                   placeholder: 'product',
                   options: [],
-                  required: true,
+                  required: false,
                   lazy: {
                     url: 'products/products/?summary=true',
                     lazyOneTime: true
@@ -1306,7 +1345,7 @@ loadQuickpackProducts() {
                   placeholder: 'Qty',
                   min: 1,
                   hideLabel: true,
-                  required: true
+                  required: false,
                 },
                 hooks: {
                   onInit: (field: any) => {
@@ -1474,7 +1513,7 @@ loadQuickpackProducts() {
                   dataLabel: 'unit_name',
                   dataKey: 'unit_options_id',
                   bindId: true,
-                  required: true,
+                  required: false,
                   lazy: {
                     url: 'masters/unit_options',
                     lazyOneTime: true

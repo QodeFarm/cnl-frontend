@@ -662,97 +662,116 @@ openDocPreview() {
   //   return this.http.post('sales/sale_invoice_order/', invoiceData);
   // }
 
-  editSaleOrder(event) {
-    this.SaleOrderEditID = event;
-    console.log("event : ", event);
-    this.showForm = false;
-    this.http.get('sales/sale_order/' + event).subscribe((res: any) => {
-      if (res && res.data) {
+  // editSaleOrder(event) {
+  //   this.SaleOrderEditID = event;
+  //   console.log("event : ", event);
+  //   this.showForm = false;
+  //   this.http.get('sales/sale_order/' + event).subscribe((res: any) => {
+  //     if (res && res.data) {
 
-        this.formConfig.model = res.data;
-        // set sale_order default value
-        this.formConfig.model['sale_order']['order_type'] = 'sale_order';
-        // set labels for update
-        // show form after setting form values
-        this.formConfig.pkId = 'sale_order_id';
-        this.formConfig.model['flow_status'] = res.data.sale_order.flow_status;
-        this.formConfig.model['tax_amount'] = res.data.sale_order.tax_amount;
-        this.formConfig.submit.label = 'Update';
-        this.formConfig.model['sale_order_id'] = this.SaleOrderEditID;
+  //       this.formConfig.model = res.data;
+  //       // set sale_order default value
+  //       this.formConfig.model['sale_order']['order_type'] = 'sale_order';
+  //       // set labels for update
+  //       // show form after setting form values
+  //       this.formConfig.pkId = 'sale_order_id';
+  //       this.formConfig.model['flow_status'] = res.data.sale_order.flow_status;
+  //       this.formConfig.model['tax_amount'] = res.data.sale_order.tax_amount;
+  //       this.formConfig.submit.label = 'Update';
+  //       this.formConfig.model['sale_order_id'] = this.SaleOrderEditID;
         
-        this.formConfig.fields[0].fieldGroup[0].fieldGroup[8].hide = false;
-        this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = false;
-        this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide = true;
+  //       this.formConfig.fields[0].fieldGroup[0].fieldGroup[8].hide = false;
+  //       this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = false;
+  //       this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide = true;
 
-        // Ensure custom_field_values are correctly populated in the model
-        // --- Custom Fields Handling ---
-        if (res.data.custom_field_values && Array.isArray(res.data.custom_field_values)) {
-          console.log("We are in the custom field values...")
-          console.log('Custom fields data : ', res.data.custom_field_values);
-          // Map API array to a form-friendly object
-          this.formConfig.model['custom_field_values'] = res.data.custom_field_values.reduce((acc: any, cf: any) => {
-            acc[cf.custom_field_id] = cf.field_value;
-            return acc;
-          }, {});
-        }
+  //       // Ensure custom_field_values are correctly populated in the model
+  //       // --- Custom Fields Handling ---
+  //       if (res.data.custom_field_values && Array.isArray(res.data.custom_field_values)) {
+  //         console.log("We are in the custom field values...")
+  //         console.log('Custom fields data : ', res.data.custom_field_values);
+  //         // Map API array to a form-friendly object
+  //         this.formConfig.model['custom_field_values'] = res.data.custom_field_values.reduce((acc: any, cf: any) => {
+  //           acc[cf.custom_field_id] = cf.field_value;
+  //           return acc;
+  //         }, {});
+  //       }
 
-        this.showForm = true;
-      }
+  //       this.showForm = true;
+  //     }
 
       
 
-      this.totalAmountCal();
-    });
-    this.hide();
-  }
-
-
-  // Function to get a new order number and a shipping tracking number
-  // getOrderNo() {
-  //   this.orderNumber = null;
-  //   this.shippingTrackingNumber = null; // Separate variable for Shipping Tracking No.
-
-  //   // Generate Shipping Tracking Number
-  //   this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
-  //     if (res && res.data && res.data.order_number) {
-  //       this.shippingTrackingNumber = res.data.order_number;
-  //       this.formConfig.model['order_shipments']['shipping_tracking_no'] = this.shippingTrackingNumber;
-
-  //       // Generate Sales Order Number
-  //       this.http.get('masters/generate_order_no/?type=SO').subscribe((res: any) => {
-  //         if (res && res.data && res.data.order_number) {
-  //           this.orderNumber = res.data.order_number;
-  //           this.formConfig.model['sale_order']['order_no'] = this.orderNumber;
-  //         }
-  //       });
-  //     }
+  //     this.totalAmountCal();
   //   });
+  //   this.hide();
   // }
 
-  // getOrderNo() {
-  //   this.orderNumber = null;
-  //   this.shippingTrackingNumber = null;
+editSaleOrder(event) {
+  this.SaleOrderEditID = event;
+  console.log("event : ", event);
+  this.showForm = false;
 
-  //   const saleTypeName = this.formConfig.model['sale_order']?.sale_type_id?.name || '';
-  //   const orderPrefix = saleTypeName.toLowerCase() === 'Other' ? 'SOO' : 'SO';
+  this.http.get('sales/sale_order/' + event).subscribe((res: any) => {
+    if (res && res.data) {
 
-  //   // Get Shipping Tracking Number
-  //   this.http.get('masters/generate_order_no/?type=SHIP').subscribe((shipRes: any) => {
-  //     if (shipRes?.data?.order_number) {
-  //       this.shippingTrackingNumber = shipRes.data.order_number;
-  //       this.formConfig.model['order_shipments']['shipping_tracking_no'] = this.shippingTrackingNumber;
+      this.formConfig.model = res.data;
 
-  //       // Get Sales Order Number
-  //       this.http.get(`masters/generate_order_no/?type=${orderPrefix}`).subscribe((orderRes: any) => {
-  //         if (orderRes?.data?.order_number) {
-  //           this.orderNumber = orderRes.data.order_number;
-  //           this.formConfig.model['sale_order']['order_no'] = this.orderNumber;
-  //         }
-  //       });
-  //     }
-  //   });
-  // }
+      // set sale_order default value
+      this.formConfig.model['sale_order']['order_type'] = 'sale_order';
 
+      // set labels for update
+      this.formConfig.pkId = 'sale_order_id';
+      this.formConfig.model['flow_status'] = res.data.sale_order.flow_status;
+      this.formConfig.model['tax_amount'] = res.data.sale_order.tax_amount;
+      this.formConfig.submit.label = 'Update';
+      this.formConfig.model['sale_order_id'] = this.SaleOrderEditID;
+
+      // Show/Hide based on update
+      this.formConfig.fields[0].fieldGroup[0].fieldGroup[8].hide = false;
+      this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = false;
+      this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide = true;
+
+      // -------------------------------
+      // CUSTOM FIELD VALUES HANDLING
+      // -------------------------------
+      if (res.data.custom_field_values && Array.isArray(res.data.custom_field_values)) {
+        this.formConfig.model['custom_field_values'] =
+          res.data.custom_field_values.reduce((acc: any, cf: any) => {
+            acc[cf.custom_field_id] = cf.field_value;
+            return acc;
+          }, {});
+      }
+
+      // ---------------------------------------------------
+      //  ENSURE SALE ORDER ALWAYS HAS 5 ITEM ROWS 
+      // ---------------------------------------------------
+      let items = res.data.sale_order_items ?? [];
+
+      // fill existing rows first, then make sure total is 5
+      while (items.length < 5) {
+        items.push({
+          sale_order_item_id: null,
+          product_id: null,
+          unit_options_id: null,
+          color_id: null,
+          quantity: null,
+          rate: null,
+          amount: null
+        });
+      }
+
+      // assign back to form model
+      this.formConfig.model['sale_order_items'] = items;
+
+      // finally show form
+      this.showForm = true;
+    }
+
+    this.totalAmountCal();
+  });
+
+  this.hide();
+}
   getOrderNo() {
     this.orderNumber = null;
     this.shippingTrackingNumber = null;
@@ -1340,69 +1359,124 @@ createSaleOrder() {
   }
 
   // Update method specifically for edit actions
-  updateSaleOrder() {
-    const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
+  // updateSaleOrder() {
+  //   const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
 
-    console.log("customFieldValues : ", customFieldValues);
+  //   console.log("customFieldValues : ", customFieldValues);
 
-    const saleType = this.formConfig.model.sale_order?.sale_type;
-    const orderStatus = this.formConfig.model.sale_order?.order_status;
+  //   const saleType = this.formConfig.model.sale_order?.sale_type;
+  //   const orderStatus = this.formConfig.model.sale_order?.order_status;
 
-    // Determine the entity type and ID dynamically
-    const entityName = 'sale_order'; // Since we're in the Sale Order form
-    const customId = this.formConfig.model.sale_order?.sale_order_id || null; // Ensure correct sale_order_id
-    console.log("customId : ", customId);
+  //   // Determine the entity type and ID dynamically
+  //   const entityName = 'sale_order'; // Since we're in the Sale Order form
+  //   const customId = this.formConfig.model.sale_order?.sale_order_id || null; // Ensure correct sale_order_id
+  //   console.log("customId : ", customId);
 
-    // Find entity record from list
-    const entity = this.entitiesList.find(e => e.entity_name === entityName);
+  //   // Find entity record from list
+  //   const entity = this.entitiesList.find(e => e.entity_name === entityName);
 
-    console.log("entity : ", entity);
+  //   console.log("entity : ", entity);
 
-    if (!entity) {
-      console.error(`Entity not found for: ${entityName}`);
-      return;
-    }
+  //   if (!entity) {
+  //     console.error(`Entity not found for: ${entityName}`);
+  //     return;
+  //   }
 
-    const entityId = entity.entity_id;
-    // Inject entity_id into metadata temporarily
-    Object.keys(this.customFieldMetadata).forEach((key) => {
-      this.customFieldMetadata[key].entity_id = entityId;
+  //   const entityId = entity.entity_id;
+  //   // Inject entity_id into metadata temporarily
+  //   Object.keys(this.customFieldMetadata).forEach((key) => {
+  //     this.customFieldMetadata[key].entity_id = entityId;
+  //   });
+  //   // Construct payload for custom fields
+  //   const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
+
+  //   console.log("customFieldsPayload : ", customFieldsPayload);
+  //   // Construct the final payload for update
+  //   const payload = {
+  //     ...this.formConfig.model,
+  //     custom_field_values: customFieldsPayload.custom_field_values // Array of dictionaries
+  //   };
+
+  //   // if (!payload) {
+  //   //   this.showDialog(); // Stop execution if required fields are missing
+  //   // }
+
+  //   // Define logic here for updating the sale order without modal pop-up
+  //   console.log("Updating sale order:", this.formConfig.model);
+  //   this.http.put(`sales/sale_order/${this.SaleOrderEditID}/`, payload)
+  //     .subscribe(response => {
+  //       this.showSuccessToast = true;
+  //       this.toastMessage = "Record updated successfully"; // Set the toast message for update
+  //       this.ngOnInit();
+  //       setTimeout(() => {
+  //         this.showSuccessToast = false;
+  //       }, 3000);
+
+  //     }, error => {
+  //       console.error('Error updating record:', error);
+
+  //       const errorMessage = error?.error?.message || '';
+  //       if (errorMessage === "Update is not allowed, please contact Product team.") {
+  //         // Re-run ngOnInit when this specific error occurs
+  //         this.ngOnInit();
+  //       }
+  //     });
+  // }
+
+updateSaleOrder() {
+
+  const customFieldValues = this.formConfig.model['custom_field_values'];
+  const saleType = this.formConfig.model.sale_order?.sale_type;
+
+  const entityName = 'sale_order';
+  const customId = this.formConfig.model.sale_order?.sale_order_id || null;
+
+  const entity = this.entitiesList.find(e => e.entity_name === entityName);
+  const entityId = entity.entity_id;
+
+  Object.keys(this.customFieldMetadata).forEach((key) => {
+    this.customFieldMetadata[key].entity_id = entityId;
+  });
+
+  const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
+
+  const payload = {
+    ...this.formConfig.model,
+    custom_field_values: customFieldsPayload.custom_field_values
+  };
+
+  //  FIX COLOR + SIZE ISSUE HERE
+  if (payload.sale_order_items && Array.isArray(payload.sale_order_items)) {
+    payload.sale_order_items = payload.sale_order_items.map(item => {
+
+      if (item.color && typeof item.color === 'object') {
+        item.color_id = item.color.color_id || null;
+      }
+
+      if (item.size && typeof item.size === 'object') {
+        item.size_id = item.size.size_id || null;
+      }
+
+      return item;
     });
-    // Construct payload for custom fields
-    const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
-
-    console.log("customFieldsPayload : ", customFieldsPayload);
-    // Construct the final payload for update
-    const payload = {
-      ...this.formConfig.model,
-      custom_field_values: customFieldsPayload.custom_field_values // Array of dictionaries
-    };
-
-    // if (!payload) {
-    //   this.showDialog(); // Stop execution if required fields are missing
-    // }
-
-    // Define logic here for updating the sale order without modal pop-up
-    console.log("Updating sale order:", this.formConfig.model);
-    this.http.put(`sales/sale_order/${this.SaleOrderEditID}/`, payload)
-      .subscribe(response => {
-        this.showSuccessToast = true;
-        this.toastMessage = "Record updated successfully"; // Set the toast message for update
-        this.ngOnInit();
-        setTimeout(() => {
-          this.showSuccessToast = false;
-        }, 3000);
-
-      }, error => {
-        console.error('Error updating record:', error);
-
-        const errorMessage = error?.error?.message || '';
-        if (errorMessage === "Update is not allowed, please contact Product team.") {
-          // Re-run ngOnInit when this specific error occurs
-          this.ngOnInit();
-        }
-      });
   }
+
+  console.log("Final Payload Before Update:", payload);
+
+  this.http.put(`sales/sale_order/${this.SaleOrderEditID}/`, payload)
+    .subscribe(response => {
+      this.showSuccessToast = true;
+      this.toastMessage = "Record updated successfully";
+      this.ngOnInit();
+      setTimeout(() => this.showSuccessToast = false, 3000);
+    }, error => {
+      console.error('Error updating record:', error);
+      if (error?.error?.message === "Update is not allowed, please contact Product team.") {
+        this.ngOnInit();
+      }
+    });
+}
+
 
   // Function to open Amount Exceed modal
   openAmountModal(total_amount: number, max_limit: number) {
@@ -2652,7 +2726,7 @@ getUnitData(unitInfo) {
       },
       model: {
         sale_order: {},
-        sale_order_items: [{}],
+        sale_order_items: [{}, {}, {}, {}, {}],
         order_attachments: [],
         order_shipments: {},
         custom_field_values: []
@@ -3103,6 +3177,7 @@ getUnitData(unitInfo) {
                                   tax: saleOrder.tax || 'Inclusive',
                                   remarks: saleOrder.remarks,
                                   advance_amount: saleOrder.advance_amount || '0',
+                                  tax_amount: saleOrder.tax_amount || '0',
                                   item_value: saleOrder.item_value,
                                   discount: saleOrder.discount,
                                   dis_amt: saleOrder.dis_amt,
@@ -3130,9 +3205,11 @@ getUnitData(unitInfo) {
                                   ...(billType == 'OTHERS' && { invoice_no: this.invoiceNumber })
                                 },
                                 // sale_invoice_items: saleOrderItems,
-                                sale_invoice_items: saleOrderItems.map(item => ({
-                                  ...item,
-                                  discount: item.discount
+                                sale_invoice_items: saleOrderItems
+                                  .filter(item => item.product_id)   // only keep valid rows
+                                  .map(item => ({
+                                    ...item,
+                                    discount: item.discount
                                 })),
                                 order_attachments: orderAttachments,
                                 order_shipments: orderShipments
@@ -3397,7 +3474,7 @@ getUnitData(unitInfo) {
                   dataLabel: 'name',
                   placeholder: 'Product',
                   options: [],
-                  required: true,
+                  required: false,
                   lazy: {
                     url: 'products/products/?summary=true',
                     lazyOneTime: true
@@ -3551,6 +3628,8 @@ getUnitData(unitInfo) {
                       field.formControl.setValue(saleOrderItems.color);
                     }
 
+                    console.log("color data : ", saleOrderItems?.color )
+
                     // Subscribe to value changes & avoid unnecessary API calls
                     field.formControl.valueChanges.subscribe((selectedColor: any) => {
                       if (!row.product?.product_id) {
@@ -3654,7 +3733,7 @@ getUnitData(unitInfo) {
                   placeholder: 'Qty',
                   min: 1,
                   hideLabel: true,
-                  required: true
+                  required: false
                 },
                 hooks: {
                   onInit: (field: any) => {
@@ -3768,50 +3847,6 @@ getUnitData(unitInfo) {
                   }
                 }
               },
-
-              // {
-              //   type: 'input',
-              //   key: 'discount',
-              //   templateOptions: {
-              //     type: 'number',
-              //     placeholder: 'Enter Disc',
-              //     label: 'Discount (%)',
-              //     hideLabel: true,
-              //   },
-              //   hooks: {
-              //     onInit: (field: any) => {
-              //       const parentArray = field.parent;
-
-              //       // Check if parentArray exists and proceed
-              //       if (parentArray) {
-              //         const currentRowIndex = +parentArray.key; // Simplified number conversion
-
-              //         // Check if there is a product already selected in this row (when data is copied)
-              //         if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
-              //           const existingDisc = this.dataToPopulate.sale_order_items[currentRowIndex].discount;
-
-              //           // Set the full product object instead of just the product_id
-              //           if (existingDisc) {
-              //             field.formControl.setValue(existingDisc); // Set full product object (not just product_id)
-              //           }
-              //         }
-              //       }
-              //       // Subscribe to discount value changes
-              //       field.formControl.valueChanges.subscribe(discount => {
-              //         this.totalAmountCal();
-              //         // if (field.form && field.form.controls) {
-              //         //   const quantity = field.form.controls.quantity?.value || 0;
-              //         //   const rate = field.form.controls.rate?.value || 0;
-              //         //   const discountValue = discount || 0;
-
-              //         //   if (quantity && rate) {
-              //         //     field.form.controls.amount.setValue((parseFloat(rate) * parseFloat(quantity)) - parseFloat(discountValue));
-              //         //   }
-              //         // }
-              //       });
-              //     }
-              //   }
-              // },
               {
                 type: 'input',
                 key: 'amount',
@@ -3895,7 +3930,7 @@ getUnitData(unitInfo) {
                   dataLabel: 'unit_name',
                   dataKey: 'unit_options_id',
                   bindId: true,
-                  required: true,
+                  required: false,
                   lazy: {
                     url: 'masters/unit_options',
                     lazyOneTime: true
