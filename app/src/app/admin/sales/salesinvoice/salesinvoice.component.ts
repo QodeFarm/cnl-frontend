@@ -456,6 +456,31 @@ async autoFillProductDetails(field, data) {
             return acc;
           }, {});
         }
+
+        // ---------------------------------------------------
+        //  ENSURE SALE INVOCIE ORDER ALWAYS HAS 5 ITEM ROWS 
+        // ---------------------------------------------------
+        let items = res.data.sale_invoice_items ?? [];
+
+        // fill existing rows first, then make sure total is 5
+        while (items.length < 5) {
+          items.push({
+            sale_order_item_id: null,
+            product_id: null,
+            unit_options_id: null,
+            size_id: null,
+            color_id: null,
+            quantity: null,
+            rate: null,
+            amount: null
+          });
+        }
+
+        // assign back to form model
+        this.formConfig.model['sale_invoice_items'] = items;
+
+        // finally show form
+        this.showForm = true;
       }
     });
     this.hide();
@@ -1135,6 +1160,24 @@ createSaleInovice() {
       custom_field_values: customFieldsPayload.custom_field_values // Array of dictionaries
     };
 
+    //  FIX COLOR + SIZE ISSUE HERE
+    if (payload.sale_invoice_items && Array.isArray(payload.sale_invoice_items)) {
+      payload.sale_invoice_items = payload.sale_invoice_items.map(item => {
+
+        if (item.color && typeof item.color === 'object') {
+          item.color_id = item.color.color_id || null;
+        }
+
+        if (item.size && typeof item.size === 'object') {
+          item.size_id = item.size.size_id || null;
+        }
+
+        return item;
+      });
+    }
+
+    console.log("Final Payload Before Update:", payload);
+
     // Define logic here for updating the sale order without modal pop-up
     // console.log("Updating sale order:", this.formConfig.model);
     this.http.put(`sales/sale_invoice_order/${this.SaleInvoiceEditID}/`, payload)
@@ -1210,7 +1253,7 @@ createSaleInovice() {
         sale_invoice_order: {
           // customer_id: null,
         },
-        sale_invoice_items: [{}],
+        sale_invoice_items: [{}, {}, {}, {}, {}],
         order_attachments: [],
         order_shipments: {},
         custom_field_values: []
@@ -1223,97 +1266,7 @@ createSaleInovice() {
             {
               className: 'col-lg-9 col-md-8 col-12 p-0',
               fieldGroupClassName: "ant-row mx-0 row align-items-end mt-2",
-              fieldGroup: [
-                // {
-                //   key: 'bill_type',
-                //   type: 'select',
-                //   className: 'col-md-4 col-sm-6 col-12',
-                //   templateOptions: {
-                //     label: 'Bill type',
-                //     options: [
-                //       { label: 'Cash', value: 'CASH' },
-                //       { label: 'Credit', value: 'CREDIT' },
-                //       { label: 'Others', value: 'OTHERS' }
-                //     ],
-                //     required: true
-                //   },
-                //   hooks: {
-                //     onInit: (field: any) => {
-                //       const billTypeControl = field.formControl;
-                
-                //       // Set initial value
-                //       if (this.dataToPopulate?.sale_invoice_order?.bill_type && billTypeControl) {
-                //         billTypeControl.setValue(this.dataToPopulate.sale_invoice_order.bill_type);
-                //       } else {
-                //         billTypeControl.setValue('CASH');
-                //       }
-                
-                //       billTypeControl.valueChanges.subscribe((billType: string) => {
-                //         const isOtherType = billType?.toLowerCase() === 'others';
-                
-                //         // Update invoice number
-                //         const prefix = isOtherType ? 'SOO-INV' : 'SO-INV';
-                //         this.http.get(`masters/generate_order_no/?type=${prefix}`).subscribe((res: any) => {
-                //           if (res?.data?.order_number) {
-                //             this.invoiceNumber = res.data.order_number;
-                //             this.formConfig.model['sale_invoice_order']['invoice_no'] = this.invoiceNumber;
-                //             field.form.controls.invoice_no.setValue(this.invoiceNumber);
-                //             this.cdRef.detectChanges();
-                //           }
-                //         });
-                
-                //         // Update customer lazy URL
-                //         const customerField = field.parent?.fieldGroup?.find(f => f.key === 'customer');
-                //         if (customerField?.props?.lazy) {
-                //           const baseUrl = 'customers/customers/?summary=true';
-                //           const customerUrl = isOtherType ? `${baseUrl}&bill_type=OTHERS` : baseUrl;
-                
-                //           customerField.props.lazy.url = customerUrl;
-                //           customerField.props.lazy.lazyOneTime = false;
-                //           customerField.props.options = [];
-                //           customerField.formControl.setValue(null);
-                
-                //           // Force re-evaluation of customer field
-                //           const customerKey = customerField.key;
-                //           const parentGroup = field.parent?.fieldGroup;
-                //           const index = parentGroup.findIndex(f => f.key === customerKey);
-                //           if (index !== -1) {
-                //             const removed = parentGroup.splice(index, 1)[0];
-                //             setTimeout(() => {
-                //               parentGroup.splice(index, 0, removed);
-                //               this.cdRef.detectChanges();
-                //             });
-                //           }
-                //         }
-                //       });
-                //     }
-                //   }
-                // },          
-                // {
-                //   key: 'bill_type',
-                //   type: 'select',
-                //   // defaultValue: 'Exclusive',
-                //   className: 'col-md-4 col-sm-6 col-12',
-                //   templateOptions: {
-                //     label: 'Bill type',
-                //     options: [
-                //       { 'label': "Cash", value: 'CASH' },
-                //       { 'label': "Credit", value: 'CREDIT' },
-                //       { 'label': "Others", value: 'OTHERS' }
-                //     ],
-                //     required: true
-                //   },
-                //   hooks: {
-                //     onInit: (field: any) => {
-                //       if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.bill_type && field.formControl) {
-                //         field.formControl.setValue(this.dataToPopulate.sale_invoice_order.bill_type);
-                //       } else {
-                //         // If no data to populate, set 'CASH' as default
-                //         field.formControl.setValue('CASH');
-                //       }
-                //     }
-                //   }
-                // },            
+              fieldGroup: [           
                 {
                   key: 'bill_type',
                   type: 'select',
@@ -1793,7 +1746,7 @@ createSaleInovice() {
                   dataLabel: 'name',
                   placeholder: 'product',
                   options: [],
-                  required: true,
+                  required: false,
                   lazy: {
                     url: 'products/products/?summary=true',
                     lazyOneTime: true
@@ -2009,35 +1962,6 @@ createSaleInovice() {
                   }
                 }
               },
-              // {
-              //   type: 'input',
-              //   key: 'code',
-              //   templateOptions: {
-              //     label: 'Code',
-              //     placeholder: 'code',
-              //     hideLabel: true,
-              //   },
-              //   hooks: {
-              //     onInit: (field: any) => {
-              //       const parentArray = field.parent;
-
-              //       // Check if parentArray exists and proceed
-              //       if (parentArray) {
-              //         const currentRowIndex = +parentArray.key; // Simplified number conversion
-
-              //         // Check if there is a product already selected in this row (when data is copied)
-              //         if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
-              //           const existingCode = this.dataToPopulate.sale_invoice_items[currentRowIndex].product?.code;
-
-              //           // Set the full product object instead of just the product_id
-              //           if (existingCode) {
-              //             field.formControl.setValue(existingCode); // Set full product object (not just product_id)
-              //           }
-              //         }
-              //       }
-              //     }
-              //   }
-              // },
               {
                 type: 'input',
                 key: 'quantity',
@@ -2048,7 +1972,7 @@ createSaleInovice() {
                   placeholder: 'Qty',
                   min: 1,
                   hideLabel: true,
-                  required: true
+                  required: false
                 },
                 hooks: {
                   onInit: (field: any) => {
@@ -2276,7 +2200,7 @@ createSaleInovice() {
                   dataLabel: 'unit_name',
                   dataKey: 'unit_options_id',
                   bindId: true,
-                  required: true,
+                  required: false,
                   lazy: {
                     url: 'masters/unit_options',
                     lazyOneTime: true
