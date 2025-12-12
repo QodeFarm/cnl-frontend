@@ -1035,7 +1035,66 @@ showSuccessToast = false;
                     }); // end of product info text code
                   }
                 }
-              },          
+              }, 
+              {
+                type: 'input',
+                key: 'print_name',
+                // defaultValue: 1000,
+                templateOptions: {
+                  label: 'Print name',
+                  placeholder: 'name',
+                  hideLabel: true,
+                  // type: 'number',
+                  // // required: true mrp tax 
+                },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_return_items.length > currentRowIndex) {
+                        const existingName = this.dataToPopulate.purchase_return_items[currentRowIndex].print_name;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingName) {
+                          field.formControl.setValue(existingName); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
+              },   
+              {
+                type: 'input',
+                key: 'code',
+                templateOptions: {
+                  label: 'Code',
+                  placeholder: 'code',
+                  hideLabel: true,
+                },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+                    if (!parentArray) return;
+
+                    const idx = +parentArray.key;
+                    console.log('Init code field for row', idx);
+
+                    // Use form model directly instead of dataToPopulate
+                    const rowData = this.formConfig.model.purchase_return_items[idx];
+                    const existingCode = rowData ? rowData.product?.code : undefined;
+                    console.log(`Row ${idx} code from formConfig.model:`, existingCode);
+
+                    if (existingCode !== undefined && existingCode !== null) {
+                      field.formControl.setValue(existingCode);
+                    }
+                  }
+                }
+              },      
               {
                 key: 'size',
                 type: 'select',
@@ -1180,33 +1239,6 @@ showSuccessToast = false;
                   }
                 }
               },
-              {
-                type: 'input',
-                key: 'code',
-                templateOptions: {
-                  label: 'Code',
-                  placeholder: 'code',
-                  hideLabel: true,
-                },
-                hooks: {
-                  onInit: (field: any) => {
-                    const parentArray = field.parent;
-                    if (!parentArray) return;
-
-                    const idx = +parentArray.key;
-                    console.log('Init code field for row', idx);
-
-                    // Use form model directly instead of dataToPopulate
-                    const rowData = this.formConfig.model.purchase_return_items[idx];
-                    const existingCode = rowData ? rowData.product?.code : undefined;
-                    console.log(`Row ${idx} code from formConfig.model:`, existingCode);
-
-                    if (existingCode !== undefined && existingCode !== null) {
-                      field.formControl.setValue(existingCode);
-                    }
-                  }
-                }
-              },
               // {
               //   type: 'input',
               //   key: 'code',
@@ -1238,6 +1270,38 @@ showSuccessToast = false;
               //     }
               //   }
               // },
+              {
+                type: 'input',
+                key: 'total_boxes',
+                // defaultValue: 1000,
+                templateOptions: {
+                  type: 'number',
+                  label: 'Total Boxes',
+                  placeholder: 'Boxes',
+                  hideLabel: true,
+                  // // required: true
+                },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+              
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_return_items.length > currentRowIndex) {
+                        const existingBox = this.dataToPopulate.purchase_return_items[currentRowIndex].total_boxes;
+                        
+                        // Set the full product object instead of just the product_id
+                        if (existingBox) {
+                          field.formControl.setValue(existingBox); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
+              },
               // quantity amount rate dsc
               {
                 type: 'input',
@@ -1416,38 +1480,6 @@ showSuccessToast = false;
                 },
               },
               {
-                type: 'input',
-                key: 'print_name',
-                // defaultValue: 1000,
-                templateOptions: {
-                  label: 'Print name',
-                  placeholder: 'name',
-                  hideLabel: true,
-                  // type: 'number',
-                  // // required: true mrp tax 
-                },
-                hooks: {
-                  onInit: (field: any) => {
-                    const parentArray = field.parent;
-              
-                    // Check if parentArray exists and proceed
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
-              
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.purchase_return_items.length > currentRowIndex) {
-                        const existingName = this.dataToPopulate.purchase_return_items[currentRowIndex].print_name;
-                        
-                        // Set the full product object instead of just the product_id
-                        if (existingName) {
-                          field.formControl.setValue(existingName); // Set full product object (not just product_id)
-                        }
-                      }
-                    }
-                  }
-                }
-              },
-              {
                 type: 'select',
                 key: 'unit_options_id',
                 templateOptions: {
@@ -1478,38 +1510,6 @@ showSuccessToast = false;
                         // Set the full product object instead of just the product_id
                         if (existingUnit) {
                           field.formControl.setValue(existingUnit.unit_options_id); // Set full product object (not just product_id)
-                        }
-                      }
-                    }
-                  }
-                }
-              },
-              {
-                type: 'input',
-                key: 'total_boxes',
-                // defaultValue: 1000,
-                templateOptions: {
-                  type: 'number',
-                  label: 'Total Boxes',
-                  placeholder: 'Boxes',
-                  hideLabel: true,
-                  // // required: true
-                },
-                hooks: {
-                  onInit: (field: any) => {
-                    const parentArray = field.parent;
-              
-                    // Check if parentArray exists and proceed
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
-              
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.purchase_return_items.length > currentRowIndex) {
-                        const existingBox = this.dataToPopulate.purchase_return_items[currentRowIndex].total_boxes;
-                        
-                        // Set the full product object instead of just the product_id
-                        if (existingBox) {
-                          field.formControl.setValue(existingBox); // Set full product object (not just product_id)
                         }
                       }
                     }
