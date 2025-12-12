@@ -327,7 +327,7 @@ private fallbackPrint(pdfBlob: Blob): void {
             const finalAmount = existingAmount + addValue;
 
             return {
-              amount: finalAmount,                // ⭐ Updated amount
+              amount: finalAmount,                //  Updated amount
               payment_receipt_no: row.payment_receipt_no,
               account: row.account_id,
               vendor: row.vendor_id,

@@ -464,14 +464,24 @@ async autoFillProductDetails(field, data) {
       ...this.formConfig.model,
       custom_field_values: customFieldsPayload.custom_field_values // Array of dictionaries
     };
-    // const saleReturnId = this.formConfig.model.sale_return_order.sale_return_id;
-    // console.log("Sale return id in edit : ", saleReturnId);
-    // const saleReturnPayload = {
-    //   sale_return_order: this.formConfig.model.sale_return_order,
-    //   sale_return_items: this.formConfig.model.sale_return_items,
-    //   order_attachments: this.formConfig.model.order_attachments,  // Attachments if applicable
-    //   order_shipments: this.formConfig.model.order_shipments,      // Shipment info if applicable
-    // };
+
+    //  FIX COLOR + SIZE ISSUE HERE
+    if (payload.sale_return_items && Array.isArray(payload.sale_return_items)) {
+      payload.sale_return_items = payload.sale_return_items.map(item => {
+
+        if (item.color && typeof item.color === 'object') {
+          item.color_id = item.color.color_id || null;
+        }
+
+        if (item.size && typeof item.size === 'object') {
+          item.size_id = item.size.size_id || null;
+        }
+
+        return item;
+      });
+    }
+
+    console.log("Final Payload Before Update:", payload);
 
     // PUT request to update Sale Return Order
     this.http.put(`sales/sale_return_order/${this.SaleReturnOrderEditID}/`, payload).subscribe(
@@ -514,6 +524,29 @@ async autoFillProductDetails(field, data) {
             return acc;
           }, {});
         }
+
+        // ---------------------------------------------------
+        //  ENSURE SALE RETURN ORDER ALWAYS HAS 5 ITEM ROWS 
+        // ---------------------------------------------------
+        let items = res.data.sale_return_items ?? [];
+
+        // fill existing rows first, then make sure total is 5
+        while (items.length < 5) {
+          items.push({
+            sale_order_item_id: null,
+            product_id: null,
+            unit_options_id: null,
+            quantity: null,
+            rate: null,
+            amount: null
+          });
+        }
+
+        // assign back to form model
+        this.formConfig.model['sale_return_items'] = items;
+
+        // finally show form
+        this.showForm = true;
       }
     });
     this.hide();
@@ -897,7 +930,7 @@ async autoFillProductDetails(field, data) {
       },
       model: {
         sale_return_order: {},
-        sale_return_items: [{}],
+        sale_return_items: [{}, {}, {}, {}, {}],
         order_attachments: [],
         order_shipments: {},
         custom_field_values: []
@@ -1359,7 +1392,7 @@ async autoFillProductDetails(field, data) {
                   dataLabel: 'name',
                   placeholder: 'product',
                   options: [],
-                  required: true,
+                  required: false,
                   lazy: {
                     url: 'products/products/?summary=true',
                     lazyOneTime: true
@@ -1652,7 +1685,7 @@ async autoFillProductDetails(field, data) {
                   placeholder: 'Qty',
                   min: 1,
                   hideLabel: true,
-                  required: true
+                  required: false,
                 },
                 hooks: {
                   onInit: (field: any) => {
@@ -1817,7 +1850,7 @@ async autoFillProductDetails(field, data) {
                   dataLabel: 'unit_name',
                   dataKey: 'unit_options_id',
                   bindId: true,
-                  required: true,
+                  required: false,
                   lazy: {
                     url: 'masters/unit_options',
                     lazyOneTime: true

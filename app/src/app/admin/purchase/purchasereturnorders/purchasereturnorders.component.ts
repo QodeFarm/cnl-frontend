@@ -371,6 +371,29 @@ export class PurchasereturnordersComponent {
             return acc;
           }, {});
         }
+
+        // ---------------------------------------------------
+        //  ENSURE PURCHASE INVOICE ORDER ALWAYS HAS 5 ITEM ROWS 
+        // ---------------------------------------------------
+        let items = res.data.purchase_return_items ?? [];
+
+        // fill existing rows first, then make sure total is 5
+        while (items.length < 5) {
+          items.push({
+            sale_order_item_id: null,
+            product_id: null,
+            unit_options_id: null,
+            quantity: null,
+            rate: null,
+            amount: null
+          });
+        }
+
+        // assign back to form model
+        this.formConfig.model['purchase_return_items'] = items;
+
+        // finally show form
+        this.showForm = true;
       }
       this.totalAmountCal();
     });
@@ -490,6 +513,22 @@ showSuccessToast = false;
       custom_field_values: customFieldsPayload.custom_field_values // Array of dictionaries
     };
 
+    //  FIX COLOR + SIZE ISSUE HERE
+    if (payload.purchase_return_items && Array.isArray(payload.purchase_return_items)) {
+      payload.purchase_return_items = payload.purchase_return_items.map(item => {
+
+        if (item.color && typeof item.color === 'object') {
+          item.color_id = item.color.color_id || null;
+        }
+
+        if (item.size && typeof item.size === 'object') {
+          item.size_id = item.size.size_id || null;
+        }
+
+        return item;
+      });
+    }
+
     // Define logic here for updating the sale order without modal pop-up
     // console.log("Updating sale order:", this.formConfig.model);
     this.http.put(`purchase/purchase_return_order/${this.PurchaseReturnOrderEditID}/`, payload)
@@ -551,7 +590,7 @@ showSuccessToast = false;
       },
       model: {
         purchase_return_orders: {},
-        purchase_return_items: [{}],
+        purchase_return_items: [{}, {}, {}, {}, {}],
         order_attachments: [],
         order_shipments: {}
       },
@@ -992,7 +1031,7 @@ showSuccessToast = false;
                   dataLabel: 'name',
                   placeholder: 'product',
                   options: [],
-                  required: true,
+                  required: false,
                   lazy: {
                     url: 'products/products/?summary=true',
                     lazyOneTime: true
@@ -1313,7 +1352,7 @@ showSuccessToast = false;
                   placeholder: 'Qty',
                   min: 1,
                   hideLabel: true,
-                  required: true
+                  required: false,
                 },
                 hooks: {
                   onInit: (field: any) => {
@@ -1489,7 +1528,7 @@ showSuccessToast = false;
                   dataLabel: 'unit_name',
                   dataKey: 'unit_options_id',
                   bindId: true,
-                  required: true,
+                  required: false,
                   lazy: {
                     url: 'masters/unit_options',
                     lazyOneTime: true

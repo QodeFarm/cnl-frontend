@@ -877,7 +877,7 @@ import { AssetCategoriesConfig, AssetStatusConfig, cityConfig, CountryConfig, cu
               label: 'Products',
               dataKey: 'product_id',
               dataLabel: 'name',
-              required: true,
+              required: false,
               curdConfig: productsCrudConfig
             }
           }
