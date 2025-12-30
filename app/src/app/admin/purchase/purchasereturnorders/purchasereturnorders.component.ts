@@ -653,7 +653,7 @@ showSuccessToast = false;
                 },
                 {
                   key: 'vendor',
-                  type: 'select',
+                  type: 'vendor-dropdown',
                   className: 'col-md-4 col-sm-6 col-12',
                   props: {
                     label: 'Vendor',

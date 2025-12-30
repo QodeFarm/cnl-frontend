@@ -30,10 +30,10 @@ export class SalesInvoiceListComponent implements OnInit {
 
 
   selectedFormat: string = "CNL_Standard_Excl" //CNL_Standard_Excl
-  pendingAction: 'email' | 'preview' | 'print' | null = null;
+  pendingAction: 'email' | 'preview' | 'print' | 'whatsapp' | null = null;
 
   // Show format selection popup
-  private showFormatDialog(action: 'email' | 'preview' | 'print'): void {
+  private showFormatDialog(action: 'email' | 'preview' | 'print' | 'whatsapp'): void {
     this.pendingAction = action;
     const dialog = document.getElementById('formatDialog');
     if (dialog) dialog.style.display = 'flex';
@@ -47,17 +47,6 @@ export class SalesInvoiceListComponent implements OnInit {
 
   // Inject format and proceed with existing method
   proceedWithSelectedAction(): void {
-    // this.closeFormatDialog();
-
-    // // Inject format in request manually (monkey patch)
-    // const originalPost = this.http.post.bind(this.http);
-    // this.http.post = (url: string, body: any, options?: any) => {
-    //   if (typeof body === 'object' && body !== null && this.selectedFormat) {
-    //     body.format = this.selectedFormat;
-    //   }
-    //   return originalPost(url, body, options);
-    // };
-
     switch (this.pendingAction) {
       case 'email':
         this.onMailLinkClick(); break;
@@ -65,10 +54,62 @@ export class SalesInvoiceListComponent implements OnInit {
         this.onPreviewClick(); break;
       case 'print':
         this.onPrintClick(); break;
+      case 'whatsapp':
+        this.onWhatsappClick();
+        break;
     }
 
     this.pendingAction = null;
     this.closeFormatDialog();
+  }
+
+  onWhatsappClick(): void {
+    const selectedIds = this.taTableComponent.options.checkedRows;
+
+    if (selectedIds.length === 0) {
+      return this.showDialog();
+    }
+
+    const saleInvoiceId = selectedIds[0];
+    const url = `masters/document_generator/${saleInvoiceId}/sale_invoice/`; 
+
+    const payload = {
+      flag: 'whatsapp',
+      format: this.selectedFormat
+    };
+
+    this.showLoading = true;
+
+    this.http.post<any>(url, payload).subscribe(
+      (response) => {
+        this.showLoading = false;
+        this.refreshTable();
+
+        // ✅ CASE 1: WATI (server sends directly)
+        if (response.mode === 'wati') {
+          this.showSuccessToast = true;
+          this.toastMessage = 'WhatsApp message sent successfully';
+          setTimeout(() => this.showSuccessToast = false, 2000);
+        }
+
+        // ✅ CASE 2: Click-to-chat (local / dev)
+        else if (response.mode === 'click_to_chat' && response.whatsapp_url) {
+          window.open(response.whatsapp_url, '_blank');
+
+          this.showSuccessToast = true;
+          this.toastMessage = 'Opening WhatsApp…';
+          setTimeout(() => this.showSuccessToast = false, 2000);
+        }
+      },
+      (error) => {
+        this.showLoading = false;
+        console.error('Error sending WhatsApp message', error);
+
+        this.showSuccessToast = true;
+        this.toastMessage = 'Failed to send WhatsApp message';
+        setTimeout(() => this.showSuccessToast = false, 2000);
+      }
+    );
   }
   // In your component (e.g., SalesListComponent)
   onSelect(event: Event): void {
@@ -79,6 +120,7 @@ export class SalesInvoiceListComponent implements OnInit {
       this.showFormatDialog('email');
     } else if (selectedValue === 'whatsapp') {
       // Add WhatsApp logic if needed
+      this.showFormatDialog('whatsapp');
     }
 
     selectElement.value = '';

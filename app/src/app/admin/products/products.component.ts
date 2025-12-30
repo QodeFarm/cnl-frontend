@@ -40,7 +40,8 @@ export class ProductsComponent implements OnInit {
     this.selectedProductMode = "Inventory";
     this.setFormConfig();
     // console.log('Check field : ',this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[7])
-    // this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = true;
+    this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[9].hide = true;
+    this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[10].hide = true;
   }
 
   hide() {
@@ -75,6 +76,8 @@ export class ProductsComponent implements OnInit {
         this.formConfig.model['product_id'] = this.ProductEditID;
         this.showForm = true;
         // this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = false;
+        this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[9].hide = false;
+        this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[10].hide = false;
 
         // If we're editing a product, get the product mode name from the API to set selectedProductMode
         // if (this.formConfig.model.products?.product_mode_id) {
@@ -708,6 +711,48 @@ preprocessFormData() {
                       required: false, 
                     }
                   },
+                  {
+                    className: 'col-md-4 col-sm-6 col-12',
+                    key: 'physical_balance',
+                    type: 'input',
+                    defaultValue: 0,
+                    templateOptions: {
+                      label: 'Physical Balance',
+                      required: false,
+                      type: 'number'
+                    },
+                    hooks: {
+                      onInit: (field) => {
+                        field.formControl.valueChanges.subscribe(() => {
+                          const balance = field.model?.balance || 0;
+                          const physical = field.model?.physical_balance || 0;
+
+                          field.model.balance_diff = physical - balance;
+                        });
+                      }
+                    }
+                  },
+
+                  {
+                    className: 'col-md-4 col-sm-6 col-12',
+                    key: 'balance_diff',
+                    type: 'input',
+                    defaultValue: 0,
+                    templateOptions: {
+                      label: 'Balance Diff.',
+                      required: false,
+                      readonly: true,
+                      type: 'number'
+                    },
+                    expressionProperties: {
+                      'model.balance_diff': (model) => {
+                        const balance = model?.balance || 0;
+                        const physical = model?.physical_balance || 0;
+                        return physical - balance;
+                      }
+                    }
+                  },
+
                   ]
                 },
                 {

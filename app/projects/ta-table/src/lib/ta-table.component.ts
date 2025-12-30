@@ -389,9 +389,42 @@ ledgerAccount() {
     );
   }
 
+  selectedCity: string | null = null;
+  cityOptions: any[] = [];
+  isCityDisabled = true;
+
+  loadCities() {
+    if (!this.selectedAccountType) {
+      this.cityOptions = [];
+      this.isCityDisabled = false;
+      return;
+    }
+
+    const url = `finance/account-cities/?type=${this.selectedAccountType}`;
+
+    this.http.get<any>(url).subscribe(
+      res => {
+        this.cityOptions = res.data || [];
+        this.isCityDisabled = false;
+      },
+      err => {
+        console.error('Failed to load cities', err);
+        this.cityOptions = [];
+        this.isCityDisabled = false;
+      }
+    );
+  }
+
+
+
   onAccountTypeChange() {
     this.selectedAccountId = null;
+    // ✅ ADD: reset city when account type changes
+    this.selectedCity = null;
+    this.cityOptions = [];
+    this.isCityDisabled = false;
     this.loadAccounts();
+    this.loadCities();
     this.applyFilters();
   }
 
@@ -399,6 +432,10 @@ ledgerAccount() {
   onAccountChange() {
   if (this.selectedAccountType && this.selectedAccountId) {
     console.log("Account selected:", this.selectedAccountType, this.selectedAccountId);
+
+    this.isCityDisabled = true;
+    this.selectedCity = null;
+    // this.loadCities();
 
     // For account ledger page
     if (this.router.url === '/admin/finance/account-ledger') {
@@ -426,58 +463,161 @@ ledgerAccount() {
     }
   }
 
+  // 🟢 CASE 2: Resource CLEARED
+  if (!this.selectedAccountId) {
+    console.log("Resource cleared, enabling city");
+
+    this.isCityDisabled = false;   // ✅ Enable city again
+    this.applyFilters();
+    return;
+  }
+
   this.applyFilters(); // Fall back to the default behavior
 }
 
   // Apply filters like quick period, date range, and status to fetch filtered data
+// applyFilters() {
+//   const filters = {
+//     quickPeriod: this.selectedQuickPeriod,
+//     fromDate: this.fromDate,
+//     toDate: this.toDate,
+//     status: this.selectedStatus,
+//     employee: this.selectedEmployee,
+//     accountType: this.selectedAccountType,
+//     accountId: this.selectedAccountId,
+//     group: this.selectedGroup,        
+//     category: this.selectedCategory,  
+//     type: this.selectedType,          
+//     warehouse: this.selectedWarehouse ,
+//     ledgerAccount: this.selectedLedgerAccount,
+//     city: this.selectedCity
+
+//   };
+
+//   const queryString = this.generateQueryString(filters);
+//   const page = this.pageIndex;
+//   const limit = this.pageSize;
+  
+//   // Make sure we have a valid API URL before proceeding
+//   if (!this.options.apiUrl) {
+//     console.error("No valid API URL provided");
+//     return "";
+//   }
+
+//   const tableParamConfig: TaParamsConfig = {
+//     apiUrl: this.options.apiUrl,
+//     pageIndex: this.pageIndex,
+//     pageSize: this.pageSize,
+//     filters: this.filters,
+//     fixedFilters: this.options.fixedFilters
+//   }
+
+//   // Check if apiUrl already has a '?'
+//   let url = this.options.apiUrl;
+//   let connector = url.includes('?') ? '&' : '?';
+//   url = `${url}${connector}summary=true${queryString ? '&' + queryString.slice(1) : ''}&page=${page}&limit=${limit}`;
+
+//   console.log("Making API request to:", url);
+
+//   this.http.get(url).subscribe(
+//     response => {
+//       this.loading = false;
+//       if (response && response['data']) {
+//         this.rows = response['data'];
+//         this.total = response['count'] || response['data'].length;
+//       } else {
+//         console.warn("API response contains no data");
+//         this.rows = [];
+//         this.total = 0;
+//       }
+//     },
+//     error => {
+//       console.error('Error executing URL:', url, error);
+//       this.loading = false;
+//     }
+//   );
+//   return url;
+// }
+
+public lastApiUrl: string = '';
 applyFilters() {
+  // ---------------------------
+  //  FILTER OBJECT
+  // ---------------------------
   const filters = {
     quickPeriod: this.selectedQuickPeriod,
     fromDate: this.fromDate,
     toDate: this.toDate,
     status: this.selectedStatus,
     employee: this.selectedEmployee,
-    accountType: this.selectedAccountType,
-    accountId: this.selectedAccountId,
-    group: this.selectedGroup,        
-    category: this.selectedCategory,  
-    type: this.selectedType,          
-    warehouse: this.selectedWarehouse ,
-    ledgerAccount: this.selectedLedgerAccount
-
+    group: this.selectedGroup,
+    category: this.selectedCategory,
+    type: this.selectedType,
+    warehouse: this.selectedWarehouse,
+    ledgerAccount: this.selectedLedgerAccount,
+    city: this.selectedCity   // ✅ City sent only when selected
   };
 
   const queryString = this.generateQueryString(filters);
   const page = this.pageIndex;
   const limit = this.pageSize;
-  
-  // Make sure we have a valid API URL before proceeding
-  if (!this.options.apiUrl) {
+
+  // ---------------------------
+  // DECIDE BASE API URL
+  // ---------------------------
+  let baseUrl = this.options.apiUrl;
+
+  // Priority 1️: Individual account selected
+  if (this.selectedAccountType && this.selectedAccountId) {
+    baseUrl = `finance/journal_entry_lines_list/${this.selectedAccountId}/`;
+  }
+
+  // Priority 2️: City selected but NO account
+  else if (this.selectedAccountType && this.selectedCity) {
+    // customer_id OR vendor_id
+    baseUrl = `finance/journal_entry_lines_list/${this.selectedAccountType}_id/?city=${this.selectedCity}`;
+  }
+
+  // Safety check
+  if (!baseUrl) {
     console.error("No valid API URL provided");
     return "";
   }
 
-  const tableParamConfig: TaParamsConfig = {
-    apiUrl: this.options.apiUrl,
-    pageIndex: this.pageIndex,
-    pageSize: this.pageSize,
-    filters: this.filters,
-    fixedFilters: this.options.fixedFilters
-  }
-
-  // Check if apiUrl already has a '?'
-  let url = this.options.apiUrl;
-  let connector = url.includes('?') ? '&' : '?';
-  url = `${url}${connector}summary=true${queryString ? '&' + queryString.slice(1) : ''}&page=${page}&limit=${limit}`;
+  // ---------------------------
+  //  FINAL URL BUILD
+  // ---------------------------
+  const connector = baseUrl.includes('?') ? '&' : '?';
+  const url =
+    `${baseUrl}${connector}summary=true` +
+    `${queryString ? '&' + queryString.slice(1) : ''}` +
+    `&page=${page}&limit=${limit}`;
 
   console.log("Making API request to:", url);
 
+  // ✅✅ ADD THIS BLOCK (SYNC FILTER STATE)
+  if (window['accountLedgerComponentInstance']) {
+    window['accountLedgerComponentInstance'].selectedAccountType = this.selectedAccountType;
+    window['accountLedgerComponentInstance'].selectedAccountId = this.selectedAccountId;
+    window['accountLedgerComponentInstance'].selectedCity = this.selectedCity;
+    window['accountLedgerComponentInstance'].quickPeriod = this.selectedQuickPeriod;
+    window['accountLedgerComponentInstance'].fromDate = this.fromDate;
+    window['accountLedgerComponentInstance'].toDate = this.toDate;
+  }
+
+  this.loading = true;
+  this.lastApiUrl = url;
+
+  // ---------------------------
+  //  API CALL
+  // ---------------------------
   this.http.get(url).subscribe(
-    response => {
+    (response: any) => {
       this.loading = false;
-      if (response && response['data']) {
-        this.rows = response['data'];
-        this.total = response['count'] || response['data'].length;
+      if (response && response.data) {
+        console.log("Response data in table : ", response.data);
+        this.rows = response.data;
+        this.total = response.totalCount || response.count || response.data.length;
       } else {
         console.warn("API response contains no data");
         this.rows = [];
@@ -489,8 +629,10 @@ applyFilters() {
       this.loading = false;
     }
   );
+
   return url;
 }
+
   
   // Clear all filters like quick period, date range, and status
   clearFilters() {
