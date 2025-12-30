@@ -330,16 +330,16 @@ export class CustomersComponent {
                         required: true,
                       }
                     },
-                    {
-                      className: 'col-md-4 col-sm-6 col-12',
-                      key: 'print_name',
-                      type: 'input',
-                      templateOptions: {
-                        label: 'Print Name',
-                        placeholder: 'Enter Print Name',
-                        required: true,
-                      }
-                    },
+                    // {
+                    //   className: 'col-md-4 col-sm-6 col-12',
+                    //   key: 'print_name',
+                    //   type: 'input',
+                    //   templateOptions: {
+                    //     label: 'Print Name',
+                    //     placeholder: 'Enter Print Name',
+                    //     required: true,
+                    //   }
+                    // },
                     {
                       className: 'col-md-4 col-sm-6 col-12',
                       key: 'code',
@@ -921,31 +921,49 @@ export class CustomersComponent {
                       key: 'customer_data',
                       fieldGroupClassName: "ant-row row align-items-end mt-3",
                       fieldGroup: [
+                        // {
+                        //   className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                        //   key: 'gst_category',
+                        //   type: 'gst-cat-dropdown',
+                        //   templateOptions: {
+                        //     label: 'GST Category',
+                        //     dataKey: 'gst_category_id',
+                        //     dataLabel: 'name',
+                        //     options: [],
+                        //     lazy: {
+                        //       url: 'masters/gst_categories/',
+                        //       lazyOneTime: true
+                        //     }
+                        //   },
+                        //   hooks: {
+                        //     onChanges: (field: any) => {
+                        //       field.formControl.valueChanges.subscribe((data: any) => {
+                        //         if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
+                        //           this.formConfig.model['customer_data']['gst_category_id'] = data.gst_category_id;
+                        //         } else {
+                        //           console.error('Form config or Customer data model is not defined.');
+                        //         }
+                        //       });
+                        //     }
+                        //   }
+                        // },
                         {
                           className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                           key: 'gst_category',
-                          type: 'gst-cat-dropdown',
+                          type: 'select',
                           templateOptions: {
-                            label: 'GST Category',
-                            dataKey: 'gst_category_id',
-                            dataLabel: 'name',
-                            options: [],
-                            lazy: {
-                              url: 'masters/gst_categories/',
-                              lazyOneTime: true
-                            }
+                              label: 'GST Category',
+                              dataKey: 'gst_category_id',
+                              dataLabel: 'name',
+                              options: [
+                                  { label: 'Registered', value: { gst_category_id: 'registered', name: 'Registered' } },
+                                  { label: 'Unregistered', value: { gst_category_id: 'unregistered', name: 'Unregistered' } }
+                              ],
+                              // lazy: {
+                              //     url: 'masters/gst_categories/',
+                              //     lazyOneTime: true
+                              // }
                           },
-                          hooks: {
-                            onChanges: (field: any) => {
-                              field.formControl.valueChanges.subscribe((data: any) => {
-                                if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
-                                  this.formConfig.model['customer_data']['gst_category_id'] = data.gst_category_id;
-                                } else {
-                                  console.error('Form config or Customer data model is not defined.');
-                                }
-                              });
-                            }
-                          }
                         },
                         {
                           className: 'col-lg-3 col-md-4 col-sm-6 col-12',
@@ -956,15 +974,15 @@ export class CustomersComponent {
                             placeholder: 'Enter GST',
                           }
                         },
-                        {
-                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                          key: 'cin',
-                          type: 'input',
-                          templateOptions: {
-                            label: 'CIN',
-                            placeholder: 'Enter CIN',
-                          }
-                        },
+                        // {
+                        //   className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                        //   key: 'cin',
+                        //   type: 'input',
+                        //   templateOptions: {
+                        //     label: 'CIN',
+                        //     placeholder: 'Enter CIN',
+                        //   }
+                        // },
                         {
                           className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                           key: 'pan',

@@ -1442,7 +1442,65 @@ async autoFillProductDetails(field, data) {
                     }); // end of product info text code
                   }
                 }
-              },          
+              },   
+              {
+                type: 'input',
+                key: 'print_name',
+                templateOptions: {
+                  label: 'Print name',
+                  placeholder: 'name',
+                  hideLabel: true
+                },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_return_items.length > currentRowIndex) {
+                        const existingName = this.dataToPopulate.sale_return_items[currentRowIndex].print_name;
+
+                        // Set the full product object instead of just the product_id
+                        if (existingName) {
+                          field.formControl.setValue(existingName); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
+              },   
+              {
+                type: 'input',
+                key: 'code',
+                templateOptions: {
+                  label: 'Code',
+                  placeholder: 'code',
+                  hideLabel: true,
+                },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_return_items.length > currentRowIndex) {
+                        const existingCode = this.dataToPopulate.sale_return_items[currentRowIndex].product?.code;
+
+                        // Set the full product object instead of just the product_id
+                        if (existingCode) {
+                          field.formControl.setValue(existingCode); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
+              },    
               {
                 key: 'size',
                 type: 'select',
@@ -1586,14 +1644,15 @@ async autoFillProductDetails(field, data) {
                     });
                   }
                 }
-              },              
+              }, 
               {
                 type: 'input',
-                key: 'code',
+                key: 'total_boxes',
                 templateOptions: {
-                  label: 'Code',
-                  placeholder: 'code',
-                  hideLabel: true,
+                  type: 'number',
+                  label: 'Total Boxes',
+                  placeholder: 'Boxes',
+                  hideLabel: true
                 },
                 hooks: {
                   onInit: (field: any) => {
@@ -1605,18 +1664,17 @@ async autoFillProductDetails(field, data) {
 
                       // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_return_items.length > currentRowIndex) {
-                        const existingCode = this.dataToPopulate.sale_return_items[currentRowIndex].product?.code;
+                        const existingBox = this.dataToPopulate.sale_return_items[currentRowIndex].total_boxes;
 
                         // Set the full product object instead of just the product_id
-                        if (existingCode) {
-                          field.formControl.setValue(existingCode); // Set full product object (not just product_id)
+                        if (existingBox) {
+                          field.formControl.setValue(existingBox); // Set full product object (not just product_id)
                         }
                       }
                     }
                   }
                 }
-              },
-             
+              },             
               {
                 type: 'input',
                 key: 'quantity',
@@ -1782,36 +1840,6 @@ async autoFillProductDetails(field, data) {
                   disabled: true
                 },
               },
-              
-              {
-                type: 'input',
-                key: 'print_name',
-                templateOptions: {
-                  label: 'Print name',
-                  placeholder: 'name',
-                  hideLabel: true
-                },
-                hooks: {
-                  onInit: (field: any) => {
-                    const parentArray = field.parent;
-
-                    // Check if parentArray exists and proceed
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
-
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.sale_return_items.length > currentRowIndex) {
-                        const existingName = this.dataToPopulate.sale_return_items[currentRowIndex].print_name;
-
-                        // Set the full product object instead of just the product_id
-                        if (existingName) {
-                          field.formControl.setValue(existingName); // Set full product object (not just product_id)
-                        }
-                      }
-                    }
-                  }
-                }
-              },
               {
                 type: 'select',
                 key: 'unit_options_id',
@@ -1918,36 +1946,6 @@ async autoFillProductDetails(field, data) {
                   'templateOptions.disabled': 'true' // Make it read-only
                 }
               }, 
-              {
-                type: 'input',
-                key: 'total_boxes',
-                templateOptions: {
-                  type: 'number',
-                  label: 'Total Boxes',
-                  placeholder: 'Boxes',
-                  hideLabel: true
-                },
-                hooks: {
-                  onInit: (field: any) => {
-                    const parentArray = field.parent;
-
-                    // Check if parentArray exists and proceed
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
-
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.sale_return_items.length > currentRowIndex) {
-                        const existingBox = this.dataToPopulate.sale_return_items[currentRowIndex].total_boxes;
-
-                        // Set the full product object instead of just the product_id
-                        if (existingBox) {
-                          field.formControl.setValue(existingBox); // Set full product object (not just product_id)
-                        }
-                      }
-                    }
-                  }
-                }
-              },
               {
                 type: 'input',
                 key: 'tax',

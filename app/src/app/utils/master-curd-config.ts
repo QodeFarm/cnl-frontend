@@ -152,16 +152,16 @@ export const customerCudConfig: TaCurdConfig = {
                                             required: true,
                                         }
                                     },
-                                    {
-                                        className: 'col-md-4 col-sm-6 col-12',
-                                        key: 'print_name',
-                                        type: 'input',
-                                        templateOptions: {
-                                            label: 'Print Name',
-                                            placeholder: 'Enter Print Name',
-                                            required: true,
-                                        }
-                                    },
+                                    // {
+                                    //     className: 'col-md-4 col-sm-6 col-12',
+                                    //     key: 'print_name',
+                                    //     type: 'input',
+                                    //     templateOptions: {
+                                    //         label: 'Print Name',
+                                    //         placeholder: 'Enter Print Name',
+                                    //         required: true,
+                                    //     }
+                                    // },
                                     {
                                         className: 'col-md-4 col-sm-6 col-12',
                                         key: 'code',
@@ -689,11 +689,14 @@ export const customerCudConfig: TaCurdConfig = {
                                                     label: 'GST Category',
                                                     dataKey: 'gst_category_id',
                                                     dataLabel: 'name',
-                                                    options: [],
-                                                    lazy: {
-                                                        url: 'masters/gst_categories/',
-                                                        lazyOneTime: true
-                                                    }
+                                                    options: [
+                                                        { label: 'Registered', value: { gst_category_id: 'registered', name: 'Registered' } },
+                                                        { label: 'Unregistered', value: { gst_category_id: 'unregistered', name: 'Unregistered' } }
+                                                    ],
+                                                    // lazy: {
+                                                    //     url: 'masters/gst_categories/',
+                                                    //     lazyOneTime: true
+                                                    // }
                                                 },
                                                 hooks: {
                                                     onChanges: (field: any) => {
@@ -716,15 +719,15 @@ export const customerCudConfig: TaCurdConfig = {
                                                     placeholder: 'Enter GST',
                                                 }
                                             },
-                                            {
-                                                className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                                                key: 'cin',
-                                                type: 'input',
-                                                templateOptions: {
-                                                    label: 'CIN',
-                                                    placeholder: 'Enter CIN',
-                                                }
-                                            },
+                                            // {
+                                            //     className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                                            //     key: 'cin',
+                                            //     type: 'input',
+                                            //     templateOptions: {
+                                            //         label: 'CIN',
+                                            //         placeholder: 'Enter CIN',
+                                            //     }
+                                            // },
                                             {
                                                 className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                                                 key: 'pan',
