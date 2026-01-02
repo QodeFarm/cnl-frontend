@@ -18,6 +18,8 @@ import { ExpenseClaimListComponent } from './expense-claim/expense-claim-list/ex
 import { BudgetListComponent } from './budget/budget-list/budget-list.component';
 import { JournalEntryListComponent } from './journal-entry/journal-entry-list/journal-entry-list.component';
 import { JournalEntryComponent } from './journal-entry/journal-entry.component';
+import { JournalVoucherListComponent } from './journal-voucher/journal-voucher-list/journal-voucher-list.component';
+import { JournalVoucherComponent } from './journal-voucher/journal-voucher.component';
 import { PaymentTransactionListComponent } from './payment-transaction/payment-transaction-list/payment-transaction-list.component';
 import { GstDetailsComponent } from './gst-details/gst-details.component';
 import { AccountLedgerComponent } from './account-ledger/account-ledger.component';
@@ -48,6 +50,7 @@ import { LedgerAccountsComponent } from '../customers/ledger-accounts/ledger-acc
     ExpenseClaimListComponent,
     BudgetListComponent,
     JournalEntryListComponent,
+    JournalVoucherListComponent,
     PaymentTransactionListComponent,
     AccountLedgerComponent,
     GstDetailsComponent,

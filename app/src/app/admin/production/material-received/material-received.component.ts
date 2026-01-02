@@ -67,9 +67,11 @@ export class MaterialReceivedComponent implements OnInit {
     if (payload.material_received && payload.material_received.production_floor_id && typeof payload.material_received.production_floor_id === 'object') {
       payload.material_received.production_floor_id = payload.material_received.production_floor_id.production_floor_id;
     }
-    // Fix items array
+    // Fix items array - filter out empty items first
     if (Array.isArray(payload.items)) {
-      payload.items = payload.items.map(item => {
+      payload.items = payload.items
+        .filter(item => item.product_id) // Filter out empty rows
+        .map(item => {
         const newItem = { ...item };
         if (newItem.product_id && typeof newItem.product_id === 'object' && newItem.product_id.product_id) {
           newItem.product_id = newItem.product_id.product_id;
@@ -159,7 +161,7 @@ export class MaterialReceivedComponent implements OnInit {
       },
       model: {
         material_received: {},
-        items: [{}],
+        items: [{}, {}, {}, {}, {}],
         attachments: []
       },
       fields: [
@@ -268,7 +270,7 @@ export class MaterialReceivedComponent implements OnInit {
     hideLabel: true,
     placeholder: 'Select Product',
     options: [],
-    required: true,
+    required: false,
     lazy: {
       url: 'products/products/?summary=true',
       lazyOneTime: true
@@ -315,7 +317,7 @@ export class MaterialReceivedComponent implements OnInit {
                   dataLabel: 'unit_name',
                   dataKey: 'unit_options_id',
                   bindId: true,
-                  required: true,
+                  required: false,
                   lazy: {
                     url: 'masters/unit_options',
                     lazyOneTime: true
@@ -342,7 +344,7 @@ export class MaterialReceivedComponent implements OnInit {
               {
                 key: 'quantity',
                 type: 'input',
-                templateOptions: { label: 'Quantity', type: 'number', required: true, hideLabel: true }
+                templateOptions: { label: 'Quantity', type: 'number', required: false, hideLabel: true }
               },
               {
                 key: 'rate',
