@@ -87,7 +87,7 @@ openDocPreview() {
       line-height: 1.6;
       color: #222;
 
-      /* ✅ Violet styling */
+      /*  Violet styling */
       border: 3px solid rgb(38, 4, 70);                  /* Violet border */
       box-shadow: 0 5px 25px rgb(34, 3, 63, 0.4); /* Violet glow */
     }
@@ -378,7 +378,7 @@ openDocPreview() {
 
     this.getOrderNo();
     // to get SaleOrder number for save 
-    this.formConfig.fields[0].fieldGroup[0].fieldGroup[8].hide = true; //flow_status hiding in create page 
+    this.formConfig.fields[0].fieldGroup[0].fieldGroup[7].hide = true; //flow_status hiding in create page 
     this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = true;
     this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide = true;
 
@@ -503,8 +503,8 @@ openDocPreview() {
       ...this.invoiceData,
       sale_invoice_order: {
         ...this.invoiceData.sale_invoice_order,
-        // sale_order_id: this.invoiceData.sale_invoice_order.sale_order_id, // ✅ correct
-        // customer_id: this.invoiceData.sale_invoice_order.customer.customer_id, // ✅ correct
+        // sale_order_id: this.invoiceData.sale_invoice_order.sale_order_id, //  correct
+        // customer_id: this.invoiceData.sale_invoice_order.customer.customer_id, //  correct
         // item_value: items_value,
         tax_amount: tax_amount,
         // discount: discount,
@@ -727,7 +727,7 @@ editSaleOrder(event) {
       this.formConfig.model['sale_order_id'] = this.SaleOrderEditID;
 
       // Show/Hide based on update
-      this.formConfig.fields[0].fieldGroup[0].fieldGroup[8].hide = false;
+      this.formConfig.fields[0].fieldGroup[0].fieldGroup[7].hide = false;
       this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = false;
       this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide = true;
 
@@ -1646,7 +1646,7 @@ updateSaleOrder() {
   //       ? data.code
   //       : field.form.controls.code.value,
   //     rate: data.sales_rate ?? field.form.controls.rate.value,
-  //     // ✅ Key fix for discount:
+  //     //  Key fix for discount:
   //     discount: data.discount !== undefined
   //       ? parseFloat(data.discount)
   //       : field.form.controls.discount.value,
@@ -1671,18 +1671,18 @@ updateSaleOrder() {
 
     const customerCategory = this.formConfig.model?.sale_order?.customer?.customer_category?.name?.toLowerCase();
 
-    // ✅ Figure out the current row index safely
+    //  Figure out the current row index safely
     const parentArray = field.parent;
     const currentRowIndex = +parentArray?.key;
 
-    // ✅ Get the rate on that row if it exists
+    //  Get the rate on that row if it exists
     const currentRowRate = this.formConfig.model?.sale_order_items?.[currentRowIndex]?.rate;
 
     console.log("Current row rate value : ", currentRowRate);
 
     let selectedRate = data.sales_rate; // default fallback
 
-    // ✅ Only override if current rate is 0 or empty
+    //  Only override if current rate is 0 or empty
     if (!currentRowRate || currentRowRate === 0) {
       if (customerCategory === 'wholesalers') {
         selectedRate = data.wholesale_rate ?? data.sales_rate;
@@ -1692,7 +1692,7 @@ updateSaleOrder() {
         selectedRate = data.dealer_rate ?? data.sales_rate;
       }
     } else {
-      // ✅ Keep the manually entered rate
+      //  Keep the manually entered rate
       selectedRate = currentRowRate;
     }
 
@@ -1983,7 +1983,7 @@ updateSaleOrder() {
   //           this.http.patch(`sales/sale_order/${saleOrderDetails.sale_order_id}/`, patchPayload).subscribe({
   //             next: () => {
   //               console.log('Parent sale order updated after removing selected items');
-  //               // ✅ Full refresh of parent order with all entities
+  //               //  Full refresh of parent order with all entities
   //               // this.http.put(`sales/sale_order/${saleOrderDetails.sale_order_id}/`, putPayload).subscribe({
   //               //   next: () => {
   //               //     console.log('Parent sale order fully refreshed with recalculated totals');
@@ -2160,7 +2160,7 @@ confirmWorkOrder() {
           sale_order_items: [product],
           order_attachments: orderAttachments,
           order_shipments: orderShipments,
-          custom_field_values: customFieldsPayload?.custom_field_values || []   // ✅ fixed
+          custom_field_values: customFieldsPayload?.custom_field_values || []   //  fixed
         };
 
         console.log('Payload for child sale order:', childSaleOrderPayload);
@@ -2379,7 +2379,7 @@ confirmWorkOrder() {
 
   //         this.http.patch(`sales/sale_order/${saleOrderDetails.sale_order_id}/`, patchPayload).subscribe({
   //           next: () => {
-  //             // ✅ Recalculate parent totals from remainingItems
+  //             //  Recalculate parent totals from remainingItems
   //             let updatedItemValue = 0;
   //             let updatedTaxAmount = 0;
   //             let updatedProductDiscount = 0;
@@ -2409,7 +2409,7 @@ confirmWorkOrder() {
 
   //             const updatedTotalAmount = updatedItemValue - totalDiscount + updatedTaxAmount + totalCess - updatedProductDiscount;
 
-  //             // ✅ Full PUT call to update parent sale order
+  //             //  Full PUT call to update parent sale order
   //             const finalPutPayload = {
   //               sale_order: {
   //                 ...saleOrderDetails,
@@ -2427,7 +2427,7 @@ confirmWorkOrder() {
 
   //             this.http.put(`sales/sale_order/${saleOrderDetails.sale_order_id}/`, finalPutPayload).subscribe({
   //               next: () => {
-  //                 console.log("✅ Parent sale order fully updated via PUT.");
+  //                 console.log(" Parent sale order fully updated via PUT.");
   //                 this.closeModalworkorder();
   //               },
   //               error: err => {
@@ -2464,7 +2464,7 @@ confirmWorkOrder() {
 //     const packUnit = unitInfo.pack_unit?.unit_name ?? (unitInfo.pack_unit_id === null ? 'NA' : unitInfo.pack_unit);
 //     const gPackUnit = unitInfo.g_pack_unit?.unit_name ?? (unitInfo.g_pack_unit_id === null ? 'NA' : unitInfo.g_pack_unit);
 
-//     // ✅ Explicit check so 0 stays 0
+//     //  Explicit check so 0 stays 0
 //     const packVsStock = unitInfo.pack_vs_stock !== null && unitInfo.pack_vs_stock !== undefined
 //       ? unitInfo.pack_vs_stock
 //       : 'NA';
@@ -2516,7 +2516,7 @@ getUnitData(unitInfo) {
   const unitOption = unitInfo.unit_options?.unit_name ?? 'NA';
   const stockUnit = unitInfo.stock_unit?.stock_unit_name ?? 'NA';
 
-  // ✅ Only null/undefined → NA, keep 0 or string
+  //  Only null/undefined → NA, keep 0 or string
   const packUnit = unitInfo.pack_unit?.unit_name ?? (unitInfo.pack_unit_id == null ? 'NA' : unitInfo.pack_unit_id);
   const gPackUnit = unitInfo.g_pack_unit?.unit_name ?? (unitInfo.g_pack_unit_id == null ? 'NA' : unitInfo.g_pack_unit_id);
 
@@ -2854,7 +2854,7 @@ getUnitData(unitInfo) {
                                 this.orderNumber = res.data.order_number;
                                 modelSaleOrder.order_no = this.orderNumber;
 
-                                // ✅ setValue only if field exists in form
+                                //  setValue only if field exists in form
                                 const orderNoControl = field.form.get('order_no');
                                 if (orderNoControl) {
                                   orderNoControl.setValue(this.orderNumber);
@@ -3011,7 +3011,7 @@ getUnitData(unitInfo) {
                     label: 'Ref date',
                     placeholder: 'Select Ref date',
                     readonly: false,
-                    required: true,
+                    required: false,
                   }
                 },
                 {
@@ -3113,13 +3113,13 @@ getUnitData(unitInfo) {
                           if (res?.data?.order_number) {
                             this.invoiceNumber = res.data.order_number;
 
-                            // ✅ Fetch order_status_id by status_name = "Completed"
+                            //  Fetch order_status_id by status_name = "Completed"
                             this.http.get('masters/order_status/?status_name=Pending').subscribe((statusRes: any) => {
                               const completedStatus = statusRes?.data?.[0];
                               const completedStatusId = completedStatus?.order_status_id;
                               console.log("Second time toal_amount : ", saleOrder.total_amount);
 
-                              // ✅ Inline total calculation
+                              //  Inline total calculation
                               let itemValue = 0;
                               let amountTotal = 0;
 
@@ -3225,16 +3225,6 @@ getUnitData(unitInfo) {
                   }
                 },
                 {
-                  key: 'use_workflow',
-                  type: 'checkbox',
-                  className: 'col-md-4 col-sm-6 col-12',
-                  defaultValue: true,
-                  templateOptions: {
-                    label: 'Use Workflow',
-                    placeholder: 'Enable Workflow',
-                  },
-                },
-                {
                   key: 'remarks',
                   type: 'textarea',
                   className: 'col-md-4 col-sm-6 col-12',
@@ -3250,6 +3240,16 @@ getUnitData(unitInfo) {
                       }
                     }
                   }
+                },
+                {
+                  key: 'use_workflow',
+                  type: 'checkbox',
+                  className: 'col-md-4 col-sm-6 col-12',
+                  defaultValue: true,
+                  templateOptions: {
+                    label: 'Use Workflow',
+                    placeholder: 'Enable Workflow',
+                  },
                 },
               ]
             },
@@ -3792,7 +3792,7 @@ getUnitData(unitInfo) {
                   dataLabel: 'unit_name',
                   dataKey: 'unit_options_id',
                   bindId: true,
-                  required: true,
+                  required: false,
                   lazy: {
                     url: 'masters/unit_options',
                     lazyOneTime: true
@@ -4277,7 +4277,7 @@ getUnitData(unitInfo) {
 
                                   // Subscribe to changes
                                   field.formControl.valueChanges.subscribe(data => {
-                                    // ✅ Coerce empty, null, or invalid to 0
+                                    //  Coerce empty, null, or invalid to 0
                                     const numeric = parseFloat(data);
                                     field.formControl.setValue(isNaN(numeric) ? 0 : numeric, { emitEvent: false });
 

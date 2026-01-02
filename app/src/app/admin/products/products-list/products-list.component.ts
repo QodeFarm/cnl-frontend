@@ -175,11 +175,43 @@ export class ProductsListComponent {
           }
         }
       },
-      // {
-      //   fieldKey: 'print_name',
-      //   name: 'Print Name',
-      //   sort: true
-      // },
+      {
+        fieldKey: 'physical_balance',
+        name: 'Physical Balance',
+        sort: true,
+        isEdit: true,
+        isEditSumbmit: (row, value, col) => {
+          console.log("isEditSumbmit", row, value, col);
+          // Implement your logic here
+        },
+        autoSave: {
+          apiUrl: row => `products/products/${row.product_id}`,
+          method: 'patch',
+          body: (row: any, value: any, col: any) => {
+            console.log('PATCH value:', value); // Add this log
+            return {
+              [col.fieldKey]: value,
+              product_id: row.product_id
+            };
+          }
+        }
+      },
+      {
+        fieldKey: 'balance_diff',
+        name: 'Balance Diff',
+        sort: true,
+        displayType: 'map',
+        mapFn: (value: number, row: any) => {
+          if (value > 0) {
+            return `<span class="text-success fw-bold">+${value}</span>`;
+          }
+          if (value < 0) {
+            return `<span class="text-danger fw-bold">${value}</span>`;
+          }
+          return `<span>${value || 0}</span>`;
+        }
+      },
+
       // {
       //   fieldKey: 'hsn_code',
       //   name: 'HSN',
