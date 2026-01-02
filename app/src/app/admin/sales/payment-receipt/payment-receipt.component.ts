@@ -164,7 +164,7 @@ export class PaymentReceiptComponent implements OnInit {
       (response: any) => {
         console.log('Customer payment data:', response);
 
-        // ✅ Check the response structure properly
+        //  Check the response structure properly
         const hasData =
           response &&
           response.data &&
@@ -172,7 +172,7 @@ export class PaymentReceiptComponent implements OnInit {
           response.data.length > 0;
 
         if (hasData) {
-          // ✅ Vendor has invoices → refresh table
+          //  Vendor has invoices → refresh table
           if (this.taTableComponent) {
             this.taTableComponent.refresh();
           }
@@ -226,7 +226,7 @@ export class PaymentReceiptComponent implements OnInit {
     }, 4000);
   }
 
-    /** ✅ Error handler */
+    /**  Error handler */
     handleError(error: any) {
       console.error('API error:', error);
       let errorMessage = 'Error submitting payment.';
@@ -236,7 +236,7 @@ export class PaymentReceiptComponent implements OnInit {
       this.showErrorToastMessage(errorMessage);
     }
 
-  /** ✅ Manual create or update handler */
+  /**  Manual create or update handler */
   onSubmit(model: any) {
     if (!this.selectedCustomerId) {
       this.showErrorToastMessage('Please select a Customer');
@@ -275,7 +275,7 @@ export class PaymentReceiptComponent implements OnInit {
     return false; // prevent default form auto-submit
   }
 
-  /** ✅ Create new Bill Payment (POST) */
+  /**  Create new Bill Payment (POST) */
   createBillPayment(payload: any) {
     this.http.post(this.apiEndpoint, payload).subscribe({
       next: (response: any) => this.handleSuccess(response),
@@ -283,7 +283,7 @@ export class PaymentReceiptComponent implements OnInit {
     });
   }
 
-  /** ✅ Update existing Bill Payment (PUT) */
+  /**  Update existing Bill Payment (PUT) */
   updateBillPayment(payload: any) {
     this.http.put(`${this.apiEndpoint}${this.SaleOrderEditID}/`, payload).subscribe({
       next: (response: any) => this.handleSuccess(response),
@@ -370,7 +370,7 @@ export class PaymentReceiptComponent implements OnInit {
 
   handleSuccess(response: any) {
   if (response && response.message && response.message.toLowerCase().includes('successfully')) {
-    console.log('✅ Transaction success:', response);
+    console.log(' Transaction success:', response);
 
     // Reset table and form
     this.tableConfig.apiUrl = '';

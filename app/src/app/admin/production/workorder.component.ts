@@ -66,7 +66,7 @@ export class WorkorderComponent implements OnInit {
 
   hideFields(hide: boolean): void {
     // Array of indexes to hide or show
-    const fieldsToToggle = [5, 6, 4, 9, 11];
+    const fieldsToToggle = [4, 9, 11];
   
     // Loop through the array and toggle the `hide` property based on the argument
     fieldsToToggle.forEach(index => {
@@ -94,7 +94,7 @@ export class WorkorderComponent implements OnInit {
   editWorkorder(event: any) {
     this.editMode = true;
     this.showCreateBomButton = false
-    this.hideFields(false); // Shows fields at indexes 5, 4, and 9
+    // this.hideFields(false); // Shows fields at indexes 5, 4, and 9
     this.formConfig.fields[0].fieldGroup[10].hide = true;
     this.formConfig.fields[0].fieldGroup[11].hide = true;
     this.makeFieldsNotTouchable([0, 1, 2]);
@@ -302,7 +302,7 @@ populateBom(product_id: any) {
       this.isBomButtonDisabled = false;
       this.showCreateBomButton = !!this.formConfig.model.work_order.product_id;
  
-      // ✅ Recalculate cost safely
+      //  Recalculate cost safely
       this.updateMaterialCosts();
     }
   });
@@ -984,17 +984,17 @@ resetFormData() {
 }
 
 // hardReset() {
-//   // ✅ Clear history.state so old data is gone
+//   //  Clear history.state so old data is gone
 //   history.replaceState({}, document.title);
 
-//   // ✅ Reset component-level flags
+//   //  Reset component-level flags
 //   this.showWorkorderList = false;
 //   this.showForm = true;
 //   this.editMode = false;
 //   this.WorkOrdrEditID = null;
 //   this.dataToPopulate = undefined;
 
-//   // ✅ Reset form config
+//   //  Reset form config
 //   this.setFormConfig();
 //   this.formConfig.model = {
 //     work_order: {},
@@ -1004,7 +1004,7 @@ resetFormData() {
 //     work_order_stages: [{}]
 //   };
 
-//   // ✅ Force UI refresh
+//   //  Force UI refresh
 //   this.cdRef.detectChanges();
 // }
 
@@ -1048,7 +1048,7 @@ handleSubmit() {
     work_order_stages: workOrder.work_order_stages
   };
 
-  // ✅ Modal check first
+  //  Modal check first
   if (!payload.work_order.sync_qty && payload.work_order.temp_quantity === payload.work_order.quantity) {
     this.showSyncModal = true;
     return;
