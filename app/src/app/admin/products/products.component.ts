@@ -580,7 +580,19 @@ preprocessFormData() {
                         // disabled: true
                       },
                       hooks: {
-                        onInit: (field: any) => { }
+                        onInit: (field: any) => {
+                          // Auto-fill Print Name when Name is entered
+                          field.formControl.valueChanges.subscribe((value: string) => {
+                            if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                              this.formConfig.model['products']['print_name'] = value;
+                              // Find the print_name field and update its form control
+                              const printNameField = field.parent.fieldGroup.find((f: any) => f.key === 'print_name');
+                              if (printNameField && printNameField.formControl) {
+                                printNameField.formControl.setValue(value);
+                              }
+                            }
+                          });
+                        }
                       },
                     },
                     {
@@ -632,6 +644,33 @@ preprocessFormData() {
                           field.formControl.valueChanges.subscribe((data: any) => {
                             if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
                               this.formConfig.model['products']['product_group_id'] = data?.product_group_id;
+                            } else {
+                              console.error('Form config or lead_status data model is not defined.');
+                            }
+                          });
+                        }
+                      }
+                    },
+                    {
+                      key: 'category',
+                      type: 'productCategories-dropdown',
+                      className: 'col-md-4 col-sm-6 col-12',
+                      templateOptions: {
+                        label: 'Category',
+                        dataKey: 'category_id',
+                        dataLabel: "category_name",
+                        options: [],
+                        required: false,
+                        lazy: {
+                          url: 'products/product_categories/',
+                          lazyOneTime: true
+                        }
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          field.formControl.valueChanges.subscribe((data: any) => {
+                            if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                              this.formConfig.model['products']['category_id'] = data?.category_id;
                             } else {
                               console.error('Form config or lead_status data model is not defined.');
                             }
@@ -792,33 +831,6 @@ preprocessFormData() {
                           key: 'products',
                           fieldGroupClassName: "ant-row row align-items-end mt-3",
                           fieldGroup: [
-                            {
-                              key: 'category',
-                              type: 'productCategories-dropdown',
-                              className: 'col-3',
-                              templateOptions: {
-                                label: 'Category',
-                                dataKey: 'category_id',
-                                dataLabel: "category_name",
-                                options: [],
-                                required: false,
-                                lazy: {
-                                  url: 'products/product_categories/',
-                                  lazyOneTime: true
-                                }
-                              },
-                              hooks: {
-                                onChanges: (field: any) => {
-                                  field.formControl.valueChanges.subscribe((data: any) => {
-                                    if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
-                                      this.formConfig.model['products']['category_id'] = data?.category_id;
-                                    } else {
-                                      console.error('Form config or lead_status data model is not defined.');
-                                    }
-                                  });
-                                }
-                              }
-                            },
                             // {
                             //   className: 'col-md-4 col-sm-6 col-12',
                             //   key: 'gst_input',

@@ -3011,7 +3011,7 @@ getUnitData(unitInfo) {
                     label: 'Ref date',
                     placeholder: 'Select Ref date',
                     readonly: false,
-                    required: true,
+                    required: false,
                   }
                 },
                 {

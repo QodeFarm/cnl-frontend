@@ -957,7 +957,30 @@ onCancel() {
 
 isResetting: boolean = false;
 resetFormData() {
-  window.location.reload();
+  // Clear history.state so old data is gone
+  history.replaceState({}, document.title);
+
+  // Reset component-level flags
+  this.showWorkorderList = false;
+  this.editMode = false;
+  this.WorkOrdrEditID = null;
+  this.dataToPopulate = undefined;
+
+  // Hide the form temporarily to destroy and recreate it
+  this.showForm = false;
+  this.cdRef.detectChanges();
+
+  // Reset form config with fresh configuration
+  this.setFormConfig();
+
+  // Hide the fields that should be hidden on reset
+  this.hideFields(true);
+
+  // Show the form again after a brief delay to ensure clean state
+  setTimeout(() => {
+    this.showForm = true;
+    this.cdRef.detectChanges();
+  }, 0);
 }
 
 // hardReset() {
@@ -990,11 +1013,36 @@ showSuccessToast = false;
 toastMessage = '';
 handleSubmit() {
  
-  const workOrder = this.formConfig.model
-   
+  const workOrder = this.formConfig.model;
+
+  // Helper function to extract ID from nested object or return the value if it's already an ID
+  const extractId = (value: any, idKey: string): any => {
+    if (value && typeof value === 'object' && value[idKey]) {
+      return value[idKey];
+    }
+    return value;
+  };
+
+  // Clean BOM data - extract product_id, size_id, color_id from nested objects
+  const cleanedBom = (workOrder.bom || []).map((item: any) => ({
+    ...item,
+    product_id: extractId(item.product_id, 'product_id') || extractId(item.product, 'product_id'),
+    size_id: extractId(item.size_id, 'size_id') || extractId(item.size, 'size_id') || null,
+    color_id: extractId(item.color_id, 'color_id') || extractId(item.color, 'color_id') || null,
+  }));
+
+  // Clean work_order data - extract IDs from nested objects
+  const cleanedWorkOrder = {
+    ...workOrder.work_order,
+    product_id: extractId(workOrder.work_order?.product_id, 'product_id') || extractId(workOrder.work_order?.product, 'product_id'),
+    size_id: extractId(workOrder.work_order?.size_id, 'size_id') || extractId(workOrder.work_order?.size, 'size_id') || null,
+    color_id: extractId(workOrder.work_order?.color_id, 'color_id') || extractId(workOrder.work_order?.color, 'color_id') || null,
+    status_id: extractId(workOrder.work_order?.status_id, 'status_id') || extractId(workOrder.work_order?.status, 'status_id') || null,
+  };
+
   const payload = {
-    work_order: workOrder.work_order,
-    bom: workOrder.bom,
+    work_order: cleanedWorkOrder,
+    bom: cleanedBom,
     work_order_machines: workOrder.work_order_machines,
     workers: workOrder.workers,
     work_order_stages: workOrder.work_order_stages
@@ -1324,7 +1372,7 @@ closeSyncModal() {
             },            
             {
               key: 'status_id',
-              type: 'productionStatuses-dropdown',
+              type: 'production-status-dropdown',
               className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Status',

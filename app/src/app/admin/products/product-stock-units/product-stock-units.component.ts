@@ -102,7 +102,7 @@ export class ProductStockUnitsComponent {
             },
 			{
               key: 'quantity_code',
-              type: 'select',
+              type: 'productUniqueQuantityCodes-dropdown',
               className: 'col-md-6 col-12 px-1 pb-3',
               templateOptions: {
                 label: 'Quantity Code',
