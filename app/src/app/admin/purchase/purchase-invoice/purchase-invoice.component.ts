@@ -324,7 +324,7 @@ export class PurchaseInvoiceComponent {
         ? data.code
         : field.form.controls.code.value,
       rate: data.sales_rate ?? field.form.controls.rate.value,
-      // ✅ Key fix for discount:
+      //  Key fix for discount:
       discount: data.discount !== undefined
         ? parseFloat(data.discount)
         : field.form.controls.discount.value,
@@ -715,7 +715,7 @@ loadQuickpackProducts() {
                 },
                 {
                   key: 'vendor',
-                  type: 'select',
+                  type: 'vendor-dropdown',
                   className: 'col-md-4 col-sm-6 col-12',
                   props: {
                     label: 'Vendor',
@@ -847,6 +847,107 @@ loadQuickpackProducts() {
                     }
                   }
                 },
+                // {
+                //   key: 'voucher',
+                //   type: 'select',
+                //   className: 'col-md-4 col-sm-6 col-12',
+                //   templateOptions: {
+                //     label: 'Voucher',
+                //     required: false,
+                //     options: [
+                //       { label: 'GST_Purchase', value: 'GST_Purchase' },
+                //       { label: 'Purchase', value: 'Purchase' }
+                //     ]
+                //   },
+                //   hooks: {
+                //     onInit: (field: any) => {
+                //       if (this.dataToPopulate?.purchase_invoice_orders?.voucher && field.formControl) {
+                //         field.formControl.setValue(this.dataToPopulate.purchase_invoice_orders.voucher);
+                //       }
+                //     },
+                //     onChanges: (field: any) => {
+                //       field.formControl.valueChanges.subscribe(value => {
+                //         const taxCodeControl = field.form.get('tax_code');
+
+                //         if (value === 'GST_Purchase') {
+                //           taxCodeControl.setValue('Local');
+                //         } else if (value === 'Purchase') {
+                //           taxCodeControl.setValue('Exempted');
+                //         }
+
+                //         this.totalAmountCal();
+                //       });
+                //     }
+                //   }
+                // },
+                {
+                  key: 'voucher',
+                  type: 'select',
+                  className: 'col-md-4 col-sm-6 col-12',
+                  templateOptions: {
+                    label: 'Voucher',
+                    required: false,
+                    options: [
+                      { label: 'GST_Purchase', value: 'GST_Purchase' },
+                      { label: 'Purchase', value: 'Purchase' }
+                    ]
+                  },
+                  hooks: {
+                    onInit: (field: any) => {
+
+                      // Edit mode populate
+                      if (
+                        this.dataToPopulate?.purchase_invoice_orders?.voucher &&
+                        field.formControl
+                      ) {
+                        field.formControl.setValue(
+                          this.dataToPopulate.purchase_invoice_orders.voucher
+                        );
+                      }
+
+                      field.formControl.valueChanges.subscribe(value => {
+                        const parentModel = field.model; // 👈 IMPORTANT
+
+                        const taxCodeControl = field.form.get('tax_code');
+
+                        // 🔑 Update model
+                        parentModel.voucher = value;
+
+                        if (value === 'GST_Purchase') {
+                          parentModel.tax_code = 'Local';
+                          taxCodeControl?.setValue('Local');   // 👈 IMPORTANT
+                        } else if (value === 'Purchase') {
+                          parentModel.tax_code = 'Exempted';
+                          taxCodeControl?.setValue('Exempted'); // 👈 IMPORTANT
+                        }
+
+                        // 🔥 NOW recalculate (model is correct)
+                        this.totalAmountCal();
+                      });
+                    }
+                  }
+                },
+                {
+                  key: 'tax_code',
+                  type: 'select',
+                  className: 'col-md-4 col-sm-6 col-12',
+                  templateOptions: {
+                    label: 'Tax Code',
+                    required: false,
+                    // disabled:true,
+                    options: [
+                      { 'label': "Local", value: 'Local' },
+                      { 'label': "Exempted", value: 'Exempted' }
+                    ]
+                  },
+                  hooks: {
+                    onInit: (field: any) => {
+                      if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders.tax_code && field.formControl) {
+                        field.formControl.setValue(this.dataToPopulate.purchase_invoice_orders.tax_code);
+                      } 
+                    }
+                  }
+                },
                 {
                   key: 'remarks',
                   type: 'textarea',
@@ -922,6 +1023,12 @@ loadQuickpackProducts() {
                   defaultValue: '0.00',
                   expressionProperties: {
                     'model.cgst': (model, field) => {
+
+                      // NEW CONDITION: If voucher = Purchase → return 0.00
+                      if (model.voucher === 'Purchase') {
+                        return '0.00';
+                      }
+
                       if (!field._lastValue || field._lastValue !== model.tax_amount) {
                         const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
                         field._lastValue = model.tax_amount; // Store last value to avoid infinite logs
@@ -945,6 +1052,12 @@ loadQuickpackProducts() {
                   defaultValue: '0.00',
                   expressionProperties: {
                     'model.sgst': (model, field) => {
+
+                      // NEW CONDITION: If voucher = Purchase → return 0.00
+                      if (model.voucher === 'Purchase') {
+                        return '0.00';
+                      }
+
                       if (!field._lastValue || field._lastValue !== model.tax_amount) {
                         const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
                         field._lastValue = model.tax_amount;
@@ -968,6 +1081,12 @@ loadQuickpackProducts() {
                   defaultValue: '0.00',
                   expressionProperties: {
                     'model.igst': (model, field) => {
+
+                      // NEW CONDITION: If voucher = Purchase → return 0.00
+                      if (model.voucher === 'Purchase') {
+                        return '0.00';
+                      }
+
                       if (!field._lastValue || field._lastValue !== model.tax_amount) {
                         const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
                         field._lastValue = model.tax_amount;
@@ -1618,7 +1737,7 @@ loadQuickpackProducts() {
                   }
                 },
                 expressionProperties: {
-                  'templateOptions.disabled': 'true' // Make it read-only
+                  'templateOptions.disabled': 'true', // Make it read-only
                 }
               },              
               {
@@ -1664,7 +1783,11 @@ loadQuickpackProducts() {
                   }
                 },
                 expressionProperties: {
-                  'templateOptions.disabled': 'true' // Make it read-only
+                  'templateOptions.disabled': 'true', // Make it read-only
+                  'model.igst': (model, field) => {
+                    if (model.voucher === 'Purchase') return 0;
+                    return model.igst;
+                  }
                 }
               },
               {
@@ -1866,7 +1989,7 @@ loadQuickpackProducts() {
 
                                   // Subscribe to changes
                                   field.formControl.valueChanges.subscribe(data => {
-                                    // ✅ Coerce empty, null, or invalid to 0
+                                    //  Coerce empty, null, or invalid to 0
                                     const numeric = parseFloat(data);
                                     field.formControl.setValue(isNaN(numeric) ? 0 : numeric, { emitEvent: false });
 

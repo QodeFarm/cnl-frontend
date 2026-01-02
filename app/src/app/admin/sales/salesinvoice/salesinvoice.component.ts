@@ -323,18 +323,18 @@ async autoFillProductDetails(field, data) {
 
   const customerCategory = this.formConfig.model?.sale_invoice_order?.customer?.customer_category?.name?.toLowerCase();
 
-  // ✅ Figure out the current row index safely
+  //  Figure out the current row index safely
   const parentArray = field.parent;
   const currentRowIndex = +parentArray?.key;
 
-  // ✅ Get the rate on that row if it exists
+  //  Get the rate on that row if it exists
   const currentRowRate = this.formConfig.model?.sale_invoice_items?.[currentRowIndex]?.rate;
 
   console.log("Current row rate value : ", currentRowRate);
 
   let selectedRate = data.sales_rate; // default fallback
 
-  // ✅ Only override if current rate is 0 or empty
+  //  Only override if current rate is 0 or empty
   if (!currentRowRate || currentRowRate === 0) {
     if (customerCategory === 'wholesalers') {
       selectedRate = data.wholesale_rate ?? data.sales_rate;
@@ -344,7 +344,7 @@ async autoFillProductDetails(field, data) {
       selectedRate = data.dealer_rate ?? data.sales_rate;
     }
   } else {
-    // ✅ Keep the manually entered rate
+    //  Keep the manually entered rate
     selectedRate = currentRowRate;
   }
 
@@ -1192,7 +1192,7 @@ createSaleInovice() {
 
       }, error => {
         console.error('Error updating record:', error);
-          // ✅ Check if backend error matches mstcnl restriction
+          //  Check if backend error matches mstcnl restriction
           const errorMessage = error?.error?.message || '';
           if (errorMessage === "Update is not allowed, please contact Product team.") {
             // Re-run ngOnInit when this specific error occurs

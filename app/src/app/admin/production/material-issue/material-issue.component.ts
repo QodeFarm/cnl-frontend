@@ -93,9 +93,11 @@ export class MaterialIssueComponent implements OnInit {
       payload.material_issue.production_floor_id = payload.material_issue.production_floor_id.production_floor_id;
     }
 
-    // Fix items array
+    // Fix items array - filter out empty items first
     if (Array.isArray(payload.items)) {
-      payload.items = payload.items.map(item => {
+      payload.items = payload.items
+        .filter(item => item.product_id) // Filter out empty rows
+        .map(item => {
         const newItem = { ...item };
         // Fix product_id (send only UUID)
         if (newItem.product_id && typeof newItem.product_id === 'object' && newItem.product_id.product_id) {
@@ -200,7 +202,7 @@ displayInformation(product: any) {
       },
       model: {
         material_issue: {},
-        items: [{}],
+        items: [{}, {}, {}, {}, {}],
         attachments: []
       },
       fields: [
@@ -324,7 +326,7 @@ displayInformation(product: any) {
                   hideLabel: true,
                   placeholder: 'Select Product',
                   options: [],
-                  required: true,
+                  required: false,
                   lazy: {
                     url: 'products/products/?summary=true',
                     lazyOneTime: true
@@ -394,7 +396,7 @@ displayInformation(product: any) {
                 dataLabel: 'unit_name',
                 dataKey: 'unit_options_id',
                 bindId: true,
-                required: true,
+                required: false,
                 lazy: {
                   url: 'masters/unit_options',
                   lazyOneTime: true
@@ -422,7 +424,7 @@ displayInformation(product: any) {
               {
                 key: 'quantity',
                 type: 'input',
-                templateOptions: { label: 'Quantity', type: 'number', required: true, hideLabel: true }
+                templateOptions: { label: 'Quantity', type: 'number', required: false, hideLabel: true }
               },
               {
                 key: 'rate',

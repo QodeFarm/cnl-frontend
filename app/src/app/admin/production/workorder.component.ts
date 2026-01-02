@@ -66,7 +66,7 @@ export class WorkorderComponent implements OnInit {
 
   hideFields(hide: boolean): void {
     // Array of indexes to hide or show
-    const fieldsToToggle = [5, 6, 4, 9, 11];
+    const fieldsToToggle = [4, 9, 11];
   
     // Loop through the array and toggle the `hide` property based on the argument
     fieldsToToggle.forEach(index => {
@@ -94,7 +94,7 @@ export class WorkorderComponent implements OnInit {
   editWorkorder(event: any) {
     this.editMode = true;
     this.showCreateBomButton = false
-    this.hideFields(false); // Shows fields at indexes 5, 4, and 9
+    // this.hideFields(false); // Shows fields at indexes 5, 4, and 9
     this.formConfig.fields[0].fieldGroup[10].hide = true;
     this.formConfig.fields[0].fieldGroup[11].hide = true;
     this.makeFieldsNotTouchable([0, 1, 2]);
@@ -302,7 +302,7 @@ populateBom(product_id: any) {
       this.isBomButtonDisabled = false;
       this.showCreateBomButton = !!this.formConfig.model.work_order.product_id;
  
-      // ✅ Recalculate cost safely
+      //  Recalculate cost safely
       this.updateMaterialCosts();
     }
   });
@@ -957,21 +957,44 @@ onCancel() {
 
 isResetting: boolean = false;
 resetFormData() {
-  window.location.reload();
+  // Clear history.state so old data is gone
+  history.replaceState({}, document.title);
+
+  // Reset component-level flags
+  this.showWorkorderList = false;
+  this.editMode = false;
+  this.WorkOrdrEditID = null;
+  this.dataToPopulate = undefined;
+
+  // Hide the form temporarily to destroy and recreate it
+  this.showForm = false;
+  this.cdRef.detectChanges();
+
+  // Reset form config with fresh configuration
+  this.setFormConfig();
+
+  // Hide the fields that should be hidden on reset
+  this.hideFields(true);
+
+  // Show the form again after a brief delay to ensure clean state
+  setTimeout(() => {
+    this.showForm = true;
+    this.cdRef.detectChanges();
+  }, 0);
 }
 
 // hardReset() {
-//   // ✅ Clear history.state so old data is gone
+//   //  Clear history.state so old data is gone
 //   history.replaceState({}, document.title);
 
-//   // ✅ Reset component-level flags
+//   //  Reset component-level flags
 //   this.showWorkorderList = false;
 //   this.showForm = true;
 //   this.editMode = false;
 //   this.WorkOrdrEditID = null;
 //   this.dataToPopulate = undefined;
 
-//   // ✅ Reset form config
+//   //  Reset form config
 //   this.setFormConfig();
 //   this.formConfig.model = {
 //     work_order: {},
@@ -981,7 +1004,7 @@ resetFormData() {
 //     work_order_stages: [{}]
 //   };
 
-//   // ✅ Force UI refresh
+//   //  Force UI refresh
 //   this.cdRef.detectChanges();
 // }
 
@@ -990,17 +1013,42 @@ showSuccessToast = false;
 toastMessage = '';
 handleSubmit() {
  
-  const workOrder = this.formConfig.model
-   
+  const workOrder = this.formConfig.model;
+
+  // Helper function to extract ID from nested object or return the value if it's already an ID
+  const extractId = (value: any, idKey: string): any => {
+    if (value && typeof value === 'object' && value[idKey]) {
+      return value[idKey];
+    }
+    return value;
+  };
+
+  // Clean BOM data - extract product_id, size_id, color_id from nested objects
+  const cleanedBom = (workOrder.bom || []).map((item: any) => ({
+    ...item,
+    product_id: extractId(item.product_id, 'product_id') || extractId(item.product, 'product_id'),
+    size_id: extractId(item.size_id, 'size_id') || extractId(item.size, 'size_id') || null,
+    color_id: extractId(item.color_id, 'color_id') || extractId(item.color, 'color_id') || null,
+  }));
+
+  // Clean work_order data - extract IDs from nested objects
+  const cleanedWorkOrder = {
+    ...workOrder.work_order,
+    product_id: extractId(workOrder.work_order?.product_id, 'product_id') || extractId(workOrder.work_order?.product, 'product_id'),
+    size_id: extractId(workOrder.work_order?.size_id, 'size_id') || extractId(workOrder.work_order?.size, 'size_id') || null,
+    color_id: extractId(workOrder.work_order?.color_id, 'color_id') || extractId(workOrder.work_order?.color, 'color_id') || null,
+    status_id: extractId(workOrder.work_order?.status_id, 'status_id') || extractId(workOrder.work_order?.status, 'status_id') || null,
+  };
+
   const payload = {
-    work_order: workOrder.work_order,
-    bom: workOrder.bom,
+    work_order: cleanedWorkOrder,
+    bom: cleanedBom,
     work_order_machines: workOrder.work_order_machines,
     workers: workOrder.workers,
     work_order_stages: workOrder.work_order_stages
   };
 
-  // ✅ Modal check first
+  //  Modal check first
   if (!payload.work_order.sync_qty && payload.work_order.temp_quantity === payload.work_order.quantity) {
     this.showSyncModal = true;
     return;
@@ -1324,7 +1372,7 @@ closeSyncModal() {
             },            
             {
               key: 'status_id',
-              type: 'productionStatuses-dropdown',
+              type: 'production-status-dropdown',
               className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Status',
