@@ -1,0 +1,344 @@
+/* Professional Accordion Styles */
+.accordion {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: none;
+}
+
+.accordion-item {
+  border: none;
+  background: #fff;
+}
+
+.accordion-button {
+  font-weight: 600;
+  font-size: 15px;
+  color: #fff;
+  // background: linear-gradient(135deg, #1a3353 0%, #2c4a6e 100%);
+  padding: 14px 20px;
+  border: none;
+  box-shadow: none;
+  
+  &:not(.collapsed) {
+    // background: linear-gradient(135deg, #1a3353 0%, #2c4a6e 100%);
+    color: #fff;
+    box-shadow: none;
+  }
+
+  &:focus {
+    box-shadow: none;
+    border: none;
+  }
+
+  &::after {
+    filter: brightness(0) invert(1);
+  }
+}
+
+.accordion-body {
+  padding: 16px 20px;
+  background: #f8fafc;
+  border-top: 1px solid #e8e8e8;
+}
+
+.report-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  color: #1a3353;
+  text-decoration: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  
+  &:hover {
+    background: #e6f4ff;
+    border-color: #1890ff;
+    color: #1890ff;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(24, 144, 255, 0.15);
+  }
+
+  &.active {
+    background: #1890ff;
+    border-color: #1890ff;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
+  }
+}
+
+// Summary Dashboard
+.summary-dashboard {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.summary-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px 20px;
+  transition: all 0.2s ease;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+  .card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    i {
+      font-size: 24px;
+      color: #fff;
+    }
+  }
+
+  .card-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-value {
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .card-label {
+    font-size: 12px;
+    color: #8c8c8c;
+    margin-top: 2px;
+  }
+
+  // Card Variants
+  &.total {
+    .card-icon { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .card-value { color: #5b5b5b; }
+  }
+
+  &.critical {
+    .card-icon { background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%); }
+    .card-value { color: #cf1322; }
+  }
+
+  &.warning {
+    .card-icon { background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%); }
+    .card-value { color: #d48806; }
+  }
+
+  &.healthy {
+    .card-icon { background: linear-gradient(135deg, #52c41a 0%, #389e0d 100%); }
+    .card-value { color: #389e0d; }
+  }
+
+  // Active state for filtering
+  &.active {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 2px solid #1890ff;
+  }
+
+  &:hover:not(.active) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Custom List Table Styles */
+.custom-list {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  
+  ::ng-deep {
+    .ant-table-thead > tr > th {
+      // background: #1a3353 !important;
+      color: #fff !important;
+      font-weight: 500;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 12px 16px;
+    }
+
+    .ant-table-tbody > tr > td {
+      padding: 12px 16px;
+    }
+
+    .ant-table-tbody > tr:hover > td {
+      background: #f5f8fa;
+    }
+  }
+}
+
+// Hide ta-table filters (we use custom filters)
+::ng-deep {
+  .ta-table-filters,
+  .table-filters,
+  .filter-section,
+  .ant-table-filter-trigger-container,
+  ta-table .filters,
+  .common-filter-wrapper,
+  app-filter {
+    display: none !important;
+  }
+
+  // Status column colors
+  .status-RED, .status-red {
+    background-color: #fff1f0 !important;
+    color: #cf1322 !important;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+
+  .status-YELLOW, .status-yellow {
+    background-color: #fffbe6 !important;
+    color: #d48806 !important;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+
+  .status-GREEN, .status-green {
+    background-color: #f6ffed !important;
+    color: #389e0d !important;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+
+  // Better table styling
+  .ant-table {
+    border-radius: 8px;
+  }
+
+  .ant-table-thead > tr > th {
+    background: #fafafa;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .ant-table-tbody > tr:hover > td {
+    background: #f5f5f5;
+  }
+
+  // Action buttons
+  .action-btn {
+    margin-right: 8px;
+    font-size: 12px;
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+}
+
+// Status badges and text colors for ta-table (using ::ng-deep to penetrate component encapsulation)
+::ng-deep {
+  // Text color classes for Difference column
+  .text-danger {
+    color: #dc3545 !important;
+  }
+
+  .text-success {
+    color: #28a745 !important;
+  }
+
+  .text-muted {
+    color: #6c757d !important;
+  }
+
+  .fw-bold {
+    font-weight: 600 !important;
+  }
+
+  // Badge styles for Status column
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1;
+    border-radius: 12px;
+    white-space: nowrap;
+  }
+
+  .badge.bg-danger {
+    background-color: #dc3545 !important;
+    color: #fff !important;
+  }
+
+  .badge.bg-warning {
+    background-color: #ffc107 !important;
+    color: #212529 !important;
+  }
+
+  .badge.bg-success {
+    background-color: #28a745 !important;
+    color: #fff !important;
+  }
+}
+
+// Period Info Banner - Shows selected period for average sales calculation
+.period-info-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #e6f7ff 0%, #f0f9ff 100%);
+  border: 1px solid #91d5ff;
+  border-radius: 8px;
+  padding: 12px 18px;
+  font-size: 14px;
+  color: #0050b3;
+  box-shadow: 0 2px 4px rgba(24, 144, 255, 0.1);
+
+  i {
+    font-size: 18px;
+    color: #1890ff;
+  }
+
+  strong {
+    color: #1a3353;
+  }
+
+  .period-hint {
+    margin-left: auto;
+    cursor: help;
+    color: #8c8c8c;
+    
+    i {
+      font-size: 16px;
+      color: #8c8c8c;
+      
+      &:hover {
+        color: #1890ff;
+      }
+    }
+  }
+}

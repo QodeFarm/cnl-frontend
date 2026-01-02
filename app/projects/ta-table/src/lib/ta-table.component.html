@@ -63,8 +63,8 @@
 
             
 
-            <!-- Warehouse Filter (only for inventory) -->
-            <div class="filter-group col p-0 mt-2" style="margin-right: 10px; display:flex" *ngIf="isInventoryFilterVisible">
+            <!-- Warehouse Filter (only for inventory, NOT for stock forecast report) -->
+            <div class="filter-group col p-0 mt-2" style="margin-right: 10px; display:flex" *ngIf="isInventoryFilterVisible && !isStockForecastPage">
                 <nz-select [(ngModel)]="selectedWarehouse" nzPlaceHolder="Select Warehouse" class="select-field" 
                   (ngModelChange)="applyFilters($event)" nzAllowClear>
                     <nz-option *ngFor="let warehouse of warehouseOptions" [nzValue]="warehouse.value" [nzLabel]="warehouse.label"></nz-option>
@@ -74,22 +74,23 @@
 
 
             <!-- Quick Period Dropdown -->
-            <div class="filter-group col p-0 mt-2" style="margin-left: 5px;" *ngIf="isButtonVisible">
+            <div class="filter-group col p-0 mt-2" style="margin-left: 5px;" *ngIf="isButtonVisible || isStockForecastPage">
                 <nz-select id="quickPeriod" [(ngModel)]="selectedQuickPeriod" (ngModelChange)="onQuickPeriodChange(); applyFilters()"
-                    nzPlaceHolder="Quick Period" class="quick-period-select" nzAllowClear>
-                    <nz-option *ngFor="let period of quickPeriodOptions" [nzValue]="period.value"
-                        [nzLabel]="period.label"></nz-option>
+                    [nzPlaceHolder]="isStockForecastPage ? 'Analysis Period' : 'Quick Period'" class="quick-period-select" nzAllowClear>
+                    <!-- Use stock forecast specific options for that page, otherwise use regular options -->
+                    <nz-option *ngFor="let period of (isStockForecastPage ? stockForecastPeriodOptions : quickPeriodOptions)" 
+                        [nzValue]="period.value" [nzLabel]="period.label"></nz-option>
                 </nz-select>
             </div>
 
-            <!-- From Date Picker -->
-            <div class="filter-group col p-0 mt-2" style="margin-left: 5px;" *ngIf="isButtonVisible">
+            <!-- From Date Picker (hidden for Stock Forecast - uses period_name for calculation) -->
+            <div class="filter-group col p-0 mt-2" style="margin-left: 5px;" *ngIf="isButtonVisible && !isStockForecastPage">
                 <nz-date-picker id="fromDate" [(ngModel)]="fromDate" nzPlaceHolder="From date" class="date-picker"
                     style="width: 130px;" (ngModelChange)="applyFilters()" nzAllowClear></nz-date-picker>
             </div>
 
-            <!-- To Date Picker -->
-            <div class="filter-group col p-0 mt-2" style="margin-left: 5px;" *ngIf="isButtonVisible">
+            <!-- To Date Picker (hidden for Stock Forecast - uses period_name for calculation) -->
+            <div class="filter-group col p-0 mt-2" style="margin-left: 5px;" *ngIf="isButtonVisible && !isStockForecastPage">
                 <nz-date-picker id="toDate" [(ngModel)]="toDate" nzPlaceHolder="To date" class="date-picker"
                     style="width: 130px;" (ngModelChange)="applyFilters()" nzAllowClear></nz-date-picker>
             </div>
@@ -117,6 +118,18 @@
                         (ngModelChange)="onStatusChange($event)" nzAllowClear>
                         <nz-option *ngFor="let status of statusOptions" [nzValue]="status.value"
                             [nzLabel]="status.label">
+                        </nz-option>
+                    </nz-select>
+                </div>
+            </div>
+
+            <!-- Stock Status Filter for Inventory Reports (RED/YELLOW/GREEN) -->
+            <div *ngIf="isStockStatusFilterVisible" class="filter-group col p-0" style="margin-left: 5px;">
+                <div class="filter-group mt-2">
+                    <nz-select [(ngModel)]="selectedStockStatus" nzPlaceHolder="Select Status" class="select-field"
+                        (ngModelChange)="applyFilters()" nzAllowClear>
+                        <nz-option *ngFor="let stockStatus of stockStatusOptions" [nzValue]="stockStatus.value"
+                            [nzLabel]="stockStatus.label">
                         </nz-option>
                     </nz-select>
                 </div>
