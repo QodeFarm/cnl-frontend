@@ -69,14 +69,14 @@ export class PaymentReceiptListComponent {
         this.showLoading = false;
         this.refreshTable();
 
-        // ✅ CASE 1: WATI (server sends directly)
+        //  CASE 1: WATI (server sends directly)
         if (response.mode === 'wati') {
           this.showSuccessToast = true;
           this.toastMessage = 'WhatsApp message sent successfully';
           setTimeout(() => this.showSuccessToast = false, 2000);
         }
 
-        // ✅ CASE 2: Click-to-chat (local / dev)
+        //  CASE 2: Click-to-chat (local / dev)
         else if (response.mode === 'click_to_chat' && response.whatsapp_url) {
           window.open(response.whatsapp_url, '_blank');
 
@@ -426,12 +426,12 @@ private fallbackPrint(pdfBlob: Blob): void {
     const user = this.localStorage.getItem('user');
     const isSuperUser = user?.is_sp_user === true;
 
-    // ✅ Correct URL for payment_transactions
+    //  Correct URL for payment_transactions
     this.tableConfig.apiUrl = isSuperUser
       ? 'sales/payment_transactions/?records_all=true'
       : 'sales/payment_transactions/';
 
-    // ✅ If you really want, you can keep this too — but it's optional now
+    //  If you really want, you can keep this too — but it's optional now
     this.tableConfig.fixedFilters = isSuperUser
       ? [{ key: 'records_all', value: 'true' }]
       : [];

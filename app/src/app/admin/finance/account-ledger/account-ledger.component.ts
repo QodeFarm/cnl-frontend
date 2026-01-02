@@ -44,93 +44,134 @@ export class AccountLedgerComponent implements OnInit, AfterViewInit {
     }, 500);
   }
 
+  // loadLedgerData(type: string, id: string) {
+  //   console.log("loadLedgerData called with:", type, id);
+
+
+  //   //  STORE FOR PRINT / PREVIEW
+  //   this.selectedAccountType = type;
+  //   this.selectedAccountId = id;
+
+
+  //   // Store current account ID for search functionality
+  //   this.currentAccountId = id;
+
+  //   // Construct the complete API URL with customer/vendor ID - with trailing slash
+  //   const apiUrl = `finance/journal_entry_lines_list/${id}/`;
+
+  //   // Update the tableConfig apiUrl to support search functionality
+  //   this.curdConfig.tableConfig.apiUrl = apiUrl;
+
+  //   console.log("Making direct API call to:", apiUrl);
+
+  //   // Make direct HTTP request to fetch the data
+  //   this.http.get(apiUrl).subscribe(
+  //     (response: any) => {
+  //       console.log('API response received:', response);
+
+  //       if (response && response.data) {
+  //         if (response.data.length === 0) {
+  //           // No data found, show notification message using NzNotificationService
+  //           const entityType = type === 'customer' ? 'Customer' : type === 'vendor' ? 'Vendor' : 'Account';
+  //           this.notification.warning(
+  //             'No Data Found',
+  //             `No ledger data found for the selected ${entityType.toLowerCase()}.`,
+  //             { nzDuration: 5000 }
+  //           );
+
+  //           // Update UI to reflect empty data
+  //           // if (this.tableComponent) {
+  //           //   this.tableComponent.rows = [];
+  //           //   this.tableComponent.total = 0;
+  //           // }
+  //           return;
+  //         }
+
+  //         console.log(`Found ${response.data.length} journal entries`);
+
+  //         // Get the table component and update its data
+  //         if (this.tableComponent) {
+  //           // Directly update the table component's data rows
+  //           this.tableComponent.rows = response.data;
+  //           this.tableComponent.total = response.count || response.data.length;
+  //           console.log("Table data updated successfully");
+  //         } else {
+  //           console.error("Table component reference not found");
+
+  //           // Try to find the table component again
+  //           if (this.curdModalComponent && this.curdModalComponent.table) {
+  //             this.tableComponent = this.curdModalComponent.table;
+  //             this.tableComponent.rows = response.data;
+  //             this.tableComponent.total = response.count || response.data.length;
+  //             console.log("Table data updated on second attempt");
+  //           }
+  //         }
+  //       } else {
+  //         console.warn("API response contains no data");
+  //         this.notification.warning(
+  //           'No Data Found',
+  //           'No ledger data found for the selected account.',
+  //           { nzDuration: 5000 }
+  //         );
+
+  //         // Clear the table
+  //         if (this.tableComponent) {
+  //           this.tableComponent.rows = [];
+  //           this.tableComponent.total = 0;
+  //         }
+  //       }
+  //     },
+  //     (error) => {
+  //       console.error('Error fetching ledger data:', error);
+  //       // this.notification.error(
+  //       //   'Error',
+  //       //   'Failed to fetch ledger data. Please try again.',
+  //       //   { nzDuration: 5000 }
+  //       // );
+  //     }
+  //   );
+  // }
+
   loadLedgerData(type: string, id: string) {
     console.log("loadLedgerData called with:", type, id);
 
-
-    // ✅ STORE FOR PRINT / PREVIEW
+    //  STORE FOR PRINT / PREVIEW
     this.selectedAccountType = type;
     this.selectedAccountId = id;
 
-
-    // Store current account ID for search functionality
     this.currentAccountId = id;
 
-    // Construct the complete API URL with customer/vendor ID - with trailing slash
     const apiUrl = `finance/journal_entry_lines_list/${id}/`;
-
-    // Update the tableConfig apiUrl to support search functionality
     this.curdConfig.tableConfig.apiUrl = apiUrl;
 
-    console.log("Making direct API call to:", apiUrl);
+    // 🔹 KEEP manual API call ONLY for validation / messages
+    this.http.get(apiUrl).subscribe((response: any) => {
 
-    // Make direct HTTP request to fetch the data
-    this.http.get(apiUrl).subscribe(
-      (response: any) => {
-        console.log('API response received:', response);
+      if (response && response.data && response.data.length === 0) {
+        const entityType =
+          type === 'customer' ? 'Customer' :
+          type === 'vendor' ? 'Vendor' : 'Account';
 
-        if (response && response.data) {
-          if (response.data.length === 0) {
-            // No data found, show notification message using NzNotificationService
-            const entityType = type === 'customer' ? 'Customer' : type === 'vendor' ? 'Vendor' : 'Account';
-            this.notification.warning(
-              'No Data Found',
-              `No ledger data found for the selected ${entityType.toLowerCase()}.`,
-              { nzDuration: 5000 }
-            );
+        this.notification.warning(
+          'No Data Found',
+          `No ledger data found for the selected ${entityType.toLowerCase()}.`,
+          { nzDuration: 5000 }
+        );
 
-            // Update UI to reflect empty data
-            if (this.tableComponent) {
-              this.tableComponent.rows = [];
-              this.tableComponent.total = 0;
-            }
-            return;
-          }
-
-          console.log(`Found ${response.data.length} journal entries`);
-
-          // Get the table component and update its data
-          if (this.tableComponent) {
-            // Directly update the table component's data rows
-            this.tableComponent.rows = response.data;
-            this.tableComponent.total = response.count || response.data.length;
-            console.log("Table data updated successfully");
-          } else {
-            console.error("Table component reference not found");
-
-            // Try to find the table component again
-            if (this.curdModalComponent && this.curdModalComponent.table) {
-              this.tableComponent = this.curdModalComponent.table;
-              this.tableComponent.rows = response.data;
-              this.tableComponent.total = response.count || response.data.length;
-              console.log("Table data updated on second attempt");
-            }
-          }
-        } else {
-          console.warn("API response contains no data");
-          this.notification.warning(
-            'No Data Found',
-            'No ledger data found for the selected account.',
-            { nzDuration: 5000 }
-          );
-
-          // Clear the table
-          if (this.tableComponent) {
-            this.tableComponent.rows = [];
-            this.tableComponent.total = 0;
-          }
-        }
-      },
-      (error) => {
-        console.error('Error fetching ledger data:', error);
-        // this.notification.error(
-        //   'Error',
-        //   'Failed to fetch ledger data. Please try again.',
-        //   { nzDuration: 5000 }
-        // );
+        // ❌ DO NOT TOUCH rows here
+        return;
       }
-    );
+
+      //  VERY IMPORTANT LINE (this fixes pagination)
+      if (this.tableComponent) {
+        this.tableComponent.reload();
+      }
+
+    }, error => {
+      console.error('Error fetching ledger data:', error);
+    });
   }
+
 
   onCityChange(city: string) {
     if (!this.currentAccountId) {
@@ -146,6 +187,10 @@ export class AccountLedgerComponent implements OnInit, AfterViewInit {
 
     // Reload table
     if (this.tableComponent) {
+      //  RESET pagination when city changes
+      this.tableComponent.pageIndex = 1;
+
+      //  Reload with fresh pagination state
       this.tableComponent.reload();
     }
   }

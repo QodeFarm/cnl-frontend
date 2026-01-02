@@ -302,7 +302,7 @@ populateBom(product_id: any) {
       this.isBomButtonDisabled = false;
       this.showCreateBomButton = !!this.formConfig.model.work_order.product_id;
  
-      // ✅ Recalculate cost safely
+      //  Recalculate cost safely
       this.updateMaterialCosts();
     }
   });
@@ -961,17 +961,17 @@ resetFormData() {
 }
 
 // hardReset() {
-//   // ✅ Clear history.state so old data is gone
+//   //  Clear history.state so old data is gone
 //   history.replaceState({}, document.title);
 
-//   // ✅ Reset component-level flags
+//   //  Reset component-level flags
 //   this.showWorkorderList = false;
 //   this.showForm = true;
 //   this.editMode = false;
 //   this.WorkOrdrEditID = null;
 //   this.dataToPopulate = undefined;
 
-//   // ✅ Reset form config
+//   //  Reset form config
 //   this.setFormConfig();
 //   this.formConfig.model = {
 //     work_order: {},
@@ -981,7 +981,7 @@ resetFormData() {
 //     work_order_stages: [{}]
 //   };
 
-//   // ✅ Force UI refresh
+//   //  Force UI refresh
 //   this.cdRef.detectChanges();
 // }
 
@@ -1000,7 +1000,7 @@ handleSubmit() {
     work_order_stages: workOrder.work_order_stages
   };
 
-  // ✅ Modal check first
+  //  Modal check first
   if (!payload.work_order.sync_qty && payload.work_order.temp_quantity === payload.work_order.quantity) {
     this.showSyncModal = true;
     return;

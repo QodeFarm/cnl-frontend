@@ -419,7 +419,7 @@ ledgerAccount() {
 
   onAccountTypeChange() {
     this.selectedAccountId = null;
-    // ✅ ADD: reset city when account type changes
+    //  ADD: reset city when account type changes
     this.selectedCity = null;
     this.cityOptions = [];
     this.isCityDisabled = false;
@@ -467,7 +467,7 @@ ledgerAccount() {
   if (!this.selectedAccountId) {
     console.log("Resource cleared, enabling city");
 
-    this.isCityDisabled = false;   // ✅ Enable city again
+    this.isCityDisabled = false;   //  Enable city again
     this.applyFilters();
     return;
   }
@@ -555,7 +555,7 @@ applyFilters() {
     type: this.selectedType,
     warehouse: this.selectedWarehouse,
     ledgerAccount: this.selectedLedgerAccount,
-    city: this.selectedCity   // ✅ City sent only when selected
+    city: this.selectedCity   //  City sent only when selected
   };
 
   const queryString = this.generateQueryString(filters);
@@ -595,7 +595,7 @@ applyFilters() {
 
   console.log("Making API request to:", url);
 
-  // ✅✅ ADD THIS BLOCK (SYNC FILTER STATE)
+  //  ADD THIS BLOCK (SYNC FILTER STATE)
   if (window['accountLedgerComponentInstance']) {
     window['accountLedgerComponentInstance'].selectedAccountType = this.selectedAccountType;
     window['accountLedgerComponentInstance'].selectedAccountId = this.selectedAccountId;

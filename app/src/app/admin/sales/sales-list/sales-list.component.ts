@@ -85,14 +85,14 @@ export class SalesListComponent {
         this.showLoading = false;
         this.refreshTable();
 
-        // ✅ CASE 1: WATI (server sends directly)
+        //  CASE 1: WATI (server sends directly)
         if (response.mode === 'wati') {
           this.showSuccessToast = true;
           this.toastMessage = 'WhatsApp message sent successfully';
           setTimeout(() => this.showSuccessToast = false, 2000);
         }
 
-        // ✅ CASE 2: Click-to-chat (local / dev)
+        //  CASE 2: Click-to-chat (local / dev)
         else if (response.mode === 'click_to_chat' && response.whatsapp_url) {
           window.open(response.whatsapp_url, '_blank');
 

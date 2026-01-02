@@ -107,7 +107,7 @@ export function getUnitData(unitInfo) {
   const unitOption = unitInfo.unit_options?.unit_name ?? 'NA';
   const stockUnit = unitInfo.stock_unit?.stock_unit_name ?? 'NA';
 
-  // ✅ Only null/undefined → NA, keep 0 or string
+  //  Only null/undefined → NA, keep 0 or string
   const packUnit = unitInfo.pack_unit?.stock_unit_name ?? (unitInfo.pack_unit_id == null ? 'NA' : unitInfo.pack_unit_id);
   const gPackUnit = unitInfo.g_pack_unit?.stock_unit_name ?? (unitInfo.g_pack_unit_id == null ? 'NA' : unitInfo.g_pack_unit_id);
 
@@ -292,7 +292,7 @@ export function calculateTotalAmount(data: any, modelName: string, form: any) {
 
   const billingAddress = data[parentModel]?.billing_address || '';
 
-  // ✅ NEW: Identify Purchase Invoice without tax
+  //  NEW: Identify Purchase Invoice without tax
   const isPurchaseInvoice = parentModel === 'purchase_invoice_orders';
   const isWithoutTaxPurchase =
     isPurchaseInvoice && data[parentModel]?.voucher === 'Purchase';
@@ -319,7 +319,7 @@ export function calculateTotalAmount(data: any, modelName: string, form: any) {
           totalAmount += amount;
           totalDiscount += discountAmount;
 
-          // ✅ UPDATED GST LOGIC (Purchase without tax bypass)
+          //  UPDATED GST LOGIC (Purchase without tax bypass)
           if (!isWithoutTaxPurchase && product.product?.gst_input) {
             const gstValue = (amount * Number(product.product.gst_input)) / 100;
 
@@ -333,7 +333,7 @@ export function calculateTotalAmount(data: any, modelName: string, form: any) {
               product.sgst = 0.00;
             }
           } else {
-            // ✅ Force zero tax for Purchase (Without Tax)
+            //  Force zero tax for Purchase (Without Tax)
             product.cgst = 0.00;
             product.sgst = 0.00;
             product.igst = 0.00;
@@ -342,7 +342,7 @@ export function calculateTotalAmount(data: any, modelName: string, form: any) {
       }
     });
 
-    // ✅ UPDATED total tax calculation
+    //  UPDATED total tax calculation
     taxAmount = isWithoutTaxPurchase
       ? 0
       : products.reduce((totalTax: number, product: any) => {

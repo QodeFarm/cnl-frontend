@@ -328,7 +328,7 @@ export class PurchasereturnordersComponent {
         ? data.code
         : field.form.controls.code.value,
       rate: data.sales_rate ?? field.form.controls.rate.value,
-      // ✅ Key fix for discount:
+      //  Key fix for discount:
       discount: data.discount !== undefined
         ? parseFloat(data.discount)
         : field.form.controls.discount.value,
@@ -1826,7 +1826,7 @@ showSuccessToast = false;
 
                                   // Subscribe to changes
                                   field.formControl.valueChanges.subscribe(data => {
-                                    // ✅ Coerce empty, null, or invalid to 0
+                                    //  Coerce empty, null, or invalid to 0
                                     const numeric = parseFloat(data);
                                     field.formControl.setValue(isNaN(numeric) ? 0 : numeric, { emitEvent: false });
 

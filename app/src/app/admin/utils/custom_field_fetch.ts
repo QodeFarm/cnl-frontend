@@ -63,7 +63,7 @@ export class CustomFieldHelper {
         `;
         document.body.appendChild(overlay);
 
-        // ✅ Attach click handler for OK button
+        //  Attach click handler for OK button
         const closeBtn = document.getElementById("customPopupCloseBtn");
         closeBtn?.addEventListener("click", () => {
           (document.getElementById("customPopupOverlay") as HTMLElement).style.display = "none";

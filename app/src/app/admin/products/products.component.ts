@@ -58,12 +58,12 @@ export class ProductsComponent implements OnInit {
       if (res) {
         this.formConfig.model = res.data;
 
-        // ✅ Ensure product_variations always has at least one row
+        //  Ensure product_variations always has at least one row
         if (!this.formConfig.model.product_variations || this.formConfig.model.product_variations.length === 0) {
           this.formConfig.model.product_variations = [{}];
         }
 
-        // ✅ Always ensure balance array exists with at least one row
+        //  Always ensure balance array exists with at least one row
         if (!this.formConfig.model.product_item_balance || this.formConfig.model.product_item_balance.length === 0) {
           this.formConfig.model.product_item_balance = [{}];
         }
@@ -211,7 +211,7 @@ export class ProductsComponent implements OnInit {
 //   const totalWarehouseQuantity = calculateTotalQuantity(this.formConfig.model.product_item_balance);
 
 //   if (!isEditMode) {
-//     // ✅ Create Mode: balance should auto-sync with variations
+//     //  Create Mode: balance should auto-sync with variations
 //     this.formConfig.model.products.balance = totalVariationQuantity;
 
 //     if (totalVariationQuantity !== totalWarehouseQuantity) {
@@ -222,7 +222,7 @@ export class ProductsComponent implements OnInit {
 //       );
 //     }
 //   } else {
-//     // ✅ Edit Mode: balance must match both
+//     //  Edit Mode: balance must match both
 //     const balance = parseInt(this.formConfig.model.products?.balance, 10) || 0;
 
 //     if (totalVariationQuantity !== balance) {
@@ -287,7 +287,7 @@ verifyBalance(): any {
     );
   }
 
-  // ✅ If both match → set balance
+  //  If both match → set balance
   this.formConfig.model.products.balance = totalVariationQuantity;
 
   return true;
