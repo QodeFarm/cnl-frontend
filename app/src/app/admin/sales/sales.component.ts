@@ -3011,7 +3011,7 @@ getUnitData(unitInfo) {
                     label: 'Ref date',
                     placeholder: 'Select Ref date',
                     readonly: false,
-                    required: true,
+                    required: false,
                   }
                 },
                 {
@@ -3792,7 +3792,7 @@ getUnitData(unitInfo) {
                   dataLabel: 'unit_name',
                   dataKey: 'unit_options_id',
                   bindId: true,
-                  required: true,
+                  required: false,
                   lazy: {
                     url: 'masters/unit_options',
                     lazyOneTime: true
