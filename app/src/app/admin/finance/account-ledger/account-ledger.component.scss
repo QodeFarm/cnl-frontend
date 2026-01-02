@@ -1,0 +1,22 @@
+/* Make ta-curd-modal footer reference point */
+.account-ledger-wrapper {
+  position: relative;
+}
+
+/* Print aligned into same row as pagination */
+.ledger-footer {
+  position: absolute;
+  bottom: 12px;              /* aligns with pagination row */
+  left: 12px;                /* slight right from edge */
+  z-index: 5;
+}
+
+/* Size */
+.print-select {
+  width: 160px;
+}
+
+/* When no data, push it slightly down */
+.ta-table-empty + .ledger-footer {
+  bottom: 16px;
+}

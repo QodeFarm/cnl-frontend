@@ -374,18 +374,18 @@ async autoFillProductDetails(field, data) {
 
   const customerCategory = this.formConfig.model?.sale_return_order?.customer?.customer_category?.name?.toLowerCase();
 
-  // ✅ Figure out the current row index safely
+  //  Figure out the current row index safely
   const parentArray = field.parent;
   const currentRowIndex = +parentArray?.key;
 
-  // ✅ Get the rate on that row if it exists
+  //  Get the rate on that row if it exists
   const currentRowRate = this.formConfig.model?.sale_return_items?.[currentRowIndex]?.rate;
 
   console.log("Current row rate value : ", currentRowRate);
 
   let selectedRate = data.sales_rate; // default fallback
 
-  // ✅ Only override if current rate is 0 or empty
+  //  Only override if current rate is 0 or empty
   if (!currentRowRate || currentRowRate === 0) {
     if (customerCategory === 'wholesalers') {
       selectedRate = data.wholesale_rate ?? data.sales_rate;
@@ -395,7 +395,7 @@ async autoFillProductDetails(field, data) {
       selectedRate = data.dealer_rate ?? data.sales_rate;
     }
   } else {
-    // ✅ Keep the manually entered rate
+    //  Keep the manually entered rate
     selectedRate = currentRowRate;
   }
 
@@ -1427,7 +1427,7 @@ async autoFillProductDetails(field, data) {
                       const currentItem = this.formConfig.model['sale_return_items'][currentRowIndex];
                       currentItem['product_id'] = data?.product_id;
 
-                      // ✅ Store gst_input from product summary
+                      //  Store gst_input from product summary
                       currentItem['gst_input'] = data?.gst_input || 0;
                       this.loadProductVariations(field);
                       this.autoFillProductDetails(field, data); // to fill the remaining fields when product is selected.

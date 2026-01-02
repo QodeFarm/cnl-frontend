@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormlyModule } from '@ngx-formly/core';
-import { AssetCategoriesConfig, AssetStatusConfig, cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, CustomerPaymentConfig, designationsConfig, employeeSalaryComponentsConfig, expenseCategoryConfig, FirmStatusConfig, gPackageUnitsConfig, GstCatConfig, GstTypesConfig, interactionTypesConfig, jobTypesConfig, leadStatusesConfig, leaveTypesConfig, ledgerAccountsConfig, LedgerGroupsConfig, LocationsAssetConfig, MachineConfig, OrderStatusConfig, OrderTypesConfig, packUnitConfig, PaymentLinkConfig, PriceCatConfig, productBrandsConfig, productCategoriesConfig, productColorsConfig, productGroupsConfig, productGstClassificationsConfig, productionFloorsConfig, ProductionStatusesConfig, productModesConfig, productPurchaseGLConfig, productSalesGLConfig, productsCrudConfig, productSizesConfig, productStockUnitsConfig, productTypesConfig, PurchaseTypesConfig, ReminderTypesConfig, SaleTypesConfig, shiftsConfig, StateConfig, statusConfig, taskPrioritiesConfig, TerritoryConfig, TransportConfig, unitOptionsConfig, UserGroupsConfig, VendorAgentConfig, vendorCategeoryConfig, VendorPaymentTermsConfig, warehouseLocationsConfig } from '../utils/master-curd-config';
+import { AssetCategoriesConfig, AssetStatusConfig, cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, CustomerPaymentConfig, designationsConfig, employeeSalaryComponentsConfig, expenseCategoryConfig, FirmStatusConfig, gPackageUnitsConfig, GstCatConfig, GstTypesConfig, interactionTypesConfig, jobTypesConfig, leadStatusesConfig, leaveTypesConfig, ledgerAccountsConfig, LedgerGroupsConfig, LocationsAssetConfig, MachineConfig, OrderStatusConfig, OrderTypesConfig, packUnitConfig, PaymentLinkConfig, PriceCatConfig, productBrandsConfig, productCategoriesConfig, productColorsConfig, productGroupsConfig, productGstClassificationsConfig, productionFloorsConfig, ProductionStatusesConfig, productModesConfig, productPurchaseGLConfig, productSalesGLConfig, productsCrudConfig, productSizesConfig, productStockUnitsConfig, productTypesConfig, PurchaseTypesConfig, ReminderTypesConfig, SaleTypesConfig, shiftsConfig, StateConfig, statusConfig, taskPrioritiesConfig, TerritoryConfig, TransportConfig, unitOptionsConfig, UserGroupsConfig, VendorAgentConfig, vendorCategeoryConfig, VendorCurdConfig, VendorPaymentTermsConfig, warehouseLocationsConfig } from '../utils/master-curd-config';
 
 
 
@@ -23,6 +23,21 @@ import { AssetCategoriesConfig, AssetStatusConfig, cityConfig, CountryConfig, cu
               dataLabel: 'name',
               required: false,
               curdConfig: customerCudConfig
+            }
+          }
+        },
+        {
+          name: 'vendor-dropdown',
+          extends: 'adv-select',
+          wrappers: ['ta-field'],
+          defaultOptions: {
+            templateOptions: {
+              placeholder: ' Select',
+              label: 'Vendors',
+              dataKey: 'vendor_id',
+              dataLabel: 'name',
+              required: false,
+              curdConfig: VendorCurdConfig
             }
           }
         },

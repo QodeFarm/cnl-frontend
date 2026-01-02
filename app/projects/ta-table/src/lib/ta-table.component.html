@@ -20,6 +20,23 @@
                     <nz-option *ngFor="let option of accountOptions" [nzValue]="option.value"
                         [nzLabel]="option.label"></nz-option>
                 </nz-select>
+
+                <!-- Third Select Box: Names Based on Selection -->
+                <nz-select
+                    [(ngModel)]="selectedCity"
+                    nzPlaceHolder="Select City"
+                    style="width: 180px"
+                    [nzDisabled]="isCityDisabled"
+                    nzAllowClear
+                    (ngModelChange)="applyFilters()">
+
+                    <nz-option
+                    *ngFor="let city of cityOptions"
+                    [nzValue]="city.value"
+                    [nzLabel]="city.label">
+                    </nz-option>
+
+                </nz-select>
             </div>
 
 

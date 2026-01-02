@@ -341,7 +341,7 @@ export class PurchaseComponent {
         ? data.code
         : field.form.controls.code.value,
       rate: data.sales_rate ?? field.form.controls.rate.value,
-      // ✅ Key fix for discount:
+      //  Key fix for discount:
       discount: data.discount !== undefined
         ? parseFloat(data.discount)
         : field.form.controls.discount.value,
@@ -1041,7 +1041,7 @@ loadQuickpackProducts() {
                 },
                 {
                   key: 'vendor',
-                  type: 'select',
+                  type: 'vendor-dropdown',
                   className: 'col-md-4 col-sm-6 col-12',
                   props: {
                     label: 'Vendor',
@@ -2166,7 +2166,7 @@ loadQuickpackProducts() {
 
                                   // Subscribe to changes
                                   field.formControl.valueChanges.subscribe(data => {
-                                    // ✅ Coerce empty, null, or invalid to 0
+                                    //  Coerce empty, null, or invalid to 0
                                     const numeric = parseFloat(data);
                                     field.formControl.setValue(isNaN(numeric) ? 0 : numeric, { emitEvent: false });
 

@@ -495,9 +495,9 @@ export class ProductionReportsComponent {
     this.loading = false;
   }
 
-  // // ✅ Function to get total records from the table data
+  // //  Function to get total records from the table data
   // onDataLoaded(data: any[]) {
-  //   this.totalRecords = data.length; // ✅ Update total records dynamically
+  //   this.totalRecords = data.length; //  Update total records dynamically
   // }
 
 
