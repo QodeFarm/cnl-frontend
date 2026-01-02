@@ -10,6 +10,7 @@ import { ExpenseCategoryComponent } from './expense-category/expense-category.co
 import { ExpenseItemComponent } from './expense-item/expense-item.component';
 import { FinancialReportComponent } from './financial-report/financial-report.component';
 import { JournalEntryComponent } from './journal-entry/journal-entry.component';
+import { JournalVoucherComponent } from './journal-voucher/journal-voucher.component';
 import { GstDetailsComponent } from './gst-details/gst-details.component';
 import { AccountLedgerComponent } from './account-ledger/account-ledger.component';
 import { LedgerAccountsComponent } from '../customers/ledger-accounts/ledger-accounts.component';
@@ -53,6 +54,10 @@ const routes: Routes = [
   {
     path: 'journal-entry',
     component: JournalEntryComponent,
+  },
+  {
+    path: 'journal-voucher',
+    component: JournalVoucherComponent,
   },
   {
     path: 'gst',

@@ -1,0 +1,80 @@
+<div class="container-fluid p-3">
+    <div class="journal-voucher-banner page-component-header">
+        <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <button (click)="JournalVoucherEditID = null" type="button" class="btn pl-0" style="color: black;">
+                    <span *ngIf="JournalVoucherEditID" class="custom-heading">Update Journal Voucher</span>
+                    <span *ngIf="!JournalVoucherEditID" class="custom-heading">Create Journal Voucher</span>
+                </button>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; justify-content: end; flex-wrap: wrap;">
+                <!-- Pull from Expense Claim -->
+                <div class="d-flex align-items-center gap-2">
+                    <select class="form-control form-select" [(ngModel)]="selectedExpenseClaimId" style="width: 200px;">
+                        <option value="" disabled selected>Select Expense Claim</option>
+                        <option *ngFor="let claim of expenseClaimOptions" [value]="claim.value">
+                            {{ claim.label }}
+                        </option>
+                    </select>
+                    <button (click)="pullExpenseClaim()" type="button" class="btn btn-info" [disabled]="!selectedExpenseClaimId">
+                        Fill
+                    </button>
+                </div>
+                
+                <!-- Post Voucher Button (Only for Edit) -->
+                <button *ngIf="JournalVoucherEditID && formConfig?.model && !formConfig?.model?.is_posted" 
+                        (click)="postVoucher()" 
+                        type="button" 
+                        class="btn btn-success">
+                    Post to Ledger
+                </button>
+                
+                <button (click)="showJournalVoucherListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#journalVoucherListModal">
+                    Voucher List
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Totals Display -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="d-flex justify-content-end align-items-center gap-4" style="font-size: 14px; font-weight: 600;">
+                <div class="text-primary">
+                    Total Debit: <span class="text-success">₹{{ totalDebit.toFixed(2) }}</span>
+                </div>
+                <div class="text-primary">
+                    Total Credit: <span class="text-danger">₹{{ totalCredit.toFixed(2) }}</span>
+                </div>
+                <div [ngClass]="{'text-success': totalDebit === totalCredit && totalDebit > 0, 'text-danger': totalDebit !== totalCredit}">
+                    <span *ngIf="totalDebit === totalCredit && totalDebit > 0">✓ Balanced</span>
+                    <span *ngIf="totalDebit !== totalCredit">⚠ Unbalanced (Diff: ₹{{ (totalDebit - totalCredit).toFixed(2) }})</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row custom-form">
+        <div class="col-12 p-0">
+            <ta-form #journalVoucherForm [options]="formConfig"></ta-form>
+        </div>
+    </div>
+</div>
+
+<!-- Journal Voucher List Modal -->
+<div class="modal fade custom-modal" id="journalVoucherListModal" tabindex="-1" aria-labelledby="journalVoucherListModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="journalVoucherListModalLabel">Journal Voucher List</h5>
+                <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" *ngIf="showJournalVoucherList">
+                <app-journal-voucher-list (edit)="editJournalVoucher($event)" class="custom-list"></app-journal-voucher-list>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

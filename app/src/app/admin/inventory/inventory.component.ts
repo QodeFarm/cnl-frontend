@@ -154,12 +154,12 @@ export class InventoryComponent {
             }
           },
 
-          { 
-            fieldKey: 'updated_at', 
-            name: 'Last Updated', 
-            sort: true,
-            displayType: "map", mapFn: (v, row) => row.updated_at.split('T')[0] 
-          }
+          // { 
+          //   fieldKey: 'updated_at', 
+          //   name: 'Last Updated', 
+          //   sort: true,
+          //   displayType: "map", mapFn: (v, row) => row.updated_at ? row.updated_at.split('T')[0] : '-' 
+          // }
         ]
       },
       formConfig: {

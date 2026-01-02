@@ -100,7 +100,7 @@ const routes: Routes = [
       { path: 'finance/gst', data: { title: 'GST', moduleName: 'gst-details' }, canActivate: [], loadComponent: () => import('./admin/finance/gst-details/gst-details.component').then(m => m.GstDetailsComponent) },
       { path: 'finance/account-ledger', data: { title: 'Account ledger', moduleName: 'account-ledger' }, canActivate: [], loadComponent: () => import('./admin/finance/account-ledger/account-ledger.component').then(m => m.AccountLedgerComponent) },
       { path: 'finance/ledger-accounts', data: { title: 'Ledger Accounts', moduleName: 'ledger-accounts' }, canActivate: [], loadComponent: () => import('./admin/customers/ledger-accounts/ledger-accounts.component').then(m => m.LedgerAccountsComponent) },
-
+      { path: 'finance/journal-voucher', data: { title: 'Journal Voucher', moduleName: 'journal-voucher' }, canActivate: [], loadComponent: () => import('./admin/finance/journal-voucher/journal-voucher.component').then(m => m.JournalVoucherComponent) },
       //Company Module
       { path: 'company', data: { title: 'Company', moduleName: 'company' }, canActivate: [], loadComponent: () => import('./admin/company/company.component').then(m => m.CompanyComponent) },
       { path: 'company/branches', data: { title: 'Branches', moduleName: 'branches' }, canActivate: [], loadComponent: () => import('./admin/company/branches/branches.component').then(m => m.BranchesComponent) },
