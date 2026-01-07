@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, ElementRef } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
@@ -14,7 +15,14 @@ export class LedgersReportsComponent {
   isAccordionOpen = true;
   selectedReportKey: string | null = null;
   tableConfig: TaTableConfig | null = null;
-  // totalRecords: number | null = null; 
+  // totalRecords: number | null = null;
+
+  // Grand totals for Journal Book Report
+  grandTotalDebit: number = 0;
+  grandTotalCredit: number = 0;
+  showGrandTotals: boolean = false;
+
+  constructor(private http: HttpClient, private elementRef: ElementRef) {} 
 
   reportsConfig: { [key: string]: TaTableConfig } = {
 
@@ -380,6 +388,10 @@ export class LedgersReportsComponent {
           mapFn: (currentValue: any, row: any) => {
             return row.lines?.map((line: any) => line.account).join('<br>');
           },
+          // Clean value for Excel export
+          exportFn: (currentValue: any, row: any) => {
+            return row.lines?.map((line: any) => line.account).join(' | ') || '';
+          },
           sort: true
         },
         {
@@ -388,6 +400,10 @@ export class LedgersReportsComponent {
           displayType: 'map',
           mapFn: (currentValue: any, row: any) => {
             return row.lines?.map((line: any) => line.debit).join('<br>');
+          },
+          // Clean value for Excel export
+          exportFn: (currentValue: any, row: any) => {
+            return row.lines?.map((line: any) => line.debit).join(' | ') || '';
           },
           sort: true
         },
@@ -398,6 +414,10 @@ export class LedgersReportsComponent {
           mapFn: (currentValue: any, row: any) => {
             return row.lines?.map((line: any) => line.credit).join('<br>');
           },
+          // Clean value for Excel export
+          exportFn: (currentValue: any, row: any) => {
+            return row.lines?.map((line: any) => line.credit).join(' | ') || '';
+          },
           sort: true
         },
         {
@@ -406,6 +426,10 @@ export class LedgersReportsComponent {
           displayType: 'map',
           mapFn: (currentValue: any, row: any) => {
             return row.lines?.map((line: any) => line.description).join('<br>');
+          },
+          // Clean value for Excel export
+          exportFn: (currentValue: any, row: any) => {
+            return row.lines?.map((line: any) => line.description).join(' | ') || '';
           },
           sort: false
         }
@@ -462,6 +486,110 @@ export class LedgersReportsComponent {
           sort: true
         }
       ]
+    },
+    JournalBookReport: {
+      apiUrl: 'finance/journal_book_report/',
+      pageSize: 10,
+      globalSearch: {
+        keys: ['voucher_no', 'voucher_date', 'narration', 'total_debit', 'total_credit']
+      },
+      export: { downloadName: 'JournalBookReport' },
+      defaultSort: { key: 'voucher_date', value: 'descend' },
+      cols: [
+        {
+          fieldKey: 'voucher_no',
+          name: 'Voucher No',
+          sort: true
+        },
+        {
+          fieldKey: 'voucher_date',
+          name: 'Date',
+          sort: true
+        },
+        {
+          fieldKey: 'particulars',
+          name: 'Particulars',
+          displayType: 'map',
+          mapFn: (currentValue: any, row: any) => {
+            if (!row.particulars || !Array.isArray(row.particulars)) return '';
+            
+            const lines = row.particulars.map((p: any) => {
+              // Ledger Group (bold) on its own line if exists
+              const ledgerGroup = p.ledger_group ? `<strong>${p.ledger_group}</strong><br>` : '';
+              // Ledger Name (bold) with party name below
+              const ledgerName = p.ledger_name ? `<strong>${p.ledger_name}</strong>` : '';
+              const partyInfo = p.party_name ? `<br>${p.party_name}` : '';
+              // Narration text for each line
+              const narration = p.narration_text ? `<br><small style="color: #666;">${p.narration_text}</small>` : '';
+              return `${ledgerGroup}${ledgerName}${partyInfo}${narration}`;
+            });
+            
+            return lines.join('<hr style="margin: 8px 0; border: 0; border-top: 1px solid #ddd;">');
+          },
+          // Clean value for Excel export - strip HTML and format as plain text
+          exportFn: (currentValue: any, row: any) => {
+            if (!row.particulars || !Array.isArray(row.particulars)) return '';
+            
+            const lines = row.particulars.map((p: any) => {
+              const parts = [];
+              if (p.ledger_group) parts.push(p.ledger_group);
+              if (p.ledger_name) parts.push(p.ledger_name);
+              if (p.party_name) parts.push(p.party_name);
+              if (p.narration_text) parts.push(p.narration_text);
+              return parts.join(' - ');
+            });
+            
+            return lines.join(' | ');
+          },
+          sort: false
+        },
+        {
+          fieldKey: 'total_debit',
+          name: 'Debit(₹)',
+          displayType: 'map',
+          mapFn: (currentValue: any, row: any) => {
+            if (!row.lines || !Array.isArray(row.lines)) return '₹0.00';
+            const lines = row.lines.map((line: any) => {
+              const debit = parseFloat(line.debit) || 0;
+              return `₹${debit.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+            });
+            return lines.join('<hr style="margin: 5px 0; border: 0; border-top: 1px dashed #ccc;">');
+          },
+          // Clean value for Excel export - sum all debits or list them
+          exportFn: (currentValue: any, row: any) => {
+            if (!row.lines || !Array.isArray(row.lines)) return '₹0.00';
+            const lines = row.lines.map((line: any) => {
+              const debit = parseFloat(line.debit) || 0;
+              return `₹${debit.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+            });
+            return lines.join(' | ');
+          },
+          sort: true
+        },
+        {
+          fieldKey: 'total_credit',
+          name: 'Credit(₹)',
+          displayType: 'map',
+          mapFn: (currentValue: any, row: any) => {
+            if (!row.lines || !Array.isArray(row.lines)) return '₹0.00';
+            const lines = row.lines.map((line: any) => {
+              const credit = parseFloat(line.credit) || 0;
+              return `₹${credit.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+            });
+            return lines.join('<hr style="margin: 5px 0; border: 0; border-top: 1px dashed #ccc;">');
+          },
+          // Clean value for Excel export - sum all credits or list them
+          exportFn: (currentValue: any, row: any) => {
+            if (!row.lines || !Array.isArray(row.lines)) return '₹0.00';
+            const lines = row.lines.map((line: any) => {
+              const credit = parseFloat(line.credit) || 0;
+              return `₹${credit.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+            });
+            return lines.join(' | ');
+          },
+          sort: true
+        }
+      ]
     }
   }
   toggleAccordion() {
@@ -477,16 +605,46 @@ export class LedgersReportsComponent {
     this.selectedReportKey = null;
     this.tableConfig = null;
     this.isAccordionOpen = true;
+    this.showGrandTotals = false;
+    this.grandTotalDebit = 0;
+    this.grandTotalCredit = 0;
+
+    // Remove existing totals row when switching reports
+    this.removeTotalsRow();
 
     if (reportKey) {
       this.selectedReportKey = reportKey;
       this.tableConfig = this.reportsConfig[reportKey];
       this.isAccordionOpen = false;
+
+      // Fetch grand totals for Journal Book Report
+      if (reportKey === 'JournalBookReport') {
+        this.fetchJournalBookTotals();
+      }
     }
 
     setTimeout(() => {
       this.loading = false; // Hide loading after data loads
     },); // Adjust timeout based on API response time
+  }
+
+  fetchJournalBookTotals() {
+    this.http.get<any>('finance/journal_book_report/').subscribe(
+      (response) => {
+        if (response && response.summary) {
+          this.grandTotalDebit = response.summary.grand_total_debit || 0;
+          this.grandTotalCredit = response.summary.grand_total_credit || 0;
+          this.showGrandTotals = true;
+          // Inject totals row after data loads
+          setTimeout(() => {
+            this.injectTotalsRow();
+          }, 500);
+        }
+      },
+      (error) => {
+        console.error('Error fetching journal book totals:', error);
+      }
+    );
   }
 
   onDataLoaded(data: any[]) {
@@ -496,9 +654,34 @@ export class LedgersReportsComponent {
     this.loading = false;
   }
 
-  // //  Function to get total records from the table data
-  // onDataLoaded(data: any[]) {
-  //   this.totalRecords = data.length; //  Update total records dynamically
-  // }
+  removeTotalsRow() {
+    const existingTotals = this.elementRef.nativeElement.querySelector('.journal-book-totals-row');
+    if (existingTotals) {
+      existingTotals.remove();
+    }
+  }
+
+  injectTotalsRow() {
+    this.removeTotalsRow();
+
+    // Find the table body
+    const tableBody = this.elementRef.nativeElement.querySelector('.ant-table-tbody');
+    if (tableBody) {
+      const totalsRow = document.createElement('tr');
+      totalsRow.className = 'journal-book-totals-row ant-table-row';
+      // totalsRow.innerHTML = `
+      //   <td class="ant-table-cell" style="padding: 12px 16px; border-bottom: 1px solid #f0f0f0; font-weight: 600;"></td>
+      //   <td class="ant-table-cell" style="padding: 12px 16px; border-bottom: 1px solid #f0f0f0; font-weight: 600;"></td>
+      //   <td class="ant-table-cell" style="padding: 12px 16px; border-bottom: 1px solid #f0f0f0; font-weight: 600; text-align: right;"></td>
+      //   <td class="ant-table-cell" style="padding: 12px 16px; border-bottom: 1px solid #f0f0f0; font-weight: 600; text-align: right;">${this.formatCurrency(this.grandTotalDebit)}</td>
+      //   <td class="ant-table-cell" style="padding: 12px 16px; border-bottom: 1px solid #f0f0f0; font-weight: 600; text-align: right;">${this.formatCurrency(this.grandTotalCredit)}</td>
+      // `;
+      tableBody.appendChild(totalsRow);
+    }
+  }
+
+  formatCurrency(amount: number): string {
+    return `₹${amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
 
 }
