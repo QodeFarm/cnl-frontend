@@ -388,6 +388,10 @@ export class LedgersReportsComponent {
           mapFn: (currentValue: any, row: any) => {
             return row.lines?.map((line: any) => line.account).join('<br>');
           },
+          // Clean value for Excel export
+          exportFn: (currentValue: any, row: any) => {
+            return row.lines?.map((line: any) => line.account).join(' | ') || '';
+          },
           sort: true
         },
         {
@@ -396,6 +400,10 @@ export class LedgersReportsComponent {
           displayType: 'map',
           mapFn: (currentValue: any, row: any) => {
             return row.lines?.map((line: any) => line.debit).join('<br>');
+          },
+          // Clean value for Excel export
+          exportFn: (currentValue: any, row: any) => {
+            return row.lines?.map((line: any) => line.debit).join(' | ') || '';
           },
           sort: true
         },
@@ -406,6 +414,10 @@ export class LedgersReportsComponent {
           mapFn: (currentValue: any, row: any) => {
             return row.lines?.map((line: any) => line.credit).join('<br>');
           },
+          // Clean value for Excel export
+          exportFn: (currentValue: any, row: any) => {
+            return row.lines?.map((line: any) => line.credit).join(' | ') || '';
+          },
           sort: true
         },
         {
@@ -414,6 +426,10 @@ export class LedgersReportsComponent {
           displayType: 'map',
           mapFn: (currentValue: any, row: any) => {
             return row.lines?.map((line: any) => line.description).join('<br>');
+          },
+          // Clean value for Excel export
+          exportFn: (currentValue: any, row: any) => {
+            return row.lines?.map((line: any) => line.description).join(' | ') || '';
           },
           sort: false
         }
@@ -510,6 +526,21 @@ export class LedgersReportsComponent {
             
             return lines.join('<hr style="margin: 8px 0; border: 0; border-top: 1px solid #ddd;">');
           },
+          // Clean value for Excel export - strip HTML and format as plain text
+          exportFn: (currentValue: any, row: any) => {
+            if (!row.particulars || !Array.isArray(row.particulars)) return '';
+            
+            const lines = row.particulars.map((p: any) => {
+              const parts = [];
+              if (p.ledger_group) parts.push(p.ledger_group);
+              if (p.ledger_name) parts.push(p.ledger_name);
+              if (p.party_name) parts.push(p.party_name);
+              if (p.narration_text) parts.push(p.narration_text);
+              return parts.join(' - ');
+            });
+            
+            return lines.join(' | ');
+          },
           sort: false
         },
         {
@@ -524,6 +555,15 @@ export class LedgersReportsComponent {
             });
             return lines.join('<hr style="margin: 5px 0; border: 0; border-top: 1px dashed #ccc;">');
           },
+          // Clean value for Excel export - sum all debits or list them
+          exportFn: (currentValue: any, row: any) => {
+            if (!row.lines || !Array.isArray(row.lines)) return '₹0.00';
+            const lines = row.lines.map((line: any) => {
+              const debit = parseFloat(line.debit) || 0;
+              return `₹${debit.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+            });
+            return lines.join(' | ');
+          },
           sort: true
         },
         {
@@ -537,6 +577,15 @@ export class LedgersReportsComponent {
               return `₹${credit.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
             });
             return lines.join('<hr style="margin: 5px 0; border: 0; border-top: 1px dashed #ccc;">');
+          },
+          // Clean value for Excel export - sum all credits or list them
+          exportFn: (currentValue: any, row: any) => {
+            if (!row.lines || !Array.isArray(row.lines)) return '₹0.00';
+            const lines = row.lines.map((line: any) => {
+              const credit = parseFloat(line.credit) || 0;
+              return `₹${credit.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+            });
+            return lines.join(' | ');
           },
           sort: true
         }
