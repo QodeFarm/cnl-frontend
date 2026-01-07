@@ -83,6 +83,16 @@ export class TaTableComponent implements OnDestroy {
   isInventoryFilterVisible = false;
   isStockSummaryFilterVisible: boolean;
   isLegerAccountFilterVisible: boolean;
+  isStockStatusFilterVisible: boolean = false;
+  isStockForecastPage: boolean = false;
+
+  // Stock status options for inventory reports (RED/YELLOW/GREEN)
+  stockStatusOptions = [
+    { value: 'RED', label: 'Critical - Reorder Now' },
+    { value: 'YELLOW', label: 'Warning - Low Stock' },
+    { value: 'GREEN', label: 'Healthy - Sufficient' }
+  ];
+  selectedStockStatus: string | null = null;
 
 
 selectedGroup: string | null = null;
@@ -117,11 +127,22 @@ warehouseOptions: Array<{ value: string; label: string }> = [];
     { value: 'last_week', label: 'Last Week' },
     { value: 'current_month', label: 'Current Month' },
     { value: 'last_month', label: 'Last Month' },
-    { value: 'last_six_months', label: 'Last Six Months' },
+    { value: 'last_six_months', label: 'Last 6 Months' },
     { value: 'current_quarter', label: 'Current Quarter' },
     { value: 'year_to_date', label: 'Year to Date' },
     { value: 'last_year', label: 'Last Year' }
   ];
+
+  // Stock Forecast specific options - only meaningful periods for average sales calculation
+  stockForecastPeriodOptions = [
+    { value: 'current_month', label: 'Current Month' },
+    { value: 'last_month', label: 'Last Month' },
+    { value: 'current_quarter', label: 'Current Quarter (3 Months)' },
+    { value: 'last_six_months', label: 'Last 6 Months' },
+    { value: 'year_to_date', label: 'Year to Date' },
+    { value: 'last_year', label: 'Last 12 Months' }
+  ];
+
   formConfig: any;
   selectedLedgerAccount: any;
   ledgerAccountOptions: any;
@@ -550,12 +571,15 @@ applyFilters() {
     toDate: this.toDate,
     status: this.selectedStatus,
     employee: this.selectedEmployee,
-    group: this.selectedGroup,
-    category: this.selectedCategory,
-    type: this.selectedType,
+    accountType: this.selectedAccountType,
+    accountId: this.selectedAccountId,
+    group: this.selectedGroup,        
+    category: this.selectedCategory,  
+    type: this.selectedType,          
     warehouse: this.selectedWarehouse,
     ledgerAccount: this.selectedLedgerAccount,
-    city: this.selectedCity   //  City sent only when selected
+    // stockStatus: this.selectedStockStatus,
+    city: this.selectedCity 
   };
 
   const queryString = this.generateQueryString(filters);
@@ -648,7 +672,8 @@ applyFilters() {
     this.selectedCategory = null;    
     this.selectedType = null;         
     this.selectedWarehouse = null;   
-    this.selectedLedgerAccount= null;
+    this.selectedLedgerAccount = null;
+    this.selectedStockStatus = null;
 
     // Optionally, you might want to clear other filters or reset pagination if necessary
     this.pageIndex = 1;
@@ -738,21 +763,29 @@ applyFilters() {
     group?: string | number | null, 
     category?: string | number | null, 
     type?: string | number | null, 
-    warehouse?: string | number | null ,
-    ledgerAccount?: string | number | null
+    warehouse?: string | number | null,
+    ledgerAccount?: string | number | null,
+    stockStatus?: string | null
     }): string {
     const queryParts: string[] = [];
 
-    // Add filter for 'fromDate' if available
-    if (filters.fromDate) {
-      const fromDateStr = this.formatDate(filters.fromDate);
-      queryParts.push(`created_at_after=${encodeURIComponent(fromDateStr)}`);
-    }
-
-    // Add filter for 'toDate' if available
-    if (filters.toDate) {
-      const toDateStr = this.formatDate(filters.toDate);
-      queryParts.push(`created_at_before=${encodeURIComponent(toDateStr)}`);
+    // For Stock Forecast page: Quick Period sends period_name for avg sales calculation
+    // For Other pages: Quick Period sets fromDate/toDate for date filtering
+    if (this.isStockForecastPage) {
+      // Stock Forecast uses period_name parameter (not date filtering)
+      if (filters.quickPeriod) {
+        queryParts.push(`period_name=${encodeURIComponent(filters.quickPeriod)}`);
+      }
+    } else {
+      // Other modules use date filtering
+      if (filters.fromDate) {
+        const fromDateStr = this.formatDate(filters.fromDate);
+        queryParts.push(`created_at_after=${encodeURIComponent(fromDateStr)}`);
+      }
+      if (filters.toDate) {
+        const toDateStr = this.formatDate(filters.toDate);
+        queryParts.push(`created_at_before=${encodeURIComponent(toDateStr)}`);
+      }
     }
 
     // Add filter for status if available
@@ -774,7 +807,8 @@ applyFilters() {
     }
 
     if (filters.type) {
-      queryParts.push(`type_id=${encodeURIComponent(filters.type.toString())}`);
+      // Use item_type_id for inventory/stock forecast APIs, type_id for others
+      queryParts.push(`item_type_id=${encodeURIComponent(filters.type.toString())}`);
     }
 
     if (filters.warehouse) {
@@ -908,6 +942,7 @@ downloadData(event: any) {
       '/admin/reports/customer-reports',
       '/admin/reports/ledgers-reports',
       '/admin/reports/audit-logs',
+      '/admin/reports/inventory-reports',
       '/admin/finance/account-ledger',
       '/admin/finance/expense-item',
       '/admin/production/material-issue',
@@ -940,11 +975,8 @@ downloadData(event: any) {
       '/admin/production/stockjournal',
       '/admin/production/stock-summary',
       '/admin/reports/audit-logs',
-      '/admin/reports/ledgers-reports'
-
-      
-      
-
+      '/admin/reports/ledgers-reports',
+      '/admin/reports/inventory-reports' // Hide order status for stock forecast page
     ];
     this.isStatusButtonVisible = this.options.hideFilters ? false : !hideStatusUrls.includes(currentUrl);
 
@@ -959,13 +991,21 @@ downloadData(event: any) {
     const productFilterUrls = ['/admin/products',];
     // Check if filters should be explicitly hidden
     this.isProductFilterVisible = this.options.hideFilters ? false : productFilterUrls.includes(currentUrl);
-    const inventoryFilterUrls = ['/admin/inventory'];  
+    const inventoryFilterUrls = ['/admin/inventory', '/admin/reports/inventory-reports'];  
     this.isInventoryFilterVisible = this.options.hideFilters ? false : inventoryFilterUrls.includes(currentUrl);
     const stockSummaryFilterUrls = ['/admin/production/stock-summary'];
     this.isStockSummaryFilterVisible = this.options.hideFilters ? false : stockSummaryFilterUrls.includes(currentUrl);
 
     const ledgerAccountUrls = ['/admin/reports/ledgers-reports'];
     this.isLegerAccountFilterVisible  = this.options.hideFilters ? false : ledgerAccountUrls.includes(currentUrl);
+
+    // Stock status filter disabled for inventory reports - backend handles status differently
+    const stockStatusFilterUrls: string[] = [];  // Empty - no pages use this filter
+    this.isStockStatusFilterVisible = false;  // Disabled
+    
+    // Stock Forecast Page flag for showing appropriate filters
+    const stockForecastUrls = ['/admin/reports/inventory-reports'];
+    this.isStockForecastPage = stockForecastUrls.includes(currentUrl);
     
     // Reset filter values when component is initialized
     // This ensures filters are cleared when modal is reopened
@@ -986,6 +1026,36 @@ downloadData(event: any) {
     // if(startIntial){
     //   _pageIndex = 1;
     // }
+    
+    // Build API URL with filters for Stock Forecast page (preserves filters during pagination)
+    let apiUrl = this.options.apiUrl;
+    if (this.isStockForecastPage) {
+      const filterParams: string[] = [];
+      
+      // Category filter
+      if (this.selectedCategory) {
+        filterParams.push(`category_id=${this.selectedCategory}`);
+      }
+      // Product Group filter
+      if (this.selectedGroup) {
+        filterParams.push(`product_group_id=${this.selectedGroup}`);
+      }
+      // Item Type filter
+      if (this.selectedType) {
+        filterParams.push(`item_type_id=${this.selectedType}`);
+      }
+      // Quick Period filter for Stock Forecast - sends period_name for avg sales calculation
+      // (NOT date filtering like other modules)
+      if (this.selectedQuickPeriod) {
+        filterParams.push(`period_name=${this.selectedQuickPeriod}`);
+      }
+      
+      if (filterParams.length > 0) {
+        const connector = apiUrl.includes('?') ? '&' : '?';
+        apiUrl = `${apiUrl}${connector}${filterParams.join('&')}`;
+      }
+    }
+    
     const tableParamConfig: TaParamsConfig = {
       apiUrl: this.options.apiUrl,
       pageIndex: this.pageIndex,
@@ -1165,6 +1235,7 @@ downloadData(event: any) {
     this.selectedCategory = null;    
     this.selectedType = null;         
     this.selectedWarehouse = null;
+    this.selectedStockStatus = null;
     
     // Also clear global search to ensure complete reset
     this.globalSearchValue = '';
@@ -1172,6 +1243,14 @@ downloadData(event: any) {
     // Force UI update
     this.cdr.detectChanges();
   }
+  // Helper function to strip HTML tags from a string
+  stripHtmlTags(html: string): string {
+    if (!html || typeof html !== 'string') return html;
+    // Remove HTML tags and get clean text
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    return doc.body.textContent || '';
+  }
+
   exportExcel() {
     let _rows = cloneDeep(this.rows);
     if (this.options.export) {
@@ -1185,7 +1264,14 @@ downloadData(event: any) {
 
           // 1) Check if displayType=map and mapFn is a function
           if (col.displayType === 'map' && typeof col.mapFn === 'function') {
-            _r[col.name] = col.mapFn(r[col.fieldKey], r, col);
+            // Check if there's a custom export function for clean values
+            if (typeof col.exportFn === 'function') {
+              _r[col.name] = col.exportFn(r[col.fieldKey], r, col);
+            } else {
+              // Get the mapped value and strip HTML tags for Excel export
+              let mappedValue = col.mapFn(r[col.fieldKey], r, col);
+              _r[col.name] = this.stripHtmlTags(mappedValue);
+            }
           } else {
             // 2) Otherwise just use the raw value
             _r[col.name] = getValue(r, col.fieldKey);

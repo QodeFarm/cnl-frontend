@@ -1,0 +1,86 @@
+<div class="container-fluid mt-2">
+    <!-- Accordion for Inventory Reports -->
+    <div class="accordion" id="reportAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="reportHeading">
+                <button class="accordion-button" [class.collapsed]="!isAccordionOpen" type="button" (click)="toggleAccordion()">
+                    Inventory Reports
+                </button>
+            </h2>
+            <div id="reportCollapse" class="accordion-collapse" [class.show]="isAccordionOpen" *ngIf="isAccordionOpen">
+                <div class="accordion-body">
+                    <div class="d-flex gap-3 flex-wrap">
+                        <a class="report-link" [class.active]="selectedReportKey === 'stockForecast'" 
+                           (click)="selectReport('stockForecast')">
+                            <i nz-icon nzType="stock" nzTheme="outline"></i>
+                            Stock Forecast (Reorder Alert)
+                        </a>
+                        <!-- Add more inventory reports here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stock Forecast Summary Cards - COMMENTED OUT (using ta-table status filter instead)
+    <div *ngIf="showSummary && !isAccordionOpen" class="mt-3">
+        <div class="summary-dashboard">
+            <div class="summary-card total" [class.active]="activeStatusFilter === 'all'" (click)="filterByStatus('all')" style="cursor: pointer;">
+                <div class="card-icon">
+                    <i nz-icon nzType="appstore" nzTheme="outline"></i>
+                </div>
+                <div class="card-info">
+                    <span class="card-value">{{summary.total_products}}</span>
+                    <span class="card-label">Total Products</span>
+                </div>
+            </div>
+            <div class="summary-card critical" [class.active]="activeStatusFilter === 'critical'" (click)="filterByStatus('critical')" style="cursor: pointer;">
+                <div class="card-icon">
+                    <i nz-icon nzType="warning" nzTheme="fill"></i>
+                </div>
+                <div class="card-info">
+                    <span class="card-value">{{summary.critical_count}}</span>
+                    <span class="card-label">Critical - Reorder Now</span>
+                </div>
+            </div>
+            <div class="summary-card warning" [class.active]="activeStatusFilter === 'warning'" (click)="filterByStatus('warning')" style="cursor: pointer;">
+                <div class="card-icon">
+                    <i nz-icon nzType="exclamation-circle" nzTheme="fill"></i>
+                </div>
+                <div class="card-info">
+                    <span class="card-value">{{summary.warning_count}}</span>
+                    <span class="card-label">Warning - Low Stock</span>
+                </div>
+            </div>
+            <div class="summary-card healthy" [class.active]="activeStatusFilter === 'healthy'" (click)="filterByStatus('healthy')" style="cursor: pointer;">
+                <div class="card-icon">
+                    <i nz-icon nzType="check-circle" nzTheme="fill"></i>
+                </div>
+                <div class="card-info">
+                    <span class="card-value">{{summary.healthy_count}}</span>
+                    <span class="card-label">Healthy - Sufficient</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    -->
+
+    <!-- Period Info Banner - Shows selected period for average sales calculation -->
+    <div *ngIf="showSummary && !isAccordionOpen && periodInfo.start_date" class="mt-3">
+        <div class="period-info-banner">
+            <i nz-icon nzType="calendar" nzTheme="outline"></i>
+            <span>
+                Showing average sales for: <strong>{{selectedPeriodLabel}}</strong>
+                ({{formatDisplayDate(periodInfo.start_date)}} - {{formatDisplayDate(periodInfo.end_date)}})
+            </span>
+            <span class="period-hint" nz-tooltip nzTooltipTitle="Average monthly sales calculated for the selected period. Use 'Quick Period' filter to change.">
+                <i nz-icon nzType="info-circle" nzTheme="outline"></i>
+            </span>
+        </div>
+    </div>
+
+    <!-- Table Component for Selected Report -->
+    <div *ngIf="!loading && !error && tableConfig && !isAccordionOpen" class="mt-3 custom-list">
+        <ta-table [options]="tableConfig"></ta-table>
+    </div>
+</div>
