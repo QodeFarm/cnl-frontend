@@ -9,7 +9,7 @@
             </div>
             <div style="display: flex; gap: 10px; align-items: center; justify-content: end; flex-wrap: wrap;">
                 <!-- Pull from Expense Claim -->
-                <div class="d-flex align-items-center gap-2">
+                <!-- <div class="d-flex align-items-center gap-2">
                     <select class="form-control form-select" [(ngModel)]="selectedExpenseClaimId" style="width: 200px;">
                         <option value="" disabled selected>Select Expense Claim</option>
                         <option *ngFor="let claim of expenseClaimOptions" [value]="claim.value">
@@ -19,7 +19,7 @@
                     <button (click)="pullExpenseClaim()" type="button" class="btn btn-info" [disabled]="!selectedExpenseClaimId">
                         Fill
                     </button>
-                </div>
+                </div> -->
                 
                 <!-- Post Voucher Button (Only for Edit) -->
                 <button *ngIf="JournalVoucherEditID && formConfig?.model && !formConfig?.model?.is_posted" 
