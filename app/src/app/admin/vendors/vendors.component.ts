@@ -7,11 +7,15 @@ import { VendorsListComponent } from './vendors-list/vendors-list.component';
 import { CommonModule } from '@angular/common';
 import { CustomFieldHelper } from '../utils/custom_field_fetch';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
+import { NzSpinModule } from 'ng-zorro-antd/spin';
+import { NzProgressModule } from 'ng-zorro-antd/progress';
+import { NzResultModule } from 'ng-zorro-antd/result';
+import { NzAlertModule } from 'ng-zorro-antd/alert';
 
 @Component({
   selector: 'app-vendors',
   templateUrl: './vendors.component.html',
-  imports: [CommonModule, AdminCommmonModule, VendorsListComponent],
+  imports: [CommonModule, AdminCommmonModule, VendorsListComponent, NzSpinModule, NzProgressModule, NzResultModule, NzAlertModule],
   standalone: true,
   styleUrls: ['./vendors.component.scss']
 })
@@ -21,6 +25,19 @@ export class VendorsComponent {
   showForm: boolean = false;
   VendorEditID: any;
   @ViewChild(VendorsListComponent) VendorsListComponent!: VendorsListComponent;
+
+  // Import state tracking
+  isImporting: boolean = false;
+  importProgress: number = 0;
+  importStatusMessage: string = '';
+  importCompleted: boolean = false;
+  importResults: {
+    success: boolean;
+    totalRecords: number;
+    successCount: number;
+    errorCount: number;
+    errors: Array<{ row: number; error: string }>;
+  } | null = null;
 
   nowDate = () => {
     const date = new Date();
@@ -1187,7 +1204,41 @@ closeModal() {
   }
 }
 
+// Reset import state for new import
+resetImportState() {
+  this.isImporting = false;
+  this.importProgress = 0;
+  this.importStatusMessage = '';
+  this.importCompleted = false;
+  this.importResults = null;
+}
+
+// Simulate progress for better UX
+simulateProgress() {
+  this.importProgress = 0;
+  const progressInterval = setInterval(() => {
+    if (this.importProgress < 90 && this.isImporting) {
+      const increment = Math.max(1, Math.floor((90 - this.importProgress) / 10));
+      this.importProgress = Math.min(90, this.importProgress + increment);
+      
+      if (this.importProgress < 30) {
+        this.importStatusMessage = 'Reading Excel file...';
+      } else if (this.importProgress < 60) {
+        this.importStatusMessage = 'Validating data...';
+      } else if (this.importProgress < 90) {
+        this.importStatusMessage = 'Importing records to database...';
+      }
+    } else {
+      clearInterval(progressInterval);
+    }
+  }, 500);
+  return progressInterval;
+}
+
 showImportModal() {
+  // Reset import state for fresh start
+  this.resetImportState();
+  
   // Reset the import form model to ensure fresh start
   this.importFormConfig.model = {};
   
@@ -1233,99 +1284,111 @@ showImportModal() {
   submit: {
     label: 'Import',
     submittedFn: (formData: any) => {
-      const rawFile = formData.file[0]?.rawFile;
-      if (!rawFile || !(rawFile instanceof File)) {
-        this.notification.error('Error', 'No valid file selected!');
-        return;
-      }
-      const uploadData = new FormData();
-      uploadData.append('file', rawFile);
-
-      // Add headers to skip the default error interceptor
-      const headers = { 'X-Skip-Error-Interceptor': 'true' };
-
-      this.http.post('vendors/upload-excel/', uploadData, { headers }).subscribe({
-        next: (res: any) => {
-          console.log('Upload success', res);
-          
-          if (res.errors && res.errors.length > 0) {
-            // Handle partial success/errors
-            const successCount = res.message ? res.message.split(' ')[0] : '0';
-            const errorCount = res.errors.length;
-            
-            // Check if errors are related to missing required fields
-            const missingFieldErrors = res.errors.filter((e: any) => 
-              e.error && e.error.includes('Missing required field:')
-            );
-            
-            if (missingFieldErrors.length > 0) {
-              // Extract the missing field names from the error messages
-              const missingFields = missingFieldErrors.map((e: any) => {
-                const match = e.error.match(/Missing required field: (.+)/);
-                return match ? match[1] : '';
-              }).filter(Boolean);
-              
-              // Create a clear message about required fields
-              const message = `Required fields missing: ${missingFields.join(', ')}`;
-              this.notification.error(
-                'Import Failed', 
-                message,
-                { nzDuration: 6000 }
-              );
-            } else {
-              // Generic partial import message for other types of errors
-              this.notification.warning(
-                'Partial Import',
-                `${successCount} vendors imported, ${errorCount} failed.`,
-                { nzDuration: 5000 }
-              );
-            }
-          } else {
-            // Complete success
-            this.notification.success(
-              'Success', 
-              res.message || 'Vendors imported successfully', 
-              { nzDuration: 3000 }
-            );
-          }
-          
-          this.closeModal();
-          this.showVendorListFn(); // Update this to match your method name for refreshing vendors list
-        },
-        error: (error) => {
-          console.error('Upload error', error);
-          
-          // Extract the error response structure
-          const errorResponse = error.error || {};
-          
-          // Access the message property directly
-          const errorMessage = errorResponse.message || 'Import failed';
-          
-          // Check for specific error messages to determine the error type
-          if (errorMessage.includes('Excel template format mismatch')) {
-            this.notification.error(
-              'Excel Template Error', 
-              'Excel template format mismatch. Please download the correct template.',
-              { nzDuration: 5000 }
-            );
-          } else if (errorMessage.includes('missing required data')) {
-            this.notification.error(
-              'Import Failed', 
-              'Some rows are missing required data. Please check your Excel file.',
-              { nzDuration: 5000 }
-            );
-          } else {
-            // Generic error
-            this.notification.error(
-              'Import Failed', 
-              errorMessage, 
-              { nzDuration: 5000 }
-            );
-          }
-        }
-      });
+      this.handleImport(formData);
     }
   },
   model: {}
   };
+
+  // Handle the import process with loading states
+  handleImport(formData: any) {
+    const rawFile = formData.file[0]?.rawFile;
+    if (!rawFile || !(rawFile instanceof File)) {
+      this.notification.error('Error', 'No valid file selected!');
+      return;
+    }
+
+    // Reset and start import
+    this.resetImportState();
+    this.isImporting = true;
+    this.importStatusMessage = 'Preparing import...';
+
+    const uploadData = new FormData();
+    uploadData.append('file', rawFile);
+
+    const headers = { 'X-Skip-Error-Interceptor': 'true' };
+    const progressInterval = this.simulateProgress();
+
+    this.http.post('vendors/upload-excel/', uploadData, { headers }).subscribe({
+      next: (res: any) => {
+        clearInterval(progressInterval);
+        this.importProgress = 100;
+        this.importStatusMessage = 'Import completed!';
+        this.isImporting = false;
+        this.importCompleted = true;
+
+        console.log('Upload success', res);
+
+        const successMatch = res.message?.match(/(\d+)/);
+        const successCount = successMatch ? parseInt(successMatch[1], 10) : 0;
+        const errorCount = res.errors?.length || 0;
+        const totalRecords = successCount + errorCount;
+
+        this.importResults = {
+          success: errorCount === 0,
+          totalRecords: totalRecords,
+          successCount: successCount,
+          errorCount: errorCount,
+          errors: res.errors?.slice(0, 10) || []
+        };
+
+        // Notifications commented out - results shown in modal instead
+        // if (errorCount === 0) {
+        //   this.notification.success('Success', res.message || 'Vendors imported successfully', { nzDuration: 3000 });
+        // } else if (successCount > 0) {
+        //   this.notification.warning('Partial Import', `${successCount} vendors imported, ${errorCount} failed.`, { nzDuration: 5000 });
+        // } else {
+        //   const missingFieldErrors = res.errors?.filter((e: any) => e.error && e.error.includes('Missing required field:')) || [];
+        //   if (missingFieldErrors.length > 0) {
+        //     const missingFields = missingFieldErrors.map((e: any) => {
+        //       const match = e.error.match(/Missing required field: (.+)/);
+        //       return match ? match[1] : '';
+        //     }).filter(Boolean);
+        //     this.notification.error('Import Failed', `Required fields missing: ${missingFields.join(', ')}`, { nzDuration: 6000 });
+        //   }
+        // }
+      },
+      error: (error) => {
+        clearInterval(progressInterval);
+        this.isImporting = false;
+        this.importCompleted = true;
+        this.importProgress = 100;
+
+        console.error('Upload error', error);
+
+        const errorResponse = error.error || {};
+        const errorMessage = errorResponse.message || 'Import failed';
+
+        this.importResults = {
+          success: false,
+          totalRecords: 0,
+          successCount: 0,
+          errorCount: 1,
+          errors: [{ row: 0, error: errorMessage }]
+        };
+
+        // Notifications commented out - results shown in modal instead
+        // if (errorMessage.includes('Excel template format mismatch')) {
+        //   this.notification.error('Excel Template Error', 'Excel template format mismatch. Please download the correct template.', { nzDuration: 5000 });
+        // } else if (errorMessage.includes('missing required data')) {
+        //   this.notification.error('Import Failed', 'Some rows are missing required data. Please check your Excel file.', { nzDuration: 5000 });
+        // } else {
+        //   this.notification.error('Import Failed', errorMessage, { nzDuration: 5000 });
+        // }
+      }
+    });
+  }
+
+  // Close modal and refresh list after viewing results
+  closeImportAndRefresh() {
+    this.resetImportState();
+    this.closeModal();
+    this.showVendorListFn();
+  }
+
+  // Start a new import
+  startNewImport() {
+    this.resetImportState();
+    this.showImportModal();
+  }
 }
