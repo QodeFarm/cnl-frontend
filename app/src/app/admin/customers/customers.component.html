@@ -52,27 +52,128 @@
 
 
 <!-- Import Modal -->
-<div class="modal fade custom-modal" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+<div class="modal fade custom-modal" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="importModalLabel">Import Customers from Excel</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="modalClose"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="modalClose" [disabled]="isImporting"></button>
       </div>
       <div class="modal-body">
-        <!-- Add this somewhere in your HTML -->
-        <button id="downloadTemplateBtn" (click)="downloadExcelTemplate()" style="display: none;"></button>
-        <!-- Update the import modal info section -->
-        <div class="alert alert-info mb-3">
-          <p class="mb-1"><strong>Instructions:</strong></p>
-          <ul class="mb-0">
-            <li>Download and use the official <a href="#" (click)="downloadExcelTemplate(); $event.preventDefault()">Excel Template</a></li>
-            <li>Required fields: Name, Print Name, Customer Category</li>
-            <!-- <li>All column names must match exactly as in the template</li> -->
-            <li>Only Excel files (.xlsx, .xls) are supported</li>
-          </ul>
+        <!-- Loading State with Spinner and Progress -->
+        <div *ngIf="isImporting" class="import-loading-container">
+          <nz-spin nzSimple [nzSize]="'large'"></nz-spin>
+          <div class="import-progress-section">
+            <nz-progress 
+              [nzPercent]="importProgress" 
+              [nzStatus]="importProgress < 100 ? 'active' : 'success'"
+              nzStrokeLinecap="round">
+            </nz-progress>
+            <p class="import-status-message">{{ importStatusMessage }}</p>
+            <p class="import-hint text-muted">
+              <small>Please wait while we process your Excel file. This may take a few moments for large files.</small>
+            </p>
+          </div>
         </div>
-        <ta-form [options]="importFormConfig"></ta-form>
+
+        <!-- Results Display -->
+        <div *ngIf="importCompleted && importResults" class="import-results-container">
+          <!-- Success Result -->
+          <nz-result 
+            *ngIf="importResults.success"
+            nzStatus="success"
+            nzTitle="Import Successful!"
+            [nzSubTitle]="'Successfully imported ' + importResults.successCount + ' customer(s)'">
+            <div nz-result-extra>
+              <button class="btn btn-primary" (click)="closeImportAndRefresh()">OK</button>
+            </div>
+          </nz-result>
+
+          <!-- Partial Success Result -->
+          <nz-result 
+            *ngIf="!importResults.success && importResults.successCount > 0"
+            nzStatus="warning"
+            nzTitle="Partial Import"
+            [nzSubTitle]="importResults.successCount + ' of ' + importResults.totalRecords + ' customers imported'">
+            <div nz-result-content class="import-results-details">
+              <nz-alert
+                nzType="warning"
+                [nzMessage]="importResults.errorCount + ' record(s) failed to import'"
+                nzShowIcon>
+              </nz-alert>
+              
+              <div *ngIf="importResults.errors.length > 0" class="error-details mt-3">
+                <h6>Error Details:</h6>
+                <div class="table-responsive">
+                  <table class="table table-sm table-bordered">
+                    <thead class="table-light">
+                      <tr>
+                        <th style="width: 80px;">Row</th>
+                        <th>Error Message</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let err of importResults.errors">
+                        <td>{{ err.row || 'N/A' }}</td>
+                        <td>{{ err.error }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <p *ngIf="importResults.errorCount > 10" class="text-muted">
+                  <small>Showing first 10 errors. Total errors: {{ importResults.errorCount }}</small>
+                </p>
+              </div>
+            </div>
+            <div nz-result-extra>
+              <button class="btn btn-primary me-2" (click)="closeImportAndRefresh()">OK</button>
+              <button class="btn btn-outline-secondary" (click)="startNewImport()">Try Again</button>
+            </div>
+          </nz-result>
+
+          <!-- Complete Failure Result -->
+          <nz-result 
+            *ngIf="!importResults.success && importResults.successCount === 0"
+            nzStatus="error"
+            nzTitle="Import Failed"
+            nzSubTitle="No customers were imported">
+            <div nz-result-content class="import-results-details">
+              <nz-alert
+                nzType="error"
+                [nzMessage]="importResults.errors[0]?.error || 'An unexpected error occurred'"
+                nzShowIcon>
+              </nz-alert>
+              
+              <div class="mt-3">
+                <p><strong>Suggestions:</strong></p>
+                <ul>
+                  <li>Make sure you're using the correct Excel template</li>
+                  <li>Check that all required fields are filled</li>
+                  <li>Verify the data format matches the expected format</li>
+                </ul>
+              </div>
+            </div>
+            <div nz-result-extra>
+              <button class="btn btn-outline-primary me-2" (click)="downloadExcelTemplate()">Download Template</button>
+              <button class="btn btn-primary" (click)="startNewImport()">Try Again</button>
+            </div>
+          </nz-result>
+        </div>
+
+        <!-- Initial Form State -->
+        <div *ngIf="!isImporting && !importCompleted">
+          <button id="downloadTemplateBtn" (click)="downloadExcelTemplate()" style="display: none;"></button>
+          <div class="alert alert-info mb-3">
+            <p class="mb-1"><strong>Instructions:</strong></p>
+            <ul class="mb-0">
+              <li>Download and use the official <a href="#" (click)="downloadExcelTemplate(); $event.preventDefault()">Excel Template</a></li>
+              <li>Required fields: Name, Print Name, Customer Category</li>
+              <li>Only Excel files (.xlsx, .xls) are supported</li>
+              <li>Large files (500-5000 records) may take a few minutes to process</li>
+            </ul>
+          </div>
+          <ta-form [options]="importFormConfig"></ta-form>
+        </div>
       </div>
     </div>
   </div>

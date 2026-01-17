@@ -514,17 +514,32 @@ export class LedgersReportsComponent {
             if (!row.particulars || !Array.isArray(row.particulars)) return '';
             
             const lines = row.particulars.map((p: any) => {
-              // Ledger Group (bold) on its own line if exists
-              const ledgerGroup = p.ledger_group ? `<strong>${p.ledger_group}</strong><br>` : '';
-              // Ledger Name (bold) with party name below
-              const ledgerName = p.ledger_name ? `<strong>${p.ledger_name}</strong>` : '';
-              const partyInfo = p.party_name ? `<br>${p.party_name}` : '';
-              // Narration text for each line
-              const narration = p.narration_text ? `<br><small style="color: #666;">${p.narration_text}</small>` : '';
-              return `${ledgerGroup}${ledgerName}${partyInfo}${narration}`;
+              let result = '';
+              
+              if (p.ledger_group) {
+                // If ledger_group exists: Show Group (bold), then Party Name below
+                result = `<strong>${p.ledger_group}</strong>`;
+                if (p.party_name) {
+                  result += `<br>${p.party_name}`;
+                }
+              } else {
+                // If no ledger_group: Show Ledger Name (bold), then Party Name below
+                result = `<strong>${p.ledger_name || ''}</strong>`;
+                if (p.party_name) {
+                  result += `<br>${p.party_name}`;
+                }
+              }
+              
+              // Add narration text after each entry
+              if (p.narration || p.narration_text) {
+                result += `<br>${p.narration || p.narration_text}`;
+                
+              }
+              
+              return result;
             });
             
-            return lines.join('<hr style="margin: 8px 0; border: 0; border-top: 1px solid #ddd;">');
+            return lines.join('<br><br>');
           },
           // Clean value for Excel export - strip HTML and format as plain text
           exportFn: (currentValue: any, row: any) => {

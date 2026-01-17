@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormlyModule } from '@ngx-formly/core';
-import { AssetCategoriesConfig, AssetStatusConfig, cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, CustomerPaymentConfig, designationsConfig, employeeSalaryComponentsConfig, expenseCategoryConfig, FirmStatusConfig, gPackageUnitsConfig, GstCatConfig, GstTypesConfig, interactionTypesConfig, jobTypesConfig, leadStatusesConfig, leaveTypesConfig, ledgerAccountsConfig, LedgerGroupsConfig, LocationsAssetConfig, MachineConfig, OrderStatusConfig, OrderTypesConfig, packUnitConfig, PaymentLinkConfig, PriceCatConfig, productBrandsConfig, productCategoriesConfig, productColorsConfig, productGroupsConfig, productGstClassificationsConfig, productionFloorsConfig, ProductionStatusesConfig, productModesConfig, productPurchaseGLConfig, productSalesGLConfig, productsCrudConfig, productSizesConfig, productStockUnitsConfig, productTypesConfig, productUniqueQuantityCodesConfig, PurchaseTypesConfig, ReminderTypesConfig, SaleTypesConfig, shiftsConfig, StateConfig, statusConfig, taskPrioritiesConfig, TerritoryConfig, TransportConfig, unitOptionsConfig, UserGroupsConfig, VendorAgentConfig, vendorCategeoryConfig, VendorCurdConfig, VendorPaymentTermsConfig, warehouseLocationsConfig } from '../utils/master-curd-config';
+import { AssetCategoriesConfig, AssetStatusConfig, cityConfig, CountryConfig, customerCategoryConfig, customerCudConfig, CustomerPaymentConfig, departmentsConfig, designationsConfig, employeeSalaryComponentsConfig, expenseCategoryConfig, FirmStatusConfig, gPackageUnitsConfig, GstCatConfig, GstTypesConfig, interactionTypesConfig, jobCodesConfig, jobTypesConfig, leadStatusesConfig, leaveTypesConfig, ledgerAccountsConfig, LedgerGroupsConfig, LocationsAssetConfig, MachineConfig, OrderStatusConfig, OrderTypesConfig, packUnitConfig, PaymentLinkConfig, PriceCatConfig, productBrandsConfig, productCategoriesConfig, productColorsConfig, productGroupsConfig, productGstClassificationsConfig, productionFloorsConfig, ProductionStatusesConfig, productModesConfig, productPurchaseGLConfig, productSalesGLConfig, productsCrudConfig, productSizesConfig, productStockUnitsConfig, productTypesConfig, productUniqueQuantityCodesConfig, PurchaseTypesConfig, ReminderTypesConfig, SaleTypesConfig, shiftsConfig, StateConfig, statusConfig, taskPrioritiesConfig, TerritoryConfig, TransportConfig, unitOptionsConfig, UserGroupsConfig, VendorAgentConfig, vendorCategeoryConfig, VendorCurdConfig, VendorPaymentTermsConfig, warehouseLocationsConfig } from '../utils/master-curd-config';
 
 
 
@@ -729,7 +729,7 @@ import { AssetCategoriesConfig, AssetStatusConfig, cityConfig, CountryConfig, cu
               dataKey: 'job_code_id',
               dataLabel: 'job_code',
               required: false,
-              curdConfig: jobTypesConfig  
+              curdConfig: jobCodesConfig
             }
           }
         },
@@ -744,7 +744,7 @@ import { AssetCategoriesConfig, AssetStatusConfig, cityConfig, CountryConfig, cu
               dataKey: 'department_id',
               dataLabel: 'department_name',
               required: false,
-              curdConfig: designationsConfig  
+              curdConfig: departmentsConfig
             }
           }
         },
