@@ -820,7 +820,7 @@ async autoFillProductDetails(field, data) {
         cgst: product.cgst || 0,
         sgst: product.sgst || 0,
         igst: product.igst || 0,
-        remarks: product.remarks || ''
+        remarks: product.remarks || null
       }));
     } else {
       products.forEach(newProduct => {
@@ -846,12 +846,16 @@ async autoFillProductDetails(field, data) {
             cgst: newProduct.cgst || 0,
             sgst: newProduct.sgst || 0,
             igst: newProduct.igst || 0,
-            remarks: newProduct.remarks || ''
+            remarks: newProduct.remarks || null
           });
         } else {
           existingProducts[existingProductIndex] = {
             ...existingProducts[existingProductIndex],
             ...newProduct,
+            remarks:
+              newProduct.remarks !== undefined
+                ? newProduct.remarks
+                : existingProducts[existingProductIndex].remarks ?? null,
             product: {
               product_id: newProduct.product_id || existingProducts[existingProductIndex].product.product_id,
               name: newProduct.name || existingProducts[existingProductIndex].product.name,
