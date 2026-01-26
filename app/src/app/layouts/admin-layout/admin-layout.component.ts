@@ -57,6 +57,9 @@ export class AdminLayoutComponent {
   remindersCount: number = 0;
   remindersList: any[] = [];
 
+  // Force password change flag
+  isForcePasswordChange: boolean = false;
+
   private recognition: SpeechRecognitionEvent | null = null;
   constructor(private activatedRoute: ActivatedRoute, private cd: ChangeDetectorRef, private elementRef: ElementRef, private http: HttpClient, private renderer: Renderer2, private router: Router, private taLoacal: LocalStorageService, private aS: AdminCommonService) {
     this.aS.action$.subscribe(res => {
@@ -113,6 +116,9 @@ export class AdminLayoutComponent {
 
   isAdmin: boolean = false;
   ngOnInit() {
+    // Check if force password change is required
+    this.isForcePasswordChange = localStorage.getItem('force_password_change') === 'true';
+    
     const user = this.taLoacal.getItem('user');
     this.menulList = [];
 
@@ -505,6 +511,8 @@ openReminder() {
   logout() {
     localStorage.removeItem('user');
     localStorage.removeItem('accessToken');
+    localStorage.removeItem('force_password_change');
+    localStorage.removeItem('refreshToken');
     this.router.navigateByUrl('/login');
 
   }

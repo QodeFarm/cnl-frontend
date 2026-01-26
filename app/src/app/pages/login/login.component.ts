@@ -161,12 +161,33 @@ constructor(private router: Router, private userService: UserService, private ht
     localStorage.setItem('accessToken', res.data[0].access_token);
     TaLocalStorage.setItem('user', res.data[0]);
 
+    // Store force_password_change flag
+    // Check user object first (res.data[0]), then response level as fallback
+    // Handle boolean, string "true"/"1", and number 1
+    const rawForcePasswordChange = user.force_password_change !== undefined 
+                                    ? user.force_password_change 
+                                    : res.force_password_change;
+    const forcePasswordChange = rawForcePasswordChange === true || 
+                                 rawForcePasswordChange === 'true' || 
+                                 rawForcePasswordChange === '1' || 
+                                 rawForcePasswordChange === 1;
+    localStorage.setItem('force_password_change', forcePasswordChange.toString());
+    console.log('LoginComponent: user.force_password_change:', user.force_password_change);
+    console.log('LoginComponent: res.force_password_change:', res.force_password_change);
+    console.log('LoginComponent: raw force_password_change used:', rawForcePasswordChange);
+    console.log('LoginComponent: parsed force_password_change:', forcePasswordChange);
+
     // Log stored tokens
     console.log('LoginComponent: Access token stored:', user.access_token);
     console.log('LoginComponent: Refresh token stored:', user.refresh_token);
     console.log('response: Access token stored:', res.data[0].access_token);
     console.log('response: user', res.data[0]);
-    // Navigate to the admin page after login
-    this.router.navigateByUrl('/admin');
+    
+    // Navigate based on force_password_change flag
+    if (forcePasswordChange) {
+      this.router.navigateByUrl('/admin/force-change-password');
+    } else {
+      this.router.navigateByUrl('/admin');
+    }
   }
 }

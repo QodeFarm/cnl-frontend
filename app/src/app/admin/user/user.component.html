@@ -1,7 +1,89 @@
 <div class="container-fluid pt-3">
     <div class="row">
         <div class="col-12 px-1">
-            <ta-curd-modal [options]="curdConfig" class="custom-list"></ta-curd-modal>
+            <ta-curd-modal #taCurd [options]="curdConfig" class="custom-list"></ta-curd-modal>
         </div>
     </div>
 </div>
+
+<!-- Temp Password Modal -->
+<nz-modal
+    [(nzVisible)]="showTempPasswordModal"
+    nzTitle="User Created Successfully"
+    [nzClosable]="false"
+    [nzMaskClosable]="false"
+    [nzFooter]="modalFooter"
+    nzWidth="480px"
+    nzCentered
+    nzClassName="temp-password-modal-wrapper">
+    
+    <ng-container *nzModalContent>
+        <div class="temp-password-modal">
+            <!-- Success Icon -->
+            <div class="success-icon-wrapper">
+                <i nz-icon nzType="check-circle" nzTheme="twotone" [nzTwotoneColor]="'#52c41a'"></i>
+            </div>
+            
+            <!-- User Info Card -->
+            <div class="user-info-card">
+                <div class="user-avatar">
+                    <i nz-icon nzType="user" nzTheme="outline"></i>
+                </div>
+                <div class="user-details">
+                    <span class="user-label">New User</span>
+                    <span class="user-name">{{ createdUserName }}</span>
+                </div>
+            </div>
+            
+            <!-- Warning Banner -->
+            <div class="warning-banner">
+                <i nz-icon nzType="warning" nzTheme="twotone" [nzTwotoneColor]="'#faad14'"></i>
+                <div class="warning-text">
+                    <strong>Important:</strong> This password is shown only once. Copy it now!
+                </div>
+            </div>
+            
+            <!-- Password Display -->
+            <div class="password-section">
+                <label class="password-label">Temporary Password</label>
+                <div class="password-display">
+                    <input 
+                        [type]="tempPasswordVisible ? 'text' : 'password'" 
+                        class="password-input" 
+                        [value]="tempPassword" 
+                        readonly>
+                    <div class="password-actions">
+                        <button 
+                            nz-button 
+                            nzType="text"
+                            (click)="toggleTempPasswordVisibility()"
+                            nz-tooltip
+                            [nzTooltipTitle]="tempPasswordVisible ? 'Hide' : 'Show'">
+                            <i nz-icon [nzType]="tempPasswordVisible ? 'eye-invisible' : 'eye'" nzTheme="outline"></i>
+                        </button>
+                        <button 
+                            nz-button 
+                            nzType="primary"
+                            (click)="copyTempPassword()">
+                            <i nz-icon nzType="copy" nzTheme="outline"></i>
+                            Copy
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Info Note -->
+            <div class="info-note">
+                <i nz-icon nzType="info-circle" nzTheme="twotone" [nzTwotoneColor]="'#1890ff'"></i>
+                <span>User must change this password on first login.</span>
+            </div>
+        </div>
+    </ng-container>
+    
+    <ng-template #modalFooter>
+        <button nz-button nzType="primary" nzSize="large" (click)="closeTempPasswordModal()">
+            <i nz-icon nzType="check" nzTheme="outline"></i>
+            Got it, Done
+        </button>
+    </ng-template>
+</nz-modal>
