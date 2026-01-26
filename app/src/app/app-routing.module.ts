@@ -4,6 +4,7 @@ import { BlankLayoutComponent } from './layouts/blank-layout/blank-layout.compon
 import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.component';
 import { appGuard } from './guards/app.guard';
 import { AuthguardGuard } from './guards/authguard.guard';
+import { InventoryScanComponent } from './admin/inventory/inventory-scan/inventory-scan.component';
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login' },
@@ -143,6 +144,15 @@ const routes: Routes = [
 
       //Customfields Tool
       { path: 'customfields', data: { title: 'customfields', moduleName: 'customfields' }, canActivate: [], loadChildren: () => import('./admin/customfields/customfields.module').then(m => m.CustomfieldsModule) },
+
+      {
+        path: 'inventory-scan',
+        loadComponent: () =>
+          import('./admin/inventory/inventory-scan/inventory-scan.component')
+            .then(m => m.InventoryScanComponent),
+        data: { title: 'Scan Card'},
+      },
+
 
 
       // { path: 'production', data: { title: 'production', moduleName: 'production' }, canActivate: [], loadChildren: () => import('./admin/production/production.module').then(m => m.ProductionModule) },

@@ -40,8 +40,11 @@ export class ProductsComponent implements OnInit {
     this.selectedProductMode = "Inventory";
     this.setFormConfig();
     // console.log('Check field : ',this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[7])
-    this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[9].hide = true;
-    this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[10].hide = true;
+    // this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[9].hide = true;
+    // this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[10].hide = true;
+    // this.formConfig.fields[0].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[6].hide = true;
+    console.log("this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[9]: ", this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[9])
+    this.formConfig.fields[0].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = true;
   }
 
   hide() {
@@ -57,6 +60,7 @@ export class ProductsComponent implements OnInit {
     this.http.get('products/products/' + event).subscribe((res: any) => {
       if (res) {
         this.formConfig.model = res.data;
+        console.log("Data of product : ", res.data);
 
         //  Ensure product_variations always has at least one row
         if (!this.formConfig.model.product_variations || this.formConfig.model.product_variations.length === 0) {
@@ -144,6 +148,8 @@ export class ProductsComponent implements OnInit {
       product_item_balance: this.formConfig.model.product_item_balance
     };
 
+    console.log('Updating Products with ID:', ProductEditID, 'Data:', updateData);
+
     // PUT request to update Sale Return Order
     this.http.put(`products/products/${ProductEditID}/`, updateData).subscribe(
       (response) => {
@@ -157,141 +163,65 @@ export class ProductsComponent implements OnInit {
     );
   }
 
-  // Method to calculate and verify the balance
-  // verifyBalance(): any {
-  //   const balance = parseInt(this.formConfig.model.products.balance, 10);
-
-  //   // Helper function to calculate total quantity
-  //   const calculateTotalQuantity = (items) =>
-  //     items?.reduce((sum, item) => sum + (parseInt(item.quantity, 10) || 0), 0) || 0;
-
-  //   // Filter out empty/null variations
-  //   const productVariations = (this.formConfig.model.product_variations ?? []).filter(
-  //     (obj) => obj && Object.keys(obj).length
-  //   );
-
-  //   // Update model with cleaned variations
-  //   this.formConfig.model.product_variations = productVariations;
-
-  //   const totalVariationQuantity = calculateTotalQuantity(productVariations);
-  //   const totalWarehouseQuantity  = calculateTotalQuantity(this.formConfig.model.product_item_balance);
-
-  //   // Validate variations match balance
-  //   if (totalVariationQuantity !== balance) {
-  //     return this.showDialog(
-  //       `<b>Variations !</b><br>
-  //        Your sum of quantities are <b>${totalVariationQuantity}</b> not matching with overall balance <b>${balance}.</b>`
-  //     );
-  //   }
-
-  //   // Validate item balance matches
-  //   if (totalWarehouseQuantity  !== balance) {
-  //     return this.showDialog(
-  //       `<b>Warehouse Locations!</b><br>
-  //        Your sum of quantities are <b>${totalWarehouseQuantity }</b> not matching with overall balance <b>${balance}.</b>`
-  //     );
-  //   }
-
-  //   return true; // Everything matches
-  // }
-
-// verifyBalance(): any {
-//   const isEditMode = this.formConfig.formState.viewMode; // true = edit, false = create
-
-//   // Helper to sum quantities
-//   const calculateTotalQuantity = (items) =>
-//     items?.reduce((sum, item) => sum + (parseInt(item.quantity, 10) || 0), 0) || 0;
-
-//   const productVariations = (this.formConfig.model.product_variations ?? []).filter(
-//     (obj) => obj && Object.keys(obj).length
-//   );
-//   this.formConfig.model.product_variations = productVariations;
-
-//   const totalVariationQuantity = calculateTotalQuantity(productVariations);
-//   const totalWarehouseQuantity = calculateTotalQuantity(this.formConfig.model.product_item_balance);
-
-//   if (!isEditMode) {
-//     //  Create Mode: balance should auto-sync with variations
-//     this.formConfig.model.products.balance = totalVariationQuantity;
-
-//     if (totalVariationQuantity !== totalWarehouseQuantity) {
-//       return this.showDialog(
-//         `<b>Mismatch!</b><br>
-//          Variations = <b>${totalVariationQuantity}</b>, 
-//          Warehouse = <b>${totalWarehouseQuantity}</b>. They must match.`
-//       );
-//     }
-//   } else {
-//     //  Edit Mode: balance must match both
-//     const balance = parseInt(this.formConfig.model.products?.balance, 10) || 0;
-
-//     if (totalVariationQuantity !== balance) {
-//       return this.showDialog(
-//         `<b>Variations!</b><br>
-//          Sum of variation quantities <b>${totalVariationQuantity}</b> 
-//          is not matching with Balance <b>${balance}</b>.`
-//       );
-//     }
-
-//     if (totalWarehouseQuantity !== balance) {
-//       return this.showDialog(
-//         `<b>Warehouse!</b><br>
-//          Sum of warehouse quantities <b>${totalWarehouseQuantity}</b> 
-//          is not matching with Balance <b>${balance}</b>.`
-//       );
-//     }
-//   }
-
-//   return true;
-// }
-
 verifyBalance(): any {
-  const isEditMode = this.formConfig.formState.viewMode; // true = edit, false = create
+  const isEditMode = this.formConfig.submit.label === 'Update';
 
-  // Helper to sum quantities
-  const calculateTotalQuantity = (items) =>
-    items?.reduce((sum, item) => sum + (parseInt(item.quantity, 10) || 0), 0) || 0;
-
-  const productVariations = (this.formConfig.model.product_variations ?? []).filter(
-    (obj) => obj && Object.keys(obj).length
-  );
-  this.formConfig.model.product_variations = productVariations;
-
-  const totalVariationQuantity = calculateTotalQuantity(productVariations);
-  const totalWarehouseQuantity = calculateTotalQuantity(this.formConfig.model.product_item_balance);
-
-  // --- CASE 1: Both empty → balance = 0
-  if (totalVariationQuantity === 0 && totalWarehouseQuantity === 0) {
-    this.formConfig.model.products.balance = 0;
-    return true;
-  }
-
-  // --- CASE 2: Only variations entered
-  if (totalVariationQuantity > 0 && totalWarehouseQuantity === 0) {
-    this.formConfig.model.products.balance = totalVariationQuantity;
-    return true;
-  }
-
-  // --- CASE 3: Only warehouses entered
-  if (totalWarehouseQuantity > 0 && totalVariationQuantity === 0) {
-    this.formConfig.model.products.balance = totalWarehouseQuantity;
-    return true;
-  }
-
-  // --- CASE 4: Both entered → must match
-  if (totalVariationQuantity !== totalWarehouseQuantity) {
-    return this.showDialog(
-      `<b>Mismatch!</b><br>
-       Variations = <b>${totalVariationQuantity}</b>, 
-       Warehouse = <b>${totalWarehouseQuantity}</b>. They must match.`
+  const calculateTotal = (items: any[]) =>
+    (items || []).reduce(
+      (sum, i) => sum + (parseInt(i?.quantity, 10) || 0),
+      0
     );
+
+  const variations = (this.formConfig.model.product_variations || []).filter(
+    v => v && Object.keys(v).length && v.quantity != null
+  );
+
+  const warehouses = (this.formConfig.model.product_item_balance || []).filter(
+    w => w && Object.keys(w).length && w.quantity != null
+  );
+
+  const variationQty = calculateTotal(variations);
+  const warehouseQty = calculateTotal(warehouses);
+
+  // -----------------------------------------
+  // CASE 1: VARIATIONS EXIST → balance controlled by variations
+  // -----------------------------------------
+  if (variations.length > 0) {
+    if (warehouseQty > 0 && variationQty !== warehouseQty) {
+      return this.showDialog(
+        `<b>Mismatch!</b><br>
+         Variations = <b>${variationQty}</b>,
+         Warehouse = <b>${warehouseQty}</b>`
+      );
+    }
+
+    this.formConfig.model.products.balance = variationQty;
+    return true;
   }
 
-  //  If both match → set balance
-  this.formConfig.model.products.balance = totalVariationQuantity;
+  // -----------------------------------------
+  // CASE 2: NO VARIATIONS → balance independent
+  // -----------------------------------------
+  if (variations.length === 0) {
 
-  return true;
+    // If warehouses exist, balance must match warehouse
+    if (warehouseQty > 0) {
+      this.formConfig.model.products.balance = warehouseQty;
+      return true;
+    }
+
+    // No variations & no warehouses
+    // CREATE → balance defaults to 0
+    // EDIT → keep existing balance
+    if (!isEditMode) {
+      this.formConfig.model.products.balance =
+        this.formConfig.model.products.balance ?? 0;
+    }
+
+    return true;
+  }
 }
+
 
 preprocessFormData() {
   // Ensure product_mode_id is just the UUID
@@ -315,14 +245,14 @@ preprocessFormData() {
 }
 
 
-  // On every change in product_variations update balance
-  updateBalanceFromVariations() {
-    const productVariations = this.formConfig.model.product_variations ?? [];
-    const balance = productVariations.reduce(
-      (sum, item) => sum + (parseInt(item.quantity, 10) || 0), 0
-    );
-    this.formConfig.model.products.balance = balance;
-  }
+  // // On every change in product_variations update balance
+  // updateBalanceFromVariations() {
+  //   const productVariations = this.formConfig.model.product_variations ?? [];
+  //   const balance = productVariations.reduce(
+  //     (sum, item) => sum + (parseInt(item.quantity, 10) || 0), 0
+  //   );
+  //   this.formConfig.model.products.balance = balance;
+  // }
 
 
   showDialog(message: string): void {
@@ -741,15 +671,20 @@ preprocessFormData() {
                       }
                     }, 
                     {
-                      className: 'col-md-4 col-sm-6 col-12',
                       key: 'balance',
+                      className: 'col-md-4 col-sm-6 col-12',
                       type: 'input',
-                      defaultValue: 0.00,
+                      defaultValue: 0,
                       templateOptions: {
-                      label: 'Balance',
-                      required: false, 
-                    }
-                  },
+                        label: 'Balance',
+                        required: false,
+                        type: 'number'
+                      },
+                      expressionProperties: {
+                        'model.balance': (model) => model.balance ?? model.balance
+                      }
+
+                    },
                   {
                     className: 'col-md-4 col-sm-6 col-12',
                     key: 'physical_balance',
@@ -763,8 +698,8 @@ preprocessFormData() {
                     hooks: {
                       onInit: (field) => {
                         field.formControl.valueChanges.subscribe(() => {
-                          const balance = field.model?.balance || 0;
-                          const physical = field.model?.physical_balance || 0;
+                          const balance = field.model?.balance ?? 0;
+                          const physical = field.model?.physical_balance ?? 0;
 
                           field.model.balance_diff = physical - balance;
                         });
@@ -1116,20 +1051,6 @@ preprocessFormData() {
                             },
                             {
                               className: 'col-3',
-                              key: 'packet_barcode',
-                              type: 'input',
-                              templateOptions: {
-                                label: 'Packet Barcode',
-                                required: false,
-                              },
-                              hideExpression: (model) => {
-                                // Check if `unit_options` exists, and check the value of `unit_name`
-                                const unitName = model.unit_options ? model.unit_options.unit_name : undefined;
-                                return unitName !== 'Stock Pack GPack Unit';  // Hide if it's not 'Stock Pack Unit'
-                              }
-                            },
-                            {
-                              className: 'col-3',
                               key: 'barcode',
                               type: 'input',
                               templateOptions: {
@@ -1145,7 +1066,7 @@ preprocessFormData() {
                               templateOptions: {
                                 label: 'Print Barcode'
                               }
-                            }
+                            },
                           ]
                         },
                       ]
@@ -1270,7 +1191,7 @@ preprocessFormData() {
                                 hooks: {
                                   onChanges: (field: any) => {
                                     field.formControl.valueChanges.subscribe(() => {
-                                      this.updateBalanceFromVariations();
+                                      // this.updateBalanceFromVariations();
                                     });
                                   }
                                 }

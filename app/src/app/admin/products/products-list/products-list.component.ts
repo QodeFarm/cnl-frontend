@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
+import JsBarcode from 'jsbarcode';
 
 @Component({
   selector: 'app-products-list',
@@ -250,11 +251,93 @@ export class ProductsListComponent {
               console.log(row);
               this.edit.emit(row.product_id);
             }
+          },
+          {
+            type: 'callBackFn',
+            icon: 'fa fa-barcode',
+            tooltip: 'Print Barcode',
+            callBackFn: (row) => {
+              this.printBarcode(row);
+            }
           }
         ]
       }
     ]
   };
   constructor(private router: Router, private http: HttpClient) { }
+
+  //Barcode image ...
+  // printBarcode(row: any) {
+  //   const printWindow = window.open('', '_blank');
+
+  //   printWindow!.document.write(`
+  //     <html>
+  //       <body style="text-align:center">
+  //         <img src="${row.barcode_image}" style="max-width:300px"/>
+  //         <p>${row.name} (${row.code})</p>
+  //         <script>
+  //           window.onload = function() {
+  //             window.print();
+  //             window.close();
+  //           }
+  //         </script>
+  //       </body>
+  //     </html>
+  //   `);
+
+  //   printWindow!.document.close();
+  // }
+
+
+printBarcode(product: any) {
+
+  const iframe = document.createElement('iframe');
+  iframe.style.position = 'fixed';
+  iframe.style.right = '0';
+  iframe.style.bottom = '0';
+  iframe.style.width = '0';
+  iframe.style.height = '0';
+  iframe.style.border = '0';
+
+  document.body.appendChild(iframe);
+
+  const doc = iframe.contentWindow!.document;
+
+  doc.open();
+  doc.write(`
+    <html>
+      <head>
+        <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+        <style>
+          body { text-align:center; font-family: Arial; }
+        </style>
+      </head>
+      <body>
+        <h3>${product.name} (${product.code})</h3>
+        <svg id="barcode"></svg>
+
+        <script>
+          JsBarcode("#barcode", "${product.barcode}", {
+            format: "CODE128",
+            width: 2,
+            height: 80,
+            displayValue: true
+          });
+          setTimeout(() => {
+            window.print();
+          }, 300);
+        </script>
+      </body>
+    </html>
+  `);
+  doc.close();
+
+  // ✅ CLEANUP (VERY IMPORTANT)
+  setTimeout(() => {
+    document.body.removeChild(iframe);
+  }, 1000);
+}
+
+
 
 }

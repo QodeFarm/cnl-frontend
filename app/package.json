@@ -21,6 +21,7 @@
     "@nestjsx/crud-request": "^5.0.0-alpha.3",
     "@ngx-formly/core": "^6.0.0",
     "chart.js": "^4.4.7",
+    "jsbarcode": "^3.12.3",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "ng-zorro-antd": "^16.2.2",

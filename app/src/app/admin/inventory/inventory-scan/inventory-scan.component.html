@@ -1,0 +1,44 @@
+<div class="scan-wrapper">
+  <div class="scan-card" [class.in]="mode === 'IN'" [class.out]="mode === 'OUT'">
+
+    <!-- Header -->
+    <div class="scan-header">
+      <span class="badge" [class.in]="mode === 'IN'" [class.out]="mode === 'OUT'">
+        {{ mode }}
+      </span>
+    </div>
+
+    <!-- Barcode -->
+    <div class="form-group">
+      <label>Barcode</label>
+      <input
+        #barcodeInput
+        type="text"
+        [(ngModel)]="barcode"
+        (keydown)="onKey($event)"
+        placeholder="Scan barcode here"
+        class="barcode-input"
+      />
+    </div>
+
+    <!-- Quantity -->
+    <div class="form-group">
+      <label>Quantity</label>
+      <input
+        type="number"
+        [(ngModel)]="qty"
+        min="1"
+        class="qty-input"
+      />
+    </div>
+
+    <!-- Message -->
+    <div *ngIf="message"
+         class="result"
+         [class.success]="success"
+         [class.error]="!success">
+      {{ message }}
+    </div>
+
+  </div>
+</div>

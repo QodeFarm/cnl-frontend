@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { TaCurdConfig } from '@ta/ta-curd';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
@@ -16,6 +17,25 @@ export class InventoryComponent {
   curdConfig: TaCurdConfig | null = null;
   loading: boolean = false;
   error: string | null = null;
+
+  
+  constructor(private router: Router) {}
+
+  
+  openScanIn() {
+    this.router.navigate(
+      ['/admin/inventory-scan'],
+      { queryParams: { mode: 'IN' } }
+    );
+  }
+
+  openScanOut() {
+    this.router.navigate(
+      ['/admin/inventory-scan'],
+      { queryParams: { mode: 'OUT' } }
+    );
+  }
+
 
    ngOnInit() {
     // Load default tab on page load
