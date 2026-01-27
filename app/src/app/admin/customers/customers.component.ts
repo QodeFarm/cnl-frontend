@@ -197,40 +197,87 @@ export class CustomersComponent {
     document.getElementById('modalClose').click();
   }
 
-  editCustomer(event: string) {
-    this.CustomerEditID = event;
+  // editCustomer(event: string) {
+  //   this.CustomerEditID = event;
 
-    // Fetch customer details
-    this.http.get(`customers/customers/${event}`).subscribe(
-      (res: any) => {
-        if (res && res.data) {
-          console.log("Res in edit : ", res)
-          // Set customer data in the form model
-          this.formConfig.model = res.data;
-          this.formConfig.model['customer_id'] = this.CustomerEditID;
+  //   // Fetch customer details
+  //   this.http.get(`customers/customers/${event}`).subscribe(
+  //     (res: any) => {
+  //       if (res && res.data) {
+  //         console.log("Res in edit : ", res)
+  //         // Set customer data in the form model
+  //         this.formConfig.model = res.data;
+  //         this.formConfig.model['customer_id'] = this.CustomerEditID;
 
-          // Ensure custom_field_values are correctly populated in the model
-          if (res.data.custom_field_values) {
-            this.formConfig.model['custom_field_values'] = res.data.custom_field_values.reduce((acc: any, fieldValue: any) => {
-              acc[fieldValue.custom_field_id] = fieldValue.field_value; // Map custom_field_id to the corresponding value
+  //         // Ensure custom_field_values are correctly populated in the model
+  //         if (res.data.custom_field_values) {
+  //           this.formConfig.model['custom_field_values'] = res.data.custom_field_values.reduce((acc: any, fieldValue: any) => {
+  //             acc[fieldValue.custom_field_id] = fieldValue.field_value; // Map custom_field_id to the corresponding value
+  //             return acc;
+  //           }, {});
+  //         }
+
+  //         // Update form labels for editing mode
+  //         this.formConfig.pkId = 'customer_id';
+  //         this.formConfig.submit.label = 'Update';
+  //         this.showForm = true; // Display the form
+  //       }
+  //     },
+  //     (error) => {
+  //       console.error('Error fetching customer data:', error);
+  //     }
+  //   );
+
+  //   // Close the customer list modal
+  //   this.hide();
+  // }
+editCustomer(event: string) {
+  this.CustomerEditID = event;
+
+  this.http.get(`customers/customers/${event}`).subscribe(
+    (res: any) => {
+      if (res && res.data) {
+        console.log("Res in edit : ", res);
+
+        // ------------------ MAIN MODEL SET ------------------
+        this.formConfig.model = res.data;
+        this.formConfig.model['customer_id'] = this.CustomerEditID;
+
+        // ------------------ 🔥 FIX START ------------------
+        const addresses = res.data.customer_addresses || [];
+
+        const billing = addresses.find((a: any) => a.address_type === 'Billing');
+        const shipping = addresses.find((a: any) => a.address_type === 'Shipping');
+
+        this.formConfig.model.customer_addresses = [
+          billing || { address_type: 'Billing' },
+          shipping || { address_type: 'Shipping' }
+        ];
+        // ------------------ 🔥 FIX END ------------------
+
+        // ------------------ CUSTOM FIELDS ------------------
+        if (res.data.custom_field_values) {
+          this.formConfig.model['custom_field_values'] =
+            res.data.custom_field_values.reduce((acc: any, fieldValue: any) => {
+              acc[fieldValue.custom_field_id] = fieldValue.field_value;
               return acc;
             }, {});
-          }
-
-          // Update form labels for editing mode
-          this.formConfig.pkId = 'customer_id';
-          this.formConfig.submit.label = 'Update';
-          this.showForm = true; // Display the form
         }
-      },
-      (error) => {
-        console.error('Error fetching customer data:', error);
-      }
-    );
 
-    // Close the customer list modal
-    this.hide();
-  }
+        // ------------------ FORM STATE ------------------
+        this.formConfig.pkId = 'customer_id';
+        this.formConfig.submit.label = 'Update';
+        this.showForm = true;
+      }
+    },
+    (error) => {
+      console.error('Error fetching customer data:', error);
+    }
+  );
+
+  this.hide();
+}
+
 
   showCustomerListFn() {
     this.showCustomerList = true;

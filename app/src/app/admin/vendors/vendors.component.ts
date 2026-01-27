@@ -241,29 +241,85 @@ export class VendorsComponent {
     document.getElementById('modalClose').click();
   }
 
-  editVendor(event) {
-    this.VendorEditID = event;
-    this.http.get('vendors/vendors/' + event).subscribe((res: any) => {
-      if (res && res.data) {
-        this.formConfig.model = res.data;
+  // editVendor(event) {
+  //   this.VendorEditID = event;
+  //   this.http.get('vendors/vendors/' + event).subscribe((res: any) => {
+  //     if (res && res.data) {
+  //       this.formConfig.model = res.data;
 
-        // Ensure custom_field_values are correctly populated in the model
-        if (res.data.custom_field_values) {
-          this.formConfig.model['custom_field_values'] = res.data.custom_field_values.reduce((acc: any, fieldValue: any) => {
-            acc[fieldValue.custom_field_id] = fieldValue.field_value; // Map custom_field_id to the corresponding value
+  //       // Ensure custom_field_values are correctly populated in the model
+  //       if (res.data.custom_field_values) {
+  //         this.formConfig.model['custom_field_values'] = res.data.custom_field_values.reduce((acc: any, fieldValue: any) => {
+  //           acc[fieldValue.custom_field_id] = fieldValue.field_value; // Map custom_field_id to the corresponding value
+  //           return acc;
+  //         }, {});
+  //       }
+  //       // Set labels for update
+  //       this.formConfig.submit.label = 'Update';
+  //       // Show form after setting form values
+  //       this.formConfig.pkId = 'vendor_id';
+  //       this.formConfig.model['vendor_id'] = this.VendorEditID;
+  //       this.showForm = true;
+  //     }
+  //   });
+  //   this.hide();
+  // }
+
+editVendor(event) {
+  this.VendorEditID = event;
+
+  this.http.get('vendors/vendors/' + event).subscribe((res: any) => {
+    if (res && res.data) {
+      this.formConfig.model = res.data;
+
+      /* ================= ADDRESS NORMALIZATION ================= */
+      if (
+        !this.formConfig.model.vendor_addresses ||
+        !Array.isArray(this.formConfig.model.vendor_addresses) ||
+        this.formConfig.model.vendor_addresses.length === 0
+      ) {
+        this.formConfig.model.vendor_addresses = [
+          { address_type: 'Billing' },
+          { address_type: 'Shipping' }
+        ];
+      } else {
+        const hasBilling = this.formConfig.model.vendor_addresses.some(
+          a => a.address_type === 'Billing'
+        );
+        const hasShipping = this.formConfig.model.vendor_addresses.some(
+          a => a.address_type === 'Shipping'
+        );
+
+        if (!hasBilling) {
+          this.formConfig.model.vendor_addresses.unshift({ address_type: 'Billing' });
+        }
+
+        if (!hasShipping) {
+          this.formConfig.model.vendor_addresses.push({ address_type: 'Shipping' });
+        }
+      }
+      /* =========================================================== */
+
+      // Normalize custom fields
+      if (res.data.custom_field_values) {
+        this.formConfig.model['custom_field_values'] =
+          res.data.custom_field_values.reduce((acc: any, fieldValue: any) => {
+            acc[fieldValue.custom_field_id] = fieldValue.field_value;
             return acc;
           }, {});
-        }
-        // Set labels for update
-        this.formConfig.submit.label = 'Update';
-        // Show form after setting form values
-        this.formConfig.pkId = 'vendor_id';
-        this.formConfig.model['vendor_id'] = this.VendorEditID;
-        this.showForm = true;
       }
-    });
-    this.hide();
-  }
+
+      // Update form config
+      this.formConfig.submit.label = 'Update';
+      this.formConfig.pkId = 'vendor_id';
+      this.formConfig.model['vendor_id'] = this.VendorEditID;
+      this.showForm = true;
+    }
+  });
+
+  this.hide();
+}
+
 
   showVendorListFn() {
     this.showVendorList = true;
