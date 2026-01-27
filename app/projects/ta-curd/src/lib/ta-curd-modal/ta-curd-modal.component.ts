@@ -47,8 +47,17 @@ export class TaCurdModalComponent implements OnInit {
     if (this.options.formConfig.model && !this.options.formConfig.initialModel) {
       this.options.formConfig.initialModel = JSON.parse(JSON.stringify(this.options.formConfig.model));
     }
+    
+    // Store user's custom callback if provided
+    const userSubmittedFn = this.options.formConfig.submit?.submittedFn;
+    
     if (this.options.formConfig.submit) {
       this.options.formConfig.submit.submittedFn = (res: any) => {
+        // Call user's custom callback first (if provided)
+        if (userSubmittedFn) {
+          userSubmittedFn(res);
+        }
+        // Then do the default behavior
         this.table?.reload();
         this.close();
       };

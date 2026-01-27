@@ -4,6 +4,7 @@ import { BlankLayoutComponent } from './layouts/blank-layout/blank-layout.compon
 import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.component';
 import { appGuard } from './guards/app.guard';
 import { AuthguardGuard } from './guards/authguard.guard';
+import { ForcePasswordChangeGuard } from './guards/force-password-change.guard';
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login' },
@@ -16,11 +17,13 @@ const routes: Routes = [
       { path: 'activation/:uid/:token', canActivate: [], loadComponent: () => import('./pages/activation/activation.component').then(m => m.ActivationComponent) },
       { path: 'create-account', canActivate: [], loadComponent: () => import('./pages/create-account/create-account.component').then(m => m.CreateAccountComponent) },
       { path: 'reset-password/:uid/:token', canActivate: [], loadComponent: () => import('./pages/reset-password/reset-password.component').then(m => m.ResetPasswordComponent) },
+      { path: 'set-password/:uid/:token', canActivate: [], loadComponent: () => import('./pages/set-password/set-password.component').then(m => m.SetPasswordComponent) },
     ]
   },
   {
     path: 'admin',
     canActivate: [AuthguardGuard],
+    canActivateChild: [ForcePasswordChangeGuard],
     title: 'Admin',
     component: AdminLayoutComponent,
     children: [
@@ -28,6 +31,7 @@ const routes: Routes = [
       { path: 'profile', data: { title: 'Profile', moduleName: 'profile' }, canActivate: [], loadChildren: () => import('./admin/profile/profile.module').then(m => m.ProfileModule) },
       { path: 'dashboard', data: { title: 'Dashbord', moduleName: 'dashboard' }, canActivate: [], loadComponent: () => import('./admin/dashboard/dashboard.component').then(m => m.DashboardComponent) },
       { path: 'profile/change-password', data: { title: 'Change Password', moduleName: 'change-password' }, canActivate: [], loadComponent: () => import('./admin/profile/change-password/change-password.component').then(m => m.ChangePasswordComponent) },
+      { path: 'force-change-password', data: { title: 'Set New Password', moduleName: 'force-change-password' }, canActivate: [], loadComponent: () => import('./admin/profile/force-change-password/force-change-password.component').then(m => m.ForceChangePasswordComponent) },
       // { path: 'users', data: { title: 'Users', moduleName: 'Users' }, canActivate: [], loadChildren: () => import('./admin/user/user.component').then(m => m.UserComponent) },
       // sales module
       { path: 'sales', data: { title: 'Sales', moduleName: 'Sales' }, canActivate: [], loadComponent: () => import('./admin/sales/sales.component').then(m => m.SalesComponent) },

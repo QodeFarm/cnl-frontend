@@ -2121,3 +2121,52 @@ ta-form {
     font-weight: 500;
     vertical-align: middle;
 }
+
+/* Temp Password Modal - User Created Successfully */
+.temp-password-modal-wrapper {
+    .ant-modal-content {
+        border-radius: 16px;
+        overflow: hidden;
+    }
+    
+    .ant-modal-header {
+        background-color: #142768 !important;
+        padding: 16px 24px;
+        border-bottom: none;
+        border-radius: 16px 16px 0 0;
+        
+        .ant-modal-title {
+            color: #fff !important;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+        }
+    }
+    
+    .ant-modal-body {
+        padding: 24px;
+        background-color: #fff;
+    }
+    
+    .ant-modal-footer {
+        padding: 16px 24px 20px;
+        border-top: none;
+        background-color: #fff;
+        text-align: center;
+        border-radius: 0 0 16px 16px;
+        
+        .ant-btn-primary {
+            background-color: #142768;
+            border: none;
+            border-radius: 8px;
+            height: 42px;
+            padding: 0 28px;
+            font-weight: 600;
+            font-size: 14px;
+            
+            &:hover {
+                background-color: #1e3a8a;
+            }
+        }
+    }
+}

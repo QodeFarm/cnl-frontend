@@ -1,13 +1,18 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { LocalStorageService } from '@ta/ta-core';
 import { TaCurdConfig } from '@ta/ta-curd';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 
 @Component({
   selector: 'app-user',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule],
+  imports: [CommonModule, AdminCommmonModule, NzModalModule, NzButtonModule, NzIconModule, NzToolTipModule],
   templateUrl: './user.component.html',
   styleUrls: ['./user.component.scss']
 })
@@ -107,11 +112,8 @@ export class UserComponent {
           type: 'script',
           value: 'data.role.role_id'
         },
-        {
-          key: 'status_id',
-          type: 'script',
-          value: 'data.status.status_id'
-        },
+        // is_active is now handled directly via the switch toggle
+        // No need to extract status_id - backend uses is_active boolean
         // {
         //   key: 'branch_id',
         //   type: 'script',
@@ -162,7 +164,7 @@ export class UserComponent {
                     label: 'User Email',
                     dataKey: 'user',
                     dataLabel: 'user',
-                    required: true
+                    required: false
                   }
                 },
                 {
@@ -204,16 +206,24 @@ export class UserComponent {
                   className: 'col-12 col-md-6',
                   templateOptions: { label: 'Date Of Birth', placeholder: 'Select date' }
                 },
+                // User Active/Inactive Toggle - Only shown in EDIT mode
+                // Backend automatically sets status on CREATE:
+                // - WITH email: is_active=False (until activation)
+                // - WITHOUT email: is_active=True (with force_password_change=True)
                 {
-                  key: 'status',
-                  type: 'status-dropdown',
+                  key: 'is_active',
+                  type: 'switch',
                   className: 'col-12 col-md-6',
+                  defaultValue: true,
                   templateOptions: {
-                    label: 'Status',
-                    dataKey: 'status_name',
-                    dataLabel: 'status_name',
-                    options: [],
-                    lazy: { url: 'masters/statuses/', lazyOneTime: true }
+                    label: 'Account Status',
+                    checkedLabel: 'Active',
+                    uncheckedLabel: 'Inactive',
+                    showLabel: true
+                  },
+                  expressions: {
+                    // Hide in CREATE mode - only show in EDIT mode
+                    hide: (field: any) => !field.model?.user_id
                   }
                 },
 
@@ -237,20 +247,64 @@ export class UserComponent {
                   }
                 },
 
-                // Password and Re-password (show only when creating)
+                // Password and Re-password - ALWAYS HIDDEN
+                // User sets password via:
+                // - WITH email: Activation email link
+                // - WITHOUT email: Force change password on first login
+                // {
+                //   key: 'password',
+                //   type: 'text',
+                //   className: 'col-12 col-md-6',
+                //   templateOptions: { type: 'password', label: 'Password', required: false },
+                //   expressions: { 
+                //     hide: () => true // Always hide - password set by user, not admin
+                //   }
+                // },
+                // {
+                //   key: 're_password',
+                //   type: 'text',
+                //   className: 'col-12 col-md-6',
+                //   templateOptions: { type: 'password', label: 'Re Password', required: false },
+                //   expressions: { 
+                //     hide: () => true // Always hide - password set by user, not admin
+                //   }
+                // },
+
+                // Helper text for WITH email users
                 {
-                  key: 'password',
-                  type: 'text',
-                  className: 'col-12 col-md-6',
-                  templateOptions: { type: 'password', label: 'Password', required: true },
-                  expressions: { hide: '(model.user_id)?true:false' }
+                  type: 'template',
+                  className: 'col-12',
+                  template: `
+                    <div class="alert alert-info py-2 px-3 mb-0" style="font-size: 13px;">
+                      <i class="fa fa-info-circle me-1"></i>
+                      <strong>Email provided:</strong> User will receive an activation email to set their own password.
+                    </div>
+                  `,
+                  expressions: {
+                    hide: (field: any) => {
+                      // Show only when creating with email
+                      return field.model?.user_id || !field.model?.email;
+                    }
+                  }
                 },
+
+                // Helper text for NO email users
                 {
-                  key: 're_password',
-                  type: 'text',
-                  className: 'col-12 col-md-6',
-                  templateOptions: { type: 'password', label: 'Re Password', required: true },
-                  expressions: { hide: '(model.user_id)?true:false' }
+                  type: 'template',
+                  className: 'col-12',
+                  template: `
+                    <div class="alert alert-warning py-2 px-3 mb-0" style="font-size: 13px;">
+                      <i class="fa fa-exclamation-triangle me-1"></i>
+                      <strong>No email provided:</strong> A temporary password will be generated. 
+                      Share it securely with the user.
+                    </div>
+                  `,
+                  expressions: {
+                    hide: (field: any) => {
+                      // Show only when creating without email
+                      return field.model?.user_id || field.model?.email;
+                    }
+                  }
                 }
               ]
             },
@@ -277,11 +331,25 @@ export class UserComponent {
             }
           ]
         }
-      ]
-
+      ],
+      // Submit callback to handle temp_password response
+      submit: {
+        submittedFn: (res: any) => {
+          this.handleUserCreated(res);
+        }
+      }
     }
   }
-  constructor(private taLocal: LocalStorageService) { }
+
+  // Temp password modal properties
+  showTempPasswordModal: boolean = false;
+  tempPassword: string = '';
+  tempPasswordVisible: boolean = false;
+  createdUserName: string = '';
+
+  @ViewChild('taCurd') taCurd: any;
+
+  constructor(private taLocal: LocalStorageService, private message: NzMessageService) { }
 
   ngOnInit(): void {
     const user = this.taLocal.getItem('user');
@@ -291,6 +359,65 @@ export class UserComponent {
       this.curdConfig.tableConfig.apiUrl = 'users/user';
       // Uncomment the line below if you want to exclude the logged-in user from the list
       // this.curdConfig.tableConfig.apiUrl = `users/user?exclude_id=${user.user_id}`;
+    }
+  }
+
+  // Handle user creation response
+  handleUserCreated(res: any): void {
+    console.log('User created response:', res);
+    console.log('Response type:', typeof res);
+    
+    // Handle different response structures from ta-curd
+    let tempPassword = null;
+    let username = 'User';
+    
+    // Case 1: res.data.temp_password (full response object)
+    if (res?.data?.temp_password) {
+      tempPassword = res.data.temp_password;
+      username = res.data.username || res.data.first_name || 'User';
+    }
+    // Case 2: res.temp_password (just the data object)
+    else if (res?.temp_password) {
+      tempPassword = res.temp_password;
+      username = res.username || res.first_name || 'User';
+    }
+    
+    console.log('Temp password found:', tempPassword);
+    
+    // Show modal if temp_password exists
+    if (tempPassword) {
+      this.tempPassword = tempPassword;
+      this.createdUserName = username;
+      this.showTempPasswordModal = true;
+      this.tempPasswordVisible = false;
+      console.log('Modal should show now, showTempPasswordModal:', this.showTempPasswordModal);
+    }
+  }
+
+  // Toggle password visibility
+  toggleTempPasswordVisibility(): void {
+    this.tempPasswordVisible = !this.tempPasswordVisible;
+  }
+
+  // Copy password to clipboard
+  copyTempPassword(): void {
+    navigator.clipboard.writeText(this.tempPassword).then(() => {
+      this.message.success('Password copied to clipboard!');
+    }).catch(() => {
+      this.message.error('Failed to copy password');
+    });
+  }
+
+  // Close temp password modal
+  closeTempPasswordModal(): void {
+    this.showTempPasswordModal = false;
+    this.tempPassword = '';
+    this.tempPasswordVisible = false;
+    this.createdUserName = '';
+    
+    // Refresh the table
+    if (this.taCurd) {
+      this.taCurd.refresh();
     }
   }
 }
