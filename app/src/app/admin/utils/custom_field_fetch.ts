@@ -353,7 +353,7 @@ export class CustomFieldHelper {
   
       // If any required fields are missing, show an alert and stop submission
       if (missingRequiredFields.length > 0 && entityName !== "sale_invoice" && entityName !== "sale_order") {
-        this.showPopup("Custom fields required fields are missing");
+        // this.showPopup("Custom fields required fields are missing");
         return null;
       }
 
