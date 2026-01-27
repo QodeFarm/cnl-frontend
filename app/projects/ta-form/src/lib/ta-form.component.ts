@@ -120,9 +120,16 @@ export class TaFormComponent implements OnInit {
                 if (this.options.submit.successMsg) {
                   msg = this.options.submit.successMsg;
                 }
+                
+                // Allow suppressing the success notification
+                if (this.options.submit.showSuccessMsg === false) {
+                  // Skip showing notification
+                } else {
+                  this.notification.success(msg, '');
+                }
+              } else {
+                this.notification.success(msg, '');
               }
-
-              this.notification.success(msg, '');
               this.formlyOptions.resetModel();
             } else {
               this.notification.error('Login Failed', res.message || 'Invalid credentials');
@@ -146,6 +153,17 @@ export class TaFormComponent implements OnInit {
             // Handle login-specific errors with a clean message
             else if (isLoginForm && error.status === 401) {
               this.notification.error('Login Failed', 'Username or Password is not valid');
+            }
+            // Handle 403 - Account disabled or access denied
+            else if (isLoginForm && error.status === 403) {
+              const errorCode = error.error?.error_code;
+              if (errorCode === 'ACCOUNT_DISABLED') {
+                this.notification.error('Account Disabled', 
+                  error.error?.message || 'Your account has been disabled. Please contact your administrator.');
+              } else {
+                this.notification.error('Access Denied', 
+                  error.error?.message || 'You do not have permission to login.');
+              }
             }
             else if (error.status === 404) {
               this.notification.error('Server Error', 'Login API not found! Check the backend URL.');

@@ -3,30 +3,25 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { NzMessageService } from 'ng-zorro-antd/message';
+import { TaLocalStorage } from '@ta/ta-core';
 
 @Component({
-  selector: 'app-change-password',
+  selector: 'app-force-change-password',
   standalone: true,
   imports: [CommonModule, AdminCommmonModule],
-  templateUrl: './change-password.component.html',
-  styleUrls: ['./change-password.component.scss']
+  templateUrl: './force-change-password.component.html',
+  styleUrls: ['./force-change-password.component.scss']
 })
-export class ChangePasswordComponent implements OnInit {
-
-  // Force password change flag
-  isForcePasswordChange: boolean = false;
-
-  // Password strength
-  passwordStrength: string = '';
-  passwordStrengthClass: string = '';
+export class ForceChangePasswordComponent implements OnInit {
 
   // Form options for ta-form
   options: any = {
-    url: "users/change_password/",
+    url: "users/force_change_password/",
     submit: {
-      label: "Change Password",
+      label: "Set Password",
       icon: 'lock',
-      successMsg: "Password changed successfully!",
+      showSuccessMsg: false, // Suppress default notification - we show our own custom message
       submittedFn: (res: any) => {
         this.onPasswordChanged(res);
       },
@@ -38,18 +33,6 @@ export class ChangePasswordComponent implements OnInit {
       {
         fieldGroupClassName: 'row',
         fieldGroup: [
-          {
-            key: 'old_password',
-            type: 'input',
-            className: 'col-12 mb-2',
-            templateOptions: {
-              label: 'Old Password',
-              type: 'password',
-              placeholder: 'Enter your current password',
-              required: true,
-              description: 'Enter the password you currently use to login.',
-            }
-          },
           {
             key: 'password',
             type: 'input',
@@ -76,7 +59,7 @@ export class ChangePasswordComponent implements OnInit {
             type: 'input',
             className: 'col-12 mb-2',
             templateOptions: {
-              label: 'Confirm New Password',
+              label: 'Confirm Password',
               type: 'password',
               placeholder: 'Re-enter your new password',
               required: true,
@@ -97,11 +80,14 @@ export class ChangePasswordComponent implements OnInit {
     ]
   };
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private message: NzMessageService) {}
 
   ngOnInit(): void {
-    // Check if this is a forced password change
-    this.isForcePasswordChange = localStorage.getItem('force_password_change') === 'true';
+    // Verify user should be on this page
+    const forceChange = localStorage.getItem('force_password_change');
+    if (forceChange !== 'true') {
+      this.router.navigateByUrl('/admin/dashboard');
+    }
   }
 
   // Calculate password strength
@@ -120,26 +106,27 @@ export class ChangePasswordComponent implements OnInit {
     return { label: 'Strong 🟢', class: 'text-success' };
   }
 
-  // Handle Cancel button
-  onCancel(): void {
-    if (this.isForcePasswordChange) {
-      // Can't cancel if forced to change password
-      return;
-    }
-    this.router.navigateByUrl('/admin/profile');
-  }
-
   // Handle successful password change
   onPasswordChanged(res: any): void {
-    // Clear the force_password_change flag after successful password change
-    if (this.isForcePasswordChange) {
-      localStorage.setItem('force_password_change', 'false');
-      this.isForcePasswordChange = false;
-      
-      // Redirect to dashboard after a short delay
-      setTimeout(() => {
-        this.router.navigateByUrl('/admin/dashboard');
-      }, 1500);
-    }
+    console.log('Password changed successfully, clearing session...');
+    
+    // Clear ALL authentication data from localStorage
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('force_password_change');
+    
+    // Clear TaLocalStorage user data
+    TaLocalStorage.removeItem('user');
+    
+    // Also clear any other auth-related items
+    localStorage.removeItem('user');
+    
+    // Show success message
+    this.message.success('Password updated successfully! Please login with your new password.');
+    
+    // Redirect to login page (not dashboard!)
+    setTimeout(() => {
+      this.router.navigateByUrl('/login');
+    }, 1500);
   }
 }

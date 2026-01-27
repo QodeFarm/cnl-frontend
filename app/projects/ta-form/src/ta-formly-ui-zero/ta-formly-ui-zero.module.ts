@@ -7,6 +7,7 @@ import { TaFormFieldModule } from './wrappers/form-field.module';
 import { FormlyTaTextAreaModule } from './fields/textarea/textarea.module';
 import { FormlyTaRadioModule } from './fields/ta-radio/radio.module';
 import { FormlyTaCheckboxModule } from './fields/checkbox/checkbox.module';
+import { FormlyFieldSwitchModule } from './fields/field-switch/field-switch.module';
 import { FieldFileModule } from './fields/field-file/field-file.module';
 import { FieldCommonModule } from './fields/field-common/field-common.module';
 import { FieldAccordionModule } from './fields/field-accordion/field-accordion.module';
@@ -23,6 +24,7 @@ import { FieldAdvSelectModule } from './fields/field-adv-select/field-adv-select
     FormlyTaTextAreaModule,
     FormlyTaRadioModule,
     FormlyTaCheckboxModule,
+    FormlyFieldSwitchModule,
     FieldSelectModule,
     FieldRepeatModule,
     FieldDatepickerModule,

@@ -9,7 +9,8 @@
                 <h3>C&L</h3>
                 <span>Accounts Book</span>
             </a>
-            <button id="sidebarToggleTop" (click)="menuToggle()" class="btn bar-toggle ms-3">
+            <!-- Sidebar Toggle (Topbar) - Hidden when force password change is required -->
+            <button id="sidebarToggleTop" (click)="menuToggle()" class="btn bar-toggle ms-3" *ngIf="!isForcePasswordChange">
                 <i class="fa fa-bars"></i>
             </button>
         </div>
@@ -300,9 +301,9 @@
 </header>
 <div id="wrapper">
 
-    <!-- Sidebar -->
-    <div id="myCanvasNav" class="menu-overlay" (click)="layertoggleMenu()"></div>
-    <ul class="navbar-nav sidebar sidemenu-bar">
+    <!-- Sidebar - Hidden when force password change is required -->
+    <div id="myCanvasNav" class="menu-overlay" (click)="layertoggleMenu()" *ngIf="!isForcePasswordChange"></div>
+    <ul class="navbar-nav sidebar sidemenu-bar" *ngIf="!isForcePasswordChange">
         <li class="nav-item dropdown no-arrow d-md-none d-block user-profile-details">
             <a class="nav-link dropdown-toggle p-0" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <div class="d-flex align-items-center">
