@@ -35,7 +35,7 @@
         </button> -->
 
       <div style="display: flex; gap: 10px; align-items: center;justify-content: end;flex-wrap: wrap;">
-                <div *ngIf="!SaleOrderEditID" class="quickpack-container d-flex align-items-center">
+                <div *ngIf="!SaleOrderEditID" class="quickpack-container-1 d-flex align-items-center">
                     <div class="quickpack-box d-flex align-items-center">
                         <div class="dropdown-container rounded-start">
                             <select id="quickpackSelect" class="dropdown-select m-0 " [(ngModel)]="selectedQuickpack">
@@ -213,7 +213,7 @@
 
 
 <!-- Existing Sale Order/Estimate Modal -->
-<div id="customDialog" class="custom-dialog-overlay" *ngIf="isConfirmationModalOpen">
+<!-- <div id="customDialog" class="custom-dialog-overlay" *ngIf="isConfirmationModalOpen">
     <div class="custom-dialog-box">
         <div class="form-group">
             <label for="typeSelect"><strong>Select Type:</strong></label>
@@ -225,7 +225,41 @@
         <br />
         <button (click)="confirmSelection()">OK</button>
     </div>
+</div> -->
+<!-- Combined Sale Estimate + QuickPack Modal -->
+<div id="customDialog" class="custom-dialog-overlay" *ngIf="isConfirmationModalOpen">
+    <div class="custom-dialog-box custom-size">
+        <p><strong>Select Options for this Sale Order</strong></p>
+
+        <!-- Sale Estimate / Sale Order -->
+        <div class="quickpack-container">
+            <label for="typeSelect">Select Type:</label>
+            <div class="dropdown-container">
+                <select id="typeSelect" class="dropdown-select" [(ngModel)]="selectedOption" name="typeSelect">
+                    <option value="sale_order" selected>Sale Order</option>
+                    <option value="sale_estimate">Sale Estimate</option>
+                </select>
+            </div>
+        </div>
+        <br />
+
+        <!-- QuickPack Yes / No -->
+        <div class="quickpack-container">
+            <label for="quickPackSelect">Create QuickPack?</label>
+            <div class="dropdown-container">
+                <select id="quickPackSelect" class="dropdown-select" [(ngModel)]="createQuickPackOption" name="quickPackSelect">
+                    <option value="no" selected>No</option>
+                    <option value="yes">Yes</option>
+                </select>
+            </div>
+        </div>
+        <br />
+
+        <!-- Action Button -->
+        <button (click)="confirmSelection()">OK</button>
+    </div>
 </div>
+
 
 <!-- Modal for Amount Check -->
 <div id="amountDialog" class="custom-dialog-overlay" *ngIf="isAmountModalOpen">
