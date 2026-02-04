@@ -104,3 +104,23 @@
     </div>
   </div>
 </div>
+
+<!-- Zero Balance Modal -->
+<div class="zb-backdrop" *ngIf="showZeroBalanceModal">
+  <div class="zb-modal">
+
+    <div class="zb-icon">⚠️</div>
+
+    <h2>Product Balance is 0</h2>
+
+    <p>
+      <strong>{{ zeroBalanceProductName }}</strong> has zero stock.<br />
+      Product balance update is mandatory before dispatch.
+    </p>
+
+    <button class="zb-btn" (click)="closeZeroBalanceModal()">
+      OK
+    </button>
+
+  </div>
+</div>

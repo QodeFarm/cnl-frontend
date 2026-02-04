@@ -284,3 +284,24 @@
     <button id="dialogOkButton" (click)="closeDialog()">OK</button>
     </div>
 </div>
+
+<div class="zb-backdrop" *ngIf="showOutOfStockModal">
+  <div class="zb-modal">
+
+    <div class="zb-icon">🚫</div>
+
+    <h2>Product Out of Stock</h2>
+
+    <p>
+      <strong>{{ currentOutOfStockItem?.product?.name }}</strong> is out of stock.<br>
+      Have you already checked with the production team?
+    </p>
+
+    <div class="zb-actions">
+      <button class="zb-btn yes" (click)="confirmOutOfStockYes()">Yes</button>
+      <button class="zb-btn no" (click)="confirmOutOfStockNo()">No</button>
+    </div>
+
+  </div>
+</div>
+
