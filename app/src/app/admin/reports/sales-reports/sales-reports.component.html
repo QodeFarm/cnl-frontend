@@ -14,8 +14,8 @@
                         <a class="report-link" (click)="selectReport('salesSummary')">
                             Sales Summary
                         </a>
-                        <a class="report-link" (click)="selectReport('salesInvoice')">
-                            Sales Invoice 
+                        <a class="report-link" [class.active]="isSaleRegister" (click)="selectSaleRegister()">
+                            Sale Register 
                         </a>
                         <a class="report-link" (click)="selectReport('SalesbyProductReport')">
                             Sales by Product 
@@ -68,9 +68,110 @@
     </div>
 
     
+    <!-- Sale Register Filter Section -->
+    <div *ngIf="isSaleRegister" class="sale-register-filter mt-3">
+        <div class="d-flex align-items-center gap-3">
+            <label class="filter-label">Register Type:</label>
+            <nz-select 
+                [(ngModel)]="selectedRegisterType" 
+                (ngModelChange)="onRegisterTypeChange()"
+                style="width: 280px;"
+                nzPlaceHolder="Select Register Type">
+                <nz-option *ngFor="let option of registerTypeOptions" 
+                           [nzValue]="option.value" 
+                           [nzLabel]="option.label">
+                </nz-option>
+            </nz-select>
+        </div>
+    </div>
+
     <!-- Table Component for Selected Report -->
     <!-- <div *ngIf="loading">Loading...</div> -->
-<div *ngIf="!loading && !error && tableConfig" class="mt-3 custom-list">
-  <ta-table [options]="tableConfig" (dataLoaded)="onDataLoaded($event)"></ta-table>
-</div>
+<ng-container *ngIf="!loading && !error && tableConfig">
+  <div class="mt-3 custom-list">
+    <ta-table [options]="tableConfig" (dataLoaded)="onDataLoaded($event)"></ta-table>
+  </div>
+</ng-container>
+
+<!-- Attachment Modal -->
+<nz-modal 
+    [(nzVisible)]="isAttachmentModalVisible" 
+    nzTitle="Attach Documents"
+    [nzWidth]="700"
+    (nzOnCancel)="closeAttachmentModal()"
+    [nzFooter]="null"
+    nzCentered
+    nzClassName="attachment-modal-wrapper">
+    
+    <ng-container *nzModalContent>
+        <div class="attachment-modal-content">
+            <!-- Upload Section -->
+            <div class="upload-section">
+                <div class="upload-row">
+                    <span class="upload-label">Filename:</span>
+                    <label for="fileInput" class="upload-btn attach-btn">
+                        Attach file
+                    </label>
+                    <input 
+                        type="file" 
+                        id="fileInput" 
+                        style="display: none;" 
+                        (change)="onFileSelected($event)">
+                    <input 
+                        type="text" 
+                        class="paste-input" 
+                        placeholder="Paste here (Ctrl + V)"
+                        (paste)="onPasteAttachment($event)">
+                    <button class="upload-btn save-btn" (click)="loadAttachments()">
+                        <i nz-icon nzType="save" nzTheme="outline"></i> Save
+                    </button>
+                    <button class="upload-btn capture-btn" (click)="captureAttachment()">
+                        <i nz-icon nzType="camera" nzTheme="outline"></i> Capture
+                    </button>
+                </div>
+            </div>
+
+            <!-- Attachments Table -->
+            <div class="attachments-table-wrapper">
+                <nz-table 
+                    #attachmentTable 
+                    [nzData]="attachmentList" 
+                    [nzLoading]="attachmentLoading"
+                    nzSize="small"
+                    [nzShowPagination]="false"
+                    [nzNoResult]="noDataTpl">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;"></th>
+                            <th>File Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of attachmentTable.data">
+                            <td style="width: 60px;">
+                                <button nz-button nzType="text" nzDanger nzSize="small" 
+                                        (click)="deleteAttachment(item)"
+                                        nz-tooltip nzTooltipTitle="Delete">
+                                    <i nz-icon nzType="delete"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <a [href]="item.attachment_path" target="_blank" class="file-link">
+                                    <i nz-icon nzType="file" nzTheme="outline"></i>
+                                    {{ item.attachment_name }}
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </nz-table>
+                <ng-template #noDataTpl>
+                    <div class="no-data">
+                        <i nz-icon nzType="inbox" nzTheme="outline"></i>
+                        <span>No Data</span>
+                    </div>
+                </ng-template>
+            </div>
+        </div>
+    </ng-container>
+</nz-modal>
 </div>

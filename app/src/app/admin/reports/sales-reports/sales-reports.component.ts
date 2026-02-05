@@ -1,13 +1,22 @@
 import { CommonModule } from '@angular/common';
 import { Component, ViewChild } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { LocalStorageService } from '@ta/ta-core';
 import { TaTableComponent, TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
+import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzUploadModule, NzUploadFile } from 'ng-zorro-antd/upload';
+import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzIconModule } from 'ng-zorro-antd/icon';
 
 @Component({
   selector: 'app-sales-repots',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule],
+  imports: [CommonModule, AdminCommmonModule, FormsModule, NzSelectModule, NzModalModule, NzUploadModule, NzTableModule, NzButtonModule, NzIconModule],
   templateUrl: './sales-reports.component.html',
   styleUrls: ['./sales-reports.component.scss']
 })
@@ -17,15 +26,583 @@ export class SalesRepotsComponent {
   isAccordionOpen = true;
   selectedReportKey: string | null = null;
   tableConfig: TaTableConfig | null = null;
-  // totalRecords: number | null = null; 
 
   isSuperUser: boolean = false;
 
-  constructor(private localStorage: LocalStorageService) {
+  // Sale Register Properties
+  isSaleRegister: boolean = false;
+  selectedRegisterType: string = 'general';
+  registerTypeOptions = [
+    { value: 'general', label: 'General Register' },
+    { value: 'detailed', label: 'Detailed Register' },
+    { value: 'cancelled', label: 'Cancelled Voucher List' },
+    { value: 'product_group_wise', label: 'Columnar (Product Group Wise)' },
+    { value: 'product_category_wise', label: 'Columnar (Product Category Wise)' },
+    { value: 'product_brand_wise', label: 'Columnar (Product Brand Wise)' },
+    { value: 'hsn_wise', label: 'Columnar (HSN Code Wise)' },
+    { value: 'daily_sales_summary', label: 'Daily Sales Summary' },
+    { value: 'monthly_sales_summary', label: 'Monthly Sales Summary' }
+  ];
+
+  // Document Attachment Properties
+  isAttachmentModalVisible: boolean = false;
+  selectedInvoiceForAttachment: any = null;
+  attachmentList: any[] = [];
+  attachmentLoading: boolean = false;
+
+  constructor(
+    private localStorage: LocalStorageService,
+    private http: HttpClient,
+    private modal: NzModalService,
+    private message: NzMessageService
+  ) {
     const user = this.localStorage.getItem('user');
     this.isSuperUser = user?.is_sp_user === true;
-    // this.initReportsConfig();
   }
+
+  // ============== Sale Register Configs ==============
+  saleRegisterConfigs: { [key: string]: TaTableConfig } = {
+    
+    general: {
+      apiUrl: 'sales/sale_invoice_order/?sale_register&register_type=general',
+      pkId: "sale_invoice_id",
+      showCheckbox: true,
+      pageSize: 10,
+      "globalSearch": {
+        keys: ['invoice_no', 'customer_name', 'date', 'city', 'voucher_type', 'amount']
+      },
+      export: { downloadName: 'SaleRegister_General' },
+      defaultSort: { key: 'date', value: 'descend' },
+      cols: [
+        {
+          fieldKey: 'docs',
+          name: 'Docs',
+          type: 'action',
+          actions: [
+            {
+              type: 'callBackFn',
+              icon: 'fa fa-upload',
+              tooltip: 'Attach Documents',
+              callBackFn: (row: any) => {
+                this.openAttachmentModal(row);
+              }
+            }
+          ]
+        },
+        {
+          fieldKey: 's_no',
+          name: 'S.No',
+          sort: true
+        },
+        {
+          fieldKey: 'voucher_type',
+          name: 'Voucher Type',
+          sort: true
+        },
+        {
+          fieldKey: 'date',
+          name: 'Date',
+          sort: true
+        },
+        {
+          fieldKey: 'invoice_no',
+          name: 'Invoice No',
+          sort: true
+        },
+        {
+          fieldKey: 'customer_name',
+          name: 'Customer',
+          sort: true
+        },
+        {
+          fieldKey: 'city',
+          name: 'City',
+          sort: true
+        },
+        {
+          fieldKey: 'gross_amount',
+          name: 'Gross Amount',
+          sort: true,
+          displayType: 'map',
+          mapFn: (currentValue: any) => {
+            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+          }
+        },
+        {
+          fieldKey: 'discount',
+          name: 'Discount',
+          sort: true,
+          displayType: 'map',
+          mapFn: (currentValue: any) => {
+            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+          }
+        },
+        {
+          fieldKey: 'tax_amount',
+          name: 'Tax',
+          sort: true,
+          displayType: 'map',
+          mapFn: (currentValue: any) => {
+            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+          }
+        },
+        {
+          fieldKey: 'round_off',
+          name: 'Round Off',
+          sort: true,
+          displayType: 'map',
+          mapFn: (currentValue: any) => {
+            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+          }
+        },
+        {
+          fieldKey: 'amount',
+          name: 'Amount',
+          sort: true,
+          displayType: 'map',
+          mapFn: (currentValue: any) => {
+            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+          }
+        },
+        {
+          fieldKey: 'status',
+          name: 'Status',
+          sort: true
+        }
+      ]
+    },
+
+    detailed: {
+      apiUrl: 'sales/sale_invoice_order/?sale_register&register_type=detailed',
+      pkId: "s_no",
+      showCheckbox: true,
+      pageSize: 10,
+      "globalSearch": {
+        keys: ['doc_no', 'customer_name', 'product_name', 'date']
+      },
+      export: { downloadName: 'SaleRegister_Detailed' },
+      defaultSort: { key: 'date', value: 'descend' },
+      cols: [
+        {
+          fieldKey: 's_no',
+          name: 'S.No',
+          sort: true
+        },
+        {
+          fieldKey: 'date',
+          name: 'Date',
+          sort: true
+        },
+        {
+          fieldKey: 'doc_no',
+          name: 'Doc No',
+          sort: true
+        },
+        {
+          fieldKey: 'customer_name',
+          name: 'Customer',
+          sort: true
+        },
+        {
+          fieldKey: 'product_name',
+          name: 'Product Name',
+          sort: true
+        },
+        {
+          fieldKey: 'qty',
+          name: 'Qty',
+          sort: true
+        },
+        {
+          fieldKey: 'unit_name',
+          name: 'Unit',
+          sort: true
+        },
+        {
+          fieldKey: 'rate',
+          name: 'Rate',
+          sort: true,
+          displayType: 'map',
+          mapFn: (currentValue: any) => {
+            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+          }
+        },
+        {
+          fieldKey: 'net_amount',
+          name: 'Net Amount',
+          sort: true,
+          displayType: 'map',
+          mapFn: (currentValue: any) => {
+            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+          }
+        },
+        {
+          fieldKey: 'amount',
+          name: 'Amount',
+          sort: true,
+          displayType: 'map',
+          mapFn: (currentValue: any) => {
+            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+          }
+        }
+      ]
+    },
+
+    cancelled: {
+      apiUrl: 'sales/sale_invoice_order/?sale_register&register_type=cancelled',
+      pkId: "sale_invoice_id",
+      showCheckbox: true,
+      pageSize: 10,
+      "globalSearch": {
+        keys: ['invoice_no', 'customer_name', 'date', 'city', 'amount']
+      },
+      export: { downloadName: 'SaleRegister_Cancelled' },
+      defaultSort: { key: 'date', value: 'descend' },
+      cols: [
+        {
+          fieldKey: 's_no',
+          name: 'S.No',
+          sort: true
+        },
+        {
+          fieldKey: 'voucher_type',
+          name: 'Voucher Type',
+          sort: true
+        },
+        {
+          fieldKey: 'date',
+          name: 'Date',
+          sort: true
+        },
+        {
+          fieldKey: 'invoice_no',
+          name: 'Invoice No',
+          sort: true
+        },
+        {
+          fieldKey: 'customer_name',
+          name: 'Customer',
+          sort: true
+        },
+        {
+          fieldKey: 'city',
+          name: 'City',
+          sort: true
+        },
+        {
+          fieldKey: 'amount',
+          name: 'Amount',
+          sort: true,
+          displayType: 'map',
+          mapFn: (currentValue: any) => {
+            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+          }
+        },
+        {
+          fieldKey: 'status',
+          name: 'Status',
+          sort: true
+        }
+      ]
+    },
+
+    product_group_wise: {
+      apiUrl: 'sales/sale_invoice_order/?sale_register&register_type=product_group_wise',
+      pkId: "s_no",
+      showCheckbox: true,
+      pageSize: 10,
+      "globalSearch": {
+        keys: ['group_name']
+      },
+      export: { downloadName: 'SaleRegister_ProductGroupWise' },
+      cols: [
+        {
+          fieldKey: 's_no',
+          name: 'S.No',
+          sort: true
+        },
+        {
+          fieldKey: 'group_name',
+          name: 'Product Group',
+          sort: true
+        },
+        {
+          fieldKey: 'item_count',
+          name: 'Item Count',
+          sort: true
+        },
+        {
+          fieldKey: 'qty_total',
+          name: 'Qty Total',
+          sort: true
+        },
+        {
+          fieldKey: 'amount_total',
+          name: 'Amount Total',
+          sort: true,
+          displayType: 'map',
+          mapFn: (currentValue: any) => {
+            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+          }
+        }
+      ]
+    },
+
+    product_category_wise: {
+      apiUrl: 'sales/sale_invoice_order/?sale_register&register_type=product_category_wise',
+      pkId: "s_no",
+      showCheckbox: true,
+      pageSize: 10,
+      "globalSearch": {
+        keys: ['group_name']
+      },
+      export: { downloadName: 'SaleRegister_ProductCategoryWise' },
+      cols: [
+        {
+          fieldKey: 's_no',
+          name: 'S.No',
+          sort: true
+        },
+        {
+          fieldKey: 'group_name',
+          name: 'Product Category',
+          sort: true
+        },
+        {
+          fieldKey: 'item_count',
+          name: 'Item Count',
+          sort: true
+        },
+        {
+          fieldKey: 'qty_total',
+          name: 'Qty Total',
+          sort: true
+        },
+        {
+          fieldKey: 'amount_total',
+          name: 'Amount Total',
+          sort: true,
+          displayType: 'map',
+          mapFn: (currentValue: any) => {
+            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+          }
+        }
+      ]
+    },
+
+    product_brand_wise: {
+      apiUrl: 'sales/sale_invoice_order/?sale_register&register_type=product_brand_wise',
+      pkId: "s_no",
+      showCheckbox: true,
+      pageSize: 10,
+      "globalSearch": {
+        keys: ['group_name']
+      },
+      export: { downloadName: 'SaleRegister_ProductBrandWise' },
+      cols: [
+        {
+          fieldKey: 's_no',
+          name: 'S.No',
+          sort: true
+        },
+        {
+          fieldKey: 'group_name',
+          name: 'Product Brand',
+          sort: true
+        },
+        {
+          fieldKey: 'item_count',
+          name: 'Item Count',
+          sort: true
+        },
+        {
+          fieldKey: 'qty_total',
+          name: 'Qty Total',
+          sort: true
+        },
+        {
+          fieldKey: 'amount_total',
+          name: 'Amount Total',
+          sort: true,
+          displayType: 'map',
+          mapFn: (currentValue: any) => {
+            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+          }
+        }
+      ]
+    },
+
+    hsn_wise: {
+      apiUrl: 'sales/sale_invoice_order/?sale_register&register_type=hsn_wise',
+      pkId: "s_no",
+      showCheckbox: true,
+      pageSize: 10,
+      "globalSearch": {
+        keys: ['group_name']
+      },
+      export: { downloadName: 'SaleRegister_HSNWise' },
+      cols: [
+        {
+          fieldKey: 's_no',
+          name: 'S.No',
+          sort: true
+        },
+        {
+          fieldKey: 'group_name',
+          name: 'HSN Code',
+          sort: true
+        },
+        {
+          fieldKey: 'item_count',
+          name: 'Item Count',
+          sort: true
+        },
+        {
+          fieldKey: 'qty_total',
+          name: 'Qty Total',
+          sort: true
+        },
+        {
+          fieldKey: 'amount_total',
+          name: 'Amount Total',
+          sort: true,
+          displayType: 'map',
+          mapFn: (currentValue: any) => {
+            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+          }
+        }
+      ]
+    },
+
+    daily_sales_summary: {
+      apiUrl: 'sales/sale_invoice_order/?sale_register&register_type=daily_sales_summary',
+      pkId: "s_no",
+      showCheckbox: true,
+      pageSize: 10,
+      "globalSearch": {
+        keys: ['date']
+      },
+      export: { downloadName: 'SaleRegister_DailySummary' },
+      defaultSort: { key: 'date', value: 'descend' },
+      cols: [
+        {
+          fieldKey: 's_no',
+          name: 'S.No',
+          sort: true
+        },
+        {
+          fieldKey: 'date',
+          name: 'Date',
+          sort: true
+        },
+        {
+          fieldKey: 'invoice_count',
+          name: 'Invoice Count',
+          sort: true
+        },
+        {
+          fieldKey: 'gross_total',
+          name: 'Gross Total',
+          sort: true,
+          displayType: 'map',
+          mapFn: (currentValue: any) => {
+            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+          }
+        },
+        {
+          fieldKey: 'discount_total',
+          name: 'Discount',
+          sort: true,
+          displayType: 'map',
+          mapFn: (currentValue: any) => {
+            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+          }
+        },
+        {
+          fieldKey: 'tax_total',
+          name: 'Tax',
+          sort: true,
+          displayType: 'map',
+          mapFn: (currentValue: any) => {
+            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+          }
+        },
+        {
+          fieldKey: 'amount_total',
+          name: 'Amount',
+          sort: true,
+          displayType: 'map',
+          mapFn: (currentValue: any) => {
+            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+          }
+        }
+      ]
+    },
+
+    monthly_sales_summary: {
+      apiUrl: 'sales/sale_invoice_order/?sale_register&register_type=monthly_sales_summary',
+      pkId: "s_no",
+      showCheckbox: true,
+      pageSize: 10,
+      "globalSearch": {
+        keys: ['month']
+      },
+      export: { downloadName: 'SaleRegister_MonthlySummary' },
+      cols: [
+        {
+          fieldKey: 's_no',
+          name: 'S.No',
+          sort: true
+        },
+        {
+          fieldKey: 'month',
+          name: 'Month',
+          sort: true
+        },
+        {
+          fieldKey: 'invoice_count',
+          name: 'Invoice Count',
+          sort: true
+        },
+        {
+          fieldKey: 'gross_total',
+          name: 'Gross Total',
+          sort: true,
+          displayType: 'map',
+          mapFn: (currentValue: any) => {
+            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+          }
+        },
+        {
+          fieldKey: 'discount_total',
+          name: 'Discount',
+          sort: true,
+          displayType: 'map',
+          mapFn: (currentValue: any) => {
+            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+          }
+        },
+        {
+          fieldKey: 'tax_total',
+          name: 'Tax',
+          sort: true,
+          displayType: 'map',
+          mapFn: (currentValue: any) => {
+            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+          }
+        },
+        {
+          fieldKey: 'amount_total',
+          name: 'Amount',
+          sort: true,
+          displayType: 'map',
+          mapFn: (currentValue: any) => {
+            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+          }
+        }
+      ]
+    }
+  };
 
   reportsConfig: { [key: string]: TaTableConfig } = {
 
@@ -738,11 +1315,12 @@ export class SalesRepotsComponent {
   error: string | null = null;
 
   selectReport(reportKey: string) {
-    this.loading = true; // Show loading state
-    this.error = null; // Clear any previous errors
+    this.loading = true;
+    this.error = null;
     this.selectedReportKey = null;
     this.tableConfig = null;
     this.isAccordionOpen = true;
+    this.isSaleRegister = false; // Reset sale register flag
 
     if (reportKey) {
       this.selectedReportKey = reportKey;
@@ -751,8 +1329,41 @@ export class SalesRepotsComponent {
     }
 
     setTimeout(() => {
-      this.loading = false; // Hide loading after data loads
-    },); // Adjust timeout based on API response time
+      this.loading = false;
+    },);
+  }
+
+  // Select Sale Register with dropdown
+  selectSaleRegister() {
+    this.loading = true;
+    this.error = null;
+    this.selectedReportKey = 'saleRegister';
+    this.isSaleRegister = true;
+    this.isAccordionOpen = false;
+    
+    // Load the selected register type config
+    this.loadSaleRegisterConfig();
+    
+    setTimeout(() => {
+      this.loading = false;
+    },);
+  }
+
+  // Load Sale Register config based on selected type
+  loadSaleRegisterConfig() {
+    const configKey = `saleRegister_${this.selectedRegisterType}`;
+    this.tableConfig = this.saleRegisterConfigs[this.selectedRegisterType];
+  }
+
+  // On Register Type dropdown change
+  onRegisterTypeChange() {
+    // Set tableConfig to null to destroy the table component
+    this.tableConfig = null;
+    
+    // Use setTimeout to allow Angular to destroy the old component first
+    setTimeout(() => {
+      this.loadSaleRegisterConfig();
+    }, 0);
   }
 
   onDataLoaded(data: any[]) {
@@ -760,6 +1371,119 @@ export class SalesRepotsComponent {
       this.error = 'No data available for this report.';
     }
     this.loading = false;
+  }
+
+  // ============== Document Attachment Methods ==============
+  
+  // Open attachment modal
+  openAttachmentModal(row: any) {
+    this.selectedInvoiceForAttachment = row;
+    this.isAttachmentModalVisible = true;
+    this.loadAttachments();
+  }
+
+  // Close attachment modal
+  closeAttachmentModal() {
+    this.isAttachmentModalVisible = false;
+    this.selectedInvoiceForAttachment = null;
+    this.attachmentList = [];
+  }
+
+  // Load attachments for the selected invoice
+  loadAttachments() {
+    if (!this.selectedInvoiceForAttachment) return;
+    
+    this.attachmentLoading = true;
+    const orderId = this.selectedInvoiceForAttachment.sale_invoice_id;
+    
+    this.http.get<any>(`sales/order_attachements/?order_id=${orderId}`).subscribe({
+      next: (response) => {
+        this.attachmentList = response.data || response || [];
+        this.attachmentLoading = false;
+      },
+      error: (err) => {
+        console.error('Error loading attachments:', err);
+        this.message.error('Failed to load attachments');
+        this.attachmentLoading = false;
+      }
+    });
+  }
+
+  // Handle file upload via file input
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.uploadAttachment(file);
+    }
+  }
+
+  // Handle paste from clipboard
+  onPasteAttachment(event: ClipboardEvent) {
+    const items = event.clipboardData?.items;
+    if (items) {
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf('image') !== -1) {
+          const blob = items[i].getAsFile();
+          if (blob) {
+            this.uploadAttachment(blob, 'pasted_image.png');
+          }
+        }
+      }
+    }
+  }
+
+  // Upload attachment to server
+  uploadAttachment(file: File, fileName?: string) {
+    if (!this.selectedInvoiceForAttachment) return;
+
+    const formData = new FormData();
+    formData.append('file', file, fileName || file.name);
+    formData.append('order_id', this.selectedInvoiceForAttachment.sale_invoice_id);
+    formData.append('attachment_name', fileName || file.name);
+    
+    this.attachmentLoading = true;
+    
+    this.http.post<any>(`sales/order_attachements/`, formData).subscribe({
+      next: (response) => {
+        this.message.success('File uploaded successfully');
+        this.loadAttachments();
+      },
+      error: (err) => {
+        console.error('Error uploading attachment:', err);
+        this.message.error('Failed to upload file');
+        this.attachmentLoading = false;
+      }
+    });
+  }
+
+  // Delete attachment
+  deleteAttachment(attachment: any) {
+    this.modal.confirm({
+      nzTitle: 'Are you sure you want to delete this attachment?',
+      nzOkText: 'Yes',
+      nzOkType: 'primary',
+      nzOkDanger: true,
+      nzCancelText: 'No',
+      nzOnOk: () => {
+        this.http.delete(`sales/order_attachements/${attachment.attachment_id}/`).subscribe({
+          next: () => {
+            this.message.success('Attachment deleted');
+            this.loadAttachments();
+          },
+          error: (err) => {
+            console.error('Error deleting attachment:', err);
+            this.message.error('Failed to delete attachment');
+          }
+        });
+      }
+    });
+  }
+
+  // Capture from camera (screenshot)
+  captureAttachment() {
+    // This would typically open a camera or screen capture
+    // For now, we'll show a message
+    this.message.info('Camera capture feature coming soon');
   }
 
   // //  Function to get total records from the table data
