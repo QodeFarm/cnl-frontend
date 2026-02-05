@@ -19,6 +19,17 @@ export class AccountLedgerComponent implements OnInit, AfterViewInit {
   tableComponent: TaTableComponent;
   currentAccountId: string = '';
 
+  // Opening and Closing Balance for ERP-standard ledger display
+  openingBalance: string = '0.00';
+  closingBalance: string = '0.00';
+  totalDebit: string = '0.00';
+  totalCredit: string = '0.00';
+  showBalanceSummary: boolean = false;
+  
+  get isPositiveBalance(): boolean {
+    return parseFloat(this.closingBalance) >= 0;
+  }
+
   constructor(
     private http: HttpClient,
     private notification: NzNotificationService
@@ -158,9 +169,21 @@ export class AccountLedgerComponent implements OnInit, AfterViewInit {
           { nzDuration: 5000 }
         );
 
-        // ❌ DO NOT TOUCH rows here
+        // Reset balance summary when no data
+        this.showBalanceSummary = false;
+        this.openingBalance = '0.00';
+        this.closingBalance = '0.00';
+        this.totalDebit = '0.00';
+        this.totalCredit = '0.00';
         return;
       }
+
+      // Capture Opening and Closing Balance from API response (ERP standard)
+      this.openingBalance = response.opening_balance || '0.00';
+      this.closingBalance = response.closing_balance || '0.00';
+      this.totalDebit = response.total_debit || this.calculateTotalDebit(response.data);
+      this.totalCredit = response.total_credit || this.calculateTotalCredit(response.data);
+      this.showBalanceSummary = true;
 
       //  VERY IMPORTANT LINE (this fixes pagination)
       if (this.tableComponent) {
@@ -170,6 +193,50 @@ export class AccountLedgerComponent implements OnInit, AfterViewInit {
     }, error => {
       console.error('Error fetching ledger data:', error);
     });
+  }
+
+  // Helper methods to calculate totals from data (fallback if API doesn't provide)
+  private calculateTotalDebit(data: any[]): string {
+    if (!data || !Array.isArray(data)) return '0.00';
+    const total = data.reduce((sum, row) => sum + (parseFloat(row.debit) || 0), 0);
+    return total.toFixed(2);
+  }
+
+  private calculateTotalCredit(data: any[]): string {
+    if (!data || !Array.isArray(data)) return '0.00';
+    const total = data.reduce((sum, row) => sum + (parseFloat(row.credit) || 0), 0);
+    return total.toFixed(2);
+  }
+
+  /**
+   * Clear ledger data when account type or account is cleared
+   * Called from ta-table component when user clears the dropdown selection
+   */
+  clearLedgerData() {
+    console.log("clearLedgerData called - resetting ledger state");
+    
+    // Reset stored values
+    this.currentAccountId = '';
+    this.selectedAccountType = null;
+    this.selectedAccountId = null;
+    this.selectedCity = null;
+    
+    // Reset balance summary (ERP standard)
+    this.openingBalance = '0.00';
+    this.closingBalance = '0.00';
+    this.totalDebit = '0.00';
+    this.totalCredit = '0.00';
+    this.showBalanceSummary = false;
+    
+    // Clear the API URL to prevent any data loading
+    this.curdConfig.tableConfig.apiUrl = '';
+    
+    // Clear the table data
+    if (this.tableComponent) {
+      this.tableComponent.rows = [];
+      this.tableComponent.total = 0;
+      this.tableComponent.pageIndex = 1;
+    }
   }
 
 
@@ -315,7 +382,7 @@ private buildLedgerDocumentUrl(): string | null {
   if (id) params.push(`${backendKey}=${id}`);
     if (cityId && backendKey !== 'ledger_account_id') params.push(`city=${cityId}`);
 
-    // 🔥 PERIOD PARAMS
+    // PERIOD PARAMS
     if (periodName) params.push(`period_name=${periodName}`);
     if (fromDate) params.push(`created_at_after=${fromDate}`);
     if (toDate) params.push(`created_at_before=${toDate}`);
@@ -458,9 +525,11 @@ private fallbackPrint(pdfBlob: Blob): void {
       pkId: "journal_entry_line_id",
       pageSize: 10,
       "globalSearch": {
-        keys: ['ledger_account', 'debit', 'credit', 'balance', 'created_at', 'voucher_no']
+        keys: ['ledger_account', 'debit', 'credit', 'running_balance', 'created_at', 'voucher_no']
       },
-      defaultSort: { key: 'created_at', value: 'descend' },
+      // Backend returns data in chronological order (ASC) for accounting correctness
+      // Removing defaultSort to preserve backend ordering
+      defaultSort: null,
       export: { downloadName: 'AccountLedgerList' },
       cols: [
         {
@@ -480,7 +549,7 @@ private fallbackPrint(pdfBlob: Blob): void {
         {
           fieldKey: 'created_at',
           name: 'Date',
-          sort: true,
+          sort: false,  // Disable sorting - backend handles chronological order
           displayType: 'date'
         },
         {
@@ -491,17 +560,33 @@ private fallbackPrint(pdfBlob: Blob): void {
         {
           fieldKey: 'debit',
           name: 'Debit',
-          sort: true
+          sort: false,  // Disable sorting for accounting columns
+          displayType: 'map',
+          mapFn: (currentValue: any, row: any, col: any) => {
+            const value = parseFloat(row.debit) || 0;
+            return value.toFixed(2);
+          }
         },
         {
           fieldKey: 'credit',
           name: 'Credit',
-          sort: true
+          sort: false,  // Disable sorting for accounting columns
+          displayType: 'map',
+          mapFn: (currentValue: any, row: any, col: any) => {
+            const value = parseFloat(row.credit) || 0;
+            return value.toFixed(2);
+          }
         },
         {
-          fieldKey: 'balance',
+          fieldKey: 'running_balance',  // Using new running_balance field from backend
           name: 'Running Balance',
-          sort: true
+          sort: false,  // Disable sorting - running balance must stay in order
+          displayType: 'map',
+          mapFn: (currentValue: any, row: any, col: any) => {
+            // Use running_balance if available, fallback to balance for backward compatibility
+            const value = parseFloat(row.running_balance || row.balance) || 0;
+            return value.toFixed(2);
+          }
         },
         // {
         //   fieldKey: "code",

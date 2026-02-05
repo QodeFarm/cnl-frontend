@@ -1,35 +1,55 @@
 <div class="container-fluid pt-3 account-ledger-wrapper">
   <div class="row">
     <div class="col-12 px-2 py-1 ledger-content">
+
       <ta-curd-modal
         [options]="curdConfig"
         class="custom-list">
       </ta-curd-modal>
 
-      <!-- Print Action -->
-      <div class="ledger-footer">
-      <div class="ledger-footer-left">
+      <!-- ERP Standard: Balance Summary Bar + Print Action (below table) -->
+      <div class="ledger-footer-section" *ngIf="showBalanceSummary">
+        <!-- Print Action (Left) -->
+        <div class="ledger-footer">
+          <select class="form-select print-select" (change)="onPrintSelect($event)">
+            <option value="" disabled selected hidden>Print Document</option>
+            <option value="preview">Preview</option>
+            <option value="print">Print</option>
+          </select>
+        </div>
+
+        <!-- Balance Summary (Right) -->
+        <div class="ledger-balance-summary">
+          <div class="balance-row">
+            <div class="balance-item opening">
+              <span class="balance-label">Opening Balance:</span>
+              <span class="balance-amount">₹{{ openingBalance }}</span>
+            </div>
+            <div class="balance-item totals">
+              <span class="balance-label">Total Debit:</span>
+              <span class="balance-amount debit">₹{{ totalDebit }}</span>
+              <span class="balance-separator">|</span>
+              <span class="balance-label">Total Credit:</span>
+              <span class="balance-amount credit">₹{{ totalCredit }}</span>
+            </div>
+            <div class="balance-item closing">
+              <span class="balance-label">Closing Balance:</span>
+              <span class="balance-amount" [ngClass]="{'positive': isPositiveBalance, 'negative': !isPositiveBalance}">
+                ₹{{ closingBalance }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Print Action when no data (fallback) -->
+      <div class="ledger-footer" *ngIf="!showBalanceSummary">
         <select class="form-select print-select" (change)="onPrintSelect($event)">
           <option value="" disabled selected hidden>Print Document</option>
           <option value="preview">Preview</option>
           <option value="print">Print</option>
         </select>
       </div>
-    </div>
-    <!-- <div class="ledger-footer-left" *ngIf="hasRecords">
-      <button class="btn btn-outline-primary me-2"
-              title="Preview"
-              (click)="onPreviewClick()">
-        <i class="bi bi-eye"></i>
-      </button>
-
-      <button class="btn btn-outline-secondary"
-              title="Print"
-              (click)="onPrintClick()">
-        <i class="bi bi-printer"></i>
-      </button>
-    </div> -->
-
 
     </div>
   </div>

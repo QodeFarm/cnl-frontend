@@ -1,8 +1,8 @@
 import { ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormComponent, TaFormConfig } from '@ta/ta-form';
-import { tap, switchMap } from 'rxjs/operators';
-import { forkJoin, Observable } from 'rxjs';
+import { tap, switchMap , debounceTime} from 'rxjs/operators';
+import { Observable, forkJoin, Subject, Subscription } from 'rxjs';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { OrderslistComponent } from '../orderslist/orderslist.component';
 import { SalesInvoiceListComponent } from './salesinvoice-list/salesinvoice-list.component';
@@ -12,12 +12,19 @@ import { calculateTotalAmount, displayInformation, getUnitData, sumQuantities } 
 import { CustomFieldHelper } from '../../utils/custom_field_fetch';
 // import { displayInformation, getUnitData, sumQuantities } from 'src/app/utils/display.utils';
 import { FormlyFieldConfig } from '@ngx-formly/core';
+import { LocalStorageService } from '@ta/ta-core';
+import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+
+
+
 declare var bootstrap;
 @Component({
   selector: 'app-salesinvoice',
   standalone: true,
   imports: [AdminCommmonModule, OrderslistComponent,
-    SalesInvoiceListComponent],
+    SalesInvoiceListComponent, NzModalModule, NzButtonModule, NzIconModule],
   templateUrl: './salesinvoice.component.html',
   styleUrls: ['./salesinvoice.component.scss']
 })
@@ -37,6 +44,16 @@ export class SalesinvoiceComponent {
   selectedOrder: any;
   // noOrdersMessage: string;
   // customerOrders: any[] = []; 
+
+  
+    // ========== DRAFT AUTO-SAVE PROPERTIES ==========
+    private draftSaveSubject = new Subject<void>();
+    private draftSaveSubscription: Subscription | null = null;
+    private readonly DRAFT_KEY_PREFIX = 'cnl_sale_invoice_draft_';
+    private readonly DRAFT_EXPIRY_HOURS = 24;
+    showDraftRestoreModal: boolean = false;
+    // =================================================
+  
 
   nowDate = () => {
     const date = new Date();
@@ -167,7 +184,8 @@ export class SalesinvoiceComponent {
     private router: Router,
     private route: ActivatedRoute,
     private fb: FormBuilder,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private localStorage: LocalStorageService
   ) { }
 
   dataToPopulate: any;
@@ -196,6 +214,8 @@ export class SalesinvoiceComponent {
     this.getInvoiceNo();
     this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = true;
     this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide = true;
+    this.initDraftAutoSave();
+    this.checkAndRestoreDraft();
   }
 
   loadProductVariations(field: FormlyFieldConfig, productValuechange: boolean = false) {
@@ -873,7 +893,229 @@ async autoFillProductDetails(field, data) {
 
   ngOnDestroy() {
     document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+
+    // Clear up draft save subscription
+    if (this.draftSaveSubscription) {
+      this.draftSaveSubscription.unsubscribe();
+    }
+    
   }
+
+   // ================== DRAFT AUTO-SAVE METHODS ==================
+  
+    /**
+     * Get the unique draft storage key for current user
+     */
+    private getDraftKey(): string {
+      const user = this.localStorage.getItem('user');
+      const userId = user?.user_id || 'anonymous';
+      return `${this.DRAFT_KEY_PREFIX}${userId}`;
+    }
+  
+    /**
+     * Initialize the draft auto-save subscription with debounce
+     */
+    private initDraftAutoSave(): void {
+      // Clean up existing subscription if any
+      if (this.draftSaveSubscription) {
+        this.draftSaveSubscription.unsubscribe();
+      }
+  
+      // Set up debounced draft saving (1500ms delay)
+      this.draftSaveSubscription = this.draftSaveSubject
+        .pipe(debounceTime(1500))
+        .subscribe(() => {
+          this.saveDraft();
+        });
+    }
+  
+    /**
+     * Trigger draft save (called from form value changes)
+     * Only saves in CREATE mode
+     */
+    triggerDraftSave(): void {
+      // Only save draft in CREATE mode (not edit mode)
+      if (!this.SaleInvoiceEditID) {
+        this.draftSaveSubject.next();
+      }
+    }
+  
+    /**
+     * Save current form data as draft to sessionStorage
+     */
+    private saveDraft(): void {
+      try {
+        // Only save in CREATE mode
+        if (this.SaleInvoiceEditID) {
+          return;
+        }
+  
+        const model = this.formConfig.model;
+        if (!model) {
+          return;
+        }
+  
+        // Check if there's meaningful data to save
+        const hasProducts = model.sale_invoice_items?.some((item: any) => 
+          item && item.product_id
+        );
+        const hasCustomer = model.sale_invoice_order?.customer_id;
+  
+        // Only save if there's at least a customer or product selected
+        if (!hasProducts && !hasCustomer) {
+          return;
+        }
+  
+        const draftData = {
+          sale_invoice_order: model.sale_invoice_order || {},
+          sale_invoice_items: model.sale_invoice_items || [],
+          custom_field_values: model.custom_field_values || [],
+          order_shipments: model.order_shipments || {},
+          timestamp: Date.now()
+        };
+  
+        sessionStorage.setItem(this.getDraftKey(), JSON.stringify(draftData));
+        console.log('Draft saved successfully');
+      } catch (error) {
+        console.error('Error saving draft:', error);
+      }
+    }
+  
+    /**
+     * Check for existing draft and prompt user to restore
+     */
+    private checkAndRestoreDraft(): void {
+      try {
+        // Only check in CREATE mode
+        if (this.SaleInvoiceEditID) {
+          return;
+        }
+  
+        // Don't restore if data is being populated from Copy/Past Orders
+        if (this.dataToPopulate) {
+          return;
+        }
+  
+        const draftJson = sessionStorage.getItem(this.getDraftKey());
+        if (!draftJson) {
+          return;
+        }
+  
+        const draftData = JSON.parse(draftJson);
+  
+        // Check if draft has expired (24 hours)
+        const draftAge = Date.now() - (draftData.timestamp || 0);
+        const maxAgeMs = this.DRAFT_EXPIRY_HOURS * 60 * 60 * 1000;
+        if (draftAge > maxAgeMs) {
+          this.clearDraft();
+          console.log('Draft expired and cleared');
+          return;
+        }
+  
+        // Check if draft has meaningful data
+        const hasProducts = draftData.sale_invoice_items?.some((item: any) => 
+          item && item.product_id
+        );
+        const hasCustomer = draftData.sale_invoice_order?.customer_id;
+  
+        if (!hasProducts && !hasCustomer) {
+          this.clearDraft();
+          return;
+        }
+  
+        // Show restore confirmation modal
+        this.showDraftRestoreModal = true;
+  
+      } catch (error) {
+        console.error('Error checking draft:', error);
+        this.clearDraft();
+      }
+    }
+  
+    /**
+     * Restore draft data to form (called when user confirms restore)
+     */
+    confirmRestoreDraft(): void {
+      try {
+        const draftJson = sessionStorage.getItem(this.getDraftKey());
+        if (!draftJson) {
+          this.showDraftRestoreModal = false;
+          return;
+        }
+  
+        const draftData = JSON.parse(draftJson);
+  
+        // Restore sale_order data (except order_no which should be fresh)
+        if (draftData.sale_invoice_order) {
+          const currentOrderNo = this.formConfig.model['sale_invoice_order']['order_no'];
+          this.formConfig.model['sale_invoice_order'] = {
+            ...draftData.sale_invoice_order,
+            order_no: currentOrderNo, // Keep the freshly generated order number
+            order_type: 'sale_invoice'
+          };
+        }
+  
+        // Restore sale_invoice_items
+        if (draftData.sale_invoice_items && draftData.sale_invoice_items.length > 0) {
+          this.formConfig.model['sale_invoice_items'] = [...draftData.sale_invoice_items];
+        }
+  
+        // Restore custom_field_values
+        if (draftData.custom_field_values) {
+          this.formConfig.model['custom_field_values'] = draftData.custom_field_values;
+        }
+  
+        // Restore order_shipments (except tracking number)
+        if (draftData.order_shipments) {
+          const currentTrackingNo = this.formConfig.model['order_shipments']['shipping_tracking_no'];
+          this.formConfig.model['order_shipments'] = {
+            ...draftData.order_shipments,
+            shipping_tracking_no: currentTrackingNo // Keep fresh tracking number
+          };
+        }
+  
+        // Trigger change detection
+        this.formConfig.model = { ...this.formConfig.model };
+        this.cdRef.detectChanges();
+  
+        // Recalculate totals
+        this.totalAmountCal();
+  
+        this.showDraftRestoreModal = false;
+        console.log('Draft restored successfully');
+  
+      } catch (error) {
+        console.error('Error restoring draft:', error);
+        this.showDraftRestoreModal = false;
+        this.clearDraft();
+      }
+    }
+  
+    /**
+     * Decline draft restore (called when user cancels restore)
+     */
+    declineRestoreDraft(): void {
+      this.clearDraft();
+      this.showDraftRestoreModal = false;
+    }
+  
+    /**
+     * Clear the saved draft from sessionStorage
+     */
+    clearDraft(): void {
+      try {
+        sessionStorage.removeItem(this.getDraftKey());
+        console.log('Draft cleared');
+      } catch (error) {
+        console.error('Error clearing draft:', error);
+      }
+    }
+
+
+
+
+
+
   //=====================================================
   quickpackOptions: any[] = []; // To store available Quickpack options
   selectedQuickpack: string = ''; // Selected Quickpack value
@@ -1116,6 +1358,7 @@ createSaleInovice() {
   this.http.post('sales/sale_invoice_order/', payload)
     .subscribe(response => {
       console.log("Entered...");
+      this.clearDraft(); // Clear draft on successful creation
       this.showSuccessToast = true;
       this.toastMessage = 'Record created successfully';
       this.ngOnInit();
@@ -1339,6 +1582,7 @@ createSaleInovice() {
                         //console.log("customer", data);
                         if (data && data.customer_id) {
                           this.formConfig.model['sale_invoice_order']['customer_id'] = data.customer_id;
+                          this.triggerDraftSave(); // Auto-save draft on customer change
                         }
                         if (data.customer_addresses && data.customer_addresses.billing_address) {
                           field.form.controls.billing_address.setValue(data.customer_addresses.billing_address)
@@ -1779,6 +2023,7 @@ createSaleInovice() {
                       this.formConfig.model['sale_invoice_items'][currentRowIndex]['product_id'] = data?.product_id;
                       this.loadProductVariations(field);
                       this.autoFillProductDetails(field, data); // to fill the remaining fields when product is selected.
+                      this.triggerDraftSave(); // Auto-save draft on product change
                     });
 
                     // Product Info Text code
@@ -2101,6 +2346,7 @@ createSaleInovice() {
                           field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity) - productDiscount) ;
                         }
                       }
+                      this.triggerDraftSave(); // Auto-save draft on quantity change
                     });
                   },
                   onChanges: (field: any) => {
@@ -2145,6 +2391,7 @@ createSaleInovice() {
                           field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity));
                         }
                       }
+                      this.triggerDraftSave(); // Auto-save draft on rate change
                     });
                   }
                 }

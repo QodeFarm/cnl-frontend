@@ -1,0 +1,177 @@
+// Sale Register Filter Styles
+.sale-register-filter {
+    background: #f8f9fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+    
+    .filter-label {
+        font-weight: 500;
+        color: #495057;
+        margin: 0;
+    }
+}
+
+// Active state for report links
+.report-link.active {
+    color: #1890ff;
+    font-weight: 600;
+    border-bottom: 2px solid #1890ff;
+}
+
+// Attachment Modal Content Styles
+.attachment-modal-content {
+    padding: 0;
+    
+    .upload-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
+        padding: 16px 20px;
+        border-radius: 12px;
+        border: 1px solid #e9ecef;
+        margin-bottom: 20px;
+    }
+
+    .upload-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .upload-label {
+        font-weight: 500;
+        color: #495057;
+        font-size: 14px;
+    }
+
+    .upload-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s ease;
+
+        i {
+            font-size: 14px;
+        }
+    }
+
+    .attach-btn {
+        background: #fff;
+        border: 1px solid #d9d9d9;
+        color: #595959;
+
+        &:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+            background: #e6f7ff;
+        }
+    }
+
+    .save-btn {
+        background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
+        color: #fff;
+
+        &:hover {
+            background: linear-gradient(135deg, #389e0d 0%, #52c41a 100%);
+        }
+    }
+
+    .capture-btn {
+        background: linear-gradient(135deg, #ff4d4f 0%, #ff7875 100%);
+        color: #fff;
+
+        &:hover {
+            background: linear-gradient(135deg, #cf1322 0%, #ff4d4f 100%);
+        }
+    }
+
+    .paste-input {
+        flex: 1;
+        min-width: 180px;
+        max-width: 220px;
+        padding: 8px 14px;
+        border: 1px solid #d9d9d9;
+        border-radius: 8px;
+        font-size: 13px;
+        color: #8c8c8c;
+        transition: all 0.2s ease;
+
+        &:focus {
+            outline: none;
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+        }
+
+        &::placeholder {
+            color: #bfbfbf;
+        }
+    }
+
+    .attachments-table-wrapper {
+        border: 1px solid #e9ecef;
+        border-radius: 12px;
+        overflow: hidden;
+
+        ::ng-deep {
+            .ant-table {
+                border-radius: 12px;
+            }
+
+            .ant-table-thead > tr > th {
+                background: #fafafa;
+                font-weight: 600;
+                color: #262626;
+                border-bottom: 1px solid #e9ecef;
+            }
+
+            .ant-table-tbody > tr > td {
+                border-bottom: 1px solid #f0f0f0;
+            }
+
+            .ant-table-tbody > tr:hover > td {
+                background: #fafafa;
+            }
+        }
+    }
+
+    .file-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #1890ff;
+        text-decoration: none;
+
+        &:hover {
+            color: #40a9ff;
+            text-decoration: underline;
+        }
+
+        i {
+            font-size: 16px;
+        }
+    }
+
+    .no-data {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        color: #bfbfbf;
+
+        i {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        span {
+            font-size: 14px;
+        }
+    }
+}

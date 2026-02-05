@@ -9,7 +9,8 @@ import {
   NzTableSortFn,
   NzTableSortOrder,
 } from 'ng-zorro-antd/table';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { TaParamsConfig, TaTableConfig } from './ta-table-config';
 import { TaTableService } from './ta-table.service';
 import moment from 'moment';
@@ -113,6 +114,10 @@ warehouseOptions: Array<{ value: string; label: string }> = [];
 
   accountOptions: Array<{ value: number; label: string }> = [];
 
+  // Search properties for account dropdown
+  accountSearchSubject = new Subject<string>();
+  accountSearchLoading = false;
+  accountSearchTerm = '';
 
   accountTypeOptions = [
     { value: 'customer', label: 'Customer' },
@@ -361,12 +366,20 @@ ledgerAccount() {
     // this.applyFilters(); // Apply the filter immediately
   }
 
-  loadAccounts() {
+  // Handler for account search input - triggers debounced search
+  onAccountSearch(searchTerm: string): void {
+    this.accountSearchTerm = searchTerm;
+    this.accountSearchSubject.next(searchTerm);
+  }
+
+  loadAccounts(searchTerm: string = '') {
     if (!this.selectedAccountType) {
       this.accountOptions = [];
+      this.accountSearchLoading = false;
       return;
     }
 
+    this.accountSearchLoading = true;
     let url = '';
     switch (this.selectedAccountType) {
       case 'customer':
@@ -380,20 +393,35 @@ ledgerAccount() {
         break;
     }
 
-    this.http.get<any>(url).subscribe(
+    // Add search parameter and increase limit for better results
+    const params: string[] = [];
+    if (searchTerm && searchTerm.trim()) {
+      params.push(`search=${encodeURIComponent(searchTerm.trim())}`);
+    }
+    params.push('limit=50'); // Increase limit for search results
+    
+    const queryString = params.length > 0 ? `?${params.join('&')}` : '';
+    const fullUrl = `${url}${queryString}`;
+
+    this.http.get<any>(fullUrl).subscribe(
       (response) => {
+        this.accountSearchLoading = false;
         if (response && response.data) {
           console.log('Account options loaded:', response);
           // For customer and vendor, use customer_id/vendor_id as the value
           if (this.selectedAccountType === 'customer') {
             this.accountOptions = response.data.map(item => ({
               value: item.customer_id,
-              label: item.name
+              label: item.name,
+              code: item.code || '',
+              print_name: item.print_name || ''
             }));
           } else if (this.selectedAccountType === 'vendor') {
             this.accountOptions = response.data.map(item => ({
               value: item.vendor_id,
-              label: item.name
+              label: item.name,
+              code: item.code || '',
+              print_name: item.print_name || ''
             }));
           } else {
             // For general accounts, use account_id
@@ -405,6 +433,7 @@ ledgerAccount() {
         }
       },
       (error) => {
+        this.accountSearchLoading = false;
         console.error('Error fetching accounts:', error);
       }
     );
@@ -439,24 +468,54 @@ ledgerAccount() {
 
 
   onAccountTypeChange() {
+    // Reset the selected account when account type changes or is cleared
     this.selectedAccountId = null;
-    //  ADD: reset city when account type changes
     this.selectedCity = null;
     this.cityOptions = [];
     this.isCityDisabled = false;
+    
+    // Clear the account options when type is cleared
+    if (!this.selectedAccountType) {
+      this.accountOptions = [];
+      // Clear the ledger data when account type is cleared
+      this.clearLedgerData();
+      return;
+    }
+    
+    // Load new accounts for the selected type
     this.loadAccounts();
     this.loadCities();
-    this.applyFilters();
+    
+    // Clear the ledger data since no account is selected yet
+    this.clearLedgerData();
+  }
+
+  // Helper method to clear ledger data and reset table state
+  clearLedgerData() {
+    if (this.router.url === '/admin/finance/account-ledger') {
+      // Reset the table data
+      this.rows = [];
+      this.total = 0;
+      
+      // Reset API URL to prevent showing stale data
+      this.options.apiUrl = '';
+      
+      // Notify any parent component if needed
+      if (window['accountLedgerComponentInstance'] &&
+        typeof window['accountLedgerComponentInstance'].clearLedgerData === 'function') {
+        window['accountLedgerComponentInstance'].clearLedgerData();
+      }
+    }
   }
 
   
   onAccountChange() {
+  // CASE 1: Account is selected
   if (this.selectedAccountType && this.selectedAccountId) {
     console.log("Account selected:", this.selectedAccountType, this.selectedAccountId);
 
     this.isCityDisabled = true;
     this.selectedCity = null;
-    // this.loadCities();
 
     // For account ledger page
     if (this.router.url === '/admin/finance/account-ledger') {
@@ -484,12 +543,14 @@ ledgerAccount() {
     }
   }
 
-  // 🟢 CASE 2: Resource CLEARED
+  // CASE 2: Account (Resource) is CLEARED
   if (!this.selectedAccountId) {
-    console.log("Resource cleared, enabling city");
+    console.log("Resource cleared, enabling city and clearing ledger");
 
-    this.isCityDisabled = false;   //  Enable city again
-    this.applyFilters();
+    this.isCityDisabled = false;
+    
+    // Clear the ledger data when account is cleared
+    this.clearLedgerData();
     return;
   }
 
@@ -642,10 +703,30 @@ applyFilters() {
         console.log("Response data in table : ", response.data);
         this.rows = response.data;
         this.total = response.totalCount || response.count || response.data.length;
+        
+        // ✅ Sync Opening/Closing Balance with Account Ledger Component (ERP Standard)
+        if (window['accountLedgerComponentInstance'] && this.isAccountLedgerPage) {
+          const instance = window['accountLedgerComponentInstance'];
+          instance.openingBalance = response.opening_balance || '0.00';
+          instance.closingBalance = response.closing_balance || '0.00';
+          instance.totalDebit = response.total_debit || this.calculatePageTotalDebit(response.data);
+          instance.totalCredit = response.total_credit || this.calculatePageTotalCredit(response.data);
+          instance.showBalanceSummary = response.data.length > 0;
+        }
       } else {
         console.warn("API response contains no data");
         this.rows = [];
         this.total = 0;
+        
+        // Reset balance summary when no data
+        if (window['accountLedgerComponentInstance'] && this.isAccountLedgerPage) {
+          const instance = window['accountLedgerComponentInstance'];
+          instance.openingBalance = '0.00';
+          instance.closingBalance = '0.00';
+          instance.totalDebit = '0.00';
+          instance.totalCredit = '0.00';
+          instance.showBalanceSummary = false;
+        }
       }
     },
     error => {
@@ -892,6 +973,14 @@ downloadData(event: any) {
     this.filtersObservable$ = this.taTableS.filterObserval().subscribe((res: any) => {
       // // console.log('res', res);
     });
+
+    // Initialize debounced search for account dropdown
+    this.accountSearchSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    ).subscribe((searchTerm: string) => {
+      this.loadAccounts(searchTerm);
+    });
   }
 
 
@@ -1071,6 +1160,18 @@ downloadData(event: any) {
         this.loading = false;
         this.total = data.totalCount; // mock the total data here
         this.rows = data.data || data;
+        
+        // ✅ Sync Opening/Closing Balance with Account Ledger Component during pagination (ERP Standard)
+        if (window['accountLedgerComponentInstance'] && this.isAccountLedgerPage) {
+          const instance = window['accountLedgerComponentInstance'];
+          const rowData = data.data || data;
+          instance.openingBalance = data.opening_balance || '0.00';
+          instance.closingBalance = data.closing_balance || '0.00';
+          instance.totalDebit = data.total_debit || this.calculatePageTotalDebit(rowData);
+          instance.totalCredit = data.total_credit || this.calculatePageTotalCredit(rowData);
+          instance.showBalanceSummary = (data.data && data.data.length > 0) || (Array.isArray(data) && data.length > 0);
+        }
+        
         if (this.options.showCheckbox) {
           this.refreshCheckedStatus();
         }
@@ -1182,6 +1283,19 @@ downloadData(event: any) {
   globalSearchClear() {
     this.globalSearchValue = '';
     this.globalSearch();
+  }
+
+  // Helper methods for calculating page totals (ERP Standard - Account Ledger)
+  private calculatePageTotalDebit(data: any[]): string {
+    if (!data || !Array.isArray(data)) return '0.00';
+    const total = data.reduce((sum, row) => sum + (parseFloat(row.debit) || 0), 0);
+    return total.toFixed(2);
+  }
+
+  private calculatePageTotalCredit(data: any[]): string {
+    if (!data || !Array.isArray(data)) return '0.00';
+    const total = data.reduce((sum, row) => sum + (parseFloat(row.credit) || 0), 0);
+    return total.toFixed(2);
   }
 
   refreshIcon() {
@@ -1311,6 +1425,8 @@ downloadData(event: any) {
 
   ngOnDestroy() {
     this.actionObservable$.unsubscribe();
+    // Clean up the search subject to prevent memory leaks
+    this.accountSearchSubject.complete();
   }
   // Additional code for handling action button events in the table(added this code for file upload)(start)
   performAction(action: any, row: any) {

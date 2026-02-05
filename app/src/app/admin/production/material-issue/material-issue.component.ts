@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ChangeDetectorRef, PlatformRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectorRef, PlatformRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { HttpClient } from '@angular/common/http';
@@ -6,15 +6,21 @@ import { TaFormComponent } from '@ta/ta-form';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MaterialIssueListComponent } from './material-issue-list/material-issue-list.component';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+import { LocalStorageService } from '@ta/ta-core';
+import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzIconModule } from 'ng-zorro-antd/icon';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, MaterialIssueListComponent],
+  imports: [CommonModule, AdminCommmonModule, MaterialIssueListComponent, NzModalModule, NzButtonModule, NzIconModule],
   selector: 'app-material-issue',
   templateUrl: './material-issue.component.html',
   styleUrls: ['./material-issue.component.scss']
 })
-export class MaterialIssueComponent implements OnInit {
+export class MaterialIssueComponent implements OnInit, OnDestroy {
   @ViewChild('materialIssueForm', { static: false }) materialIssueForm: TaFormComponent | undefined;
   @ViewChild(MaterialIssueListComponent) MaterialIssueListComponent!: MaterialIssueListComponent;
   @ViewChild(TaFormComponent) taFormComponent!: TaFormComponent;
@@ -27,6 +33,15 @@ export class MaterialIssueComponent implements OnInit {
   availableTables: string[] = [];
   selectedTable: string;
   currentTable: string = 'Material Issue';
+
+  // ========== DRAFT AUTO-SAVE PROPERTIES ==========
+  private draftSaveSubject = new Subject<void>();
+  private draftSaveSubscription: Subscription | null = null;
+  private readonly DRAFT_KEY_PREFIX = 'cnl_material_issue_draft_';
+  private readonly DRAFT_EXPIRY_HOURS = 24;
+  showDraftRestoreModal: boolean = false;
+  // =================================================
+
   fieldMapping = {
     'Material Issue Return': {
       sourceModel: 'material_issue',
@@ -43,7 +58,8 @@ export class MaterialIssueComponent implements OnInit {
     private cdRef: ChangeDetectorRef,
     private notification: NzNotificationService,
     private router: Router,
-    private route: ActivatedRoute) { }
+    private route: ActivatedRoute,
+    private localStorage: LocalStorageService) { }
 
   ngOnInit() {
     this.showMaterialIssueList = false;
@@ -57,6 +73,14 @@ export class MaterialIssueComponent implements OnInit {
     // this.showForm = true;
     this.setFormConfig();
     this.getIssueNo();
+    this.initDraftAutoSave();
+    this.checkAndRestoreDraft();
+  }
+
+  ngOnDestroy(): void {
+    if (this.draftSaveSubscription) {
+      this.draftSaveSubscription.unsubscribe();
+    }
   }
 
   getIssueNo() {
@@ -119,6 +143,7 @@ export class MaterialIssueComponent implements OnInit {
 
     this.http.post('production/material-issues/', payload)
       .subscribe(response => {
+        this.clearDraft(); // Clear draft on successful creation
         this.notification.success('Record updated successfully', '');
         this.ngOnInit();
         this.taFormComponent.formlyOptions.resetModel([]);
@@ -230,6 +255,7 @@ displayInformation(product: any) {
                   field.formControl.valueChanges.subscribe(data => {
                     if (data && data.production_floor_id) {
                       this.formConfig.model['material_issue']['production_floor_id'] = data.production_floor_id; // Update the model with the selected ledger_account_id
+                      this.triggerDraftSave(); // Auto-save draft on production floor change
                     }
                   });
                 }
@@ -353,6 +379,7 @@ displayInformation(product: any) {
                       this.formConfig.model.items[currentRowIndex].product_id = data?.product_id;
                       if (data) {
                         this.displayInformation(data);
+                        this.triggerDraftSave(); // Auto-save draft on product change
                       }
                     });
                   }
@@ -503,5 +530,154 @@ displayInformation(product: any) {
     this.hide();
     // this.showMaterialIssueList = false;
   }
+
+  // ================== DRAFT AUTO-SAVE METHODS ==================
+
+  private getDraftKey(): string {
+    const userId = this.localStorage.getItem('user')?.userId || 'default';
+    return `${this.DRAFT_KEY_PREFIX}${userId}`;
+  }
+
+  private initDraftAutoSave(): void {
+    if (this.draftSaveSubscription) {
+      this.draftSaveSubscription.unsubscribe();
+    }
+
+    this.draftSaveSubscription = this.draftSaveSubject
+      .pipe(debounceTime(1500))
+      .subscribe(() => {
+        this.saveDraft();
+      });
+  }
+
+  triggerDraftSave(): void {
+    if (!this.MaterialIssueEditID) {
+      this.draftSaveSubject.next();
+    }
+  }
+
+  private saveDraft(): void {
+    try {
+      if (this.MaterialIssueEditID) {
+        return;
+      }
+
+      const model = this.formConfig.model;
+      if (!model) {
+        return;
+      }
+
+      const hasItems = model.items?.some((item: any) => item && item.product_id);
+      const hasProductionFloor = model.material_issue?.production_floor_id;
+
+      if (!hasItems && !hasProductionFloor) {
+        return;
+      }
+
+      const draftData = {
+        material_issue: model.material_issue || {},
+        items: model.items || [],
+        attachments: model.attachments || [],
+        timestamp: Date.now()
+      };
+
+      sessionStorage.setItem(this.getDraftKey(), JSON.stringify(draftData));
+      console.log('Material Issue Draft saved successfully');
+    } catch (error) {
+      console.error('Error saving draft:', error);
+    }
+  }
+
+  private checkAndRestoreDraft(): void {
+    try {
+      if (this.MaterialIssueEditID) {
+        return;
+      }
+
+      const draftJson = sessionStorage.getItem(this.getDraftKey());
+      if (!draftJson) {
+        return;
+      }
+
+      const draftData = JSON.parse(draftJson);
+
+      const draftAge = Date.now() - (draftData.timestamp || 0);
+      const maxAgeMs = this.DRAFT_EXPIRY_HOURS * 60 * 60 * 1000;
+      if (draftAge > maxAgeMs) {
+        this.clearDraft();
+        console.log('Draft expired and cleared');
+        return;
+      }
+
+      const hasItems = draftData.items?.some((item: any) => item && item.product_id);
+      const hasProductionFloor = draftData.material_issue?.production_floor_id;
+
+      if (!hasItems && !hasProductionFloor) {
+        this.clearDraft();
+        return;
+      }
+
+      this.showDraftRestoreModal = true;
+
+    } catch (error) {
+      console.error('Error checking draft:', error);
+      this.clearDraft();
+    }
+  }
+
+  confirmRestoreDraft(): void {
+    try {
+      const draftJson = sessionStorage.getItem(this.getDraftKey());
+      if (!draftJson) {
+        this.showDraftRestoreModal = false;
+        return;
+      }
+
+      const draftData = JSON.parse(draftJson);
+
+      if (draftData.material_issue) {
+        const currentIssueNo = this.formConfig.model['material_issue']['issue_no'];
+        this.formConfig.model['material_issue'] = {
+          ...draftData.material_issue,
+          issue_no: currentIssueNo
+        };
+      }
+
+      if (draftData.items && draftData.items.length > 0) {
+        this.formConfig.model['items'] = [...draftData.items];
+      }
+
+      if (draftData.attachments) {
+        this.formConfig.model['attachments'] = draftData.attachments;
+      }
+
+      this.formConfig.model = { ...this.formConfig.model };
+      this.cdRef.detectChanges();
+
+      this.showDraftRestoreModal = false;
+      console.log('Material Issue Draft restored successfully');
+
+    } catch (error) {
+      console.error('Error restoring draft:', error);
+      this.showDraftRestoreModal = false;
+      this.clearDraft();
+    }
+  }
+
+  declineRestoreDraft(): void {
+    this.clearDraft();
+    this.showDraftRestoreModal = false;
+  }
+
+  clearDraft(): void {
+    try {
+      sessionStorage.removeItem(this.getDraftKey());
+      console.log('Material Issue Draft cleared');
+    } catch (error) {
+      console.error('Error clearing draft:', error);
+    }
+  }
+
+  // ================== END DRAFT AUTO-SAVE METHODS ==================
 
 }
