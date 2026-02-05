@@ -186,57 +186,112 @@ export class PurchaseInvoiceComponent {
     this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide =true;  //Hiding order status in create field
   }
 
-  checkAndPopulateData() {
-    // Check if data has already been populated
-    if (this.dataToPopulate === undefined) {
-      // Subscribe to route params and history state data
-      this.route.paramMap.subscribe(params => {
-        // Retrieve data from history only if it's the first time populating
-        this.dataToPopulate = history.state.data; 
-        console.log('Data retrieved:', this.dataToPopulate);
+  // checkAndPopulateData() {
+  //   // Check if data has already been populated
+  //   if (this.dataToPopulate === undefined) {
+  //     // Subscribe to route params and history state data
+  //     this.route.paramMap.subscribe(params => {
+  //       // Retrieve data from history only if it's the first time populating
+  //       this.dataToPopulate = history.state.data; 
+  //       console.log('Data retrieved:', this.dataToPopulate);
         
-        // Populate the form only if data exists
-        if (this.dataToPopulate) {
-          // Ensure we are handling purchase_invoice_items correctly
-          const purchaseInvoiceItems = this.dataToPopulate.purchase_invoice_items || [];
+  //       // Populate the form only if data exists
+  //       if (this.dataToPopulate) {
+  //         // Ensure we are handling purchase_invoice_items correctly
+  //         const purchaseInvoiceItems = this.dataToPopulate.purchase_invoice_items || [];
   
-          // Clear existing purchase_invoice_items to avoid duplicates
-          this.formConfig.model.purchase_invoice_items = [];
+  //         // Clear existing purchase_invoice_items to avoid duplicates
+  //         this.formConfig.model.purchase_invoice_items = [];
   
-          // Populate form with data, ensuring unique entries
-          purchaseInvoiceItems.forEach(item => {
-            const populatedItem = {
-              product_id: item.product.product_id,
-              size: item.size,
-              color: item.color,
-              code: item.code,
-              unit: item.unit,
-              total_boxes: item.total_boxes,
-              quantity: item.quantity,
-              amount: item.amount,
-              rate: item.rate,
-              print_name: item.print_name,
-              discount: item.discount
-            };
-            this.formConfig.model.purchase_invoice_items.push(populatedItem);
-          });
-        }
-      });
-    } else {
-    // Detect if the page was refreshed
-      const wasPageRefreshed = window.performance?.navigation?.type === window.performance?.navigation?.TYPE_RELOAD;
+  //         // Populate form with data, ensuring unique entries
+  //         purchaseInvoiceItems.forEach(item => {
+  //           const populatedItem = {
+  //             product_id: item.product.product_id,
+  //             size: item.size,
+  //             color: item.color,
+  //             code: item.code,
+  //             unit: item.unit,
+  //             total_boxes: item.total_boxes,
+  //             quantity: item.quantity,
+  //             amount: item.amount,
+  //             rate: item.rate,
+  //             print_name: item.print_name,
+  //             discount: item.discount
+  //           };
+  //           this.formConfig.model.purchase_invoice_items.push(populatedItem);
+  //         });
+  //       }
+  //     });
+  //   } else {
+  //   // Detect if the page was refreshed
+  //     const wasPageRefreshed = window.performance?.navigation?.type === window.performance?.navigation?.TYPE_RELOAD;
     
-      // Clear data if the page was refreshed
-      if (wasPageRefreshed) {
-        this.dataToPopulate = undefined;
-        console.log("Page was refreshed, clearing data.");
+  //     // Clear data if the page was refreshed
+  //     if (wasPageRefreshed) {
+  //       this.dataToPopulate = undefined;
+  //       console.log("Page was refreshed, clearing data.");
         
-        // Ensure the history state is cleared to prevent repopulation
-        history.replaceState(null, '');
-        return; // Stop further execution as we don't want to repopulate the form
+  //       // Ensure the history state is cleared to prevent repopulation
+  //       history.replaceState(null, '');
+  //       return; // Stop further execution as we don't want to repopulate the form
+  //     }
+  //   }
+  // }
+
+checkAndPopulateData() {
+  if (this.dataToPopulate === undefined) {
+    this.route.paramMap.subscribe(() => {
+      this.dataToPopulate = history.state.data;
+      console.log('Data retrieved:', this.dataToPopulate);
+
+      if (!this.dataToPopulate) return;
+
+      const purchaseInvoiceItems = this.dataToPopulate.purchase_invoice_items;
+
+      // IMPORTANT FIX
+      // If no items came from source → keep default payloads
+      if (!Array.isArray(purchaseInvoiceItems) || purchaseInvoiceItems.length === 0) {
+        console.log('No items received, keeping default payload rows');
+        return;
       }
+
+      // Only clear when we actually have data
+      this.formConfig.model.purchase_invoice_items = [];
+
+      purchaseInvoiceItems.forEach((item, index) => {
+        this.formConfig.model.purchase_invoice_items.push({
+          product_id: item.product?.product_id ?? item.product_id,
+          size: item.size,
+          color: item.color,
+          code: item.code,
+          unit: item.unit,
+          total_boxes: item.total_boxes,
+          quantity: item.quantity,
+          amount: item.amount,
+          rate: item.rate,
+          print_name: item.print_name,
+          discount: item.discount
+        });
+        console.log(`Populated row ${index + 1}`);
+      });
+
+      // Trigger change detection
+      this.formConfig.model.purchase_invoice_items = [
+        ...this.formConfig.model.purchase_invoice_items
+      ];
+      this.cdRef.detectChanges();
+    });
+  } else {
+    const wasPageRefreshed =
+      window.performance?.navigation?.type ===
+      window.performance?.navigation?.TYPE_RELOAD;
+
+    if (wasPageRefreshed) {
+      this.dataToPopulate = undefined;
+      history.replaceState(null, '');
     }
   }
+}
   
   loadProductVariations(field: FormlyFieldConfig, productValuechange: boolean = false) {
     const parentArray = field.parent;
@@ -325,9 +380,13 @@ export class PurchaseInvoiceComponent {
         : field.form.controls.code.value,
       rate: data.sales_rate ?? field.form.controls.rate.value,
       //  Key fix for discount:
-      discount: data.discount !== undefined
-        ? parseFloat(data.discount)
-        : field.form.controls.discount.value,
+      discount:
+        data.discount !== undefined &&
+        data.discount !== null &&
+        data.discount !== '' &&
+        !isNaN(Number(data.discount))
+          ? Number(data.discount)
+          : 0,
       unit_options_id: data.unit_options?.unit_options_id,
       print_name: data.print_name,
       mrp: data.mrp
@@ -650,7 +709,7 @@ loadQuickpackProducts() {
       },
       model: {
         purchase_invoice_orders: {},
-        purchase_invoice_items: [{}, {}, {}, {}, {}],
+        purchase_invoice_items: [{}, {}, {}, {}, {}, {}, {}, {}, {}],
         order_attachments: [],
         order_shipments: {},
         custom_field_values: []

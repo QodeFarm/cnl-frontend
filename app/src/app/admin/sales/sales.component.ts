@@ -403,60 +403,116 @@ openDocPreview() {
     this.checkAndRestoreDraft();
     // ==============================================================================
   }
+  // checkAndPopulateData() {
+  //   if (this.dataToPopulate === undefined) {
+  //     console.log("Data status checking 1 : ", (this.dataToPopulate === undefined));
+  //     this.route.paramMap.subscribe(params => {
+  //       this.dataToPopulate = history.state.data;
+  //       console.log('Data retrieved:', this.dataToPopulate);
+
+  //       if (this.dataToPopulate) {
+  //         const saleOrderItems = this.dataToPopulate.sale_order_items || [];
+  //         console.log("saleOrderItems : ", saleOrderItems);
+
+  //         if (!this.formConfig.model) {
+  //           this.formConfig.model = {}
+  //         }
+
+  //         // Clear existing items to avoid duplicates
+  //         this.formConfig.model.sale_order_items = [];
+  //         console.log("checking data status : ", this.formConfig.model.sale_order_items);
+
+  //         saleOrderItems.forEach((item, index) => {
+  //           this.formConfig.model.sale_order_items.push({
+  //             product_id: item.product.product_id,
+  //             size: item.size.size_name,
+  //             color: item.color.color_name,
+  //             code: item.code,
+  //             unit: item.unit,
+  //             total_boxes: item.total_boxes,
+  //             quantity: item.quantity,
+  //             amount: item.amount,
+  //             rate: item.rate,
+  //             discount: item.discount
+  //           });
+  //           console.log(`Populated row ${index + 1} in sale_order_items`);
+  //         });
+
+  //         // Reassign the array to trigger change detection
+  //         this.formConfig.model.sale_order_items = [...this.formConfig.model.sale_order_items];
+  //         console.log("After method : ", this.formConfig.model.sale_order_items)
+  //         this.cdRef.detectChanges();
+
+  //         console.log("Updated formConfig:", this.formConfig.model.sale_order_items);
+  //       }
+  //     });
+  //   } else {
+  //     const wasPageRefreshed = window.performance?.navigation?.type === window.performance?.navigation?.TYPE_RELOAD;
+
+  //     if (wasPageRefreshed) {
+  //       this.dataToPopulate = undefined;
+  //       console.log("Page was refreshed, clearing data.");
+  //       history.replaceState(null, '');
+  //       return;
+  //     }
+  //   }
+  // }
+
   checkAndPopulateData() {
-    if (this.dataToPopulate === undefined) {
-      console.log("Data status checking 1 : ", (this.dataToPopulate === undefined));
-      this.route.paramMap.subscribe(params => {
-        this.dataToPopulate = history.state.data;
-        console.log('Data retrieved:', this.dataToPopulate);
+  if (this.dataToPopulate === undefined) {
+    this.route.paramMap.subscribe(() => {
+      this.dataToPopulate = history.state.data;
+      console.log('Data retrieved:', this.dataToPopulate);
 
-        if (this.dataToPopulate) {
-          const saleOrderItems = this.dataToPopulate.sale_order_items || [];
-          console.log("saleOrderItems : ", saleOrderItems);
+      if (!this.dataToPopulate) return;
 
-          if (!this.formConfig.model) {
-            this.formConfig.model = {}
-          }
+      const saleOrderItems = this.dataToPopulate.sale_order_items;
 
-          // Clear existing items to avoid duplicates
-          this.formConfig.model.sale_order_items = [];
-          console.log("checking data status : ", this.formConfig.model.sale_order_items);
-
-          saleOrderItems.forEach((item, index) => {
-            this.formConfig.model.sale_order_items.push({
-              product_id: item.product.product_id,
-              size: item.size.size_name,
-              color: item.color.color_name,
-              code: item.code,
-              unit: item.unit,
-              total_boxes: item.total_boxes,
-              quantity: item.quantity,
-              amount: item.amount,
-              rate: item.rate,
-              discount: item.discount
-            });
-            console.log(`Populated row ${index + 1} in sale_order_items`);
-          });
-
-          // Reassign the array to trigger change detection
-          this.formConfig.model.sale_order_items = [...this.formConfig.model.sale_order_items];
-          console.log("After method : ", this.formConfig.model.sale_order_items)
-          this.cdRef.detectChanges();
-
-          console.log("Updated formConfig:", this.formConfig.model.sale_order_items);
-        }
-      });
-    } else {
-      const wasPageRefreshed = window.performance?.navigation?.type === window.performance?.navigation?.TYPE_RELOAD;
-
-      if (wasPageRefreshed) {
-        this.dataToPopulate = undefined;
-        console.log("Page was refreshed, clearing data.");
-        history.replaceState(null, '');
+      // IMPORTANT FIX
+      // If no items came from source → keep default payloads
+      if (!Array.isArray(saleOrderItems) || saleOrderItems.length === 0) {
+        console.log('No items received, keeping default payload rows');
         return;
       }
+
+      // Only clear when we actually have data
+      this.formConfig.model.sale_order_items = [];
+
+      saleOrderItems.forEach((item, index) => {
+        this.formConfig.model.sale_order_items.push({
+          product_id: item.product?.product_id ?? item.product_id,
+          size: item.size,
+          color: item.color,
+          code: item.code,
+          unit: item.unit,
+          total_boxes: item.total_boxes,
+          quantity: item.quantity,
+          amount: item.amount,
+          rate: item.rate,
+          print_name: item.print_name,
+          discount: item.discount
+        });
+        console.log(`Populated row ${index + 1}`);
+      });
+
+      // Trigger change detection
+      this.formConfig.model.sale_order_items = [
+        ...this.formConfig.model.sale_order_items
+      ];
+      this.cdRef.detectChanges();
+    });
+  } else {
+    const wasPageRefreshed =
+      window.performance?.navigation?.type ===
+      window.performance?.navigation?.TYPE_RELOAD;
+
+    if (wasPageRefreshed) {
+      this.dataToPopulate = undefined;
+      history.replaceState(null, '');
     }
   }
+}
+
   //COPY-End ====================================================
 
   //Sale-invoice ==============================================
@@ -1530,6 +1586,141 @@ editSaleOrder(event) {
   return true; // Validation passed
 }
 
+private sendSaleOrderWhatsapp(saleOrderId: string): void {
+  const url = `masters/document_generator/${saleOrderId}/sale_order/`;
+
+  const payload = {
+    flag: 'whatsapp',
+    format: 'CNL_Standard_Excl' // default
+  };
+
+  this.http.post<any>(url, payload).subscribe(
+    (response) => {
+      // PROD → WATI
+      if (response?.mode === 'wati') {
+        console.log('WhatsApp sent via WATI');
+      }
+
+      // DEV → Click-to-chat
+      else if (response?.mode === 'click_to_chat' && response.whatsapp_url) {
+        window.open(response.whatsapp_url, '_blank');
+      }
+    },
+    (error) => {
+      console.warn('WhatsApp failed, continuing sale order flow');
+
+      // Show popup ONLY for WhatsApp failure
+      this.openWhatsappFallbackDialog();
+    }
+  );
+}
+
+isWhatsappDialogOpen: boolean = false;
+
+openWhatsappFallbackDialog(): void {
+  this.isWhatsappDialogOpen = true;
+}
+
+closeWhatsappDialog(): void {
+  this.isWhatsappDialogOpen = false;
+}
+
+selectedFormat: string = "CNL_Standard_Excl";
+triggerWhatsappSilently(saleOrderId: string): void {
+  console.log("Silent WhatsApp Triggered for Sale Order ID:", saleOrderId);
+  const url = `masters/document_generator/${saleOrderId}/sale_order/`;
+
+  const payload = {
+    flag: 'whatsapp',
+    format: this.selectedFormat
+  };
+
+  this.http.post<any>(url, payload).subscribe(
+    (response) => {
+      console.log("response.mode : ", response.mode);
+      // ONLY backend-send allowed
+      if (response.mode === 'wati') {
+        console.log('WhatsApp sent silently via WATI');
+      } else {
+        console.log('WhatsApp skipped (local / click-to-chat)');
+      }
+    },
+    (error) => {
+      console.error('Silent WhatsApp failed', error);
+    }
+  );
+}
+
+createQuickPack: boolean = false;
+createQuickPackOption: string = 'no';
+
+
+// createSaleOrder() {
+//   // Use the already validated payload
+//   const customFieldsPayload = this.validatedCustomFieldsPayload;
+
+//   const payload = {
+//     ...this.formConfig.model,
+//     custom_field_values: customFieldsPayload.custom_field_values
+//   };
+
+//   //Quick creation check - logic ------------------------------
+
+//   if (this.createQuickPack) {
+//     const customerName = payload.sale_order?.customer?.name || "Customer";
+//     const productNames = payload.sale_order_items?.map(item => item.product?.name) || [];
+
+//     let quickPackName = `${customerName} QuickPack (${productNames.join(', ')})`;
+
+//     // Optional: shorten if too long
+//     if (quickPackName.length > 50) {
+//         quickPackName = `${customerName} QuickPack (${productNames[0]} +${productNames.length - 1} more)`;
+//     }
+
+//     payload.quick_pack_data = {
+//         name: quickPackName,
+//         customer_id: payload.sale_order.customer?.customer_id,
+//         description: `QuickPack created from Sale Order ${payload.sale_order.order_no}`,
+//         active: 'Y',
+//         lot_qty: payload.sale_order_items?.length || 0
+//     };
+
+//     payload.quick_pack_data_items = payload.sale_order_items?.map(item => ({
+//         product_id: item.product?.product_id,
+//         quantity: item.quantity,
+//         unit_options_id: item.unit_options?.unit_options_id,
+//         size_id: item.size?.size_id,
+//         color_id: item.color?.color_id
+//     })) || [];
+// }
+
+
+//   //------------------------END------------------------------
+
+//   this.http.post<any>('sales/sale_order/', payload)
+//     .subscribe(response => {
+//       this.showSuccessToast = true;
+//       this.toastMessage = 'Record created successfully';
+
+//       const saleOrderId =
+//         // this.formConfig.model?.sale_order?.sale_order_id ||
+//         response?.data?.sale_order?.sale_order_id;
+//       console.log("Created Sale Order ID:", saleOrderId);
+//       // Auto WhatsApp (silent)
+//       if (saleOrderId) {
+//         this.sendSaleOrderWhatsapp(saleOrderId);
+//       }
+
+//       this.ngOnInit();
+//       setTimeout(() => this.showSuccessToast = false, 3000);
+//     }, error => {
+//       if (error.status === 400) { 
+//         this.showDialog();
+//       }
+//     });
+
+// }
+
 createSaleOrder() {
   // Use the already validated payload
   const customFieldsPayload = this.validatedCustomFieldsPayload;
@@ -1539,11 +1730,61 @@ createSaleOrder() {
     custom_field_values: customFieldsPayload.custom_field_values
   };
 
-  this.http.post('sales/sale_order/', payload)
+  // ---------------- QuickPack creation logic ----------------
+  if (this.createQuickPack) {
+    const customerName = payload.sale_order?.customer?.name || "Customer";
+    const productNames = payload.sale_order_items?.map(item => item.product?.name) || [];
+
+    let quickPackName = `${customerName} QuickPack (${productNames.join(', ')})`;
+    // Optional: shorten if too long
+    if (quickPackName.length > 50) {
+        quickPackName = `${customerName} QuickPack (${productNames[0]} +${productNames.length - 1} more)`;
+    }
+
+    const quickPackPayload = {
+        quick_pack_data: {
+            name: quickPackName,
+            customer_id: payload.sale_order.customer?.customer_id,
+            description: `QuickPack created from Sale Order ${payload.sale_order.order_no}`,
+            active: 'Y',
+            lot_qty: payload.sale_order_items
+              ?.filter(item => item.product && item.quantity) // only count entered items
+              .reduce((sum, item) => sum + (item.quantity || 0), 0) || 0
+        },
+        quick_pack_data_items: payload.sale_order_items?.map(item => ({
+            product_id: item.product?.product_id,
+            quantity: item.quantity,
+            unit_options_id: item.unit_options?.unit_options_id,
+            size_id: item.size?.size_id,
+            color_id: item.color?.color_id
+        })) || []
+    };
+
+    // Call QuickPack API separately
+    this.http.post<any>('sales/quick_pack/', quickPackPayload)
+      .subscribe(res => {
+        console.log("QuickPack created successfully:", res);
+      }, err => {
+        console.error("QuickPack creation failed:", err);
+      });
+  }
+  // ---------------- End QuickPack logic ----------------
+
+  // Now create Sale Order
+  this.http.post<any>('sales/sale_order/', payload)
     .subscribe(response => {
       this.clearDraft(); // Clear draft on successful creation
       this.showSuccessToast = true;
       this.toastMessage = 'Record created successfully';
+
+      const saleOrderId = response?.data?.sale_order?.sale_order_id;
+      console.log("Created Sale Order ID:", saleOrderId);
+
+      // Auto WhatsApp (silent)
+      if (saleOrderId) {
+        this.sendSaleOrderWhatsapp(saleOrderId);
+      }
+
       this.ngOnInit();
       setTimeout(() => this.showSuccessToast = false, 3000);
     }, error => {
@@ -1552,6 +1793,7 @@ createSaleOrder() {
       }
     });
 }
+
 
 
   closeToast() {
@@ -1573,91 +1815,46 @@ createSaleOrder() {
     }
   }
 
-  confirmSelection() {
-    // Check the selected option and set sale_estimate accordingly
-    if (this.selectedOption === 'sale_estimate') {
-      this.formConfig.model['sale_order']['sale_estimate'] = 'Yes'; // Update model for sale_estimate
-    } else {
-      this.formConfig.model['sale_order']['sale_estimate'] = 'No'; // Update model for sale_order
-    }
+  // confirmSelection() {
+  //   // Check the selected option and set sale_estimate accordingly
+  //   if (this.selectedOption === 'sale_estimate') {
+  //     this.formConfig.model['sale_order']['sale_estimate'] = 'Yes'; // Update model for sale_estimate
+  //   } else {
+  //     this.formConfig.model['sale_order']['sale_estimate'] = 'No'; // Update model for sale_order
+  //   }
 
-    console.log("Selected option:", this.selectedOption);
+  //   console.log("Selected option:", this.selectedOption);
+  //   console.log("Sale estimate:", this.formConfig.model['sale_order']['sale_estimate']);
+
+  //   // Proceed with the next steps, like API call
+  //   this.createSaleOrder(); // or however you're proceeding
+  //   this.isConfirmationModalOpen = false; // Close modal after selection
+  // }
+
+confirmSelection() {
+    // Set Sale Estimate field
+    this.formConfig.model['sale_order']['sale_estimate'] =
+        this.selectedOption === 'sale_estimate' ? 'Yes' : 'No';
+
     console.log("Sale estimate:", this.formConfig.model['sale_order']['sale_estimate']);
 
-    // Proceed with the next steps, like API call
-    this.createSaleOrder(); // or however you're proceeding
-    this.isConfirmationModalOpen = false; // Close modal after selection
-  }
+    // Set QuickPack creation flag
+    this.createQuickPack = this.createQuickPackOption === 'yes';
+    console.log("Create QuickPack?", this.createQuickPack);
+
+    // Close the modal
+    this.isConfirmationModalOpen = false;
+
+    // Proceed with Sale Order creation (and QuickPack if flagged)
+    this.createSaleOrder();
+}
+
 
   // Method to open Sale Order / Sale Estimate modal
   openSaleOrderEstimateModal() {
     this.isConfirmationModalOpen = true; // Open the Sale Order / Sale Estimate modal
   }
 
-  // Update method specifically for edit actions
-  // updateSaleOrder() {
-  //   const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
-
-  //   console.log("customFieldValues : ", customFieldValues);
-
-  //   const saleType = this.formConfig.model.sale_order?.sale_type;
-  //   const orderStatus = this.formConfig.model.sale_order?.order_status;
-
-  //   // Determine the entity type and ID dynamically
-  //   const entityName = 'sale_order'; // Since we're in the Sale Order form
-  //   const customId = this.formConfig.model.sale_order?.sale_order_id || null; // Ensure correct sale_order_id
-  //   console.log("customId : ", customId);
-
-  //   // Find entity record from list
-  //   const entity = this.entitiesList.find(e => e.entity_name === entityName);
-
-  //   console.log("entity : ", entity);
-
-  //   if (!entity) {
-  //     console.error(`Entity not found for: ${entityName}`);
-  //     return;
-  //   }
-
-  //   const entityId = entity.entity_id;
-  //   // Inject entity_id into metadata temporarily
-  //   Object.keys(this.customFieldMetadata).forEach((key) => {
-  //     this.customFieldMetadata[key].entity_id = entityId;
-  //   });
-  //   // Construct payload for custom fields
-  //   const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
-
-  //   console.log("customFieldsPayload : ", customFieldsPayload);
-  //   // Construct the final payload for update
-  //   const payload = {
-  //     ...this.formConfig.model,
-  //     custom_field_values: customFieldsPayload.custom_field_values // Array of dictionaries
-  //   };
-
-  //   // if (!payload) {
-  //   //   this.showDialog(); // Stop execution if required fields are missing
-  //   // }
-
-  //   // Define logic here for updating the sale order without modal pop-up
-  //   console.log("Updating sale order:", this.formConfig.model);
-  //   this.http.put(`sales/sale_order/${this.SaleOrderEditID}/`, payload)
-  //     .subscribe(response => {
-  //       this.showSuccessToast = true;
-  //       this.toastMessage = "Record updated successfully"; // Set the toast message for update
-  //       this.ngOnInit();
-  //       setTimeout(() => {
-  //         this.showSuccessToast = false;
-  //       }, 3000);
-
-  //     }, error => {
-  //       console.error('Error updating record:', error);
-
-  //       const errorMessage = error?.error?.message || '';
-  //       if (errorMessage === "Update is not allowed, please contact Product team.") {
-  //         // Re-run ngOnInit when this specific error occurs
-  //         this.ngOnInit();
-  //       }
-  //     });
-  // }
 
 updateSaleOrder() {
 
@@ -1699,7 +1896,7 @@ updateSaleOrder() {
 
   console.log("Final Payload Before Update:", payload);
 
-  this.http.put(`sales/sale_order/${this.SaleOrderEditID}/`, payload)
+  this.http.put<any>(`sales/sale_order/${this.SaleOrderEditID}/`, payload)
     .subscribe(response => {
       this.showSuccessToast = true;
       this.toastMessage = "Record updated successfully";
@@ -1937,9 +2134,16 @@ updateSaleOrder() {
         ? data.code
         : field.form.controls.code.value,
       rate: selectedRate,
-      discount: data.discount !== undefined
-        ? parseFloat(data.discount)
-        : field.form.controls.discount.value,
+      // discount: data.discount !== undefined
+      //   ? parseFloat(data.discount)
+      //   : field.form.controls.discount.value,
+      discount:
+        data.discount !== undefined &&
+        data.discount !== null &&
+        data.discount !== '' &&
+        !isNaN(Number(data.discount))
+          ? Number(data.discount)
+          : 0,
       unit_options_id: data.unit_options?.unit_options_id,
       print_name: data.print_name,
       mrp: data.mrp
@@ -2963,7 +3167,7 @@ getUnitData(unitInfo) {
       },
       model: {
         sale_order: {},
-        sale_order_items: [{}, {}, {}, {}, {}],
+        sale_order_items: [{}, {}, {}, {}, {}, {}, {}, {}, {}],
         order_attachments: [],
         order_shipments: {},
         custom_field_values: []

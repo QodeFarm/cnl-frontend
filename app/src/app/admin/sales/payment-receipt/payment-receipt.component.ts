@@ -431,7 +431,7 @@ export class PaymentReceiptComponent implements OnInit {
           },
           {
             key: 'customer',
-            type: 'select' ,//'customer-dropdown',
+            type: 'customer-dropdown' ,//'customer-dropdown',
             className: 'col-md-4 col-sm-6 col-12',
             templateOptions: {
               label: 'Customer',

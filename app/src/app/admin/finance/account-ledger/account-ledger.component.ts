@@ -298,6 +298,11 @@ onPrintSelect(event: Event): void {
   if (selectedValue === 'print') {
     this.onPrintClick();
   }
+  
+  if (selectedValue === 'whatsapp') {
+    this.onWhatsAppClick();
+  }
+
 
   selectElement.value = '';
 }
@@ -512,6 +517,34 @@ private fallbackPrint(pdfBlob: Blob): void {
   };
 }
 
+onWhatsAppClick(): void {
+  const url = this.buildLedgerDocumentUrl();
+  if (!url) return;
+
+  this.showLoading = true;
+
+  this.http.post(url, { flag: 'whatsapp' }).subscribe(
+    (response: any) => {
+      this.showLoading = false;
+
+      if (response?.whatsapp_url) {
+        window.open(response.whatsapp_url, '_blank');
+      }
+
+      this.showSuccessToast = true;
+      this.toastMessage = 'WhatsApp opened successfully';
+      setTimeout(() => this.showSuccessToast = false, 2000);
+    },
+    () => {
+      this.showLoading = false;
+      this.toastMessage = 'Failed to open WhatsApp';
+      this.showSuccessToast = true;
+      setTimeout(() => this.showSuccessToast = false, 2000);
+    }
+  );
+}
+
+
 
 //---------------------------------------------------------
 
@@ -555,8 +588,20 @@ private fallbackPrint(pdfBlob: Blob): void {
         {
           fieldKey: 'description',
           name: 'Description',
-          sort: true
+          sort: true,
+          displayType: 'map',
+          mapFn: (value: any) => {
+            if (!value) return '';
+
+            const lines = value.split('\n');
+
+            // Bold first line (customer line)
+            lines[0] = `<strong>${lines[0]}</strong>`;
+
+            return lines.join('<br/>');
+          }
         },
+
         {
           fieldKey: 'debit',
           name: 'Debit',

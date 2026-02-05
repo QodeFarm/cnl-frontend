@@ -1,3 +1,127 @@
+/* ====================== Custom Dialog Overlay ====================== */
+.custom-dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+/* ====================== Custom Dialog Box ====================== */
+.custom-dialog-box {
+    background-color: #ffffff;
+    padding: 25px 30px;
+    border-radius: 14px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+    width: 400px;
+    max-width: 95%;
+    text-align: left;
+    animation: fadeInScale 0.3s ease-in-out;
+    font-family: Arial, sans-serif;
+}
+
+/* ====================== Modal Header ====================== */
+.custom-dialog-box p {
+    font-size: 19px;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+/* ====================== Dropdown Container ====================== */
+.quickpack-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 12px 15px;
+    border-radius: 10px;
+    background-color: #f5f8ff; /* Light blue background to highlight section */
+    border: 1px solid #d0d7e5; /* Soft border */
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.quickpack-container label {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.dropdown-container {
+    position: relative;
+    width: 100%;
+}
+
+.dropdown-select {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    background-color: #fff;
+    transition: all 0.2s ease-in-out;
+}
+
+.dropdown-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 6px rgba(0,123,255,0.3);
+}
+
+/* Custom arrow */
+.dropdown-container::after {
+    content: '▼';
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: #888;
+    pointer-events: none;
+}
+
+/* ====================== Action Button ====================== */
+.custom-dialog-box button {
+    width: 100%;
+    padding: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    background-color: #007bff;
+    color: #fff;
+    transition: background-color 0.2s ease-in-out;
+    margin-top: 10px;
+}
+
+.custom-dialog-box button:hover {
+    background-color: #0056b3;
+}
+
+/* ====================== Animations ====================== */
+@keyframes fadeInScale {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+
+// new css changes above--------------------------
 .button-spacing {
     margin-left: 10px;
   }
@@ -140,16 +264,16 @@
     white-space: nowrap; /* Prevents wrapping of text */
 }
 
-.quickpack-container .dropdown-container {
+.quickpack-container-1 .dropdown-container {
   flex-grow: 1; /* Adjust width of the dropdown if needed */
 }
   
-.quickpack-container .dropdown-select {
+.quickpack-container-1 .dropdown-select {
   min-width: 100px; /* Adjust dropdown width */
   padding: 5px;
 }
 
-.quickpack-container button {
+.quickpack-container-1 button {
   margin-left: 10px; /* Space between dropdown and button */
 }
 
