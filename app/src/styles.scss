@@ -19,14 +19,97 @@
             max-width: 1000px !important;
         }
     }
+    
+    // Login page specific input styles - consistent for all input types
+    .ant-input-group-wrapper,
+    .ant-input-affix-wrapper,
+    nz-input-group {
+        background: #fff;
+        border-radius: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        min-height: auto !important;
+        
+        .ant-input-group-addon {
+            background: #fff;
+            border: none;
+            padding: 0 11px;
+        }
+        
+        .ant-input {
+            background: #fff !important;
+            border: none !important;
+            box-shadow: none !important;
+            color: #333 !important;
+            
+            &::placeholder {
+                color: #999 !important;
+            }
+        }
+        
+        .ant-input-prefix,
+        .ant-input-suffix {
+            color: #777777 !important;
+        }
+    }
+    
+    // Fix password field eye icon alignment
+    .ant-input-affix-wrapper {
+        display: flex !important;
+        align-items: center !important;
+        padding: 0 11px !important;
+        
+        .ant-input-suffix {
+            display: flex;
+            align-items: center;
+            margin-left: 4px;
+            
+            .anticon {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+            }
+        }
+    }
+    
+    // Ensure input wrapper has consistent border
+    nz-input-group.ant-input-group-wrapper {
+        border: 1px solid #d9d9d9 !important;
+        border-radius: 4px !important;
+        overflow: hidden;
+        
+        &:hover {
+            border-color: #40a9ff !important;
+        }
+        
+        &:focus-within {
+            border-color: #142768 !important;
+            box-shadow: 0 0 0 2px rgba(20, 39, 104, 0.1) !important;
+        }
+    }
+    
     .ant-btn-primary {
-        background-color: white;
-        color: #142768;
+        background-color: white !important;
+        color: #142768 !important;
         font-size: 18px;
         font-weight: 600;
         padding: 5px 14px;
         height: auto;
         border-radius: 5px;
+        border: 1px solid white !important;
+        background: white !important;
+        transition: all 0.3s ease;
+        
+        &:hover,
+        &:focus {
+            background-color: #142768 !important;
+            background: #142768 !important;
+            color: white !important;
+            border-color: white !important;
+        }
+        
         @media(max-width:575px){
             font-size: 16px;
         }
@@ -727,7 +810,7 @@ body.ant-scrolling-effect {
 .curd-modal-form .ant-modal{
     
         border-radius: 10px;
-        overflow: hidden;
+        overflow: hidden; // Clips ALL content at rounded corners
          width: 85% !important;
          max-width: 1200px;
          padding-bottom: 0 !important;
@@ -744,6 +827,11 @@ body.ant-scrolling-effect {
             @media(max-width:767px){
                 width: 98%;
             }
+    
+    .ant-modal-content {
+        overflow: hidden; // Ensure content is clipped at modal boundaries
+        border-radius: 5px;
+    }
     
       .ant-modal-close {
          position: absolute;
@@ -774,8 +862,21 @@ body.ant-scrolling-effect {
 
     .ant-modal-body {
         max-height: calc(90vh - 120px);
-        overflow-y: auto;
+        overflow: auto; // Allow both X and Y scrolling within body
+        overflow-x: hidden; // But hide horizontal overflow - table handles its own scroll
         padding: 20px;
+        
+        // Ensure table wrapper doesn't overflow modal
+        .ant-table-wrapper,
+        ta-table,
+        .custom-list {
+            max-width: 100%;
+            overflow: hidden;
+            
+            .ant-table-container {
+                max-width: 100%;
+            }
+        }
     }
 
     .ant-modal-footer {
@@ -1134,42 +1235,133 @@ ta-form {
     }
 }
 
+// ============================================================
+// PROFESSIONAL LIST TABLE STYLES
+// ============================================================
+
 .custom-list {
     .h2 {
         color: #142768;
         font-size: 1.2rem !important;
         font-weight: 600 !important;
     }
+    
+    // Professional table wrapper - clips content at rounded corners
+    // This prevents sticky column background from overlapping border-radius
+    .ant-table-wrapper {
+        border-radius: 4px;
+        overflow: hidden; // Clips sticky column at rounded corners
+        box-shadow: 0 2px 8px rgba(20, 39, 104, 0.08);
+    }
+    
     table {
+        border-collapse: separate;
+        border-spacing: 0;
+        
         thead {
             th {
-                background-color: #142768;
+                background: linear-gradient(180deg, #1a3278 0%, #142768 100%);
                 color: #fff;
                 font-size: 13px;
-                font-weight: 400;
+                font-weight: 500;
+                text-transform: uppercase;
+                letter-spacing: 0.3px;
+                padding: 14px 12px;
+                border-bottom: 2px solid #0d1b4a;
+                white-space: nowrap;
+                border-radius: 0 !important; // Reset all header cell radius
+                
+                // First header cell - top-left corner
+                &:first-child {
+                    border-top-left-radius: 4px !important;
+                }
+                
+                // Last header cell - top-right corner
+                &:last-child {
+                    border-top-right-radius: 4px !important;
+                }
+                
+                // Sort icon styling
+                .ant-table-column-sorter {
+                    color: rgba(255, 255, 255, 0.5);
+                    
+                    &-up.active,
+                    &-down.active {
+                        color: #fff;
+                    }
+                }
             }
         }
+        
         tbody {
+            tr {
+                transition: all 0.15s ease;
+                
+                // Zebra striping
+                &:nth-child(odd) {
+                    background-color: #ffffff;
+                }
+                
+                &:nth-child(even) {
+                    background-color: #f8fafc;
+                }
+                
+                // Hover effect
+                &:hover {
+                    background-color: #eef4ff !important;
+                    
+                    td {
+                        color: #142768;
+                    }
+                }
+                
+                // Selected row
+                &.ant-table-row-selected td {
+                    background-color: #e6f4ff !important;
+                }
+            }
+            
             td {
                 font-size: 13px;
+                padding: 12px;
+                color: #374151;
+                border-bottom: 1px solid #e5e7eb;
+                vertical-align: middle;
+                
+                // Action icons
+                .anticon-delete {
+                    color: #ef4444;
+                    font-size: 16px;
+                    cursor: pointer;
+                    padding: 4px;
+                    border-radius: 4px;
+                    transition: all 0.2s;
+                    
+                    &:hover {
+                        background-color: #fef2f2;
+                    }
+                }
+                
+                .anticon-edit {
+                    color: #3b82f6;
+                    font-size: 16px;
+                    cursor: pointer;
+                    padding: 4px;
+                    border-radius: 4px;
+                    transition: all 0.2s;
+                    
+                    &:hover {
+                        background-color: #eff6ff;
+                    }
+                }
             }
         }
     }
+    
     &.sale-receipt-table{
         table{
             tbody{
                 td{
-                    // button{
-                    //     border:1px solid #37af47;
-                    //     background-color: #37af47;
-                    //     color: #ffffff;
-                    //     border-radius: 20px;
-                    //     padding: 3px 15px;
-                    //     &:hover{
-                    //         border:1px solid #2f923d;
-                    //         background-color: #2f923d;
-                    //     }
-                    // }
                     a,button{
                         border: 1px solid #142768;
                         background-color: #142768;
@@ -1184,6 +1376,330 @@ ta-form {
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+// ============================================================
+// PROFESSIONAL FILTER & SEARCH BAR STYLES
+// ============================================================
+
+// All filter/search containers (excluding login page)
+.ant-row:not(.login-block),
+.row:not(.login-block) {
+    // Select dropdowns (Quick Period, Status, etc.)
+    .ant-select {
+        .ant-select-selector {
+            border-radius: 6px !important;
+            border: 1px solid #d1d5db !important;
+            min-height: 38px;
+            padding: 4px 12px;
+            transition: all 0.2s;
+            
+            .ant-select-selection-placeholder {
+                color: #9ca3af;
+            }
+            
+            .ant-select-selection-item {
+                color: #374151;
+            }
+        }
+        
+        &:hover .ant-select-selector {
+            border-color: #94a3b8 !important;
+        }
+        
+        &.ant-select-focused .ant-select-selector {
+            border-color: #142768 !important;
+            box-shadow: 0 0 0 2px rgba(20, 39, 104, 0.1) !important;
+        }
+    }
+    
+    // Date pickers
+    .ant-picker {
+        border-radius: 6px !important;
+        border: 1px solid #d1d5db;
+        min-height: 38px;
+        padding: 6px 12px;
+        transition: all 0.2s;
+        
+        .ant-picker-input > input {
+            color: #374151;
+            
+            &::placeholder {
+                color: #9ca3af;
+            }
+        }
+        
+        .ant-picker-suffix {
+            color: #6b7280;
+        }
+        
+        &:hover {
+            border-color: #94a3b8;
+        }
+        
+        &.ant-picker-focused {
+            border-color: #142768 !important;
+            box-shadow: 0 0 0 2px rgba(20, 39, 104, 0.1);
+        }
+    }
+    
+    // Search input
+    .ant-input-affix-wrapper {
+        border-radius: 6px !important;
+        border: 1px solid #d1d5db;
+        min-height: 38px;
+        padding: 6px 12px;
+        transition: all 0.2s;
+        
+        .ant-input {
+            color: #374151;
+            
+            &::placeholder {
+                color: #9ca3af;
+            }
+        }
+        
+        .ant-input-prefix,
+        .ant-input-suffix {
+            color: #6b7280;
+        }
+        
+        &:hover {
+            border-color: #94a3b8;
+        }
+        
+        &.ant-input-affix-wrapper-focused {
+            border-color: #142768 !important;
+            box-shadow: 0 0 0 2px rgba(20, 39, 104, 0.1);
+        }
+    }
+    
+    // Search/Export/Refresh action buttons
+    .ant-btn {
+        border-radius: 6px;
+        min-height: 38px;
+        min-width: 38px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        
+        &.ant-btn-primary {
+            background: linear-gradient(180deg, #1a3278 0%, #142768 100%);
+            border: none;
+            
+            &:hover {
+                background: linear-gradient(180deg, #1e3a8a 0%, #1a3278 100%);
+                transform: translateY(-1px);
+                box-shadow: 0 4px 8px rgba(20, 39, 104, 0.25);
+            }
+        }
+        
+        &.ant-btn-default {
+            border: 1px solid #d1d5db;
+            
+            &:hover {
+                border-color: #142768;
+                color: #142768;
+            }
+        }
+    }
+}
+
+// ============================================================
+// PROFESSIONAL PAGINATION STYLES
+// ============================================================
+
+.ant-pagination {
+    margin: 16px 0;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+    
+    .ant-pagination-total-text {
+        color: #6b7280;
+        font-size: 13px;
+        margin-right: 16px;
+    }
+    
+    .ant-pagination-item {
+        border-radius: 6px;
+        border: 1px solid #e5e7eb;
+        min-width: 36px;
+        height: 36px;
+        line-height: 34px;
+        font-size: 13px;
+        font-weight: 500;
+        transition: all 0.2s;
+        
+        a {
+            color: #374151;
+        }
+        
+        &:hover {
+            border-color: #142768;
+            
+            a {
+                color: #142768;
+            }
+        }
+        
+        &.ant-pagination-item-active {
+            background: linear-gradient(180deg, #1a3278 0%, #142768 100%);
+            border-color: #142768;
+            
+            a {
+                color: #fff;
+            }
+            
+            &:hover a {
+                color: #fff;
+            }
+        }
+    }
+    
+    .ant-pagination-prev,
+    .ant-pagination-next {
+        min-width: 36px;
+        height: 36px;
+        line-height: 34px;
+        
+        .ant-pagination-item-link {
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            color: #374151;
+            transition: all 0.2s;
+        }
+        
+        &:hover .ant-pagination-item-link {
+            border-color: #142768;
+            color: #142768;
+        }
+        
+        &.ant-pagination-disabled .ant-pagination-item-link {
+            color: #d1d5db;
+            border-color: #e5e7eb;
+        }
+    }
+    
+    .ant-pagination-options {
+        .ant-select-selector {
+            border-radius: 6px !important;
+            height: 36px !important;
+            padding: 4px 8px !important;
+        }
+    }
+}
+
+// ============================================================
+// MODAL TABLE ENHANCEMENTS
+// ============================================================
+
+.ant-modal,
+.modal,
+nz-modal {
+    .ant-table-wrapper {
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    table {
+        thead th,
+        .ant-table-thead > tr > th,
+        .ant-table-thead th {
+            background: linear-gradient(180deg, #1a3278 0%, #142768 100%) !important;
+            color: #fff !important;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            padding: 12px 10px;
+            white-space: nowrap;
+            border-radius: 0 !important; // Reset all header cell radius
+            
+            // First header cell - top-left corner
+            &:first-child {
+                border-top-left-radius: 8px !important;
+            }
+            
+            // Last header cell - top-right corner
+            &:last-child {
+                border-top-right-radius: 8px !important;
+            }
+        }
+        
+        tbody {
+            tr {
+                transition: all 0.15s ease;
+                
+                &:nth-child(even) {
+                    background-color: #f8fafc;
+                }
+                
+                &:hover {
+                    background-color: #eef4ff !important;
+                }
+            }
+            
+            td {
+                padding: 10px;
+                font-size: 13px;
+                border-bottom: 1px solid #e5e7eb;
+            }
+        }
+    }
+    
+    // Modal pagination
+    .ant-pagination {
+        margin: 12px 0;
+        
+        .ant-pagination-item,
+        .ant-pagination-prev .ant-pagination-item-link,
+        .ant-pagination-next .ant-pagination-item-link {
+            min-width: 32px;
+            height: 32px;
+            line-height: 30px;
+            font-size: 12px;
+        }
+    }
+}
+
+// ============================================================
+// CHECKBOX STYLING IN TABLES
+// ============================================================
+
+.ant-table-selection-column {
+    .ant-checkbox-wrapper {
+        .ant-checkbox {
+            .ant-checkbox-inner {
+                border-radius: 4px;
+                border: 2px solid #d1d5db;
+                width: 18px;
+                height: 18px;
+                transition: all 0.2s;
+            }
+            
+            &:hover .ant-checkbox-inner {
+                border-color: #142768;
+            }
+            
+            &-checked {
+                .ant-checkbox-inner {
+                    background-color: #142768;
+                    border-color: #142768;
+                }
+                
+                &::after {
+                    border-color: #142768;
+                }
+            }
+            
+            &-indeterminate .ant-checkbox-inner::after {
+                background-color: #142768;
             }
         }
     }
@@ -2170,3 +2686,864 @@ ta-form {
         }
     }
 }
+
+/* Attachment Modal - Sale Register Documents */
+.attachment-modal-wrapper {
+    .ant-modal-content {
+        border-radius: 16px;
+        overflow: hidden;
+    }
+    
+    .ant-modal-header {
+        background-color: #142768 !important;
+        padding: 16px 24px;
+        border-bottom: none;
+        border-radius: 16px 16px 0 0;
+        
+        .ant-modal-title {
+            color: #fff !important;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+        }
+    }
+    
+    .ant-modal-close {
+        color: #fff;
+        
+        &:hover {
+            color: rgba(255, 255, 255, 0.8);
+        }
+    }
+    
+    .ant-modal-body {
+        padding: 24px;
+        background-color: #fff;
+    }
+    
+    .ant-modal-footer {
+        padding: 16px 24px 20px;
+        border-top: none;
+        background-color: #fff;
+        text-align: center;
+        border-radius: 0 0 16px 16px;
+    }
+}
+
+/* NZ Confirm Modal - Delete Confirmation Fix */
+.ant-modal-confirm {
+    .ant-modal-content {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    
+    .ant-modal-body {
+        padding: 24px 24px 20px;
+    }
+    
+    .ant-modal-confirm-body {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        
+        .ant-modal-confirm-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #262626;
+            line-height: 1.5;
+        }
+        
+        > .anticon {
+            font-size: 22px;
+            margin-top: 2px;
+        }
+    }
+    
+    .ant-modal-confirm-btns {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 24px;
+        
+        .ant-btn {
+            min-width: 70px;
+            height: 36px;
+            border-radius: 6px;
+            font-weight: 500;
+            
+            &.ant-btn-default {
+                border: 1px solid #d9d9d9;
+                
+                &:hover {
+                    border-color: #1890ff;
+                    color: #1890ff;
+                }
+            }
+            
+            &.ant-btn-primary {
+                &.ant-btn-dangerous {
+                    background: #ff4d4f;
+                    border-color: #ff4d4f;
+                    
+                    &:hover {
+                        background: #ff7875;
+                        border-color: #ff7875;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// ============================================================
+// GLOBAL SCROLLBAR STYLES FOR ALL LIST/TABLE PAGES
+// ============================================================
+
+// ============================================================
+// GLOBAL HORIZONTAL SCROLL FOR WIDE TABLES
+// Enables horizontal scrolling when table columns exceed container width
+// Keeps header aligned with body during horizontal scroll
+// Border-radius is clipped by outer wrapper with overflow: hidden
+// ============================================================
+.custom-list,
+ta-table,
+.ta-table,
+ta-curd-modal {
+    .ant-table-wrapper {
+        // Wrapper clips content at rounded corners (overflow: hidden set in .custom-list)
+        // For non-.custom-list contexts, ensure clipping
+        overflow: hidden;
+        border-radius: 4px;
+        
+        .ant-table {
+            overflow: visible;
+        }
+        
+        .ant-table-container {
+            overflow-x: auto;
+            overflow-y: visible;
+            
+            // Horizontal scrollbar styling
+            &::-webkit-scrollbar {
+                height: 10px;
+            }
+            
+            &::-webkit-scrollbar-track {
+                background: #f1f5f9;
+                border-radius: 5px;
+            }
+            
+            &::-webkit-scrollbar-thumb {
+                background: linear-gradient(90deg, #1a3278 0%, #142768 100%);
+                border-radius: 5px;
+                border: 2px solid #f1f5f9;
+                
+                &:hover {
+                    background: linear-gradient(90deg, #1e3a8a 0%, #1a3278 100%);
+                }
+            }
+        }
+        
+        // Ensure table takes minimum width needed for all columns
+        table {
+            min-width: 100%;
+            width: max-content;
+        }
+    }
+}
+
+// Firefox horizontal scrollbar support for tables
+.ant-table-container {
+    scrollbar-width: thin;
+    scrollbar-color: #142768 #f1f5f9;
+}
+
+// ============================================================
+// END GLOBAL HORIZONTAL SCROLL FOR WIDE TABLES
+// ============================================================
+
+// ============================================================
+// STICKY ACTION COLUMN - RIGHT SIDE
+// Keeps Action column fixed on the right while scrolling horizontally
+// Follows same pattern as Product Items table (.sticky-column)
+// Note: Only applies to columns containing ta-table-actions (actual Action columns)
+// Border-radius is removed from sticky columns - wrapper's overflow:hidden clips at corners
+// ============================================================
+.custom-list,
+ta-table,
+.ta-table,
+ta-curd-modal {
+    // Target ONLY Action column header - identified by being the last column with action content
+    // We use a more specific selector to only target columns that contain action buttons
+    .ant-table-thead > tr > th:last-child:has(~ td ta-table-actions),
+    thead > tr > th.action-column {
+        position: sticky;
+        right: 0;
+        z-index: 3;
+        background: linear-gradient(180deg, #1a3278 0%, #142768 100%);
+        box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+        border-radius: 0 !important; // No radius - wrapper clips at corner
+    }
+    
+    // Target ONLY Action column cells - cells that contain ta-table-actions component
+    .ant-table-tbody > tr > td:has(ta-table-actions),
+    tbody > tr > td:has(ta-table-actions) {
+        position: sticky;
+        right: 0;
+        z-index: 1;
+        background: #ffffff;
+        box-shadow: -2px 0 5px rgba(0, 0, 0, 0.08);
+        border-radius: 0 !important; // No radius - wrapper clips at corner
+    }
+    
+    // Handle zebra striping for action column cells
+    .ant-table-tbody > tr:nth-child(even) > td:has(ta-table-actions) {
+        background-color: #f8fafc;
+    }
+    
+    .ant-table-tbody > tr:hover > td:has(ta-table-actions) {
+        background-color: #eef4ff !important;
+    }
+    
+    .ant-table-tbody > tr.ant-table-row-selected > td:has(ta-table-actions) {
+        background-color: #e6f4ff !important;
+    }
+    
+    // Also handle header sticky when table has action column
+    // The header doesn't have ta-table-actions, so we rely on sibling relationship
+    &:has(ta-table-actions) {
+        .ant-table-thead > tr > th:last-child,
+        thead > tr > th:last-child {
+            position: sticky;
+            right: 0;
+            z-index: 3;
+            background: linear-gradient(180deg, #1a3278 0%, #142768 100%);
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+            border-radius: 0 !important; // No radius - wrapper clips at corner
+        }
+    }
+}
+
+// Ensure checkbox column (first column) is not affected when present
+.custom-list,
+ta-table,
+.ta-table,
+ta-curd-modal {
+    // When checkbox is present, ensure first column styling is preserved
+    .ant-table-selection-column {
+        position: static;
+        box-shadow: none;
+    }
+}
+
+// ============================================================
+// END STICKY ACTION COLUMN
+// ============================================================
+
+// ============================================================
+// DROPDOWN/POPUP TABLE - NO STICKY COLUMNS
+// Ensures dropdown tables (advanced select, etc.) have normal scrolling
+// All columns (including Action) scroll together as a single unit
+// ============================================================
+.cdk-overlay-pane,
+.cdk-overlay-container,
+.ant-select-dropdown,
+.adv-select-curd-container,
+.adv-select-custom-overlay-panel {
+    // Reset ALL sticky/fixed positioning inside dropdowns/popups
+    // This ensures all columns scroll together
+    .ant-table-thead > tr > th,
+    thead > tr > th,
+    .ant-table-tbody > tr > td,
+    tbody > tr > td {
+        position: static !important;
+        box-shadow: none !important;
+    }
+    
+    // Specifically target action columns to ensure they're not sticky
+    .ant-table-thead > tr > th:last-child,
+    thead > tr > th:last-child,
+    .ant-table-tbody > tr > td:last-child,
+    tbody > tr > td:last-child,
+    td:has(ta-table-actions),
+    th:has(ta-table-actions) {
+        position: static !important;
+        right: auto !important;
+        box-shadow: none !important;
+        z-index: auto !important;
+    }
+    
+    // Single scroll container for the entire table
+    .ant-table-wrapper {
+        overflow: hidden;
+        border-radius: 4px;
+        
+        .ant-table {
+            overflow: visible;
+        }
+    }
+    
+    // Table container handles all scrolling
+    .ant-table-container {
+        overflow: auto !important;
+        max-height: 45vh;
+        
+        // Ensure table scrolls as single unit
+        .ant-table-content,
+        .ant-table-body {
+            overflow: visible !important;
+        }
+    }
+    
+    // Ensure proper border-radius on dropdown tables
+    table thead th:last-child {
+        border-top-right-radius: 4px !important;
+    }
+    
+    table thead th:first-child {
+        border-top-left-radius: 4px !important;
+    }
+}
+
+// ============================================================
+// END DROPDOWN/POPUP TABLE STYLES
+// ============================================================
+
+// Product Item Table (Form tables with inputs) - field-repeat component
+nz-card .ant-table-container,
+.product-item-table,
+.ant-card-body .ant-table-container {
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+    max-height: 60vh;
+    
+    &::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+    &::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 5px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: linear-gradient(90deg, #1a3278 0%, #142768 100%);
+        border-radius: 5px;
+        border: 2px solid #f1f5f9;
+        &:hover {
+            background: linear-gradient(90deg, #1e3a8a 0%, #1a3278 100%);
+        }
+    }
+}
+
+// Global scrollbar for all tables and list containers
+.ant-table-wrapper,
+.ant-table-container,
+.ant-table-body,
+.ant-table-content,
+nz-table,
+ta-table,
+.ta-table,
+.custom-list,
+.custom-form-list,
+.product-table {
+    .ant-table-body,
+    .ant-table-content {
+        overflow: auto !important;
+        max-height: calc(100vh - 300px);
+        
+        // Webkit scrollbar (Chrome, Safari, Edge)
+        &::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        
+        &::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 5px;
+        }
+        
+        &::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #1a3278 0%, #142768 100%);
+            border-radius: 5px;
+            border: 2px solid #f1f5f9;
+            
+            &:hover {
+                background: linear-gradient(180deg, #1e3a8a 0%, #1a3278 100%);
+            }
+        }
+        
+        &::-webkit-scrollbar-corner {
+            background: #f1f5f9;
+        }
+    }
+}
+
+// Direct table body scrollbar
+.ant-table-body {
+    overflow: auto !important;
+    
+    &::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+    
+    &::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 5px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, #1a3278 0%, #142768 100%);
+        border-radius: 5px;
+        border: 2px solid #f1f5f9;
+        
+        &:hover {
+            background: linear-gradient(180deg, #1e3a8a 0%, #1a3278 100%);
+        }
+    }
+}
+
+// ============================================================
+// MODAL TABLE CONTAINMENT
+// Ensures tables inside modals don't overflow the modal boundaries
+// ============================================================
+.ant-modal,
+.modal,
+nz-modal,
+.curd-modal-form {
+    // Modal content clips all children
+    .ant-modal-content {
+        overflow: hidden;
+    }
+    
+    // Modal body contains the table
+    .ant-modal-body {
+        overflow: hidden;
+        
+        // Table wrapper stays within modal
+        .ant-table-wrapper,
+        ta-table,
+        .ta-table,
+        .custom-list {
+            max-width: 100%;
+            overflow: hidden;
+            border-radius: 4px;
+            
+            .ant-table-container {
+                overflow-x: auto;
+                max-width: 100%;
+            }
+        }
+    }
+    
+    // Table scrollbars inside modals
+    .ant-table-body,
+    .ant-table-content {
+        max-height: 50vh;
+        overflow: auto !important;
+        
+        &::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        &::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        
+        &::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #1a3278 0%, #142768 100%);
+            border-radius: 4px;
+            
+            &:hover {
+                background: linear-gradient(180deg, #1e3a8a 0%, #1a3278 100%);
+            }
+        }
+    }
+}
+
+// Sticky table header when scrolling
+.ant-table-wrapper,
+.custom-list,
+ta-table,
+.ta-table {
+    .ant-table-thead > tr > th {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background: linear-gradient(180deg, #1a3278 0%, #142768 100%) !important;
+    }
+}
+
+// Firefox scrollbar support
+.ant-table-body,
+.ant-table-content {
+    scrollbar-width: thin;
+    scrollbar-color: #142768 #f1f5f9;
+}
+
+// Page content area scrollable tables
+.container-fluid,
+.page-content,
+.main-content {
+    .custom-list,
+    ta-table,
+    .ta-table,
+    .ant-table-wrapper {
+        .ant-table-container {
+            overflow: visible;
+        }
+        
+        .ant-table-body {
+            max-height: calc(100vh - 280px);
+            overflow: auto !important;
+        }
+    }
+}
+
+// ============================================================
+// END GLOBAL SCROLLBAR STYLES
+// ============================================================
+
+// ============================================================
+// GLOBAL TABLE HEADER BORDER-RADIUS CONSISTENCY
+// Ensures all table headers have consistent rounded corners
+// ============================================================
+.ant-table-thead > tr > th,
+.ant-table-thead th {
+    border-radius: 0 !important;
+    
+    &:first-child {
+        border-top-left-radius: 4px !important;
+    }
+    
+    &:last-child {
+        border-top-right-radius: 4px !important;
+    }
+}
+// ============================================================
+// END GLOBAL TABLE HEADER STYLES
+// ============================================================
+
+// ============================================================
+// GLOBAL CDK OVERLAY / DROPDOWN POPUP TABLE STYLES
+// Ensures all popup tables (Product select, etc.) match modal styles
+// ============================================================
+.cdk-overlay-pane {
+    // Popup table container
+    .adv-select-curd-container,
+    .ant-select-dropdown {
+        border-radius: 4px;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+        overflow: hidden;
+        
+        // Table wrapper inside popup
+        .ant-table-wrapper {
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        // Table styles
+        table {
+            thead th,
+            .ant-table-thead > tr > th,
+            .ant-table-thead th {
+                background: linear-gradient(180deg, #1a3278 0%, #142768 100%) !important;
+                color: #fff !important;
+                font-size: 12px;
+                font-weight: 500;
+                text-transform: uppercase;
+                letter-spacing: 0.3px;
+                padding: 12px 10px;
+                white-space: nowrap;
+                border-radius: 0 !important;
+                
+                &:first-child {
+                    border-top-left-radius: 4px !important;
+                }
+                
+                &:last-child {
+                    border-top-right-radius: 4px !important;
+                }
+            }
+            
+            tbody {
+                tr {
+                    transition: all 0.15s ease;
+                    
+                    &:nth-child(even) {
+                        background-color: #f8fafc;
+                    }
+                    
+                    &:hover {
+                        background-color: #eef4ff !important;
+                    }
+                }
+                
+                td {
+                    padding: 10px;
+                    font-size: 13px;
+                    border-bottom: 1px solid #e5e7eb;
+                }
+            }
+        }
+        
+        // Pagination inside popup
+        .ant-pagination {
+            margin: 12px 0;
+            
+            .ant-pagination-item,
+            .ant-pagination-prev .ant-pagination-item-link,
+            .ant-pagination-next .ant-pagination-item-link {
+                min-width: 32px;
+                height: 32px;
+                line-height: 30px;
+                font-size: 12px;
+            }
+        }
+    }
+}
+
+// Popup-specific overlay panel class
+.adv-select-custom-overlay-panel {
+    border-radius: 4px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    overflow: visible !important;
+    
+    .adv-select-curd-container {
+        border-radius: 4px;
+        max-height: 70vh !important;
+        overflow: hidden !important;
+        display: flex;
+        flex-direction: column;
+        
+        // Inner container - remove double scroll
+        > div {
+            max-height: none !important;
+            overflow: visible !important;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            padding: 8px 12px !important;
+        }
+        
+        // Search bar row - proper spacing between all elements
+        .ta-row {
+            gap: 8px !important;
+            
+            // Search input group
+            nz-input-group {
+                margin-right: 0 !important;
+            }
+            
+            // Filter groups with buttons
+            .filter-group {
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+            }
+            
+            // All buttons in the row
+            .ant-btn {
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+            }
+            
+            // Direct child divs (button wrappers)
+            > div {
+                margin-left: 0 !important;
+            }
+        }
+        
+        // ta-curd-modal container
+        ta-curd-modal,
+        .custom-list {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            max-height: calc(70vh - 20px);
+            overflow: hidden;
+        }
+        
+        // ta-table within the popup
+        ta-table {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            overflow: hidden;
+            
+            // Search/filter bar at top - fixed
+            .ta-row:first-child,
+            > div:first-child {
+                flex-shrink: 0;
+            }
+            
+            // Table container - scrollable
+            .ant-table-wrapper {
+                flex: 1;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                
+                .ant-spin-nested-loading,
+                .ant-spin-container {
+                    display: flex;
+                    flex-direction: column;
+                    flex: 1;
+                    overflow: hidden;
+                }
+                
+                .ant-table {
+                    flex: 1;
+                    overflow: hidden;
+                    display: flex;
+                    flex-direction: column;
+                    
+                    .ant-table-container {
+                        flex: 1;
+                        overflow: hidden;
+                        display: flex;
+                        flex-direction: column;
+                        
+                        .ant-table-header {
+                            flex-shrink: 0;
+                        }
+                        
+                        .ant-table-body {
+                            flex: 1;
+                            overflow-y: auto !important;
+                            overflow-x: auto !important;
+                            max-height: calc(70vh - 180px) !important;
+                        }
+                    }
+                }
+            }
+            
+            // Pagination - always visible at bottom
+            .ant-pagination {
+                flex-shrink: 0;
+                padding: 10px 0;
+                margin: 0 !important;
+                background: #fff;
+                border-top: 1px solid #e5e7eb;
+            }
+        }
+    }
+}
+
+// ============================================================
+// GLOBAL ACTION BUTTONS CONSISTENCY (Search, Export, Refresh, Add)
+// Ensures all action buttons in tables/popups look consistent
+// ============================================================
+.custom-list,
+.curd-modal-form,
+.adv-select-curd-container,
+.cdk-overlay-pane,
+.ant-modal,
+nz-modal {
+    // Primary action buttons (Search, Add)
+    .ant-btn-primary {
+        background: linear-gradient(180deg, #1a3278 0%, #142768 100%) !important;
+        border: none !important;
+        border-radius: 6px !important;
+        min-height: 36px;
+        min-width: 36px;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        transition: all 0.2s !important;
+        
+        &:hover {
+            background: linear-gradient(180deg, #1e3a8a 0%, #1a3278 100%) !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(20, 39, 104, 0.25);
+        }
+        
+        i, .anticon {
+            font-size: 14px;
+        }
+    }
+    
+    // Default/secondary buttons (Export, Refresh)
+    .ant-btn-default,
+    .ant-btn:not(.ant-btn-primary):not(.ant-btn-danger):not(.ant-btn-link) {
+        border-radius: 6px !important;
+        min-height: 36px;
+        min-width: 36px;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border: 1px solid #d1d5db !important;
+        background: #fff !important;
+        transition: all 0.2s !important;
+        
+        &:hover {
+            border-color: #142768 !important;
+            color: #142768 !important;
+        }
+        
+        i, .anticon {
+            font-size: 14px;
+        }
+    }
+    
+    // Button with text and icon
+    .ant-btn {
+        gap: 6px;
+        
+        span + i,
+        i + span,
+        span + .anticon,
+        .anticon + span {
+            margin-left: 4px;
+        }
+    }
+    
+    // Button spacing - ensure gap between adjacent buttons
+    .ant-btn + .ant-btn {
+        margin-left: 6px !important;
+    }
+}
+// ============================================================
+// END GLOBAL ACTION BUTTONS STYLES
+// ============================================================
+
+// ============================================================
+// GLOBAL SEARCH BAR BUTTON SPACING
+// Ensures proper gaps between search input, buttons, and filter groups
+// ============================================================
+ta-table,
+ta-curd-modal,
+.custom-list {
+    .ta-row {
+        // Use gap for consistent spacing between all elements
+        gap: 8px;
+        
+        // Reset any inline margin-left on buttons
+        .ant-btn,
+        .filter-group,
+        > div {
+            margin-left: 0 !important;
+        }
+        
+        // Search input group - no extra margin
+        nz-input-group,
+        .ant-input-group-wrapper {
+            margin-right: 0 !important;
+        }
+    }
+    
+    // Also target the ta-cell containing the search row
+    .ta-cell {
+        .ta-row.justify-content-end {
+            gap: 8px;
+            
+            > * {
+                margin-left: 0 !important;
+            }
+        }
+    }
+}
+// ============================================================
+// END GLOBAL SEARCH BAR BUTTON SPACING
+// ============================================================

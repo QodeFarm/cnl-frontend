@@ -14,11 +14,29 @@
                         [nzLabel]="option.label"></nz-option>
                 </nz-select>
 
-                <!-- Second Select Box: Names Based on Selection -->
-                <nz-select [(ngModel)]="selectedAccountId" (ngModelChange)="onAccountChange()"
-                    nzPlaceHolder="Select Resource" style="width: 200px" [nzDisabled]="!selectedAccountType" nzAllowClear>
-                    <nz-option *ngFor="let option of accountOptions" [nzValue]="option.value"
-                        [nzLabel]="option.label"></nz-option>
+                <!-- Second Select Box: Searchable Names Based on Selection -->
+                <nz-select 
+                    [(ngModel)]="selectedAccountId" 
+                    (ngModelChange)="onAccountChange()"
+                    nzPlaceHolder="Search & Select Resource" 
+                    style="width: 220px" 
+                    [nzDisabled]="!selectedAccountType" 
+                    nzAllowClear
+                    nzShowSearch
+                    nzServerSearch
+                    [nzLoading]="accountSearchLoading"
+                    (nzOnSearch)="onAccountSearch($event)"
+                    [nzNotFoundContent]="accountSearchLoading ? 'Searching...' : 'No results found. Type to search.'">
+                    <nz-option 
+                        *ngFor="let option of accountOptions" 
+                        [nzValue]="option.value"
+                        [nzLabel]="option.label"
+                        nzCustomContent>
+                        <div>
+                            <span style="font-weight: 500;">{{ option.label }}</span>
+                            <span *ngIf="option.code" style="color: #888; font-size: 12px; margin-left: 8px;">({{ option.code }})</span>
+                        </div>
+                    </nz-option>
                 </nz-select>
 
                 <!-- Third Select Box: Names Based on Selection -->

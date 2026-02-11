@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { TaFormComponent, TaFormConfig } from '@ta/ta-form';
-import { Observable, forkJoin } from 'rxjs';
-import { tap, switchMap, map, filter } from 'rxjs/operators';
+import { Observable, forkJoin, Subject, Subscription } from 'rxjs';
+import { tap, switchMap, map, filter, debounceTime } from 'rxjs/operators';
+import { LocalStorageService } from '@ta/ta-core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { OrderslistComponent } from './orderslist/orderslist.component';
@@ -14,10 +15,13 @@ import { BindingType } from '@angular/compiler';
 import { FormlyField, FormlyFieldConfig } from '@ngx-formly/core';
 import { calculateTotalAmount } from 'src/app/utils/display.utils';
 import { CustomFieldHelper } from '../utils/custom_field_fetch';
+import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzIconModule } from 'ng-zorro-antd/icon';
 declare var bootstrap;
 @Component({
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, OrderslistComponent, SalesListComponent],
+  imports: [CommonModule, AdminCommmonModule, OrderslistComponent, SalesListComponent, NzModalModule, NzButtonModule, NzIconModule],
   selector: 'app-sales',
   templateUrl: './sales.component.html',
   styleUrls: ['./sales.component.scss']
@@ -46,6 +50,14 @@ export class SalesComponent {
 
   showPreview: boolean = false;
   docUrl: string = '';
+
+  // ========== DRAFT AUTO-SAVE PROPERTIES ==========
+  private draftSaveSubject = new Subject<void>();
+  private draftSaveSubscription: Subscription | null = null;
+  private readonly DRAFT_KEY_PREFIX = 'cnl_sale_order_draft_';
+  private readonly DRAFT_EXPIRY_HOURS = 24;
+  showDraftRestoreModal: boolean = false;
+  // =================================================
 
 openDocPreview() {
   //C:\Users\Pramod Kumar\CNL_frontend\sales_workflow_new\cnl-frontend\app\src\assets\img\sale_order_management_documentation.pdf
@@ -346,7 +358,8 @@ openDocPreview() {
     private router: Router,
     private route: ActivatedRoute,
     private fb: FormBuilder,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private localStorage: LocalStorageService
   ) { }
 
   dataToPopulate: any;
@@ -384,6 +397,11 @@ openDocPreview() {
 
     // this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1].fieldGroup[9].hide = true;
     // //console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
+
+    // ========== DRAFT AUTO-SAVE: Initialize and check for existing draft ==========
+    this.initDraftAutoSave();
+    this.checkAndRestoreDraft();
+    // ==============================================================================
   }
   // checkAndPopulateData() {
   //   if (this.dataToPopulate === undefined) {
@@ -1158,7 +1176,224 @@ editSaleOrder(event) {
   ngOnDestroy() {
     // Ensure modals are disposed of correctly
     document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+    
+    // Clean up draft save subscription
+    if (this.draftSaveSubscription) {
+      this.draftSaveSubscription.unsubscribe();
+    }
   }
+
+  // ================== DRAFT AUTO-SAVE METHODS ==================
+
+  /**
+   * Get the unique draft storage key for current user
+   */
+  private getDraftKey(): string {
+    const user = this.localStorage.getItem('user');
+    const userId = user?.user_id || 'anonymous';
+    return `${this.DRAFT_KEY_PREFIX}${userId}`;
+  }
+
+  /**
+   * Initialize the draft auto-save subscription with debounce
+   */
+  private initDraftAutoSave(): void {
+    // Clean up existing subscription if any
+    if (this.draftSaveSubscription) {
+      this.draftSaveSubscription.unsubscribe();
+    }
+
+    // Set up debounced draft saving (1500ms delay)
+    this.draftSaveSubscription = this.draftSaveSubject
+      .pipe(debounceTime(1500))
+      .subscribe(() => {
+        this.saveDraft();
+      });
+  }
+
+  /**
+   * Trigger draft save (called from form value changes)
+   * Only saves in CREATE mode
+   */
+  triggerDraftSave(): void {
+    // Only save draft in CREATE mode (not edit mode)
+    if (!this.SaleOrderEditID) {
+      this.draftSaveSubject.next();
+    }
+  }
+
+  /**
+   * Save current form data as draft to sessionStorage
+   */
+  private saveDraft(): void {
+    try {
+      // Only save in CREATE mode
+      if (this.SaleOrderEditID) {
+        return;
+      }
+
+      const model = this.formConfig.model;
+      if (!model) {
+        return;
+      }
+
+      // Check if there's meaningful data to save
+      const hasProducts = model.sale_order_items?.some((item: any) => 
+        item && item.product_id
+      );
+      const hasCustomer = model.sale_order?.customer_id;
+
+      // Only save if there's at least a customer or product selected
+      if (!hasProducts && !hasCustomer) {
+        return;
+      }
+
+      const draftData = {
+        sale_order: model.sale_order || {},
+        sale_order_items: model.sale_order_items || [],
+        custom_field_values: model.custom_field_values || [],
+        order_shipments: model.order_shipments || {},
+        timestamp: Date.now()
+      };
+
+      sessionStorage.setItem(this.getDraftKey(), JSON.stringify(draftData));
+      console.log('Draft saved successfully');
+    } catch (error) {
+      console.error('Error saving draft:', error);
+    }
+  }
+
+  /**
+   * Check for existing draft and prompt user to restore
+   */
+  private checkAndRestoreDraft(): void {
+    try {
+      // Only check in CREATE mode
+      if (this.SaleOrderEditID) {
+        return;
+      }
+
+      // Don't restore if data is being populated from Copy/Past Orders
+      if (this.dataToPopulate) {
+        return;
+      }
+
+      const draftJson = sessionStorage.getItem(this.getDraftKey());
+      if (!draftJson) {
+        return;
+      }
+
+      const draftData = JSON.parse(draftJson);
+
+      // Check if draft has expired (24 hours)
+      const draftAge = Date.now() - (draftData.timestamp || 0);
+      const maxAgeMs = this.DRAFT_EXPIRY_HOURS * 60 * 60 * 1000;
+      if (draftAge > maxAgeMs) {
+        this.clearDraft();
+        console.log('Draft expired and cleared');
+        return;
+      }
+
+      // Check if draft has meaningful data
+      const hasProducts = draftData.sale_order_items?.some((item: any) => 
+        item && item.product_id
+      );
+      const hasCustomer = draftData.sale_order?.customer_id;
+
+      if (!hasProducts && !hasCustomer) {
+        this.clearDraft();
+        return;
+      }
+
+      // Show restore confirmation modal
+      this.showDraftRestoreModal = true;
+
+    } catch (error) {
+      console.error('Error checking draft:', error);
+      this.clearDraft();
+    }
+  }
+
+  /**
+   * Restore draft data to form (called when user confirms restore)
+   */
+  confirmRestoreDraft(): void {
+    try {
+      const draftJson = sessionStorage.getItem(this.getDraftKey());
+      if (!draftJson) {
+        this.showDraftRestoreModal = false;
+        return;
+      }
+
+      const draftData = JSON.parse(draftJson);
+
+      // Restore sale_order data (except order_no which should be fresh)
+      if (draftData.sale_order) {
+        const currentOrderNo = this.formConfig.model['sale_order']['order_no'];
+        this.formConfig.model['sale_order'] = {
+          ...draftData.sale_order,
+          order_no: currentOrderNo, // Keep the freshly generated order number
+          order_type: 'sale_order'
+        };
+      }
+
+      // Restore sale_order_items
+      if (draftData.sale_order_items && draftData.sale_order_items.length > 0) {
+        this.formConfig.model['sale_order_items'] = [...draftData.sale_order_items];
+      }
+
+      // Restore custom_field_values
+      if (draftData.custom_field_values) {
+        this.formConfig.model['custom_field_values'] = draftData.custom_field_values;
+      }
+
+      // Restore order_shipments (except tracking number)
+      if (draftData.order_shipments) {
+        const currentTrackingNo = this.formConfig.model['order_shipments']['shipping_tracking_no'];
+        this.formConfig.model['order_shipments'] = {
+          ...draftData.order_shipments,
+          shipping_tracking_no: currentTrackingNo // Keep fresh tracking number
+        };
+      }
+
+      // Trigger change detection
+      this.formConfig.model = { ...this.formConfig.model };
+      this.cdRef.detectChanges();
+
+      // Recalculate totals
+      this.totalAmountCal();
+
+      this.showDraftRestoreModal = false;
+      console.log('Draft restored successfully');
+
+    } catch (error) {
+      console.error('Error restoring draft:', error);
+      this.showDraftRestoreModal = false;
+      this.clearDraft();
+    }
+  }
+
+  /**
+   * Decline draft restore (called when user cancels restore)
+   */
+  declineRestoreDraft(): void {
+    this.clearDraft();
+    this.showDraftRestoreModal = false;
+  }
+
+  /**
+   * Clear the saved draft from sessionStorage
+   */
+  clearDraft(): void {
+    try {
+      sessionStorage.removeItem(this.getDraftKey());
+      console.log('Draft cleared');
+    } catch (error) {
+      console.error('Error clearing draft:', error);
+    }
+  }
+
+  // ================== END DRAFT AUTO-SAVE METHODS ==================
 
   // API call to fetch available sizes and colors for a selected product
   fetchProductVariations(productID: string): Observable<any> {
@@ -1508,6 +1743,7 @@ createSaleOrder() {
   // Now create Sale Order
   this.http.post<any>('sales/sale_order/', payload)
     .subscribe(response => {
+      this.clearDraft(); // Clear draft on successful creation
       this.showSuccessToast = true;
       this.toastMessage = 'Record created successfully';
 
@@ -3150,6 +3386,7 @@ getUnitData(unitInfo) {
       },
       reset: {
         resetFn: () => {
+          this.clearDraft(); // Clear draft on reset
           this.ngOnInit();
         }
       },
@@ -3387,6 +3624,7 @@ getUnitData(unitInfo) {
                         if (data.email) {
                           field.form.controls.email.setValue(data.email)
                         }
+                        this.triggerDraftSave(); // Auto-save draft on customer change
                       });
                       if (this.dataToPopulate && this.dataToPopulate.sale_order.customer && field.formControl) {
                         field.formControl.setValue(this.dataToPopulate.sale_order.customer);
@@ -3938,6 +4176,7 @@ getUnitData(unitInfo) {
                       this.formConfig.model['sale_order_items'][currentRowIndex]['product_id'] = data?.product_id;
                       this.loadProductVariations(field);
                       this.autoFillProductDetails(field, data); // to fill the remaining fields when product is selected.
+                      this.triggerDraftSave(); // Auto-save draft on product change
                     });
 
                     // Product Info Text code
@@ -4361,6 +4600,7 @@ getUnitData(unitInfo) {
                       // ---------------- ✅ Production Qty calculation (NEW)
                       const productionQty = Math.max(0, qty - availableQty);
                       field.form.controls.production_qty?.setValue(productionQty);
+                      this.triggerDraftSave(); // Auto-save draft on quantity change
                     });
                   }
                 }
@@ -4416,6 +4656,7 @@ getUnitData(unitInfo) {
                           field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity));
                         }
                       }
+                      this.triggerDraftSave(); // Auto-save draft on rate change
                     });
                   }
                 }

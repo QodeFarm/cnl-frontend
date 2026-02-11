@@ -120,3 +120,46 @@
 </div>
 
 
+
+<!-- Draft Restore Confirmation Modal -->
+<nz-modal
+    [(nzVisible)]="showDraftRestoreModal"
+    nzTitle="Restore Unsaved Draft"
+    [nzWidth]="450"
+    [nzClosable]="true"
+    [nzMaskClosable]="false"
+    (nzOnCancel)="declineRestoreDraft()"
+    [nzFooter]="draftModalFooter"
+    nzCentered
+    nzClassName="draft-restore-modal-wrapper">
+    
+    <ng-container *nzModalContent>
+        <div class="draft-restore-content">
+            <!-- <div class="draft-icon-wrapper">
+                <i nz-icon nzType="file-sync" nzTheme="outline" style="font-size: 48px; color: #1890ff;"></i>
+            </div> -->
+            <p style="text-align: center; margin: 16px 0; font-size: 14px; color: #595959;">
+                You have an unsaved Sales Invoice Order from your previous session. Do you want to restore it?
+            </p>
+            <div class="draft-info-note">
+                <i nz-icon nzType="info-circle" nzTheme="outline" style="color: #faad14;"></i>
+                <span>Choosing 'Discard' will permanently delete the saved draft.</span>
+            </div>
+        </div>
+    </ng-container>
+    
+    <ng-template #draftModalFooter>
+        <div style="display: flex; justify-content: center; gap: 12px;">
+            <button nz-button nzType="default" nzDanger (click)="declineRestoreDraft()">
+                <i nz-icon nzType="delete" nzTheme="outline"></i>
+                Discard
+            </button>
+            <button nz-button nzType="primary" (click)="confirmRestoreDraft()">
+                <i nz-icon nzType="redo" nzTheme="outline"></i>
+                Restore
+            </button>
+        </div>
+    </ng-template>
+</nz-modal>
+
+

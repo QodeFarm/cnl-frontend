@@ -3,20 +3,214 @@
   position: relative;
 }
 
-/* Print aligned into same row as pagination */
+/* ========================================
+   ERP Standard: Ledger Balance Summary Bar
+   Clean, professional accounting-style design
+   ======================================== */
+
+.ledger-balance-summary {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  margin: 8px 0 8px 0;
+  padding: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.balance-row {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  min-height: 48px;
+}
+
+.balance-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  gap: 8px;
+  
+  &.opening {
+    background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
+    border-right: 1px solid #e2e8f0;
+    border-radius: 6px 0 0 6px;
+    min-width: 180px;
+  }
+  
+  &.totals {
+    flex: 1;
+    justify-content: center;
+    background: #fff;
+    gap: 6px;
+  }
+  
+  &.closing {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border-left: 1px solid #e2e8f0;
+    border-radius: 0 6px 6px 0;
+    min-width: 200px;
+    justify-content: flex-end;
+  }
+}
+
+.balance-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+
+.balance-amount {
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Roboto Mono', 'Consolas', 'Courier New', monospace;
+  color: #1e293b;
+  
+  &.debit {
+    color: #dc2626;
+  }
+  
+  &.credit {
+    color: #16a34a;
+  }
+  
+  &.positive {
+    color: #16a34a;
+    font-size: 15px;
+  }
+  
+  &.negative {
+    color: #dc2626;
+    font-size: 15px;
+  }
+}
+
+.balance-separator {
+  color: #94a3b8;
+  margin: 0 8px;
+  font-weight: 300;
+  font-size: 14px;
+}
+
+/* ========================================
+   Footer Section: Print + Balance aligned
+   ======================================== */
+
+.ledger-footer-section {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 8px;
+  padding: 0;
+}
+
+.ledger-footer-section .ledger-balance-summary {
+  flex: 1;
+  margin: 0;
+}
+
 .ledger-footer {
-  position: absolute;
-  bottom: 12px;              /* aligns with pagination row */
-  left: 12px;                /* slight right from edge */
+  display: flex;
+  align-items: center;
   z-index: 5;
 }
 
 /* Size */
 .print-select {
-  width: 160px;
+  width: 150px;
+  height: 36px;
+  font-size: 13px;
+  border-radius: 4px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  cursor: pointer;
+  
+  &:hover {
+    border-color: #9ca3af;
+  }
+  
+  &:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  }
 }
 
-/* When no data, push it slightly down */
-.ta-table-empty + .ledger-footer {
-  bottom: 16px;
+/* ========================================
+   Table Column Alignments (ERP Standard)
+   ======================================== */
+
+// Right-align numeric columns and ensure consistent styling
+::ng-deep .account-ledger-wrapper {
+  // Target all table cells in the last 3 columns (Debit, Credit, Running Balance)
+  .ant-table-tbody > tr > td:nth-last-child(1),  // Running Balance (last)
+  .ant-table-tbody > tr > td:nth-last-child(2),  // Credit (2nd from last)
+  .ant-table-tbody > tr > td:nth-last-child(3) { // Debit (3rd from last)
+    text-align: right !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+    font-weight: 500 !important;
+    font-size: 14px !important;
+    color: #1e293b !important;
+  }
+  
+  // Header alignment for last 3 columns
+  .ant-table-thead > tr > th:nth-last-child(1),
+  .ant-table-thead > tr > th:nth-last-child(2),
+  .ant-table-thead > tr > th:nth-last-child(3) {
+    text-align: right !important;
+  }
+  
+  // Ensure consistent cell rendering
+  .ant-table-cell {
+    vertical-align: middle;
+  }
+  
+  // Consistent row height
+  .ant-table-tbody > tr > td {
+    padding: 12px 16px !important;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .balance-row {
+    flex-direction: column;
+  }
+  
+  .balance-item {
+    width: 100%;
+    justify-content: space-between !important;
+    border-radius: 0 !important;
+    border-right: none !important;
+    border-left: none !important;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 8px 12px;
+    min-width: auto !important;
+    
+    &:last-child {
+      border-bottom: none;
+    }
+    
+    &.opening {
+      border-radius: 6px 6px 0 0 !important;
+    }
+    
+    &.closing {
+      border-radius: 0 0 6px 6px !important;
+    }
+  }
+  
+  .balance-item.totals {
+    flex-wrap: wrap;
+    justify-content: center !important;
+    gap: 4px;
+  }
+  
+  .ledger-footer-section {
+    flex-direction: column;
+    gap: 12px;
+  }
 }

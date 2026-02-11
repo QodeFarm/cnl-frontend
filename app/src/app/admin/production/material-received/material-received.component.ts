@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { HttpClient } from '@angular/common/http';
@@ -6,15 +6,20 @@ import { TaFormComponent } from '@ta/ta-form';
 import { Router, ActivatedRoute } from '@angular/router';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { MaterialReceivedListComponent } from './material-received-list/material-received-list.component';
+import { Subject, Subscription, debounceTime } from 'rxjs';
+import { LocalStorageService } from '@ta/ta-core';
+import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzIconModule } from 'ng-zorro-antd/icon';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, MaterialReceivedListComponent],
+  imports: [CommonModule, AdminCommmonModule, MaterialReceivedListComponent, NzModalModule, NzButtonModule, NzIconModule],
   selector: 'app-material-received',
   templateUrl: './material-received.component.html',
   styleUrls: ['./material-received.component.scss']
 })
-export class MaterialReceivedComponent implements OnInit {
+export class MaterialReceivedComponent implements OnInit, OnDestroy {
   @ViewChild('materialReceivedForm', { static: false }) materialReceivedForm: TaFormComponent | undefined;
   @ViewChild(TaFormComponent) taFormComponent!: TaFormComponent;
   @ViewChild(MaterialReceivedListComponent)  MaterialReceivedListComponent!:  MaterialReceivedListComponent;
@@ -25,12 +30,21 @@ export class MaterialReceivedComponent implements OnInit {
   formConfig: any = {};
   showMaterialReceivedList: boolean = false;
 
+  // --- Draft auto-save properties ---
+  private draftSaveSubject = new Subject<void>();
+  private draftSaveSubscription: Subscription | null = null;
+  private readonly DRAFT_KEY_PREFIX = 'cnl_material_received_draft_';
+  private readonly DRAFT_EXPIRY_HOURS = 24;
+  showDraftRestoreModal = false;
+  private pendingDraftData: any = null;
+
   constructor(
     private http: HttpClient,
     private cdRef: ChangeDetectorRef,
     private notification: NzNotificationService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private localStorageService: LocalStorageService
   ) { }
 
   ngOnInit() {
@@ -39,6 +53,14 @@ export class MaterialReceivedComponent implements OnInit {
     this.MaterialReceivedEditID = null;
     this.setFormConfig();
     this.getReceiptNo();
+    this.initDraftAutoSave();
+    this.checkAndRestoreDraft();
+  }
+
+  ngOnDestroy() {
+    if (this.draftSaveSubscription) {
+      this.draftSaveSubscription.unsubscribe();
+    }
   }
 
   getReceiptNo() {
@@ -90,6 +112,7 @@ export class MaterialReceivedComponent implements OnInit {
     this.http.post('production/material-received/', payload)
       .subscribe(response => {
         this.notification.success('Record created successfully', '');
+        this.clearDraft();
         this.ngOnInit();
         this.taFormComponent.formlyOptions.resetModel([]);
       }, error => {
@@ -188,6 +211,7 @@ export class MaterialReceivedComponent implements OnInit {
                   field.formControl.valueChanges.subscribe(data => {
                     if (data && data.production_floor_id) {
                       this.formConfig.model['material_received']['production_floor_id'] = data.production_floor_id;
+                      this.triggerDraftSave();
                     }
                   });
                 }
@@ -297,6 +321,7 @@ export class MaterialReceivedComponent implements OnInit {
         this.formConfig.model.items[currentRowIndex].product_id = data?.product_id;
         if (data) {
           this.displayInformation(data);
+          this.triggerDraftSave();
         }
       });
     }
@@ -412,5 +437,84 @@ export class MaterialReceivedComponent implements OnInit {
       }
     });
     this.hide()
+  }
+
+  // --- Draft auto-save methods ---
+  private getDraftKey(): string {
+    const userId = this.localStorageService.getItem('user')?.user_id || 'default';
+    return `${this.DRAFT_KEY_PREFIX}${userId}`;
+  }
+
+  private initDraftAutoSave() {
+    if (this.draftSaveSubscription) {
+      this.draftSaveSubscription.unsubscribe();
+    }
+    this.draftSaveSubscription = this.draftSaveSubject
+      .pipe(debounceTime(1500))
+      .subscribe(() => this.saveDraft());
+  }
+
+  private triggerDraftSave() {
+    if (!this.MaterialReceivedEditID) {
+      this.draftSaveSubject.next();
+    }
+  }
+
+  private saveDraft() {
+    if (this.MaterialReceivedEditID) return;
+    const model = this.formConfig.model;
+    const hasProductionFloor = model?.material_received?.production_floor_id;
+    const hasItems = model?.items?.some((item: any) => item?.product_id);
+    if (!hasProductionFloor && !hasItems) return;
+    const draftData = {
+      model: JSON.parse(JSON.stringify(model)),
+      savedAt: new Date().toISOString()
+    };
+    sessionStorage.setItem(this.getDraftKey(), JSON.stringify(draftData));
+  }
+
+  private checkAndRestoreDraft() {
+    if (this.MaterialReceivedEditID) return;
+    const draftKey = this.getDraftKey();
+    const draftJson = sessionStorage.getItem(draftKey);
+    if (!draftJson) return;
+    try {
+      const draftData = JSON.parse(draftJson);
+      const savedAt = new Date(draftData.savedAt);
+      const now = new Date();
+      const hoursDiff = (now.getTime() - savedAt.getTime()) / (1000 * 60 * 60);
+      if (hoursDiff > this.DRAFT_EXPIRY_HOURS) {
+        sessionStorage.removeItem(draftKey);
+        return;
+      }
+      this.pendingDraftData = draftData;
+      this.showDraftRestoreModal = true;
+    } catch (e) {
+      sessionStorage.removeItem(draftKey);
+    }
+  }
+
+  confirmRestoreDraft() {
+    if (this.pendingDraftData?.model) {
+      const restored = this.pendingDraftData.model;
+      this.formConfig.model = {
+        material_received: restored.material_received || {},
+        items: restored.items || [{}, {}, {}, {}, {}],
+        attachments: restored.attachments || []
+      };
+      this.cdRef.detectChanges();
+    }
+    this.showDraftRestoreModal = false;
+    this.pendingDraftData = null;
+  }
+
+  declineRestoreDraft() {
+    this.clearDraft();
+    this.showDraftRestoreModal = false;
+    this.pendingDraftData = null;
+  }
+
+  private clearDraft() {
+    sessionStorage.removeItem(this.getDraftKey());
   }
 }
