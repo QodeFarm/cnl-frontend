@@ -12,11 +12,12 @@ import { calculateTotalAmount, displayInformation, getUnitData, sumQuantities } 
 import { CustomFieldHelper } from '../../utils/custom_field_fetch';
 // import { displayInformation, getUnitData, sumQuantities } from 'src/app/utils/display.utils';
 import { FormlyFieldConfig } from '@ngx-formly/core';
+import { SaleinvoiceorderlistComponent } from '../saleinvoiceorderlist/saleinvoiceorderlist.component';
 declare var bootstrap;
 @Component({
   selector: 'app-salesinvoice',
   standalone: true,
-  imports: [AdminCommmonModule, OrderslistComponent,
+  imports: [AdminCommmonModule, SaleinvoiceorderlistComponent,
     SalesInvoiceListComponent],
   templateUrl: './salesinvoice.component.html',
   styleUrls: ['./salesinvoice.component.scss']
@@ -214,42 +215,7 @@ export class SalesinvoiceComponent {
         // Clear previous options for both size and color fields before adding new ones
         if (sizeField) sizeField.templateOptions.options = [];
         if (colorField) colorField.templateOptions.options = [];
-        // this.http.get(`products/product_variations/?product_id=${product.product_id}`).subscribe((response: any) => {
-        //   if (response.data.length > 0) {
-  
-        //     let availableSizes, availableColors;
-        //     // Check if response data is non-empty for size
-        //     if (response.data && response.data.length > 0) {
-        //       availableSizes = response.data.map((variation: any) => ({
-        //         label: variation.size?.size_name || '----',
-        //         value: {
-        //           size_id: variation.size?.size_id || null,
-        //           size_name: variation.size?.size_name || '----'
-        //         }
-        //       }));
-        //       availableColors = response.data.map((variation: any) => ({
-        //         label: variation.color?.color_name || '----',
-        //         value: {
-        //           color_id: variation.color?.color_id || null,
-        //           color_name: variation.color?.color_name || '----'
-        //         }
-        //       }));
-        //       // Enable and update the size field options if sizes are available
-        //       if (sizeField) {
-        //         sizeField.formControl.enable(); // Ensure the field is enabled
-        //         sizeField.templateOptions.options = availableSizes.filter((item, index, self) => index === self.findIndex((t) => t.value.size_id === item.value.size_id)); // Ensure unique size options
-        //       }
-        //     } else {
-        //       // Clear options and keep the fields enabled, without any selection if no options exist
-        //       if (sizeField) {
-        //         sizeField.templateOptions.options = [];
-        //       }
-        //       if (colorField) {
-        //         colorField.templateOptions.options = [];
-        //       }
-        //     }
-        //   }
-        // });
+
         this.http.get(`products/product_variations/?product_id=${product.product_id}`).subscribe((response: any) => {
           if (response.data.length > 0) {
             const availableSizes = response.data.map((variation: any) => ({
@@ -293,28 +259,7 @@ export class SalesinvoiceComponent {
         console.error('Product not selected or invalid.');
       }
     };
-
-    // async autoFillProductDetails(field, data) {
-    //   this.productOptions = data;
-    //   console.log("this.productOptions : ", this.productOptions)
-    //   if (!field.form?.controls || !data) return;
-    //   const fieldMappings = {
-    //     // code: data.code,
-    //     code: data.code !== undefined
-    //       ? data.code
-    //       : field.form.controls.code.value,
-    //     rate: data.sales_rate || field.form.controls.rate.value,
-    //     discount: parseFloat(data.discount) || 0,
-    //     unit_options_id: data.unit_options?.unit_options_id,
-    //     print_name: data.print_name,
-    //     mrp: data.mrp
-    //   };
-    
-    //   Object.entries(fieldMappings).forEach(([key, value]) => {
-    //     if (value !== undefined) field.form.controls[key]?.setValue(value);
-    //   });
-    //   this.totalAmountCal();
-    // }    
+  
 
 async autoFillProductDetails(field, data) {
   this.productOptions = data;
@@ -373,55 +318,6 @@ async autoFillProductDetails(field, data) {
 
   this.totalAmountCal();
 }
-
-  // checkAndPopulateData() {
-  //   // Check if data has already been populated
-  //   if (this.dataToPopulate === undefined) {
-  //     this.route.paramMap.subscribe(params => {
-  //       this.dataToPopulate = history.state.data;
-  //       console.log('Data retrieved:', this.dataToPopulate);
-
-  //       // Populate the form only if data exists
-  //       if (this.dataToPopulate) {
-  //         const saleInvoiceItems = this.dataToPopulate.sale_invoice_items || [];
-
-  //         // Clear existing sale_invoice_items to avoid duplicates
-  //         this.formConfig.model.sale_invoice_items = [];
-
-  //         // Populate form with data, ensuring unique entries
-  //         saleInvoiceItems.forEach(item => {
-  //           const populatedItem = {
-  //             product_id: item.product.product_id,
-  //             size: item.size,
-  //             color: item.color,
-  //             code: item.code,
-  //             unit: item.unit,
-  //             total_boxes: item.total_boxes,
-  //             quantity: item.quantity,
-  //             amount: item.amount,
-  //             rate: item.rate,
-  //             print_name: item.print_name,
-  //             discount: item.discount
-  //           };
-  //           this.formConfig.model.sale_invoice_items.push(populatedItem);
-  //         });
-  //       }
-  //     });
-  //   } else {
-  //     // Detect if the page was refreshed
-  //     const wasPageRefreshed = window.performance?.navigation?.type === window.performance?.navigation?.TYPE_RELOAD;
-
-  //     // Clear data if the page was refreshed
-  //     if (wasPageRefreshed) {
-  //       this.dataToPopulate = undefined;
-  //       console.log("Page was refreshed, clearing data.");
-
-  //       // Ensure the history state is cleared to prevent repopulation
-  //       history.replaceState(null, '');
-  //       return; // Stop further execution as we don't want to repopulate the form
-  //     }
-  //   }
-  // }
 
   checkAndPopulateData() {
   if (this.dataToPopulate === undefined) {
@@ -546,24 +442,6 @@ async autoFillProductDetails(field, data) {
     this.hide();
   }
 
-  // getInvoiceNo() {
-  //   this.invoiceNumber = null;
-  //   this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
-  //     if (res && res.data && res.data.order_number) {
-  //       this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
-
-  //       this.http.get('masters/generate_order_no/?type=SO-INV').subscribe((res: any) => {
-  //         if (res && res.data && res.data.order_number) {
-  //           this.formConfig.model['sale_invoice_order']['invoice_no'] = res.data.order_number;
-  //           this.invoiceNumber = res.data.order_number;
-  //           console.log("SaleInvoice NO: ", this.invoiceNumber);
-  //           console.log("get SaleInvoice number called");
-  //         }
-  //       });
-  //     }
-  //   });
-  // }
-
   getInvoiceNo() {
     this.invoiceNumber = null;
 
@@ -599,59 +477,57 @@ async autoFillProductDetails(field, data) {
       this.SalesInvoiceListComponent.refreshTable();
    }
   }
-  showPendingOrdersList() {
-    console.log("We are selecting customer here : ");
-    const selectedCustomerId = this.formConfig.model.sale_invoice_order.customer_id;
-    const selectedCustomerName = this.formConfig.model.sale_invoice_order.customer?.name;
 
-    if (!selectedCustomerId) {
-      this.noOrdersMessage = 'Please select a customer.';
-      this.customerOrders = [];
+//-----------------pending orders modal logic-----------------
+
+getGlobalPendingOrders(): Observable<any> {
+  return this.http.get<any>('sales/pending/');
+}
+
+showGlobalPendingOrders() {
+  this.customerOrders = [];
+  this.noOrdersMessage = '';
+
+  this.getGlobalPendingOrders().subscribe(res => {
+    if (!res || !res.data || res.data.length === 0) {
+      this.noOrdersMessage = 'No pending quantities found.';
       this.openModal();
       return;
     }
 
-    this.customerOrders = [];
-    this.noOrdersMessage = '';
+    this.customerOrders = res.data.map(order => ({
+      sale_order_id: order.sale_order_id,   // 🔥 important for later
+      invoice_no: order.order_no,
+      invoice_date: order.order_date,
+      customer: { name: order.customer_name },
 
-    this.getPendingOrdersByCustomer(selectedCustomerId).pipe(
-      switchMap(orders => {
-        if (orders.count === 0) {
-          this.noOrdersMessage = `No Pending orders for ${selectedCustomerName}.`;
-          this.customerOrders = [];
-          this.openModal();
-          return [];
-        }
+      productsList: order.pending_items.map(p => ({
+        product_id: p.product_id,
+        product_name: p.product_name,
 
-        const detailedOrderRequests = orders.data.map(order =>
-          this.getOrderDetails(order.sale_order_id).pipe(
-            tap(orderDetails => {
-              order.productsList = orderDetails.data.sale_order_items.map(item => ({
-                product_id: item.product?.name,
-                product_name: item.product?.name ?? 'Unknown Product',
-                quantity: item.quantity,
-                code: item.product?.code,
-                total_boxes: item.total_boxes,
-                unit_options_id: item.unit_options_id,
-                rate: item.rate,
-                discount: item.discount,
-                amount: item.amount,
-                tax: item.tax,
-                remarks: item.remarks
-              }));
-            })
-          )
-        );
+        // ✅ CORRECT FIELD
+        production_qty: p.production_qty || 0,
 
-        return forkJoin(detailedOrderRequests).pipe(
-          tap(() => {
-            this.customerOrders = orders.data;
-            this.openModal();
-          })
-        );
-      })
-    ).subscribe();
-  }
+        // ✅ will be refreshed from products table later
+        available_qty: 0,
+
+        // ✅ user input
+        dispatch_qty: 0,
+
+        rate: p.rate,
+        tax: p.tax,
+        unit_options_id: p.unit_options_id,
+
+        selected: false
+      }))
+    }));
+
+
+    this.openModal();
+  });
+}
+
+
   ordersListModal: any;
   openModal() {
     this.ordersListModal = new bootstrap.Modal(document.getElementById("ordersListModal"));
@@ -662,274 +538,213 @@ async autoFillProductDetails(field, data) {
     this.ordersListModal.hide();
   }
 
-  getPendingOrdersByCustomer(customerId: string): Observable<any> {
-    const url = `sales/sale_order_search/?customer_id=${customerId}&status_name=Pending`;
-    return this.http.get<any>(url);
-  }
 
-  getOrderDetails(orderId: string): Observable<any> {
-    const url = `sales/sale_order/${orderId}/`;
-    return this.http.get<any>(url);
-  }
+  // getOrderDetails(orderId: string): Observable<any> {
+  //   const url = `sales/sale_order/${orderId}/`;
+  //   return this.http.get<any>(url);
+  // }
 
   selectOrder(order: any) {
     console.log('Selected Order:', order);
     this.handleOrderSelected(order); // Handle order selection
   }
 
-  handleOrderSelected(order: any) {
-    const saleOrderId = order.sale_order_id;
-    console.log("saleOrderId : ", saleOrderId)
-    console.log("order : ", order);
-    if (!saleOrderId) {
-      console.error('Invalid saleOrderId:', saleOrderId);
-      return;
-    }
-    // Fetch sale invoice details using the saleInvoiceId
-    this.http.get(`sales/sale_order/${saleOrderId}`).subscribe((res: any) => {
-      if (res && res.data) {
-        const orderData = res.data.sale_order;
-        console.log("orderData : ", orderData);
-        const orderItems = res.data.sale_order_items;
-        // const invoiceShipments = res.data.order_shipments;
+handleOrderSelected(order: any) {
+  console.log('Handling selected order:', order);
 
-        // Map sale_invoice_order fields to sale_return_order fields
-        this.formConfig.model = {
-          sale_invoice_order: {
-            order_type: this.formConfig.model.sale_invoice_order.order_type || 'sale_invoice',
-            invoice_date: this.nowDate(),
-            invoice_no: this.formConfig.model.sale_invoice_order.invoice_no,
-            ref_no: orderData.ref_no,
-            ref_date: orderData.ref_date,
-            tax: orderData.tax,
-            remarks: orderData.remarks,
-            item_value: orderData.item_value,
-            discount: orderData.discount,
-            dis_amt: orderData.dis_amt,
-            taxable: orderData.taxable,
-            tax_amount: orderData.tax_amount,
-            cess_amount: orderData.cess_amount,
-            transport_charges: orderData.transport_charges,
-            round_off: orderData.round_off,
-            total_amount: orderData.total_amount,
-            total_boxes: orderData.total_boxes,
-            gst_type: {
-              gst_type_id: orderData.gst_type?.gst_type_id,
-              name: orderData.gst_type?.name
-            },
-            gst_type_id: orderData.gst_type?.gst_type_id,
-            payment_term: {
-              payment_term_id: orderData.payment_term?.payment_term_id,
-              name: orderData.payment_term?.name,
-              code: orderData.payment_term?.code,
-            },
-            payment_term_id: orderData.payment_term?.payment_term_id,
-            ledger_account: {
-              ledger_account_id: orderData.ledger_account?.ledger_account_id,
-              name: orderData.ledger_account?.name,
-              code: orderData.ledger_account?.code,
-            },
-            ledger_account_id: orderData.ledger_account?.ledger_account_id,
-            customer: {
-              customer_id: orderData.customer?.customer_id,
-              name: orderData.customer?.name
-            },
-            email: orderData.email,
-            billing_address: orderData.billing_address,
-            shipping_address: orderData.shipping_address,
-          },
-          sale_invoice_items: orderItems,
-          order_attachments: res.data.order_attachments,
-          order_shipments: res.data.order_shipments
-        };
-
-        // Display the form
-        this.showForm = true;
-
-        // Trigger change detection to update the form
-        this.cdRef.detectChanges();
-      }
-    }, (error) => {
-      console.error('Error fetching order details:', error);
-    });
-
-    // Hide the modal
-    this.hideModal();
+  const saleOrderId = order?.sale_order_id;
+  if (!saleOrderId) {
+    console.error('Invalid saleOrderId:', order);
+    return;
   }
+
+  // 🔥 Build dispatch map from modal
+  const dispatchMap: Record<string, number> = {};
+  (order.productsList || []).forEach(p => {
+    if (p.dispatch_qty > 0) {
+      dispatchMap[p.product_id] = p.dispatch_qty;
+    }
+  });
+
+  // 🔥 Close modal first
+  this.hideModal();
+
+  this.http.get(`sales/sale_order/${saleOrderId}`).subscribe(
+    (res: any) => {
+      if (!res || !res.data) return;
+
+      const orderData = res.data.sale_order;
+      const orderItems = res.data.sale_order_items || [];
+
+      // 🔥 Build FINAL invoice items
+      const invoiceItems = orderItems
+        .filter(item => dispatchMap[item.product_id] > 0)   // ✅ only dispatched
+        .map(item => ({
+          ...item,
+
+          // 🔥 FORCE quantity = dispatch_qty (NO FALLBACK)
+          quantity: dispatchMap[item.product_id]
+        }))
+        .slice(0, 9); // ✅ project rule: only 9 items
+
+      console.log('FINAL sale_invoice_items:', invoiceItems);
+
+      // 🔥 FULL MODEL (as your project expects)
+      this.formConfig.model = {
+        sale_invoice_order: {
+          order_type: this.formConfig.model.sale_invoice_order.order_type || 'sale_invoice',
+          invoice_date: this.nowDate(),
+          invoice_no: this.formConfig.model.sale_invoice_order.invoice_no,
+
+          sale_order_id: orderData.sale_order_id,
+          ref_no: orderData.ref_no,
+          ref_date: orderData.ref_date,
+          tax: orderData.tax,
+          remarks: orderData.remarks,
+          item_value: orderData.item_value,
+          discount: orderData.discount,
+          dis_amt: orderData.dis_amt,
+          taxable: orderData.taxable,
+          tax_amount: orderData.tax_amount,
+          cess_amount: orderData.cess_amount,
+          transport_charges: orderData.transport_charges,
+          round_off: orderData.round_off,
+          total_amount: orderData.total_amount,
+          total_boxes: orderData.total_boxes,
+
+          gst_type: {
+            gst_type_id: orderData.gst_type?.gst_type_id,
+            name: orderData.gst_type?.name
+          },
+          gst_type_id: orderData.gst_type?.gst_type_id,
+
+          payment_term: {
+            payment_term_id: orderData.payment_term?.payment_term_id,
+            name: orderData.payment_term?.name,
+            code: orderData.payment_term?.code
+          },
+          payment_term_id: orderData.payment_term?.payment_term_id,
+
+          ledger_account: {
+            ledger_account_id: orderData.ledger_account?.ledger_account_id,
+            name: orderData.ledger_account?.name,
+            code: orderData.ledger_account?.code
+          },
+          ledger_account_id: orderData.ledger_account?.ledger_account_id,
+
+          customer: {
+            customer_id: orderData.customer?.customer_id,
+            name: orderData.customer?.name
+          },
+
+          email: orderData.email,
+          billing_address: orderData.billing_address,
+          shipping_address: orderData.shipping_address
+        },
+
+        // 🔥 EXACTLY WHAT YOU WANT
+        sale_invoice_items: invoiceItems,
+
+        order_attachments: res.data.order_attachments || [],
+        order_shipments: res.data.order_shipments || []
+      };
+
+      this.showForm = true;
+      this.cdRef.detectChanges();
+    },
+    error => {
+      console.error('Error fetching order details:', error);
+    }
+  );
+}
 
   closeModal() {
     this.hideModal();
   }
 
-  // handleProductPull(selectedProducts: any[]) {
-  //   let existingProducts = this.formConfig.model['sale_invoice_items'] || [];
+  
+// // Handles the selected products and updates the form model with them
+//   handleProductPull(selectedProducts: any[]) {
+//     console.log('Pulled selected products in OrdersListComponent:', selectedProducts);
 
-  //   // Clean up existing products by filtering out any undefined, null, or empty entries
-  //   existingProducts = existingProducts.filter((product: any) => product?.code && product.code.trim() !== "");
+//     // Retrieve or initialize the current sale_invoice_items list
+//     let existingProducts = this.formConfig.model['sale_invoice_items'] || [];
 
-  //   if (existingProducts.length === 0) {
-  //     // Initialize the product list if no products exist
-  //     this.formConfig.model['sale_invoice_items'] = selectedProducts.map(product => ({
-  //       product: {
-  //         product_id: product.product_id || null,
-  //         name: product.product_name || '',  // Ensure the actual product name is set
-  //         code: product.code || '',
-  //       },
-  //       product_id: product.product_id || null,
-  //       code: product.code || '',
-  //       total_boxes: product.total_boxes || 0,
-  //       unit_options_id: product.unit_options_id || null,
-  //       quantity: product.quantity || 1,
-  //       rate: product.rate || 0,
-  //       discount: product.discount || 0,
-  //       print_name: product.print_name || product.product_name || '', // Use print_name only if necessary
-  //       amount: product.amount || 0,
-  //       tax: product.tax || 0,
-  //       cgst: product.cgst || 0,
-  //       sgst: product.sgst || 0,
-  //       igst: product.igst || 0,
-  //       remarks: product.remarks || ''
-  //     }));
-  //   } else {
-  //     // Update existing products or add new products
-  //     selectedProducts.forEach(newProduct => {
-  //       const existingProductIndex = existingProducts.findIndex((product: any) =>
-  //         product.product_id === newProduct.product_id || product.code === newProduct.code
-  //       );
+//     // Filter out any empty entries from existing products
+//     existingProducts = existingProducts.filter(product => product && product.product_id);
 
-  //       if (existingProductIndex === -1) {
-  //         // Add the product if it doesn't exist in the list
-  //         existingProducts.push({
-  //           product: {
-  //             product_id: newProduct.product_id || null,
-  //             name: newProduct.product_name || '',  // Ensure the actual product name is set
-  //             code: newProduct.code || '',
-  //           },
-  //           product_id: newProduct.product_id || null,
-  //           code: newProduct.code || '',
-  //           total_boxes: newProduct.total_boxes || 0,
-  //           unit_options_id: newProduct.unit_options_id || null,
-  //           quantity: newProduct.quantity || 1,
-  //           rate: newProduct.rate || 0,
-  //           discount: newProduct.discount || 0,
-  //           print_name: newProduct.print_name || newProduct.product_name || '', // Use print_name only if necessary
-  //           amount: newProduct.amount || 0,
-  //           tax: newProduct.tax || 0,
-  //           cgst: newProduct.cgst || 0,
-  //           sgst: newProduct.sgst || 0,
-  //           igst: newProduct.igst || 0,
-  //           remarks: newProduct.remarks || ''
-  //         });
-  //       } else {
-  //         // Update the existing product
-  //         existingProducts[existingProductIndex] = {
-  //           ...existingProducts[existingProductIndex],
-  //           ...newProduct,
-  //           product: {
-  //             product_id: newProduct.product_id || existingProducts[existingProductIndex].product.product_id,
-  //             name: newProduct.product_name || existingProducts[existingProductIndex].product.name, // Ensure correct name is set
-  //             code: newProduct.code || existingProducts[existingProductIndex].product.code,
-  //           },
-  //           print_name: newProduct.print_name || newProduct.product_name || existingProducts[existingProductIndex].product.name, // Ensure correct name is shown
-  //         };
-  //       }
-  //     });
+//     selectedProducts.forEach(newProduct => {
+//       if (!newProduct || !newProduct.product_id || !newProduct.code) {
+//         console.warn("Skipped an incomplete or undefined product:", newProduct);
+//         return; // Skip if data is incomplete
+//       }
 
-  //     // Assign the updated product list back to the model
-  //     this.formConfig.model['sale_invoice_items'] = [...existingProducts];
-  //   }
+//       // Check for duplicates by comparing all key fields
+//       const isDuplicate = existingProducts.some(existingProduct => (
+//         existingProduct.product_id === newProduct.product_id &&
+//         existingProduct.code === newProduct.code &&
+//         existingProduct.total_boxes === (newProduct.total_boxes || 0) &&
+//         existingProduct.unit_options_id === (newProduct.unit_options_id || null) &&
+//         existingProduct.igst === (newProduct.igst || null) &&
+//         existingProduct.cgst === (newProduct.cgst || null) &&
+//         existingProduct.sgst === (newProduct.sgst || null) &&
+//         existingProduct.quantity === (newProduct.quantity || 1) &&
+//         existingProduct.size?.size_name === (newProduct.size?.size_name || 'Unspecified') &&
+//         existingProduct.color?.color_name === (newProduct.color?.color_name || 'Unspecified')
+//       ));
 
-  //   // Re-render the form
-  //   this.formConfig.model = { ...this.formConfig.model };
+//       if (!isDuplicate) {
+//         console.log("Adding new product:", newProduct);
 
-  //   // Trigger UI update
-  //   this.cdRef.detectChanges();
+//         // Add valid, non-duplicate product to existingProducts list
+//         existingProducts.push({
+//           product: {
+//             product_id: newProduct.product_id,
+//             name: newProduct.name || '',
+//             code: newProduct.code || '',
+//           },
+//           product_id: newProduct.product_id,
+//           code: newProduct.code || '',
+//           total_boxes: newProduct.total_boxes || 0,
+//           unit_options_id: newProduct.unit_options_id || null,
+//           quantity: newProduct.quantity,
+//           rate: parseFloat(newProduct.rate) || 0,
+//           discount: parseFloat(newProduct.discount) || 0,
+//           print_name: newProduct.print_name || newProduct.name || '',
+//           amount: parseFloat(newProduct.amount) || 0, // Ensure amount is a number
+//           tax: parseFloat(newProduct.tax) || 0,       // Ensure tax is a number
+//           remarks: newProduct.remarks || '',
+//           cgst: parseFloat(newProduct.cgst) || 0,
+//           sgst: parseFloat(newProduct.sgst) || 0,
+//           igst: parseFloat(newProduct.igst) || 0,
 
-  //   //console.log("Final Products List:", this.formConfig.model['sale_order_items']);
-  // }
+//           // Set size and color properties with defaults if not provided
+//           size: {
+//             size_id: newProduct.size?.size_id || null,
+//             size_name: newProduct.size?.size_name || 'Unspecified'
+//           },
+//           color: {
+//             color_id: newProduct.color?.color_id || null,
+//             color_name: newProduct.color?.color_name || 'Unspecified'
+//           },
+//           size_id: newProduct.size?.size_id || null,
+//           color_id: newProduct.color?.color_id || null
+//         });
+//       } else {
+//         console.log("Duplicate detected, skipping product:", newProduct);
+//       }
+//     });
 
-// Handles the selected products and updates the form model with them
-  handleProductPull(selectedProducts: any[]) {
-    console.log('Pulled selected products in OrdersListComponent:', selectedProducts);
+//     // Update the model with the final product list, ensuring there are no placeholder or duplicate rows
+//     this.formConfig.model['sale_invoice_items'] = [...existingProducts];
 
-    // Retrieve or initialize the current sale_invoice_items list
-    let existingProducts = this.formConfig.model['sale_invoice_items'] || [];
+//     // Trigger change detection to update the UI immediately
+//     this.formConfig.model = { ...this.formConfig.model }; // Refresh the formConfig model
+//     setTimeout(() => this.cdRef.detectChanges(), 0); // Use async change detection for smooth UI update
 
-    // Filter out any empty entries from existing products
-    existingProducts = existingProducts.filter(product => product && product.product_id);
-
-    selectedProducts.forEach(newProduct => {
-      if (!newProduct || !newProduct.product_id || !newProduct.code) {
-        console.warn("Skipped an incomplete or undefined product:", newProduct);
-        return; // Skip if data is incomplete
-      }
-
-      // Check for duplicates by comparing all key fields
-      const isDuplicate = existingProducts.some(existingProduct => (
-        existingProduct.product_id === newProduct.product_id &&
-        existingProduct.code === newProduct.code &&
-        existingProduct.total_boxes === (newProduct.total_boxes || 0) &&
-        existingProduct.unit_options_id === (newProduct.unit_options_id || null) &&
-        existingProduct.igst === (newProduct.igst || null) &&
-        existingProduct.cgst === (newProduct.cgst || null) &&
-        existingProduct.sgst === (newProduct.sgst || null) &&
-        existingProduct.quantity === (newProduct.quantity || 1) &&
-        existingProduct.size?.size_name === (newProduct.size?.size_name || 'Unspecified') &&
-        existingProduct.color?.color_name === (newProduct.color?.color_name || 'Unspecified')
-      ));
-
-      if (!isDuplicate) {
-        console.log("Adding new product:", newProduct);
-
-        // Add valid, non-duplicate product to existingProducts list
-        existingProducts.push({
-          product: {
-            product_id: newProduct.product_id,
-            name: newProduct.name || '',
-            code: newProduct.code || '',
-          },
-          product_id: newProduct.product_id,
-          code: newProduct.code || '',
-          total_boxes: newProduct.total_boxes || 0,
-          unit_options_id: newProduct.unit_options_id || null,
-          quantity: newProduct.quantity,
-          rate: parseFloat(newProduct.rate) || 0,
-          discount: parseFloat(newProduct.discount) || 0,
-          print_name: newProduct.print_name || newProduct.name || '',
-          amount: parseFloat(newProduct.amount) || 0, // Ensure amount is a number
-          tax: parseFloat(newProduct.tax) || 0,       // Ensure tax is a number
-          remarks: newProduct.remarks || '',
-          cgst: parseFloat(newProduct.cgst) || 0,
-          sgst: parseFloat(newProduct.sgst) || 0,
-          igst: parseFloat(newProduct.igst) || 0,
-
-          // Set size and color properties with defaults if not provided
-          size: {
-            size_id: newProduct.size?.size_id || null,
-            size_name: newProduct.size?.size_name || 'Unspecified'
-          },
-          color: {
-            color_id: newProduct.color?.color_id || null,
-            color_name: newProduct.color?.color_name || 'Unspecified'
-          },
-          size_id: newProduct.size?.size_id || null,
-          color_id: newProduct.color?.color_id || null
-        });
-      } else {
-        console.log("Duplicate detected, skipping product:", newProduct);
-      }
-    });
-
-    // Update the model with the final product list, ensuring there are no placeholder or duplicate rows
-    this.formConfig.model['sale_invoice_items'] = [...existingProducts];
-
-    // Trigger change detection to update the UI immediately
-    this.formConfig.model = { ...this.formConfig.model }; // Refresh the formConfig model
-    setTimeout(() => this.cdRef.detectChanges(), 0); // Use async change detection for smooth UI update
-
-    // Log the final products to confirm the update
-    console.log("Final Products List in sale_invoice_items:", this.formConfig.model['sale_invoice_items']);
-  }
+//     // Log the final products to confirm the update
+//     console.log("Final Products List in sale_invoice_items:", this.formConfig.model['sale_invoice_items']);
+//   }
 
   ngOnDestroy() {
     document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
@@ -1003,62 +818,11 @@ async autoFillProductDetails(field, data) {
   }
 
   customFieldMetadata: any = {};
-  // createSaleInovice(){
-  //   const customFieldValues = this.formConfig.model['custom_field_values']
-
-  //   // Determine the entity type and ID dynamically
-  //   // const entityId = '97ca2f54-7036-4ae1-9515-894f676c58aa'; // Since we're in the Sale Invoice form
-    
-  
-  //   // Determine the entity type and ID dynamically
-  //   const entityName = 'sale_invoice'; // Since we're in the Sale Order form
-  //   const customId = this.formConfig.model.sale_invoice_order?.sale_invoice_id || null;
-  
-  //   // Find entity record from list
-  //   const entity = this.entitiesList.find(e => e.entity_name === entityName);
-
-  //   // if (!entity) {
-  //   //   console.error(`Entity not found for: ${entityName}`);
-  //   //   return;
-  //   // }
-
-  //   const entityId = entity.entity_id;
-  //   // Inject entity_id into metadata temporarily
-  //   Object.keys(this.customFieldMetadata).forEach((key) => {
-  //     this.customFieldMetadata[key].entity_id = entityId;
-  //   });
-  //   // Construct payload for custom fields
-  //   const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
-  //   // console.log("customFieldsPayload : ", customFieldsPayload);
-  //   // if (!customFieldsPayload) {
-  //   //   this.showDialog(); // Stop execution if required fields are missing
-  //   // }
-
-  //   // Construct the final payload
-  //   const payload = {
-  //     ...this.formConfig.model,
-  //     // custom_field: customFieldsPayload.custom_field, // Dictionary of custom fields
-  //     custom_field_values: customFieldsPayload // Array of custom field values
-  //   };
-
-  //   this.http.post('sales/sale_invoice_order/', payload)
-  //     .subscribe(response => {
-  //       console.log("Entered...")
-  //       this.showSuccessToast = true;
-  //       this.toastMessage = 'Record created successfully';
-  //       this.ngOnInit();
-  //       setTimeout(() => {
-  //         this.showSuccessToast = false;
-  //       }, 3000); // Hide toast after 3 seconds
-  //     }, error => {
-  //       console.error('Error creating record:', error);
-  //     });
-  // }
 
 // createSaleInovice() {
 //   const customFieldValues = this.formConfig.model['custom_field_values'];
 
-//   const entityName = 'sale_invoice'; 
+//   const entityName = 'sale_invoice';
 //   const customId = this.formConfig.model.sale_invoice_order?.sale_invoice_id || null;
 
 //   const entity = this.entitiesList.find(e => e.entity_name === entityName);
@@ -1073,119 +837,437 @@ async autoFillProductDetails(field, data) {
 //   Object.keys(this.customFieldMetadata).forEach((fieldKey) => {
 //     const metadata = this.customFieldMetadata[fieldKey.toLowerCase()] || {};
 //     if (metadata.is_required) {
-//       const currentValue = customFieldValues[fieldKey];
+//       let currentValue = customFieldValues[fieldKey];
 
 //       if (currentValue === '' || currentValue === null || currentValue === undefined) {
-//         if (metadata.field_type_id === "int" || metadata.field_type_id === "number") {
-//           customFieldValues[fieldKey] = 0;   // Default for numbers
-//         } else {
-//           customFieldValues[fieldKey] = "Auto"; // Default for strings/char
-//         }
+//         currentValue =
+//           metadata.field_type_id === "int" || metadata.field_type_id === "number"
+//             ? 0
+//             : "Auto";
+//         customFieldValues[fieldKey] = currentValue;
 //       }
 //     }
 //   });
 
 //   // Construct payload for custom fields
-//   const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(
+//   let customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(
 //     customFieldValues,
 //     entityName,
 //     customId
 //   );
 
-//   // Construct the final payload
+//   // 🚨 Ensure defaults are pushed into payload
+//   if (entityName === "sale_invoice") {
+//     const requiredDefaults = Object.keys(this.customFieldMetadata).map((fieldKey) => {
+//       const metadata = this.customFieldMetadata[fieldKey.toLowerCase()] || {};
+//       return {
+//         field_value:
+//           customFieldValues[fieldKey] ??
+//           (metadata.field_type_id === "int" ? 0 : "Auto"),
+//         field_value_type:
+//           metadata.field_type_id === "int" ? "number" : "string",
+//         entity_id: metadata.entity_id,
+//         entity_name: entityName,
+//         custom_field_id: fieldKey,
+//         custom_id: customId
+//       };
+//     });
+
+//     customFieldsPayload.custom_field_values = requiredDefaults;
+//   }
+
+//   // ================= FINAL PAYLOAD =================
 //   const payload = {
 //     ...this.formConfig.model,
-//     custom_field_values: customFieldsPayload.custom_field_values  
+//     custom_field_values: customFieldsPayload.custom_field_values
 //   };
 
+//   // ================= CREATE SALE INVOICE =================
 //   this.http.post('sales/sale_invoice_order/', payload)
 //     .subscribe(response => {
-//       console.log("Entered...");
+//       console.log("Sale Invoice Created Successfully");
+
+//       // ===================================================
+//       // 🔥 INVENTORY REDUCTION (ONLY IF DIRECT SALE)
+//       // ===================================================
+//       const saleOrderId = payload.sale_invoice_order?.sale_order_id;
+//       const invoiceItems = payload.sale_invoice_items || [];
+
+//       // 🔹 If sale_order_id EXISTS → stock already reduced during Sale Order
+//       // 🔹 If sale_order_id NOT EXISTS → reduce stock now
+//       if (!saleOrderId) {
+//         invoiceItems.forEach(item => {
+
+//           if (item.product_id && item.quantity > 0) {
+
+//             const stockPayload = {
+//               quantity: item.quantity
+//             };
+
+//             this.http.patch(
+//               `products/reduce-stock/${item.product_id}/`,
+//               stockPayload
+//             ).subscribe({
+//               next: () => {
+//                 console.log(
+//                   `Stock reduced → Product: ${item.product_id}, Qty: ${item.quantity}`
+//                 );
+//               },
+//               error: err => {
+//                 console.error(
+//                   `Stock update failed for product ${item.product_id}`,
+//                   err
+//                 );
+//               }
+//             });
+//           }
+//         });
+//       }
+//       // ===================================================
+
+//       // UI feedback
 //       this.showSuccessToast = true;
 //       this.toastMessage = 'Record created successfully';
+
 //       this.ngOnInit();
+
 //       setTimeout(() => {
 //         this.showSuccessToast = false;
 //       }, 3000);
+
 //     }, error => {
-//       console.error('Error creating record:', error);
+//       console.error('Error creating sale invoice:', error);
 //     });
 // }
 
+// createSaleInovice() {
+
+//   const customFieldValues = this.formConfig.model['custom_field_values'];
+
+//   const entityName = 'sale_invoice';
+//   const customId =
+//     this.formConfig.model.sale_invoice_order?.sale_invoice_id || null;
+
+//   const entity = this.entitiesList.find(
+//     e => e.entity_name === entityName
+//   );
+//   const entityId = entity?.entity_id;
+
+//   // Inject entity_id into metadata
+//   Object.keys(this.customFieldMetadata).forEach(key => {
+//     this.customFieldMetadata[key].entity_id = entityId;
+//   });
+
+//   // Ensure required defaults
+//   Object.keys(this.customFieldMetadata).forEach(fieldKey => {
+//     const metadata = this.customFieldMetadata[fieldKey.toLowerCase()] || {};
+//     if (metadata.is_required) {
+//       let currentValue = customFieldValues[fieldKey];
+//       if (
+//         currentValue === '' ||
+//         currentValue === null ||
+//         currentValue === undefined
+//       ) {
+//         customFieldValues[fieldKey] =
+//           metadata.field_type_id === 'int' ||
+//           metadata.field_type_id === 'number'
+//             ? 0
+//             : 'Auto';
+//       }
+//     }
+//   });
+
+//   const customFieldsPayload =
+//     CustomFieldHelper.constructCustomFieldsPayload(
+//       customFieldValues,
+//       entityName,
+//       customId
+//     );
+
+//   const payload = {
+//     ...this.formConfig.model,
+//     custom_field_values: customFieldsPayload.custom_field_values
+//   };
+
+//   // ================= CREATE SALE INVOICE =================
+//   this.http.post('sales/sale_invoice_order/', payload)
+//     .subscribe(() => {
+//       const saleOrderId = payload.sale_invoice_order?.sale_order_id;
+//       const invoiceItems = payload.sale_invoice_items || [];
+//       // =====================================================
+//       // 🔥 UPDATE production_qty (SAFE PATCH – CHILD ONLY)
+//       // =====================================================
+//       if (saleOrderId && invoiceItems.length > 0) {
+
+//         this.http.get(`sales/sale_order/${saleOrderId}`)
+//           .subscribe((res: any) => {
+
+//             const saleOrderData = res?.data?.sale_order;
+//             console.log('Fetched Sale Order Data for Update:', saleOrderData);
+//             const saleOrderItems = res?.data?.sale_order_items || [];
+//             console.log('Fetched Sale Order Items for Update:', saleOrderItems);
+//             const orderShipments = res?.data?.order_shipments || [];
+//             const ordersAttachments = res?.data?.order_attachments || [];
+//             const customFields = res?.data?.custom_field_values || [];
+
+//             const updatedItems = saleOrderItems.map((soItem: any) => {
+
+//               const invItem = invoiceItems.find(
+//                 (i: any) => i.product_id === soItem.product_id
+//               );
+
+//               if (
+//                 invItem &&
+//                 Number(soItem.production_qty) > 0 &&
+//                 Number(invItem.quantity) > 0
+//               ) {
+//                 return {
+//                   ...soItem,
+//                   available_qty: Math.max(
+//                     Number(soItem.available_qty) + Number(invItem.quantity),
+//                     0
+//                   ),
+//                   production_qty: Math.max(
+//                     Number(soItem.production_qty) - Number(invItem.quantity),
+//                     0
+//                   )
+//                 };
+//               }
+
+//               return soItem; // untouched
+//             });
+
+//             const updatePayload = {
+//               sale_order: {
+//                 ...saleOrderData, 
+//                 order_type: 'sale_order'
+//               },
+//               sale_order_items: updatedItems,
+//               order_shipments: orderShipments,
+//               order_attachments: ordersAttachments,
+//               custom_field_values: customFields 
+//             };
+
+//             this.http.put(
+//               `sales/sale_order/${saleOrderId}`,
+//               updatePayload
+//             ).subscribe(() => {
+//               console.log('Sale order production_qty updated safely');
+//             });
+//           });  
+//       }
+//       invoiceItems.forEach(item => {
+//         if (item.product_id && item.quantity > 0) {
+//           this.http.patch(
+//             `products/reduce-stock/${item.product_id}/`,
+//             { quantity: item.quantity }
+//           ).subscribe();
+//         }
+//       });
+      
+//       this.showSuccessToast = true;
+//       this.toastMessage = 'Record created successfully';
+
+//       this.ngOnInit();
+
+//       setTimeout(() => {
+//         this.showSuccessToast = false;
+//       }, 3000);
+
+//     }, error => {
+//       console.error('Error creating sale invoice', error);
+//     });
+
+// }
+
 createSaleInovice() {
+
   const customFieldValues = this.formConfig.model['custom_field_values'];
 
-  const entityName = 'sale_invoice'; 
-  const customId = this.formConfig.model.sale_invoice_order?.sale_invoice_id || null;
+  const entityName = 'sale_invoice';
+  const customId =
+    this.formConfig.model.sale_invoice_order?.sale_invoice_id || null;
 
-  const entity = this.entitiesList.find(e => e.entity_name === entityName);
+  const entity = this.entitiesList.find(
+    e => e.entity_name === entityName
+  );
   const entityId = entity?.entity_id;
 
-  // Inject entity_id into metadata temporarily
-  Object.keys(this.customFieldMetadata).forEach((key) => {
+  // Inject entity_id into metadata
+  Object.keys(this.customFieldMetadata).forEach(key => {
     this.customFieldMetadata[key].entity_id = entityId;
   });
 
-  // 🔹 Auto-populate defaults for required fields if missing
-  Object.keys(this.customFieldMetadata).forEach((fieldKey) => {
+  // Ensure required defaults
+  Object.keys(this.customFieldMetadata).forEach(fieldKey => {
     const metadata = this.customFieldMetadata[fieldKey.toLowerCase()] || {};
     if (metadata.is_required) {
       let currentValue = customFieldValues[fieldKey];
-
-      if (currentValue === '' || currentValue === null || currentValue === undefined) {
-        if (metadata.field_type_id === "int" || metadata.field_type_id === "number") {
-          currentValue = 0;
-        } else {
-          currentValue = "Auto";
-        }
-        customFieldValues[fieldKey] = currentValue;
+      if (
+        currentValue === '' ||
+        currentValue === null ||
+        currentValue === undefined
+      ) {
+        customFieldValues[fieldKey] =
+          metadata.field_type_id === 'int' ||
+          metadata.field_type_id === 'number'
+            ? 0
+            : 'Auto';
       }
     }
   });
 
-  // Construct payload for custom fields
-  let customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(
-    customFieldValues,
-    entityName,
-    customId
-  );
+  const customFieldsPayload =
+    CustomFieldHelper.constructCustomFieldsPayload(
+      customFieldValues,
+      entityName,
+      customId
+    );
 
-  // 🚨 Ensure defaults are pushed into payload even if user left fields blank
-  if (entityName === "sale_invoice") {
-    const requiredDefaults = Object.keys(this.customFieldMetadata).map((fieldKey) => {
-      const metadata = this.customFieldMetadata[fieldKey.toLowerCase()] || {};
-      return {
-        field_value: customFieldValues[fieldKey] ?? (metadata.field_type_id === "int" ? 0 : "Auto"),
-        field_value_type: (metadata.field_type_id === "int" ? "number" : "string"),
-        entity_id: metadata.entity_id,
-        entity_name: entityName,
-        custom_field_id: fieldKey,
-        custom_id: customId
-      };
-    });
-
-    customFieldsPayload.custom_field_values = requiredDefaults;
-  }
-
-  // Final payload
   const payload = {
     ...this.formConfig.model,
     custom_field_values: customFieldsPayload.custom_field_values
   };
 
+  // ================= CREATE SALE INVOICE =================
   this.http.post('sales/sale_invoice_order/', payload)
-    .subscribe(response => {
-      console.log("Entered...");
+    .subscribe(() => {
+
+      const saleOrderId = payload.sale_invoice_order?.sale_order_id;
+      const invoiceItems = payload.sale_invoice_items || [];
+
+      // =====================================================
+      // 🔥 UPDATE production_qty & available_qty (CHILD SAFE)
+      // =====================================================
+      if (saleOrderId && invoiceItems.length > 0) {
+
+        this.http.get(`sales/sale_order/${saleOrderId}`)
+          .subscribe((res: any) => {
+
+            const saleOrderData = res?.data?.sale_order;
+            const saleOrderItems = res?.data?.sale_order_items || [];
+            const orderShipments = res?.data?.order_shipments || [];
+            const ordersAttachments = res?.data?.order_attachments || [];
+            const customFields = res?.data?.custom_field_values || [];
+
+            const updatedItems = saleOrderItems.map((soItem: any) => {
+
+              const invItem = invoiceItems.find(
+                (i: any) => i.product_id === soItem.product_id
+              );
+
+              if (
+                invItem &&
+                Number(soItem.production_qty) > 0 &&
+                Number(invItem.quantity) > 0
+              ) {
+                return {
+                  ...soItem,
+                  available_qty: Math.max(
+                    Number(soItem.available_qty) + Number(invItem.quantity),
+                    0
+                  ),
+                  production_qty: Math.max(
+                    Number(soItem.production_qty) - Number(invItem.quantity),
+                    0
+                  )
+                };
+              }
+
+              return soItem;
+            });
+
+            // =================================================
+            // ✅ FLOW STATUS CHECK (BASED ONLY ON production_qty)
+            // =================================================
+            const allProductionCompleted = updatedItems.every(
+              (item: any) => Number(item.production_qty || 0) === 0
+            );
+
+            const baseSaleOrderPayload: any = {
+              ...saleOrderData,
+              order_type: 'sale_order'
+            };
+
+            if (allProductionCompleted) {
+
+              // 🔥 Fetch FK for Delivery in Progress
+              this.http
+                .get('masters/flow_status/?flow_status_name=Delivery in Progress')
+                .subscribe((flowRes: any) => {
+
+                  const flow_status_id = flowRes?.data?.[0]?.flow_status_id;
+
+                  if (flow_status_id) {
+                    baseSaleOrderPayload.flow_status_id = flow_status_id;
+                  }
+
+                  const updatePayload = {
+                    sale_order: baseSaleOrderPayload,
+                    sale_order_items: updatedItems,
+                    order_shipments: orderShipments,
+                    order_attachments: ordersAttachments,
+                    custom_field_values: customFields
+                  };
+
+                  this.http.put(
+                    `sales/sale_order/${saleOrderId}`,
+                    updatePayload
+                  ).subscribe(() => {
+                    console.log(
+                      'Sale order updated → Delivery in Progress (production completed)'
+                    );
+                  });
+                });
+
+            } else {
+
+              // 🔹 Normal update (NO flow_status change)
+              const updatePayload = {
+                sale_order: baseSaleOrderPayload,
+                sale_order_items: updatedItems,
+                order_shipments: orderShipments,
+                order_attachments: ordersAttachments,
+                custom_field_values: customFields
+              };
+
+              this.http.put(
+                `sales/sale_order/${saleOrderId}`,
+                updatePayload
+              ).subscribe(() => {
+                console.log(
+                  'Sale order updated (production still pending)'
+                );
+              });
+            }
+          });
+      }
+
+      // ================= REDUCE PRODUCT STOCK =================
+      invoiceItems.forEach(item => {
+        if (item.product_id && item.quantity > 0) {
+          this.http.patch(
+            `products/reduce-stock/${item.product_id}/`,
+            { quantity: item.quantity }
+          ).subscribe();
+        }
+      });
+
+      // ================= UI FEEDBACK =================
       this.showSuccessToast = true;
       this.toastMessage = 'Record created successfully';
+
       this.ngOnInit();
+
       setTimeout(() => {
         this.showSuccessToast = false;
       }, 3000);
+
     }, error => {
-      console.error('Error creating record:', error);
+      console.error('Error creating sale invoice', error);
     });
 }
+
 
 
 

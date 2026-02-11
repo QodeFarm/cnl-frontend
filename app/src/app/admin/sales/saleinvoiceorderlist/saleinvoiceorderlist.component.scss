@@ -1,0 +1,37 @@
+/* Table header */
+.table thead th {
+  background-color: #1b2e73;      /* same violet family */
+  color: #ffffff;
+  font-weight: 600;
+  border-right: 1px solid #3c4fb3;
+  border-bottom: 2px solid #3c4fb3;
+  white-space: nowrap;
+}
+
+/* Table body cells */
+.table td {
+  border-right: 1px solid #d6dcff;
+  vertical-align: middle;
+}
+
+/* Remove last column border */
+.table th:last-child,
+.table td:last-child {
+  border-right: none;
+}
+
+/* Row hover */
+.table tbody tr:hover {
+  background-color: #f4f6ff;
+}
+
+/* Checkbox alignment */
+.table input[type="checkbox"] {
+  margin-right: 6px;
+}
+
+/* Scroll container (important) */
+.table-responsive {
+  max-height: 420px;
+  overflow-y: auto;
+}

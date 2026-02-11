@@ -14,7 +14,7 @@
 <ng-template #customProductTemplate let-row>
     <ng-container *ngIf="row.products && row.products.length > 0; else noProducts">
       <div *ngFor="let product of row.products" style="display: flex; align-items: center;">
-        {{ product.product_name }} (Qty: {{ product.quantity }})
+        {{ product.product_name }} (Qty: {{ product.quantity - product.production_qty }})
       </div>
     </ng-container>
     <ng-template #noProducts>No products available</ng-template>

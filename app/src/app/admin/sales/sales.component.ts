@@ -802,7 +802,6 @@ editSaleOrder(event) {
       //  ENSURE SALE ORDER ALWAYS HAS 5 ITEM ROWS 
       // ---------------------------------------------------
       let items = res.data.sale_order_items ?? [];
-
       // fill existing rows first, then make sure total is 5
       while (items.length < 5) {
         items.push({
@@ -945,43 +944,12 @@ editSaleOrder(event) {
     this.ordersListModal = new bootstrap.Modal(document.getElementById("ordersListModal"));
     this.ordersListModal.show();
 
-    // // Remove aria-hidden from the modal when opening
-    // this.ordersModal.nativeElement.setAttribute('aria-hidden', 'false');
-
-    // // Ensure any existing backdrops are removed
-    // this.removeModalBackdrop();
-
-    // // Add 'show' class and display the modal
-    // this.ordersModal.nativeElement.classList.add('show');
-    // this.ordersModal.nativeElement.style.display = 'block';
-
-    // // Add backdrop and prevent body scroll
-    // const backdrop = document.createElement('div');
-    // backdrop.className = 'modal-backdrop fade show';
-    // document.body.appendChild(backdrop);
-    // document.body.classList.add('modal-open');
-    // document.body.style.overflow = 'hidden';
   }
 
   hideModal() {
     // var myModal = new bootstrap.Modal(document.getElementById("ordersListModal"));
     this.ordersListModal.hide();
-    // console.log('hideModal called');
-
-    // Set aria-hidden to true when the modal is hidden
-    // this.ordersModal.nativeElement.setAttribute('aria-hidden', 'true');
-
-    // // Hide the modal itself
-    // this.ordersModal.nativeElement.classList.remove('show');
-    // this.ordersModal.nativeElement.style.display = 'none';
-
-    // // console.log('Modal visibility set to none');
-
-    // // Remove the modal backdrop and body styling
-    // this.removeModalBackdrop();
-
-    // console.log('Body classes after hiding modal:', document.body.classList);
-    // console.log('Body overflow style after hiding modal:', document.body.style.overflow);
+    
   }
 
 
@@ -1486,113 +1454,10 @@ createQuickPackOption: string = 'no';
 
 // }
 
-private createWorkOrderFromSaleItem(
-  product: any,
-  saleOrderId: string,
-  orderDate?: string
-) {
-  const workOrderPayload = {
-    work_order: {
-      product_id: product.product_id,
-      quantity: product.quantity || 0,
-      completed_qty: 0,
-      pending_qty: product.quantity || 0,
-      start_date: orderDate || new Date().toISOString().split('T')[0],
-      sync_qty: true,
-      size_id: product.size?.size_id || null,
-      color_id: product.color?.color_id || null,
-      status_id: '',
-      sale_order_id: saleOrderId
-    },
-    bom: [
-      {
-        product_id: product.product_id,
-        size_id: product.size?.size_id || null,
-        color_id: product.color?.color_id || null
-      }
-    ],
-    work_order_machines: [],
-    workers: [],
-    work_order_stages: []
-  };
 
-  return this.http.post('production/work_order/', workOrderPayload);
-}
-
-
-// createSaleOrder() {
-//   // Use the already validated payload
-//   const customFieldsPayload = this.validatedCustomFieldsPayload;
-
-//   const payload = {
-//     ...this.formConfig.model,
-//     custom_field_values: customFieldsPayload.custom_field_values
-//   };
-
-//   // ---------------- QuickPack creation logic ----------------
-//   if (this.createQuickPack) {
-//     const customerName = payload.sale_order?.customer?.name || "Customer";
-//     const productNames = payload.sale_order_items?.map(item => item.product?.name) || [];
-
-//     let quickPackName = `${customerName} QuickPack (${productNames.join(', ')})`;
-//     // Optional: shorten if too long
-//     if (quickPackName.length > 50) {
-//         quickPackName = `${customerName} QuickPack (${productNames[0]} +${productNames.length - 1} more)`;
-//     }
-
-//     const quickPackPayload = {
-//         quick_pack_data: {
-//             name: quickPackName,
-//             customer_id: payload.sale_order.customer?.customer_id,
-//             description: `QuickPack created from Sale Order ${payload.sale_order.order_no}`,
-//             active: 'Y',
-//             lot_qty: payload.sale_order_items
-//               ?.filter(item => item.product && item.quantity) // only count entered items
-//               .reduce((sum, item) => sum + (item.quantity || 0), 0) || 0
-//         },
-//         quick_pack_data_items: payload.sale_order_items?.map(item => ({
-//             product_id: item.product?.product_id,
-//             quantity: item.quantity,
-//             unit_options_id: item.unit_options?.unit_options_id,
-//             size_id: item.size?.size_id,
-//             color_id: item.color?.color_id
-//         })) || []
-//     };
-
-//     // Call QuickPack API separately
-//     this.http.post<any>('sales/quick_pack/', quickPackPayload)
-//       .subscribe(res => {
-//         console.log("QuickPack created successfully:", res);
-//       }, err => {
-//         console.error("QuickPack creation failed:", err);
-//       });
-//   }
-//   // ---------------- End QuickPack logic ----------------
-
-//   // Now create Sale Order
-//   this.http.post<any>('sales/sale_order/', payload)
-//     .subscribe(response => {
-//       this.showSuccessToast = true;
-//       this.toastMessage = 'Record created successfully';
-
-//       const saleOrderId = response?.data?.sale_order?.sale_order_id;
-//       console.log("Created Sale Order ID:", saleOrderId);
-
-//       // Auto WhatsApp (silent)
-//       if (saleOrderId) {
-//         this.sendSaleOrderWhatsapp(saleOrderId);
-//       }
-
-//       this.ngOnInit();
-//       setTimeout(() => this.showSuccessToast = false, 3000);
-//     }, error => {
-//       if (error.status === 400) { 
-//         this.showDialog();
-//       }
-//     });
-// }
 
 createSaleOrder() {
+  // Use the already validated payload
   const customFieldsPayload = this.validatedCustomFieldsPayload;
 
   const payload = {
@@ -1600,158 +1465,229 @@ createSaleOrder() {
     custom_field_values: customFieldsPayload.custom_field_values
   };
 
-  /* -------------------------------------------------
-   QUICK PACK (UNCHANGED)
-  -------------------------------------------------- */
+  // ---------------- QuickPack creation logic ----------------
   if (this.createQuickPack) {
-    const customerName = payload.sale_order?.customer?.name || 'Customer';
-    const productNames = payload.sale_order_items?.map(i => i.product?.name) || [];
+    const customerName = payload.sale_order?.customer?.name || "Customer";
+    const productNames = payload.sale_order_items?.map(item => item.product?.name) || [];
 
     let quickPackName = `${customerName} QuickPack (${productNames.join(', ')})`;
+    // Optional: shorten if too long
     if (quickPackName.length > 50) {
-      quickPackName = `${customerName} QuickPack (${productNames[0]} +${productNames.length - 1} more)`;
+        quickPackName = `${customerName} QuickPack (${productNames[0]} +${productNames.length - 1} more)`;
     }
 
     const quickPackPayload = {
-      quick_pack_data: {
-        name: quickPackName,
-        customer_id: payload.sale_order.customer?.customer_id,
-        description: `QuickPack created from Sale Order ${payload.sale_order.order_no}`,
-        active: 'Y',
-        lot_qty: payload.sale_order_items.reduce((s, i) => s + (i.quantity || 0), 0)
-      },
-      quick_pack_data_items: payload.sale_order_items.map(i => ({
-        product_id: i.product?.product_id,
-        quantity: i.quantity,
-        unit_options_id: i.unit_options?.unit_options_id,
-        size_id: i.size?.size_id,
-        color_id: i.color?.color_id
-      }))
+        quick_pack_data: {
+            name: quickPackName,
+            customer_id: payload.sale_order.customer?.customer_id,
+            description: `QuickPack created from Sale Order ${payload.sale_order.order_no}`,
+            active: 'Y',
+            lot_qty: payload.sale_order_items
+              ?.filter(item => item.product && item.quantity) // only count entered items
+              .reduce((sum, item) => sum + (item.quantity || 0), 0) || 0
+        },
+        quick_pack_data_items: payload.sale_order_items?.map(item => ({
+            product_id: item.product?.product_id,
+            quantity: item.quantity,
+            unit_options_id: item.unit_options?.unit_options_id,
+            size_id: item.size?.size_id,
+            color_id: item.color?.color_id
+        })) || []
     };
 
-    this.http.post('sales/quick_pack/', quickPackPayload).subscribe();
+    // Call QuickPack API separately
+    this.http.post<any>('sales/quick_pack/', quickPackPayload)
+      .subscribe(res => {
+        console.log("QuickPack created successfully:", res);
+      }, err => {
+        console.error("QuickPack creation failed:", err);
+      });
   }
+  // ---------------- End QuickPack logic ----------------
 
-  /* -------------------------------------------------
-   SPLIT LOGIC
-  -------------------------------------------------- */
-  const parentItems: any[] = [];
-  const childItems: any[] = [];
-
-  payload.sale_order_items.forEach(item => {
-    const qty = Number(item.quantity) || 0;
-    const available = Number(item.available_qty) || 0;
-
-    if (qty > available) {
-      if (available > 0) {
-        parentItems.push({
-          ...item,
-          quantity: available,
-          production_qty: 0
-        });
-      }
-
-      childItems.push({
-        ...item,
-        quantity: qty - available,
-        available_qty: 0,
-        production_qty: qty - available
-      });
-    } else {
-      parentItems.push({
-        ...item,
-        production_qty: 0
-      });
-    }
-  });
-  // 8
-
-
-  payload.sale_order_items = parentItems;
-
-  /* -------------------------------------------------
-   CREATE PARENT SALE ORDER
-  -------------------------------------------------- */
-  this.http.post<any>('sales/sale_order/', payload).subscribe({
-    next: parentRes => {
-      const parentOrder = parentRes.data.sale_order;
-      const parentOrderId = parentOrder.sale_order_id;
-
-      // WhatsApp
-      this.sendSaleOrderWhatsapp(parentOrderId);
-
-      /* -------------------------------------------------
-       CREATE CHILD SALE ORDERS + WORK ORDERS
-      -------------------------------------------------- */
-      if (childItems.length > 0) {
-        let counter = 1;
-
-        const childRequests = childItems.map(item => {
-          const childOrderNo = `${parentOrder.order_no}-P${counter++}`;
-
-          const childPayload = {
-            sale_order: {
-              ...parentOrder,
-              sale_order_id: undefined,
-              order_no: childOrderNo,
-              flow_status: { flow_status_name: 'Production' },
-              item_value: item.quantity * item.rate,
-              total_amount: item.quantity * item.rate,
-              order_type: parentOrder.order_type || 'sale_order',
-              dis_amt: 0 // overall discount remains in parent
-            },
-            sale_order_items: [item],
-            order_attachments: payload.order_attachments,
-            order_shipments: payload.order_shipments,
-            custom_field_values: customFieldsPayload.custom_field_values
-          };
-
-          return this.http.post<any>('sales/sale_order/', childPayload).pipe(
-            switchMap(childRes => {
-              const childOrderId = childRes.data.sale_order.sale_order_id;
-
-              /* ---- WORK ORDER CREATION ---- */
-              const workOrderPayload = {
-                work_order: {
-                  product_id: item.product_id,
-                  quantity: item.quantity,
-                  completed_qty: 0,
-                  pending_qty: item.quantity,
-                  start_date: parentOrder.order_date,
-                  sync_qty: true,
-                  size_id: item.size?.size_id || null,
-                  color_id: item.color?.color_id || null,
-                  status_id: '',
-                  sale_order_id: childOrderId
-                },
-                bom: [{
-                  product_id: item.product_id,
-                  size_id: item.size?.size_id || null,
-                  color_id: item.color?.color_id || null
-                }],
-                work_order_machines: [],
-                workers: [],
-                work_order_stages: []
-              };
-
-              return this.http.post('production/work_order/', workOrderPayload);
-            })
-          );
-        });
-
-        forkJoin(childRequests).subscribe();
-      }
-
+  // Now create Sale Order
+  this.http.post<any>('sales/sale_order/', payload)
+    .subscribe(response => {
       this.showSuccessToast = true;
-      this.toastMessage = 'Sale Order created successfully';
-      setTimeout(() => (this.showSuccessToast = false), 3000);
+      this.toastMessage = 'Record created successfully';
+
+      const saleOrderId = response?.data?.sale_order?.sale_order_id;
+      console.log("Created Sale Order ID:", saleOrderId);
+
+      // Auto WhatsApp (silent)
+      if (saleOrderId) {
+        this.sendSaleOrderWhatsapp(saleOrderId);
+      }
+
       this.ngOnInit();
-    },
-    error: err => {
-      if (err.status === 400) this.showDialog();
-    }
-  });
+      setTimeout(() => this.showSuccessToast = false, 3000);
+    }, error => {
+      if (error.status === 400) { 
+        this.showDialog();
+      }
+    });
 }
+
+// createSaleOrder() {
+//   const customFieldsPayload = this.validatedCustomFieldsPayload;
+
+//   const payload = {
+//     ...this.formConfig.model,
+//     custom_field_values: customFieldsPayload.custom_field_values
+//   };
+
+//   /* -------------------------------------------------
+//    QUICK PACK (UNCHANGED)
+//   -------------------------------------------------- */
+//   if (this.createQuickPack) {
+//     const customerName = payload.sale_order?.customer?.name || 'Customer';
+//     const productNames = payload.sale_order_items?.map(i => i.product?.name) || [];
+
+//     let quickPackName = `${customerName} QuickPack (${productNames.join(', ')})`;
+//     if (quickPackName.length > 50) {
+//       quickPackName = `${customerName} QuickPack (${productNames[0]} +${productNames.length - 1} more)`;
+//     }
+
+//     const quickPackPayload = {
+//       quick_pack_data: {
+//         name: quickPackName,
+//         customer_id: payload.sale_order.customer?.customer_id,
+//         description: `QuickPack created from Sale Order ${payload.sale_order.order_no}`,
+//         active: 'Y',
+//         lot_qty: payload.sale_order_items.reduce((s, i) => s + (i.quantity || 0), 0)
+//       },
+//       quick_pack_data_items: payload.sale_order_items.map(i => ({
+//         product_id: i.product?.product_id,
+//         quantity: i.quantity,
+//         unit_options_id: i.unit_options?.unit_options_id,
+//         size_id: i.size?.size_id,
+//         color_id: i.color?.color_id
+//       }))
+//     };
+
+//     this.http.post('sales/quick_pack/', quickPackPayload).subscribe();
+//   }
+
+//   /* -------------------------------------------------
+//    SPLIT LOGIC
+//   -------------------------------------------------- */
+//   const parentItems: any[] = [];
+//   const childItems: any[] = [];
+
+//   payload.sale_order_items.forEach(item => {
+//     const qty = Number(item.quantity) || 0;
+//     const available = Number(item.available_qty) || 0;
+
+//     if (qty > available) {
+//       if (available > 0) {
+//         parentItems.push({
+//           ...item,
+//           quantity: available,
+//           production_qty: 0
+//         });
+//       }
+
+//       childItems.push({
+//         ...item,
+//         quantity: qty - available,
+//         available_qty: 0,
+//         production_qty: qty - available
+//       });
+//     } else {
+//       parentItems.push({
+//         ...item,
+//         production_qty: 0
+//       });
+//     }
+//   });
+//   // 8
+
+
+//   payload.sale_order_items = parentItems;
+
+//   /* -------------------------------------------------
+//    CREATE PARENT SALE ORDER
+//   -------------------------------------------------- */
+//   this.http.post<any>('sales/sale_order/', payload).subscribe({
+//     next: parentRes => {
+//       const parentOrder = parentRes.data.sale_order;
+//       const parentOrderId = parentOrder.sale_order_id;
+
+//       // WhatsApp
+//       this.sendSaleOrderWhatsapp(parentOrderId);
+
+//       /* -------------------------------------------------
+//        CREATE CHILD SALE ORDERS + WORK ORDERS
+//       -------------------------------------------------- */
+//       if (childItems.length > 0) {
+//         let counter = 1;
+
+//         const childRequests = childItems.map(item => {
+//           const childOrderNo = `${parentOrder.order_no}-P${counter++}`;
+
+//           const childPayload = {
+//             sale_order: {
+//               ...parentOrder,
+//               sale_order_id: undefined,
+//               order_no: childOrderNo,
+//               flow_status: { flow_status_name: 'Production' },
+//               item_value: item.quantity * item.rate,
+//               total_amount: item.quantity * item.rate,
+//               order_type: parentOrder.order_type || 'sale_order',
+//               dis_amt: 0 // overall discount remains in parent
+//             },
+//             sale_order_items: [item],
+//             order_attachments: payload.order_attachments,
+//             order_shipments: payload.order_shipments,
+//             custom_field_values: customFieldsPayload.custom_field_values
+//           };
+
+//           return this.http.post<any>('sales/sale_order/', childPayload).pipe(
+//             switchMap(childRes => {
+//               const childOrderId = childRes.data.sale_order.sale_order_id;
+
+//               /* ---- WORK ORDER CREATION ---- */
+//               const workOrderPayload = {
+//                 work_order: {
+//                   product_id: item.product_id,
+//                   quantity: item.quantity,
+//                   completed_qty: 0,
+//                   pending_qty: item.quantity,
+//                   start_date: parentOrder.order_date,
+//                   sync_qty: true,
+//                   size_id: item.size?.size_id || null,
+//                   color_id: item.color?.color_id || null,
+//                   status_id: '',
+//                   sale_order_id: childOrderId
+//                 },
+//                 bom: [{
+//                   product_id: item.product_id,
+//                   size_id: item.size?.size_id || null,
+//                   color_id: item.color?.color_id || null
+//                 }],
+//                 work_order_machines: [],
+//                 workers: [],
+//                 work_order_stages: []
+//               };
+
+//               return this.http.post('production/work_order/', workOrderPayload);
+//             })
+//           );
+//         });
+
+//         forkJoin(childRequests).subscribe();
+//       }
+
+//       this.showSuccessToast = true;
+//       this.toastMessage = 'Sale Order created successfully';
+//       setTimeout(() => (this.showSuccessToast = false), 3000);
+//       this.ngOnInit();
+//     },
+//     error: err => {
+//       if (err.status === 400) this.showDialog();
+//     }
+//   });
+// }
 
 currentOutOfStockItem: any = null;
 showOutOfStockModal: boolean = false;
@@ -3702,6 +3638,7 @@ getUnitData(unitInfo) {
                                   .filter(item => item.product_id)   // only keep valid rows
                                   .map(item => ({
                                     ...item,
+                                    quantity: Number(item.quantity || 0) - Number(item.production_qty || 0),
                                     discount: item.discount
                                 })),
                                 order_attachments: orderAttachments,
@@ -4437,6 +4374,9 @@ getUnitData(unitInfo) {
                   placeholder: 'In Production',
                   hideLabel: true,
                   disabled: true
+                },
+                expressionProperties: {
+                  'model.production_qty': 'model.production_qty'
                 }
               },
               {

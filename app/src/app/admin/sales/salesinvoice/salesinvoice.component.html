@@ -27,7 +27,7 @@
         <button (click)="openCopyModal()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#copyModal">
             Copy
         </button>
-        <button (click)="showPendingOrdersList()" type="button" class="btn btn-primary">
+        <button (click)="showGlobalPendingOrders()" type="button" class="btn btn-primary">
           Pending Orders
         </button>
         <button (click)="showSaleInvoiceListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
@@ -72,13 +72,13 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="hideModal()"></button>
       </div>
       <div class="modal-body">
-        <app-orderslist class="custom-list" 
-          [customerOrders]="customerOrders" 
-          (orderSelected)="handleOrderSelected($event)"
-          (productsPulled)="handleProductPull($event)"
+        <app-saleinvoiceorderlist
+          [customerOrders]="customerOrders"
           [noOrdersMessage]="noOrdersMessage"
+          (orderSelected)="handleOrderSelected($event)"
           (modalClosed)="closeModal()">
-        </app-orderslist>
+        </app-saleinvoiceorderlist>
+
       </div>
     </div>
   </div>
