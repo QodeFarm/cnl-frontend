@@ -1,12 +1,12 @@
 /* Table header */
-.table thead th {
-  background-color: #1b2e73;      /* same violet family */
-  color: #ffffff;
-  font-weight: 600;
-  border-right: 1px solid #3c4fb3;
-  border-bottom: 2px solid #3c4fb3;
-  white-space: nowrap;
-}
+// .table thead th {
+//   background-color: #1b2e73;      /* same violet family */
+//   color: #ffffff;
+//   font-weight: 600;
+//   border-right: 1px solid #3c4fb3;
+//   border-bottom: 2px solid #3c4fb3;
+//   white-space: nowrap;
+// }
 
 /* Table body cells */
 .table td {
@@ -15,10 +15,10 @@
 }
 
 /* Remove last column border */
-.table th:last-child,
-.table td:last-child {
-  border-right: none;
-}
+// .table th:last-child,
+// .table td:last-child {
+//   border-right: none;
+// }
 
 /* Row hover */
 .table tbody tr:hover {
@@ -30,8 +30,33 @@
   margin-right: 6px;
 }
 
-/* Scroll container (important) */
+// /* Scroll container (important) */
+// .table-responsive {
+//   max-height: 420px;
+//   overflow-y: auto;
+// }
+
+/* Scroll wrapper */
 .table-responsive {
   max-height: 420px;
   overflow-y: auto;
+  position: relative;
+}
+
+/* Sticky table header */
+.table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+
+  background-color: #1b2e73;   /* same violet */
+  color: #ffffff;
+
+  border-bottom: 2px solid #3c4fb3;
+  border-right: 1px solid #3c4fb3;
+}
+
+/* Keep last column clean */
+.table thead th:last-child {
+  border-right: none;
 }
