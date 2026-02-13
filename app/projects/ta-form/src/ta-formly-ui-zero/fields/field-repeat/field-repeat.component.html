@@ -1,9 +1,12 @@
 <nz-card [nzBordered]="true" [nzTitle]="to.title" [nzExtra]="extraTemplate">
     <div class="ant-table-container">
-        <table class="table table-bordered product-item-table">
+        <table class="table table-bordered product-item-table" (keydown)="onTableKeyDown($event)">
             <thead *ngIf="to.tableCols">
                 <tr>
-                    <th *ngFor="let col of field.fieldArray.fieldGroup;">
+                    <th *ngFor="let col of field.fieldArray.fieldGroup; let idx = index"
+                        [class.sticky-col-0]="hasStickyColumns && idx === 0"
+                        [class.sticky-col-1]="hasStickyColumns && idx === 1"
+                        [class.sticky-col-2]="hasStickyColumns && idx === 2">
                         {{ col.templateOptions.label }}
                     </th>
                     <th *ngIf="!isRestrictedPage" class="sticky-column">
@@ -14,7 +17,10 @@
             </thead>
             <tbody class="ant-table-tbody">
                 <tr class="ant-table-row" *ngFor="let f of field.fieldGroup; let i = index;">
-                    <td *ngFor="let fg of f.fieldGroup">
+                    <td *ngFor="let fg of f.fieldGroup; let colIdx = index"
+                        [class.sticky-col-0]="hasStickyColumns && colIdx === 0"
+                        [class.sticky-col-1]="hasStickyColumns && colIdx === 1"
+                        [class.sticky-col-2]="hasStickyColumns && colIdx === 2">
                         <formly-field class="col" [field]="fg"></formly-field>
                     </td>
                     <td class="sticky-column" *ngIf="!isRestrictedPage" style="vertical-align: middle;text-align: center;">

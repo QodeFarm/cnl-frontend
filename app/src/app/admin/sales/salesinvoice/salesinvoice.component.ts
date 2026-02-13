@@ -339,7 +339,17 @@ export class SalesinvoiceComponent {
 async autoFillProductDetails(field, data) {
   this.productOptions = data;
   console.log("Autofill data : ", this.productOptions);
-  if (!field.form?.controls || !data) return;
+  if (!field.form?.controls) return;
+
+  // When product is cleared (X button), reset all auto-filled fields
+  if (!data) {
+    const clearMappings = { code: '', rate: null, discount: 0, print_name: '', mrp: null, unit_options_id: null, quantity: null, amount: null, total_boxes: null };
+    Object.entries(clearMappings).forEach(([key, value]) => {
+      field.form.controls[key]?.setValue(value);
+    });
+    this.totalAmountCal();
+    return;
+  }
 
   const customerCategory = this.formConfig.model?.sale_invoice_order?.customer?.customer_category?.name?.toLowerCase();
 

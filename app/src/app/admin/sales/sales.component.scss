@@ -1,3 +1,598 @@
+/* ====================== Sale Options Modal (nz-modal) ====================== */
+::ng-deep .sale-options-modal-wrapper {
+  .ant-modal-header {
+    background: linear-gradient(135deg, #1e3a5f 0%, #0d2137 100%);
+    border-radius: 8px 8px 0 0;
+    padding: 14px 24px;
+
+    .ant-modal-title {
+      color: #fff;
+      font-weight: 600;
+      font-size: 16px;
+    }
+  }
+
+  .ant-modal-close {
+    color: #fff;
+
+    &:hover {
+      color: #ff4d4f;
+    }
+  }
+
+  .ant-modal-content {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  }
+
+  .ant-modal-body {
+    padding: 24px;
+  }
+
+  .ant-modal-footer {
+    border-top: 1px solid #f0f0f0;
+    padding: 12px 24px;
+  }
+}
+
+.sale-options-body {
+  .sale-option-field {
+    margin-bottom: 20px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .sale-option-label {
+      display: block;
+      font-weight: 600;
+      font-size: 13px;
+      color: #374151;
+      margin-bottom: 8px;
+    }
+  }
+}
+
+.sale-options-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* ====================== Amount Check Modal (nz-modal) ====================== */
+::ng-deep .amount-check-modal-wrapper {
+  .ant-modal-header {
+    background: linear-gradient(135deg, #a8341e 0%, #7a1e10 100%);
+    border-radius: 8px 8px 0 0;
+    padding: 14px 24px;
+
+    .ant-modal-title {
+      color: #fff;
+      font-weight: 600;
+      font-size: 16px;
+    }
+  }
+
+  .ant-modal-close {
+    color: #fff;
+
+    &:hover {
+      color: #ffd6d6;
+    }
+  }
+
+  .ant-modal-content {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  }
+
+  .ant-modal-body {
+    padding: 28px 24px;
+  }
+
+  .ant-modal-footer {
+    border-top: 1px solid #f0f0f0;
+    padding: 12px 24px;
+  }
+}
+
+.amount-check-body {
+  text-align: center;
+
+  .amount-warning-icon {
+    font-size: 48px;
+    color: #faad14;
+    margin-bottom: 16px;
+  }
+
+  .amount-message {
+    font-size: 15px;
+    color: #374151;
+    line-height: 1.6;
+    margin: 0;
+  }
+}
+
+.amount-check-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* ====================== Validation Error Modal (nz-modal) ====================== */
+::ng-deep .validation-error-modal-wrapper {
+  .ant-modal-header {
+    background: linear-gradient(135deg, #d4860b 0%, #b36d00 100%);
+    border-radius: 8px 8px 0 0;
+    padding: 14px 24px;
+
+    .ant-modal-title {
+      color: #fff;
+      font-weight: 600;
+      font-size: 16px;
+    }
+  }
+
+  .ant-modal-close {
+    color: #fff;
+
+    &:hover {
+      color: #fff3cd;
+    }
+  }
+
+  .ant-modal-content {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  }
+
+  .ant-modal-body {
+    padding: 28px 24px;
+  }
+
+  .ant-modal-footer {
+    border-top: 1px solid #f0f0f0;
+    padding: 12px 24px;
+    text-align: center;
+  }
+}
+
+.validation-error-body {
+  text-align: center;
+
+  .validation-warning-icon {
+    font-size: 48px;
+    color: #faad14;
+    margin-bottom: 16px;
+  }
+
+  .validation-message {
+    font-size: 15px;
+    color: #374151;
+    line-height: 1.6;
+    margin: 0;
+  }
+}
+
+
+// new css changes above--------------------------
+.button-spacing {
+    margin-left: 10px;
+  }
+
+// Custom modal size 
+.custom-size {
+    max-width: 65%; //Increase the width to 85% of the viewport 
+    max-height: 90vh; //Increase the height to 85% of the viewport height 
+}
+
+.custom-dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5); /* Dark overlay */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999; /* Ensure it's above other elements */
+}
+
+.custom-dialog-box {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 300px; /* Adjust width as needed */
+}
+
+.custom-dialog-box p {
+    margin-bottom: 20px;
+}
+
+.custom-dialog-box button {
+    padding: 10px 20px;
+    background-color: #007bff; /* Primary color */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 0 5px; /* Space between buttons */
+}
+
+.custom-dialog-box button:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+}
+
+.toast-message {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #fff; /* Pure white background */
+  color: #0e0d0d; /* Dark grey text */
+  padding: 12px 30px;
+  width: 370px; /* Wider box */
+  height: 60px;
+  border-radius: 0px; /* No rounded corners */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Soft shadow */
+  display: flex;
+  align-items: center;
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  z-index: 1000;
+  animation: fadeIn 0.4s ease-in-out;
+  border: 2px solid #dcdcdc; /* Subtle border */
+}
+
+/* Circle with white inside and green border */
+.tick-circle {
+  width: 23px; /* Slightly smaller */
+  height: 23px;
+  background-color: #fff; /* White inside */
+  border: 2px solid #28a745; /* Green border */
+  border-radius: 50%; /* Perfect circle */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px; /* Space between icon and text */
+}
+
+/* Smaller tick mark inside the white circle */
+.tick-mark {
+  color: #28a745; /* Green tick */
+  font-size: 12px; /* Smaller size */
+  // font-weight: bold;
+  line-height: 1; /* Perfectly centered */
+}
+
+.toast-message-text {
+  flex: 1;
+  color: rgb(41, 41, 41);
+  font-size: 16px;
+  font-weight: 500; /* Medium weight */
+}
+
+/* Close button (X symbol) */
+.toast-close {
+  font-size: 16px;
+  color: rgb(73, 73, 73);
+  cursor: pointer;
+  margin-left: 12px; /* Space between text and close button */
+}
+
+.toast-close:hover {
+  color: #000; /* Darker on hover */
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+//added .modal-backdrop because of this code only we can abble to see past orders modalbox function correctly 
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); // Adjust opacity as needed 
+  z-index: 999; //Ensure it's below the modal but above other content 
+}
+
+.modal-dialog.custom-size {
+    max-width: 300px; /* Adjust width as needed */
+}
+
+.quickpack-container {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Adjust spacing between elements */
+  }
+
+.quickpack-container label {
+    margin-right: 10px; /* Space between label and dropdown */
+    white-space: nowrap; /* Prevents wrapping of text */
+}
+
+.quickpack-container-1 .dropdown-container {
+  flex-grow: 1; /* Adjust width of the dropdown if needed */
+}
+  
+.quickpack-container-1 .dropdown-select {
+  min-width: 100px; /* Adjust dropdown width */
+  padding: 5px;
+}
+
+.quickpack-container-1 button {
+  margin-left: 10px; /* Space between dropdown and button */
+}
+
+// .quickpack-select {
+//     width: 200px; /* Set dropdown width */
+//     height: 38px; /* Adjust height to match buttons */
+//     border-radius: 4px;
+//   }
+  
+//   .btn-icon {
+//     background-color: #2c5ca9; /* Match the blue button background */
+//     color: white;
+//     border: none;
+//     height: 38px;
+//     width: 38px;
+//     display: flex;
+//     justify-content: center;
+//     align-items: center;
+//   }
+  
+//   .btn-icon i {
+//     font-size: 16px;
+//   }
+  
+//   .btn-primary {
+//     height: 38px; /* Match height with the dropdown */
+//   }
+
+//==================================
+/* Dropdown container */
+.dropdown-container {
+    position: relative;
+    width: 100%; /* Adjust width as required */
+    max-width: 300px;
+    border: 1px solid #ccc;
+    // border-radius: 4px;
+    background-color: #fff;
+    font-size: 14px;
+    overflow: hidden;
+  }
+  
+  /* Dropdown select styling */
+.dropdown-select {
+    width: 100%;
+    padding: 10px 30px 10px 10px; /* Padding to make room for arrow */
+    font-size: 14px;
+    border: none;
+    outline: none;
+    appearance: none; /* Hides default arrow in browsers */
+    background: transparent;
+    cursor: pointer;
+  }
+  
+  /* Add custom arrow for the dropdown */
+.dropdown-container::after {
+    content: '▼'; /* Unicode for a dropdown arrow */
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none; /* Prevent interaction with the arrow */
+    font-size: 12px;
+    color: #888; /* Adjust arrow color */
+    }
+
+.quickpack-box {
+  // border: 1px solid #ccc;
+  // border-radius: 4px;
+  background-color: #f9f9f9;
+  display: flex;
+  align-items: center;
+  // padding: 8px;
+  .btn-primary{
+    border-radius: 0 4px 4px 0 !important;
+  }
+}
+.dropdown-select {
+  border: none;
+  outline: none;
+  font-size: 14px;
+  margin-right: 8px;
+}
+.custom-modal.modal-center.show{
+   display: inline-flex !important;
+    width: 100%;
+    .modal-dialog{
+      width: 100%;
+      display: flex;
+      align-items: center;
+    }
+}
+
+.modal.fade .modal-dialog{
+  border: none;
+  .modal-content{
+    border: solid 2px white;
+    margin: 2px;
+  }
+} 
+
+//--------------------
+// /* Modal Overlay */
+// .modal-info {
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+//   position: fixed;
+//   z-index: 1050; /* higher than other UI elements */
+//   left: 0;
+//   top: 0;
+//   width: 100%;
+//   height: 100%;
+//   background-color: rgba(0,0,0,0.6);
+//   overflow-y: auto;
+//   padding: 20px 0;
+//   animation: fadeInOverlay 0.3s ease-in-out;
+// }
+
+// /* Fade-in overlay animation */
+// @keyframes fadeInOverlay {
+//   from { background-color: rgba(0,0,0,0); }
+//   to { background-color: rgba(0,0,0,0.6); }
+// }
+
+// /* Modal Content */
+// .modal-info .modal-content {
+//   background: #fff;
+//   padding: 15px;
+//   border-radius: 10px;
+//   width: 80%;
+//   max-width: 900px;
+//   box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+//   animation: fadeIn 0.3s ease-in-out;
+//   position: relative;
+// }
+
+// /* Modal content animation */
+// @keyframes fadeIn {
+//   from { opacity: 0; transform: translateY(-20px); }
+//   to { opacity: 1; transform: translateY(0); }
+// }
+
+// /* Close Button */
+// .modal-info .close {
+//   position: absolute;
+//   top: 10px;
+//   right: 10px;
+//   font-size: 28px;
+//   font-weight: bold;
+//   cursor: pointer;
+//   color: #333;
+//   transition: color 0.2s;
+// }
+// .modal-info .close:hover {
+//   color: red;
+// }
+
+.info-btn {
+  background-color: #07052e;   /* Violet */
+  color: #fff;
+  border: none;
+  border-radius: 20%;
+  width: 22px;
+  height: 22px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  transition: all .2s ease-in-out;
+}
+
+// .info-btn:hover {
+//   background-color: #140d61;   /* Darker violet */
+//   transform: scale(1.1);
+//   // box-shadow: 0 2px 6px rgba(6, 2, 68, 0.4);
+// }
+
+
+.zb-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.zb-btn.yes {
+  background: #2e7d32;
+}
+
+.zb-btn.yes:hover {
+  background: #1b5e20;
+}
+
+.zb-btn.no {
+  background: #9e9e9e;
+}
+
+.zb-btn.no:hover {
+  background: #616161;
+}
+// ========== Draft Restore Modal Styles ==========
+::ng-deep .draft-restore-modal-wrapper {
+  .ant-modal-header {
+    background: linear-gradient(135deg, #1e3a5f 0%, #0d2137 100%);
+    border-radius: 18px 18px 0 0;
+    padding: 16px 24px;
+    
+    .ant-modal-title {
+      color: #fff;
+      font-weight: 600;
+      font-size: 16px;
+    }
+  }
+  
+  .ant-modal-close {
+    color: #fff;
+    
+    &:hover {
+      color: #ff4d4f;
+    }
+  }
+  
+  .ant-modal-content {
+    border-radius: 18px;
+    overflow: hidden;
+  }
+  
+  .ant-modal-body {
+    padding: 24px;
+  }
+  
+  .ant-modal-footer {
+    border-top: 1px solid #f0f0f0;
+    padding: 12px 24px;
+  }
+}
+
+.draft-restore-content {
+  .draft-icon-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+  
+  .draft-info-note {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fffbe6;
+    border: 1px solid #ffe58f;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #8c8c8c;
+  }
+}
+// ================================================
+
+
 /* ====================== Custom Dialog Overlay ====================== */
 .custom-dialog-overlay-1 {
     position: fixed;

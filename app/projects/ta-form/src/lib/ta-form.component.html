@@ -1,5 +1,6 @@
 <div class="inner-content" *ngIf="showForm">
-    <form nz-form [nzLayout]="'vertical'" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <form nz-form [nzLayout]="'vertical'" [formGroup]="form" (ngSubmit)="onSubmit()"
+          (keydown.enter)="$event.target.type !== 'submit' && $event.preventDefault()">
 
         <div [ngSwitch]="options.isBuilder">
             <div *ngSwitchCase="true">
