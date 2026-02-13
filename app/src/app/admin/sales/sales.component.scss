@@ -1,11 +1,8 @@
 /* ====================== Custom Dialog Overlay ====================== */
-.custom-dialog-overlay {
+.custom-dialog-overlay-1 {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.6);
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -13,26 +10,187 @@
 }
 
 /* ====================== Custom Dialog Box ====================== */
-.custom-dialog-box {
-    background-color: #ffffff;
-    padding: 25px 30px;
+.custom-dialog-box-1 {
+    width: 440px;  
+    max-width: 94%;
+    background: #ffffff;
+    padding: 30px 34px 28px;
     border-radius: 14px;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
-    width: 400px;
-    max-width: 95%;
-    text-align: left;
-    animation: fadeInScale 0.3s ease-in-out;
-    font-family: Arial, sans-serif;
+    border: 1px solid #e5e7eb;
+    box-shadow:
+        0 12px 28px rgba(0, 0, 0, 0.15);
+    font-family: "Inter", "Segoe UI", sans-serif;
+    animation: fadeUp 0.28s ease;
 }
 
-/* ====================== Modal Header ====================== */
-.custom-dialog-box p {
-    font-size: 19px;
-    font-weight: 700;
-    color: #222;
-    margin-bottom: 25px;
+.custom-dialog-box-1 h5 {
+    font-size: 18px;              /* ⬅ slightly bigger */
+    font-weight: 600;
+    color: #111827;
     text-align: center;
+    margin-bottom: 10px;
 }
+
+.custom-dialog-box-1 p {
+    font-size: 15px;              /* ⬅ improved readability */
+    color: #6b7280;
+    text-align: center;
+    line-height: 1.6;
+    margin-bottom: 26px;
+}
+
+
+.dialog-actions {
+    display: flex;
+    justify-content: center;   /* centers the whole group */
+    align-items: center;
+    gap: 20px;
+    // margin-top: 10px;
+}
+
+.custom-dialog-box-1 .btn-danger {
+    min-width: 130px;             /* ⬅ wider */
+    height: 44px;                 /* ⬅ taller */
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 10px;
+    background-color: #ef4444;
+    border: none;
+}
+
+.custom-dialog-box-1 .btn-danger:hover {
+    background-color: #dc2626;
+}
+
+.custom-dialog-box-1 .btn-primary {
+    min-width: 130px;             /* ⬅ wider */
+    height: 44px;                 /* ⬅ taller */
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 10px;
+    background-color: #1e40af;    /* same deep blue as invoice */
+    border: none;
+    box-shadow: 0 6px 14px rgba(30, 64, 175, 0.35);
+}
+
+.custom-dialog-box-1 .btn-primary:hover {
+    background-color: #1e3a8a;
+}
+
+//invoice modal box css
+.custom-dialog-overlay.style2 {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.custom-dialog-box.style2 {
+    width: 440px;
+    max-width: 94%;
+    background: #ffffff;
+    padding: 30px 34px 28px;
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    box-shadow:
+        0 12px 28px rgba(0, 0, 0, 0.15);
+    font-family: "Inter", "Segoe UI", sans-serif;
+    animation: fadeUp 0.28s ease;
+}
+
+// .custom-dialog-box.style2 h3 {
+//     margin: 0 0 8px;
+//     font-size: 17px;
+//     font-weight: 600;
+//     color: #111827;
+// }
+// .custom-dialog-box.style2 p {
+//     font-size: 14px;
+//     color: #6b7280;
+//     line-height: 1.6;
+//     margin-bottom: 20px;
+// }
+
+.custom-dialog-box.style2 h3 {
+    margin: 0 0 8px;
+    font-size: 20px;              /* ⬅ slightly bigger */
+    font-weight: 600;
+    color: #111827;
+    // text-align: center;
+    // margin-bottom: 10px;
+}
+.custom-dialog-box.style2 p {
+    font-size: 15px;              /* ⬅ improved readability */
+    color: #6b7280;
+    text-align: center;
+    line-height: 1.6;
+    margin-bottom: 23px;
+}
+.custom-dialog-box.style2 .dialog-actions {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+}
+
+.custom-dialog-box.style2 .btn-cancel {
+    min-width: 110px;
+    padding: 9px 16px;
+    background: linear-gradient(135deg, #0ea5e9, #2563eb);
+    border: none;
+    border-radius: 8px;
+    color: #ffffff;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+    transition: all 0.25s ease;
+}
+
+.custom-dialog-box.style2 .btn-cancel:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(37, 99, 235, 0.45);
+}
+.custom-dialog-box.style2 .btn-confirm {
+    min-width: 110px;
+    padding: 9px 16px;
+    background: linear-gradient(135deg, #0ea5e9, #2563eb);
+    border: none;
+    border-radius: 8px;
+    color: #ffffff;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+    transition: all 0.25s ease;
+}
+
+.custom-dialog-box.style2 .btn-confirm:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(37, 99, 235, 0.45);
+}
+
+// @keyframes fadeUp {
+//     from {
+//         opacity: 0;
+//         transform: translateY(10px);
+//     }
+//     to {
+//         opacity: 1;
+//         transform: translateY(0);
+//     }
+// }
+
+
+/* ====================== Modal Header ====================== */
+.custom-dialog-box-1 p {
+    font-size: 18.5px;
+    color: #4b5563;
+    text-align: center;
+    line-height: 1.6;
+    margin-bottom: 26px;
+}
+
 
 /* ====================== Dropdown Container ====================== */
 .quickpack-container {
@@ -455,6 +613,28 @@
 //   // box-shadow: 0 2px 6px rgba(6, 2, 68, 0.4);
 // }
 
+
+.zb-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.zb-btn.yes {
+  background: #2e7d32;
+}
+
+.zb-btn.yes:hover {
+  background: #1b5e20;
+}
+
+.zb-btn.no {
+  background: #9e9e9e;
+}
+
+.zb-btn.no:hover {
+  background: #616161;
+}
 // ========== Draft Restore Modal Styles ==========
 ::ng-deep .draft-restore-modal-wrapper {
   .ant-modal-header {
