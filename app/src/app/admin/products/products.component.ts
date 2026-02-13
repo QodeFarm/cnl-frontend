@@ -57,8 +57,8 @@ export class ProductsComponent implements OnInit {
     this.selectedProductMode = "Inventory";
     this.setFormConfig();
     // console.log('Check field : ',this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[7])
-    this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[9].hide = true;
-    this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[10].hide = true;
+    // this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[9].hide = true;
+    // this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[10].hide = true;
   }
 
   hide() {
@@ -299,9 +299,57 @@ updateProducts() {
 //   return true;
 // }
 
-verifyBalance(): any {
+// verifyBalance(): any {
+//   const sumQty = (items) =>
+//     items?.reduce((s, i) => s + (Number(i.quantity) || 0), 0) || 0;
+
+//   const variations = (this.formConfig.model.product_variations || [])
+//     .filter(v => v && Object.keys(v).length);
+
+//   const warehouses = (this.formConfig.model.product_item_balance || [])
+//     .filter(w => w && Object.keys(w).length);
+
+//   const variationQty = sumQty(variations);
+//   const warehouseQty = sumQty(warehouses);
+//   const enteredBalance = Number(this.formConfig.model.products.balance) || 0;
+
+//   // ✅ CASE 1: nothing entered → free balance
+//   if (variationQty === 0 && warehouseQty === 0) {
+//     return true;
+//   }
+
+//   // ✅ CASE 2: variations entered, balance empty → auto set
+//   if (variationQty > 0 && enteredBalance === 0) {
+//     this.formConfig.model.products.balance = variationQty;
+//     return true;
+//   }
+
+//   // ✅ CASE 3: warehouses entered, balance empty → auto set
+//   if (warehouseQty > 0 && enteredBalance === 0) {
+//     this.formConfig.model.products.balance = warehouseQty;
+//     return true;
+//   }
+
+//   // ✅ CASE 4: validate consistency
+//   if (
+//     (variationQty > 0 && enteredBalance !== variationQty) ||
+//     (warehouseQty > 0 && enteredBalance !== warehouseQty) ||
+//     (variationQty > 0 && warehouseQty > 0 && variationQty !== warehouseQty)
+//   ) {
+//     return this.showDialog(
+//       `Mismatch detected:
+//        Variations = ${variationQty},
+//        Warehouses = ${warehouseQty},
+//        Balance = ${enteredBalance}`
+//     );
+//   }
+
+//   return true;
+// }
+
+verifyBalance(): boolean {
   const sumQty = (items) =>
-    items?.reduce((s, i) => s + (Number(i.quantity) || 0), 0) || 0;
+    items?.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0) || 0;
 
   const variations = (this.formConfig.model.product_variations || [])
     .filter(v => v && Object.keys(v).length);
@@ -311,60 +359,60 @@ verifyBalance(): any {
 
   const variationQty = sumQty(variations);
   const warehouseQty = sumQty(warehouses);
-  const enteredBalance = Number(this.formConfig.model.products.balance) || 0;
 
-  // ✅ CASE 1: nothing entered → free balance
-  if (variationQty === 0 && warehouseQty === 0) {
-    return true;
-  }
+  // 🔥 ERP RULE 1: Balance always comes from variations
+  this.formConfig.model.products.balance = variationQty;
 
-  // ✅ CASE 2: variations entered, balance empty → auto set
-  if (variationQty > 0 && enteredBalance === 0) {
-    this.formConfig.model.products.balance = variationQty;
-    return true;
-  }
-
-  // ✅ CASE 3: warehouses entered, balance empty → auto set
-  if (warehouseQty > 0 && enteredBalance === 0) {
-    this.formConfig.model.products.balance = warehouseQty;
-    return true;
-  }
-
-  // ✅ CASE 4: validate consistency
-  if (
-    (variationQty > 0 && enteredBalance !== variationQty) ||
-    (warehouseQty > 0 && enteredBalance !== warehouseQty) ||
-    (variationQty > 0 && warehouseQty > 0 && variationQty !== warehouseQty)
-  ) {
-    return this.showDialog(
-      `Mismatch detected:
-       Variations = ${variationQty},
-       Warehouses = ${warehouseQty},
-       Balance = ${enteredBalance}`
+  // 🔥 ERP RULE 2: Warehouse is allocation only
+  if (warehouseQty > variationQty) {
+    this.showDialog(
+      `Warehouse quantity (${warehouseQty})
+       cannot exceed variation quantity (${variationQty}).`
     );
+    return false; // ✅ explicit boolean
   }
 
   return true;
 }
 
 
+// preprocessFormData() {
+//   // Ensure product_mode_id is just the UUID
+//   const products = this.formConfig.model.products;
+//   if (products && typeof products.product_mode_id === 'object') {
+//     products.product_mode_id = products.product_mode_id.item_master_id;
+//   }
+  
+//   // Process product variations to ensure size_id and color_id are just UUIDs
+//   const variations = this.formConfig.model.product_variations || [];
+//   variations.forEach(variation => {
+//     if (variation) {
+//       if (typeof variation.size_id === 'object') {
+//         variation.size_id = variation.size_id.size_id;
+//       }
+//       if (typeof variation.color_id === 'object') {
+//         variation.color_id = variation.color_id.color_id;
+//       }
+//     }
+//   });
+// }
+
 preprocessFormData() {
-  // Ensure product_mode_id is just the UUID
   const products = this.formConfig.model.products;
   if (products && typeof products.product_mode_id === 'object') {
     products.product_mode_id = products.product_mode_id.item_master_id;
   }
-  
-  // Process product variations to ensure size_id and color_id are just UUIDs
+
   const variations = this.formConfig.model.product_variations || [];
   variations.forEach(variation => {
-    if (variation) {
-      if (typeof variation.size_id === 'object') {
-        variation.size_id = variation.size_id.size_id;
-      }
-      if (typeof variation.color_id === 'object') {
-        variation.color_id = variation.color_id.color_id;
-      }
+    if (!variation) return;
+
+    if (variation.size_id && typeof variation.size_id === 'object') {
+      variation.size_id = variation.size_id.size_id;
+    }
+
+    if (variation.color_id && typeof variation.color_id === 'object') {
+      variation.color_id = variation.color_id.color_id;
     }
   });
 }
@@ -801,9 +849,11 @@ preprocessFormData() {
                       type: 'input',
                       defaultValue: 0.00,
                       templateOptions: {
-                      label: 'Balance',
-                      required: false, 
-                    }
+                        label: 'Balance',
+                        readonly: true,
+                        disabled: true,
+                        required: false, 
+                      }
                   },
                   {
                     className: 'col-md-4 col-sm-6 col-12',
@@ -826,22 +876,26 @@ preprocessFormData() {
                       }
                     }
                   },
-
                   {
                     className: 'col-md-4 col-sm-6 col-12',
                     key: 'balance_diff',
                     type: 'input',
-                    defaultValue: 0,
                     templateOptions: {
                       label: 'Balance Diff.',
-                      required: false,
                       readonly: true,
+                      disabled: true,
                       type: 'number'
                     },
                     expressionProperties: {
                       'model.balance_diff': (model) => {
-                        const balance = model?.balance || 0;
-                        const physical = model?.physical_balance || 0;
+                        const balance = Number(model?.balance) || 0;
+                        const physical = Number(model?.physical_balance) || 0;
+
+                        // 🔥 ERP RULE: no physical count → no difference
+                        if (!physical) {
+                          return 0;
+                        }
+
                         return physical - balance;
                       }
                     }

@@ -159,11 +159,15 @@
 </div>
 
 <!-- Confirmation Modal -->
-<div id="customDialog" class="custom-dialog-overlay" *ngIf="isConfirmationInvoiceOpen">
-    <div class="custom-dialog-box">
+<div class="custom-dialog-overlay style2" *ngIf="isConfirmationInvoiceOpen">
+    <div class="custom-dialog-box style2">
+        <h3>Confirm Sale Invoice</h3>
         <p>Are you sure you want to create the sale invoice?</p>
-        <button (click)="confirmInvoiceCreation()">OK</button>
-        <button (click)="cancelInvoiceCreation()">Cancel</button>
+
+        <div class="dialog-actions">
+            <button class="btn-cancel" (click)="cancelInvoiceCreation()">Cancel</button>
+            <button class="btn-confirm" (click)="confirmInvoiceCreation()">Confirm</button>
+        </div>
     </div>
 </div>
 
@@ -200,8 +204,8 @@
 
 
 <!-- code for workorder modalbox in sales  -->
-<div *ngIf="showModal" class="custom-dialog-overlay">
-    <div class="custom-dialog-box">
+<div *ngIf="showModal" class="custom-dialog-overlay-1">
+    <div class="custom-dialog-box-1">
         <h5>Confirm Work Order Creation</h5>
         <p>Are you sure you want to create a work order for the selected products?</p>
         <div class="dialog-actions">
