@@ -2950,42 +2950,75 @@ confirmWorkOrder() {
     }
   }
 
-getUnitData(unitInfo) {
-  console.log("unitinfo : ", unitInfo);
+getUnitData(unitInfo: any) {
+  if (!unitInfo) return '';
 
-  const unitOption = unitInfo.unit_options?.unit_name ?? 'NA';
-  const stockUnit = unitInfo.stock_unit?.stock_unit_name ?? 'NA';
+  // Always resolve values first
+  const stockUnit = unitInfo?.stock_unit?.stock_unit_name ?? 'NA';
+  const packUnit = unitInfo?.pack_unit?.unit_name ?? 'NA';
+  const gPackUnit = unitInfo?.g_pack_unit?.unit_name ?? 'NA';
 
-  //  Only null/undefined → NA, keep 0 or string
-  const packUnit = unitInfo.pack_unit?.unit_name ?? (unitInfo.pack_unit_id == null ? 'NA' : unitInfo.pack_unit_id);
-  const gPackUnit = unitInfo.g_pack_unit?.unit_name ?? (unitInfo.g_pack_unit_id == null ? 'NA' : unitInfo.g_pack_unit_id);
+  const packVsStock =
+    unitInfo?.pack_vs_stock === null || unitInfo?.pack_vs_stock === undefined
+      ? 'NA'
+      : unitInfo.pack_vs_stock;
 
-  const packVsStock = unitInfo.pack_vs_stock == null ? 'NA' : unitInfo.pack_vs_stock;
-  const gPackVsPack = unitInfo.g_pack_vs_pack == null ? 'NA' : unitInfo.g_pack_vs_pack;
+  const gPackVsPack =
+    unitInfo?.g_pack_vs_pack === null || unitInfo?.g_pack_vs_pack === undefined
+      ? 'NA'
+      : unitInfo.g_pack_vs_pack;
 
-  const stockUnitReg = /\b[sS][tT][oO][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
-  const GpackReg = /\b(?:[sS]tock[_ ]?[pP]ack[_ ]?)?[gG][pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
-  const stockPackReg = /\b[sS][tT][oO][cC][kK][_ ]?[pP][aA][cC][kK][_ ]?[uU][nN][iI][tT]\b/g;
+  const unitOption = unitInfo?.unit_options?.unit_name;
+
+  // 🔥 CASE 1: unit_options is NULL → ALWAYS show fallback block
+  if (!unitOption) {
+    return `
+      <span style="color:red;">Stock Unit:</span>
+      <span style="color:blue;">${stockUnit}</span> |
+      <span style="color:red;">Pack Unit:</span>
+      <span style="color:blue;">${packUnit}</span> |
+      <span style="color:red;">PackVsStock:</span>
+      <span style="color:blue;">${packVsStock}</span> |
+      <span style="color:red;">GPack Unit:</span>
+      <span style="color:blue;">${gPackUnit}</span> |
+      <span style="color:red;">GPackVsPack:</span>
+      <span style="color:blue;">${gPackVsPack}</span>
+    `;
+  }
+
+  // Regex cases (only affect WHICH fields are shown, not IF)
+  const stockUnitReg = /\bstock[_ ]?unit\b/i;
+  const gPackReg = /\bgpack[_ ]?unit\b/i;
+  const stockPackReg = /\bstock[_ ]?pack[_ ]?unit\b/i;
 
   if (stockUnitReg.test(unitOption)) {
-    return `<span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> | &nbsp;`;
-  } else if (GpackReg.test(unitOption)) {
     return `
-      <span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> |
-      <span style="color: red;">Pck Unit:</span> <span style="color: blue;">${packUnit}</span> |
-      <span style="color: red;">PackVsStock:</span> <span style="color: blue;">${packVsStock}</span> |
-      <span style="color: red;">GPackUnit:</span> <span style="color: blue;">${gPackUnit}</span> |
-      <span style="color: red;">GPackVsPack:</span> <span style="color: blue;">${gPackVsPack}</span> | &nbsp;`;
-  } else if (stockPackReg.test(unitOption)) {
-    return `
-      <span style="color: red;">Stock Unit:</span> <span style="color: blue;">${stockUnit}</span> |
-      <span style="color: red;">Pack Unit:</span> <span style="color: blue;">${packUnit}</span> |
-      <span style="color: red;">PackVsStock:</span> <span style="color: blue;">${packVsStock}</span> | &nbsp;`;
-  } else {
-    console.log('No Unit Option match found');
-    return "";
+      <span style="color:red;">Stock Unit:</span>
+      <span style="color:blue;">${stockUnit}</span>
+    `;
   }
+
+  if (gPackReg.test(unitOption)) {
+    return `
+      <span style="color:red;">Stock Unit:</span> <span style="color:blue;">${stockUnit}</span> |
+      <span style="color:red;">Pack Unit:</span> <span style="color:blue;">${packUnit}</span> |
+      <span style="color:red;">PackVsStock:</span> <span style="color:blue;">${packVsStock}</span> |
+      <span style="color:red;">GPack Unit:</span> <span style="color:blue;">${gPackUnit}</span> |
+      <span style="color:red;">GPackVsPack:</span> <span style="color:blue;">${gPackVsPack}</span>
+    `;
+  }
+
+  if (stockPackReg.test(unitOption)) {
+    return `
+      <span style="color:red;">Stock Unit:</span> <span style="color:blue;">${stockUnit}</span> |
+      <span style="color:red;">Pack Unit:</span> <span style="color:blue;">${packUnit}</span> |
+      <span style="color:red;">PackVsStock:</span> <span style="color:blue;">${packVsStock}</span>
+    `;
+  }
+
+  return '';
 }
+
 
 
 
@@ -3040,57 +3073,81 @@ getUnitData(unitInfo) {
   //   cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
   // };
 
-  displayInformation(product: any, size: any, color: any, unitData : any, sizeBalance: any, colorBalance: any) {
-    const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
-    let data = '';
-    console.log('Product data in html : ', product)
-    console.log('unitData data in html : ', unitData)
+  displayInformation(
+  product: any,
+  size: any,
+  color: any,
+  unitData: any,
+  sizeBalance: any,
+  colorBalance: any
+) {
+  const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
+  if (!cardWrapper || !product) return;
 
-    // format unitData fields in correct order
-    const stockInfo = `
-      <span style="color: red;">Stock Unit:</span> <span style="color: blue;">${product?.stock_unit.stock_unit_name || 'NA'}</span> |
-      <span style="color: red;">Pack Unit:</span> <span style="color: blue;">${product?.pack_unit_id || 'NA'}</span> |
-      <span style="color: red;">PackVsStock:</span> <span style="color: blue;">${product?.pack_vs_stock || 'NA'}</span> |
-      <span style="color: red;">GPack Unit:</span> <span style="color: blue;">${product?.g_pack_unit_id || 'NA'}</span> |
-      <span style="color: red;">GPackVsPack:</span> <span style="color: blue;">${product?.g_pack_vs_pack || 'NA'}</span>
+  console.log('Product data in html:', product);
+  console.log('unitData data in html:', unitData);
+
+  // ✅ Always-safe unit info
+  const stockInfo = `
+    <span style="color:red;">Unit Option:</span>
+    <span style="color:blue;">${product?.unit_options?.unit_name ?? 'NA'}</span> |
+    <span style="color:red;">Pack Unit:</span>
+    <span style="color:blue;">${product?.pack_unit?.unit_name ?? 'NA'}</span> |
+    <span style="color:red;">PackVsStock:</span>
+    <span style="color:blue;">${product?.pack_vs_stock ?? 'NA'}</span> |
+    <span style="color:red;">GPack Unit:</span>
+    <span style="color:blue;">${product?.g_pack_unit?.unit_name ?? 'NA'}</span> |
+    <span style="color:red;">GPackVsPack:</span>
+    <span style="color:blue;">${product?.g_pack_vs_pack ?? 'NA'}</span>
+  `;
+
+  let data = `
+    <span style="font-size:12px;">
+      <span style="color:red;">Product Info:</span>
+      <span style="color:blue;">${product?.name ?? 'N/A'}</span> |
+      <span style="color:red;">Balance:</span>
+      <span style="color:blue;">${product?.balance ?? 0}</span> |
+      ${stockInfo}
+    </span>
+  `;
+
+  if (size && !color) {
+    data = `
+      <span style="font-size:12px;">
+        <span style="color:red;">Product Info:</span>
+        <span style="color:blue;">${product?.name ?? 'N/A'}</span> |
+        <span style="color:red;">Balance:</span>
+        <span style="color:blue;">${sizeBalance ?? 0}</span> |
+        <span style="color:red;">Size:</span>
+        <span style="color:blue;">${size?.size_name ?? 'NA'}</span> |
+        ${stockInfo}
+      </span>
     `;
+  }
 
-    if (product && !size && !color) {
-      data = `
-        <span style="font-size: 12px;">
-          <span style="color: red;">Product Info:</span> <span style="color: blue;">${product?.name || 'N/A'}</span> | 
-          <span style="color: red;">Balance:</span> <span style="color: blue;">${product?.balance || 0}</span> | 
-          ${stockInfo}
-        </span>`;
-    }
+  if (color) {
+    data = `
+      <span style="font-size:12px;">
+        <span style="color:red;">Product Info:</span>
+        <span style="color:blue;">${product?.name ?? 'N/A'}</span> |
+        <span style="color:red;">Balance:</span>
+        <span style="color:blue;">${colorBalance ?? 0}</span> |
+        <span style="color:red;">Size:</span>
+        <span style="color:blue;">${size?.size_name ?? 'NA'}</span> |
+        <span style="color:red;">Color:</span>
+        <span style="color:blue;">${color?.color_name ?? 'NA'}</span> |
+        ${stockInfo}
+      </span>
+    `;
+  }
 
-    if (size && !color) {
-      data = `
-        <span style="font-size: 12px;">
-          <span style="color: red;">Product Info:</span> <span style="color: blue;">${product?.name || 'N/A'}</span> | 
-          <span style="color: red;">Balance:</span> <span style="color: blue;">${sizeBalance || 0}</span> | 
-          <span style="color: red;">Size:</span> <span style="color: blue;">${size.size_name}</span> | 
-          ${stockInfo}
-        </span>`;
-    }
+  cardWrapper.querySelector('.center-message')?.remove();
+  const productInfoDiv = document.createElement('div');
+  productInfoDiv.classList.add('center-message');
+  productInfoDiv.innerHTML = data;
+  cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
+}
 
-    if (color) {
-      data = `
-        <span style="font-size: 12px;">
-          <span style="color: red;">Product Info:</span> <span style="color: blue;">${product?.name || 'N/A'}</span> | 
-          <span style="color: red;">Balance:</span> <span style="color: blue;">${colorBalance || 0}</span> | 
-          <span style="color: red;">Size:</span> <span style="color: blue;">${size?.size_name || 'NA'}</span> | 
-          <span style="color: red;">Color:</span> <span style="color: blue;">${color.color_name}</span> | 
-          ${stockInfo}
-        </span>`;
-    }
-
-    cardWrapper.querySelector('.center-message')?.remove();
-    const productInfoDiv = document.createElement('div');
-    productInfoDiv.classList.add('center-message');
-    productInfoDiv.innerHTML = data;
-    cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
-  };
 
 
   hasOrderNoLoaded = false;
