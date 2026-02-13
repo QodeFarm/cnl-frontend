@@ -1,7 +1,46 @@
-/* .adv-select-curd-container{
-    box-shadow:0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 9px 28px 8px rgba(0, 0, 0, 0.05)
-} */
+/* ============================================================
+   DROPDOWN TRIGGER – styled to match NG-ZORRO ant-input / ant-select
+   so dropdowns and normal fields look identical in all forms.
+   ============================================================ */
 
 div:hover .hover-show {
   display: inline !important; /* override d-none */
+}
+
+/* Base trigger – mirrors .ant-input / .ant-select-selector */
+.btn.dropdown-toggle {
+  background-color: #fff;
+  border: 1px solid #d9d9d9;
+  border-radius: 5px;
+  height: 34px;
+  padding: 4px 11px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #aaa;                        /* placeholder colour */
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: all 0.3s;
+  box-shadow: none;
+}
+
+/* Hover – same as ant-input:hover */
+.btn.dropdown-toggle:hover {
+  border-color: #40a9ff;
+}
+
+/* Focus / open state – same as ant-input:focus */
+.btn.dropdown-toggle:focus,
+.btn.dropdown-toggle:active {
+  border-color: #142768;
+  box-shadow: 0 0 0 2px rgba(20, 39, 104, 0.1);
+  outline: none;
+}
+
+/* Selected value – dark text matching ant-select-selection-item */
+.btn.dropdown-toggle.has-value {
+  color: #374151;
+  font-weight: 400;
 }

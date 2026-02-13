@@ -1,4 +1,4 @@
-import { AfterViewInit, AfterContentChecked, ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, OnInit } from '@angular/core';
+import { AfterContentChecked, ChangeDetectorRef, Component, ElementRef, forwardRef, HostListener, OnInit } from '@angular/core';
 import { FieldType } from '@ngx-formly/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NzSelectModule } from 'ng-zorro-antd/select';
@@ -13,9 +13,9 @@ import { TaCurdComponent } from '@ta/ta-curd';
 import { TaCurdModalComponent } from 'projects/ta-curd/src/lib/ta-curd-modal/ta-curd-modal.component';
 import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 import { TaFormComponent, TaFormModule } from '@ta/ta-form';
-import { ClickOutsideDirective } from './click-outside.directive';
 import { NzPopoverModule } from 'ng-zorro-antd/popover';
 import { OverlayModule } from '@angular/cdk/overlay';
+import { NzButtonModule } from 'ng-zorro-antd/button';
 @Component({
   selector: 'ta-field-adv-select',
   templateUrl: './field-adv-select.component.html',
@@ -31,63 +31,65 @@ import { OverlayModule } from '@angular/cdk/overlay';
     NzDrawerModule,
     TaTableModule,
     TaCurdModalComponent,
-    ClickOutsideDirective,
+    NzButtonModule,
     NzPopoverModule,
     forwardRef(() => TaFormComponent),
     NzIconModule]
 })
-export class FieldAdvSelectComponent extends FieldType implements OnInit, AfterViewInit, AfterContentChecked {
+export class FieldAdvSelectComponent extends FieldType implements OnInit, AfterContentChecked {
   dropdownOpen = false;
   lazySelectedItem: any;
   visible = false;
   formTitle = "Create";
   showCurdDiv = false;
-  Math = Math; // Make Math available in the template
-  window = window; // Make window available in the template
-  private lastValue: any = undefined; // Track last value to avoid redundant updates
-  positions = [
-    {
-      originX: 'start',
-      originY: 'bottom',
-      overlayX: 'start',
-      overlayY: 'top',
-    },
-    {
-      originX: 'start',
-      originY: 'top',
-      overlayX: 'start',
-      overlayY: 'bottom',
-    },
-    {
-      originX: 'end',
-      originY: 'bottom',
-      overlayX: 'end',
-      overlayY: 'top',
-    },
-    {
-      originX: 'end',
-      originY: 'top',
-      overlayX: 'end',
-      overlayY: 'bottom',
-    }
+  Math = Math;
+  window = window;
+  overlayMaxHeight: string = '70vh';
+  overlayWidth: number | string = 'auto';
+  private lastValue: any = undefined;
+  positions: any[] = [
+    { originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top' },
+    { originX: 'end',   originY: 'bottom', overlayX: 'end',   overlayY: 'top' },
+    { originX: 'start', originY: 'top',    overlayX: 'start', overlayY: 'bottom' },
+    { originX: 'end',   originY: 'top',    overlayX: 'end',   overlayY: 'bottom' },
   ];
-  constructor(private cdr: ChangeDetectorRef) {
+  constructor(private cdr: ChangeDetectorRef, private elRef: ElementRef) {
     super();
   }
-  ngAfterViewInit(): void {
-    const overlayPane = document.querySelector('.cdk-overlay-pane.select-adv-field');
-    const drawerContent = document.querySelector('.curd-modal-form');
 
-    document.addEventListener('click', (event: MouseEvent) => {
-      const clickTarget = event.target as HTMLElement;
-      const isSelectClick = overlayPane?.contains(clickTarget);
-      const isDrawerClick = drawerContent?.contains(clickTarget);
+  /**
+   * Click-outside-to-close: listens on the document for any mousedown.
+   * Closes the dropdown if the click is outside BOTH the component host
+   * element AND the CDK overlay panel.
+   */
+  @HostListener('document:mousedown', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.showCurdDiv) return; // dropdown is already closed
 
-      // If clicked outside both select and drawer, close it
-      if (isDrawerClick) {
-        this.dropdownOpen = true;
-      }
-    });
+    const target = event.target as HTMLElement;
+
+    // 1. Click inside this component's own element (trigger button, etc.)
+    if (this.elRef.nativeElement.contains(target)) return;
+
+    // 2. Click inside the CDK overlay panel (the dropdown itself)
+    const overlayPanel = document.querySelector('.adv-select-custom-overlay-panel');
+    if (overlayPanel && overlayPanel.contains(target)) return;
+
+    // 3. Click inside a modal dialog (Add form opened from within dropdown)
+    const modalContainer = document.querySelector('.cdk-overlay-container');
+    const isInsideModal = target.closest('.ant-modal-wrap') ||
+                          target.closest('.ant-modal-mask') ||
+                          target.closest('.curd-modal-form') ||
+                          target.closest('.ant-drawer');
+    if (isInsideModal) return;
+
+    // 4. Click inside a popover confirmation (delete action etc.)
+    if (target.closest('.ant-popover') || target.closest('.table-action-conformation')) return;
+
+    // Everything else = outside → close the dropdown
+    this.dropdownOpen = false;
+    this.showCurdDiv = false;
+    this.cdr.detectChanges();
   }
   ngOnInit(): void {
     // Initialize any additional properties or methods if needed
@@ -100,7 +102,33 @@ export class FieldAdvSelectComponent extends FieldType implements OnInit, AfterV
         this.showCurdDiv = false;
       }
     }
-    
+
+    // Auto-select newly created record from the Add form inside dropdown
+    if (this.props.curdConfig && this.props.curdConfig.formConfig) {
+      if (!this.props.curdConfig.formConfig.submit) {
+        this.props.curdConfig.formConfig.submit = {};
+      }
+      // Preserve any existing user callback
+      const existingSubmitFn = this.props.curdConfig.formConfig.submit.submittedFn;
+      this.props.curdConfig.formConfig.submit.submittedFn = (res: any) => {
+        // Call existing callback first
+        if (existingSubmitFn) {
+          existingSubmitFn(res);
+        }
+        // Auto-select the newly created record
+        const newRecord = res?.data || res;
+        if (newRecord && typeof newRecord === 'object') {
+          this.formControl.setValue(newRecord);
+          // Close the dropdown after selection
+          setTimeout(() => {
+            this.dropdownOpen = false;
+            this.showCurdDiv = false;
+            this.cdr.detectChanges();
+          }, 300);
+        }
+      };
+    }
+
     // Set initial value if form control already has a value
     if (this.formControl.value) {
       const data = this.itemMapping(this.formControl.value);
@@ -143,10 +171,6 @@ export class FieldAdvSelectComponent extends FieldType implements OnInit, AfterV
     }
   }
 
-  toggleDropdown() {
-    this.dropdownOpen = !this.dropdownOpen;
-  }
-
   compareFn = (o1: any, o2: any) => {
     if (this.props.dataKey && o1 && o2 && !this.props.bindId) {
       return o1[this.props.dataKey] === o2[this.props.dataKey];
@@ -178,41 +202,55 @@ export class FieldAdvSelectComponent extends FieldType implements OnInit, AfterV
   close(): void {
     this.visible = false;
   }
-  onOpenChange(open: boolean) {
-    // this.dropdownOpen = true;
-    // this.showCurdDiv = true;
-
-  }
-  onClickOutside(event: MouseEvent): void {
-    // Don't close dropdown
-    // event.preventDefault();
-    // event.stopPropagation();
-    //this.dropdownOpen = true;
-    //const overlayPane = document.querySelector('.cdk-overlay-pane.select-adv-field');
-    const overlayPane = document.querySelector('.cdk-overlay-container');
-    const drawerContent = document.querySelector('.curd-modal-form');
-    const popoverContent = document.querySelector('.table-action-conformation');
-
-    const target = event.target as Node;
-
-    const isInsideOverlay = overlayPane?.contains(target);
-    const isInsideDrawer = drawerContent?.contains(target);
-    const isPoverContent = popoverContent?.contains(target);
-
-    if (!isInsideOverlay && !isInsideDrawer && !isPoverContent) {
-      // event.stopPropagation();
-      // event.preventDefault();
-      this.dropdownOpen = false;
-      this.showCurdDiv = false;
-    } else {
-
-    }
-  }
   clearValue(event: MouseEvent) {
     event.stopPropagation();
     event.preventDefault();
     this.formControl.setValue(null);
     this.lazySelectedItem = null;
+    this.cdr.detectChanges();
+  }
+
+  /** Toggle dropdown and compute max-height + width based on available viewport space */
+  toggleDropdown(): void {
+    this.dropdownOpen = !this.dropdownOpen;
+    this.showCurdDiv = !this.showCurdDiv;
+
+    if (this.showCurdDiv) {
+      const triggerEl = this.elRef.nativeElement.querySelector('.dropdown-toggle');
+      if (triggerEl) {
+        const rect = triggerEl.getBoundingClientRect();
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const margin = 16; // breathing room from edges
+
+        // --- Vertical: pick the bigger gap (above vs below) ---
+        const spaceBelow = vh - rect.bottom - margin;
+        const spaceAbove = rect.top - margin;
+        const maxH = Math.max(spaceBelow, spaceAbove, 250);
+        this.overlayMaxHeight = Math.min(maxH, vh * 0.7) + 'px';
+
+        // --- Horizontal: clamp desired width so panel stays in viewport ---
+        const desiredW = this.props?.curdConfig?.drawerSize || 500;
+        const spaceRight = vw - rect.left - margin;
+        const spaceLeft  = rect.right - margin;
+        const maxW = Math.max(spaceRight, spaceLeft, 300);
+        this.overlayWidth = Math.min(desiredW, maxW);
+      }
+    }
+  }
+
+  /** Close dropdown without changing the selected value */
+  cancelDropdown(): void {
+    this.dropdownOpen = false;
+    this.showCurdDiv = false;
+  }
+
+  /** Clear the selected value and close dropdown */
+  clearAndClose(): void {
+    this.formControl.setValue(null);
+    this.lazySelectedItem = null;
+    this.dropdownOpen = false;
+    this.showCurdDiv = false;
     this.cdr.detectChanges();
   }
   openDrawer(row?: any) {
