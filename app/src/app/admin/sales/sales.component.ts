@@ -18,10 +18,11 @@ import { CustomFieldHelper } from '../utils/custom_field_fetch';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 declare var bootstrap;
 @Component({
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, OrderslistComponent, SalesListComponent, NzModalModule, NzButtonModule, NzIconModule],
+  imports: [CommonModule, AdminCommmonModule, OrderslistComponent, SalesListComponent, NzModalModule, NzButtonModule, NzIconModule, NzSelectModule],
   selector: 'app-sales',
   templateUrl: './sales.component.html',
   styleUrls: ['./sales.component.scss']
@@ -1800,19 +1801,15 @@ createSaleOrder() {
     this.showSuccessToast = false;
   }
 
+  isValidationDialogOpen: boolean = false;
+
   showDialog() {
-    const dialog = document.getElementById('customDialog');
-    if (dialog) {
-      dialog.style.display = 'flex'; // Show the dialog
-    }
+    this.isValidationDialogOpen = true;
   }
 
   // Function to close the custom dialog
   closeDialog() {
-    const dialog = document.getElementById('customDialog');
-    if (dialog) {
-      dialog.style.display = 'none'; // Hide the dialog
-    }
+    this.isValidationDialogOpen = false;
   }
 
   // confirmSelection() {
@@ -2100,7 +2097,17 @@ updateSaleOrder() {
   async autoFillProductDetails(field, data) {
     this.productOptions = data;
     console.log("Autofill data : ", this.productOptions);
-    if (!field.form?.controls || !data) return;
+    if (!field.form?.controls) return;
+
+    // When product is cleared (X button), reset all auto-filled fields
+    if (!data) {
+      const clearMappings = { code: '', rate: null, discount: 0, print_name: '', mrp: null, unit_options_id: null, quantity: null, amount: null, total_boxes: null };
+      Object.entries(clearMappings).forEach(([key, value]) => {
+        field.form.controls[key]?.setValue(value);
+      });
+      this.totalAmountCal();
+      return;
+    }
 
     const customerCategory = this.formConfig.model?.sale_order?.customer?.customer_category?.name?.toLowerCase();
 

@@ -175,8 +175,8 @@
     <span class="message-text">Invoice Created Successfully!</span>
 </div>
 
-<!-- Confirmation Modal -->
-<div id="customDialog" class="custom-dialog-overlay" *ngIf="isConfirmationModalOpen">
+<!-- Old Sale Order/Estimate Modal (replaced by nz-modal below) -->
+<!-- <div id="customDialog" class="custom-dialog-overlay" *ngIf="isConfirmationModalOpen">
     <div class="custom-dialog-box">
         <div class="form-group">
             <label for="typeSelect"><strong>Select Type:</strong></label>
@@ -188,7 +188,7 @@
         <br />
         <button (click)="confirmSelection()">OK</button>
     </div>
-</div>
+</div> -->
 
 <div id="customToast" class="toast-message" *ngIf="showSuccessToast">
     <div class="tick-circle">
@@ -267,60 +267,103 @@
     </div>
 </div> -->
 <!-- Combined Sale Estimate + QuickPack Modal -->
-<div id="customDialog" class="custom-dialog-overlay" *ngIf="isConfirmationModalOpen">
-    <div class="custom-dialog-box custom-size">
-        <p><strong>Select Options for this Sale Order</strong></p>
+<nz-modal
+  [(nzVisible)]="isConfirmationModalOpen"
+  nzTitle="Select Options for this Sale Order"
+  [nzClosable]="true"
+  [nzMaskClosable]="false"
+  (nzOnCancel)="closeSaleOrderEstimateModal()"
+  [nzWidth]="420"
+  [nzWrapClassName]="'sale-options-modal-wrapper'"
+  [nzFooter]="saleOptionsFooter">
 
-        <!-- Sale Estimate / Sale Order -->
-        <div class="quickpack-container">
-            <label for="typeSelect">Select Type:</label>
-            <div class="dropdown-container">
-                <select id="typeSelect" class="dropdown-select" [(ngModel)]="selectedOption" name="typeSelect">
-                    <option value="sale_order" selected>Sale Order</option>
-                    <option value="sale_estimate">Sale Estimate</option>
-                </select>
-            </div>
-        </div>
-        <br />
+  <ng-container *nzModalContent>
+    <div class="sale-options-body">
+      <!-- Sale Estimate / Sale Order -->
+      <div class="sale-option-field">
+        <label class="sale-option-label">Select Type</label>
+        <nz-select [(ngModel)]="selectedOption" nzPlaceHolder="Choose type" style="width: 100%;">
+          <nz-option nzValue="sale_order" nzLabel="Sale Order"></nz-option>
+          <nz-option nzValue="sale_estimate" nzLabel="Sale Estimate"></nz-option>
+        </nz-select>
+      </div>
 
-        <!-- QuickPack Yes / No -->
-        <div class="quickpack-container">
-            <label for="quickPackSelect">Create QuickPack?</label>
-            <div class="dropdown-container">
-                <select id="quickPackSelect" class="dropdown-select" [(ngModel)]="createQuickPackOption" name="quickPackSelect">
-                    <option value="no" selected>No</option>
-                    <option value="yes">Yes</option>
-                </select>
-            </div>
-        </div>
-        <br />
-
-        <!-- Action Button -->
-        <button (click)="confirmSelection()">OK</button>
+      <!-- QuickPack Yes / No -->
+      <div class="sale-option-field">
+        <label class="sale-option-label">Create QuickPack?</label>
+        <nz-select [(ngModel)]="createQuickPackOption" nzPlaceHolder="Choose option" style="width: 100%;">
+          <nz-option nzValue="no" nzLabel="No"></nz-option>
+          <nz-option nzValue="yes" nzLabel="Yes"></nz-option>
+        </nz-select>
+      </div>
     </div>
-</div>
+  </ng-container>
+
+  <ng-template #saleOptionsFooter>
+    <div class="sale-options-footer">
+      <button nz-button nzType="default" (click)="closeSaleOrderEstimateModal()">Cancel</button>
+      <button nz-button nzType="primary" (click)="confirmSelection()">Confirm</button>
+    </div>
+  </ng-template>
+</nz-modal>
 
 
 <!-- Modal for Amount Check -->
-<div id="amountDialog" class="custom-dialog-overlay" *ngIf="isAmountModalOpen">
-    <div class="custom-dialog-box">
-        <div class="form-group">
-            <p><strong>{{ amountExceedMessage }}</strong></p>
-            <button (click)="proceedWithAmount()">Yes</button>
-            <button (click)="closeAmountModal()">No</button>
-        </div>
+<nz-modal
+  [(nzVisible)]="isAmountModalOpen"
+  nzTitle="Credit Limit Exceeded"
+  [nzClosable]="true"
+  [nzMaskClosable]="false"
+  (nzOnCancel)="closeAmountModal()"
+  [nzWidth]="440"
+  [nzWrapClassName]="'amount-check-modal-wrapper'"
+  [nzFooter]="amountCheckFooter">
+
+  <ng-container *nzModalContent>
+    <div class="amount-check-body">
+      <div class="amount-warning-icon">
+        <span nz-icon nzType="exclamation-circle" nzTheme="outline"></span>
+      </div>
+      <p class="amount-message">{{ amountExceedMessage }}</p>
     </div>
+  </ng-container>
+
+  <ng-template #amountCheckFooter>
+    <div class="amount-check-footer">
+      <button nz-button nzType="default" (click)="closeAmountModal()">No</button>
+      <button nz-button nzType="primary" nzDanger (click)="proceedWithAmount()">Yes, Proceed</button>
+    </div>
+  </ng-template>
+</nz-modal>
 
     <div id="errorModal" class="modal">
         <div class="modal-content">
-            <span class="close-button" (click)="closeModalQuick()">&times;</span>
+            <span class="close-button" (click)="closeModal()">&times;</span>
             <p id="modalMessage"></p>
         </div>
     </div>
 
-<div id="customDialog" class="custom-dialog-overlay" style="display: none;">
-    <div class="custom-dialog-box">
-    <p> ⚠️ Please fill in all required fields before submitting.</p>
-    <button id="dialogOkButton" (click)="closeDialog()">OK</button>
+<!-- Validation Error Modal -->
+<nz-modal
+  [(nzVisible)]="isValidationDialogOpen"
+  nzTitle="Validation Error"
+  [nzClosable]="true"
+  [nzMaskClosable]="true"
+  (nzOnCancel)="closeDialog()"
+  [nzWidth]="400"
+  [nzWrapClassName]="'validation-error-modal-wrapper'"
+  [nzFooter]="validationFooter">
+
+  <ng-container *nzModalContent>
+    <div class="validation-error-body">
+      <div class="validation-warning-icon">
+        <span nz-icon nzType="warning" nzTheme="outline"></span>
+      </div>
+      <p class="validation-message">Please fill in all required fields before submitting.</p>
     </div>
-</div>
+  </ng-container>
+
+  <ng-template #validationFooter>
+    <button nz-button nzType="primary" (click)="closeDialog()">OK</button>
+  </ng-template>
+</nz-modal>

@@ -4,19 +4,98 @@
 
 .table-responsive {
     overflow-x: auto;
-    /* Enables horizontal scroll */
 }
 
+/* ============================================================
+   STICKY COLUMNS – LEFT SIDE (first 3 columns)
+   Col-0: Checkbox   | left: 0        | width: 50px
+   Col-1: Product    | left: 50px     | width: 220px
+   Col-2: Print Name | left: 270px    | width: 200px
+
+   z-index layering:
+     Header sticky-cols  = 5  (above everything)
+     Body   sticky-cols  = 2  (above normal cells)
+     Header row baseline = 3
+     Actions header      = 4
+     Actions body        = 1
+   ============================================================ */
+
+/* ---------- Column 0 – Checkbox ---------- */
+.sticky-col-0 {
+    position: sticky;
+    left: 0;
+    min-width: 50px;
+    max-width: 50px;
+    z-index: 2;
+    background: #ffffff;
+}
+
+thead .sticky-col-0 {
+    z-index: 5;
+    background: #142768;
+}
+
+/* ---------- Column 1 – Product ---------- */
+.sticky-col-1 {
+    position: sticky;
+    left: 50px;
+    min-width: 220px;
+    z-index: 2;
+    background: #ffffff;
+}
+
+thead .sticky-col-1 {
+    z-index: 5;
+    background: #142768;
+}
+
+/* ---------- Column 2 – Print Name ---------- */
+.sticky-col-2 {
+    position: sticky;
+    left: 270px;
+    min-width: 200px;
+    z-index: 2;
+    background: #ffffff;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.06);
+}
+
+thead .sticky-col-2 {
+    z-index: 5;
+    background: #142768;
+}
+
+/* ---------- Zebra striping for ALL sticky left columns ---------- */
+.ant-table-row:nth-child(even) .sticky-col-0,
+.ant-table-row:nth-child(even) .sticky-col-1,
+.ant-table-row:nth-child(even) .sticky-col-2 {
+    background: #f8fafc;
+}
+
+/* ---------- Hover state for ALL sticky left columns ---------- */
+.ant-table-row:hover .sticky-col-0,
+.ant-table-row:hover .sticky-col-1,
+.ant-table-row:hover .sticky-col-2 {
+    background: #eef4ff;
+}
+
+/* ============================================================
+   STICKY ACTION COLUMN – RIGHT SIDE
+   ============================================================ */
 .sticky-column {
     position: sticky;
     right: -1px;
-    background: white;
-    /* Ensure it stays visible */
+    z-index: 1;
+    background: #ffffff;
     box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
-    /* Optional shadow for visibility */
     min-width: 150px;
 }
-@media(max-width:767px){
+
+thead .sticky-column {
+    z-index: 4;
+    background: #142768;
+}
+
+@media (max-width: 767px) {
     .sticky-column {
         min-width: 50px;
     }

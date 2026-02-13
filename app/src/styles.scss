@@ -942,7 +942,7 @@ input[type="number"] {
 formly-field,
 formly-wrapper-form-field {
     max-width: 100%;
-    overflow: hidden;
+    overflow: visible;
 }
 
 /* Ensure dropdowns in modal appear above everything */
@@ -1603,7 +1603,7 @@ ta-form {
 .modal,
 nz-modal {
     .ant-table-wrapper {
-        border-radius: 8px;
+        border-radius: 4px;
         overflow: hidden;
     }
     
@@ -1623,12 +1623,12 @@ nz-modal {
             
             // First header cell - top-left corner
             &:first-child {
-                border-top-left-radius: 8px !important;
+                border-top-left-radius: 4px !important;
             }
             
             // Last header cell - top-right corner
             &:last-child {
-                border-top-right-radius: 8px !important;
+                border-top-right-radius: 4px !important;
             }
         }
         
@@ -2983,18 +2983,6 @@ ta-curd-modal {
         }
     }
     
-    // Table container handles all scrolling
-    .ant-table-container {
-        overflow: auto !important;
-        max-height: 45vh;
-        
-        // Ensure table scrolls as single unit
-        .ant-table-content,
-        .ant-table-body {
-            overflow: visible !important;
-        }
-    }
-    
     // Ensure proper border-radius on dropdown tables
     table thead th:last-child {
         border-top-right-radius: 4px !important;
@@ -3005,8 +2993,73 @@ ta-curd-modal {
     }
 }
 
+// Table container scrolling — only for NON-panel overlays (nz-select dropdowns, etc.)
+// The .adv-select-custom-overlay-panel has its own scoped rules below.
+.cdk-overlay-pane:not(.adv-select-custom-overlay-panel),
+.cdk-overlay-container,
+.ant-select-dropdown:not(.adv-select-curd-container) {
+    .ant-table-container {
+        overflow: auto !important;
+        max-height: 45vh;
+        
+        .ant-table-content,
+        .ant-table-body {
+            overflow: visible !important;
+        }
+    }
+}
+
 // ============================================================
 // END DROPDOWN/POPUP TABLE STYLES
+// ============================================================
+
+// ============================================================
+// PRODUCT ITEMS GRID - STICKY HEADER + FIRST COLUMN
+// Scoped to field-repeat's .product-item-table only
+// Provides ERP-grade sticky behavior for data-entry grids
+// z-index hierarchy: Corner (4) > Header (3) > First column (2) > Body (auto)
+// ============================================================
+.product-item-table {
+    // --- Sticky Header (vertical scroll) ---
+    thead th {
+        position: sticky;
+        top: 0;
+        z-index: 3;
+        background: #142768;
+    }
+
+    // --- Sticky First Column (horizontal scroll) ---
+    thead th:first-child,
+    tbody td:first-child {
+        position: sticky;
+        left: 0;
+        z-index: 2;
+    }
+
+    // First header cell (corner): highest z-index — sits above both axes
+    thead th:first-child {
+        z-index: 4;
+        background: #142768;
+    }
+
+    // First body cell: solid background so content doesn't bleed through
+    tbody td:first-child {
+        background: #ffffff;
+        box-shadow: 2px 0 4px rgba(0, 0, 0, 0.06);
+    }
+
+    // Zebra stripe: match even-row background on sticky first cell
+    tbody tr:nth-child(even) td:first-child {
+        background: #f8fafc;
+    }
+
+    // Hover: carry through to sticky first cell
+    tbody tr:hover td:first-child {
+        background: #eef4ff;
+    }
+}
+// ============================================================
+// END PRODUCT ITEMS GRID STICKY
 // ============================================================
 
 // Product Item Table (Form tables with inputs) - field-repeat component
@@ -3309,28 +3362,59 @@ ta-table,
 .adv-select-custom-overlay-panel {
     border-radius: 4px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-    overflow: visible !important;
+    overflow: hidden;
+    // Prevent panel from going off-screen
+    max-width: calc(100vw - 32px);
     
     .adv-select-curd-container {
         border-radius: 4px;
-        max-height: 70vh !important;
-        overflow: hidden !important;
+        // max-height is set dynamically via inline style from the component.
+        // This fallback is for safety only.
+        max-height: 70vh;
+        overflow: hidden;
         display: flex;
         flex-direction: column;
         
-        // Inner container - remove double scroll
+        // Inner wrapper – scrolls when space is tight so pagination stays reachable
         > div {
-            max-height: none !important;
-            overflow: visible !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
             display: flex;
             flex-direction: column;
-            flex: 1;
             padding: 8px 12px !important;
+        }
+
+        // ============================================================
+        // FOOTER – Cancel & Clear buttons (Align Books ERP style)
+        // Side-by-side, centered, compact
+        // ============================================================
+        .adv-select-footer {
+            display: flex !important;
+            flex-direction: row !important;
+            justify-content: center !important;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            border-top: 1px solid #e8e8e8;
+            background: #fafafa;
+            flex-shrink: 0;
+
+            .adv-select-footer-btn {
+                flex: 1;
+                max-width: 140px;
+                border-radius: 4px;
+                font-weight: 600;
+                font-size: 13px;
+                height: 34px;
+                line-height: 32px;
+                padding: 0 16px;
+            }
         }
         
         // Search bar row - proper spacing between all elements
         .ta-row {
             gap: 8px !important;
+            flex-shrink: 0;
             
             // Search input group
             nz-input-group {
@@ -3360,8 +3444,6 @@ ta-table,
         .custom-list {
             display: flex;
             flex-direction: column;
-            flex: 1;
-            max-height: calc(70vh - 20px);
             overflow: hidden;
         }
         
@@ -3369,7 +3451,6 @@ ta-table,
         ta-table {
             display: flex;
             flex-direction: column;
-            flex: 1;
             overflow: hidden;
             
             // Search/filter bar at top - fixed
@@ -3378,54 +3459,31 @@ ta-table,
                 flex-shrink: 0;
             }
             
-            // Table container - scrollable
+            // Table wrapper
             .ant-table-wrapper {
-                flex: 1;
                 overflow: hidden;
-                display: flex;
-                flex-direction: column;
-                
-                .ant-spin-nested-loading,
-                .ant-spin-container {
-                    display: flex;
-                    flex-direction: column;
-                    flex: 1;
-                    overflow: hidden;
-                }
-                
-                .ant-table {
-                    flex: 1;
-                    overflow: hidden;
-                    display: flex;
-                    flex-direction: column;
-                    
-                    .ant-table-container {
-                        flex: 1;
-                        overflow: hidden;
-                        display: flex;
-                        flex-direction: column;
-                        
-                        .ant-table-header {
-                            flex-shrink: 0;
-                        }
-                        
-                        .ant-table-body {
-                            flex: 1;
-                            overflow-y: auto !important;
-                            overflow-x: auto !important;
-                            max-height: calc(70vh - 180px) !important;
-                        }
-                    }
-                }
             }
             
-            // Pagination - always visible at bottom
+            // .ant-table-container is the SINGLE scroll container.
+            // Header + body scroll together horizontally;
+            // body scrolls vertically within max-height.
+            .ant-table-container {
+                overflow: auto !important;
+                max-height: 30vh !important;
+            }
+            
+            // Sticky table header inside dropdown scroll container
+            .ant-table-thead > tr > th,
+            thead > tr > th {
+                position: sticky !important;
+                top: 0 !important;
+                z-index: 2 !important;
+                background: linear-gradient(180deg, #1a3278 0%, #142768 100%) !important;
+            }
+            
+            // Pagination - hidden in dropdown panels (users use search instead)
             .ant-pagination {
-                flex-shrink: 0;
-                padding: 10px 0;
-                margin: 0 !important;
-                background: #fff;
-                border-top: 1px solid #e5e7eb;
+                display: none !important;
             }
         }
     }
@@ -3547,3 +3605,4 @@ ta-curd-modal,
 // ============================================================
 // END GLOBAL SEARCH BAR BUTTON SPACING
 // ============================================================
+
