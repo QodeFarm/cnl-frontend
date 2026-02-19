@@ -5,8 +5,7 @@ import { Router } from '@angular/router';
 import { TaTableConfig } from '@ta/ta-table';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
-import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
-import { collapseMotion } from 'ng-zorro-antd/core/animation';
+import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component';
 
 @Component({
   selector: 'app-customers-list',
@@ -18,12 +17,40 @@ import { collapseMotion } from 'ng-zorro-antd/core/animation';
 export class CustomersListComponent {
 
   @Output('edit') edit = new EventEmitter<void>();
+  @Output('bulkEdit') bulkEdit = new EventEmitter<string[]>();
+  @Output('exportCustomers') exportCustomers = new EventEmitter<string[]>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
   constructor(private http: HttpClient, private router: Router, private message: NzMessageService) { }
 
+  /** Selected customer IDs — read directly from ta-table's checkedRows */
+  get selectedIds(): string[] {
+    return (this.tableConfig.checkedRows as string[]) || [];
+  }
+
+  get isOverLimit(): boolean {
+    return this.selectedIds.length > 100;
+  }
+
   refreshTable() {
     this.taTableComponent?.refresh();
-  };
+  }
+
+  /** Clear all checkbox selections */
+  clearSelections() {
+    this.taTableComponent?.setOfCheckedId?.clear();
+    this.tableConfig.checkedRows = [];
+    this.taTableComponent?.refreshCheckedStatus();
+  }
+
+  /** Emit selected IDs to parent for bulk edit */
+  onBulkEditClick() {
+    this.bulkEdit.emit([...this.selectedIds]);
+  }
+
+  /** Emit selected IDs (empty array if none selected) to parent for export */
+  onExportClick() {
+    this.exportCustomers.emit([...this.selectedIds]);
+  }
 
   tableConfig: TaTableConfig = {
     apiUrl: 'customers/customers/?summary=true',
@@ -42,8 +69,8 @@ export class CustomersListComponent {
     "globalSearch": {
       keys: ['created_at', 'name', 'email', 'phone', 'gst', 'city_id', 'ledger_account_id']
     },
-    // defaultSort: { key: 'created_at', value: 'descend' },
-    defaultSort: { key: 'is_deleted', value: 'ascend' },
+    // defaultSort: { key: 'is_deleted', value: 'ascend' },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {
         fieldKey: 'name',

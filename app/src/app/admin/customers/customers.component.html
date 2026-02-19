@@ -9,11 +9,14 @@
       <div class="d-flex gap-2">
         <!-- Import Button with Dropdown -->
         <div class="btn-group">
-          <button type="button" class="btn btn-primary" (click)="showImportModal()">Import</button>
+          <button type="button" class="btn btn-primary" (click)="importMode = 'create'; showImportModal()">Import</button>
           <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false"></button>
           <ul class="dropdown-menu">
-            <!-- <li><a class="dropdown-item" href="assets/import-template.xlsx" download>Download Excel Format</a></li> -->
-              <a class="dropdown-item" (click)="downloadExcelTemplate()">Download Excel Format</a>
+              <li><button type="button" class="dropdown-item" (click)="downloadExcelTemplate()">Download Excel Format</button></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><button type="button" class="dropdown-item" (click)="showImportUpdateModal()">
+                <i class="fa fa-sync-alt me-1"></i> Import (Update Existing)
+              </button></li>
           </ul>
         </div>
 
@@ -40,7 +43,7 @@
         <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body" *ngIf="showCustomerList">
-        <app-customers-list (edit)="editCustomer($event)" class="custom-list"></app-customers-list>
+        <app-customers-list (edit)="editCustomer($event)" (bulkEdit)="openBulkEditModal($event)" (exportCustomers)="exportCustomers($event)" class="custom-list"></app-customers-list>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
@@ -56,7 +59,9 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="importModalLabel">Import Customers from Excel</h5>
+        <h5 class="modal-title" id="importModalLabel">
+          {{ importMode === 'update' ? 'Update Customers from Excel' : 'Import Customers from Excel' }}
+        </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="modalClose" [disabled]="isImporting"></button>
       </div>
       <div class="modal-body">
@@ -82,8 +87,8 @@
           <nz-result 
             *ngIf="importResults.success"
             nzStatus="success"
-            nzTitle="Import Successful!"
-            [nzSubTitle]="'Successfully imported ' + importResults.successCount + ' customer(s)'">
+            [nzTitle]="importMode === 'update' ? 'Update Successful!' : 'Import Successful!'"
+            [nzSubTitle]="(importMode === 'update' ? 'Successfully updated ' : 'Successfully imported ') + importResults.successCount + ' customer(s)'">
             <div nz-result-extra>
               <button class="btn btn-primary" (click)="closeImportAndRefresh()">OK</button>
             </div>
@@ -93,8 +98,8 @@
           <nz-result 
             *ngIf="!importResults.success && importResults.successCount > 0"
             nzStatus="warning"
-            nzTitle="Partial Import"
-            [nzSubTitle]="importResults.successCount + ' of ' + importResults.totalRecords + ' customers imported'">
+            [nzTitle]="importMode === 'update' ? 'Partial Update' : 'Partial Import'"
+            [nzSubTitle]="importResults.successCount + ' of ' + importResults.totalRecords + ' customers ' + (importMode === 'update' ? 'updated' : 'imported')">
             <div nz-result-content class="import-results-details">
               <nz-alert
                 nzType="warning"
@@ -135,8 +140,8 @@
           <nz-result 
             *ngIf="!importResults.success && importResults.successCount === 0"
             nzStatus="error"
-            nzTitle="Import Failed"
-            nzSubTitle="No customers were imported">
+            [nzTitle]="importMode === 'update' ? 'Update Failed' : 'Import Failed'"
+            [nzSubTitle]="importMode === 'update' ? 'No customers were updated' : 'No customers were imported'">
             <div nz-result-content class="import-results-details">
               <nz-alert
                 nzType="error"
@@ -163,7 +168,9 @@
         <!-- Initial Form State -->
         <div *ngIf="!isImporting && !importCompleted">
           <button id="downloadTemplateBtn" (click)="downloadExcelTemplate()" style="display: none;"></button>
-          <div class="alert alert-info mb-3">
+
+          <!-- Create mode instructions -->
+          <div class="alert alert-info mb-3" *ngIf="importMode === 'create'">
             <p class="mb-1"><strong>Instructions:</strong></p>
             <ul class="mb-0">
               <li>Download and use the official <a href="#" (click)="downloadExcelTemplate(); $event.preventDefault()">Excel Template</a></li>
@@ -172,6 +179,18 @@
               <li>Large files (500-5000 records) may take a few minutes to process</li>
             </ul>
           </div>
+
+          <!-- Update mode instructions -->
+          <div class="alert alert-warning mb-3" *ngIf="importMode === 'update'">
+            <p class="mb-1"><strong>How to update existing customers:</strong></p>
+            <ol class="mb-0">
+              <li>First <strong>Export</strong> customers from the Customer List (use the "Export" button)</li>
+              <li>Edit the downloaded Excel — only fill cells you want to change, leave others blank</li>
+              <li><strong>Do NOT</strong> modify the <code>customer_id</code> column (gold-colored)</li>
+              <li>Upload the edited file below</li>
+            </ol>
+          </div>
+
           <ta-form [options]="importFormConfig"></ta-form>
         </div>
       </div>
@@ -193,3 +212,14 @@
   <button id="dialogOkButton" (click)="closeDialog()">OK</button>
   </div>
 </div>
+
+<!-- ==================== BULK EDIT MODAL (reusable) ==================== -->
+<app-bulk-edit-modal
+  [visible]="showBulkEditModal"
+  [entityIds]="bulkEditIds"
+  entityName="Customer"
+  bulkUpdateUrl="customers/bulk-update/"
+  [fields]="BULK_FIELDS"
+  (updated)="onBulkUpdated($event)"
+  (closed)="onBulkEditClosed()">
+</app-bulk-edit-modal>

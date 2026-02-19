@@ -11,11 +11,13 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzProgressModule } from 'ng-zorro-antd/progress';
 import { NzResultModule } from 'ng-zorro-antd/result';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
+import { BulkEditModalComponent } from '../utils/bulk-edit-modal/bulk-edit-modal.component';
+import { BulkField, BulkOperationsService } from '../utils/bulk-operations.service';
 
 @Component({
   selector: 'app-vendors',
   templateUrl: './vendors.component.html',
-  imports: [CommonModule, AdminCommmonModule, VendorsListComponent, NzSpinModule, NzProgressModule, NzResultModule, NzAlertModule],
+  imports: [CommonModule, AdminCommmonModule, VendorsListComponent, NzSpinModule, NzProgressModule, NzResultModule, NzAlertModule, BulkEditModalComponent],
   standalone: true,
   styleUrls: ['./vendors.component.scss']
 })
@@ -31,6 +33,7 @@ export class VendorsComponent {
   importProgress: number = 0;
   importStatusMessage: string = '';
   importCompleted: boolean = false;
+  importMode: 'create' | 'update' = 'create';
   importResults: {
     success: boolean;
     totalRecords: number;
@@ -48,6 +51,81 @@ export class VendorsComponent {
   isDownloading: boolean;
 
   constructor(private http: HttpClient, private notification: NzNotificationService,) { }
+
+  // ─── Bulk Edit State ─────────────────────────────────────────
+  showBulkEditModal = false;
+  bulkEditIds: string[] = [];
+  isExporting = false;
+
+  /** Config: maps each bulk-edit field to its API & display info */
+  readonly VENDOR_BULK_FIELDS: BulkField[] = [
+    { key: 'vendor_category_id',   apiKey: 'vendor_category_id',   label: 'Vendor Category',    type: 'dropdown', url: 'vendors/vendor_category/',              dataKey: 'vendor_category_id',   dataLabel: 'name' },
+    { key: 'vendor_agent_id',      apiKey: 'vendor_agent_id',      label: 'Vendor Agent',       type: 'dropdown', url: 'vendors/vendor_agent/',                 dataKey: 'vendor_agent_id',      dataLabel: 'agent_name' },
+    { key: 'firm_status_id',       apiKey: 'firm_status_id',       label: 'Firm Status',        type: 'dropdown', url: 'masters/firm_statuses/',                dataKey: 'firm_status_id',       dataLabel: 'name' },
+    { key: 'territory_id',         apiKey: 'territory_id',         label: 'Territory',          type: 'dropdown', url: 'masters/territory/',                    dataKey: 'territory_id',         dataLabel: 'name' },
+    { key: 'gst_category_id',      apiKey: 'gst_category_id',      label: 'GST Category',       type: 'dropdown', url: 'masters/gst_categories/',               dataKey: 'gst_category_id',      dataLabel: 'name' },
+    { key: 'payment_term_id',      apiKey: 'payment_term_id',      label: 'Payment Terms',      type: 'dropdown', url: 'vendors/vendor_payment_terms/',         dataKey: 'payment_term_id',      dataLabel: 'name' },
+    { key: 'price_category_id',    apiKey: 'price_category_id',    label: 'Price Category',     type: 'dropdown', url: 'masters/price_categories/',             dataKey: 'price_category_id',    dataLabel: 'name' },
+    { key: 'transporter_id',       apiKey: 'transporter_id',       label: 'Transporter',        type: 'dropdown', url: 'masters/transporters/',                 dataKey: 'transporter_id',       dataLabel: 'name' },
+    { key: 'tax_type',             apiKey: 'tax_type',             label: 'Tax Type',           type: 'static-dropdown', options: [{ label: 'Inclusive', value: 'Inclusive' }, { label: 'Exclusive', value: 'Exclusive' }, { label: 'Both', value: 'Both' }] },
+    { key: 'credit_limit',         apiKey: 'credit_limit',         label: 'Credit Limit',       type: 'number' },
+    { key: 'max_credit_days',      apiKey: 'max_credit_days',      label: 'Max Credit Days',    type: 'number' },
+    { key: 'interest_rate_yearly',  apiKey: 'interest_rate_yearly', label: 'Interest Rate (%)',   type: 'number' },
+    { key: 'tds_applicable',       apiKey: 'tds_applicable',       label: 'TDS Applicable',     type: 'boolean' },
+    { key: 'tds_on_gst_applicable', apiKey: 'tds_on_gst_applicable', label: 'TDS on GST',       type: 'boolean' },
+    { key: 'gst_suspend',          apiKey: 'gst_suspend',          label: 'GST Suspend',        type: 'boolean' },
+  ];
+  // ─────────────────────────────────────────────────────────────
+
+  /** Open the bulk edit modal */
+  openBulkEditModal(ids: string[]) {
+    this.bulkEditIds = ids;
+    this.showBulkEditModal = true;
+  }
+
+  /** Handle successful bulk update */
+  onBulkUpdated(event: { message: string; count: number }) {
+    this.notification.success('Success', event.message);
+    this.VendorsListComponent?.clearSelections();
+    this.VendorsListComponent?.refreshTable();
+  }
+
+  /** Close bulk edit modal */
+  onBulkEditClosed() {
+    this.showBulkEditModal = false;
+  }
+
+  /** Export all or selected vendors to Excel */
+  exportVendors(ids: string[]) {
+    this.isExporting = true;
+    let url = 'vendors/export-vendors/';
+    if (ids.length > 0) {
+      url += '?ids=' + ids.join(',');
+    }
+
+    this.http.get(url, { responseType: 'blob' }).subscribe({
+      next: (blob: Blob) => {
+        this.isExporting = false;
+        const a = document.createElement('a');
+        const objectUrl = window.URL.createObjectURL(blob);
+        a.href = objectUrl;
+        a.download = ids.length > 0
+          ? `Vendors_Export_${ids.length}.xlsx`
+          : 'Vendors_Export_All.xlsx';
+        a.click();
+        window.URL.revokeObjectURL(objectUrl);
+        this.notification.success('Export Complete',
+          ids.length > 0
+            ? `${ids.length} vendor(s) exported successfully`
+            : 'All vendors exported successfully'
+        );
+      },
+      error: () => {
+        this.isExporting = false;
+        this.notification.error('Export Failed', 'Could not export vendors. Please try again.');
+      }
+    });
+  }
   entitiesList: any[] = [];
   ngOnInit() {
     this.showVendorList = false;
@@ -1235,6 +1313,12 @@ editVendor(event) {
   }
   // Add these methods to your VendorsComponent class
 
+/** Open the import modal in UPDATE mode */
+showImportUpdateModal() {
+  this.importMode = 'update';
+  this.showImportModal();
+}
+
 downloadExcelTemplate() {
   this.isDownloading = true; // Add this property to your class if not already present
   
@@ -1277,6 +1361,7 @@ resetImportState() {
   this.importStatusMessage = '';
   this.importCompleted = false;
   this.importResults = null;
+  this.importMode = 'create';
 }
 
 // Simulate progress for better UX
@@ -1302,8 +1387,12 @@ simulateProgress() {
 }
 
 showImportModal() {
+  // Save the intended mode before reset (showImportUpdateModal sets 'update' before calling this)
+  const savedMode = this.importMode;
   // Reset import state for fresh start
   this.resetImportState();
+  // Restore the intended import mode
+  this.importMode = savedMode || 'create';
   
   // Reset the import form model to ensure fresh start
   this.importFormConfig.model = {};
@@ -1364,55 +1453,56 @@ showImportModal() {
       return;
     }
 
+    // Capture the import mode BEFORE resetting (resetImportState sets importMode = 'create')
+    const isUpdate = this.importMode === 'update';
+
     // Reset and start import
     this.resetImportState();
     this.isImporting = true;
-    this.importStatusMessage = 'Preparing import...';
+    this.importStatusMessage = isUpdate ? 'Preparing update...' : 'Preparing import...';
 
     const uploadData = new FormData();
     uploadData.append('file', rawFile);
 
     const headers = { 'X-Skip-Error-Interceptor': 'true' };
     const progressInterval = this.simulateProgress();
+    const uploadUrl = isUpdate ? 'vendors/upload-excel/?mode=update' : 'vendors/upload-excel/';
 
-    this.http.post('vendors/upload-excel/', uploadData, { headers }).subscribe({
+    this.http.post(uploadUrl, uploadData, { headers }).subscribe({
       next: (res: any) => {
         clearInterval(progressInterval);
         this.importProgress = 100;
-        this.importStatusMessage = 'Import completed!';
+        this.importStatusMessage = isUpdate ? 'Update completed!' : 'Import completed!';
         this.isImporting = false;
         this.importCompleted = true;
 
         console.log('Upload success', res);
 
-        const successMatch = res.message?.match(/(\d+)/);
-        const successCount = successMatch ? parseInt(successMatch[1], 10) : 0;
-        const errorCount = res.errors?.length || 0;
+        // Handle both create and update response formats
+        let successCount = 0;
+        let errorCount = 0;
+        let errors: any[] = [];
+
+        if (isUpdate && res.data) {
+          successCount = res.data.success_count || 0;
+          errorCount = res.data.failed_count || 0;
+          errors = res.data.errors || [];
+        } else {
+          const successMatch = res.message?.match(/(\d+)/);
+          successCount = successMatch ? parseInt(successMatch[1], 10) : 0;
+          errorCount = res.errors?.length || 0;
+          errors = res.errors || [];
+        }
+
         const totalRecords = successCount + errorCount;
 
         this.importResults = {
-          success: errorCount === 0,
+          success: errorCount === 0 && successCount > 0,
           totalRecords: totalRecords,
           successCount: successCount,
           errorCount: errorCount,
-          errors: res.errors?.slice(0, 10) || []
+          errors: errors.slice(0, 10)
         };
-
-        // Notifications commented out - results shown in modal instead
-        // if (errorCount === 0) {
-        //   this.notification.success('Success', res.message || 'Vendors imported successfully', { nzDuration: 3000 });
-        // } else if (successCount > 0) {
-        //   this.notification.warning('Partial Import', `${successCount} vendors imported, ${errorCount} failed.`, { nzDuration: 5000 });
-        // } else {
-        //   const missingFieldErrors = res.errors?.filter((e: any) => e.error && e.error.includes('Missing required field:')) || [];
-        //   if (missingFieldErrors.length > 0) {
-        //     const missingFields = missingFieldErrors.map((e: any) => {
-        //       const match = e.error.match(/Missing required field: (.+)/);
-        //       return match ? match[1] : '';
-        //     }).filter(Boolean);
-        //     this.notification.error('Import Failed', `Required fields missing: ${missingFields.join(', ')}`, { nzDuration: 6000 });
-        //   }
-        // }
       },
       error: (error) => {
         clearInterval(progressInterval);

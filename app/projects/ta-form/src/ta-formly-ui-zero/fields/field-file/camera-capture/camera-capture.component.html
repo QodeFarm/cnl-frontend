@@ -1,0 +1,100 @@
+<!-- Camera Button (only visible when camera is supported) -->
+<button
+  *ngIf="isCameraSupported"
+  type="button"
+  class="camera-capture-btn"
+  (click)="openModal()"
+  title="Capture from Camera">
+  <svg class="icon-camera" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+  <span class="btn-text">Capture from Camera</span>
+</button>
+
+<!-- Camera Modal Overlay -->
+<div class="camera-modal-overlay" *ngIf="isModalOpen" (click)="onBackdropClick()">
+  <div class="camera-modal" (click)="$event.stopPropagation()">
+
+    <!-- Modal Header -->
+    <div class="camera-modal-header">
+      <h5>Capture Photo</h5>
+      <button type="button" class="modal-close-btn" (click)="closeModal()" [disabled]="isUploading">
+        &#x2715;
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="camera-modal-body">
+
+      <!-- Connecting State -->
+      <div *ngIf="isConnecting && !cameraError" class="camera-connecting">
+        <div class="connecting-spinner"></div>
+        <p>Connecting to camera...</p>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="cameraError" class="camera-error">
+        <span class="error-icon">&#9888;</span>
+        <p>{{ cameraError }}</p>
+      </div>
+
+      <!-- Live Video Feed (video element always in DOM for getElementById, but hidden until ready) -->
+      <div class="video-container" [style.display]="(isCameraReady && !capturedImageUrl && !cameraError) ? 'flex' : 'none'">
+        <video #cameraVideo id="cameraVideo" autoplay playsinline muted></video>
+      </div>
+
+      <!-- Captured Preview (only when NO error) -->
+      <div class="preview-container" *ngIf="capturedImageUrl && !cameraError">
+        <img [src]="capturedImageUrl" alt="Captured photo" />
+      </div>
+
+      <!-- Upload Spinner -->
+      <div class="upload-spinner" *ngIf="isUploading">
+        <nz-spin nzSimple nzSize="large"></nz-spin>
+        <p>Uploading photo...</p>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="camera-modal-footer">
+
+      <!-- Connecting state: no buttons -->
+
+      <!-- Error state: Close only -->
+      <ng-container *ngIf="cameraError">
+        <button type="button" class="btn-retake" (click)="closeModal()">
+          Close
+        </button>
+      </ng-container>
+
+      <!-- Live camera: show capture controls (only when camera is ready) -->
+      <ng-container *ngIf="isCameraReady && !capturedImageUrl && !cameraError">
+        <!-- Switch Camera -->
+        <button
+          *ngIf="showSwitchCamera"
+          type="button"
+          class="btn-switch"
+          (click)="switchCamera()">
+          &#x21C4; Switch Camera
+        </button>
+
+        <!-- Capture -->
+        <button type="button" class="btn-capture" (click)="capturePhoto()">
+          <span class="capture-circle"></span>
+        </button>
+
+        <!-- Spacer for alignment -->
+        <div *ngIf="showSwitchCamera" class="btn-spacer"></div>
+      </ng-container>
+
+      <!-- Preview state: Retake / Use Photo (only when preview AND no error) -->
+      <ng-container *ngIf="capturedImageUrl && !cameraError && !isUploading">
+        <button type="button" class="btn-retake" (click)="retake()">
+          &#x21BB; Retake
+        </button>
+        <button type="button" class="btn-use" (click)="usePhoto()">
+          &#x2713; Use Photo
+        </button>
+      </ng-container>
+    </div>
+
+  </div>
+</div>

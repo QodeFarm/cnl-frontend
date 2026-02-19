@@ -3,7 +3,7 @@ import { Component, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '
 import { TaFormComponent, TaFormConfig } from '@ta/ta-form';
 import { Observable, forkJoin, Subject, Subscription } from 'rxjs';
 import { tap, switchMap, map, filter, debounceTime } from 'rxjs/operators';
-import { LocalStorageService } from '@ta/ta-core';
+import { LocalStorageService, TaLocalStorage } from '@ta/ta-core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { OrderslistComponent } from './orderslist/orderslist.component';
@@ -51,6 +51,13 @@ export class SalesComponent {
 
   showPreview: boolean = false;
   docUrl: string = '';
+
+  // ========== CUSTOMER INFO BANNER ==========
+  customerNotes: string = '';
+  customerTransporterName: string = '';
+  customerTransportNotes: string = '';
+  showCustomerInfoBanner: boolean = false;
+  // ===========================================
 
   // ========== DRAFT AUTO-SAVE PROPERTIES ==========
   private draftSaveSubject = new Subject<void>();
@@ -373,6 +380,17 @@ openDocPreview() {
     this.showSaleOrderList = false;
     this.showForm = false;
     this.SaleOrderEditID = null;
+    // Reset customer info banner
+    this.customerNotes = '';
+    this.customerTransporterName = '';
+    this.customerTransportNotes = '';
+    this.showCustomerInfoBanner = false;
+
+    // Detect admin role from stored user data
+    const currentUser: any = TaLocalStorage.getItem('user');
+    if (currentUser && currentUser.role_name) {
+      this.isAdmin = (currentUser.role_name === 'Admin');
+    }
     // set form config
     this.checkAndPopulateData();
     this.setFormConfig();
@@ -1021,6 +1039,67 @@ editSaleOrder(event) {
     return this.http.get<any>(url);
   }
 
+  // ========== CUSTOMER INFO BANNER: Fetch & display notes + transport info ==========
+  fetchCustomerInfoForBanner(customerId: string) {
+    // Step 1: Fetch custom field definitions to get field_name ↔ custom_field_id mapping
+    this.http.get('customfields/customfieldscreate/').subscribe(
+      (cfResponse: any) => {
+        // Build a map: custom_field_id → field_name (only for 'customers' entity)
+        const fieldNameMap: { [id: string]: string } = {};
+        if (cfResponse?.data) {
+          cfResponse.data
+            .filter((f: any) => f.entity?.entity_name === 'customers')
+            .forEach((f: any) => {
+              fieldNameMap[f.custom_field_id?.toLowerCase()] = (f.field_name || '').toLowerCase().trim();
+            });
+        }
+
+        // Step 2: Fetch customer details
+        this.http.get(`customers/customers/${customerId}`).subscribe(
+          (res: any) => {
+            if (res?.data) {
+              const custData = res.data.customer_data || res.data;
+
+              // Extract transporter info (first-class field)
+              this.customerTransporterName = custData.transporter?.name || '';
+
+              // Reset notes
+              this.customerNotes = '';
+              this.customerTransportNotes = '';
+
+              // Cross-reference custom_field_values with field definitions
+              if (res.data.custom_field_values && Array.isArray(res.data.custom_field_values)) {
+                res.data.custom_field_values.forEach((cfv: any) => {
+                  const cfId = (cfv.custom_field_id || '').toLowerCase();
+                  const fieldName = fieldNameMap[cfId] || '';
+
+                  if (fieldName && fieldName.includes('note') && !fieldName.includes('transport')) {
+                    this.customerNotes = cfv.field_value || '';
+                  }
+                  if (fieldName && fieldName.includes('transport') && fieldName.includes('note')) {
+                    this.customerTransportNotes = cfv.field_value || '';
+                  }
+                });
+              }
+
+              // Also check for notes/transport_notes as direct fields (if BE adds them later)
+              if (custData.notes) { this.customerNotes = custData.notes; }
+              if (custData.transport_notes) { this.customerTransportNotes = custData.transport_notes; }
+
+              // Show banner only if there's something to display
+              this.showCustomerInfoBanner = !!(this.customerNotes || this.customerTransporterName || this.customerTransportNotes);
+            }
+          },
+          (error) => {
+            console.error('Error fetching customer details for info banner:', error);
+            this.showCustomerInfoBanner = false;
+          }
+        );
+      }
+    );
+  }
+  // ====================================================================================
+
   // Fetch detailed information about an order by its ID
   getOrderDetails(orderId: string): Observable<any> {
     const url = `sales/sale_order/${orderId}/`;
@@ -1495,6 +1574,13 @@ editSaleOrder(event) {
   isAmountModalOpen: boolean = false; // Controls Amount modal
   totalAmount: number = 0; // Replace this with the actual total amount from your logic
   amountExceedMessage: string = ''; // Dynamic message for the modal
+
+  // ========== CREDIT LIMIT ROLE-BASED CONTROL ==========
+  isAdmin: boolean = false;
+  private pendingCreditLimitPayload: any = null;
+  private pendingCreditLimitAction: 'create' | 'update' = 'create';
+  private creditLimitApproved: boolean = false;
+  // ======================================================
 
   updateProductInfo(currentRowIndex, product, unitData = '') {
     // Select the card wrapper element
@@ -1977,7 +2063,192 @@ createQuickPackOption: string = 'no';
 //   });
 // }
 //-----------------------working create -end --------------------------
+// createSaleOrder() {
+//   const customFieldsPayload = this.validatedCustomFieldsPayload;
+
+//   const payload = {
+//     ...this.formConfig.model,
+//     custom_field_values: customFieldsPayload.custom_field_values
+//   };
+
+//   /* -------------------------------------------------
+//    QUICK PACK (UNCHANGED)
+//   -------------------------------------------------- */
+//   if (this.createQuickPack) {
+//     const customerName = payload.sale_order?.customer?.name || 'Customer';
+//     const productNames = payload.sale_order_items?.map(i => i.product?.name) || [];
+
+//     let quickPackName = `${customerName} QuickPack (${productNames.join(', ')})`;
+//     if (quickPackName.length > 50) {
+//       quickPackName = `${customerName} QuickPack (${productNames[0]} +${productNames.length - 1} more)`;
+//     }
+
+//     const quickPackPayload = {
+//       quick_pack_data: {
+//         name: quickPackName,
+//         customer_id: payload.sale_order.customer?.customer_id,
+//         description: `QuickPack created from Sale Order ${payload.sale_order.order_no}`,
+//         active: 'Y',
+//         lot_qty: payload.sale_order_items.reduce((s, i) => s + (i.quantity || 0), 0)
+//       },
+//       quick_pack_data_items: payload.sale_order_items.map(i => ({
+//         product_id: i.product?.product_id,
+//         quantity: i.quantity,
+//         unit_options_id: i.unit_options?.unit_options_id,
+//         size_id: i.size?.size_id,
+//         color_id: i.color?.color_id
+//       }))
+//     };
+
+//     this.http.post('sales/quick_pack/', quickPackPayload).subscribe();
+//   }
+
+//   /* -------------------------------------------------
+//    SPLIT LOGIC (UNCHANGED)
+//   -------------------------------------------------- */
+//   const parentItems: any[] = [];
+//   const childItems: any[] = [];
+
+//   payload.sale_order_items.forEach(item => {
+//     const qty = Number(item.quantity) || 0;
+//     const available = Number(item.available_qty) || 0;
+
+//     parentItems.push({
+//       ...item,
+//       production_qty: 0
+//     });
+
+//     if (qty > available) {
+//       childItems.push({
+//         ...item,
+//         quantity: qty - available,
+//         available_qty: available,
+//         production_qty: qty - available
+//       });
+//     }
+//   });
+
+//   payload.sale_order_items = parentItems;
+
+//   /* -------------------------------------------------
+//    🔥 NEW: CHILD ORDER DECISION LOGIC
+//   -------------------------------------------------- */
+//   const totalProducts = payload.sale_order_items.length;
+
+//   const allAvailableZero = payload.sale_order_items.every(
+//     i => Number(i.available_qty || 0) === 0
+//   );
+
+//   const shouldCreateChildOrders =
+//     totalProducts > 1 &&        // multiple products
+//     !allAvailableZero &&        // not all unavailable
+//     childItems.length > 0;      // production required
+//   console.log('Should create child orders:', shouldCreateChildOrders);
+
+//   // if (!shouldCreateChildOrders) {
+//   //   payload.sale_order.flow_status = { flow_status_name: 'Production' };
+//   // }
+//   /* -------------------------------------------------
+//    CREATE PARENT SALE ORDER (UNCHANGED)
+//   -------------------------------------------------- */
+//   this.http.post<any>('sales/sale_order/', payload).subscribe({
+//     next: parentRes => {
+//       const parentOrder = parentRes.data.sale_order;
+//       const parentOrderId = parentOrder.sale_order_id;
+
+//       // 🔥 If no child orders → mark parent as Production
+
+//       this.sendSaleOrderWhatsapp(parentOrderId);
+
+//       /* -------------------------------------------------
+//        CREATE CHILD SALE ORDERS (CONTROLLED)
+//       -------------------------------------------------- */
+//       if (shouldCreateChildOrders) {
+//         console.log('Creating child orders for production items:', childItems);
+//         let counter = 1;
+
+//         const childRequests = childItems.map(item => {
+//           const childOrderNo = `${parentOrder.order_no}-P${counter++}`;
+
+//           const childPayload = {
+//             sale_order: {
+//               ...parentOrder,
+//               sale_order_id: undefined,
+//               order_no: childOrderNo,
+//               flow_status: { flow_status_name: 'Production' },
+
+//               item_value: 0,
+//               total_amount: 0,
+//               tax_amount: 0,
+//               dis_amt: 0,
+//               cess_amount: 0,
+
+//               order_type: parentOrder.order_type || 'sale_order'
+//             },
+//             sale_order_items: [{
+//               ...item,
+//               available_qty: 0,
+//               amount: 0,
+//               rate: 0,
+//               tax: 0,
+//               cgst: 0,
+//               sgst: 0,
+//               igst: 0,
+//               production_qty: item.quantity
+//             }],
+//             order_attachments: payload.order_attachments,
+//             order_shipments: payload.order_shipments,
+//             custom_field_values: customFieldsPayload.custom_field_values
+//           };
+
+//           return this.http.post<any>('sales/sale_order/', childPayload).pipe(
+//             switchMap(childRes => {
+//               const childOrderId = childRes.data.sale_order.sale_order_id;
+
+//               const workOrderPayload = {
+//                 work_order: {
+//                   product_id: item.product_id,
+//                   quantity: item.production_qty,
+//                   completed_qty: 0,
+//                   pending_qty: item.production_qty,
+//                   start_date: parentOrder.order_date,
+//                   sync_qty: true,
+//                   size_id: item.size?.size_id || null,
+//                   color_id: item.color?.color_id || null,
+//                   status_id: '',
+//                   sale_order_id: childOrderId
+//                 },
+//                 bom: [{
+//                   product_id: item.product_id,
+//                   size_id: item.size?.size_id || null,
+//                   color_id: item.color?.color_id || null
+//                 }],
+//                 work_order_machines: [],
+//                 workers: [],
+//                 work_order_stages: []
+//               };
+
+//               return this.http.post('production/work_order/', workOrderPayload);
+//             })
+//           );
+//         });
+
+//         forkJoin(childRequests).subscribe();
+//       }
+
+//       this.showSuccessToast = true;
+//       this.toastMessage = 'Sale Order created successfully';
+//       setTimeout(() => (this.showSuccessToast = false), 3000);
+//       this.ngOnInit();
+//     },
+//     error: err => {
+//       if (err.status === 400) this.showDialog();
+//     }
+//   });
+// }
+
 createSaleOrder() {
+
   const customFieldsPayload = this.validatedCustomFieldsPayload;
 
   const payload = {
@@ -2018,6 +2289,14 @@ createSaleOrder() {
   }
 
   /* -------------------------------------------------
+   CREDIT LIMIT OVERRIDE (ADDED FROM OLD CODE)
+  -------------------------------------------------- */
+  if (this.creditLimitApproved) {
+    payload.credit_limit_approved = true;
+    this.creditLimitApproved = false;
+  }
+
+  /* -------------------------------------------------
    SPLIT LOGIC (UNCHANGED)
   -------------------------------------------------- */
   const parentItems: any[] = [];
@@ -2045,7 +2324,7 @@ createSaleOrder() {
   payload.sale_order_items = parentItems;
 
   /* -------------------------------------------------
-   🔥 NEW: CHILD ORDER DECISION LOGIC
+   CHILD ORDER DECISION
   -------------------------------------------------- */
   const totalProducts = payload.sale_order_items.length;
 
@@ -2054,34 +2333,43 @@ createSaleOrder() {
   );
 
   const shouldCreateChildOrders =
-    totalProducts > 1 &&        // multiple products
-    !allAvailableZero &&        // not all unavailable
-    childItems.length > 0;      // production required
+    totalProducts > 1 &&
+    !allAvailableZero &&
+    childItems.length > 0;
+
   console.log('Should create child orders:', shouldCreateChildOrders);
 
-  // if (!shouldCreateChildOrders) {
-  //   payload.sale_order.flow_status = { flow_status_name: 'Production' };
-  // }
   /* -------------------------------------------------
-   CREATE PARENT SALE ORDER (UNCHANGED)
+   CREATE PARENT SALE ORDER
   -------------------------------------------------- */
   this.http.post<any>('sales/sale_order/', payload).subscribe({
     next: parentRes => {
+
+      /* -------------------------------------------------
+       CREDIT LIMIT RESPONSE CHECK
+      -------------------------------------------------- */
+      if (parentRes?.data?.credit_limit_exceeded) {
+        console.log("Credit limit exceeded — showing modal");
+        this.pendingCreditLimitPayload = payload;
+        this.pendingCreditLimitAction = 'create';
+        this.showCreditLimitModal(parentRes.data);
+        return;
+      }
+
       const parentOrder = parentRes.data.sale_order;
       const parentOrderId = parentOrder.sale_order_id;
-
-      // 🔥 If no child orders → mark parent as Production
 
       this.sendSaleOrderWhatsapp(parentOrderId);
 
       /* -------------------------------------------------
-       CREATE CHILD SALE ORDERS (CONTROLLED)
+       CREATE CHILD SALE ORDERS
       -------------------------------------------------- */
       if (shouldCreateChildOrders) {
-        console.log('Creating child orders for production items:', childItems);
+
         let counter = 1;
 
         const childRequests = childItems.map(item => {
+
           const childOrderNo = `${parentOrder.order_no}-P${counter++}`;
 
           const childPayload = {
@@ -2117,6 +2405,7 @@ createSaleOrder() {
 
           return this.http.post<any>('sales/sale_order/', childPayload).pipe(
             switchMap(childRes => {
+
               const childOrderId = childRes.data.sale_order.sale_order_id;
 
               const workOrderPayload = {
@@ -2150,16 +2439,33 @@ createSaleOrder() {
         forkJoin(childRequests).subscribe();
       }
 
+      /* -------------------------------------------------
+       SUCCESS
+      -------------------------------------------------- */
+      this.clearDraft();
       this.showSuccessToast = true;
       this.toastMessage = 'Sale Order created successfully';
+
       setTimeout(() => (this.showSuccessToast = false), 3000);
       this.ngOnInit();
     },
+
     error: err => {
-      if (err.status === 400) this.showDialog();
+
+      /* CREDIT LIMIT BLOCKED (NON ADMIN) */
+      if (err.status === 403 && err.error?.data?.credit_limit_exceeded) {
+        this.pendingCreditLimitPayload = null;
+        this.showCreditLimitModal(err.error.data);
+        return;
+      }
+
+      if (err.status === 400) {
+        this.showDialog();
+      }
     }
   });
 }
+
 
 
 
@@ -2380,16 +2686,36 @@ updateSaleOrder() {
     });
   }
 
+  // Add credit limit override flag if admin approved
+  if (this.creditLimitApproved) {
+    payload.credit_limit_approved = true;
+    this.creditLimitApproved = false; // Reset after use
+  }
+
   console.log("Final Payload Before Update:", payload);
 
   this.http.put<any>(`sales/sale_order/${this.SaleOrderEditID}/`, payload)
     .subscribe(response => {
+      // Check if backend returned credit_limit_exceeded (HTTP 200 with flag)
+      if (response?.data?.credit_limit_exceeded) {
+        console.log("Credit limit exceeded on update — showing modal.");
+        this.pendingCreditLimitPayload = payload;
+        this.pendingCreditLimitAction = 'update';
+        this.showCreditLimitModal(response.data);
+        return;
+      }
+
       this.showSuccessToast = true;
       this.toastMessage = "Record updated successfully";
       this.ngOnInit();
       setTimeout(() => this.showSuccessToast = false, 3000);
     }, error => {
       console.error('Error updating record:', error);
+      if (error.status === 403 && error.error?.data?.credit_limit_exceeded) {
+        this.pendingCreditLimitPayload = null;
+        this.showCreditLimitModal(error.error.data);
+        return;
+      }
       if (error?.error?.message === "Update is not allowed, please contact Product team.") {
         this.ngOnInit();
       }
@@ -2397,35 +2723,58 @@ updateSaleOrder() {
 }
 
 
-  // Function to open Amount Exceed modal
-  openAmountModal(total_amount: number, max_limit: number) {
-    console.log("Opening Amount Exceed modal.");
+  // ========== CREDIT LIMIT MODAL (Server-driven, Role-aware) ==========
+
+  /**
+   * Called when backend returns credit_limit_exceeded.
+   * Shows the modal with appropriate message based on user role.
+   */
+  showCreditLimitModal(creditData: any) {
     this.isAmountModalOpen = true;
-    this.amountExceedMessage = `The total amount of ${total_amount} exceeds the credit limit of ${max_limit}. Do you want to proceed?`; // Set dynamic message
-  }
+    const newTotal = parseFloat(creditData.new_total ?? creditData.order_amount ?? 0);
+    const creditLimit = parseFloat(creditData.credit_limit ?? 0);
 
-  // Confirm action in Amount Exceed modal
-  proceedWithAmount() {
-    console.log("User confirmed to proceed with amount exceeding credit limit.");
-    this.isAmountModalOpen = false;
-
-    if (!this.SaleOrderEditID) {
-      console.log("Opening Sale Order/Estimate modal after confirmation.");
-      this.openSaleOrderEstimateModal(); // Open Sale Order/Estimate modal
+    if (this.isAdmin) {
+      this.amountExceedMessage = `The total amount of ${newTotal.toFixed(2)} exceeds the credit limit of ${creditLimit.toFixed(2)}. Do you want to proceed?`;
     } else {
-      console.log("Proceeding to update existing sale order.");
-      this.updateSaleOrder(); // Proceed to update existing sale order
+      this.amountExceedMessage = `The total amount of ${newTotal.toFixed(2)} exceeds the credit limit of ${creditLimit.toFixed(2)}. Please contact an Admin to approve this order.`;
     }
   }
 
-  // Cancel action in Amount Exceed modal
-  closeAmountModal() {
-    console.log("User canceled submission due to exceeding amount limit.");
+  // (Legacy wrapper — kept for backward compatibility if called elsewhere)
+  openAmountModal(total_amount: number, max_limit: number) {
+    this.showCreditLimitModal({ new_total: total_amount, credit_limit: max_limit });
+  }
+
+  /**
+   * Admin clicks "Yes, Proceed".
+   * Sets the creditLimitApproved flag, then continues the normal flow.
+   * The flag is picked up by createSaleOrder() / updateSaleOrder() and added to the payload.
+   */
+  proceedWithAmount() {
+    console.log("Admin approved credit limit override.");
     this.isAmountModalOpen = false;
+    this.creditLimitApproved = true; // Flag — will be added to payload in create/update
+
+    if (this.pendingCreditLimitAction === 'create') {
+      console.log("Proceeding to Sale Order/Estimate modal with credit limit approval.");
+      this.openSaleOrderEstimateModal();
+    } else if (this.pendingCreditLimitAction === 'update') {
+      console.log("Proceeding to update sale order with credit limit approval.");
+      this.updateSaleOrder();
+    }
+  }
+
+  // Cancel / Close the credit limit modal
+  closeAmountModal() {
+    console.log("Credit limit modal closed.");
+    this.isAmountModalOpen = false;
+    this.pendingCreditLimitPayload = null;
 
     // Ensure the first modal (Sale Order/Estimate Modal) does not open
     this.isConfirmationModalOpen = false;
   }
+  // ==================================================================
 
   // Close Sale Order/Estimate modal
   closeSaleOrderEstimateModal() {
@@ -3782,33 +4131,32 @@ getUnitData(unitInfo: any) {
         submittedFn: () => {
           console.log("Submit button clicked.");
 
-          const totalAmount = this.formConfig.model.sale_order.total_amount; // Get the total amount
-          const customer = this.formConfig.model.sale_order.customer; // Get the customer details
-          console.log("Customer in formconfig : ", customer);
-          console.log("Customer.credit_limit : ", customer.credit_limit);
+          // Validate custom fields BEFORE proceeding
+          if (!this.validateCustomFields()) {
+            console.log("Custom field validation failed. Showing dialog.");
+            return; // Stop here if validation failed
+          }
 
-          const maxLimit = parseFloat(customer.credit_limit); // Convert credit limit to number
-          console.log(`Total Amount: ${totalAmount}, Credit Limit: ${maxLimit}`);
+          // ---- Client-side credit limit pre-check (UX layer) ----
+          const totalAmount = this.formConfig.model.sale_order.total_amount;
+          const customer = this.formConfig.model.sale_order.customer;
+          const creditLimit = parseFloat(customer?.credit_limit) || 0;
+          console.log(`Total Amount: ${totalAmount}, Credit Limit: ${creditLimit}`);
 
-          if (totalAmount >= maxLimit) {
-            // Exceeds credit limit: show the Amount Exceed modal
-            this.openAmountModal(totalAmount, maxLimit);
+          if (creditLimit > 0 && totalAmount >= creditLimit) {
+            // Credit limit exceeded — show modal (role-aware)
+            this.pendingCreditLimitAction = this.SaleOrderEditID ? 'update' : 'create';
+            this.showCreditLimitModal({ new_total: totalAmount, credit_limit: creditLimit });
+            return; // Block here — wait for admin approval or user close
+          }
+          // ---- End credit limit pre-check ----
+
+          if (!this.SaleOrderEditID) {
+            console.log("Within credit limit: Opening Sale Order/Estimate modal.");
+            this.openSaleOrderEstimateModal();
           } else {
-
-            // Validate custom fields BEFORE proceeding
-            if (!this.validateCustomFields()) {
-              console.log("Custom field validation failed. Showing dialog.");
-              return; // Stop here if validation failed
-            }
-
-            // Within credit limit: check if a new sale order or existing
-            if (!this.SaleOrderEditID) {
-              console.log("Within credit limit: Opening Sale Order/Estimate modal.");
-              this.openSaleOrderEstimateModal();
-            } else {
-              console.log("Within credit limit: Proceeding to update existing sale order.");
-              this.updateSaleOrder();
-            }
+            console.log("Within credit limit: Proceeding to update existing sale order.");
+            this.updateSaleOrder();
           }
         }
       },
@@ -4042,6 +4390,14 @@ getUnitData(unitInfo: any) {
                         //console.log("customer", data);
                         if (data && data.customer_id) {
                           this.formConfig.model['sale_order']['customer_id'] = data.customer_id;
+                          // Fetch full customer details for info banner
+                          this.fetchCustomerInfoForBanner(data.customer_id);
+                        } else {
+                          // Clear banner when customer is deselected
+                          this.showCustomerInfoBanner = false;
+                          this.customerNotes = '';
+                          this.customerTransporterName = '';
+                          this.customerTransportNotes = '';
                         }
                         if (data.customer_addresses && data.customer_addresses.billing_address) {
                           field.form.controls.billing_address.setValue(data.customer_addresses.billing_address)

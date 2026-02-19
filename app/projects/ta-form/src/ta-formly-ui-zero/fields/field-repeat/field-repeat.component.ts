@@ -18,26 +18,20 @@ export class FieldRepeatComponent extends FieldArrayType implements OnInit {
 
   ngOnInit(): void {
     const currentUrl = this.router.url || '';
-    console.log(this.field, this.field.fieldGroup);
 
     // Enable sticky columns only when the table starts with a selectItem (checkbox) column.
-    // Tables like Sales/Purchase have: selectItem → product → print_name (sticky layout).
-    // Tables like Work Order BOM start with product directly — no sticky needed.
     const firstFieldKey = (this.field?.fieldArray as any)?.fieldGroup?.[0]?.key;
     this.hasStickyColumns = firstFieldKey === 'selectItem';
 
-    // List of restricted URLs
-    const restrictedUrls = ['/admin/customers', '/admin/vendors'];
-
-    // Check if the current URL matches any restricted URL
-    this.isRestrictedPage = restrictedUrls.some(url => currentUrl.includes(url));
-
-    // console.log('Is Restricted Page:', this.isRestrictedPage);
-
-    // Additional logic for specific pages
-    // if (this.isRestrictedPage) {
-    //   console.log(`Restricted page detected: ${currentUrl}`);
-    // }
+    // Per-field control: check templateOptions for hideActions flag
+    // If set, respect it. Otherwise fall back to URL-based restriction.
+    const to = this.to || this.field?.templateOptions || {} as any;
+    if (to.hideActions !== undefined) {
+      this.isRestrictedPage = !!to.hideActions;
+    } else {
+      const restrictedUrls = ['/admin/customers', '/admin/vendors'];
+      this.isRestrictedPage = restrictedUrls.some(url => currentUrl.includes(url));
+    }
   }
 
   /**

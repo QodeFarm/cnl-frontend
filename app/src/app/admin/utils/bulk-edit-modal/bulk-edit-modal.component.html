@@ -1,0 +1,140 @@
+<!-- ==================== REUSABLE BULK EDIT MODAL ==================== -->
+<div class="bulk-edit-overlay" *ngIf="visible" (click)="close()"
+     (focusin)="$event.stopPropagation()"
+     (keydown.escape)="close()">
+  <div class="bulk-edit-modal" (click)="$event.stopPropagation()" (mousedown)="$event.stopPropagation()"
+       (keydown)="$event.stopPropagation()" (keyup)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="bulk-edit-header">
+      <h5 class="mb-0">Bulk Edit &mdash; {{ entityIds.length }} {{ (entityName || 'Record') }}{{ entityIds.length > 1 ? 's' : '' }} Selected</h5>
+      <button class="btn-close" (click)="close()" [disabled]="loading" aria-label="Close"></button>
+    </div>
+
+    <!-- Error Alert -->
+    <div class="bulk-edit-alert" *ngIf="errorMessage">
+      <div role="alert" class="alert alert-danger alert-sm mb-0 d-flex align-items-center justify-content-between py-2 px-3">
+        <span><small>{{ errorMessage }}</small></span>
+        <button type="button" class="btn-close btn-close-sm" (click)="errorMessage = ''" aria-label="Dismiss error"></button>
+      </div>
+    </div>
+
+    <!-- FORM VIEW -->
+    <div class="bulk-edit-body" *ngIf="!confirmVisible">
+      <p class="text-muted mb-3">
+        <i class="fa fa-info-circle me-1"></i>
+        Only fill the fields you want to change. Empty fields will not be modified.
+      </p>
+
+      <div class="bulk-edit-grid">
+        <ng-container *ngFor="let field of fields">
+
+          <!-- FK Dropdown -->
+          <div class="bulk-field" *ngIf="field.type === 'dropdown'">
+            <label [attr.for]="'bulk-' + field.key">{{ field.label }}</label>
+            <select [id]="'bulk-' + field.key" class="form-select form-select-sm" [(ngModel)]="bulkEditForm[field.key]">
+              <option [ngValue]="null">&mdash; No change &mdash;</option>
+              <option *ngFor="let opt of dropdownOptions[field.key]" [ngValue]="opt[field.dataKey]">
+                {{ opt[field.dataLabel] }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Static Dropdown -->
+          <div class="bulk-field" *ngIf="field.type === 'static-dropdown'">
+            <label [attr.for]="'bulk-' + field.key">{{ field.label }}</label>
+            <select [id]="'bulk-' + field.key" class="form-select form-select-sm" [(ngModel)]="bulkEditForm[field.key]">
+              <option [ngValue]="null">&mdash; No change &mdash;</option>
+              <option *ngFor="let opt of field.options" [ngValue]="opt.value">
+                {{ opt.label }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Number Input -->
+          <div class="bulk-field" *ngIf="field.type === 'number'">
+            <label [attr.for]="'bulk-' + field.key">{{ field.label }}</label>
+            <input
+              [id]="'bulk-' + field.key"
+              type="number"
+              class="form-control form-control-sm"
+              [name]="field.key"
+              [ngModel]="bulkEditForm[field.key]"
+              (ngModelChange)="bulkEditForm[field.key] = $event"
+              placeholder="No change"
+            />
+          </div>
+
+          <!-- Text Input -->
+          <div class="bulk-field" *ngIf="field.type === 'text'">
+            <label [attr.for]="'bulk-' + field.key">{{ field.label }}</label>
+            <input
+              [id]="'bulk-' + field.key"
+              type="text"
+              class="form-control form-control-sm"
+              [name]="field.key"
+              [ngModel]="bulkEditForm[field.key]"
+              (ngModelChange)="bulkEditForm[field.key] = $event"
+              placeholder="No change"
+            />
+          </div>
+
+          <!-- Boolean (3-state radio: null / true / false) -->
+          <div class="bulk-field" *ngIf="field.type === 'boolean'">
+            <label>{{ field.label }}</label>
+            <div class="bool-radio-group">
+              <label class="bool-option" [class.active]="bulkEditForm[field.key] === null">
+                <input type="radio" [name]="field.key" [ngModel]="bulkEditForm[field.key]" (ngModelChange)="bulkEditForm[field.key] = $event" [value]="null" />
+                <span>No change</span>
+              </label>
+              <label class="bool-option yes" [class.active]="bulkEditForm[field.key] === true">
+                <input type="radio" [name]="field.key" [ngModel]="bulkEditForm[field.key]" (ngModelChange)="bulkEditForm[field.key] = $event" [value]="true" />
+                <span>Yes</span>
+              </label>
+              <label class="bool-option no" [class.active]="bulkEditForm[field.key] === false">
+                <input type="radio" [name]="field.key" [ngModel]="bulkEditForm[field.key]" (ngModelChange)="bulkEditForm[field.key] = $event" [value]="false" />
+                <span>No</span>
+              </label>
+            </div>
+          </div>
+
+        </ng-container>
+      </div>
+    </div>
+
+    <!-- CONFIRMATION VIEW -->
+    <div class="bulk-edit-body" *ngIf="confirmVisible">
+      <div class="confirm-box">
+        <p class="confirm-title">&#9888;&#65039; Confirm Bulk Update</p>
+        <p>You are about to update <strong>{{ entityIds.length }}</strong> {{ (entityName || 'record').toLowerCase() }}{{ entityIds.length > 1 ? 's' : '' }}.</p>
+        <p class="mb-2">Fields being changed:</p>
+        <ul class="changed-fields-list">
+          <li *ngFor="let label of changedFieldLabels">{{ label }}</li>
+        </ul>
+        <p class="text-muted"><small>This action cannot be undone.</small></p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="bulk-edit-footer">
+      <button class="btn btn-outline-secondary btn-sm" (click)="confirmVisible ? cancelConfirm() : close()" [disabled]="loading">
+        {{ confirmVisible ? 'Back' : 'Cancel' }}
+      </button>
+      <button
+        *ngIf="!confirmVisible"
+        class="btn btn-primary btn-sm"
+        (click)="showConfirm()">
+        Update All
+      </button>
+      <button
+        *ngIf="confirmVisible"
+        class="btn btn-primary btn-sm"
+        [disabled]="loading"
+        (click)="executeBulkUpdate()">
+        <span *ngIf="loading" class="spinner-border spinner-border-sm me-1"></span>
+        {{ loading ? 'Updating...' : 'Yes, Update' }}
+      </button>
+    </div>
+
+  </div>
+</div>

@@ -2,8 +2,9 @@ import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { forkJoin } from 'rxjs';  // Import forkJoin from rxjs
+import { forkJoin } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { CustomersListComponent } from './customers-list/customers-list.component';
 import { CustomFieldHelper } from '../utils/custom_field_fetch';
@@ -12,17 +13,21 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzProgressModule } from 'ng-zorro-antd/progress';
 import { NzResultModule } from 'ng-zorro-antd/result';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
+import { BulkEditModalComponent } from '../utils/bulk-edit-modal/bulk-edit-modal.component';
+import { BulkField } from '../utils/bulk-operations.service';
 
 @Component({
   selector: 'app-customers',
   templateUrl: './customers.component.html',
   imports: [CommonModule,
+    FormsModule,
     AdminCommmonModule,
     CustomersListComponent,
     NzSpinModule,
     NzProgressModule,
     NzResultModule,
-    NzAlertModule],
+    NzAlertModule,
+    BulkEditModalComponent],
   standalone: true,
   styleUrls: ['./customers.component.scss']
 })
@@ -37,6 +42,8 @@ export class CustomersComponent {
   importProgress: number = 0;
   importStatusMessage: string = '';
   importCompleted: boolean = false;
+  importMode: 'create' | 'update' = 'create';
+  isExporting: boolean = false;
   importResults: {
     success: boolean;
     totalRecords: number;
@@ -44,6 +51,29 @@ export class CustomersComponent {
     errorCount: number;
     errors: Array<{ row: number; error: string }>;
   } | null = null;
+
+  // ─── Bulk Edit State ─────────────────────────────────────────
+  showBulkEditModal = false;
+  bulkEditIds: string[] = [];
+
+  /** Config: maps each bulk-edit field to its API & display info */
+  readonly BULK_FIELDS: BulkField[] = [
+    { key: 'customer_category_id', apiKey: 'customer_category_id', label: 'Customer Category', type: 'dropdown', url: 'masters/customer_categories/', dataKey: 'customer_category_id', dataLabel: 'name' },
+    { key: 'territory_id', apiKey: 'territory_id', label: 'Territory', type: 'dropdown', url: 'masters/territory/', dataKey: 'territory_id', dataLabel: 'name' },
+    { key: 'firm_status_id', apiKey: 'firm_status_id', label: 'Firm Status', type: 'dropdown', url: 'masters/firm_statuses/', dataKey: 'firm_status_id', dataLabel: 'name' },
+    { key: 'gst_category_id', apiKey: 'gst_category_id', label: 'GST Category', type: 'dropdown', url: 'masters/gst_categories/', dataKey: 'gst_category_id', dataLabel: 'name' },
+    { key: 'payment_term_id', apiKey: 'payment_term_id', label: 'Payment Terms', type: 'dropdown', url: 'masters/customer_payment_terms/', dataKey: 'payment_term_id', dataLabel: 'name' },
+    { key: 'price_category_id', apiKey: 'price_category_id', label: 'Price Category', type: 'dropdown', url: 'masters/price_categories/', dataKey: 'price_category_id', dataLabel: 'name' },
+    { key: 'transporter_id', apiKey: 'transporter_id', label: 'Transporter', type: 'dropdown', url: 'masters/transporters/', dataKey: 'transporter_id', dataLabel: 'name' },
+    { key: 'tax_type', apiKey: 'tax_type', label: 'Tax Type', type: 'static-dropdown', options: [{ label: 'Inclusive', value: 'Inclusive' }, { label: 'Exclusive', value: 'Exclusive' }, { label: 'Both', value: 'Both' }] },
+    { key: 'credit_limit', apiKey: 'credit_limit', label: 'Credit Limit', type: 'number' },
+    { key: 'max_credit_days', apiKey: 'max_credit_days', label: 'Max Credit Days', type: 'number' },
+    { key: 'interest_rate_yearly', apiKey: 'interest_rate_yearly', label: 'Interest Rate (%)', type: 'number' },
+    { key: 'tds_applicable', apiKey: 'tds_applicable', label: 'TDS Applicable', type: 'boolean' },
+    { key: 'tds_on_gst_applicable', apiKey: 'tds_on_gst_applicable', label: 'TDS on GST', type: 'boolean' },
+    { key: 'gst_suspend', apiKey: 'gst_suspend', label: 'GST Suspend', type: 'boolean' },
+  ];
+  // ─────────────────────────────────────────────────────────────
 
   nowDate = () => {
     const date = new Date();
@@ -74,21 +104,7 @@ export class CustomersComponent {
 
 
   ngAfterViewInit() {
-    const containerSelector = '.customers-component'; // Scoped to this component
-    this.applyDomManipulations(containerSelector);
-
-    // Use MutationObserver to monitor changes and re-apply manipulations
-    const container = document.querySelector(containerSelector);
-    if (container) {
-      this.observer = new MutationObserver(() => {
-        this.applyDomManipulations(containerSelector);
-      });
-
-      this.observer.observe(container, {
-        childList: true,
-        subtree: true,
-      });
-    }
+    // No DOM manipulation needed — copy buttons are in the component template
   }
 
   customFieldMetadata: any = {}; // To store mapping of field names to metadata
@@ -159,36 +175,59 @@ export class CustomersComponent {
   }
 
   applyDomManipulations(containerSelector: string) {
-    const container = document.querySelector(containerSelector);
-    if (!container) return;
-
-    // Hide Actions Column
-    const actionHeaders = Array.from(container.querySelectorAll('.custom-form-list .table th'));
-    actionHeaders.forEach((header: HTMLElement) => {
-      if (header.innerText.trim() === 'Actions') {
-        header.style.display = 'none';
-        const index = Array.from(header.parentElement?.children || []).indexOf(header);
-        const rows = container.querySelectorAll('.custom-form-list .table tbody tr');
-        rows.forEach(row => {
-          const cells = row.children;
-          if (cells[index]) {
-            (cells[index] as HTMLElement).style.display = 'none';
-          }
-        });
-      }
-    });
-
-    // Remove Button
-    const button = container.querySelector('.custom-form-list .ant-card-head button');
-    if (button) {
-      button.remove();
-    }
+    // Kept for backward compatibility — no-op now
   }
 
   ngOnDestroy() {
     if (this.observer) {
       this.observer.disconnect();
     }
+  }
+
+  // --- Copy Address Helpers (reusable for Customers & Vendors) ---
+  private readonly ADDRESS_COPY_FIELDS = ['address', 'city', 'city_id', 'state', 'state_id', 'country', 'country_id', 'pin_code', 'phone', 'email'];
+
+  copyBillingToShipping() {
+    const addresses = this.formConfig.model['customer_addresses'];
+    if (!addresses || addresses.length < 2) {
+      this.notification.warning('No Address', 'Please fill billing address first.');
+      return;
+    }
+    const billing = addresses[0];
+    const hasData = this.ADDRESS_COPY_FIELDS.some(key => billing[key] != null && billing[key] !== '');
+    if (!hasData) {
+      this.notification.warning('Empty Address', 'Please fill billing address before copying.');
+      return;
+    }
+    this.ADDRESS_COPY_FIELDS.forEach(key => {
+      addresses[1][key] = billing[key] ?? null;
+    });
+    addresses[1]['address_type'] = 'Shipping';
+    // Deep-clone to force Formly re-render
+    this.formConfig.model = JSON.parse(JSON.stringify(this.formConfig.model));
+    this.cdref.detectChanges();
+    this.notification.success('Copied', 'Billing address copied to Shipping.');
+  }
+
+  copyShippingToBilling() {
+    const addresses = this.formConfig.model['customer_addresses'];
+    if (!addresses || addresses.length < 2) {
+      this.notification.warning('No Address', 'Please fill shipping address first.');
+      return;
+    }
+    const shipping = addresses[1];
+    const hasData = this.ADDRESS_COPY_FIELDS.some(key => shipping[key] != null && shipping[key] !== '');
+    if (!hasData) {
+      this.notification.warning('Empty Address', 'Please fill shipping address before copying.');
+      return;
+    }
+    this.ADDRESS_COPY_FIELDS.forEach(key => {
+      addresses[0][key] = shipping[key] ?? null;
+    });
+    addresses[0]['address_type'] = 'Billing';
+    this.formConfig.model = JSON.parse(JSON.stringify(this.formConfig.model));
+    this.cdref.detectChanges();
+    this.notification.success('Copied', 'Shipping address copied to Billing.');
   }
 
   formConfig: TaFormConfig = {};
@@ -231,52 +270,56 @@ export class CustomersComponent {
   //   // Close the customer list modal
   //   this.hide();
   // }
-editCustomer(event: string) {
-  this.CustomerEditID = event;
+  editCustomer(event: string) {
+    this.CustomerEditID = event;
 
-  this.http.get(`customers/customers/${event}`).subscribe(
-    (res: any) => {
-      if (res && res.data) {
-        console.log("Res in edit : ", res);
+    this.http.get(`customers/customers/${event}`).subscribe(
+      (res: any) => {
+        if (res && res.data) {
+          console.log("Res in edit : ", res);
 
-        // ------------------ MAIN MODEL SET ------------------
-        this.formConfig.model = res.data;
-        this.formConfig.model['customer_id'] = this.CustomerEditID;
+          // ------------------ MAIN MODEL SET ------------------
+          this.formConfig.model = res.data;
+          this.formConfig.model['customer_id'] = this.CustomerEditID;
 
-        // ------------------ 🔥 FIX START ------------------
-        const addresses = res.data.customer_addresses || [];
+          // ------------------ FIX START ------------------
+          const addresses = res.data.customer_addresses || [];
 
-        const billing = addresses.find((a: any) => a.address_type === 'Billing');
-        const shipping = addresses.find((a: any) => a.address_type === 'Shipping');
+          const billing = addresses.find((a: any) => a.address_type === 'Billing');
+          const shippingList = addresses.filter((a: any) => a.address_type === 'Shipping');
+          if (shippingList.length === 0) shippingList.push({ address_type: 'Shipping' });
 
-        this.formConfig.model.customer_addresses = [
-          billing || { address_type: 'Billing' },
-          shipping || { address_type: 'Shipping' }
-        ];
-        // ------------------ 🔥 FIX END ------------------
+          this.formConfig.model.customer_addresses = [
+            billing || { address_type: 'Billing' },
+            ...shippingList
+          ];
+          // ------------------ FIX END ------------------
 
-        // ------------------ CUSTOM FIELDS ------------------
-        if (res.data.custom_field_values) {
-          this.formConfig.model['custom_field_values'] =
-            res.data.custom_field_values.reduce((acc: any, fieldValue: any) => {
-              acc[fieldValue.custom_field_id] = fieldValue.field_value;
-              return acc;
-            }, {});
+          // ------------------ CUSTOM FIELDS ------------------
+          if (res.data.custom_field_values) {
+            this.formConfig.model['custom_field_values'] =
+              res.data.custom_field_values.reduce((acc: any, fieldValue: any) => {
+                acc[fieldValue.custom_field_id] = fieldValue.field_value;
+                return acc;
+              }, {});
+          }
+
+          // ------------------ FORM STATE ------------------
+          this.formConfig.pkId = 'customer_id';
+          this.formConfig.submit.label = 'Update';
+          this.showForm = true;
         }
-
-        // ------------------ FORM STATE ------------------
-        this.formConfig.pkId = 'customer_id';
-        this.formConfig.submit.label = 'Update';
-        this.showForm = true;
+      },
+      (error) => {
+        console.error('Error fetching customer data:', error);
       }
-    },
-    (error) => {
-      console.error('Error fetching customer data:', error);
-    }
-  );
+    );
 
-  this.hide();
-}
+    // hide() moved to inside subscribe success handler would be ideal,
+    // but the form needs the modal to close for layout reasons.
+    // Keep it here for now — the HTTP call populates model asynchronously.
+    this.hide();
+  }
 
 
   showCustomerListFn() {
@@ -310,8 +353,9 @@ editCustomer(event: string) {
     // Construct payload for custom fields
     const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
     if (!customFieldsPayload) {
-        this.showDialog(); // Stop execution if required fields are missing
-      }
+      this.showDialog(); // Stop execution if required fields are missing
+      return;
+    }
     // Construct the final payload for update
     const payload = {
       ...this.formConfig.model,
@@ -484,6 +528,22 @@ editCustomer(event: string) {
                         }
                       }
                     },
+                    {
+                      className: 'col-md-4 col-sm-6 col-12',
+                      key: 'customer_common_for_sales_purchase',
+                      type: 'checkbox',
+                      templateOptions: {
+                        label: 'Customer Common for Sales and Purchase',
+                      }
+                    },
+                    {
+                      className: 'col-md-4 col-sm-6 col-12',
+                      key: 'is_sub_customer',
+                      type: 'checkbox',
+                      templateOptions: {
+                        label: 'Is Sub Customer',
+                      }
+                    },
                     // {
                     //   className: 'col-md-4 col-sm-6 col-12',
                     //   key: 'tax_type',
@@ -529,63 +589,102 @@ editCustomer(event: string) {
               className: 'col-12 pb-0',
               fieldGroupClassName: "field-no-bottom-space",
               props: {
-                label: 'Addresses'
+                label: 'Tax Details'
               },
               fieldGroup: [
+                // --- Tax Fields ---
+                {
+                  fieldGroupClassName: "",
+                  fieldGroup: [
+                    {
+                      className: 'col-12 p-0',
+                      key: 'customer_data',
+                      fieldGroupClassName: "ant-row row align-items-end mt-3",
+                      fieldGroup: [
+                        {
+                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                          key: 'gst_category',
+                          type: 'select',
+                          templateOptions: {
+                            label: 'GST Category',
+                            dataKey: 'gst_category_id',
+                            dataLabel: 'name',
+                            options: [
+                              { label: 'Registered', value: { gst_category_id: 'registered', name: 'Registered' } },
+                              { label: 'Unregistered', value: { gst_category_id: 'unregistered', name: 'Unregistered' } }
+                            ],
+                          },
+                        },
+                        {
+                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                          key: 'gst',
+                          type: 'input',
+                          templateOptions: {
+                            label: 'GST No',
+                            placeholder: 'Enter GST',
+                          }
+                        },
+                        {
+                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                          key: 'pan',
+                          type: 'input',
+                          templateOptions: {
+                            label: 'PAN',
+                            placeholder: 'Enter PAN',
+                          }
+                        },
+                        {
+                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                          key: 'gst_suspend',
+                          type: 'checkbox',
+                          templateOptions: {
+                            label: 'GST Suspend',
+                          }
+                        },
+                        {
+                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                          key: 'tds_on_gst_applicable',
+                          type: 'checkbox',
+                          templateOptions: {
+                            label: 'TDS on GST Applicable',
+                          }
+                        },
+                        {
+                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                          key: 'tds_applicable',
+                          type: 'checkbox',
+                          templateOptions: {
+                            label: 'TDS Applicable',
+                          }
+                        },
+                      ]
+                    },
+                  ]
+                },
+                // --- Addresses Section ---
                 {
                   fieldGroupClassName: "",
                   fieldGroup: [
                     {
                       key: 'customer_addresses',
                       type: 'table',
-                      className: 'custom-form-list no-ant-card',
+                      className: 'custom-form-list address-table-actions',
                       templateOptions: {
-                        // addText: 'Add Addresses',
+                        title: 'Addresses',
+                        addText: 'Add Shipping Address',
+                        showAddBtn: true,
+                        extraActionText: 'Copy Billing → Shipping',
+                        extraActionIcon: 'fas fa-copy',
+                        onExtraAction: () => this.copyBillingToShipping(),
                         tableCols: [
-                          {
-                            name: 'address_type',
-                            label: 'Address Type'  // New column for Address Type
-                          },
-                          {
-                            name: 'address',
-                            label: 'Address'
-                          },
-                          {
-                            name: 'city',
-                            label: 'City'
-                          },
-                          {
-                            name: 'state',
-                            label: 'State'
-                          },
-                          {
-                            name: 'country',
-                            label: 'Country'
-                          },
-                          {
-                            name: 'pin_code',
-                            label: 'Pin Code'
-                          },
-                          {
-                            name: 'phone',
-                            label: 'Phone'
-                          },
-                          {
-                            name: 'email',
-                            label: 'Email'
-                          },
-                          {
-                            name: 'route_map',
-                            label: 'Route Map'
-                          },
-                          {
-                            name: 'longitude',
-                            label: 'Longitude'
-                          },
-                          {
-                            name: 'latitude',
-                            label: 'Latitude'
-                          }
+                          { name: 'address_type', label: 'Type' },
+                          { name: 'address', label: 'Address' },
+                          { name: 'city', label: 'City' },
+                          { name: 'state', label: 'State' },
+                          { name: 'country', label: 'Country' },
+                          { name: 'pin_code', label: 'Pin Code' },
+                          { name: 'phone', label: 'Phone' },
+                          { name: 'email', label: 'Email' }
                         ]
                       },
                       fieldArray: {
@@ -593,15 +692,15 @@ editCustomer(event: string) {
                           {
                             key: 'address_type',
                             type: 'input',
+                            defaultValue: 'Shipping',
                             className: 'custom-select-bold',
                             templateOptions: {
                               label: 'Address Type',
                               hideLabel: true,
                               readonly: true,
                               required: true,
-                              value: 'Billing',  // Set to 'Billing'
                               attributes: {
-                                style: 'font-weight: bold; border: none; background-color: transparent; margin-bottom: 10px;' // Bold text, no border, transparent background
+                                style: 'font-weight: bold; border: none; background-color: transparent; margin-bottom: 10px;'
                               }
                             }
                           },
@@ -801,6 +900,60 @@ editCustomer(event: string) {
                 }
               ]
             },
+            // ===================== COMMUNICATION TAB =====================
+            {
+              className: 'col-12 pb-0',
+              fieldGroupClassName: "field-no-bottom-space",
+              props: {
+                label: 'Communication'
+              },
+              fieldGroup: [
+                {
+                  fieldGroupClassName: "",
+                  fieldGroup: [
+                    {
+                      className: 'col-12 p-0',
+                      key: 'customer_data',
+                      fieldGroupClassName: "ant-row row align-items-end mt-3",
+                      fieldGroup: [
+                        {
+                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                          key: 'contact_person',
+                          type: 'input',
+                          templateOptions: {
+                            label: 'Contact Person',
+                            placeholder: 'Enter Contact Person',
+                          }
+                        },
+                        {
+                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                          key: 'phone',
+                          type: 'input',
+                          templateOptions: {
+                            label: 'Phone',
+                            placeholder: 'Enter Phone',
+                          }
+                        },
+                        {
+                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                          key: 'email',
+                          type: 'input',
+                          templateOptions: {
+                            label: 'Email',
+                            placeholder: 'Enter Email',
+                          }
+                        },
+                      ]
+                    },
+                  ]
+                },
+                // Communication tab info text
+                {
+                  className: 'col-12 p-0',
+                  template: '<p class="text-muted mt-2 mb-0" style="font-size:12px"><i class="fas fa-info-circle" style="margin-right:4px"></i> Billing and Shipping addresses can be managed in the <strong>Tax Details</strong> tab.</p>',
+                },
+              ]
+            },
             {
               className: 'col-12 custom-form-card-block',
               props: {
@@ -896,22 +1049,7 @@ editCustomer(event: string) {
                             type: 'number',
                           }
                         },
-                        {
-                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                          key: 'is_sub_customer',
-                          type: 'checkbox',
-                          templateOptions: {
-                            label: 'Is Sub Customer',
-                          }
-                        },
-                        {
-                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                          key: 'customer_common_for_sales_purchase',
-                          type: 'checkbox',
-                          templateOptions: {
-                            label: 'Customer common for Sales and Purchase',
-                          }
-                        },
+
                       ]
                     },
                   ]
@@ -976,122 +1114,6 @@ editCustomer(event: string) {
                           templateOptions: {
                             label: 'LinkedIn',
                             placeholder: 'Enter LinkedIn URL',
-                          }
-                        },
-                      ]
-                    },
-                  ]
-                }
-              ]
-            },
-            {
-              className: 'col-12 pb-0',
-              fieldGroupClassName: "field-no-bottom-space",
-              props: {
-                label: 'Tax Details'
-              },
-              fieldGroup: [
-                {
-                  fieldGroupClassName: "",
-                  fieldGroup: [
-                    {
-                      className: 'col-12 p-0',
-                      key: 'customer_data',
-                      fieldGroupClassName: "ant-row row align-items-end mt-3",
-                      fieldGroup: [
-                        // {
-                        //   className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                        //   key: 'gst_category',
-                        //   type: 'gst-cat-dropdown',
-                        //   templateOptions: {
-                        //     label: 'GST Category',
-                        //     dataKey: 'gst_category_id',
-                        //     dataLabel: 'name',
-                        //     options: [],
-                        //     lazy: {
-                        //       url: 'masters/gst_categories/',
-                        //       lazyOneTime: true
-                        //     }
-                        //   },
-                        //   hooks: {
-                        //     onChanges: (field: any) => {
-                        //       field.formControl.valueChanges.subscribe((data: any) => {
-                        //         if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
-                        //           this.formConfig.model['customer_data']['gst_category_id'] = data.gst_category_id;
-                        //         } else {
-                        //           console.error('Form config or Customer data model is not defined.');
-                        //         }
-                        //       });
-                        //     }
-                        //   }
-                        // },
-                        {
-                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                          key: 'gst_category',
-                          type: 'select',
-                          templateOptions: {
-                              label: 'GST Category',
-                              dataKey: 'gst_category_id',
-                              dataLabel: 'name',
-                              options: [
-                                  { label: 'Registered', value: { gst_category_id: 'registered', name: 'Registered' } },
-                                  { label: 'Unregistered', value: { gst_category_id: 'unregistered', name: 'Unregistered' } }
-                              ],
-                              // lazy: {
-                              //     url: 'masters/gst_categories/',
-                              //     lazyOneTime: true
-                              // }
-                          },
-                        },
-                        {
-                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                          key: 'gst',
-                          type: 'input',
-                          templateOptions: {
-                            label: 'GST No',
-                            placeholder: 'Enter GST',
-                          }
-                        },
-                        // {
-                        //   className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                        //   key: 'cin',
-                        //   type: 'input',
-                        //   templateOptions: {
-                        //     label: 'CIN',
-                        //     placeholder: 'Enter CIN',
-                        //   }
-                        // },
-                        {
-                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                          key: 'pan',
-                          type: 'input',
-                          templateOptions: {
-                            label: 'PAN',
-                            placeholder: 'Enter PAN',
-                          }
-                        },
-                        {
-                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                          key: 'gst_suspend',
-                          type: 'checkbox',
-                          templateOptions: {
-                            label: 'GST Suspend',
-                          }
-                        },
-                        {
-                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                          key: 'tds_on_gst_applicable',
-                          type: 'checkbox',
-                          templateOptions: {
-                            label: 'TDS on GST Applicable',
-                          }
-                        },
-                        {
-                          className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                          key: 'tds_applicable',
-                          type: 'checkbox',
-                          templateOptions: {
-                            label: 'TDS Applicable',
                           }
                         },
                       ]
@@ -1198,15 +1220,6 @@ editCustomer(event: string) {
                   fieldGroup: [
                     {
                       className: 'col-lg-3 col-md-4 col-sm-6 col-12',
-                      key: 'contact_person',
-                      type: 'input',
-                      templateOptions: {
-                        label: 'Contact Person',
-                        placeholder: 'Enter Contact Person',
-                      }
-                    },
-                    {
-                      className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                       key: 'firm_status',
                       type: 'firm-status-dropdown',
                       templateOptions: {
@@ -1302,6 +1315,70 @@ editCustomer(event: string) {
   //   });
   // }
 
+  // ─── Bulk Edit Methods ───────────────────────────────────────
+
+  /** Open the bulk edit modal */
+  openBulkEditModal(ids: string[]) {
+    this.bulkEditIds = ids;
+    this.showBulkEditModal = true;
+  }
+
+  /** Handle successful bulk update */
+  onBulkUpdated(event: { message: string; count: number }) {
+    this.notification.success('Success', event.message);
+    this.CustomersListComponent?.clearSelections();
+    this.CustomersListComponent?.refreshTable();
+  }
+
+  /** Close bulk edit modal */
+  onBulkEditClosed() {
+    this.showBulkEditModal = false;
+  }
+
+  // ─── Export Customers ────────────────────────────────────────
+
+  /** Export all or selected customers to Excel */
+  exportCustomers(ids: string[]) {
+    this.isExporting = true;
+    let url = 'customers/export-customers/';
+    if (ids.length > 0) {
+      url += '?ids=' + ids.join(',');
+    }
+
+    this.http.get(url, { responseType: 'blob' }).subscribe({
+      next: (blob: Blob) => {
+        this.isExporting = false;
+        const a = document.createElement('a');
+        const objectUrl = window.URL.createObjectURL(blob);
+        a.href = objectUrl;
+        a.download = ids.length > 0
+          ? `Customers_Export_${ids.length}.xlsx`
+          : 'Customers_Export_All.xlsx';
+        a.click();
+        window.URL.revokeObjectURL(objectUrl);
+        this.notification.success('Export Complete',
+          ids.length > 0
+            ? `${ids.length} customer(s) exported successfully`
+            : 'All customers exported successfully'
+        );
+      },
+      error: () => {
+        this.isExporting = false;
+        this.notification.error('Export Failed', 'Could not export customers. Please try again.');
+      }
+    });
+  }
+
+  // ─── Import for Update ─────────────────────────────────────
+
+  /** Open the import modal in UPDATE mode */
+  showImportUpdateModal() {
+    this.importMode = 'update';
+    this.showImportModal();
+  }
+
+  // ─────────────────────────────────────────────────────────────
+
   downloadExcelTemplate() {
     this.http.get('customers/download-template/', {
       responseType: 'blob'
@@ -1340,6 +1417,7 @@ editCustomer(event: string) {
     this.importStatusMessage = '';
     this.importCompleted = false;
     this.importResults = null;
+    // Keep importMode as-is — it's set before modal opens
   }
 
   // Simulate progress for better UX
@@ -1349,7 +1427,7 @@ editCustomer(event: string) {
       if (this.importProgress < 90 && this.isImporting) {
         const increment = Math.max(1, Math.floor((90 - this.importProgress) / 10));
         this.importProgress = Math.min(90, this.importProgress + increment);
-        
+
         if (this.importProgress < 30) {
           this.importStatusMessage = 'Reading Excel file...';
         } else if (this.importProgress < 60) {
@@ -1367,7 +1445,11 @@ editCustomer(event: string) {
   showImportModal() {
     // Reset import state for fresh start
     this.resetImportState();
-    
+    // Default to create mode unless already set to update
+    if (this.importMode !== 'update') {
+      this.importMode = 'create';
+    }
+
     // Reset the import form model to ensure fresh start
     this.importFormConfig.model = {};
 
@@ -1430,52 +1512,53 @@ editCustomer(event: string) {
     // Reset and start import
     this.resetImportState();
     this.isImporting = true;
-    this.importStatusMessage = 'Preparing import...';
+    const isUpdate = this.importMode === 'update';
+    this.importStatusMessage = isUpdate ? 'Preparing update...' : 'Preparing import...';
 
     const uploadData = new FormData();
     uploadData.append('file', rawFile);
 
     const headers = { 'X-Skip-Error-Interceptor': 'true' };
     const progressInterval = this.simulateProgress();
+    const uploadUrl = isUpdate ? 'customers/upload-excel/?mode=update' : 'customers/upload-excel/';
 
-    this.http.post('customers/upload-excel/', uploadData, { headers }).subscribe({
+    this.http.post(uploadUrl, uploadData, { headers }).subscribe({
       next: (res: any) => {
         clearInterval(progressInterval);
         this.importProgress = 100;
-        this.importStatusMessage = 'Import completed!';
+        this.importStatusMessage = isUpdate ? 'Update completed!' : 'Import completed!';
         this.isImporting = false;
         this.importCompleted = true;
 
         console.log('Upload success', res);
 
-        const successMatch = res.message?.match(/(\d+)/);
-        const successCount = successMatch ? parseInt(successMatch[1], 10) : 0;
-        const errorCount = res.errors?.length || 0;
+        // Handle both create and update response formats
+        let successCount = 0;
+        let errorCount = 0;
+        let errors: any[] = [];
+
+        if (isUpdate && res.data) {
+          // Update mode response: { data: { success_count, failed_count, errors } }
+          successCount = res.data.success_count || 0;
+          errorCount = res.data.failed_count || 0;
+          errors = res.data.errors || [];
+        } else {
+          // Create mode response
+          const successMatch = res.message?.match(/(\d+)/);
+          successCount = successMatch ? parseInt(successMatch[1], 10) : 0;
+          errorCount = res.errors?.length || 0;
+          errors = res.errors || [];
+        }
+
         const totalRecords = successCount + errorCount;
 
         this.importResults = {
-          success: errorCount === 0,
+          success: errorCount === 0 && successCount > 0,
           totalRecords: totalRecords,
           successCount: successCount,
           errorCount: errorCount,
-          errors: res.errors?.slice(0, 10) || []
+          errors: errors.slice(0, 10)
         };
-
-        // Notifications commented out - results shown in modal instead
-        // if (errorCount === 0) {
-        //   this.notification.success('Success', res.message || 'Customers imported successfully', { nzDuration: 3000 });
-        // } else if (successCount > 0) {
-        //   this.notification.warning('Partial Import', `${successCount} customers imported, ${errorCount} failed.`, { nzDuration: 5000 });
-        // } else {
-        //   const missingFieldErrors = res.errors?.filter((e: any) => e.error && e.error.includes('Missing required field:')) || [];
-        //   if (missingFieldErrors.length > 0) {
-        //     const missingFields = missingFieldErrors.map((e: any) => {
-        //       const match = e.error.match(/Missing required field: (.+)/);
-        //       return match ? match[1] : '';
-        //     }).filter(Boolean);
-        //     this.notification.error('Import Failed', `Required fields missing: ${missingFields.join(', ')}`, { nzDuration: 6000 });
-        //   }
-        // }
       },
       error: (error) => {
         clearInterval(progressInterval);
@@ -1486,7 +1569,7 @@ editCustomer(event: string) {
         console.error('Upload error', error);
 
         const errorResponse = error.error || {};
-        const errorMessage = errorResponse.message || 'Import failed';
+        const errorMessage = errorResponse.message || (isUpdate ? 'Update failed' : 'Import failed');
 
         this.importResults = {
           success: false,
@@ -1495,15 +1578,6 @@ editCustomer(event: string) {
           errorCount: 1,
           errors: [{ row: 0, error: errorMessage }]
         };
-
-        // Notifications commented out - results shown in modal instead
-        // if (errorMessage.includes('Excel template format mismatch')) {
-        //   this.notification.error('Excel Template Error', 'Excel template format mismatch. Please download the correct template.', { nzDuration: 5000 });
-        // } else if (errorMessage.includes('missing required data')) {
-        //   this.notification.error('Import Failed', 'Some rows are missing required data. Please check your Excel file.', { nzDuration: 5000 });
-        // } else {
-        //   this.notification.error('Import Failed', errorMessage, { nzDuration: 5000 });
-        // }
       }
     });
   }

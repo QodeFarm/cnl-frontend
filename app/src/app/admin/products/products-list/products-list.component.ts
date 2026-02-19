@@ -16,11 +16,39 @@ import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 export class ProductsListComponent {
 
   @Output('edit') edit = new EventEmitter<void>();
+  @Output('bulkEdit') bulkEdit = new EventEmitter<string[]>();
+  @Output('exportProducts') exportProducts = new EventEmitter<string[]>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+
+  /** Selected product IDs from ta-table's checkedRows */
+  get selectedIds(): string[] {
+    return (this.tableConfig.checkedRows as string[]) || [];
+  }
+
+  get isOverLimit(): boolean {
+    return this.selectedIds.length > 100;
+  }
 
   refreshTable() {
     this.taTableComponent?.refresh();
   };
+
+  /** Clear all checkbox selections */
+  clearSelections() {
+    this.taTableComponent?.setOfCheckedId?.clear();
+    this.tableConfig.checkedRows = [];
+    this.taTableComponent?.refreshCheckedStatus();
+  }
+
+  /** Emit selected IDs to parent for bulk edit */
+  onBulkEditClick() {
+    this.bulkEdit.emit([...this.selectedIds]);
+  }
+
+  /** Emit selected IDs (empty array if none selected) to parent for export */
+  onExportClick() {
+    this.exportProducts.emit([...this.selectedIds]);
+  }
 
   tableConfig: TaTableConfig = {
     apiUrl: 'products/products/?summary=true',

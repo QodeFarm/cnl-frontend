@@ -338,6 +338,7 @@ export class SalesListComponent {
       keys: ['order_date', 'order_no', 'sale_type', 'customer', 'sale_estimate', 'amount', 'tax', 'advance_amount', 'status_name', 'flow_status_name']
     },
     defaultSort: { key: 'created_at', value: 'descend' },
+    scrollX: '1600px',
     cols: [
       {
         fieldKey: 'order_date',
@@ -425,17 +426,17 @@ export class SalesListComponent {
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
           return row.flow_status?.flow_status_name || row.flow_status_id || '';
-          // if (row.flow_status)
-          //   // return `${row.flow_status.flow_status_name}`
-          // return row.flow_status?.flow_status_name || row.flow_status_id || '';
-          // return '';
         },
-        sort: true
+        sort: true,
+        width: '160px',
+        tdClassName: 'sticky-flow-status'
       },
       {
         fieldKey: "code",
         name: "Action",
         type: 'action',
+        width: '120px',
+        tdClassName: 'sticky-action',
         actions: [
           {
             type: 'delete',
@@ -467,7 +468,7 @@ export class SalesListComponent {
           {
             type: 'callBackFn',
             icon: 'fa fa-file-invoice',
-            label: 'Create Invoice',
+            // label: 'Create Invoice',
             tooltip: 'Create Invoice for this order',
             callBackFn: (row, action) => {
               const flowStatusName = row.flow_status?.flow_status_name;

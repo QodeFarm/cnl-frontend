@@ -42,6 +42,25 @@
   
     <div class="row custom-form">
       <div class="col-12 px-1" *ngIf="invoiceNumber">
+
+        <!-- Customer Info Strip -->
+        <div *ngIf="showCustomerInfoBanner" class="customer-info-strip">
+            <span class="cis-label">ℹ Customer Info</span>
+            <span class="cis-divider" *ngIf="customerNotes">|</span>
+            <span class="cis-item" *ngIf="customerNotes">
+                <span class="cis-icon">📝</span> {{ customerNotes }}
+            </span>
+            <span class="cis-divider" *ngIf="customerTransporterName">|</span>
+            <span class="cis-item" *ngIf="customerTransporterName">
+                <span class="cis-icon">🚚</span> Preferred: <strong class="cis-transport-tag">{{ customerTransporterName }}</strong>
+            </span>
+            <span class="cis-divider" *ngIf="customerTransportNotes">|</span>
+            <span class="cis-item" *ngIf="customerTransportNotes">
+                <span class="cis-icon">📋</span> {{ customerTransportNotes }}
+            </span>
+            <button class="cis-close" (click)="showCustomerInfoBanner = false" aria-label="Close customer info">&times;</button>
+        </div>
+
         <ta-form #saleinvoiceForm [options]="formConfig"></ta-form>
       </div>
     </div>

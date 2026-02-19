@@ -35,6 +35,10 @@ export class TaCurdModalComponent implements OnInit {
   @ViewChild('table', { static: true }) table: TaTableComponent | undefined;
   @ViewChild('form', { static: false }) form: TaFormComponent | undefined;
   @Input() customProductTemplate!: TemplateRef<any>; //Added this customProductTemplate
+  /** Current nesting depth (0 = top-level, 1 = inside a nested Add form, etc.) */
+  @Input() nestLevel: number = 0;
+  /** Maximum allowed nesting depth before the Add button is hidden */
+  @Input() maxNestLevel: number = 3;
   visible = false;
   formTitle = "Create";
   constructor(private taAction: TaActionService, private cdr: ChangeDetectorRef, private http: HttpClient) { }
@@ -114,6 +118,7 @@ export class TaCurdModalComponent implements OnInit {
               
               // Set model BEFORE opening - ensure Angular detects the change
               this.options.formConfig.model = JSON.parse(JSON.stringify(fullData));
+              this.ensureNestLevelInFormState();
               this.cdr.detectChanges();
               
               // Delay opening to ensure model is set
@@ -219,6 +224,8 @@ export class TaCurdModalComponent implements OnInit {
   // Helper to set model and open modal
   private setModelAndOpen(data: any): void {
     this.options.formConfig.model = JSON.parse(JSON.stringify(data));
+    // Propagate nesting depth so nested adv-select fields respect the limit
+    this.ensureNestLevelInFormState();
     this.open();
     setTimeout(() => {
       if (this.form) {
@@ -226,6 +233,15 @@ export class TaCurdModalComponent implements OnInit {
         this.form.formlyForm?.options?.resetModel(data);
       }
     }, 100);
+  }
+
+  /** Ensure nesting depth is written into formState for edit/view/create flows */
+  private ensureNestLevelInFormState(): void {
+    if (!this.options.formConfig.formState) {
+      this.options.formConfig.formState = {};
+    }
+    this.options.formConfig.formState.nestLevel = this.nestLevel + 1;
+    this.options.formConfig.formState.maxNestLevel = this.maxNestLevel;
   }
   open(): void {
     this.visible = true;
@@ -244,6 +260,8 @@ export class TaCurdModalComponent implements OnInit {
     } else {
       this.options.formConfig.model = {};
     }
+    // Propagate nesting depth into the child form's formState
+    this.ensureNestLevelInFormState();
     this.visible = true;
   }
 
