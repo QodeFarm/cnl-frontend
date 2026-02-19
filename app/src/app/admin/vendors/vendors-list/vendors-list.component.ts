@@ -15,11 +15,39 @@ import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 export class VendorsListComponent {
 
   @Output('edit') edit = new EventEmitter<void>();
+  @Output('bulkEdit') bulkEdit = new EventEmitter<string[]>();
+  @Output('exportVendors') exportVendors = new EventEmitter<string[]>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+
+  /** Selected vendor IDs from ta-table's checkedRows */
+  get selectedIds(): string[] {
+    return (this.tableConfig.checkedRows as string[]) || [];
+  }
+
+  get isOverLimit(): boolean {
+    return this.selectedIds.length > 100;
+  }
 
   refreshTable() {
    this.taTableComponent?.refresh();
   };
+
+  /** Clear all checkbox selections */
+  clearSelections() {
+    this.taTableComponent?.setOfCheckedId?.clear();
+    this.tableConfig.checkedRows = [];
+    this.taTableComponent?.refreshCheckedStatus();
+  }
+
+  /** Emit selected IDs to parent for bulk edit */
+  onBulkEditClick() {
+    this.bulkEdit.emit([...this.selectedIds]);
+  }
+
+  /** Emit selected IDs (or empty for all) to parent for export */
+  onExportClick() {
+    this.exportVendors.emit([...this.selectedIds]);
+  }
 
   tableConfig: TaTableConfig = {
     // apiUrl: 'vendors/vendors/?summary=true&summary=true&page=1&limit=10&sort[0]=name,DESC',

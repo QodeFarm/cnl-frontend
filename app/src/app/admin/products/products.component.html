@@ -15,6 +15,10 @@
                 <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false"></button>
                 <ul class="dropdown-menu">
                     <a class="dropdown-item" (click)="downloadExcelTemplate()">Download Excel Format</a>
+                    <li><hr class="dropdown-divider"></li>
+                    <a class="dropdown-item" (click)="showImportUpdateModal()">
+                        <i class="fa fa-sync-alt me-1"></i> Import (Update Existing)
+                    </a>
                 </ul>
             </div>
 
@@ -40,7 +44,7 @@
                 <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" *ngIf="showProductsList">
-                <app-products-list (edit)="editProducts($event)" class="custom-list"></app-products-list>
+                <app-products-list (edit)="editProducts($event)" (bulkEdit)="openBulkEditModal($event)" (exportProducts)="exportProducts($event)" class="custom-list"></app-products-list>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
@@ -188,3 +192,14 @@
       <button id="dialogOkButton" (click)="closeDialog()">OK</button>
     </div>
 </div>
+
+<!-- ==================== BULK EDIT MODAL (reusable) ==================== -->
+<app-bulk-edit-modal
+  [visible]="showBulkEditModal"
+  [entityIds]="bulkEditIds"
+  entityName="Product"
+  bulkUpdateUrl="products/bulk-update/"
+  [fields]="PRODUCT_BULK_FIELDS"
+  (updated)="onBulkUpdated($event)"
+  (closed)="onBulkEditClosed()">
+</app-bulk-edit-modal>

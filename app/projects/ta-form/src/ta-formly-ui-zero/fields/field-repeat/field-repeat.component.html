@@ -9,7 +9,7 @@
                         [class.sticky-col-2]="hasStickyColumns && idx === 2">
                         {{ col.templateOptions.label }}
                     </th>
-                    <th *ngIf="!isRestrictedPage" class="sticky-column">
+                    <th *ngIf="!isRestrictedPage || to.showAddBtn" class="sticky-column">
                         Actions
                     </th>
                 </tr>
@@ -23,7 +23,7 @@
                         [class.sticky-col-2]="hasStickyColumns && colIdx === 2">
                         <formly-field class="col" [field]="fg"></formly-field>
                     </td>
-                    <td class="sticky-column" *ngIf="!isRestrictedPage" style="vertical-align: middle;text-align: center;">
+                    <td class="sticky-column" *ngIf="!isRestrictedPage || to.showAddBtn" style="vertical-align: middle;text-align: center;">
                         <div class="">
                             <button nz-button nzDanger type="button" (click)="remove(i)"><i class="fa fa-trash"></i></button>
                         </div>
@@ -36,7 +36,14 @@
 </nz-card>
 
 <ng-template #extraTemplate>
-    <button *ngIf="!isRestrictedPage" nz-button nzType="primary" type="button" (click)="add()">{{ to.addText }}</button>
+    <div style="display:flex;gap:10px;align-items:center;">
+        <button *ngIf="to.onExtraAction" nz-button nzType="default" nzSize="small" type="button" (click)="to.onExtraAction()"
+            style="display:inline-flex;align-items:center;gap:6px;font-weight:500;font-size:12px;border-radius:4px;border-color:#142768;color:#142768;">
+            <i *ngIf="to.extraActionIcon" [class]="to.extraActionIcon"></i>
+            <span>{{ to.extraActionText || 'Action' }}</span>
+        </button>
+        <button *ngIf="!isRestrictedPage || to.showAddBtn" nz-button nzType="primary" type="button" (click)="add()">{{ to.addText }}</button>
+    </div>
 </ng-template>
 
 
