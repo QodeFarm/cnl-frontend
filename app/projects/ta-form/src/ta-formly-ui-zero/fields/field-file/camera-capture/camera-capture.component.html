@@ -10,7 +10,7 @@
 </button>
 
 <!-- Camera Modal Overlay -->
-<div class="camera-modal-overlay" *ngIf="isModalOpen" (click)="closeModal()">
+<div class="camera-modal-overlay" *ngIf="isModalOpen" (click)="onBackdropClick()">
   <div class="camera-modal" (click)="$event.stopPropagation()">
 
     <!-- Modal Header -->
@@ -38,7 +38,7 @@
 
       <!-- Live Video Feed (video element always in DOM for getElementById, but hidden until ready) -->
       <div class="video-container" [style.display]="(isCameraReady && !capturedImageUrl && !cameraError) ? 'flex' : 'none'">
-        <video id="cameraVideo" autoplay playsinline muted></video>
+        <video #cameraVideo id="cameraVideo" autoplay playsinline muted></video>
       </div>
 
       <!-- Captured Preview (only when NO error) -->

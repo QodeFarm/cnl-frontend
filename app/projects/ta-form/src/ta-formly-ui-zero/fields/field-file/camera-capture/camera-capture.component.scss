@@ -18,6 +18,22 @@
     border-color: #40a9ff;
   }
 
+  &:focus {
+    outline: 2px solid #1890ff;
+    outline-offset: 2px;
+    border-color: #40a9ff;
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #1890ff;
+    outline-offset: 2px;
+    border-color: #40a9ff;
+  }
+
   &:active {
     border-color: #096dd9;
     color: #096dd9;
@@ -87,6 +103,22 @@
   line-height: 1;
 
   &:hover {
+    color: #333;
+  }
+
+  &:focus {
+    outline: 2px solid #1890ff;
+    outline-offset: 2px;
+    color: #333;
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #1890ff;
+    outline-offset: 2px;
     color: #333;
   }
 
@@ -202,6 +234,23 @@
     &:hover {
       background: rgba(255, 255, 255, 0.1);
     }
+
+    &:focus {
+      background: rgba(255, 255, 255, 0.1);
+      outline: 2px solid rgba(255, 255, 255, 0.7);
+      outline-offset: 2px;
+    }
+
+    &:focus:not(:focus-visible) {
+      outline: none;
+      background: transparent;
+    }
+
+    &:focus-visible {
+      background: rgba(255, 255, 255, 0.1);
+      outline: 2px solid rgba(255, 255, 255, 0.7);
+      outline-offset: 2px;
+    }
   }
 }
 
@@ -299,6 +348,24 @@
     border-color: #1890ff;
     color: #1890ff;
   }
+
+  &:focus {
+    border-color: #1890ff;
+    color: #1890ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+    outline: none;
+  }
+
+  &:focus:not(:focus-visible) {
+    box-shadow: none;
+  }
+
+  &:focus-visible {
+    border-color: #1890ff;
+    color: #1890ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+    outline: none;
+  }
 }
 
 .btn-spacer {
@@ -323,6 +390,24 @@
     border-color: #ff4d4f;
     color: #ff4d4f;
   }
+
+  &:focus {
+    border-color: #ff4d4f;
+    color: #ff4d4f;
+    box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
+    outline: none;
+  }
+
+  &:focus:not(:focus-visible) {
+    box-shadow: none;
+  }
+
+  &:focus-visible {
+    border-color: #ff4d4f;
+    color: #ff4d4f;
+    box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
+    outline: none;
+  }
 }
 
 /* Use Photo Button */
@@ -342,6 +427,23 @@
 
   &:hover {
     background: #40a9ff;
+  }
+
+  &:focus {
+    background: #40a9ff;
+    box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.25);
+    outline: none;
+  }
+
+  &:focus:not(:focus-visible) {
+    box-shadow: none;
+    background: #1890ff;
+  }
+
+  &:focus-visible {
+    background: #40a9ff;
+    box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.25);
+    outline: none;
   }
 
   &:active {

@@ -1905,12 +1905,12 @@ preprocessFormData() {
   }
 
   showImportModal() {
+    // Save the intended mode before reset (showImportUpdateModal sets 'update' before calling this)
+    const savedMode = this.importMode;
     // Reset the import state for a fresh start
     this.resetImportState();
-    // Default to create mode unless already set to update
-    if (this.importMode !== 'update') {
-      this.importMode = 'create';
-    }
+    // Restore the intended import mode
+    this.importMode = savedMode || 'create';
     
     // Reset the import form model to ensure fresh start
     this.importFormConfig.model = {};
@@ -2006,10 +2006,12 @@ preprocessFormData() {
       return;
     }
 
+    // Capture the import mode BEFORE resetting (resetImportState sets importMode = 'create')
+    const isUpdate = this.importMode === 'update';
+
     // Reset and start import
     this.resetImportState();
     this.isImporting = true;
-    const isUpdate = this.importMode === 'update';
     this.importStatusMessage = isUpdate ? 'Preparing update...' : 'Preparing import...';
 
     const uploadData = new FormData();

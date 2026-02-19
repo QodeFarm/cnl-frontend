@@ -315,6 +315,9 @@ export class CustomersComponent {
       }
     );
 
+    // hide() moved to inside subscribe success handler would be ideal,
+    // but the form needs the modal to close for layout reasons.
+    // Keep it here for now — the HTTP call populates model asynchronously.
     this.hide();
   }
 

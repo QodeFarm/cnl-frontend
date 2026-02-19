@@ -1,10 +1,9 @@
 <!-- ==================== REUSABLE BULK EDIT MODAL ==================== -->
 <div class="bulk-edit-overlay" *ngIf="visible" (click)="close()"
      (focusin)="$event.stopPropagation()"
-     (keydown)="$event.stopPropagation()"
-     (keypress)="$event.stopPropagation()"
-     (keyup)="$event.stopPropagation()">
-  <div class="bulk-edit-modal" (click)="$event.stopPropagation()" (mousedown)="$event.stopPropagation()">
+     (keydown.escape)="close()">
+  <div class="bulk-edit-modal" (click)="$event.stopPropagation()" (mousedown)="$event.stopPropagation()"
+       (keydown)="$event.stopPropagation()" (keyup)="$event.stopPropagation()">
 
     <!-- Header -->
     <div class="bulk-edit-header">
@@ -32,8 +31,8 @@
 
           <!-- FK Dropdown -->
           <div class="bulk-field" *ngIf="field.type === 'dropdown'">
-            <label>{{ field.label }}</label>
-            <select class="form-select form-select-sm" [(ngModel)]="bulkEditForm[field.key]">
+            <label [attr.for]="'bulk-' + field.key">{{ field.label }}</label>
+            <select [id]="'bulk-' + field.key" class="form-select form-select-sm" [(ngModel)]="bulkEditForm[field.key]">
               <option [ngValue]="null">&mdash; No change &mdash;</option>
               <option *ngFor="let opt of dropdownOptions[field.key]" [ngValue]="opt[field.dataKey]">
                 {{ opt[field.dataLabel] }}
@@ -43,8 +42,8 @@
 
           <!-- Static Dropdown -->
           <div class="bulk-field" *ngIf="field.type === 'static-dropdown'">
-            <label>{{ field.label }}</label>
-            <select class="form-select form-select-sm" [(ngModel)]="bulkEditForm[field.key]">
+            <label [attr.for]="'bulk-' + field.key">{{ field.label }}</label>
+            <select [id]="'bulk-' + field.key" class="form-select form-select-sm" [(ngModel)]="bulkEditForm[field.key]">
               <option [ngValue]="null">&mdash; No change &mdash;</option>
               <option *ngFor="let opt of field.options" [ngValue]="opt.value">
                 {{ opt.label }}
@@ -54,8 +53,9 @@
 
           <!-- Number Input -->
           <div class="bulk-field" *ngIf="field.type === 'number'">
-            <label>{{ field.label }}</label>
+            <label [attr.for]="'bulk-' + field.key">{{ field.label }}</label>
             <input
+              [id]="'bulk-' + field.key"
               type="number"
               class="form-control form-control-sm"
               [name]="field.key"
@@ -67,8 +67,9 @@
 
           <!-- Text Input -->
           <div class="bulk-field" *ngIf="field.type === 'text'">
-            <label>{{ field.label }}</label>
+            <label [attr.for]="'bulk-' + field.key">{{ field.label }}</label>
             <input
+              [id]="'bulk-' + field.key"
               type="text"
               class="form-control form-control-sm"
               [name]="field.key"

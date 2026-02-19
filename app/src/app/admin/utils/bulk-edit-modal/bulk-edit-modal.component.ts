@@ -61,9 +61,16 @@ export class BulkEditModalComponent implements OnChanges {
   /** Load dropdown options (cached after first load) */
   private loadOptions() {
     if (this.optionsLoaded) return;
-    this.bulkOps.loadDropdownOptions(this.fields).subscribe(opts => {
-      this.dropdownOptions = opts;
-      this.optionsLoaded = true;
+    this.bulkOps.loadDropdownOptions(this.fields).subscribe({
+      next: (opts) => {
+        this.dropdownOptions = opts;
+        this.optionsLoaded = true;
+      },
+      error: (err) => {
+        console.error('Failed to load bulk edit dropdown options:', err);
+        this.dropdownOptions = {};
+        this.optionsLoaded = true; // prevent infinite retry
+      }
     });
   }
 

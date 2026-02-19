@@ -87,7 +87,8 @@ export class BulkOperationsService {
   exportToExcel(url: string, ids: string[]): Observable<Blob> {
     let exportUrl = url;
     if (ids.length > 0) {
-      exportUrl += '?ids=' + ids.join(',');
+      const separator = exportUrl.includes('?') ? '&' : '?';
+      exportUrl += separator + 'ids=' + ids.join(',');
     }
     return this.http.get(exportUrl, { responseType: 'blob' });
   }
@@ -101,7 +102,8 @@ export class BulkOperationsService {
   importFromExcel(url: string, file: File, mode: 'create' | 'update' = 'create'): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
-    const uploadUrl = mode === 'update' ? `${url}?mode=update` : url;
+    const separator = url.includes('?') ? '&' : '?';
+    const uploadUrl = mode === 'update' ? `${url}${separator}mode=update` : url;
     return this.http.post(uploadUrl, formData, {
       headers: { 'X-Skip-Error-Interceptor': 'true' }
     });

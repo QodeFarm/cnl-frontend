@@ -1,7 +1,9 @@
-import { Component, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnDestroy, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'ta-camera-capture',
@@ -18,6 +20,8 @@ export class CameraCaptureComponent implements OnDestroy {
   /** Upload endpoint (relative URL, interceptor prepends baseUrl) */
   @Input() uploadUrl = 'masters/uploads/';
 
+  @ViewChild('cameraVideo') private videoRef?: ElementRef<HTMLVideoElement>;
+
   // State
   isModalOpen = false;
   isCameraSupported = false;
@@ -33,12 +37,20 @@ export class CameraCaptureComponent implements OnDestroy {
   private facingMode: 'user' | 'environment' = 'environment';
   private hasMultipleCameras = false;
 
+  // Lifecycle cleanup
+  private destroy$ = new Subject<void>();
+  private pendingTimeouts: ReturnType<typeof setTimeout>[] = [];
+
   constructor(private http: HttpClient) {
     this.isCameraSupported = !!(navigator.mediaDevices?.getUserMedia);
   }
 
   ngOnDestroy(): void {
     this.stopCamera();
+    this.pendingTimeouts.forEach(id => clearTimeout(id));
+    this.pendingTimeouts = [];
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   // ─── PUBLIC ACTIONS ────────────────────────────────────────
@@ -53,7 +65,14 @@ export class CameraCaptureComponent implements OnDestroy {
     // Await camera detection so hasMultipleCameras is accurate before rendering
     await this.detectMultipleCameras();
     // Wait for DOM to render before starting camera
-    setTimeout(() => this.startCamera(), 100);
+    this.scheduleTimeout(() => this.startCamera(), 100);
+  }
+
+  /** Only close modal if not uploading (matches header close button's [disabled]="isUploading") */
+  onBackdropClick(): void {
+    if (!this.isUploading) {
+      this.closeModal();
+    }
   }
 
   closeModal(): void {
@@ -92,7 +111,7 @@ export class CameraCaptureComponent implements OnDestroy {
     this.cameraError = null;
     this.isCameraReady = false;
     this.isConnecting = true;
-    setTimeout(() => this.startCamera(), 100);
+    this.scheduleTimeout(() => this.startCamera(), 100);
   }
 
   usePhoto(): void {
@@ -110,7 +129,9 @@ export class CameraCaptureComponent implements OnDestroy {
     const formData = new FormData();
     formData.append('files', file);
 
-    this.http.post<any>(this.uploadUrl, formData).subscribe({
+    this.http.post<any>(this.uploadUrl, formData).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
       next: (res) => {
         this.isUploading = false;
         if (res?.data && res.data.length > 0) {
@@ -139,7 +160,7 @@ export class CameraCaptureComponent implements OnDestroy {
   switchCamera(): void {
     this.facingMode = this.facingMode === 'user' ? 'environment' : 'user';
     this.stopCamera();
-    setTimeout(() => this.startCamera(), 100);
+    this.scheduleTimeout(() => this.startCamera(), 100);
   }
 
   // ─── PRIVATE HELPERS ───────────────────────────────────────
@@ -149,7 +170,7 @@ export class CameraCaptureComponent implements OnDestroy {
     this.capturedImageUrl = null;
     this.isCameraReady = false;
     this.isConnecting = true;
-    this.videoEl = document.getElementById('cameraVideo') as HTMLVideoElement;
+    this.videoEl = this.videoRef?.nativeElement || document.getElementById('cameraVideo') as HTMLVideoElement;
     if (!this.videoEl) {
       this.isConnecting = false;
       return;
@@ -203,14 +224,34 @@ export class CameraCaptureComponent implements OnDestroy {
   }
 
   private dataUrlToBlob(dataUrl: string): Blob {
+    if (!dataUrl || typeof dataUrl !== 'string' || !dataUrl.includes(',')) {
+      throw new Error('Invalid data URL provided');
+    }
     const parts = dataUrl.split(',');
+    if (parts.length < 2) {
+      throw new Error('Malformed data URL: missing data segment');
+    }
     const mime = parts[0].match(/:(.*?);/)?.[1] || 'image/jpeg';
-    const byteString = atob(parts[1]);
+    let byteString: string;
+    try {
+      byteString = atob(parts[1]);
+    } catch (e) {
+      throw new Error('Invalid base64 data in data URL');
+    }
     const ab = new ArrayBuffer(byteString.length);
     const ia = new Uint8Array(ab);
     for (let i = 0; i < byteString.length; i++) {
       ia[i] = byteString.charCodeAt(i);
     }
     return new Blob([ab], { type: mime });
+  }
+
+  /** Schedule a timeout and track it for cleanup */
+  private scheduleTimeout(fn: () => void, delay: number): void {
+    const id = setTimeout(() => {
+      this.pendingTimeouts = this.pendingTimeouts.filter(t => t !== id);
+      fn();
+    }, delay);
+    this.pendingTimeouts.push(id);
   }
 }

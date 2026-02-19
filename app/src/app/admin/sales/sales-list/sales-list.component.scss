@@ -185,19 +185,22 @@
 /* ====================== Sticky Columns: Flow Status + Action ====================== */
 /* Scoped to .sale-order-list-table so it does NOT affect other tables/modules */
 :host .sale-order-list-table ::ng-deep {
+  --action-column-width: 120px;
+
   // Action column (last data col) — stick to right edge
   .ant-table-thead > tr > th:last-child,
   .ant-table-tbody > tr > td.sticky-action {
     position: sticky !important;
     right: 0 !important;
     z-index: 2;
+    width: var(--action-column-width);
   }
 
   // Flow Status column — stick right, offset by Action width
   .ant-table-thead > tr > th:nth-last-child(2),
   .ant-table-tbody > tr > td.sticky-flow-status {
     position: sticky !important;
-    right: 120px !important;
+    right: var(--action-column-width) !important;
     z-index: 2;
   }
 

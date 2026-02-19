@@ -756,6 +756,10 @@ async autoFillProductDetails(field, data) {
             this.showCustomerInfoBanner = false;
           }
         );
+      },
+      (error) => {
+        console.error('Error fetching custom fields for banner:', error);
+        this.showCustomerInfoBanner = false;
       }
     );
   }
