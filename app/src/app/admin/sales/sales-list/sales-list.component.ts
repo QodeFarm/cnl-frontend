@@ -491,7 +491,7 @@ export class SalesListComponent {
   // Show the "Not ready for invoice" modal
 showOrderNotReadyModal() {
   const modal = document.getElementById('notReadyInvoiceDialog');
-  if (modal) modal.style.display = 'block';
+  if (modal) modal.style.display = 'flex';
 }
 
 // Close the modal
@@ -515,81 +515,6 @@ closeNotReadyInvoiceDialog() {
       : [{ key: 'summary', value: 'true' }];
   }
 
-//---------------------------------
-// createInvoiceFromList(row: any) {
-//   if (!row) return;
-
-//   // Prepare invoiceData like in sale-order.component
-//   const saleOrder = row;
-//   const saleOrderItems = row.sale_order_items || [];
-//   const orderAttachments = row.order_attachments || [];
-//   const orderShipments = row.order_shipments || [];
-
-//   // Calculate totals
-//   let itemValue = 0;
-//   let amountTotal = 0;
-
-//   saleOrderItems.forEach(item => {
-//     const quantity = Number(item.quantity) || 0;
-//     const rate = Number(item.rate) || 0;
-//     const discountPercent = Number(item.discount) || 0;
-//     const itemVal = quantity * rate;
-//     const itemDiscount = (itemVal * discountPercent) / 100;
-//     const amount = itemVal - itemDiscount;
-
-//     item.amount = amount;
-//     itemValue += itemVal;
-//     amountTotal += amount;
-//   });
-
-//   const totalTax = saleOrderItems.reduce((sum, item) => {
-//     const cgst = Number(item.cgst) || 0;
-//     const igst = Number(item.igst) || 0;
-//     const sgst = Number(item.sgst) || 0;
-//     return sum + cgst + igst + sgst;
-//   }, 0);
-
-//   const cessAmount = Number(saleOrder.cess_amount) || 0;
-//   const disAmt = Number(saleOrder.dis_amt) || 0;
-//   const totalAmount = amountTotal + totalTax;
-//   const finalTotal = totalAmount - disAmt + cessAmount;
-
-//   // Prepare invoiceData object
-//   const invoiceData = {
-//     sale_invoice_order: {
-//       ...saleOrder,
-//       total_amount: finalTotal,
-//       tax_amount: totalTax,
-//       item_value: itemValue
-//     },
-//     sale_invoice_items: saleOrderItems.filter(item => item.product_id),
-//     order_attachments: orderAttachments,
-//     order_shipments: orderShipments
-//   };
-
-//   console.log("Invoice data from list:", invoiceData);
-
-//   // Call backend to create invoice
-//   this.http.post('sales/sale_invoice_order/', invoiceData).subscribe(
-//     (res: any) => {
-//       console.log('Invoice created successfully from list:', res);
-
-//       // Move workflow to next stage
-//       const saleOrderId = saleOrder.sale_order_id;
-//       this.http.post(`sales/SaleOrder/${saleOrderId}/move_next_stage/`, {}).subscribe(
-//         nextStageRes => {
-//           console.log('Moved to next stage successfully', nextStageRes);
-//           // Optionally show a toast
-//           this.toastMessage = 'Invoice created & workflow moved';
-//           this.showSuccessToast = true;
-//           setTimeout(() => this.showSuccessToast = false, 3000);
-//         },
-//         nextStageErr => console.error('Error moving workflow', nextStageErr)
-//       );
-//     },
-//     err => console.error('Error creating invoice from list', err)
-//   );
-// }
 
 createInvoiceFromList(row: any) {
   if (!row) return;
