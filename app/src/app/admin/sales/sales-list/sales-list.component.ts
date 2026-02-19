@@ -697,8 +697,8 @@ createInvoiceFromList(row: any) {
               ledger_account_id: saleOrder.ledger_account_id,
               flow_status: saleOrder.flow_status,
               order_status_id: completedStatusId,
-              sale_order: saleOrder.sale_order,
-              sale_order_id: saleOrder.sale_order_id,
+              // sale_order: saleOrder.sale_order,
+              sale_order_id: saleOrderId,
               ...(billType === 'OTHERS' && { invoice_no: invoiceNo })
             },
             sale_invoice_items: saleOrderItems

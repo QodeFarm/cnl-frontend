@@ -5431,8 +5431,8 @@ getUnitData(unitInfo: any) {
                 key: 'production_qty',
                 templateOptions: {
                   type: 'number',
-                  label: 'In Production',
-                  placeholder: 'In Production',
+                  label: 'Need Production',
+                  placeholder: 'Need Production',
                   hideLabel: true,
                   disabled: true
                 },

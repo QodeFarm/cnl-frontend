@@ -46,7 +46,7 @@ export class SaleReceiptComponent implements OnInit {
       hideAddBtn: true,
       tableConfig: {
         apiUrl: apiUrl, //'sales/sale_order/?summary=true&flow_status=Delivery In progress',
-        title: 'Sales Receipt',
+        title: 'Order Acknowledgement List',
         pkId: "sale_order_id",
         pageSize: 10,
         globalSearch: {
@@ -108,7 +108,7 @@ export class SaleReceiptComponent implements OnInit {
             actions: [
               {
                 type: 'callBackFn',
-                label: 'Confirm Receipt',  // Static label required by table
+                label: 'Confirm Acknowledge',  // Static label required by table
                 callBackFn: (row: any) => {
                   if (row?.flow_status?.flow_status_name === 'Completed') {
                     // alert('Already Completed');  // Or disable the button if needed
