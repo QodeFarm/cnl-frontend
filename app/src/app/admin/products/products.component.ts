@@ -10,12 +10,14 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzProgressModule } from 'ng-zorro-antd/progress';
 import { NzResultModule } from 'ng-zorro-antd/result';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
+import { BulkEditModalComponent } from '../utils/bulk-edit-modal/bulk-edit-modal.component';
+import { BulkField, BulkOperationsService } from '../utils/bulk-operations.service';
 
 
 @Component({
   selector: 'app-products',
   templateUrl: './products.component.html',
-  imports: [CommonModule, AdminCommmonModule, ProductsListComponent, NzSpinModule, NzProgressModule, NzResultModule, NzAlertModule],
+  imports: [CommonModule, AdminCommmonModule, ProductsListComponent, NzSpinModule, NzProgressModule, NzResultModule, NzAlertModule, BulkEditModalComponent],
   standalone: true,
   styleUrls: ['./products.component.scss']
 })
@@ -38,6 +40,7 @@ export class ProductsComponent implements OnInit {
   importProgress: number = 0;
   importStatusMessage: string = '';
   importCompleted: boolean = false;
+  importMode: 'create' | 'update' = 'create';
   importResults: {
     success: boolean;
     totalRecords: number;
@@ -48,6 +51,87 @@ export class ProductsComponent implements OnInit {
 
 
   constructor(private http: HttpClient, private notification: NzNotificationService) { }
+
+  // ─── Bulk Edit State ─────────────────────────────────────────
+  showBulkEditModal = false;
+  bulkEditIds: string[] = [];
+  isExporting = false;
+
+  /** Config: maps each bulk-edit field to its API & display info */
+  readonly PRODUCT_BULK_FIELDS: BulkField[] = [
+    { key: 'type_id',                    apiKey: 'type_id',                    label: 'Product Type',           type: 'dropdown', url: 'masters/product_types/',               dataKey: 'type_id',                    dataLabel: 'type_name' },
+    { key: 'product_group_id',           apiKey: 'product_group_id',           label: 'Product Group',          type: 'dropdown', url: 'products/product_groups/',              dataKey: 'product_group_id',           dataLabel: 'group_name' },
+    { key: 'category_id',               apiKey: 'category_id',               label: 'Category',               type: 'dropdown', url: 'products/product_categories/',          dataKey: 'category_id',               dataLabel: 'category_name' },
+    { key: 'brand_id',                   apiKey: 'brand_id',                   label: 'Brand',                  type: 'dropdown', url: 'masters/product_brands/',              dataKey: 'brand_id',                   dataLabel: 'brand_name' },
+    { key: 'stock_unit_id',              apiKey: 'stock_unit_id',              label: 'Stock Unit',             type: 'dropdown', url: 'products/product_stock_units/',         dataKey: 'stock_unit_id',              dataLabel: 'stock_unit_name' },
+    { key: 'gst_classification_id',      apiKey: 'gst_classification_id',      label: 'GST Classification',     type: 'dropdown', url: 'products/product_gst_classifications/', dataKey: 'gst_classification_id',      dataLabel: 'type' },
+    { key: 'product_item_type_id',       apiKey: 'product_item_type_id',       label: 'Item Type',              type: 'dropdown', url: 'masters/product_item_type/',           dataKey: 'product_item_type_id',       dataLabel: 'item_name' },
+    { key: 'sales_gl_id',               apiKey: 'sales_gl_id',               label: 'Sales GL',               type: 'dropdown', url: 'products/product_sales_gl/',            dataKey: 'sales_gl_id',               dataLabel: 'name' },
+    { key: 'purchase_gl_id',            apiKey: 'purchase_gl_id',            label: 'Purchase GL',            type: 'dropdown', url: 'products/product_purchase_gl/',          dataKey: 'purchase_gl_id',            dataLabel: 'name' },
+    { key: 'drug_type_id',              apiKey: 'drug_type_id',              label: 'Drug Type',              type: 'dropdown', url: 'masters/product_drug_types/',           dataKey: 'drug_type_id',              dataLabel: 'drug_type_name' },
+    { key: 'product_mode_id',           apiKey: 'product_mode_id',           label: 'Product Mode',           type: 'dropdown', url: 'products/item-master/',                  dataKey: 'item_master_id',            dataLabel: 'mode_name' },
+    { key: 'sales_rate',                apiKey: 'sales_rate',                label: 'Sales Rate',             type: 'number' },
+    { key: 'mrp',                       apiKey: 'mrp',                       label: 'MRP',                    type: 'number' },
+    { key: 'wholesale_rate',            apiKey: 'wholesale_rate',            label: 'Wholesale Rate',         type: 'number' },
+    { key: 'dealer_rate',               apiKey: 'dealer_rate',               label: 'Dealer Rate',            type: 'number' },
+    { key: 'purchase_rate',             apiKey: 'purchase_rate',             label: 'Purchase Rate',          type: 'number' },
+    { key: 'discount',                  apiKey: 'discount',                  label: 'Discount (%)',           type: 'number' },
+    { key: 'gst_input',                 apiKey: 'gst_input',                 label: 'GST Input (%)',          type: 'number' },
+    { key: 'gst_output',               apiKey: 'gst_output',               label: 'GST Output (%)',         type: 'number' },
+    { key: 'min_level',                 apiKey: 'min_level',                 label: 'Min Level',              type: 'number' },
+    { key: 'max_level',                 apiKey: 'max_level',                 label: 'Max Level',              type: 'number' },
+  ];
+  // ─────────────────────────────────────────────────────────────
+
+  /** Open the bulk edit modal */
+  openBulkEditModal(ids: string[]) {
+    this.bulkEditIds = ids;
+    this.showBulkEditModal = true;
+  }
+
+  /** Handle successful bulk update */
+  onBulkUpdated(event: { message: string; count: number }) {
+    this.notification.success('Success', event.message);
+    this.ProductsListComponent?.clearSelections();
+    this.ProductsListComponent?.refreshTable();
+  }
+
+  /** Close bulk edit modal */
+  onBulkEditClosed() {
+    this.showBulkEditModal = false;
+  }
+
+  /** Export all or selected products to Excel */
+  exportProducts(ids: string[]) {
+    this.isExporting = true;
+    let url = 'products/export-products/';
+    if (ids.length > 0) {
+      url += '?ids=' + ids.join(',');
+    }
+
+    this.http.get(url, { responseType: 'blob' }).subscribe({
+      next: (blob: Blob) => {
+        this.isExporting = false;
+        const a = document.createElement('a');
+        const objectUrl = window.URL.createObjectURL(blob);
+        a.href = objectUrl;
+        a.download = ids.length > 0
+          ? `Products_Export_${ids.length}.xlsx`
+          : 'Products_Export_All.xlsx';
+        a.click();
+        window.URL.revokeObjectURL(objectUrl);
+        this.notification.success('Export Complete',
+          ids.length > 0
+            ? `${ids.length} product(s) exported successfully`
+            : 'All products exported successfully'
+        );
+      },
+      error: () => {
+        this.isExporting = false;
+        this.notification.error('Export Failed', 'Could not export products. Please try again.');
+      }
+    });
+  }
 
   ngOnInit() {
     this.showProductsList = false;
@@ -1779,6 +1863,13 @@ preprocessFormData() {
       ]
     }
   }
+
+  /** Open the import modal in UPDATE mode */
+  showImportUpdateModal() {
+    this.importMode = 'update';
+    this.showImportModal();
+  }
+
   downloadExcelTemplate() {
     this.isDownloading = true;
     this.http.get('products/download-template/', {
@@ -1814,8 +1905,12 @@ preprocessFormData() {
   }
 
   showImportModal() {
+    // Save the intended mode before reset (showImportUpdateModal sets 'update' before calling this)
+    const savedMode = this.importMode;
     // Reset the import state for a fresh start
     this.resetImportState();
+    // Restore the intended import mode
+    this.importMode = savedMode || 'create';
     
     // Reset the import form model to ensure fresh start
     this.importFormConfig.model = {};
@@ -1875,6 +1970,7 @@ preprocessFormData() {
     this.importStatusMessage = '';
     this.importCompleted = false;
     this.importResults = null;
+    this.importMode = 'create';
   }
 
   // Simulate progress for better UX (since we don't have real progress from server)
@@ -1910,10 +2006,13 @@ preprocessFormData() {
       return;
     }
 
+    // Capture the import mode BEFORE resetting (resetImportState sets importMode = 'create')
+    const isUpdate = this.importMode === 'update';
+
     // Reset and start import
     this.resetImportState();
     this.isImporting = true;
-    this.importStatusMessage = 'Preparing import...';
+    this.importStatusMessage = isUpdate ? 'Preparing update...' : 'Preparing import...';
 
     const uploadData = new FormData();
     uploadData.append('file', rawFile);
@@ -1923,30 +2022,43 @@ preprocessFormData() {
 
     // Start progress simulation
     const progressInterval = this.simulateProgress();
+    const uploadUrl = isUpdate ? 'products/upload-excel/?mode=update' : 'products/upload-excel/';
 
-    this.http.post('products/upload-excel/', uploadData, { headers }).subscribe({
+    this.http.post(uploadUrl, uploadData, { headers }).subscribe({
       next: (res: any) => {
         clearInterval(progressInterval);
         this.importProgress = 100;
-        this.importStatusMessage = 'Import completed!';
+        this.importStatusMessage = isUpdate ? 'Update completed!' : 'Import completed!';
         this.isImporting = false;
         this.importCompleted = true;
 
         console.log('Upload success', res);
 
-        // Parse results
-        const successMatch = res.message?.match(/(\d+)/);
-        const successCount = successMatch ? parseInt(successMatch[1], 10) : 0;
-        const errorCount = res.errors?.length || 0;
+        // Handle both create and update response formats
+        let successCount = 0;
+        let errorCount = 0;
+        let errors: any[] = [];
+
+        if (isUpdate && res.data) {
+          successCount = res.data.success_count || 0;
+          errorCount = res.data.failed_count || 0;
+          errors = res.data.errors || [];
+        } else {
+          const successMatch = res.message?.match(/(\d+)/);
+          successCount = successMatch ? parseInt(successMatch[1], 10) : 0;
+          errorCount = res.errors?.length || 0;
+          errors = res.errors || [];
+        }
+
         const totalRecords = successCount + errorCount;
 
         // Store results for display
         this.importResults = {
-          success: errorCount === 0,
+          success: errorCount === 0 && successCount > 0,
           totalRecords: totalRecords,
           successCount: successCount,
           errorCount: errorCount,
-          errors: res.errors?.slice(0, 10) || [] // Show first 10 errors
+          errors: errors.slice(0, 10)
         };
 
         // Notifications commented out - results shown in modal instead

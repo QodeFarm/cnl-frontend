@@ -181,3 +181,70 @@
     width: 300px;
   }
 }
+
+/* ====================== Sticky Columns: Flow Status + Action ====================== */
+/* Scoped to .sale-order-list-table so it does NOT affect other tables/modules */
+:host .sale-order-list-table ::ng-deep {
+  --action-column-width: 120px;
+
+  // Action column (last data col) — stick to right edge
+  .ant-table-thead > tr > th:last-child,
+  .ant-table-tbody > tr > td.sticky-action {
+    position: sticky !important;
+    right: 0 !important;
+    z-index: 2;
+    width: var(--action-column-width);
+  }
+
+  // Flow Status column — stick right, offset by Action width
+  .ant-table-thead > tr > th:nth-last-child(2),
+  .ant-table-tbody > tr > td.sticky-flow-status {
+    position: sticky !important;
+    right: var(--action-column-width) !important;
+    z-index: 2;
+  }
+
+  // Header cells need higher z-index
+  .ant-table-thead > tr > th:last-child,
+  .ant-table-thead > tr > th:nth-last-child(2) {
+    z-index: 3 !important;
+  }
+
+  // Background for sticky cells — header
+  .ant-table-thead > tr > th:last-child,
+  .ant-table-thead > tr > th:nth-last-child(2) {
+    background: #0d2f5e !important;
+  }
+
+  // Background for sticky cells — body (odd rows)
+  .ant-table-tbody > tr > td.sticky-action,
+  .ant-table-tbody > tr > td.sticky-flow-status {
+    background: #fff !important;
+  }
+
+  // Background for sticky cells — body (even/striped rows)
+  .ant-table-tbody > tr:nth-child(even) > td.sticky-action,
+  .ant-table-tbody > tr:nth-child(even) > td.sticky-flow-status {
+    background: #f0f5ff !important;
+  }
+
+  // Hover state on sticky cells
+  .ant-table-tbody > tr:hover > td.sticky-action,
+  .ant-table-tbody > tr:hover > td.sticky-flow-status {
+    background: #e6f7ff !important;
+  }
+
+  // Left shadow on Flow Status for visual separation when scrolling
+  .ant-table-tbody > tr > td.sticky-flow-status::after,
+  .ant-table-thead > tr > th:nth-last-child(2)::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -6px;
+    width: 6px;
+    pointer-events: none;
+    box-shadow: inset -6px 0 6px -6px rgba(0, 0, 0, 0.15);
+  }
+}
+/* ================================================================== */

@@ -16,7 +16,7 @@
     <ng-container after-search>
         <ng-content select="[after-search]">
         </ng-content>
-        <button *ngIf="!options.hideAddBtn" nz-button nzType="primary" class="ml-md" (click)="openDrawer()">
+        <button *ngIf="!options.hideAddBtn && nestLevel < maxNestLevel" nz-button nzType="primary" class="ml-md" (click)="openDrawer()">
             <i nz-icon nzType="plus"></i>Add
         </button>
     </ng-container>

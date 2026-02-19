@@ -89,7 +89,25 @@
 
     <div class="row custom-form">
         <!--  removed this commented line because when I refresh the page form is not displaying *checkAction="{ moduleName: 'Sales', sectionName: 'Sale Order', actionName: 'Create' }" -->
+
         <div class="col-12 px-1" *ngIf="orderNumber || showForm">
+            <!-- Customer Info Strip (shown after customer selection) -->
+            <div class="customer-info-strip" *ngIf="showCustomerInfoBanner">
+                <span class="cis-label">ℹ Customer Info</span>
+                <span class="cis-divider" *ngIf="customerNotes">|</span>
+                <span class="cis-item" *ngIf="customerNotes">
+                    <span class="cis-icon">📝</span> {{ customerNotes }}
+                </span>
+                <span class="cis-divider" *ngIf="customerTransporterName">|</span>
+                <span class="cis-item" *ngIf="customerTransporterName">
+                    <span class="cis-icon">🚚</span> Preferred: <strong class="cis-transport-tag">{{ customerTransporterName }}</strong>
+                </span>
+                <span class="cis-divider" *ngIf="customerTransportNotes">|</span>
+                <span class="cis-item" *ngIf="customerTransportNotes">
+                    <span class="cis-icon">📋</span> {{ customerTransportNotes }}
+                </span>
+                <button class="cis-close" (click)="showCustomerInfoBanner = false" aria-label="Close customer info">&times;</button>
+            </div>
             <ta-form #salesForm [options]="formConfig"></ta-form>
         </div>
     </div>
@@ -334,8 +352,8 @@
 
   <ng-template #amountCheckFooter>
     <div class="amount-check-footer">
-      <button nz-button nzType="default" (click)="closeAmountModal()">No</button>
-      <button nz-button nzType="primary" nzDanger (click)="proceedWithAmount()">Yes, Proceed</button>
+      <button nz-button nzType="default" (click)="closeAmountModal()">{{ isAdmin ? 'No' : 'Close' }}</button>
+      <button *ngIf="isAdmin" nz-button nzType="primary" nzDanger (click)="proceedWithAmount()">Yes, Proceed</button>
     </div>
   </ng-template>
 </nz-modal>

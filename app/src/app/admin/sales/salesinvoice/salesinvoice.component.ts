@@ -53,6 +53,13 @@ export class SalesinvoiceComponent {
     private readonly DRAFT_EXPIRY_HOURS = 24;
     showDraftRestoreModal: boolean = false;
     // =================================================
+
+    // ========== CUSTOMER INFO BANNER ==========
+    customerNotes: string = '';
+    customerTransporterName: string = '';
+    customerTransportNotes: string = '';
+    showCustomerInfoBanner: boolean = false;
+    // ===========================================
   
 
   nowDate = () => {
@@ -195,6 +202,11 @@ export class SalesinvoiceComponent {
     this.showSaleInvoiceList = false;
     this.showForm = true;
     this.SaleInvoiceEditID = null;
+    // Reset customer info banner
+    this.customerNotes = '';
+    this.customerTransporterName = '';
+    this.customerTransportNotes = '';
+    this.showCustomerInfoBanner = false;
     this.setFormConfig();
     this.checkAndPopulateData();
     this.loadQuickpackOptions(); // Fetch Quickpack options
@@ -696,6 +708,62 @@ async autoFillProductDetails(field, data) {
     const url = `sales/sale_order_search/?customer_id=${customerId}&status_name=Pending`;
     return this.http.get<any>(url);
   }
+
+  // ========== CUSTOMER INFO BANNER: Fetch & display notes + transport info ==========
+  fetchCustomerInfoForBanner(customerId: string) {
+    this.http.get('customfields/customfieldscreate/').subscribe(
+      (cfResponse: any) => {
+        const fieldNameMap: { [id: string]: string } = {};
+        if (cfResponse?.data) {
+          cfResponse.data
+            .filter((f: any) => f.entity?.entity_name === 'customers')
+            .forEach((f: any) => {
+              fieldNameMap[f.custom_field_id?.toLowerCase()] = (f.field_name || '').toLowerCase().trim();
+            });
+        }
+
+        this.http.get(`customers/customers/${customerId}`).subscribe(
+          (res: any) => {
+            if (res?.data) {
+              const custData = res.data.customer_data || res.data;
+
+              this.customerTransporterName = custData.transporter?.name || '';
+              this.customerNotes = '';
+              this.customerTransportNotes = '';
+
+              if (res.data.custom_field_values && Array.isArray(res.data.custom_field_values)) {
+                res.data.custom_field_values.forEach((cfv: any) => {
+                  const cfId = (cfv.custom_field_id || '').toLowerCase();
+                  const fieldName = fieldNameMap[cfId] || '';
+
+                  if (fieldName && fieldName.includes('note') && !fieldName.includes('transport')) {
+                    this.customerNotes = cfv.field_value || '';
+                  }
+                  if (fieldName && fieldName.includes('transport') && fieldName.includes('note')) {
+                    this.customerTransportNotes = cfv.field_value || '';
+                  }
+                });
+              }
+
+              if (custData.notes) { this.customerNotes = custData.notes; }
+              if (custData.transport_notes) { this.customerTransportNotes = custData.transport_notes; }
+
+              this.showCustomerInfoBanner = !!(this.customerNotes || this.customerTransporterName || this.customerTransportNotes);
+            }
+          },
+          (error) => {
+            console.error('Error fetching customer details for info banner:', error);
+            this.showCustomerInfoBanner = false;
+          }
+        );
+      },
+      (error) => {
+        console.error('Error fetching custom fields for banner:', error);
+        this.showCustomerInfoBanner = false;
+      }
+    );
+  }
+  // ====================================================================================
 
   getOrderDetails(orderId: string): Observable<any> {
     const url = `sales/sale_order/${orderId}/`;
@@ -1653,6 +1721,14 @@ createSaleInovice() {
                         if (data && data.customer_id) {
                           this.formConfig.model['sale_invoice_order']['customer_id'] = data.customer_id;
                           this.triggerDraftSave(); // Auto-save draft on customer change
+                          // Fetch full customer details for info banner
+                          this.fetchCustomerInfoForBanner(data.customer_id);
+                        } else {
+                          // Clear banner when customer is deselected
+                          this.showCustomerInfoBanner = false;
+                          this.customerNotes = '';
+                          this.customerTransporterName = '';
+                          this.customerTransportNotes = '';
                         }
                         if (data.customer_addresses && data.customer_addresses.billing_address) {
                           field.form.controls.billing_address.setValue(data.customer_addresses.billing_address)

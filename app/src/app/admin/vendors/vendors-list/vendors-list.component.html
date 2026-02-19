@@ -1,1 +1,30 @@
+<!-- Action toolbar -->
+<div class="bulk-edit-bar" [class.has-selection]="selectedIds.length > 0">
+  <!-- Left: selection info + bulk edit -->
+  <div class="bar-left" *ngIf="selectedIds.length > 0">
+    <span class="selected-count">{{ selectedIds.length }} selected</span>
+    <button
+      class="btn btn-primary btn-sm bulk-edit-btn"
+      [disabled]="isOverLimit"
+      [title]="isOverLimit ? 'Select up to 100 vendors' : 'Bulk edit selected vendors'"
+      (click)="onBulkEditClick()">
+      <i class="fa fa-pencil-alt me-1"></i>
+      Bulk Edit ({{ selectedIds.length }})
+    </button>
+    <span class="text-danger ms-2" *ngIf="isOverLimit">
+      <small>Max 100 allowed</small>
+    </span>
+  </div>
+  <!-- Right: Export button (always visible) -->
+  <div class="bar-right">
+    <button
+      class="btn btn-outline-success btn-sm"
+      [title]="selectedIds.length > 0 ? 'Export ' + selectedIds.length + ' selected vendors' : 'Export all vendors'"
+      (click)="onExportClick()">
+      <i class="fa fa-file-excel me-1"></i>
+      {{ selectedIds.length > 0 ? 'Export Selected (' + selectedIds.length + ')' : 'Export All' }}
+    </button>
+  </div>
+</div>
+
 <ta-table [options]="tableConfig" class="custom-list"> </ta-table>
