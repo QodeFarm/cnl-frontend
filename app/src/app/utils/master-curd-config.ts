@@ -10025,3 +10025,90 @@ export const VendorCurdConfig: TaCurdConfig = {
       ]
     }
 }
+
+export const gstConfig: TaCurdConfig = {
+  drawerSize: 500,
+  drawerPlacement: 'top',
+  tableConfig: {
+    apiUrl: 'products/gst/',
+    pkId: "gst_id",
+    pageSize: 10,
+    hideFilters: true,
+    globalSearch: {
+      keys: ['gst_id', 'gst_name', 'gst_percentage']
+    },
+    defaultSort: { key: 'is_deleted', value: 'ascend' },
+    cols: [
+      {
+        fieldKey: 'gst_name',
+        name: 'GST Name',
+        sort: true
+      },
+      {
+        fieldKey: 'gst_percentage',
+        name: 'GST Percentage',
+        sort: true
+      },
+      {
+        fieldKey: 'gst_id',
+        name: 'Action',
+        type: 'action',
+        actions: [
+          // {
+          //   type: 'delete',
+          //   label: 'Delete',
+          //   confirm: true,
+          //   confirmMsg: "Sure to delete?",
+          //   apiUrl: 'products/gst'
+          // },
+          {
+            type: 'restore',
+            label: 'Restore',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
+            apiUrl: 'products/gst'
+          },
+          {
+            type: 'edit',
+            label: 'Edit'
+          }
+        ]
+      }
+    ]
+  },
+  formConfig: {
+    url: 'products/gst/',
+    title: 'GST Master',
+    pkId: "gst_id",
+    fields: [
+      {
+        className: 'col-12 p-0',
+        fieldGroupClassName: "ant-row",
+        fieldGroup: [
+          {
+            key: 'gst_name',
+            type: 'input',
+            className: 'col-md-6 col-12 pb-3 px-1',
+            templateOptions: {
+              label: 'GST Name',
+              placeholder: 'Enter GST Name',
+              required: true,
+            }
+          },
+          {
+            key: 'gst_percentage',
+            type: 'input',
+            className: 'col-md-6 col-12 pb-3 px-1',
+            templateOptions: {
+              label: 'GST Percentage',
+              placeholder: 'Enter GST Percentage',
+              type: 'number',
+              required: true,
+              min: 0
+            }
+          }
+        ]
+      }
+    ]
+  }
+};

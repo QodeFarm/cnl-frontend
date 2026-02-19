@@ -844,21 +844,49 @@ preprocessFormData() {
                     },
                     {
                       className: 'col-md-4 col-sm-6 col-12',
-                      key: 'gst_input',
-                      type: 'input',
+                      key: 'gst',
+                      type: 'gst-dropdown',
                       templateOptions: {
                         label: 'GST Percentage',
-                        // placeholder: 'Select GST Percentage',
+                        dataKey: 'gst_id',
+                        dataLabel: 'gst_name',
+                        options: [],
                         required: false,
-                        // options: [
-                        //   { value: 3, label: '3%' },
-                        //   { value: 5, label: '5%' },
-                        //   { value: 9, label: '9%' },
-                        //   { value: 12, label: '12%' },
-                        //   { value: 18, label: '18%' }
-                        // ]
+                        lazy: {
+                          url: 'products/gst/',
+                          lazyOneTime: true
+                        }
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          field.formControl.valueChanges.subscribe((data: any) => {
+                            console.log("GST changed to:", data);
+                            if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                              this.formConfig.model['products']['gst_id'] = data?.gst;
+                            } else {
+                              console.error('Form config or gst_id data model is not defined.');
+                            }
+                          });
+                        }
                       }
-                    },   
+                    },
+                    // {
+                    //   className: 'col-md-4 col-sm-6 col-12',
+                    //   key: 'gst_input',
+                    //   type: 'input',
+                    //   templateOptions: {
+                    //     label: 'GST Percentage',
+                    //     // placeholder: 'Select GST Percentage',
+                    //     required: false,
+                    //     // options: [
+                    //     //   { value: 3, label: '3%' },
+                    //     //   { value: 5, label: '5%' },
+                    //     //   { value: 9, label: '9%' },
+                    //     //   { value: 12, label: '12%' },
+                    //     //   { value: 18, label: '18%' }
+                    //     // ]
+                    //   }
+                    // },   
                     {
                       key: 'stock_unit',
                       type: 'productStockUnits-dropdown',
