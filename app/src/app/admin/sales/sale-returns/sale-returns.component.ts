@@ -15,13 +15,14 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { calculateTotalAmount, displayInformation, getUnitData, sumQuantities } from 'src/app/utils/display.utils';
 import { CustomFieldHelper } from '../../utils/custom_field_fetch';
 import { FormlyFieldConfig } from '@ngx-formly/core';
+import { ReturnorderslistComponent } from '../returnorderslist/returnorderslist.component';
 declare var bootstrap;
 
 
 @Component({
   selector: 'app-sale-returns',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, SaleReturnsListComponent, SaleinvoiceorderlistComponent],
+  imports: [CommonModule, AdminCommmonModule, SaleReturnsListComponent, ReturnorderslistComponent],
   templateUrl: './sale-returns.component.html',
   styleUrls: ['./sale-returns.component.scss']
 })
@@ -477,6 +478,7 @@ async autoFillProductDetails(field, data) {
         ? Number(data.discount)
         : 0,
     unit_options_id: data.unit_options?.unit_options_id,
+    stock_unit_id: data.stock_unit?.stock_unit_id,
     print_name: data.print_name,
     mrp: data.mrp
   };
@@ -1912,6 +1914,43 @@ async autoFillProductDetails(field, data) {
                   hideLabel: true,
                   disabled: true
                 },
+              },
+              {
+                type: 'select',
+                key: 'stock_unit_id',
+                templateOptions: {
+                  label: 'Unit',
+                  placeholder: 'Unit',
+                  hideLabel: true,
+                  dataLabel: 'stock_unit_name',
+                  dataKey: 'stock_unit_id',
+                  bindId: true,
+                  required: false,
+                  lazy: {
+                    url: 'products/product_stock_units/',
+                    lazyOneTime: true
+                  }
+                },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_return_items.length > currentRowIndex) {
+                        const existingUnit = this.dataToPopulate.sale_return_items[currentRowIndex].product.stock_unit;
+
+                        // Set the full product object instead of just the product_id
+                        if (existingUnit) {
+                          field.formControl.setValue(existingUnit.stock_unit_id); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
               },
               {
                 type: 'select',

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FieldType } from '@ngx-formly/core';
 
@@ -10,6 +10,25 @@ import { FieldType } from '@ngx-formly/core';
 export class FieldTabsComponent extends FieldType {
 
   activeTab = 0;
+
+  constructor(private cdr: ChangeDetectorRef) {
+    super();
+  }
+
+
+  // tab visible check
+  get visibleTabs() {
+    return (this.field.fieldGroup || []).filter((tab: any) => !tab.hide);
+  }
+
+  // tab hide check
+  ngDoCheck() {
+    const visible = this.visibleTabs;
+    if (!visible[this.activeTab]) {
+      this.activeTab = 0;
+      this.cdr.detectChanges();
+    }
+  }
 
   selectTab(index: number) {
     this.activeTab = index;

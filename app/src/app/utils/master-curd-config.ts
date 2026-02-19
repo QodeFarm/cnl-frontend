@@ -4680,11 +4680,11 @@ export const productGroupsConfig: TaCurdConfig = {
                 name: 'Name',
                 sort: true
             },
-            // {
-            //     fieldKey: 'description',
-            //     name: 'Description',
-            //     sort: true
-            // },
+            {
+                fieldKey: 'code',
+                name: 'Code',
+                sort: true
+            },
             {
                 fieldKey: "code",
                 name: "Action",
@@ -4716,7 +4716,6 @@ export const productGroupsConfig: TaCurdConfig = {
         url: 'products/product_groups/',
         title: 'Product Groups',
         pkId: "product_group_id",
-        exParams: [],
         fields:
             [
                 {
@@ -4736,6 +4735,178 @@ export const productGroupsConfig: TaCurdConfig = {
                                         //field.templateOptions.options = this.cs.getRole();
                                     }
                                 }
+                            },
+                            {
+                              className: 'col-md-6 col-12 px-1 pb-md-0 pb-3',
+                              key: 'code',
+                              type: 'input',
+                              templateOptions: {
+                                label: 'Group Code',
+                                // readonly: true
+                              }
+                            },
+                            // {
+                            //   className: 'col-md-6 col-12 px-1 pb-md-0 pb-3',
+                            //   key: 'product_mode_id',
+                            //   type: 'productModes-dropdown',
+                            //   templateOptions: {
+                            //     label: 'Product group Mode',
+                            //     dataKey: 'item_master_id',
+                            //     dataLabel: 'mode_name',
+                            //     options: [],
+                            //     required: false,
+                            //     lazy: {
+                            //       url: 'products/item-master/',
+                            //       lazyOneTime: true
+                            //     }
+                            //   },
+                            //   hooks: {
+                            //     onInit: (field: any) => {
+                            //       console.log("field?.form?.root?.options?.exParams?.product_mode_id : ", field?.form?.root?.options?.exParams?.product_mode_id)
+                            //       const modeId =
+                            //         field?.form?.root?.options?.exParams?.product_mode_id;
+
+                            //       if (modeId) {
+                            //         // wait till dropdown options load
+                            //         setTimeout(() => {
+                            //           field.formControl.setValue(modeId);
+                            //         }, 0);
+                            //       }
+                            //     }
+                            //   }
+                            // },
+                            // {
+                            //   className: 'col-md-6 col-12 px-1 pb-md-0 pb-3',
+                            //   key: 'product_mode_id',
+                            //   type: 'select',
+                            //   templateOptions: {
+                            //     label: 'Product group Mode',
+                            //     dataKey: 'item_master_id',
+                            //     dataLabel: 'mode_name',
+                            //     options: [],
+                            //     required: false,
+                            //     lazy: {
+                            //       url: 'products/item-master/',
+                            //       lazyOneTime: true
+                            //     }
+                            //   },
+                            //   hooks: {
+                            //       onInit: (field: any) => {
+                            //         const modeId = field?.options?.formState?.activeProductModeId
+                            //           || localStorage.getItem('ACTIVE_PRODUCT_MODE_ID');
+
+                            //         if (!modeId) return;
+
+                            //         // Watch the options array — when it's populated, set the value
+                            //         const waitForOptions = () => {
+                            //           if (field.templateOptions.options && field.templateOptions.options.length > 0) {
+                            //             // Find the matching option
+                            //             const match = field.templateOptions.options.find((opt: any) => opt.value === modeId);
+                            //             if (match) {
+                            //               field.formControl.setValue(modeId); // now label will show
+                            //             } else {
+                            //               // Optionally, push it so it shows
+                            //               field.templateOptions.options.unshift({ value: modeId, label: modeId });
+                            //               field.formControl.setValue(modeId);
+                            //             }
+                            //           } else {
+                            //             // Retry after short delay
+                            //             setTimeout(waitForOptions, 50);
+                            //           }
+                            //         };
+
+                            //         waitForOptions();
+                            //       }
+                            //     }
+
+
+                            // },
+                            {
+                              className: 'col-md-6 col-12 px-1 pb-md-0 pb-3',
+                              key: 'product_mode',
+                              type: 'select',
+                              templateOptions: {
+                                label: 'Product group Mode',
+                                dataKey: 'product_mode_id',
+                                dataLabel: 'mode_name',
+                                options: [],
+                                required: false,
+                                lazy: {
+                                  url: 'products/item-master/',
+                                  lazyOneTime: true
+                                }
+                              },
+                              hooks: {
+                                onInit: (field: any) => {
+                              //     const activeModeId = field?.options?.formState?.activeProductModeId
+                              //       || localStorage.getItem('ACTIVE_PRODUCT_MODE_ID');
+                              //     const activeModeLabel = localStorage.getItem('ACTIVE_PRODUCT_MODE_LABEL') || activeModeId;
+                              //   console.log("Active Product Mode ID from formState/localStorage: ", activeModeId);
+                              //   console.log("Active Product Mode ID from formState/localStorage: ", activeModeLabel);
+                              //     if (!activeModeId) return;
+
+                              //     const waitForOptions = () => {
+                              //       const opts = field.templateOptions.options;
+                              //       if (opts && opts.length > 0) {
+                              //         // Check if the active mode already exists
+                              //         let match = opts.find((opt: any) => opt.value === activeModeId);
+
+                              //         if (!match) {
+                              //           // Add new option dynamically
+                              //           const newOption = {
+                              //             product_mode_id: activeModeId,   // matches dataKey
+                              //             mode_name: activeModeLabel      // matches dataLabel
+                              //           };
+                              //           field.templateOptions.options.unshift(newOption);
+
+                              //           // Then set the value
+                              //           field.formControl.setValue(activeModeId, { emitEvent: true });
+                              //           field.templateOptions.options = [...field.templateOptions.options]; // trigger re-render
+
+                              //           console.log("Adding new option to dropdown: ", newOption);
+                              //           field.templateOptions.options.unshift(newOption);
+                              //           match = newOption;
+                              //         }
+
+                              //         // ⚡ Important: make sure the select recognizes the label
+                              //         field.formControl.setValue(activeModeId);
+                              //         field.templateOptions.options = [...field.templateOptions.options]; // trigger change detection
+                              //       } else {
+                              //         setTimeout(waitForOptions, 50);
+                              //       }
+                              //     };
+
+                              //     waitForOptions();
+                                }
+                              }
+
+                            },
+                            {
+                              className: 'col-md-6 col-12 px-1 pb-md-0 pb-3',
+                              key: 'under_group_id',
+                              type: 'productGroups-dropdown',
+                              templateOptions: {
+                                label: 'Under Group',
+                                dataKey: 'product_group_id',
+                                dataLabel: "group_name",
+                                options: [],
+                                required: true,
+                                lazy: {
+                                  url: 'products/product_groups/',
+                                  lazyOneTime: true
+                                }
+                              },
+                              hooks: {
+                                onChanges: (field: any) => {
+                                  field.formControl.valueChanges.subscribe((data: any) => {
+                                    // if (this.curdConfig.formConfig && this.curdConfig.formConfig.model && this.curdConfig.formConfig.model['products']) {
+                                    //   this.curdConfig.formConfig.model['products']['product_group_id'] = data?.product_group_id;
+                                    // } else {
+                                    //   console.error('Form config or lead_status data model is not defined.');
+                                    // }
+                                  });
+                                }
+                              }
                             },
                             {
                                 key: 'description',
@@ -9854,3 +10025,90 @@ export const VendorCurdConfig: TaCurdConfig = {
       ]
     }
 }
+
+export const gstConfig: TaCurdConfig = {
+  drawerSize: 500,
+  drawerPlacement: 'top',
+  tableConfig: {
+    apiUrl: 'products/gst/',
+    pkId: "gst_id",
+    pageSize: 10,
+    hideFilters: true,
+    globalSearch: {
+      keys: ['gst_id', 'gst_name', 'gst_percentage']
+    },
+    defaultSort: { key: 'is_deleted', value: 'ascend' },
+    cols: [
+      {
+        fieldKey: 'gst_name',
+        name: 'GST Name',
+        sort: true
+      },
+      {
+        fieldKey: 'gst_percentage',
+        name: 'GST Percentage',
+        sort: true
+      },
+      {
+        fieldKey: 'gst_id',
+        name: 'Action',
+        type: 'action',
+        actions: [
+          // {
+          //   type: 'delete',
+          //   label: 'Delete',
+          //   confirm: true,
+          //   confirmMsg: "Sure to delete?",
+          //   apiUrl: 'products/gst'
+          // },
+          {
+            type: 'restore',
+            label: 'Restore',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
+            apiUrl: 'products/gst'
+          },
+          {
+            type: 'edit',
+            label: 'Edit'
+          }
+        ]
+      }
+    ]
+  },
+  formConfig: {
+    url: 'products/gst/',
+    title: 'GST Master',
+    pkId: "gst_id",
+    fields: [
+      {
+        className: 'col-12 p-0',
+        fieldGroupClassName: "ant-row",
+        fieldGroup: [
+          {
+            key: 'gst_name',
+            type: 'input',
+            className: 'col-md-6 col-12 pb-3 px-1',
+            templateOptions: {
+              label: 'GST Name',
+              placeholder: 'Enter GST Name',
+              required: true,
+            }
+          },
+          {
+            key: 'gst_percentage',
+            type: 'input',
+            className: 'col-md-6 col-12 pb-3 px-1',
+            templateOptions: {
+              label: 'GST Percentage',
+              placeholder: 'Enter GST Percentage',
+              type: 'number',
+              required: true,
+              min: 0
+            }
+          }
+        ]
+      }
+    ]
+  }
+};

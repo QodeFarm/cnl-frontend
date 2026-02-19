@@ -17,7 +17,7 @@
 <div class="tab-inner">
     <nz-tabset [(nzSelectedIndex)]="activeTab">
 
-        <nz-tab *ngFor="let tab of field.fieldGroup; let i = index" [nzTitle]="titleTemplate" (nzClick)="selectTab(i)">
+        <nz-tab *ngFor="let tab of visibleTabs; let i = index" [nzTitle]="titleTemplate" (nzClick)="selectTab(i)">
             <ng-template #titleTemplate>
                 <span class="tab-title" [ngClass]="{ 'tab-error': shouldShowError(tab) }">
                     {{ tab.props?.label || 'Tab ' + (i + 1) }}

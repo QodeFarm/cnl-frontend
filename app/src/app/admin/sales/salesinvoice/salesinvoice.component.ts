@@ -16,6 +16,7 @@ import { LocalStorageService } from '@ta/ta-core';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { SaleinvoiceorderlistComponent } from '../saleinvoiceorderlist/saleinvoiceorderlist.component';
 
 
 
@@ -23,7 +24,7 @@ declare var bootstrap;
 @Component({
   selector: 'app-salesinvoice',
   standalone: true,
-  imports: [AdminCommmonModule, OrderslistComponent,
+  imports: [AdminCommmonModule, OrderslistComponent, SaleinvoiceorderlistComponent,
     SalesInvoiceListComponent, NzModalModule, NzButtonModule, NzIconModule],
   templateUrl: './salesinvoice.component.html',
   styleUrls: ['./salesinvoice.component.scss']
@@ -403,6 +404,7 @@ async autoFillProductDetails(field, data) {
         ? Number(data.discount)
         : 0,
     unit_options_id: data.unit_options?.unit_options_id,
+    stock_unit_id: data.stock_unit?.stock_unit_id,
     print_name: data.print_name,
     mrp: data.mrp
   };
@@ -641,59 +643,86 @@ async autoFillProductDetails(field, data) {
       this.SalesInvoiceListComponent.refreshTable();
    }
   }
-  showPendingOrdersList() {
-    console.log("We are selecting customer here : ");
-    const selectedCustomerId = this.formConfig.model.sale_invoice_order.customer_id;
-    const selectedCustomerName = this.formConfig.model.sale_invoice_order.customer?.name;
 
-    if (!selectedCustomerId) {
-      this.noOrdersMessage = 'Please select a customer.';
-      this.customerOrders = [];
-      this.openModal();
-      return;
-    }
+tempSelectedProducts: any[] = []; 
+  
+showPendingOrdersList() {
 
+  // Reset temp selections
+  this.tempSelectedProducts = [];
+
+  // Reset checkbox state
+  this.customerOrders.forEach(order => {
+    order.productsList?.forEach(p => p.checked = false);
+  });
+
+  const selectedCustomerId = this.formConfig.model.sale_invoice_order.customer_id;
+  const selectedCustomerName = this.formConfig.model.sale_invoice_order.customer?.name;
+
+  if (!selectedCustomerId) {
+    this.noOrdersMessage = 'Please select a customer.';
     this.customerOrders = [];
-    this.noOrdersMessage = '';
-
-    this.getPendingOrdersByCustomer(selectedCustomerId).pipe(
-      switchMap(orders => {
-        if (orders.count === 0) {
-          this.noOrdersMessage = `No Pending orders for ${selectedCustomerName}.`;
-          this.customerOrders = [];
-          this.openModal();
-          return [];
-        }
-
-        const detailedOrderRequests = orders.data.map(order =>
-          this.getOrderDetails(order.sale_order_id).pipe(
-            tap(orderDetails => {
-              order.productsList = orderDetails.data.sale_order_items.map(item => ({
-                product_id: item.product?.name,
-                product_name: item.product?.name ?? 'Unknown Product',
-                quantity: item.quantity,
-                code: item.product?.code,
-                total_boxes: item.total_boxes,
-                unit_options_id: item.unit_options_id,
-                rate: item.rate,
-                discount: item.discount,
-                amount: item.amount,
-                tax: item.tax,
-                remarks: item.remarks
-              }));
-            })
-          )
-        );
-
-        return forkJoin(detailedOrderRequests).pipe(
-          tap(() => {
-            this.customerOrders = orders.data;
-            this.openModal();
-          })
-        );
-      })
-    ).subscribe();
+    this.openModal();
+    return;
   }
+
+  this.customerOrders = [];
+  this.noOrdersMessage = '';
+
+  this.getPendingOrdersByCustomer(selectedCustomerId).pipe(
+    switchMap(orders => {
+
+      if (orders.count === 0) {
+        this.noOrdersMessage = `No pending orders for ${selectedCustomerName}.`;
+        this.customerOrders = [];
+        this.openModal();
+        return [];
+      }
+
+      const detailedOrderRequests = orders.data.map(order =>
+        this.getOrderDetails(order.sale_order_id).pipe(
+          tap(orderDetails => {
+            order.productsList = orderDetails.data.sale_order_items.map(item => ({
+              product_id: item.product?.product_id,
+              product_name: item.product?.name ?? 'Unknown Product',
+              quantity: item.quantity,
+              code: item.product?.code,
+              rate: item.rate,
+              amount: item.amount,
+              discount: item.discount,
+              unit_name: item.unit_options?.unit_name ?? 'N/A',
+              total_boxes: item.total_boxes ?? 0,
+              size: item.size?.size_name ?? 'N/A',
+              color: item.color?.color_name ?? 'N/A',
+              remarks: item.remarks ?? '',
+              tax: item.tax ?? 0,
+              cgst: item.cgst ?? 0,
+              sgst: item.sgst ?? 0,
+              igst: item.igst ?? 0,
+              print_name: item.print_name ?? item.product?.name ?? 'N/A',
+              checked: false
+            }));
+          })
+        )
+      );
+
+      return forkJoin(detailedOrderRequests).pipe(
+        tap(() => {
+          this.customerOrders = orders.data;
+          this.openModal();
+        })
+      );
+    })
+  ).subscribe();
+}
+
+
+getPendingOrdersByCustomer(customerId: string) {
+  return this.http.get<any>(
+    `sales/sale_order/?summary=true&customer_id=${customerId}&status_name=Pending`
+  );
+}
+
   ordersListModal: any;
   openModal() {
     this.ordersListModal = new bootstrap.Modal(document.getElementById("ordersListModal"));
@@ -704,10 +733,11 @@ async autoFillProductDetails(field, data) {
     this.ordersListModal.hide();
   }
 
-  getPendingOrdersByCustomer(customerId: string): Observable<any> {
-    const url = `sales/sale_order_search/?customer_id=${customerId}&status_name=Pending`;
-    return this.http.get<any>(url);
-  }
+  // getPendingOrdersByCustomer(customerId: string): Observable<any> {
+  //   console.log("Fetching pending orders for customer ID:", customerId);
+  //   const url = `sales/sale_order/?summary=true&customer_id=${customerId}&status_name=Pending`;
+  //   return this.http.get<any>(url);
+  // }
 
   // ========== CUSTOMER INFO BANNER: Fetch & display notes + transport info ==========
   fetchCustomerInfoForBanner(customerId: string) {
@@ -2406,6 +2436,43 @@ createSaleInovice() {
                         // Set the full product object instead of just the product_id
                         if (existingBox) {
                           field.formControl.setValue(existingBox); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                type: 'select',
+                key: 'stock_unit_id',
+                templateOptions: {
+                  label: 'StockUnit',
+                  placeholder: 'Unit',
+                  hideLabel: true,
+                  dataLabel: 'stock_unit_name',
+                  dataKey: 'stock_unit_id',
+                  bindId: true,
+                  required:false,
+                  lazy: {
+                    url: 'products/product_stock_units/',
+                    lazyOneTime: true
+                  }
+                },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
+                        const existingUnit = this.dataToPopulate.sale_invoice_items[currentRowIndex].product.stock_unit;
+
+                        // Set the full product object instead of just the product_id
+                        if (existingUnit) {
+                          field.formControl.setValue(existingUnit.stock_unit_id); // Set full product object (not just product_id)
                         }
                       }
                     }
