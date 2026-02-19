@@ -97,24 +97,207 @@ export class WorkorderboardComponent implements OnInit {
     this.selectedOrder = null;
   }
 
-  confirmDispatch() {
-    if (this.selectedOrder) {
-      const saleOrderId = this.selectedOrder.sale_order_id;
-      const url = `sales/SaleOrder/${saleOrderId}/move_next_stage/`;
+  // confirmDispatch() {
+  //   if (this.selectedOrder) {
+  //     const saleOrderId = this.selectedOrder.sale_order_id;
+  //     const url = `sales/SaleOrder/${saleOrderId}/move_next_stage/`;
 
-      this.http.post(url, {}).subscribe(
+  //     this.http.post(url, {}).subscribe(
+  //       () => {
+  //         console.log('Dispatch confirmed for order:', saleOrderId);
+  //         this.closeModal();
+  //         this.curdConfig = this.getCurdConfig();
+  //       },
+  //       error => {
+  //         console.error('Error in confirming dispatch:', error);
+  //         alert('Failed to confirm dispatch. Please try again.');
+  //       }
+  //     );
+  //   }
+  // }
+
+  showZeroBalanceModal = false;
+zeroBalanceProductName = '';
+
+
+showZeroBalancePopup(item: any) {
+  this.zeroBalanceProductName = item.product?.name || 'This product';
+  this.showZeroBalanceModal = true;
+  this.ngOnInit();
+}
+
+closeZeroBalanceModal() {
+  this.showZeroBalanceModal = false;
+}
+
+zeroBalanceTitle = '';
+zeroBalanceMessage = '';
+
+showStockError(
+  item: any,
+  type: 'ZERO_BALANCE' | 'INSUFFICIENT_BALANCE',
+  balance?: number
+) {
+  this.zeroBalanceProductName = item.product_name || 'Product';
+
+  if (type === 'ZERO_BALANCE') {
+    this.zeroBalanceTitle = 'Product Balance is 0';
+    this.zeroBalanceMessage =
+      'Stock is not available. Product balance update is mandatory before dispatch.';
+  }
+
+  if (type === 'INSUFFICIENT_BALANCE') {
+    this.zeroBalanceTitle = 'Insufficient Product Balance';
+    this.zeroBalanceMessage =
+      `Ordered quantity is greater than available stock.
+       Available: ${balance}, Ordered: ${item.quantity}`;
+  }
+
+  this.showZeroBalanceModal = true;
+}
+
+
+confirmDispatch() {
+  if (!this.selectedOrder) {
+    console.warn('No order selected');
+    return;
+  }
+
+  const saleOrderId = this.selectedOrder.sale_order_id;
+  console.log('Starting dispatch confirmation for order:', saleOrderId);
+
+  // ================= STEP 1: FETCH FULL SALE ORDER =================
+  this.http.get(`sales/sale_order/${saleOrderId}/`).subscribe(
+    async (res: any) => {
+
+      const saleOrder = res?.data?.sale_order;
+      const saleOrderItems = res?.data?.sale_order_items || [];
+      const orderAttachments = res?.data?.order_attachments || [];
+      const orderShipments = res?.data?.order_shipments || [];
+      const customFields = res?.data?.custom_fields || {};
+
+      if (!saleOrder || !saleOrderItems.length) {
+        alert('Sale order data not found');
+        return;
+      }
+
+      // ================= STEP 2: PREPARE UPDATED ITEMS (WITH REAL BALANCE) =================
+      const updatedSaleOrderItems = [];
+
+      for (const item of saleOrderItems) {
+
+        const orderedQty = Number(item.quantity || 0);
+        if (!item.product_id || orderedQty <= 0) continue;
+
+        try {
+          // FETCH REAL PRODUCT BALANCE
+          const productRes: any = await this.http
+            .get(`products/products/${item.product_id}`)
+            .toPromise();
+
+          console.log(`Fetched balance for product ${item.product_id}:`, productRes);
+
+          const currentBalance =
+            Number(productRes?.data?.products.balance || 0);
+
+          console.log(`Product ${item.product_id} - Current Balance: ${currentBalance}, Ordered Qty: ${orderedQty}`);
+
+          // balance = 0
+          if (currentBalance === 0) {
+            this.showStockError(item, 'ZERO_BALANCE');
+            return;
+          }
+
+          // ordered qty > balance
+          if (orderedQty > currentBalance) {
+            this.showStockError(item, 'INSUFFICIENT_BALANCE', currentBalance);
+            return;
+          }
+
+          const availableQty = currentBalance - orderedQty;
+          const productionQty = availableQty >= orderedQty ? 0 : orderedQty - availableQty;
+          console.log("availableQty:", availableQty, "productionQty:", productionQty);
+          updatedSaleOrderItems.push({
+            // REQUIRED FOR UPDATE (NO DELETE)
+            sale_order_item_id: item.sale_order_item_id,
+            sale_order_id: saleOrderId,
+            product_id: item.product_id,
+            unit_options_id: item.unit_options_id,
+
+            // REQUIRED FIELD
+            quantity: orderedQty,
+
+            // FINAL CORRECT VALUES
+            available_qty: availableQty,
+            production_qty: productionQty
+          });
+
+          // ================= UPDATE PRODUCT BALANCE =================
+          await this.http.patch(
+            `products/update-balance/${item.product_id}/`,
+            { balance: availableQty }
+          ).toPromise();
+
+
+          } catch (err) {
+          console.error(
+            `Failed to fetch balance for product ${item.product_id}`,
+            err
+          );
+        }
+      }
+      
+
+      // ================= STEP 3: BUILD PUT PAYLOAD (UNCHANGED STRUCTURE) =================
+      const payload = {
+        sale_order: {
+          ...saleOrder,
+
+          // FORCE order_type
+          order_type: 'sale_order'
+        },
+        sale_order_items: updatedSaleOrderItems,
+        order_attachments: orderAttachments,
+        order_shipments: orderShipments,
+        custom_fields: customFields
+      };
+
+      // ================= STEP 4: UPDATE SALE ORDER (PUT) =================
+      this.http.put(`sales/sale_order/${saleOrderId}/`, payload).subscribe(
         () => {
-          console.log('Dispatch confirmed for order:', saleOrderId);
-          this.closeModal();
-          this.curdConfig = this.getCurdConfig();
+
+          console.log('✅ Sale order items updated successfully');
+
+          // ================= STEP 5: MOVE TO NEXT STAGE =================
+          const moveNextStageUrl =
+            `sales/SaleOrder/${saleOrderId}/move_next_stage/`;
+
+          this.http.post(moveNextStageUrl, {}).subscribe(
+            () => {
+              console.log('✅ Dispatch confirmed & moved to next stage');
+              this.closeModal();
+              this.curdConfig = this.getCurdConfig();
+            },
+            error => {
+              console.error('Move next stage failed:', error);
+              alert('Failed to move order to next stage');
+            }
+          );
+
         },
         error => {
-          console.error('Error in confirming dispatch:', error);
-          alert('Failed to confirm dispatch. Please try again.');
+          console.error('Sale order update failed:', error);
+          alert('Failed to update sale order items');
         }
       );
+
+    },
+    error => {
+      console.error('Fetch sale order failed:', error);
+      alert('Unable to fetch sale order data');
     }
-  }
+  );
+}
 
   getCurdConfig(): TaCurdConfig {
     return {

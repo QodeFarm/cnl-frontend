@@ -104,3 +104,23 @@
     </div>
   </div>
 </div>
+
+<!-- Zero Balance Modal -->
+<div class="zb-backdrop" *ngIf="showZeroBalanceModal">
+  <div class="zb-modal">
+
+    <div class="zb-icon">⚠️</div>
+
+    <h2>{{ zeroBalanceTitle }}</h2>
+
+    <p>
+      <strong>{{ zeroBalanceProductName }}</strong><br />
+      {{ zeroBalanceMessage }}
+    </p>
+
+    <button class="zb-btn" (click)="closeZeroBalanceModal()">
+      OK
+    </button>
+
+  </div>
+</div>

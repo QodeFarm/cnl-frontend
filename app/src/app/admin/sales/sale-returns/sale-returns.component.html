@@ -53,14 +53,14 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="hideModal()"></button>
         </div>
         <div class="modal-body">
-          <app-saleinvoiceorderlist 
+          <app-returnorderslist 
           [customerOrders]="customerOrders" 
           (orderSelected)="handleInvoiceOrderSelected($event)"
           (productsPulled)="handleProductsPulled($event)"
           [noOrdersMessage]="noOrdersMessage"
           (modalClosed)="closeModal()"
           class="custom-list">
-      </app-saleinvoiceorderlist>
+      </app-returnorderslist>
   
         </div> 
       </div>

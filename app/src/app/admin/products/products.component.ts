@@ -57,8 +57,8 @@ export class ProductsComponent implements OnInit {
     this.selectedProductMode = "Inventory";
     this.setFormConfig();
     // console.log('Check field : ',this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[7])
-    // this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[9].hide = true;
-    // this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[10].hide = true;
+    this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[11].hide = true;
+    this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[12].hide = true;
   }
 
   hide() {
@@ -143,8 +143,8 @@ editProducts(event: any) {
       this.formConfig.model['product_id'] = this.ProductEditID;
       this.showForm = true;
 
-      this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[9].hide = false;
-      this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[10].hide = false;
+      this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[11].hide = true;
+      this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[12].hide = true;
     }
   });
 
@@ -551,7 +551,9 @@ preprocessFormData() {
                                // Get the selected mode name for use in visibility conditions
                                  // Extract just the UUID from the selected value
                                this.formConfig.model['products']['product_mode_id'] = typeof data === 'object' ? data.item_master_id : data;
-        
+                              
+                               const modeId = this.formConfig.model['products']['product_mode_id'];
+                                  localStorage.setItem('ACTIVE_PRODUCT_MODE_ID', modeId);
         
                                 // Store the mode name for visibility conditions
                                 const selectedOption = field.templateOptions.options.find((option: any) => option.value === data);
@@ -672,6 +674,65 @@ preprocessFormData() {
                         }
                       }
                     },
+                    // {
+                    //   className: 'col-md-4 col-sm-6 col-12',
+                    //   key: 'product_mode',
+                    //   type: 'productModes-dropdown',
+                    //   templateOptions: {
+                    //     label: 'Product Mode',
+                    //     placeholder: 'Select Product Mode',
+                    //     dataKey: 'product_mode_id',
+                    //     dataLabel: 'mode_name',
+                    //     required: true,
+                    //     options: []
+                    //   },
+                    //   hooks: {
+                    //     onInit: (field: any) => {
+                    //       // Load the dropdown data from the API
+                    //       this.http.get('products/item-master/').subscribe((response: any) => {
+                    //         if (response && response.data) {
+                    //           const options = response.data.map((item: any) => ({
+                    //             value: item.product_mode_id,
+                    //             label: item.mode_name
+                    //           }));
+
+                    //           field.templateOptions.options = options;
+
+                    //           // If in edit mode, select current value
+                    //           if (this.ProductEditID && this.formConfig.model.products?.product_mode_id) {
+                    //             const currentId = this.formConfig.model.products.product_mode_id;
+                    //             const matchedOption = options.find((opt: any) => opt.value === currentId);
+                    //             if (matchedOption) {
+                    //               field.formControl.setValue(matchedOption.value);
+                    //               this.selectedProductMode = matchedOption.label; // store the name
+                    //               localStorage.setItem('ACTIVE_PRODUCT_MODE_ID', matchedOption.value);
+                    //               localStorage.setItem('ACTIVE_PRODUCT_MODE_LABEL', matchedOption.label); // new
+                    //             }
+                    //           }
+                    //         }
+                    //       });
+                    //     },
+                    //     onChanges: (field: any) => {
+                    //       if (field._subscription) field._subscription.unsubscribe();
+
+                    //       field._subscription = field.formControl.valueChanges.subscribe((data: any) => {
+                    //         if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                    //           // Store selected ID
+                    //           const modeId = typeof data === 'object' ? data.item_master_id : data;
+                    //           this.formConfig.model['products']['product_mode_id'] = modeId;
+                    //           localStorage.setItem('ACTIVE_PRODUCT_MODE_ID', modeId);
+
+                    //           // Store name for visibility and pre-populate in product groups
+                    //           const selectedOption = field.templateOptions.options.find((option: any) => option.value === modeId);
+                    //           if (selectedOption) {
+                    //             this.selectedProductMode = selectedOption.label;
+                    //             localStorage.setItem('ACTIVE_PRODUCT_MODE_LABEL', selectedOption.label);
+                    //           }
+                    //         }
+                    //       });
+                    //     }
+                    //   }
+                    // },
                     {
                       key: 'name',
                       type: 'input',
@@ -740,7 +801,7 @@ preprocessFormData() {
                         lazy: {
                           url: 'products/product_groups/',
                           lazyOneTime: true
-                        }
+                        },
                       },
                       hooks: {
                         onChanges: (field: any) => {
@@ -784,18 +845,18 @@ preprocessFormData() {
                     {
                       className: 'col-md-4 col-sm-6 col-12',
                       key: 'gst_input',
-                      type: 'select',
+                      type: 'input',
                       templateOptions: {
                         label: 'GST Percentage',
-                        placeholder: 'Select GST Percentage',
+                        // placeholder: 'Select GST Percentage',
                         required: false,
-                        options: [
-                          { value: 3, label: '3%' },
-                          { value: 5, label: '5%' },
-                          { value: 9, label: '9%' },
-                          { value: 12, label: '12%' },
-                          { value: 18, label: '18%' }
-                        ]
+                        // options: [
+                        //   { value: 3, label: '3%' },
+                        //   { value: 5, label: '5%' },
+                        //   { value: 9, label: '9%' },
+                        //   { value: 12, label: '12%' },
+                        //   { value: 18, label: '18%' }
+                        // ]
                       }
                     },   
                     {
@@ -845,15 +906,30 @@ preprocessFormData() {
                     }, 
                     {
                       className: 'col-md-4 col-sm-6 col-12',
+                      key: 'has_opening_balance',
+                      type: 'toggle', // or checkbox / switch (based on your UI lib)
+                      defaultValue: false,
+                      templateOptions: {
+                        label: 'Opening Balance',
+                        required: false,
+                        options: [
+                          { label: 'Yes', value: true },
+                          { label: 'No', value: false }
+                        ]
+                      }
+                    },
+                    {
+                      className: 'col-md-4 col-sm-6 col-12',
                       key: 'balance',
                       type: 'input',
                       defaultValue: 0.00,
                       templateOptions: {
                         label: 'Balance',
-                        readonly: true,
-                        disabled: true,
+                        // readonly: true,
+                        // disabled: true,
                         required: false, 
-                      }
+                      },
+                      hideExpression: (model) => !model?.has_opening_balance
                   },
                   {
                     className: 'col-md-4 col-sm-6 col-12',
@@ -1013,7 +1089,7 @@ preprocessFormData() {
                             // },
                             {
                               key: 'type',
-                              type: 'productType-dropdown',
+                              type: 'select', //'productType-dropdown',
                               className: 'col-3',
                               templateOptions: {
                                 label: 'Type',
@@ -1022,7 +1098,11 @@ preprocessFormData() {
                                 placeholder: 'Select Product Mode first',
                                 options: [],
                                 required: false,
-                                disabled: true
+                                // disabled: true
+                                lazy: {
+                                  url: 'masters/product_types/',
+                                  lazyOneTime: true
+                                }
                               },
                               hooks: {
                                 onChanges: (field: any) => {
@@ -1067,7 +1147,7 @@ preprocessFormData() {
                             },
                             {
                               key: 'unit_options',
-                              type: 'productUnitOptions-dropdown',
+                              type: 'select', //'productUnitOptions-dropdown',
                               className: 'col-3',
                               templateOptions: {
                                 label: 'Unit Options',
@@ -1301,18 +1381,18 @@ preprocessFormData() {
                                   }
                                 },
                                 hooks: {
-        onChanges: (field: any) => {
-          field.formControl.valueChanges.subscribe((data: any) => {
-            const rowIndex = +field.parent.key;
-            if (!this.formConfig.model['product_variations'][rowIndex]) {
-              this.formConfig.model['product_variations'][rowIndex] = {};
-            }
-            // Extract just the UUID
-            this.formConfig.model['product_variations'][rowIndex]['size_id'] = 
-              data?.size_id || null;
-          });
-        }
-      }
+                                  onChanges: (field: any) => {
+                                    field.formControl.valueChanges.subscribe((data: any) => {
+                                      const rowIndex = +field.parent.key;
+                                      if (!this.formConfig.model['product_variations'][rowIndex]) {
+                                        this.formConfig.model['product_variations'][rowIndex] = {};
+                                      }
+                                      // Extract just the UUID
+                                      this.formConfig.model['product_variations'][rowIndex]['size_id'] = 
+                                        data?.size_id || null;
+                                    });
+                                  }
+                                }
                               },
                               {
                                 key: 'color',
@@ -1330,18 +1410,18 @@ preprocessFormData() {
                                   }
                                 },
                                 hooks: {
-        onChanges: (field: any) => {
-          field.formControl.valueChanges.subscribe((data: any) => {
-            const rowIndex = +field.parent.key;
-            if (!this.formConfig.model['product_variations'][rowIndex]) {
-              this.formConfig.model['product_variations'][rowIndex] = {};
-            }
-            // Extract just the UUID
-            this.formConfig.model['product_variations'][rowIndex]['color_id'] = 
-              data?.color_id || null;
-          });
-        }
-      }
+                                  onChanges: (field: any) => {
+                                    field.formControl.valueChanges.subscribe((data: any) => {
+                                      const rowIndex = +field.parent.key;
+                                      if (!this.formConfig.model['product_variations'][rowIndex]) {
+                                        this.formConfig.model['product_variations'][rowIndex] = {};
+                                      }
+                                      // Extract just the UUID
+                                      this.formConfig.model['product_variations'][rowIndex]['color_id'] = 
+                                        data?.color_id || null;
+                                    });
+                                  }
+                                }
                               },
                               
                               {
@@ -1397,6 +1477,23 @@ preprocessFormData() {
                   props: {
                     label: 'Warehouse Locations'
                   },
+                  expressionProperties: {
+                    hide: (model: any) => !model?.products?.has_opening_balance
+                  },
+                  hooks: {
+                    onInit: (field: any) => {
+                      field.formControl?.valueChanges?.subscribe(() => {
+                        const model = field.model;
+
+                        if (model?.products?.has_opening_balance) {
+                          if (!model.product_item_balance || model.product_item_balance.length === 0) {
+                            model.product_item_balance = [{}];
+                          }
+                        }
+                      });
+                    }
+                  },
+
                   fieldGroup: [
                     {
                       fieldGroupClassName: "",
@@ -1534,8 +1631,8 @@ preprocessFormData() {
                               key: 'sales_rate',
                               type: 'input',
                               templateOptions: {
-                                label: 'Sales Rate',
-                                placeholder: 'Enter Sales Rate',
+                                label: 'Retail Rate',
+                                placeholder: 'Enter Retail Rate',
                                 required: false
                               }
                             },

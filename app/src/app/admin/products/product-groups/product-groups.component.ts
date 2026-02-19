@@ -85,9 +85,70 @@ export class ProductGroupsComponent   {
             }
           },
           {
+            className: 'col-md-6 col-12 px-1 pb-md-0 pb-3',
+            key: 'code',
+            type: 'input',
+            templateOptions: {
+              label: 'Group Code',
+              readonly: false,
+            }
+          },
+          {
+            className: 'col-md-6 col-12 px-1 pb-md-0 pb-3',
+            key: 'product_mode_id',
+            type: 'select',
+            templateOptions: {
+              label: 'Product group Mode',
+              dataKey: 'item_master_id',
+              dataLabel: 'mode_name',
+              options: [],
+              required: false,
+              lazy: {
+                url: 'products/item-master/',
+                lazyOneTime: true
+              }
+            },
+            // hooks: {
+            //   onChanges: (field: any) => {
+            //     field.formControl.valueChanges.subscribe((data: any) => {
+            //       if (this.curdConfig.formConfig?.model?.products) {
+            //         this.curdConfig.formConfig.model['product_mode_id'] = data?.item_master_id;
+            //       }
+            //     });
+            //   }
+            // }
+          },
+          {
+            className: 'col-md-6 col-12 px-1 pb-md-0 pb-3',
+            key: 'under_group_id',
+            type: 'productGroups-dropdown',
+            templateOptions: {
+              label: 'Under Group',
+              dataKey: 'product_group_id',
+              dataLabel: "group_name",
+              options: [],
+              required: true,
+              lazy: {
+                url: 'products/product_groups/',
+                lazyOneTime: true
+              }
+            },
+            hooks: {
+              onChanges: (field: any) => {
+                field.formControl.valueChanges.subscribe((data: any) => {
+                  if (this.curdConfig.formConfig && this.curdConfig.formConfig.model && this.curdConfig.formConfig.model['products']) {
+                    this.curdConfig.formConfig.model['products']['product_group_id'] = data?.product_group_id;
+                  } else {
+                    console.error('Form config or lead_status data model is not defined.');
+                  }
+                });
+              }
+            }
+          },
+          {
             key: 'description',
             type: 'textarea',
-            className: 'col-md-6 col-12 px-1',
+            className: 'col-md-6 col-12 px-1 pb-md-0 pb-3',
             templateOptions: {
               label: 'Description',
               required: true
@@ -97,7 +158,7 @@ export class ProductGroupsComponent   {
                 //field.templateOptions.options = this.cs.getRole();
               }
             }
-          },
+          }
         ]
       }
     ]

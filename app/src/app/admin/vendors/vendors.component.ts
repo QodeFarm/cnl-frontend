@@ -406,6 +406,16 @@ editVendor(event) {
                         label: 'Code',
                         placeholder: 'Enter Code',
                         required: false,
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          this.http.get('masters/generate_order_no/?type=vend').subscribe((res: any) => {
+                            if (res && res.data && res.data?.order_number) {
+                              console.log('Generated Code:', res.data.order_number);
+                              field.formControl.setValue(res.data?.order_number);
+                            }
+                          });
+                        }
                       }
                     },
                   

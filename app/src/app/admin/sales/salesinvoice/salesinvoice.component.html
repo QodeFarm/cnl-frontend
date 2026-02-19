@@ -72,13 +72,23 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="hideModal()"></button>
       </div>
       <div class="modal-body">
-        <app-orderslist class="custom-list" 
+        <!-- <app-saleinvoiceorderlist
           [customerOrders]="customerOrders" 
           (orderSelected)="handleOrderSelected($event)"
           (productsPulled)="handleProductPull($event)"
           [noOrdersMessage]="noOrdersMessage"
           (modalClosed)="closeModal()">
-        </app-orderslist>
+        </app-saleinvoiceorderlist> -->
+        <app-saleinvoiceorderlist
+          [customerOrders]="customerOrders"
+          [noOrdersMessage]="noOrdersMessage"
+          (orderSelected)="handleOrderSelected($event)"
+          (productsPulled)="handleProductPull($event)"
+          (modalClosed)="closeModal()"
+          [selectedCustomerId]="formConfig.model.sale_invoice_order.customer_id"
+          class="custom-list">
+        </app-saleinvoiceorderlist>
+
       </div>
     </div>
   </div>
