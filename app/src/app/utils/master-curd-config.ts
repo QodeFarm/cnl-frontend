@@ -5240,11 +5240,122 @@ export const productCategoriesConfig: TaCurdConfig = {
                                     }
                                 }
                             },
+                            {
+                              key: 'sub_category',
+                              type: 'subProductCategories-dropdown',
+                              className: 'col-md-6 col-12 px-1 pb-3',
+                              templateOptions: {
+                                  label: 'Sub Category',
+                                  dataKey: 'sub_category_id',
+                                  dataLabel: "sub_category_name",
+                                  options: [],
+                                  lazy: {
+                                      url: 'masters/sub-product-categories/',
+                                      lazyOneTime: true
+                                  },
+                                  // required: true
+                              },
+                              hooks: {
+                                  onInit: (field: any) => {
+                                      // field.templateOptions.options = this.cs.getSubProductCategories();
+                                  }
+                              }
+                          },
                         ]
                 }
             ]
     }
 }
+
+export const subProductCategoriesConfig: TaCurdConfig = {
+  drawerSize: 500,
+  drawerPlacement: 'top',
+
+  tableConfig: {
+    apiUrl: 'products/sub-product-categories/',
+    pkId: "sub_category_id",
+    pageSize: 10,
+    hideFilters: true,
+
+    globalSearch: {
+      keys: ['sub_category_name', 'code']
+    },
+
+    defaultSort: { key: 'is_deleted', value: 'ascend' },
+
+    cols: [
+      {
+        fieldKey: 'sub_category_name',
+        name: 'Sub Category Name',
+        sort: true
+      },
+      {
+        fieldKey: 'code',
+        name: 'Code',
+        sort: true
+      },
+      {
+        fieldKey: "code",
+        name: "Action",
+        type: 'action',
+        actions: [
+          {
+            type: 'delete',
+            label: 'Delete',
+            confirm: true,
+            confirmMsg: "Sure to delete?",
+            apiUrl: 'products/sub-product-categories'
+          },
+          {
+            type: 'restore',
+            label: 'Restore',
+            confirm: true,
+            confirmMsg: "Sure to restore?",
+            apiUrl: 'products/sub-product-categories'
+          },
+          {
+            type: 'edit',
+            label: 'Edit'
+          }
+        ]
+      }
+    ]
+  },
+
+  formConfig: {
+    url: 'products/sub-product-categories/',
+    title: 'Sub Product Categories',
+    pkId: "sub_category_id",
+    exParams: [],
+
+    fields: [
+      {
+        fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
+        fieldGroup: [
+          {
+            key: 'sub_category_name',
+            type: 'input',
+            className: 'col-md-6 col-12 px-1 pb-md-0 pb-3',
+            templateOptions: {
+              label: 'Sub Category Name',
+              required: true
+            }
+          },
+          {
+            key: 'code',
+            type: 'input',
+            className: 'col-md-6 col-12 px-1',
+            templateOptions: {
+              label: 'Code',
+              required: false
+            }
+          }
+        ]
+      }
+    ]
+  }
+};
+
 
 export const productGstClassificationsConfig: TaCurdConfig = {
     drawerSize: 500,
