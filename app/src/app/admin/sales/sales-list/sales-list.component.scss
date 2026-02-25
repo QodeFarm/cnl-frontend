@@ -248,3 +248,19 @@
   }
 }
 /* ================================================================== */
+
+
+.bottom-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.left-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.form-select {
+  min-width: 150px;
+}
