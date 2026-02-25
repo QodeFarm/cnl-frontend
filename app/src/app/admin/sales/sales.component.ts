@@ -2247,49 +2247,236 @@ createQuickPackOption: string = 'no';
 //   });
 // }
 
+// createSaleOrder() {
+
+//   const customFieldsPayload = this.validatedCustomFieldsPayload;
+
+//   const payload = {
+//     ...this.formConfig.model,
+//     custom_field_values: customFieldsPayload.custom_field_values
+//   };
+
+//   /* -------------------------------------------------
+//    QUICK PACK (UNCHANGED)
+//   -------------------------------------------------- */
+//   if (this.createQuickPack) {
+//     const customerName = payload.sale_order?.customer?.name || 'Customer';
+//     const productNames = payload.sale_order_items?.map(i => i.product?.name) || [];
+
+//     let quickPackName = `${customerName} QuickPack (${productNames.join(', ')})`;
+//     if (quickPackName.length > 50) {
+//       quickPackName = `${customerName} QuickPack (${productNames[0]} +${productNames.length - 1} more)`;
+//     }
+
+//     const quickPackPayload = {
+//       quick_pack_data: {
+//         name: quickPackName,
+//         customer_id: payload.sale_order.customer?.customer_id,
+//         description: `QuickPack created from Sale Order ${payload.sale_order.order_no}`,
+//         active: 'Y',
+//         lot_qty: payload.sale_order_items.reduce((s, i) => s + (i.quantity || 0), 0)
+//       },
+//       quick_pack_data_items: payload.sale_order_items.map(i => ({
+//         product_id: i.product?.product_id,
+//         quantity: i.quantity,
+//         unit_options_id: i.unit_options?.unit_options_id,
+//         size_id: i.size?.size_id,
+//         color_id: i.color?.color_id
+//       }))
+//     };
+
+//     this.http.post('sales/quick_pack/', quickPackPayload).subscribe();
+//   }
+
+//   /* -------------------------------------------------
+//    CREDIT LIMIT OVERRIDE (ADDED FROM OLD CODE)
+//   -------------------------------------------------- */
+//   if (this.creditLimitApproved) {
+//     payload.credit_limit_approved = true;
+//     this.creditLimitApproved = false;
+//   }
+
+//   /* -------------------------------------------------
+//    SPLIT LOGIC (UNCHANGED)
+//   -------------------------------------------------- */
+//   const parentItems: any[] = [];
+//   const childItems: any[] = [];
+
+//   payload.sale_order_items.forEach(item => {
+//     const qty = Number(item.quantity) || 0;
+//     const available = Number(item.available_qty) || 0;
+
+//     parentItems.push({
+//       ...item,
+//       production_qty: 0
+//     });
+
+//     if (qty > available) {
+//       childItems.push({
+//         ...item,
+//         quantity: qty - available,
+//         available_qty: available,
+//         production_qty: qty - available
+//       });
+//     }
+//   });
+
+//   payload.sale_order_items = parentItems;
+
+//   /* -------------------------------------------------
+//    CHILD ORDER DECISION
+//   -------------------------------------------------- */
+//   const totalProducts = payload.sale_order_items.length;
+
+//   const allAvailableZero = payload.sale_order_items.every(
+//     i => Number(i.available_qty || 0) === 0
+//   );
+
+//   const shouldCreateChildOrders =
+//     totalProducts > 1 &&
+//     !allAvailableZero &&
+//     childItems.length > 0;
+
+//   console.log('Should create child orders:', shouldCreateChildOrders);
+
+//   /* -------------------------------------------------
+//    CREATE PARENT SALE ORDER
+//   -------------------------------------------------- */
+//   this.http.post<any>('sales/sale_order/', payload).subscribe({
+//     next: parentRes => {
+
+//       /* -------------------------------------------------
+//        CREDIT LIMIT RESPONSE CHECK
+//       -------------------------------------------------- */
+//       if (parentRes?.data?.credit_limit_exceeded) {
+//         console.log("Credit limit exceeded — showing modal");
+//         this.pendingCreditLimitPayload = payload;
+//         this.pendingCreditLimitAction = 'create';
+//         this.showCreditLimitModal(parentRes.data);
+//         return;
+//       }
+
+//       const parentOrder = parentRes.data.sale_order;
+//       const parentOrderId = parentOrder.sale_order_id;
+
+//       this.sendSaleOrderWhatsapp(parentOrderId);
+
+//       /* -------------------------------------------------
+//        CREATE CHILD SALE ORDERS
+//       -------------------------------------------------- */
+//       if (shouldCreateChildOrders) {
+
+//         let counter = 1;
+
+//         const childRequests = childItems.map(item => {
+
+//           const childOrderNo = `${parentOrder.order_no}-P${counter++}`;
+
+//           const childPayload = {
+//             sale_order: {
+//               ...parentOrder,
+//               sale_order_id: undefined,
+//               order_no: childOrderNo,
+//               flow_status: { flow_status_name: 'Production' },
+
+//               item_value: 0,
+//               total_amount: 0,
+//               tax_amount: 0,
+//               dis_amt: 0,
+//               cess_amount: 0,
+
+//               order_type: parentOrder.order_type || 'sale_order'
+//             },
+//             sale_order_items: [{
+//               ...item,
+//               available_qty: 0,
+//               amount: 0,
+//               rate: 0,
+//               tax: 0,
+//               cgst: 0,
+//               sgst: 0,
+//               igst: 0,
+//               production_qty: item.quantity
+//             }],
+//             order_attachments: payload.order_attachments,
+//             order_shipments: payload.order_shipments,
+//             custom_field_values: customFieldsPayload.custom_field_values
+//           };
+
+//           return this.http.post<any>('sales/sale_order/', childPayload).pipe(
+//             switchMap(childRes => {
+
+//               const childOrderId = childRes.data.sale_order.sale_order_id;
+
+//               const workOrderPayload = {
+//                 work_order: {
+//                   product_id: item.product_id,
+//                   quantity: item.production_qty,
+//                   completed_qty: 0,
+//                   pending_qty: item.production_qty,
+//                   start_date: parentOrder.order_date,
+//                   sync_qty: true,
+//                   size_id: item.size?.size_id || null,
+//                   color_id: item.color?.color_id || null,
+//                   status_id: '',
+//                   sale_order_id: childOrderId
+//                 },
+//                 bom: [{
+//                   product_id: item.product_id,
+//                   size_id: item.size?.size_id || null,
+//                   color_id: item.color?.color_id || null
+//                 }],
+//                 work_order_machines: [],
+//                 workers: [],
+//                 work_order_stages: []
+//               };
+
+//               return this.http.post('production/work_order/', workOrderPayload);
+//             })
+//           );
+//         });
+
+//         forkJoin(childRequests).subscribe();
+//       }
+
+//       /* -------------------------------------------------
+//        SUCCESS
+//       -------------------------------------------------- */
+//       this.clearDraft();
+//       this.showSuccessToast = true;
+//       this.toastMessage = 'Sale Order created successfully';
+
+//       setTimeout(() => (this.showSuccessToast = false), 3000);
+//       this.ngOnInit();
+//     },
+
+//     error: err => {
+
+//       /* CREDIT LIMIT BLOCKED (NON ADMIN) */
+//       if (err.status === 403 && err.error?.data?.credit_limit_exceeded) {
+//         this.pendingCreditLimitPayload = null;
+//         this.showCreditLimitModal(err.error.data);
+//         return;
+//       }
+
+//       if (err.status === 400) {
+//         this.showDialog();
+//       }
+//     }
+//   });
+// }
+
 createSaleOrder() {
 
   const customFieldsPayload = this.validatedCustomFieldsPayload;
 
-  const payload = {
+  const payload: any = {
     ...this.formConfig.model,
     custom_field_values: customFieldsPayload.custom_field_values
   };
 
   /* -------------------------------------------------
-   QUICK PACK (UNCHANGED)
-  -------------------------------------------------- */
-  if (this.createQuickPack) {
-    const customerName = payload.sale_order?.customer?.name || 'Customer';
-    const productNames = payload.sale_order_items?.map(i => i.product?.name) || [];
-
-    let quickPackName = `${customerName} QuickPack (${productNames.join(', ')})`;
-    if (quickPackName.length > 50) {
-      quickPackName = `${customerName} QuickPack (${productNames[0]} +${productNames.length - 1} more)`;
-    }
-
-    const quickPackPayload = {
-      quick_pack_data: {
-        name: quickPackName,
-        customer_id: payload.sale_order.customer?.customer_id,
-        description: `QuickPack created from Sale Order ${payload.sale_order.order_no}`,
-        active: 'Y',
-        lot_qty: payload.sale_order_items.reduce((s, i) => s + (i.quantity || 0), 0)
-      },
-      quick_pack_data_items: payload.sale_order_items.map(i => ({
-        product_id: i.product?.product_id,
-        quantity: i.quantity,
-        unit_options_id: i.unit_options?.unit_options_id,
-        size_id: i.size?.size_id,
-        color_id: i.color?.color_id
-      }))
-    };
-
-    this.http.post('sales/quick_pack/', quickPackPayload).subscribe();
-  }
-
-  /* -------------------------------------------------
-   CREDIT LIMIT OVERRIDE (ADDED FROM OLD CODE)
+   CREDIT LIMIT OVERRIDE
   -------------------------------------------------- */
   if (this.creditLimitApproved) {
     payload.credit_limit_approved = true;
@@ -2297,12 +2484,12 @@ createSaleOrder() {
   }
 
   /* -------------------------------------------------
-   SPLIT LOGIC (UNCHANGED)
+   SPLIT LOGIC (ALWAYS RUN)
   -------------------------------------------------- */
   const parentItems: any[] = [];
   const childItems: any[] = [];
 
-  payload.sale_order_items.forEach(item => {
+  payload.sale_order_items?.forEach(item => {
     const qty = Number(item.quantity) || 0;
     const available = Number(item.available_qty) || 0;
 
@@ -2315,7 +2502,6 @@ createSaleOrder() {
       childItems.push({
         ...item,
         quantity: qty - available,
-        available_qty: available,
         production_qty: qty - available
       });
     }
@@ -2323,33 +2509,19 @@ createSaleOrder() {
 
   payload.sale_order_items = parentItems;
 
-  /* -------------------------------------------------
-   CHILD ORDER DECISION
-  -------------------------------------------------- */
-  const totalProducts = payload.sale_order_items.length;
-
-  const allAvailableZero = payload.sale_order_items.every(
-    i => Number(i.available_qty || 0) === 0
-  );
-
-  const shouldCreateChildOrders =
-    totalProducts > 1 &&
-    !allAvailableZero &&
-    childItems.length > 0;
-
-  console.log('Should create child orders:', shouldCreateChildOrders);
+  const shouldCreateChildOrders = childItems.length > 0;
 
   /* -------------------------------------------------
    CREATE PARENT SALE ORDER
   -------------------------------------------------- */
   this.http.post<any>('sales/sale_order/', payload).subscribe({
+
     next: parentRes => {
 
       /* -------------------------------------------------
-       CREDIT LIMIT RESPONSE CHECK
+       CREDIT LIMIT RESPONSE
       -------------------------------------------------- */
       if (parentRes?.data?.credit_limit_exceeded) {
-        console.log("Credit limit exceeded — showing modal");
         this.pendingCreditLimitPayload = payload;
         this.pendingCreditLimitAction = 'create';
         this.showCreditLimitModal(parentRes.data);
@@ -2359,6 +2531,44 @@ createSaleOrder() {
       const parentOrder = parentRes.data.sale_order;
       const parentOrderId = parentOrder.sale_order_id;
 
+      /* -------------------------------------------------
+       QUICK PACK CREATION (SAFE PLACE)
+      -------------------------------------------------- */
+      if (this.createQuickPack) {
+
+        const customerName = payload.sale_order?.customer?.name || 'Customer';
+        const productNames = payload.sale_order_items?.map(i => i.product?.name) || [];
+
+        let quickPackName = `${customerName} QuickPack (${productNames.join(', ')})`;
+
+        if (quickPackName.length > 50) {
+          quickPackName =
+            `${customerName} QuickPack (${productNames[0]} +${productNames.length - 1} more)`;
+        }
+
+        const quickPackPayload = {
+          quick_pack_data: {
+            name: quickPackName,
+            customer_id: payload.sale_order.customer?.customer_id,
+            description: `QuickPack created from Sale Order ${parentOrder.order_no}`,
+            active: 'Y',
+            lot_qty: payload.sale_order_items.reduce((s, i) => s + (i.quantity || 0), 0)
+          },
+          quick_pack_data_items: payload.sale_order_items.map(i => ({
+            product_id: i.product?.product_id,
+            quantity: i.quantity,
+            unit_options_id: i.unit_options?.unit_options_id,
+            size_id: i.size?.size_id,
+            color_id: i.color?.color_id
+          }))
+        };
+
+        this.http.post('sales/quick_pack/', quickPackPayload).subscribe();
+      }
+
+      /* -------------------------------------------------
+       SEND WHATSAPP
+      -------------------------------------------------- */
       this.sendSaleOrderWhatsapp(parentOrderId);
 
       /* -------------------------------------------------
@@ -2378,13 +2588,11 @@ createSaleOrder() {
               sale_order_id: undefined,
               order_no: childOrderNo,
               flow_status: { flow_status_name: 'Production' },
-
               item_value: 0,
               total_amount: 0,
               tax_amount: 0,
               dis_amt: 0,
               cess_amount: 0,
-
               order_type: parentOrder.order_type || 'sale_order'
             },
             sale_order_items: [{
@@ -2396,6 +2604,7 @@ createSaleOrder() {
               cgst: 0,
               sgst: 0,
               igst: 0,
+              mrp: item.rate,
               production_qty: item.quantity
             }],
             order_attachments: payload.order_attachments,
@@ -2446,13 +2655,16 @@ createSaleOrder() {
       this.showSuccessToast = true;
       this.toastMessage = 'Sale Order created successfully';
 
-      setTimeout(() => (this.showSuccessToast = false), 3000);
+      setTimeout(() => {
+        this.showSuccessToast = false;
+      }, 3000);
+
       this.ngOnInit();
     },
 
     error: err => {
 
-      /* CREDIT LIMIT BLOCKED (NON ADMIN) */
+      /* CREDIT LIMIT BLOCKED */
       if (err.status === 403 && err.error?.data?.credit_limit_exceeded) {
         this.pendingCreditLimitPayload = null;
         this.showCreditLimitModal(err.error.data);
@@ -2465,6 +2677,7 @@ createSaleOrder() {
     }
   });
 }
+
 
 
 
@@ -4660,6 +4873,7 @@ getUnitData(unitInfo: any) {
                                   .filter(item => item.product_id)   // only keep valid rows
                                   .map(item => ({
                                     ...item,
+                                    quantity: Number(item.quantity || 0) - Number(item.production_qty || 0),
                                     discount: item.discount
                                 })),
                                 order_attachments: orderAttachments,

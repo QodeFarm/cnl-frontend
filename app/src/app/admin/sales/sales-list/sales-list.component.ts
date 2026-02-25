@@ -465,23 +465,23 @@ export class SalesListComponent {
               // this.router.navigateByUrl('/admin/sales/edit/' + row.sale_order_id);
             }
           },
-          {
-            type: 'callBackFn',
-            icon: 'fa fa-file-invoice',
-            // label: 'Create Invoice',
-            tooltip: 'Create Invoice for this order',
-            callBackFn: (row, action) => {
-              const flowStatusName = row.flow_status?.flow_status_name;
+          // {
+          //   type: 'callBackFn',
+          //   icon: 'fa fa-file-invoice',
+          //   // label: 'Create Invoice',
+          //   tooltip: 'Create Invoice for this order',
+          //   callBackFn: (row, action) => {
+          //     const flowStatusName = row.flow_status?.flow_status_name;
 
-              if (flowStatusName === 'Ready for Invoice') {
-                // Only create invoice if order is ready
-                this.createInvoiceFromList(row);
-              } else {
-                // Show modal warning
-                this.showOrderNotReadyModal();
-              }
-            }
-          }
+          //     if (flowStatusName === 'Ready for Invoice') {
+          //       // Only create invoice if order is ready
+          //       this.createInvoiceFromList(row);
+          //     } else {
+          //       // Show modal warning
+          //       this.showOrderNotReadyModal();
+          //     }
+          //   }
+          // }
 
         ]
       }
@@ -515,16 +515,32 @@ closeNotReadyInvoiceDialog() {
       : [{ key: 'summary', value: 'true' }];
   }
 
+// Method to update invoiced status using HttpClient
+  updateInvoicedStatusDirectly_1(itemId: number, status: string) {
+    const apiUrl = `sales/sale_order_items/${itemId}/`;
+    const payload = { invoiced: status };
+    console.log("{ invoiced: status } : ", payload);
+    this.http.patch(apiUrl, payload).subscribe(
+      response => {
+        console.log("Invoiced status updated successfully", response);
+      },
+      error => {
+        console.error("Error updating invoiced status", error);
+      }
+    );
+  }
 
-createInvoiceFromList(row: any) {
-  if (!row) return;
-
-  const saleOrderId = row.sale_order_id;
+createInvoiceFromList(sale_order_id: any) {
+  // if (!row) {
+  //   console.log("No row data available to create invoice");
+  //   return;
+  // };
+  const saleOrderId = sale_order_id;
   if (!saleOrderId) return;
 
   this.showLoading = true; // optional spinner
 
-  // 1️⃣ Fetch full sale order
+  // 1️Fetch full sale order
   this.http.get(`sales/sale_order/${saleOrderId}/`).subscribe(
     (res: any) => {
       const saleOrder = res.data;
@@ -550,7 +566,7 @@ createInvoiceFromList(row: any) {
       let amountTotal = 0;
 
       saleOrderItems.forEach(item => {
-        const quantity = Number(item.quantity) || 0;
+        const quantity = Number(item.quantity || 0) - Number(item.production_qty || 0);
         const rate = Number(item.rate) || 0;
         const discountPercent = Number(item.discount) || 0;
         const itemVal = quantity * rate;
@@ -563,11 +579,37 @@ createInvoiceFromList(row: any) {
       });
 
       const totalTax = saleOrderItems.reduce((sum, item) => {
-        const cgst = Number(item.cgst) || 0;
-        const igst = Number(item.igst) || 0;
-        const sgst = Number(item.sgst) || 0;
-        return sum + cgst + igst + sgst;
+        const quantity = Number(item.quantity || 0) - Number(item.production_qty || 0);
+
+        const rate = Number(item.rate) || 0;
+        let tax = 0;
+        tax = (quantity * rate) * (Number(item.product.gst_input) || 0)/100 ; //50/2 --> 25
+        // If IGST exists → use IGST
+        // if (Number(item.igst) > 0) {
+          
+        // } 
+        // // Otherwise use CGST + SGST
+        // else {
+        //   tax = (quantity * rate) * (Number(item.product.gst_input) || 0)/100 ; 
+        //   const cgst = tax / 2; // Split tax equally for CGST and SGST
+        //   const sgst = tax / 2; // Split tax equally for CGST and SGST
+        //   tax = cgst + sgst;
+        // }
+
+        return sum + tax;
       }, 0);
+
+      saleOrderItems.forEach(item => {
+                  if (item.igst > 0) {
+                    item.igst = totalTax;
+                  } else {
+                    item.cgst = totalTax / 2;
+                    item.sgst = totalTax / 2;
+                  }
+                });
+      // const cgst = tax / 2; // Split tax equally for CGST and SGST
+      // const sgst = tax / 2;
+      // const igst = tax / 2;
 
       const cessAmount = Number(saleOrder.cess_amount) || 0;
       const disAmt = Number(saleOrder.dis_amt) || 0;
@@ -578,6 +620,13 @@ createInvoiceFromList(row: any) {
       const saleTypeName = saleOrder.sale_type?.name || '';
       const billType = (saleTypeName === 'Other') ? 'OTHERS' : 'CASH';
       const invoicePrefix = (saleTypeName === 'Other') ? 'SOO-INV' : 'SO-INV';
+
+      // saleOrderItems.forEach(item => {
+      //       if (item.invoiced === 'NO') {
+      //         item.invoiced = 'YES';
+      //         this.updateInvoicedStatusDirectly_1(item.sale_order_item_id, 'YES');
+      //       }
+      //     });
 
       // Generate invoice number (optional, async)
       this.http.get(`masters/generate_order_no/?type=${invoicePrefix}`).subscribe((invRes: any) => {
@@ -630,6 +679,7 @@ createInvoiceFromList(row: any) {
               .filter(item => item.product_id)
               .map(item => ({
                 ...item,
+                quantity: Number(item.quantity || 0) - Number(item.production_qty || 0),
                 discount: item.discount
               })),
             order_attachments: orderAttachments,
@@ -679,6 +729,164 @@ nowDate = () => {
     const date = new Date();
     return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   }
+
+
+// onFlowStatusSelect(event: Event): void {
+//   const selectElement = event.target as HTMLSelectElement;
+//   const selectedValue = selectElement.value;
+
+//   const selectedIds = this.taTableComponent.options.checkedRows;
+
+//   if (selectedIds.length === 0) {
+//     this.showDialog();
+//     selectElement.value = '';
+//     return;
+//   }
+
+//   const saleOrderId = selectedIds[0];
+
+//   // CREATE INVOICE
+//   if (selectedValue === 'create_invoice') {
+//     this.http.get(`sales/sale_order/${saleOrderId}/`).subscribe(
+//       (res: any) => {
+//         const row = res?.data;
+
+//         if (!row) {
+//           console.error("Sale order data not found");
+//           return;
+//         }
+
+//         const flowStatusName = row.sale_order.flow_status?.flow_status_name;
+//         console.log("Current flow status:", flowStatusName);
+
+//         if (flowStatusName === 'Ready for Invoice') {
+//           console.log("Order is ready for invoice. Proceeding to create invoice...");
+//           this.createInvoiceFromList(saleOrderId);
+//           console.log("createInvoiceFromList method called with ID:", saleOrderId);
+//         } else {
+//           this.showOrderNotReadyModal();
+//         }
+//       },
+//       (error) => {
+//         console.error("Error fetching sale order", error);
+//       }
+//     );
+
+//     selectElement.value = '';
+//     return;
+//   }
+
+//   // UPDATE FLOW STATUS
+//   if (selectedValue) {
+//     this.updateFlowStatus(selectedValue);
+//   }
+
+//   selectElement.value = '';
+// }
+
+onFlowStatusSelect(event: Event): void {
+  const selectElement = event.target as HTMLSelectElement;
+  const selectedValue = selectElement.value;
+
+  const selectedIds = this.taTableComponent.options.checkedRows;
+  const saleOrderId = selectedIds[0];
+
+  if (selectedValue === 'dispatch') {
+    this.updateFlowStatus('Dispatch');
+  }
+
+  if (selectedValue === 'create_invoice') {
+    // this.http.get(`sales/sale_order/${saleOrderId}/`).subscribe((res: any) => {
+    //   const row = res?.data;
+    //   this.createInvoiceFromList(saleOrderId);
+    // });
+    this.createInvoiceFromList(saleOrderId);
+  }
+
+  selectElement.value = '';
+}
+
+updateFlowStatus(statusName: string): void {
+  const selectedIds = this.taTableComponent.options.checkedRows;
+
+  if (selectedIds.length === 0) {
+    return this.showDialog();
+  }
+
+  const saleOrderId = selectedIds[0];
+
+  // Step 1: Fetch flow status record
+  this.http
+    .get(`masters/flow_status/?flow_status_name=${statusName}`)
+    .subscribe((flowRes: any) => {
+      const flow_status_id = flowRes?.data?.[0]?.flow_status_id;
+
+      if (!flow_status_id) {
+        console.error('Flow status not found');
+        return;
+      }
+
+      const apiUrl = `sales/sale_order/${saleOrderId}/`;
+
+      const payload = {
+        flow_status_id: flow_status_id
+      };
+
+      // Step 2: Update sale order
+      this.http.patch(apiUrl, payload).subscribe(
+        (response) => {
+          this.showSuccessToast = true;
+          this.toastMessage = `Flow Status updated to ${statusName}`;
+          this.refreshTable();
+
+          setTimeout(() => {
+            this.showSuccessToast = false;
+          }, 2000);
+        },
+        (error) => {
+          console.error('Error updating flow status', error);
+        }
+      );
+    });
+}
+
+showFlowStatusDropdown = false;
+availableActions: string[] = [];
+
+checkFlowStatusOptions() {
+  const selectedIds = this.taTableComponent.options.checkedRows;
+
+  if (selectedIds.length !== 1) {
+    this.showFlowStatusDropdown = false;
+    return;
+  }
+
+  const saleOrderId = selectedIds[0];
+
+  this.http.get(`sales/sale_order/${saleOrderId}/`).subscribe((res: any) => {
+    const row = res?.data;
+    const flowStatus = row?.sale_order.flow_status?.flow_status_name;
+
+    this.availableActions = [];
+
+    if (flowStatus === 'Review Inventory') {
+      this.availableActions.push('dispatch');
+    }
+
+    if (flowStatus === 'Ready for Invoice') {
+      this.availableActions.push('create_invoice');
+    }
+
+    this.showFlowStatusDropdown = this.availableActions.length > 0;
+  });
+}
+
+ngAfterViewInit() {
+  setInterval(() => {
+    this.checkFlowStatusOptions();
+  }, 500);
+}
+
 
 
 }

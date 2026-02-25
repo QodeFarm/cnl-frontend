@@ -3,18 +3,56 @@
     <div class="bottom-left" bottom-left>
         <div class="d-flex align-items-center">
             <!-- Mail Dropdown - Modified to hide default option in dropdown -->
-            <select class="form-select me-2" (change)="onSelect($event)">
+            <!-- <select class="form-select me-2" (change)="onSelect($event)">
                 <option value="" disabled selected hidden>Sending Mail</option>
                 <option value="email">Email</option>
                 <option value="whatsapp">WhatsApp</option>
-            </select>
+            </select> -->
             
             <!-- Print Dropdown -->
-            <select class="form-select me-2" (change)="onPrintSelect($event)">
+            <!-- <select class="form-select me-2" (change)="onPrintSelect($event)">
                 <option value="" disabled selected hidden>Print Document</option>
                 <option value="preview">Preview</option>
                 <option value="print">Print</option>
-            </select>
+            </select> -->
+
+            <!-- <select class="form-select me-2" (change)="onFlowStatusSelect($event)">
+                <option value="" disabled selected hidden>Flow Status</option>
+                <option value="dispatch">Dispatch</option>
+                <option value="create_invoice">Create Invoice</option>
+            </select> -->
+
+            <div class="bottom-actions">
+                <div class="left-actions">
+                    <select class="form-select">
+                    <option hidden>Sending Mail</option>
+                    <option>Email</option>
+                    <option>WhatsApp</option>
+                    </select>
+
+                    <select class="form-select">
+                    <option hidden>Print Document</option>
+                    <option>Preview</option>
+                    <option>Print</option>
+                    </select>
+
+                    <!-- Flow Status -->
+                    <select 
+                    *ngIf="showFlowStatusDropdown"
+                    class="form-select"
+                    (change)="onFlowStatusSelect($event)">
+                    <option hidden>Flow Status</option>
+
+                    <option *ngIf="availableActions.includes('dispatch')" value="dispatch">
+                        Dispatch
+                    </option>
+
+                    <option *ngIf="availableActions.includes('create_invoice')" value="create_invoice">
+                        Create Invoice
+                    </option>
+                    </select>
+                </div>
+                </div>
         </div>
     </div>
 
