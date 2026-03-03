@@ -7,7 +7,7 @@
 
   // Hide Actions column & Add button ONLY on tables that DON'T opt-in.
   // Tables with .address-table-actions are exempted.
-  .custom-form-list:not(.address-table-actions) {
+  .custom-form-list:not(.address-table-actions):not(.comm-address-table) {
     .table {
       th.sticky-column,
       td.sticky-column {
@@ -22,155 +22,27 @@
   }
 
   // ============================================================
-  // ADDRESS TABLE — ERP-grade professional styling
+  // SHARED ADDRESS TABLE STYLES
+  // Scrollable container + min column widths (matches vendor's no-ant-card)
   // ============================================================
-
-  .address-table-actions {
-
-    // ---- Card container ----
-    .ant-card {
-      border: 1px solid #e2e8f0;
-      border-radius: 6px;
-      overflow: hidden;
-    }
-
+  .address-table-actions,
+  .comm-address-table {
     .ant-card-body {
-      padding: 0 !important;
+      padding: 0;
     }
 
-    // ---- Card header (title + action buttons) ----
-    .ant-card-head {
-      padding: 0 16px;
-      min-height: 48px;
-      background: linear-gradient(135deg, #f8fafc 0%, #eef2f7 100%);
-      border-bottom: 1px solid #e2e8f0;
-
-      .ant-card-head-title {
-        padding: 10px 0;
-        font-size: 15px;
-        font-weight: 700;
-        color: #142768;
-        letter-spacing: 0.3px;
-      }
-
-      .ant-card-extra {
-        padding: 8px 0;
-
-        // Style the Add button inside this specific table
-        .ant-btn-primary {
-          background: #142768 !important;
-          border-color: #142768 !important;
-          font-weight: 500;
-          font-size: 12px;
-          border-radius: 4px;
-        }
-      }
-    }
-
-    // ---- Hide delete on Billing row (always 1st row) ----
-    .table tbody tr.ant-table-row:first-child td.sticky-column button {
-      display: none;
-    }
-
-    // ---- Scrollable container ----
     .ant-table-container {
       overflow-x: auto;
-
-      &::-webkit-scrollbar {
-        height: 8px;
-      }
-      &::-webkit-scrollbar-track {
-        background: #f1f5f9;
-        border-radius: 4px;
-      }
-      &::-webkit-scrollbar-thumb {
-        background: linear-gradient(90deg, #1a3278 0%, #142768 100%);
-        border-radius: 4px;
-        &:hover { background: #0f1d52; }
-      }
+      display: block;
     }
 
-    // ---- Action column (delete) ----
-    .sticky-column {
-      min-width: 70px !important;
-      width: 70px !important;
-      max-width: 70px !important;
-      box-shadow: none !important;
-      vertical-align: middle !important;
-      text-align: center !important;
-
-      // Delete button polish
-      button {
-        width: 32px;
-        height: 32px;
-        padding: 0;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 6px;
-        border: 1px solid #fca5a5;
-        background: #fff5f5;
-        color: #dc2626;
-        transition: all 0.2s ease;
-
-        &:hover {
-          background: #fee2e2;
-          border-color: #ef4444;
-          transform: scale(1.05);
-        }
-
-        i {
-          font-size: 13px;
-        }
-      }
-    }
-
-    // ---- Table structure ----
     .table {
-      min-width: 1100px;
-      table-layout: fixed;
-      margin-bottom: 0;
-      border-collapse: separate;
-      border-spacing: 0;
-
-      // Header row — match global ERP theme
       thead th {
-        background: #142768;
-        color: #fff;
-        font-weight: 500;
-        font-size: 13px;
-        padding: 10px 12px;
-        text-align: center;
+        min-width: 120px;
         white-space: nowrap;
-        border: none;
-        border-right: 1px solid rgba(255,255,255,0.1);
-
-        &:last-child { border-right: none; }
       }
 
-      // Data rows
-      tbody td {
-        padding: 8px 10px;
-        vertical-align: middle;
-        border-bottom: 1px solid #f0f0f0;
-        border-right: 1px solid #f0f0f0;
-        background: #fff;
-        transition: background 0.15s;
-
-        &:last-child { border-right: none; }
-      }
-
-      // Zebra striping
-      tbody tr.ant-table-row:nth-child(even) td {
-        background: #f8fafc;
-      }
-
-      // Hover highlight
-      tbody tr.ant-table-row:hover td {
-        background: #eef4ff;
-      }
-
-      // Force form fields to fill cell width
+      // Ensure form fields fill cells (dropdowns, inputs, textareas)
       td {
         formly-field {
           display: block;
@@ -178,27 +50,26 @@
           padding: 0 !important;
         }
 
-        formly-field > *,
-        .ant-select,
         nz-select,
+        .ant-select,
         input,
         textarea {
           width: 100% !important;
-          display: block;
-        }
-
-        // Clean select / input look inside cells
-        input, .ant-select-selector, textarea {
-          border-radius: 4px !important;
-          border-color: #d9d9d9 !important;
-          font-size: 13px;
-
-          &:focus, &:hover {
-            border-color: #142768 !important;
-            box-shadow: 0 0 0 2px rgba(20,39,104,0.08) !important;
-          }
         }
       }
+    }
+  }
+
+  // ============================================================
+  // ADDRESS TABLE (Tax Details)
+  // Only overrides what's specific to the address table:
+  //   • Billing row (1st row) — no delete button
+  // ============================================================
+  .address-table-actions {
+
+    // Hide delete on Billing row (always 1st row)
+    .table tbody tr.ant-table-row:first-child td.sticky-column button {
+      display: none;
     }
   }
 
@@ -219,6 +90,28 @@
 
   .communication-actions {
     padding: 8px 0;
+  }
+
+  // ============================================================
+  // COMMUNICATION ADDRESS TABLE
+  // Inherits all styling from global .custom-form-list (styles.scss).
+  // Only overrides what's specific to communication address:
+  //   • single row — no Add button, no Actions column
+  // ============================================================
+  .comm-address-table {
+
+    // Hide actions column (single row, no delete needed)
+    .table {
+      th.sticky-column,
+      td.sticky-column {
+        display: none !important;
+      }
+    }
+
+    // Hide the Add Row button (only 1 communication address)
+    .ant-card-extra .ant-btn-primary {
+      display: none !important;
+    }
   }
 
 } // end :host ::ng-deep
@@ -294,73 +187,7 @@
     }
 }   
 
-.custom-dialog-overlay {
-
-    position: fixed;
-  
-    top: 0;
-  
-    left: 0;
-  
-    width: 100vw;
-  
-    height: 100vh;
-  
-    background: rgba(0, 0, 0, 0.5); /* Dark overlay */
-  
-    display: flex;
-  
-    justify-content: center;
-  
-    align-items: center;
-  
-    z-index: 999; /* Ensure it's above other elements */
-  
-  }
-  
-  .custom-dialog-box {
-  
-    background-color: #fff;
-  
-    padding: 20px;
-  
-    border-radius: 10px;
-  
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  
-    text-align: center;
-  
-    width: 300px;
-  
-  }
-  
-  .custom-dialog-box p {
-  
-    margin-bottom: 20px;
-  
-  }
-  
-  .custom-dialog-box button {
-  
-    padding: 10px 20px;
-  
-    background-color: #007bff;
-  
-    color: white;
-  
-    border: none;
-  
-    border-radius: 5px;
-  
-    cursor: pointer;
-  
-  }
-  
-  .custom-dialog-box button:hover {
-  
-    background-color: #0056b3;
-  
-  }
+/* Dialog styles handled globally in styles.scss */
 
 // Import Loading & Results Styles
 .import-loading-container {

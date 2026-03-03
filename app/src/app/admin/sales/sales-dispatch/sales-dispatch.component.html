@@ -1,7 +1,8 @@
 <div class="container-fluid pt-3">
   <div class="row">
     <div class="col-12 px-2 py-1">
-      <ta-curd-modal [options]="curdConfig" [customProductTemplate]="customProductTemplate" class="custom-list sale-receipt-table" ></ta-curd-modal>
+      <ta-curd-modal [options]="curdConfig" [customProductTemplate]="customProductTemplate"
+        class="custom-list sale-receipt-table"></ta-curd-modal>
     </div>
   </div>
 </div>
@@ -23,8 +24,19 @@
     <h5>Confirm Dispatch</h5>
     <p>Are you sure you want to confirm dispatch for the order {{ selectedOrder?.order_no }}?</p>
     <div class="dialog-actions">
-      <button class="btn btn-secondary" (click)="closeModal()">Cancel</button>
-      <button class="btn btn-primary" (click)="confirmDispatch()">Confirm</button>
+      <button class="btn-cancel" (click)="closeModal()">Cancel</button>
+      <button class="btn-confirm" (click)="confirmDispatch()">Confirm</button>
     </div>
   </div>
 </div>
+
+<!-- Notification Action Template -->
+<ng-template #notificationActionTpl>
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+    <span>Dispatch successful for <b>{{ dispatchedOrderContext?.order_no }}</b></span>
+    <button (click)="navigateToInvoice()"
+      style="background: #142768; color: #fff; border: none; border-radius: 4px; padding: 6px 16px; font-size: 13px; font-weight: 600; cursor: pointer; align-self: flex-start; margin-top: 4px;">
+      Create Sales Invoice
+    </button>
+  </div>
+</ng-template>

@@ -167,7 +167,7 @@ export class SalesListComponent {
     }
 
     const saleOrderId = selectedIds[0]; // Assuming only one row can be selected
-    
+
     const payload = { flag: "email", format: this.selectedFormat };
 
     const url = `masters/document_generator/${saleOrderId}/sale_order/`;
@@ -206,7 +206,7 @@ export class SalesListComponent {
       (pdfBlob: Blob) => {
         this.showLoading = false;
         this.refreshTable();
-        
+
 
         // Create blob URL and open in new window
         const blobUrl = URL.createObjectURL(pdfBlob);
@@ -425,10 +425,26 @@ export class SalesListComponent {
         name: 'Flow Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          return row.flow_status?.flow_status_name || row.flow_status_id || '';
+          const name = row.flow_status?.flow_status_name || '';
+          if (!name) return '';
+          const classMap: Record<string, string> = {
+            'Pending': 'fb-pending',
+            'Review Inventory': 'fb-review',
+            'Review for Inventory': 'fb-review',
+            'Production': 'fb-production',
+            'Dispatch': 'fb-dispatch',
+            'Ready for Invoice': 'fb-ready-invoice',
+            'Delivery In progress': 'fb-delivery',
+            'Delivery in Progress': 'fb-delivery',
+            'Delivery In Progress': 'fb-delivery',
+            'Partially Delivered': 'fb-partial',
+            'Completed': 'fb-completed'
+          };
+          const cls = classMap[name] || 'fb-default';
+          return `<span class="flow-badge ${cls}">${name}</span>`;
         },
         sort: true,
-        width: '160px',
+        width: '180px',
         tdClassName: 'sticky-flow-status'
       },
       {
@@ -489,16 +505,16 @@ export class SalesListComponent {
   };
 
   // Show the "Not ready for invoice" modal
-showOrderNotReadyModal() {
-  const modal = document.getElementById('notReadyInvoiceDialog');
-  if (modal) modal.style.display = 'flex';
-}
+  showOrderNotReadyModal() {
+    const modal = document.getElementById('notReadyInvoiceDialog');
+    if (modal) modal.style.display = 'flex';
+  }
 
-// Close the modal
-closeNotReadyInvoiceDialog() {
-  const modal = document.getElementById('notReadyInvoiceDialog');
-  if (modal) modal.style.display = 'none';
-}
+  // Close the modal
+  closeNotReadyInvoiceDialog() {
+    const modal = document.getElementById('notReadyInvoiceDialog');
+    if (modal) modal.style.display = 'none';
+  }
 
   private setApiUrlBasedOnUser() {
     const user = this.localStorage.getItem('user');
@@ -516,166 +532,172 @@ closeNotReadyInvoiceDialog() {
   }
 
 
-createInvoiceFromList(row: any) {
-  if (!row) return;
+  createInvoiceFromList(row: any) {
+    if (!row) return;
 
-  const saleOrderId = row.sale_order_id;
-  if (!saleOrderId) return;
-
-  this.showLoading = true; // optional spinner
-
-  // 1️⃣ Fetch full sale order
-  this.http.get(`sales/sale_order/${saleOrderId}/`).subscribe(
-    (res: any) => {
-      const saleOrder = res.data;
-      if (!saleOrder) {
-        this.showLoading = false;
-        console.error("Sale order data not found!");
-        return;
-      }
-
-      const saleOrderItems = saleOrder.sale_order_items || [];
-      const orderAttachments = saleOrder.order_attachments || [];
-      const orderShipments = saleOrder.order_shipments || [];
-
-      const customerId =
-        saleOrder.customer_id ||
-        saleOrder.customer?.customer_id ||
-        saleOrder.sale_order?.customer_id;
-
-      console.log('FINAL customerId:', customerId);
-
-      // 2️⃣ Calculate totals
-      let itemValue = 0;
-      let amountTotal = 0;
-
-      saleOrderItems.forEach(item => {
-        const quantity = Number(item.quantity) || 0;
-        const rate = Number(item.rate) || 0;
-        const discountPercent = Number(item.discount) || 0;
-        const itemVal = quantity * rate;
-        const itemDiscount = (itemVal * discountPercent) / 100;
-        const amount = itemVal - itemDiscount;
-
-        item.amount = amount;
-        itemValue += itemVal;
-        amountTotal += amount;
-      });
-
-      const totalTax = saleOrderItems.reduce((sum, item) => {
-        const cgst = Number(item.cgst) || 0;
-        const igst = Number(item.igst) || 0;
-        const sgst = Number(item.sgst) || 0;
-        return sum + cgst + igst + sgst;
-      }, 0);
-
-      const cessAmount = Number(saleOrder.cess_amount) || 0;
-      const disAmt = Number(saleOrder.dis_amt) || 0;
-      const totalAmount = amountTotal + totalTax;
-      const finalTotal = totalAmount - disAmt + cessAmount;
-
-      // 3️⃣ Determine bill_type and invoice number
-      const saleTypeName = saleOrder.sale_type?.name || '';
-      const billType = (saleTypeName === 'Other') ? 'OTHERS' : 'CASH';
-      const invoicePrefix = (saleTypeName === 'Other') ? 'SOO-INV' : 'SO-INV';
-
-      // Generate invoice number (optional, async)
-      this.http.get(`masters/generate_order_no/?type=${invoicePrefix}`).subscribe((invRes: any) => {
-        const invoiceNo = invRes?.data?.order_number;
-
-        // Fetch order_status_id for "Pending" (workflow)
-        this.http.get('masters/order_status/?status_name=Pending').subscribe((statusRes: any) => {
-          const completedStatusId = statusRes?.data?.[0]?.order_status_id;
-
-          // 4️⃣ Construct final payload with all required fields
-          const invoiceData = {
-            sale_invoice_order: {
-              customer_id: customerId,
-              bill_type: billType,
-              invoice_date: this.nowDate(),
-              email: saleOrder.email,
-              ref_no: saleOrder.ref_no,
-              ref_date: this.nowDate(),
-              due_date: this.nowDate(),
-              tax: saleOrder.tax || 'Inclusive',
-              remarks: saleOrder.remarks,
-              advance_amount: saleOrder.advance_amount || '0',
-              tax_amount: totalTax,
-              item_value: itemValue,
-              discount: saleOrder.discount,
-              dis_amt: disAmt,
-              taxable: saleOrder.taxable,
-              cess_amount: cessAmount,
-              transport_charges: saleOrder.transport_charges,
-              round_off: saleOrder.round_off,
-              total_amount: finalTotal,
-              vehicle_name: saleOrder.vehicle_name,
-              total_boxes: saleOrder.total_boxes,
-              shipping_address: saleOrder.shipping_address,
-              billing_address: saleOrder.billing_address,
-              gst_type_id: saleOrder.gst_type_id,
-              order_type: 'sale_invoice',
-              order_salesman_id: saleOrder.order_salesman_id,
-              customer_address_id: saleOrder.customer_address_id,
-              payment_term_id: saleOrder.payment_term_id,
-              payment_link_type_id: saleOrder.payment_link_type_id,
-              ledger_account_id: saleOrder.ledger_account_id,
-              flow_status: saleOrder.flow_status,
-              order_status_id: completedStatusId,
-              // sale_order: saleOrder.sale_order,
-              sale_order_id: saleOrderId,
-              ...(billType === 'OTHERS' && { invoice_no: invoiceNo })
-            },
-            sale_invoice_items: saleOrderItems
-              .filter(item => item.product_id)
-              .map(item => ({
-                ...item,
-                discount: item.discount
-              })),
-            order_attachments: orderAttachments,
-            order_shipments: orderShipments
-          };
-
-          console.log('Final invoiceData:', invoiceData);
-
-          // 5️⃣ Call backend to create invoice
-          this.http.post('sales/sale_invoice_order/', invoiceData).subscribe(
-            (resp: any) => {
-              console.log('Invoice created successfully from list:', resp);
-
-              // Move workflow to next stage
-              this.http.post(`sales/SaleOrder/${saleOrderId}/move_next_stage/`, {}).subscribe(
-                nextStageRes => {
-                  console.log('Moved to next stage successfully', nextStageRes);
-                  this.toastMessage = 'Invoice created & workflow moved';
-                  this.showSuccessToast = true;
-                  setTimeout(() => this.showSuccessToast = false, 3000);
-                  this.showLoading = false;
-                },
-                nextStageErr => {
-                  console.error('Error moving workflow', nextStageErr);
-                  this.showLoading = false;
-                }
-              );
-            },
-            err => {
-              console.error('Error creating invoice from list', err);
-              this.showLoading = false;
-            }
-          );
-
-        }); // end get order_status_id
-      }); // end generate invoice_no
-
-    },
-    err => {
-      console.error('Error fetching sale order by ID', err);
-      this.showLoading = false;
+    const flowStatusName = (row.flow_status?.flow_status_name || '').toLowerCase();
+    if (flowStatusName !== 'ready for invoice') {
+      this.showOrderNotReadyModal();
+      return;
     }
-  );
-}
 
-nowDate = () => {
+    const saleOrderId = row.sale_order_id;
+    if (!saleOrderId) return;
+
+    this.showLoading = true; // optional spinner
+
+    // 1️⃣ Fetch full sale order
+    this.http.get(`sales/sale_order/${saleOrderId}/`).subscribe(
+      (res: any) => {
+        const saleOrder = res.data;
+        if (!saleOrder) {
+          this.showLoading = false;
+          console.error("Sale order data not found!");
+          return;
+        }
+
+        const saleOrderItems = saleOrder.sale_order_items || [];
+        const orderAttachments = saleOrder.order_attachments || [];
+        const orderShipments = saleOrder.order_shipments || [];
+
+        const customerId =
+          saleOrder.customer_id ||
+          saleOrder.customer?.customer_id ||
+          saleOrder.sale_order?.customer_id;
+
+        console.log('FINAL customerId:', customerId);
+
+        // 2️⃣ Calculate totals
+        let itemValue = 0;
+        let amountTotal = 0;
+
+        saleOrderItems.forEach(item => {
+          const quantity = Number(item.quantity) || 0;
+          const rate = Number(item.rate) || 0;
+          const discountPercent = Number(item.discount) || 0;
+          const itemVal = quantity * rate;
+          const itemDiscount = (itemVal * discountPercent) / 100;
+          const amount = itemVal - itemDiscount;
+
+          item.amount = amount;
+          itemValue += itemVal;
+          amountTotal += amount;
+        });
+
+        const totalTax = saleOrderItems.reduce((sum, item) => {
+          const cgst = Number(item.cgst) || 0;
+          const igst = Number(item.igst) || 0;
+          const sgst = Number(item.sgst) || 0;
+          return sum + cgst + igst + sgst;
+        }, 0);
+
+        const cessAmount = Number(saleOrder.cess_amount) || 0;
+        const disAmt = Number(saleOrder.dis_amt) || 0;
+        const totalAmount = amountTotal + totalTax;
+        const finalTotal = totalAmount - disAmt + cessAmount;
+
+        // 3️⃣ Determine bill_type and invoice number
+        const saleTypeName = saleOrder.sale_type?.name || '';
+        const billType = (saleTypeName === 'Other') ? 'OTHERS' : 'CASH';
+        const invoicePrefix = (saleTypeName === 'Other') ? 'SOO-INV' : 'SO-INV';
+
+        // Generate invoice number (optional, async)
+        this.http.get(`masters/generate_order_no/?type=${invoicePrefix}`).subscribe((invRes: any) => {
+          const invoiceNo = invRes?.data?.order_number;
+
+          // Fetch order_status_id for "Pending" (workflow)
+          this.http.get('masters/order_status/?status_name=Pending').subscribe((statusRes: any) => {
+            const completedStatusId = statusRes?.data?.[0]?.order_status_id;
+
+            // 4️⃣ Construct final payload with all required fields
+            const invoiceData = {
+              sale_invoice_order: {
+                customer_id: customerId,
+                bill_type: billType,
+                invoice_date: this.nowDate(),
+                email: saleOrder.email,
+                ref_no: saleOrder.ref_no,
+                ref_date: this.nowDate(),
+                due_date: this.nowDate(),
+                tax: saleOrder.tax || 'Inclusive',
+                remarks: saleOrder.remarks,
+                advance_amount: saleOrder.advance_amount || '0',
+                tax_amount: totalTax,
+                item_value: itemValue,
+                discount: saleOrder.discount,
+                dis_amt: disAmt,
+                taxable: saleOrder.taxable,
+                cess_amount: cessAmount,
+                transport_charges: saleOrder.transport_charges,
+                round_off: saleOrder.round_off,
+                total_amount: finalTotal,
+                vehicle_name: saleOrder.vehicle_name,
+                total_boxes: saleOrder.total_boxes,
+                shipping_address: saleOrder.shipping_address,
+                billing_address: saleOrder.billing_address,
+                gst_type_id: saleOrder.gst_type_id,
+                order_type: 'sale_invoice',
+                order_salesman_id: saleOrder.order_salesman_id,
+                customer_address_id: saleOrder.customer_address_id,
+                payment_term_id: saleOrder.payment_term_id,
+                payment_link_type_id: saleOrder.payment_link_type_id,
+                ledger_account_id: saleOrder.ledger_account_id,
+                flow_status: saleOrder.flow_status,
+                order_status_id: completedStatusId,
+                // sale_order: saleOrder.sale_order,
+                sale_order_id: saleOrderId,
+                ...(billType === 'OTHERS' && { invoice_no: invoiceNo })
+              },
+              sale_invoice_items: saleOrderItems
+                .filter(item => item.product_id)
+                .map(item => ({
+                  ...item,
+                  discount: item.discount
+                })),
+              order_attachments: orderAttachments,
+              order_shipments: orderShipments
+            };
+
+            console.log('Final invoiceData:', invoiceData);
+
+            // 5️⃣ Call backend to create invoice
+            this.http.post('sales/sale_invoice_order/', invoiceData).subscribe(
+              (resp: any) => {
+                console.log('Invoice created successfully from list:', resp);
+
+                // Move workflow to next stage
+                this.http.post(`sales/SaleOrder/${saleOrderId}/move_next_stage/`, {}).subscribe(
+                  nextStageRes => {
+                    console.log('Moved to next stage successfully', nextStageRes);
+                    this.toastMessage = 'Invoice created & workflow moved';
+                    this.showSuccessToast = true;
+                    setTimeout(() => this.showSuccessToast = false, 3000);
+                    this.showLoading = false;
+                  },
+                  nextStageErr => {
+                    console.error('Error moving workflow', nextStageErr);
+                    this.showLoading = false;
+                  }
+                );
+              },
+              err => {
+                console.error('Error creating invoice from list', err);
+                this.showLoading = false;
+              }
+            );
+
+          }); // end get order_status_id
+        }); // end generate invoice_no
+
+      },
+      err => {
+        console.error('Error fetching sale order by ID', err);
+        this.showLoading = false;
+      }
+    );
+  }
+
+  nowDate = () => {
     const date = new Date();
     return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   }

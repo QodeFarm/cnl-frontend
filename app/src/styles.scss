@@ -1849,46 +1849,116 @@ nz-modal {
     cursor: pointer
 }
 
-/* This is a alert code*/
+/* ======== GLOBAL CUSTOM DIALOG ======== */
 .custom-dialog-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.5); /* Dark overlay */
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 999; /* Ensure it's above other elements */
+    z-index: 9999;
 }
 
 .custom-dialog-box {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 440px;
+    max-width: 94%;
+    background: #ffffff;
+    padding: 30px 34px 28px;
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
     text-align: center;
-    width: 300px;
-    position: relative; /* Ensure box doesn't inherit any odd positioning */
+    font-family: "Inter", "Segoe UI", sans-serif;
+    animation: dialogFadeUp 0.28s ease;
+}
+
+.custom-dialog-box h3,
+.custom-dialog-box h5 {
+    margin: 0 0 8px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #111827;
 }
 
 .custom-dialog-box p {
-    margin-bottom: 20px;
+    font-size: 15px;
+    color: #6b7280;
+    line-height: 1.6;
+    margin-bottom: 24px;
 }
 
-.custom-dialog-box button {
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
+.custom-dialog-box .dialog-actions {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+}
+
+/* Shared button base for all dialog buttons */
+.custom-dialog-box button,
+.custom-dialog-box .btn-cancel,
+.custom-dialog-box .btn-confirm,
+.custom-dialog-box .btn-ok {
+    min-width: 110px;
+    padding: 9px 16px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 8px;
     cursor: pointer;
+    transition: all 0.25s ease;
+    border: 1px solid #142768;
+    background: #142768;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(20, 39, 104, 0.2);
 }
 
-.custom-dialog-box button:hover {
-    background-color: #0056b3;
+.custom-dialog-box button:hover,
+.custom-dialog-box .btn-cancel:hover,
+.custom-dialog-box .btn-confirm:hover,
+.custom-dialog-box .btn-ok:hover {
+    background: #1a3593;
+    border-color: #1a3593;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(20, 39, 104, 0.3);
 }
+
+/* Cancel button - red variant (for confirm+cancel dialogs) */
+.custom-dialog-box .btn-cancel,
+.custom-dialog-box .dialog-actions .btn-danger,
+.custom-dialog-box .dialog-actions .btn-secondary {
+    background: #ef4444;
+    border-color: #ef4444;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+.custom-dialog-box .btn-cancel:hover,
+.custom-dialog-box .dialog-actions .btn-danger:hover,
+.custom-dialog-box .dialog-actions .btn-secondary:hover {
+    background: #dc2626;
+    border-color: #dc2626;
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.3);
+}
+
+/* Confirm / Primary button */
+.custom-dialog-box .btn-confirm,
+.custom-dialog-box .dialog-actions .btn-primary {
+    background: #142768;
+    border-color: #142768;
+    box-shadow: 0 4px 12px rgba(20, 39, 104, 0.2);
+}
+
+.custom-dialog-box .btn-confirm:hover,
+.custom-dialog-box .dialog-actions .btn-primary:hover {
+    background: #1a3593;
+    border-color: #1a3593;
+    box-shadow: 0 6px 16px rgba(20, 39, 104, 0.3);
+}
+
+@keyframes dialogFadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+/* ======== END GLOBAL CUSTOM DIALOG ======== */
 
 
 // inline form-fields styles beggin
@@ -3606,3 +3676,128 @@ ta-curd-modal,
 // END GLOBAL SEARCH BAR BUTTON SPACING
 // ============================================================
 
+
+// ============================================================
+// FLOW STATUS BADGES — class-based so Angular innerHTML doesn't strip styles
+// ============================================================
+.flow-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  line-height: 1.6;
+
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.8;
+    flex-shrink: 0;
+  }
+
+  &.fb-pending            { background: #f5f5f5; color: #595959; border: 1px solid #d9d9d9; }
+  &.fb-review             { background: #fffbe6; color: #875800; border: 1px solid #ffe58f; }
+  &.fb-production         { background: #e6f0ff; color: #142768; border: 1px solid #91b4ff; }
+  &.fb-dispatch           { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; }
+  &.fb-ready-invoice      { background: #f0fdf4; color: #15803d; border: 1px solid #86efac; }
+  &.fb-delivery           { background: #f5f3ff; color: #6d28d9; border: 1px solid #c4b5fd; }
+  &.fb-partial            { background: #fdf2f8; color: #be185d; border: 1px solid #f9a8d4; }
+  &.fb-completed          { background: #ecfdf5; color: #065f46; border: 1px solid #6ee7b7; }
+  &.fb-default            { background: #f0f4ff; color: #142768; border: 1px solid #91b4ff; }
+}
+
+// ============================================================
+// WORK ORDER BOARD — MODAL THEME OVERRIDES (global, nz-modal renders at body)
+// ============================================================
+
+/* ── Confirm Done Modal ── */
+.wo-done-modal-wrapper {
+  .ant-modal-content {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  }
+  .ant-modal-header {
+    background: linear-gradient(180deg, #1a3278 0%, #142768 100%) !important;
+    padding: 14px 24px;
+    border-bottom: none;
+    border-radius: 16px 16px 0 0;
+    .ant-modal-title { color: #fff !important; font-weight: 600; font-size: 16px; }
+  }
+  .ant-modal-close { color: #fff !important; &:hover { color: rgba(255,255,255,0.75); } }
+  .ant-modal-body  { padding: 24px; background: #fff; }
+  .ant-modal-footer { border-top: 1px solid #f0f0f0; padding: 12px 24px; background: #fff; border-radius: 0 0 16px 16px; }
+}
+
+/* ── Work Order Details Modal ── */
+.wo-view-modal-wrapper {
+  .ant-modal-content {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  }
+  .ant-modal-header {
+    background: linear-gradient(180deg, #1a3278 0%, #142768 100%) !important;
+    padding: 14px 24px;
+    border-bottom: none;
+    border-radius: 16px 16px 0 0;
+    .ant-modal-title { color: #fff !important; font-weight: 600; font-size: 16px; }
+  }
+  .ant-modal-close { color: #fff !important; &:hover { color: rgba(255,255,255,0.75); } }
+  .ant-modal-body  { padding: 20px 24px; max-height: 70vh; overflow-y: auto; background: #fff; }
+  .ant-modal-footer { border-top: 1px solid #f0f0f0; padding: 12px 24px; background: #fff; border-radius: 0 0 16px 16px; }
+
+  // nz-table header cells — project navy
+  .ant-table-thead > tr > th {
+    background: linear-gradient(180deg, #1a3278 0%, #142768 100%) !important;
+    color: #fff !important;
+    font-weight: 600;
+    font-size: 13px;
+    &::before { display: none !important; } // remove ant resizer separator
+  }
+  .ant-table-tbody > tr:hover > td { background: #f0f4ff !important; }
+  .ant-table-bordered .ant-table-thead > tr > th,
+  .ant-table-bordered .ant-table-tbody > tr > td {
+    border-color: #d6dff7;
+  }
+}
+
+/* ── Zero-Balance / Stock Error Modal ── */
+.wo-error-modal-wrapper {
+  .ant-modal-content {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  }
+  .ant-modal-header {
+    background: linear-gradient(135deg, #a8341e 0%, #7a1e10 100%) !important;
+    padding: 14px 24px;
+    border-bottom: none;
+    border-radius: 16px 16px 0 0;
+    .ant-modal-title { color: #fff !important; font-weight: 600; font-size: 16px; }
+  }
+  .ant-modal-close { color: #fff !important; &:hover { color: #ffd6d6; } }
+  .ant-modal-body  { padding: 28px 24px; background: #fff; }
+  .ant-modal-footer { border-top: 1px solid #f0f0f0; padding: 12px 24px; background: #fff; border-radius: 0 0 16px 16px; }
+}
+// ============================================================
+// END WORK ORDER BOARD MODAL THEME
+// ============================================================
+
+// ============================================================
+// COLUMN RESIZE — Global cursor override during drag
+// ============================================================
+body.col-resizing,
+body.col-resizing * {
+  cursor: col-resize !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}

@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { Router } from '@angular/router';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
@@ -26,6 +26,7 @@ export class VendorsComponent {
   showVendorList: boolean = false;
   showForm: boolean = false;
   VendorEditID: any;
+  isSubmitting: boolean = false;
   @ViewChild(VendorsListComponent) VendorsListComponent!: VendorsListComponent;
 
   // Import state tracking
@@ -50,7 +51,7 @@ export class VendorsComponent {
   private observer: MutationObserver;
   isDownloading: boolean;
 
-  constructor(private http: HttpClient, private notification: NzNotificationService,) { }
+  constructor(private http: HttpClient, private cdref: ChangeDetectorRef, private notification: NzNotificationService,) { }
 
   // ─── Bulk Edit State ─────────────────────────────────────────
   showBulkEditModal = false;
@@ -147,6 +148,7 @@ export class VendorsComponent {
   showSuccessToast = false;
   toastMessage = '';
   submitVendorForm() {
+    if (this.isSubmitting) return; // Prevent double-click
     const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
   
     // Determine the entity type and ID dynamically
@@ -171,6 +173,7 @@ export class VendorsComponent {
   
     if (!customFieldsPayload) {
       this.showDialog(); // Stop execution if required fields are missing
+      return;
     }
     // Construct the final payload
     const payload = {
@@ -181,17 +184,29 @@ export class VendorsComponent {
     console.log('Final Payload:', payload); // Debugging to verify the payload
   
     // Submit the payload
+    this.isSubmitting = true;
     this.http.post('vendors/vendors/', payload).subscribe(
       (response: any) => {
+        this.isSubmitting = false;
         this.showSuccessToast = true;
-          this.toastMessage = "Record Created successfully"; // Set the toast message for update
-          this.ngOnInit();
-          setTimeout(() => {
-            this.showSuccessToast = false;
-          }, 3000);
+        this.toastMessage = "Record Created successfully";
+        // Fully reset form: destroy → reinit → recreate (clears validation state)
+        this.showForm = false;
+        this.setFormConfig();
+        setTimeout(() => {
+          this.showForm = true;
+          this.cdref.detectChanges();
+          CustomFieldHelper.fetchCustomFields(this.http, 'vendors', (customFields: any, customFieldMetadata: any) => {
+            CustomFieldHelper.addCustomFieldsToFormConfig(customFields, customFieldMetadata, this.formConfig);
+          });
+        });
+        setTimeout(() => {
+          this.showSuccessToast = false;
+        }, 3000);
       },
       (error) => {
-        console.error('Error creating customer and custom fields:', error);
+        this.isSubmitting = false;
+        console.error('Error creating vendor and custom fields:', error);
       }
     );
   }
@@ -212,6 +227,7 @@ export class VendorsComponent {
   }
 
   updateVendor() {
+    if (this.isSubmitting) return; // Prevent double-click
     const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
    
     // Determine the entity type and ID dynamically
@@ -234,8 +250,9 @@ export class VendorsComponent {
     // Construct payload for custom fields
     const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
     if (!customFieldsPayload) {
-        this.showDialog(); // Stop execution if required fields are missing
-      }
+      this.showDialog(); // Stop execution if required fields are missing
+      return;
+    }
     // Construct the final payload for update
     const payload = {
       ...this.formConfig.model, // Array or empty
@@ -245,19 +262,29 @@ export class VendorsComponent {
     console.log('Final Payload for Update:', payload); // Debugging to verify the payload
   
     // Send the update request with the payload
+    this.isSubmitting = true;
     this.http.put(`vendors/vendors/${this.VendorEditID}/`, payload).subscribe(
       (response: any) => {
+        this.isSubmitting = false;
         this.showSuccessToast = true;
-          this.toastMessage = "Record updated successfully"; // Set the toast message for update
-          this.ngOnInit();
-          setTimeout(() => {
-            this.showSuccessToast = false;
-          }, 3000);
-        // this.showCustomerListFn(); // Redirect or refresh the customer list
-        // this.ngOnInit();
+        this.toastMessage = "Record updated successfully";
+        // Fully reset form: destroy → reinit → recreate (clears validation state)
+        this.showForm = false;
+        this.setFormConfig();
+        setTimeout(() => {
+          this.showForm = true;
+          this.cdref.detectChanges();
+          CustomFieldHelper.fetchCustomFields(this.http, 'vendors', (customFields: any, customFieldMetadata: any) => {
+            CustomFieldHelper.addCustomFieldsToFormConfig(customFields, customFieldMetadata, this.formConfig);
+          });
+        });
+        setTimeout(() => {
+          this.showSuccessToast = false;
+        }, 3000);
       },
       (error) => {
-        console.error('Error updating customer:', error);
+        this.isSubmitting = false;
+        console.error('Error updating vendor:', error);
       }
     );
   }
@@ -609,6 +636,24 @@ editVendor(event) {
                       className: 'custom-form-list no-ant-card',
                       templateOptions: {
                         // addText: 'Add Addresses',
+                        columnConfig: {
+                          moduleKey: 'vendor_addresses',
+                          lockedColumns: ['address_type'],
+                          defaultHidden: [],
+                          excludeFromSettings: ['address_type'],
+                          showColumnSettings: false,
+                          defaultWidths: {
+                            address_type: 100,
+                            address: 180,
+                            city: 120,
+                            state: 120,
+                            country: 120,
+                            pin_code: 100,
+                            phone: 120,
+                            email: 150
+                          },
+                          minColumnWidth: 60
+                        },
                         tableCols: [
                           {
                             name: 'address_type',

@@ -100,3 +100,238 @@ thead .sticky-column {
         min-width: 50px;
     }
 }
+
+/* ============================================================
+   COLUMN CONFIGURATION DROPDOWN
+   ============================================================ */
+
+/* Wrapper for gear icon + dropdown panel */
+.col-cfg-dropdown-wrapper {
+    display: inline-block;
+    position: relative;
+}
+
+/* Dropdown panel */
+.col-cfg-panel {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 1050;
+    min-width: 220px;
+    max-width: 280px;
+    max-height: 380px;
+    background: #ffffff;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+    animation: colCfgFadeIn 0.15s ease-out;
+}
+
+@keyframes colCfgFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Header row inside the dropdown */
+.col-cfg-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    border-bottom: 1px solid #f0f0f0;
+    background: #fafafa;
+}
+
+.col-cfg-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #142768;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.col-cfg-reset-btn {
+    background: none;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 11px;
+    color: #595959;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.col-cfg-reset-btn:hover {
+    color: #142768;
+    border-color: #142768;
+}
+
+/* Scrollable list of columns */
+.col-cfg-list {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 4px 0;
+}
+
+/* Individual column item */
+.col-cfg-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #333;
+    transition: background 0.15s;
+    user-select: none;
+    margin-bottom: 0;
+}
+
+.col-cfg-item:hover {
+    background: #f5f5f5;
+}
+
+/* Checkbox styling */
+.col-cfg-item input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    accent-color: #142768;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.col-cfg-item input[type="checkbox"]:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* Column label text */
+.col-cfg-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Locked column styling */
+.col-cfg-locked {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.col-cfg-locked .col-cfg-label {
+    color: #8c8c8c;
+}
+
+/* Lock icon */
+.col-cfg-lock-icon {
+    font-size: 10px;
+    color: #bfbfbf;
+    flex-shrink: 0;
+}
+
+/* Custom scrollbar for the dropdown list */
+.col-cfg-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.col-cfg-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.col-cfg-list::-webkit-scrollbar-thumb {
+    background: #d9d9d9;
+    border-radius: 2px;
+}
+
+.col-cfg-list::-webkit-scrollbar-thumb:hover {
+    background: #bfbfbf;
+}
+
+/* ============================================================
+   COLUMN RESIZE
+   ============================================================ */
+
+/* Scroll container — enables vertical sticky header within a bounded area */
+.table-scroll-container {
+    max-height: 70vh;
+    overflow: auto;
+    position: relative;
+}
+
+/* Fixed table layout for resizable columns (only when columnConfig is active) */
+.table-fixed-layout {
+    table-layout: fixed;
+    width: auto;         /* Override Bootstrap .table { width: 100% } — let column widths determine table width */
+    min-width: 100%;     /* At least fill container when total column width is small */
+}
+
+/*
+ * ALL header cells: vertically sticky (top: 0) so header row stays visible
+ * during vertical scroll inside .table-scroll-container.
+ * Also acts as positioning context for resize handles (replaces position: relative).
+ */
+.table-fixed-layout > thead > tr > th {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    background: #142768;
+    color: #fff;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/*
+ * Sticky-column HEADERS — horizontally + vertically sticky.
+ * z-index: 5 places them above all other sticky headers (z-index: 3)
+ * and above body sticky columns (z-index: 2).
+ * The `left` value comes from the inline [style.left.px] binding.
+ */
+.table-fixed-layout > thead > tr > th.sticky-col-0,
+.table-fixed-layout > thead > tr > th.sticky-col-1,
+.table-fixed-layout > thead > tr > th.sticky-col-2 {
+    z-index: 5;
+}
+
+.table-fixed-layout > thead > tr > th.sticky-column {
+    z-index: 4;
+}
+
+/* Resize drag handle — invisible 6px hit area on right edge of each <th> */
+.col-resize-handle {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    cursor: col-resize;
+    user-select: none;
+    z-index: 10;
+    background: transparent;
+    transition: background 0.15s;
+}
+
+/* Visual affordance on hover — subtle blue line */
+.col-resize-handle:hover {
+    background: rgba(20, 39, 104, 0.25);
+}
+
+/* Active state during drag */
+.col-resize-handle:active {
+    background: rgba(20, 39, 104, 0.4);
+}
+
+/* Cell content overflow handling for fixed layout */
+.table-fixed-layout td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
