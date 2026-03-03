@@ -23,6 +23,11 @@ export class SalesListComponent {
     this.setApiUrlBasedOnUser();
   }
 
+  onRowDoubleClick(row: any) {
+    console.log('Double clicked row:', row);
+    this.edit.emit(row.sale_order_id);
+  }
+
   refreshTable() {
     this.taTableComponent?.refresh();
   };
@@ -323,6 +328,12 @@ export class SalesListComponent {
     // title: 'Edit Sales Order List',
     showCheckbox: true,
     pkId: "sale_order_id",
+    rowEvents: {
+      dblclick: (row: any) => {
+        console.log('Row double-clicked:', row);
+        this.onRowDoubleClick(row);
+      }
+    },
     fixedFilters: [
       // {
       //   key: 'summary',
@@ -515,20 +526,20 @@ closeNotReadyInvoiceDialog() {
       : [{ key: 'summary', value: 'true' }];
   }
 
-// Method to update invoiced status using HttpClient
-  updateInvoicedStatusDirectly_1(itemId: number, status: string) {
-    const apiUrl = `sales/sale_order_items/${itemId}/`;
-    const payload = { invoiced: status };
-    console.log("{ invoiced: status } : ", payload);
-    this.http.patch(apiUrl, payload).subscribe(
-      response => {
-        console.log("Invoiced status updated successfully", response);
-      },
-      error => {
-        console.error("Error updating invoiced status", error);
-      }
-    );
-  }
+//   // Method to update invoiced status using HttpClient
+//   updateInvoicedStatusDirectly_1(itemId: number, status: string) {
+//     const apiUrl = `sales/sale_order_items/${itemId}/`;
+//     const payload = { invoiced: status };
+//     console.log("{ invoiced: status } : ", payload);
+//     this.http.patch(apiUrl, payload).subscribe(
+//       response => {
+//         console.log("Invoiced status updated successfully", response);
+//       },
+//       error => {
+//         console.error("Error updating invoiced status", error);
+//       }
+//     );
+//   }
 
 createInvoiceFromList(sale_order_id: any) {
   // if (!row) {
@@ -621,12 +632,12 @@ createInvoiceFromList(sale_order_id: any) {
       const billType = (saleTypeName === 'Other') ? 'OTHERS' : 'CASH';
       const invoicePrefix = (saleTypeName === 'Other') ? 'SOO-INV' : 'SO-INV';
 
-      // saleOrderItems.forEach(item => {
-      //       if (item.invoiced === 'NO') {
-      //         item.invoiced = 'YES';
-      //         this.updateInvoicedStatusDirectly_1(item.sale_order_item_id, 'YES');
-      //       }
-      //     });
+      saleOrderItems.forEach(item => {
+            if (item.invoiced === 'NO') {
+              item.invoiced = 'YES';
+              this.updateInvoicedStatusDirectly_1(item.sale_order_item_id, 'YES');
+            }
+          });
 
       // Generate invoice number (optional, async)
       this.http.get(`masters/generate_order_no/?type=${invoicePrefix}`).subscribe((invRes: any) => {
@@ -725,64 +736,25 @@ createInvoiceFromList(sale_order_id: any) {
   );
 }
 
+// Method to update invoiced status using HttpClient
+updateInvoicedStatusDirectly_1(itemId: number, status: string) {
+  const apiUrl = `sales/sale_order_items/${itemId}/`;
+  const payload = { invoiced: status };
+  console.log("{ invoiced: status } : ", payload);
+  this.http.patch(apiUrl, payload).subscribe(
+    response => {
+      console.log("Invoiced status updated successfully", response);
+    },
+    error => {
+      console.error("Error updating invoiced status", error);
+    }
+  );
+}
+
 nowDate = () => {
     const date = new Date();
     return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   }
-
-
-// onFlowStatusSelect(event: Event): void {
-//   const selectElement = event.target as HTMLSelectElement;
-//   const selectedValue = selectElement.value;
-
-//   const selectedIds = this.taTableComponent.options.checkedRows;
-
-//   if (selectedIds.length === 0) {
-//     this.showDialog();
-//     selectElement.value = '';
-//     return;
-//   }
-
-//   const saleOrderId = selectedIds[0];
-
-//   // CREATE INVOICE
-//   if (selectedValue === 'create_invoice') {
-//     this.http.get(`sales/sale_order/${saleOrderId}/`).subscribe(
-//       (res: any) => {
-//         const row = res?.data;
-
-//         if (!row) {
-//           console.error("Sale order data not found");
-//           return;
-//         }
-
-//         const flowStatusName = row.sale_order.flow_status?.flow_status_name;
-//         console.log("Current flow status:", flowStatusName);
-
-//         if (flowStatusName === 'Ready for Invoice') {
-//           console.log("Order is ready for invoice. Proceeding to create invoice...");
-//           this.createInvoiceFromList(saleOrderId);
-//           console.log("createInvoiceFromList method called with ID:", saleOrderId);
-//         } else {
-//           this.showOrderNotReadyModal();
-//         }
-//       },
-//       (error) => {
-//         console.error("Error fetching sale order", error);
-//       }
-//     );
-
-//     selectElement.value = '';
-//     return;
-//   }
-
-//   // UPDATE FLOW STATUS
-//   if (selectedValue) {
-//     this.updateFlowStatus(selectedValue);
-//   }
-
-//   selectElement.value = '';
-// }
 
 onFlowStatusSelect(event: Event): void {
   const selectElement = event.target as HTMLSelectElement;

@@ -1,53 +1,156 @@
 <div class="work-order-board">
-  <!-- Work Order List Table -->
-  <ta-table [options]="curdConfig.tableConfig" class="custom-list sale-receipt-table"></ta-table>
 
-  <!-- Confirmation Modal for Marking Done -->
-  <div *ngIf="showModal" class="custom-dialog-overlay">
-    <div class="custom-dialog-box small-dialog-box">
-      <h5><b>Confirm Work Order Completion</b></h5>
-      <p>Are you sure you want to mark the work order for <b>{{ selectedOrder?.product?.name }}</b> as done?</p>
-      <div class="dialog-actions">
-        <button class="btn btn-secondary" (click)="closeModal()">Cancel</button>
-        <button class="btn btn-primary" (click)="confirmDispatch()">Confirm</button>
+  <!-- Toggle Button -->
+  <div class="planning-toggle-btn">
+    <button class="btn btn-primary" (click)="toggleProductionPlanning()">
+      {{ showProductionPlanning ? 'Hide Production Planning' : 'Show Production Planning' }}
+    </button>
+  </div>
+
+  <!-- Production Planning Cards -->
+  <div class="production-summary-board" *ngIf="showProductionPlanning">
+
+    <h4 class="summary-title">Production Planning</h4>
+
+    <div class="production-progress-list">
+
+      <div class="production-item" *ngFor="let item of productionSummary">
+
+        <div class="production-header">
+          <span class="product-name">{{ item.product_name }}</span>
+          <span class="qty-info">
+            {{ item.available_qty || 0 }} / {{ item.total_qty }}
+          </span>
+        </div>
+
+        <div class="progress">
+          <div
+            class="progress-bar"
+            [style.width.%]="getCompletionPercentage(item)"
+            [ngClass]="getProgressColor(item)">
+          </div>
+        </div>
+
+        <div class="remaining-text">
+          Remaining: {{ item.total_qty - (item.available_qty || 0) }}
+        </div>
+
       </div>
+
+    </div>
+
+  </div>
+
+  <!-- Work Order List Table -->
+  <ta-table
+    [options]="curdConfig.tableConfig"
+    class="custom-list sale-receipt-table">
+  </ta-table>
+
+  <!-- UPDATED DISPATCH MODAL -->
+  <div *ngIf="showModal" class="custom-dialog-overlay">
+    <div class="custom-dialog-box dispatch-modal">
+
+      <div class="dispatch-header">
+        Work Order Dispatch
+      </div>
+
+      <!-- Product Details -->
+      <div class="dispatch-info-card">
+        <div class="info-item">
+          <label>Product</label>
+          <span>{{ selectedOrder?.product?.name }}</span>
+        </div>
+
+        <div class="info-item">
+          <label>Ordered Qty</label>
+          <span>{{ selectedOrder?.ordered_qty }}</span>
+        </div>
+
+        <div class="info-item">
+          <label>Available Stock</label>
+          <span>{{ selectedOrder?.available_qty }}</span>
+        </div>
+      </div>
+
+      <!-- Dispatch Quantity -->
+      <div class="form-group">
+        <label>Dispatch Quantity</label>
+        <input
+          type="number"
+          class="form-control"
+          [(ngModel)]="dispatchQty"
+          min="1"
+          [max]="selectedOrder?.completed_qty">
+      </div>
+
+      <!-- Remarks -->
+      <div class="form-group">
+        <label>Remarks</label>
+        <textarea
+          class="form-control dispatch-remarks"
+          rows="2"
+          [(ngModel)]="dispatchRemarks"
+          placeholder="Optional notes about dispatch">
+        </textarea>
+      </div>
+
+      <!-- Footer Buttons -->
+      <div class="dispatch-footer">
+        <button class="btn cancel-btn" (click)="closeModal()">
+          Cancel
+        </button>
+
+        <button class="btn confirm-btn" (click)="confirmDispatch()">
+          Confirm Dispatch
+        </button>
+      </div>
+
+
     </div>
   </div>
 
   <!-- Work Order Details Modal -->
-  <div *ngIf="showEditModal" class="custom-dialog-overlay" role="dialog" aria-hidden="true">
+  <div *ngIf="showEditModal" class="custom-dialog-overlay" role="dialog">
     <div class="modal-dialog modal-xl" (click)="$event.stopPropagation()">
       <div class="modal-content">
+
         <div class="modal-header">
           <h5 class="modal-title">WORK ORDER DETAILS</h5>
         </div>
 
         <div class="modal-body">
-          <!-- Work Order Details Table -->
+
+          <!-- Work Order -->
           <h5>Work Order</h5>
           <div class="overflow-auto d-block mb-md-3 mb-2">
             <table class="table table-bordered custom-table mb-0">
               <thead>
                 <tr>
-                  <th *ngFor="let field of tableFields.workOrder">{{ field.label }}</th>
+                  <th *ngFor="let field of tableFields.workOrder">
+                    {{ field.label }}
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td *ngFor="let field of tableFields.workOrder">
                     {{ getNestedValue(workOrderData?.work_order, field.key) ?? field.defaultValue }}
-                  </td>              
+                  </td>
                 </tr>
               </tbody>
             </table>
           </div>
-          <!-- Bill of Materials (BOM) Table -->
+
+          <!-- BOM -->
           <h5>Bill Of Materials</h5>
           <div class="overflow-auto d-block mb-md-3 mb-2">
             <table class="table table-bordered custom-table mb-0">
               <thead>
                 <tr>
-                  <th *ngFor="let field of tableFields.bom">{{ field.label }}</th>
+                  <th *ngFor="let field of tableFields.bom">
+                    {{ field.label }}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -58,69 +161,71 @@
                 </tr>
               </tbody>
             </table>
-         </div>
-          <!-- Workers Table -->
+          </div>
+
+          <!-- Workers -->
           <h5>Workers</h5>
           <div class="overflow-auto d-block mb-md-3 mb-2">
-          <table class="table table-bordered custom-table mb-0">
-            <thead>
-              <tr>
-                <th *ngFor="let field of tableFields.workers">{{ field.label }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let worker of workOrderData?.workers">
-                <td *ngFor="let field of tableFields.workers">
-                  {{ getNestedValue(worker, field.key) || 'N/A' }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-</div>
-          <!-- Work Stages Table -->
+            <table class="table table-bordered custom-table mb-0">
+              <thead>
+                <tr>
+                  <th *ngFor="let field of tableFields.workers">
+                    {{ field.label }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let worker of workOrderData?.workers">
+                  <td *ngFor="let field of tableFields.workers">
+                    {{ getNestedValue(worker, field.key) || 'N/A' }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Stages -->
           <h5>Work Stages</h5>
           <div class="overflow-auto d-block mb-md-3 mb-2">
-          <table class="table table-bordered custom-table mb-0">
-            <thead>
-              <tr>
-                <th *ngFor="let field of tableFields.stages">{{ field.label }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let stage of workOrderData?.work_order_stages">
-                <td *ngFor="let field of tableFields.stages">
-                  {{ getNestedValue(stage, field.key) || '' }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+            <table class="table table-bordered custom-table mb-0">
+              <thead>
+                <tr>
+                  <th *ngFor="let field of tableFields.stages">
+                    {{ field.label }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let stage of workOrderData?.work_order_stages">
+                  <td *ngFor="let field of tableFields.stages">
+                    {{ getNestedValue(stage, field.key) || '' }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
+
         </div>
 
         <div class="modal-footer text-center">
-          <button type="button" class="btn btn-danger" (click)="closeEditModal()">Close</button>
+          <button class="btn btn-danger" (click)="closeEditModal()">Close</button>
         </div>
+
       </div>
     </div>
   </div>
+
 </div>
 
 <!-- Zero Balance Modal -->
 <div class="zb-backdrop" *ngIf="showZeroBalanceModal">
   <div class="zb-modal">
-
     <div class="zb-icon">⚠️</div>
-
     <h2>{{ zeroBalanceTitle }}</h2>
-
     <p>
       <strong>{{ zeroBalanceProductName }}</strong><br />
       {{ zeroBalanceMessage }}
     </p>
-
-    <button class="zb-btn" (click)="closeZeroBalanceModal()">
-      OK
-    </button>
-
+    <button class="zb-btn" (click)="closeZeroBalanceModal()">OK</button>
   </div>
 </div>

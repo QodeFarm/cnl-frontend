@@ -2466,6 +2466,221 @@ createQuickPackOption: string = 'no';
 //   });
 // }
 
+// createSaleOrder() {
+
+//   const customFieldsPayload = this.validatedCustomFieldsPayload;
+
+//   const payload: any = {
+//     ...this.formConfig.model,
+//     custom_field_values: customFieldsPayload.custom_field_values
+//   };
+
+//   /* -------------------------------------------------
+//    CREDIT LIMIT OVERRIDE
+//   -------------------------------------------------- */
+//   if (this.creditLimitApproved) {
+//     payload.credit_limit_approved = true;
+//     this.creditLimitApproved = false;
+//   }
+
+//   /* -------------------------------------------------
+//    SPLIT LOGIC (ALWAYS RUN)
+//   -------------------------------------------------- */
+//   const parentItems: any[] = [];
+//   const childItems: any[] = [];
+
+//   payload.sale_order_items?.forEach(item => {
+//     const qty = Number(item.quantity) || 0;
+//     const available = Number(item.available_qty) || 0;
+
+//     parentItems.push({
+//       ...item,
+//       production_qty: 0
+//     });
+
+//     if (qty > available) {
+//       childItems.push({
+//         ...item,
+//         quantity: qty - available,
+//         production_qty: qty - available
+//       });
+//     }
+//   });
+
+//   payload.sale_order_items = parentItems;
+
+//   const shouldCreateChildOrders = childItems.length > 0;
+
+//   /* -------------------------------------------------
+//    CREATE PARENT SALE ORDER
+//   -------------------------------------------------- */
+//   this.http.post<any>('sales/sale_order/', payload).subscribe({
+
+//     next: parentRes => {
+
+//       /* -------------------------------------------------
+//        CREDIT LIMIT RESPONSE
+//       -------------------------------------------------- */
+//       if (parentRes?.data?.credit_limit_exceeded) {
+//         this.pendingCreditLimitPayload = payload;
+//         this.pendingCreditLimitAction = 'create';
+//         this.showCreditLimitModal(parentRes.data);
+//         return;
+//       }
+
+//       const parentOrder = parentRes.data.sale_order;
+//       const parentOrderId = parentOrder.sale_order_id;
+
+//       /* -------------------------------------------------
+//        QUICK PACK CREATION (SAFE PLACE)
+//       -------------------------------------------------- */
+//       if (this.createQuickPack) {
+
+//         const customerName = payload.sale_order?.customer?.name || 'Customer';
+//         const productNames = payload.sale_order_items?.map(i => i.product?.name) || [];
+
+//         let quickPackName = `${customerName} QuickPack (${productNames.join(', ')})`;
+
+//         if (quickPackName.length > 50) {
+//           quickPackName =
+//             `${customerName} QuickPack (${productNames[0]} +${productNames.length - 1} more)`;
+//         }
+
+//         const quickPackPayload = {
+//           quick_pack_data: {
+//             name: quickPackName,
+//             customer_id: payload.sale_order.customer?.customer_id,
+//             description: `QuickPack created from Sale Order ${parentOrder.order_no}`,
+//             active: 'Y',
+//             lot_qty: payload.sale_order_items.reduce((s, i) => s + (i.quantity || 0), 0)
+//           },
+//           quick_pack_data_items: payload.sale_order_items.map(i => ({
+//             product_id: i.product?.product_id,
+//             quantity: i.quantity,
+//             unit_options_id: i.unit_options?.unit_options_id,
+//             size_id: i.size?.size_id,
+//             color_id: i.color?.color_id
+//           }))
+//         };
+
+//         this.http.post('sales/quick_pack/', quickPackPayload).subscribe();
+//       }
+
+//       /* -------------------------------------------------
+//        SEND WHATSAPP
+//       -------------------------------------------------- */
+//       this.sendSaleOrderWhatsapp(parentOrderId);
+
+//       /* -------------------------------------------------
+//        CREATE CHILD SALE ORDERS
+//       -------------------------------------------------- */
+//       if (shouldCreateChildOrders) {
+
+//         let counter = 1;
+
+//         const childRequests = childItems.map(item => {
+
+//           const childOrderNo = `${parentOrder.order_no}-P${counter++}`;
+
+//           const childPayload = {
+//             sale_order: {
+//               ...parentOrder,
+//               sale_order_id: undefined,
+//               order_no: childOrderNo,
+//               flow_status: { flow_status_name: 'Production' },
+//               item_value: 0,
+//               total_amount: 0,
+//               tax_amount: 0,
+//               dis_amt: 0,
+//               cess_amount: 0,
+//               order_type: parentOrder.order_type || 'sale_order'
+//             },
+//             sale_order_items: [{
+//               ...item,
+//               available_qty: 0,
+//               amount: 0,
+//               rate: 0,
+//               tax: 0,
+//               cgst: 0,
+//               sgst: 0,
+//               igst: 0,
+//               mrp: item.rate,
+//               production_qty: item.quantity
+//             }],
+//             order_attachments: payload.order_attachments,
+//             order_shipments: payload.order_shipments,
+//             custom_field_values: customFieldsPayload.custom_field_values
+//           };
+
+//           return this.http.post<any>('sales/sale_order/', childPayload).pipe(
+//             switchMap(childRes => {
+
+//               const childOrderId = childRes.data.sale_order.sale_order_id;
+
+//               const workOrderPayload = {
+//                 work_order: {
+//                   product_id: item.product_id,
+//                   quantity: item.production_qty,
+//                   completed_qty: 0,
+//                   ordered_qty: item.production_qty || 0,   // ✅ NEW
+//                   available_qty: 0,                     // ✅ NEW
+//                   pending_qty: item.production_qty,
+//                   start_date: parentOrder.order_date,
+//                   sync_qty: true,
+//                   size_id: item.size?.size_id || null,
+//                   color_id: item.color?.color_id || null,
+//                   status_id: '',
+//                   sale_order_id: childOrderId
+//                 },
+//                 bom: [{
+//                   product_id: item.product_id,
+//                   size_id: item.size?.size_id || null,
+//                   color_id: item.color?.color_id || null
+//                 }],
+//                 work_order_machines: [],
+//                 workers: [],
+//                 work_order_stages: []
+//               };
+
+//               return this.http.post('production/work_order/', workOrderPayload);
+//             })
+//           );
+//         });
+
+//         forkJoin(childRequests).subscribe();
+//       }
+
+//       /* -------------------------------------------------
+//        SUCCESS
+//       -------------------------------------------------- */
+//       this.clearDraft();
+//       this.showSuccessToast = true;
+//       this.toastMessage = 'Sale Order created successfully';
+
+//       setTimeout(() => {
+//         this.showSuccessToast = false;
+//       }, 3000);
+
+//       this.ngOnInit();
+//     },
+
+//     error: err => {
+
+//       /* CREDIT LIMIT BLOCKED */
+//       if (err.status === 403 && err.error?.data?.credit_limit_exceeded) {
+//         this.pendingCreditLimitPayload = null;
+//         this.showCreditLimitModal(err.error.data);
+//         return;
+//       }
+
+//       if (err.status === 400) {
+//         this.showDialog();
+//       }
+//     }
+//   });
+// }
+
+//working above ----
 createSaleOrder() {
 
   const customFieldsPayload = this.validatedCustomFieldsPayload;
@@ -2476,7 +2691,7 @@ createSaleOrder() {
   };
 
   /* -------------------------------------------------
-   CREDIT LIMIT OVERRIDE
+    CREDIT LIMIT OVERRIDE
   -------------------------------------------------- */
   if (this.creditLimitApproved) {
     payload.credit_limit_approved = true;
@@ -2484,27 +2699,57 @@ createSaleOrder() {
   }
 
   /* -------------------------------------------------
-   SPLIT LOGIC (ALWAYS RUN)
+    CALCULATION LOGIC (NO QUANTITY SPLIT)
   -------------------------------------------------- */
   const parentItems: any[] = [];
   const childItems: any[] = [];
 
   payload.sale_order_items?.forEach(item => {
+
     const qty = Number(item.quantity) || 0;
     const available = Number(item.available_qty) || 0;
+    const rate = Number(item.rate) || 0;
+    const gst = Number(item.product?.gst_input) || 0;
+
+    const productionQty = Math.max(qty - available, 0);
+
+    /* -------------------------------
+       PARENT ITEM (FULL QUANTITY)
+    --------------------------------*/
+    const itemValue = qty * rate;
+    const tax = (itemValue * gst) / 100;
+    const amount = itemValue + tax;
 
     parentItems.push({
       ...item,
-      production_qty: 0
+      quantity: qty,                // FULL quantity
+      production_qty: productionQty, // production needed
+      cgst: gst / 2,
+      sgst: gst / 2,
+      igst: 0,
+      amount: amount
     });
 
-    if (qty > available) {
+    /* -------------------------------
+       CHILD ORDER (ONLY PRODUCTION)
+    --------------------------------*/
+    if (available > 0 && productionQty > 0) {
+
+      const childItemValue = productionQty * rate;
+      const childTax = (childItemValue * gst) / 100;
+      const childAmount = childItemValue + childTax;
+
       childItems.push({
         ...item,
-        quantity: qty - available,
-        production_qty: qty - available
+        quantity: productionQty,
+        production_qty: productionQty,
+        cgst: gst / 2,
+        sgst: gst / 2,
+        igst: 0,
+        amount: childAmount
       });
     }
+
   });
 
   payload.sale_order_items = parentItems;
@@ -2512,15 +2757,12 @@ createSaleOrder() {
   const shouldCreateChildOrders = childItems.length > 0;
 
   /* -------------------------------------------------
-   CREATE PARENT SALE ORDER
+    CREATE PARENT SALE ORDER
   -------------------------------------------------- */
   this.http.post<any>('sales/sale_order/', payload).subscribe({
 
     next: parentRes => {
 
-      /* -------------------------------------------------
-       CREDIT LIMIT RESPONSE
-      -------------------------------------------------- */
       if (parentRes?.data?.credit_limit_exceeded) {
         this.pendingCreditLimitPayload = payload;
         this.pendingCreditLimitAction = 'create';
@@ -2532,7 +2774,7 @@ createSaleOrder() {
       const parentOrderId = parentOrder.sale_order_id;
 
       /* -------------------------------------------------
-       QUICK PACK CREATION (SAFE PLACE)
+        QUICK PACK CREATION
       -------------------------------------------------- */
       if (this.createQuickPack) {
 
@@ -2567,12 +2809,12 @@ createSaleOrder() {
       }
 
       /* -------------------------------------------------
-       SEND WHATSAPP
+        SEND WHATSAPP
       -------------------------------------------------- */
       this.sendSaleOrderWhatsapp(parentOrderId);
 
       /* -------------------------------------------------
-       CREATE CHILD SALE ORDERS
+        CREATE CHILD SALE ORDERS
       -------------------------------------------------- */
       if (shouldCreateChildOrders) {
 
@@ -2588,9 +2830,9 @@ createSaleOrder() {
               sale_order_id: undefined,
               order_no: childOrderNo,
               flow_status: { flow_status_name: 'Production' },
-              item_value: 0,
-              total_amount: 0,
-              tax_amount: 0,
+              item_value: item.amount,
+              total_amount: item.amount,
+              tax_amount: (item.amount * (Number(item.product?.gst_input) || 0)) / 100,
               dis_amt: 0,
               cess_amount: 0,
               order_type: parentOrder.order_type || 'sale_order'
@@ -2598,14 +2840,7 @@ createSaleOrder() {
             sale_order_items: [{
               ...item,
               available_qty: 0,
-              amount: 0,
-              rate: 0,
-              tax: 0,
-              cgst: 0,
-              sgst: 0,
-              igst: 0,
-              mrp: item.rate,
-              production_qty: item.quantity
+              mrp: item.rate
             }],
             order_attachments: payload.order_attachments,
             order_shipments: payload.order_shipments,
@@ -2622,6 +2857,8 @@ createSaleOrder() {
                   product_id: item.product_id,
                   quantity: item.production_qty,
                   completed_qty: 0,
+                  ordered_qty: item.production_qty,
+                  available_qty: 0,
                   pending_qty: item.production_qty,
                   start_date: parentOrder.order_date,
                   sync_qty: true,
@@ -2643,13 +2880,14 @@ createSaleOrder() {
               return this.http.post('production/work_order/', workOrderPayload);
             })
           );
+
         });
 
         forkJoin(childRequests).subscribe();
       }
 
       /* -------------------------------------------------
-       SUCCESS
+        SUCCESS
       -------------------------------------------------- */
       this.clearDraft();
       this.showSuccessToast = true;
@@ -2664,7 +2902,6 @@ createSaleOrder() {
 
     error: err => {
 
-      /* CREDIT LIMIT BLOCKED */
       if (err.status === 403 && err.error?.data?.credit_limit_exceeded) {
         this.pendingCreditLimitPayload = null;
         this.showCreditLimitModal(err.error.data);
@@ -2677,9 +2914,6 @@ createSaleOrder() {
     }
   });
 }
-
-
-
 
 
 //   /* -------------------------------------------------
@@ -3260,12 +3494,18 @@ async autoFillProductDetails(field, data) {
   const fieldMappings = {
     code: data.code,
     rate: selectedRate,
-    discount: !isNaN(Number(data.discount)) ? Number(data.discount) : 0,
+    // discount: !isNaN(Number(data.discount)) ? Number(data.discount) : 0,
+    // ✅ Only map discount in CREATE mode
+    discount: !this.SaleOrderEditID
+      ? (!isNaN(Number(data.discount)) ? Number(data.discount) : 0)
+      : field.form.controls.discount?.value,
+
     unit_options_id: data.unit_options?.unit_options_id,
     stock_unit_id: data.stock_unit?.stock_unit_id,       // required field
     print_name: data.print_name,
     mrp: data.mrp,
-    available_qty: availableQty
+    available_qty: availableQty,
+    tax: data.gst_input
   };
 
   Object.entries(fieldMappings).forEach(([key, value]) => {
@@ -3609,6 +3849,8 @@ confirmWorkOrder() {
                 product_id: product.product_id,
                 quantity: product.quantity || 0,
                 completed_qty: 0,
+                ordered_qty: product.quantity || 0,   // ✅ NEW
+                available_qty: 0,                     // ✅ NEW
                 pending_qty: product.quantity || 0,
                 start_date: saleOrderDetails.order_date || new Date().toISOString().split('T')[0],
                 sync_qty: true,
@@ -3769,6 +4011,8 @@ confirmWorkOrder() {
                 product_id: product.product_id,
                 quantity: product.quantity || 0,
                 completed_qty: 0,
+                ordered_qty: product.quantity || 0,   // ✅ NEW
+                available_qty: 0,                     // ✅ NEW
                 pending_qty: product.quantity || 0,
                 start_date: saleOrderDetails.order_date || new Date().toISOString().split('T')[0],
                 sync_qty: true,
@@ -4696,6 +4940,31 @@ getUnitData(unitInfo: any) {
                     }
                   }
                 },
+                // {
+                //   key: 'tax',
+                //   type: 'select',
+                //   className: 'col-md-4 col-sm-6 col-12',
+                //   templateOptions: {
+                //     label: 'Tax',
+                //     required: false,
+                //     disabled: false,
+                //     options: [
+                //       { 'label': "Inclusive", value: 'Inclusive' },
+                //       { 'label': "Exclusive", value: 'Exclusive' }
+
+                //     ]
+                //   },
+                //   hooks: {
+                //     onInit: (field: any) => {
+                //       if (this.dataToPopulate && this.dataToPopulate.sale_order.tax && field.formControl) {
+                //         field.formControl.setValue(this.dataToPopulate.sale_order.tax);
+                //       } else {
+                //         // Set default value to 'Exclusive'
+                //         field.formControl.setValue('Exclusive');
+                //       }
+                //     }
+                //   }
+                // },
                 {
                   key: 'tax',
                   type: 'select',
@@ -4703,44 +4972,26 @@ getUnitData(unitInfo: any) {
                   templateOptions: {
                     label: 'Tax',
                     required: false,
-                    disabled: false,
                     options: [
-                      { 'label': "Inclusive", value: 'Inclusive' },
-                      { 'label': "Exclusive", value: 'Exclusive' }
-
+                      { label: "Inclusive", value: 'Inclusive' },
+                      { label: "Exclusive", value: 'Exclusive' }
                     ]
                   },
                   hooks: {
                     onInit: (field: any) => {
-                      if (this.dataToPopulate && this.dataToPopulate.sale_order.tax && field.formControl) {
+                      if (this.dataToPopulate?.sale_order?.tax) {
                         field.formControl.setValue(this.dataToPopulate.sale_order.tax);
                       } else {
-                        // Set default value to 'Exclusive'
                         field.formControl.setValue('Exclusive');
                       }
+
+                      // 🔥 Recalculate when tax type changes
+                      field.formControl.valueChanges.subscribe(() => {
+                        this.totalAmountCal();
+                      });
                     }
                   }
                 },
-                // {
-                //   key: 'tax',
-                //   type: 'select',
-                //   className: 'col-md-4 col-sm-6 col-12',
-                //   templateOptions: {
-                //     label: 'Tax',
-                //     required: true,
-                //     options: [
-                //       { 'label': "Inclusive", value: 'Inclusive' },
-                //       { 'label': "Exclusive", value: 'Exclusive' }
-                //     ]
-                //   },
-                //   hooks: {
-                //     onInit: (field: any) => {
-                //       if (this.dataToPopulate && this.dataToPopulate.sale_order.tax && field.formControl) {
-                //         field.formControl.setValue(this.dataToPopulate.sale_order.tax);
-                //       }
-                //     }
-                //   }
-                // },
                 {
                   key: 'flow_status',
                   type: 'select',
@@ -4964,6 +5215,17 @@ getUnitData(unitInfo: any) {
 
                 },
                 {
+                  key: 'shipping_charges',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Shipping Charges',
+                    required: false,
+                    disabled: true
+                  },
+                  defaultValue: '0.00',
+                },
+                {
                   key: 'cgst',
                   type: 'text',
                   className: 'col-12',
@@ -4973,19 +5235,26 @@ getUnitData(unitInfo: any) {
                   },
                   defaultValue: '0.00',
                   expressionProperties: {
-                    'model.cgst': (model, field) => {
-                      if (!field._lastValue || field._lastValue !== model.tax_amount) {
-                        const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
-                        field._lastValue = model.tax_amount; // Store last value to avoid infinite logs
-                      }
-                      return model.billing_address?.includes('Andhra Pradesh')
-                        ? (parseFloat(model.tax_amount) / 2).toFixed(2)
+                    'model.cgst': (model) => {
+                      const address = model.billing_address || model.shipping_address || '';
+
+                      const isIntraState =
+                        address === '' || address.includes('Andhra Pradesh');
+
+                      return isIntraState
+                        ? (parseFloat(model.tax_amount || 0) / 2).toFixed(2)
                         : '0.00';
                     },
-                    'templateOptions.disabled': 'true' // Make it read-only
+                    // 'templateOptions.disabled': true
+                    },
+                    hideExpression: (model) => {
+                      const address = model.billing_address || model.shipping_address || '';
+                      const isIntraState =
+                        address === '' || address.includes('Andhra Pradesh');
+
+                      return !isIntraState;
+                    }
                   },
-                  hideExpression: (model) => !model.billing_address || !model.billing_address?.includes('Andhra Pradesh') // Hide CGST for inter-state
-                },
                 {
                   key: 'sgst',
                   type: 'text',
@@ -4996,20 +5265,27 @@ getUnitData(unitInfo: any) {
                   },
                   defaultValue: '0.00',
                   expressionProperties: {
-                    'model.sgst': (model, field) => {
-                      if (!field._lastValue || field._lastValue !== model.tax_amount) {
-                        const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
-                        field._lastValue = model.tax_amount;
-                      }
-                      return model.billing_address?.includes('Andhra Pradesh')
-                        ? (parseFloat(model.tax_amount) / 2).toFixed(2)
+                    'model.sgst': (model) => {
+                      const address = model.billing_address || model.shipping_address || '';
+
+                      const isIntraState =
+                        address === '' || address.includes('Andhra Pradesh');
+
+                      return isIntraState
+                        ? (parseFloat(model.tax_amount || 0) / 2).toFixed(2)
                         : '0.00';
                     },
-                    'templateOptions.disabled': 'true' // Make it read-only
+                    // 'templateOptions.disabled': true
                   },
-                  hideExpression: (model) => !model.billing_address || !model.billing_address?.includes('Andhra Pradesh') // Hide CGST for inter-state
+                  hideExpression: (model) => {
+                    const address = model.billing_address || model.shipping_address || '';
+                    const isIntraState =
+                      address === '' || address.includes('Andhra Pradesh');
+
+                    return !isIntraState;
+                  }
                 },
-                {
+                                {
                   key: 'igst',
                   type: 'text',
                   className: 'col-12',
@@ -5019,19 +5295,95 @@ getUnitData(unitInfo: any) {
                   },
                   defaultValue: '0.00',
                   expressionProperties: {
-                    'model.igst': (model, field) => {
-                      if (!field._lastValue || field._lastValue !== model.tax_amount) {
-                        const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
-                        field._lastValue = model.tax_amount;
-                      }
-                      return !model.billing_address?.includes('Andhra Pradesh')
-                        ? parseFloat(model.tax_amount).toFixed(2)
+                    'model.igst': (model) => {
+                      const address = model.billing_address || model.shipping_address || '';
+
+                      const isIntraState =
+                        address === '' || address.includes('Andhra Pradesh');
+
+                      return !isIntraState
+                        ? parseFloat(model.tax_amount || 0).toFixed(2)
                         : '0.00';
                     },
-                    'templateOptions.disabled': 'true' // Make it read-only
+                    // 'templateOptions.disabled': true
                   },
-                  hideExpression: (model) => !model.billing_address || model.billing_address?.includes('Andhra Pradesh') // Hide if intra-state
+                  hideExpression: (model) => {
+                    const address = model.billing_address || model.shipping_address || '';
+                    const isIntraState =
+                      address === '' || address.includes('Andhra Pradesh');
+
+                    return isIntraState;
+                  }
                 },
+                // {
+                //   key: 'cgst',
+                //   type: 'text',
+                //   className: 'col-12',
+                //   templateOptions: {
+                //     label: 'Output CGST',
+                //     required: false
+                //   },
+                //   defaultValue: '0.00',
+                //   expressionProperties: {
+                //     'model.cgst': (model, field) => {
+                //       if (!field._lastValue || field._lastValue !== model.tax_amount) {
+                //         const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
+                //         field._lastValue = model.tax_amount; // Store last value to avoid infinite logs
+                //       }
+                //       return model.billing_address?.includes('Andhra Pradesh')
+                //         ? (parseFloat(model.tax_amount) / 2).toFixed(2)
+                //         : '0.00';
+                //     },
+                //     'templateOptions.disabled': 'true' // Make it read-only
+                //   },
+                //   hideExpression: (model) => !model.billing_address || !model.billing_address?.includes('Andhra Pradesh') // Hide CGST for inter-state
+                // },
+                // {
+                //   key: 'sgst',
+                //   type: 'text',
+                //   className: 'col-12',
+                //   templateOptions: {
+                //     label: 'Output SGST',
+                //     required: false
+                //   },
+                //   defaultValue: '0.00',
+                //   expressionProperties: {
+                //     'model.sgst': (model, field) => {
+                //       if (!field._lastValue || field._lastValue !== model.tax_amount) {
+                //         const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
+                //         field._lastValue = model.tax_amount;
+                //       }
+                //       return model.billing_address?.includes('Andhra Pradesh')
+                //         ? (parseFloat(model.tax_amount) / 2).toFixed(2)
+                //         : '0.00';
+                //     },
+                //     'templateOptions.disabled': 'true' // Make it read-only
+                //   },
+                //   hideExpression: (model) => !model.billing_address || !model.billing_address?.includes('Andhra Pradesh') // Hide CGST for inter-state
+                // },
+                // {
+                //   key: 'igst',
+                //   type: 'text',
+                //   className: 'col-12',
+                //   templateOptions: {
+                //     label: 'Output IGST',
+                //     required: false
+                //   },
+                //   defaultValue: '0.00',
+                //   expressionProperties: {
+                //     'model.igst': (model, field) => {
+                //       if (!field._lastValue || field._lastValue !== model.tax_amount) {
+                //         const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
+                //         field._lastValue = model.tax_amount;
+                //       }
+                //       return !model.billing_address?.includes('Andhra Pradesh')
+                //         ? parseFloat(model.tax_amount).toFixed(2)
+                //         : '0.00';
+                //     },
+                //     'templateOptions.disabled': 'true' // Make it read-only
+                //   },
+                //   hideExpression: (model) => !model.billing_address || model.billing_address?.includes('Andhra Pradesh') // Hide if intra-state
+                // },
                 {
                   key: 'advance_amount',
                   type: 'text',
@@ -5582,64 +5934,124 @@ getUnitData(unitInfo: any) {
                   disabled: true
                 }
               },
+              // {
+              //   type: 'input',
+              //   key: 'quantity',
+              //   templateOptions: {
+              //     type: 'number',
+              //     label: 'Qty',
+              //     placeholder: 'Qty',
+              //     min: 1,
+              //     hideLabel: true,
+              //     required: false
+              //   },
+              //   hooks: {
+              //     onInit: (field: any) => {
+              //       const parentArray = field.parent;
+
+              //       if (parentArray) {
+              //         const currentRowIndex = +parentArray.key;
+
+              //         if (
+              //           this.dataToPopulate &&
+              //           this.dataToPopulate.sale_order_items.length > currentRowIndex
+              //         ) {
+              //           const existingQuan =
+              //             this.dataToPopulate.sale_order_items[currentRowIndex].quantity;
+
+              //           if (existingQuan) {
+              //             field.formControl.setValue(existingQuan);
+              //           }
+              //         }
+              //       }
+
+              //       // 🔥 Quantity change logic
+              //       field.formControl.valueChanges.subscribe(quantity => {
+
+              //         if (!field.form || !field.form.controls) return;
+
+              //         const rate = Number(field.form.controls.rate?.value || 0);
+              //         const discount = Number(field.form.controls.discount?.value || 0);
+              //         const availableQty = Number(field.form.controls.available_qty?.value || 0);
+
+              //         const qty = Number(quantity || 0);
+
+              //         // ---------------- Amount calculation (existing)
+              //         const productDiscount = rate * qty * discount / 100;
+              //         if (rate && qty) {
+              //           field.form.controls.amount?.setValue(
+              //             rate * qty - productDiscount
+              //           );
+              //         }
+
+              //         // ---------------- ✅ Production Qty calculation (NEW)
+              //         const productionQty = Math.max(0, qty - availableQty);
+              //         field.form.controls.production_qty?.setValue(productionQty);
+              //         this.triggerDraftSave(); // Auto-save draft on quantity change
+              //       });
+              //     }
+              //   }
+              // },
               {
-                type: 'input',
-                key: 'quantity',
-                templateOptions: {
-                  type: 'number',
-                  label: 'Qty',
-                  placeholder: 'Qty',
-                  min: 1,
-                  hideLabel: true,
-                  required: false
-                },
-                hooks: {
-                  onInit: (field: any) => {
-                    const parentArray = field.parent;
+  type: 'input',
+  key: 'quantity',
+  templateOptions: {
+    type: 'number',
+    step: 0.01,
+    label: 'Qty',
+    placeholder: 'Qty',
+    min: 1,
+    hideLabel: true,
+    required: false
+  },
+  hooks: {
+    onInit: (field: any) => {
+      const parentArray = field.parent;
 
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key;
+      if (parentArray) {
+        const currentRowIndex = +parentArray.key;
 
-                      if (
-                        this.dataToPopulate &&
-                        this.dataToPopulate.sale_order_items.length > currentRowIndex
-                      ) {
-                        const existingQuan =
-                          this.dataToPopulate.sale_order_items[currentRowIndex].quantity;
+        if (
+          this.dataToPopulate &&
+          this.dataToPopulate.sale_order_items.length > currentRowIndex
+        ) {
+          const existingQuan =
+            this.dataToPopulate.sale_order_items[currentRowIndex].quantity;
 
-                        if (existingQuan) {
-                          field.formControl.setValue(existingQuan);
-                        }
-                      }
-                    }
+          if (existingQuan) {
+            field.formControl.setValue(existingQuan);
+          }
+        }
+      }
 
-                    // 🔥 Quantity change logic
-                    field.formControl.valueChanges.subscribe(quantity => {
+      field.formControl.valueChanges.subscribe(quantity => {
 
-                      if (!field.form || !field.form.controls) return;
+        if (!field.form || !field.form.controls) return;
 
-                      const rate = Number(field.form.controls.rate?.value || 0);
-                      const discount = Number(field.form.controls.discount?.value || 0);
-                      const availableQty = Number(field.form.controls.available_qty?.value || 0);
+        const rate = Number(field.form.controls.rate?.value || 0);
+        const discount = Number(field.form.controls.discount?.value || 0);
+        const availableQty = Number(field.form.controls.available_qty?.value || 0);
 
-                      const qty = Number(quantity || 0);
+        const qty = Number(quantity || 0);
 
-                      // ---------------- Amount calculation (existing)
-                      const productDiscount = rate * qty * discount / 100;
-                      if (rate && qty) {
-                        field.form.controls.amount?.setValue(
-                          rate * qty - productDiscount
-                        );
-                      }
+        // Existing Amount Logic (KEEP)
+        const productDiscount = rate * qty * discount / 100;
+        if (rate && qty) {
+          field.form.controls.amount?.setValue(
+            rate * qty - productDiscount
+          );
+        }
 
-                      // ---------------- ✅ Production Qty calculation (NEW)
-                      const productionQty = Math.max(0, qty - availableQty);
-                      field.form.controls.production_qty?.setValue(productionQty);
-                      this.triggerDraftSave(); // Auto-save draft on quantity change
-                    });
-                  }
-                }
-              },
+        // Production Qty Logic
+        const productionQty = Math.max(0, qty - availableQty);
+        field.form.controls.production_qty?.setValue(productionQty);
+
+        this.totalAmountCal();
+        this.triggerDraftSave();
+      });
+    }
+  }
+},
               {
                 type: 'input',
                 key: 'production_qty',
@@ -5691,80 +6103,387 @@ getUnitData(unitInfo: any) {
                           field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity));
                         }
                       }
+                      this.totalAmountCal();
                       this.triggerDraftSave(); // Auto-save draft on rate change
                     });
                   }
                 }
               },
+//               {
+//   type: 'input',
+//   key: 'rate',
+//   templateOptions: {
+//     type: 'number',
+//     step: 0.01,
+//     label: 'Rate',
+//     placeholder: 'Enter Rate',
+//     hideLabel: true,
+//   },
+//   hooks: {
+//     onInit: (field: any) => {
+//       const parentArray = field.parent;
+
+//       if (parentArray) {
+//         const currentRowIndex = +parentArray.key;
+
+//         if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
+//           const existingPrice = this.dataToPopulate.sale_order_items[currentRowIndex].rate;
+
+//           if (existingPrice) {
+//             field.formControl.setValue(existingPrice);
+//           }
+//         }
+//       }
+
+//       field.formControl.valueChanges.subscribe(() => {
+//         this.totalAmountCal();
+//         this.triggerDraftSave();
+//       });
+//     }
+//   }
+// },
+{
+  type: 'select',
+  key: 'discount_type',
+  templateOptions: {
+    placeholder: 'Type',
+    label: 'Discount Type',
+    hideLabel: true,
+    options: [
+      { label: '%', value: 'percentage' },
+      { label: '₹', value: 'amount' }
+    ]
+  },
+  defaultValue: 'percentage',
+  hooks: {
+    onInit: (field: any) => {
+      field.formControl.valueChanges.subscribe(type => {
+        if (!field.form?.controls) return;
+
+        if (type === 'percentage') {
+          field.form.controls.discount_amount?.setValue(0, { emitEvent: false });
+        } else {
+          field.form.controls.discount?.setValue(0, { emitEvent: false });
+        }
+
+        this.totalAmountCal();
+      });
+    }
+  }
+},
+              // {
+              //   type: 'input',
+              //   key: 'discount_amount',
+              //   templateOptions: {
+              //     type: 'number',
+              //     placeholder: 'Disc ₹',
+              //     label: 'Disc ₹',
+              //     hideLabel: true,
+              //   },
+              //   expressionProperties: {
+              //     'templateOptions.disabled': (model: any) => {
+              //       return model.discount_type === 'percentage';
+              //     }
+              //   },
+              //   hooks: {
+              //     onInit: (field: any) => {
+              //       field.formControl.valueChanges.subscribe(value => {
+              //         if (!field.form?.controls) return;
+
+              //         // stop if disabled
+              //         if (field.model.discount_type === 'percentage') return;
+
+              //         const rate = Number(field.form.controls.rate?.value || 0);
+              //         const qty = Number(field.form.controls.quantity?.value || 0);
+              //         const total = rate * qty;
+
+              //         if (total > 0) {
+              //           const amount = Number(value || 0);
+
+              //           // ERP safe percent conversion
+              //           const percent = (amount / total) * 100;
+
+              //           field.form.controls.discount?.setValue(
+              //             Number(percent.toFixed(4)), // store accurate %
+              //             { emitEvent: false }
+              //           );
+              //         }
+
+              //         this.totalAmountCal();
+              //       });
+              //     }
+              //   }
+              // },
               {
-                type: 'input',
-                key: 'discount',
-                templateOptions: {
-                  type: 'number',
-                  placeholder: 'Enter Disc',
-                  label: 'Discount (%)',
-                  hideLabel: true,
-                },
-                hooks: {
-                  onInit: (field: any) => {
-                    const parentArray = field.parent;
+  type: 'input',
+  key: 'discount_amount',
+  templateOptions: {
+    type: 'number',
+    step: 0.01,
+    placeholder: 'Disc ₹',
+    label: 'Disc ₹',
+    hideLabel: true,
+  },
+  expressionProperties: {
+    'templateOptions.disabled': (model: any) => {
+      return model.discount_type === 'percentage';
+    }
+  },
+  hooks: {
+    onInit: (field: any) => {
+      field.formControl.valueChanges.subscribe(value => {
 
-                    // Check if parentArray exists and proceed
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+        if (!field.form?.controls) return;
+        if (field.model.discount_type === 'percentage') return;
 
-                      if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
-                        const existingDisc = this.dataToPopulate.sale_order_items[currentRowIndex].discount;
-                        console.log("existingDisc : ", existingDisc)
-                        // Just update this condition to include zeroes
-                        if (existingDisc) {
-                          field.formControl.setValue(existingDisc);
-                        }
-                      }
-                    }
+        const rate = Number(field.form.controls.rate?.value || 0);
+        const qty = Number(field.form.controls.quantity?.value || 0);
+        const total = rate * qty;
 
-                    // Subscribe to discount value changes
-                    field.formControl.valueChanges.subscribe(discount => {
-                      this.totalAmountCal();
-                      // Your original amount-calculation logic remains commented and untouched
-                    });
-                  }
-                }
-              },
+        if (total > 0) {
+          let amount = Number(value || 0);
+
+          if (amount > total) amount = total;
+
+          const percent = (amount / total) * 100;
+
+          field.form.controls.discount?.setValue(
+            Number(percent.toFixed(2)),
+            { emitEvent: false }
+          );
+        }
+
+        this.totalAmountCal();
+      });
+    }
+  }
+},
+              // {
+              //   type: 'input',
+              //   key: 'discount',
+              //   templateOptions: {
+              //     type: 'number',
+              //     placeholder: 'Enter Disc',
+              //     label: 'Discount (%)',
+              //     hideLabel: true,
+              //   },
+              //   expressionProperties: {
+              //     'templateOptions.readonly': (model: any) => {
+              //       return model.discount_type === 'amount';
+              //     }
+              //   },
+              //   hooks: {
+              //     onInit: (field: any) => {
+              //       const parentArray = field.parent;
+
+              //       // Check if parentArray exists and proceed
+              //       if (parentArray) {
+              //         const currentRowIndex = +parentArray.key; // Simplified number conversion
+
+              //         if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
+              //           const existingDisc = this.dataToPopulate.sale_order_items[currentRowIndex].discount;
+              //           console.log("existingDisc : ", existingDisc)
+              //           // Just update this condition to include zeroes
+              //           if (existingDisc) {
+              //             field.formControl.setValue(existingDisc);
+              //           }
+              //         }
+              //       }
+
+              //       // Subscribe to discount value changes
+              //       field.formControl.valueChanges.subscribe(discount => {
+              //         this.totalAmountCal();
+              //         // Your original amount-calculation logic remains commented and untouched
+              //       });
+              //     }
+              //   }
+              // },
+              // {
+              //   type: 'input',
+              //   key: 'discount',
+              //   templateOptions: {
+              //     type: 'number',
+              //     placeholder: 'Disc %',
+              //     label: 'Disc %',
+              //     hideLabel: true,
+              //   },
+              //   expressionProperties: {
+              //     'templateOptions.disabled': (model: any) => {
+              //       return model.discount_type === 'amount';
+              //     }
+              //   },
+              //   hooks: {
+              //     onInit: (field: any) => {
+              //       const parentArray = field.parent;
+
+              //       if (parentArray) {
+              //         const currentRowIndex = +parentArray.key;
+
+              //         if (
+              //           this.dataToPopulate &&
+              //           this.dataToPopulate.sale_order_items.length > currentRowIndex
+              //         ) {
+              //           const existingDisc =
+              //             this.dataToPopulate.sale_order_items[currentRowIndex].discount;
+
+              //           if (existingDisc !== null && existingDisc !== undefined) {
+              //             field.formControl.setValue(existingDisc);
+              //           }
+              //         }
+              //       }
+
+              //       field.formControl.valueChanges.subscribe(value => {
+              //         if (!field.form?.controls) return;
+
+              //         // stop if disabled
+              //         if (field.model.discount_type === 'amount') return;
+
+              //         const rate = Number(field.form.controls.rate?.value || 0);
+              //         const qty = Number(field.form.controls.quantity?.value || 0);
+              //         const total = rate * qty;
+
+              //         if (total > 0) {
+              //           const percent = Number(value || 0);
+
+              //           const discountAmount = (percent / 100) * total;
+
+              //           field.form.controls.discount_amount?.setValue(
+              //             Number(discountAmount.toFixed(2)), // ERP currency rounding
+              //             { emitEvent: false }
+              //           );
+              //         }
+
+              //         this.totalAmountCal();
+              //       });
+              //     }
+              //   }
+              // },
               {
-                type: 'input',
-                key: 'amount',
-                templateOptions: {
-                  type: 'number',
-                  label: 'Amount',
-                  placeholder: 'Amount',
-                  hideLabel: true,
-                  disabled: true
-                },
-                hooks: {
-                  onInit: (field: any) => {
-                    const parentArray = field.parent;
+  type: 'input',
+  key: 'discount',
+  templateOptions: {
+    type: 'number',
+    step: 0.01,
+    placeholder: 'Disc %',
+    label: 'Disc %',
+    hideLabel: true,
+  },
+  expressionProperties: {
+    'templateOptions.disabled': (model: any) => {
+      return model.discount_type === 'amount';
+    }
+  },
+  hooks: {
+    onInit: (field: any) => {
+      const parentArray = field.parent;
 
-                    // Check if parentArray exists and proceed
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+      if (parentArray) {
+        const currentRowIndex = +parentArray.key;
 
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
-                        const existingAmount = this.dataToPopulate.sale_order_items[currentRowIndex].amount;
+        if (
+          this.dataToPopulate &&
+          this.dataToPopulate.sale_order_items.length > currentRowIndex
+        ) {
+          const existingDisc =
+            this.dataToPopulate.sale_order_items[currentRowIndex].discount;
 
-                        // Set the full product object instead of just the product_id
-                        if (existingAmount) {
-                          field.formControl.setValue(existingAmount); // Set full product object (not just product_id)
-                        }
-                      }
-                    }
-                    field.formControl.valueChanges.subscribe(data => {
-                      this.totalAmountCal();
-                    });
-                  }
-                }
-              },
+          if (existingDisc !== null && existingDisc !== undefined) {
+            field.formControl.setValue(existingDisc);
+          }
+        }
+      }
+
+      field.formControl.valueChanges.subscribe(value => {
+
+        if (!field.form?.controls) return;
+        if (field.model.discount_type === 'amount') return;
+
+        const rate = Number(field.form.controls.rate?.value || 0);
+        const qty = Number(field.form.controls.quantity?.value || 0);
+        const total = rate * qty;
+
+        if (total > 0) {
+          const percent = Number(value || 0);
+          const discountAmount = (percent / 100) * total;
+
+          field.form.controls.discount_amount?.setValue(
+            Number(discountAmount.toFixed(2)),
+            { emitEvent: false }
+          );
+        }
+
+        this.totalAmountCal();
+      });
+    }
+  }
+},
+              // {
+              //   type: 'input',
+              //   key: 'amount',
+              //   templateOptions: {
+              //     type: 'number',
+              //     label: 'Amount',
+              //     placeholder: 'Amount',
+              //     hideLabel: true,
+              //     disabled: true
+              //   },
+              //   hooks: {
+              //     onInit: (field: any) => {
+              //       const parentArray = field.parent;
+
+              //       // Check if parentArray exists and proceed
+              //       if (parentArray) {
+              //         const currentRowIndex = +parentArray.key; // Simplified number conversion
+
+              //         // Check if there is a product already selected in this row (when data is copied)
+              //         if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
+              //           const existingAmount = this.dataToPopulate.sale_order_items[currentRowIndex].amount;
+
+              //           // Set the full product object instead of just the product_id
+              //           if (existingAmount) {
+              //             field.formControl.setValue(existingAmount); // Set full product object (not just product_id)
+              //           }
+              //         }
+              //       }
+              //       field.formControl.valueChanges.subscribe(data => {
+              //         this.totalAmountCal();
+              //       });
+              //     }
+              //   }
+              // },
+              {
+  type: 'input',
+  key: 'amount',
+  templateOptions: {
+    type: 'number',
+    step: 0.01,
+    label: 'Amount',
+    placeholder: 'Amount',
+    hideLabel: true,
+    disabled: true
+  },
+  hooks: {
+    onInit: (field: any) => {
+      const parentArray = field.parent;
+
+      if (parentArray) {
+        const currentRowIndex = +parentArray.key;
+
+        if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
+          const existingAmount = this.dataToPopulate.sale_order_items[currentRowIndex].amount;
+
+          if (existingAmount) {
+            field.formControl.setValue(existingAmount);
+          }
+        }
+      }
+
+      field.formControl.valueChanges.subscribe(() => {
+        this.totalAmountCal();
+      });
+    }
+  }
+},
               {
                 type: 'input',
                 key: 'mrp',
@@ -5775,36 +6494,126 @@ getUnitData(unitInfo: any) {
                   disabled: true
                 },
               },
+              // {
+              //   type: 'input',
+              //   key: 'tax',
+              //   templateOptions: {
+              //     type: "number",
+              //     label: 'Tax',
+              //     placeholder: 'Tax',
+              //     hideLabel: false
+              //   },
+              //   expressionProperties: {
+              //     'templateOptions.label': (model: any, formState: any, field: any) => {
+
+              //       const rate = Number(field?.form?.controls?.rate?.value || 0);
+              //       const qty = Number(field?.form?.controls?.quantity?.value || 0);
+
+              //       // percentage
+              //       const discountPercent = Number(field?.form?.controls?.discount?.value || 0);
+
+              //       const taxPercent = Number(model?.tax || 0);
+
+              //       const grossAmount = rate * qty;
+
+              //       // ✅ convert percentage → amount
+              //       const discountAmount = (grossAmount * discountPercent) / 100;
+
+              //       const taxableAmount = grossAmount - discountAmount;
+
+              //       const taxAmount = (taxableAmount * taxPercent) / 100;
+
+              //       if (taxPercent > 0) {
+              //         return `(${taxPercent}% | ₹${taxAmount.toFixed(2)})`;
+              //       }
+
+              //       return '';
+              //     }
+              //   },
+              //   hooks: {
+              //     onInit: (field: any) => {
+              //       const parentArray = field.parent;
+
+              //       if (parentArray) {
+              //         const currentRowIndex = +parentArray.key;
+
+              //         if (
+              //           this.dataToPopulate &&
+              //           this.dataToPopulate.sale_order_items.length > currentRowIndex
+              //         ) {
+              //           const existingtax =
+              //             this.dataToPopulate.sale_order_items[currentRowIndex].tax;
+
+              //           if (existingtax || existingtax === 0) {
+              //             field.formControl.setValue(existingtax);
+              //           }
+              //         }
+              //       }
+              //     }
+              //   }
+              // },
               {
-                type: 'input',
-                key: 'tax',
-                templateOptions: {
-                  type: "number",
-                  label: 'Tax',
-                  placeholder: 'Tax',
-                  hideLabel: true
-                },
-                hooks: {
-                  onInit: (field: any) => {
-                    const parentArray = field.parent;
+  type: 'input',
+  key: 'tax',
+  templateOptions: {
+    type: "number",
+    step: 0.01,
+    label: 'Tax',
+    placeholder: 'Tax',
+    hideLabel: false
+  },
+  expressionProperties: {
+    'templateOptions.label': (model: any, formState: any, field: any) => {
 
-                    // Check if parentArray exists and proceed
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+      const rate = Number(field?.form?.controls?.rate?.value || 0);
+      const qty = Number(field?.form?.controls?.quantity?.value || 0);
 
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
-                        const existingtax = this.dataToPopulate.sale_order_items[currentRowIndex].tax;
+      const discountPercent = Number(field?.form?.controls?.discount?.value || 0);
+      const discountAmountField = Number(field?.form?.controls?.discount_amount?.value || 0);
 
-                        // Set the full product object instead of just the product_id
-                        if (existingtax) {
-                          field.formControl.setValue(existingtax); // Set full product object (not just product_id)
-                        }
-                      }
-                    }
-                  }
-                }
-              },
+      const taxPercent = Number(model?.tax || 0);
+
+      const grossAmount = rate * qty;
+
+      // ERP priority
+      const discountAmount =
+        model.discount_type === 'amount'
+          ? discountAmountField
+          : (grossAmount * discountPercent) / 100;
+
+      const taxableAmount = grossAmount - discountAmount;
+
+      const taxAmount = (taxableAmount * taxPercent) / 100;
+
+      if (taxPercent > 0) {
+        return `(${taxPercent}% | ₹${taxAmount.toFixed(2)})`;
+      }
+
+      return '';
+    }
+  },
+  hooks: {
+    onInit: (field: any) => {
+      const parentArray = field.parent;
+
+      if (parentArray) {
+        const currentRowIndex = +parentArray.key;
+
+        if (
+          this.dataToPopulate &&
+          this.dataToPopulate.sale_order_items.length > currentRowIndex
+        ) {
+          const existingtax =
+            this.dataToPopulate.sale_order_items[currentRowIndex].tax;
+
+          if (existingtax || existingtax === 0) {
+            field.formControl.setValue(existingtax);
+          }
+        }
+      }
+    }
+  }
+},
               {
                 type: 'input',
                 key: 'cgst',
@@ -6473,21 +7282,53 @@ getUnitData(unitInfo: any) {
                         // required: true
                       }
                     },
+                    // {
+                    //   key: 'shipping_charges',
+                    //   type: 'input',
+                    //   className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                    //   templateOptions: {
+                    //     type: "number",
+                    //     label: 'Shipping Charges.',
+                    //     placeholder: 'Enter Shipping Charges',
+                    //     // required: true
+                    //   },
+                    //   hooks: {
+                    //     onInit: (field: any) => {
+                    //       if (this.dataToPopulate && this.dataToPopulate.order_shipments.shipping_charges && field.formControl) {
+                    //         field.formControl.setValue(this.dataToPopulate.order_shipments.shipping_charges);
+                    //       }
+                    //     }
+                    //   }
+                    // }
                     {
                       key: 'shipping_charges',
                       type: 'input',
+                      defaultValue: "0",
                       className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                       templateOptions: {
                         type: "number",
                         label: 'Shipping Charges.',
                         placeholder: 'Enter Shipping Charges',
-                        // required: true
                       },
                       hooks: {
                         onInit: (field: any) => {
-                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.shipping_charges && field.formControl) {
-                            field.formControl.setValue(this.dataToPopulate.order_shipments.shipping_charges);
+
+                          // Populate existing value (edit mode)
+                          const existing = this.dataToPopulate?.order_shipments?.shipping_charges;
+                          if (existing !== undefined && existing !== null && field.formControl) {
+                            field.formControl.setValue(existing);
                           }
+
+                          // Subscribe to changes
+                          field.formControl.valueChanges.subscribe(data => {
+                            const numeric = parseFloat(data);
+                            field.formControl.setValue(isNaN(numeric) ? 0 : numeric, { emitEvent: false });
+
+                            // IMPORTANT: Sync with root model
+                            this.formConfig.model.shipping_charges = numeric || 0;
+
+                            this.totalAmountCal();
+                          });
                         }
                       }
                     }
@@ -6554,7 +7395,8 @@ getUnitData(unitInfo: any) {
                       templateOptions: {
                         type: 'input',
                         label: 'Email',
-                        placeholder: 'Enter Email'
+                        placeholder: 'Enter Email',
+                        readonly: true
                       },
                       hooks: {
                         onInit: (field: any) => {
@@ -6570,7 +7412,8 @@ getUnitData(unitInfo: any) {
                       className: 'col-md-4 col-sm-6 col-12',
                       templateOptions: {
                         label: 'Billing address',
-                        placeholder: 'Enter Billing address'
+                        placeholder: 'Enter Billing address',
+                        readonly: true
                       },
                       hooks: {
                         onInit: (field: any) => {
@@ -6586,7 +7429,8 @@ getUnitData(unitInfo: any) {
                       className: 'col-md-4 col-sm-6 col-12',
                       templateOptions: {
                         label: 'Shipping address',
-                        placeholder: 'Enter Shipping address'
+                        placeholder: 'Enter Shipping address',
+                        readonly: true
                       },
                       hooks: {
                         onInit: (field: any) => {

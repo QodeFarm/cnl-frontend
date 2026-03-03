@@ -410,13 +410,283 @@ export function getUnitData(unitInfo: any) {
   //   }
   // }
 
+// export function calculateTotalAmount(data: any, modelName: string, form: any) {
+//   if (!data) return;
+
+//   // Determine the parent model dynamically
+//   let parentModel = modelName.replace('_items', '');
+
+//   // Handling special cases for model names
+//   const modelMapping: { [key: string]: string } = {
+//     sale_invoice: 'sale_invoice_order',
+//     purchase_order: 'purchase_order_data',
+//     purchase_invoice: 'purchase_invoice_orders',
+//     sale_return: 'sale_return_order',
+//     purchase_return: 'purchase_return_orders'
+//   };
+
+//   parentModel = modelMapping[parentModel] || parentModel;
+
+//   const products = data[modelName] || [];
+//   let totalAmount = 0;
+//   let totalDiscount = 0;
+//   let totalRate = 0;
+
+//   // Reset taxAmount before recalculating
+//   let taxAmount = 0;
+
+//   const billingAddress = data[parentModel]?.billing_address || '';
+
+//   //  NEW: Identify Purchase Invoice without tax
+//   const isPurchaseInvoice = parentModel === 'purchase_invoice_orders';
+//   const isWithoutTaxPurchase =
+//     isPurchaseInvoice && data[parentModel]?.voucher === 'Purchase';
+
+//   if (products.length) {
+//     products.forEach((product: any) => {
+//       if (product) {
+//         const quantity = Number(product.quantity ?? 0);
+//         let rate = Number(product.rate ?? 0);
+//         const discountPercentage = Number(product.discount ?? 0);
+
+//         // Calculate individual product amounts
+//         const itemValue = quantity * rate;
+//         const discountAmount = (itemValue * discountPercentage) / 100;
+//         const amount = itemValue - discountAmount;
+
+//         product.item_value = itemValue.toFixed(2);
+//         product.discount_amount = discountAmount.toFixed(2);
+//         product.amount = amount.toFixed(2);
+
+//         // Update totals
+//         if (amount > 0 && quantity > 0) {
+//           totalRate += itemValue;
+//           totalAmount += amount;
+//           totalDiscount += discountAmount;
+
+//           //  UPDATED GST LOGIC (Purchase without tax bypass)
+//           if (!isWithoutTaxPurchase && product.product?.gst_input) {
+//             const gstValue = (amount * Number(product.product.gst_input)) / 100;
+
+//             if (billingAddress.includes('Andhra Pradesh')) {
+//               product.cgst = (gstValue / 2).toFixed(2);
+//               product.sgst = (gstValue / 2).toFixed(2);
+//               product.igst = 0.00;
+//             } else {
+//               product.igst = gstValue.toFixed(2);
+//               product.cgst = 0.00;
+//               product.sgst = 0.00;
+//             }
+//           } else {
+//             //  Force zero tax for Purchase (Without Tax)
+//             product.cgst = 0.00;
+//             product.sgst = 0.00;
+//             product.igst = 0.00;
+//           }
+//         }
+//       }
+//     });
+
+//     //  UPDATED total tax calculation
+//     taxAmount = isWithoutTaxPurchase
+//       ? 0
+//       : products.reduce((totalTax: number, product: any) => {
+//           return (
+//             totalTax +
+//             Number(product.igst || 0) +
+//             Number(product.sgst || 0) +
+//             Number(product.cgst || 0)
+//           );
+//         }, 0);
+
+//     // Apply GST values to form controls
+//     products.forEach((product: any, index: number) => {
+//       const itemControls = form?.controls?.[modelName]?.controls?.[index];
+
+//       if (itemControls && itemControls instanceof FormGroup) {
+//         const controls = itemControls.controls;
+
+//         if (controls['cgst']) controls['cgst'].setValue(product.cgst || 0.00);
+//         if (controls['sgst']) controls['sgst'].setValue(product.sgst || 0.00);
+//         if (controls['igst']) controls['igst'].setValue(product.igst || 0.00);
+//       }
+//     });
+//   }
+
+//   // Update parent totals
+//   if (form?.controls?.[parentModel]?.controls) {
+//     const controls: any = form.controls[parentModel].controls;
+
+//     if (controls.item_value) controls.item_value.setValue(totalRate.toFixed(2));
+//     if (controls.tax_amount) controls.tax_amount.setValue(taxAmount.toFixed(2));
+//     if (controls.discount) controls.discount.setValue(totalDiscount.toFixed(2));
+
+//     const cessAmount = Number(data[parentModel]?.cess_amount ?? 0);
+//     const advanceAmount = Number(data[parentModel]?.advance_amount ?? 0);
+//     const saleOrderDiscount = Number(data[parentModel]?.dis_amt ?? 0);
+
+//     const finalAmount =
+//       totalAmount + taxAmount + cessAmount - saleOrderDiscount - advanceAmount;
+
+//     controls.total_amount.setValue(finalAmount.toFixed(2));
+//   } else {
+//     console.error('Form controls not found for:', parentModel);
+//   }
+// }
+
+// export function calculateTotalAmount(data: any, modelName: string, form: any) {
+//   if (!data) return;
+
+//   let parentModel = modelName.replace('_items', '');
+
+//   const modelMapping: { [key: string]: string } = {
+//     sale_invoice: 'sale_invoice_order',
+//     purchase_order: 'purchase_order_data',
+//     purchase_invoice: 'purchase_invoice_orders',
+//     sale_return: 'sale_return_order',
+//     purchase_return: 'purchase_return_orders'
+//   };
+
+//   parentModel = modelMapping[parentModel] || parentModel;
+
+//   const products = data[modelName] || [];
+//   let totalAmount = 0;
+//   let totalDiscount = 0;
+//   let totalRate = 0;
+//   let taxAmount = 0;
+
+//   const companyState = 'Andhra Pradesh';
+//   const billingAddress = data[parentModel]?.billing_address || '';
+
+//   // Default local state if customer state missing
+//   const isLocalState =
+//     !billingAddress || billingAddress.includes(companyState);
+
+//   const taxType = data[parentModel]?.tax || 'Exclusive';
+
+//   const isPurchaseInvoice = parentModel === 'purchase_invoice_orders';
+//   const isWithoutTaxPurchase =
+//     isPurchaseInvoice && data[parentModel]?.voucher === 'Purchase';
+
+//   if (products.length) {
+//     products.forEach((product: any) => {
+//       if (product) {
+//         const quantity = Number(product.quantity ?? 0);
+//         let rate = Number(product.rate ?? 0);
+
+//         const itemValue = quantity * rate;
+
+//         // --------------------------------
+//         // Discount Logic (NEW)
+//         // --------------------------------
+//         let discountAmount = 0;
+
+//         if (product.discount_amount && Number(product.discount_amount) > 0) {
+//           discountAmount = Number(product.discount_amount);
+//         } else {
+//           const discountPercentage = Number(product.discount ?? 0);
+//           discountAmount = (itemValue * discountPercentage) / 100;
+//         }
+
+//         const amountBeforeTax = itemValue - discountAmount;
+
+//         let amount = amountBeforeTax;
+//         let gstValue = 0;
+
+//         // --------------------------------
+//         // Inclusive / Exclusive GST Logic
+//         // --------------------------------
+//         if (!isWithoutTaxPurchase && product.product?.gst_input) {
+//           const gstPercent = Number(product.product.gst_input);
+
+//           if (taxType === 'Inclusive') {
+//             const baseAmount =
+//               amountBeforeTax / (1 + gstPercent / 100);
+
+//             gstValue = amountBeforeTax - baseAmount;
+//             amount = baseAmount;
+//           } else {
+//             gstValue = (amountBeforeTax * gstPercent) / 100;
+//           }
+//         }
+
+//         product.item_value = itemValue.toFixed(2);
+//         product.discount_amount = discountAmount.toFixed(2);
+//         product.amount = amount.toFixed(2);
+
+//         if (amount > 0 && quantity > 0) {
+//           totalRate += itemValue;
+//           totalAmount += amount;
+//           totalDiscount += discountAmount;
+
+//           if (!isWithoutTaxPurchase && product.product?.gst_input) {
+//             if (isLocalState) {
+//               product.cgst = (gstValue / 2).toFixed(2);
+//               product.sgst = (gstValue / 2).toFixed(2);
+//               product.igst = 0.00;
+//             } else {
+//               product.igst = gstValue.toFixed(2);
+//               product.cgst = 0.00;
+//               product.sgst = 0.00;
+//             }
+//           } else {
+//             product.cgst = 0.00;
+//             product.sgst = 0.00;
+//             product.igst = 0.00;
+//           }
+//         }
+//       }
+//     });
+
+//     taxAmount = isWithoutTaxPurchase
+//       ? 0
+//       : products.reduce((totalTax: number, product: any) => {
+//           return (
+//             totalTax +
+//             Number(product.igst || 0) +
+//             Number(product.sgst || 0) +
+//             Number(product.cgst || 0)
+//           );
+//         }, 0);
+
+//     products.forEach((product: any, index: number) => {
+//       const itemControls = form?.controls?.[modelName]?.controls?.[index];
+
+//       if (itemControls && itemControls instanceof FormGroup) {
+//         const controls = itemControls.controls;
+
+//         if (controls['cgst']) controls['cgst'].setValue(product.cgst || 0.00);
+//         if (controls['sgst']) controls['sgst'].setValue(product.sgst || 0.00);
+//         if (controls['igst']) controls['igst'].setValue(product.igst || 0.00);
+//       }
+//     });
+//   }
+
+//   if (form?.controls?.[parentModel]?.controls) {
+//     const controls: any = form.controls[parentModel].controls;
+
+//     if (controls.item_value) controls.item_value.setValue(totalRate.toFixed(2));
+//     if (controls.tax_amount) controls.tax_amount.setValue(taxAmount.toFixed(2));
+//     if (controls.discount) controls.discount.setValue(totalDiscount.toFixed(2));
+
+//     const cessAmount = Number(data[parentModel]?.cess_amount ?? 0);
+//     const advanceAmount = Number(data[parentModel]?.advance_amount ?? 0);
+//     const saleOrderDiscount = Number(data[parentModel]?.dis_amt ?? 0);
+
+//     const finalAmount =
+//       totalAmount + taxAmount + cessAmount - saleOrderDiscount - advanceAmount;
+
+//     controls.total_amount.setValue(finalAmount.toFixed(2));
+//   } else {
+//     console.error('Form controls not found for:', parentModel);
+//   }
+// }
+
 export function calculateTotalAmount(data: any, modelName: string, form: any) {
   if (!data) return;
 
-  // Determine the parent model dynamically
   let parentModel = modelName.replace('_items', '');
 
-  // Handling special cases for model names
   const modelMapping: { [key: string]: string } = {
     sale_invoice: 'sale_invoice_order',
     purchase_order: 'purchase_order_data',
@@ -431,13 +701,16 @@ export function calculateTotalAmount(data: any, modelName: string, form: any) {
   let totalAmount = 0;
   let totalDiscount = 0;
   let totalRate = 0;
-
-  // Reset taxAmount before recalculating
   let taxAmount = 0;
 
+  const companyState = 'Andhra Pradesh';
   const billingAddress = data[parentModel]?.billing_address || '';
 
-  //  NEW: Identify Purchase Invoice without tax
+  const isLocalState =
+    !billingAddress || billingAddress.includes(companyState);
+
+  const taxType = data[parentModel]?.tax || 'Exclusive';
+
   const isPurchaseInvoice = parentModel === 'purchase_invoice_orders';
   const isWithoutTaxPurchase =
     isPurchaseInvoice && data[parentModel]?.voucher === 'Purchase';
@@ -447,28 +720,50 @@ export function calculateTotalAmount(data: any, modelName: string, form: any) {
       if (product) {
         const quantity = Number(product.quantity ?? 0);
         let rate = Number(product.rate ?? 0);
-        const discountPercentage = Number(product.discount ?? 0);
 
-        // Calculate individual product amounts
         const itemValue = quantity * rate;
-        const discountAmount = (itemValue * discountPercentage) / 100;
-        const amount = itemValue - discountAmount;
+
+        // Discount Logic
+        let discountAmount = 0;
+
+        if (product.discount_amount && Number(product.discount_amount) > 0) {
+          discountAmount = Number(product.discount_amount);
+        } else {
+          const discountPercentage = Number(product.discount ?? 0);
+          discountAmount = (itemValue * discountPercentage) / 100;
+        }
+
+        const amountBeforeTax = itemValue - discountAmount;
+
+        let amount = amountBeforeTax;
+        let gstValue = 0;
+
+        // Inclusive / Exclusive GST Logic
+        if (!isWithoutTaxPurchase && product.product?.gst_input) {
+          const gstPercent = Number(product.product.gst_input);
+
+          if (taxType === 'Inclusive') {
+            const baseAmount =
+              amountBeforeTax / (1 + gstPercent / 100);
+
+            gstValue = amountBeforeTax - baseAmount;
+            amount = baseAmount;
+          } else {
+            gstValue = (amountBeforeTax * gstPercent) / 100;
+          }
+        }
 
         product.item_value = itemValue.toFixed(2);
         product.discount_amount = discountAmount.toFixed(2);
         product.amount = amount.toFixed(2);
 
-        // Update totals
         if (amount > 0 && quantity > 0) {
           totalRate += itemValue;
           totalAmount += amount;
           totalDiscount += discountAmount;
 
-          //  UPDATED GST LOGIC (Purchase without tax bypass)
           if (!isWithoutTaxPurchase && product.product?.gst_input) {
-            const gstValue = (amount * Number(product.product.gst_input)) / 100;
-
-            if (billingAddress.includes('Andhra Pradesh')) {
+            if (isLocalState) {
               product.cgst = (gstValue / 2).toFixed(2);
               product.sgst = (gstValue / 2).toFixed(2);
               product.igst = 0.00;
@@ -478,7 +773,6 @@ export function calculateTotalAmount(data: any, modelName: string, form: any) {
               product.sgst = 0.00;
             }
           } else {
-            //  Force zero tax for Purchase (Without Tax)
             product.cgst = 0.00;
             product.sgst = 0.00;
             product.igst = 0.00;
@@ -487,7 +781,39 @@ export function calculateTotalAmount(data: any, modelName: string, form: any) {
       }
     });
 
-    //  UPDATED total tax calculation
+    // --------------------------------
+    // Shipping Charges Tax Calculation (NEW)
+    // --------------------------------
+    const shippingCharges =
+      Number(data?.order_shipments?.shipping_charges ?? 0);
+
+    const shippingGstPercent =
+      Number(data[parentModel]?.shipping_gst ?? 0);
+
+    let shippingTaxAmount = 0;
+    let shippingCgst = 0;
+    let shippingSgst = 0;
+    let shippingIgst = 0;
+
+    if (shippingCharges > 0 && shippingGstPercent > 0) {
+      if (taxType === 'Inclusive') {
+        const baseShipping =
+          shippingCharges / (1 + shippingGstPercent / 100);
+
+        shippingTaxAmount = shippingCharges - baseShipping;
+      } else {
+        shippingTaxAmount =
+          (shippingCharges * shippingGstPercent) / 100;
+      }
+
+      if (isLocalState) {
+        shippingCgst = shippingTaxAmount / 2;
+        shippingSgst = shippingTaxAmount / 2;
+      } else {
+        shippingIgst = shippingTaxAmount;
+      }
+    }
+
     taxAmount = isWithoutTaxPurchase
       ? 0
       : products.reduce((totalTax: number, product: any) => {
@@ -499,7 +825,9 @@ export function calculateTotalAmount(data: any, modelName: string, form: any) {
           );
         }, 0);
 
-    // Apply GST values to form controls
+    // Add shipping tax
+    taxAmount += shippingTaxAmount;
+
     products.forEach((product: any, index: number) => {
       const itemControls = form?.controls?.[modelName]?.controls?.[index];
 
@@ -513,7 +841,6 @@ export function calculateTotalAmount(data: any, modelName: string, form: any) {
     });
   }
 
-  // Update parent totals
   if (form?.controls?.[parentModel]?.controls) {
     const controls: any = form.controls[parentModel].controls;
 
@@ -525,8 +852,21 @@ export function calculateTotalAmount(data: any, modelName: string, form: any) {
     const advanceAmount = Number(data[parentModel]?.advance_amount ?? 0);
     const saleOrderDiscount = Number(data[parentModel]?.dis_amt ?? 0);
 
+    const shippingCharges =
+      Number(data?.order_shipments?.shipping_charges ?? 0);
+    
+    // Push to parent model so billing summary can read it
+    if (controls.shipping_charges) {
+      controls.shipping_charges.setValue(shippingCharges.toFixed(2));
+    }
+
     const finalAmount =
-      totalAmount + taxAmount + cessAmount - saleOrderDiscount - advanceAmount;
+      totalAmount +
+      taxAmount +
+      shippingCharges +
+      cessAmount -
+      saleOrderDiscount -
+      advanceAmount;
 
     controls.total_amount.setValue(finalAmount.toFixed(2));
   } else {

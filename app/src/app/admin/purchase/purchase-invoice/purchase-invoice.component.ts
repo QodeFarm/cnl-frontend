@@ -878,15 +878,26 @@ loadQuickpackProducts() {
                   }
                 },
                 {
-                  key: 'supplier_invoice_no',
+                  key: 'supplier_invoice_date', 
+                  type: 'date',
+                  // defaultValue: "testing@example.com",
+                  className: 'col-md-4 col-sm-6 col-12',
+                  templateOptions: {
+                    type: 'input',
+                    label: 'Supplier invoice Date',
+                    required: false
+                  },
+                },
+                {
+                  key: 'supplier_invoice_no', //supplier_invoice_date
                   type: 'input',
                   // defaultValue: "testing@example.com",
                   className: 'col-md-4 col-sm-6 col-12',
                   templateOptions: {
                     type: 'input',
-                    label: 'Supiler invoice no',
-                    placeholder: 'Enter Supiler invoice no',
-                    required: false
+                    label: 'Supplier invoice no',
+                    placeholder: 'Enter Supplier invoice no',
+                    required: true
                   },
                   hooks: {
                     onInit: (field: any) => { }
