@@ -5071,6 +5071,7 @@ export class SalesComponent {
                                   .filter(item => item.product_id)   // only keep valid rows
                                   .map(item => ({
                                     ...item,
+                                    quantity: Number(item.quantity || 0) - Number(item.production_qty || 0),
                                     discount: item.discount
                                   })),
                                 order_attachments: orderAttachments,
