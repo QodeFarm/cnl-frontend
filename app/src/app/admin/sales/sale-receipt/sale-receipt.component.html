@@ -30,8 +30,8 @@
       <h5>Confirm Receipt</h5>
       <p>Are you sure you want to confirm the receipt for order {{ selectedReceipt?.receipt_no }}?</p>
       <div class="dialog-actions">
-        <button class="btn btn-danger" (click)="closeModal()">Cancel</button>
-        <button class="btn btn-primary" (click)="confirmReceipt()">Confirm</button>
+        <button class="btn-cancel" (click)="closeModal()">Cancel</button>
+        <button class="btn-confirm" (click)="confirmReceipt()">Confirm</button>
       </div>
     </div>
   </div>
@@ -39,6 +39,21 @@
   <div id="customDialog" class="custom-dialog-overlay" style="display: none;">
     <div class="custom-dialog-box">
     <p> ⚠️ This Record Receipt confirmed Previously, choose another Record</p>
-    <button id="dialogOkButton" (click)="closeDialog()">OK</button>
+    <button class="btn-ok" id="dialogOkButton" (click)="closeDialog()">OK</button>
     </div>
   </div>
+
+  <!-- Post-Confirm Notification Template -->
+  <ng-template #postConfirmTpl>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <span style="font-weight: 600; color: #16a34a;">✅ Receipt Confirmed</span>
+      <span>Order <b>{{ confirmedOrderNo }}</b> marked as Completed.</span>
+      <span style="font-size: 12px; color: #666;">
+        Parent <b>{{ confirmedParentOrderNo }}</b> → <b>{{ parentNewStatus }}</b>
+      </span>
+      <button (click)="viewParentSaleOrder()"
+        style="background: #142768; color: #fff; border: none; border-radius: 4px; padding: 6px 16px; font-size: 13px; font-weight: 600; cursor: pointer; align-self: flex-start; margin-top: 4px;">
+        View Sale Order →
+      </button>
+    </div>
+  </ng-template>

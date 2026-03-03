@@ -7,3 +7,7 @@ export * from './lib/ta-form.component';
 export * from './lib/ta-form.module';
 export * from './lib/ta-form-config';
 export * from './ta-formly-ui-zero/fields/ta-field-input/ta-field-input.module';
+
+// Column Configuration
+export * from './ta-formly-ui-zero/fields/field-repeat/column-config/column-config.interfaces';
+export * from './ta-formly-ui-zero/fields/field-repeat/column-config/column-config.service';

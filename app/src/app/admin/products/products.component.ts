@@ -927,7 +927,7 @@ preprocessFormData() {
                       }
                     },
                     {
-                      className: 'col-md-4 col-sm-6 col-12',
+                      className: 'col-md-4 col-sm-6 col-12 gst-field-col',
                       key: 'gst',
                       type: 'gst-dropdown',
                       templateOptions: {
@@ -942,6 +942,21 @@ preprocessFormData() {
                         }
                       },
                       hooks: {
+                        onInit: (field: any) => {
+                          // Inject GST Portal link below the dropdown inside the same column
+                          setTimeout(() => {
+                            const el = document.querySelector('.gst-field-col');
+                            if (el && !el.querySelector('.gst-portal-link')) {
+                              const link = document.createElement('a');
+                              link.href = 'https://services.gst.gov.in/services/searchtp';
+                              link.target = '_blank';
+                              link.rel = 'noopener noreferrer';
+                              link.className = 'gst-portal-link';
+                              link.innerHTML = '<i class="fa fa-external-link-alt"></i> GST Portal';
+                              el.appendChild(link);
+                            }
+                          }, 300);
+                        },
                         onChanges: (field: any) => {
                           field.formControl.valueChanges.subscribe((data: any) => {
                             console.log("GST changed to:", data);

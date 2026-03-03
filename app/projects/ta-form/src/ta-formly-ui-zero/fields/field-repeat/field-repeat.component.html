@@ -1,30 +1,40 @@
 <nz-card [nzBordered]="true" [nzTitle]="to.title" [nzExtra]="extraTemplate">
-    <div class="ant-table-container">
-        <table class="table table-bordered product-item-table" (keydown)="onTableKeyDown($event)">
+    <div class="ant-table-container" [class.table-scroll-container]="hasColumnConfig">
+        <table class="table table-bordered product-item-table"
+               [class.table-fixed-layout]="hasColumnConfig"
+               (keydown)="onTableKeyDown($event)">
             <thead *ngIf="to.tableCols">
                 <tr>
-                    <th *ngFor="let col of field.fieldArray.fieldGroup; let idx = index"
+                    <th *ngFor="let col of field.fieldArray.fieldGroup; let idx = index; trackBy: trackByFieldKey"
                         [class.sticky-col-0]="hasStickyColumns && idx === 0"
                         [class.sticky-col-1]="hasStickyColumns && idx === 1"
-                        [class.sticky-col-2]="hasStickyColumns && idx === 2">
+                        [class.sticky-col-2]="hasStickyColumns && idx === 2"
+                        [style.width.px]="getColumnWidth(col.key)"
+                        [style.left.px]="getStickyLeft(idx)"
+                        [hidden]="isColumnHidden(col.key)">
                         {{ col.templateOptions.label }}
+                        <span *ngIf="isResizeEnabled" class="col-resize-handle"
+                              (mousedown)="onResizeStart($event, col.key, idx)"></span>
                     </th>
-                    <th *ngIf="!isRestrictedPage || to.showAddBtn" class="sticky-column">
+                    <th *ngIf="showActionsColumn" class="sticky-column"
+                        [style.width.px]="hasColumnConfig ? 150 : null">
                         Actions
                     </th>
                 </tr>
 
             </thead>
             <tbody class="ant-table-tbody">
-                <tr class="ant-table-row" *ngFor="let f of field.fieldGroup; let i = index;">
-                    <td *ngFor="let fg of f.fieldGroup; let colIdx = index"
+                <tr class="ant-table-row" *ngFor="let f of field.fieldGroup; let i = index; trackBy: trackByRowIndex">
+                    <td *ngFor="let fg of f.fieldGroup; let colIdx = index; trackBy: trackByFieldKey"
                         [class.sticky-col-0]="hasStickyColumns && colIdx === 0"
                         [class.sticky-col-1]="hasStickyColumns && colIdx === 1"
-                        [class.sticky-col-2]="hasStickyColumns && colIdx === 2">
+                        [class.sticky-col-2]="hasStickyColumns && colIdx === 2"
+                        [style.left.px]="getStickyLeft(colIdx)"
+                        [hidden]="isColumnHidden(fg.key)">
                         <formly-field class="col" [field]="fg"></formly-field>
                     </td>
-                    <td class="sticky-column" *ngIf="!isRestrictedPage || to.showAddBtn" style="vertical-align: middle;text-align: center;">
-                        <div class="">
+                    <td class="sticky-column" *ngIf="showActionsColumn" style="vertical-align: middle;text-align: center;">
+                        <div class="" *ngIf="canDeleteRow(i)">
                             <button nz-button nzDanger type="button" (click)="remove(i)"><i class="fa fa-trash"></i></button>
                         </div>
                     </td>
@@ -42,6 +52,50 @@
             <i *ngIf="to.extraActionIcon" [class]="to.extraActionIcon"></i>
             <span>{{ to.extraActionText || 'Action' }}</span>
         </button>
+
+        <button *ngIf="to.onSecondAction" nz-button nzType="default" nzSize="small" type="button" (click)="to.onSecondAction()"
+            style="display:inline-flex;align-items:center;gap:6px;font-weight:500;font-size:12px;border-radius:4px;border-color:#142768;color:#142768;">
+            <i *ngIf="to.secondActionIcon" [class]="to.secondActionIcon"></i>
+            <span>{{ to.secondActionText || 'Action' }}</span>
+        </button>
+
+        <!-- Column Configuration Gear Icon + Dropdown -->
+        <div *ngIf="hasColumnConfig && showColumnSettings" class="col-cfg-dropdown-wrapper" style="position:relative;">
+            <button nz-button nzType="default" nzSize="small" type="button"
+                (click)="toggleColumnSettings(); $event.stopPropagation()"
+                title="Configure Columns"
+                style="display:inline-flex;align-items:center;gap:4px;font-weight:500;font-size:12px;border-radius:4px;border-color:#142768;color:#142768;">
+                <i class="fa fa-cog"></i>
+                <span>Columns</span>
+            </button>
+
+            <!-- Column Settings Dropdown Panel -->
+            <div *ngIf="columnSettingsOpen" class="col-cfg-panel">
+                <div class="col-cfg-header">
+                    <span class="col-cfg-title">Toggle Columns</span>
+                    <button type="button" class="col-cfg-reset-btn" (click)="resetColumnsToDefault()">
+                        Reset
+                    </button>
+                </div>
+                <div class="col-cfg-list">
+                    <ng-container *ngFor="let col of columnList; trackBy: trackByColumnKey">
+                    <label *ngIf="!col.excluded"
+                           class="col-cfg-item"
+                           [class.col-cfg-locked]="col.locked">
+                        <input type="checkbox"
+                               [checked]="col.visible"
+                               [disabled]="col.locked"
+                               (change)="toggleColumnVisibility(col.key)">
+                        <span class="col-cfg-label">{{ col.label || col.key }}</span>
+                        <span *ngIf="col.locked" class="col-cfg-lock-icon" title="This column cannot be hidden">
+                            <i class="fa fa-lock"></i>
+                        </span>
+                    </label>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+
         <button *ngIf="!isRestrictedPage || to.showAddBtn" nz-button nzType="primary" type="button" (click)="add()">{{ to.addText }}</button>
     </div>
 </ng-template>

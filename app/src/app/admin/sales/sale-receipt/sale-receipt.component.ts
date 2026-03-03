@@ -1,13 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { TaCurdConfig } from '@ta/ta-curd';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { HttpClient } from '@angular/common/http';
 import { LocalStorageService } from '@ta/ta-core';
+import { NzNotificationService, NzNotificationModule } from 'ng-zorro-antd/notification';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule],
+  imports: [CommonModule, AdminCommmonModule, NzNotificationModule],
   selector: 'app-sale-receipt',
   templateUrl: './sale-receipt.component.html',
   styleUrls: ['./sale-receipt.component.scss']
@@ -17,10 +19,20 @@ export class SaleReceiptComponent implements OnInit {
   showModal = false;
   selectedOrder: any = null;
   selectedReceipt: any = null;
+  // Post-confirm context for notification action button
+  confirmedOrderNo: string = '';
+  confirmedParentOrderNo: string = '';
+  parentNewStatus: string = '';
+  @ViewChild('postConfirmTpl', { static: true }) postConfirmTpl!: TemplateRef<{}>;
   // Initial curdConfig setup for sale receipt
   curdConfig: TaCurdConfig = this.getCurdConfig();
 
-  constructor(private http: HttpClient, private localStorage: LocalStorageService) {
+  constructor(
+    private http: HttpClient,
+    private localStorage: LocalStorageService,
+    private router: Router,
+    private notification: NzNotificationService
+  ) {
     this.curdConfig = this.getCurdConfig();
   }
 
@@ -33,12 +45,12 @@ export class SaleReceiptComponent implements OnInit {
     const isSuperUser = user?.is_sp_user === true;
     console.log("isSuperUser : ", isSuperUser);
     const apiUrl = isSuperUser
-      ? 'sales/sale_order/?records_all=true&flow_status_name=Completed,Delivery in Progress'
-      : 'sales/sale_order/?summary=true&flow_status_name=Completed,Delivery in Progress';
+      ? 'sales/sale_order/?records_all=true&flow_status_name=Completed,Delivery In progress'
+      : 'sales/sale_order/?summary=true&flow_status_name=Completed,Delivery In progress';
 
     const fixedFilters = isSuperUser
-      ? [{ key: 'records_all', value: 'true' }, { key: 'flow_status_name', value: 'Delivery In progress' }]
-      : [{ key: 'summary', value: 'true' }, { key: 'flow_status_name', value: 'Delivery In progress' }];
+      ? [{ key: 'records_all', value: 'true' }, { key: 'flow_status_name', value: 'Completed,Delivery In progress' }]
+      : [{ key: 'summary', value: 'true' }, { key: 'flow_status_name', value: 'Completed,Delivery In progress' }];
 
     return {
       drawerSize: 500,
@@ -88,6 +100,22 @@ export class SaleReceiptComponent implements OnInit {
             fieldKey: 'total_amount',
             name: 'Total Amount',
             // sort: true
+          },
+          {
+            fieldKey: 'flow_status',
+            name: 'Status',
+            displayType: 'map',
+            mapFn: (currentValue: any, row: any) => {
+              const statusName = row.flow_status?.flow_status_name || 'Unknown';
+              const colorMap: any = {
+                'Completed': '#16a34a',
+                'Delivery In progress': '#0ea5e9',
+                'Partially Delivered': '#a855f7'
+              };
+              const color = colorMap[statusName] || '#555';
+              return `<span style="color:${color};font-weight:600">${statusName}</span>`;
+            },
+            sort: true
           },
           {
             fieldKey: 'file_upload',
@@ -419,6 +447,7 @@ async confirmReceipt() {
                                 console.log(` Parent Sale Order ${parentOrderNo} updated to Completed.`);
                                 this.closeModal();
                                 this.refreshCurdConfig();
+                                this.showPostConfirmNotification(parentOrderNo, 'Completed');
                               },
                               error => {
                                 console.error(" Error updating parent sale order status:", error);
@@ -441,6 +470,7 @@ async confirmReceipt() {
                                 console.log(` Parent Sale Order ${parentOrderNo} updated to Partially Delivered.`);
                                 this.closeModal();
                                 this.refreshCurdConfig();
+                                this.showPostConfirmNotification(parentOrderNo, 'Partially Delivered');
                               },
                               error => {
                                 console.error(" Error updating parent sale order status:", error);
@@ -480,97 +510,24 @@ async confirmReceipt() {
 }
 
 
-  private updateChildAndParent(childSaleOrderId: string, parentOrderNo: string) {
-    const updateChildStatusUrl = `sales/sale_order/${childSaleOrderId}/`;
-    const updateChildPayload = {
-      flow_status_id: '595ae9ff-8806-4ca5-ba04-bcb572ee0194',
-      order_status_id: '717c922f-c092-4d40-94e7-6a12d7095600'
-    };
-  
-    this.http.patch(updateChildStatusUrl, updateChildPayload).subscribe(
-      () => {
-        console.log(` Child Sale Order ${childSaleOrderId} updated to Completed.`);
-        this.closeModal();
-        this.refreshCurdConfig();
-  
-        const childOrdersUrl = `sales/sale_order/?parent_order_no=${parentOrderNo}`;
-        console.log("Fetching child orders with URL:", childOrdersUrl);
-        this.http.get<any>(childOrdersUrl).subscribe(
-          (childOrdersResponse) => {
-            console.log(" Fetched child sale orders:", childOrdersResponse);
-            console.log(" Checking all child orders' statuses:");
-            childOrdersResponse.data.forEach((childOrder: any) => {
-              console.log(`Order No: ${childOrder.order_no}, Flow Status: ${childOrder.flow_status.flow_status_name}`);
-            });
-  
-            const allCompleted = childOrdersResponse.data
-              .filter((order: any) => order.order_no !== parentOrderNo)
-              .every((childOrder: any) => childOrder.flow_status.flow_status_name === 'Completed');
-  
-            console.log(" allCompleted:", allCompleted);
-  
-            const parentSaleOrder = childOrdersResponse.data.find(
-              (order: any) => order.order_no === parentOrderNo
-            );
-  
-            if (parentSaleOrder) {
-              const parentSaleOrderId = parentSaleOrder.sale_order_id;
-              const updateParentStatusUrl = `sales/sale_order/${parentSaleOrderId}/`;
-  
-              if (allCompleted) {
-                console.log(` All child sale orders for ${parentOrderNo} are completed. Updating parent order.`);
-                const updateParentPayload = {
-                  flow_status_id: '595ae9ff-8806-4ca5-ba04-bcb572ee0194',
-                  order_status_id: '717c922f-c092-4d40-94e7-6a12d7095600'
-                };
-  
-                this.http.patch(updateParentStatusUrl, updateParentPayload).subscribe(
-                  () => {
-                    console.log(` Parent Sale Order ${parentOrderNo} updated to Completed.`);
-                    this.closeModal();
-                    this.refreshCurdConfig();
-                  },
-                  error => {
-                    console.error(" Error updating parent sale order status:", error);
-                    alert("Failed to update parent sale order status. Please try again.");
-                  }
-                );
-              } else {
-                console.log(`Some child sale orders are still pending. Updating parent order to 'Partially Delivered'.`);
-                const updateParentPayload = {
-                  flow_status_id: '35ba9d92-dd2b-4adf-94ec-1391e50cfb30',
-                  order_status_id: 'e2079d63-2e5f-4f8e-9d8b-817cefa87398'
-                };
-  
-                this.http.patch(updateParentStatusUrl, updateParentPayload).subscribe(
-                  () => {
-                    console.log(` Parent Sale Order ${parentOrderNo} updated to Partially Delivered.`);
-                    this.closeModal();
-                    this.refreshCurdConfig();
-                  },
-                  error => {
-                    console.error(" Error updating parent sale order status:", error);
-                    alert("Failed to update parent sale order status. Please try again.");
-                  }
-                );
-              }
-            } else {
-              console.error(` Parent Sale Order ${parentOrderNo} not found.`);
-            }
-          },
-          (error) => {
-            console.error(" Error fetching child sale orders:", error);
-            alert("Failed to fetch child sale orders. Please try again.");
-          }
-        );
-      },
-      error => {
-        console.error(" Error updating child sale order status:", error);
-        alert("Failed to update child sale order status. Please try again.");
-      }
-    );
+  // ========== POST-CONFIRM NOTIFICATION ==========
+  showPostConfirmNotification(parentOrderNo: string, parentStatus: string) {
+    this.confirmedOrderNo = this.selectedOrder?.order_no || '';
+    this.confirmedParentOrderNo = parentOrderNo;
+    this.parentNewStatus = parentStatus;
+    this.notification.template(this.postConfirmTpl, {
+      nzDuration: 10000,
+      nzPlacement: 'topRight'
+    });
   }
-  
+
+  viewParentSaleOrder() {
+    this.notification.remove();
+    // Navigate to Sales page and open the sale order list so user can find the parent
+    this.router.navigate(['/admin/sales'], {
+      queryParams: { showList: 'true' }
+    });
+  }
 
   // Angular / JavaScript pseudo-code
   isConfirmReceiptDisabled(order): boolean {

@@ -1,9 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, EventEmitter, Output } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit, OnDestroy, EventEmitter, Output, ViewChild, TemplateRef } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 import { TaCurdConfig } from '@ta/ta-curd';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { HttpClient } from '@angular/common/http';
+import { Subscription } from 'rxjs';
+import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
+import { NzNotificationModule } from 'ng-zorro-antd/notification';
 
 const TABLE_FIELDS = {
   workOrder: [
@@ -43,11 +48,15 @@ const TABLE_FIELDS = {
 @Component({
   selector: 'app-workorderboard',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule],
+  imports: [CommonModule, AdminCommmonModule, NzModalModule, NzTableModule, NzNotificationModule],
   templateUrl: './workorderboard.component.html',
   styleUrls: ['./workorderboard.component.scss']
 })
-export class WorkorderboardComponent implements OnInit {
+export class WorkorderboardComponent implements OnInit, OnDestroy {
+  @ViewChild('woCompletedTpl', { static: false }) woCompletedTpl: TemplateRef<{}>;
+  woNotifRef: any = null;
+  woNotifProductName = '';
+
   isLoading = true;
   showModal = false;
   showEditModal = false;
@@ -55,13 +64,26 @@ export class WorkorderboardComponent implements OnInit {
   selectedWorkOrderId: string;
   workOrderData: any = null;
   tableFields = TABLE_FIELDS;
-  
+  private routeSub: Subscription;
+
   @Output() view = new EventEmitter<any>();
 
-  constructor(private router: Router, private http: HttpClient) {}
+  constructor(private router: Router, private route: ActivatedRoute, private http: HttpClient, private notification: NzNotificationService) {}
 
   ngOnInit() {
     this.isLoading = false;
+    // Rebuild curdConfig whenever the 'refresh' query param changes.
+    // This handles the case where the tab is already open and Angular
+    // reuses the component instance instead of creating a new one.
+    this.routeSub = this.route.queryParams.subscribe(params => {
+      if (params['refresh']) {
+        this.curdConfig = this.getCurdConfig();
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    this.routeSub?.unsubscribe();
   }
 
   getNestedValue(obj: any, path: string): any {
@@ -275,8 +297,14 @@ confirmDispatch() {
           this.http.post(moveNextStageUrl, {}).subscribe(
             () => {
               console.log('✅ Dispatch confirmed & moved to next stage');
+              const productName = this.selectedOrder?.product?.name || 'Product';
               this.closeModal();
               this.curdConfig = this.getCurdConfig();
+              this.woNotifProductName = productName;
+              this.woNotifRef = this.notification.template(this.woCompletedTpl, {
+                nzDuration: 6000,
+                nzPlacement: 'topRight'
+              });
             },
             error => {
               console.error('Move next stage failed:', error);
@@ -338,4 +366,21 @@ confirmDispatch() {
   }
 
   curdConfig: TaCurdConfig = this.getCurdConfig();
+
+  dismissWoNotif(): void {
+    if (this.woNotifRef) {
+      this.notification.remove(this.woNotifRef.messageId);
+      this.woNotifRef = null;
+    }
+  }
+
+  goToSaleOrders(): void {
+    this.dismissWoNotif();
+    this.router.navigate(['/admin/sales'], { queryParams: { showList: 'true' } });
+  }
+
+  goToDispatch(): void {
+    this.dismissWoNotif();
+    this.router.navigate(['/admin/sales/sales-dispatch']);
+  }
 }

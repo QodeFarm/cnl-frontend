@@ -71,10 +71,15 @@ export class FieldAdvSelectComponent extends FieldType implements OnInit, AfterC
     // 1. Click inside this component's own element (trigger button, etc.)
     if (this.elRef.nativeElement.contains(target)) return;
 
-    // 2. Click inside ANY adv-select overlay panel (handles nested dropdowns too)
-    //    Using target.closest() instead of document.querySelector() so that
-    //    clicks inside a *nested* adv-select overlay (e.g. Under Group inside
-    //    the Create Ledger Accounts modal) are correctly detected.
+    // 2. Click anywhere inside the global CDK overlay container.
+    //    ALL overlay content (panels, modals, popovers, date-pickers, select
+    //    dropdowns, inline edit buttons/inputs etc.) lives inside this element.
+    //    This is the most reliable guard — avoids SVG/shadow-DOM traversal
+    //    issues that can cause target.closest() to miss specific class names.
+    if (target.closest('.cdk-overlay-container')) return;
+
+    // 3. Click inside ANY adv-select overlay panel (handles nested dropdowns too)
+    //    Kept as a fallback in case overlay content is rendered outside CDK.
     if (target.closest('.adv-select-custom-overlay-panel')) return;
     if (target.closest('.adv-select-curd-container')) return;
 

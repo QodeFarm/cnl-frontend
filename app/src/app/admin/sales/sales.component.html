@@ -1,17 +1,14 @@
 <div class="container-fluid p-3">
     <div class="sales-banner page-component-header">
-        <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
+        <div class="col-12 px-0"
+            style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
             <div style="display: flex; align-items: center; gap: 6px;">
-            <button type="button" class="btn pl-0">
-        <span *ngIf="SaleOrderEditID" class="custom-heading">Update Sales Order</span>
-        <span *ngIf="!SaleOrderEditID" class="custom-heading">Create Sales Order</span>
-      </button>
-      <!-- <button class="btn-primary" (click)="openDocPreview()" title="Help">i</button> -->
-       <button 
-            class="btn-primary" 
-            (click)="openDocPreview()" 
-            title="Help"
-            style="border: none;
+                <button type="button" class="btn pl-0">
+                    <span *ngIf="SaleOrderEditID" class="custom-heading">Update Sales Order</span>
+                    <span *ngIf="!SaleOrderEditID" class="custom-heading">Create Sales Order</span>
+                </button>
+                <!-- <button class="btn-primary" (click)="openDocPreview()" title="Help">i</button> -->
+                <button class="btn-primary" (click)="openDocPreview()" title="Help" style="border: none;
                     border-radius: 50%;
                     width: 22px;
                     height: 22px;
@@ -24,24 +21,23 @@
                     line-height: 1;
                     padding: 0;
                     transition: all .2s ease-in-out;">
-            i
-            </button>
+                    i
+                </button>
 
-      </div>
+            </div>
 
-      <!-- Info Button (just “i”) -->
-        <!-- <button class="info-btn" (click)="openDocPreview()" title="Help">
+            <!-- Info Button (just “i”) -->
+            <!-- <button class="info-btn" (click)="openDocPreview()" title="Help">
           i
         </button> -->
 
-      <div style="display: flex; gap: 10px; align-items: center;justify-content: end;flex-wrap: wrap;">
+            <div style="display: flex; gap: 10px; align-items: center;justify-content: end;flex-wrap: wrap;">
                 <div *ngIf="!SaleOrderEditID" class="quickpack-container-1 d-flex align-items-center">
                     <div class="quickpack-box d-flex align-items-center">
                         <div class="dropdown-container rounded-start">
                             <select id="quickpackSelect" class="dropdown-select m-0 " [(ngModel)]="selectedQuickpack">
                                 <option value="" disabled selected aria-disabled="true">Quickpack</option>
-                                <option *ngFor="let quickpack of quickpackOptions" 
-                                        [value]="quickpack.quick_pack_id">
+                                <option *ngFor="let quickpack of quickpackOptions" [value]="quickpack.quick_pack_id">
                                     {{ quickpack.name }}
                                 </option>
                             </select>
@@ -50,36 +46,69 @@
                     </div>
                 </div>
                 <!-- New Copy Button -->
-                <button (click)="openCopyModal()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#copyModal">
-                Copy
-            </button>
+                <button (click)="openCopyModal()" type="button" class="btn btn-primary" data-bs-toggle="modal"
+                    data-bs-target="#copyModal">
+                    Copy
+                </button>
                 <!-- data-bs-toggle="modal" data-bs-target="#ordersListModal" -->
 
                 <button (click)="showOrdersList()" type="button" class="btn btn-primary">
-                Past Orders
-            </button>
+                    Past Orders
+                </button>
 
-                <button (click)="showSaleOrderListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#saleOrderListModal">
-                Sales Order List
-            </button>
+                <button (click)="showSaleOrderListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal"
+                    data-bs-target="#saleOrderListModal">
+                    Sales Order List
+                </button>
 
                 <!-- <button *checkAction="{ moduleName: 'Sales', sectionName: 'Customers', actionName: 'Update' }" (click)="showSaleOrderListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#saleOrderListModal">
           Sales Order List
         </button>  Commented this code causing issues(form is not displaying) now pasted old code-->
 
 
-                <!-- Invoice Creation Button (Only for Edit and if flow status is "Ready for Invoice") -->
-                <button *ngIf="SaleOrderEditID && formConfig.model && formConfig.model.sale_order && formConfig.model.sale_order.flow_status?.flow_status_name === 'Ready for Invoice'" (click)="openSaleInvoiceModal()" type="button" class="btn btn-primary">
-            Create Invoice
-        </button>
+                <!-- Create Invoice — only when Ready for Invoice -->
+                <button
+                    *ngIf="SaleOrderEditID && formConfig.model?.sale_order?.flow_status?.flow_status_name === 'Ready for Invoice'"
+                    (click)="openSaleInvoiceModal()" type="button" class="btn btn-primary">
+                    Create Invoice
+                </button>
 
-                <!-- Create Work Order Button (Only for Edit) -->
-                <button *ngIf="SaleOrderEditID" (click)="createWorkOrder()" type="button" class="btn btn-primary">
-            Create Work Order
-        </button>
+                <!-- Create Work Order — visible at Review Inventory and Production -->
+                <button
+                    *ngIf="SaleOrderEditID && (formConfig.model?.sale_order?.flow_status?.flow_status_name === 'Review Inventory' || formConfig.model?.sale_order?.flow_status?.flow_status_name === 'Production')"
+                    (click)="createWorkOrder()" type="button" class="btn btn-primary">
+                    Create Work Order
+                </button>
 
-        <!-- Info Icon -->
-            <!-- <button class="info-btn" (click)="openDocPreview()">
+                <!-- Go to Dispatch — only when flow_status is Dispatch -->
+                <button
+                    *ngIf="SaleOrderEditID && formConfig.model?.sale_order?.flow_status?.flow_status_name === 'Dispatch'"
+                    (click)="goToDispatch()" type="button" class="btn btn-primary">
+                    Go to Dispatch
+                </button>
+
+                <!-- View Invoices — invoice exists from Ready for Invoice onwards -->
+                <button
+                    *ngIf="SaleOrderEditID && (
+                        formConfig.model?.sale_order?.flow_status?.flow_status_name === 'Ready for Invoice' ||
+                        formConfig.model?.sale_order?.flow_status?.flow_status_name === 'Delivery In progress' ||
+                        formConfig.model?.sale_order?.flow_status?.flow_status_name === 'Partially Delivered' ||
+                        formConfig.model?.sale_order?.flow_status?.flow_status_name === 'Completed')"
+                    (click)="goToInvoices()" type="button" class="btn btn-primary">
+                    View Invoices
+                </button>
+
+                <!-- Order Acknowledgement — when Delivery In progress or Partially Delivered -->
+                <button
+                    *ngIf="SaleOrderEditID && (
+                        formConfig.model?.sale_order?.flow_status?.flow_status_name === 'Delivery In progress' ||
+                        formConfig.model?.sale_order?.flow_status?.flow_status_name === 'Partially Delivered')"
+                    (click)="goToOrderAcknowledgement()" type="button" class="btn btn-primary">
+                    Order Acknowledgement
+                </button>
+
+                <!-- Info Icon -->
+                <!-- <button class="info-btn" (click)="openDocPreview()">
             <i class="fa fa-info-circle"></i> Info
             </button> -->
 
@@ -91,6 +120,57 @@
         <!--  removed this commented line because when I refresh the page form is not displaying *checkAction="{ moduleName: 'Sales', sectionName: 'Sale Order', actionName: 'Create' }" -->
 
         <div class="col-12 px-1" *ngIf="orderNumber || showForm">
+
+            <!-- ====== FLOW STATUS GUIDANCE STRIP ====== -->
+            <!-- Edit mode: show stepper with current progress -->
+            <div *ngIf="SaleOrderEditID && formConfig.model?.sale_order?.flow_status?.flow_status_name"
+                class="workflow-stepper-strip">
+                <div *ngIf="workflowStages.length > 0" class="wf-stepper">
+                    <ng-container *ngFor="let stage of workflowStages; let last = last">
+                        <div class="wf-step"
+                            [class.wf-completed]="getStageState(stage.flow_status_name) === 'completed'"
+                            [class.wf-current]="getStageState(stage.flow_status_name) === 'current'"
+                            [class.wf-upcoming]="getStageState(stage.flow_status_name) === 'upcoming'">
+                            <span class="wf-dot"></span>
+                            <span class="wf-label">{{ stage.flow_status_name }}</span>
+                        </div>
+                        <span *ngIf="!last" class="wf-line"
+                            [class.wf-line-done]="getStageState(stage.flow_status_name) === 'completed'"></span>
+                    </ng-container>
+                </div>
+                <div *ngIf="workflowStages.length === 0" class="wf-fallback">
+                    <span class="wf-badge">{{ formConfig.model?.sale_order?.flow_status?.flow_status_name }}</span>
+                </div>
+                <div class="wf-hint">
+                    <ng-container [ngSwitch]="formConfig.model?.sale_order?.flow_status?.flow_status_name">
+                        <ng-container *ngSwitchCase="'Review Inventory'">Review stock levels. Click <strong>Create Work Order</strong> if production is needed, or update flow status to skip.</ng-container>
+                        <ng-container *ngSwitchCase="'Production'">Click <strong>Create Work Order</strong> above.</ng-container>
+                        <ng-container *ngSwitchCase="'Pending'">Review details and update flow status.</ng-container>
+                        <ng-container *ngSwitchCase="'Ready for Invoice'">Click <strong>Create Invoice</strong> above.</ng-container>
+                        <ng-container *ngSwitchCase="'Dispatch'">Click <strong>Update</strong> to create dispatch, then <strong>Go to Dispatch</strong>.</ng-container>
+                        <ng-container *ngSwitchCase="'Delivery In progress'">Click <strong>Order Acknowledgement</strong> or <strong>View Invoices</strong>.</ng-container>
+                        <ng-container *ngSwitchCase="'Partially Delivered'">Remaining items in production. Auto-completes when done.</ng-container>
+                        <ng-container *ngSwitchCase="'Completed'">Order fully completed.</ng-container>
+                        <ng-container *ngSwitchDefault>Order is being processed.</ng-container>
+                    </ng-container>
+                </div>
+            </div>
+            <!-- Create mode: preview all stages when Use Workflow is checked -->
+            <div *ngIf="!SaleOrderEditID && formConfig.model?.sale_order?.use_workflow && workflowStages.length > 0"
+                class="workflow-stepper-strip">
+                <div class="wf-stepper">
+                    <ng-container *ngFor="let stage of workflowStages; let first = first; let last = last">
+                        <div class="wf-step" [class.wf-preview-first]="first" [class.wf-upcoming]="!first">
+                            <span class="wf-dot"></span>
+                            <span class="wf-label">{{ stage.flow_status_name }}</span>
+                        </div>
+                        <span *ngIf="!last" class="wf-line"></span>
+                    </ng-container>
+                </div>
+                <div class="wf-hint">This order will follow the workflow above. First stage starts after creation.</div>
+            </div>
+            <!-- ====== END GUIDANCE STRIP ====== -->
+
             <!-- Customer Info Strip (shown after customer selection) -->
             <div class="customer-info-strip" *ngIf="showCustomerInfoBanner">
                 <span class="cis-label">ℹ Customer Info</span>
@@ -100,13 +180,15 @@
                 </span>
                 <span class="cis-divider" *ngIf="customerTransporterName">|</span>
                 <span class="cis-item" *ngIf="customerTransporterName">
-                    <span class="cis-icon">🚚</span> Preferred: <strong class="cis-transport-tag">{{ customerTransporterName }}</strong>
+                    <span class="cis-icon">🚚</span> Preferred: <strong class="cis-transport-tag">{{
+                        customerTransporterName }}</strong>
                 </span>
                 <span class="cis-divider" *ngIf="customerTransportNotes">|</span>
                 <span class="cis-item" *ngIf="customerTransportNotes">
                     <span class="cis-icon">📋</span> {{ customerTransportNotes }}
                 </span>
-                <button class="cis-close" (click)="showCustomerInfoBanner = false" aria-label="Close customer info">&times;</button>
+                <button class="cis-close" (click)="showCustomerInfoBanner = false"
+                    aria-label="Close customer info">&times;</button>
             </div>
             <ta-form #salesForm [options]="formConfig"></ta-form>
         </div>
@@ -114,12 +196,14 @@
 </div>
 
 <!-- Sales List Modal -->
-<div class="modal fade custom-modal" id="saleOrderListModal" tabindex="-1" aria-labelledby="saleOrderListModalLabel" aria-hidden="true">
+<div class="modal fade custom-modal" id="saleOrderListModal" tabindex="-1" aria-labelledby="saleOrderListModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-xl ">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="saleOrderListModalLabel">Sales Order List</h5>
-                <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
             </div>
             <div class="modal-body" *ngIf="showSaleOrderList">
                 <app-sales-list (edit)="editSaleOrder($event)" class="custom-list"></app-sales-list>
@@ -132,7 +216,8 @@
 </div>
 
 <!-- Past Orders List Modal -->
-<div #ordersModal class="modal fade custom-modal modal-center" id="ordersListModal" tabindex="-1" aria-labelledby="ordersListModalLabel" aria-hidden="true">
+<div #ordersModal class="modal fade custom-modal modal-center" id="ordersListModal" tabindex="-1"
+    aria-labelledby="ordersListModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
@@ -140,7 +225,10 @@
                 <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
             </div>
             <div class="modal-body">
-                <app-orderslist [customerOrders]="customerOrders" [noOrdersMessage]="noOrdersMessage" (orderSelected)="handleOrderSelected($event)" [selectedCustomerId]="formConfig.model.sale_order.customer_id" (productsPulled)="handleProductPull($event)" (modalClosed)="closeOrdersListModal()"
+                <app-orderslist [customerOrders]="customerOrders" [noOrdersMessage]="noOrdersMessage"
+                    (orderSelected)="handleOrderSelected($event)"
+                    [selectedCustomerId]="formConfig.model.sale_order.customer_id"
+                    (productsPulled)="handleProductPull($event)" (modalClosed)="closeOrdersListModal()"
                     (modalClosed)="hideModal()" class="custom-list">
                 </app-orderslist>
             </div>
@@ -149,7 +237,8 @@
 </div>
 
 <!-- Copy Modal -->
-<div class="modal fade custom-modal modal-center" id="copyModal" tabindex="-1" aria-labelledby="copyModalLabel" aria-hidden="true">
+<div class="modal fade custom-modal modal-center" id="copyModal" tabindex="-1" aria-labelledby="copyModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-sm custom-size">
         <!-- Add custom-size class here -->
         <div class="modal-content">
@@ -162,7 +251,8 @@
                 <form>
                     <div class="form-group">
                         <label for="tableSelect">Select Table</label>
-                        <select id="tableSelect" class="form-control form-select" [(ngModel)]="selectedTable" name="selectedTable">
+                        <select id="tableSelect" class="form-control form-select" [(ngModel)]="selectedTable"
+                            name="selectedTable">
                             <option *ngFor="let table of availableTables" [value]="table">{{table}}</option>
                         </select>
                     </div>
@@ -177,8 +267,8 @@
 </div>
 
 <!-- Confirmation Modal -->
-<div class="custom-dialog-overlay style2" *ngIf="isConfirmationInvoiceOpen">
-    <div class="custom-dialog-box style2">
+<div class="custom-dialog-overlay" *ngIf="isConfirmationInvoiceOpen">
+    <div class="custom-dialog-box">
         <h3>Confirm Sale Invoice</h3>
         <p>Are you sure you want to create the sale invoice?</p>
 
@@ -217,34 +307,90 @@
         <span class="tick-mark">✓</span>
     </div>
     <span class="toast-message-text">{{ toastMessage }}</span>
-    <span class="toast-close" onclick="this.parentElement.style.display='none'">x</span>
+    <span class="toast-close" (click)="closeToast()">x</span>
 </div>
 
+<!-- Ng-Zorro notification template with action button -->
+<ng-template #notificationActionTpl>
+    <div style="display: flex; flex-direction: column; gap: 8px; width: 100%;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span nz-icon nzType="check-circle" nzTheme="fill" style="color: #52c41a; font-size: 22px;"></span>
+            <strong style="font-size: 14px;">Record Updated</strong>
+        </div>
+        <span style="color: #595959; font-size: 13px;">Sale Order updated successfully</span>
+        <button (click)="notificationActionFn && notificationActionFn()"
+            style="background: #142768; color: #fff; border: none; border-radius: 4px; padding: 6px 16px; font-size: 13px; font-weight: 600; cursor: pointer; align-self: flex-start; margin-top: 4px;">
+            {{ notificationActionLabel }}
+        </button>
+    </div>
+</ng-template>
 
-<!-- code for workorder modalbox in sales  -->
-<div *ngIf="showModal" class="custom-dialog-overlay-1">
-    <div class="custom-dialog-box-1">
-        <h5>Confirm Work Order Creation</h5>
-        <p>Are you sure you want to create a work order for the selected products?</p>
-        <div class="dialog-actions">
-            <button class="btn btn-danger" (click)="closeModalworkorder()">Cancel</button>
-            <button class="btn btn-primary" (click)="confirmWorkOrder()">Confirm</button>
+<!-- Work Order Created — two-button notification -->
+<ng-template #workOrderCreatedTpl>
+    <div style="display: flex; flex-direction: column; gap: 8px; width: 100%;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span nz-icon nzType="check-circle" nzTheme="fill" style="color: #52c41a; font-size: 22px;"></span>
+            <strong style="font-size: 14px;">Work Order Created</strong>
+        </div>
+        <span style="color: #595959; font-size: 13px;">Work order has been successfully sent to the production board.</span>
+        <div style="display: flex; gap: 8px; margin-top: 6px;">
+            <button (click)="dismissWorkOrderNotif()"
+                style="background: #f0f0f0; color: #333; border: none; border-radius: 4px; padding: 6px 16px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                Stay Here
+            </button>
+            <button (click)="goToWorkOrderBoard()"
+                style="background: #142768; color: #fff; border: none; border-radius: 4px; padding: 6px 16px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                Open Work Order Board →
+            </button>
         </div>
     </div>
-</div>
+</ng-template>
+
+<!-- Work Order confirmation modal -->
+<nz-modal [(nzVisible)]="showModal" nzTitle="Confirm Work Order Creation" [nzWidth]="440" [nzClosable]="true"
+    [nzMaskClosable]="false" (nzOnCancel)="closeModalworkorder()" [nzFooter]="workOrderModalFooter" nzCentered
+    [nzWrapClassName]="'work-order-modal-wrapper'">
+
+    <ng-container *nzModalContent>
+        <div class="work-order-body">
+
+            <!-- Products label + list -->
+            <div class="work-order-field">
+                <label class="work-order-label">Products for Production</label>
+                <div class="work-order-product-list">
+                    <div *ngFor="let p of selectedOrder?.productDetails; let last = last"
+                        class="work-order-product-row"
+                        [class.no-border]="last">
+                        <span class="work-order-product-name">
+                            {{ p.print_name || p.product_name || p.product_id }}
+                        </span>
+                        <span class="work-order-qty-badge">Qty: {{ p.quantity }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info note -->
+            <div class="work-order-note">
+                <i nz-icon nzType="info-circle" nzTheme="outline" style="color:#fa8c16;flex-shrink:0;"></i>
+                <span>Once confirmed, a Work Order will be created and this order's status will advance to the next stage.</span>
+            </div>
+
+        </div>
+    </ng-container>
+
+    <ng-template #workOrderModalFooter>
+        <div class="work-order-footer">
+            <button nz-button nzType="default" (click)="closeModalworkorder()">Cancel</button>
+            <button nz-button nzType="primary" (click)="confirmWorkOrder()">Confirm</button>
+        </div>
+    </ng-template>
+</nz-modal>
 
 <!-- Draft Restore Confirmation Modal -->
-<nz-modal
-    [(nzVisible)]="showDraftRestoreModal"
-    nzTitle="Restore Unsaved Draft"
-    [nzWidth]="450"
-    [nzClosable]="true"
-    [nzMaskClosable]="false"
-    (nzOnCancel)="declineRestoreDraft()"
-    [nzFooter]="draftModalFooter"
-    nzCentered
+<nz-modal [(nzVisible)]="showDraftRestoreModal" nzTitle="Restore Unsaved Draft" [nzWidth]="450" [nzClosable]="true"
+    [nzMaskClosable]="false" (nzOnCancel)="declineRestoreDraft()" [nzFooter]="draftModalFooter" nzCentered
     nzClassName="draft-restore-modal-wrapper">
-    
+
     <ng-container *nzModalContent>
         <div class="draft-restore-content">
             <!-- <div class="draft-icon-wrapper">
@@ -259,7 +405,7 @@
             </div>
         </div>
     </ng-container>
-    
+
     <ng-template #draftModalFooter>
         <div style="display: flex; justify-content: center; gap: 12px;">
             <button nz-button nzType="default" nzDanger (click)="declineRestoreDraft()">
@@ -289,81 +435,90 @@
     </div>
 </div> -->
 <!-- Combined Sale Estimate + QuickPack Modal -->
-<nz-modal
-  [(nzVisible)]="isConfirmationModalOpen"
-  nzTitle="Select Options for this Sale Order"
-  [nzClosable]="true"
-  [nzMaskClosable]="false"
-  (nzOnCancel)="closeSaleOrderEstimateModal()"
-  [nzWidth]="420"
-  [nzWrapClassName]="'sale-options-modal-wrapper'"
-  [nzFooter]="saleOptionsFooter">
+<nz-modal [(nzVisible)]="isConfirmationModalOpen" nzTitle="Select Options for this Sale Order" [nzClosable]="true"
+    [nzMaskClosable]="false" (nzOnCancel)="closeSaleOrderEstimateModal()" [nzWidth]="420"
+    [nzWrapClassName]="'sale-options-modal-wrapper'" [nzFooter]="saleOptionsFooter">
 
-  <ng-container *nzModalContent>
-    <div class="sale-options-body">
-      <!-- Sale Estimate / Sale Order -->
-      <div class="sale-option-field">
-        <label class="sale-option-label">Select Type</label>
-        <nz-select [(ngModel)]="selectedOption" nzPlaceHolder="Choose type" style="width: 100%;">
-          <nz-option nzValue="sale_order" nzLabel="Sale Order"></nz-option>
-          <nz-option nzValue="sale_estimate" nzLabel="Sale Estimate"></nz-option>
-        </nz-select>
-      </div>
+    <ng-container *nzModalContent>
+        <div class="sale-options-body">
+            <!-- Sale Estimate / Sale Order -->
+            <div class="sale-option-field">
+                <label class="sale-option-label">Select Type</label>
+                <nz-select [(ngModel)]="selectedOption" nzPlaceHolder="Choose type" style="width: 100%;">
+                    <nz-option nzValue="sale_order" nzLabel="Sale Order"></nz-option>
+                    <nz-option nzValue="sale_estimate" nzLabel="Sale Estimate"></nz-option>
+                </nz-select>
+            </div>
 
-      <!-- QuickPack Yes / No -->
-      <div class="sale-option-field">
-        <label class="sale-option-label">Create QuickPack?</label>
-        <nz-select [(ngModel)]="createQuickPackOption" nzPlaceHolder="Choose option" style="width: 100%;">
-          <nz-option nzValue="no" nzLabel="No"></nz-option>
-          <nz-option nzValue="yes" nzLabel="Yes"></nz-option>
-        </nz-select>
-      </div>
-    </div>
-  </ng-container>
+            <!-- QuickPack Yes / No -->
+            <div class="sale-option-field">
+                <label class="sale-option-label">Create QuickPack?</label>
+                <nz-select [(ngModel)]="createQuickPackOption" nzPlaceHolder="Choose option" style="width: 100%;">
+                    <nz-option nzValue="no" nzLabel="No"></nz-option>
+                    <nz-option nzValue="yes" nzLabel="Yes"></nz-option>
+                </nz-select>
+            </div>
+        </div>
+    </ng-container>
 
-  <ng-template #saleOptionsFooter>
-    <div class="sale-options-footer">
-      <button nz-button nzType="default" (click)="closeSaleOrderEstimateModal()">Cancel</button>
-      <button nz-button nzType="primary" (click)="confirmSelection()">Confirm</button>
-    </div>
-  </ng-template>
+    <ng-template #saleOptionsFooter>
+        <div class="sale-options-footer">
+            <button nz-button nzType="default" (click)="closeSaleOrderEstimateModal()">Cancel</button>
+            <button nz-button nzType="primary" (click)="confirmSelection()">Confirm</button>
+        </div>
+    </ng-template>
 </nz-modal>
 
 
 <!-- Modal for Amount Check -->
-<nz-modal
-  [(nzVisible)]="isAmountModalOpen"
-  nzTitle="Credit Limit Exceeded"
-  [nzClosable]="true"
-  [nzMaskClosable]="false"
-  (nzOnCancel)="closeAmountModal()"
-  [nzWidth]="440"
-  [nzWrapClassName]="'amount-check-modal-wrapper'"
-  [nzFooter]="amountCheckFooter">
+<nz-modal [(nzVisible)]="isAmountModalOpen" nzTitle="Credit Limit Exceeded" [nzClosable]="true" [nzMaskClosable]="false"
+    (nzOnCancel)="closeAmountModal()" [nzWidth]="440" [nzWrapClassName]="'amount-check-modal-wrapper'"
+    [nzFooter]="amountCheckFooter">
 
-  <ng-container *nzModalContent>
-    <div class="amount-check-body">
-      <div class="amount-warning-icon">
-        <span nz-icon nzType="exclamation-circle" nzTheme="outline"></span>
-      </div>
-      <p class="amount-message">{{ amountExceedMessage }}</p>
-    </div>
-  </ng-container>
+    <ng-container *nzModalContent>
+        <div class="amount-check-body">
+            <div class="amount-warning-icon">
+                <span nz-icon nzType="exclamation-circle" nzTheme="outline"></span>
+            </div>
+            <p class="amount-message">{{ amountExceedMessage }}</p>
+        </div>
+    </ng-container>
 
-  <ng-template #amountCheckFooter>
-    <div class="amount-check-footer">
-      <button nz-button nzType="default" (click)="closeAmountModal()">{{ isAdmin ? 'No' : 'Close' }}</button>
-      <button *ngIf="isAdmin" nz-button nzType="primary" nzDanger (click)="proceedWithAmount()">Yes, Proceed</button>
-    </div>
-  </ng-template>
+    <ng-template #amountCheckFooter>
+        <div class="amount-check-footer">
+            <button nz-button nzType="default" (click)="closeAmountModal()">{{ isAdmin ? 'No' : 'Close' }}</button>
+            <button *ngIf="isAdmin" nz-button nzType="primary" nzDanger (click)="proceedWithAmount()">Yes,
+                Proceed</button>
+        </div>
+    </ng-template>
 </nz-modal>
 
-    <div id="errorModal" class="modal">
+<div id="errorModal" class="modal">
+    <div class="modal-content">
+        <span class="close-button" (click)="closeModal()">&times;</span>
+        <p id="modalMessage"></p>
+    </div>
+</div>
+
+<!-- Sale Invoice List Modal -->
+<div class="modal fade custom-modal" id="saleInvoiceListModal" tabindex="-1" aria-labelledby="saleInvoiceListModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
-            <span class="close-button" (click)="closeModal()">&times;</span>
-            <p id="modalMessage"></p>
+            <div class="modal-header">
+                <h5 class="modal-title" id="saleInvoiceListModalLabel">Sale Invoice List</h5>
+                <button type="button" id="invoiceListModalClose" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body" *ngIf="showInvoiceListModal">
+                <app-salesinvoice-list (edit)="onInvoiceListEdit($event)" class="custom-list"></app-salesinvoice-list>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+            </div>
         </div>
     </div>
+</div>
 
 <!-- Validation Error Modal -->
 <!-- <nz-modal

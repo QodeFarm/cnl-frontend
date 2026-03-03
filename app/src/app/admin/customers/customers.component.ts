@@ -35,6 +35,7 @@ export class CustomersComponent {
   showCustomerList: boolean = false;
   showForm: boolean = false;
   CustomerEditID: any;
+  isSubmitting: boolean = false;
   @ViewChild(CustomersListComponent) CustomersListComponent!: CustomersListComponent;
 
   // Import state tracking
@@ -104,11 +105,12 @@ export class CustomersComponent {
 
 
   ngAfterViewInit() {
-    // No DOM manipulation needed — copy buttons are in the component template
+    // Copy buttons are now handled by the field-repeat table component (extraAction / secondAction)
   }
 
   customFieldMetadata: any = {}; // To store mapping of field names to metadata
   submitCustomerForm() {
+    if (this.isSubmitting) return; // Prevent double-click
     const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
 
     // Determine the entity type and ID dynamically
@@ -133,26 +135,42 @@ export class CustomersComponent {
 
     if (!customFieldsPayload) {
       this.showDialog(); // Stop execution if required fields are missing
+      return;
     }
     // Construct the final payload
-    const payload = {
+    let payload: any = {
       ...this.formConfig.model,
       custom_field_values: customFieldsPayload.custom_field_values // Array of dictionaries
     };
+    // Merge communication address into customer_addresses
+    payload = this.mergeCommAddressIntoPayload(payload);
 
     console.log('Final Payload:', payload); // Debugging to verify the payload
 
     // Submit the payload
+    this.isSubmitting = true;
     this.http.post('customers/customers/', payload).subscribe(
       (response: any) => {
+        this.isSubmitting = false;
         this.showSuccessToast = true;
-        this.toastMessage = "Record Created successfully"; // Set the toast message for update
-        this.ngOnInit();
+        this.toastMessage = "Record Created successfully";
+        // Fully reset form: destroy → reinit → recreate (clears validation state)
+        this.showForm = false;
+        this.setFormConfig();
+        setTimeout(() => {
+          this.showForm = true;
+          this.cdref.detectChanges();
+          // Re-fetch custom fields for the fresh form
+          CustomFieldHelper.fetchCustomFields(this.http, 'customers', (customFields: any, customFieldMetadata: any) => {
+            CustomFieldHelper.addCustomFieldsToFormConfig(customFields, customFieldMetadata, this.formConfig);
+          });
+        });
         setTimeout(() => {
           this.showSuccessToast = false;
         }, 3000);
       },
       (error) => {
+        this.isSubmitting = false;
         console.error('Error creating customer and custom fields:', error);
       }
     );
@@ -186,6 +204,7 @@ export class CustomersComponent {
 
   // --- Copy Address Helpers (reusable for Customers & Vendors) ---
   private readonly ADDRESS_COPY_FIELDS = ['address', 'city', 'city_id', 'state', 'state_id', 'country', 'country_id', 'pin_code', 'phone', 'email'];
+  private readonly COMM_ADDRESS_COPY_FIELDS = ['address', 'city', 'city_id', 'state', 'state_id', 'country', 'country_id', 'pin_code', 'phone', 'email'];
 
   copyBillingToShipping() {
     const addresses = this.formConfig.model['customer_addresses'];
@@ -228,6 +247,75 @@ export class CustomersComponent {
     this.formConfig.model = JSON.parse(JSON.stringify(this.formConfig.model));
     this.cdref.detectChanges();
     this.notification.success('Copied', 'Shipping address copied to Billing.');
+  }
+
+  // --- Copy Tax-tab addresses to Communication Address ---
+  copyBillingToCommAddress() {
+    const addresses = this.formConfig.model['customer_addresses'];
+    if (!addresses || addresses.length < 1) {
+      this.notification.warning('No Address', 'Please fill billing address in Tax Details tab first.');
+      return;
+    }
+    const billing = addresses[0];
+    const hasData = this.COMM_ADDRESS_COPY_FIELDS.some(key => billing[key] != null && billing[key] !== '');
+    if (!hasData) {
+      this.notification.warning('Empty Address', 'Please fill billing address in Tax Details tab before copying.');
+      return;
+    }
+    const commAddresses = this.formConfig.model['communication_addresses'] || [{}];
+    const commAddr = commAddresses[0] || {};
+    this.COMM_ADDRESS_COPY_FIELDS.forEach(key => {
+      commAddr[key] = billing[key] ?? null;
+    });
+    commAddresses[0] = { ...commAddr };
+    this.formConfig.model['communication_addresses'] = commAddresses;
+    this.formConfig.model = JSON.parse(JSON.stringify(this.formConfig.model));
+    this.cdref.detectChanges();
+    this.notification.success('Copied', 'Billing address copied to Communication Address.');
+  }
+
+  copyShippingToCommAddress() {
+    const addresses = this.formConfig.model['customer_addresses'];
+    if (!addresses || addresses.length < 2) {
+      this.notification.warning('No Address', 'Please fill shipping address in Tax Details tab first.');
+      return;
+    }
+    const shipping = addresses[1];
+    const hasData = this.COMM_ADDRESS_COPY_FIELDS.some(key => shipping[key] != null && shipping[key] !== '');
+    if (!hasData) {
+      this.notification.warning('Empty Address', 'Please fill shipping address in Tax Details tab before copying.');
+      return;
+    }
+    const commAddresses = this.formConfig.model['communication_addresses'] || [{}];
+    const commAddr = commAddresses[0] || {};
+    this.COMM_ADDRESS_COPY_FIELDS.forEach(key => {
+      commAddr[key] = shipping[key] ?? null;
+    });
+    commAddresses[0] = { ...commAddr };
+    this.formConfig.model['communication_addresses'] = commAddresses;
+    this.formConfig.model = JSON.parse(JSON.stringify(this.formConfig.model));
+    this.cdref.detectChanges();
+    this.notification.success('Copied', 'Shipping address copied to Communication Address.');
+  }
+
+  // --- Merge communication_addresses into customer_addresses before sending to API ---
+  private mergeCommAddressIntoPayload(payload: any): any {
+    const commAddresses = payload['communication_addresses'];
+    if (commAddresses && commAddresses.length > 0) {
+      const commAddr = commAddresses[0];
+      const hasData = this.COMM_ADDRESS_COPY_FIELDS.some(key => commAddr[key] != null && commAddr[key] !== '');
+      if (hasData) {
+        const commEntry = { ...commAddr, address_type: 'Communication' };
+        // Remove any existing Communication address in the array
+        payload['customer_addresses'] = (payload['customer_addresses'] || []).filter(
+          (a: any) => a.address_type !== 'Communication'
+        );
+        payload['customer_addresses'].push(commEntry);
+      }
+    }
+    // Remove the separate key so backend doesn't get confused
+    delete payload['communication_addresses'];
+    return payload;
   }
 
   formConfig: TaFormConfig = {};
@@ -289,6 +377,10 @@ export class CustomersComponent {
           const shippingList = addresses.filter((a: any) => a.address_type === 'Shipping');
           if (shippingList.length === 0) shippingList.push({ address_type: 'Shipping' });
 
+          // Extract Communication address for the Communication tab
+          const commAddress = addresses.find((a: any) => a.address_type === 'Communication');
+          this.formConfig.model['communication_addresses'] = commAddress ? [commAddress] : [{}];
+
           this.formConfig.model.customer_addresses = [
             billing || { address_type: 'Billing' },
             ...shippingList
@@ -329,8 +421,9 @@ export class CustomersComponent {
 
   showSuccessToast = false;
   toastMessage = '';
-  // Method to handle updating the Sale Return Order
+  // Method to handle updating the Customer
   updateCustomer() {
+    if (this.isSubmitting) return; // Prevent double-click
     const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
 
     // Determine the entity type and ID dynamically
@@ -357,26 +450,39 @@ export class CustomersComponent {
       return;
     }
     // Construct the final payload for update
-    const payload = {
+    let payload: any = {
       ...this.formConfig.model,
       custom_field_values: customFieldsPayload.custom_field_values // Array of dictionaries
     };
+    // Merge communication address into customer_addresses
+    payload = this.mergeCommAddressIntoPayload(payload);
 
     console.log('Final Payload for Update:', payload); // Debugging to verify the payload
 
     // Send the update request with the payload
+    this.isSubmitting = true;
     this.http.put(`customers/customers/${this.CustomerEditID}/`, payload).subscribe(
       (response: any) => {
+        this.isSubmitting = false;
         this.showSuccessToast = true;
-        this.toastMessage = "Record updated successfully"; // Set the toast message for update
-        this.ngOnInit();
+        this.toastMessage = "Record updated successfully";
+        // Fully reset form: destroy → reinit → recreate (clears validation state)
+        this.showForm = false;
+        this.setFormConfig();
+        setTimeout(() => {
+          this.showForm = true;
+          this.cdref.detectChanges();
+          // Re-fetch custom fields for the fresh form
+          CustomFieldHelper.fetchCustomFields(this.http, 'customers', (customFields: any, customFieldMetadata: any) => {
+            CustomFieldHelper.addCustomFieldsToFormConfig(customFields, customFieldMetadata, this.formConfig);
+          });
+        });
         setTimeout(() => {
           this.showSuccessToast = false;
         }, 3000);
-        // this.showCustomerListFn(); // Redirect or refresh the customer list
-        // this.ngOnInit();
       },
       (error) => {
+        this.isSubmitting = false;
         console.error('Error updating customer:', error);
       }
     );
@@ -417,6 +523,7 @@ export class CustomersComponent {
         }, {
           address_type: 'Shipping',
         }],
+        communication_addresses: [{}],
         custom_field_values: []
       },
       fields: [
@@ -673,12 +780,31 @@ export class CustomersComponent {
                         title: 'Addresses',
                         addText: 'Add Shipping Address',
                         showAddBtn: true,
+                        minRows: 2,
                         extraActionText: 'Copy Billing → Shipping',
                         extraActionIcon: 'fas fa-copy',
                         onExtraAction: () => this.copyBillingToShipping(),
+                        columnConfig: {
+                          moduleKey: 'customer_addresses',
+                          lockedColumns: ['address_type', 'state'],
+                          defaultHidden: [],
+                          excludeFromSettings: ['address_type'],
+                          showColumnSettings: false,
+                          defaultWidths: {
+                            address_type: 100,
+                            address: 180,
+                            city: 120,
+                            state: 120,
+                            country: 120,
+                            pin_code: 100,
+                            phone: 120,
+                            email: 150
+                          },
+                          minColumnWidth: 60
+                        },
                         tableCols: [
-                          { name: 'address_type', label: 'Type' },
-                          { name: 'address', label: 'Address' },
+                          { name: 'address_type', label: 'Address Type' },
+                          { name: 'address', label: 'Full Address' },
                           { name: 'city', label: 'City' },
                           { name: 'state', label: 'State' },
                           { name: 'country', label: 'Country' },
@@ -908,6 +1034,7 @@ export class CustomersComponent {
                 label: 'Communication'
               },
               fieldGroup: [
+                // --- Contact Person, Phone, Email ---
                 {
                   fieldGroupClassName: "",
                   fieldGroup: [
@@ -947,10 +1074,180 @@ export class CustomersComponent {
                     },
                   ]
                 },
-                // Communication tab info text
+                // --- Communication Address Section (Table style matching Tax Details) ---
                 {
-                  className: 'col-12 p-0',
-                  template: '<p class="text-muted mt-2 mb-0" style="font-size:12px"><i class="fas fa-info-circle" style="margin-right:4px"></i> Billing and Shipping addresses can be managed in the <strong>Tax Details</strong> tab.</p>',
+                  fieldGroupClassName: "",
+                  fieldGroup: [
+                    {
+                      key: 'communication_addresses',
+                      type: 'table',
+                      className: 'custom-form-list comm-address-table',
+                      templateOptions: {
+                        title: 'Communication Address',
+                        addText: '',
+                        showAddBtn: false,
+                        minRows: 1,
+                        extraActionText: 'Copy from Billing',
+                        extraActionIcon: 'fas fa-copy',
+                        onExtraAction: () => this.copyBillingToCommAddress(),
+                        secondActionText: 'Copy from Shipping',
+                        secondActionIcon: 'fas fa-copy',
+                        onSecondAction: () => this.copyShippingToCommAddress(),
+                        columnConfig: {
+                          moduleKey: 'communication_addresses',
+                          lockedColumns: [],
+                          defaultHidden: [],
+                          excludeFromSettings: [],
+                          showColumnSettings: false,
+                          defaultWidths: {
+                            address: 200,
+                            city: 120,
+                            state: 120,
+                            country: 120,
+                            pin_code: 100
+                          },
+                          minColumnWidth: 60
+                        },
+                        tableCols: [
+                          { name: 'address', label: 'Full Address' },
+                          { name: 'city', label: 'City' },
+                          { name: 'state', label: 'State' },
+                          { name: 'country', label: 'Country' },
+                          { name: 'pin_code', label: 'Pin Code' },
+                          // phone & email omitted — already captured in the Contact Person section above
+                        ]
+                      },
+                      fieldArray: {
+                        fieldGroup: [
+                          {
+                            type: 'textarea',
+                            key: 'address',
+                            templateOptions: {
+                              label: 'Full Address',
+                              hideLabel: true,
+                              placeholder: 'Address',
+                            }
+                          },
+                          {
+                            key: 'city',
+                            type: 'city-dropdown',
+                            templateOptions: {
+                              dataKey: 'city_id',
+                              dataLabel: 'city_name',
+                              label: 'City',
+                              placeholder: 'City',
+                              hideLabel: true,
+                              required: false,
+                              lazy: {
+                                url: 'masters/city/',
+                                lazyOneTime: true
+                              }
+                            },
+                            hooks: {
+                              onChanges: (field: any) => {
+                                field.formControl.valueChanges.subscribe((data: any) => {
+                                  const index = field.parent.key;
+                                  if (this.formConfig && this.formConfig.model) {
+                                    this.formConfig.model['communication_addresses'][index]['city_id'] = data?.city_id ?? null;
+                                  }
+                                });
+                              }
+                            }
+                          },
+                          {
+                            key: 'state',
+                            type: 'state-dropdown',
+                            templateOptions: {
+                              dataKey: 'state_id',
+                              dataLabel: 'state_name',
+                              label: 'State',
+                              placeholder: 'State',
+                              hideLabel: true,
+                              required: false,
+                              lazy: {
+                                url: 'masters/state/',
+                                lazyOneTime: true
+                              }
+                            },
+                            hooks: {
+                              onChanges: (field: any) => {
+                                field.formControl.valueChanges.subscribe((data: any) => {
+                                  const index = field.parent.key;
+                                  if (this.formConfig && this.formConfig.model) {
+                                    this.formConfig.model['communication_addresses'][index]['state_id'] = data?.state_id ?? null;
+                                  }
+                                });
+                              }
+                            }
+                          },
+                          {
+                            key: 'country',
+                            type: 'country-dropdown',
+                            templateOptions: {
+                              dataKey: 'country_id',
+                              dataLabel: 'country_name',
+                              label: 'Country',
+                              placeholder: 'Country',
+                              hideLabel: true,
+                              required: false,
+                              lazy: {
+                                url: 'masters/country/',
+                                lazyOneTime: true
+                              }
+                            },
+                            hooks: {
+                              onChanges: (field: any) => {
+                                field.formControl.valueChanges.subscribe((data: any) => {
+                                  const index = field.parent.key;
+                                  if (this.formConfig && this.formConfig.model) {
+                                    this.formConfig.model['communication_addresses'][index]['country_id'] = data?.country_id ?? null;
+                                  }
+                                });
+                              }
+                            }
+                          },
+                          {
+                            type: 'input',
+                            key: 'pin_code',
+                            templateOptions: {
+                              label: 'Pin Code',
+                              hideLabel: true,
+                              placeholder: 'Pin Code',
+                            },
+                            hooks: {
+                              onInit: (field: any) => {
+                                field.formControl.valueChanges.subscribe((value: any) => {
+                                  const index = field.parent.key;
+                                  if (this.formConfig && this.formConfig.model) {
+                                    this.formConfig.model['communication_addresses'][index]['pin_code'] = value === '' ? null : value;
+                                  }
+                                });
+                              }
+                            }
+                          },
+                          // phone & email fields commented out — already in Contact Person section above
+                          // {
+                          //   type: 'input',
+                          //   key: 'phone',
+                          //   templateOptions: {
+                          //     label: 'Phone',
+                          //     hideLabel: true,
+                          //     placeholder: 'Phone',
+                          //   },
+                          // },
+                          // {
+                          //   type: 'input',
+                          //   key: 'email',
+                          //   templateOptions: {
+                          //     label: 'Email',
+                          //     hideLabel: true,
+                          //     placeholder: 'Email',
+                          //   },
+                          // },
+                        ]
+                      }
+                    },
+                  ]
                 },
               ]
             },

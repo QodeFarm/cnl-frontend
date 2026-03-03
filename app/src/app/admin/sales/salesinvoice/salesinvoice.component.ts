@@ -2092,6 +2092,13 @@ createSaleInovice() {
           templateOptions: {
             // title: 'Products',
             addText: 'Add Product',
+            columnConfig: {
+              moduleKey: 'sale_invoice_items',
+              lockedColumns: ['selectItem', 'product', 'quantity', 'rate', 'amount'],
+              defaultHidden: [],
+              stickyColumns: ['selectItem', 'product', 'print_name'],
+              enableResize: false
+            },
             tableCols: [
               {
                 name: 'selectItem',
@@ -2101,45 +2108,59 @@ createSaleInovice() {
               },
               {
                 name: 'product',
-                label: 'Product'
+                label: 'Product',
+                width: '220px'
               },
               {
-                name: 'size',
-                label: 'size'
-              },
-              {
-                name: 'color',
-                label: 'color'
+                name: 'print_name',
+                label: 'Print Name',
+                width: '200px'
               },
               {
                 name: 'code',
-                label: 'Code'
+                label: 'Code',
+                width: '100px'
               },
               {
-                name: 'unit',
-                label: 'Unit'
+                name: 'size',
+                label: 'size',
+                width: '100px'
+              },
+              {
+                name: 'color',
+                label: 'color',
+                width: '100px'
               },
               {
                 name: 'total_boxes',
-                label: 'Total Boxes'
+                label: 'Total Boxes',
+                width: '110px'
+              },
+              {
+                name: 'unit',
+                label: 'Unit',
+                width: '90px'
               },
               {
                 name: 'quantity',
-                label: 'Quantity'
+                label: 'Quantity',
+                width: '100px'
               },
               {
                 name: 'amount',
-                label: 'Price'
+                label: 'Price',
+                width: '110px'
               },
               {
                 name: 'rate',
-                label: 'Rate'
+                label: 'Rate',
+                width: '110px'
               },
               {
                 name: 'discount',
-                label: 'Discount'
+                label: 'Discount',
+                width: '100px'
               },
-              // { name: 'select_item', label: 'Select' }
             ]
           },
           fieldArray: {
