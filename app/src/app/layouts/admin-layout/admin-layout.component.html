@@ -10,7 +10,8 @@
                 <span>Accounts Book</span>
             </a>
             <!-- Sidebar Toggle (Topbar) - Hidden when force password change is required -->
-            <button id="sidebarToggleTop" (click)="menuToggle()" class="btn bar-toggle ms-3" *ngIf="!isForcePasswordChange">
+            <button id="sidebarToggleTop" (click)="menuToggle()" class="btn bar-toggle ms-3"
+                *ngIf="!isForcePasswordChange">
                 <i class="fa fa-bars"></i>
             </button>
         </div>
@@ -30,23 +31,29 @@
 
 
         <ul class="navbar-nav align-items-center">
-            <li class="company-title"><span class="badge bg-light ms-2" style="font-weight: 500; font-size: 14px; color:#142768; border-radius: 3px;padding: 7px 10px;"><span class="company-code" style="padding: 0 !important;">{{company_code}} - </span>{{company_name}}</span>
+            <li class="company-title"><span class="badge bg-light ms-2"
+                    style="font-weight: 500; font-size: 14px; color:#142768; border-radius: 3px;padding: 7px 10px;"><span
+                        class="company-code" style="padding: 0 !important;">{{company_code}} -
+                    </span>{{company_name}}</span>
             </li>
             <li class="nav-item dropdown no-arrow mx-1 d-none">
-                <button class="nav-link dropdown-toggle" (click)="startSpeechRecognition()" id="alerts1" role="button" data-bs-toggle="" aria-haspopup="true" aria-expanded="false">
+                <button class="nav-link dropdown-toggle" (click)="startSpeechRecognition()" id="alerts1" role="button"
+                    data-bs-toggle="" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-microphone"></i>
                 </button>
             </li>
 
             <!-- Nav Item - Alerts -->
             <li class="nav-item dropdown no-arrow mx-1 d-none">
-                <a class="nav-link dropdown-toggle" id="alertsDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <a class="nav-link dropdown-toggle" id="alertsDropdown" role="button" data-bs-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-bell fa-fw"></i>
                     <!-- Counter - Alerts -->
                     <span class="badge badge-danger badge-counter">3+</span>
                 </a>
                 <!-- Dropdown - Alerts -->
-                <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown">
+                <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                    aria-labelledby="alertsDropdown">
                     <h6 class="dropdown-header">
                         Alerts Center
                     </h6>
@@ -89,18 +96,21 @@
             <!-- Nav Item - Search Dropdown -->
             <li class="nav-item dropdown no-arrow d-none">
 
-                <a class="nav-link dropdown-toggle" id="searchDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <a class="nav-link dropdown-toggle" id="searchDropdown" role="button" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-search fa-fw"></i>
                 </a>
                 <!-- Dropdown - Messages -->
-                <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in" aria-labelledby="searchDropdown">
+                <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
+                    aria-labelledby="searchDropdown">
                     <form class="form-inline mr-auto w-100 navbar-search">
                         <div class="input-group">
-                            <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
+                            <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
+                                aria-label="Search" aria-describedby="basic-addon2">
                             <div class="input-group-append">
                                 <button class="btn btn-primary" type="button">
-                                 <i class="fas fa-search fa-sm"></i>
-                             </button>
+                                    <i class="fas fa-search fa-sm"></i>
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -108,13 +118,15 @@
             </li>
             <!-- Nav Item - Messages -->
             <li class="nav-item dropdown no-arrow mx-1 d-none">
-                <a class="nav-link dropdown-toggle" id="messagesDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <a class="nav-link dropdown-toggle" id="messagesDropdown" role="button" data-bs-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-envelope fa-fw"></i>
                     <!-- Counter - Messages -->
                     <span class="badge badge-danger badge-counter">7</span>
                 </a>
                 <!-- Dropdown - Messages -->
-                <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="messagesDropdown">
+                <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                    aria-labelledby="messagesDropdown">
                     <h6 class="dropdown-header">
                         Message Center
                     </h6>
@@ -124,7 +136,8 @@
                             <div class="status-indicator bg-success"></div>
                         </div>
                         <div class="font-weight-bold">
-                            <div class="text-truncate">Hi there! I am wondering if you can help me with a problem I've been having.</div>
+                            <div class="text-truncate">Hi there! I am wondering if you can help me with a problem I've
+                                been having.</div>
                             <div class="small text-gray-500">Emily Fowler · 58m</div>
                         </div>
                     </a>
@@ -134,7 +147,8 @@
                             <div class="status-indicator"></div>
                         </div>
                         <div>
-                            <div class="text-truncate">I have the photos that you ordered last month, how would you like them sent to you?</div>
+                            <div class="text-truncate">I have the photos that you ordered last month, how would you like
+                                them sent to you?</div>
                             <div class="small text-gray-500">Jae Chun · 1d</div>
                         </div>
                     </a>
@@ -144,7 +158,8 @@
                             <div class="status-indicator bg-warning"></div>
                         </div>
                         <div>
-                            <div class="text-truncate">Last month's report looks great, I am very happy with the progress so far, keep up the good work!</div>
+                            <div class="text-truncate">Last month's report looks great, I am very happy with the
+                                progress so far, keep up the good work!</div>
                             <div class="small text-gray-500">Morgan Alvarez · 2d</div>
                         </div>
                     </a>
@@ -154,7 +169,8 @@
                             <div class="status-indicator bg-success"></div>
                         </div>
                         <div>
-                            <div class="text-truncate">Am I a good boy? The reason I ask is because someone told me that people say this to all dogs, even if they aren't good...</div>
+                            <div class="text-truncate">Am I a good boy? The reason I ask is because someone told me that
+                                people say this to all dogs, even if they aren't good...</div>
                             <div class="small text-gray-500">Chicken the Dog · 2w</div>
                         </div>
                     </a>
@@ -163,11 +179,13 @@
             </li>
             <!-- Nav Item - Configuration -->
             <li class="nav-item dropdown no-arrow mx-1" *ngIf="role === 'Admin'">
-                <a class="nav-link dropdown-toggle" id="configDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <a class="nav-link dropdown-toggle" id="configDropdown" role="button" data-bs-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-cog fa-fw" title="Configuration"></i>
                 </a>
                 <!-- Dropdown - Configuration -->
-                <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="configDropdown">
+                <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                    aria-labelledby="configDropdown">
                     <h6 class="dropdown-header">
                         Configuration
                     </h6>
@@ -230,45 +248,46 @@
 
             <!-- Bell icon -->
             <li class="nav-item no-arrow mx-1">
-            <a class="nav-link" role="button" (click)="openReminders()">
-                <i class="fas fa-bell fa-fw" title="Notifications"></i>
-                <span *ngIf="remindersCount > 0" class="badge badge-danger badge-counter">
-                {{ remindersCount }}
-                </span>
-            </a>
+                <a class="nav-link" role="button" (click)="openReminders()">
+                    <i class="fas fa-bell fa-fw" title="Notifications"></i>
+                    <span *ngIf="remindersCount > 0" class="badge badge-danger badge-counter">
+                        {{ remindersCount }}
+                    </span>
+                </a>
             </li>
 
             <!-- Reminders Modal -->
             <div *ngIf="isReminderOpen" class="modal-overlay">
-            <div class="modal-box shadow-lg rounded">
-                <div class="modal-header">
-                <h6 class="modal-title">Reminders</h6>
-                <button type="button" class="btn-close" (click)="closeReminders()"></button>
-                </div>
-                <div class="modal-body">
-                <div *ngIf="remindersList.length === 0" class="text-center small">No Reminders</div>
+                <div class="modal-box shadow-lg rounded">
+                    <div class="modal-header">
+                        <h6 class="modal-title">Reminders</h6>
+                        <button type="button" class="btn-close" (click)="closeReminders()"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div *ngIf="remindersList.length === 0" class="text-center small">No Reminders</div>
 
-                <ul class="list-unstyled">
-                    <li *ngFor="let reminder of remindersList"
-                        [ngClass]="{ 'unread-box': !reminder.read, 'read-box': reminder.read }"
-                        (click)="markAsRead(reminder)">
-                    <a href="javascript:;" class="d-block">
-                        <strong class="subject-text">{{ reminder.subject }}</strong>
-                        <small class="text-muted">
-                        ({{ reminder.reminder_date | date:'short' }})
-                        </small>
-                    </a>
-                    </li>
-                </ul>
+                        <ul class="list-unstyled">
+                            <li *ngFor="let reminder of remindersList"
+                                [ngClass]="{ 'unread-box': !reminder.read, 'read-box': reminder.read }"
+                                (click)="markAsRead(reminder)">
+                                <a href="javascript:;" class="d-block">
+                                    <strong class="subject-text">{{ reminder.subject }}</strong>
+                                    <small class="text-muted">
+                                        ({{ reminder.reminder_date | date:'short' }})
+                                    </small>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
             </div>
 
             <div class="topbar-divider d-none d-sm-block"></div>
 
             <!-- Nav Item - User Information -->
             <li class="nav-item dropdown no-arrow d-md-block d-none">
-                <a class="nav-link dropdown-toggle p-0" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <a class="nav-link dropdown-toggle p-0" id="userDropdown" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
                     <span class="mr-2 d-none d-lg-inline text-white-600">{{userName | uppercase}}</span>
                     <img class="img-profile rounded-circle" src="assets/img/user.png">
                 </a>
@@ -303,9 +322,11 @@
 
     <!-- Sidebar - Hidden when force password change is required -->
     <div id="myCanvasNav" class="menu-overlay" (click)="layertoggleMenu()" *ngIf="!isForcePasswordChange"></div>
-    <ul class="navbar-nav sidebar sidemenu-bar" *ngIf="!isForcePasswordChange">
+    <ul class="navbar-nav sidebar sidemenu-bar" [class.sidebar-searching]="isMenuSearching"
+        *ngIf="!isForcePasswordChange">
         <li class="nav-item dropdown no-arrow d-md-none d-block user-profile-details">
-            <a class="nav-link dropdown-toggle p-0" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <a class="nav-link dropdown-toggle p-0" id="userDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">
                 <div class="d-flex align-items-center">
                     <img class="img-profile rounded-circle" src="assets/img/user.png">
                     <div class="ml-2">
@@ -336,19 +357,57 @@
                 </a>
             </div>
         </li>
+        <!-- Sidebar Menu Search -->
+        <li class="sidebar-search-wrapper">
+            <div class="sidebar-search-box">
+                <i class="fas fa-search sidebar-search-icon"></i>
+                <input type="text" class="sidebar-search-input" placeholder="Search menu..." [ngModel]="menuSearchText"
+                    (ngModelChange)="menuSearchText = $event; onMenuSearchChange()" autocomplete="off" />
+                <i *ngIf="menuSearchText" class="fas fa-times sidebar-search-clear" (click)="clearMenuSearch()"></i>
+            </div>
+        </li>
         <ul class="custome-horizental-scroll" style="list-style: none; padding: 0; margin: 0;">
-            <li class="nav-item" *ngFor="let m of menulList; let i = index" [ngClass]="{'sub-menu': (m.module_sections && m.module_sections.length > 0)}">
-                <a *ngIf="!(m.module_sections && m.module_sections.length > 0)" class="nav-link" [routerLink]="[m.sec_link]" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">
+            <!-- No results message -->
+            <li *ngIf="isMenuSearching && filteredMenuList.length === 0" class="sidebar-no-results">
+                <span>No menu items found</span>
+            </li>
+            <li class="nav-item" *ngFor="let m of filteredMenuList; let i = index"
+                [ngClass]="{'sub-menu': (m.module_sections && m.module_sections.length > 0)}">
+                <!-- No children -->
+                <a *ngIf="!(m.module_sections && m.module_sections.length > 0)" class="nav-link"
+                    [routerLink]="[m.sec_link]" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+                    (click)="closeMenu()">
                     <i class="" [ngClass]="m.mod_icon"></i><span>{{m.module_name}}</span>
                 </a>
-                <a *ngIf="m.module_sections && m.module_sections.length > 0" class="nav-link collapsed" [ngClass]="{ 'active': isActive(m.sec_link, m.module_sections)}" [attr.data-bs-toggle]="'collapse'" [attr.data-bs-target]="'#collapseMenu'+i" [attr.aria-expanded]="'true'"
-                    [attr.aria-controls]="'collapseMenu'+i">
+                <!-- Has children — normal mode (no search) -->
+                <a *ngIf="m.module_sections && m.module_sections.length > 0 && !isMenuSearching"
+                    class="nav-link collapsed" [ngClass]="{ 'active': isActive(m.sec_link, m.module_sections)}"
+                    [attr.data-bs-toggle]="'collapse'" [attr.data-bs-target]="'#collapseMenu'+i"
+                    [attr.aria-expanded]="'true'" [attr.aria-controls]="'collapseMenu'+i">
                     <i [ngClass]="m.mod_icon"></i>
                     <span>{{m.module_name}}</span>
                 </a>
-                <div *ngIf="m.module_sections && m.module_sections.length > 0" id="collapseMenu{{i}}" class="collapse sub-menu-items" [attr.aria-labelledby]="'heading'+i" [attr.data-parent]="'#accordionSidebar'">
+                <div *ngIf="m.module_sections && m.module_sections.length > 0 && !isMenuSearching"
+                    id="collapseMenu{{i}}" class="collapse sub-menu-items" [attr.aria-labelledby]="'heading'+i"
+                    [attr.data-parent]="'#accordionSidebar'">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        <a (click)="closeMenu()" class="collapse-item" *ngFor="let sm of m.module_sections" [routerLink]="[sm.sec_link]" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">{{sm.section_name}}</a>
+                        <a (click)="closeMenu()" class="collapse-item" *ngFor="let sm of m.module_sections"
+                            [routerLink]="[sm.sec_link]" routerLinkActive="active"
+                            [routerLinkActiveOptions]="{ exact: true }">{{sm.section_name}}</a>
+                    </div>
+                </div>
+                <!-- Has children — search mode (auto-expanded) -->
+                <a *ngIf="m.module_sections && m.module_sections.length > 0 && isMenuSearching" class="nav-link"
+                    [ngClass]="{ 'active': isActive(m.sec_link, m.module_sections)}">
+                    <i [ngClass]="m.mod_icon"></i>
+                    <span>{{m.module_name}}</span>
+                </a>
+                <div *ngIf="m.module_sections && m.module_sections.length > 0 && isMenuSearching"
+                    class="sub-menu-items search-expanded">
+                    <div class="py-2 collapse-inner">
+                        <a (click)="closeMenu(); clearMenuSearch()" class="collapse-item"
+                            *ngFor="let sm of m.module_sections" [routerLink]="[sm.sec_link]" routerLinkActive="active"
+                            [routerLinkActiveOptions]="{ exact: true }">{{sm.section_name}}</a>
                     </div>
                 </div>
             </li>
@@ -387,7 +446,8 @@
         <!-- <h1 class="h3 mb-4 text-gray-800">Blank Page</h1> -->
         <!-- <router-outlet></router-outlet> -->
         <div class="tab  flex-fill h-100 px-0 bg-white d-flex flex-column">
-            <nz-tabset [(nzSelectedIndex)]="selectedTabIndex" nzType="editable-card" nzHideAdd (nzClose)="removeTab($event)">
+            <nz-tabset [(nzSelectedIndex)]="selectedTabIndex" nzType="editable-card" nzHideAdd
+                (nzClose)="removeTab($event)">
                 <nz-tab (nzSelect)="onTabSelect(tab)" [nzClosable]="true" [nzTitle]="tab.name" *ngFor="let tab of tabs">
                     <ng-container *ngComponentOutlet="tab.component;"></ng-container>
                 </nz-tab>
@@ -447,14 +507,15 @@
 </a> -->
 
     <!-- Logout Modal-->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
                     <button class="close" type="button" data-bs-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">×</span>
-              </button>
+                        <span aria-hidden="true">×</span>
+                    </button>
                 </div>
                 <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
                 <div class="modal-footer">
