@@ -313,11 +313,22 @@ private fallbackPrint(pdfBlob: Blob): void {
       }, 1000);
   };
 }
+
+onRowDoubleClick(row: any) {
+    console.log('Double clicked row:', row);
+    this.edit.emit(row.sale_invoice_id);
+  }
 //---------------print & Preview - end --------------------------
   tableConfig: TaTableConfig = {
     apiUrl: '',//'sales/sale_invoice_order/?records_all=true',
     showCheckbox: true,
     pkId: "sale_invoice_id",
+    rowEvents: {
+      dblclick: (row: any) => {
+        console.log('Row double-clicked:', row);
+        this.onRowDoubleClick(row);
+      }
+    },
     fixedFilters: [
       // {
       //   key: 'summary',

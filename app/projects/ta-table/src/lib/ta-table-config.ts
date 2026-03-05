@@ -10,6 +10,9 @@ export interface TaTableConfig {
   paginationPosition?: 'top' | 'bottom' | 'both';
   scrollX?: any;
   scrollY?: any;
+  rowEvents?: {
+    dblclick?: (row: any) => void;
+  };
   globalSearch?: {
     keys?: any[];
     label?: string; //default search

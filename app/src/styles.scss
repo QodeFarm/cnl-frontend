@@ -1,9 +1,12 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-.select-adv-field .cdk-virtual-scroll-viewport,.select-adv-field nz-option-container{
+
+.select-adv-field .cdk-virtual-scroll-viewport,
+.select-adv-field nz-option-container {
     display: none;
 }
+
 // .cdk-overlay-connected-position-bounding-box{
 //     z-index: 888 !important;
 // }
@@ -14,12 +17,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
+
     .container {
         @media(max-width: 1400px) {
             max-width: 1000px !important;
         }
     }
-    
+
     // Login page specific input styles - consistent for all input types
     .ant-input-group-wrapper,
     .ant-input-affix-wrapper,
@@ -30,41 +34,41 @@
         box-shadow: none !important;
         padding: 0 !important;
         min-height: auto !important;
-        
+
         .ant-input-group-addon {
             background: #fff;
             border: none;
             padding: 0 11px;
         }
-        
+
         .ant-input {
             background: #fff !important;
             border: none !important;
             box-shadow: none !important;
             color: #333 !important;
-            
+
             &::placeholder {
                 color: #999 !important;
             }
         }
-        
+
         .ant-input-prefix,
         .ant-input-suffix {
             color: #777777 !important;
         }
     }
-    
+
     // Fix password field eye icon alignment
     .ant-input-affix-wrapper {
         display: flex !important;
         align-items: center !important;
         padding: 0 11px !important;
-        
+
         .ant-input-suffix {
             display: flex;
             align-items: center;
             margin-left: 4px;
-            
+
             .anticon {
                 display: flex;
                 align-items: center;
@@ -73,23 +77,23 @@
             }
         }
     }
-    
+
     // Ensure input wrapper has consistent border
     nz-input-group.ant-input-group-wrapper {
         border: 1px solid #d9d9d9 !important;
         border-radius: 4px !important;
         overflow: hidden;
-        
+
         &:hover {
             border-color: #40a9ff !important;
         }
-        
+
         &:focus-within {
             border-color: #142768 !important;
             box-shadow: 0 0 0 2px rgba(20, 39, 104, 0.1) !important;
         }
     }
-    
+
     .ant-btn-primary {
         background-color: white !important;
         color: #142768 !important;
@@ -101,7 +105,7 @@
         border: 1px solid white !important;
         background: white !important;
         transition: all 0.3s ease;
-        
+
         &:hover,
         &:focus {
             background-color: #142768 !important;
@@ -109,11 +113,12 @@
             color: white !important;
             border-color: white !important;
         }
-        
-        @media(max-width:575px){
+
+        @media(max-width:575px) {
             font-size: 16px;
         }
     }
+
     .ant-btn-dangerous {
         font-size: 18px;
         font-weight: 600;
@@ -122,17 +127,21 @@
         border-radius: 5px;
         border: 1px solid #142768;
         color: #ff0000;
-        @media(max-width:575px){
+
+        @media(max-width:575px) {
             font-size: 16px;
         }
+
         &:hover {
             color: #fff;
             background-color: #ff0000;
         }
     }
+
     .login-block {
         background-color: #142768;
         padding: 6px;
+
         .login-left-block {
             background-color: #efefef;
             width: 63%;
@@ -142,33 +151,42 @@
             flex-direction: column;
             padding: 30px;
             border-radius: 10px;
-            @media(max-width:991px){
+
+            @media(max-width:991px) {
                 width: 50%;
             }
-            @media(max-width:767px){
+
+            @media(max-width:767px) {
                 display: none;
             }
+
             h1 {
                 font-weight: 400;
             }
+
             img {
                 max-width: 100%;
             }
         }
+
         .login-right-block {
             width: 37%;
             display: flex;
             align-items: center;
             justify-content: center;
-            @media(max-width:991px){
+
+            @media(max-width:991px) {
                 width: 50%;
             }
-            @media(max-width:767px){
+
+            @media(max-width:767px) {
                 width: 100%;
             }
-            @media(max-width:575px){
-               padding: 0;
+
+            @media(max-width:575px) {
+                padding: 0;
             }
+
             h1 {
                 font-weight: 600;
                 color: #fff;
@@ -177,62 +195,78 @@
                 line-height: 60px;
                 margin-bottom: 0;
             }
+
             .login-form {
                 max-width: 450px;
                 margin: 0 auto 50px;
+
                 @media(max-width: 1400px) {
                     max-width: 400px;
                 }
-                @media(max-width:757px){
+
+                @media(max-width:757px) {
                     padding: 0 !important;
                     margin-bottom: 0;
-                 }
+                }
+
                 .login-form-block {
                     padding: 40px 42px 25px;
                     border: 1px solid #898989;
                     border-radius: 5px;
-                    @media(max-width:575px){
+
+                    @media(max-width:575px) {
                         padding: 20px !important;
+
                         ta-form formly-form formly-field {
                             padding-bottom: 0rem;
                         }
-                        .ant-input-affix-wrapper{
+
+                        .ant-input-affix-wrapper {
                             padding-top: 0;
                             padding-bottom: 0;
                         }
-                     }
+                    }
                 }
+
                 input {
                     height: 44px;
                     font-size: 16px;
                     font-weight: 600;
+
                     &::placeholder {
                         font-weight: 400;
                     }
-                    @media(max-width:575px){
+
+                    @media(max-width:575px) {
                         font-size: 14px;
-                        &[type="password"]{
+
+                        &[type="password"] {
                             height: 42px;
                         }
                     }
                 }
+
                 .ant-input-group-addon {
                     color: #777777;
                     font-weight: 700;
                     font-size: 22px;
-                    @media(max-width:575px){
+
+                    @media(max-width:575px) {
                         .anticon {
                             vertical-align: 0em;
                         }
                     }
                 }
+
                 .form-group {
                     position: relative;
                 }
+
                 .invalid-feedback {
                     position: absolute;
                     left: 0;
                 }
+
                 .forgot-link {
                     a {
                         color: #f4f7f9;
@@ -244,6 +278,7 @@
                     }
                 }
             }
+
             .signup-link {
                 color: #f4f7f9;
                 font-size: 0.9rem;
@@ -253,6 +288,7 @@
         }
     }
 }
+
 .sidemenu-bar {
     background-color: #142768;
     border-right: 1px solid #142768;
@@ -262,25 +298,35 @@
 //   z-index: 1;
 //   position: relative;
 // }
-.sidebar .nav-item .nav-link:hover{
+.sidebar .nav-item .nav-link:hover {
     background-color: #ffffff;
-    color: #142768 !important; 
+    color: #142768 !important;
+}
+
+.sidebar.sidebar-searching .nav-item .nav-link:hover,
+.sidebar.sidebar-searching .nav-item .nav-link {
+    background-color: transparent !important;
+    color: #fff !important;
 }
 
 .sidebar {
     .nav-item {
         border-bottom: 1px solid #ffffff;
-        &:first-child{
+
+        &:first-child {
             border-top: 1px solid #ffffff;
         }
+
         &.sub-menu {
+
             .collapse.show,
             .collapse,
             .collapsing {
                 display: none !important;
             }
         }
-        &:hover {             
+
+        &:hover {
             .nav-link {
                 span {
                     display: block !important;
@@ -300,6 +346,7 @@
                     -webkit-box-shadow: 0 0 8px #ccc;
                     z-index: 9;
                     position: relative;
+
                     &::before {
                         content: "";
                         display: block;
@@ -311,6 +358,7 @@
                         top: 45%;
                         transform: translateY(-50%)
                     }
+
                     &::after {
                         content: "";
                         display: block;
@@ -322,22 +370,26 @@
                         transform: translateY(-50%);
                     }
                 }
+
                 &.active {
                     span {
                         color: #363642 !important;
                     }
+
                     i {
                         color: #fff !important;
                         background-color: #142768;
                     }
                 }
-             }
+            }
+
             &.sub-menu {
                 span {
                     padding: 6px 10px 5px 16px !important;
                     border-bottom-left-radius: 0;
                     border-bottom-right-radius: 0;
                 }
+
                 .sub-menu-items {
                     display: block !important;
                     border-color: #ccc;
@@ -364,15 +416,18 @@
                 }
             }
         }
+
         .nav-link {
             span {
                 display: none !important;
-                transition: all 0.3s ;
+                transition: all 0.3s;
             }
+
             &.active {
                 span {
                     color: #fff !important;
                 }
+
                 i {
                     color: #fff !important;
                     background-color: #142768;
@@ -384,8 +439,9 @@
 
 .sidebar.toggled {
     .nav-item {
-        &:hover {            
+        &:hover {
             background-color: transparent;
+
             .nav-link {
                 span {
                     position: relative;
@@ -399,26 +455,31 @@
                     -moz-box-shadow: none;
                     -webkit-box-shadow: none;
                     padding: 0;
+
                     &::after,
                     &::before {
                         display: none;
                     }
                 }
+
                 &.active {
                     span {
                         color: #142768 !important;
                     }
+
                     i {
                         color: #142768 !important;
                         background-color: transparent;
                     }
                 }
             }
+
             &.sub-menu {
                 span {
                     padding: 0 !important;
                     color: #142768 !important;
                 }
+
                 .sub-menu-items {
                     display: none !important;
                     padding: 0px;
@@ -438,13 +499,16 @@
                     top: 0 !important;
                     border-radius: 0;
                     height: auto !important;
-                    &.collapse.show {
+
+                    &.collapse.show,
+                    &.search-expanded {
                         display: block !important;
                     }
                 }
             }
 
         }
+
         .collapse.show {
             display: block !important;
             position: relative;
@@ -452,6 +516,7 @@
             top: 0;
         }
     }
+
     .nav-link {
         span {
             display: flex !important;
@@ -465,32 +530,191 @@
             span {
                 color: #142768 !important;
             }
+
             i {
                 color: #142768 !important;
                 background-color: transparent;
             }
         }
     }
+
+    /* Show search input when sidebar is expanded */
+    .sidebar-search-wrapper {
+        display: block;
+    }
+
     .sub-menu-items {
         .collapse-item {
             margin-left: 12px !important;
             padding: 0.5rem !important;
             position: relative;
+
             &:hover,
             &.active {
                 background-color: transparent !important;
                 color: #142768 !important;
             }
-          
-            // &::after {
-            //     content: "\f105";
-            //     font-family: "Font Awesome 5 Free";
-            //     font-weight: 600;
-            //     color: #5e5e5e;
-            //     padding-right: 0px;
-            //     position: absolute;
-            //     right: 3px;
-            // }
+        }
+    }
+}
+
+/* ── Search-expanded base layout (non-hover state) ── */
+.sidebar.toggled .sub-menu-items.search-expanded {
+    display: block !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    -moz-box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+    position: relative !important;
+    width: 100%;
+    padding: 0 !important;
+
+    .collapse-inner {
+        display: flex;
+        flex-direction: column;
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        padding: 4px 0 !important;
+        margin: 0 8px 4px 8px;
+        border-radius: 6px !important;
+        box-shadow: none !important;
+        border-left: 2px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .collapse-item {
+        display: block !important;
+        width: 100%;
+        padding: 7px 12px 7px 16px !important;
+        margin: 0 !important;
+        color: rgba(255, 255, 255, 0.7) !important;
+        font-size: 13px;
+        text-decoration: none;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: all 0.15s ease;
+
+        &:hover {
+            background-color: rgba(255, 255, 255, 0.08) !important;
+            color: #fff !important;
+        }
+
+        &.active {
+            color: #fff !important;
+            background-color: rgba(255, 255, 255, 0.12) !important;
+        }
+    }
+}
+
+/* ── Sidebar Search Mode — keep dark theme on hover ── */
+.sidebar.toggled.sidebar-searching {
+    .nav-item {
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.08) !important;
+            color: #fff !important;
+        }
+
+        &:hover {
+            background-color: transparent;
+
+            .nav-link {
+                background-color: transparent !important;
+                color: #fff !important;
+
+                i {
+                    color: #fff !important;
+                }
+
+                span {
+                    display: flex !important;
+                    position: relative;
+                    min-width: auto;
+                    margin-left: 42px !important;
+                    background-color: transparent !important;
+                    border: none !important;
+                    box-shadow: none !important;
+                    padding: 0 !important;
+                    color: #fff !important;
+
+                    &::before,
+                    &::after {
+                        display: none !important;
+                    }
+                }
+
+                &.active {
+                    span {
+                        color: #fff !important;
+                    }
+
+                    i {
+                        color: #fff !important;
+                        background-color: rgba(255, 255, 255, 0.15);
+                    }
+                }
+            }
+
+            &.sub-menu {
+                span {
+                    color: #fff !important;
+                }
+
+                .sub-menu-items.search-expanded {
+                    display: block !important;
+                    background-color: transparent !important;
+                    border: none !important;
+                    box-shadow: none !important;
+                    position: relative !important;
+                    width: 100%;
+
+                    .collapse-inner {
+                        display: flex;
+                        flex-direction: column;
+                        background-color: rgba(255, 255, 255, 0.05) !important;
+                        padding: 4px 0 !important;
+                        margin: 0 8px 4px 8px;
+                        border-radius: 6px !important;
+                        box-shadow: none !important;
+                        border-left: 2px solid rgba(255, 255, 255, 0.15);
+                    }
+
+                    .collapse-item {
+                        display: block !important;
+                        width: 100%;
+                        padding: 7px 12px 7px 16px !important;
+                        margin: 0 !important;
+                        color: rgba(255, 255, 255, 0.7) !important;
+                        font-size: 13px;
+                        text-decoration: none;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        transition: all 0.15s ease;
+
+                        &:hover {
+                            background-color: rgba(255, 255, 255, 0.08) !important;
+                            color: #fff !important;
+                        }
+
+                        &.active {
+                            color: #fff !important;
+                            background-color: rgba(255, 255, 255, 0.12) !important;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .sub-menu-items .collapse-item {
+        &:hover {
+            background-color: rgba(255, 255, 255, 0.08) !important;
+            color: #fff !important;
+        }
+
+        &.active {
+            background-color: rgba(255, 255, 255, 0.12) !important;
+            color: #fff !important;
         }
     }
 }
@@ -499,9 +723,11 @@
     width: 20%;
     border-radius: 14px;
     padding: 0;
-    @media(max-width:767px){
-       margin-bottom: 10px;
+
+    @media(max-width:767px) {
+        margin-bottom: 10px;
     }
+
     .dashboard-card-head {
         height: 58px;
         background-color: #394c8f;
@@ -514,13 +740,16 @@
         color: #fff;
         z-index: 1;
         position: relative;
-        @media(max-width:1024px){
+
+        @media(max-width:1024px) {
             font-size: 18px;
         }
-        @media(max-width:767px){
+
+        @media(max-width:767px) {
             font-size: 16px;
             height: 50px;
         }
+
         &::after {
             content: "";
             height: 50px;
@@ -536,6 +765,7 @@
             z-index: -1;
         }
     }
+
     .dashboard-card-content {
         padding-top: 22px;
         text-align: center;
@@ -543,30 +773,36 @@
         border-bottom-left-radius: 14px;
         border-bottom-right-radius: 14px;
         padding-bottom: 5px;
+
         h5 {
             font-size: 26px;
             font-weight: 500;
             margin-bottom: 0;
             color: #2c2e35;
         }
+
         p {
             font-size: 13px;
             color: #2c2e35;
             font-weight: 500;
             margin-bottom: 5px;
         }
-        @media(max-width:1024px){
+
+        @media(max-width:1024px) {
             h5 {
                 font-size: 20px;
             }
+
             p {
                 font-size: 12px;
             }
         }
-        @media(max-width:767px){
+
+        @media(max-width:767px) {
             h5 {
                 font-size: 18px;
             }
+
             p {
                 font-size: 11px;
             }
@@ -578,13 +814,16 @@
     &:focus {
         box-shadow: none;
     }
+
     &:active {
         border-color: transparent !important;
     }
+
     i {
         color: #fff;
         font-size: 22px;
     }
+
     &:hover {
         i {
             color: #142768;
@@ -605,6 +844,7 @@ header {
     display: flex;
     align-items: center;
     justify-content: center;
+
     &:hover,
     &:focus {
         color: #fff;
@@ -617,12 +857,15 @@ ta-table {
     .ant-input-group-wrapper {
         width: 300px;
     }
+
     .after-search {
         margin-left: 2px;
     }
+
     .ant-table-wrapper {
         margin-top: 5px;
     }
+
     .ant-table-thead>tr>th,
     .ant-table-tbody>tr>td,
     .ant-table tfoot>tr>th,
@@ -643,13 +886,14 @@ ta-table {
 .ant-drawer {
     z-index: 1050 !important;
     position: fixed !important;
-    
+
     .ant-drawer-mask {
         background-color: rgba(0, 0, 0, 0.85) !important;
         position: fixed !important;
         inset: 0 !important;
         z-index: 1050 !important;
     }
+
     .ant-drawer-content-wrapper {
         height: auto;
         max-height: 90vh;
@@ -659,7 +903,7 @@ ta-table {
         justify-content: center;
         padding-top: 20px;
         z-index: 1051 !important;
-        
+
         .ant-drawer-content {
             width: 85%;
             margin: 0 auto;
@@ -671,46 +915,53 @@ ta-table {
             flex-direction: column;
             background: #fff !important;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-            
-            @media(max-width:1400px){
+
+            @media(max-width:1400px) {
                 width: 90%;
             }
-            @media(max-width:1199px){
+
+            @media(max-width:1199px) {
                 width: 95%;
             }
-            @media(max-width:767px){
+
+            @media(max-width:767px) {
                 width: 98%;
             }
-            
-            .ant-drawer-body{
+
+            .ant-drawer-body {
                 padding: 20px 25px;
                 overflow-y: auto;
                 overflow-x: hidden;
                 max-height: calc(85vh - 60px);
                 background: #fff;
-                
+
                 /* Custom scrollbar inside modal */
                 &::-webkit-scrollbar {
                     width: 8px;
                 }
+
                 &::-webkit-scrollbar-track {
                     background: #f1f1f1;
                     border-radius: 4px;
                 }
+
                 &::-webkit-scrollbar-thumb {
                     background: #888;
                     border-radius: 4px;
                 }
+
                 &::-webkit-scrollbar-thumb:hover {
                     background: #555;
                 }
             }
         }
+
         .ant-drawer-header {
             background-color: #142768;
             padding: 14px 20px;
             flex-shrink: 0;
         }
+
         .ant-drawer-header-title {
             .ant-drawer-close {
                 position: absolute;
@@ -724,6 +975,7 @@ ta-table {
                 color: #000;
                 z-index: 10;
             }
+
             .ant-drawer-title {
                 color: #fff;
                 font-size: 18px;
@@ -731,8 +983,9 @@ ta-table {
             }
         }
     }
-    .ant-drawer-body{
-        .inner-content{
+
+    .ant-drawer-body {
+        .inner-content {
             overflow-y: auto;
             max-height: calc(85vh - 120px);
             overflow-x: hidden;
@@ -759,82 +1012,85 @@ body.ant-scrolling-effect {
     .formly-field {
         margin-bottom: 15px;
     }
-    
+
     .form-group {
         margin-bottom: 15px;
     }
-    
+
     formly-wrapper-form-field {
         display: block;
         margin-bottom: 12px;
     }
-    
+
     label {
         font-weight: 500;
         color: #333;
         margin-bottom: 5px;
         display: block;
     }
-    
+
     .ant-select,
     .ant-input,
     input.form-control,
     select.form-control {
         width: 100% !important;
     }
-    
+
     .ant-select-selector {
         min-height: 38px !important;
         display: flex !important;
         align-items: center !important;
     }
-    
+
     /* Tab styling */
     .tab-form-list {
         margin-top: 20px;
         border-top: 1px solid #e8e8e8;
         padding-top: 15px;
     }
-    
+
     .ant-tabs-nav {
         margin-bottom: 15px !important;
     }
-    
+
     /* Row spacing */
-    .row.g-3 > [class*="col-"] {
+    .row.g-3>[class*="col-"] {
         padding-top: 8px;
         padding-bottom: 8px;
     }
 }
 
-.curd-modal-form .ant-modal{
-    
-        border-radius: 10px;
-        overflow: hidden; // Clips ALL content at rounded corners
-         width: 85% !important;
-         max-width: 1200px;
-         padding-bottom: 0 !important;
-            margin: 0 auto;
-            max-height: 90vh;
-            border: solid 2px white;
-            border-radius: 5px;
-            @media(max-width:1400px){
-                width: 90%;
-            }
-            @media(max-width:1199px){
-                width: 95%;
-            }
-            @media(max-width:767px){
-                width: 98%;
-            }
-    
+.curd-modal-form .ant-modal {
+
+    border-radius: 10px;
+    overflow: hidden; // Clips ALL content at rounded corners
+    width: 85% !important;
+    max-width: 1200px;
+    padding-bottom: 0 !important;
+    margin: 0 auto;
+    max-height: 90vh;
+    border: solid 2px white;
+    border-radius: 5px;
+
+    @media(max-width:1400px) {
+        width: 90%;
+    }
+
+    @media(max-width:1199px) {
+        width: 95%;
+    }
+
+    @media(max-width:767px) {
+        width: 98%;
+    }
+
     .ant-modal-content {
         overflow: hidden; // Ensure content is clipped at modal boundaries
         border-radius: 5px;
     }
-    
-      .ant-modal-close {
-         position: absolute;
+
+    .ant-modal-close {
+        position: absolute;
         right: 0;
         background-color: #fff;
         opacity: 1;
@@ -842,22 +1098,24 @@ body.ant-scrolling-effect {
         margin: 10px;
         padding: 0px 0px;
         color: #000;
-            .ant-modal-close-x
-            {
-                width: 25px;
-                height: 25px;
-                line-height: 25px;
-            }
+
+        .ant-modal-close-x {
+            width: 25px;
+            height: 25px;
+            line-height: 25px;
         }
-    .ant-modal-header{
+    }
+
+    .ant-modal-header {
         background-color: #142768;
         padding: 12px 18px;
+
         .ant-modal-title {
             color: #fff;
             font-size: 18px;
             font-weight: 500;
         }
-      
+
     }
 
     .ant-modal-body {
@@ -865,14 +1123,14 @@ body.ant-scrolling-effect {
         overflow: auto; // Allow both X and Y scrolling within body
         overflow-x: hidden; // But hide horizontal overflow - table handles its own scroll
         padding: 20px;
-        
+
         // Ensure table wrapper doesn't overflow modal
         .ant-table-wrapper,
         ta-table,
         .custom-list {
             max-width: 100%;
             overflow: hidden;
-            
+
             .ant-table-container {
                 max-width: 100%;
             }
@@ -895,11 +1153,11 @@ body.ant-scrolling-effect {
 /* Fix placeholder text overflow in ALL select fields globally */
 .ant-select {
     max-width: 100%;
-    
+
     .ant-select-selector {
         max-width: 100% !important;
         overflow: hidden !important;
-        
+
         .ant-select-selection-placeholder,
         .ant-select-selection-item,
         .ant-select-selection-search-input {
@@ -916,7 +1174,7 @@ body.ant-scrolling-effect {
 nz-select,
 ng-select {
     max-width: 100%;
-    
+
     .ant-select-selection-placeholder,
     .ng-placeholder,
     .ng-value {
@@ -956,7 +1214,7 @@ formly-wrapper-form-field {
 /* Prevent body scroll when modal is open */
 .ant-modal-open {
     overflow: hidden !important;
-    
+
     body {
         overflow: hidden !important;
     }
@@ -967,15 +1225,17 @@ ta-form {
     formly-form {
         formly-field {
             padding-bottom: 1rem;
+
             .form-label {
                 color: #000;
                 white-space: nowarp;
+
                 span {
                     color: #ff0000;
                 }
             }
         }
-    } 
+    }
 }
 
 .logo-design-block {
@@ -985,8 +1245,9 @@ ta-form {
         color: #fff;
         font-size: 15px;
     }
-    @media(max-width:575px){
-     margin-bottom: 15px !important;
+
+    @media(max-width:575px) {
+        margin-bottom: 15px !important;
     }
 }
 
@@ -997,6 +1258,7 @@ ta-form {
         margin: 0;
         line-height: 30px;
     }
+
     span {
         font-size: 11px;
         color: #fff;
@@ -1010,9 +1272,10 @@ ta-form {
     color: #142768;
     font-size: 1.2rem;
     font-weight: 600;
-    @media(max-width:991px){
+
+    @media(max-width:991px) {
         font-size: 1rem;
-    } 
+    }
 }
 
 .btn-primary {
@@ -1021,6 +1284,7 @@ ta-form {
     border: 1px solid #142d81;
     padding: 5px 10px;
     font-size: 0.9rem;
+
     &:hover {
         background-color: #142768;
         color: #fff;
@@ -1034,56 +1298,68 @@ ta-form {
 }
 
 .custom-form {
-  .tab-form-list ta-field-tabs{
-    border: 1px solid #142768;
-    display: block;
-  }
+    .tab-form-list ta-field-tabs {
+        border: 1px solid #142768;
+        display: block;
+    }
+
     .ant-input,
     .ant-select-selector,
     .ant-picker {
         border-radius: 5px !important;
         padding: 5px 11px !important;
+
         &::placeholder {
             color: #aaa;
             font-weight: 300;
         }
     }
+
     .ant-select-selector {
         font-weight: 300 !important;
     }
+
     .ant-select-single:not(.ant-select-customize-input) .ant-select-selector {
         height: 34px;
         padding: 0px 11px !important;
     }
+
     .custom-form-block {
         background-color: rgb(249 249 249 / 60%);
         padding: 20px 10px 6px;
         border-radius: 8px;
         margin: 5px;
-        @media(max-width:767px){
-            padding:0;
+
+        @media(max-width:767px) {
+            padding: 0;
         }
     }
 }
 
 .custom-form-list {
-    &.product-table{
-        .ant-table-container{
+    &.product-table {
+        .ant-table-container {
             display: block;
             overflow-x: auto;
-            .table{
+
+            .table {
                 white-space: nowrap;
                 width: 100%;
+
                 thead {
-                    th{
+                    th {
                         white-space: nowrap;
-                         min-width: 120px; 
-                         &:nth-child(1),&:last-child{
+                        min-width: 120px;
+
+                        &:nth-child(1),
+                        &:last-child {
                             min-width: 50px;
-                         }
-                         &:nth-child(2){
+                        }
+
+                        &:nth-child(2) {
                             min-width: 150px;
-                         }       
+                        }
+
                         //  &:nth-child(5){
                         //     min-width: 70px;
                         //  }            
@@ -1091,24 +1367,30 @@ ta-form {
                 }
             }
         }
-       
-      }
+
+    }
+
     .ant-card {
         margin: 0 5px;
     }
+
     .ant-card-head {
         padding: 0 8px;
+
         .ant-card-head-title,
         .ant-card-extra {
             padding: 8px 0;
             font-size: 18px;
         }
     }
+
     .ant-card-body {
         padding: 8px;
     }
+
     .table {
         margin-bottom: 0;
+
         thead {
             th {
                 background-color: #142768;
@@ -1120,12 +1402,15 @@ ta-form {
                 text-align: center;
             }
         }
+
         tbody {
             td {
                 font-size: 13px;
                 padding: 0.35rem;
+
                 formly-field {
                     padding-bottom: 0rem;
+
                     &.col {
                         padding: 0 !important;
                     }
@@ -1133,70 +1418,85 @@ ta-form {
             }
         }
     }
-    &.new-items-list{
-        .ant-card{
-          margin: 0;
-          .ant-card-head {
-            padding: 0;
-          }
-          .ant-card-body {
-            padding: 0;            
-            overflow-x: auto; 
-            width: 100%; 
-          }
-          .table{
-            th{
-                white-space: nowrap;
-                min-width: 100px;
+
+    &.new-items-list {
+        .ant-card {
+            margin: 0;
+
+            .ant-card-head {
+                padding: 0;
             }
-            td{
-                min-width: 100px;
+
+            .ant-card-body {
+                padding: 0;
+                overflow-x: auto;
+                width: 100%;
             }
-          }
+
+            .table {
+                th {
+                    white-space: nowrap;
+                    min-width: 100px;
+                }
+
+                td {
+                    min-width: 100px;
+                }
+            }
         }
     }
-    &.no-ant-card{
+
+    &.no-ant-card {
         .ant-card {
-            margin: 0px; 
+            margin: 0px;
             border: none;
+
             .ant-card-head {
-                 display: none;
+                display: none;
             }
+
             .ant-card-body {
                 padding: 0px;
-                .ant-table-container{
+
+                .ant-table-container {
                     overflow-x: auto;
                     display: block;
-                    .table{
+
+                    .table {
                         border: none;
                         overflow-x: auto;
-                        thead th{
+
+                        thead th {
                             min-width: 150px;
                         }
                     }
                 }
-              
+
             }
         }
-       
+
     }
 }
 
 .custom-form-card {
     padding: 0;
+
     .custom-form-card-block {
         max-width: calc(50% - 10px);
         padding: 0;
         border-radius: 10px;
         border: 1px solid #e3e6f0;
         margin: 0 5px;
+
         .ant-row {
             padding: 0 7px;
         }
+
         &.w-100 {
             max-width: 100%;
         }
     }
+
     .custom-form-card-title {
         padding: 12px 18px;
         background-color: #142768;
@@ -1210,26 +1510,34 @@ ta-form {
 
 .custom-file-attachement {
     padding-bottom: 36px;
+
     .ant-upload-btn {
         background: #fff;
         padding: 10px 5px 0 !important;
     }
+
     .ant-upload-hint,
     .ant-upload-drag-icon {
         display: none;
     }
+
     .ant-upload-list-item-card-actions-btn {
         opacity: 1;
     }
+
     .ant-upload-text-icon {
         line-height: 1;
     }
+
     .anticon-delete svg {
         color: #ff0000;
     }
+
     .anticon-undo svg {
-        color: #12c03a; /* green for restore */
+        color: #12c03a;
+        /* green for restore */
     }
+
     .anticon-download svg {
         color: #000000;
     }
@@ -1245,7 +1553,7 @@ ta-form {
         font-size: 1.2rem !important;
         font-weight: 600 !important;
     }
-    
+
     // Professional table wrapper - clips content at rounded corners
     // This prevents sticky column background from overlapping border-radius
     .ant-table-wrapper {
@@ -1253,11 +1561,11 @@ ta-form {
         overflow: hidden; // Clips sticky column at rounded corners
         box-shadow: 0 2px 8px rgba(20, 39, 104, 0.08);
     }
-    
+
     table {
         border-collapse: separate;
         border-spacing: 0;
-        
+
         thead {
             th {
                 background: linear-gradient(180deg, #1a3278 0%, #142768 100%);
@@ -1270,21 +1578,21 @@ ta-form {
                 border-bottom: 2px solid #0d1b4a;
                 white-space: nowrap;
                 border-radius: 0 !important; // Reset all header cell radius
-                
+
                 // First header cell - top-left corner
                 &:first-child {
                     border-top-left-radius: 4px !important;
                 }
-                
+
                 // Last header cell - top-right corner
                 &:last-child {
                     border-top-right-radius: 4px !important;
                 }
-                
+
                 // Sort icon styling
                 .ant-table-column-sorter {
                     color: rgba(255, 255, 255, 0.5);
-                    
+
                     &-up.active,
                     &-down.active {
                         color: #fff;
@@ -1292,42 +1600,42 @@ ta-form {
                 }
             }
         }
-        
+
         tbody {
             tr {
                 transition: all 0.15s ease;
-                
+
                 // Zebra striping
                 &:nth-child(odd) {
                     background-color: #ffffff;
                 }
-                
+
                 &:nth-child(even) {
                     background-color: #f8fafc;
                 }
-                
+
                 // Hover effect
                 &:hover {
                     background-color: #eef4ff !important;
-                    
+
                     td {
                         color: #142768;
                     }
                 }
-                
+
                 // Selected row
                 &.ant-table-row-selected td {
                     background-color: #e6f4ff !important;
                 }
             }
-            
+
             td {
                 font-size: 13px;
                 padding: 12px;
                 color: #374151;
                 border-bottom: 1px solid #e5e7eb;
                 vertical-align: middle;
-                
+
                 // Action icons
                 .anticon-delete {
                     color: #ef4444;
@@ -1336,12 +1644,12 @@ ta-form {
                     padding: 4px;
                     border-radius: 4px;
                     transition: all 0.2s;
-                    
+
                     &:hover {
                         background-color: #fef2f2;
                     }
                 }
-                
+
                 .anticon-edit {
                     color: #3b82f6;
                     font-size: 16px;
@@ -1349,7 +1657,7 @@ ta-form {
                     padding: 4px;
                     border-radius: 4px;
                     transition: all 0.2s;
-                    
+
                     &:hover {
                         background-color: #eff6ff;
                     }
@@ -1357,22 +1665,25 @@ ta-form {
             }
         }
     }
-    
-    &.sale-receipt-table{
-        table{
-            tbody{
-                td{
-                    a,button{
+
+    &.sale-receipt-table {
+        table {
+            tbody {
+                td {
+
+                    a,
+                    button {
                         border: 1px solid #142768;
                         background-color: #142768;
                         color: #ffffff;
                         padding: 4px 10px;
                         font-size: 14px;
                         border-radius: 5px;
-                        &:hover{
-                          border:1px solid #233a88;
-                          background-color: #233a88;
-                          color: #ffffff;
+
+                        &:hover {
+                            border: 1px solid #233a88;
+                            background-color: #233a88;
+                            color: #ffffff;
                         }
                     }
                 }
@@ -1388,6 +1699,7 @@ ta-form {
 // All filter/search containers (excluding login page)
 .ant-row:not(.login-block),
 .row:not(.login-block) {
+
     // Select dropdowns (Quick Period, Status, etc.)
     .ant-select {
         .ant-select-selector {
@@ -1396,26 +1708,26 @@ ta-form {
             min-height: 38px;
             padding: 4px 12px;
             transition: all 0.2s;
-            
+
             .ant-select-selection-placeholder {
                 color: #9ca3af;
             }
-            
+
             .ant-select-selection-item {
                 color: #374151;
             }
         }
-        
+
         &:hover .ant-select-selector {
             border-color: #94a3b8 !important;
         }
-        
+
         &.ant-select-focused .ant-select-selector {
             border-color: #142768 !important;
             box-shadow: 0 0 0 2px rgba(20, 39, 104, 0.1) !important;
         }
     }
-    
+
     // Date pickers
     .ant-picker {
         border-radius: 6px !important;
@@ -1423,29 +1735,29 @@ ta-form {
         min-height: 38px;
         padding: 6px 12px;
         transition: all 0.2s;
-        
-        .ant-picker-input > input {
+
+        .ant-picker-input>input {
             color: #374151;
-            
+
             &::placeholder {
                 color: #9ca3af;
             }
         }
-        
+
         .ant-picker-suffix {
             color: #6b7280;
         }
-        
+
         &:hover {
             border-color: #94a3b8;
         }
-        
+
         &.ant-picker-focused {
             border-color: #142768 !important;
             box-shadow: 0 0 0 2px rgba(20, 39, 104, 0.1);
         }
     }
-    
+
     // Search input
     .ant-input-affix-wrapper {
         border-radius: 6px !important;
@@ -1453,30 +1765,30 @@ ta-form {
         min-height: 38px;
         padding: 6px 12px;
         transition: all 0.2s;
-        
+
         .ant-input {
             color: #374151;
-            
+
             &::placeholder {
                 color: #9ca3af;
             }
         }
-        
+
         .ant-input-prefix,
         .ant-input-suffix {
             color: #6b7280;
         }
-        
+
         &:hover {
             border-color: #94a3b8;
         }
-        
+
         &.ant-input-affix-wrapper-focused {
             border-color: #142768 !important;
             box-shadow: 0 0 0 2px rgba(20, 39, 104, 0.1);
         }
     }
-    
+
     // Search/Export/Refresh action buttons
     .ant-btn {
         border-radius: 6px;
@@ -1486,21 +1798,21 @@ ta-form {
         align-items: center;
         justify-content: center;
         transition: all 0.2s;
-        
+
         &.ant-btn-primary {
             background: linear-gradient(180deg, #1a3278 0%, #142768 100%);
             border: none;
-            
+
             &:hover {
                 background: linear-gradient(180deg, #1e3a8a 0%, #1a3278 100%);
                 transform: translateY(-1px);
                 box-shadow: 0 4px 8px rgba(20, 39, 104, 0.25);
             }
         }
-        
+
         &.ant-btn-default {
             border: 1px solid #d1d5db;
-            
+
             &:hover {
                 border-color: #142768;
                 color: #142768;
@@ -1519,13 +1831,13 @@ ta-form {
     align-items: center;
     flex-wrap: wrap;
     gap: 4px;
-    
+
     .ant-pagination-total-text {
         color: #6b7280;
         font-size: 13px;
         margin-right: 16px;
     }
-    
+
     .ant-pagination-item {
         border-radius: 6px;
         border: 1px solid #e5e7eb;
@@ -1535,57 +1847,57 @@ ta-form {
         font-size: 13px;
         font-weight: 500;
         transition: all 0.2s;
-        
+
         a {
             color: #374151;
         }
-        
+
         &:hover {
             border-color: #142768;
-            
+
             a {
                 color: #142768;
             }
         }
-        
+
         &.ant-pagination-item-active {
             background: linear-gradient(180deg, #1a3278 0%, #142768 100%);
             border-color: #142768;
-            
+
             a {
                 color: #fff;
             }
-            
+
             &:hover a {
                 color: #fff;
             }
         }
     }
-    
+
     .ant-pagination-prev,
     .ant-pagination-next {
         min-width: 36px;
         height: 36px;
         line-height: 34px;
-        
+
         .ant-pagination-item-link {
             border-radius: 6px;
             border: 1px solid #e5e7eb;
             color: #374151;
             transition: all 0.2s;
         }
-        
+
         &:hover .ant-pagination-item-link {
             border-color: #142768;
             color: #142768;
         }
-        
+
         &.ant-pagination-disabled .ant-pagination-item-link {
             color: #d1d5db;
             border-color: #e5e7eb;
         }
     }
-    
+
     .ant-pagination-options {
         .ant-select-selector {
             border-radius: 6px !important;
@@ -1606,10 +1918,11 @@ nz-modal {
         border-radius: 4px;
         overflow: hidden;
     }
-    
+
     table {
+
         thead th,
-        .ant-table-thead > tr > th,
+        .ant-table-thead>tr>th,
         .ant-table-thead th {
             background: linear-gradient(180deg, #1a3278 0%, #142768 100%) !important;
             color: #fff !important;
@@ -1620,31 +1933,31 @@ nz-modal {
             padding: 12px 10px;
             white-space: nowrap;
             border-radius: 0 !important; // Reset all header cell radius
-            
+
             // First header cell - top-left corner
             &:first-child {
                 border-top-left-radius: 4px !important;
             }
-            
+
             // Last header cell - top-right corner
             &:last-child {
                 border-top-right-radius: 4px !important;
             }
         }
-        
+
         tbody {
             tr {
                 transition: all 0.15s ease;
-                
+
                 &:nth-child(even) {
                     background-color: #f8fafc;
                 }
-                
+
                 &:hover {
                     background-color: #eef4ff !important;
                 }
             }
-            
+
             td {
                 padding: 10px;
                 font-size: 13px;
@@ -1652,11 +1965,11 @@ nz-modal {
             }
         }
     }
-    
+
     // Modal pagination
     .ant-pagination {
         margin: 12px 0;
-        
+
         .ant-pagination-item,
         .ant-pagination-prev .ant-pagination-item-link,
         .ant-pagination-next .ant-pagination-item-link {
@@ -1682,22 +1995,22 @@ nz-modal {
                 height: 18px;
                 transition: all 0.2s;
             }
-            
+
             &:hover .ant-checkbox-inner {
                 border-color: #142768;
             }
-            
+
             &-checked {
                 .ant-checkbox-inner {
                     background-color: #142768;
                     border-color: #142768;
                 }
-                
+
                 &::after {
                     border-color: #142768;
                 }
             }
-            
+
             &-indeterminate .ant-checkbox-inner::after {
                 background-color: #142768;
             }
@@ -1710,11 +2023,13 @@ nz-modal {
         background-color: #142768;
         color: #fff;
         padding: 8px 18px;
+
         .modal-title {
             color: #fff;
             font-size: 18px;
             font-weight: 500;
         }
+
         .btn-close {
             background-color: #fff;
             opacity: 1;
@@ -1735,6 +2050,7 @@ nz-modal {
 .ant-popover-buttons {
     display: flex;
     align-items: center;
+
     .ant-btn-sm {
         display: flex;
         align-items: center;
@@ -1753,9 +2069,11 @@ nz-modal {
                 color: #666666;
                 font-size: 16px;
                 font-weight: 500;
+
                 &:hover {
                     color: #142768;
                 }
+
                 &.active {
                     color: #fff;
                     background-color: #142768;
@@ -1764,6 +2082,7 @@ nz-modal {
             }
         }
     }
+
     .tab-content {
         padding: 15px;
         background-color: #fff;
@@ -1777,11 +2096,14 @@ nz-modal {
 .master-menu-list {
     list-style: circle;
     padding-left: 20px;
+
     li {
         margin: 5px 0;
+
         a {
             color: #000;
             font-size: 14px;
+
             // font-weight: 500;
             &:hover {
                 color: #142768;
@@ -1801,11 +2123,13 @@ nz-modal {
     border: 1px solid #142768;
     border-radius: 5px;
     height: 100%;
+
     .custom-sub-heading {
         background-color: #142768;
         color: #fff;
         padding: 8px;
     }
+
     .master-menu-list {
         padding: 0px 10px 0px 30px;
     }
@@ -1816,11 +2140,14 @@ nz-modal {
     padding: 10px 1.5rem;
     display: flex;
     flex-wrap: wrap;
+
     li {
         padding: 5px 2px;
         width: 50%;
+
         a {
             color: #000;
+
             &:hover {
                 color: #142768;
             }
@@ -1834,12 +2161,14 @@ nz-modal {
 
 .ant-upload.ant-upload-drag {
     background: transparent;
+
     .ant-upload {
         padding: 0 0 !important;
         display: flex;
         align-items: center;
         justify-content: center;
     }
+
     p.ant-upload-text {
         margin: 10px 0 4px;
     }
@@ -1955,51 +2284,68 @@ nz-modal {
 }
 
 @keyframes dialogFadeUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
+
 /* ======== END GLOBAL CUSTOM DIALOG ======== */
 
 
 // inline form-fields styles beggin
-.inline-form-fields{
-    .ant-row{
+.inline-form-fields {
+    .ant-row {
         border: 1px solid #ddd;
         border-radius: 5px;
         position: relative;
         box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
         padding-top: 15px;
         padding-bottom: 15px;
-        formly-field{
+
+        formly-field {
             padding-bottom: 0;
-            ta-wrapper-form-field>div{
+
+            ta-wrapper-form-field>div {
                 display: flex;
-                .form-label{
-                   flex: 0 0 auto;
-                   width: auto;
-                   max-width: 100%;
+
+                .form-label {
+                    flex: 0 0 auto;
+                    width: auto;
+                    max-width: 100%;
                 }
-                .ta-field{
-                   flex-basis: 0;
-                   flex-grow: 1;
-                   max-width: 100%;
-                   input{
-                       text-align: end;
-                       border: none;
-                       &[disabled]{
-                           background-color: #ffffff;
-                           color: #000000;
-                       }
-                       &:focus{
-                        box-shadow: none;
-                       }
-                   }
+
+                .ta-field {
+                    flex-basis: 0;
+                    flex-grow: 1;
+                    max-width: 100%;
+
+                    input {
+                        text-align: end;
+                        border: none;
+
+                        &[disabled] {
+                            background-color: #ffffff;
+                            color: #000000;
+                        }
+
+                        &:focus {
+                            box-shadow: none;
+                        }
+                    }
                 }
             }
-            &.product-total{
+
+            &.product-total {
                 padding-top: 10px;
-                input{
-                    &{
+
+                input {
+                    & {
                         background-color: #142768 !important;
                         color: #ffffff !important;
                         font-size: 18px;
@@ -2008,46 +2354,53 @@ nz-modal {
                 }
             }
         }
-     
+
     }
- 
+
 }
+
 // inline form-fields styles end
-.modal-content{
-    .ant-table-content{
+.modal-content {
+    .ant-table-content {
         max-height: calc(100vh - 415px);
         overflow: auto;
     }
-   
+
 }
-.ant-pagination-total-text{
-    .bottom-left{
+
+.ant-pagination-total-text {
+    .bottom-left {
         position: absolute;
         left: 0;
         z-index: 99;
-        .form-select{
+
+        .form-select {
             height: 36px;
             font-size: 14px;
             border-radius: 3px;
             line-height: 1;
             width: 150px;
         }
-        .btn-primary{
+
+        .btn-primary {
             border-radius: 3px;
         }
-        @media(max-width:1199px){
+
+        @media(max-width:1199px) {
             bottom: -85px;
             left: -5px;
-            .form-select{
+
+            .form-select {
                 width: auto;
             }
         }
     }
 }
-.sidemenu-bar{
-    .nav-item{
-        &:hover{
-            >.nav-link{
+
+.sidemenu-bar {
+    .nav-item {
+        &:hover {
+            >.nav-link {
                 background-color: #ffffff;
                 color: #142d81;
             }
@@ -2055,36 +2408,43 @@ nz-modal {
     }
 }
 
-.custom-form-card-block{
-    .responsive-row{
-        @media(max-width:575px){
+.custom-form-card-block {
+    .responsive-row {
+        @media(max-width:575px) {
             flex-direction: column-reverse;
         }
     }
 }
+
 .ant-input-affix-wrapper {
     padding: 0px 11px 0 0;
 }
-.tab-inner{
-    .ant-tabs-tab{
+
+.tab-inner {
+    .ant-tabs-tab {
         margin: 0 !important;
-        padding: 0.5rem 1rem;       
-        &.ant-tabs-tab-active{
+        padding: 0.5rem 1rem;
+
+        &.ant-tabs-tab-active {
             background-color: #142768 !important;
             border-color: #142678 !important;
-            .ant-tabs-tab-btn{
-                color: #fff;                
+
+            .ant-tabs-tab-btn {
+                color: #fff;
             }
         }
     }
-    .ant-tabs-top > .ant-tabs-nav{
-        &::before{
+
+    .ant-tabs-top>.ant-tabs-nav {
+        &::before {
             border-color: #142678 !important;
         }
-        .ant-tabs-nav-operations{
+
+        .ant-tabs-nav-operations {
             overflow: inherit;
             min-width: 50px;
-            .ant-tabs-nav-more{
+
+            .ant-tabs-nav-more {
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -2093,57 +2453,68 @@ nz-modal {
         }
     }
 }
-.company-banner{
-    button{
+
+.company-banner {
+    button {
         margin-left: 15px;
     }
 }
-.ant-pagination-prev .ant-pagination-item-link, 
+
+.ant-pagination-prev .ant-pagination-item-link,
 .ant-pagination-next .ant-pagination-item-link {
     display: inline-flex;
     align-items: center;
     justify-content: center;
 }
-.ant-pagination-prev, 
-.ant-pagination-next, 
-.ant-pagination-jump-prev, 
+
+.ant-pagination-prev,
+.ant-pagination-next,
+.ant-pagination-jump-prev,
 .ant-pagination-jump-next {
     line-height: inherit;
 }
-.ant-table-footer{
+
+.ant-table-footer {
     display: none;
 }
 
-@media(max-width:1199px){
-    .customer-title-alignment{
+@media(max-width:1199px) {
+    .customer-title-alignment {
         flex-wrap: wrap;
-        .ta-cell.filter-alignments{
-            .filter-group{
-                .ant-picker,.ant-select{
+
+        .ta-cell.filter-alignments {
+            .filter-group {
+
+                .ant-picker,
+                .ant-select {
                     width: 100% !important;
                 }
             }
         }
     }
+
     .ant-table-content {
-        table{
-          tr{
-                th:not(:first-child), td:not(:first-child){
+        table {
+            tr {
+
+                th:not(:first-child),
+                td:not(:first-child) {
                     width: 150px;
                 }
             }
         }
     }
 }
-@media(max-width:1024px){
 
-    .custom-modal{
+@media(max-width:1024px) {
+
+    .custom-modal {
         .modal-dialog {
-            max-width:80%;
+            max-width: 80%;
         }
     }
-   
-    .sidebar{
+
+    .sidebar {
         width: 0px;
         left: -60px;
         position: fixed;
@@ -2151,10 +2522,11 @@ nz-modal {
         top: 56px !important;
         z-index: 999;
         height: 100%;
-        transition: all ease .3s; 
+        transition: all ease .3s;
         overflow: hidden;
         padding: 0;
-        &.toggled{
+
+        &.toggled {
             top: 0;
             left: 0;
             min-width: unset;
@@ -2162,10 +2534,11 @@ nz-modal {
             width: 230px !important;
             min-width: 230px !important;
             transform: translateX(0%);
-            transition: all ease .3s;        
-            .nav-item{
-                &:hover{
-                    .nav-link{
+            transition: all ease .3s;
+
+            .nav-item {
+                &:hover {
+                    .nav-link {
                         span {
                             margin-left: 15px !important;
                         }
@@ -2173,27 +2546,33 @@ nz-modal {
                 }
             }
         }
-        .custome-horizental-scroll{
+
+        .custome-horizental-scroll {
             overflow-y: auto !important;
             height: calc(100vh - 55px) !important;
             list-style: none;
             margin: 0;
+
             &::-webkit-scrollbar {
                 width: 0.5em;
             }
+
             &::-webkit-scrollbar-thumb {
                 background-color: darkgrey;
                 outline: 0px solid slategrey;
             }
+
             ::-webkit-scrollbar-track {
                 -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
                 box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
             }
-        }  
-        .nav-item{
-            .nav-link{
+        }
+
+        .nav-item {
+            .nav-link {
                 width: auto !important;
                 align-items: center;
+
                 i {
                     font-size: 1.2rem;
                     position: inherit;
@@ -2204,13 +2583,15 @@ nz-modal {
                     padding: 0;
                     left: 0;
                 }
+
                 span {
                     margin-left: 15px !important;
                 }
-            
+
             }
-            &:hover{
-                .nav-link{
+
+            &:hover {
+                .nav-link {
                     span {
                         margin-left: 15px !important;
                     }
@@ -2219,57 +2600,72 @@ nz-modal {
         }
     }
 }
-@media(max-width:960px){
+
+@media(max-width:960px) {
 
     .ant-table-content {
-      table{
-        tr{
-            border: 1px solid #142678;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            background: #ffffff;
-           &:last-child{
-            margin-bottom: 0;
-           }
-            td{
-                display: flex;
-                ta-table-cell-dynamic,label,ta-table-actions{
-                    flex: 1;
-                    margin: 0;
-                    span{
-                        word-break: break-all;
+        table {
+            tr {
+                border: 1px solid #142678;
+                margin-bottom: 15px;
+                border-radius: 5px;
+                background: #ffffff;
+
+                &:last-child {
+                    margin-bottom: 0;
+                }
+
+                td {
+                    display: flex;
+
+                    ta-table-cell-dynamic,
+                    label,
+                    ta-table-actions {
+                        flex: 1;
+                        margin: 0;
+
+                        span {
+                            word-break: break-all;
+                        }
+                    }
+
+                    .col-name {
+                        color: #142678;
+                        font-weight: 600;
+                    }
+
+                    .ant-checkbox-wrapper {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin: 0 0 5px 0;
+                    }
+
+                    &.ant-table-selection-column {
+                        border-color: #142678 !important;
+                        border-radius: 5px 0 0 0;
+                    }
+
+                    .ant-btn-dangerous {
+                        background: #ffffff !important;
                     }
                 }
-                .col-name {
-                    color: #142678;
-                    font-weight: 600;
+
+                th:not(:first-child),
+                td:not(:first-child) {
+                    width: auto;
                 }
-                .ant-checkbox-wrapper{
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    margin: 0 0 5px 0;
-                }
-                &.ant-table-selection-column {
-                    border-color: #142678 !important;
-                    border-radius: 5px 0 0 0;
-                }
-                .ant-btn-dangerous {
-                    background: #ffffff !important;
-                }
-            }
-            th:not(:first-child), td:not(:first-child){
-                width: auto;
             }
         }
-      }
     }
 }
-@media(max-width:767px){
+
+@media(max-width:767px) {
     .custom-modal .modal-dialog {
         max-width: 98%;
     }
-    .menu-overlay.menuBglayer{
+
+    .menu-overlay.menuBglayer {
         content: '';
         height: 100%;
         width: 100%;
@@ -2283,69 +2679,82 @@ nz-modal {
         text-align: center;
         opacity: 1;
         transition: opacity 0.2s ease-in-out;
-    }  
-    .sidebar-toggled{       
-        .nav-item{
-            &:hover{
-                .nav-link{
-                    i,span{
+    }
+
+    .sidebar-toggled {
+        .nav-item {
+            &:hover {
+                .nav-link {
+
+                    i,
+                    span {
                         color: #142678;
                     }
                 }
-            }           
+            }
         }
-       
+
     }
-    .sidebar-toggled .sidebar .nav-item .nav-link{
+
+    .sidebar-toggled .sidebar .nav-item .nav-link {
         &[data-bs-toggle="collapse"]::after {
             content: '\f107';
         }
-        &.collapsed{
+
+        &.collapsed {
             &[data-bs-toggle="collapse"]::after {
                 content: '\f105';
             }
         }
     }
+
     .sidebar {
         top: 0 !important;
-        &.toggled{      
-           .nav-item{
-                &.user-profile-details{
+
+        &.toggled {
+            .nav-item {
+                &.user-profile-details {
                     box-shadow: 0 0 0 1px rgb(20 20 31 / 5%), 0 1px 3px 0 rgb(20 20 31 / 15%);
-                    border-top-color:#ffffff ;
+                    border-top-color: #ffffff;
+
                     a.nav-link {
                         display: flex;
                         align-items: center;
                         justify-content: space-between;
-                        padding:10px 15px !important;
+                        padding: 10px 15px !important;
                         overflow: hidden;
                         z-index: 99;
                         background-color: #ffffff;
-                        h4{
+
+                        h4 {
                             color: #363642;
                             font-weight: 600;
                             font-size: 17px;
                         }
-                        span{
+
+                        span {
                             margin: 0 !important;
                             font-size: 12px;
                             color: #afa3a3;
                             font-weight: 600;
                             line-height: 16px;
                         }
-                        i{
+
+                        i {
                             font-size: 20px;
                             transition: all 0.3s ease-in-out;
                             color: #000000;
                         }
-                        &.show{
-                            i{
+
+                        &.show {
+                            i {
                                 transform: rotate(180deg);
                             }
                         }
                     }
-                    &:hover{
-                        .nav-link{
+
+                    &:hover {
+                        .nav-link {
                             span {
                                 margin-left: 0px !important;
                                 line-height: 16px;
@@ -2353,50 +2762,58 @@ nz-modal {
                                 text-align: left;
                             }
                         }
-                    }    
+                    }
                 }
-              
+
             }
-           
-               
+
+
         }
+
         .dropdown-menu {
             width: 100%;
             // transition: all 15s ease-in-out;
-            transition:0.3s ease-in-out;
+            transition: 0.3s ease-in-out;
             top: 35px !important;
             border-radius: 0 !important;
             border: none;
             padding: 0;
-            will-change:transform;
+            will-change: transform;
             z-index: 9;
+
             .dropdown-divider {
                 margin: 0rem 0;
             }
-            .dropdown-item{
+
+            .dropdown-item {
                 padding: 7px 10px !important;
-                i{
+
+                i {
                     font-size: 18px;
                 }
-            }           
+            }
         }
-        .nav-item{
-            .nav-link{
+
+        .nav-item {
+            .nav-link {
                 display: flex;
                 align-items: center;
                 position: relative;
                 padding: 10px 15px !important;
-                i{
+
+                i {
                     display: flex;
                     align-items: center;
                     font-size: 20px !important;
-                    color:#ffffff;
+                    color: #ffffff;
                 }
-                span{
+
+                span {
                     font-size: 14px !important;
                     line-height: 16px !important;
-                    color:#ffffff;
+                    color: #ffffff;
                 }
+
                 &[data-bs-toggle="collapse"]::after {
                     width: 1rem;
                     text-align: center;
@@ -2410,109 +2827,132 @@ nz-modal {
                     right: 7px;
                     color: #ffffff;
                 }
-            
+
             }
+
             .collapse .collapse-inner {
                 border-radius: 0rem;
-                box-shadow:none;
+                box-shadow: none;
             }
-            &:first-child{
+
+            &:first-child {
                 border-top-color: #142768;
             }
         }
-        &.toggled{
-            .nav-item{
-                &:hover{
+
+        &.toggled {
+            .nav-item {
+                &:hover {
                     .nav-link[data-bs-toggle=collapse]::after {
                         color: #142678;
                     }
                 }
-                .collapse .collapse-inner{
+
+                .collapse .collapse-inner {
                     padding: 0 !important;
                     border-radius: 0 !important;
                     background-color: #ffffff !important;
+
                     .collapse-item {
                         border-top: 1px solid #ffffff;
                         margin: 0 !important;
                         padding: 0.5rem 0.5rem 0.5rem 2rem !important;
                         border-radius: 0;
-                        border-top:1px solid #142678;
-                        &:hover,&.active{
+                        border-top: 1px solid #142678;
+
+                        &:hover,
+                        &.active {
                             background-color: #142768a8 !important;
                             color: #ffffff !important;
                         }
                     }
                 }
-            } 
+            }
         }
     }
 }
-@media(max-width:575px){
-  
-    .ant-table-footer{
+
+@media(max-width:575px) {
+
+    .ant-table-footer {
         display: block;
     }
+
     .topbar .dropdown .dropdown-menu {
-        width:100%;
+        width: 100%;
         right: 0rem;
-        
+
     }
-    .page-component-header{
-        button{
+
+    .page-component-header {
+        button {
             flex: 1;
             font-size: 0.9rem !important;
             white-space: nowrap;
-            &:first-child{
+
+            &:first-child {
                 text-align: left;
-                .custom-heading{
+
+                .custom-heading {
                     font-size: 1.2rem;
                 }
             }
-        }     
+        }
     }
 
-    .filter-alignments .ta-row{
+    .filter-alignments .ta-row {
         flex-wrap: wrap;
     }
+
     .custom-modal .modal-dialog {
         max-width: 98%;
         margin: 10px auto;
     }
-    .customers-banner{
-        button,.custom-heading {
+
+    .customers-banner {
+
+        button,
+        .custom-heading {
             font-size: .9rem;
         }
     }
-    .customer-title-alignment{
+
+    .customer-title-alignment {
         flex-wrap: wrap;
     }
-  
-    .ant-tabs-content-holder{
-        .btn{
+
+    .ant-tabs-content-holder {
+        .btn {
             font-size: 16px !important;
         }
     }
-    .customer-title-alignment{
-        .ta-cell{
-            .filter-group.col{
+
+    .customer-title-alignment {
+        .ta-cell {
+            .filter-group.col {
                 flex: 0 0 50%;
                 max-width: 50%;
                 padding-left: 5px !important;
                 margin-left: 0 !important;
-                .ant-select{
+
+                .ant-select {
                     width: 100%;
                 }
-                &:nth-child(odd){
+
+                &:nth-child(odd) {
                     margin-left: 0 !important;
                     padding-left: 0px !important;
                 }
             }
+
             .ant-select {
                 width: 100%;
             }
-            &.ms-2{
+
+            &.ms-2 {
                 margin-left: 0 !important;
-               .ant-input-group-wrapper {
+
+                .ant-input-group-wrapper {
                     width: 100%;
                 }
             }
@@ -2520,14 +2960,15 @@ nz-modal {
     }
 }
 
-@media(max-width:475px){
-    .header-right-btn{
+@media(max-width:475px) {
+    .header-right-btn {
         position: absolute;
         right: 0;
-        top:-30px;
+        top: -30px;
         z-index: 9;
-     }
+    }
 }
+
 // error message styles //
 .error-modal .ant-modal-content,
 .error-modal .ant-modal-header,
@@ -2536,15 +2977,19 @@ nz-modal {
 }
 
 .error-modal .ant-modal-content {
-    color: #721c24; /* Dark red text for contrast */
-    border-radius: 10px; /* Rounded corners */
-    text-align: left; /* Align text to the left */
+    color: #721c24;
+    /* Dark red text for contrast */
+    border-radius: 10px;
+    /* Rounded corners */
+    text-align: left;
+    /* Align text to the left */
 }
 
 .error-modal .ant-modal-header {
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
-    border-bottom: 1px solid #ffcccc; /* Light red border */
+    border-bottom: 1px solid #ffcccc;
+    /* Light red border */
 }
 
 .error-modal .ant-modal-footer {
@@ -2566,7 +3011,8 @@ nz-modal {
 }
 
 .error-modal .ant-modal-footer .ant-btn {
-    background-color: #007BFF;  /* Brighter Blue */
+    background-color: #007BFF;
+    /* Brighter Blue */
     color: #ffffff;
     border: 1px solid #007BFF;
     border-radius: 5px;
@@ -2576,7 +3022,8 @@ nz-modal {
 }
 
 .error-modal .ant-modal-footer .ant-btn:hover {
-    background-color: #0056D2;  /* Darker blue on hover */
+    background-color: #0056D2;
+    /* Darker blue on hover */
     border: 1px solid #0056D2;
 }
 
@@ -2588,8 +3035,10 @@ nz-modal {
 
 /* Reports Module UI Styles */
 .accordion-header .accordion-button {
-    background-color: #142768 !important; /* Dark blue color from project theme */
-    color: white !important; /* White text color */
+    background-color: #142768 !important;
+    /* Dark blue color from project theme */
+    color: white !important;
+    /* White text color */
     font-weight: 600;
     padding: 0.75rem 1.25rem;
     border: none;
@@ -2597,7 +3046,8 @@ nz-modal {
 }
 
 .accordion-button:not(.collapsed) {
-    background-color: #142768 !important; /* Keep dark blue when expanded */
+    background-color: #142768 !important;
+    /* Keep dark blue when expanded */
     color: white !important;
 }
 
@@ -2661,7 +3111,7 @@ nz-modal {
         text-align: center;
         padding: 0.6rem 0.8rem;
     }
-    
+
     .accordion-body .d-flex {
         padding: 0.2rem;
     }
@@ -2674,7 +3124,7 @@ nz-modal {
         border-left: 3px solid transparent;
         margin: 0.5rem;
     }
-    
+
     .report-link:hover {
         border-left: 3px solid #fff;
     }
@@ -2714,13 +3164,13 @@ nz-modal {
         border-radius: 16px;
         overflow: hidden;
     }
-    
+
     .ant-modal-header {
         background-color: #142768 !important;
         padding: 16px 24px;
         border-bottom: none;
         border-radius: 16px 16px 0 0;
-        
+
         .ant-modal-title {
             color: #fff !important;
             font-size: 18px;
@@ -2728,19 +3178,19 @@ nz-modal {
             text-align: center;
         }
     }
-    
+
     .ant-modal-body {
         padding: 24px;
         background-color: #fff;
     }
-    
+
     .ant-modal-footer {
         padding: 16px 24px 20px;
         border-top: none;
         background-color: #fff;
         text-align: center;
         border-radius: 0 0 16px 16px;
-        
+
         .ant-btn-primary {
             background-color: #142768;
             border: none;
@@ -2749,7 +3199,7 @@ nz-modal {
             padding: 0 28px;
             font-weight: 600;
             font-size: 14px;
-            
+
             &:hover {
                 background-color: #1e3a8a;
             }
@@ -2763,13 +3213,13 @@ nz-modal {
         border-radius: 16px;
         overflow: hidden;
     }
-    
+
     .ant-modal-header {
         background-color: #142768 !important;
         padding: 16px 24px;
         border-bottom: none;
         border-radius: 16px 16px 0 0;
-        
+
         .ant-modal-title {
             color: #fff !important;
             font-size: 18px;
@@ -2777,20 +3227,20 @@ nz-modal {
             text-align: center;
         }
     }
-    
+
     .ant-modal-close {
         color: #fff;
-        
+
         &:hover {
             color: rgba(255, 255, 255, 0.8);
         }
     }
-    
+
     .ant-modal-body {
         padding: 24px;
         background-color: #fff;
     }
-    
+
     .ant-modal-footer {
         padding: 16px 24px 20px;
         border-top: none;
@@ -2806,55 +3256,55 @@ nz-modal {
         border-radius: 12px;
         overflow: hidden;
     }
-    
+
     .ant-modal-body {
         padding: 24px 24px 20px;
     }
-    
+
     .ant-modal-confirm-body {
         display: flex;
         align-items: flex-start;
         gap: 16px;
-        
+
         .ant-modal-confirm-title {
             font-size: 16px;
             font-weight: 600;
             color: #262626;
             line-height: 1.5;
         }
-        
-        > .anticon {
+
+        >.anticon {
             font-size: 22px;
             margin-top: 2px;
         }
     }
-    
+
     .ant-modal-confirm-btns {
         display: flex;
         justify-content: flex-end;
         gap: 12px;
         margin-top: 24px;
-        
+
         .ant-btn {
             min-width: 70px;
             height: 36px;
             border-radius: 6px;
             font-weight: 500;
-            
+
             &.ant-btn-default {
                 border: 1px solid #d9d9d9;
-                
+
                 &:hover {
                     border-color: #1890ff;
                     color: #1890ff;
                 }
             }
-            
+
             &.ant-btn-primary {
                 &.ant-btn-dangerous {
                     background: #ff4d4f;
                     border-color: #ff4d4f;
-                    
+
                     &:hover {
                         background: #ff7875;
                         border-color: #ff7875;
@@ -2884,36 +3334,36 @@ ta-curd-modal {
         // For non-.custom-list contexts, ensure clipping
         overflow: hidden;
         border-radius: 4px;
-        
+
         .ant-table {
             overflow: visible;
         }
-        
+
         .ant-table-container {
             overflow-x: auto;
             overflow-y: visible;
-            
+
             // Horizontal scrollbar styling
             &::-webkit-scrollbar {
                 height: 10px;
             }
-            
+
             &::-webkit-scrollbar-track {
                 background: #f1f5f9;
                 border-radius: 5px;
             }
-            
+
             &::-webkit-scrollbar-thumb {
                 background: linear-gradient(90deg, #1a3278 0%, #142768 100%);
                 border-radius: 5px;
                 border: 2px solid #f1f5f9;
-                
+
                 &:hover {
                     background: linear-gradient(90deg, #1e3a8a 0%, #1a3278 100%);
                 }
             }
         }
-        
+
         // Ensure table takes minimum width needed for all columns
         table {
             min-width: 100%;
@@ -2943,10 +3393,11 @@ ta-curd-modal {
 ta-table,
 .ta-table,
 ta-curd-modal {
+
     // Target ONLY Action column header - identified by being the last column with action content
     // We use a more specific selector to only target columns that contain action buttons
-    .ant-table-thead > tr > th:last-child:has(~ td ta-table-actions),
-    thead > tr > th.action-column {
+    .ant-table-thead>tr>th:last-child:has(~ td ta-table-actions),
+    thead>tr>th.action-column {
         position: sticky;
         right: 0;
         z-index: 3;
@@ -2954,10 +3405,10 @@ ta-curd-modal {
         box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
         border-radius: 0 !important; // No radius - wrapper clips at corner
     }
-    
+
     // Target ONLY Action column cells - cells that contain ta-table-actions component
-    .ant-table-tbody > tr > td:has(ta-table-actions),
-    tbody > tr > td:has(ta-table-actions) {
+    .ant-table-tbody>tr>td:has(ta-table-actions),
+    tbody>tr>td:has(ta-table-actions) {
         position: sticky;
         right: 0;
         z-index: 1;
@@ -2965,25 +3416,26 @@ ta-curd-modal {
         box-shadow: -2px 0 5px rgba(0, 0, 0, 0.08);
         border-radius: 0 !important; // No radius - wrapper clips at corner
     }
-    
+
     // Handle zebra striping for action column cells
-    .ant-table-tbody > tr:nth-child(even) > td:has(ta-table-actions) {
+    .ant-table-tbody>tr:nth-child(even)>td:has(ta-table-actions) {
         background-color: #f8fafc;
     }
-    
-    .ant-table-tbody > tr:hover > td:has(ta-table-actions) {
+
+    .ant-table-tbody>tr:hover>td:has(ta-table-actions) {
         background-color: #eef4ff !important;
     }
-    
-    .ant-table-tbody > tr.ant-table-row-selected > td:has(ta-table-actions) {
+
+    .ant-table-tbody>tr.ant-table-row-selected>td:has(ta-table-actions) {
         background-color: #e6f4ff !important;
     }
-    
+
     // Also handle header sticky when table has action column
     // The header doesn't have ta-table-actions, so we rely on sibling relationship
     &:has(ta-table-actions) {
-        .ant-table-thead > tr > th:last-child,
-        thead > tr > th:last-child {
+
+        .ant-table-thead>tr>th:last-child,
+        thead>tr>th:last-child {
             position: sticky;
             right: 0;
             z-index: 3;
@@ -2999,6 +3451,7 @@ ta-curd-modal {
 ta-table,
 .ta-table,
 ta-curd-modal {
+
     // When checkbox is present, ensure first column styling is preserved
     .ant-table-selection-column {
         position: static;
@@ -3020,21 +3473,22 @@ ta-curd-modal {
 .ant-select-dropdown,
 .adv-select-curd-container,
 .adv-select-custom-overlay-panel {
+
     // Reset ALL sticky/fixed positioning inside dropdowns/popups
     // This ensures all columns scroll together
-    .ant-table-thead > tr > th,
-    thead > tr > th,
-    .ant-table-tbody > tr > td,
-    tbody > tr > td {
+    .ant-table-thead>tr>th,
+    thead>tr>th,
+    .ant-table-tbody>tr>td,
+    tbody>tr>td {
         position: static !important;
         box-shadow: none !important;
     }
-    
+
     // Specifically target action columns to ensure they're not sticky
-    .ant-table-thead > tr > th:last-child,
-    thead > tr > th:last-child,
-    .ant-table-tbody > tr > td:last-child,
-    tbody > tr > td:last-child,
+    .ant-table-thead>tr>th:last-child,
+    thead>tr>th:last-child,
+    .ant-table-tbody>tr>td:last-child,
+    tbody>tr>td:last-child,
     td:has(ta-table-actions),
     th:has(ta-table-actions) {
         position: static !important;
@@ -3042,22 +3496,22 @@ ta-curd-modal {
         box-shadow: none !important;
         z-index: auto !important;
     }
-    
+
     // Single scroll container for the entire table
     .ant-table-wrapper {
         overflow: hidden;
         border-radius: 4px;
-        
+
         .ant-table {
             overflow: visible;
         }
     }
-    
+
     // Ensure proper border-radius on dropdown tables
     table thead th:last-child {
         border-top-right-radius: 4px !important;
     }
-    
+
     table thead th:first-child {
         border-top-left-radius: 4px !important;
     }
@@ -3071,7 +3525,7 @@ ta-curd-modal {
     .ant-table-container {
         overflow: auto !important;
         max-height: 45vh;
-        
+
         .ant-table-content,
         .ant-table-body {
             overflow: visible !important;
@@ -3090,6 +3544,7 @@ ta-curd-modal {
 // z-index hierarchy: Corner (4) > Header (3) > First column (2) > Body (auto)
 // ============================================================
 .product-item-table {
+
     // --- Sticky Header (vertical scroll) ---
     thead th {
         position: sticky;
@@ -3128,6 +3583,7 @@ ta-curd-modal {
         background: #eef4ff;
     }
 }
+
 // ============================================================
 // END PRODUCT ITEMS GRID STICKY
 // ============================================================
@@ -3139,19 +3595,22 @@ nz-card .ant-table-container,
     overflow-x: auto !important;
     overflow-y: auto !important;
     max-height: 60vh;
-    
+
     &::-webkit-scrollbar {
         width: 10px;
         height: 10px;
     }
+
     &::-webkit-scrollbar-track {
         background: #f1f5f9;
         border-radius: 5px;
     }
+
     &::-webkit-scrollbar-thumb {
         background: linear-gradient(90deg, #1a3278 0%, #142768 100%);
         border-radius: 5px;
         border: 2px solid #f1f5f9;
+
         &:hover {
             background: linear-gradient(90deg, #1e3a8a 0%, #1a3278 100%);
         }
@@ -3169,32 +3628,33 @@ ta-table,
 .custom-list,
 .custom-form-list,
 .product-table {
+
     .ant-table-body,
     .ant-table-content {
         overflow: auto !important;
         max-height: calc(100vh - 300px);
-        
+
         // Webkit scrollbar (Chrome, Safari, Edge)
         &::-webkit-scrollbar {
             width: 10px;
             height: 10px;
         }
-        
+
         &::-webkit-scrollbar-track {
             background: #f1f5f9;
             border-radius: 5px;
         }
-        
+
         &::-webkit-scrollbar-thumb {
             background: linear-gradient(180deg, #1a3278 0%, #142768 100%);
             border-radius: 5px;
             border: 2px solid #f1f5f9;
-            
+
             &:hover {
                 background: linear-gradient(180deg, #1e3a8a 0%, #1a3278 100%);
             }
         }
-        
+
         &::-webkit-scrollbar-corner {
             background: #f1f5f9;
         }
@@ -3204,22 +3664,22 @@ ta-table,
 // Direct table body scrollbar
 .ant-table-body {
     overflow: auto !important;
-    
+
     &::-webkit-scrollbar {
         width: 10px;
         height: 10px;
     }
-    
+
     &::-webkit-scrollbar-track {
         background: #f1f5f9;
         border-radius: 5px;
     }
-    
+
     &::-webkit-scrollbar-thumb {
         background: linear-gradient(180deg, #1a3278 0%, #142768 100%);
         border-radius: 5px;
         border: 2px solid #f1f5f9;
-        
+
         &:hover {
             background: linear-gradient(180deg, #1e3a8a 0%, #1a3278 100%);
         }
@@ -3234,15 +3694,16 @@ ta-table,
 .modal,
 nz-modal,
 .curd-modal-form {
+
     // Modal content clips all children
     .ant-modal-content {
         overflow: hidden;
     }
-    
+
     // Modal body contains the table
     .ant-modal-body {
         overflow: hidden;
-        
+
         // Table wrapper stays within modal
         .ant-table-wrapper,
         ta-table,
@@ -3251,34 +3712,34 @@ nz-modal,
             max-width: 100%;
             overflow: hidden;
             border-radius: 4px;
-            
+
             .ant-table-container {
                 overflow-x: auto;
                 max-width: 100%;
             }
         }
     }
-    
+
     // Table scrollbars inside modals
     .ant-table-body,
     .ant-table-content {
         max-height: 50vh;
         overflow: auto !important;
-        
+
         &::-webkit-scrollbar {
             width: 8px;
             height: 8px;
         }
-        
+
         &::-webkit-scrollbar-track {
             background: #f1f5f9;
             border-radius: 4px;
         }
-        
+
         &::-webkit-scrollbar-thumb {
             background: linear-gradient(180deg, #1a3278 0%, #142768 100%);
             border-radius: 4px;
-            
+
             &:hover {
                 background: linear-gradient(180deg, #1e3a8a 0%, #1a3278 100%);
             }
@@ -3291,7 +3752,7 @@ nz-modal,
 .custom-list,
 ta-table,
 .ta-table {
-    .ant-table-thead > tr > th {
+    .ant-table-thead>tr>th {
         position: sticky;
         top: 0;
         z-index: 2;
@@ -3310,6 +3771,7 @@ ta-table,
 .container-fluid,
 .page-content,
 .main-content {
+
     .custom-list,
     ta-table,
     .ta-table,
@@ -3317,7 +3779,7 @@ ta-table,
         .ant-table-container {
             overflow: visible;
         }
-        
+
         .ant-table-body {
             max-height: calc(100vh - 280px);
             overflow: auto !important;
@@ -3333,18 +3795,19 @@ ta-table,
 // GLOBAL TABLE HEADER BORDER-RADIUS CONSISTENCY
 // Ensures all table headers have consistent rounded corners
 // ============================================================
-.ant-table-thead > tr > th,
+.ant-table-thead>tr>th,
 .ant-table-thead th {
     border-radius: 0 !important;
-    
+
     &:first-child {
         border-top-left-radius: 4px !important;
     }
-    
+
     &:last-child {
         border-top-right-radius: 4px !important;
     }
 }
+
 // ============================================================
 // END GLOBAL TABLE HEADER STYLES
 // ============================================================
@@ -3354,23 +3817,25 @@ ta-table,
 // Ensures all popup tables (Product select, etc.) match modal styles
 // ============================================================
 .cdk-overlay-pane {
+
     // Popup table container
     .adv-select-curd-container,
     .ant-select-dropdown {
         border-radius: 4px;
         box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
         overflow: hidden;
-        
+
         // Table wrapper inside popup
         .ant-table-wrapper {
             border-radius: 4px;
             overflow: hidden;
         }
-        
+
         // Table styles
         table {
+
             thead th,
-            .ant-table-thead > tr > th,
+            .ant-table-thead>tr>th,
             .ant-table-thead th {
                 background: linear-gradient(180deg, #1a3278 0%, #142768 100%) !important;
                 color: #fff !important;
@@ -3381,29 +3846,29 @@ ta-table,
                 padding: 12px 10px;
                 white-space: nowrap;
                 border-radius: 0 !important;
-                
+
                 &:first-child {
                     border-top-left-radius: 4px !important;
                 }
-                
+
                 &:last-child {
                     border-top-right-radius: 4px !important;
                 }
             }
-            
+
             tbody {
                 tr {
                     transition: all 0.15s ease;
-                    
+
                     &:nth-child(even) {
                         background-color: #f8fafc;
                     }
-                    
+
                     &:hover {
                         background-color: #eef4ff !important;
                     }
                 }
-                
+
                 td {
                     padding: 10px;
                     font-size: 13px;
@@ -3411,11 +3876,11 @@ ta-table,
                 }
             }
         }
-        
+
         // Pagination inside popup
         .ant-pagination {
             margin: 12px 0;
-            
+
             .ant-pagination-item,
             .ant-pagination-prev .ant-pagination-item-link,
             .ant-pagination-next .ant-pagination-item-link {
@@ -3435,7 +3900,7 @@ ta-table,
     overflow: hidden;
     // Prevent panel from going off-screen
     max-width: calc(100vw - 32px);
-    
+
     .adv-select-curd-container {
         border-radius: 4px;
         // max-height is set dynamically via inline style from the component.
@@ -3444,9 +3909,9 @@ ta-table,
         overflow: hidden;
         display: flex;
         flex-direction: column;
-        
+
         // Inner wrapper – scrolls when space is tight so pagination stays reachable
-        > div {
+        >div {
             overflow-y: auto !important;
             overflow-x: hidden !important;
             display: flex;
@@ -3480,35 +3945,35 @@ ta-table,
                 padding: 0 16px;
             }
         }
-        
+
         // Search bar row - proper spacing between all elements
         .ta-row {
             gap: 8px !important;
             flex-shrink: 0;
-            
+
             // Search input group
             nz-input-group {
                 margin-right: 0 !important;
             }
-            
+
             // Filter groups with buttons
             .filter-group {
                 margin-left: 0 !important;
                 margin-right: 0 !important;
             }
-            
+
             // All buttons in the row
             .ant-btn {
                 margin-left: 0 !important;
                 margin-right: 0 !important;
             }
-            
+
             // Direct child divs (button wrappers)
-            > div {
+            >div {
                 margin-left: 0 !important;
             }
         }
-        
+
         // ta-curd-modal container
         ta-curd-modal,
         .custom-list {
@@ -3516,24 +3981,24 @@ ta-table,
             flex-direction: column;
             overflow: hidden;
         }
-        
+
         // ta-table within the popup
         ta-table {
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            
+
             // Search/filter bar at top - fixed
             .ta-row:first-child,
-            > div:first-child {
+            >div:first-child {
                 flex-shrink: 0;
             }
-            
+
             // Table wrapper
             .ant-table-wrapper {
                 overflow: hidden;
             }
-            
+
             // .ant-table-container is the SINGLE scroll container.
             // Header + body scroll together horizontally;
             // body scrolls vertically within max-height.
@@ -3541,16 +4006,16 @@ ta-table,
                 overflow: auto !important;
                 max-height: 30vh !important;
             }
-            
+
             // Sticky table header inside dropdown scroll container
-            .ant-table-thead > tr > th,
-            thead > tr > th {
+            .ant-table-thead>tr>th,
+            thead>tr>th {
                 position: sticky !important;
                 top: 0 !important;
                 z-index: 2 !important;
                 background: linear-gradient(180deg, #1a3278 0%, #142768 100%) !important;
             }
-            
+
             // Pagination - hidden in dropdown panels (users use search instead)
             .ant-pagination {
                 display: none !important;
@@ -3569,6 +4034,7 @@ ta-table,
 .cdk-overlay-pane,
 .ant-modal,
 nz-modal {
+
     // Primary action buttons (Search, Add)
     .ant-btn-primary {
         background: linear-gradient(180deg, #1a3278 0%, #142768 100%) !important;
@@ -3580,18 +4046,19 @@ nz-modal {
         align-items: center !important;
         justify-content: center !important;
         transition: all 0.2s !important;
-        
+
         &:hover {
             background: linear-gradient(180deg, #1e3a8a 0%, #1a3278 100%) !important;
             transform: translateY(-1px);
             box-shadow: 0 4px 8px rgba(20, 39, 104, 0.25);
         }
-        
-        i, .anticon {
+
+        i,
+        .anticon {
             font-size: 14px;
         }
     }
-    
+
     // Default/secondary buttons (Export, Refresh)
     .ant-btn-default,
     .ant-btn:not(.ant-btn-primary):not(.ant-btn-danger):not(.ant-btn-link) {
@@ -3604,34 +4071,36 @@ nz-modal {
         border: 1px solid #d1d5db !important;
         background: #fff !important;
         transition: all 0.2s !important;
-        
+
         &:hover {
             border-color: #142768 !important;
             color: #142768 !important;
         }
-        
-        i, .anticon {
+
+        i,
+        .anticon {
             font-size: 14px;
         }
     }
-    
+
     // Button with text and icon
     .ant-btn {
         gap: 6px;
-        
-        span + i,
-        i + span,
-        span + .anticon,
-        .anticon + span {
+
+        span+i,
+        i+span,
+        span+.anticon,
+        .anticon+span {
             margin-left: 4px;
         }
     }
-    
+
     // Button spacing - ensure gap between adjacent buttons
-    .ant-btn + .ant-btn {
+    .ant-btn+.ant-btn {
         margin-left: 6px !important;
     }
 }
+
 // ============================================================
 // END GLOBAL ACTION BUTTONS STYLES
 // ============================================================
@@ -3646,32 +4115,33 @@ ta-curd-modal,
     .ta-row {
         // Use gap for consistent spacing between all elements
         gap: 8px;
-        
+
         // Reset any inline margin-left on buttons
         .ant-btn,
         .filter-group,
-        > div {
+        >div {
             margin-left: 0 !important;
         }
-        
+
         // Search input group - no extra margin
         nz-input-group,
         .ant-input-group-wrapper {
             margin-right: 0 !important;
         }
     }
-    
+
     // Also target the ta-cell containing the search row
     .ta-cell {
         .ta-row.justify-content-end {
             gap: 8px;
-            
-            > * {
+
+            >* {
                 margin-left: 0 !important;
             }
         }
     }
 }
+
 // ============================================================
 // END GLOBAL SEARCH BAR BUTTON SPACING
 // ============================================================
@@ -3681,37 +4151,81 @@ ta-curd-modal,
 // FLOW STATUS BADGES — class-based so Angular innerHTML doesn't strip styles
 // ============================================================
 .flow-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 3px 10px;
-  border-radius: 12px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-  white-space: nowrap;
-  line-height: 1.6;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    line-height: 1.6;
 
-  &::before {
-    content: '';
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: currentColor;
-    opacity: 0.8;
-    flex-shrink: 0;
-  }
+    &::before {
+        content: '';
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+        opacity: 0.8;
+        flex-shrink: 0;
+    }
 
-  &.fb-pending            { background: #f5f5f5; color: #595959; border: 1px solid #d9d9d9; }
-  &.fb-review             { background: #fffbe6; color: #875800; border: 1px solid #ffe58f; }
-  &.fb-production         { background: #e6f0ff; color: #142768; border: 1px solid #91b4ff; }
-  &.fb-dispatch           { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; }
-  &.fb-ready-invoice      { background: #f0fdf4; color: #15803d; border: 1px solid #86efac; }
-  &.fb-delivery           { background: #f5f3ff; color: #6d28d9; border: 1px solid #c4b5fd; }
-  &.fb-partial            { background: #fdf2f8; color: #be185d; border: 1px solid #f9a8d4; }
-  &.fb-completed          { background: #ecfdf5; color: #065f46; border: 1px solid #6ee7b7; }
-  &.fb-default            { background: #f0f4ff; color: #142768; border: 1px solid #91b4ff; }
+    &.fb-pending {
+        background: #f5f5f5;
+        color: #595959;
+        border: 1px solid #d9d9d9;
+    }
+
+    &.fb-review {
+        background: #fffbe6;
+        color: #875800;
+        border: 1px solid #ffe58f;
+    }
+
+    &.fb-production {
+        background: #e6f0ff;
+        color: #142768;
+        border: 1px solid #91b4ff;
+    }
+
+    &.fb-dispatch {
+        background: #e0f2fe;
+        color: #0369a1;
+        border: 1px solid #7dd3fc;
+    }
+
+    &.fb-ready-invoice {
+        background: #f0fdf4;
+        color: #15803d;
+        border: 1px solid #86efac;
+    }
+
+    &.fb-delivery {
+        background: #f5f3ff;
+        color: #6d28d9;
+        border: 1px solid #c4b5fd;
+    }
+
+    &.fb-partial {
+        background: #fdf2f8;
+        color: #be185d;
+        border: 1px solid #f9a8d4;
+    }
+
+    &.fb-completed {
+        background: #ecfdf5;
+        color: #065f46;
+        border: 1px solid #6ee7b7;
+    }
+
+    &.fb-default {
+        background: #f0f4ff;
+        color: #142768;
+        border: 1px solid #91b4ff;
+    }
 }
 
 // ============================================================
@@ -3720,74 +4234,155 @@ ta-curd-modal,
 
 /* ── Confirm Done Modal ── */
 .wo-done-modal-wrapper {
-  .ant-modal-content {
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-  }
-  .ant-modal-header {
-    background: linear-gradient(180deg, #1a3278 0%, #142768 100%) !important;
-    padding: 14px 24px;
-    border-bottom: none;
-    border-radius: 16px 16px 0 0;
-    .ant-modal-title { color: #fff !important; font-weight: 600; font-size: 16px; }
-  }
-  .ant-modal-close { color: #fff !important; &:hover { color: rgba(255,255,255,0.75); } }
-  .ant-modal-body  { padding: 24px; background: #fff; }
-  .ant-modal-footer { border-top: 1px solid #f0f0f0; padding: 12px 24px; background: #fff; border-radius: 0 0 16px 16px; }
+    .ant-modal-content {
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .ant-modal-header {
+        background: linear-gradient(180deg, #1a3278 0%, #142768 100%) !important;
+        padding: 14px 24px;
+        border-bottom: none;
+        border-radius: 16px 16px 0 0;
+
+        .ant-modal-title {
+            color: #fff !important;
+            font-weight: 600;
+            font-size: 16px;
+        }
+    }
+
+    .ant-modal-close {
+        color: #fff !important;
+
+        &:hover {
+            color: rgba(255, 255, 255, 0.75);
+        }
+    }
+
+    .ant-modal-body {
+        padding: 24px;
+        background: #fff;
+    }
+
+    .ant-modal-footer {
+        border-top: 1px solid #f0f0f0;
+        padding: 12px 24px;
+        background: #fff;
+        border-radius: 0 0 16px 16px;
+    }
 }
 
 /* ── Work Order Details Modal ── */
 .wo-view-modal-wrapper {
-  .ant-modal-content {
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-  }
-  .ant-modal-header {
-    background: linear-gradient(180deg, #1a3278 0%, #142768 100%) !important;
-    padding: 14px 24px;
-    border-bottom: none;
-    border-radius: 16px 16px 0 0;
-    .ant-modal-title { color: #fff !important; font-weight: 600; font-size: 16px; }
-  }
-  .ant-modal-close { color: #fff !important; &:hover { color: rgba(255,255,255,0.75); } }
-  .ant-modal-body  { padding: 20px 24px; max-height: 70vh; overflow-y: auto; background: #fff; }
-  .ant-modal-footer { border-top: 1px solid #f0f0f0; padding: 12px 24px; background: #fff; border-radius: 0 0 16px 16px; }
+    .ant-modal-content {
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    }
 
-  // nz-table header cells — project navy
-  .ant-table-thead > tr > th {
-    background: linear-gradient(180deg, #1a3278 0%, #142768 100%) !important;
-    color: #fff !important;
-    font-weight: 600;
-    font-size: 13px;
-    &::before { display: none !important; } // remove ant resizer separator
-  }
-  .ant-table-tbody > tr:hover > td { background: #f0f4ff !important; }
-  .ant-table-bordered .ant-table-thead > tr > th,
-  .ant-table-bordered .ant-table-tbody > tr > td {
-    border-color: #d6dff7;
-  }
+    .ant-modal-header {
+        background: linear-gradient(180deg, #1a3278 0%, #142768 100%) !important;
+        padding: 14px 24px;
+        border-bottom: none;
+        border-radius: 16px 16px 0 0;
+
+        .ant-modal-title {
+            color: #fff !important;
+            font-weight: 600;
+            font-size: 16px;
+        }
+    }
+
+    .ant-modal-close {
+        color: #fff !important;
+
+        &:hover {
+            color: rgba(255, 255, 255, 0.75);
+        }
+    }
+
+    .ant-modal-body {
+        padding: 20px 24px;
+        max-height: 70vh;
+        overflow-y: auto;
+        background: #fff;
+    }
+
+    .ant-modal-footer {
+        border-top: 1px solid #f0f0f0;
+        padding: 12px 24px;
+        background: #fff;
+        border-radius: 0 0 16px 16px;
+    }
+
+    // nz-table header cells — project navy
+    .ant-table-thead>tr>th {
+        background: linear-gradient(180deg, #1a3278 0%, #142768 100%) !important;
+        color: #fff !important;
+        font-weight: 600;
+        font-size: 13px;
+
+        &::before {
+            display: none !important;
+        }
+
+        // remove ant resizer separator
+    }
+
+    .ant-table-tbody>tr:hover>td {
+        background: #f0f4ff !important;
+    }
+
+    .ant-table-bordered .ant-table-thead>tr>th,
+    .ant-table-bordered .ant-table-tbody>tr>td {
+        border-color: #d6dff7;
+    }
 }
 
 /* ── Zero-Balance / Stock Error Modal ── */
 .wo-error-modal-wrapper {
-  .ant-modal-content {
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-  }
-  .ant-modal-header {
-    background: linear-gradient(135deg, #a8341e 0%, #7a1e10 100%) !important;
-    padding: 14px 24px;
-    border-bottom: none;
-    border-radius: 16px 16px 0 0;
-    .ant-modal-title { color: #fff !important; font-weight: 600; font-size: 16px; }
-  }
-  .ant-modal-close { color: #fff !important; &:hover { color: #ffd6d6; } }
-  .ant-modal-body  { padding: 28px 24px; background: #fff; }
-  .ant-modal-footer { border-top: 1px solid #f0f0f0; padding: 12px 24px; background: #fff; border-radius: 0 0 16px 16px; }
+    .ant-modal-content {
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .ant-modal-header {
+        background: linear-gradient(135deg, #a8341e 0%, #7a1e10 100%) !important;
+        padding: 14px 24px;
+        border-bottom: none;
+        border-radius: 16px 16px 0 0;
+
+        .ant-modal-title {
+            color: #fff !important;
+            font-weight: 600;
+            font-size: 16px;
+        }
+    }
+
+    .ant-modal-close {
+        color: #fff !important;
+
+        &:hover {
+            color: #ffd6d6;
+        }
+    }
+
+    .ant-modal-body {
+        padding: 28px 24px;
+        background: #fff;
+    }
+
+    .ant-modal-footer {
+        border-top: 1px solid #f0f0f0;
+        padding: 12px 24px;
+        background: #fff;
+        border-radius: 0 0 16px 16px;
+    }
 }
+
 // ============================================================
 // END WORK ORDER BOARD MODAL THEME
 // ============================================================
@@ -3797,7 +4392,7 @@ ta-curd-modal,
 // ============================================================
 body.col-resizing,
 body.col-resizing * {
-  cursor: col-resize !important;
-  user-select: none !important;
-  -webkit-user-select: none !important;
+    cursor: col-resize !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
 }

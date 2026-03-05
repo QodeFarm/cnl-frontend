@@ -1,114 +1,135 @@
-.navbar{
-    p{
-        margin: 0;
-        font-size: 17px;
-        color: #ffffff;
-    }
-}
-.company-title{
-    position: absolute;
-    right: 50%;
-    transform: translateX(50%);
-    // @media(max-width:1199px){
-    //        transform: inherit;
-    // }
-    // @media(max-width:991px){
-    //     right: inherit;
-    //     position: inherit;
-    //     margin-right: 10px;
-    // }
-    @media(max-width:767px){
-       span{
-        font-size: 12px !important;
-        padding: 5px 8px !important;
-       }
-       .company-code{
-        display: none;
-       }
-      }
-    @media(max-width:575px){
-         right: inherit;
-         position: inherit;
-         transform: inherit;
-    }
-}
-@media(max-width:991px){
-    .topbar .nav-item .nav-link {
-        padding: 0 0.4rem;
-    }
-    .sidebar-brand.layout-logo-design{
-        h3 {
-            font-size: 32px;
-        }
-        span {
-            font-size: 9px;
-        }
-    }
-}
-@media(max-width:767px){
-    .topbar .nav-item .nav-link {
-        padding: 0 0.2rem;
-    }
-    .sidebar-brand.layout-logo-design{
-        h3 {
-            font-size: 27px;
-        }
-        span {
-            font-size: 8px;
-            line-height: 5px;
-            padding-top: 0px;
-        }
-    }
-    .bar-toggle i {
-        font-size: 18px;
-    }
-    header {
-        .navbar{
-           padding-left:10px;
-           padding-right: 5px;
-        }
-        .topbar{
-            #sidebarToggleTop {
-                margin-left: 5px !important;
-             }
-            .topbar-divider {
-              display: none !important;
-            }
-        } 
-    }
-}
-@media(max-width:575px){
-    .navbar-expand .navbar-nav {
-        flex-direction: row;
-        width: 60%;
-        justify-content: space-between;
-        .company-title span {
-            font-size: 11px !important;
-            margin: 0 !important;
-        }
-        @media(max-width:575px){
-            width: 65%;
-        }
-    }
-}
-.company-details{
+.navbar {
+  p {
     margin: 0;
-    font-weight: 600;
-    font-size: 16px;
-    color: #333333;
-    background: #fff;
-    padding: 5px 15px;
-    z-index: 99;
-    position: relative;
-    span{
-        font-weight: 400;
-        color: #142768;
+    font-size: 17px;
+    color: #ffffff;
+  }
+}
+
+.company-title {
+  position: absolute;
+  right: 50%;
+  transform: translateX(50%);
+
+  // @media(max-width:1199px){
+  //        transform: inherit;
+  // }
+  // @media(max-width:991px){
+  //     right: inherit;
+  //     position: inherit;
+  //     margin-right: 10px;
+  // }
+  @media(max-width:767px) {
+    span {
+      font-size: 12px !important;
+      padding: 5px 8px !important;
     }
+
+    .company-code {
+      display: none;
+    }
+  }
+
+  @media(max-width:575px) {
+    right: inherit;
+    position: inherit;
+    transform: inherit;
+  }
+}
+
+@media(max-width:991px) {
+  .topbar .nav-item .nav-link {
+    padding: 0 0.4rem;
+  }
+
+  .sidebar-brand.layout-logo-design {
+    h3 {
+      font-size: 32px;
+    }
+
+    span {
+      font-size: 9px;
+    }
+  }
+}
+
+@media(max-width:767px) {
+  .topbar .nav-item .nav-link {
+    padding: 0 0.2rem;
+  }
+
+  .sidebar-brand.layout-logo-design {
+    h3 {
+      font-size: 27px;
+    }
+
+    span {
+      font-size: 8px;
+      line-height: 5px;
+      padding-top: 0px;
+    }
+  }
+
+  .bar-toggle i {
+    font-size: 18px;
+  }
+
+  header {
+    .navbar {
+      padding-left: 10px;
+      padding-right: 5px;
+    }
+
+    .topbar {
+      #sidebarToggleTop {
+        margin-left: 5px !important;
+      }
+
+      .topbar-divider {
+        display: none !important;
+      }
+    }
+  }
+}
+
+@media(max-width:575px) {
+  .navbar-expand .navbar-nav {
+    flex-direction: row;
+    width: 60%;
+    justify-content: space-between;
+
+    .company-title span {
+      font-size: 11px !important;
+      margin: 0 !important;
+    }
+
+    @media(max-width:575px) {
+      width: 65%;
+    }
+  }
+}
+
+.company-details {
+  margin: 0;
+  font-weight: 600;
+  font-size: 16px;
+  color: #333333;
+  background: #fff;
+  padding: 5px 15px;
+  z-index: 99;
+  position: relative;
+
+  span {
+    font-weight: 400;
+    color: #142768;
+  }
 }
 
 .reminder-item {
-  display: block;   /* makes each item go to a new line */
-  margin-bottom: 5px; /* optional spacing between items */
+  display: block;
+  /* makes each item go to a new line */
+  margin-bottom: 5px;
+  /* optional spacing between items */
 }
 
 .reminder-item {
@@ -147,13 +168,13 @@
   padding: 10px 12px;
   margin-bottom: 8px;
   border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   cursor: pointer;
   transition: all 0.2s ease-in-out;
 }
 
 .unread-box:hover {
-  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
 }
 
 // .read-box {
@@ -166,7 +187,8 @@
 // }
 
 .subject-text {
-  color: #000; /* black subject text */
+  color: #000;
+  /* black subject text */
 }
 
 .backdrop {
@@ -175,9 +197,12 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.3); /* dim effect */
-  z-index: 1040; /* below dropdown but above form */
+  background: rgba(0, 0, 0, 0.3);
+  /* dim effect */
+  z-index: 1040;
+  /* below dropdown but above form */
 }
+
 .dropdown-menu.show {
   display: block;
 }
@@ -223,10 +248,11 @@
   background: #f8f9fa;
   border-radius: 8px;
   margin: 5px 0;
-  box-shadow: 0px 4px 6px rgba(0,0,0,0.15);
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.15);
   cursor: pointer;
   transition: all 0.2s ease-in-out;
 }
+
 .unread-box:hover {
   background: #e9ecef;
 }
@@ -247,21 +273,30 @@
 
 /* Animation */
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 
 /* Unread Reminder */
 .unread-box {
   background: #f8f9fa;
-  border: 2px solid #0d2c7a;   /* Blue border */
+  border: 2px solid #0d2c7a;
+  /* Blue border */
   border-radius: 8px;
   margin: 5px 0;
-  box-shadow: 0px 4px 6px rgba(0,0,0,0.15);
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.15);
   cursor: pointer;
   transition: all 0.2s ease-in-out;
 }
+
 // .unread-box:hover {
 //   background: #e9ecef;
 // }
@@ -269,7 +304,8 @@
 /* Read Reminder */
 .read-box {
   background: #ffffff;
-  border: 2px solid #0d2c7a;   /* Same blue border */
+  border: 2px solid #0d2c7a;
+  /* Same blue border */
   border-radius: 8px;
   margin: 5px 0;
   cursor: pointer;
@@ -282,23 +318,28 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: transparent; /* remove dim background if you want dropdown style */
+  background: transparent;
+  /* remove dim background if you want dropdown style */
   z-index: 1050;
-  pointer-events: none; /* let clicks pass except modal */
+  pointer-events: none;
+  /* let clicks pass except modal */
 }
 
 /* Modal Box under bell icon */
 .modal-box {
   position: absolute;
-  top: 50px; /* adjust: space below the navbar height */
-  right: 20px; /* adjust: aligns with bell icon */
+  top: 50px;
+  /* adjust: space below the navbar height */
+  right: 20px;
+  /* adjust: aligns with bell icon */
   background: #fff;
   border-radius: 10px;
-  overflow: hidden; 
+  overflow: hidden;
   width: 400px;
   max-width: 90%;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-  pointer-events: auto; /* keep clickable */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  pointer-events: auto;
+  /* keep clickable */
 }
 
 /* Modal Body */
@@ -310,18 +351,19 @@
 /* Reminder Items */
 .unread-box {
   background: #f8f9fa;
-//   border: 2px solid #0d6efd;  /* 👈 blue border for each reminder */
+  //   border: 2px solid #0d6efd;  /* 👈 blue border for each reminder */
   border-radius: 8px;
   margin: 5px 0;
   padding: 8px;
-  box-shadow: 0px 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   transition: all 0.2s ease-in-out;
 }
 
 .read-box {
   background: #ffffff;
-  border: 2px solid #0d6efd;  /* 👈 keep same border color for consistency */
+  border: 2px solid #0d6efd;
+  /* 👈 keep same border color for consistency */
   border-radius: 8px;
   margin: 5px 0;
   padding: 8px;
@@ -338,19 +380,88 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
-  background-color: #0c3470; /* 👈 theme blue background */
-  color: #fff;              /* white text */
-//   border-top-left-radius: 10px;
-//   border-top-right-radius: 10px;
+  background-color: #0c3470;
+  /* 👈 theme blue background */
+  color: #fff;
+  /* white text */
+  //   border-top-left-radius: 10px;
+  //   border-top-right-radius: 10px;
 }
 
 .modal-title {
   font-weight: bold;
   margin: 0;
-  color: #fff; /* keep text white */
+  color: #fff;
+  /* keep text white */
 }
 
 /* Close button */
 .modal-header .btn-close {
-  filter: brightness(0) invert(1); /* makes the close icon white */
+  filter: brightness(0) invert(1);
+  /* makes the close icon white */
+}
+
+/* ── Sidebar Search ── */
+.sidebar-search-wrapper {
+  display: none;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.sidebar.toggled .sidebar-search-wrapper {
+  display: block;
+}
+
+.sidebar-search-box {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  padding: 4px 10px;
+  transition: background 0.2s;
+
+  &:focus-within {
+    background: rgba(255, 255, 255, 0.18);
+  }
+}
+
+.sidebar-search-icon {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 13px;
+  margin-right: 8px;
+}
+
+.sidebar-search-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-size: 13px;
+  width: 100%;
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.45);
+  }
+}
+
+.sidebar-search-clear {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
+  cursor: pointer;
+  margin-left: 6px;
+
+  &:hover {
+    color: #fff;
+  }
+}
+
+.sidebar-no-results {
+  padding: 12px 16px;
+  text-align: center;
+
+  span {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 13px;
+    font-style: italic;
+  }
 }

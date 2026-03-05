@@ -269,7 +269,7 @@
         </tr> -->
     </thead>
     <tbody>
-        <tr *ngFor="let data of rows" [class.selectable-row]="options.rowSelectionEnabled">
+        <tr *ngFor="let data of rows" [class.selectable-row]="options.rowSelectionEnabled" (dblclick)="options?.rowEvents?.dblclick?.(data)">
             <td *ngIf="options.showCheckbox" style="width: 50px;" [nzChecked]="setOfCheckedId.has(data[options.pkId])"
                 (nzCheckedChange)="onItemChecked(data[options.pkId], $event)" [nzDisabled]="false"
                 [nzLabel]="data.name"></td>

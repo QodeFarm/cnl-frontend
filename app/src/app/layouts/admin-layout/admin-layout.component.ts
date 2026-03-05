@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Component, HostListener, ElementRef, Renderer2, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Route, Router, RouterModule, RoutesRecognized, NavigationEnd } from '@angular/router';
 import { LocalStorageService } from '@ta/ta-core';
@@ -40,10 +41,43 @@ export interface Tab {
   templateUrl: './admin-layout.component.html',
   styleUrls: ['./admin-layout.component.scss'],
   standalone: true,
-  imports: [CommonModule, RouterModule, NzTabsModule, CustomfieldsModule]
+  imports: [CommonModule, FormsModule, RouterModule, NzTabsModule, CustomfieldsModule]
 })
 export class AdminLayoutComponent {
   menulList = <any>[];
+  menuSearchText = '';
+  filteredMenuList: any[] = [];
+  isMenuSearching = false;
+
+  onMenuSearchChange(): void {
+    const term = this.menuSearchText?.trim().toLowerCase() || '';
+    this.isMenuSearching = term.length > 0;
+    if (!term) {
+      this.filteredMenuList = this.menulList;
+      return;
+    }
+    const result: any[] = [];
+    for (const m of this.menulList) {
+      const parentMatch = m.module_name?.toLowerCase().includes(term);
+      if (parentMatch) {
+        result.push(m);
+      } else if (m.module_sections && m.module_sections.length > 0) {
+        const matchedSections = m.module_sections.filter(
+          (sec: any) => sec.section_name?.toLowerCase().includes(term)
+        );
+        if (matchedSections.length > 0) {
+          result.push({ ...m, module_sections: matchedSections });
+        }
+      }
+    }
+    this.filteredMenuList = result;
+  }
+
+  clearMenuSearch(): void {
+    this.menuSearchText = '';
+    this.filteredMenuList = this.menulList;
+    this.isMenuSearching = false;
+  }
   userName: any;
   role: any;
   company_name: any;
@@ -107,7 +141,7 @@ export class AdminLayoutComponent {
   layertoggleMenu() {
     document.body.classList.remove("sidebar-toggled");
     const sidebarElement = this.elementRef.nativeElement.querySelector('.sidebar');
-    const menuOverlayElement = this.elementRef.nativeElement.querySelector('.menu-overlay'); 
+    const menuOverlayElement = this.elementRef.nativeElement.querySelector('.menu-overlay');
     if (sidebarElement) {
       this.renderer.removeClass(sidebarElement, 'toggled');
       this.renderer.removeClass(menuOverlayElement, 'menuBglayer');
@@ -118,7 +152,7 @@ export class AdminLayoutComponent {
   ngOnInit() {
     // Check if force password change is required
     this.isForcePasswordChange = localStorage.getItem('force_password_change') === 'true';
-    
+
     const user = this.taLoacal.getItem('user');
     this.menulList = [];
 
@@ -138,6 +172,7 @@ export class AdminLayoutComponent {
       // Using template literals to inject user_id dynamically into the URL
       this.http.get(`users/user_access/${role_Id}`).subscribe((res: any) => {
         this.menulList = res.data;
+        this.filteredMenuList = this.menulList;
         this.aS.accessModuleList = this.menulList;
         this.showContain = true;
       });
@@ -407,50 +442,50 @@ export class AdminLayoutComponent {
     // ]
     this.closeMenu();
   }
-  
 
-// API call for reminders
-loadReminders(userId: number) {
-  this.http.get(`reminders/reminders/?user_id=${userId}`).subscribe((res: any) => {
-    if (res.data && Array.isArray(res.data)) {
-      const today = new Date();
-      this.remindersList = res.data.filter((r: any) => new Date(r.reminder_date) <= today);
-      this.remindersCount = this.remindersList.length;
-    } else {
+
+  // API call for reminders
+  loadReminders(userId: number) {
+    this.http.get(`reminders/reminders/?user_id=${userId}`).subscribe((res: any) => {
+      if (res.data && Array.isArray(res.data)) {
+        const today = new Date();
+        this.remindersList = res.data.filter((r: any) => new Date(r.reminder_date) <= today);
+        this.remindersCount = this.remindersList.length;
+      } else {
+        this.remindersList = [];
+        this.remindersCount = 0;
+      }
+    }, (err) => {
+      console.error('Error loading reminders:', err);
       this.remindersList = [];
       this.remindersCount = 0;
-    }
-  }, (err) => {
-    console.error('Error loading reminders:', err);
-    this.remindersList = [];
-    this.remindersCount = 0;
-  });
-}
+    });
+  }
 
-markAsRead(reminder: any) {
-  reminder.read = true;
-}
+  markAsRead(reminder: any) {
+    reminder.read = true;
+  }
 
-isReminderOpen = false;
+  isReminderOpen = false;
 
-// Open modal
-openReminders() {
-  this.isReminderOpen = true;
-}
+  // Open modal
+  openReminders() {
+    this.isReminderOpen = true;
+  }
 
-// Close modal
-closeReminders() {
-  this.isReminderOpen = false;
-}
+  // Close modal
+  closeReminders() {
+    this.isReminderOpen = false;
+  }
 
 
-// markAsRead(reminder: any) {
-//   reminder.read = true;
-//   // You can also call API to mark as read in backend
-// }
+  // markAsRead(reminder: any) {
+  //   reminder.read = true;
+  //   // You can also call API to mark as read in backend
+  // }
 
 
-openReminder() {
+  openReminder() {
     const modalEl = document.getElementById('reminderModal');
     if (modalEl) {
       const reminderModal = new bootstrap.Modal(modalEl, { backdrop: 'static' });
@@ -506,6 +541,9 @@ openReminder() {
       collapses.forEach(function (collapse: any) {
         collapse.classList.remove('show');
       });
+    } else {
+      // Sidebar is collapsing — clear any active search
+      this.clearMenuSearch();
     }
   }
   logout() {

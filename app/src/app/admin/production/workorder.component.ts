@@ -95,8 +95,10 @@ export class WorkorderComponent implements OnInit {
     this.editMode = true;
     this.showCreateBomButton = false
     // this.hideFields(false); // Shows fields at indexes 5, 4, and 9
+    this.formConfig.fields[0].fieldGroup[4].hide = false;
+    this.formConfig.fields[0].fieldGroup[9].hide = false;
     this.formConfig.fields[0].fieldGroup[10].hide = true;
-    this.formConfig.fields[0].fieldGroup[11].hide = true;
+    this.formConfig.fields[0].fieldGroup[11].hide = false;
     this.makeFieldsNotTouchable([0, 1, 2]);
     this.disableMaterials()
     console.log('event', event);
@@ -104,8 +106,11 @@ export class WorkorderComponent implements OnInit {
     this.http.get('production/work_order/' + event).subscribe((res: any) => {
       if (res) {
         this.formConfig.model = res.data;
+
+        // FIX 1: Store previous completed quantity
+        this.previousCompletedQty = res.data.work_order?.completed_qty || 0;
           // --- Ensure arrays have at least one row for Formly tables ---
-          if (this.formConfig.model.workers.length==0){
+        if (this.formConfig.model.workers.length==0){
           this.formConfig.model.workers = [{}]
         }
         if (this.formConfig.model.work_order_machines.length==0){
@@ -115,7 +120,7 @@ export class WorkorderComponent implements OnInit {
           this.formConfig.model.work_order_stages = [{}]
         }
 
-        this.formConfig.model.work_order['completed_qty'] = 0
+        // this.formConfig.model.work_order['completed_qty'] = 0
         this.formConfig.showActionBtn = true;
         // Set labels for update
         this.formConfig.pkId = 'work_order_id';
@@ -1011,11 +1016,90 @@ resetFormData() {
 
 showSuccessToast = false;
 toastMessage = '';
-handleSubmit() {
+// handleSubmit() {
  
+//   const workOrder = this.formConfig.model;
+
+//   // Helper function to extract ID from nested object or return the value if it's already an ID
+//   const extractId = (value: any, idKey: string): any => {
+//     if (value && typeof value === 'object' && value[idKey]) {
+//       return value[idKey];
+//     }
+//     return value;
+//   };
+
+//   // Clean BOM data - extract product_id, size_id, color_id from nested objects
+//   const cleanedBom = (workOrder.bom || []).map((item: any) => ({
+//     ...item,
+//     product_id: extractId(item.product_id, 'product_id') || extractId(item.product, 'product_id'),
+//     size_id: extractId(item.size_id, 'size_id') || extractId(item.size, 'size_id') || null,
+//     color_id: extractId(item.color_id, 'color_id') || extractId(item.color, 'color_id') || null,
+//   }));
+
+//   // Clean work_order data - extract IDs from nested objects
+//   const cleanedWorkOrder = {
+//     ...workOrder.work_order,
+//     product_id: extractId(workOrder.work_order?.product_id, 'product_id') || extractId(workOrder.work_order?.product, 'product_id'),
+//     size_id: extractId(workOrder.work_order?.size_id, 'size_id') || extractId(workOrder.work_order?.size, 'size_id') || null,
+//     color_id: extractId(workOrder.work_order?.color_id, 'color_id') || extractId(workOrder.work_order?.color, 'color_id') || null,
+//     status_id: extractId(workOrder.work_order?.status_id, 'status_id') || extractId(workOrder.work_order?.status, 'status_id') || null,
+//   };
+
+//   const payload = {
+//     work_order: cleanedWorkOrder,
+//     bom: cleanedBom,
+//     work_order_machines: workOrder.work_order_machines,
+//     workers: workOrder.workers,
+//     work_order_stages: workOrder.work_order_stages
+//   };
+
+//   //  Modal check first
+//   if (!payload.work_order.sync_qty && payload.work_order.temp_quantity === payload.work_order.quantity) {
+//     this.showSyncModal = true;
+//     return;
+//   }
+
+//   if (this.editMode) {
+//     // Update mode
+//     this.http.put(`production/work_order/${this.WorkOrdrEditID}/`, payload)
+//       .subscribe((res: any) => {
+//         this.showSuccessToast = true;
+//         this.toastMessage = "Record updated successfully"; // Set the toast message for update
+//         this.ngOnInit();
+//         this.resetFormData();
+//         this.showForm = true; // show clean form
+//         setTimeout(() => {
+//           this.showSuccessToast = false;
+//         }, 3000);
+        
+
+
+//       }, error => {
+//         console.error('Error updating record:', error);
+//       });
+//   } else {
+//     // Create mode
+//     this.http.post(`production/work_order/`, payload)
+//       .subscribe((res: any) => {
+//         this.showSuccessToast = true;
+//         this.toastMessage = "Record created successfully"; // Set the toast message for update
+//         this.ngOnInit();
+//         setTimeout(() => {
+//           this.showSuccessToast = false;
+//         }, 3000);
+//         this.resetFormData();
+
+//       }, error => {
+//         console.error('Error updating record:', error);
+//       });
+//   }
+// }
+
+previousCompletedQty: number = 0;
+handleSubmit() {
+
   const workOrder = this.formConfig.model;
 
-  // Helper function to extract ID from nested object or return the value if it's already an ID
   const extractId = (value: any, idKey: string): any => {
     if (value && typeof value === 'object' && value[idKey]) {
       return value[idKey];
@@ -1023,7 +1107,6 @@ handleSubmit() {
     return value;
   };
 
-  // Clean BOM data - extract product_id, size_id, color_id from nested objects
   const cleanedBom = (workOrder.bom || []).map((item: any) => ({
     ...item,
     product_id: extractId(item.product_id, 'product_id') || extractId(item.product, 'product_id'),
@@ -1031,7 +1114,6 @@ handleSubmit() {
     color_id: extractId(item.color_id, 'color_id') || extractId(item.color, 'color_id') || null,
   }));
 
-  // Clean work_order data - extract IDs from nested objects
   const cleanedWorkOrder = {
     ...workOrder.work_order,
     product_id: extractId(workOrder.work_order?.product_id, 'product_id') || extractId(workOrder.work_order?.product, 'product_id'),
@@ -1039,6 +1121,24 @@ handleSubmit() {
     color_id: extractId(workOrder.work_order?.color_id, 'color_id') || extractId(workOrder.work_order?.color, 'color_id') || null,
     status_id: extractId(workOrder.work_order?.status_id, 'status_id') || extractId(workOrder.work_order?.status, 'status_id') || null,
   };
+
+  /* -----------------------------
+     ERP PRODUCTION LOGIC
+  ------------------------------ */
+
+  if (this.editMode) {
+
+    const previousCompletedQty = Number(this.previousCompletedQty || 0);
+    const newCompletedQty = Number(cleanedWorkOrder.completed_qty || 0);
+
+    const producedNow = newCompletedQty - previousCompletedQty;
+
+    if (producedNow > 0) {
+      cleanedWorkOrder.available_qty =
+        Number(cleanedWorkOrder.available_qty || 0) + producedNow;
+    }
+
+  }
 
   const payload = {
     work_order: cleanedWorkOrder,
@@ -1048,45 +1148,61 @@ handleSubmit() {
     work_order_stages: workOrder.work_order_stages
   };
 
-  //  Modal check first
-  if (!payload.work_order.sync_qty && payload.work_order.temp_quantity === payload.work_order.quantity) {
+  // if (!payload.work_order.sync_qty && payload.work_order.temp_quantity === payload.work_order.quantity) {
+  //   this.showSyncModal = true;
+  //   return;
+  // }
+  const hasSaleOrder = !!payload.work_order.sale_order_id;
+
+  if (
+    !payload.work_order.sync_qty &&
+    hasSaleOrder &&
+    payload.work_order.temp_quantity === payload.work_order.quantity
+  ) {
     this.showSyncModal = true;
     return;
   }
 
   if (this.editMode) {
-    // Update mode
+
     this.http.put(`production/work_order/${this.WorkOrdrEditID}/`, payload)
       .subscribe((res: any) => {
+
         this.showSuccessToast = true;
-        this.toastMessage = "Record updated successfully"; // Set the toast message for update
+        this.toastMessage = "Record updated successfully";
+
         this.ngOnInit();
         this.resetFormData();
-        this.showForm = true; // show clean form
+        this.showForm = true;
+
         setTimeout(() => {
           this.showSuccessToast = false;
         }, 3000);
-        
-
 
       }, error => {
         console.error('Error updating record:', error);
       });
+
   } else {
-    // Create mode
+
     this.http.post(`production/work_order/`, payload)
       .subscribe((res: any) => {
+
         this.showSuccessToast = true;
-        this.toastMessage = "Record created successfully"; // Set the toast message for update
+        this.toastMessage = "Record created successfully";
+
         this.ngOnInit();
+
         setTimeout(() => {
           this.showSuccessToast = false;
         }, 3000);
+
         this.resetFormData();
 
       }, error => {
         console.error('Error updating record:', error);
       });
+
   }
 }
 
