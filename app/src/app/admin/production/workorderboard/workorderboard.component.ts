@@ -72,6 +72,11 @@ export class WorkorderboardComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.isLoading = false;
+    this.http.get('production/work_order/?flow_status=Production')
+      .subscribe((res: any) => {
+        const records = res?.data || res?.results || [];
+        this.generateProductionSummary(records);
+      });
     // Rebuild curdConfig whenever the 'refresh' query param changes.
     // This handles the case where the tab is already open and Angular
     // reuses the component instance instead of creating a new one.
@@ -81,6 +86,7 @@ export class WorkorderboardComponent implements OnInit, OnDestroy {
       }
     });
   }
+  
 
   ngOnDestroy() {
     this.routeSub?.unsubscribe();
@@ -157,27 +163,57 @@ zeroBalanceMessage = '';
 
 showStockError(
   item: any,
-  type: 'ZERO_BALANCE' | 'INSUFFICIENT_BALANCE',
-  balance?: number
+  type:
+    | 'ZERO_BALANCE'
+    | 'INSUFFICIENT_BALANCE'
+    | 'DISPATCH_EXCEEDS_STOCK'
+    | 'DISPATCH_EXCEEDS_ORDER'
+    | 'DISPATCH_EXCEEDS_AVAILABLE',
+  balance?: number,
+  dispatchQty?: number
 ) {
-  this.zeroBalanceProductName = item.product_name || 'Product';
+  this.zeroBalanceProductName =
+    item?.product?.name || item?.product_name || 'Product';
 
   if (type === 'ZERO_BALANCE') {
     this.zeroBalanceTitle = 'Product Balance is 0';
     this.zeroBalanceMessage =
-      'Stock is not available. Product balance update is mandatory before dispatch.';
+      `Stock is not available for "${this.zeroBalanceProductName}". 
+       Please update the product balance before dispatching.`;
   }
 
   if (type === 'INSUFFICIENT_BALANCE') {
     this.zeroBalanceTitle = 'Insufficient Product Balance';
     this.zeroBalanceMessage =
-      `Ordered quantity is greater than available stock.
-       Available: ${balance}, Ordered: ${item.quantity}`;
+      `Cannot process order for "${this.zeroBalanceProductName}". 
+       Ordered quantity (${item.quantity}) exceeds available stock (${balance}).`;
+  }
+
+  if (type === 'DISPATCH_EXCEEDS_STOCK') {
+    this.zeroBalanceTitle = 'Dispatch Quantity Exceeds Stock';
+    this.zeroBalanceMessage =
+      `Dispatch quantity (${dispatchQty}) for "${this.zeroBalanceProductName}" exceeds current stock (${balance}). 
+       Please select a quantity within available stock.`;
+  }
+
+  if (type === 'DISPATCH_EXCEEDS_ORDER') {
+    this.zeroBalanceTitle = 'Dispatch Quantity Exceeds Order';
+    this.zeroBalanceMessage =
+      `Dispatch quantity (${dispatchQty}) cannot be greater than the ordered quantity (${item.quantity}) for "${this.zeroBalanceProductName}".`;
+  }
+
+  if (type === 'DISPATCH_EXCEEDS_AVAILABLE') {
+    this.zeroBalanceTitle = 'Dispatch Quantity Exceeds Available Balance';
+    this.zeroBalanceMessage =
+      `Selected dispatch quantity (${dispatchQty}) for "${this.zeroBalanceProductName}" exceeds the available balance (${balance}). 
+       Please select a quantity within the available balance.`;
   }
 
   this.showZeroBalanceModal = true;
 }
 
+dispatchQty: number = 0;
+dispatchRemarks: string = '';
 
 confirmDispatch() {
   if (!this.selectedOrder) {
@@ -186,9 +222,51 @@ confirmDispatch() {
   }
 
   const saleOrderId = this.selectedOrder.sale_order_id;
+  const workOrderId = this.selectedOrder.work_order_id;
+
+  if (!this.dispatchQty || this.dispatchQty <= 0) {
+    return;
+  }
+
+  const dispatchQty = Number(this.dispatchQty);
+
+  const previousAvailableQty = Number(this.selectedOrder.available_qty || 0);
+  const totalOrderQty = Number(this.selectedOrder.quantity || 0);
+
+  // Prevent dispatch more than available
+  if (dispatchQty > previousAvailableQty) {
+    this.showStockError(
+      this.selectedOrder,
+      'DISPATCH_EXCEEDS_AVAILABLE',
+      previousAvailableQty,
+      dispatchQty
+    );
+    return;
+  }
+
+  /* ================= WORK ORDER CALCULATION ================= */
+
+  const newOrderedQty =
+    Number(this.selectedOrder.ordered_qty || 0) - dispatchQty;
+
+  const newAvailableQty = previousAvailableQty - dispatchQty;
+
+  /* ================= REMARKS LOGIC ================= */
+
+  const previousRemarks = this.selectedOrder?.remarks || '';
+
+  const autoMessage = `Dispatched ${dispatchQty} qty from ${totalOrderQty}`;
+
+  const finalRemark = this.dispatchRemarks?.trim()
+    ? this.dispatchRemarks
+    : autoMessage;
+
+  const updatedRemarks = previousRemarks
+    ? `${previousRemarks}\n${finalRemark}`
+    : finalRemark;
+
   console.log('Starting dispatch confirmation for order:', saleOrderId);
 
-  // ================= STEP 1: FETCH FULL SALE ORDER =================
   this.http.get(`sales/sale_order/${saleOrderId}/`).subscribe(
     async (res: any) => {
 
@@ -199,12 +277,11 @@ confirmDispatch() {
       const customFields = res?.data?.custom_fields || {};
 
       if (!saleOrder || !saleOrderItems.length) {
-        alert('Sale order data not found');
         return;
       }
 
-      // ================= STEP 2: PREPARE UPDATED ITEMS (WITH REAL BALANCE) =================
       const updatedSaleOrderItems = [];
+      let isFullDispatch = true;
 
       for (const item of saleOrderItems) {
 
@@ -212,70 +289,59 @@ confirmDispatch() {
         if (!item.product_id || orderedQty <= 0) continue;
 
         try {
-          // FETCH REAL PRODUCT BALANCE
           const productRes: any = await this.http
             .get(`products/products/${item.product_id}`)
             .toPromise();
 
-          console.log(`Fetched balance for product ${item.product_id}:`, productRes);
-
           const currentBalance =
             Number(productRes?.data?.products.balance || 0);
 
-          console.log(`Product ${item.product_id} - Current Balance: ${currentBalance}, Ordered Qty: ${orderedQty}`);
-
-          // balance = 0
           if (currentBalance === 0) {
             this.showStockError(item, 'ZERO_BALANCE');
             return;
           }
 
-          // ordered qty > balance
-          if (orderedQty > currentBalance) {
-            this.showStockError(item, 'INSUFFICIENT_BALANCE', currentBalance);
+          if (dispatchQty > currentBalance) {
+            this.showStockError(item, 'DISPATCH_EXCEEDS_STOCK', currentBalance, dispatchQty);
             return;
           }
 
-          const availableQty = currentBalance - orderedQty;
-          const productionQty = availableQty >= orderedQty ? 0 : orderedQty - availableQty;
-          console.log("availableQty:", availableQty, "productionQty:", productionQty);
+          const updatedBalance = currentBalance - dispatchQty;
+
+          const newAvailableQtyItems = Number(item.available_qty || 0) + dispatchQty;
+          const newProductionQty = orderedQty - newAvailableQtyItems;
+
+          if (newProductionQty > 0) {
+            isFullDispatch = false;
+          }
+
           updatedSaleOrderItems.push({
-            // REQUIRED FOR UPDATE (NO DELETE)
             sale_order_item_id: item.sale_order_item_id,
             sale_order_id: saleOrderId,
             product_id: item.product_id,
             unit_options_id: item.unit_options_id,
-
-            // REQUIRED FIELD
             quantity: orderedQty,
-
-            // FINAL CORRECT VALUES
-            available_qty: availableQty,
-            production_qty: productionQty
+            available_qty: newAvailableQtyItems,
+            production_qty: newProductionQty > 0 ? newProductionQty : 0
           });
 
-          // ================= UPDATE PRODUCT BALANCE =================
+          // Update Product Balance
           await this.http.patch(
             `products/update-balance/${item.product_id}/`,
-            { balance: availableQty }
+            { balance: updatedBalance }
           ).toPromise();
 
-
-          } catch (err) {
+        } catch (err) {
           console.error(
             `Failed to fetch balance for product ${item.product_id}`,
             err
           );
         }
       }
-      
 
-      // ================= STEP 3: BUILD PUT PAYLOAD (UNCHANGED STRUCTURE) =================
       const payload = {
         sale_order: {
           ...saleOrder,
-
-          // FORCE order_type
           order_type: 'sale_order'
         },
         sale_order_items: updatedSaleOrderItems,
@@ -284,48 +350,220 @@ confirmDispatch() {
         custom_fields: customFields
       };
 
-      // ================= STEP 4: UPDATE SALE ORDER (PUT) =================
+      /* ================= UPDATE SALE ORDER (YOUR EXISTING LOGIC) ================= */
+
       this.http.put(`sales/sale_order/${saleOrderId}/`, payload).subscribe(
         () => {
 
-          console.log('✅ Sale order items updated successfully');
+          console.log('Sale order items updated successfully');
 
-          // ================= STEP 5: MOVE TO NEXT STAGE =================
-          const moveNextStageUrl =
-            `sales/SaleOrder/${saleOrderId}/move_next_stage/`;
+          /* ================= UPDATE WORK ORDER (NEW ADDITION) ================= */
 
-          this.http.post(moveNextStageUrl, {}).subscribe(
-            () => {
-              console.log('✅ Dispatch confirmed & moved to next stage');
-              const productName = this.selectedOrder?.product?.name || 'Product';
-              this.closeModal();
-              this.curdConfig = this.getCurdConfig();
-              this.woNotifProductName = productName;
-              this.woNotifRef = this.notification.template(this.woCompletedTpl, {
-                nzDuration: 6000,
-                nzPlacement: 'topRight'
-              });
-            },
-            error => {
-              console.error('Move next stage failed:', error);
-              alert('Failed to move order to next stage');
+          const workOrderPayload = {
+            work_order: {
+              ordered_qty: newOrderedQty,
+              available_qty: newAvailableQty,
+              remarks: updatedRemarks
             }
-          );
+          };
+
+          this.http.patch(
+            `production/work_order/${workOrderId}/`,
+            workOrderPayload
+          ).subscribe(() => {
+            console.log('Work Order updated successfully');
+          });
+
+          // Update UI instantly
+          this.selectedOrder.available_qty = newAvailableQty;
+          this.selectedOrder.ordered_qty = newOrderedQty;
+          this.selectedOrder.remarks = updatedRemarks;
+
+          if (isFullDispatch) {
+
+            const moveNextStageUrl =
+              `sales/SaleOrder/${saleOrderId}/move_next_stage/`;
+
+            this.http.post(moveNextStageUrl, {}).subscribe(
+              () => {
+                console.log('Dispatch confirmed & moved to next stage');
+                this.closeModal();
+                this.curdConfig = this.getCurdConfig();
+                this.ngOnInit();
+              },
+              error => {
+                console.error('Move next stage failed:', error);
+              }
+            );
+
+          } else {
+            console.log('Partial dispatch - staying in current stage');
+            this.closeModal();
+            this.curdConfig = this.getCurdConfig();
+            this.ngOnInit();
+          }
 
         },
         error => {
           console.error('Sale order update failed:', error);
-          alert('Failed to update sale order items');
         }
       );
 
     },
     error => {
       console.error('Fetch sale order failed:', error);
-      alert('Unable to fetch sale order data');
     }
   );
 }
+
+
+// confirmDispatch() {
+//   if (!this.selectedOrder) {
+//     console.warn('No order selected');
+//     return;
+//   }
+
+//   const saleOrderId = this.selectedOrder.sale_order_id;
+//   console.log('Starting dispatch confirmation for order:', saleOrderId);
+
+//   // ================= STEP 1: FETCH FULL SALE ORDER =================
+//   this.http.get(`sales/sale_order/${saleOrderId}/`).subscribe(
+//     async (res: any) => {
+
+//       const saleOrder = res?.data?.sale_order;
+//       const saleOrderItems = res?.data?.sale_order_items || [];
+//       const orderAttachments = res?.data?.order_attachments || [];
+//       const orderShipments = res?.data?.order_shipments || [];
+//       const customFields = res?.data?.custom_fields || {};
+
+//       if (!saleOrder || !saleOrderItems.length) {
+//         alert('Sale order data not found');
+//         return;
+//       }
+
+//       // ================= STEP 2: PREPARE UPDATED ITEMS (WITH REAL BALANCE) =================
+//       const updatedSaleOrderItems = [];
+
+//       for (const item of saleOrderItems) {
+
+//         const orderedQty = Number(item.quantity || 0);
+//         if (!item.product_id || orderedQty <= 0) continue;
+
+//         try {
+//           // FETCH REAL PRODUCT BALANCE
+//           const productRes: any = await this.http
+//             .get(`products/products/${item.product_id}`)
+//             .toPromise();
+
+//           console.log(`Fetched balance for product ${item.product_id}:`, productRes);
+
+//           const currentBalance =
+//             Number(productRes?.data?.products.balance || 0);
+
+//           console.log(`Product ${item.product_id} - Current Balance: ${currentBalance}, Ordered Qty: ${orderedQty}`);
+
+//           // balance = 0
+//           if (currentBalance === 0) {
+//             this.showStockError(item, 'ZERO_BALANCE');
+//             return;
+//           }
+
+//           // ordered qty > balance
+//           if (orderedQty > currentBalance) {
+//             this.showStockError(item, 'INSUFFICIENT_BALANCE', currentBalance);
+//             return;
+//           }
+
+//           const availableQty = currentBalance - orderedQty;
+//           const productionQty = availableQty >= orderedQty ? 0 : orderedQty - availableQty;
+//           console.log("availableQty:", availableQty, "productionQty:", productionQty);
+//           updatedSaleOrderItems.push({
+//             // REQUIRED FOR UPDATE (NO DELETE)
+//             sale_order_item_id: item.sale_order_item_id,
+//             sale_order_id: saleOrderId,
+//             product_id: item.product_id,
+//             unit_options_id: item.unit_options_id,
+
+//             // REQUIRED FIELD
+//             quantity: orderedQty,
+
+//             // FINAL CORRECT VALUES
+//             available_qty: availableQty,
+//             production_qty: productionQty
+//           });
+
+//           // ================= UPDATE PRODUCT BALANCE =================
+//           await this.http.patch(
+//             `products/update-balance/${item.product_id}/`,
+//             { balance: availableQty }
+//           ).toPromise();
+
+
+//           } catch (err) {
+//           console.error(
+//             `Failed to fetch balance for product ${item.product_id}`,
+//             err
+//           );
+//         }
+//       }
+      
+
+//       // ================= STEP 3: BUILD PUT PAYLOAD (UNCHANGED STRUCTURE) =================
+//       const payload = {
+//         sale_order: {
+//           ...saleOrder,
+
+//           // FORCE order_type
+//           order_type: 'sale_order'
+//         },
+//         sale_order_items: updatedSaleOrderItems,
+//         order_attachments: orderAttachments,
+//         order_shipments: orderShipments,
+//         custom_fields: customFields
+//       };
+
+//       // ================= STEP 4: UPDATE SALE ORDER (PUT) =================
+//       this.http.put(`sales/sale_order/${saleOrderId}/`, payload).subscribe(
+//         () => {
+
+//           console.log('✅ Sale order items updated successfully');
+
+//           // ================= STEP 5: MOVE TO NEXT STAGE =================
+//           const moveNextStageUrl =
+//             `sales/SaleOrder/${saleOrderId}/move_next_stage/`;
+
+//           this.http.post(moveNextStageUrl, {}).subscribe(
+//             () => {
+//               console.log('✅ Dispatch confirmed & moved to next stage');
+//               const productName = this.selectedOrder?.product?.name || 'Product';
+//               this.closeModal();
+//               this.curdConfig = this.getCurdConfig();
+//               this.woNotifProductName = productName;
+//               this.woNotifRef = this.notification.template(this.woCompletedTpl, {
+//                 nzDuration: 6000,
+//                 nzPlacement: 'topRight'
+//               });
+//             },
+//             error => {
+//               console.error('Move next stage failed:', error);
+//               alert('Failed to move order to next stage');
+//             }
+//           );
+
+//         },
+//         error => {
+//           console.error('Sale order update failed:', error);
+//           alert('Failed to update sale order items');
+//         }
+//       );
+
+//     },
+//     error => {
+//       console.error('Fetch sale order failed:', error);
+//       alert('Unable to fetch sale order data');
+//     }
+//   );
+// }
 
   getCurdConfig(): TaCurdConfig {
     return {
@@ -340,18 +578,72 @@ confirmDispatch() {
         export: {downloadName: 'WorkOrderBoard'},
         defaultSort: { key: 'created_at', value: 'descend' },
         cols: [
-          { fieldKey: 'product', name: 'Product', displayType: "map", mapFn: (cv, row) => `${row.product.name}`, sort: true },
-          { fieldKey: 'quantity', name: 'Quantity', sort: true },
-          { fieldKey: 'status_id', name: 'Status', displayType: 'map', mapFn: (cv, row) => `${row.status.status_name}`, sort: true },
-          { fieldKey: 'start_date', name: 'Start Date', sort: true },
-          { fieldKey: 'end_date', name: 'End Date', sort: true },
-          { fieldKey: 'actions', name: 'Actions', type: 'action',
-            actions: [
-              { type: 'callBackFn', label: 'Done', callBackFn: (row) => this.openModal(row) },
-              { type: 'callBackFn', label: 'View', callBackFn: (row) => this.viewWorkOrder(row.work_order_id) }
-            ]
-          }
-        ]
+                {
+                  fieldKey: 'customer',
+                  name: 'Customer',
+                  displayType: "map",
+                  mapFn: (cv, row) => `${row.sale_order?.customer_name || '-'}`,
+                  sort: true
+                },
+                {
+                  fieldKey: 'product',
+                  name: 'Product',
+                  displayType: "map",
+                  mapFn: (cv, row) => `${row.product?.name || '-'}`,
+                  sort: true
+                },
+                {
+                  fieldKey: 'color',
+                  name: 'Color',
+                  displayType: "map",
+                  mapFn: (cv, row) => `${row.color?.color_name || '-'}`,
+                  sort: true
+                },
+                {
+                  fieldKey: 'size',
+                  name: 'Size',
+                  displayType: "map",
+                  mapFn: (cv, row) => `${row.size?.size_name || '-'}`,
+                  sort: true
+                },
+                { fieldKey: 'ordered_qty', name: 'Quantity', sort: true },
+                { fieldKey: 'available_qty', name: 'Available Qty', sort: true },
+
+                {
+                  fieldKey: 'status_id',
+                  name: 'Status',
+                  displayType: 'map',
+                  mapFn: (cv, row) => `${row.status?.status_name || '-'}`,
+                  sort: true
+                },
+
+                { fieldKey: 'start_date', name: 'Start Date', sort: true },
+                { fieldKey: 'end_date', name: 'End Date', sort: true },
+                { fieldKey: 'remarks', name: 'Remarks', sort: false },
+
+                {
+                  fieldKey: 'actions',
+                  name: 'Actions',
+                  type: 'action',
+                  actions: [
+                    { type: 'callBackFn', label: 'Done', callBackFn: (row) => this.openModal(row) },
+                    { type: 'callBackFn', label: 'View', callBackFn: (row) => this.viewWorkOrder(row.work_order_id) }
+                  ]
+                }
+              ]
+        // cols: [
+        //   { fieldKey: 'product', name: 'Product', displayType: "map", mapFn: (cv, row) => `${row.product.name}`, sort: true },
+        //   { fieldKey: 'quantity', name: 'Quantity', sort: true },
+        //   { fieldKey: 'status_id', name: 'Status', displayType: 'map', mapFn: (cv, row) => `${row.status.status_name}`, sort: true },
+        //   { fieldKey: 'start_date', name: 'Start Date', sort: true },
+        //   { fieldKey: 'end_date', name: 'End Date', sort: true },
+        //   { fieldKey: 'actions', name: 'Actions', type: 'action',
+        //     actions: [
+        //       { type: 'callBackFn', label: 'Done', callBackFn: (row) => this.openModal(row) },
+        //       { type: 'callBackFn', label: 'View', callBackFn: (row) => this.viewWorkOrder(row.work_order_id) }
+        //     ]
+        //   }
+        // ]
       },
       formConfig: {
         url: 'sales/sale_order/{saleOrderId}/move_next_stage/',
@@ -383,4 +675,50 @@ confirmDispatch() {
     this.dismissWoNotif();
     this.router.navigate(['/admin/sales/sales-dispatch']);
   }
+
+  productionSummary: any[] = [];
+
+generateProductionSummary(data: any[]) {
+  const map: { [key: string]: any } = {};
+
+  data.forEach(row => {
+    const productId = row.product?.product_id;
+    if (!productId) return;
+
+    if (!map[productId]) {
+      map[productId] = {
+        product_name: row.product?.name,
+        total_qty: 0,
+        available_qty: 0
+      };
+    }
+
+    map[productId].total_qty += Number(row.quantity || 0);
+    map[productId].available_qty += Number(row.available_qty || 0);
+  });
+
+  this.productionSummary = Object.values(map);
+}
+
+showProductionPlanning = false;
+
+toggleProductionPlanning() {
+  this.showProductionPlanning = !this.showProductionPlanning;
+}
+
+getCompletionPercentage(item: any): number {
+  console.log("repsonse data : ", this.productionSummary);
+  console.log("item data : ", item);
+  if (!item.total_qty) return 0;
+  return ((item.available_qty || 0) / item.total_qty) * 100;
+}
+
+
+getProgressColor(item: any) {
+  const percent = this.getCompletionPercentage(item);
+
+  if (percent === 100) return 'bg-success';
+  if (percent >= 50) return 'bg-warning';
+  return 'bg-danger';
+}
 }

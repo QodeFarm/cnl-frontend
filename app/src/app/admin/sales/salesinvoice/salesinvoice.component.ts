@@ -396,17 +396,15 @@ async autoFillProductDetails(field, data) {
       ? data.code
       : field.form.controls.code.value,
     rate: selectedRate,
-    discount:
-      data.discount !== undefined &&
-      data.discount !== null &&
-      data.discount !== '' &&
-      !isNaN(Number(data.discount))
-        ? Number(data.discount)
-        : 0,
+    discount: !this.SaleInvoiceEditID
+      ? (!isNaN(Number(data.discount)) ? Number(data.discount) : 0)
+      : field.form.controls.discount?.value,
+
     unit_options_id: data.unit_options?.unit_options_id,
     stock_unit_id: data.stock_unit?.stock_unit_id,
     print_name: data.print_name,
-    mrp: data.mrp
+    mrp: data.mrp,
+    tax: data.gst_input || 0,
   };
 
   Object.entries(fieldMappings).forEach(([key, value]) => {
@@ -1893,6 +1891,11 @@ createSaleInovice() {
                         // Set default value to 'Exclusive'
                         field.formControl.setValue('Exclusive');
                       }
+
+                      // 🔥 Recalculate when tax type changes
+                      field.formControl.valueChanges.subscribe(() => {
+                        this.totalAmountCal();
+                      });
                     }
                   }
                 },
@@ -1960,6 +1963,17 @@ createSaleInovice() {
                   defaultValue: '0.00',
                 },
                 {
+                  key: 'shipping_charges',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Shipping Charges',
+                    required: false,
+                    disabled: true
+                  },
+                  defaultValue: '0.00',
+                },
+                {
                   key: 'cgst',
                   type: 'text',
                   className: 'col-12',
@@ -1969,19 +1983,27 @@ createSaleInovice() {
                   },
                   defaultValue: '0.00',
                   expressionProperties: {
-                    'model.cgst': (model, field) => {
-                      if (!field._lastValue || field._lastValue !== model.tax_amount) {
-                        const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
-                        field._lastValue = model.tax_amount; // Store last value to avoid infinite logs
-                      }
-                      return model.billing_address?.includes('Andhra Pradesh') 
-                        ? (parseFloat(model.tax_amount) / 2).toFixed(2) 
+                    'model.cgst': (model) => {
+                      const address = model.billing_address || model.shipping_address || '';
+
+                      const isIntraState =
+                        address === '' || address.toLowerCase().includes('andhra pradesh');
+
+                      const taxAmount = parseFloat(model.tax_amount || 0);
+
+                      return isIntraState
+                        ? (taxAmount / 2).toFixed(2)
                         : '0.00';
-                    },
-                    'templateOptions.disabled': 'true' // Make it read-only
+                    }
                   },
-                  hideExpression: (model) => !model.billing_address || !model.billing_address?.includes('Andhra Pradesh') // Hide CGST for inter-state
-                },
+                  hideExpression: (model) => {
+                    const address = model.billing_address || model.shipping_address || '';
+                    const isIntraState =
+                      address === '' || address.toLowerCase().includes('andhra pradesh');
+
+                    return !isIntraState;
+                  }
+                  },
                 {
                   key: 'sgst',
                   type: 'text',
@@ -1992,20 +2014,28 @@ createSaleInovice() {
                   },
                   defaultValue: '0.00',
                   expressionProperties: {
-                    'model.sgst': (model, field) => {
-                      if (!field._lastValue || field._lastValue !== model.tax_amount) {
-                        const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
-                        field._lastValue = model.tax_amount;
-                      }
-                      return model.billing_address?.includes('Andhra Pradesh') 
-                        ? (parseFloat(model.tax_amount) / 2).toFixed(2) 
+                    'model.sgst': (model) => {
+                      const address = model.billing_address || model.shipping_address || '';
+
+                      const isIntraState =
+                        address === '' || address.toLowerCase().includes('andhra pradesh');
+
+                      const taxAmount = parseFloat(model.tax_amount || 0);
+
+                      return isIntraState
+                        ? (taxAmount / 2).toFixed(2)
                         : '0.00';
-                    },
-                    'templateOptions.disabled': 'true' // Make it read-only
+                    }
                   },
-                  hideExpression: (model) => !model.billing_address || !model.billing_address?.includes('Andhra Pradesh') // Hide CGST for inter-state
+                  hideExpression: (model) => {
+                    const address = model.billing_address || model.shipping_address || '';
+                    const isIntraState =
+                      address === '' || address.toLowerCase().includes('andhra pradesh');
+
+                    return !isIntraState;
+                  }
                 },
-                {
+                                {
                   key: 'igst',
                   type: 'text',
                   className: 'col-12',
@@ -2015,18 +2045,26 @@ createSaleInovice() {
                   },
                   defaultValue: '0.00',
                   expressionProperties: {
-                    'model.igst': (model, field) => {
-                      if (!field._lastValue || field._lastValue !== model.tax_amount) {
-                        const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
-                        field._lastValue = model.tax_amount;
-                      }
-                      return !model.billing_address?.includes('Andhra Pradesh') 
-                        ? parseFloat(model.tax_amount).toFixed(2) 
+                    'model.igst': (model) => {
+                      const address = model.billing_address || model.shipping_address || '';
+
+                      const isIntraState =
+                        address === '' || address.toLowerCase().includes('andhra pradesh');
+
+                      const taxAmount = parseFloat(model.tax_amount || 0);
+
+                      return !isIntraState
+                        ? taxAmount.toFixed(2)
                         : '0.00';
-                    },
-                    'templateOptions.disabled': 'true' // Make it read-only
+                    }
                   },
-                  hideExpression: (model) => !model.billing_address || model.billing_address?.includes('Andhra Pradesh') // Hide if intra-state
+                  hideExpression: (model) => {
+                    const address = model.billing_address || model.shipping_address || '';
+                    const isIntraState =
+                      address === '' || address.toLowerCase().includes('andhra pradesh');
+
+                    return isIntraState;
+                  },
                 }, 
                 // {
                 //   key: 'tax_amount',
@@ -2709,38 +2747,99 @@ createSaleInovice() {
                 },
               },
               
-              
-              
               {
                 type: 'input',
                 key: 'tax',
                 templateOptions: {
                   type: "number",
+                  step: 0.01,
                   label: 'Tax',
                   placeholder: 'Tax',
-                  hideLabel: true
+                  hideLabel: false
+                },
+                expressionProperties: {
+                  'templateOptions.label': (model: any, formState: any, field: any) => {
+
+                    const rate = Number(field?.form?.controls?.rate?.value || 0);
+                    const qty = Number(field?.form?.controls?.quantity?.value || 0);
+
+                    const discountPercent = Number(field?.form?.controls?.discount?.value || 0);
+                    const discountAmountField = Number(field?.form?.controls?.discount_amount?.value || 0);
+
+                    const taxPercent = Number(model?.tax || 0);
+
+                    const grossAmount = rate * qty;
+
+                    // ERP priority
+                    const discountAmount =
+                      model.discount_type === 'amount'
+                        ? discountAmountField
+                        : (grossAmount * discountPercent) / 100;
+
+                    const taxableAmount = grossAmount - discountAmount;
+
+                    const taxAmount = (taxableAmount * taxPercent) / 100;
+
+                    if (taxPercent > 0) {
+                      return `(${taxPercent}% | ₹${taxAmount.toFixed(2)})`;
+                    }
+
+                    return '';
+                  }
                 },
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
 
-                    // Check if parentArray exists and proceed
                     if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+                      const currentRowIndex = +parentArray.key;
 
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
-                        const existingtax = this.dataToPopulate.sale_invoice_items[currentRowIndex].tax;
+                      if (
+                        this.dataToPopulate &&
+                        this.dataToPopulate.sale_invoice_items.length > currentRowIndex
+                      ) {
+                        const existingtax =
+                          this.dataToPopulate.sale_invoice_items[currentRowIndex].tax;
 
-                        // Set the full product object instead of just the product_id
-                        if (existingtax) {
-                          field.formControl.setValue(existingtax); // Set full product object (not just product_id)
+                        if (existingtax || existingtax === 0) {
+                          field.formControl.setValue(existingtax);
                         }
                       }
                     }
                   }
                 }
               },
+              
+              // {
+              //   type: 'input',
+              //   key: 'tax',
+              //   templateOptions: {
+              //     type: "number",
+              //     label: 'Tax',
+              //     placeholder: 'Tax',
+              //     hideLabel: true
+              //   },
+              //   hooks: {
+              //     onInit: (field: any) => {
+              //       const parentArray = field.parent;
+
+              //       // Check if parentArray exists and proceed
+              //       if (parentArray) {
+              //         const currentRowIndex = +parentArray.key; // Simplified number conversion
+
+              //         // Check if there is a product already selected in this row (when data is copied)
+              //         if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
+              //           const existingtax = this.dataToPopulate.sale_invoice_items[currentRowIndex].tax;
+
+              //           // Set the full product object instead of just the product_id
+              //           if (existingtax) {
+              //             field.formControl.setValue(existingtax); // Set full product object (not just product_id)
+              //           }
+              //         }
+              //       }
+              //     }
+              //   }
+              // },
               {
                 type: 'input',
                 key: 'cgst',
@@ -3323,18 +3422,91 @@ createSaleInovice() {
                     {
                       key: 'shipping_charges',
                       type: 'input',
+                      defaultValue: "0",
                       className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                       templateOptions: {
                         type: "number",
-                        label: 'Shipping Charges.',
+                        label: 'Shipping Charges',
                         placeholder: 'Enter Shipping Charges',
-                        // required: true
                       },
                       hooks: {
                         onInit: (field: any) => {
-                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.shipping_charges && field.formControl) {
-                            field.formControl.setValue(this.dataToPopulate.order_shipments.shipping_charges);
+
+                          // Ensure model exists
+                          if (!this.formConfig.model.order_shipments) {
+                            this.formConfig.model.order_shipments = {};
                           }
+
+                          // Edit mode value populate
+                          const existingShipping =
+                            this.dataToPopulate?.order_shipments?.shipping_charges ?? 0;
+
+                          if (field.formControl && existingShipping !== undefined) {
+                            field.formControl.setValue(existingShipping, { emitEvent: false });
+                            this.formConfig.model.order_shipments.shipping_charges = parseFloat(existingShipping) || 0;
+                          }
+
+                          // Value change
+                          field.formControl.valueChanges.subscribe((value: any) => {
+
+                            const numeric = parseFloat(value);
+                            const shipping = isNaN(numeric) ? 0 : numeric;
+
+                            field.formControl.setValue(shipping, { emitEvent: false });
+
+                            // Update model
+                            this.formConfig.model.order_shipments.shipping_charges = shipping;
+
+                            console.log("Shipping Charges Changed:", shipping);
+
+                            // Trigger global calculation
+                            this.totalAmountCal();
+                          });
+                        }
+                      }
+                    },
+                    {
+                      key: 'shipping_gst',
+                      type: 'input',
+                      defaultValue: "0",
+                      className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                      templateOptions: {
+                        type: "number",
+                        label: 'Shipping GST (%)',
+                        placeholder: 'Enter Shipping GST',
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+
+                          // Ensure model exists
+                          if (!this.formConfig.model.order_shipments) {
+                            this.formConfig.model.order_shipments = {};
+                          }
+
+                          // Edit mode populate
+                          const existingGST =
+                            this.dataToPopulate?.order_shipments?.shipping_gst ?? 0;
+
+                          if (field.formControl && existingGST !== undefined) {
+                            field.formControl.setValue(existingGST, { emitEvent: false });
+                            this.formConfig.model.order_shipments.shipping_gst = parseFloat(existingGST) || 0;
+                          }
+
+                          field.formControl.valueChanges.subscribe((value: any) => {
+
+                            const numeric = parseFloat(value);
+                            const gst = isNaN(numeric) ? 0 : numeric;
+
+                            field.formControl.setValue(gst, { emitEvent: false });
+
+                            // Update model
+                            this.formConfig.model.order_shipments.shipping_gst = gst;
+
+                            console.log("Shipping GST Changed:", gst);
+
+                            // Trigger global calculation
+                            this.totalAmountCal();
+                          });
                         }
                       }
                     }

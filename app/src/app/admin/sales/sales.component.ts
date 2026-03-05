@@ -1071,7 +1071,10 @@ export class SalesComponent {
         // ==========================================
       }
 
+      // this.totalAmountCal();
+      setTimeout(() => {
       this.totalAmountCal();
+    }, 200);
     });
 
     this.hide();
@@ -2532,350 +2535,239 @@ export class SalesComponent {
   //   });
   // }
 
-  createSaleOrder() {
+createSaleOrder() {
 
-    const customFieldsPayload = this.validatedCustomFieldsPayload;
+  const customFieldsPayload = this.validatedCustomFieldsPayload;
 
-    const payload = {
-      ...this.formConfig.model,
-      custom_field_values: customFieldsPayload.custom_field_values
-    };
+  const payload: any = {
+    ...this.formConfig.model,
+    custom_field_values: customFieldsPayload.custom_field_values
+  };
 
-    /* -------------------------------------------------
-     QUICK PACK (UNCHANGED)
-    -------------------------------------------------- */
-    if (this.createQuickPack) {
-      const customerName = payload.sale_order?.customer?.name || 'Customer';
-      const productNames = payload.sale_order_items?.map(i => i.product?.name) || [];
-
-      let quickPackName = `${customerName} QuickPack (${productNames.join(', ')})`;
-      if (quickPackName.length > 50) {
-        quickPackName = `${customerName} QuickPack (${productNames[0]} +${productNames.length - 1} more)`;
-      }
-
-      const quickPackPayload = {
-        quick_pack_data: {
-          name: quickPackName,
-          customer_id: payload.sale_order.customer?.customer_id,
-          description: `QuickPack created from Sale Order ${payload.sale_order.order_no}`,
-          active: 'Y',
-          lot_qty: payload.sale_order_items.reduce((s, i) => s + (i.quantity || 0), 0)
-        },
-        quick_pack_data_items: payload.sale_order_items.map(i => ({
-          product_id: i.product?.product_id,
-          quantity: i.quantity,
-          unit_options_id: i.unit_options?.unit_options_id,
-          size_id: i.size?.size_id,
-          color_id: i.color?.color_id
-        }))
-      };
-
-      this.http.post('sales/quick_pack/', quickPackPayload).subscribe();
-    }
-
-    /* -------------------------------------------------
-     CREDIT LIMIT OVERRIDE (ADDED FROM OLD CODE)
-    -------------------------------------------------- */
-    if (this.creditLimitApproved) {
-      payload.credit_limit_approved = true;
-      this.creditLimitApproved = false;
-    }
-
-    /* -------------------------------------------------
-     SPLIT LOGIC (UNCHANGED)
-    -------------------------------------------------- */
-    const parentItems: any[] = [];
-    const childItems: any[] = [];
-
-    payload.sale_order_items.forEach(item => {
-      const qty = Number(item.quantity) || 0;
-      const available = Number(item.available_qty) || 0;
-
-      parentItems.push({
-        ...item,
-        production_qty: 0
-      });
-
-      if (qty > available) {
-        childItems.push({
-          ...item,
-          quantity: qty - available,
-          available_qty: available,
-          production_qty: qty - available
-        });
-      }
-    });
-
-    payload.sale_order_items = parentItems;
-
-    /* -------------------------------------------------
-     CHILD ORDER DECISION
-    -------------------------------------------------- */
-    const totalProducts = payload.sale_order_items.length;
-
-    const allAvailableZero = payload.sale_order_items.every(
-      i => Number(i.available_qty || 0) === 0
-    );
-
-    const shouldCreateChildOrders =
-      totalProducts > 1 &&
-      !allAvailableZero &&
-      childItems.length > 0;
-
-    console.log('Should create child orders:', shouldCreateChildOrders);
-
-    /* -------------------------------------------------
-     CREATE PARENT SALE ORDER
-    -------------------------------------------------- */
-    this.http.post<any>('sales/sale_order/', payload).subscribe({
-      next: parentRes => {
-
-        /* -------------------------------------------------
-         CREDIT LIMIT RESPONSE CHECK
-        -------------------------------------------------- */
-        if (parentRes?.data?.credit_limit_exceeded) {
-          console.log("Credit limit exceeded — showing modal");
-          this.pendingCreditLimitPayload = payload;
-          this.pendingCreditLimitAction = 'create';
-          this.showCreditLimitModal(parentRes.data);
-          return;
-        }
-
-        const parentOrder = parentRes.data.sale_order;
-        const parentOrderId = parentOrder.sale_order_id;
-
-        this.sendSaleOrderWhatsapp(parentOrderId);
-
-        /* -------------------------------------------------
-         CREATE CHILD SALE ORDERS
-        -------------------------------------------------- */
-        if (shouldCreateChildOrders) {
-
-          let counter = 1;
-
-          const childRequests = childItems.map(item => {
-
-            const childOrderNo = `${parentOrder.order_no}-P${counter++}`;
-
-            const childPayload = {
-              sale_order: {
-                ...parentOrder,
-                sale_order_id: undefined,
-                order_no: childOrderNo,
-                flow_status: { flow_status_name: 'Production' },
-
-                item_value: 0,
-                total_amount: 0,
-                tax_amount: 0,
-                dis_amt: 0,
-                cess_amount: 0,
-
-                order_type: parentOrder.order_type || 'sale_order'
-              },
-              sale_order_items: [{
-                ...item,
-                available_qty: 0,
-                amount: 0,
-                rate: 0,
-                tax: 0,
-                cgst: 0,
-                sgst: 0,
-                igst: 0,
-                production_qty: item.quantity
-              }],
-              order_attachments: payload.order_attachments,
-              order_shipments: payload.order_shipments,
-              custom_field_values: customFieldsPayload.custom_field_values
-            };
-
-            return this.http.post<any>('sales/sale_order/', childPayload).pipe(
-              switchMap(childRes => {
-
-                const childOrderId = childRes.data.sale_order.sale_order_id;
-
-                const workOrderPayload = {
-                  work_order: {
-                    product_id: item.product_id,
-                    quantity: item.production_qty,
-                    completed_qty: 0,
-                    pending_qty: item.production_qty,
-                    start_date: parentOrder.order_date,
-                    sync_qty: true,
-                    size_id: item.size?.size_id || null,
-                    color_id: item.color?.color_id || null,
-                    status_id: '',
-                    sale_order_id: childOrderId
-                  },
-                  bom: [{
-                    product_id: item.product_id,
-                    size_id: item.size?.size_id || null,
-                    color_id: item.color?.color_id || null
-                  }],
-                  work_order_machines: [],
-                  workers: [],
-                  work_order_stages: []
-                };
-
-                return this.http.post('production/work_order/', workOrderPayload);
-              })
-            );
-          });
-
-          forkJoin(childRequests).subscribe();
-        }
-
-        /* -------------------------------------------------
-         SUCCESS
-        -------------------------------------------------- */
-        this.clearDraft();
-        this.showSuccessToast = true;
-        this.toastMessage = 'Sale Order created successfully';
-
-        setTimeout(() => (this.showSuccessToast = false), 3000);
-        this.ngOnInit();
-      },
-
-      error: err => {
-
-        /* CREDIT LIMIT BLOCKED (NON ADMIN) */
-        if (err.status === 403 && err.error?.data?.credit_limit_exceeded) {
-          this.pendingCreditLimitPayload = null;
-          this.showCreditLimitModal(err.error.data);
-          return;
-        }
-
-        if (err.status === 400) {
-          this.showDialog();
-        }
-      }
-    });
+  /* -------------------------------------------------
+    CREDIT LIMIT OVERRIDE
+  -------------------------------------------------- */
+  if (this.creditLimitApproved) {
+    payload.credit_limit_approved = true;
+    this.creditLimitApproved = false;
   }
 
+  /* -------------------------------------------------
+    CALCULATION LOGIC (NO QUANTITY SPLIT)
+  -------------------------------------------------- */
+  const parentItems: any[] = [];
+  const childItems: any[] = [];
 
+  payload.sale_order_items?.forEach(item => {
 
+    const qty = Number(item.quantity) || 0;
+    const available = Number(item.available_qty) || 0;
+    const rate = Number(item.rate) || 0;
+    const gst = Number(item.product?.gst_input) || 0;
 
-  //   /* -------------------------------------------------
-  //    SPLIT LOGIC
-  //   -------------------------------------------------- */
-  //   const parentItems: any[] = [];
-  //   const childItems: any[] = [];
+    const productionQty = Math.max(qty - available, 0);
 
-  //   payload.sale_order_items.forEach(item => {
-  //     const qty = Number(item.quantity) || 0;
-  //     const available = Number(item.available_qty) || 0;
+    /* -------------------------------
+       PARENT ITEM (FULL QUANTITY)
+    --------------------------------*/
+    const itemValue = qty * rate;
+    const tax = (itemValue * gst) / 100;
+    const amount = itemValue + tax;
 
-  //     if (qty > available) {
-  //       if (available > 0) {
-  //         parentItems.push({
-  //           ...item,
-  //           quantity: available,
-  //           production_qty: 0
-  //         });
-  //       }
+    parentItems.push({
+      ...item,
+      quantity: qty,                // FULL quantity
+      production_qty: productionQty, // production needed
+      cgst: gst / 2,
+      sgst: gst / 2,
+      igst: 0,
+      amount: amount
+    });
 
-  //       childItems.push({
-  //         ...item,
-  //         quantity: qty - available,
-  //         available_qty: 0,
-  //         production_qty: qty - available
-  //       });
-  //     } else {
-  //       parentItems.push({
-  //         ...item,
-  //         production_qty: 0
-  //       });
-  //     }
-  //   });
-  //   // 8
+    /* -------------------------------
+       CHILD ORDER (ONLY PRODUCTION)
+    --------------------------------*/
+    if (available > 0 && productionQty > 0) {
 
+      const childItemValue = productionQty * rate;
+      const childTax = (childItemValue * gst) / 100;
+      const childAmount = childItemValue + childTax;
 
-  //   payload.sale_order_items = parentItems;
+      childItems.push({
+        ...item,
+        quantity: productionQty,
+        production_qty: productionQty,
+        cgst: gst / 2,
+        sgst: gst / 2,
+        igst: 0,
+        amount: childAmount
+      });
+    }
 
-  //   /* -------------------------------------------------
-  //    CREATE PARENT SALE ORDER
-  //   -------------------------------------------------- */
-  //   this.http.post<any>('sales/sale_order/', payload).subscribe({
-  //     next: parentRes => {
-  //       const parentOrder = parentRes.data.sale_order;
-  //       const parentOrderId = parentOrder.sale_order_id;
+  });
 
-  //       // WhatsApp
-  //       this.sendSaleOrderWhatsapp(parentOrderId);
+  payload.sale_order_items = parentItems;
 
-  //       /* -------------------------------------------------
-  //        CREATE CHILD SALE ORDERS + WORK ORDERS
-  //       -------------------------------------------------- */
-  //       if (childItems.length > 0) {
-  //         let counter = 1;
+  const shouldCreateChildOrders = childItems.length > 0;
 
-  //         const childRequests = childItems.map(item => {
-  //           const childOrderNo = `${parentOrder.order_no}-P${counter++}`;
+  /* -------------------------------------------------
+    CREATE PARENT SALE ORDER
+  -------------------------------------------------- */
+  this.http.post<any>('sales/sale_order/', payload).subscribe({
 
-  //           const childPayload = {
-  //             sale_order: {
-  //               ...parentOrder,
-  //               sale_order_id: undefined,
-  //               order_no: childOrderNo,
-  //               flow_status: { flow_status_name: 'Production' },
-  //               item_value: item.quantity * item.rate,
-  //               total_amount: item.quantity * item.rate,
-  //               order_type: parentOrder.order_type || 'sale_order',
-  //               dis_amt: 0 // overall discount remains in parent
-  //             },
-  //             sale_order_items: [item],
-  //             order_attachments: payload.order_attachments,
-  //             order_shipments: payload.order_shipments,
-  //             custom_field_values: customFieldsPayload.custom_field_values
-  //           };
+    next: parentRes => {
 
-  //           return this.http.post<any>('sales/sale_order/', childPayload).pipe(
-  //             switchMap(childRes => {
-  //               const childOrderId = childRes.data.sale_order.sale_order_id;
+      if (parentRes?.data?.credit_limit_exceeded) {
+        this.pendingCreditLimitPayload = payload;
+        this.pendingCreditLimitAction = 'create';
+        this.showCreditLimitModal(parentRes.data);
+        return;
+      }
 
-  //               /* ---- WORK ORDER CREATION ---- */
-  //               const workOrderPayload = {
-  //                 work_order: {
-  //                   product_id: item.product_id,
-  //                   quantity: item.quantity,
-  //                   completed_qty: 0,
-  //                   pending_qty: item.quantity,
-  //                   start_date: parentOrder.order_date,
-  //                   sync_qty: true,
-  //                   size_id: item.size?.size_id || null,
-  //                   color_id: item.color?.color_id || null,
-  //                   status_id: '',
-  //                   sale_order_id: childOrderId
-  //                 },
-  //                 bom: [{
-  //                   product_id: item.product_id,
-  //                   size_id: item.size?.size_id || null,
-  //                   color_id: item.color?.color_id || null
-  //                 }],
-  //                 work_order_machines: [],
-  //                 workers: [],
-  //                 work_order_stages: []
-  //               };
+      const parentOrder = parentRes.data.sale_order;
+      const parentOrderId = parentOrder.sale_order_id;
 
-  //               return this.http.post('production/work_order/', workOrderPayload);
-  //             })
-  //           );
-  //         });
+      /* -------------------------------------------------
+        QUICK PACK CREATION
+      -------------------------------------------------- */
+      if (this.createQuickPack) {
 
-  //         forkJoin(childRequests).subscribe();
-  //       }
+        const customerName = payload.sale_order?.customer?.name || 'Customer';
+        const productNames = payload.sale_order_items?.map(i => i.product?.name) || [];
 
-  //       this.showSuccessToast = true;
-  //       this.toastMessage = 'Sale Order created successfully';
-  //       setTimeout(() => (this.showSuccessToast = false), 3000);
-  //       this.ngOnInit();
-  //     },
-  //     error: err => {
-  //       if (err.status === 400) this.showDialog();
-  //     }
-  //   });
-  // }
+        let quickPackName = `${customerName} QuickPack (${productNames.join(', ')})`;
 
+        if (quickPackName.length > 50) {
+          quickPackName =
+            `${customerName} QuickPack (${productNames[0]} +${productNames.length - 1} more)`;
+        }
 
+        const quickPackPayload = {
+          quick_pack_data: {
+            name: quickPackName,
+            customer_id: payload.sale_order.customer?.customer_id,
+            description: `QuickPack created from Sale Order ${parentOrder.order_no}`,
+            active: 'Y',
+            lot_qty: payload.sale_order_items.reduce((s, i) => s + (i.quantity || 0), 0)
+          },
+          quick_pack_data_items: payload.sale_order_items.map(i => ({
+            product_id: i.product?.product_id,
+            quantity: i.quantity,
+            unit_options_id: i.unit_options?.unit_options_id,
+            size_id: i.size?.size_id,
+            color_id: i.color?.color_id
+          }))
+        };
+
+        this.http.post('sales/quick_pack/', quickPackPayload).subscribe();
+      }
+
+      /* -------------------------------------------------
+        SEND WHATSAPP
+      -------------------------------------------------- */
+      this.sendSaleOrderWhatsapp(parentOrderId);
+
+      /* -------------------------------------------------
+        CREATE CHILD SALE ORDERS
+      -------------------------------------------------- */
+      if (shouldCreateChildOrders) {
+
+        let counter = 1;
+
+        const childRequests = childItems.map(item => {
+
+          const childOrderNo = `${parentOrder.order_no}-P${counter++}`;
+
+          const childPayload = {
+            sale_order: {
+              ...parentOrder,
+              sale_order_id: undefined,
+              order_no: childOrderNo,
+              flow_status: { flow_status_name: 'Production' },
+              item_value: item.amount,
+              total_amount: item.amount,
+              tax_amount: (item.amount * (Number(item.product?.gst_input) || 0)) / 100,
+              dis_amt: 0,
+              cess_amount: 0,
+              order_type: parentOrder.order_type || 'sale_order'
+            },
+            sale_order_items: [{
+              ...item,
+              available_qty: 0,
+              mrp: item.rate
+            }],
+            order_attachments: payload.order_attachments,
+            order_shipments: payload.order_shipments,
+            custom_field_values: customFieldsPayload.custom_field_values
+          };
+
+          return this.http.post<any>('sales/sale_order/', childPayload).pipe(
+            switchMap(childRes => {
+
+              const childOrderId = childRes.data.sale_order.sale_order_id;
+
+              const workOrderPayload = {
+                work_order: {
+                  product_id: item.product_id,
+                  quantity: item.production_qty,
+                  completed_qty: 0,
+                  ordered_qty: item.production_qty,
+                  available_qty: 0,
+                  pending_qty: item.production_qty,
+                  start_date: parentOrder.order_date,
+                  sync_qty: true,
+                  size_id: item.size?.size_id || null,
+                  color_id: item.color?.color_id || null,
+                  status_id: '',
+                  sale_order_id: childOrderId
+                },
+                bom: [{
+                  product_id: item.product_id,
+                  size_id: item.size?.size_id || null,
+                  color_id: item.color?.color_id || null
+                }],
+                work_order_machines: [],
+                workers: [],
+                work_order_stages: []
+              };
+
+              return this.http.post('production/work_order/', workOrderPayload);
+            })
+          );
+
+        });
+
+        forkJoin(childRequests).subscribe();
+      }
+
+      /* -------------------------------------------------
+        SUCCESS
+      -------------------------------------------------- */
+      this.clearDraft();
+      this.showSuccessToast = true;
+      this.toastMessage = 'Sale Order created successfully';
+
+      setTimeout(() => {
+        this.showSuccessToast = false;
+      }, 3000);
+
+      this.ngOnInit();
+    },
+
+    error: err => {
+
+      if (err.status === 403 && err.error?.data?.credit_limit_exceeded) {
+        this.pendingCreditLimitPayload = null;
+        this.showCreditLimitModal(err.error.data);
+        return;
+      }
+
+      if (err.status === 400) {
+        this.showDialog();
+      }
+    }
+  });
+}
 
   closeToast() {
     this.showSuccessToast = false;
@@ -3407,71 +3299,77 @@ export class SalesComponent {
   // }
 
   async autoFillProductDetails(field, data) {
-    if (!field.form?.controls || !data) return;
+  if (!field.form?.controls || !data) return;
 
-    const parentArray = field.parent;
-    const currentRowIndex = +parentArray?.key;
+  const parentArray = field.parent;
+  const currentRowIndex = +parentArray?.key;
 
-    const customerCategory =
-      this.formConfig.model?.sale_order?.customer?.customer_category?.name?.toLowerCase();
+  const customerCategory =
+    this.formConfig.model?.sale_order?.customer?.customer_category?.name?.toLowerCase();
 
-    // ---------------- RATE LOGIC ----------------
-    const currentRowRate =
-      this.formConfig.model?.sale_order_items?.[currentRowIndex]?.rate;
+  // ---------------- RATE LOGIC ----------------
+  const currentRowRate =
+    this.formConfig.model?.sale_order_items?.[currentRowIndex]?.rate;
 
-    let selectedRate = data.sales_rate;
+  let selectedRate = data.sales_rate;
 
-    if (!currentRowRate || currentRowRate === 0) {
-      if (customerCategory === 'wholesalers') {
-        selectedRate = data.wholesale_rate ?? data.sales_rate;
-      } else if (customerCategory === 'retail') {
-        selectedRate = data.sales_rate;
-      } else if (['e-commerce partners', 'distributors'].includes(customerCategory)) {
-        selectedRate = data.dealer_rate ?? data.sales_rate;
-      }
-    } else {
-      selectedRate = currentRowRate;
+  if (!currentRowRate || currentRowRate === 0) {
+    if (customerCategory === 'wholesalers') {
+      selectedRate = data.wholesale_rate ?? data.sales_rate;
+    } else if (customerCategory === 'retail') {
+      selectedRate = data.sales_rate;
+    } else if (['e-commerce partners', 'distributors'].includes(customerCategory)) {
+      selectedRate = data.dealer_rate ?? data.sales_rate;
     }
-
-    // ---------------- AVAILABLE QTY SOURCE ----------------
-    let availableQty = 0;
-
-    if (!this.SaleOrderEditID) {
-      // CREATE MODE → from product master
-      availableQty = Number(data.balance ?? 0);
-    } else {
-      // EDIT MODE → from sale_order_items
-      availableQty = Number(
-        this.formConfig.model?.sale_order_items?.[currentRowIndex]?.available_qty ?? 0
-      );
-    }
-
-    // ---------------- SET VALUES ----------------
-    const fieldMappings = {
-      code: data.code,
-      rate: selectedRate,
-      discount: !isNaN(Number(data.discount)) ? Number(data.discount) : 0,
-      unit_options_id: data.unit_options?.unit_options_id,
-      stock_unit_id: data.stock_unit?.stock_unit_id,       // required field
-      print_name: data.print_name,
-      mrp: data.mrp,
-      available_qty: availableQty
-    };
-
-    Object.entries(fieldMappings).forEach(([key, value]) => {
-      if (value !== undefined) {
-        field.form.controls[key]?.setValue(value);
-      }
-    });
-
-    // ---------------- PRODUCTION QTY CALC ----------------
-    const quantity = Number(field.form.controls.quantity?.value || 0);
-    const productionQty = Math.max(0, quantity - availableQty);
-
-    field.form.controls.production_qty?.setValue(productionQty);
-
-    this.totalAmountCal();
+  } else {
+    selectedRate = currentRowRate;
   }
+
+  // ---------------- AVAILABLE QTY SOURCE ----------------
+  let availableQty = 0;
+
+  if (!this.SaleOrderEditID) {
+    // CREATE MODE → from product master
+    availableQty = Number(data.balance ?? 0);
+  } else {
+    // EDIT MODE → from sale_order_items
+    availableQty = Number(
+      this.formConfig.model?.sale_order_items?.[currentRowIndex]?.available_qty ?? 0
+    );
+  }
+
+  // ---------------- SET VALUES ----------------
+  const fieldMappings = {
+    code: data.code,
+    rate: selectedRate,
+    // discount: !isNaN(Number(data.discount)) ? Number(data.discount) : 0,
+    // ✅ Only map discount in CREATE mode
+    discount: !this.SaleOrderEditID
+      ? (!isNaN(Number(data.discount)) ? Number(data.discount) : 0)
+      : field.form.controls.discount?.value,
+
+    unit_options_id: data.unit_options?.unit_options_id,
+    stock_unit_id: data.stock_unit?.stock_unit_id,       // required field
+    print_name: data.print_name,
+    mrp: data.mrp,
+    available_qty: availableQty,
+    tax: data.gst_input
+  };
+
+  Object.entries(fieldMappings).forEach(([key, value]) => {
+    if (value !== undefined) {
+      field.form.controls[key]?.setValue(value);
+    }
+  });
+
+  // ---------------- PRODUCTION QTY CALC ----------------
+  const quantity = Number(field.form.controls.quantity?.value || 0);
+  const productionQty = Math.max(0, quantity - availableQty);
+
+  field.form.controls.production_qty?.setValue(productionQty);
+
+  this.totalAmountCal();
+}
 
 
 
@@ -4888,21 +4786,23 @@ export class SalesComponent {
                   templateOptions: {
                     label: 'Tax',
                     required: false,
-                    disabled: false,
                     options: [
-                      { 'label': "Inclusive", value: 'Inclusive' },
-                      { 'label': "Exclusive", value: 'Exclusive' }
-
+                      { label: "Inclusive", value: 'Inclusive' },
+                      { label: "Exclusive", value: 'Exclusive' }
                     ]
                   },
                   hooks: {
                     onInit: (field: any) => {
-                      if (this.dataToPopulate && this.dataToPopulate.sale_order.tax && field.formControl) {
+                      if (this.dataToPopulate?.sale_order?.tax) {
                         field.formControl.setValue(this.dataToPopulate.sale_order.tax);
                       } else {
-                        // Set default value to 'Exclusive'
                         field.formControl.setValue('Exclusive');
                       }
+
+                      // 🔥 Recalculate when tax type changes
+                      field.formControl.valueChanges.subscribe(() => {
+                        this.totalAmountCal();
+                      });
                     }
                   }
                 },
@@ -4939,97 +4839,173 @@ export class SalesComponent {
                       lazyOneTime: true
                     }
                   },
-                  expressionProperties: {
-                    'templateOptions.disabled': (model: any) => {
-                      const statusName = model?.sale_order?.flow_status?.flow_status_name;
-                      if (!statusName) return false;
-                      const workflowControlledStages = [
-                        'Production', 'Dispatch', 'Ready for Invoice',
-                        'Delivery In progress', 'Partially Delivered', 'Completed'
-                      ];
-                      return workflowControlledStages.includes(statusName);
-                    }
-                  },
                   hooks: {
                     onChanges: (field: any) => {
+
                       field.formControl.valueChanges.subscribe(data => {
                         if (data && data.flow_status_id) {
                           this.formConfig.model['sale_order']['flow_status_id'] = data.flow_status_id;
-                          // Persist the full selected object so flow_status_name is always current
-                          this.formConfig.model['sale_order']['flow_status'] = data;
                         }
                       });
 
-                      const valueChangesSubscription = field.formControl.valueChanges.subscribe(data => {
+                      field.formControl.valueChanges.subscribe(data => {
+
+                        if (!data || data.flow_status_name !== 'Ready for Invoice') return;
+
                         const saleOrder = this.formConfig.model['sale_order'];
-                        const saleOrderItems = this.formConfig.model['sale_order_items'];
+                        const saleOrderItems = this.formConfig.model['sale_order_items'] || [];
                         const orderAttachments = this.formConfig.model['order_attachments'];
                         const orderShipments = this.formConfig.model['order_shipments'];
-                        console.log("starting toal_amount : ", saleOrder.total_amount);
+
                         const saleTypeObj = saleOrder.sale_type;
                         const saleTypeName = saleTypeObj?.name || '';
+
                         const billType = (saleTypeName === 'Other') ? 'OTHERS' : 'CASH';
                         const invoicePrefix = (saleTypeName === 'Other') ? 'SOO-INV' : 'SO-INV';
 
                         this.http.get(`masters/generate_order_no/?type=${invoicePrefix}`).subscribe((res: any) => {
+
                           if (res?.data?.order_number) {
+
                             this.invoiceNumber = res.data.order_number;
 
-                            //  Fetch order_status_id by status_name = "Completed"
                             this.http.get('masters/order_status/?status_name=Pending').subscribe((statusRes: any) => {
+
                               const completedStatus = statusRes?.data?.[0];
                               const completedStatusId = completedStatus?.order_status_id;
-                              console.log("Second time toal_amount : ", saleOrder.total_amount);
 
-                              //  Inline total calculation
-                              let itemValue = 0;
+                              let itemValueTotal = 0;
+                              let discountTotal = 0;
+                              let taxableTotal = 0;
+                              let taxTotal = 0;
                               let amountTotal = 0;
 
-                              if (Array.isArray(saleOrderItems)) {
-                                saleOrderItems.forEach(item => {
-                                  const quantity = Number(item.quantity) || 0;
-                                  const rate = Number(item.rate) || 0;
-                                  const discountPercent = Number(item.discount) || 0;
-                                  console.log("discountPercent : ", discountPercent)
-                                  const itemVal = quantity * rate;
-                                  const itemDiscount = (itemVal * discountPercent) / 100;
-                                  const amount = itemVal - itemDiscount;
-                                  console.log("amount : ", amount)
+                              let totalOrderQty = 0;
+                              let invoiceQty = 0;
 
-                                  item.amount = amount;
+                              /* -------------------------
+                                ITEM CALCULATION
+                              ------------------------- */
 
-                                  itemValue += itemVal;
-                                  amountTotal += amount;
-                                });
+                              saleOrderItems.forEach(item => {
+
+                                const quantity = Number(item.quantity) || 0;
+                                const rate = Number(item.rate) || 0;
+                                const discountPercent = Number(item.discount) || 0;
+                                const taxPercent = Number(item.tax) || 0;
+                                const productionQty = Number(item.production_qty) || 0;
+
+                                const invoiceItemQty = quantity - productionQty;
+
+                                const itemValue = quantity * rate;
+
+                                const discountAmount =
+                                  (itemValue * discountPercent) / 100;
+
+                                const amountAfterDiscount =
+                                  itemValue - discountAmount;
+
+                                const taxAmount =
+                                  (amountAfterDiscount * taxPercent) / 100;
+
+                                const totalAmount =
+                                  amountAfterDiscount + taxAmount;
+
+                                /* Save values to item */
+
+                                item.item_value = itemValue;
+                                item.discount_amount = discountAmount;
+                                item.amount = amountAfterDiscount;
+                                item.tax_amount = taxAmount;
+                                item.total = totalAmount;
+
+                                /* GST Split */
+
+                                const address =
+                                  saleOrder.billing_address || saleOrder.shipping_address || '';
+
+                                const isIntraState =
+                                  address.toLowerCase().includes('andhra pradesh');
+
+                                if (isIntraState) {
+                                  item.cgst = taxAmount / 2;
+                                  item.sgst = taxAmount / 2;
+                                  item.igst = 0;
+                                } else {
+                                  item.igst = taxAmount;
+                                  item.cgst = 0;
+                                  item.sgst = 0;
+                                }
+
+                                /* Totals */
+
+                                itemValueTotal += itemValue;
+                                discountTotal += discountAmount;
+                                taxableTotal += amountAfterDiscount;
+                                taxTotal += taxAmount;
+                                amountTotal += totalAmount;
+
+                                totalOrderQty += quantity;
+                                invoiceQty += invoiceItemQty;
+                              });
+
+                              /* -------------------------
+                                SHIPPING DISTRIBUTION
+                              ------------------------- */
+
+                              const totalShipping =
+                                Number(saleOrder.shipping_charges || 0);
+
+                              const shippingGSTPercent =
+                                Number(saleOrder.shipping_gst || 0);
+
+                              let shippingForInvoice = 0;
+
+                              if (totalOrderQty > 0) {
+                                shippingForInvoice =
+                                  (invoiceQty / totalOrderQty) * totalShipping;
                               }
 
-                              const totalTax = saleOrderItems.reduce((sum, item) => {
-                                const cgst = Number(item.cgst) || 0;
-                                const igst = Number(item.igst) || 0;
-                                const sgst = Number(item.sgst) || 0;
-                                return sum + cgst + igst + sgst;
-                              }, 0);
+                              const shippingTax =
+                                (shippingForInvoice * shippingGSTPercent) / 100;
 
-                              console.log("Third time toal_amount : ", saleOrder.total_amount);
+                              const finalShipping =
+                                shippingForInvoice + shippingTax;
 
-                              const cessAmount = Number(saleOrder.cess_amount) || 0;
-                              const disAmt = Number(saleOrder.dis_amt) || 0;
-                              console.log("disAmt : ", disAmt)
+                              /* -------------------------
+                                OTHER AMOUNTS
+                              ------------------------- */
 
-                              const totalAmount = amountTotal + totalTax;
-                              saleOrder.dis_amt = disAmt;
+                              const cessAmount =
+                                Number(saleOrder.cess_amount) || 0;
 
-                              const dis_amt = Number(saleOrder.dis_amt) || 0;
-                              const cess_amount = Number(saleOrder.cess_amount) || 0;
-                              const final_total_amount = totalAmount - dis_amt + cess_amount;
-                              console.log("Cess amount : ", saleOrder.cess_amount)
-                              console.log("discount amount : ", saleOrder.dis_amt)
-                              console.log("Total amount : ", saleOrder.total_amount)
-                              saleOrder.total_amount = final_total_amount
+                              const advanceAmount =
+                                Number(saleOrder.advance_amount) || 0;
+
+                              const roundOff =
+                                Number(saleOrder.round_off) || 0;
+
+                              const finalTotal =
+                                taxableTotal +
+                                taxTotal +
+                                finalShipping +
+                                cessAmount -
+                                advanceAmount +
+                                roundOff;
+
+                              saleOrder.item_value = itemValueTotal.toFixed(2);
+                              saleOrder.taxable = taxableTotal.toFixed(2);
+                              saleOrder.tax_amount = taxTotal.toFixed(2);
+                              saleOrder.transport_charges = finalShipping.toFixed(2);
+                              saleOrder.total_amount = finalTotal.toFixed(2);
+
+                              /* -------------------------
+                                INVOICE PAYLOAD
+                              ------------------------- */
 
                               this.invoiceData = {
+
                                 sale_invoice_order: {
-                                  // invoice_no: this.invoiceNumber,
                                   bill_type: billType,
                                   invoice_date: this.nowDate(),
                                   email: saleOrder.email,
@@ -5039,13 +5015,12 @@ export class SalesComponent {
                                   tax: saleOrder.tax || 'Inclusive',
                                   remarks: saleOrder.remarks,
                                   advance_amount: saleOrder.advance_amount || '0',
-                                  tax_amount: saleOrder.tax_amount || '0',
-                                  item_value: saleOrder.item_value,
-                                  discount: saleOrder.discount,
-                                  dis_amt: saleOrder.dis_amt,
-                                  taxable: saleOrder.taxable,
+                                  tax_amount: taxTotal.toFixed(2),
+                                  item_value: itemValueTotal.toFixed(2),
+                                  discount: discountTotal.toFixed(2),
+                                  taxable: taxableTotal.toFixed(2),
                                   cess_amount: saleOrder.cess_amount,
-                                  transport_charges: saleOrder.transport_charges,
+                                  transport_charges: finalShipping.toFixed(2),
                                   round_off: saleOrder.round_off,
                                   total_amount: saleOrder.total_amount,
                                   vehicle_name: saleOrder.vehicle_name,
@@ -5064,26 +5039,35 @@ export class SalesComponent {
                                   order_status_id: completedStatusId,
                                   sale_order: saleOrder.sale_order,
                                   sale_order_id: saleOrder.sale_order_id,
-                                  ...(billType == 'OTHERS' && { invoice_no: this.invoiceNumber })
+                                  ...(billType == 'OTHERS' && {
+                                    invoice_no: this.invoiceNumber
+                                  })
                                 },
-                                // sale_invoice_items: saleOrderItems,
+
                                 sale_invoice_items: saleOrderItems
-                                  .filter(item => item.product_id)   // only keep valid rows
+                                  .filter(item => item.product_id)
                                   .map(item => ({
                                     ...item,
-                                    quantity: Number(item.quantity || 0) - Number(item.production_qty || 0),
-                                    discount: item.discount
+                                    quantity:
+                                      Number(item.quantity || 0) -
+                                      Number(item.production_qty || 0),
+                                    discount: item.discount || '0',
                                   })),
+
                                 order_attachments: orderAttachments,
                                 order_shipments: orderShipments
                               };
-                              console.log("final toal_amount : ", saleOrder.total_amount);
-                              console.log('invoiceData:', this.invoiceData);
-                              console.log("invoiceData toal_amount : ", this.invoiceData.sale_invoice_order.total_amount);
+
+                              console.log('Perfect ERP Invoice Data:', this.invoiceData);
+
                             });
+
                           }
+
                         });
+
                       });
+
                     }
                   }
                 },
@@ -5183,6 +5167,17 @@ export class SalesComponent {
 
                 },
                 {
+                  key: 'shipping_charges',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Shipping Charges',
+                    required: false,
+                    disabled: true
+                  },
+                  defaultValue: '0.00',
+                },
+                {
                   key: 'cgst',
                   type: 'text',
                   className: 'col-12',
@@ -5192,19 +5187,27 @@ export class SalesComponent {
                   },
                   defaultValue: '0.00',
                   expressionProperties: {
-                    'model.cgst': (model, field) => {
-                      if (!field._lastValue || field._lastValue !== model.tax_amount) {
-                        const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
-                        field._lastValue = model.tax_amount; // Store last value to avoid infinite logs
-                      }
-                      return model.billing_address?.includes('Andhra Pradesh')
-                        ? (parseFloat(model.tax_amount) / 2).toFixed(2)
+                    'model.cgst': (model) => {
+                      const address = model.billing_address || model.shipping_address || '';
+
+                      const isIntraState =
+                        address === '' || address.toLowerCase().includes('andhra pradesh');
+
+                      const taxAmount = parseFloat(model.tax_amount || 0);
+
+                      return isIntraState
+                        ? (taxAmount / 2).toFixed(2)
                         : '0.00';
-                    },
-                    'templateOptions.disabled': 'true' // Make it read-only
+                    }
                   },
-                  hideExpression: (model) => !model.billing_address || !model.billing_address?.includes('Andhra Pradesh') // Hide CGST for inter-state
-                },
+                  hideExpression: (model) => {
+                    const address = model.billing_address || model.shipping_address || '';
+                    const isIntraState =
+                      address === '' || address.toLowerCase().includes('andhra pradesh');
+
+                    return !isIntraState;
+                  }
+                  },
                 {
                   key: 'sgst',
                   type: 'text',
@@ -5215,20 +5218,28 @@ export class SalesComponent {
                   },
                   defaultValue: '0.00',
                   expressionProperties: {
-                    'model.sgst': (model, field) => {
-                      if (!field._lastValue || field._lastValue !== model.tax_amount) {
-                        const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
-                        field._lastValue = model.tax_amount;
-                      }
-                      return model.billing_address?.includes('Andhra Pradesh')
-                        ? (parseFloat(model.tax_amount) / 2).toFixed(2)
+                    'model.sgst': (model) => {
+                      const address = model.billing_address || model.shipping_address || '';
+
+                      const isIntraState =
+                        address === '' || address.toLowerCase().includes('andhra pradesh');
+
+                      const taxAmount = parseFloat(model.tax_amount || 0);
+
+                      return isIntraState
+                        ? (taxAmount / 2).toFixed(2)
                         : '0.00';
-                    },
-                    'templateOptions.disabled': 'true' // Make it read-only
+                    }
                   },
-                  hideExpression: (model) => !model.billing_address || !model.billing_address?.includes('Andhra Pradesh') // Hide CGST for inter-state
+                  hideExpression: (model) => {
+                    const address = model.billing_address || model.shipping_address || '';
+                    const isIntraState =
+                      address === '' || address.toLowerCase().includes('andhra pradesh');
+
+                    return !isIntraState;
+                  }
                 },
-                {
+                                {
                   key: 'igst',
                   type: 'text',
                   className: 'col-12',
@@ -5238,18 +5249,26 @@ export class SalesComponent {
                   },
                   defaultValue: '0.00',
                   expressionProperties: {
-                    'model.igst': (model, field) => {
-                      if (!field._lastValue || field._lastValue !== model.tax_amount) {
-                        const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
-                        field._lastValue = model.tax_amount;
-                      }
-                      return !model.billing_address?.includes('Andhra Pradesh')
-                        ? parseFloat(model.tax_amount).toFixed(2)
+                    'model.igst': (model) => {
+                      const address = model.billing_address || model.shipping_address || '';
+
+                      const isIntraState =
+                        address === '' || address.toLowerCase().includes('andhra pradesh');
+
+                      const taxAmount = parseFloat(model.tax_amount || 0);
+
+                      return !isIntraState
+                        ? taxAmount.toFixed(2)
                         : '0.00';
-                    },
-                    'templateOptions.disabled': 'true' // Make it read-only
+                    }
                   },
-                  hideExpression: (model) => !model.billing_address || model.billing_address?.includes('Andhra Pradesh') // Hide if intra-state
+                  hideExpression: (model) => {
+                    const address = model.billing_address || model.shipping_address || '';
+                    const isIntraState =
+                      address === '' || address.toLowerCase().includes('andhra pradesh');
+
+                    return isIntraState;
+                  },
                 },
                 {
                   key: 'advance_amount',
@@ -5826,11 +5845,70 @@ export class SalesComponent {
                   disabled: true
                 }
               },
+              // {
+              //   type: 'input',
+              //   key: 'quantity',
+              //   templateOptions: {
+              //     type: 'number',
+              //     label: 'Qty',
+              //     placeholder: 'Qty',
+              //     min: 1,
+              //     hideLabel: true,
+              //     required: false
+              //   },
+              //   hooks: {
+              //     onInit: (field: any) => {
+              //       const parentArray = field.parent;
+
+              //       if (parentArray) {
+              //         const currentRowIndex = +parentArray.key;
+
+              //         if (
+              //           this.dataToPopulate &&
+              //           this.dataToPopulate.sale_order_items.length > currentRowIndex
+              //         ) {
+              //           const existingQuan =
+              //             this.dataToPopulate.sale_order_items[currentRowIndex].quantity;
+
+              //           if (existingQuan) {
+              //             field.formControl.setValue(existingQuan);
+              //           }
+              //         }
+              //       }
+
+              //       // 🔥 Quantity change logic
+              //       field.formControl.valueChanges.subscribe(quantity => {
+
+              //         if (!field.form || !field.form.controls) return;
+
+              //         const rate = Number(field.form.controls.rate?.value || 0);
+              //         const discount = Number(field.form.controls.discount?.value || 0);
+              //         const availableQty = Number(field.form.controls.available_qty?.value || 0);
+
+              //         const qty = Number(quantity || 0);
+
+              //         // ---------------- Amount calculation (existing)
+              //         const productDiscount = rate * qty * discount / 100;
+              //         if (rate && qty) {
+              //           field.form.controls.amount?.setValue(
+              //             rate * qty - productDiscount
+              //           );
+              //         }
+
+              //         // ---------------- ✅ Production Qty calculation (NEW)
+              //         const productionQty = Math.max(0, qty - availableQty);
+              //         field.form.controls.production_qty?.setValue(productionQty);
+              //         this.triggerDraftSave(); // Auto-save draft on quantity change
+              //       });
+              //     }
+              //   }
+              // },
               {
                 type: 'input',
                 key: 'quantity',
                 templateOptions: {
                   type: 'number',
+                  step: 0.01,
                   label: 'Qty',
                   placeholder: 'Qty',
                   min: 1,
@@ -5857,7 +5935,6 @@ export class SalesComponent {
                       }
                     }
 
-                    // 🔥 Quantity change logic
                     field.formControl.valueChanges.subscribe(quantity => {
 
                       if (!field.form || !field.form.controls) return;
@@ -5868,7 +5945,7 @@ export class SalesComponent {
 
                       const qty = Number(quantity || 0);
 
-                      // ---------------- Amount calculation (existing)
+                      // Existing Amount Logic (KEEP)
                       const productDiscount = rate * qty * discount / 100;
                       if (rate && qty) {
                         field.form.controls.amount?.setValue(
@@ -5876,10 +5953,12 @@ export class SalesComponent {
                         );
                       }
 
-                      // ---------------- ✅ Production Qty calculation (NEW)
+                      // Production Qty Logic
                       const productionQty = Math.max(0, qty - availableQty);
                       field.form.controls.production_qty?.setValue(productionQty);
-                      this.triggerDraftSave(); // Auto-save draft on quantity change
+
+                      this.totalAmountCal();
+                      this.triggerDraftSave();
                     });
                   }
                 }
@@ -5898,6 +5977,48 @@ export class SalesComponent {
                   'model.production_qty': 'model.production_qty'
                 }
               },
+              // {
+              //   type: 'input',
+              //   key: 'rate',
+              //   templateOptions: {
+              //     type: 'number',
+              //     label: 'Rate',
+              //     placeholder: 'Enter Rate',
+              //     hideLabel: true,
+              //   },
+              //   hooks: {
+              //     onInit: (field: any) => {
+              //       const parentArray = field.parent;
+
+              //       // Check if parentArray exists and proceed
+              //       if (parentArray) {
+              //         const currentRowIndex = +parentArray.key; // Simplified number conversion
+
+              //         // Check if there is a product already selected in this row (when data is copied)
+              //         if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
+              //           const existingPrice = this.dataToPopulate.sale_order_items[currentRowIndex].rate;
+
+              //           // Set the full product object instead of just the product_id
+              //           if (existingPrice) {
+              //             field.formControl.setValue(existingPrice); // Set full product object (not just product_id)
+              //           }
+              //         }
+              //       }
+
+              //       // Subscribe to value changes to update amount
+              //       field.formControl.valueChanges.subscribe(data => {
+              //         if (field.form && field.form.controls && field.form.controls.quantity && data) {
+              //           const quantity = field.form.controls.quantity.value;
+              //           const rate = data;
+              //           if (rate && quantity) {
+              //             field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity));
+              //           }
+              //         }
+              //         this.triggerDraftSave(); // Auto-save draft on rate change
+              //       });
+              //     }
+              //   }
+              // },
               {
                 type: 'input',
                 key: 'rate',
@@ -5935,7 +6056,81 @@ export class SalesComponent {
                           field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity));
                         }
                       }
+                      this.totalAmountCal();
                       this.triggerDraftSave(); // Auto-save draft on rate change
+                    });
+                  }
+                }
+              },
+              {
+                type: 'select',
+                key: 'discount_type',
+                templateOptions: {
+                  placeholder: 'Type',
+                  label: 'Discount Type',
+                  hideLabel: true,
+                  options: [
+                    { label: '%', value: 'percentage' },
+                    { label: '₹', value: 'amount' }
+                  ]
+                },
+                defaultValue: 'percentage',
+                hooks: {
+                  onInit: (field: any) => {
+                    field.formControl.valueChanges.subscribe(type => {
+                      if (!field.form?.controls) return;
+
+                      if (type === 'percentage') {
+                        field.form.controls.discount_amount?.setValue(0, { emitEvent: false });
+                      } else {
+                        field.form.controls.discount?.setValue(0, { emitEvent: false });
+                      }
+
+                      this.totalAmountCal();
+                    });
+                  }
+                }
+              },
+              {
+                type: 'input',
+                key: 'discount_amount',
+                templateOptions: {
+                  type: 'number',
+                  step: 0.01,
+                  placeholder: 'Disc ₹',
+                  label: 'Disc ₹',
+                  hideLabel: true,
+                },
+                expressionProperties: {
+                  'templateOptions.disabled': (model: any) => {
+                    return model.discount_type === 'percentage';
+                  }
+                },
+                hooks: {
+                  onInit: (field: any) => {
+                    field.formControl.valueChanges.subscribe(value => {
+
+                      if (!field.form?.controls) return;
+                      if (field.model.discount_type === 'percentage') return;
+
+                      const rate = Number(field.form.controls.rate?.value || 0);
+                      const qty = Number(field.form.controls.quantity?.value || 0);
+                      const total = rate * qty;
+
+                      if (total > 0) {
+                        let amount = Number(value || 0);
+
+                        if (amount > total) amount = total;
+
+                        const percent = (amount / total) * 100;
+
+                        field.form.controls.discount?.setValue(
+                          Number(percent.toFixed(2)),
+                          { emitEvent: false }
+                        );
+                      }
+
+                      this.totalAmountCal();
                     });
                   }
                 }
@@ -5945,41 +6140,100 @@ export class SalesComponent {
                 key: 'discount',
                 templateOptions: {
                   type: 'number',
-                  placeholder: 'Enter Disc',
-                  label: 'Discount (%)',
+                  step: 0.01,
+                  placeholder: 'Disc %',
+                  label: 'Disc %',
                   hideLabel: true,
+                },
+                expressionProperties: {
+                  'templateOptions.disabled': (model: any) => {
+                    return model.discount_type === 'amount';
+                  }
                 },
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
 
-                    // Check if parentArray exists and proceed
                     if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+                      const currentRowIndex = +parentArray.key;
 
-                      if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
-                        const existingDisc = this.dataToPopulate.sale_order_items[currentRowIndex].discount;
-                        console.log("existingDisc : ", existingDisc)
-                        // Just update this condition to include zeroes
-                        if (existingDisc) {
+                      if (
+                        this.dataToPopulate &&
+                        this.dataToPopulate.sale_order_items.length > currentRowIndex
+                      ) {
+                        const existingDisc =
+                          this.dataToPopulate.sale_order_items[currentRowIndex].discount;
+
+                        if (existingDisc !== null && existingDisc !== undefined) {
                           field.formControl.setValue(existingDisc);
                         }
                       }
                     }
 
-                    // Subscribe to discount value changes
-                    field.formControl.valueChanges.subscribe(discount => {
+                    field.formControl.valueChanges.subscribe(value => {
+
+                      if (!field.form?.controls) return;
+                      if (field.model.discount_type === 'amount') return;
+
+                      const rate = Number(field.form.controls.rate?.value || 0);
+                      const qty = Number(field.form.controls.quantity?.value || 0);
+                      const total = rate * qty;
+
+                      if (total > 0) {
+                        const percent = Number(value || 0);
+                        const discountAmount = (percent / 100) * total;
+
+                        field.form.controls.discount_amount?.setValue(
+                          Number(discountAmount.toFixed(2)),
+                          { emitEvent: false }
+                        );
+                      }
+
                       this.totalAmountCal();
-                      // Your original amount-calculation logic remains commented and untouched
                     });
                   }
                 }
               },
+              // {
+              //   type: 'input',
+              //   key: 'amount',
+              //   templateOptions: {
+              //     type: 'number',
+              //     label: 'Amount',
+              //     placeholder: 'Amount',
+              //     hideLabel: true,
+              //     disabled: true
+              //   },
+              //   hooks: {
+              //     onInit: (field: any) => {
+              //       const parentArray = field.parent;
+
+              //       // Check if parentArray exists and proceed
+              //       if (parentArray) {
+              //         const currentRowIndex = +parentArray.key; // Simplified number conversion
+
+              //         // Check if there is a product already selected in this row (when data is copied)
+              //         if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
+              //           const existingAmount = this.dataToPopulate.sale_order_items[currentRowIndex].amount;
+
+              //           // Set the full product object instead of just the product_id
+              //           if (existingAmount) {
+              //             field.formControl.setValue(existingAmount); // Set full product object (not just product_id)
+              //           }
+              //         }
+              //       }
+              //       field.formControl.valueChanges.subscribe(data => {
+              //         this.totalAmountCal();
+              //       });
+              //     }
+              //   }
+              // },
               {
                 type: 'input',
                 key: 'amount',
                 templateOptions: {
                   type: 'number',
+                  step: 0.01,
                   label: 'Amount',
                   placeholder: 'Amount',
                   hideLabel: true,
@@ -5989,21 +6243,19 @@ export class SalesComponent {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
 
-                    // Check if parentArray exists and proceed
                     if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+                      const currentRowIndex = +parentArray.key;
 
-                      // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
                         const existingAmount = this.dataToPopulate.sale_order_items[currentRowIndex].amount;
 
-                        // Set the full product object instead of just the product_id
                         if (existingAmount) {
-                          field.formControl.setValue(existingAmount); // Set full product object (not just product_id)
+                          field.formControl.setValue(existingAmount);
                         }
                       }
                     }
-                    field.formControl.valueChanges.subscribe(data => {
+
+                    field.formControl.valueChanges.subscribe(() => {
                       this.totalAmountCal();
                     });
                   }
@@ -6024,25 +6276,57 @@ export class SalesComponent {
                 key: 'tax',
                 templateOptions: {
                   type: "number",
+                  step: 0.01,
                   label: 'Tax',
                   placeholder: 'Tax',
-                  hideLabel: true
+                  hideLabel: false
+                },
+                expressionProperties: {
+                  'templateOptions.label': (model: any, formState: any, field: any) => {
+
+                    const rate = Number(field?.form?.controls?.rate?.value || 0);
+                    const qty = Number(field?.form?.controls?.quantity?.value || 0);
+
+                    const discountPercent = Number(field?.form?.controls?.discount?.value || 0);
+                    const discountAmountField = Number(field?.form?.controls?.discount_amount?.value || 0);
+
+                    const taxPercent = Number(model?.tax || 0);
+
+                    const grossAmount = rate * qty;
+
+                    // ERP priority
+                    const discountAmount =
+                      model.discount_type === 'amount'
+                        ? discountAmountField
+                        : (grossAmount * discountPercent) / 100;
+
+                    const taxableAmount = grossAmount - discountAmount;
+
+                    const taxAmount = (taxableAmount * taxPercent) / 100;
+
+                    if (taxPercent > 0) {
+                      return `(${taxPercent}% | ₹${taxAmount.toFixed(2)})`;
+                    }
+
+                    return '';
+                  }
                 },
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
 
-                    // Check if parentArray exists and proceed
                     if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+                      const currentRowIndex = +parentArray.key;
 
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
-                        const existingtax = this.dataToPopulate.sale_order_items[currentRowIndex].tax;
+                      if (
+                        this.dataToPopulate &&
+                        this.dataToPopulate.sale_order_items.length > currentRowIndex
+                      ) {
+                        const existingtax =
+                          this.dataToPopulate.sale_order_items[currentRowIndex].tax;
 
-                        // Set the full product object instead of just the product_id
-                        if (existingtax) {
-                          field.formControl.setValue(existingtax); // Set full product object (not just product_id)
+                        if (existingtax || existingtax === 0) {
+                          field.formControl.setValue(existingtax);
                         }
                       }
                     }
@@ -6720,18 +7004,91 @@ export class SalesComponent {
                     {
                       key: 'shipping_charges',
                       type: 'input',
+                      defaultValue: "0",
                       className: 'col-lg-3 col-md-4 col-sm-6 col-12',
                       templateOptions: {
                         type: "number",
-                        label: 'Shipping Charges.',
+                        label: 'Shipping Charges',
                         placeholder: 'Enter Shipping Charges',
-                        // required: true
                       },
                       hooks: {
                         onInit: (field: any) => {
-                          if (this.dataToPopulate && this.dataToPopulate.order_shipments.shipping_charges && field.formControl) {
-                            field.formControl.setValue(this.dataToPopulate.order_shipments.shipping_charges);
+
+                          // Ensure model exists
+                          if (!this.formConfig.model.order_shipments) {
+                            this.formConfig.model.order_shipments = {};
                           }
+
+                          // Edit mode value populate
+                          const existingShipping =
+                            this.dataToPopulate?.order_shipments?.shipping_charges ?? 0;
+
+                          if (field.formControl && existingShipping !== undefined) {
+                            field.formControl.setValue(existingShipping, { emitEvent: false });
+                            this.formConfig.model.order_shipments.shipping_charges = parseFloat(existingShipping) || 0;
+                          }
+
+                          // Value change
+                          field.formControl.valueChanges.subscribe((value: any) => {
+
+                            const numeric = parseFloat(value);
+                            const shipping = isNaN(numeric) ? 0 : numeric;
+
+                            field.formControl.setValue(shipping, { emitEvent: false });
+
+                            // Update model
+                            this.formConfig.model.order_shipments.shipping_charges = shipping;
+
+                            console.log("Shipping Charges Changed:", shipping);
+
+                            // Trigger global calculation
+                            this.totalAmountCal();
+                          });
+                        }
+                      }
+                    },
+                    {
+                      key: 'shipping_gst',
+                      type: 'input',
+                      defaultValue: "0",
+                      className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                      templateOptions: {
+                        type: "number",
+                        label: 'Shipping GST (%)',
+                        placeholder: 'Enter Shipping GST',
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+
+                          // Ensure model exists
+                          if (!this.formConfig.model.order_shipments) {
+                            this.formConfig.model.order_shipments = {};
+                          }
+
+                          // Edit mode populate
+                          const existingGST =
+                            this.dataToPopulate?.order_shipments?.shipping_gst ?? 0;
+
+                          if (field.formControl && existingGST !== undefined) {
+                            field.formControl.setValue(existingGST, { emitEvent: false });
+                            this.formConfig.model.order_shipments.shipping_gst = parseFloat(existingGST) || 0;
+                          }
+
+                          field.formControl.valueChanges.subscribe((value: any) => {
+
+                            const numeric = parseFloat(value);
+                            const gst = isNaN(numeric) ? 0 : numeric;
+
+                            field.formControl.setValue(gst, { emitEvent: false });
+
+                            // Update model
+                            this.formConfig.model.order_shipments.shipping_gst = gst;
+
+                            console.log("Shipping GST Changed:", gst);
+
+                            // Trigger global calculation
+                            this.totalAmountCal();
+                          });
                         }
                       }
                     }

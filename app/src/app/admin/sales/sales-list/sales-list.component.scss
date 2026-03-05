@@ -198,3 +198,18 @@
 .form-select {
   min-width: 150px;
 }
+
+.sale-order-list-table {
+  position: relative; /* container for absolute positioning */
+}
+
+.flow-status-container {
+  display: flex;
+  justify-content: flex-end; /* right align */
+  margin-top: 10px;          /* space below table */
+  width: 100%;
+}
+
+.flow-status-container select.form-select {
+  width: 180px;               /* fixed width */
+}
