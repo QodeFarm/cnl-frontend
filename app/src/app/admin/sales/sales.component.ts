@@ -4897,7 +4897,7 @@ createSaleOrder() {
 
                                 const invoiceItemQty = quantity - productionQty;
 
-                                const itemValue = quantity * rate;
+                                const itemValue = invoiceItemQty * rate;
 
                                 const discountAmount =
                                   (itemValue * discountPercent) / 100;
@@ -4979,6 +4979,9 @@ createSaleOrder() {
                               const cessAmount =
                                 Number(saleOrder.cess_amount) || 0;
 
+                              const disAmount =
+                                Number(saleOrder.dis_amt) || 0;
+
                               const advanceAmount =
                                 Number(saleOrder.advance_amount) || 0;
 
@@ -4990,6 +4993,7 @@ createSaleOrder() {
                                 taxTotal +
                                 finalShipping +
                                 cessAmount -
+                                disAmount -
                                 advanceAmount +
                                 roundOff;
 
@@ -5017,7 +5021,8 @@ createSaleOrder() {
                                   advance_amount: saleOrder.advance_amount || '0',
                                   tax_amount: taxTotal.toFixed(2),
                                   item_value: itemValueTotal.toFixed(2),
-                                  discount: discountTotal.toFixed(2),
+                                  discount: saleOrder.discount || '0',
+                                  dis_amt: saleOrder.dis_amt || '0',
                                   taxable: taxableTotal.toFixed(2),
                                   cess_amount: saleOrder.cess_amount,
                                   transport_charges: finalShipping.toFixed(2),
