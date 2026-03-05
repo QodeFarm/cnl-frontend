@@ -878,6 +878,17 @@ loadQuickpackProducts() {
                   }
                 },
                 {
+                  key: 'supplier_invoice_date', 
+                  type: 'date',
+                  // defaultValue: "testing@example.com",
+                  className: 'col-md-4 col-sm-6 col-12',
+                  templateOptions: {
+                    type: 'input',
+                    label: 'Supplier invoice Date',
+                    required: false
+                  },
+                },
+                {
                   key: 'supplier_invoice_no',
                   type: 'input',
                   // defaultValue: "testing@example.com",
