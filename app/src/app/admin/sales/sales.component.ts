@@ -5307,6 +5307,7 @@ export class SalesComponent {
                 amount: 120,
                 remarks: 150
               },
+              enableResize: true,
               minColumnWidth: 50
             },
             tableCols: [

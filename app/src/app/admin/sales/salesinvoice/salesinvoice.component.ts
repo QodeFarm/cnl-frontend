@@ -2096,8 +2096,31 @@ createSaleInovice() {
               moduleKey: 'sale_invoice_items',
               lockedColumns: ['selectItem', 'product', 'quantity', 'rate', 'amount'],
               defaultHidden: [],
-              stickyColumns: ['selectItem', 'product', 'print_name'],
-              enableResize: false
+              excludeFromSettings: ['selectItem'],
+              defaultWidths: {
+                selectItem: 50,
+                product: 220,
+                print_name: 200,
+                code: 100,
+                size: 100,
+                color: 100,
+                total_boxes: 110,
+                stock_unit_id: 90,
+                unit_options_id: 90,
+                quantity: 100,
+                rate: 110,
+                discount: 100,
+                amount: 120,
+                mrp: 100,
+                tax: 80,
+                cgst: 80,
+                sgst: 80,
+                igst: 80,
+                remarks: 150,
+                invoiced: 80
+              },
+              enableResize: true,
+              minColumnWidth: 50
             },
             tableCols: [
               {
