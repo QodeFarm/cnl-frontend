@@ -65,6 +65,7 @@ export class SalesComponent {
   customerTransporterName: string = '';
   customerTransportNotes: string = '';
   showCustomerInfoBanner: boolean = false;
+  customerOutstandingAmount: number = 0;
   // ===========================================
 
   // ========== DRAFT AUTO-SAVE PROPERTIES ==========
@@ -416,6 +417,7 @@ export class SalesComponent {
     this.customerNotes = '';
     this.customerTransporterName = '';
     this.customerTransportNotes = '';
+    this.customerOutstandingAmount = 0;
     this.showCustomerInfoBanner = false;
     this.workflowStages = [];
     this.isLoadingStages = false;
@@ -503,7 +505,6 @@ export class SalesComponent {
     this.setFormConfig();
 
     this.loadQuickpackOptions(); // Fetch Quickpack options
-    console.log("data in load : ", this.loadQuickpackOptions())
 
     this.http.get('masters/entities/')
       .subscribe((res: any) => {
@@ -1364,7 +1365,12 @@ export class SalesComponent {
               if (custData.transport_notes) { this.customerTransportNotes = custData.transport_notes; }
 
               // Show banner only if there's something to display
-              this.showCustomerInfoBanner = !!(this.customerNotes || this.customerTransporterName || this.customerTransportNotes);
+              this.showCustomerInfoBanner = !!(
+                this.customerNotes ||
+                this.customerTransporterName ||
+                this.customerTransportNotes ||
+                this.customerOutstandingAmount > 0 || this.customerOutstandingAmount == 0 // Show if there's any outstanding, even if negative (advance)
+              );
             }
           },
           (error) => {
@@ -1374,6 +1380,38 @@ export class SalesComponent {
         );
       }
     );
+
+    // =========================
+  // FETCH CUSTOMER OUTSTANDING
+  // =========================
+
+  this.http.get(`sales/payment_transactions/?customer_id=${customerId}`).subscribe(
+
+    (outRes: any) => {
+
+      if (outRes?.data) {
+
+        const totalOutstanding = outRes.data.reduce((sum: number, trx: any) => {
+          return sum + (parseFloat(trx.outstanding_amount) || 0);
+        }, 0);
+
+        this.customerOutstandingAmount = totalOutstanding;
+
+        // Show banner also if outstanding exists
+        if (totalOutstanding > 0) {
+          this.showCustomerInfoBanner = true;
+        }
+
+      }
+
+    },
+    (error) => {
+      console.error('Error fetching customer outstanding:', error);
+      this.customerOutstandingAmount = 0;
+    }
+
+  );
+
   }
   // ====================================================================================
 
@@ -1804,12 +1842,57 @@ export class SalesComponent {
   quickpackOptions: any[] = []; // To store available Quickpack options
   selectedQuickpack: string = ''; // Selected Quickpack value
 
+  customerSelected: boolean = false;
+
+openQuickpackModal() {
+
+  const customerId = this.formConfig?.model?.sale_order?.customer?.customer_id;
+
+  this.customerSelected = !!customerId;
+
+  if (this.customerSelected) {
+    this.loadQuickpackOptions();
+  }
+
+  const modalElement = document.getElementById('quickpackModal');
+
+  if (!modalElement) return;
+
+  const modal = new (window as any).bootstrap.Modal(modalElement);
+
+  modal.show();
+}
+
+  selectQuickpack(quickpackId: string) {
+
+    this.selectedQuickpack = quickpackId;
+
+    this.loadQuickpackProducts();
+
+    const modalElement = document.getElementById('quickpackModal');
+    const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
+
+    modal.hide();
+  }
+
   loadQuickpackOptions() {
-    this.http.get('sales/quick_pack/') // Replace with your API endpoint
+    console.log("csutomer id fecthed in loadQuick : ", this.formConfig?.model?.sale_order?.customer_id);
+
+    const customerId = this.formConfig?.model?.sale_order.customer?.customer_id;
+
+    if (!customerId) {
+      console.log("Customer not selected");
+      return;
+    }
+
+    this.http.get(`sales/quick_pack/?customer_id=${customerId}`)
       .subscribe((response: any) => {
-        this.quickpackOptions = response.data || []; // Adjust based on API response
+
+        this.quickpackOptions = response.data || [];
         console.log("quickpackOptions : ", this.quickpackOptions);
+
       });
+
   }
 
 
@@ -4694,6 +4777,7 @@ createSaleOrder() {
                           this.customerNotes = '';
                           this.customerTransporterName = '';
                           this.customerTransportNotes = '';
+                          this.customerOutstandingAmount = 0; 
                         }
                         if (data.customer_addresses && data.customer_addresses.billing_address) {
                           field.form.controls.billing_address.setValue(data.customer_addresses.billing_address)
@@ -5721,7 +5805,7 @@ createSaleOrder() {
                 type: 'select',
                 key: 'stock_unit_id',
                 templateOptions: {
-                  label: 'Stock Unit',
+                  label: 'Stock Unit Level',
                   placeholder: 'Unit',
                   hideLabel: true,
                   dataLabel: 'stock_unit_name',
@@ -5754,43 +5838,43 @@ createSaleOrder() {
                   }
                 }
               },
-              {
-                type: 'select',
-                key: 'unit_options_id',
-                templateOptions: {
-                  label: 'Unit',
-                  placeholder: 'Unit',
-                  hideLabel: true,
-                  dataLabel: 'unit_name',
-                  dataKey: 'unit_options_id',
-                  bindId: true,
-                  required: false,
-                  lazy: {
-                    url: 'masters/unit_options',
-                    lazyOneTime: true
-                  }
-                },
-                hooks: {
-                  onInit: (field: any) => {
-                    const parentArray = field.parent;
+              // {
+              //   type: 'select',
+              //   key: 'unit_options_id',
+              //   templateOptions: {
+              //     label: 'Unit',
+              //     placeholder: 'Unit Level',
+              //     hideLabel: true,
+              //     dataLabel: 'unit_name',
+              //     dataKey: 'unit_options_id',
+              //     bindId: true,
+              //     required: false,
+              //     lazy: {
+              //       url: 'masters/unit_options',
+              //       lazyOneTime: true
+              //     }
+              //   },
+              //   hooks: {
+              //     onInit: (field: any) => {
+              //       const parentArray = field.parent;
 
-                    // Check if parentArray exists and proceed
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              //       // Check if parentArray exists and proceed
+              //       if (parentArray) {
+              //         const currentRowIndex = +parentArray.key; // Simplified number conversion
 
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
-                        const existingUnit = this.dataToPopulate.sale_order_items[currentRowIndex].product.unit_options;
+              //         // Check if there is a product already selected in this row (when data is copied)
+              //         if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
+              //           const existingUnit = this.dataToPopulate.sale_order_items[currentRowIndex].product.unit_options;
 
-                        // Set the full product object instead of just the product_id
-                        if (existingUnit) {
-                          field.formControl.setValue(existingUnit.unit_options_id); // Set full product object (not just product_id)
-                        }
-                      }
-                    }
-                  }
-                }
-              },
+              //           // Set the full product object instead of just the product_id
+              //           if (existingUnit) {
+              //             field.formControl.setValue(existingUnit.unit_options_id); // Set full product object (not just product_id)
+              //           }
+              //         }
+              //       }
+              //     }
+              //   }
+              // },
               // {
               //   type: 'input',
               //   key: 'quantity',
