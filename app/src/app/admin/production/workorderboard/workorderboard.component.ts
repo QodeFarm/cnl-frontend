@@ -117,6 +117,10 @@ export class WorkorderboardComponent implements OnInit, OnDestroy {
 
   openModal(order: any) {
     this.selectedOrder = order;
+    // Reset modal fields every time it opens
+    this.dispatchQty = 0;
+    this.dispatchRemarks = '';
+
     this.showModal = true;
   }
 
@@ -216,6 +220,7 @@ dispatchQty: number = 0;
 dispatchRemarks: string = '';
 
 confirmDispatch() {
+
   if (!this.selectedOrder) {
     console.warn('No order selected');
     return;
@@ -261,9 +266,12 @@ confirmDispatch() {
     ? this.dispatchRemarks
     : autoMessage;
 
+  // Add bullet point
+  const bulletRemark = `• ${finalRemark}`;
+
   const updatedRemarks = previousRemarks
-    ? `${previousRemarks}\n${finalRemark}`
-    : finalRemark;
+    ? `${previousRemarks}\n${bulletRemark}`
+    : bulletRemark;
 
   console.log('Starting dispatch confirmation for order:', saleOrderId);
 
@@ -289,6 +297,7 @@ confirmDispatch() {
         if (!item.product_id || orderedQty <= 0) continue;
 
         try {
+
           const productRes: any = await this.http
             .get(`products/products/${item.product_id}`)
             .toPromise();
@@ -302,14 +311,22 @@ confirmDispatch() {
           }
 
           if (dispatchQty > currentBalance) {
-            this.showStockError(item, 'DISPATCH_EXCEEDS_STOCK', currentBalance, dispatchQty);
+            this.showStockError(
+              item,
+              'DISPATCH_EXCEEDS_STOCK',
+              currentBalance,
+              dispatchQty
+            );
             return;
           }
 
           const updatedBalance = currentBalance - dispatchQty;
 
-          const newAvailableQtyItems = Number(item.available_qty || 0) + dispatchQty;
-          const newProductionQty = orderedQty - newAvailableQtyItems;
+          const newAvailableQtyItems =
+            Number(item.available_qty || 0) + dispatchQty;
+
+          const newProductionQty =
+            orderedQty - newAvailableQtyItems;
 
           if (newProductionQty > 0) {
             isFullDispatch = false;
@@ -350,14 +367,14 @@ confirmDispatch() {
         custom_fields: customFields
       };
 
-      /* ================= UPDATE SALE ORDER (YOUR EXISTING LOGIC) ================= */
+      /* ================= UPDATE SALE ORDER ================= */
 
       this.http.put(`sales/sale_order/${saleOrderId}/`, payload).subscribe(
         () => {
 
           console.log('Sale order items updated successfully');
 
-          /* ================= UPDATE WORK ORDER (NEW ADDITION) ================= */
+          /* ================= UPDATE WORK ORDER ================= */
 
           const workOrderPayload = {
             work_order: {
@@ -386,10 +403,13 @@ confirmDispatch() {
 
             this.http.post(moveNextStageUrl, {}).subscribe(
               () => {
+
                 console.log('Dispatch confirmed & moved to next stage');
+
                 this.closeModal();
                 this.curdConfig = this.getCurdConfig();
                 this.ngOnInit();
+
               },
               error => {
                 console.error('Move next stage failed:', error);
@@ -397,10 +417,13 @@ confirmDispatch() {
             );
 
           } else {
+
             console.log('Partial dispatch - staying in current stage');
+
             this.closeModal();
             this.curdConfig = this.getCurdConfig();
             this.ngOnInit();
+
           }
 
         },
@@ -619,7 +642,16 @@ confirmDispatch() {
 
                 { fieldKey: 'start_date', name: 'Start Date', sort: true },
                 { fieldKey: 'end_date', name: 'End Date', sort: true },
-                { fieldKey: 'remarks', name: 'Remarks', sort: false },
+                // { fieldKey: 'remarks', name: 'Remarks', sort: false },
+                {
+                  fieldKey: 'remarks',
+                  name: 'Remarks',
+                  displayType: "map",
+                  mapFn: (cv) => {
+                    return `<div style="white-space: pre-line;">${cv || '-'}</div>`;
+                  },
+                  sort: false
+                },
 
                 {
                   fieldKey: 'actions',

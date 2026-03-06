@@ -2012,43 +2012,43 @@ async autoFillProductDetails(field, data) {
                   }
                 }
               },
-              {
-                type: 'select',
-                key: 'unit_options_id',
-                templateOptions: {
-                  label: 'Unit',
-                  placeholder: 'Unit',
-                  hideLabel: true,
-                  dataLabel: 'unit_name',
-                  dataKey: 'unit_options_id',
-                  bindId: true,
-                  required: false,
-                  lazy: {
-                    url: 'masters/unit_options',
-                    lazyOneTime: true
-                  }
-                },
-                hooks: {
-                  onInit: (field: any) => {
-                    const parentArray = field.parent;
+              // {
+              //   type: 'select',
+              //   key: 'unit_options_id',
+              //   templateOptions: {
+              //     label: 'Unit',
+              //     placeholder: 'Unit',
+              //     hideLabel: true,
+              //     dataLabel: 'unit_name',
+              //     dataKey: 'unit_options_id',
+              //     bindId: true,
+              //     required: false,
+              //     lazy: {
+              //       url: 'masters/unit_options',
+              //       lazyOneTime: true
+              //     }
+              //   },
+              //   hooks: {
+              //     onInit: (field: any) => {
+              //       const parentArray = field.parent;
 
-                    // Check if parentArray exists and proceed
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+              //       // Check if parentArray exists and proceed
+              //       if (parentArray) {
+              //         const currentRowIndex = +parentArray.key; // Simplified number conversion
 
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.sale_return_items.length > currentRowIndex) {
-                        const existingUnit = this.dataToPopulate.sale_return_items[currentRowIndex].product.unit_options;
+              //         // Check if there is a product already selected in this row (when data is copied)
+              //         if (this.dataToPopulate && this.dataToPopulate.sale_return_items.length > currentRowIndex) {
+              //           const existingUnit = this.dataToPopulate.sale_return_items[currentRowIndex].product.unit_options;
 
-                        // Set the full product object instead of just the product_id
-                        if (existingUnit) {
-                          field.formControl.setValue(existingUnit.unit_options_id); // Set full product object (not just product_id)
-                        }
-                      }
-                    }
-                  }
-                }
-              },
+              //           // Set the full product object instead of just the product_id
+              //           if (existingUnit) {
+              //             field.formControl.setValue(existingUnit.unit_options_id); // Set full product object (not just product_id)
+              //           }
+              //         }
+              //       }
+              //     }
+              //   }
+              // },
               {
                 type: 'input',
                 key: 'cgst',

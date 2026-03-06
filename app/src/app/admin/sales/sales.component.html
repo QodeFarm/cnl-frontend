@@ -32,18 +32,49 @@
         </button> -->
 
             <div style="display: flex; gap: 10px; align-items: center;justify-content: end;flex-wrap: wrap;">
-                <div *ngIf="!SaleOrderEditID" class="quickpack-container-1 d-flex align-items-center">
+                <!-- <div *ngIf="!SaleOrderEditID" class="quickpack-container-1 d-flex align-items-center">
                     <div class="quickpack-box d-flex align-items-center">
                         <div class="dropdown-container rounded-start">
-                            <select id="quickpackSelect" class="dropdown-select m-0 " [(ngModel)]="selectedQuickpack">
+                            <select
+                                id="quickpackSelect"
+                                class="dropdown-select m-0"
+                                [(ngModel)]="selectedQuickpack"
+                                [disabled]="!formConfig?.model?.sale_order.customer?.customer_id">
+
                                 <option value="" disabled selected aria-disabled="true">Quickpack</option>
+
                                 <option *ngFor="let quickpack of quickpackOptions" [value]="quickpack.quick_pack_id">
                                     {{ quickpack.name }}
                                 </option>
+
                             </select>
                         </div>
-                        <button class="btn btn-primary ml-0 rounded-end" (click)="loadQuickpackProducts()">OK</button>
+
+                        <button
+                            class="btn btn-primary ml-0 rounded-end"
+                            (click)="loadQuickpackProducts()"
+                            [disabled]="!selectedQuickpack">
+                            OK
+                        </button>
                     </div>
+                </div> -->
+                <div *ngIf="!SaleOrderEditID" class="quickpack-container-1">
+
+                    <!-- <button 
+                        type="button" class="btn btn-primary" data-bs-toggle="modal"
+                        (click)="openQuickpackModal()"
+                        data-bs-target="#quickpackModal">
+
+                        Quickpacks
+                    </button> -->
+                    <button 
+                    class="btn btn-primary"
+                    (click)="openQuickpackModal()">
+
+                    Quickpacks
+
+                    </button>
+
                 </div>
                 <!-- New Copy Button -->
                 <button (click)="openCopyModal()" type="button" class="btn btn-primary" data-bs-toggle="modal"
@@ -174,19 +205,46 @@
             <!-- Customer Info Strip (shown after customer selection) -->
             <div class="customer-info-strip" *ngIf="showCustomerInfoBanner">
                 <span class="cis-label">ℹ Customer Info</span>
+
                 <span class="cis-divider" *ngIf="customerNotes">|</span>
                 <span class="cis-item" *ngIf="customerNotes">
                     <span class="cis-icon">📝</span> {{ customerNotes }}
                 </span>
+
                 <span class="cis-divider" *ngIf="customerTransporterName">|</span>
                 <span class="cis-item" *ngIf="customerTransporterName">
-                    <span class="cis-icon">🚚</span> Preferred: <strong class="cis-transport-tag">{{
-                        customerTransporterName }}</strong>
+                    <span class="cis-icon">🚚</span> Preferred:
+                    <strong class="cis-transport-tag">{{ customerTransporterName }}</strong>
                 </span>
+
                 <span class="cis-divider" *ngIf="customerTransportNotes">|</span>
                 <span class="cis-item" *ngIf="customerTransportNotes">
                     <span class="cis-icon">📋</span> {{ customerTransportNotes }}
                 </span>
+
+                <!-- ⭐ Customer Outstanding Amount -->
+                <span class="cis-divider" *ngIf="customerOutstandingAmount !== null">|</span>
+
+                <span class="cis-item outstanding-box" *ngIf="customerOutstandingAmount !== null">
+                    <span class="cis-icon">💰</span>
+                    Outstanding:
+                    <strong class="cis-outstanding"
+                        [ngClass]="{
+                            'outstanding-zero': customerOutstandingAmount == 0,
+                            'outstanding-due': customerOutstandingAmount > 0
+                        }">
+
+                        <ng-container *ngIf="customerOutstandingAmount > 0">
+                            ₹{{ customerOutstandingAmount | number:'1.2-2' }}
+                        </ng-container>
+
+                        <ng-container *ngIf="customerOutstandingAmount == 0">
+                            ₹0.00 (No Outstanding)
+                        </ng-container>
+
+                    </strong>
+                </span>
+
                 <button class="cis-close" (click)="showCustomerInfoBanner = false"
                     aria-label="Close customer info">&times;</button>
             </div>
@@ -544,3 +602,78 @@
     <button nz-button nzType="primary" (click)="closeDialog()">OK</button>
   </ng-template>
 </nz-modal> -->
+
+<div class="modal fade" id="quickpackModal" tabindex="-1">
+  <div class="modal-dialog modal-xl quickpack-modal">
+    <div class="modal-content">
+
+      <!-- Header -->
+      <div class="modal-header quickpack-header">
+        <h5 class="modal-title">Quickpacks List</h5>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body">
+
+        <!-- If customer not selected -->
+        <div *ngIf="!customerSelected" class="text-center p-4">
+          Please select a customer.
+        </div>
+
+        <!-- If customer selected -->
+        <div *ngIf="customerSelected">
+
+          <table class="table table-bordered quickpack-table">
+            <thead>
+              <tr>
+                <th>Quickpack</th>
+                <th>Customer</th>
+                <th>Lot Qty</th>
+                <th>Select</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let pack of quickpackOptions">
+
+                <td>{{ pack.name }}</td>
+
+                <td>
+                  {{ pack.customer?.name }}
+                </td>
+
+                <td>
+                  {{ pack.lot_qty }}
+                </td>
+
+                <td>
+                  <button
+                    class="btn btn-sm btn-primary"
+                    (click)="selectQuickpack(pack.quick_pack_id)">
+                    Select
+                  </button>
+                </td>
+
+              </tr>
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer">
+
+        <button
+          class="btn btn-danger"
+          data-bs-dismiss="modal">
+          Close
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+</div>

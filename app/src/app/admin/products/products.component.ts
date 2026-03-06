@@ -991,7 +991,7 @@ preprocessFormData() {
                       type: 'productStockUnits-dropdown',
                       className: 'col-md-4 col-sm-6 col-12',
                       templateOptions: {
-                        label: 'Stock Unit',
+                        label: 'Stock Level Unit',
                         dataKey: 'stock_unit_id',
                         dataLabel: "stock_unit_name",
                         options: [],
@@ -1277,7 +1277,7 @@ preprocessFormData() {
                               type: 'select', //'productUnitOptions-dropdown',
                               className: 'col-3',
                               templateOptions: {
-                                label: 'Unit Options',
+                                label: 'Unit Level',
                                 dataKey: 'unit_options_id',
                                 dataLabel: "unit_name",
                                 options: [],
