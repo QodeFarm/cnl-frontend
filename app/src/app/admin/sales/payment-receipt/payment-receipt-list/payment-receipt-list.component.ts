@@ -321,6 +321,11 @@ private fallbackPrint(pdfBlob: Blob): void {
     defaultSort: { key: 'payment_date', value: 'descend' },
     cols: [
       {
+        fieldKey: 'customer_name',
+        name: 'Customer Name',
+        sort: true
+      },
+      {
         fieldKey: 'invoice_no',
         name: 'Invoice No',
         sort: true
@@ -349,44 +354,64 @@ private fallbackPrint(pdfBlob: Blob): void {
         }
       },
       // {
-      //   fieldKey: 'adjusted_now',
-      //   name: 'Adjusted Now',
+      //   fieldKey: 'adjust_now',
+      //   name: 'Adjust Now (₹)',
       //   sort: true,
-      //   displayType: 'map',
-      //   mapFn: (currentValue: any) => {
-      //     return currentValue ? `₹${currentValue}` : '₹0.00';
+      //   isEdit: true,
+
+      //   autoSave: {
+      //     apiUrl: (row: any) => `sales/payment_transactions/${row.transaction_id}/`,
+      //     method: 'put',
+
+      //     body: (row: any, value: any, col: any) => {
+      //       const existingAmount = Number(row.amount) || 0;
+      //       const addValue = Number(value) || 0;
+      //       const finalAmount = existingAmount + addValue;
+
+      //       return {
+      //         amount: finalAmount,                //  Updated amount
+      //         payment_receipt_no: row.payment_receipt_no,
+      //         account: row.account_id,
+      //         customer: row.customer_id,
+      //         customer_id: row.customer_id,
+      //         payment_status: row.payment_status,
+      //         voucher_no: row.voucher_no,
+      //         invoice_no: row.invoice_no
+      //       };
+      //     }
+
+      //     // Note: onSaveSuccess and onSaveError are injected in ngAfterViewInit to ensure `this` is correct.
       //   }
       // },
       {
-        fieldKey: 'adjust_now',
-        name: 'Adjust Now (₹)',
-        sort: true,
-        isEdit: true,
-
-        autoSave: {
-          apiUrl: (row: any) => `sales/payment_transactions/${row.transaction_id}/`,
-          method: 'put',
-
-          body: (row: any, value: any, col: any) => {
-            const existingAmount = Number(row.amount) || 0;
-            const addValue = Number(value) || 0;
-            const finalAmount = existingAmount + addValue;
-
-            return {
-              amount: finalAmount,                //  Updated amount
-              payment_receipt_no: row.payment_receipt_no,
-              account: row.account_id,
-              customer: row.customer_id,
-              customer_id: row.customer_id,
-              payment_status: row.payment_status,
-              voucher_no: row.voucher_no,
-              invoice_no: row.invoice_no
-            };
-          }
-
-          // Note: onSaveSuccess and onSaveError are injected in ngAfterViewInit to ensure `this` is correct.
-        }
-      },
+  fieldKey: 'adjust_now',
+  name: 'Adjust Now (₹)',
+  sort: true,
+  isEdit: true,
+  autoSave: {
+    apiUrl: (row: any) => `sales/payment_transactions/${row.transaction_id}/`,
+    method: 'put',
+    validate: (value: any) => {
+      const numValue = Number(value) || 0;
+      if (numValue < 0) return 'Amount cannot be negative';
+      return null; // valid
+    },
+    body: (row: any, value: any, col: any) => {
+      const existingAmount = Number(row.amount) || 0;
+      const addValue = Number(value) || 0;
+      const finalAmount = existingAmount + addValue;
+      
+      return {
+        amount: finalAmount,
+        payment_receipt_no: row.payment_receipt_no,
+        account: row.account_id,
+        customer: row.customer_id,
+        payment_status: row.payment_status,
+        invoice_no: row.invoice_no
+      };
+    }
+  }
+},
       {
         fieldKey: 'payment_status',
         name: 'Payment Status',

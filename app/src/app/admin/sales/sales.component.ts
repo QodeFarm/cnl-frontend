@@ -4891,275 +4891,961 @@ createSaleOrder() {
                   }
                 },
                 // {
-                //   key: 'tax',
+                //   key: 'flow_status',
                 //   type: 'select',
                 //   className: 'col-md-4 col-sm-6 col-12',
                 //   templateOptions: {
-                //     label: 'Tax',
-                //     required: true,
-                //     options: [
-                //       { 'label': "Inclusive", value: 'Inclusive' },
-                //       { 'label': "Exclusive", value: 'Exclusive' }
-                //     ]
+                //     label: 'Flow status',
+                //     dataKey: 'flow_status_id',
+                //     dataLabel: 'flow_status_name',
+                //     lazy: {
+                //       url: 'masters/flow_status/',
+                //       lazyOneTime: true
+                //     }
                 //   },
                 //   hooks: {
-                //     onInit: (field: any) => {
-                //       if (this.dataToPopulate && this.dataToPopulate.sale_order.tax && field.formControl) {
-                //         field.formControl.setValue(this.dataToPopulate.sale_order.tax);
-                //       }
+                //     onChanges: (field: any) => {
+
+                //       field.formControl.valueChanges.subscribe(data => {
+                //         if (data && data.flow_status_id) {
+                //           this.formConfig.model['sale_order']['flow_status_id'] = data.flow_status_id;
+                //         }
+                //       });
+
+                //       field.formControl.valueChanges.subscribe(data => {
+
+                //         if (!data || data.flow_status_name !== 'Ready for Invoice') return;
+
+                //         const saleOrder = this.formConfig.model['sale_order'];
+                //         const saleOrderItems = this.formConfig.model['sale_order_items'] || [];
+                //         const orderAttachments = this.formConfig.model['order_attachments'];
+                //         const orderShipments = this.formConfig.model['order_shipments'] || {};
+
+                //         const saleTypeObj = saleOrder.sale_type;
+                //         const saleTypeName = saleTypeObj?.name || '';
+
+                //         const billType = (saleTypeName === 'Other') ? 'OTHERS' : 'CASH';
+                //         const invoicePrefix = (saleTypeName === 'Other') ? 'SOO-INV' : 'SO-INV';
+
+                //         this.http.get(`masters/generate_order_no/?type=${invoicePrefix}`).subscribe((res: any) => {
+
+                //           if (res?.data?.order_number) {
+
+                //             this.invoiceNumber = res.data.order_number;
+
+                //             this.http.get('masters/order_status/?status_name=Pending').subscribe((statusRes: any) => {
+
+                //               const completedStatus = statusRes?.data?.[0];
+                //               const completedStatusId = completedStatus?.order_status_id;
+
+                //               let itemValueTotal = 0;
+                //               let discountTotal = 0;
+                //               let taxableTotal = 0;
+                //               let itemTaxTotal = 0;
+                //               let amountTotal = 0;
+
+                //               let totalOrderQty = 0;
+                //               let invoiceQty = 0;
+
+                //               /* -------------------------
+                //                 ITEM CALCULATION
+                //               ------------------------- */
+
+                //               saleOrderItems.forEach(item => {
+
+                //                 const quantity = Number(item.quantity) || 0;
+                //                 const rate = Number(item.rate) || 0;
+                //                 const discountPercent = Number(item.discount) || 0;
+                //                 const taxPercent = Number(item.tax) || 0;
+                //                 const productionQty = Number(item.production_qty) || 0;
+
+                //                 const invoiceItemQty = quantity - productionQty;
+
+                //                 const itemValue = invoiceItemQty * rate;
+
+                //                 const discountAmount =
+                //                   (itemValue * discountPercent) / 100;
+
+                //                 const amountAfterDiscount =
+                //                   itemValue - discountAmount;
+
+                //                 const taxAmount =
+                //                   (amountAfterDiscount * taxPercent) / 100;
+
+                //                 const totalAmount =
+                //                   amountAfterDiscount + taxAmount;
+
+                //                 /* Save values to item */
+
+                //                 item.item_value = itemValue;
+                //                 item.discount_amount = discountAmount;
+                //                 item.amount = amountAfterDiscount;
+                //                 item.tax_amount = taxAmount;
+                //                 item.total = totalAmount;
+
+                //                 /* GST Split */
+
+                //                 const address =
+                //                   saleOrder.billing_address || saleOrder.shipping_address || '';
+
+                //                 const isIntraState =
+                //                   address.toLowerCase().includes('andhra pradesh');
+
+                //                 if (isIntraState) {
+                //                   item.cgst = taxAmount / 2;
+                //                   item.sgst = taxAmount / 2;
+                //                   item.igst = 0;
+                //                 } else {
+                //                   item.igst = taxAmount;
+                //                   item.cgst = 0;
+                //                   item.sgst = 0;
+                //                 }
+
+                //                 /* Totals */
+
+                //                 itemValueTotal += itemValue;
+                //                 discountTotal += discountAmount;
+                //                 taxableTotal += amountAfterDiscount;
+                //                 itemTaxTotal += taxAmount;
+                //                 amountTotal += totalAmount;
+
+                //                 totalOrderQty += quantity;
+                //                 invoiceQty += invoiceItemQty;
+                //               });
+
+                //               /* -------------------------
+                //                 SHIPPING CALCULATION - USING SAME LOGIC AS GLOBAL FUNCTION
+                //               ------------------------- */
+
+                //               const shippingCharges = Number(orderShipments.shipping_charges || 0);
+                //               const shippingGstPercent = Number(orderShipments.shipping_gst || 0);
+                //               const taxType = saleOrder.tax || 'Exclusive'; // Get tax type from sale order
+
+                //               // Calculate proportional shipping for invoice
+                //               let shippingBaseAmount = 0;
+                //               if (totalOrderQty > 0) {
+                //                 shippingBaseAmount = (invoiceQty / totalOrderQty) * shippingCharges;
+                //               }
+
+                //               // Calculate shipping tax based on tax type (same as global function)
+                //               let shippingTaxAmount = 0;
+                //               if (shippingBaseAmount > 0 && shippingGstPercent > 0) {
+                //                 if (taxType === 'Inclusive') {
+                //                   const baseShipping = shippingBaseAmount / (1 + shippingGstPercent / 100);
+                //                   shippingTaxAmount = shippingBaseAmount - baseShipping;
+                //                   shippingBaseAmount = baseShipping; // Update base amount for inclusive tax
+                //                 } else {
+                //                   shippingTaxAmount = (shippingBaseAmount * shippingGstPercent) / 100;
+                //                 }
+                //               }
+
+                //               // Calculate total shipping with tax
+                //               const totalShippingWithTax = shippingBaseAmount + shippingTaxAmount;
+
+                //               /* -------------------------
+                //                 OTHER AMOUNTS
+                //               ------------------------- */
+
+                //               const cessAmount = Number(saleOrder.cess_amount) || 0;
+                //               const disAmount = Number(saleOrder.dis_amt) || 0;
+                //               const advanceAmount = Number(saleOrder.advance_amount) || 0;
+                //               const roundOff = Number(saleOrder.round_off) || 0;
+
+                //               /* -------------------------
+                //                 FINAL TOTALS
+                //               ------------------------- */
+
+                //               // Total tax = Item tax + Shipping tax
+                //               const totalTaxAmount = itemTaxTotal + shippingTaxAmount;
+
+                //               // FINAL TOTAL - Following same pattern as global function
+                //               const finalTotal = 
+                //                 taxableTotal +           // Item taxable (amount after discount)
+                //                 itemTaxTotal +           // Item tax
+                //                 shippingBaseAmount +     // Shipping base (after inclusive tax adjustment if needed)
+                //                 shippingTaxAmount +      // Shipping tax
+                //                 cessAmount -
+                //                 disAmount -
+                //                 advanceAmount +
+                //                 roundOff;
+
+                //               // Store ALL values in saleOrder
+                //               saleOrder.item_value = itemValueTotal.toFixed(2);
+                //               saleOrder.taxable = taxableTotal.toFixed(2);
+                              
+                //               // Tax breakdown
+                //               saleOrder.item_tax_amount = itemTaxTotal.toFixed(2);
+                //               saleOrder.shipping_tax_amount = shippingTaxAmount.toFixed(2);
+                //               saleOrder.tax_amount = totalTaxAmount.toFixed(2);
+                              
+                //               // Shipping breakdown - Update orderShipments too
+                //               orderShipments.shipping_charges = shippingBaseAmount.toFixed(2);
+                //               orderShipments.shipping_gst = shippingGstPercent;
+                //               orderShipments.shipping_gst_amount = shippingTaxAmount.toFixed(2);
+                //               orderShipments.transport_charges = totalShippingWithTax.toFixed(2);
+                              
+                //               // Update saleOrder shipping fields for backward compatibility
+                //               saleOrder.shipping_base_amount = shippingBaseAmount.toFixed(2);
+                //               saleOrder.shipping_gst_percent = shippingGstPercent;
+                //               saleOrder.shipping_gst_amount = shippingTaxAmount.toFixed(2);
+                //               saleOrder.transport_charges = totalShippingWithTax.toFixed(2);
+                              
+                //               // FINAL TOTAL
+                //               saleOrder.total_amount = finalTotal.toFixed(2);
+
+                //               /* -------------------------
+                //                 INVOICE PAYLOAD
+                //               ------------------------- */
+
+                //               this.invoiceData = {
+
+                //                 sale_invoice_order: {
+                //                   bill_type: billType,
+                //                   invoice_date: this.nowDate(),
+                //                   email: saleOrder.email,
+                //                   ref_no: saleOrder.ref_no,
+                //                   ref_date: this.nowDate(),
+                //                   due_date: this.nowDate(),
+                //                   tax: saleOrder.tax || 'Exclusive', // Pass tax type
+                //                   remarks: saleOrder.remarks,
+                //                   advance_amount: saleOrder.advance_amount || '0',
+                                  
+                //                   // Tax fields
+                //                   tax_amount: totalTaxAmount.toFixed(2),
+                //                   item_tax_amount: itemTaxTotal.toFixed(2),
+                //                   shipping_tax_amount: shippingTaxAmount.toFixed(2),
+                                  
+                //                   item_value: itemValueTotal.toFixed(2),
+                //                   discount: saleOrder.discount || '0',
+                //                   dis_amt: saleOrder.dis_amt || '0',
+                //                   taxable: taxableTotal.toFixed(2),
+                //                   cess_amount: saleOrder.cess_amount,
+                                  
+                //                   // Shipping fields - Send ALL shipping data to backend
+                //                   shipping_charges: shippingBaseAmount.toFixed(2),
+                //                   shipping_gst: shippingGstPercent,
+                //                   shipping_gst_amount: shippingTaxAmount.toFixed(2),
+                //                   transport_charges: totalShippingWithTax.toFixed(2),
+                                  
+                //                   round_off: saleOrder.round_off,
+                //                   total_amount: finalTotal.toFixed(2),
+                                  
+                //                   vehicle_name: saleOrder.vehicle_name,
+                //                   total_boxes: saleOrder.total_boxes,
+                //                   shipping_address: saleOrder.shipping_address,
+                //                   billing_address: saleOrder.billing_address,
+                //                   customer_id: saleOrder.customer_id,
+                //                   gst_type_id: saleOrder.gst_type_id,
+                //                   order_type: saleOrder.order_type || 'sale_invoice',
+                //                   order_salesman_id: saleOrder.order_salesman_id,
+                //                   customer_address_id: saleOrder.customer_address_id,
+                //                   payment_term_id: saleOrder.payment_term_id,
+                //                   payment_link_type_id: saleOrder.payment_link_type_id,
+                //                   ledger_account_id: saleOrder.ledger_account_id,
+                //                   flow_status: saleOrder.flow_status,
+                //                   order_status_id: completedStatusId,
+                //                   sale_order: saleOrder.sale_order,
+                //                   sale_order_id: saleOrder.sale_order_id,
+                //                   ...(billType == 'OTHERS' && {
+                //                     invoice_no: this.invoiceNumber
+                //                   })
+                //                 },
+
+                //                 sale_invoice_items: saleOrderItems
+                //                   .filter(item => item.product_id)
+                //                   .map(item => ({
+                //                     ...item,
+                //                     quantity:
+                //                       Number(item.quantity || 0) -
+                //                       Number(item.production_qty || 0),
+                //                     discount: item.discount || '0',
+                //                   })),
+
+                //                 order_attachments: orderAttachments,
+                //                 order_shipments: orderShipments // This now has all shipping fields
+                //               };
+
+                //               // Debug log to verify
+                //               console.log('=== INVOICE CREATION CALCULATION ===');
+                //               console.log('Tax Type:', taxType);
+                //               console.log('Shipping Base:', shippingBaseAmount);
+                //               console.log('Shipping GST%:', shippingGstPercent);
+                //               console.log('Shipping Tax:', shippingTaxAmount);
+                //               console.log('Total Shipping with Tax:', totalShippingWithTax);
+                //               console.log('Item Tax:', itemTaxTotal);
+                //               console.log('Total Tax:', totalTaxAmount);
+                //               console.log('Final Total:', finalTotal);
+                //               console.log('====================================');
+
+                //             });
+
+                //           }
+
+                //         });
+
+                //       });
+
                 //     }
                 //   }
                 // },
-                {
-                  key: 'flow_status',
-                  type: 'select',
-                  className: 'col-md-4 col-sm-6 col-12',
-                  templateOptions: {
-                    label: 'Flow status',
-                    dataKey: 'flow_status_id',
-                    dataLabel: 'flow_status_name',
-                    lazy: {
-                      url: 'masters/flow_status/',
-                      lazyOneTime: true
-                    }
-                  },
-                  hooks: {
-                    onChanges: (field: any) => {
+//                 {
+//   key: 'flow_status',
+//   type: 'select',
+//   className: 'col-md-4 col-sm-6 col-12',
+//   templateOptions: {
+//     label: 'Flow status',
+//     dataKey: 'flow_status_id',
+//     dataLabel: 'flow_status_name',
+//     lazy: {
+//       url: 'masters/flow_status/',
+//       lazyOneTime: true
+//     }
+//   },
+//   hooks: {
+//     onChanges: (field: any) => {
 
-                      field.formControl.valueChanges.subscribe(data => {
-                        if (data && data.flow_status_id) {
-                          this.formConfig.model['sale_order']['flow_status_id'] = data.flow_status_id;
-                        }
-                      });
+//       field.formControl.valueChanges.subscribe(data => {
+//         if (data && data.flow_status_id) {
+//           this.formConfig.model['sale_order']['flow_status_id'] = data.flow_status_id;
+//         }
+//       });
 
-                      field.formControl.valueChanges.subscribe(data => {
+//       field.formControl.valueChanges.subscribe(data => {
 
-                        if (!data || data.flow_status_name !== 'Ready for Invoice') return;
+//         if (!data || data.flow_status_name !== 'Ready for Invoice') return;
 
-                        const saleOrder = this.formConfig.model['sale_order'];
-                        const saleOrderItems = this.formConfig.model['sale_order_items'] || [];
-                        const orderAttachments = this.formConfig.model['order_attachments'];
-                        const orderShipments = this.formConfig.model['order_shipments'];
+//         const saleOrder = this.formConfig.model['sale_order'];
+//         const saleOrderItems = this.formConfig.model['sale_order_items'] || [];
+//         const orderAttachments = this.formConfig.model['order_attachments'];
+//         const orderShipments = this.formConfig.model['order_shipments'] || {};
 
-                        const saleTypeObj = saleOrder.sale_type;
-                        const saleTypeName = saleTypeObj?.name || '';
+//         const saleTypeObj = saleOrder.sale_type;
+//         const saleTypeName = saleTypeObj?.name || '';
 
-                        const billType = (saleTypeName === 'Other') ? 'OTHERS' : 'CASH';
-                        const invoicePrefix = (saleTypeName === 'Other') ? 'SOO-INV' : 'SO-INV';
+//         const billType = (saleTypeName === 'Other') ? 'OTHERS' : 'CASH';
+//         const invoicePrefix = (saleTypeName === 'Other') ? 'SOO-INV' : 'SO-INV';
 
-                        this.http.get(`masters/generate_order_no/?type=${invoicePrefix}`).subscribe((res: any) => {
+//         this.http.get(`masters/generate_order_no/?type=${invoicePrefix}`).subscribe((res: any) => {
 
-                          if (res?.data?.order_number) {
+//           if (res?.data?.order_number) {
 
-                            this.invoiceNumber = res.data.order_number;
+//             this.invoiceNumber = res.data.order_number;
 
-                            this.http.get('masters/order_status/?status_name=Pending').subscribe((statusRes: any) => {
+//             this.http.get('masters/order_status/?status_name=Pending').subscribe((statusRes: any) => {
 
-                              const completedStatus = statusRes?.data?.[0];
-                              const completedStatusId = completedStatus?.order_status_id;
+//               const completedStatus = statusRes?.data?.[0];
+//               const completedStatusId = completedStatus?.order_status_id;
 
-                              let itemValueTotal = 0;
-                              let discountTotal = 0;
-                              let taxableTotal = 0;
-                              let taxTotal = 0;
-                              let amountTotal = 0;
+//               let itemValueTotal = 0;
+//               let discountTotal = 0;
+//               let taxableTotal = 0;
+//               let itemTaxTotal = 0;
+//               let amountTotal = 0;
 
-                              let totalOrderQty = 0;
-                              let invoiceQty = 0;
+//               let totalOrderQty = 0;
+//               let invoiceQty = 0;
 
-                              /* -------------------------
-                                ITEM CALCULATION
-                              ------------------------- */
+//               // 🔥 FIX: Get separate tax types
+//               const productTaxType = saleOrder.tax || 'Exclusive';
+//               const shippingTaxType = orderShipments?.tax || productTaxType;
 
-                              saleOrderItems.forEach(item => {
+//               /* -------------------------
+//                 ITEM CALCULATION
+//               ------------------------- */
 
-                                const quantity = Number(item.quantity) || 0;
-                                const rate = Number(item.rate) || 0;
-                                const discountPercent = Number(item.discount) || 0;
-                                const taxPercent = Number(item.tax) || 0;
-                                const productionQty = Number(item.production_qty) || 0;
+//               saleOrderItems.forEach(item => {
 
-                                const invoiceItemQty = quantity - productionQty;
+//                 const quantity = Number(item.quantity) || 0;
+//                 const rate = Number(item.rate) || 0;
+//                 const discountPercent = Number(item.discount) || 0;
+//                 const taxPercent = Number(item.tax) || 0;
+//                 const productionQty = Number(item.production_qty) || 0;
 
-                                const itemValue = invoiceItemQty * rate;
+//                 const invoiceItemQty = quantity - productionQty;
 
-                                const discountAmount =
-                                  (itemValue * discountPercent) / 100;
+//                 const itemValue = invoiceItemQty * rate;
 
-                                const amountAfterDiscount =
-                                  itemValue - discountAmount;
+//                 const discountAmount = (itemValue * discountPercent) / 100;
 
-                                const taxAmount =
-                                  (amountAfterDiscount * taxPercent) / 100;
+//                 const amountAfterDiscount = itemValue - discountAmount;
 
-                                const totalAmount =
-                                  amountAfterDiscount + taxAmount;
+//                 // 🔥 Use productTaxType for product tax calculation
+//                 let baseAmount = amountAfterDiscount;
+//                 let taxAmount = 0;
 
-                                /* Save values to item */
+//                 if (productTaxType === 'Inclusive') {
+//                   baseAmount = amountAfterDiscount / (1 + taxPercent / 100);
+//                   taxAmount = amountAfterDiscount - baseAmount;
+//                 } else {
+//                   baseAmount = amountAfterDiscount;
+//                   taxAmount = (amountAfterDiscount * taxPercent) / 100;
+//                 }
 
-                                item.item_value = itemValue;
-                                item.discount_amount = discountAmount;
-                                item.amount = amountAfterDiscount;
-                                item.tax_amount = taxAmount;
-                                item.total = totalAmount;
+//                 const totalAmount = baseAmount + taxAmount;
 
-                                /* GST Split */
+//                 /* Save values to item */
+//                 item.item_value = itemValue;
+//                 item.discount_amount = discountAmount;
+//                 item.base_amount = baseAmount; // Store base amount
+//                 item.amount = baseAmount; // amount field should be base
+//                 item.tax_amount = taxAmount;
+//                 item.total = totalAmount;
 
-                                const address =
-                                  saleOrder.billing_address || saleOrder.shipping_address || '';
+//                 /* GST Split */
+//                 const address = saleOrder.billing_address || saleOrder.shipping_address || '';
+//                 const isIntraState = address.toLowerCase().includes('andhra pradesh');
 
-                                const isIntraState =
-                                  address.toLowerCase().includes('andhra pradesh');
+//                 if (isIntraState) {
+//                   item.cgst = taxAmount / 2;
+//                   item.sgst = taxAmount / 2;
+//                   item.igst = 0;
+//                 } else {
+//                   item.igst = taxAmount;
+//                   item.cgst = 0;
+//                   item.sgst = 0;
+//                 }
 
-                                if (isIntraState) {
-                                  item.cgst = taxAmount / 2;
-                                  item.sgst = taxAmount / 2;
-                                  item.igst = 0;
-                                } else {
-                                  item.igst = taxAmount;
-                                  item.cgst = 0;
-                                  item.sgst = 0;
-                                }
+//                 /* Totals */
+//                 itemValueTotal += itemValue;
+//                 discountTotal += discountAmount;
+//                 taxableTotal += baseAmount; // Use base amount
+//                 itemTaxTotal += taxAmount;
+//                 amountTotal += totalAmount;
 
-                                /* Totals */
+//                 totalOrderQty += quantity;
+//                 invoiceQty += invoiceItemQty;
+//               });
 
-                                itemValueTotal += itemValue;
-                                discountTotal += discountAmount;
-                                taxableTotal += amountAfterDiscount;
-                                taxTotal += taxAmount;
-                                amountTotal += totalAmount;
+//               /* -------------------------
+//                 SHIPPING CALCULATION - FIXED WITH SHIPPING TAX TYPE
+//               ------------------------- */
 
-                                totalOrderQty += quantity;
-                                invoiceQty += invoiceItemQty;
-                              });
+//               const shippingCharges = Number(orderShipments.shipping_charges || 0);
+//               const shippingGstPercent = Number(orderShipments.shipping_gst || 0);
 
-                              /* -------------------------
-                                SHIPPING DISTRIBUTION
-                              ------------------------- */
+//               // Calculate proportional shipping for invoice
+//               let shippingBaseAmount = 0;
+//               if (totalOrderQty > 0) {
+//                 shippingBaseAmount = (invoiceQty / totalOrderQty) * shippingCharges;
+//               }
 
-                              const totalShipping =
-                                Number(saleOrder.shipping_charges || 0);
+//               // 🔥 FIX: Calculate shipping tax based on shippingTaxType
+//               let shippingTaxAmount = 0;
+//               let shippingDisplayAmount = shippingBaseAmount; // What user sees
 
-                              const shippingGSTPercent =
-                                Number(saleOrder.shipping_gst || 0);
+//               if (shippingBaseAmount > 0 && shippingGstPercent > 0) {
+//                 if (shippingTaxType === 'Inclusive') {
+//                   // For Inclusive: shippingBaseAmount includes tax
+//                   const baseShipping = shippingBaseAmount / (1 + shippingGstPercent / 100);
+//                   shippingTaxAmount = shippingBaseAmount - baseShipping;
+//                   shippingDisplayAmount = shippingBaseAmount; // Keep as entered
+//                   shippingBaseAmount = baseShipping; // Store base separately
+//                 } else {
+//                   // For Exclusive: tax added on top
+//                   shippingTaxAmount = (shippingBaseAmount * shippingGstPercent) / 100;
+//                   shippingDisplayAmount = shippingBaseAmount + shippingTaxAmount;
+//                 }
+//               }
 
-                              let shippingForInvoice = 0;
+//               /* -------------------------
+//                 OTHER AMOUNTS
+//               ------------------------- */
 
-                              if (totalOrderQty > 0) {
-                                shippingForInvoice =
-                                  (invoiceQty / totalOrderQty) * totalShipping;
-                              }
+//               const cessAmount = Number(saleOrder.cess_amount) || 0;
+//               const disAmount = Number(saleOrder.dis_amt) || 0;
+//               const advanceAmount = Number(saleOrder.advance_amount) || 0;
+//               const roundOff = Number(saleOrder.round_off) || 0;
 
-                              const shippingTax =
-                                (shippingForInvoice * shippingGSTPercent) / 100;
+//               /* -------------------------
+//                 FINAL TOTALS
+//               ------------------------- */
 
-                              const finalShipping =
-                                shippingForInvoice + shippingTax;
+//               // Total tax = Item tax + Shipping tax
+//               const totalTaxAmount = itemTaxTotal + shippingTaxAmount;
 
-                              /* -------------------------
-                                OTHER AMOUNTS
-                              ------------------------- */
+//               // 🔥 FIX: FINAL TOTAL - Following all 4 cases correctly
+//               // Product part: 
+//               // - For Exclusive: taxableTotal (base) + itemTaxTotal
+//               // - For Inclusive: use amountAfterDiscount from items (which includes tax)
+//               const productTotalToAdd = productTaxType === 'Exclusive' 
+//                 ? taxableTotal + itemTaxTotal 
+//                 : saleOrderItems.reduce((sum, item) => {
+//                     const qty = Number(item.quantity || 0) - Number(item.production_qty || 0);
+//                     const rate = Number(item.rate || 0);
+//                     const discount = Number(item.discount || 0);
+//                     const amountAfterDiscount = (qty * rate) * (1 - discount/100);
+//                     return sum + amountAfterDiscount;
+//                   }, 0);
 
-                              const cessAmount =
-                                Number(saleOrder.cess_amount) || 0;
+//               // Shipping part based on its tax type
+//               const shippingTotalToAdd = shippingTaxType === 'Exclusive'
+//                 ? shippingBaseAmount + shippingTaxAmount
+//                 : shippingDisplayAmount; // For Inclusive, display amount already includes tax
 
-                              const disAmount =
-                                Number(saleOrder.dis_amt) || 0;
+//               const finalTotal = 
+//                 productTotalToAdd +
+//                 shippingTotalToAdd +
+//                 cessAmount -
+//                 disAmount -
+//                 advanceAmount +
+//                 roundOff;
 
-                              const advanceAmount =
-                                Number(saleOrder.advance_amount) || 0;
+//               // Store ALL values in saleOrder
+//               saleOrder.item_value = itemValueTotal.toFixed(2);
+//               saleOrder.taxable = taxableTotal.toFixed(2);
+              
+//               // Tax breakdown
+//               saleOrder.item_tax_amount = itemTaxTotal.toFixed(2);
+//               saleOrder.shipping_tax_amount = shippingTaxAmount.toFixed(2);
+//               saleOrder.tax_amount = totalTaxAmount.toFixed(2);
+              
+//               // 🔥 FIX: Store shipping with proper fields
+//               orderShipments.shipping_charges = shippingBaseAmount.toFixed(2); // What user sees
+//               orderShipments.shipping_gst = shippingGstPercent;
+//               orderShipments.tax = shippingTaxType; // Store which tax type was used
+              
+//               // // Update saleOrder shipping fields
+//               // saleOrder.shipping_base_amount = shippingBaseAmount.toFixed(2);
+//               // saleOrder.shipping_gst_percent = shippingGstPercent;
+//               // saleOrder.shipping_gst_amount = shippingTaxAmount.toFixed(2);
+//               // saleOrder.transport_charges = shippingDisplayAmount.toFixed(2);
+              
+//               // FINAL TOTAL
+//               saleOrder.total_amount = finalTotal.toFixed(2);
 
-                              const roundOff =
-                                Number(saleOrder.round_off) || 0;
+//               /* -------------------------
+//                 INVOICE PAYLOAD - FIXED
+//               ------------------------- */
 
-                              const finalTotal =
-                                taxableTotal +
-                                taxTotal +
-                                finalShipping +
-                                cessAmount -
-                                disAmount -
-                                advanceAmount +
-                                roundOff;
+//               this.invoiceData = {
 
-                              saleOrder.item_value = itemValueTotal.toFixed(2);
-                              saleOrder.taxable = taxableTotal.toFixed(2);
-                              saleOrder.tax_amount = taxTotal.toFixed(2);
-                              saleOrder.transport_charges = finalShipping.toFixed(2);
-                              saleOrder.total_amount = finalTotal.toFixed(2);
+//                 sale_invoice_order: {
+//                   bill_type: billType,
+//                   invoice_date: this.nowDate(),
+//                   email: saleOrder.email,
+//                   ref_no: saleOrder.ref_no,
+//                   ref_date: this.nowDate(),
+//                   due_date: this.nowDate(),
+//                   tax: saleOrder.tax || 'Exclusive', // Product tax type
+//                   shipping_tax_type: shippingTaxType, // 🔥 NEW: Pass shipping tax type
+//                   remarks: saleOrder.remarks,
+//                   advance_amount: saleOrder.advance_amount || '0',
+                  
+//                   // Tax fields
+//                   tax_amount: totalTaxAmount.toFixed(2),
+//                   item_tax_amount: itemTaxTotal.toFixed(2),
+//                   shipping_tax_amount: shippingTaxAmount.toFixed(2),
+                  
+//                   item_value: itemValueTotal.toFixed(2),
+//                   discount: saleOrder.discount || '0',
+//                   dis_amt: saleOrder.dis_amt || '0',
+//                   taxable: taxableTotal.toFixed(2),
+//                   cess_amount: saleOrder.cess_amount,
+//                   // // 🔥 FIXED: Shipping fields - send ALL correctly
+//                   // shipping_charges: shippingDisplayAmount.toFixed(2), // Display amount
+//                   // shipping_base_amount: shippingBaseAmount.toFixed(2), // Base amount
+//                   // shipping_gst: shippingGstPercent,
+//                   // shipping_gst_amount: shippingTaxAmount.toFixed(2),
+//                   // transport_charges: shippingDisplayAmount.toFixed(2),
+                  
+//                   round_off: saleOrder.round_off,
+//                   total_amount: finalTotal.toFixed(2),
+                  
+//                   vehicle_name: saleOrder.vehicle_name,
+//                   total_boxes: saleOrder.total_boxes,
+//                   shipping_address: saleOrder.shipping_address,
+//                   billing_address: saleOrder.billing_address,
+//                   customer_id: saleOrder.customer_id,
+//                   gst_type_id: saleOrder.gst_type_id,
+//                   order_type: saleOrder.order_type || 'sale_invoice',
+//                   order_salesman_id: saleOrder.order_salesman_id,
+//                   customer_address_id: saleOrder.customer_address_id,
+//                   payment_term_id: saleOrder.payment_term_id,
+//                   payment_link_type_id: saleOrder.payment_link_type_id,
+//                   ledger_account_id: saleOrder.ledger_account_id,
+//                   flow_status: saleOrder.flow_status,
+//                   order_status_id: completedStatusId,
+//                   sale_order: saleOrder.sale_order,
+//                   sale_order_id: saleOrder.sale_order_id,
+//                   ...(billType == 'OTHERS' && {
+//                     invoice_no: this.invoiceNumber
+//                   })
+//                 },
 
-                              /* -------------------------
-                                INVOICE PAYLOAD
-                              ------------------------- */
+//                 sale_invoice_items: saleOrderItems
+//                   .filter(item => item.product_id)
+//                   .map(item => ({
+//                     ...item,
+//                     quantity:
+//                       Number(item.quantity || 0) -
+//                       Number(item.production_qty || 0),
+//                     discount: item.discount || '0',
+//                     base_amount: item.base_amount || '0', // Pass base amount
+//                   })),
 
-                              this.invoiceData = {
+//                 order_attachments: orderAttachments,
+//                 order_shipments: orderShipments
+//               };
 
-                                sale_invoice_order: {
-                                  bill_type: billType,
-                                  invoice_date: this.nowDate(),
-                                  email: saleOrder.email,
-                                  ref_no: saleOrder.ref_no,
-                                  ref_date: this.nowDate(),
-                                  due_date: this.nowDate(),
-                                  tax: saleOrder.tax || 'Inclusive',
-                                  remarks: saleOrder.remarks,
-                                  advance_amount: saleOrder.advance_amount || '0',
-                                  tax_amount: taxTotal.toFixed(2),
-                                  item_value: itemValueTotal.toFixed(2),
-                                  discount: saleOrder.discount || '0',
-                                  dis_amt: saleOrder.dis_amt || '0',
-                                  taxable: taxableTotal.toFixed(2),
-                                  cess_amount: saleOrder.cess_amount,
-                                  transport_charges: finalShipping.toFixed(2),
-                                  round_off: saleOrder.round_off,
-                                  total_amount: saleOrder.total_amount,
-                                  vehicle_name: saleOrder.vehicle_name,
-                                  total_boxes: saleOrder.total_boxes,
-                                  shipping_address: saleOrder.shipping_address,
-                                  billing_address: saleOrder.billing_address,
-                                  customer_id: saleOrder.customer_id,
-                                  gst_type_id: saleOrder.gst_type_id,
-                                  order_type: saleOrder.order_type || 'sale_invoice',
-                                  order_salesman_id: saleOrder.order_salesman_id,
-                                  customer_address_id: saleOrder.customer_address_id,
-                                  payment_term_id: saleOrder.payment_term_id,
-                                  payment_link_type_id: saleOrder.payment_link_type_id,
-                                  ledger_account_id: saleOrder.ledger_account_id,
-                                  flow_status: saleOrder.flow_status,
-                                  order_status_id: completedStatusId,
-                                  sale_order: saleOrder.sale_order,
-                                  sale_order_id: saleOrder.sale_order_id,
-                                  ...(billType == 'OTHERS' && {
-                                    invoice_no: this.invoiceNumber
-                                  })
-                                },
+//               // Debug log to verify all 4 cases
+//               console.log('=== INVOICE CREATION CALCULATION ===');
+//               console.log('Product Tax Type:', productTaxType);
+//               console.log('Shipping Tax Type:', shippingTaxType);
+//               console.log('Product Tax:', itemTaxTotal);
+//               console.log('Shipping Base:', shippingBaseAmount);
+//               console.log('Shipping Display:', shippingDisplayAmount);
+//               console.log('Shipping Tax:', shippingTaxAmount);
+//               console.log('Total Tax:', totalTaxAmount);
+//               console.log('Final Total:', finalTotal);
+//               console.log('====================================');
 
-                                sale_invoice_items: saleOrderItems
-                                  .filter(item => item.product_id)
-                                  .map(item => ({
-                                    ...item,
-                                    quantity:
-                                      Number(item.quantity || 0) -
-                                      Number(item.production_qty || 0),
-                                    discount: item.discount || '0',
-                                  })),
+//             });
 
-                                order_attachments: orderAttachments,
-                                order_shipments: orderShipments
-                              };
+//           }
 
-                              console.log('Perfect ERP Invoice Data:', this.invoiceData);
+//         });
 
-                            });
+//       });
 
-                          }
+//     }
+//   }
+// },
+{
+  key: 'flow_status',
+  type: 'select',
+  className: 'col-md-4 col-sm-6 col-12',
+  templateOptions: {
+    label: 'Flow status',
+    dataKey: 'flow_status_id',
+    dataLabel: 'flow_status_name',
+    lazy: {
+      url: 'masters/flow_status/',
+      lazyOneTime: true
+    }
+  },
+  hooks: {
+    onChanges: (field: any) => {
 
-                        });
+      field.formControl.valueChanges.subscribe(data => {
+        if (data && data.flow_status_id) {
+          this.formConfig.model['sale_order']['flow_status_id'] = data.flow_status_id;
+        }
+      });
 
-                      });
+      field.formControl.valueChanges.subscribe(data => {
 
-                    }
+        if (!data || data.flow_status_name !== 'Ready for Invoice') return;
+
+        const saleOrder = this.formConfig.model['sale_order'];
+        const saleOrderItems = this.formConfig.model['sale_order_items'] || [];
+        const orderAttachments = this.formConfig.model['order_attachments'];
+        const orderShipments = this.formConfig.model['order_shipments'] || {};
+
+        const saleTypeObj = saleOrder.sale_type;
+        const saleTypeName = saleTypeObj?.name || '';
+
+        const billType = (saleTypeName === 'Other') ? 'OTHERS' : 'CASH';
+        const invoicePrefix = (saleTypeName === 'Other') ? 'SOO-INV' : 'SO-INV';
+
+        this.http.get(`masters/generate_order_no/?type=${invoicePrefix}`).subscribe((res: any) => {
+
+          if (res?.data?.order_number) {
+
+            this.invoiceNumber = res.data.order_number;
+
+            this.http.get('masters/order_status/?status_name=Pending').subscribe((statusRes: any) => {
+
+              const completedStatus = statusRes?.data?.[0];
+              const completedStatusId = completedStatus?.order_status_id;
+
+              let itemValueTotal = 0;
+              let discountTotal = 0;
+              let taxableTotal = 0;
+              let itemTaxTotal = 0;
+              let amountTotal = 0;
+
+              let totalOrderQty = 0;
+              let invoiceQty = 0;
+
+              // Get separate tax types
+              const productTaxType = saleOrder.tax || 'Exclusive';
+              const shippingTaxType = orderShipments?.tax || productTaxType;
+
+              /* -------------------------
+                ITEM CALCULATION - FIXED WITH DISCOUNT TYPE
+              ------------------------- */
+
+              saleOrderItems.forEach(item => {
+
+                const quantity = Number(item.quantity) || 0;
+                const rate = Number(item.rate) || 0;
+                const taxPercent = Number(item.tax) || 0;
+                const productionQty = Number(item.production_qty) || 0;
+                
+                // 🔥 FIX: Get discount type (default to 'percentage' if not set)
+                const discountType = item.discount_type || 'percentage';
+                
+                const invoiceItemQty = quantity - productionQty;
+                const itemValue = invoiceItemQty * rate;
+                
+                // 🔥 FIX: Calculate discount based on discount type
+                let discountAmount = 0;
+                
+                if (discountType === 'amount') {
+                  // Amount discount - use discount_amount field
+                  discountAmount = Number(item.discount_amount) || 0;
+                  
+                  // Validate amount doesn't exceed item value
+                  if (discountAmount > itemValue) {
+                    discountAmount = itemValue;
                   }
+                } else {
+                  // Percentage discount - use discount field
+                  const discountPercent = Number(item.discount) || 0;
+                  discountAmount = (itemValue * discountPercent) / 100;
+                }
+                
+                const amountAfterDiscount = itemValue - discountAmount;
+                
+                // Calculate tax based on product tax type
+                let baseAmount = amountAfterDiscount;
+                let taxAmount = 0;
+                
+                if (productTaxType === 'Inclusive') {
+                  baseAmount = amountAfterDiscount / (1 + taxPercent / 100);
+                  taxAmount = amountAfterDiscount - baseAmount;
+                } else {
+                  baseAmount = amountAfterDiscount;
+                  taxAmount = (amountAfterDiscount * taxPercent) / 100;
+                }
+                
+                const totalAmount = baseAmount + taxAmount;
+                
+                /* Save values to item */
+                item.item_value = itemValue;
+                item.discount_amount = discountAmount; // ✅ Store actual discount amount
+                item.base_amount = baseAmount;
+                item.amount = baseAmount;
+                item.tax_amount = taxAmount;
+                item.total = totalAmount;
+                
+                // Also store which discount type was used
+                item.discount_type = discountType; // Preserve the discount type
+                
+                /* GST Split */
+                const address = saleOrder.billing_address || saleOrder.shipping_address || '';
+                const isIntraState = address.toLowerCase().includes('andhra pradesh');
+                
+                if (isIntraState) {
+                  item.cgst = taxAmount / 2;
+                  item.sgst = taxAmount / 2;
+                  item.igst = 0;
+                } else {
+                  item.igst = taxAmount;
+                  item.cgst = 0;
+                  item.sgst = 0;
+                }
+                
+                /* Totals */
+                itemValueTotal += itemValue;
+                discountTotal += discountAmount;
+                taxableTotal += baseAmount;
+                itemTaxTotal += taxAmount;
+                amountTotal += totalAmount;
+                
+                totalOrderQty += quantity;
+                invoiceQty += invoiceItemQty;
+              });
+
+              /* -------------------------
+                SHIPPING CALCULATION
+              ------------------------- */
+
+              const shippingCharges = Number(orderShipments.shipping_charges || 0);
+              const shippingGstPercent = Number(orderShipments.shipping_gst || 0);
+
+              // Calculate proportional shipping for invoice
+              let shippingBaseAmount = 0;
+              if (totalOrderQty > 0) {
+                shippingBaseAmount = (invoiceQty / totalOrderQty) * shippingCharges;
+              }
+
+              // Calculate shipping tax based on shippingTaxType
+              let shippingTaxAmount = 0;
+              let shippingDisplayAmount = shippingBaseAmount;
+
+              if (shippingBaseAmount > 0 && shippingGstPercent > 0) {
+                if (shippingTaxType === 'Inclusive') {
+                  const baseShipping = shippingBaseAmount / (1 + shippingGstPercent / 100);
+                  shippingTaxAmount = shippingBaseAmount - baseShipping;
+                  shippingDisplayAmount = shippingBaseAmount;
+                  shippingBaseAmount = baseShipping;
+                } else {
+                  shippingTaxAmount = (shippingBaseAmount * shippingGstPercent) / 100;
+                  shippingDisplayAmount = shippingBaseAmount + shippingTaxAmount;
+                }
+              }
+
+              /* -------------------------
+                OTHER AMOUNTS
+              ------------------------- */
+
+              const cessAmount = Number(saleOrder.cess_amount) || 0;
+              const disAmount = Number(saleOrder.dis_amt) || 0;
+              const advanceAmount = Number(saleOrder.advance_amount) || 0;
+              const roundOff = Number(saleOrder.round_off) || 0;
+
+              /* -------------------------
+                FINAL TOTALS
+              ------------------------- */
+
+              const totalTaxAmount = itemTaxTotal + shippingTaxAmount;
+
+              // Calculate product total based on tax type
+              const productTotalToAdd = productTaxType === 'Exclusive' 
+                ? taxableTotal + itemTaxTotal 
+                : saleOrderItems.reduce((sum, item) => {
+                    const qty = Number(item.quantity || 0) - Number(item.production_qty || 0);
+                    const rate = Number(item.rate || 0);
+                    
+                    // 🔥 FIX: Use the same discount logic for inclusive calculation
+                    const discountType = item.discount_type || 'percentage';
+                    let discountAmount = 0;
+                    
+                    if (discountType === 'amount') {
+                      discountAmount = Number(item.discount_amount) || 0;
+                      const itemValue = qty * rate;
+                      if (discountAmount > itemValue) discountAmount = itemValue;
+                    } else {
+                      const discountPercent = Number(item.discount) || 0;
+                      discountAmount = (qty * rate * discountPercent) / 100;
+                    }
+                    
+                    const amountAfterDiscount = (qty * rate) - discountAmount;
+                    return sum + amountAfterDiscount;
+                  }, 0);
+
+              // Shipping part based on its tax type
+              const shippingTotalToAdd = shippingTaxType === 'Exclusive'
+                ? shippingBaseAmount + shippingTaxAmount
+                : shippingDisplayAmount;
+
+              const finalTotal = 
+                productTotalToAdd +
+                shippingTotalToAdd +
+                cessAmount -
+                disAmount -
+                advanceAmount +
+                roundOff;
+
+              // Store values in saleOrder
+              saleOrder.item_value = itemValueTotal.toFixed(2);
+              saleOrder.taxable = taxableTotal.toFixed(2);
+              
+              // Tax breakdown
+              saleOrder.item_tax_amount = itemTaxTotal.toFixed(2);
+              saleOrder.shipping_tax_amount = shippingTaxAmount.toFixed(2);
+              saleOrder.tax_amount = totalTaxAmount.toFixed(2);
+              
+              // Store shipping with proper fields
+              orderShipments.shipping_charges = shippingBaseAmount.toFixed(2);
+              orderShipments.shipping_gst = shippingGstPercent;
+              orderShipments.tax = shippingTaxType;
+              
+              // FINAL TOTAL
+              saleOrder.total_amount = finalTotal.toFixed(2);
+
+              /* -------------------------
+                INVOICE PAYLOAD - FIXED WITH DISCOUNT TYPE
+              ------------------------- */
+
+              this.invoiceData = {
+
+                sale_invoice_order: {
+                  bill_type: billType,
+                  invoice_date: this.nowDate(),
+                  email: saleOrder.email,
+                  ref_no: saleOrder.ref_no,
+                  ref_date: this.nowDate(),
+                  due_date: this.nowDate(),
+                  tax: saleOrder.tax || 'Exclusive',
+                  shipping_tax_type: shippingTaxType,
+                  remarks: saleOrder.remarks,
+                  advance_amount: saleOrder.advance_amount || '0',
+                  
+                  // Tax fields
+                  tax_amount: totalTaxAmount.toFixed(2),
+                  item_tax_amount: itemTaxTotal.toFixed(2),
+                  shipping_tax_amount: shippingTaxAmount.toFixed(2),
+                  
+                  item_value: itemValueTotal.toFixed(2),
+                  discount: saleOrder.discount || '0',
+                  dis_amt: saleOrder.dis_amt || '0',
+                  taxable: taxableTotal.toFixed(2),
+                  cess_amount: saleOrder.cess_amount,
+                  round_off: saleOrder.round_off,
+                  total_amount: finalTotal.toFixed(2),
+                  
+                  vehicle_name: saleOrder.vehicle_name,
+                  total_boxes: saleOrder.total_boxes,
+                  shipping_address: saleOrder.shipping_address,
+                  billing_address: saleOrder.billing_address,
+                  customer_id: saleOrder.customer_id,
+                  gst_type_id: saleOrder.gst_type_id,
+                  order_type: saleOrder.order_type || 'sale_invoice',
+                  order_salesman_id: saleOrder.order_salesman_id,
+                  customer_address_id: saleOrder.customer_address_id,
+                  payment_term_id: saleOrder.payment_term_id,
+                  payment_link_type_id: saleOrder.payment_link_type_id,
+                  ledger_account_id: saleOrder.ledger_account_id,
+                  flow_status: saleOrder.flow_status,
+                  order_status_id: completedStatusId,
+                  sale_order: saleOrder.sale_order,
+                  sale_order_id: saleOrder.sale_order_id,
+                  ...(billType == 'OTHERS' && {
+                    invoice_no: this.invoiceNumber
+                  })
                 },
+
+                // 🔥 FIXED: Now passing all discount fields to invoice items
+                sale_invoice_items: saleOrderItems
+                  .filter(item => item.product_id)
+                  .map(item => ({
+                    ...item,
+                    quantity: Number(item.quantity || 0) - Number(item.production_qty || 0),
+                    discount: item.discount || '0',                 // Percentage discount
+                    discount_amount: item.discount_amount || '0',   // Amount discount
+                    discount_type: item.discount_type || 'percentage', // Discount type
+                    base_amount: item.base_amount || '0',
+                  })),
+
+                order_attachments: orderAttachments,
+                order_shipments: orderShipments
+              };
+
+              // Debug log to verify all calculations
+              console.log('=== INVOICE CREATION CALCULATION ===');
+              console.log('Product Tax Type:', productTaxType);
+              console.log('Shipping Tax Type:', shippingTaxType);
+              console.log('Discount Total:', discountTotal);
+              console.log('Product Tax:', itemTaxTotal);
+              console.log('Shipping Base:', shippingBaseAmount);
+              console.log('Shipping Tax:', shippingTaxAmount);
+              console.log('Total Tax:', totalTaxAmount);
+              console.log('Final Total:', finalTotal);
+              console.log('====================================');
+
+            });
+
+          }
+
+        });
+
+      });
+
+    }
+  }
+},
                 {
                   key: 'remarks',
                   type: 'textarea',
@@ -7089,6 +7775,33 @@ createSaleOrder() {
                         type: 'date',
                         label: 'Shipping Date',
                         // required: true
+                      }
+                    },
+                    {
+                      key: 'tax',
+                      type: 'select',
+                      className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                      templateOptions: {
+                        label: 'Tax',
+                        required: false,
+                        options: [
+                          { label: "Inclusive", value: 'Inclusive' },
+                          { label: "Exclusive", value: 'Exclusive' }
+                        ]
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate?.order_shipments?.tax) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.tax);
+                          } else {
+                            field.formControl.setValue('Exclusive');
+                          }
+
+                          // 🔥 Recalculate when tax type changes
+                          field.formControl.valueChanges.subscribe(() => {
+                            this.totalAmountCal();
+                          });
+                        }
                       }
                     },
                     {
