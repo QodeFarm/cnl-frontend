@@ -2598,12 +2598,63 @@ createSaleInovice() {
               //     }
               //   }
               // },
+              // {
+              //   type: 'input',
+              //   key: 'quantity',
+              //   // defaultValue: 1,
+              //   templateOptions: {
+              //     type: 'number',
+              //     label: 'Qty',
+              //     placeholder: 'Qty',
+              //     min: 1,
+              //     hideLabel: true,
+              //     required: false
+              //   },
+              //   hooks: {
+              //     onInit: (field: any) => {
+              //       const parentArray = field.parent;
+
+              //       // Check if parentArray exists and proceed
+              //       if (parentArray) {
+              //         const currentRowIndex = +parentArray.key; // Simplified number conversion
+
+              //         // Check if there is a product already selected in this row (when data is copied)
+              //         if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
+              //           const existingQuan = this.dataToPopulate.sale_invoice_items[currentRowIndex].quantity;
+
+              //           // Set the full product object instead of just the product_id
+              //           if (existingQuan) {
+              //             field.formControl.setValue(existingQuan); // Set full product object (not just product_id)
+              //           }
+              //         }
+              //       }
+
+              //       // Subscribe to value changes
+              //       field.formControl.valueChanges.subscribe(data => {
+              //         // this.totalAmountCal();
+              //         if (field.form && field.form.controls && field.form.controls.rate && data) {
+              //           const rate = field.form.controls.rate.value;
+              //           const discount = field.form.controls.discount.value;
+              //           const quantity = data;
+              //           const productDiscount = parseInt(rate) * parseInt(quantity) * parseInt(discount)/ 100
+              //           if (rate && quantity) {
+              //             field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity) - productDiscount) ;
+              //           }
+              //         }
+              //         this.triggerDraftSave(); // Auto-save draft on quantity change
+              //       });
+              //     },
+              //     onChanges: (field: any) => {
+              //       // You can handle any changes here if needed
+              //     }
+              //   }
+              // },
               {
                 type: 'input',
                 key: 'quantity',
-                // defaultValue: 1,
                 templateOptions: {
                   type: 'number',
+                  step: 0.01,
                   label: 'Qty',
                   placeholder: 'Qty',
                   min: 1,
@@ -2614,38 +2665,47 @@ createSaleInovice() {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
 
-                    // Check if parentArray exists and proceed
                     if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+                      const currentRowIndex = +parentArray.key;
 
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
-                        const existingQuan = this.dataToPopulate.sale_invoice_items[currentRowIndex].quantity;
+                      if (
+                        this.dataToPopulate &&
+                        this.dataToPopulate.sale_invoice_items.length > currentRowIndex
+                      ) {
+                        const existingQuan =
+                          this.dataToPopulate.sale_invoice_items[currentRowIndex].quantity;
 
-                        // Set the full product object instead of just the product_id
                         if (existingQuan) {
-                          field.formControl.setValue(existingQuan); // Set full product object (not just product_id)
+                          field.formControl.setValue(existingQuan);
                         }
                       }
                     }
 
-                    // Subscribe to value changes
-                    field.formControl.valueChanges.subscribe(data => {
-                      // this.totalAmountCal();
-                      if (field.form && field.form.controls && field.form.controls.rate && data) {
-                        const rate = field.form.controls.rate.value;
-                        const discount = field.form.controls.discount.value;
-                        const quantity = data;
-                        const productDiscount = parseInt(rate) * parseInt(quantity) * parseInt(discount)/ 100
-                        if (rate && quantity) {
-                          field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity) - productDiscount) ;
-                        }
+                    field.formControl.valueChanges.subscribe(quantity => {
+
+                      if (!field.form || !field.form.controls) return;
+
+                      const rate = Number(field.form.controls.rate?.value || 0);
+                      const discount = Number(field.form.controls.discount?.value || 0);
+                      const availableQty = Number(field.form.controls.available_qty?.value || 0);
+
+                      const qty = Number(quantity || 0);
+
+                      // Existing Amount Logic (KEEP)
+                      const productDiscount = rate * qty * discount / 100;
+                      if (rate && qty) {
+                        field.form.controls.amount?.setValue(
+                          rate * qty - productDiscount
+                        );
                       }
-                      this.triggerDraftSave(); // Auto-save draft on quantity change
+
+                      // Production Qty Logic
+                      const productionQty = Math.max(0, qty - availableQty);
+                      field.form.controls.production_qty?.setValue(productionQty);
+
+                      this.totalAmountCal();
+                      this.triggerDraftSave();
                     });
-                  },
-                  onChanges: (field: any) => {
-                    // You can handle any changes here if needed
                   }
                 }
               },
@@ -2686,7 +2746,81 @@ createSaleInovice() {
                           field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity));
                         }
                       }
+                      this.totalAmountCal();
                       this.triggerDraftSave(); // Auto-save draft on rate change
+                    });
+                  }
+                }
+              },
+              {
+                type: 'select',
+                key: 'discount_type',
+                templateOptions: {
+                  placeholder: 'Type',
+                  label: 'Discount Type',
+                  hideLabel: true,
+                  options: [
+                    { label: '%', value: 'percentage' },
+                    { label: '₹', value: 'amount' }
+                  ]
+                },
+                defaultValue: 'percentage',
+                hooks: {
+                  onInit: (field: any) => {
+                    field.formControl.valueChanges.subscribe(type => {
+                      if (!field.form?.controls) return;
+
+                      if (type === 'percentage') {
+                        field.form.controls.discount_amount?.setValue(0, { emitEvent: false });
+                      } else {
+                        field.form.controls.discount?.setValue(0, { emitEvent: false });
+                      }
+
+                      this.totalAmountCal();
+                    });
+                  }
+                }
+              },
+              {
+                type: 'input',
+                key: 'discount_amount',
+                templateOptions: {
+                  type: 'number',
+                  step: 0.01,
+                  placeholder: 'Disc ₹',
+                  label: 'Disc ₹',
+                  hideLabel: true,
+                },
+                expressionProperties: {
+                  'templateOptions.disabled': (model: any) => {
+                    return model.discount_type === 'percentage';
+                  }
+                },
+                hooks: {
+                  onInit: (field: any) => {
+                    field.formControl.valueChanges.subscribe(value => {
+
+                      if (!field.form?.controls) return;
+                      if (field.model.discount_type === 'percentage') return;
+
+                      const rate = Number(field.form.controls.rate?.value || 0);
+                      const qty = Number(field.form.controls.quantity?.value || 0);
+                      const total = rate * qty;
+
+                      if (total > 0) {
+                        let amount = Number(value || 0);
+
+                        if (amount > total) amount = total;
+
+                        const percent = (amount / total) * 100;
+
+                        field.form.controls.discount?.setValue(
+                          Number(percent.toFixed(2)),
+                          { emitEvent: false }
+                        );
+                      }
+
+                      this.totalAmountCal();
                     });
                   }
                 }
@@ -2696,31 +2830,56 @@ createSaleInovice() {
                 key: 'discount',
                 templateOptions: {
                   type: 'number',
-                  placeholder: 'Enter Disc',
-                  label: 'Disc',
+                  step: 0.01,
+                  placeholder: 'Disc %',
+                  label: 'Disc %',
                   hideLabel: true,
+                },
+                expressionProperties: {
+                  'templateOptions.disabled': (model: any) => {
+                    return model.discount_type === 'amount';
+                  }
                 },
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
 
-                    // Check if parentArray exists and proceed
                     if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+                      const currentRowIndex = +parentArray.key;
 
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
-                        const existingDisc = this.dataToPopulate.sale_invoice_items[currentRowIndex].discount;
+                      if (
+                        this.dataToPopulate &&
+                        this.dataToPopulate.sale_invoice_items.length > currentRowIndex
+                      ) {
+                        const existingDisc =
+                          this.dataToPopulate.sale_invoice_items[currentRowIndex].discount;
 
-                        // Set the full product object instead of just the product_id
-                        if (existingDisc) {
-                          field.formControl.setValue(existingDisc); // Set full product object (not just product_id)
+                        if (existingDisc !== null && existingDisc !== undefined) {
+                          field.formControl.setValue(existingDisc);
                         }
                       }
                     }
-                    field.formControl.valueChanges.subscribe(data => {
+
+                    field.formControl.valueChanges.subscribe(value => {
+
+                      if (!field.form?.controls) return;
+                      if (field.model.discount_type === 'amount') return;
+
+                      const rate = Number(field.form.controls.rate?.value || 0);
+                      const qty = Number(field.form.controls.quantity?.value || 0);
+                      const total = rate * qty;
+
+                      if (total > 0) {
+                        const percent = Number(value || 0);
+                        const discountAmount = (percent / 100) * total;
+
+                        field.form.controls.discount_amount?.setValue(
+                          Number(discountAmount.toFixed(2)),
+                          { emitEvent: false }
+                        );
+                      }
+
                       this.totalAmountCal();
-                      // Add any logic needed for when discount changes
                     });
                   }
                 }
@@ -2769,7 +2928,6 @@ createSaleInovice() {
                   disabled: true
                 },
               },
-              
               {
                 type: 'input',
                 key: 'tax',
@@ -3440,6 +3598,33 @@ createSaleInovice() {
                         type: 'date',
                         label: 'Shipping Date',
                         // required: true
+                      }
+                    },
+                    {
+                      key: 'tax',
+                      type: 'select',
+                      className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                      templateOptions: {
+                        label: 'Tax',
+                        required: false,
+                        options: [
+                          { label: "Inclusive", value: 'Inclusive' },
+                          { label: "Exclusive", value: 'Exclusive' }
+                        ]
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          if (this.dataToPopulate?.order_shipments?.tax) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.tax);
+                          } else {
+                            field.formControl.setValue('Exclusive');
+                          }
+
+                          // 🔥 Recalculate when tax type changes
+                          field.formControl.valueChanges.subscribe(() => {
+                            this.totalAmountCal();
+                          });
+                        }
                       }
                     },
                     {
