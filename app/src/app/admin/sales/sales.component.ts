@@ -5637,11 +5637,11 @@ createSaleOrder() {
                 const isIntraState = address.toLowerCase().includes('andhra pradesh');
                 
                 if (isIntraState) {
-                  item.cgst = taxAmount / 2;
-                  item.sgst = taxAmount / 2;
+                  item.cgst = Number((taxAmount / 2).toFixed(2));
+                  item.sgst = Number((taxAmount / 2).toFixed(2));
                   item.igst = 0;
                 } else {
-                  item.igst = taxAmount;
+                  item.igst = Number((taxAmount).toFixed(2));
                   item.cgst = 0;
                   item.sgst = 0;
                 }
