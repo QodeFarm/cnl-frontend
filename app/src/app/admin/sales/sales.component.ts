@@ -1863,18 +1863,29 @@ openQuickpackModal() {
   modal.show();
 }
 
-  selectQuickpack(quickpackId: string) {
+  // selectQuickpack(quickpackId: string) {
 
-    this.selectedQuickpack = quickpackId;
+  //   this.selectedQuickpack = quickpackId;
 
-    this.loadQuickpackProducts();
+  //   this.loadQuickpackProducts();
 
-    const modalElement = document.getElementById('quickpackModal');
-    const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
+  //   const modalElement = document.getElementById('quickpackModal');
+  //   const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
 
-    modal.hide();
-  }
+  //   modal.hide();
+  // }
 
+  selectQuickpack(quickpackId: string, pack?: any) {
+
+  this.selectedQuickpack = quickpackId;
+
+  this.loadQuickpackProducts(pack);
+
+  const modalElement = document.getElementById('quickpackModal');
+  const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
+
+  modal.hide();
+}
   loadQuickpackOptions() {
     console.log("csutomer id fecthed in loadQuick : ", this.formConfig?.model?.sale_order?.customer_id);
 
@@ -1896,45 +1907,151 @@ openQuickpackModal() {
   }
 
 
-  loadQuickpackProducts() {
-    console.log("quick pack id : ", this.selectedQuickpack)
-    if (!this.selectedQuickpack) {
-      console.log('Please select a Quickpack!');
-      return;
-    }
+  // loadQuickpackProducts() {
+  //   console.log("quick pack id : ", this.selectedQuickpack)
+  //   if (!this.selectedQuickpack) {
+  //     console.log('Please select a Quickpack!');
+  //     return;
+  //   }
 
-    this.http.get(`sales/quick_pack/${this.selectedQuickpack}`)
+  //   this.http.get(`sales/quick_pack/${this.selectedQuickpack}`)
+  //     .subscribe((response: any) => {
+  //       console.log("response : ", response.data.quick_pack_data_items);
+  //       const quickPackDataItems = response.data.quick_pack_data_items || [];
+
+  //       if (quickPackDataItems.length === 0) {
+  //         console.log('No items found in the selected Quickpack!');
+  //         return;
+  //       }
+  //       // Populate `sale_order_items` with Quickpack data
+  //       this.formConfig.model.sale_order_items = quickPackDataItems.map((item: any) => ({
+  //         product: item.product,
+  //         quantity: item.quantity,
+  //         size: item.size,
+  //         color: item.color,
+  //         print_name: item.product.print_name,
+  //         rate: item.product.mrp,
+  //         discount: item.product.dis_amount,
+  //         unit_options_id: item.product.unit_options
+
+  //       }));
+
+  //       // Trigger form change detection (if needed)
+  //       if (this.salesForm) {
+  //         console.log("we are inside : ", this.salesForm.form);
+  //         this.salesForm.form.controls.sale_order_items.patchValue(this.formConfig.model.sale_order_items);
+  //         console.log("After method ...")
+  //       }
+
+  //       console.log('Sale Order Items populated:', this.formConfig.model.sale_order_items);
+  //     });
+  // }
+
+loadQuickpackProducts(pack?: any) {
+
+  console.log("quick pack id : ", this.selectedQuickpack);
+
+  if (!this.selectedQuickpack) {
+    console.log('Please select a Quickpack!');
+    return;
+  }
+
+  this.http.get(`sales/quick_pack/${this.selectedQuickpack}`)
+    .subscribe((response: any) => {
+
+      console.log("response : ", response.data.quick_pack_data_items);
+
+      let quickPackDataItems = response.data.quick_pack_data_items || [];
+      console.log("Initial quickPackDataItems : ", quickPackDataItems);
+
+      // ✅ If coming from Apply button
+      if (pack && pack.products) {
+
+        quickPackDataItems = pack.products
+          .filter((p: any) => p.selected)
+          .map((p: any) => ({
+
+            ...p,
+
+            quantity: pack.custom_qty
+              ? pack.custom_qty     // user entered qty
+              : p.quantity          // original quickpack qty
+
+          }));
+
+      }
+      // if (pack && pack.products) {
+
+      //   quickPackDataItems = pack.products
+      //     .filter((p: any) => p.selected)
+      //     .map((p: any) => {
+
+      //       let qty = p.quantity; // default original qty
+
+      //       if (pack.custom_qty) {
+      //         qty = (p.quantity / pack.lot_qty) * pack.custom_qty;
+      //       }
+
+      //       return {
+      //         ...p,
+      //         quantity: qty
+      //       };
+
+      //     });
+
+      // }
+
+      if (quickPackDataItems.length === 0) {
+        console.log('No items found in the selected Quickpack!');
+        return;
+      }
+
+      this.formConfig.model.sale_order_items = quickPackDataItems.map((item: any) => ({
+        product: item.product,
+        quantity: item.quantity,
+        size: item.size,
+        color: item.color,
+        print_name: item.product.print_name,
+        rate: item.product.mrp,
+        discount: item.discount,
+        tax: item.tax,    
+        unit_options_id: item.product.unit_options?.unit_options_id
+      }));
+
+      if (this.salesForm) {
+        this.salesForm.form.controls.sale_order_items.patchValue(
+          this.formConfig.model.sale_order_items
+        );
+      }
+
+      console.log('Sale Order Items populated:', this.formConfig.model.sale_order_items);
+
+    });
+
+}
+
+toggleQuickpackProducts(pack: any) {
+
+  pack.showProducts = !pack.showProducts;
+
+  console.log("Toggled showProducts for pack:", pack.quick_pack_id, "New value:", pack.showProducts);
+
+  if (pack.showProducts && !pack.products) {
+
+    this.http.get(`sales/quick_pack/${pack.quick_pack_id}`)
       .subscribe((response: any) => {
-        console.log("response : ", response.data.quick_pack_data_items);
-        const quickPackDataItems = response.data.quick_pack_data_items || [];
 
-        if (quickPackDataItems.length === 0) {
-          console.log('No items found in the selected Quickpack!');
-          return;
-        }
-        // Populate `sale_order_items` with Quickpack data
-        this.formConfig.model.sale_order_items = quickPackDataItems.map((item: any) => ({
-          product: item.product,
-          quantity: item.quantity,
-          size: item.size,
-          color: item.color,
-          print_name: item.product.print_name,
-          rate: item.product.mrp,
-          discount: item.product.dis_amount,
-          unit_options_id: item.product.unit_options
+        console.log("response : ", response.data);
 
+        pack.products = response.data.quick_pack_data_items.map((item: any) => ({
+          ...item,
+          selected: true
         }));
 
-        // Trigger form change detection (if needed)
-        if (this.salesForm) {
-          console.log("we are inside : ", this.salesForm.form);
-          this.salesForm.form.controls.sale_order_items.patchValue(this.formConfig.model.sale_order_items);
-          console.log("After method ...")
-        }
-
-        console.log('Sale Order Items populated:', this.formConfig.model.sale_order_items);
       });
+
   }
+}
   //=====================================================
   isConfirmationModalOpen: boolean = false;
   selectedOption: string = 'sale_order';
@@ -6487,56 +6604,19 @@ createSaleOrder() {
                   }
                 }
               },
-              {
-                type: 'select',
-                key: 'stock_unit_id',
-                templateOptions: {
-                  label: 'Stock Unit Level',
-                  placeholder: 'Unit',
-                  hideLabel: true,
-                  dataLabel: 'stock_unit_name',
-                  dataKey: 'stock_unit_id',
-                  bindId: true,
-                  required: false,
-                  lazy: {
-                    url: 'products/product_stock_units/',
-                    lazyOneTime: true
-                  }
-                },
-                hooks: {
-                  onInit: (field: any) => {
-                    const parentArray = field.parent;
-
-                    // Check if parentArray exists and proceed
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
-
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
-                        const existingUnit = this.dataToPopulate.sale_order_items[currentRowIndex].product.stock_unit;
-
-                        // Set the full product object instead of just the product_id
-                        if (existingUnit) {
-                          field.formControl.setValue(existingUnit.stock_unit_id); // Set full product object (not just product_id)
-                        }
-                      }
-                    }
-                  }
-                }
-              },
               // {
               //   type: 'select',
-              //   key: 'unit_options_id',
+              //   key: 'stock_unit_id',
               //   templateOptions: {
-              //     label: 'Unit',
-              //     placeholder: 'Unit Level',
+              //     label: 'Stock Unit Level',
+              //     placeholder: 'Unit',
               //     hideLabel: true,
-              //     dataLabel: 'unit_name',
-              //     dataKey: 'unit_options_id',
+              //     dataLabel: 'stock_unit_name',
+              //     dataKey: 'stock_unit_id',
               //     bindId: true,
               //     required: false,
               //     lazy: {
-              //       url: 'masters/unit_options',
+              //       url: 'products/product_stock_units/',
               //       lazyOneTime: true
               //     }
               //   },
@@ -6550,17 +6630,54 @@ createSaleOrder() {
 
               //         // Check if there is a product already selected in this row (when data is copied)
               //         if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
-              //           const existingUnit = this.dataToPopulate.sale_order_items[currentRowIndex].product.unit_options;
+              //           const existingUnit = this.dataToPopulate.sale_order_items[currentRowIndex].product.stock_unit;
 
               //           // Set the full product object instead of just the product_id
               //           if (existingUnit) {
-              //             field.formControl.setValue(existingUnit.unit_options_id); // Set full product object (not just product_id)
+              //             field.formControl.setValue(existingUnit.stock_unit_id); // Set full product object (not just product_id)
               //           }
               //         }
               //       }
               //     }
               //   }
               // },
+              {
+                type: 'select',
+                key: 'unit_options_id',
+                templateOptions: {
+                  label: 'Unit',
+                  placeholder: 'Unit Level',
+                  hideLabel: true,
+                  dataLabel: 'unit_name',
+                  dataKey: 'unit_options_id',
+                  bindId: true,
+                  required: false,
+                  lazy: {
+                    url: 'masters/unit_options',
+                    lazyOneTime: true
+                  }
+                },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+
+                    // Check if parentArray exists and proceed
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+
+                      // Check if there is a product already selected in this row (when data is copied)
+                      if (this.dataToPopulate && this.dataToPopulate.sale_order_items.length > currentRowIndex) {
+                        const existingUnit = this.dataToPopulate.sale_order_items[currentRowIndex].product.unit_options;
+
+                        // Set the full product object instead of just the product_id
+                        if (existingUnit) {
+                          field.formControl.setValue(existingUnit.unit_options_id); // Set full product object (not just product_id)
+                        }
+                      }
+                    }
+                  }
+                }
+              },
               // {
               //   type: 'input',
               //   key: 'quantity',

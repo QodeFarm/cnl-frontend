@@ -985,25 +985,25 @@ loadQuickpackProducts() {
                         );
                       }
 
-                      field.formControl.valueChanges.subscribe(value => {
-                        const parentModel = field.model; // 👈 IMPORTANT
+                      // field.formControl.valueChanges.subscribe(value => {
+                      //   const parentModel = field.model; // 👈 IMPORTANT
 
-                        const taxCodeControl = field.form.get('tax_code');
+                      //   const taxCodeControl = field.form.get('tax_code');
 
-                        // 🔑 Update model
-                        parentModel.voucher = value;
+                      //   // 🔑 Update model
+                      //   parentModel.voucher = value;
 
-                        if (value === 'GST_Purchase') {
-                          parentModel.tax_code = 'Local';
-                          taxCodeControl?.setValue('Local');   // 👈 IMPORTANT
-                        } else if (value === 'Purchase') {
-                          parentModel.tax_code = 'Exempted';
-                          taxCodeControl?.setValue('Exempted'); // 👈 IMPORTANT
-                        }
+                      //   // if (value === 'GST_Purchase') {
+                      //   //   parentModel.tax_code = 'Local';
+                      //   //   taxCodeControl?.setValue('Local');   // 👈 IMPORTANT
+                      //   // } else if (value === 'Purchase') {
+                      //   //   parentModel.tax_code = 'Exempted';
+                      //   //   taxCodeControl?.setValue('Exempted'); // 👈 IMPORTANT
+                      //   // }
 
-                        // 🔥 NOW recalculate (model is correct)
-                        this.totalAmountCal();
-                      });
+                      //   // 🔥 NOW recalculate (model is correct)
+                      //   this.totalAmountCal();
+                      // });
                     }
                   }
                 },
