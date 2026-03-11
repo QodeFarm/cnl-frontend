@@ -694,169 +694,349 @@ export class SalesComponent {
   }
 
 
-  invoiceCreationHandler() {
-    console.log("Invoice Data at handler start:", this.invoiceData);
+  // invoiceCreationHandler() {
+  //   console.log("Invoice Data at handler start:", this.invoiceData);
 
-    // Filter selected items
-    const selectedItems = this.invoiceData.sale_invoice_items.filter(item => item.selectItem);
+  //   // Filter selected items
+  //   const selectedItems = this.invoiceData.sale_invoice_items.filter(item => item.selectItem);
 
-    // If at least one item is selected, use those; otherwise, use all
-    const itemsToInvoice = selectedItems.length > 0 ? selectedItems : this.invoiceData.sale_invoice_items;
+  //   // If at least one item is selected, use those; otherwise, use all
+  //   const itemsToInvoice = selectedItems.length > 0 ? selectedItems : this.invoiceData.sale_invoice_items;
 
-    let items_value = 0;
-    let tax_amount = 0;
-    let discount = 0;
-    let total_amount = 0;
+  //   let items_value = 0;
+  //   let tax_amount = 0;
+  //   let discount = 0;
+  //   let total_amount = 0;
 
-    itemsToInvoice.forEach(item => {
-      const itemValue = parseFloat(item.quantity) * parseFloat(item.rate);
-      const discountValue = itemValue * parseFloat(item.discount) / 100;
-      const Amount = itemValue - discountValue;
-      const taxAmount = parseFloat(item.cgst) + parseFloat(item.sgst) + parseFloat(item.igst);
-      const totalAmount = (Amount + taxAmount);
+  //   itemsToInvoice.forEach(item => {
+  //     const itemValue = parseFloat(item.quantity) * parseFloat(item.rate);
+  //     const discountValue = itemValue * parseFloat(item.discount) / 100;
+  //     const Amount = itemValue - discountValue;
+  //     const taxAmount = parseFloat(item.cgst) + parseFloat(item.sgst) + parseFloat(item.igst);
+  //     const totalAmount = (Amount + taxAmount);
 
-      items_value += itemValue;
-      tax_amount += taxAmount;
-      // discount += discountValue;
-      total_amount += totalAmount;
+  //     items_value += itemValue;
+  //     tax_amount += taxAmount;
+  //     // discount += discountValue;
+  //     total_amount += totalAmount;
 
-      // Update each item with calculated values
-      item.item_value = itemValue;
-      item.tax_amount = taxAmount;
-      // item.discount = discountValue;
-      item.total_amount = totalAmount;
-    });
+  //     // Update each item with calculated values
+  //     item.item_value = itemValue;
+  //     item.tax_amount = taxAmount;
+  //     // item.discount = discountValue;
+  //     item.total_amount = totalAmount;
+  //   });
 
-    console.log("This.Invoice data before : ", this.invoiceData);
-    const invoiceData = {
-      ...this.invoiceData,
-      sale_invoice_order: {
-        ...this.invoiceData.sale_invoice_order,
-        // sale_order_id: this.invoiceData.sale_invoice_order.sale_order_id, //  correct
-        // customer_id: this.invoiceData.sale_invoice_order.customer.customer_id, //  correct
-        // item_value: items_value,
-        tax_amount: tax_amount,
-        // discount: discount,
-        // total_amount: total_amount
-      },
-      sale_invoice_items: itemsToInvoice
-    };
+  //   console.log("This.Invoice data before : ", this.invoiceData);
+  //   const invoiceData = {
+  //     ...this.invoiceData,
+  //     sale_invoice_order: {
+  //       ...this.invoiceData.sale_invoice_order,
+  //       // sale_order_id: this.invoiceData.sale_invoice_order.sale_order_id, //  correct
+  //       // customer_id: this.invoiceData.sale_invoice_order.customer.customer_id, //  correct
+  //       // item_value: items_value,
+  //       tax_amount: tax_amount,
+  //       // discount: discount,
+  //       // total_amount: total_amount
+  //     },
+  //     sale_invoice_items: itemsToInvoice
+  //   };
 
-    console.log("Invoice Data with selected items:", invoiceData);
+  //   console.log("Invoice Data with selected items:", invoiceData);
 
-    if (itemsToInvoice.length > 0) {
-      this.createSaleInvoice(invoiceData).subscribe(
-        response => {
-          console.log('Sale invoice created successfully', response);
-          this.showInvoiceCreatedMessage();
+  //   if (itemsToInvoice.length > 0) {
+  //     this.createSaleInvoice(invoiceData).subscribe(
+  //       response => {
+  //         console.log('Sale invoice created successfully', response);
+  //         this.showInvoiceCreatedMessage();
 
-          itemsToInvoice.forEach(item => {
-            if (item.invoiced === 'NO') {
-              item.invoiced = 'YES';
-              this.updateInvoicedStatusDirectly(item.sale_order_item_id, 'YES');
-            }
-          });
+  //         itemsToInvoice.forEach(item => {
+  //           if (item.invoiced === 'NO') {
+  //             item.invoiced = 'YES';
+  //             this.updateInvoicedStatusDirectly(item.sale_order_item_id, 'YES');
+  //           }
+  //         });
 
-          const saleOrderId = this.invoiceData.sale_invoice_order.sale_order_id;
-          // if (!saleOrderId) {
-          //   const saleOrderId = this.SaleOrderEditID
-          // }
-          // console.log("saleOrderId i9n method : ", saleOrderId)
-          // const allInvoiced = this.invoiceData.sale_invoice_items.every(item => item.invoiced === 'YES');
-          // if (allInvoiced) {
-          //     this.triggerWorkflowPipeline(saleOrderId);
-          // }
-          const allInvoiced = this.invoiceData.sale_invoice_items.every(item => item.invoiced === 'YES');
-          if (allInvoiced) {
-            // Full invoice: set flow_status to 'Delivery In progress' explicitly
-            // Using direct PATCH (same pattern as partial invoice) instead of
-            // move_next_stage to avoid issues when stages were skipped via dropdown.
-            this.http.get('masters/flow_status/?flow_status_name=Delivery In progress').subscribe(
-              (statusRes: any) => {
-                const deliveryStatus = statusRes?.data?.[0];
-                if (deliveryStatus && deliveryStatus.flow_status_id) {
-                  const patchUrl = `sales/sale_order/${saleOrderId}/`;
-                  const patchPayload = { flow_status_id: deliveryStatus.flow_status_id };
+  //         const saleOrderId = this.invoiceData.sale_invoice_order.sale_order_id;
+  //         // if (!saleOrderId) {
+  //         //   const saleOrderId = this.SaleOrderEditID
+  //         // }
+  //         // console.log("saleOrderId i9n method : ", saleOrderId)
+  //         // const allInvoiced = this.invoiceData.sale_invoice_items.every(item => item.invoiced === 'YES');
+  //         // if (allInvoiced) {
+  //         //     this.triggerWorkflowPipeline(saleOrderId);
+  //         // }
+  //         const allInvoiced = this.invoiceData.sale_invoice_items.every(item => item.invoiced === 'YES');
+  //         if (allInvoiced) {
+  //           // Full invoice: set flow_status to 'Delivery In progress' explicitly
+  //           // Using direct PATCH (same pattern as partial invoice) instead of
+  //           // move_next_stage to avoid issues when stages were skipped via dropdown.
+  //           this.http.get('masters/flow_status/?flow_status_name=Delivery In progress').subscribe(
+  //             (statusRes: any) => {
+  //               const deliveryStatus = statusRes?.data?.[0];
+  //               if (deliveryStatus && deliveryStatus.flow_status_id) {
+  //                 const patchUrl = `sales/sale_order/${saleOrderId}/`;
+  //                 const patchPayload = { flow_status_id: deliveryStatus.flow_status_id };
 
-                  this.http.patch(patchUrl, patchPayload).subscribe(
-                    () => {
-                      console.log('Sale order flow status set to Delivery In progress');
-                      this.notification.success(
-                        'Invoice Created',
-                        'All items invoiced. Order moved to Delivery In progress.',
-                        { nzDuration: 5000, nzPlacement: 'topRight' }
-                      );
-                      // Reload form to reflect the new status
-                      this.editSaleOrder(saleOrderId);
-                    },
-                    (patchErr) => {
-                      console.error('Error updating flow status to Delivery In progress:', patchErr);
-                      // Fallback: still reload to show whatever the backend has
-                      this.editSaleOrder(saleOrderId);
-                    }
-                  );
-                } else {
-                  // Fallback to move_next_stage if 'Delivery In progress' status not found
-                  console.warn('Delivery In progress status not found, falling back to move_next_stage');
-                  this.triggerWorkflowPipeline(saleOrderId);
-                  this.notification.success(
-                    'Invoice Created',
-                    'All items invoiced successfully.',
-                    { nzDuration: 5000, nzPlacement: 'topRight' }
-                  );
-                  setTimeout(() => {
+  //                 this.http.patch(patchUrl, patchPayload).subscribe(
+  //                   () => {
+  //                     console.log('Sale order flow status set to Delivery In progress');
+  //                     this.notification.success(
+  //                       'Invoice Created',
+  //                       'All items invoiced. Order moved to Delivery In progress.',
+  //                       { nzDuration: 5000, nzPlacement: 'topRight' }
+  //                     );
+  //                     // Reload form to reflect the new status
+  //                     this.editSaleOrder(saleOrderId);
+  //                   },
+  //                   (patchErr) => {
+  //                     console.error('Error updating flow status to Delivery In progress:', patchErr);
+  //                     // Fallback: still reload to show whatever the backend has
+  //                     this.editSaleOrder(saleOrderId);
+  //                   }
+  //                 );
+  //               } else {
+  //                 // Fallback to move_next_stage if 'Delivery In progress' status not found
+  //                 console.warn('Delivery In progress status not found, falling back to move_next_stage');
+  //                 this.triggerWorkflowPipeline(saleOrderId);
+  //                 this.notification.success(
+  //                   'Invoice Created',
+  //                   'All items invoiced successfully.',
+  //                   { nzDuration: 5000, nzPlacement: 'topRight' }
+  //                 );
+  //                 setTimeout(() => {
+  //                   this.editSaleOrder(saleOrderId);
+  //                 }, 1500);
+  //               }
+  //             },
+  //             () => {
+  //               // Network error fallback
+  //               this.triggerWorkflowPipeline(saleOrderId);
+  //               setTimeout(() => {
+  //                 this.editSaleOrder(saleOrderId);
+  //               }, 1500);
+  //             }
+  //           );
+  //         } else {
+  //           // Partial invoice: update flow_status to 'Partially Delivered'
+  //           // Stay on this page so user can invoice the remaining items
+  //           this.http.get('masters/flow_status/?flow_status_name=Partially Delivered').subscribe(
+  //             (res: any) => {
+  //               console.log("We are in the method ... fetch");
+  //               const status = res?.data?.[0];
+  //               if (status && status.flow_status_id) {
+  //                 const patchUrl = `sales/sale_order/${saleOrderId}/`;
+  //                 const payload = { flow_status_id: status.flow_status_id };
+
+  //                 this.http.patch(patchUrl, payload).subscribe(
+  //                   (patchRes: any) => {
+  //                     console.log('Sale order flow status updated to Partially Delivered:', patchRes);
+  //                   },
+  //                   (patchErr: any) => {
+  //                     console.error('Error updating sale order flow status:', patchErr);
+  //                   }
+  //                 );
+  //               } else {
+  //                 console.warn('Partially Delivered status not found in response:', res);
+  //               }
+  //             },
+  //             (err: any) => {
+  //               console.error('Error fetching flow status:', err);
+  //             }
+  //           );
+  //         }
+  //       },
+  //       error => {
+  //         console.error('Error creating sale invoice', error);
+  //       }
+  //     );
+  //   } else {
+  //     console.warn('No items selected for invoicing');
+  //   }
+  //   // NOTE: Do NOT call ngOnInit() here — it runs synchronously while the
+  //   // invoice creation HTTP request may still be in flight and would reset
+  //   // SaleOrderEditID / showForm before the response callback fires.
+  // }
+
+invoiceCreationHandler() {
+  console.log("Invoice Data at handler start:", this.invoiceData);
+
+  // Filter selected items
+  const selectedItems = this.invoiceData.sale_invoice_items.filter(item => item.selectItem);
+
+  // If at least one item is selected, use those; otherwise, use all
+  const itemsToInvoice = selectedItems.length > 0 ? selectedItems : this.invoiceData.sale_invoice_items;
+
+  // 🔥 FIXED: Validate that at least one item has invoiceable quantity > 0
+  // Invoiceable quantity = quantity - production_qty
+  const hasValidQuantity = itemsToInvoice.some(item => {
+    const quantity = Number(item.quantity || 0);
+    const productionQty = Number(item.production_qty || 0);
+    const invoiceableQty = quantity - productionQty;
+    return invoiceableQty > 0;
+  });
+
+  if (!hasValidQuantity) {
+    // Show warning modal popup if no items have invoiceable quantity > 0
+    this.showNoQuantityWarning();
+    return; // Exit the function, don't proceed with invoice creation
+  }
+
+  let items_value = 0;
+  let tax_amount = 0;
+  let discount = 0;
+  let total_amount = 0;
+
+  itemsToInvoice.forEach(item => {
+    // 🔥 FIXED: Use invoiceable quantity for calculations too
+    const quantity = Number(item.quantity || 0);
+    const productionQty = Number(item.production_qty || 0);
+    const invoiceableQty = quantity - productionQty;
+    
+    const itemValue = invoiceableQty * Number(item.rate || 0);
+    const discountValue = itemValue * Number(item.discount || 0) / 100;
+    const Amount = itemValue - discountValue;
+    const taxAmount = Number(item.cgst || 0) + Number(item.sgst || 0) + Number(item.igst || 0);
+    const totalAmount = (Amount + taxAmount);
+
+    items_value += itemValue;
+    tax_amount += taxAmount;
+    // discount += discountValue;
+    total_amount += totalAmount;
+
+    // Update each item with calculated values
+    item.item_value = itemValue;
+    item.tax_amount = taxAmount;
+    // item.discount = discountValue;
+    item.total_amount = totalAmount;
+  });
+
+  console.log("This.Invoice data before : ", this.invoiceData);
+  const invoiceData = {
+    ...this.invoiceData,
+    sale_invoice_order: {
+      ...this.invoiceData.sale_invoice_order,
+      tax_amount: tax_amount,
+    },
+    sale_invoice_items: itemsToInvoice
+  };
+
+  console.log("Invoice Data with selected items:", invoiceData);
+
+  if (itemsToInvoice.length > 0) {
+    this.createSaleInvoice(invoiceData).subscribe(
+      response => {
+        console.log('Sale invoice created successfully', response);
+        this.showInvoiceCreatedMessage();
+
+        itemsToInvoice.forEach(item => {
+          if (item.invoiced === 'NO') {
+            item.invoiced = 'YES';
+            this.updateInvoicedStatusDirectly(item.sale_order_item_id, 'YES');
+          }
+        });
+        const saleOrderId = this.invoiceData.sale_invoice_order.sale_order_id;
+        const allInvoiced = this.invoiceData.sale_invoice_items.every(item => item.invoiced === 'YES');
+        if (allInvoiced) {
+          // Full invoice: set flow_status to 'Delivery In progress' explicitly
+          // Using direct PATCH (same pattern as partial invoice) instead of
+          // move_next_stage to avoid issues when stages were skipped via dropdown.
+          this.http.get('masters/flow_status/?flow_status_name=Delivery In progress').subscribe(
+            (statusRes: any) => {
+              const deliveryStatus = statusRes?.data?.[0];
+              if (deliveryStatus && deliveryStatus.flow_status_id) {
+                const patchUrl = `sales/sale_order/${saleOrderId}/`;
+                const patchPayload = { flow_status_id: deliveryStatus.flow_status_id };
+
+                this.http.patch(patchUrl, patchPayload).subscribe(
+                  () => {
+                    console.log('Sale order flow status set to Delivery In progress');
+                    this.notification.success(
+                      'Invoice Created',
+                      'All items invoiced. Order moved to Delivery In progress.',
+                      { nzDuration: 5000, nzPlacement: 'topRight' }
+                    );
+                    // Reload form to reflect the new status
                     this.editSaleOrder(saleOrderId);
-                  }, 1500);
-                }
-              },
-              () => {
-                // Network error fallback
+                  },
+                  (patchErr) => {
+                    console.error('Error updating flow status to Delivery In progress:', patchErr);
+                    // Fallback: still reload to show whatever the backend has
+                    this.editSaleOrder(saleOrderId);
+                  }
+                );
+              } else {
+                // Fallback to move_next_stage if 'Delivery In progress' status not found
+                console.warn('Delivery In progress status not found, falling back to move_next_stage');
                 this.triggerWorkflowPipeline(saleOrderId);
+                this.notification.success(
+                  'Invoice Created',
+                  'All items invoiced successfully.',
+                  { nzDuration: 5000, nzPlacement: 'topRight' }
+                );
                 setTimeout(() => {
                   this.editSaleOrder(saleOrderId);
                 }, 1500);
               }
-            );
-          } else {
-            // Partial invoice: update flow_status to 'Partially Delivered'
-            // Stay on this page so user can invoice the remaining items
-            this.http.get('masters/flow_status/?flow_status_name=Partially Delivered').subscribe(
-              (res: any) => {
-                console.log("We are in the method ... fetch");
-                const status = res?.data?.[0];
-                if (status && status.flow_status_id) {
-                  const patchUrl = `sales/sale_order/${saleOrderId}/`;
-                  const payload = { flow_status_id: status.flow_status_id };
+            },
+            () => {
+              // Network error fallback
+              this.triggerWorkflowPipeline(saleOrderId);
+              setTimeout(() => {
+                this.editSaleOrder(saleOrderId);
+              }, 1500);
+            }
+          );
+        } else {
+          // Partial invoice: update flow_status to 'Partially Delivered'
+          // Stay on this page so user can invoice the remaining items
+          this.http.get('masters/flow_status/?flow_status_name=Partially Delivered').subscribe(
+            (res: any) => {
+              console.log("We are in the method ... fetch");
+              const status = res?.data?.[0];
+              if (status && status.flow_status_id) {
+                const patchUrl = `sales/sale_order/${saleOrderId}/`;
+                const payload = { flow_status_id: status.flow_status_id };
 
-                  this.http.patch(patchUrl, payload).subscribe(
-                    (patchRes: any) => {
-                      console.log('Sale order flow status updated to Partially Delivered:', patchRes);
-                    },
-                    (patchErr: any) => {
-                      console.error('Error updating sale order flow status:', patchErr);
-                    }
-                  );
-                } else {
-                  console.warn('Partially Delivered status not found in response:', res);
-                }
-              },
-              (err: any) => {
-                console.error('Error fetching flow status:', err);
+                this.http.patch(patchUrl, payload).subscribe(
+                  (patchRes: any) => {
+                    console.log('Sale order flow status updated to Partially Delivered:', patchRes);
+                  },
+                  (patchErr: any) => {
+                    console.error('Error updating sale order flow status:', patchErr);
+                  }
+                );
+              } else {
+                console.warn('Partially Delivered status not found in response:', res);
               }
-            );
-          }
-        },
-        error => {
-          console.error('Error creating sale invoice', error);
+            },
+            (err: any) => {
+              console.error('Error fetching flow status:', err);
+            }
+          );
         }
-      );
-    } else {
-      console.warn('No items selected for invoicing');
-    }
-    // NOTE: Do NOT call ngOnInit() here — it runs synchronously while the
-    // invoice creation HTTP request may still be in flight and would reset
-    // SaleOrderEditID / showForm before the response callback fires.
+      },
+      error => {
+        console.error('Error creating sale invoice', error);
+      }
+    );
+  } else {
+    console.warn('No items selected for invoicing');
   }
+}
+
+// 🔥 NEW: Variable to control the warning modal
+isNoQuantityWarningOpen: boolean = false;
+
+// 🔥 NEW: Method to show the no quantity warning modal
+showNoQuantityWarning() {
+  this.isNoQuantityWarningOpen = true;
+}
+
+// 🔥 NEW: Method to close the warning modal
+closeNoQuantityWarning() {
+  this.isNoQuantityWarningOpen = false;
+}
 
 
   // Method to update invoiced status using HttpClient
@@ -5657,6 +5837,7 @@ createSaleOrder() {
         const saleOrderItems = this.formConfig.model['sale_order_items'] || [];
         const orderAttachments = this.formConfig.model['order_attachments'];
         const orderShipments = this.formConfig.model['order_shipments'] || {};
+        const customFields = this.formConfig.model['custom_field_values'] || {};
 
         const saleTypeObj = saleOrder.sale_type;
         const saleTypeName = saleTypeObj?.name || '';
@@ -5937,7 +6118,8 @@ createSaleOrder() {
                   })),
 
                 order_attachments: orderAttachments,
-                order_shipments: orderShipments
+                order_shipments: orderShipments,
+                custom_field_values: customFields
               };
 
               // Debug log to verify all calculations
