@@ -5,7 +5,6 @@ import { HttpClient } from '@angular/common/http'; // Import HttpClient
 import { SiteConfigService } from '@ta/ta-core'; // Import SiteConfigService
 import { REPORT_CONFIGS  } from '../utils/reports.config'; // Import report configurations
 import { DashboardTilesService } from './dashboard-tiles.service';
-import { ReportsService } from 'projects/ta-core/src/lib/services/reports.service';
 
 
 @Component({
@@ -1058,7 +1057,7 @@ isLoadingReports: boolean = false;
 
 
   // constructor(private http: HttpClient) {} 
-  constructor(private http: HttpClient, private siteConfigService: SiteConfigService, private reportsService: ReportsService,
+  constructor(private http: HttpClient, private siteConfigService: SiteConfigService,
         private tilesService: DashboardTilesService,  // Add this
         @Inject(PLATFORM_ID) private platformId: Object
       ) {
