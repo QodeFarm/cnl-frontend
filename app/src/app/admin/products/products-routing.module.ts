@@ -20,6 +20,7 @@ import { ColorComponent } from './color/color.component';
 import { WarehouseLocationsComponent } from './warehouse-locations/warehouse-locations.component';
 import { PackageUnitsComponent } from './package-units/package-units.component';
 import { GPackageUnitsComponent } from './g-package-units/g-package-units.component';
+import { ProductMergeComponent } from './product-merge/product-merge.component';
 
 const routes: Routes = [
   {
@@ -97,6 +98,11 @@ const routes: Routes = [
   {
     path : 'g-package-units',
     component: GPackageUnitsComponent
+  },
+  {
+    path : 'product-merge',
+    component: ProductMergeComponent,
+    data: { title: 'Product Merge', moduleName: 'product-merge' }
   }
 ];
 

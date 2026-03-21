@@ -26,6 +26,7 @@ import { PackageUnitsComponent } from './package-units/package-units.component';
 import { GPackageUnitsComponent } from './g-package-units/g-package-units.component';
 import { NzNotificationModule } from 'ng-zorro-antd/notification';
 import { ItemMasterComponent } from './item-master/item-master.component';
+import { ProductMergeComponent } from './product-merge/product-merge.component';
 
 
 @NgModule({
@@ -59,6 +60,7 @@ import { ItemMasterComponent } from './item-master/item-master.component';
     ProductsRoutingModule,
     AdminCommmonModule,
     ProductsListComponent,
+    ProductMergeComponent,
     NzNotificationModule
   ],
   exports: [

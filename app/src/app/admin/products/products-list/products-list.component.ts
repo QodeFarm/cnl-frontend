@@ -18,6 +18,7 @@ export class ProductsListComponent {
   @Output('edit') edit = new EventEmitter<void>();
   @Output('bulkEdit') bulkEdit = new EventEmitter<string[]>();
   @Output('exportProducts') exportProducts = new EventEmitter<string[]>();
+  @Output('mergeProducts') mergeProducts = new EventEmitter<void>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   /** Selected product IDs from ta-table's checkedRows */
@@ -48,6 +49,11 @@ export class ProductsListComponent {
   /** Emit selected IDs (empty array if none selected) to parent for export */
   onExportClick() {
     this.exportProducts.emit([...this.selectedIds]);
+  }
+
+  /** Emit merge event to parent (parent closes modal then navigates) */
+  onMergeClick() {
+    this.mergeProducts.emit();
   }
 
   tableConfig: TaTableConfig = {
