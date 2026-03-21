@@ -68,9 +68,34 @@
 </div>
 
 <!-- Not Ready for Invoice Modal -->
-<div id="notReadyInvoiceDialog" class="custom-dialog-overlay" style="display: none;">
+<!-- <div id="notReadyInvoiceDialog" class="custom-dialog-overlay" style="display: none;">
   <div class="custom-dialog-box">
     <p> ⚠️ This order is not ready for invoice. </p>
     <button class="btn-ok" id="notReadyDialogOkButton" (click)="closeNotReadyInvoiceDialog()">OK</button>
+  </div>
+</div> -->
+
+<div id="notReadyInvoiceDialog" class="custom-dialog-overlay" style="display: none;">
+  <div class="custom-dialog-box">
+    <div class="dialog-header">
+      <span class="warning-icon">⚠️</span>
+      <h3>Order Not Ready</h3>
+    </div>
+    
+    <div class="dialog-content">
+      <p class="warning-message">This order is not ready for Dispatch | invoice</p>
+      <p class="details-message">Please check the following:</p>
+      <ul class="checklist">
+        <li>✓ All items have quantity > 0; (quantity - production_qty > 0)</li>
+        <li>✓ Items are not already invoiced</li>
+        <li>✓ All required details are filled</li>
+      </ul>
+    </div>
+    
+    <div class="dialog-footer">
+      <button class="btn-ok" id="notReadyDialogOkButton" (click)="closeNotReadyInvoiceDialog()">
+        Got it
+      </button>
+    </div>
   </div>
 </div>

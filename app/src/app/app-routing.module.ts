@@ -146,6 +146,9 @@ const routes: Routes = [
 
 
 
+      //Smart Insights
+      { path: 'smart-insights', data: { title: 'Smart Insights', moduleName: 'smart-insights' }, canActivate: [], loadComponent: () => import('./admin/ai-dashboard/ai-dashboard.component').then(m => m.AiDashboardComponent) },
+
       //Customfields Tool
       { path: 'customfields', data: { title: 'customfields', moduleName: 'customfields' }, canActivate: [], loadChildren: () => import('./admin/customfields/customfields.module').then(m => m.CustomfieldsModule) },
 

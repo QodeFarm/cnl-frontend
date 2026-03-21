@@ -337,6 +337,20 @@
     </div>
 </div>
 
+<!-- 🔥 NEW: Warning modal for zero invoiceable quantity -->
+<div class="custom-dialog-overlay" *ngIf="isNoQuantityWarningOpen">
+    <div class="custom-dialog-box warning-box">
+        <h3>⚠️ Cannot Create Invoice</h3>
+        <p>No items have invoiceable quantity greater than zero.</p>
+        <p>Invoiceable quantity = Quantity - Produced Quantity</p>
+        <p>Please add items with remaining quantity to invoice or adjust production quantities.</p>
+
+        <div class="dialog-actions">
+            <button class="btn-confirm" (click)="closeNoQuantityWarning()">OK</button>
+        </div>
+    </div>
+</div>
+
 <!-- Success Message at the Top Right -->
 <div *ngIf="isInvoiceCreated" class="toast-message">
     <div class="tick-circle">
@@ -624,37 +638,118 @@
         <div *ngIf="customerSelected">
 
           <table class="table table-bordered quickpack-table">
+
             <thead>
               <tr>
                 <th>Quickpack</th>
                 <th>Customer</th>
                 <th>Lot Qty</th>
-                <th>Select</th>
+                <th>Action</th>
               </tr>
             </thead>
 
             <tbody>
-              <tr *ngFor="let pack of quickpackOptions">
 
-                <td>{{ pack.name }}</td>
+              <ng-container *ngFor="let pack of quickpackOptions">
 
-                <td>
-                  {{ pack.customer?.name }}
-                </td>
+                <!-- Quickpack Row -->
+                <tr>
 
-                <td>
-                  {{ pack.lot_qty }}
-                </td>
+                  <td>
+                    {{ pack.name }}
+                  </td>
 
-                <td>
-                  <button
-                    class="btn btn-sm btn-primary"
-                    (click)="selectQuickpack(pack.quick_pack_id)">
-                    Select
-                  </button>
-                </td>
+                  <td>
+                    {{ pack.customer?.name }}
+                  </td>
 
-              </tr>
+                  <td>
+
+                    <div style="display:flex;flex-direction:column;gap:4px">
+
+                      <span>{{ pack.lot_qty }}</span>
+
+                      <input
+                        type="number"
+                        class="form-control form-control-sm"
+                        placeholder="Enter Qty"
+                        [(ngModel)]="pack.custom_qty">
+
+                    </div>
+
+                  </td>
+
+                  <td>
+
+                    <button
+                      class="btn btn-sm btn-primary"
+                      (click)="toggleQuickpackProducts(pack)">
+
+                      View Products
+
+                    </button>
+
+                  </td>
+
+                </tr>
+
+                <!-- Products Section -->
+                <tr *ngIf="pack.showProducts">
+
+                  <td colspan="4">
+
+                    <table class="table table-sm table-bordered">
+
+                      <thead>
+                        <tr>
+                          <th style="width:80px">Select</th>
+                          <th>Product</th>
+                          <th style="width:120px">Default Qty</th>
+                        </tr>
+                      </thead>
+
+                      <tbody>
+
+                        <tr *ngFor="let product of pack.products">
+
+                          <td style="text-align:center">
+
+                            <input
+                              type="checkbox"
+                              [(ngModel)]="product.selected">
+
+                          </td>
+
+                          <td>
+                            {{ product.product?.print_name }}
+                          </td>
+
+                          <td>
+                            {{ product.quantity }}
+                          </td>
+
+                        </tr>
+
+                      </tbody>
+
+                    </table>
+
+                    <div style="display:flex;justify-content:flex-end;margin-top:10px">
+
+                      <button
+                        class="btn btn-success btn-sm"
+                        (click)="selectQuickpack(pack.quick_pack_id, pack)">
+                        Apply
+                    </button>
+
+                    </div>
+
+                  </td>
+
+                </tr>
+
+              </ng-container>
+
             </tbody>
 
           </table>
@@ -669,7 +764,9 @@
         <button
           class="btn btn-danger"
           data-bs-dismiss="modal">
+
           Close
+
         </button>
 
       </div>
