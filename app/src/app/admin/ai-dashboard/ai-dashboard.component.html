@@ -1,0 +1,371 @@
+﻿<!-- Smart Insights Dashboard -->
+<div class="container-fluid pt-3 ai-dashboard">
+
+  <!-- Smart Alerts Bar -->
+  <div class="smart-alerts-bar" *ngIf="smartAlerts?.length > 0"
+       (mouseenter)="alertBarPaused = true" (mouseleave)="alertBarPaused = false">
+    <span class="alerts-bar-badge">
+      <span class="alerts-bell-icon"></span>
+      <span class="alerts-count">{{ smartAlerts.length }}</span>
+    </span>
+    <div class="alerts-ticker-wrap">
+      <div class="alerts-ticker" [class.paused]="alertBarPaused"
+           [style.animation-duration]="(smartAlerts.length * 4) + 's'">
+        <span *ngFor="let a of smartAlerts; trackBy: trackAlert" class="alert-pill" [ngClass]="'pill-' + a.severity"
+              (click)="setActiveTab(a.actionTab)" (keydown.enter)="setActiveTab(a.actionTab)" (keydown.space)="setActiveTab(a.actionTab)"
+              role="button" tabindex="0" [attr.aria-label]="a.title">
+          {{ a.title }}
+        </span>
+        <!-- duplicate for seamless loop -->
+        <span *ngFor="let a of smartAlerts; trackBy: trackAlert" class="alert-pill" [ngClass]="'pill-' + a.severity"
+              (click)="setActiveTab(a.actionTab)" (keydown.enter)="setActiveTab(a.actionTab)" (keydown.space)="setActiveTab(a.actionTab)"
+              role="button" tabindex="-1" aria-hidden="true">
+          {{ a.title }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="ai-tab-bar">
+    <div class="ai-tab-scroll">
+      <button class="ai-tab" [class.active]="activeTab === 'overview'" (click)="setActiveTab('overview')">
+        <svg class="tab-icon" viewBox="0 0 20 20" fill="currentColor"><rect x="1" y="11" width="4" height="7" rx="1"/><rect x="8" y="6" width="4" height="12" rx="1"/><rect x="15" y="2" width="4" height="16" rx="1"/></svg>
+        Overview
+      </button>
+      <button class="ai-tab" [class.active]="activeTab === 'finance'" (click)="setActiveTab('finance')">
+        <svg class="tab-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="16" height="14" rx="2"/><path d="M2 7h16M6 11h2M6 14h4"/></svg>
+        Finance
+      </button>
+      <button class="ai-tab" [class.active]="activeTab === 'sales'" (click)="setActiveTab('sales')">
+        <svg class="tab-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l4-6 4 3 6-10"/></svg>
+        Sales
+      </button>
+      <button class="ai-tab" [class.active]="activeTab === 'inventory'" (click)="setActiveTab('inventory')">
+        <svg class="tab-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M3 5l7-3 7 3v10l-7 3-7-3V5z"/><path d="M10 8v10M3 5l7 3 7-3"/></svg>
+        Inventory
+      </button>
+      <button class="ai-tab" [class.active]="activeTab === 'purchase'" (click)="setActiveTab('purchase')">
+        <svg class="tab-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1h3l2 10h10l2-7H5"/><circle cx="8" cy="16" r="1.5" fill="currentColor"/><circle cx="15" cy="16" r="1.5" fill="currentColor"/></svg>
+        Purchase
+      </button>
+      <button class="ai-tab" [class.active]="activeTab === 'production'" (click)="setActiveTab('production')">
+        <svg class="tab-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M2 17V9l5 3V6l5 3V3l6 4v10H2z"/></svg>
+        Production
+      </button>
+    </div>
+    <button class="ai-tab customize-btn" (click)="toggleCustomDrawer()" title="Customize Dashboard">
+      <span class="customize-icon">⚙</span>
+    </button>
+  </div>
+
+  <!-- Customization Drawer -->
+  <div class="custom-drawer-backdrop" *ngIf="customDrawerOpen" (click)="toggleCustomDrawer()"></div>
+  <div class="custom-drawer" [class.open]="customDrawerOpen">
+    <div class="custom-drawer-header">
+      <h4>Customize Dashboard</h4>
+      <button class="drawer-close" (click)="toggleCustomDrawer()">&times;</button>
+    </div>
+    <div class="custom-drawer-body">
+      <p class="drawer-hint">Toggle widgets on/off for each tab. Your preferences are saved automatically.</p>
+      <ng-container *ngFor="let tab of ['finance','sales','inventory','purchase','production']">
+        <div class="drawer-tab-section">
+          <h5 class="drawer-tab-title">{{ tab | titlecase }}</h5>
+          <div class="drawer-widget-row" *ngFor="let w of getWidgetsForTab(tab)">
+            <label class="drawer-toggle-label">
+              <input type="checkbox" [checked]="w.visible" (change)="toggleWidget(w.id)" />
+              <span class="drawer-toggle-switch"></span>
+              <span class="drawer-widget-name">{{ w.label }}</span>
+            </label>
+          </div>
+        </div>
+      </ng-container>
+      <div class="drawer-footer">
+        <button class="drawer-reset-btn" (click)="resetPreferences()">Reset to Default</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Date Range Filter -->
+  <div class="date-filter-bar">
+    <span class="date-filter-label">
+      <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14"><path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/></svg>
+      Period
+    </span>
+    <div class="date-filter-presets">
+      <button class="preset-btn" [class.active]="datePreset === '7d'" (click)="setDatePreset('7d')">7D</button>
+      <button class="preset-btn" [class.active]="datePreset === '30d'" (click)="setDatePreset('30d')">30D</button>
+      <button class="preset-btn" [class.active]="datePreset === '90d'" (click)="setDatePreset('90d')">90D</button>
+      <button class="preset-btn" [class.active]="datePreset === 'quarter'" (click)="setDatePreset('quarter')">Quarter</button>
+      <button class="preset-btn" [class.active]="datePreset === 'fy'" (click)="setDatePreset('fy')">FY</button>
+      <button class="preset-btn" [class.active]="datePreset === '12m'" (click)="setDatePreset('12m')">12M</button>
+    </div>
+    <div class="date-filter-custom">
+      <nz-range-picker
+        [(ngModel)]="dateRange"
+        (ngModelChange)="onDateRangeChange($event)"
+        [nzFormat]="'dd-MM-yyyy'"
+        nzSize="small"
+        [nzPlaceHolder]="['From Date', 'To Date']">
+      </nz-range-picker>
+    </div>
+    <button class="date-filter-clear" *ngIf="dateRange" (click)="clearDateFilter()" title="Clear filter">
+      <svg viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 2l8 8M10 2l-8 8"/></svg>
+    </button>
+  </div>
+
+  <!-- ======================================= -->
+  <!-- OVERVIEW TAB -->
+  <!-- ======================================= -->
+  <div *ngIf="activeTab === 'overview'">
+
+    <!-- Department Health Cards (project card style) -->
+    <div class="row mt-2">
+      <div class="dashboard-card px-1 col-lg col-md-4 col-sm-4 col-6 h-100" *ngFor="let dept of departmentHealth; trackBy: trackDeptCard"
+           (click)="setActiveTab(dept.tab)" (keydown.enter)="setActiveTab(dept.tab)" (keydown.space)="setActiveTab(dept.tab)"
+           role="button" tabindex="0" [attr.aria-label]="dept.name + ': ' + dept.alertCount + ' alerts'">
+        <div class="dashboard-card-body">
+          <div class="dashboard-card-head">
+            <span class="card-indicator" [ngClass]="{'indicator-red': dept.status==='critical', 'indicator-yellow': dept.status==='warning', 'indicator-green': dept.status==='success'}"></span>
+            {{ dept.name }}
+          </div>
+          <div class="dashboard-card-content">
+            <h5>{{ dept.alertCount }}</h5>
+            <p>{{ dept.status === 'critical' ? 'Needs action' : dept.status === 'warning' ? 'Monitor closely' : 'All healthy' }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Insight Banner -->
+    <div class="insight-banner mt-2">
+      <div class="insight-badge">SMART INSIGHT</div>
+      <div class="insight-text">{{ overviewInsight }}</div>
+    </div>
+
+    <!-- Two Charts: Radar (Department Health) + Horizontal Bar (Issues by Severity) -->
+    <div class="row mx-0 mt-3">
+      <div class="col-lg-6 col-12 px-1 mb-3">
+        <div class="chart-card">
+          <div class="chart-type-toggles">
+            <button [class.active]="overviewChartMode === 'radar'" (click)="switchChart('overview', 'radar')">Radar</button>
+            <button [class.active]="overviewChartMode === 'bar'" (click)="switchChart('overview', 'bar')">Bar</button>
+            <button [class.active]="overviewChartMode === 'polarArea'" (click)="switchChart('overview', 'polarArea')">Polar</button>
+          </div>
+          <div class="skeleton-chart skeleton" *ngIf="!allDataLoaded"></div>
+          <canvas #overviewRadarCanvas *ngIf="allDataLoaded"></canvas>
+        </div>
+      </div>
+      <div class="col-lg-6 col-12 px-1 mb-3">
+        <div class="chart-card">
+          <div class="chart-type-toggles">
+            <button [class.active]="overviewSeverityMode === 'bar'" (click)="switchChart('overviewSeverity', 'bar')">Bar</button>
+            <button [class.active]="overviewSeverityMode === 'doughnut'" (click)="switchChart('overviewSeverity', 'doughnut')">Doughnut</button>
+            <button [class.active]="overviewSeverityMode === 'pie'" (click)="switchChart('overviewSeverity', 'pie')">Pie</button>
+          </div>
+          <div class="skeleton-chart skeleton" *ngIf="!allDataLoaded"></div>
+          <canvas #overviewSeverityCanvas *ngIf="allDataLoaded"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Needs Your Attention — Alert Cards -->
+    <div class="alert-section mt-1" *ngIf="allDataLoaded">
+      <div class="alert-section-header">
+        <h4>Needs Your Attention</h4>
+        <span class="section-subtitle">{{ priorityActions.length }} alert{{ priorityActions.length !== 1 ? 's' : '' }}</span>
+      </div>
+      <div class="alert-cards-list" *ngIf="priorityActions.length > 0">
+        <div class="alert-card" *ngFor="let a of priorityActions" [ngClass]="'alert-' + a.severity">
+          <div class="alert-card-dot">
+            <span class="severity-dot" [ngClass]="'severity-' + a.severity"></span>
+          </div>
+          <div class="alert-card-content">
+            <div class="alert-card-title">{{ a.title }}</div>
+            <div class="alert-card-detail">{{ a.detail }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="empty-actions" *ngIf="priorityActions.length === 0">
+        <span>&#10003;</span> All systems running smoothly — no alerts.
+      </div>
+    </div>
+
+    <!-- Loading placeholder -->
+    <div *ngIf="!allDataLoaded" class="overview-loading">
+      <div class="row mt-2">
+        <div class="dashboard-card px-1 col-lg col-md-4 col-sm-4 col-6" *ngFor="let s of [1,2,3,4,5]">
+          <div class="skeleton-card"><div class="skeleton-card-header"></div><div class="skeleton-card-body"><div class="skeleton-value skeleton"></div><div class="skeleton-label skeleton"></div></div></div>
+        </div>
+      </div>
+      <div class="skeleton-insight skeleton mt-2"></div>
+      <div class="row mx-0 mt-3">
+        <div class="col-lg-6 col-12 px-1 mb-3"><div class="skeleton-chart skeleton"></div></div>
+        <div class="col-lg-6 col-12 px-1 mb-3"><div class="skeleton-chart skeleton"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- DYNAMIC DATA TABS -->
+  <!-- ═══════════════════════════════════════ -->
+  <ng-container *ngFor="let tab of tabConfigs">
+    <div *ngIf="activeTab === tab.key">
+
+      <!-- Summary Cards -->
+      <div class="row mt-2" *ngIf="isWidgetVisible(tab.key + '-cards')">
+        <div *ngFor="let card of tabCards[tab.key]; trackBy: trackTabCard" class="dashboard-card px-1" [ngClass]="card.colClass">
+          <div class="dashboard-card-body">
+            <div class="dashboard-card-head">
+              <span class="card-indicator" [ngClass]="card.indicatorClass"></span> {{ card.title }}
+            </div>
+            <div class="dashboard-card-content">
+              <h5>{{ card.value }}</h5>
+              <p>{{ card.subtitle }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Insight Banner -->
+      <div class="insight-banner mt-2" *ngIf="isWidgetVisible(tab.key + '-insight')">
+        <div class="insight-badge">SMART INSIGHT</div>
+        <div class="insight-text">{{ prop(tab.insightKey) }}</div>
+      </div>
+
+      <!-- Reports (Chart + Table) -->
+      <ng-container *ngFor="let report of tab.reports; let ri = index">
+        <!-- What-If Simulator Controls -->
+        <div class="whatif-controls-bar" *ngIf="report.chart.id === 'whatIf' && isWidgetVisible(report.widgetId)">
+          <span class="whatif-label">Simulate:</span>
+          <span class="whatif-field">
+            <label>Growth %</label>
+            <input type="number" [(ngModel)]="whatIfGrowthPct" min="1" max="200" class="whatif-input" />
+          </span>
+          <span class="whatif-field">
+            <label>Months</label>
+            <input type="number" [(ngModel)]="whatIfForecastMonths" min="1" max="24" class="whatif-input" />
+          </span>
+          <button class="whatif-btn" (click)="runWhatIf()" [disabled]="whatIfLoading">
+            {{ whatIfLoading ? 'Simulating...' : 'Run Simulation' }}
+          </button>
+        </div>
+        <div class="row mx-0 report-section" [class.mt-3]="ri === 0" *ngIf="isWidgetVisible(report.widgetId)">
+          <!-- Chart -->
+          <div class="col-lg-5 col-12 px-1 mb-3">
+            <div class="chart-card">
+              <div class="chart-type-toggles">
+                <button *ngFor="let m of report.chart.modes"
+                        [class.active]="getChartMode(report.chart.id) === m.value"
+                        (click)="switchChart(report.chart.id, m.value)">{{ m.label }}</button>
+              </div>
+              <div class="skeleton-chart skeleton" *ngIf="prop(report.chart.loadingKey)"></div>
+              <canvas [id]="'chart-' + report.chart.id" *ngIf="!prop(report.chart.loadingKey)"></canvas>
+              <div class="chart-empty" *ngIf="!prop(report.chart.loadingKey) && report.chart.dataKey && prop(report.chart.dataKey)?.length === 0">
+                <p>{{ report.chart.emptyText }}</p>
+              </div>
+            </div>
+          </div>
+          <!-- Table -->
+          <div class="col-lg-7 col-12 px-1 mb-3">
+            <div class="section-card compact-table-card">
+              <div class="section-header">
+                <h4>{{ report.table.title }}</h4>
+                <span class="section-subtitle" *ngIf="report.table.subtitle">{{ report.table.subtitle }}</span>
+              </div>
+              <div class="section-body">
+                <table class="task-table">
+                  <thead><tr><th *ngFor="let col of report.table.columns">{{ col.label }}</th></tr></thead>
+                  <tbody>
+                    <tr *ngFor="let item of prop(report.table.dataKey)">
+                      <ng-container *ngFor="let col of report.table.columns">
+                        <td *ngIf="!col.type || col.type === 'text' || col.type === 'number'" [ngClass]="getCellClass(col, item)">
+                          <a *ngIf="col.linkRoute" class="cell-link" (click)="navigateTo(col.linkRoute!, item)">{{ item[col.key!] }}</a>
+                          <ng-container *ngIf="!col.linkRoute">{{ item[col.key!] }}</ng-container>
+                        </td>
+                        <td *ngIf="col.type === 'currency'" [ngClass]="getCellClass(col, item)">{{ formatCurrency(item[col.key!]) }}</td>
+                        <td *ngIf="col.type === 'badge'"><span class="ai-badge" [ngClass]="col.badgeClass!(item, self)">{{ col.badgeLabel ? col.badgeLabel(item, self) : item[col.key!] }}</span></td>
+                        <td *ngIf="col.type === 'custom'" [ngClass]="getCellClass(col, item)">{{ col.render!(item, self) }}</td>
+                        <td *ngIf="col.type === 'pipe'">{{ item[col.key!] | number:col.pipeFormat }}</td>
+                        <td *ngIf="col.type === 'action'">
+                          <button class="action-btn"
+                                  [disabled]="col.actionDisabled ? col.actionDisabled(self, item) : false"
+                                  (click)="handleAction(col.actionHandler!, item)">
+                            {{ col.actionText!(self, item) }}
+                          </button>
+                        </td>
+                        <td *ngIf="col.type === 'link'">
+                          <a class="view-link" (click)="navigateTo(col.linkRoute!, item)">{{ col.linkText || 'View' }}</a>
+                        </td>
+                      </ng-container>
+                    </tr>
+                    <tr *ngIf="prop(report.table.dataKey)?.length === 0">
+                      <td [attr.colspan]="report.table.columns.length" class="empty-cell">{{ report.table.emptyText }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- Extra Sections (e.g. side-by-side tables) -->
+      <ng-container *ngFor="let section of tab.extraSections">
+        <div class="row mx-0" *ngIf="isWidgetVisible(section.widgetId)">
+          <div *ngFor="let tbl of section.tables" class="px-1 mb-3" [ngClass]="tbl.colClass">
+            <div class="section-card compact-table-card">
+              <div class="section-header">
+                <h4>{{ tbl.title }}</h4>
+                <span class="section-subtitle" *ngIf="tbl.subtitle">{{ tbl.subtitle }}</span>
+              </div>
+              <div class="section-body">
+                <table class="task-table">
+                  <thead><tr><th *ngFor="let col of tbl.columns">{{ col.label }}</th></tr></thead>
+                  <tbody>
+                    <tr *ngFor="let item of prop(tbl.dataKey)">
+                      <ng-container *ngFor="let col of tbl.columns">
+                        <td *ngIf="!col.type || col.type === 'text' || col.type === 'number'" [ngClass]="getCellClass(col, item)">
+                          <a *ngIf="col.linkRoute" class="cell-link" (click)="navigateTo(col.linkRoute!, item)">{{ item[col.key!] }}</a>
+                          <ng-container *ngIf="!col.linkRoute">{{ item[col.key!] }}</ng-container>
+                        </td>
+                        <td *ngIf="col.type === 'currency'" [ngClass]="getCellClass(col, item)">{{ formatCurrency(item[col.key!]) }}</td>
+                        <td *ngIf="col.type === 'badge'"><span class="ai-badge" [ngClass]="col.badgeClass!(item, self)">{{ col.badgeLabel ? col.badgeLabel(item, self) : item[col.key!] }}</span></td>
+                        <td *ngIf="col.type === 'custom'" [ngClass]="getCellClass(col, item)">{{ col.render!(item, self) }}</td>
+                        <td *ngIf="col.type === 'pipe'">{{ item[col.key!] | number:col.pipeFormat }}</td>
+                        <td *ngIf="col.type === 'action'">
+                          <button class="action-btn"
+                                  [disabled]="col.actionDisabled ? col.actionDisabled(self, item) : false"
+                                  (click)="handleAction(col.actionHandler!, item)">
+                            {{ col.actionText!(self, item) }}
+                          </button>
+                        </td>
+                        <td *ngIf="col.type === 'link'">
+                          <a class="view-link" (click)="navigateTo(col.linkRoute!, item)">{{ col.linkText || 'View' }}</a>
+                        </td>
+                      </ng-container>
+                    </tr>
+                    <tr *ngIf="prop(tbl.dataKey)?.length === 0">
+                      <td [attr.colspan]="tbl.columns.length" class="empty-cell">{{ tbl.emptyText }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+    </div>
+  </ng-container>
+
+
+
+</div>
+
+<!-- Toast Notification -->
+<div class="toast-container" *ngIf="toastVisible">
+  <div class="toast-notification" [ngClass]="{'toast-success': toastType==='success', 'toast-error': toastType==='error'}">
+    {{ toastMessage }}
+  </div>
+</div>

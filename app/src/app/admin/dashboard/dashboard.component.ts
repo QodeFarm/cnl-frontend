@@ -1,8 +1,9 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Chart, ChartTypeRegistry, Colors, registerables } from 'chart.js';
-import { HttpClient } from '@angular/common/http'; // Import HttpClient
-import { SiteConfigService } from '@ta/ta-core'; // Import SiteConfigService
+import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { SiteConfigService } from '@ta/ta-core';
 
 
 @Component({
@@ -34,6 +35,46 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     this.fourthRowSmallTableData('Pending_For_Table')
 
     this.loadCurrentYearFinancialData();
+    this.fetchAIAlertCounts();
+  }
+
+  // ─── Smart Insights Banner ───
+  aiAlertCount: number = 0;
+  aiCriticalCount: number = 0;
+  aiTopAlert: string = '';
+  aiLoaded: boolean = false;
+
+  fetchAIAlertCounts() {
+    this.http.get(this.baseUrl + 'smart-insights/low-stock/').subscribe(
+      (res: any) => {
+        const lowStockCount = res.count || (res.data?.length || 0);
+        const critical = res.summary?.critical || 0;
+        this.http.get(this.baseUrl + 'smart-insights/debt-defaulters/').subscribe(
+          (dres: any) => {
+            const debtCount = dres.data?.length || 0;
+            const debtCritical = dres.summary?.critical || 0;
+            this.aiAlertCount = lowStockCount + debtCount;
+            this.aiCriticalCount = critical + debtCritical;
+            if (critical > 0) {
+              this.aiTopAlert = critical + ' products out of stock';
+            } else if (debtCritical > 0) {
+              this.aiTopAlert = debtCritical + ' customers critically overdue';
+            } else if (lowStockCount > 0) {
+              this.aiTopAlert = lowStockCount + ' products below minimum stock';
+            } else {
+              this.aiTopAlert = 'All systems healthy';
+            }
+            this.aiLoaded = true;
+          },
+          (err: any) => { console.error('Failed to load Smart Insights (debt-defaulters):', err); this.aiLoaded = true; this.aiTopAlert = 'View analysis'; }
+        );
+      },
+      (err: any) => { console.error('Failed to load Smart Insights (low-stock):', err); this.aiLoaded = true; this.aiTopAlert = 'View analysis'; }
+    );
+  }
+
+  openSmartInsights() {
+    this.router.navigate(['/admin/smart-insights']);
   }
 
 
@@ -76,7 +117,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
 
 
   // constructor(private http: HttpClient) {} 
-  constructor(private http: HttpClient, private siteConfigService: SiteConfigService) {} 
+  constructor(private http: HttpClient, private siteConfigService: SiteConfigService, private router: Router) {} 
 
 
   //For Charts

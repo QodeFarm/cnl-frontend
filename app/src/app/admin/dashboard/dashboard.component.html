@@ -1,5 +1,24 @@
 <!-- Begin Page Content -->
 <div class="container-fluid pt-3">
+    <!-- Smart Insights — top-right -->
+    <div class="si-chip-row">
+        <button class="si-chip" (click)="openSmartInsights()" [attr.aria-busy]="!aiLoaded">
+            <span class="si-chip-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93L12 10v2"/><circle cx="12" cy="17" r="3"/><path d="M12 20v2"/><path d="M8 22h8"/><path d="M5 6a7 7 0 0 1 14 0"/>
+                </svg>
+            </span>
+            <span class="si-chip-text">Smart Insights</span>
+            <span class="si-chip-badge" *ngIf="aiLoaded && aiAlertCount > 0" [class.critical]="aiCriticalCount > 0" aria-live="polite">
+                {{ aiAlertCount > 99 ? '99+' : aiAlertCount }}
+            </span>
+            <span class="si-chip-badge loading" *ngIf="!aiLoaded">
+                <span class="si-shimmer"></span>
+            </span>
+            <svg class="si-chip-arrow" viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M6.22 3.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 0 1 0-1.06z"/></svg>
+        </button>
+    </div>
+
     <div class="row">
         <!-- Sales Card -->
         <div class="dashboard-card px-1 col-md col-sm-4 col-6 h-100" (click)="openSalesModal()">
