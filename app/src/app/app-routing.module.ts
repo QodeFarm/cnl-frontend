@@ -125,6 +125,7 @@ const routes: Routes = [
       { path: 'master', data: { title: 'Master', moduleName: 'master' }, pathMatch: 'full', redirectTo: 'master/master' },
       { path: 'master/:code', data: { title: 'Master', moduleName: 'master' }, canActivate: [], loadComponent: () => import('./admin/master/master-list/master-list.component').then(m => m.MasterListComponent) },
       { path: 'leads', data: { title: 'Leads', moduleName: 'lead' }, canActivate: [], loadChildren: () => import('./admin/leads/leads.module').then(m => m.LeadsModule) },
+      { path: 'products/product-merge', data: { title: 'Product Merge', moduleName: 'product-merge' }, canActivate: [], loadComponent: () => import('./admin/products/product-merge/product-merge.component').then(m => m.ProductMergeComponent) },
       { path: 'products', data: { title: 'Products', moduleName: 'products' }, canActivate: [], loadChildren: () => import('./admin/products/products.module').then(m => m.ProductsModule) },
       { path: 'assets', data: { title: 'Assets', moduleName: 'assets' }, canActivate: [], loadChildren: () => import('./admin/assets/assets.module').then(m => m.AssetsModule) },
 

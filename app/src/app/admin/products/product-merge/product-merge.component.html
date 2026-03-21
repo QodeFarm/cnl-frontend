@@ -1,0 +1,231 @@
+<nz-spin [nzSpinning]="isLoading || isMerging" nzTip="Loading...">
+  <div class="merge-container">
+
+    <!-- ── Header ── -->
+    <div class="merge-header">
+        <div class="d-flex align-items-center gap-2">
+        <button class="btn btn-sm btn-outline-secondary" (click)="goBack()">
+          <i class="fas fa-arrow-left"></i>
+        </button>
+        <h5 class="custom-heading mb-0">Product Merge &amp; Deactivate</h5>
+      </div>
+    </div>
+
+    <!-- ── Success Result ── -->
+    <div *ngIf="mergeSuccess" class="merge-success-panel">
+      <div class="success-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <h5>Merge Completed Successfully</h5>
+      <p *ngIf="mergeResult">
+        <strong>{{ mergeResult.records_transferred }}</strong> records transferred.
+        Balance updated to <strong>{{ mergeResult.new_master_balance }}</strong>.
+        Duplicate product has been deactivated.
+      </p>
+      <div class="d-flex gap-2 mt-3 justify-content-center">
+        <button class="btn btn-primary btn-sm" (click)="resetForm()">Merge Another</button>
+        <button class="btn btn-outline-secondary btn-sm" (click)="goBack()">Back to Products</button>
+      </div>
+    </div>
+
+    <!-- ── Main Content ── -->
+    <div *ngIf="!mergeSuccess" class="merge-body">
+
+      <!-- Step 1: Product Selection -->
+      <div class="row">
+        <!-- Master Product -->
+        <div class="col-md-6">
+          <div class="selection-card">
+            <div class="card-label">
+              <span class="badge badge-master">MASTER</span>
+              <small class="text-muted">This product will be kept</small>
+            </div>
+            <div class="search-box">
+              <input
+                type="text"
+                class="form-control form-control-sm"
+                placeholder="Search by name or code..."
+                [(ngModel)]="masterSearchTerm"
+              />
+              <button
+                *ngIf="masterProduct"
+                class="btn btn-sm btn-link clear-btn"
+                (click)="clearMaster()"
+              >
+                <i class="fas fa-times"></i> Clear
+              </button>
+            </div>
+
+            <!-- Selected Master Display -->
+            <div *ngIf="masterProduct" class="selected-product">
+              <div class="product-name">{{ masterProduct.name }}</div>
+              <div class="product-details">
+                <span><strong>Code:</strong> {{ masterProduct.code || '—' }}</span>
+                <span><strong>Print Name:</strong> {{ masterProduct.print_name || '—' }}</span>
+                <span><strong>Balance:</strong> {{ masterProduct.balance || 0 }}</span>
+                <span *ngIf="masterProduct.status"><strong>Status:</strong>
+                  <span class="badge" [ngClass]="masterProduct.status === 'Active' ? 'bg-success' : 'bg-secondary'">
+                    {{ masterProduct.status }}
+                  </span>
+                </span>
+              </div>
+            </div>
+
+            <!-- Product List -->
+            <div *ngIf="!masterProduct" class="product-list-scroll">
+              <div class="list-hint" *ngIf="products.length > 50 && !masterSearchTerm">
+                Showing first 50 of {{ products.length }} products. Type to search.
+              </div>
+              <div
+                *ngFor="let p of filteredMasterProducts"
+                class="product-item"
+                (click)="onMasterSelected(p.product_id)"
+              >
+                <div class="item-name">{{ p.name }}</div>
+                <div class="item-sub">{{ p.code || '—' }} &middot; Bal: {{ p.balance || 0 }}</div>
+              </div>
+              <div *ngIf="filteredMasterProducts.length === 0" class="no-results">
+                No products found
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Duplicate Product -->
+        <div class="col-md-6">
+          <div class="selection-card">
+            <div class="card-label">
+              <span class="badge badge-duplicate">DUPLICATE</span>
+              <small class="text-muted">This product will be deactivated</small>
+            </div>
+            <div class="search-box">
+              <input
+                type="text"
+                class="form-control form-control-sm"
+                placeholder="Search by name or code..."
+                [(ngModel)]="duplicateSearchTerm"
+                [disabled]="!masterProduct"
+              />
+              <button
+                *ngIf="duplicateProduct"
+                class="btn btn-sm btn-link clear-btn"
+                (click)="clearDuplicate()"
+              >
+                <i class="fas fa-times"></i> Clear
+              </button>
+            </div>
+
+            <!-- Selected Duplicate Display -->
+            <div *ngIf="duplicateProduct" class="selected-product duplicate">
+              <div class="product-name">{{ duplicateProduct.name }}</div>
+              <div class="product-details">
+                <span><strong>Code:</strong> {{ duplicateProduct.code || '—' }}</span>
+                <span><strong>Print Name:</strong> {{ duplicateProduct.print_name || '—' }}</span>
+                <span><strong>Balance:</strong> {{ duplicateProduct.balance || 0 }}</span>
+                <span *ngIf="duplicateProduct.status"><strong>Status:</strong>
+                  <span class="badge" [ngClass]="duplicateProduct.status === 'Active' ? 'bg-success' : 'bg-secondary'">
+                    {{ duplicateProduct.status }}
+                  </span>
+                </span>
+              </div>
+            </div>
+
+            <!-- Product List -->
+            <div *ngIf="!duplicateProduct && masterProduct" class="product-list-scroll">
+              <div class="list-hint" *ngIf="products.length > 50 && !duplicateSearchTerm">
+                Showing first 50. Type to search.
+              </div>
+              <div
+                *ngFor="let p of filteredDuplicateProducts"
+                class="product-item"
+                (click)="onDuplicateSelected(p.product_id)"
+              >
+                <div class="item-name">{{ p.name }}</div>
+                <div class="item-sub">{{ p.code || '—' }} &middot; Bal: {{ p.balance || 0 }}</div>
+              </div>
+              <div *ngIf="filteredDuplicateProducts.length === 0" class="no-results">
+                No products found
+              </div>
+            </div>
+            <div *ngIf="!masterProduct && !duplicateProduct" class="no-results mt-3">
+              Select a master product first
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Preview Panel -->
+      <div *ngIf="canMerge" class="preview-panel">
+        <h6><i class="fas fa-exchange-alt me-2"></i>Merge Preview</h6>
+        <div class="preview-grid">
+          <div class="preview-item">
+            <span class="preview-label">Master Product</span>
+            <span class="preview-value">{{ masterProduct?.name }}</span>
+          </div>
+          <div class="preview-item">
+            <span class="preview-label">Duplicate Product</span>
+            <span class="preview-value text-danger">{{ duplicateProduct?.name }} <small>(will be deactivated)</small></span>
+          </div>
+          <div class="preview-item">
+            <span class="preview-label">Projected Balance</span>
+            <span class="preview-value">{{ projectedBalance }}</span>
+          </div>
+        </div>
+
+        <!-- Warning -->
+        <div class="merge-warning">
+          <i class="fas fa-exclamation-triangle"></i>
+          <div>
+            <strong>Warning:</strong> This action is <strong>irreversible</strong>.
+            All records (sales orders, purchase orders, invoices, production, inventory, etc.)
+            referencing the duplicate product will be transferred to the master product.
+            The duplicate will be deactivated permanently.
+          </div>
+        </div>
+
+        <div class="text-end mt-3">
+          <button class="btn btn-danger btn-sm" (click)="openConfirmModal()" [disabled]="isMerging">
+            <i class="fas fa-compress-arrows-alt me-1"></i> Merge Products
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</nz-spin>
+
+<!-- ── Confirmation Modal (Bootstrap) ── -->
+<div class="modal fade custom-modal" id="mergeConfirmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h6 class="modal-title">Confirm Product Merge</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-2">You are about to merge:</p>
+        <div class="merge-modal-detail">
+          <div class="merge-modal-row">
+            <span class="merge-modal-label">Duplicate</span>
+            <span class="merge-modal-value text-danger">{{ duplicateProduct?.name }}</span>
+            <small class="text-muted">{{ duplicateProduct?.code }}</small>
+          </div>
+          <div class="merge-modal-row">
+            <span class="merge-modal-label">Into Master</span>
+            <span class="merge-modal-value">{{ masterProduct?.name }}</span>
+            <small class="text-muted">{{ masterProduct?.code }}</small>
+          </div>
+        </div>
+        <p class="text-danger mb-0 mt-3 merge-modal-warning">
+          <i class="fas fa-exclamation-triangle me-1"></i>
+          This action cannot be undone. Records will transfer to master and duplicate will be deactivated.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger btn-sm" (click)="executeMerge()">
+          Yes, Merge &amp; Deactivate
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

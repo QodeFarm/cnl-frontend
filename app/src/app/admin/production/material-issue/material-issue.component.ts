@@ -344,7 +344,7 @@ displayInformation(product: any) {
               },
               {
                 key: 'product',
-                type: 'select',
+                type: 'products-dropdown',
                 templateOptions: {
                   label: 'Product',
                   dataKey: 'product_id',
@@ -352,11 +352,7 @@ displayInformation(product: any) {
                   hideLabel: true,
                   placeholder: 'Select Product',
                   options: [],
-                  required: false,
-                  lazy: {
-                    url: 'products/products/?summary=true',
-                    lazyOneTime: true
-                  }
+                  required: false
                 },
                 hooks: {
                   onInit: (field: any) => {
