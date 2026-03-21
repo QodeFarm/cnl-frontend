@@ -342,3 +342,84 @@
     }
   }
 }
+
+::ng-deep .forecast-detail-modal {
+  .ant-modal-header {
+    border-bottom: 1px solid #e6ebff;
+  }
+
+  .ant-modal-title {
+    color: #142768;
+    font-weight: 700;
+  }
+
+  .ant-modal-body {
+    padding-top: 14px;
+  }
+
+  .forecast-modal-content {
+    font-size: 14px;
+    color: #2c2e35;
+  }
+
+  .forecast-grid {
+    display: grid;
+    gap: 10px;
+  }
+
+  .forecast-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .label {
+    color: #6e7891;
+    font-weight: 600;
+    min-width: 170px;
+  }
+
+  .value {
+    color: #1f2433;
+    font-weight: 600;
+    text-align: right;
+    word-break: break-word;
+  }
+
+  .forecast-divider {
+    height: 1px;
+    background: #edf1ff;
+    margin: 12px 0;
+  }
+
+  .positive {
+    color: #389e0d;
+  }
+
+  .negative {
+    color: #cf1322;
+  }
+
+  .status-pill {
+    border-radius: 999px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    padding: 6px 10px;
+  }
+
+  .status-critical {
+    background: #ff4d4f;
+  }
+
+  .status-warning {
+    background: #faad14;
+    color: #2c2e35;
+  }
+
+  .status-healthy {
+    background: #52c41a;
+  }
+}

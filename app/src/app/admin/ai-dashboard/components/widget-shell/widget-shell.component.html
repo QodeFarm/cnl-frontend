@@ -1,0 +1,55 @@
+<div class="widget-shell" (mouseenter)="showControls = true" (mouseleave)="showControls = false">
+
+  <!-- Header -->
+  <div class="widget-header">
+    <div class="widget-title-area">
+      <h4 class="widget-title">{{ title }}</h4>
+      <span class="widget-updated" *ngIf="lastUpdated && !loading">{{ getTimeAgo() }}</span>
+    </div>
+
+    <div class="widget-controls" [class.visible]="showControls || loading">
+      <!-- Chart Type Toggle -->
+      <div class="chart-type-toggle" *ngIf="showChartToggle && !loading">
+        <button *ngFor="let ct of chartTypes"
+                class="chart-type-btn"
+                [class.active]="chartType === ct.type"
+                (click)="switchChartType(ct.type)"
+                [title]="ct.label">
+          {{ ct.icon }}
+        </button>
+      </div>
+
+      <button class="widget-action-btn" (click)="onRefresh()" title="Refresh" aria-label="Refresh widget" [disabled]="loading">
+        <span class="refresh-icon" [class.spinning]="loading">↻</span>
+      </button>
+
+      <button class="widget-action-btn remove-btn" (click)="onRemove()" title="Remove widget" aria-label="Remove widget" *ngIf="removable">
+        ✕
+      </button>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="widget-body">
+    <!-- Loading State -->
+    <div class="widget-loading" *ngIf="loading">
+      <div class="skeleton-block skeleton-title"></div>
+      <div class="skeleton-block skeleton-chart"></div>
+      <div class="skeleton-block skeleton-row"></div>
+      <div class="skeleton-block skeleton-row short"></div>
+    </div>
+
+    <!-- Error State -->
+    <div class="widget-error" *ngIf="error && !loading">
+      <span class="error-icon">⚠</span>
+      <p>Failed to load data</p>
+      <button class="retry-btn" (click)="onRefresh()">Retry</button>
+    </div>
+
+    <!-- Content -->
+    <div class="widget-content" *ngIf="!loading && !error">
+      <ng-content></ng-content>
+    </div>
+  </div>
+
+</div>

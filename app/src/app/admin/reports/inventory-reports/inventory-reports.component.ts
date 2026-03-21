@@ -244,13 +244,11 @@ export class InventoryReportsComponent implements OnInit {
               mapFn: (row: any) => row?.action_label || 'Request',
               label: 'Request',
               callBackFn: (row: any, action: any) => {
-                this.openWorkOrder(row);
-              }
-            },
-            {
-              type: 'callBackFn',
-              label: 'View',
-              callBackFn: (row: any, action: any) => {
+                const actionLabel = (row?.action_label || 'Request').toLowerCase();
+                if (actionLabel === 'request') {
+                  this.openWorkOrder(row);
+                  return;
+                }
                 this.viewProduct(row);
               }
             }
@@ -339,50 +337,58 @@ export class InventoryReportsComponent implements OnInit {
     });
   }
 
+  private escapeHtml(text: string): string {
+    const el = document.createElement('span');
+    el.textContent = text;
+    return el.innerHTML;
+  }
+
   viewProduct(row: any): void {
-    const productName = row?.name || 'Product';
-    const productCode = row?.code || '-';
-    const categoryName = row?.category?.category_name || '-';
-    const groupName = row?.product_group?.group_name || '-';
-    const warehouseName = row?.warehouse?.name || '-';
+    const productName = this.escapeHtml(row?.name || 'Product');
+    const productCode = this.escapeHtml(row?.code || '-');
+    const categoryName = this.escapeHtml(row?.category?.category_name || '-');
+    const groupName = this.escapeHtml(row?.product_group?.group_name || '-');
+    const warehouseName = this.escapeHtml(row?.warehouse?.name || '-');
     const currentStock = parseFloat(row?.current_stock) || 0;
     const avgSales = parseFloat(row?.average_sales) || 0;
     const difference = parseFloat(row?.stock_difference) || (currentStock - avgSales);
-    const status = row?.status || '-';
-    const statusMessage = row?.status_message || '';
-    const recommendedAction = row?.recommended_action || '';
+    const status = row?.status || '';
+    const statusMessage = this.escapeHtml(row?.status_message || '');
+    const recommendedAction = this.escapeHtml(row?.recommended_action || '');
 
-    // Format status badge
-    let statusBadge = status;
-    if (status === 'RED') {
-      statusBadge = '<span style="background: #dc3545; color: white; padding: 2px 8px; border-radius: 4px;">🔴 Critical</span>';
-    } else if (status === 'YELLOW') {
-      statusBadge = '<span style="background: #ffc107; color: black; padding: 2px 8px; border-radius: 4px;">🟡 Warning</span>';
-    } else if (status === 'GREEN') {
-      statusBadge = '<span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 4px;">🟢 Healthy</span>';
-    }
+    const statusMap: Record<string, { cls: string; label: string }> = {
+      'RED': { cls: 'status-critical', label: 'Critical' },
+      'YELLOW': { cls: 'status-warning', label: 'Warning' },
+      'GREEN': { cls: 'status-healthy', label: 'Healthy' },
+    };
+    const { cls: statusClass, label: statusLabel } = statusMap[status] || { cls: 'status-unknown', label: 'Unknown' };
 
     // Show product details in a modal
     this.modal.info({
       nzTitle: `Product Details - ${productName}`,
       nzContent: `
-        <div style="line-height: 2;">
-          <p><strong>Product Name:</strong> ${productName}</p>
-          <p><strong>Product Code:</strong> ${productCode}</p>
-          <p><strong>Category:</strong> ${categoryName}</p>
-          <p><strong>Product Group:</strong> ${groupName}</p>
-          <p><strong>Warehouse:</strong> ${warehouseName}</p>
-          <hr style="margin: 10px 0;">
-          <p><strong>Current Stock:</strong> ${currentStock.toFixed(2)}</p>
-          <p><strong>Avg Sales:</strong> ${avgSales.toFixed(2)}</p>
-          <p><strong>Difference:</strong> <span style="color: ${difference >= 0 ? '#28a745' : '#dc3545'}; font-weight: 600;">${difference >= 0 ? '+' : ''}${difference.toFixed(2)}</span></p>
-          <p><strong>Status:</strong> ${statusBadge}</p>
-          ${statusMessage ? `<p><strong>Message:</strong> ${statusMessage}</p>` : ''}
-          ${recommendedAction ? `<p><strong>Recommended Action:</strong> ${recommendedAction}</p>` : ''}
+        <div class="forecast-modal-content">
+          <div class="forecast-grid">
+            <div class="forecast-row"><span class="label">Product Name</span><span class="value">${productName}</span></div>
+            <div class="forecast-row"><span class="label">Product Code</span><span class="value">${productCode}</span></div>
+            <div class="forecast-row"><span class="label">Category</span><span class="value">${categoryName}</span></div>
+            <div class="forecast-row"><span class="label">Product Group</span><span class="value">${groupName}</span></div>
+            <div class="forecast-row"><span class="label">Warehouse</span><span class="value">${warehouseName}</span></div>
+          </div>
+          <div class="forecast-divider"></div>
+          <div class="forecast-grid">
+            <div class="forecast-row"><span class="label">Current Stock</span><span class="value">${currentStock.toFixed(2)}</span></div>
+            <div class="forecast-row"><span class="label">Avg Sales</span><span class="value">${avgSales.toFixed(2)}</span></div>
+            <div class="forecast-row"><span class="label">Difference</span><span class="value ${difference >= 0 ? 'positive' : 'negative'}">${difference >= 0 ? '+' : ''}${difference.toFixed(2)}</span></div>
+            <div class="forecast-row"><span class="label">Status</span><span class="status-pill ${statusClass}">${statusLabel}</span></div>
+            ${statusMessage ? `<div class="forecast-row"><span class="label">Message</span><span class="value">${statusMessage}</span></div>` : ''}
+            ${recommendedAction ? `<div class="forecast-row"><span class="label">Recommended Action</span><span class="value">${recommendedAction}</span></div>` : ''}
+          </div>
         </div>
       `,
       nzOkText: 'Close',
-      nzWidth: 450
+      nzWidth: 560,
+      nzClassName: 'forecast-detail-modal'
     });
   }
 }
