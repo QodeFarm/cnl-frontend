@@ -1,62 +1,80 @@
 <div class="container-fluid p-3">
+  
+  <!-- Admin View - Create/Edit Form -->
+  <div *ngIf="!isCustomerPortal">
     <div class="payment-receipt-banner">
-        <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
-            <button type="button" class="btn pl-0" style="color: black;">
-                <span class="custom-heading">Payment Receipt</span>
-            </button>
-            <button (click)="showPaymentReceiptListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#paymentReceiptListModal">
-                Payment Receipt List
-            </button>
-        </div>
+      <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
+        <button type="button" class="btn pl-0" style="color: black;">
+          <span class="custom-heading">Payment Receipt</span>
+        </button>
+        <button (click)="showPaymentReceiptListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#paymentReceiptListModal">
+          Payment Receipt List
+        </button>
+      </div>
     </div>
 
     <div class="row custom-form">
-        <div class="col-12 px-1">
-            <ta-form #paymentreceiptForm [options]="formConfig"></ta-form>
-        </div>
+      <div class="col-12 px-1">
+        <ta-form #paymentreceiptForm [options]="formConfig"></ta-form>
+      </div>
     </div>
 
     <div class="row">
-        <div class="col-12 px-2 py-1 custom-list" >
-            <ta-table [options]="tableConfig"></ta-table>
-        </div>
+      <div class="col-12 px-2 py-1 custom-list">
+        <ta-table [options]="tableConfig"></ta-table>
+      </div>
     </div>
+  </div>
+
+  <!-- Customer Portal View - Only List -->
+  <div *ngIf="isCustomerPortal">
+    <div class="customer-portal-info">
+      <h3>My Payment Receipts</h3>
+      <p>View all your payment receipts here. For any queries, please contact support.</p>
+    </div>
+    <app-payment-receipt-list 
+      #paymentReceiptListComponent
+      (edit)="editPaymentReceipt($event)" 
+      class="custom-list">
+    </app-payment-receipt-list>
+  </div>
+
 </div>
 
-<!-- Modal for Payment Receipt List -->
-<div class="modal fade custom-modal" id="paymentReceiptListModal" tabindex="-1" aria-labelledby="paymentReceiptListModalLabel" aria-hidden="true">
+<!-- Admin Modal - Payment Receipt List (Only shown in admin mode) -->
+<div *ngIf="!isCustomerPortal">
+  <div class="modal fade custom-modal" id="paymentReceiptListModal" tabindex="-1" aria-labelledby="paymentReceiptListModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="paymentReceiptListModalLabel">Payment Receipt List</h5>
-                <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" *ngIf="showPaymentReceiptList">
-                <app-payment-receipt-list (edit)="editPaymentReceipt($event)" class="custom-list"></app-payment-receipt-list>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-            </div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="paymentReceiptListModalLabel">Payment Receipt List</h5>
+          <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
+        <div class="modal-body" *ngIf="showPaymentReceiptList">
+          <app-payment-receipt-list (edit)="editPaymentReceipt($event)" class="custom-list"></app-payment-receipt-list>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
 
 <!-- Success toast notification -->
 <div id="customToast" class="toast-message" *ngIf="showSuccessToast">
-    <div class="tick-circle">
-        <span class="tick-mark">✓</span>
-    </div>
-    <span class="toast-message-text">{{ toastMessage }}</span>
-    <span class="toast-close" onclick="this.parentElement.style.display='none'">x</span>
+  <div class="tick-circle">
+    <span class="tick-mark">✓</span>
+  </div>
+  <span class="toast-message-text">{{ toastMessage }}</span>
+  <span class="toast-close" onclick="this.parentElement.style.display='none'">x</span>
 </div>
 
 <!-- Error toast notification -->
 <div id="errorToast" class="toast-message error-toast" *ngIf="showErrorToast">
-    <div class="error-circle">
-        <span class="error-mark">!</span>
-    </div>
-    <span class="toast-message-text">{{ errorMessage }}</span>
-    <span class="toast-close" onclick="this.parentElement.style.display='none'">x</span>
+  <div class="error-circle">
+    <span class="error-mark">!</span>
+  </div>
+  <span class="toast-message-text">{{ errorMessage }}</span>
+  <span class="toast-close" onclick="this.parentElement.style.display='none'">x</span>
 </div>
-
-

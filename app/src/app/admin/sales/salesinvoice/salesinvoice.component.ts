@@ -199,37 +199,98 @@ export class SalesinvoiceComponent {
   dataToPopulate: any;
   salesInvoiceForm: FormGroup;
   entitiesList: any[] = [];
-  ngOnInit() {
-    this.showSaleInvoiceList = false;
-    this.showForm = true;
-    this.SaleInvoiceEditID = null;
-    // Reset customer info banner
-    this.customerNotes = '';
-    this.customerTransporterName = '';
-    this.customerTransportNotes = '';
-    this.showCustomerInfoBanner = false;
-    this.setFormConfig();
-    this.checkAndPopulateData();
-    this.loadQuickpackOptions(); // Fetch Quickpack options
-    //custom fields logic...
-    this.http.get('masters/entities/')
-      .subscribe((res: any) => {
-        this.entitiesList = res.data || []; // Adjust if the response format differs
-      });
 
-    CustomFieldHelper.fetchCustomFields(this.http, 'sale_invoice', (customFields: any, customFieldMetadata: any) => {
-      CustomFieldHelper.addCustomFieldsToFormConfig_2(customFields, customFieldMetadata, this.formConfig);
+isCustomerPortal: boolean = false;
+salesInvoiceListComponent: SalesInvoiceListComponent;
+ngOnInit() {
+    // Check if this is customer portal
+    this.route.data.subscribe(data => {
+        this.isCustomerPortal = data['customerView'] || false;
+        
+        if (this.isCustomerPortal) {
+            // Customer Portal Mode - Only show list, no create/edit
+            this.showSaleInvoiceList = true;
+            this.showForm = false;
+            this.SaleInvoiceEditID = null;
+            
+            // IMPORTANT: Trigger list refresh for customer portal
+            setTimeout(() => {
+                if (this.salesInvoiceListComponent) {
+                    this.salesInvoiceListComponent.refreshTable();
+                }
+            }, 100);
+            
+            // Don't return immediately, we still need to initialize other things
+            // Just skip the admin-specific initialization
+        } else {
+            // Admin Mode - Full functionality
+            this.showSaleInvoiceList = false;
+            this.showForm = true;
+            this.SaleInvoiceEditID = null;
+            // Reset customer info banner
+            this.customerNotes = '';
+            this.customerTransporterName = '';
+            this.customerTransportNotes = '';
+            this.showCustomerInfoBanner = false;
+            this.setFormConfig();
+            this.checkAndPopulateData();
+            this.loadQuickpackOptions(); // Fetch Quickpack options
+            //custom fields logic...
+            this.http.get('masters/entities/')
+              .subscribe((res: any) => {
+                this.entitiesList = res.data || []; // Adjust if the response format differs
+              });
+
+            CustomFieldHelper.fetchCustomFields(this.http, 'sale_invoice', (customFields: any, customFieldMetadata: any) => {
+              CustomFieldHelper.addCustomFieldsToFormConfig_2(customFields, customFieldMetadata, this.formConfig);
+            });
+            // Set sale_order default value
+            if (this.formConfig.model && this.formConfig.model.sale_invoice_order) {
+                this.formConfig.model['sale_invoice_order']['order_type'] = 'sale_invoice';
+            }
+
+            // To get SaleInvoice number for save
+            this.getInvoiceNo();
+            if (this.formConfig.fields && this.formConfig.fields[2]) {
+                this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = true;
+                this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide = true;
+            }
+            this.initDraftAutoSave();
+            this.checkAndRestoreDraft();
+        }
     });
-    // Set sale_order default value
-    this.formConfig.model['sale_invoice_order']['order_type'] = 'sale_invoice';
+}
+  // ngOnInit() {
+  //   this.showSaleInvoiceList = false;
+  //   this.showForm = true;
+  //   this.SaleInvoiceEditID = null;
+  //   // Reset customer info banner
+  //   this.customerNotes = '';
+  //   this.customerTransporterName = '';
+  //   this.customerTransportNotes = '';
+  //   this.showCustomerInfoBanner = false;
+  //   this.setFormConfig();
+  //   this.checkAndPopulateData();
+  //   this.loadQuickpackOptions(); // Fetch Quickpack options
+  //   //custom fields logic...
+  //   this.http.get('masters/entities/')
+  //     .subscribe((res: any) => {
+  //       this.entitiesList = res.data || []; // Adjust if the response format differs
+  //     });
 
-    // To get SaleInvoice number for save
-    this.getInvoiceNo();
-    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = true;
-    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide = true;
-    this.initDraftAutoSave();
-    this.checkAndRestoreDraft();
-  }
+  //   CustomFieldHelper.fetchCustomFields(this.http, 'sale_invoice', (customFields: any, customFieldMetadata: any) => {
+  //     CustomFieldHelper.addCustomFieldsToFormConfig_2(customFields, customFieldMetadata, this.formConfig);
+  //   });
+  //   // Set sale_order default value
+  //   this.formConfig.model['sale_invoice_order']['order_type'] = 'sale_invoice';
+
+  //   // To get SaleInvoice number for save
+  //   this.getInvoiceNo();
+  //   this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = true;
+  //   this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide = true;
+  //   this.initDraftAutoSave();
+  //   this.checkAndRestoreDraft();
+  // }
 
   loadProductVariations(field: FormlyFieldConfig, productValuechange: boolean = false) {
       const parentArray = field.parent;

@@ -1,0 +1,82 @@
+<div class="portal-container">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <!-- Logo Section -->
+    <div class="sidebar-header">
+      <div class="logo">
+        <span class="logo-icon">C&L</span>
+        <span class="logo-text">Customer Portal</span>
+      </div>
+    </div>
+
+    <!-- User Profile Section -->
+    <div class="user-profile">
+      <div class="avatar">
+        {{ customerInitials }}
+      </div>
+      <div class="user-info">
+        <h4>{{ customerName }}</h4>
+        <p>Customer Account</p>
+      </div>
+    </div>
+
+    <!-- Navigation Menu -->
+    <!-- Navigation Menu -->
+<nav class="sidebar-nav">
+  <ul class="nav-menu">
+    <li class="nav-item" *ngFor="let item of menuItems">
+      <a class="nav-link" [class.active]="item.active" (click)="navigate(item.path)">
+        <div class="nav-icon">
+          <i class="fas {{ item.icon }}"></i>
+          <span class="badge" *ngIf="item.badge">{{ item.badge }}</span>
+        </div>
+        <!-- LABEL - Make sure this is NOT hidden -->
+        <div class="nav-content">
+          <span class="nav-label">{{ item.label }}</span>
+        </div>
+      </a>
+    </li>
+  </ul>
+</nav>
+
+    <!-- Sidebar Footer -->
+    <div class="sidebar-footer">
+      <div class="time-display">
+        <i class="fas fa-clock"></i>
+        {{ currentTime }}
+      </div>
+      <button class="logout-btn" (click)="logout()">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Logout</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Top Header -->
+    <header class="content-header">
+      <div class="header-left">
+        <button class="menu-toggle" (click)="toggleMobileMenu()">
+          <i class="fas fa-bars"></i>
+        </button>
+        <h1>{{ pageTitle }}</h1>
+      </div>
+      <div class="header-right">
+        <div class="notification-badge">
+          <i class="fas fa-bell"></i>
+          <span class="badge">3</span>
+        </div>
+        <div class="header-user">
+          <span class="user-name">{{ customerName }}</span>
+          <div class="avatar-small">{{ customerInitials }}</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content Area -->
+    <div class="content-body">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

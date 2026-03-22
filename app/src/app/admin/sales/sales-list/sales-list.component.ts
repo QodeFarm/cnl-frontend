@@ -1,8 +1,8 @@
-import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 import { HttpClient } from '@angular/common/http';
 import { LocalStorageService } from '@ta/ta-core';
@@ -14,13 +14,78 @@ import { LocalStorageService } from '@ta/ta-core';
   templateUrl: './sales-list.component.html',
   styleUrls: ['./sales-list.component.scss']
 })
-export class SalesListComponent {
-
+export class SalesListComponent implements OnInit {
   @Output('edit') edit = new EventEmitter<void>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
-  constructor(private router: Router, private http: HttpClient, private localStorage: LocalStorageService) {
+  // Add these properties
+  isCustomerPortal: boolean = false;
+  customerId: string | null = null;
+
+  constructor(
+    private router: Router, 
+    private http: HttpClient, 
+    private localStorage: LocalStorageService,
+    private route: ActivatedRoute  // Add this
+  ) {
     this.setApiUrlBasedOnUser();
+  }
+
+  ngOnInit() {
+    // Check if this is customer portal
+    this.route.data.subscribe(data => {
+      this.isCustomerPortal = data['customerView'] || false;
+      
+      if (this.isCustomerPortal) {
+        // Get customer ID from localStorage
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        this.customerId = user.id || null;
+        
+        console.log('Customer Portal Mode - Customer ID:', this.customerId);
+        
+        // Update the table config for customer view
+        this.updateTableConfigForCustomer();
+      }
+    });
+  }
+
+  // New method to update table config for customer
+  updateTableConfigForCustomer() {
+    // Set API URL with customer filter
+    this.tableConfig.apiUrl = `sales/sale_order/?customer_id=${this.customerId}`;
+    
+    // Remove admin-only actions
+    this.tableConfig.cols = this.tableConfig.cols.map(col => {
+      if (col.name === 'Action') {
+        // For customer portal, only keep view action, remove delete/restore
+        col.actions = [
+          {
+            type: 'callBackFn',
+            icon: 'fa fa-eye',
+            label: '',
+            tooltip: "View Order",
+            callBackFn: (row, action) => {
+              console.log('View order:', row);
+              this.edit.emit(row.sale_order_id);
+            }
+          }
+        ];
+      }
+      return col;
+    });
+
+    // Remove export option for customers
+    this.tableConfig.export = undefined;
+    
+    // Remove checkboxes for customers
+    this.tableConfig.showCheckbox = false;
+    
+    // Add fixed filter for customer
+    this.tableConfig.fixedFilters = [
+      { key: 'customer_id', value: this.customerId }
+    ];
+
+    console.log('Updated table config for customer:', this.tableConfig);
   }
 
   onRowDoubleClick(row: any) {
@@ -32,16 +97,27 @@ export class SalesListComponent {
     this.taTableComponent?.refresh();
   };
 
-  // Default format
   selectedFormat: string = "CNL_Standard_Excl";
-
   pendingAction: 'email' | 'preview' | 'print' | 'whatsapp' | null = null;
 
-  // Show format selection popup
+  // Only show format dialog for customers if needed
   private showFormatDialog(action: 'email' | 'preview' | 'print' | 'whatsapp'): void {
-    this.pendingAction = action;
-    const dialog = document.getElementById('formatDialog');
-    if (dialog) dialog.style.display = 'flex';
+    if (this.isCustomerPortal) {
+      // For customers, maybe just preview is enough
+      if (action === 'preview' || action === 'print') {
+        this.pendingAction = action;
+        const dialog = document.getElementById('formatDialog');
+        if (dialog) dialog.style.display = 'flex';
+      } else {
+        // Disable email/whatsapp for customers if not needed
+        this.showDialog();
+      }
+    } else {
+      // Admin can do everything
+      this.pendingAction = action;
+      const dialog = document.getElementById('formatDialog');
+      if (dialog) dialog.style.display = 'flex';
+    }
   }
 
   closeFormatDialog(): void {
@@ -50,7 +126,6 @@ export class SalesListComponent {
     this.pendingAction = null;
   }
 
-  // Inject format and proceed with existing method
   proceedWithSelectedAction(): void {
     switch (this.pendingAction) {
       case 'email':
@@ -90,17 +165,13 @@ export class SalesListComponent {
         this.showLoading = false;
         this.refreshTable();
 
-        //  CASE 1: WATI (server sends directly)
         if (response.mode === 'wati') {
           this.showSuccessToast = true;
           this.toastMessage = 'WhatsApp message sent successfully';
           setTimeout(() => this.showSuccessToast = false, 2000);
         }
-
-        //  CASE 2: Click-to-chat (local / dev)
         else if (response.mode === 'click_to_chat' && response.whatsapp_url) {
           window.open(response.whatsapp_url, '_blank');
-
           this.showSuccessToast = true;
           this.toastMessage = 'Opening WhatsApp…';
           setTimeout(() => this.showSuccessToast = false, 2000);
@@ -109,14 +180,12 @@ export class SalesListComponent {
       (error) => {
         this.showLoading = false;
         console.error('Error sending WhatsApp message', error);
-
         this.showSuccessToast = true;
         this.toastMessage = 'Failed to send WhatsApp message';
         setTimeout(() => this.showSuccessToast = false, 2000);
       }
     );
   }
-
 
   onSelect(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;
@@ -144,56 +213,49 @@ export class SalesListComponent {
     selectElement.value = '';
   }
 
-
   showDialog() {
     const dialog = document.getElementById('customDialog');
     if (dialog) {
-      dialog.style.display = 'flex'; // Show the dialog
+      dialog.style.display = 'flex';
     }
   }
 
-  // Function to close the custom dialog
   closeDialog() {
     const dialog = document.getElementById('customDialog');
     if (dialog) {
-      dialog.style.display = 'none'; // Hide the dialog
+      dialog.style.display = 'none';
     }
   }
 
   showSuccessToast = false;
   toastMessage = '';
-  // Method to handle "Email Sent" button click
+
   onMailLinkClick(): void {
     console.log("We are in method ...")
     const selectedIds = this.taTableComponent.options.checkedRows;
     if (selectedIds.length === 0) {
       return this.showDialog();
-      // return;
     }
 
-    const saleOrderId = selectedIds[0]; // Assuming only one row can be selected
-
+    const saleOrderId = selectedIds[0];
     const payload = { flag: "email", format: this.selectedFormat };
-
     const url = `masters/document_generator/${saleOrderId}/sale_order/`;
+    
     this.http.post(url, payload).subscribe(
       (response) => {
         this.showSuccessToast = true;
-        this.toastMessage = "Mail Sent successfully"; // Set the toast message for update
+        this.toastMessage = "Mail Sent successfully";
         this.refreshTable();
         setTimeout(() => {
           this.showSuccessToast = false;
         }, 2000);
-        // alert('Email sent successfully!');
-
       },
       (error) => {
         console.error('Error sending email', error);
-        // alert('Error sending email. Please try again.');
       }
     );
   }
-  //-----------email sending links - end ----------
+
   onPreviewClick(): void {
     const selectedIds = this.taTableComponent.options.checkedRows;
     if (selectedIds.length === 0) {
@@ -203,31 +265,23 @@ export class SalesListComponent {
     const saleOrderId = selectedIds[0];
     const url = `masters/document_generator/${saleOrderId}/sale_order/`;
 
-    // Show loading indicator
     this.showLoading = true;
 
-    // Send request with preview flag
     this.http.post(url, { flag: 'preview', format: this.selectedFormat }, { responseType: 'blob' }).subscribe(
       (pdfBlob: Blob) => {
         this.showLoading = false;
         this.refreshTable();
 
-
-        // Create blob URL and open in new window
         const blobUrl = URL.createObjectURL(pdfBlob);
         window.open(blobUrl, '_blank');
 
-        // Clean up the blob URL after use
         setTimeout(() => {
           URL.revokeObjectURL(blobUrl);
-          // this.refreshTable();
         }, 1000);
       },
       (error) => {
         this.showLoading = false;
         console.error('Error generating preview', error);
-
-        // Show error toast
         this.showSuccessToast = true;
         this.toastMessage = "Error generating document preview";
         setTimeout(() => {
@@ -237,7 +291,6 @@ export class SalesListComponent {
     );
   }
 
-  // Add this property to your component class
   showLoading = false;
 
   onPrintClick(): void {
@@ -269,30 +322,17 @@ export class SalesListComponent {
   }
 
   private openAndPrintPdf(pdfBlob: Blob): void {
-    // Create blob URL
     const blobUrl = URL.createObjectURL(pdfBlob);
-
-    // Open in new window first
     const printWindow = window.open(blobUrl, '_blank');
 
-    // Wait for window to load
     if (printWindow) {
       printWindow.onload = () => {
-        try {
-          // Give it a small delay to ensure PDF is rendered
-          setTimeout(() => {
-            printWindow.print();
-            // Clean up after printing
-            URL.revokeObjectURL(blobUrl);
-          }, 500);
-        } catch (e) {
-          console.error('Print error:', e);
-          // Fallback to iframe if window.print() fails
-          this.fallbackPrint(pdfBlob);
-        }
+        setTimeout(() => {
+          printWindow.print();
+          URL.revokeObjectURL(blobUrl);
+        }, 500);
       };
     } else {
-      // If popup was blocked, fallback to iframe
       this.fallbackPrint(pdfBlob);
     }
   }
@@ -311,10 +351,8 @@ export class SalesListComponent {
           iframe.contentWindow?.print();
         } catch (e) {
           console.error('Iframe print error:', e);
-          // Final fallback - open in new tab
           window.open(blobUrl, '_blank');
         }
-        // Clean up
         setTimeout(() => {
           document.body.removeChild(iframe);
           URL.revokeObjectURL(blobUrl);
@@ -322,10 +360,9 @@ export class SalesListComponent {
       }, 1000);
     };
   }
-  //---------------print & Preview - end --------------------------
+
   tableConfig: TaTableConfig = {
-    apiUrl: '',//'sales/sale_order/?summary=true',
-    // title: 'Edit Sales Order List',
+    apiUrl: '',
     showCheckbox: true,
     pkId: "sale_order_id",
     rowEvents: {
@@ -334,18 +371,12 @@ export class SalesListComponent {
         this.onRowDoubleClick(row);
       }
     },
-    fixedFilters: [
-      // {
-      //   key: 'summary',
-      //   value: 'true'
-      // }
-
-    ],
+    fixedFilters: [],
     export: {
       downloadName: 'SalesList'
     },
     pageSize: 10,
-    "globalSearch": {
+    globalSearch: {
       keys: ['order_date', 'order_no', 'sale_type', 'customer', 'sale_estimate', 'amount', 'tax', 'advance_amount', 'status_name', 'flow_status_name']
     },
     defaultSort: { key: 'created_at', value: 'descend' },
@@ -367,18 +398,14 @@ export class SalesListComponent {
         sort: true,
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          // console.log("-->", currentValue);
-          // return `${row.sale_type?.name || ''}`;
           return row.sale_type?.name || row.sale_type_id || '';
         },
       },
-
       {
         fieldKey: 'customer',
         name: 'Customer',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          // return `${row.customer.name}`;
           return row.customer?.name || row.customer_id || '';
         },
         sort: true
@@ -395,10 +422,6 @@ export class SalesListComponent {
         isEdit: true,
         isEditSumbmit(row, value, col) {
           console.log("isEditSumbmit", row, value, col);
-          // Implement your logic here
-          // For example, you can make an API call to save the edited value
-          // this.http.put(`api/sales/${row.sale_order_id}`, { total_amount: value }).subscribe(...);
-
         },
         autoSave: {
           apiUrl: 'sales/sale_order',
@@ -426,7 +449,6 @@ export class SalesListComponent {
         name: 'Status',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          // return `${row.order_status.status_name}`;
           return row.order_status?.status_name || row.order_status_id || '';
         },
         sort: true
@@ -471,7 +493,6 @@ export class SalesListComponent {
             confirm: true,
             confirmMsg: "Sure to delete?",
             apiUrl: 'sales/sale_order',
-            // tooltip: "Delete this record"
           },
           {
             type: 'restore',
@@ -479,7 +500,6 @@ export class SalesListComponent {
             confirm: true,
             confirmMsg: "Sure to restore?",
             apiUrl: 'sales/sale_order',
-            // tooltip: "Restore this record"
           },
           {
             type: 'callBackFn',
@@ -489,31 +509,25 @@ export class SalesListComponent {
             callBackFn: (row, action) => {
               console.log(row);
               this.edit.emit(row.sale_order_id);
-              // this.router.navigateByUrl('/admin/sales/edit/' + row.sale_order_id);
             }
-          },
-          // {
-          //   type: 'callBackFn',
-          //   icon: 'fa fa-file-invoice',
-          //   // label: 'Create Invoice',
-          //   tooltip: 'Create Invoice for this order',
-          //   callBackFn: (row, action) => {
-          //     const flowStatusName = row.flow_status?.flow_status_name;
-
-          //     if (flowStatusName === 'Ready for Invoice') {
-          //       // Only create invoice if order is ready
-          //       this.createInvoiceFromList(row);
-          //     } else {
-          //       // Show modal warning
-          //       this.showOrderNotReadyModal();
-          //     }
-          //   }
-          // }
-
+          }
         ]
       }
     ]
   };
+
+  private setApiUrlBasedOnUser() {
+    const user = this.localStorage.getItem('user');
+    const isSuperUser = user?.is_sp_user === true;
+
+    this.tableConfig.apiUrl = isSuperUser
+      ? 'sales/sale_order/?records_all=true'
+      : 'sales/sale_order/?summary=true';
+
+    this.tableConfig.fixedFilters = isSuperUser
+      ? [{ key: 'records_all', value: 'true' }]
+      : [{ key: 'summary', value: 'true' }];
+  }
 
   // Show the "Not ready for invoice" modal
   showOrderNotReadyModal() {
@@ -525,21 +539,6 @@ export class SalesListComponent {
   closeNotReadyInvoiceDialog() {
     const modal = document.getElementById('notReadyInvoiceDialog');
     if (modal) modal.style.display = 'none';
-  }
-
-  private setApiUrlBasedOnUser() {
-    const user = this.localStorage.getItem('user');
-    const isSuperUser = user?.is_sp_user === true;
-
-    // Set the API URL conditionally
-    this.tableConfig.apiUrl = isSuperUser
-      ? 'sales/sale_order/?records_all=true'
-      : 'sales/sale_order/?summary=true';
-
-    // Also set fixed filters accordingly (optional)
-    this.tableConfig.fixedFilters = isSuperUser
-      ? [{ key: 'records_all', value: 'true' }]
-      : [{ key: 'summary', value: 'true' }];
   }
 
 // Method to update invoiced status using HttpClient

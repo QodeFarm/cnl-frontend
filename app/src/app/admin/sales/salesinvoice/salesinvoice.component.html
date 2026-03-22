@@ -1,45 +1,45 @@
+
 <div class="container-fluid p-3">
-  <div class="sale-invoice-banner page-component-header">
-    <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
-      <button type="button" class="btn pl-0">
-          <span *ngIf="SaleInvoiceEditID" class="custom-heading">Update Sale Invoice</span>
-          <span *ngIf="!SaleInvoiceEditID" class="custom-heading">Create Sale Invoice</span>
-        </button>
-        <div style="display: flex; gap: 10px; align-items: center;justify-content: end;flex-wrap: wrap;">
-          <div *ngIf="!SaleInvoiceEditID" class="quickpack-container d-flex align-items-center">
-            <div class="quickpack-box d-flex align-items-center">
-                <div class="dropdown-container rounded-start">
-                    <select
-                        id="quickpackSelect"
-                        class="dropdown-select m-0 "
-                        [(ngModel)]="selectedQuickpack">
-                        <option value="" disabled selected aria-disabled="true">Quickpack</option>
-                        <option *ngFor="let quickpack of quickpackOptions" 
-                                [value]="quickpack.quick_pack_id">
-                            {{ quickpack.name }}
-                        </option>
-                    </select>
-                </div>
-                <button class="btn btn-primary ml-0 rounded-end" (click)="loadQuickpackProducts()">OK</button>
-            </div>
-        </div>    
-        <!-- New Copy Button -->
-        <button (click)="openCopyModal()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#copyModal">
-            Copy
-        </button>
-        <button (click)="showPendingOrdersList()" type="button" class="btn btn-primary">
-          Pending Orders
-        </button>
-        <button (click)="showSaleInvoiceListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-          Sales Invoice List
-        </button>
-      </div>
-        <!-- <button (click)="showSaleInvoiceListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-          Sale Invoice List
-        </button> -->
+  <!-- Admin View - Create/Edit Form -->
+  <div *ngIf="!isCustomerPortal">
+    <div class="sale-invoice-banner page-component-header">
+      <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
+        <button type="button" class="btn pl-0">
+            <span *ngIf="SaleInvoiceEditID" class="custom-heading">Update Sale Invoice</span>
+            <span *ngIf="!SaleInvoiceEditID" class="custom-heading">Create Sale Invoice</span>
+          </button>
+          <div style="display: flex; gap: 10px; align-items: center;justify-content: end;flex-wrap: wrap;">
+            <div *ngIf="!SaleInvoiceEditID" class="quickpack-container d-flex align-items-center">
+              <div class="quickpack-box d-flex align-items-center">
+                  <div class="dropdown-container rounded-start">
+                      <select
+                          id="quickpackSelect"
+                          class="dropdown-select m-0 "
+                          [(ngModel)]="selectedQuickpack">
+                          <option value="" disabled selected aria-disabled="true">Quickpack</option>
+                          <option *ngFor="let quickpack of quickpackOptions" 
+                                  [value]="quickpack.quick_pack_id">
+                              {{ quickpack.name }}
+                          </option>
+                      </select>
+                  </div>
+                  <button class="btn btn-primary ml-0 rounded-end" (click)="loadQuickpackProducts()">OK</button>
+              </div>
+          </div>    
+          <!-- New Copy Button -->
+          <button (click)="openCopyModal()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#copyModal">
+              Copy
+          </button>
+          <button (click)="showPendingOrdersList()" type="button" class="btn btn-primary">
+            Pending Orders
+          </button>
+          <button (click)="showSaleInvoiceListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            Sales Invoice List
+          </button>
+        </div>
       </div>
     </div>
-  
+
     <div class="row custom-form">
       <div class="col-12 px-1" *ngIf="invoiceNumber">
 
@@ -64,131 +64,132 @@
         <ta-form #saleinvoiceForm [options]="formConfig"></ta-form>
       </div>
     </div>
-</div>
-  
-<div class="modal fade custom-modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Sale Invoice List</h5>
-        <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" *ngIf="showSaleInvoiceList">
-        <app-salesinvoice-list (edit)="editSaleInvoice($event)" class="custom-list"></app-salesinvoice-list>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
   </div>
-</div>
-<!-- Pending Orders List -->
-<div #ordersModal class="modal fade custom-modal modal-center" id="ordersListModal" tabindex="-1" aria-labelledby="ordersListModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="ordersListModalLabel">Pending Orders List</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="hideModal()"></button>
-      </div>
-      <div class="modal-body">
-        <!-- <app-saleinvoiceorderlist
-          [customerOrders]="customerOrders" 
-          (orderSelected)="handleOrderSelected($event)"
-          (productsPulled)="handleProductPull($event)"
-          [noOrdersMessage]="noOrdersMessage"
-          (modalClosed)="closeModal()">
-        </app-saleinvoiceorderlist> -->
-        <app-saleinvoiceorderlist
-          [customerOrders]="customerOrders"
-          [noOrdersMessage]="noOrdersMessage"
-          (orderSelected)="handleOrderSelected($event)"
-          (productsPulled)="handleProductPull($event)"
-          (modalClosed)="closeModal()"
-          [selectedCustomerId]="formConfig.model.sale_invoice_order.customer_id"
-          class="custom-list">
-        </app-saleinvoiceorderlist>
 
-      </div>
+  <!-- Customer Portal View - Only List -->
+  <div *ngIf="isCustomerPortal">
+    <div class="customer-portal-info">
+      <h3>My Invoices</h3>
+      <p>View all your invoices here. For any queries, please contact support.</p>
     </div>
+    <app-salesinvoice-list 
+      (edit)="editSaleInvoice($event)" 
+      class="custom-list">
+    </app-salesinvoice-list>
   </div>
 </div>
 
-<!-- Copy Modal -->
-<div class="modal fade custom-modal modal-center" id="copyModal" tabindex="-1" aria-labelledby="copyModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-sm custom-size"> <!-- Add custom-size class here -->
+<!-- Admin Modal - Sale Invoice List (Only shown in admin mode) -->
+<div *ngIf="!isCustomerPortal">
+  <div class="modal fade custom-modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
       <div class="modal-content">
-          <div class="modal-header">
-              <h5 class="modal-title" id="copyModalLabel">Copy Form To</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-              <!-- Modal Form to Select Table -->
-              <form>
-                  <div class="form-group">
-                      <label for="tableSelect">Select Table</label>
-                      <select id="tableSelect" class="form-control form-select" [(ngModel)]="selectedTable" name="selectedTable">
-                          <option *ngFor="let table of availableTables" [value]="table">{{table}}</option>
-                      </select>
-                  </div>
-              </form>
-          </div>
-          <div class="modal-footer">
-              <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary" data-bs-toggle="modal" (click)="copyToTable()">OK</button>
-          </div>
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Sale Invoice List</h5>
+          <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" *ngIf="showSaleInvoiceList">
+          <app-salesinvoice-list (edit)="editSaleInvoice($event)" class="custom-list"></app-salesinvoice-list>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+        </div>
       </div>
+    </div>
   </div>
-</div>
 
-<div id="customToast" class="toast-message" *ngIf="showSuccessToast">
-  <div class="tick-circle">
-      <span class="tick-mark">✓</span>
+  <!-- Pending Orders List (Admin Only) -->
+  <div #ordersModal class="modal fade custom-modal modal-center" id="ordersListModal" tabindex="-1" aria-labelledby="ordersListModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="ordersListModalLabel">Pending Orders List</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="hideModal()"></button>
+        </div>
+        <div class="modal-body">
+          <app-saleinvoiceorderlist
+            [customerOrders]="customerOrders"
+            [noOrdersMessage]="noOrdersMessage"
+            (orderSelected)="handleOrderSelected($event)"
+            (productsPulled)="handleProductPull($event)"
+            (modalClosed)="closeModal()"
+            [selectedCustomerId]="formConfig?.model?.sale_invoice_order?.customer?.customer_id"
+            class="custom-list">
+          </app-saleinvoiceorderlist>
+        </div>
+      </div>
+    </div>
   </div>
-  <span class="toast-message-text">{{ toastMessage }}</span>
-  <span class="toast-close" onclick="this.parentElement.style.display='none'">x</span>
-</div>
 
-
-
-<!-- Draft Restore Confirmation Modal -->
-<nz-modal
-    [(nzVisible)]="showDraftRestoreModal"
-    nzTitle="Restore Unsaved Draft"
-    [nzWidth]="450"
-    [nzClosable]="true"
-    [nzMaskClosable]="false"
-    (nzOnCancel)="declineRestoreDraft()"
-    [nzFooter]="draftModalFooter"
-    nzCentered
-    nzClassName="draft-restore-modal-wrapper">
-    
-    <ng-container *nzModalContent>
-        <div class="draft-restore-content">
-            <!-- <div class="draft-icon-wrapper">
-                <i nz-icon nzType="file-sync" nzTheme="outline" style="font-size: 48px; color: #1890ff;"></i>
-            </div> -->
-            <p style="text-align: center; margin: 16px 0; font-size: 14px; color: #595959;">
-                You have an unsaved Sales Invoice Order from your previous session. Do you want to restore it?
-            </p>
-            <div class="draft-info-note">
-                <i nz-icon nzType="info-circle" nzTheme="outline" style="color: #faad14;"></i>
-                <span>Choosing 'Discard' will permanently delete the saved draft.</span>
+  <!-- Copy Modal (Admin Only) -->
+  <div class="modal fade custom-modal modal-center" id="copyModal" tabindex="-1" aria-labelledby="copyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm custom-size">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="copyModalLabel">Copy Form To</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="tableSelect">Select Table</label>
+                        <select id="tableSelect" class="form-control form-select" [(ngModel)]="selectedTable" name="selectedTable">
+                            <option *ngFor="let table of availableTables" [value]="table">{{table}}</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" (click)="copyToTable()">OK</button>
             </div>
         </div>
-    </ng-container>
-    
-    <ng-template #draftModalFooter>
-        <div style="display: flex; justify-content: center; gap: 12px;">
-            <button nz-button nzType="default" nzDanger (click)="declineRestoreDraft()">
-                <i nz-icon nzType="delete" nzTheme="outline"></i>
-                Discard
-            </button>
-            <button nz-button nzType="primary" (click)="confirmRestoreDraft()">
-                <i nz-icon nzType="redo" nzTheme="outline"></i>
-                Restore
-            </button>
-        </div>
-    </ng-template>
-</nz-modal>
+    </div>
+  </div>
 
+  <div id="customToast" class="toast-message" *ngIf="showSuccessToast">
+    <div class="tick-circle">
+        <span class="tick-mark">✓</span>
+    </div>
+    <span class="toast-message-text">{{ toastMessage }}</span>
+    <span class="toast-close" onclick="this.parentElement.style.display='none'">x</span>
+  </div>
 
+  <!-- Draft Restore Confirmation Modal (Admin Only) -->
+  <nz-modal
+      [(nzVisible)]="showDraftRestoreModal"
+      nzTitle="Restore Unsaved Draft"
+      [nzWidth]="450"
+      [nzClosable]="true"
+      [nzMaskClosable]="false"
+      (nzOnCancel)="declineRestoreDraft()"
+      [nzFooter]="draftModalFooter"
+      nzCentered
+      nzClassName="draft-restore-modal-wrapper">
+      
+      <ng-container *nzModalContent>
+          <div class="draft-restore-content">
+              <p style="text-align: center; margin: 16px 0; font-size: 14px; color: #595959;">
+                  You have an unsaved Sales Invoice Order from your previous session. Do you want to restore it?
+              </p>
+              <div class="draft-info-note">
+                  <i nz-icon nzType="info-circle" nzTheme="outline" style="color: #faad14;"></i>
+                  <span>Choosing 'Discard' will permanently delete the saved draft.</span>
+              </div>
+          </div>
+      </ng-container>
+      
+      <ng-template #draftModalFooter>
+          <div style="display: flex; justify-content: center; gap: 12px;">
+              <button nz-button nzType="default" nzDanger (click)="declineRestoreDraft()">
+                  <i nz-icon nzType="delete" nzTheme="outline"></i>
+                  Discard
+              </button>
+              <button nz-button nzType="primary" (click)="confirmRestoreDraft()">
+                  <i nz-icon nzType="redo" nzTheme="outline"></i>
+                  Restore
+              </button>
+          </div>
+      </ng-template>
+  </nz-modal>
+</div>

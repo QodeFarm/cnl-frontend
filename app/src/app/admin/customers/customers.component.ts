@@ -1,13 +1,14 @@
 import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { CustomersListComponent } from './customers-list/customers-list.component';
 import { CustomFieldHelper } from '../utils/custom_field_fetch';
+import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzProgressModule } from 'ng-zorro-antd/progress';
@@ -15,6 +16,8 @@ import { NzResultModule } from 'ng-zorro-antd/result';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { BulkEditModalComponent } from '../utils/bulk-edit-modal/bulk-edit-modal.component';
 import { BulkField } from '../utils/bulk-operations.service';
+import { LocalStorageService } from 'projects/ta-core/src/lib/services/local-storage.service';
+
 
 @Component({
   selector: 'app-customers',
@@ -36,6 +39,11 @@ export class CustomersComponent {
   showForm: boolean = false;
   CustomerEditID: any;
   isSubmitting: boolean = false;
+
+  isCustomerPortal: boolean = false;
+  isCustomerView: boolean = false;
+  loggedInCustomerId: string | null = null;
+
   @ViewChild(CustomersListComponent) CustomersListComponent!: CustomersListComponent;
 
   // Import state tracking
@@ -84,13 +92,43 @@ export class CustomersComponent {
   customFieldConfig: any;
   customFields: any[] = [];
 
-  constructor(private http: HttpClient, private cdref: ChangeDetectorRef, private notification: NzNotificationService) { }
+  constructor(private http: HttpClient, private route: ActivatedRoute, private router: Router, private cdref: ChangeDetectorRef, private localStorage: LocalStorageService, private notification: NzNotificationService, private modal: NzModalService) { }
   customFieldFormConfig: any = {};
   entitiesList: any[] = [];
+  showProfile: boolean = false;
   ngOnInit() {
-    this.showCustomerList = false;
-    this.showForm = true;  //temporary change 'true'
-    this.CustomerEditID = null;
+    // this.showCustomerList = false;
+    // this.showForm = true;  //temporary change 'true'
+    // this.CustomerEditID = null;
+    // Check if this is customer portal
+    this.route.data.subscribe(data => {
+      this.isCustomerPortal = data['customerView'] || false;
+      this.isCustomerView = data['customerView'] || false;
+      
+      if (this.isCustomerPortal) {
+        // Get logged in customer from localStorage
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        this.loggedInCustomerId = user.id;
+        
+        console.log('Customer Portal - Loading profile for:', this.loggedInCustomerId);
+        
+        // Hide customer list and show form with customer data
+        // Hide customer list and show profile view
+        this.showCustomerList = false;
+        this.showForm = false;
+        this.showProfile = true;
+        
+        // Load the logged-in customer's data
+        this.loadCustomerProfile();
+      } else {
+        // Normal admin mode
+        this.showCustomerList = false;
+        this.showForm = true;
+        this.showProfile = false;
+        this.CustomerEditID = null;
+        this.setFormConfig();
+      }
+    });
     // Set form config
     this.setFormConfig();
     this.http.get('masters/entities/')
@@ -103,14 +141,198 @@ export class CustomersComponent {
 
   }
 
+loadCustomerProfile() {
+    if (!this.loggedInCustomerId) return;
+    
+    this.loading = true;
+    this.http.get(`customers/customers/${this.loggedInCustomerId}/`).subscribe({
+      next: (res: any) => {
+        this.loading = false;
+        if (res && res.data) {
+          console.log("Loading customer profile:", res.data);
+          this.customerProfile = res.data;
+          this.extractContactInfo();
+          this.extractAddresses();
+          this.loadStats();
+        }
+      },
+      error: (err) => {
+        this.loading = false;
+        console.error('Error loading customer profile:', err);
+        this.notification.error('Error', 'Failed to load profile');
+      }
+    });
+  }
+
+  loadStats() {
+  if (!this.loggedInCustomerId) return;
+  
+  // Load stats from various APIs with customer_id
+  this.http.get(`sales/sale_order/?customer_id=${this.loggedInCustomerId}`).subscribe({
+    next: (res: any) => {
+      this.stats.totalOrders = res.data?.length || 0;
+    },
+    error: (err) => console.error('Error loading orders:', err)
+  });
+
+  this.http.get(`sales/sale_invoice_order/?customer_id=${this.loggedInCustomerId}`).subscribe({
+    next: (res: any) => {
+      this.stats.totalInvoices = res.data?.length || 0;
+    },
+    error: (err) => console.error('Error loading invoices:', err)
+  });
+
+  this.http.get(`sales/sale_return_order/?customer_id=${this.loggedInCustomerId}`).subscribe({
+    next: (res: any) => {
+      this.stats.totalReturns = res.data?.length || 0;
+    },
+    error: (err) => console.error('Error loading returns:', err)
+  });
+
+  this.http.get(`sales/sale_credit_notes/?customer_id=${this.loggedInCustomerId}`).subscribe({
+    next: (res: any) => {
+      this.stats.totalCreditNotes = res.data?.length || 0;
+    },
+    error: (err) => console.error('Error loading credit notes:', err)
+  });
+}
+
+  // isCustomerPortal: boolean = false;
+  // isCustomerView: boolean = false;
+  // loggedInCustomerId: string | null = null;
+  customerProfile: any = null; // Store profile data for custom view
+  contactInfo: any = { email: '', phone: '' };
+  billingAddress: any = null;
+  shippingAddress: any = null;
+  stats: any = { totalOrders: 0, totalInvoices: 0, totalReturns: 0, totalCreditNotes: 0 };
+  loading: boolean = false;
+
+  extractContactInfo() {
+    if (this.customerProfile?.customer_addresses) {
+      const commAddress = this.customerProfile.customer_addresses.find((a: any) => a.address_type === 'Communication');
+      if (commAddress) {
+        this.contactInfo.email = commAddress.email;
+        this.contactInfo.phone = commAddress.phone;
+      } else {
+        const anyAddress = this.customerProfile.customer_addresses.find((a: any) => a.email || a.phone);
+        if (anyAddress) {
+          this.contactInfo.email = anyAddress.email;
+          this.contactInfo.phone = anyAddress.phone;
+        }
+      }
+    }
+  }
+
+  extractAddresses() {
+    if (this.customerProfile?.customer_addresses) {
+      this.billingAddress = this.customerProfile.customer_addresses.find((a: any) => a.address_type === 'Billing');
+      this.shippingAddress = this.customerProfile.customer_addresses.find((a: any) => a.address_type === 'Shipping');
+    }
+  }
+
+  getInitials(name: string): string {
+    if (!name) return 'U';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+  }
+
 
   ngAfterViewInit() {
     // Copy buttons are now handled by the field-repeat table component (extraAction / secondAction)
   }
 
   customFieldMetadata: any = {}; // To store mapping of field names to metadata
-  submitCustomerForm() {
+  // submitCustomerForm() {
+  //   if (this.isSubmitting) return; // Prevent double-click
+  //   const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
+
+  //   // Determine the entity type and ID dynamically
+  //   const entityName = 'customers'; // Since we're in the Sale Order form
+  //   const customId = this.formConfig.model.customer_data?.customer_id || null; //
+
+  //   // Find entity record from list
+  //   const entity = this.entitiesList.find(e => e.entity_name === entityName);
+
+  //   if (!entity) {
+  //     console.error(`Entity not found for: ${entityName}`);
+  //     return;
+  //   }
+
+  //   const entityId = entity.entity_id;
+  //   // Inject entity_id into metadata temporarily
+  //   Object.keys(this.customFieldMetadata).forEach((key) => {
+  //     this.customFieldMetadata[key].entity_id = entityId;
+  //   });
+  //   // Construct payload for custom fields
+  //   const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
+
+  //   if (!customFieldsPayload) {
+  //     this.showDialog(); // Stop execution if required fields are missing
+  //     return;
+  //   }
+  //   // Construct the final payload
+  //   let payload: any = {
+  //     ...this.formConfig.model,
+  //     custom_field_values: customFieldsPayload.custom_field_values // Array of dictionaries
+  //   };
+  //   // Merge communication address into customer_addresses
+  //   payload = this.mergeCommAddressIntoPayload(payload);
+
+  //   console.log('Final Payload:', payload); // Debugging to verify the payload
+
+  //   // Submit the payload
+  //   this.isSubmitting = true;
+  //   this.http.post('customers/customers/', payload).subscribe(
+  //     (response: any) => {
+  //       this.isSubmitting = false;
+  //       this.showSuccessToast = true;
+  //       this.toastMessage = "Record Created successfully";
+  //       // Fully reset form: destroy → reinit → recreate (clears validation state)
+  //       this.showForm = false;
+  //       this.setFormConfig();
+  //       setTimeout(() => {
+  //         this.showForm = true;
+  //         this.cdref.detectChanges();
+  //         // Re-fetch custom fields for the fresh form
+  //         CustomFieldHelper.fetchCustomFields(this.http, 'customers', (customFields: any, customFieldMetadata: any) => {
+  //           CustomFieldHelper.addCustomFieldsToFormConfig(customFields, customFieldMetadata, this.formConfig);
+  //         });
+  //       });
+  //       setTimeout(() => {
+  //         this.showSuccessToast = false;
+  //       }, 3000);
+  //     },
+  //     (error) => {
+  //       this.isSubmitting = false;
+  //       console.error('Error creating customer and custom fields:', error);
+  //     }
+  //   );
+  // }
+
+submitCustomerForm() {
     if (this.isSubmitting) return; // Prevent double-click
+    
+    // ===== NEW: Handle portal fields before submission =====
+    const customerData = this.formConfig.model.customer_data || {};
+    
+    // Handle portal fields
+    if (customerData.is_portal_user) {
+        // Ensure username is set (either from form or auto-generated)
+        if (!customerData.username && customerData.name) {
+            customerData.username = customerData.name.toLowerCase().replace(/\s+/g, '.');
+        }
+        
+        // Password is already set via generate button or left blank for auto-generation
+        // Remove display field as it's not needed in payload
+        delete customerData.password_display;
+    } else {
+        // If portal access is not enabled, ensure portal fields are not sent
+        delete customerData.username;
+        delete customerData.password;
+        delete customerData.is_portal_user;
+        delete customerData.password_display;
+    }
+    // ===== END NEW =====
+
     const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
 
     // Determine the entity type and ID dynamically
@@ -154,6 +376,18 @@ export class CustomersComponent {
         this.isSubmitting = false;
         this.showSuccessToast = true;
         this.toastMessage = "Record Created successfully";
+        
+        // ===== NEW: Handle portal credentials in response =====
+        if (response?.data?.[0]?.customer_data?.portal_credentials) {
+          const credentials = response.data[0].customer_data.portal_credentials;
+          this.notification.success(
+            `Portal Credentials Generated<br>Username: ${credentials.username}<br>Password: ${credentials.password}`,
+            '', 
+            { nzDuration: 0 } // Keep until user closes
+          );
+        }
+        // ===== END NEW =====
+
         // Fully reset form: destroy → reinit → recreate (clears validation state)
         this.showForm = false;
         this.setFormConfig();
@@ -358,7 +592,62 @@ export class CustomersComponent {
   //   // Close the customer list modal
   //   this.hide();
   // }
-  editCustomer(event: string) {
+  // editCustomer(event: string) {
+  //   this.CustomerEditID = event;
+
+  //   this.http.get(`customers/customers/${event}`).subscribe(
+  //     (res: any) => {
+  //       if (res && res.data) {
+  //         console.log("Res in edit : ", res);
+
+  //         // ------------------ MAIN MODEL SET ------------------
+  //         this.formConfig.model = res.data;
+  //         this.formConfig.model['customer_id'] = this.CustomerEditID;
+
+  //         // ------------------ FIX START ------------------
+  //         const addresses = res.data.customer_addresses || [];
+
+  //         const billing = addresses.find((a: any) => a.address_type === 'Billing');
+  //         const shippingList = addresses.filter((a: any) => a.address_type === 'Shipping');
+  //         if (shippingList.length === 0) shippingList.push({ address_type: 'Shipping' });
+
+  //         // Extract Communication address for the Communication tab
+  //         const commAddress = addresses.find((a: any) => a.address_type === 'Communication');
+  //         this.formConfig.model['communication_addresses'] = commAddress ? [commAddress] : [{}];
+
+  //         this.formConfig.model.customer_addresses = [
+  //           billing || { address_type: 'Billing' },
+  //           ...shippingList
+  //         ];
+  //         // ------------------ FIX END ------------------
+
+  //         // ------------------ CUSTOM FIELDS ------------------
+  //         if (res.data.custom_field_values) {
+  //           this.formConfig.model['custom_field_values'] =
+  //             res.data.custom_field_values.reduce((acc: any, fieldValue: any) => {
+  //               acc[fieldValue.custom_field_id] = fieldValue.field_value;
+  //               return acc;
+  //             }, {});
+  //         }
+
+  //         // ------------------ FORM STATE ------------------
+  //         this.formConfig.pkId = 'customer_id';
+  //         this.formConfig.submit.label = 'Update';
+  //         this.showForm = true;
+  //       }
+  //     },
+  //     (error) => {
+  //       console.error('Error fetching customer data:', error);
+  //     }
+  //   );
+
+  //   // hide() moved to inside subscribe success handler would be ideal,
+  //   // but the form needs the modal to close for layout reasons.
+  //   // Keep it here for now — the HTTP call populates model asynchronously.
+  //   this.hide();
+  // }
+
+editCustomer(event: string) {
     this.CustomerEditID = event;
 
     this.http.get(`customers/customers/${event}`).subscribe(
@@ -369,6 +658,33 @@ export class CustomersComponent {
           // ------------------ MAIN MODEL SET ------------------
           this.formConfig.model = res.data;
           this.formConfig.model['customer_id'] = this.CustomerEditID;
+
+          // ===== NEW: Handle portal fields for display =====
+          if (res.data.customer_data?.is_portal_user) {
+            // Set masked password for display
+            if (!this.formConfig.model.customer_data.password_display) {
+              this.formConfig.model.customer_data.password_display = '••••••••';
+            }
+            
+            // Show portal fields by finding and unhiding them
+            setTimeout(() => {
+              const portalFields = ['username', 'password_display', 'generate_credentials', 'send_credentials'];
+              portalFields.forEach(fieldKey => {
+                const field = this.findFieldInConfig(fieldKey);
+                if (field) {
+                  field.hide = false;
+                  field.templateOptions.disabled = false;
+                }
+              });
+              
+              // Also show the portal section checkbox as checked
+              const portalCheckbox = this.findFieldInConfig('is_portal_user');
+              if (portalCheckbox) {
+                portalCheckbox.hide = false;
+              }
+            }, 100); // Small timeout to ensure form is rendered
+          }
+          // ===== END NEW =====
 
           // ------------------ FIX START ------------------
           const addresses = res.data.customer_addresses || [];
@@ -407,14 +723,12 @@ export class CustomersComponent {
       }
     );
 
-    // hide() moved to inside subscribe success handler would be ideal,
-    // but the form needs the modal to close for layout reasons.
-    // Keep it here for now — the HTTP call populates model asynchronously.
     this.hide();
   }
 
 
   showCustomerListFn() {
+    if (this.isCustomerPortal) return;  // Disable for customers
     this.showCustomerList = true;
     this.CustomersListComponent?.refreshTable();
   }
@@ -422,8 +736,106 @@ export class CustomersComponent {
   showSuccessToast = false;
   toastMessage = '';
   // Method to handle updating the Customer
-  updateCustomer() {
+  // updateCustomer() {
+  //   if (this.isSubmitting) return; // Prevent double-click
+  //   const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
+
+  //   // Determine the entity type and ID dynamically
+  //   const entityName = 'customers'; // Since we're in the Sale Order form
+  //   const customId = this.formConfig.model.customer_data?.customer_id || null; //
+
+  //   // Find entity record from list
+  //   const entity = this.entitiesList.find(e => e.entity_name === entityName);
+
+  //   if (!entity) {
+  //     console.error(`Entity not found for: ${entityName}`);
+  //     return;
+  //   }
+
+  //   const entityId = entity.entity_id;
+  //   // Inject entity_id into metadata temporarily
+  //   Object.keys(this.customFieldMetadata).forEach((key) => {
+  //     this.customFieldMetadata[key].entity_id = entityId;
+  //   });
+  //   // Construct payload for custom fields
+  //   const customFieldsPayload = CustomFieldHelper.constructCustomFieldsPayload(customFieldValues, entityName, customId);
+  //   if (!customFieldsPayload) {
+  //     this.showDialog(); // Stop execution if required fields are missing
+  //     return;
+  //   }
+  //   // Construct the final payload for update
+  //   let payload: any = {
+  //     ...this.formConfig.model,
+  //     custom_field_values: customFieldsPayload.custom_field_values // Array of dictionaries
+  //   };
+  //   // Merge communication address into customer_addresses
+  //   payload = this.mergeCommAddressIntoPayload(payload);
+
+  //   console.log('Final Payload for Update:', payload); // Debugging to verify the payload
+
+  //   // Send the update request with the payload
+  //   this.isSubmitting = true;
+  //   this.http.put(`customers/customers/${this.CustomerEditID}/`, payload).subscribe(
+  //     (response: any) => {
+  //       this.isSubmitting = false;
+  //       this.showSuccessToast = true;
+  //       this.toastMessage = "Record updated successfully";
+  //       // Fully reset form: destroy → reinit → recreate (clears validation state)
+  //       this.showForm = false;
+  //       this.setFormConfig();
+  //       setTimeout(() => {
+  //         this.showForm = true;
+  //         this.cdref.detectChanges();
+  //         // Re-fetch custom fields for the fresh form
+  //         CustomFieldHelper.fetchCustomFields(this.http, 'customers', (customFields: any, customFieldMetadata: any) => {
+  //           CustomFieldHelper.addCustomFieldsToFormConfig(customFields, customFieldMetadata, this.formConfig);
+  //         });
+  //       });
+  //       setTimeout(() => {
+  //         this.showSuccessToast = false;
+  //       }, 3000);
+  //     },
+  //     (error) => {
+  //       this.isSubmitting = false;
+  //       console.error('Error updating customer:', error);
+  //     }
+  //   );
+  // }
+
+updateCustomer() {
     if (this.isSubmitting) return; // Prevent double-click
+    
+    // ===== NEW: Handle portal fields before submission =====
+    const customerData = this.formConfig.model.customer_data || {};
+    
+    // Handle portal fields for update
+    if (customerData.is_portal_user) {
+        // Ensure username is set
+        if (!customerData.username && customerData.name) {
+            customerData.username = customerData.name.toLowerCase().replace(/\s+/g, '.');
+        }
+        
+        // Check if password was changed
+        // If password_display is not '••••••••', it means a new password was generated
+        if (customerData.password_display && customerData.password_display !== '••••••••') {
+            // New password generated, send it
+            customerData.password = customerData.password_display;
+        } else {
+            // Password not changed, don't send it
+            delete customerData.password;
+        }
+        
+        // Remove display field
+        delete customerData.password_display;
+    } else {
+        // If portal access is being disabled, clear all portal fields
+        delete customerData.username;
+        delete customerData.password;
+        delete customerData.is_portal_user;
+        delete customerData.password_display;
+    }
+    // ===== END NEW =====
+
     const customFieldValues = this.formConfig.model['custom_field_values']; // User-entered custom fields
 
     // Determine the entity type and ID dynamically
@@ -466,6 +878,18 @@ export class CustomersComponent {
         this.isSubmitting = false;
         this.showSuccessToast = true;
         this.toastMessage = "Record updated successfully";
+        
+        // ===== NEW: Handle portal credentials in response if any =====
+        if (response?.data?.[0]?.customer_data?.portal_credentials) {
+          const credentials = response.data[0].customer_data.portal_credentials;
+          this.notification.success(
+            `Portal Credentials Updated<br>Username: ${credentials.username}<br>Password: ${credentials.password}`,
+            '',
+            { nzDuration: 0 }
+          );
+        }
+        // ===== END NEW =====
+
         // Fully reset form: destroy → reinit → recreate (clears validation state)
         this.showForm = false;
         this.setFormConfig();
@@ -488,6 +912,102 @@ export class CustomersComponent {
     );
   }
 
+  // Helper method to find a field in formConfig
+findFieldInConfig(fieldKey: string): any {
+  const searchInFields = (fields: any[]): any => {
+    for (const field of fields) {
+      if (field.key === fieldKey) return field;
+      if (field.fieldGroup) {
+        const found = searchInFields(field.fieldGroup);
+        if (found) return found;
+      }
+      if (field.fieldGroup?.forEach) {
+        for (const subField of field.fieldGroup) {
+          if (subField.key === fieldKey) return subField;
+          if (subField.fieldGroup) {
+            const found = searchInFields(subField.fieldGroup);
+            if (found) return found;
+          }
+        }
+      }
+    }
+    return null;
+  };
+  
+  return searchInFields(this.formConfig.fields);
+}
+
+// Generate random password
+generatePassword(field: any) {
+  const length = 10;
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let password = '';
+  for (let i = 0; i < length; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  
+  // Set both display field and actual password field
+  field.parent.formControl.get('password_display')?.setValue(password);
+  field.parent.formControl.get('password')?.setValue(password);
+}
+
+// Generate credentials for existing customer (when editing)
+generateCustomerCredentials() {
+  if (!this.CustomerEditID) {
+    this.notification.error('Please save the customer first', '');
+    return;
+  }
+  
+  this.http.post(`customers/generate-credentials/${this.CustomerEditID}/`, {}).subscribe(
+    (res: any) => {
+      if (res.success) {
+        // Update form with generated credentials
+        this.formConfig.model.customer_data.username = res.username;
+        this.formConfig.model.customer_data.password_display = res.password;
+        this.formConfig.model.customer_data.is_portal_user = true;
+        
+        this.notification.success('Credentials generated successfully', '');
+      }
+    },
+    (error) => {
+      this.notification.error('Error generating credentials', '');
+    }
+  );
+}
+
+// Show popup to send credentials
+showSendCredentialsPopup() {
+  if (!this.CustomerEditID) {
+    this.notification.error('Please save the customer first', '');
+    return;
+  }
+  
+  // Use NzModalService or your preferred modal
+  const modal = this.modal.confirm({
+    nzTitle: 'Send Credentials to Customer',
+    nzContent: 'Do you want to send the login credentials to the customer via email?',
+    nzOkText: 'Yes, Send',
+    nzCancelText: 'No',
+    nzOnOk: () => this.sendCredentialsToCustomer()
+  });
+}
+
+// Send credentials to customer
+sendCredentialsToCustomer() {
+  this.http.post(`customers/send-credentials/${this.CustomerEditID}/`, {}).subscribe(
+    (res: any) => {
+      if (res.success) {
+        this.notification.success('Credentials sent successfully to customer', '');
+      } else {
+        this.notification.warning(res.message || 'Failed to send credentials', '');
+      }
+    },
+    (error) => {
+      this.notification.error('Error sending credentials', '');
+    }
+  );
+}
+
 
   setFormConfig() {
     this.CustomerEditID = null;
@@ -495,9 +1015,9 @@ export class CustomersComponent {
       // url: "customers/customers/",
       title: '',
       formState: {
-        viewMode: false
+        viewMode: this.isCustomerPortal || false 
       },
-      showActionBtn: true,
+      showActionBtn: !this.isCustomerPortal,
       exParams: [],
       submit: {
         label: 'Submit',
@@ -665,6 +1185,107 @@ export class CustomersComponent {
                     //     required: false,
                     //   }
                     // },
+                    {
+                      className: 'col-12 mt-3',
+                      fieldGroupClassName: 'row',
+                      fieldGroup: [
+                        {
+                          className: 'col-12',
+                          key: 'is_portal_user',
+                          type: 'checkbox',
+                          templateOptions: {
+                            label: 'Enable Customer Portal Access',
+                            description: 'Allow customer to login and view their data'
+                          },
+                          hooks: {
+                            onChanges: (field: any) => {
+                              const isEnabled = field.formControl.value;
+                              const portalFields = [
+                                'username',
+                                'password_display',
+                                'generate_credentials',
+                                'send_credentials'
+                              ];
+                              
+                              // Show/hide portal fields based on checkbox
+                              portalFields.forEach(fieldKey => {
+                                const portalField = this.findFieldInConfig(fieldKey);
+                                if (portalField) {
+                                  portalField.hide = !isEnabled;
+                                }
+                              });
+                            }
+                          }
+                        },
+                        // Username Field
+                        {
+                          className: 'col-md-4 col-sm-6 col-12',
+                          key: 'username',
+                          type: 'input',
+                          hide: true, // Initially hidden
+                          templateOptions: {
+                            label: 'Portal Username',
+                            placeholder: 'Auto-generated from name',
+                            description: 'Leave empty to auto-generate'
+                          }
+                        },
+                        // Password Display (read-only)
+                        {
+                          className: 'col-md-4 col-sm-6 col-12',
+                          key: 'password_display',
+                          type: 'input',
+                          hide: true,
+                          templateOptions: {
+                            label: 'Password',
+                            readonly: true,
+                            description: 'Password is auto-generated and hashed',
+                            addonRight: {
+                              text: 'Generate',
+                              onClick: (field: any, $event: any) => this.generatePassword(field)
+                            }
+                          }
+                        },
+                        // Hidden actual password field
+                        {
+                          key: 'password',
+                          type: 'input',
+                          hide: true,
+                          templateOptions: {
+                            label: 'Password',
+                            hidden: true
+                          }
+                        },
+                        // Action Buttons Row
+                        {
+                          className: 'col-12 mt-2',
+                          fieldGroupClassName: 'd-flex gap-2',
+                          fieldGroup: [
+                            {
+                              className: 'col-auto',
+                              type: 'button',
+                              key: 'generate_credentials',
+                              hide: true,
+                              templateOptions: {
+                                label: 'Generate Credentials',
+                                btnType: 'primary',
+                                onClick: (field: any, $event: any) => this.generateCustomerCredentials()
+                              }
+                            },
+                            {
+                              className: 'col-auto',
+                              type: 'button',
+                              key: 'send_credentials',
+                              hide: true,
+                              templateOptions: {
+                                label: 'Send Credentials to Customer',
+                                btnType: 'success',
+                                onClick: (field: any, $event: any) => this.showSendCredentialsPopup()
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
 
                   ]
                 },

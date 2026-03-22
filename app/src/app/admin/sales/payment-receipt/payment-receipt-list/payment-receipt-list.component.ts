@@ -1,4 +1,470 @@
-import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
+// import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
+// import { CommonModule } from '@angular/common';
+// import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+// import { TaTableConfig } from '@ta/ta-table';
+// import { Router } from '@angular/router';
+// import { TaTableComponent } from '@ta/ta-table';
+// import { HttpClient } from '@angular/common/http';
+// import { LocalStorageService } from '@ta/ta-core';
+
+// @Component({
+//   selector: 'app-payment-receipt-list',
+//   standalone: true,
+//   imports: [CommonModule, AdminCommmonModule],
+//   templateUrl: './payment-receipt-list.component.html',
+//   styleUrls: ['./payment-receipt-list.component.scss']
+// })
+// export class PaymentReceiptListComponent {
+//   @Output('edit') edit = new EventEmitter<void>();
+//   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+
+//    constructor(private router: Router, private http: HttpClient, private localStorage: LocalStorageService) {
+//     this.setApiUrlBasedOnUser();
+//   }
+
+//   refreshTable() {
+//     this.taTableComponent?.refresh();
+//   };
+
+// // In your component (e.g., SalesListComponent)
+//   onSelect(event: Event): void {
+//     const selectElement = event.target as HTMLSelectElement;
+//     const selectedValue = selectElement.value;
+
+//     switch (selectedValue) {
+//       case 'email':
+//         this.onMailLinkClick();
+//         break;
+//       case 'whatsapp':
+//         this.onWhatsappClick();
+//         break;
+//       default:
+//         // Handle default case (e.g., "Mail" selected)
+//         break;
+//     }
+
+//     // Reset the dropdown to the default option
+//     selectElement.value = '';
+//   }
+
+//   onWhatsappClick(): void {
+//     const selectedIds = this.taTableComponent.options.checkedRows;
+
+//     if (selectedIds.length === 0) {
+//       return this.showDialog();
+//     }
+
+//     const saleOrderId = selectedIds[0];
+//     const url = `masters/document_generator/${saleOrderId}/payment_receipt/`;
+
+//     const payload = {
+//       flag: 'whatsapp',
+//       // format: this.selectedFormat
+//     };
+
+//     this.showLoading = true;
+
+//     this.http.post<any>(url, payload).subscribe(
+//       (response) => {
+//         this.showLoading = false;
+//         this.refreshTable();
+
+//         //  CASE 1: WATI (server sends directly)
+//         if (response.mode === 'wati') {
+//           this.showSuccessToast = true;
+//           this.toastMessage = 'WhatsApp message sent successfully';
+//           setTimeout(() => this.showSuccessToast = false, 2000);
+//         }
+
+//         //  CASE 2: Click-to-chat (local / dev)
+//         else if (response.mode === 'click_to_chat' && response.whatsapp_url) {
+//           window.open(response.whatsapp_url, '_blank');
+
+//           this.showSuccessToast = true;
+//           this.toastMessage = 'Opening WhatsApp…';
+//           setTimeout(() => this.showSuccessToast = false, 2000);
+//         }
+//       },
+//       (error) => {
+//         this.showLoading = false;
+//         console.error('Error sending WhatsApp message', error);
+
+//         this.showSuccessToast = true;
+//         this.toastMessage = 'Failed to send WhatsApp message';
+//         setTimeout(() => this.showSuccessToast = false, 2000);
+//       }
+//     );
+//   }
+
+//   showDialog() {
+//     const dialog = document.getElementById('customDialog');
+//     if (dialog) {
+//       dialog.style.display = 'flex'; // Show the dialog
+//     }
+//   }
+
+//   // Function to close the custom dialog
+//   closeDialog() {
+//     const dialog = document.getElementById('customDialog');
+//     if (dialog) {
+//       dialog.style.display = 'none'; // Hide the dialog
+//     }
+//   }
+
+//   showSuccessToast = false;
+//   toastMessage = '';
+
+//   // Method to handle "Email Sent" button click
+//   onMailLinkClick(): void {
+//     console.log("We are in method ...")
+//     const selectedIds = this.taTableComponent.options.checkedRows;
+//     if (selectedIds.length === 0) {
+//       return this.showDialog();
+//     }
+
+//     console.log("selectedIds : ", selectedIds);
+
+//     const saleInvoiceId = selectedIds[0]; // Assuming only one row can be selected
+//     const payload = { flag: "email" };
+//     const url = `masters/document_generator/${saleInvoiceId}/payment_receipt/`;
+//     this.http.post(url, payload).subscribe(
+//       (response) => {
+//         this.showSuccessToast = true;
+//           this.toastMessage = "Mail Sent successfully"; // Set the toast message for update
+//           this.refreshTable();
+//           setTimeout(() => {
+//             this.showSuccessToast = false;
+//           }, 2000);
+//       },
+//       (error) => {
+//         console.error('Error sending email', error);
+//       }
+//     );
+//   }
+
+//   //----------print & preview ------------------------
+//   onPrintSelect(event: Event): void {
+//     const selectElement = event.target as HTMLSelectElement;
+//     const selectedValue = selectElement.value;
+
+//     switch (selectedValue) {
+//         case 'preview':
+//             this.onPreviewClick();
+//             break;
+//         case 'print':
+//             this.onPrintClick();
+//             break;
+//         default:
+//             // Handle default case
+//             break;
+//     }
+
+//     // Reset the dropdown to the default option
+//     selectElement.value = '';
+// }
+
+// // onPreviewClick(): void {
+// //     const selectedIds = this.taTableComponent.options.checkedRows;
+// //     if (selectedIds.length === 0) {
+// //         return this.showDialog();
+// //     }
+    
+// //     // Add your preview logic here
+// //     console.log('Preview clicked for selected documents');
+// // }
+
+// onPreviewClick(): void {
+//   const selectedIds = this.taTableComponent.options.checkedRows;
+//   if (selectedIds.length === 0) {
+//       return this.showDialog();
+//   }
+
+//   const saleInvoiceId = selectedIds[0];
+//   const url = `masters/document_generator/${saleInvoiceId}/payment_receipt/`;
+  
+//   // Show loading indicator
+//   this.showLoading = true;
+  
+//   // Send request with preview flag
+//   this.http.post(url, { flag: 'preview' }, { responseType: 'blob' }).subscribe(
+//       (pdfBlob: Blob) => {
+//           this.showLoading = false;
+          
+//           // Create blob URL and open in new window
+//           const blobUrl = URL.createObjectURL(pdfBlob);
+//           window.open(blobUrl, '_blank');
+          
+//           // Clean up the blob URL after use
+//           setTimeout(() => {
+//               URL.revokeObjectURL(blobUrl);
+//           }, 1000);
+//       },
+//       (error) => {
+//           this.showLoading = false;
+//           console.error('Error generating preview', error);
+          
+//           // Show error toast
+//           this.showSuccessToast = true;
+//           this.toastMessage = "Error generating document preview";
+//           setTimeout(() => {
+//               this.showSuccessToast = false;
+//           }, 2000);
+//       }
+//   );
+// }
+
+// // Add this property to your component class
+// showLoading = false;
+
+// // onPrintClick(): void {
+// //     const selectedIds = this.taTableComponent.options.checkedRows;
+// //     if (selectedIds.length === 0) {
+// //         return this.showDialog();
+// //     }
+    
+// //     // Add your print logic here
+// //     console.log('Print clicked for selected documents');
+// // }
+
+// onPrintClick(): void {
+//   const selectedIds = this.taTableComponent.options.checkedRows;
+//   if (selectedIds.length === 0) {
+//       return this.showDialog();
+//   }
+
+//   const saleInvoiceId = selectedIds[0];
+//   const url = `masters/document_generator/${saleInvoiceId}/payment_receipt/`;
+  
+//   this.showLoading = true;
+  
+//   this.http.post(url, { flag: 'preview' }, { responseType: 'blob' }).subscribe(
+//       (pdfBlob: Blob) => {
+//           this.showLoading = false;
+//           this.openAndPrintPdf(pdfBlob);
+//       },
+//       (error) => {
+//           this.showLoading = false;
+//           console.error('Error generating print document', error);
+//           this.showSuccessToast = true;
+//           this.toastMessage = "Error generating document for printing";
+//           setTimeout(() => {
+//               this.showSuccessToast = false;
+//           }, 2000);
+//       }
+//   );
+// }
+
+// private openAndPrintPdf(pdfBlob: Blob): void {
+//   // Create blob URL
+//   const blobUrl = URL.createObjectURL(pdfBlob);
+  
+//   // Open in new window first
+//   const printWindow = window.open(blobUrl, '_blank');
+  
+//   // Wait for window to load
+//   if (printWindow) {
+//       printWindow.onload = () => {
+//           try {
+//               // Give it a small delay to ensure PDF is rendered
+//               setTimeout(() => {
+//                   printWindow.print();
+//                   // Clean up after printing
+//                   URL.revokeObjectURL(blobUrl);
+//               }, 500);
+//           } catch (e) {
+//               console.error('Print error:', e);
+//               // Fallback to iframe if window.print() fails
+//               this.fallbackPrint(pdfBlob);
+//           }
+//       };
+//   } else {
+//       // If popup was blocked, fallback to iframe
+//       this.fallbackPrint(pdfBlob);
+//   }
+// }
+
+// private fallbackPrint(pdfBlob: Blob): void {
+//   const blobUrl = URL.createObjectURL(pdfBlob);
+//   const iframe = document.createElement('iframe');
+//   iframe.style.display = 'none';
+//   iframe.src = blobUrl;
+  
+//   document.body.appendChild(iframe);
+  
+//   iframe.onload = () => {
+//       setTimeout(() => {
+//           try {
+//               iframe.contentWindow?.print();
+//           } catch (e) {
+//               console.error('Iframe print error:', e);
+//               // Final fallback - open in new tab
+//               window.open(blobUrl, '_blank');
+//           }
+//           // Clean up
+//           setTimeout(() => {
+//               document.body.removeChild(iframe);
+//               URL.revokeObjectURL(blobUrl);
+//           }, 100);
+//       }, 1000);
+//   };
+// }
+
+//   tableConfig: TaTableConfig = {
+//     apiUrl: '', //'sales/payment_transactions/',
+//     showCheckbox: true,
+//     pkId: "transaction_id",
+//     pageSize: 10,
+//     "globalSearch": {
+//       keys: ['invoice_no', 'payment_receipt_no', 'payment_date', 'payment_method', 'payment_status']
+//     },
+//     export: { downloadName: 'PaymentReceiptList' },
+//     defaultSort: { key: 'payment_date', value: 'descend' },
+//     cols: [
+//       {
+//         fieldKey: 'customer_name',
+//         name: 'Customer Name',
+//         sort: true
+//       },
+//       {
+//         fieldKey: 'invoice_no',
+//         name: 'Invoice No',
+//         sort: true
+//       },
+//       {
+//         fieldKey: 'payment_receipt_no',
+//         name: 'Receipt No',
+//         sort: true
+//       },
+//       {
+//         fieldKey: 'total_amount',
+//         name: 'Total Amount',
+//         sort: true,
+//         displayType: 'map',
+//         mapFn: (currentValue: any) => {
+//           return currentValue ? `₹${currentValue}` : '₹0.00';
+//         }
+//       },
+//       {
+//         fieldKey: 'outstanding_amount',
+//         name: 'Outstanding',
+//         sort: true,
+//         displayType: 'map',
+//         mapFn: (currentValue: any) => {
+//           return currentValue ? `₹${currentValue}` : '₹0.00';
+//         }
+//       },
+//       // {
+//       //   fieldKey: 'adjust_now',
+//       //   name: 'Adjust Now (₹)',
+//       //   sort: true,
+//       //   isEdit: true,
+
+//       //   autoSave: {
+//       //     apiUrl: (row: any) => `sales/payment_transactions/${row.transaction_id}/`,
+//       //     method: 'put',
+
+//       //     body: (row: any, value: any, col: any) => {
+//       //       const existingAmount = Number(row.amount) || 0;
+//       //       const addValue = Number(value) || 0;
+//       //       const finalAmount = existingAmount + addValue;
+
+//       //       return {
+//       //         amount: finalAmount,                //  Updated amount
+//       //         payment_receipt_no: row.payment_receipt_no,
+//       //         account: row.account_id,
+//       //         customer: row.customer_id,
+//       //         customer_id: row.customer_id,
+//       //         payment_status: row.payment_status,
+//       //         voucher_no: row.voucher_no,
+//       //         invoice_no: row.invoice_no
+//       //       };
+//       //     }
+
+//       //     // Note: onSaveSuccess and onSaveError are injected in ngAfterViewInit to ensure `this` is correct.
+//       //   }
+//       // },
+//       {
+//   fieldKey: 'adjust_now',
+//   name: 'Adjust Now (₹)',
+//   sort: true,
+//   isEdit: true,
+//   autoSave: {
+//     apiUrl: (row: any) => `sales/payment_transactions/${row.transaction_id}/`,
+//     method: 'put',
+//     validate: (value: any) => {
+//       const numValue = Number(value) || 0;
+//       if (numValue < 0) return 'Amount cannot be negative';
+//       return null; // valid
+//     },
+//     body: (row: any, value: any, col: any) => {
+//       const existingAmount = Number(row.amount) || 0;
+//       const addValue = Number(value) || 0;
+//       const finalAmount = existingAmount + addValue;
+      
+//       return {
+//         amount: finalAmount,
+//         payment_receipt_no: row.payment_receipt_no,
+//         account: row.account_id,
+//         customer: row.customer_id,
+//         payment_status: row.payment_status,
+//         invoice_no: row.invoice_no
+//       };
+//     }
+//   }
+// },
+//       {
+//         fieldKey: 'payment_status',
+//         name: 'Payment Status',
+//         sort: true
+//       },
+//       {
+//         fieldKey: 'payment_date',
+//         name: 'Payment Date',
+//         sort: true
+//       },
+//       {
+//         fieldKey: "code",
+//         name: "Action",
+//         type: 'action',
+//         actions: [
+//           // {
+//           //   type: 'delete',
+//           //   label: 'Delete',
+//           //   apiUrl: 'sales/payment_transactions',
+//           //   confirm: true,
+//           //   confirmMsg: "sure to delete?"
+//           // },
+//           {
+//             type: 'callBackFn',
+//             icon: 'fa fa-pen',
+//             label: '',
+//             callBackFn: (row: any) => {
+//               this.edit.emit(row.transaction_id);
+//             }
+//           }
+//         ]
+//       }
+//     ]
+//   };
+
+//   private setApiUrlBasedOnUser() {
+//     const user = this.localStorage.getItem('user');
+//     const isSuperUser = user?.is_sp_user === true;
+
+//     //  Correct URL for payment_transactions
+//     this.tableConfig.apiUrl = isSuperUser
+//       ? 'sales/payment_transactions/?records_all=true'
+//       : 'sales/payment_transactions/';
+
+//     //  If you really want, you can keep this too — but it's optional now
+//     this.tableConfig.fixedFilters = isSuperUser
+//       ? [{ key: 'records_all', value: 'true' }]
+//       : [];
+//   }
+
+// }
+
+import { Component, EventEmitter, Output, ViewChild, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
@@ -6,6 +472,7 @@ import { Router } from '@angular/router';
 import { TaTableComponent } from '@ta/ta-table';
 import { HttpClient } from '@angular/common/http';
 import { LocalStorageService } from '@ta/ta-core';
+import { ActivatedRoute } from '@angular/router'; // Add this import
 
 @Component({
   selector: 'app-payment-receipt-list',
@@ -14,19 +481,93 @@ import { LocalStorageService } from '@ta/ta-core';
   templateUrl: './payment-receipt-list.component.html',
   styleUrls: ['./payment-receipt-list.component.scss']
 })
-export class PaymentReceiptListComponent {
+export class PaymentReceiptListComponent implements OnInit {
+  
+  // Add these properties
+  isCustomerPortal: boolean = false;
+  customerId: string | null = null;
+
+  ngOnInit() {
+    // Check if this is customer portal
+    this.route.data.subscribe(data => {
+      this.isCustomerPortal = data['customerView'] || false;
+      
+      if (this.isCustomerPortal) {
+        // Get customer ID from localStorage
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        this.customerId = user.id || null;
+        
+        console.log('Customer Portal Mode - Customer ID:', this.customerId);
+        
+        // Update the table config for customer view
+        this.updateTableConfigForCustomer();
+      }
+    });
+  }
+
   @Output('edit') edit = new EventEmitter<void>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
-   constructor(private router: Router, private http: HttpClient, private localStorage: LocalStorageService) {
+  constructor(
+    private router: Router, 
+    private http: HttpClient, 
+    private localStorage: LocalStorageService,
+    private route: ActivatedRoute // Add this
+  ) {
     this.setApiUrlBasedOnUser();
+  }
+
+  // New method to update table config for customer
+  updateTableConfigForCustomer() {
+    // Set API URL with customer filter
+    this.tableConfig.apiUrl = `sales/payment_transactions/?customer_id=${this.customerId}`;
+    
+    // Remove admin-only actions and inline editing
+    this.tableConfig.cols = this.tableConfig.cols.map(col => {
+      if (col.name === 'Action') {
+        // For customer portal, only keep view action
+        col.actions = [
+          {
+            type: 'callBackFn',
+            icon: 'fa fa-eye',
+            label: '',
+            tooltip: "View Payment Receipt",
+            callBackFn: (row: any) => {
+              console.log('View payment receipt:', row);
+              this.edit.emit(row.transaction_id);
+            }
+          }
+        ];
+      }
+      
+      // Remove inline editing for adjust_now field in customer portal
+      if (col.fieldKey === 'adjust_now') {
+        delete col.isEdit;
+        delete col.autoSave;
+      }
+      
+      return col;
+    });
+
+    // Remove export option for customers
+    this.tableConfig.export = undefined;
+    
+    // Remove checkboxes for customers
+    this.tableConfig.showCheckbox = false;
+    
+    // Update fixed filters
+    this.tableConfig.fixedFilters = [
+      { key: 'customer_id', value: this.customerId }
+    ];
+
+    console.log('Updated payment receipt table config for customer:', this.tableConfig);
   }
 
   refreshTable() {
     this.taTableComponent?.refresh();
   };
 
-// In your component (e.g., SalesListComponent)
+  // In your component (e.g., SalesListComponent)
   onSelect(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;
     const selectedValue = selectElement.value;
@@ -161,153 +702,133 @@ export class PaymentReceiptListComponent {
 
     // Reset the dropdown to the default option
     selectElement.value = '';
-}
+  }
 
-// onPreviewClick(): void {
-//     const selectedIds = this.taTableComponent.options.checkedRows;
-//     if (selectedIds.length === 0) {
-//         return this.showDialog();
-//     }
+  onPreviewClick(): void {
+    const selectedIds = this.taTableComponent.options.checkedRows;
+    if (selectedIds.length === 0) {
+        return this.showDialog();
+    }
+
+    const saleInvoiceId = selectedIds[0];
+    const url = `masters/document_generator/${saleInvoiceId}/payment_receipt/`;
     
-//     // Add your preview logic here
-//     console.log('Preview clicked for selected documents');
-// }
-
-onPreviewClick(): void {
-  const selectedIds = this.taTableComponent.options.checkedRows;
-  if (selectedIds.length === 0) {
-      return this.showDialog();
-  }
-
-  const saleInvoiceId = selectedIds[0];
-  const url = `masters/document_generator/${saleInvoiceId}/payment_receipt/`;
-  
-  // Show loading indicator
-  this.showLoading = true;
-  
-  // Send request with preview flag
-  this.http.post(url, { flag: 'preview' }, { responseType: 'blob' }).subscribe(
-      (pdfBlob: Blob) => {
-          this.showLoading = false;
-          
-          // Create blob URL and open in new window
-          const blobUrl = URL.createObjectURL(pdfBlob);
-          window.open(blobUrl, '_blank');
-          
-          // Clean up the blob URL after use
-          setTimeout(() => {
-              URL.revokeObjectURL(blobUrl);
-          }, 1000);
-      },
-      (error) => {
-          this.showLoading = false;
-          console.error('Error generating preview', error);
-          
-          // Show error toast
-          this.showSuccessToast = true;
-          this.toastMessage = "Error generating document preview";
-          setTimeout(() => {
-              this.showSuccessToast = false;
-          }, 2000);
-      }
-  );
-}
-
-// Add this property to your component class
-showLoading = false;
-
-// onPrintClick(): void {
-//     const selectedIds = this.taTableComponent.options.checkedRows;
-//     if (selectedIds.length === 0) {
-//         return this.showDialog();
-//     }
+    // Show loading indicator
+    this.showLoading = true;
     
-//     // Add your print logic here
-//     console.log('Print clicked for selected documents');
-// }
-
-onPrintClick(): void {
-  const selectedIds = this.taTableComponent.options.checkedRows;
-  if (selectedIds.length === 0) {
-      return this.showDialog();
+    // Send request with preview flag
+    this.http.post(url, { flag: 'preview' }, { responseType: 'blob' }).subscribe(
+        (pdfBlob: Blob) => {
+            this.showLoading = false;
+            
+            // Create blob URL and open in new window
+            const blobUrl = URL.createObjectURL(pdfBlob);
+            window.open(blobUrl, '_blank');
+            
+            // Clean up the blob URL after use
+            setTimeout(() => {
+                URL.revokeObjectURL(blobUrl);
+            }, 1000);
+        },
+        (error) => {
+            this.showLoading = false;
+            console.error('Error generating preview', error);
+            
+            // Show error toast
+            this.showSuccessToast = true;
+            this.toastMessage = "Error generating document preview";
+            setTimeout(() => {
+                this.showSuccessToast = false;
+            }, 2000);
+        }
+    );
   }
 
-  const saleInvoiceId = selectedIds[0];
-  const url = `masters/document_generator/${saleInvoiceId}/payment_receipt/`;
-  
-  this.showLoading = true;
-  
-  this.http.post(url, { flag: 'preview' }, { responseType: 'blob' }).subscribe(
-      (pdfBlob: Blob) => {
-          this.showLoading = false;
-          this.openAndPrintPdf(pdfBlob);
-      },
-      (error) => {
-          this.showLoading = false;
-          console.error('Error generating print document', error);
-          this.showSuccessToast = true;
-          this.toastMessage = "Error generating document for printing";
-          setTimeout(() => {
-              this.showSuccessToast = false;
-          }, 2000);
-      }
-  );
-}
+  // Add this property to your component class
+  showLoading = false;
 
-private openAndPrintPdf(pdfBlob: Blob): void {
-  // Create blob URL
-  const blobUrl = URL.createObjectURL(pdfBlob);
-  
-  // Open in new window first
-  const printWindow = window.open(blobUrl, '_blank');
-  
-  // Wait for window to load
-  if (printWindow) {
-      printWindow.onload = () => {
-          try {
-              // Give it a small delay to ensure PDF is rendered
-              setTimeout(() => {
-                  printWindow.print();
-                  // Clean up after printing
-                  URL.revokeObjectURL(blobUrl);
-              }, 500);
-          } catch (e) {
-              console.error('Print error:', e);
-              // Fallback to iframe if window.print() fails
-              this.fallbackPrint(pdfBlob);
-          }
-      };
-  } else {
-      // If popup was blocked, fallback to iframe
-      this.fallbackPrint(pdfBlob);
+  onPrintClick(): void {
+    const selectedIds = this.taTableComponent.options.checkedRows;
+    if (selectedIds.length === 0) {
+        return this.showDialog();
+    }
+
+    const saleInvoiceId = selectedIds[0];
+    const url = `masters/document_generator/${saleInvoiceId}/payment_receipt/`;
+    
+    this.showLoading = true;
+    
+    this.http.post(url, { flag: 'preview' }, { responseType: 'blob' }).subscribe(
+        (pdfBlob: Blob) => {
+            this.showLoading = false;
+            this.openAndPrintPdf(pdfBlob);
+        },
+        (error) => {
+            this.showLoading = false;
+            console.error('Error generating print document', error);
+            this.showSuccessToast = true;
+            this.toastMessage = "Error generating document for printing";
+            setTimeout(() => {
+                this.showSuccessToast = false;
+            }, 2000);
+        }
+    );
   }
-}
 
-private fallbackPrint(pdfBlob: Blob): void {
-  const blobUrl = URL.createObjectURL(pdfBlob);
-  const iframe = document.createElement('iframe');
-  iframe.style.display = 'none';
-  iframe.src = blobUrl;
-  
-  document.body.appendChild(iframe);
-  
-  iframe.onload = () => {
-      setTimeout(() => {
-          try {
-              iframe.contentWindow?.print();
-          } catch (e) {
-              console.error('Iframe print error:', e);
-              // Final fallback - open in new tab
-              window.open(blobUrl, '_blank');
-          }
-          // Clean up
-          setTimeout(() => {
-              document.body.removeChild(iframe);
-              URL.revokeObjectURL(blobUrl);
-          }, 100);
-      }, 1000);
-  };
-}
+  private openAndPrintPdf(pdfBlob: Blob): void {
+    // Create blob URL
+    const blobUrl = URL.createObjectURL(pdfBlob);
+    
+    // Open in new window first
+    const printWindow = window.open(blobUrl, '_blank');
+    
+    // Wait for window to load
+    if (printWindow) {
+        printWindow.onload = () => {
+            try {
+                // Give it a small delay to ensure PDF is rendered
+                setTimeout(() => {
+                    printWindow.print();
+                    // Clean up after printing
+                    URL.revokeObjectURL(blobUrl);
+                }, 500);
+            } catch (e) {
+                console.error('Print error:', e);
+                // Fallback to iframe if window.print() fails
+                this.fallbackPrint(pdfBlob);
+            }
+        };
+    } else {
+        // If popup was blocked, fallback to iframe
+        this.fallbackPrint(pdfBlob);
+    }
+  }
+
+  private fallbackPrint(pdfBlob: Blob): void {
+    const blobUrl = URL.createObjectURL(pdfBlob);
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = blobUrl;
+    
+    document.body.appendChild(iframe);
+    
+    iframe.onload = () => {
+        setTimeout(() => {
+            try {
+                iframe.contentWindow?.print();
+            } catch (e) {
+                console.error('Iframe print error:', e);
+                // Final fallback - open in new tab
+                window.open(blobUrl, '_blank');
+            }
+            // Clean up
+            setTimeout(() => {
+                document.body.removeChild(iframe);
+                URL.revokeObjectURL(blobUrl);
+            }, 100);
+        }, 1000);
+    };
+  }
 
   tableConfig: TaTableConfig = {
     apiUrl: '', //'sales/payment_transactions/',
@@ -353,65 +874,35 @@ private fallbackPrint(pdfBlob: Blob): void {
           return currentValue ? `₹${currentValue}` : '₹0.00';
         }
       },
-      // {
-      //   fieldKey: 'adjust_now',
-      //   name: 'Adjust Now (₹)',
-      //   sort: true,
-      //   isEdit: true,
-
-      //   autoSave: {
-      //     apiUrl: (row: any) => `sales/payment_transactions/${row.transaction_id}/`,
-      //     method: 'put',
-
-      //     body: (row: any, value: any, col: any) => {
-      //       const existingAmount = Number(row.amount) || 0;
-      //       const addValue = Number(value) || 0;
-      //       const finalAmount = existingAmount + addValue;
-
-      //       return {
-      //         amount: finalAmount,                //  Updated amount
-      //         payment_receipt_no: row.payment_receipt_no,
-      //         account: row.account_id,
-      //         customer: row.customer_id,
-      //         customer_id: row.customer_id,
-      //         payment_status: row.payment_status,
-      //         voucher_no: row.voucher_no,
-      //         invoice_no: row.invoice_no
-      //       };
-      //     }
-
-      //     // Note: onSaveSuccess and onSaveError are injected in ngAfterViewInit to ensure `this` is correct.
-      //   }
-      // },
       {
-  fieldKey: 'adjust_now',
-  name: 'Adjust Now (₹)',
-  sort: true,
-  isEdit: true,
-  autoSave: {
-    apiUrl: (row: any) => `sales/payment_transactions/${row.transaction_id}/`,
-    method: 'put',
-    validate: (value: any) => {
-      const numValue = Number(value) || 0;
-      if (numValue < 0) return 'Amount cannot be negative';
-      return null; // valid
-    },
-    body: (row: any, value: any, col: any) => {
-      const existingAmount = Number(row.amount) || 0;
-      const addValue = Number(value) || 0;
-      const finalAmount = existingAmount + addValue;
-      
-      return {
-        amount: finalAmount,
-        payment_receipt_no: row.payment_receipt_no,
-        account: row.account_id,
-        customer: row.customer_id,
-        payment_status: row.payment_status,
-        invoice_no: row.invoice_no
-      };
-    }
-  }
-},
+        fieldKey: 'adjust_now',
+        name: 'Adjust Now (₹)',
+        sort: true,
+        isEdit: true,
+        autoSave: {
+          apiUrl: (row: any) => `sales/payment_transactions/${row.transaction_id}/`,
+          method: 'put',
+          validate: (value: any) => {
+            const numValue = Number(value) || 0;
+            if (numValue < 0) return 'Amount cannot be negative';
+            return null; // valid
+          },
+          body: (row: any, value: any, col: any) => {
+            const existingAmount = Number(row.amount) || 0;
+            const addValue = Number(value) || 0;
+            const finalAmount = existingAmount + addValue;
+            
+            return {
+              amount: finalAmount,
+              payment_receipt_no: row.payment_receipt_no,
+              account: row.account_id,
+              customer: row.customer_id,
+              payment_status: row.payment_status,
+              invoice_no: row.invoice_no
+            };
+          }
+        }
+      },
       {
         fieldKey: 'payment_status',
         name: 'Payment Status',
@@ -427,13 +918,6 @@ private fallbackPrint(pdfBlob: Blob): void {
         name: "Action",
         type: 'action',
         actions: [
-          // {
-          //   type: 'delete',
-          //   label: 'Delete',
-          //   apiUrl: 'sales/payment_transactions',
-          //   confirm: true,
-          //   confirmMsg: "sure to delete?"
-          // },
           {
             type: 'callBackFn',
             icon: 'fa fa-pen',
@@ -461,6 +945,4 @@ private fallbackPrint(pdfBlob: Blob): void {
       ? [{ key: 'records_all', value: 'true' }]
       : [];
   }
-
 }
-
