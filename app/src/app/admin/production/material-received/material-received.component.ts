@@ -286,7 +286,7 @@ export class MaterialReceivedComponent implements OnInit, OnDestroy {
             fieldGroup: [
               {
   key: 'product',
-  type: 'select',
+  type: 'products-dropdown',
   templateOptions: {
     label: 'Product',
     dataKey: 'product_id',
@@ -294,11 +294,7 @@ export class MaterialReceivedComponent implements OnInit, OnDestroy {
     hideLabel: true,
     placeholder: 'Select Product',
     options: [],
-    required: false,
-    lazy: {
-      url: 'products/products/?summary=true',
-      lazyOneTime: true
-    }
+    required: false
   },
   hooks: {
     onInit: (field: any) => {

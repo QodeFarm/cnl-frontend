@@ -8,7 +8,7 @@
             <!-- <button (click)="showProductsListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productModal">Products List
             </button> -->
             <!-- Button Group: Import + Products List -->
-        <div class="d-flex gap-2">
+        <div class="d-flex flex-wrap gap-2">
             <!-- Import Button with Dropdown -->
             <div class="btn-group">
                 <button type="button" class="btn btn-primary" (click)="showImportModal()">Import</button>
@@ -44,7 +44,7 @@
                 <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" *ngIf="showProductsList">
-                <app-products-list (edit)="editProducts($event)" (bulkEdit)="openBulkEditModal($event)" (exportProducts)="exportProducts($event)" class="custom-list"></app-products-list>
+                <app-products-list (edit)="editProducts($event)" (bulkEdit)="openBulkEditModal($event)" (exportProducts)="exportProducts($event)" (mergeProducts)="onMergeProducts()" class="custom-list"></app-products-list>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>

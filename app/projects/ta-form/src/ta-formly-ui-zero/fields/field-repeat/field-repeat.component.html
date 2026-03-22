@@ -46,7 +46,7 @@
 </nz-card>
 
 <ng-template #extraTemplate>
-    <div style="display:flex;gap:10px;align-items:center;">
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
         <button *ngIf="to.onExtraAction" nz-button nzType="default" nzSize="small" type="button" (click)="to.onExtraAction()"
             style="display:inline-flex;align-items:center;gap:6px;font-weight:500;font-size:12px;border-radius:4px;border-color:#142768;color:#142768;">
             <i *ngIf="to.extraActionIcon" [class]="to.extraActionIcon"></i>

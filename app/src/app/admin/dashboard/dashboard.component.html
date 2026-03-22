@@ -1,5 +1,24 @@
 <!-- Begin Page Content -->
 <div class="container-fluid pt-3">
+    <!-- Smart Insights — top-right -->
+    <div class="si-chip-row">
+        <button class="si-chip" (click)="openSmartInsights()" [attr.aria-busy]="!aiLoaded">
+            <span class="si-chip-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93L12 10v2"/><circle cx="12" cy="17" r="3"/><path d="M12 20v2"/><path d="M8 22h8"/><path d="M5 6a7 7 0 0 1 14 0"/>
+                </svg>
+            </span>
+            <span class="si-chip-text">Smart Insights</span>
+            <span class="si-chip-badge" *ngIf="aiLoaded && aiAlertCount > 0" [class.critical]="aiCriticalCount > 0" aria-live="polite">
+                {{ aiAlertCount > 99 ? '99+' : aiAlertCount }}
+            </span>
+            <span class="si-chip-badge loading" *ngIf="!aiLoaded">
+                <span class="si-shimmer"></span>
+            </span>
+            <svg class="si-chip-arrow" viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M6.22 3.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 0 1 0-1.06z"/></svg>
+        </button>
+    </div>
+
     <div class="row">
         <!-- Sales Card -->
         <div class="dashboard-card px-1 col-md col-sm-4 col-6 h-100" (click)="openSalesModal()">
@@ -11,51 +30,43 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Purchase Card -->
-        <div class="dashboard-card col-md col-sm-4 col-6 px-1 h-100" (click)="openPurchaseModal()">
-            <div class="dashboard-card-body">
-                <div class="dashboard-card-head">Purchase</div>
-                <div class="dashboard-card-content">
-                    <h5>Rs. {{currentWeekPurchase}}</h5>
-                    <p>{{percentagePurchaseChange}}% from last week</p>
-                </div>
-            </div>
+    <div class="dashboard-header mb-3">
+        <div class="d-flex justify-content-end">
+            <button class="btn-add-graph" (click)="openAddGraphModal()">
+                <span class="icon">➕</span> Add Custom Graph
+            </button>
         </div>
-
-        <!-- Receivables Card -->
-        <div class="dashboard-card col-md col-sm-4 col-6 px-1 h-100" (click)="openReceivablesModal()">
-            <div class="dashboard-card-body">
-                <div class="dashboard-card-head">Receivables</div>
-                <div class="dashboard-card-content">
-                    <h5>Rs. 0</h5>
-                    <p>0% from last week</p>
-                </div>
+    </div>
+    <!-- Replace your existing static cards with this -->
+<div class="row">
+    <!-- Loading State -->
+    <div *ngIf="isLoadingTiles" class="col-12 text-center p-3">
+        <div class="spinner"></div>
+        <p>Loading dashboard data...</p>
+    </div>
+    
+    <!-- Dynamic Tiles -->
+    <div *ngFor="let tile of tiles" 
+         class="dashboard-card px-1 col-md col-sm-4 col-6 h-100" 
+         (click)="openTileModal(tile)">
+        <div class="dashboard-card-body">
+            <div class="dashboard-card-head">
+                {{ tile.title }}
+                <span *ngIf="tile.trend === 'up'" class="trend-up">↑</span>
+                <span *ngIf="tile.trend === 'down'" class="trend-down">↓</span>
             </div>
-        </div>
-
-        <!-- Payables Card -->
-        <div class="dashboard-card col-md col-sm-6 col-6 px-1 h-100" (click)="openPayablesModal()">
-            <div class="dashboard-card-body">
-                <div class="dashboard-card-head">Payables</div>
-                <div class="dashboard-card-content">
-                    <h5>Rs. 0</h5>
-                    <p>0% from last week</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Cash/Bank Card -->
-        <div class="dashboard-card col-md col-sm-6 col-12 px-1 h-100" (click)="openLiquidityModal()">
-            <div class="dashboard-card-body">
-                <div class="dashboard-card-head">Cash/ Bank</div>
-                <div class="dashboard-card-content">
-                    <h5>Rs. 0</h5>
-                    <p>0% from last week</p>
-                </div>
+            <div class="dashboard-card-content">
+                <h5>Rs. {{ tile.value | number }}</h5>
+                <p [class.text-success]="tile.change > 0" 
+                   [class.text-danger]="tile.change < 0">
+                    {{ tile.change }}% from last week
+                </p>
             </div>
         </div>
     </div>
+</div>
 </div>
 <!-- /.container-fluid -->
 
@@ -105,6 +116,171 @@
         </div>
     </div>
 </div>
+
+<!-- Dynamic Graphs Section -->
+<div class="dynamic-graphs-section container-fluid" *ngIf="dynamicGraphs.length > 0">
+    <div class="row">
+        <div class="col-12">
+            <h3 class="dynamic-graphs-heading">Custom Graphs</h3>
+        </div>
+    </div>
+    <div class="row dynamic-graphs-grid">
+        <div *ngFor="let graph of dynamicGraphs" 
+     [id]="'graph-card-' + graph.id"
+     class="col-lg-6 col-xl-4 col-md-6 col-12 mb-4">
+    <div class="dynamic-graph-card">
+        <div class="graph-header">
+            <h4 class="graph-title">{{ graph.title }}</h4>
+            <div class="graph-actions">
+                <button class="btn-icon btn-refresh" (click)="fetchDynamicGraphData(graph)" title="Refresh">
+                    <span class="icon">🔄</span>
+                </button>
+                <button class="btn-icon btn-remove" (click)="removeDynamicGraph(graph.id, graph.title)" title="Remove">
+                    <span class="icon">❌</span>
+                </button>
+            </div>
+        </div>
+        <div class="graph-content">
+            <div *ngIf="graph.isLoading" class="graph-loader">
+                <div class="spinner"></div>
+                <span>Loading data...</span>
+            </div>
+            <canvas [id]="'dynamic-graph-' + graph.id" 
+                    *ngIf="!graph.isLoading && hasGraphData(graph)" 
+                    class="dynamic-canvas">
+            </canvas>
+            <div *ngIf="!graph.isLoading && !hasGraphData(graph)" class="graph-error">
+                <span class="icon">⚠️</span>
+                <p>No data available for this report</p>
+                <button class="btn-retry" (click)="fetchDynamicGraphData(graph)">Retry</button>
+            </div>
+        </div>
+        <div class="graph-footer">
+            <span class="report-badge">{{ getReportLabel(graph.reportType) }}</span>
+            <span class="chart-badge">{{ getChartTypeLabel(graph.chartType) }}</span>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="delete-modal" *ngIf="showDeleteConfirmModal" (click)="cancelDelete()">
+    <div class="delete-modal-content" (click)="$event.stopPropagation()">
+        <div class="delete-modal-header">
+            <h3>Confirm Delete</h3>
+            <button class="close-btn" (click)="cancelDelete()">×</button>
+        </div>
+        <div class="delete-modal-body">
+            <div class="delete-icon">⚠️</div>
+            <p class="delete-message">
+                Are you sure you want to remove <strong>"{{ graphToDeleteTitle }}"</strong>?
+            </p>
+            <p class="delete-warning">This action cannot be undone.</p>
+        </div>
+        <div class="delete-modal-footer">
+            <button class="btn-cancel" (click)="cancelDelete()">Cancel</button>
+            <button class="btn-generate" (click)="confirmDelete()" style="background: #dc3545;">
+                <span class="icon">🗑️</span>
+                Yes, Remove
+            </button>
+        </div>
+    </div>
+</div>
+    </div>
+</div>
+
+<!-- ADD THIS MODAL AT THE END OF YOUR HTML, before closing body tag -->
+<!-- Add Graph Modal -->
+<div class="modal" *ngIf="isAddGraphModalOpen" (click)="closeAddGraphModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Add Custom Graph</h3>
+            <button class="close-btn" (click)="closeAddGraphModal()">×</button>
+        </div>
+       
+        <div class="modal-body">
+            <!-- Module Selection Dropdown -->
+            <div class="form-group">
+                <label>Select Module <span class="required-star">*</span></label>
+                <select 
+                    #moduleSelect
+                    (change)="onModuleSelect(moduleSelect.value)" 
+                    class="form-control"
+                    [class.has-value]="selectedModule">
+                    <option value="">-- Choose a module --</option>
+                    <option *ngFor="let module of getModuleList()" 
+                            [value]="module"
+                            [selected]="selectedModule === module">
+                        {{ getModuleIcon(module) }} {{ module }}
+                    </option>
+                </select>
+            </div>
+
+            <!-- Report Selection - Shows based on selected module -->
+            <div class="form-group" *ngIf="selectedModule">
+                <label>Select Report <span class="required-star">*</span></label>
+                <select 
+                    #reportSelect 
+                    (change)="onReportSelect(reportSelect.value)" 
+                    class="form-control"
+                    [class.has-value]="selectedReport">
+                    <option value="">-- Choose a report from {{ selectedModule }} --</option>
+                    <optgroup *ngFor="let category of getCategoriesForModule(selectedModule)" 
+                              [label]="category">
+                        <option *ngFor="let report of getReportsByModuleAndCategory(selectedModule, category)" 
+                                [value]="report.value"
+                                [selected]="selectedReport === report.value">
+                            {{ report.label }}
+                        </option>
+                    </optgroup>
+                </select>
+                <small class="selected-indicator" *ngIf="selectedReport">
+                    ✓ {{ getReportLabel(selectedReport) }} selected
+                </small>
+            </div>
+
+            <!-- Show message if no module selected -->
+            <div class="form-group" *ngIf="!selectedModule">
+                <div class="select-module-prompt">
+                    <span class="icon">👆</span> Please select a module first
+                </div>
+            </div>
+            
+            <!-- Chart Type Selection - WITH LABEL FIXED -->
+            <div class="form-group">
+                <label>Chart Type <span class="required-star">*</span></label>
+                <div class="chart-type-grid">
+                    <button *ngFor="let type of chartTypes" 
+                            type="button"
+                            class="chart-type-btn"
+                            [class.selected]="selectedChartType === type.value"
+                            (click)="selectedChartType = type.value">
+                        <span class="chart-icon">{{ type.icon }}</span>
+                        <span class="chart-label">{{ type.label }}</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Graph Title -->
+            <div class="form-group">
+                <label>Graph Title (Optional)</label>
+                <input type="text" 
+                       [(ngModel)]="graphTitle" 
+                       class="form-control"
+                       placeholder="Enter custom title">
+            </div>
+        </div>
+        
+        <div class="modal-footer">
+            <button class="btn-cancel" (click)="closeAddGraphModal()">Cancel</button>
+            <button class="btn-generate" 
+                    (click)="generateGraph()"
+                    [disabled]="!selectedModule || !selectedReport || !selectedChartType">
+                Generate Graph
+            </button>
+        </div>
+    </div>
+</div>
+
 
 <!-- second-row -->
 <!-- second-row -->

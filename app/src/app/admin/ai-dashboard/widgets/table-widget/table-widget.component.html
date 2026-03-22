@@ -1,0 +1,49 @@
+<div class="table-widget">
+
+  <!-- Export bar -->
+  <div class="table-toolbar" *ngIf="config?.exportable && config?.data?.length">
+    <span class="table-count">{{ config.data.length }} record{{ config.data.length !== 1 ? 's' : '' }}</span>
+    <button class="export-btn" (click)="exportCsv()">
+      <span class="export-icon">⬇</span> Export CSV
+    </button>
+  </div>
+
+  <!-- Table -->
+  <div class="table-scroll" [style.maxHeight]="config?.maxHeight || '280px'">
+    <table class="w-table">
+      <thead>
+        <tr>
+          <th *ngFor="let col of config?.columns"
+              [style.width]="col.width || 'auto'"
+              (click)="toggleSort(col)"
+              (keydown.enter)="toggleSort(col)"
+              class="sortable"
+              tabindex="0"
+              role="columnheader"
+              [attr.aria-sort]="sortKey === col.key ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'">
+            {{ col.label }}
+            <span class="sort-arrow" *ngIf="sortKey === col.key">
+              {{ sortDir === 'asc' ? '↑' : '↓' }}
+            </span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of sortedData">
+          <td *ngFor="let col of config?.columns">
+            <span *ngIf="col.type !== 'badge'">{{ getCellValue(row, col) }}</span>
+            <span *ngIf="col.type === 'badge'" class="w-badge" [ngClass]="getBadgeClass(row, col)">
+              {{ getCellValue(row, col) }}
+            </span>
+          </td>
+        </tr>
+        <tr *ngIf="!config?.data?.length">
+          <td [attr.colspan]="config?.columns?.length" class="empty-row">
+            {{ config?.emptyText || 'No data available' }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>

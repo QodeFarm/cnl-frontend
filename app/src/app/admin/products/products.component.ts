@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
@@ -50,7 +51,7 @@ export class ProductsComponent implements OnInit {
   } | null = null;
 
 
-  constructor(private http: HttpClient, private notification: NzNotificationService) { }
+  constructor(private http: HttpClient, private notification: NzNotificationService, private router: Router) { }
 
   // ─── Bulk Edit State ─────────────────────────────────────────
   showBulkEditModal = false;
@@ -99,6 +100,26 @@ export class ProductsComponent implements OnInit {
   /** Close bulk edit modal */
   onBulkEditClosed() {
     this.showBulkEditModal = false;
+  }
+
+  /** Close products modal and navigate to merge page */
+  onMergeProducts() {
+    // Close the Bootstrap modal
+    const modalEl = document.getElementById('productModal');
+    if (modalEl) {
+      const modal = (window as any).bootstrap?.Modal?.getInstance(modalEl);
+      if (modal) {
+        modal.hide();
+      }
+    }
+    // Remove any lingering backdrop
+    setTimeout(() => {
+      document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+      document.body.classList.remove('modal-open');
+      document.body.style.removeProperty('overflow');
+      document.body.style.removeProperty('padding-right');
+      this.router.navigate(['/admin/products/product-merge']);
+    }, 300);
   }
 
   /** Export all or selected products to Excel */
