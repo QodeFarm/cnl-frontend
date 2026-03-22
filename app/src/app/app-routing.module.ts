@@ -5,9 +5,67 @@ import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.compon
 import { appGuard } from './guards/app.guard';
 import { AuthguardGuard } from './guards/authguard.guard';
 import { ForcePasswordChangeGuard } from './guards/force-password-change.guard';
+import { CustomerPortalGuard } from './guards/customer-portal.guard';
+import { CustomerLoginComponent } from './admin/customer-portal/customer-login.component';
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login' },
+  {
+    path: 'customer_portal_login',
+    component: CustomerLoginComponent,
+  },
+  {
+    path: 'customer-portal',  // Use hyphen for consistency
+    canActivate: [CustomerPortalGuard],
+    loadComponent: () => import('./admin/customer-portal/customer-portal-layout.component').then(m => m.CustomerPortalLayoutComponent),
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { 
+        path: 'dashboard', 
+        loadComponent: () => import('./admin/customer-portal/customer-portal-dashboard.component').then(m => m.CustomerPortalDashboardComponent),
+        data: { customerView: true }
+      },
+      // In app-routing.module.ts, update the profile route:
+
+      {
+        path: 'profile',
+        canActivate: [CustomerPortalGuard],
+        loadComponent: () => import('./admin/customers/customers.component').then(m => m.CustomersComponent),
+        data: { 
+          title: 'My Profile', 
+          moduleName: 'customer-portal',
+          customerView: true,
+          readOnly: true,
+          customerId: 'current'  // Special flag to load current customer
+        }
+      },
+      { 
+        path: 'sales-orders', 
+        loadComponent: () => import('./admin/sales/sales.component').then(m => m.SalesComponent),
+        data: { customerView: true }
+      },
+      { 
+        path: 'invoices', 
+        loadComponent: () => import('./admin/sales/salesinvoice/salesinvoice.component').then(m => m.SalesinvoiceComponent),
+        data: { customerView: true }
+      },
+      { 
+        path: 'returns', 
+        loadComponent: () => import('./admin/sales/sale-returns/sale-returns.component').then(m => m.SaleReturnsComponent),
+        data: { customerView: true }
+      },
+      { 
+        path: 'credit-notes', 
+        loadComponent: () => import('./admin/sales/credit-note/credit-note.component').then(m => m.CreditNoteComponent),
+        data: { customerView: true }
+      },
+      { 
+        path: 'ledger', 
+        loadComponent: () => import('./admin/sales/payment-receipt/payment-receipt.component').then(m => m.PaymentReceiptComponent),
+        data: { customerView: true }
+      }
+    ]
+  },
   {
     path: '',
     component: BlankLayoutComponent,

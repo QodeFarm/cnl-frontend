@@ -4,6 +4,7 @@ import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { TaFormComponent, TaFormConfig } from '@ta/ta-form';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { CreditNoteListComponent } from './credit-note-list/credit-note-list.component';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-credit-note',
@@ -33,39 +34,86 @@ export class CreditNoteComponent {
     return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   }
 
-  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) { }
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef, private route: ActivatedRoute,) { }
 
-  ngOnInit() {
-    this.showSaleCreditnoteList = false;
-    this.showForm = true;
-    this.SaleCreditnoteEditID = null;
+  // ngOnInit() {
+  //   this.showSaleCreditnoteList = false;
+  //   this.showForm = true;
+  //   this.SaleCreditnoteEditID = null;
 
-    // Clear invoice options
-    // this.invoiceOptions = [];
+  //   // Clear invoice options
+  //   // this.invoiceOptions = [];
 
-    this.setFormConfig();
-    this.getOrderNo();
-    this.formConfig.fields[0].fieldGroup[5].hide = true;
+  //   this.setFormConfig();
+  //   this.getOrderNo();
+  //   this.formConfig.fields[0].fieldGroup[5].hide = true;
 
-    // // Reset form model
-    // if (this.formConfig.model && this.formConfig.model.sale_credit_note) {
-    //   this.formConfig.model.sale_credit_note = {
-    //     credit_note_number: this.orderNumber
-    //   };
-    // }
+  //   // // Reset form model
+  //   // if (this.formConfig.model && this.formConfig.model.sale_credit_note) {
+  //   //   this.formConfig.model.sale_credit_note = {
+  //   //     credit_note_number: this.orderNumber
+  //   //   };
+  //   // }
 
-    // Check if there's a message in localStorage
-    const message = localStorage.getItem('sidebarMessage');
-    if (message) {
-      this.sidebarMessage = message; // Set the message
-      localStorage.removeItem('sidebarMessage'); // Clear it after displaying
-      // Optionally, you can clear the message after a few seconds
-      setTimeout(() => {
-        this.sidebarMessage = ''; // Clear the message after 3 seconds
-      }, 3000);
-    }
+  //   // Check if there's a message in localStorage
+  //   const message = localStorage.getItem('sidebarMessage');
+  //   if (message) {
+  //     this.sidebarMessage = message; // Set the message
+  //     localStorage.removeItem('sidebarMessage'); // Clear it after displaying
+  //     // Optionally, you can clear the message after a few seconds
+  //     setTimeout(() => {
+  //       this.sidebarMessage = ''; // Clear the message after 3 seconds
+  //     }, 3000);
+  //   }
 
-  }
+  // }
+
+isCustomerPortal: boolean = false;
+
+ngOnInit() {
+    // Check if this is customer portal
+    this.route.data.subscribe(data => {
+        this.isCustomerPortal = data['customerView'] || false;
+        
+        if (this.isCustomerPortal) {
+            // Customer Portal Mode - Only show list, no create/edit
+            this.showSaleCreditnoteList = true;
+            this.showForm = false;
+            this.SaleCreditnoteEditID = null;
+            return;
+        }
+        
+        // Admin Mode - Full functionality
+        this.showSaleCreditnoteList = false;
+        this.showForm = true;
+        this.SaleCreditnoteEditID = null;
+
+        // Clear invoice options
+        // this.invoiceOptions = [];
+
+        this.setFormConfig();
+        this.getOrderNo();
+        this.formConfig.fields[0].fieldGroup[5].hide = true;
+
+        // // Reset form model
+        // if (this.formConfig.model && this.formConfig.model.sale_credit_note) {
+        //   this.formConfig.model.sale_credit_note = {
+        //     credit_note_number: this.orderNumber
+        //   };
+        // }
+
+        // Check if there's a message in localStorage
+        const message = localStorage.getItem('sidebarMessage');
+        if (message) {
+          this.sidebarMessage = message; // Set the message
+          localStorage.removeItem('sidebarMessage'); // Clear it after displaying
+          // Optionally, you can clear the message after a few seconds
+          setTimeout(() => {
+            this.sidebarMessage = ''; // Clear the message after 3 seconds
+          }, 3000);
+        }
+    });
+}
 
   formConfig: TaFormConfig = {};
 
@@ -240,7 +288,7 @@ export class CreditNoteComponent {
           fieldGroup: [
             {
               key: 'customer',
-              type: 'select',
+              type: 'customer-dropdown',
               className: 'col-md-4 col-sm-6 col-12',
               templateOptions: {
                 label: 'Select Customer',

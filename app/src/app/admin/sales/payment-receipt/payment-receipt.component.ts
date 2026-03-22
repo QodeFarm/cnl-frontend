@@ -5,6 +5,7 @@ import { TaFormComponent } from '@ta/ta-form';
 import { TaTableComponent, TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { PaymentReceiptListComponent } from './payment-receipt-list/payment-receipt-list.component';
+import { ActivatedRoute } from '@angular/router';
  
 
 @Component({
@@ -108,11 +109,41 @@ export class PaymentReceiptComponent implements OnInit {
     
   };
 
-  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef, private route: ActivatedRoute) {}
 
+  // ngOnInit() {
+  //   this.getVoucherNo();
+  //   this.setFormConfig();
+  // }
+  isCustomerPortal: boolean = false;
+  showForm: boolean = true;
   ngOnInit() {
-    this.getVoucherNo();
-    this.setFormConfig();
+    // Check if this is customer portal
+    this.route.data.subscribe(data => {
+      this.isCustomerPortal = data['customerView'] || false;
+      
+      if (this.isCustomerPortal) {
+        // Customer Portal Mode - Only show list, no create/edit
+        this.showForm = false;
+        this.showPaymentReceiptList = true;
+        
+        // Trigger list refresh for customer portal
+        setTimeout(() => {
+          if (this.paymentReceiptListComponent) {
+            this.paymentReceiptListComponent.refreshTable();
+          }
+        }, 100);
+        
+        // Don't initialize admin-specific things
+        return;
+      }
+      
+      // Admin Mode - Full functionality
+      this.showForm = true;
+      this.showPaymentReceiptList = false;
+      this.getVoucherNo();
+      this.setFormConfig();
+    });
   }
 
   // Get the next voucher number from the API

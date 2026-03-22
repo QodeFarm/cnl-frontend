@@ -24,13 +24,15 @@ import { SaleReturnsComponent } from './admin/sales/sale-returns/sale-returns.co
 import { PurchaseComponent } from './admin/purchase/purchase.component';
 import { PurchaseInvoiceComponent } from './admin/purchase/purchase-invoice/purchase-invoice.component';
 import { PurchasereturnordersComponent } from './admin/purchase/purchasereturnorders/purchasereturnorders.component';
+import { CustomerPortalModule } from './admin/customer-portal/customer-portal.module';
+import { CustomerPortalInterceptor } from 'projects/ta-core/src/lib/net/customer-portal.interceptor';
 registerLocaleData(en);
 export function initialConfigLoad(siteS: SiteConfigService) {
   return () => siteS.loadConfig();
 }
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
   ],
   imports: [
     NzModalModule,
@@ -42,6 +44,7 @@ export function initialConfigLoad(siteS: SiteConfigService) {
     IconsProviderModule,
     FormlyModule.forRoot(),
     ReactiveFormsModule,
+    CustomerPortalModule,
     RouterModule.forRoot([
       // Define your routes here
       { path: 'admin/sales', component: SalesComponent },
@@ -60,6 +63,11 @@ export function initialConfigLoad(siteS: SiteConfigService) {
       multi: true
     },
     { provide: HTTP_INTERCEPTORS, useClass: DefaultInterceptor, multi: true },
+    { 
+      provide: HTTP_INTERCEPTORS, 
+      useClass: CustomerPortalInterceptor,  // New interceptor
+      multi: true 
+    },
     { provide: ErrorHandler, useClass: GlobalErrorHandlerService },
     { provide: NZ_I18N, useValue: en_US },
     Location, { provide: LocationStrategy, useClass: HashLocationStrategy }

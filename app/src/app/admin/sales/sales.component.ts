@@ -408,7 +408,26 @@ export class SalesComponent {
   hasDataPopulated: boolean = false;
   customFieldMetadata: any = {};
   entitiesList: any[] = [];
+
+  isCustomerPortal: boolean = false;
+  loggedInCustomerId: string | null = null;
+  loggedInCustomerData: any = null;
+
   ngOnInit() {
+     // Check if this is customer portal
+    this.route.data.subscribe(data => {
+      this.isCustomerPortal = data['customerView'] || false;
+      
+      if (this.isCustomerPortal) {
+        // Get logged-in customer data from localStorage
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        this.loggedInCustomerId = user.id;
+        this.loggedInCustomerData = user;
+        
+        console.log('Customer Portal Mode - Customer ID:', this.loggedInCustomerId);
+      }
+    });
+
     this.showSaleOrderList = false;
     this.showForm = false;
     this.SaleOrderEditID = null;
@@ -2915,14 +2934,269 @@ toggleQuickpackProducts(pack: any) {
   //   });
   // }
 
-createSaleOrder() {
+// createSaleOrder() {
 
+//   const customFieldsPayload = this.validatedCustomFieldsPayload;
+
+//   const payload: any = {
+//     ...this.formConfig.model,
+//     custom_field_values: customFieldsPayload.custom_field_values
+//   };
+
+//   /* -------------------------------------------------
+//     CREDIT LIMIT OVERRIDE
+//   -------------------------------------------------- */
+//   if (this.creditLimitApproved) {
+//     payload.credit_limit_approved = true;
+//     this.creditLimitApproved = false;
+//   }
+
+//   /* -------------------------------------------------
+//     CALCULATION LOGIC (NO QUANTITY SPLIT)
+//   -------------------------------------------------- */
+//   const parentItems: any[] = [];
+//   const childItems: any[] = [];
+
+//   payload.sale_order_items?.forEach(item => {
+
+//     const qty = Number(item.quantity) || 0;
+//     const available = Number(item.available_qty) || 0;
+//     const rate = Number(item.rate) || 0;
+//     const gst = Number(item.product?.gst_input) || 0;
+
+//     const productionQty = Math.max(qty - available, 0);
+
+//     /* -------------------------------
+//        PARENT ITEM (FULL QUANTITY)
+//     --------------------------------*/
+//     const itemValue = qty * rate;
+//     const tax = (itemValue * gst) / 100;
+//     const amount = itemValue + tax;
+
+//     parentItems.push({
+//       ...item,
+//       quantity: qty,                // FULL quantity
+//       production_qty: productionQty, // production needed
+//       cgst: gst / 2,
+//       sgst: gst / 2,
+//       igst: 0,
+//       amount: amount
+//     });
+
+//     /* -------------------------------
+//        CHILD ORDER (ONLY PRODUCTION)
+//     --------------------------------*/
+//     if (available > 0 && productionQty > 0) {
+
+//       const childItemValue = productionQty * rate;
+//       const childTax = (childItemValue * gst) / 100;
+//       const childAmount = childItemValue + childTax;
+
+//       childItems.push({
+//         ...item,
+//         quantity: productionQty,
+//         production_qty: productionQty,
+//         cgst: gst / 2,
+//         sgst: gst / 2,
+//         igst: 0,
+//         amount: childAmount
+//       });
+//     }
+
+//   });
+
+//   payload.sale_order_items = parentItems;
+
+//   const shouldCreateChildOrders = childItems.length > 0;
+
+//   /* -------------------------------------------------
+//     CREATE PARENT SALE ORDER
+//   -------------------------------------------------- */
+//   this.http.post<any>('sales/sale_order/', payload).subscribe({
+
+//     next: parentRes => {
+
+//       if (parentRes?.data?.credit_limit_exceeded) {
+//         this.pendingCreditLimitPayload = payload;
+//         this.pendingCreditLimitAction = 'create';
+//         this.showCreditLimitModal(parentRes.data);
+//         return;
+//       }
+
+//       const parentOrder = parentRes.data.sale_order;
+//       const parentOrderId = parentOrder.sale_order_id;
+
+//       /* -------------------------------------------------
+//         QUICK PACK CREATION
+//       -------------------------------------------------- */
+//       if (this.createQuickPack) {
+
+//         const customerName = payload.sale_order?.customer?.name || 'Customer';
+//         const productNames = payload.sale_order_items?.map(i => i.product?.name) || [];
+
+//         let quickPackName = `${customerName} QuickPack (${productNames.join(', ')})`;
+
+//         if (quickPackName.length > 50) {
+//           quickPackName =
+//             `${customerName} QuickPack (${productNames[0]} +${productNames.length - 1} more)`;
+//         }
+
+//         const quickPackPayload = {
+//           quick_pack_data: {
+//             name: quickPackName,
+//             customer_id: payload.sale_order.customer?.customer_id,
+//             description: `QuickPack created from Sale Order ${parentOrder.order_no}`,
+//             active: 'Y',
+//             lot_qty: payload.sale_order_items.reduce((s, i) => s + (i.quantity || 0), 0)
+//           },
+//           quick_pack_data_items: payload.sale_order_items.map(i => ({
+//             product_id: i.product?.product_id,
+//             quantity: i.quantity,
+//             unit_options_id: i.unit_options?.unit_options_id,
+//             size_id: i.size?.size_id,
+//             color_id: i.color?.color_id
+//           }))
+//         };
+
+//         this.http.post('sales/quick_pack/', quickPackPayload).subscribe();
+//       }
+
+//       /* -------------------------------------------------
+//         SEND WHATSAPP
+//       -------------------------------------------------- */
+//       this.sendSaleOrderWhatsapp(parentOrderId);
+
+//       /* -------------------------------------------------
+//         CREATE CHILD SALE ORDERS
+//       -------------------------------------------------- */
+//       if (shouldCreateChildOrders) {
+
+//         let counter = 1;
+
+//         const childRequests = childItems.map(item => {
+
+//           const childOrderNo = `${parentOrder.order_no}-P${counter++}`;
+
+//           const childPayload = {
+//             sale_order: {
+//               ...parentOrder,
+//               sale_order_id: undefined,
+//               order_no: childOrderNo,
+//               flow_status: { flow_status_name: 'Production' },
+//               item_value: item.amount,
+//               total_amount: item.amount,
+//               tax_amount: (item.amount * (Number(item.product?.gst_input) || 0)) / 100,
+//               dis_amt: 0,
+//               cess_amount: 0,
+//               order_type: parentOrder.order_type || 'sale_order'
+//             },
+//             sale_order_items: [{
+//               ...item,
+//               available_qty: 0,
+//               mrp: item.rate
+//             }],
+//             order_attachments: payload.order_attachments,
+//             order_shipments: payload.order_shipments,
+//             custom_field_values: customFieldsPayload.custom_field_values
+//           };
+
+//           return this.http.post<any>('sales/sale_order/', childPayload).pipe(
+//             switchMap(childRes => {
+
+//               const childOrderId = childRes.data.sale_order.sale_order_id;
+
+//               const workOrderPayload = {
+//                 work_order: {
+//                   product_id: item.product_id,
+//                   quantity: item.production_qty,
+//                   completed_qty: 0,
+//                   ordered_qty: item.production_qty,
+//                   available_qty: 0,
+//                   pending_qty: item.production_qty,
+//                   start_date: parentOrder.order_date,
+//                   sync_qty: true,
+//                   size_id: item.size?.size_id || null,
+//                   color_id: item.color?.color_id || null,
+//                   status_id: '',
+//                   sale_order_id: childOrderId
+//                 },
+//                 bom: [{
+//                   product_id: item.product_id,
+//                   size_id: item.size?.size_id || null,
+//                   color_id: item.color?.color_id || null
+//                 }],
+//                 work_order_machines: [],
+//                 workers: [],
+//                 work_order_stages: []
+//               };
+
+//               return this.http.post('production/work_order/', workOrderPayload);
+//             })
+//           );
+
+//         });
+
+//         forkJoin(childRequests).subscribe();
+//       }
+
+//       /* -------------------------------------------------
+//         SUCCESS
+//       -------------------------------------------------- */
+//       this.clearDraft();
+//       this.showSuccessToast = true;
+//       this.toastMessage = 'Sale Order created successfully';
+
+//       setTimeout(() => {
+//         this.showSuccessToast = false;
+//       }, 3000);
+
+//       this.ngOnInit();
+//     },
+
+//     error: err => {
+
+//       if (err.status === 403 && err.error?.data?.credit_limit_exceeded) {
+//         this.pendingCreditLimitPayload = null;
+//         this.showCreditLimitModal(err.error.data);
+//         return;
+//       }
+
+//       if (err.status === 400) {
+//         this.showDialog();
+//       }
+//     }
+//   });
+// }
+
+createSaleOrder() {
+  // Get logged-in customer ID for customer portal
+  const isCustomerPortal = this.route.snapshot.data['customerView'] || false;
+  const loggedInCustomer = JSON.parse(localStorage.getItem('user') || '{}');
+  
   const customFieldsPayload = this.validatedCustomFieldsPayload;
 
   const payload: any = {
     ...this.formConfig.model,
     custom_field_values: customFieldsPayload.custom_field_values
   };
+
+  // ========== FIX: AUTO-SET CUSTOMER FOR CUSTOMER PORTAL ==========
+  if (isCustomerPortal && loggedInCustomer.id) {
+    // Set customer_id directly in sale_order
+    if (!payload.sale_order) {
+      payload.sale_order = {};
+    }
+    payload.sale_order.customer_id = loggedInCustomer.id;
+    
+    // Also ensure customer is set in the model
+    if (!payload.sale_order.customer) {
+      payload.sale_order.customer = {
+        customer_id: loggedInCustomer.id,
+        name: loggedInCustomer.name
+      };
+    }
+  }
+  // ================================================================
 
   /* -------------------------------------------------
     CREDIT LIMIT OVERRIDE
@@ -5391,53 +5665,81 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
                 //   }
                 // },                                                                        
                 {
-                  key: 'customer',
-                  type: 'customer-dropdown',
-                  className: 'col-md-4 col-sm-6 col-12',
-                  props: {
-                    label: 'Customer',
-                    dataKey: 'customer_id',
-                    dataLabel: "name",
-                    options: [],
-                    lazy: {
-                      url: 'customers/customers/?summary=true',
-                      lazyOneTime: true
-                    },
-                    required: true
-                  },
-                  hooks: {
-                    onInit: (field: any) => {
-                      field.formControl.valueChanges.subscribe(data => {
-                        //console.log("customer", data);
-                        if (data && data.customer_id) {
-                          this.formConfig.model['sale_order']['customer_id'] = data.customer_id;
-                          // Fetch full customer details for info banner
-                          this.fetchCustomerInfoForBanner(data.customer_id);
-                        } else {
-                          // Clear banner when customer is deselected
-                          this.showCustomerInfoBanner = false;
-                          this.customerNotes = '';
-                          this.customerTransporterName = '';
-                          this.customerTransportNotes = '';
-                          this.customerOutstandingAmount = 0; 
-                        }
-                        if (data.customer_addresses && data.customer_addresses.billing_address) {
-                          field.form.controls.billing_address.setValue(data.customer_addresses.billing_address)
-                        }
-                        if (data.customer_addresses && data.customer_addresses.shipping_address) {
-                          field.form.controls.shipping_address.setValue(data.customer_addresses.shipping_address)
-                        }
-                        if (data.email) {
-                          field.form.controls.email.setValue(data.email)
-                        }
-                        this.triggerDraftSave(); // Auto-save draft on customer change
-                      });
-                      if (this.dataToPopulate && this.dataToPopulate.sale_order.customer && field.formControl) {
-                        field.formControl.setValue(this.dataToPopulate.sale_order.customer);
-                      }
-                    }
-                  }
-                },
+  key: 'customer',
+  type: 'customer-dropdown',
+  className: 'col-md-4 col-sm-6 col-12',
+  props: {
+    label: 'Customer',
+    dataKey: 'customer_id',
+    dataLabel: "name",
+    options: [],
+    lazy: {
+      url: this.isCustomerPortal 
+        ? `customers/customers/${this.loggedInCustomerId}/`  // Single customer for portal
+        : 'customers/customers/?summary=true',  // All customers for admin
+      lazyOneTime: true
+    },
+    required: true,
+    disabled: this.isCustomerPortal  // Disable for customers
+  },
+  hooks: {
+    onInit: (field: any) => {
+      // For customer portal, auto-set the customer
+      if (this.isCustomerPortal && this.loggedInCustomerData) {
+        setTimeout(() => {
+          field.formControl.setValue(this.loggedInCustomerData);
+          field.formControl.disable(); // Ensure it's disabled
+          
+          // Trigger customer change logic
+          if (this.loggedInCustomerData && this.loggedInCustomerData.customer_id) {
+            this.formConfig.model['sale_order']['customer_id'] = this.loggedInCustomerData.customer_id;
+            this.fetchCustomerInfoForBanner(this.loggedInCustomerData.customer_id);
+          }
+          
+          // Set address fields
+          if (this.loggedInCustomerData.customer_addresses?.billing_address) {
+            field.form.controls.billing_address?.setValue(this.loggedInCustomerData.customer_addresses.billing_address);
+          }
+          if (this.loggedInCustomerData.customer_addresses?.shipping_address) {
+            field.form.controls.shipping_address?.setValue(this.loggedInCustomerData.customer_addresses.shipping_address);
+          }
+          if (this.loggedInCustomerData.email) {
+            field.form.controls.email?.setValue(this.loggedInCustomerData.email);
+          }
+          
+          this.triggerDraftSave();
+        }, 500);
+      }
+
+      field.formControl.valueChanges.subscribe(data => {
+        if (data && data.customer_id) {
+          this.formConfig.model['sale_order']['customer_id'] = data.customer_id;
+          this.fetchCustomerInfoForBanner(data.customer_id);
+        } else {
+          this.showCustomerInfoBanner = false;
+          this.customerNotes = '';
+          this.customerTransporterName = '';
+          this.customerTransportNotes = '';
+          this.customerOutstandingAmount = 0;
+        }
+        if (data?.customer_addresses?.billing_address) {
+          field.form.controls.billing_address?.setValue(data.customer_addresses.billing_address);
+        }
+        if (data?.customer_addresses?.shipping_address) {
+          field.form.controls.shipping_address?.setValue(data.customer_addresses.shipping_address);
+        }
+        if (data?.email) {
+          field.form.controls.email?.setValue(data.email);
+        }
+        this.triggerDraftSave();
+      });
+      
+      if (this.dataToPopulate?.sale_order?.customer && field.formControl) {
+        field.formControl.setValue(this.dataToPopulate.sale_order.customer);
+      }
+    }
+  }
+},
                 {
                   key: 'order_no',
                   type: 'input',

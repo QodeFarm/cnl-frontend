@@ -314,6 +314,9 @@ export class DefaultInterceptor implements HttpInterceptor {
   private handleData(ev: HttpErrorResponse, req: HttpRequest<any>, next: HttpHandler): Observable<any> {
     this.loadingS.hide();
     
+    // Check if this is a customer portal request
+    const isCustomerPortal = req.url.includes('customers/portal/');
+    
     // Check if this request URL is in our skip list
     const skipErrorHandling = req.url && this.skipErrorUrls.has(req.url);
     
@@ -322,8 +325,8 @@ export class DefaultInterceptor implements HttpInterceptor {
                            ev.error?.detail?.includes('token') ||
                            (ev.error?.messages && ev.error.messages.some((m: any) => m.message?.includes('expired')));
     
-    // If token is expired, redirect to login
-    if (isTokenExpired) {
+    // If token is expired, redirect to login (but not for customer portal)
+    if (isTokenExpired && !isCustomerPortal) {
       this.toLogin(ev);
       return throwError(() => ev);
     }
@@ -332,42 +335,29 @@ export class DefaultInterceptor implements HttpInterceptor {
     if (!skipErrorHandling) {
       this.checkStatus(ev);
     }
+    
     //Business processing: some common operations
     switch (ev.status) {
       case 200:
       case 400:
-        // 业务层级错误处理，以下是假定restful有一套统一输出格式（指不管成功与否都有相应的数据格式）情况下进行处理
-        // 例如响应内容：
-        //  错误内容：{ status: 1, msg: '非法参数' }
-        //  正确内容：{ status: 0, response: {  } }
-        // 则以下代码片断可直接适用
-        // if (ev instanceof HttpResponse) {
-        //   const body = ev.body;
-        //   if (body && body.status !== 0) {
-        //     this.injector.get(NzMessageService).error(body.msg);
-        //     // 注意：这里如果继续抛出错误会被行254的 catchError 二次拦截，导致外部实现的 Pipe、subscribe 操作被中断，例如：this.http.get('/').subscribe() 不会触发
-        //     // 如果你希望外部实现，需要手动移除行254
-        //     return throwError({});
-        //   } else {
-        //     // 重新修改 `body` 内容为 `response` 内容，对于绝大多数场景已经无须再关心业务状态码
-        //     return of(new HttpResponse(Object.assign(ev, { body: body.response })));
-        //     // 或者依然保持完整的格式
-        //     return of(ev);
-        //   }
-        // }
         break;
       case 401:
-        if (this.refreshTokenEnabled && this.refreshTokenType === 're-request') {
+        // For customer portal, don't redirect - just log and return error
+        if (isCustomerPortal) {
+          console.log('Customer portal 401 error - staying in portal', ev);
+          // Optionally show a notification here
+          // this.notification.error('Session Expired', 'Please login again');
+        } else if (this.refreshTokenEnabled && this.refreshTokenType === 're-request') {
           // return this.tryRefreshToken(ev, req, next);
+        } else {
+          this.toLogin(ev);
         }
-        this.toLogin(ev);
         break;
       case 403:
         // Check if 403 is due to expired token
-        if (isTokenExpired) {
+        if (isTokenExpired && !isCustomerPortal) {
           this.toLogin(ev);
         }
-        // this.goTo(`/exception/${ev.status}`);
         break;
       case 404:
       case 500:
@@ -387,7 +377,84 @@ export class DefaultInterceptor implements HttpInterceptor {
     } else {
       return of(ev);
     }
-  }
+}
+  // private handleData(ev: HttpErrorResponse, req: HttpRequest<any>, next: HttpHandler): Observable<any> {
+  //   this.loadingS.hide();
+    
+  //   // Check if this request URL is in our skip list
+  //   const skipErrorHandling = req.url && this.skipErrorUrls.has(req.url);
+    
+  //   // Check if token is expired (can come as 401 or 403 with token_not_valid code)
+  //   const isTokenExpired = ev.error?.code === 'token_not_valid' || 
+  //                          ev.error?.detail?.includes('token') ||
+  //                          (ev.error?.messages && ev.error.messages.some((m: any) => m.message?.includes('expired')));
+    
+  //   // If token is expired, redirect to login
+  //   if (isTokenExpired) {
+  //     this.toLogin(ev);
+  //     return throwError(() => ev);
+  //   }
+    
+  //   // Only call checkStatus if we're not skipping error handling
+  //   if (!skipErrorHandling) {
+  //     this.checkStatus(ev);
+  //   }
+  //   //Business processing: some common operations
+  //   switch (ev.status) {
+  //     case 200:
+  //     case 400:
+  //       // 业务层级错误处理，以下是假定restful有一套统一输出格式（指不管成功与否都有相应的数据格式）情况下进行处理
+  //       // 例如响应内容：
+  //       //  错误内容：{ status: 1, msg: '非法参数' }
+  //       //  正确内容：{ status: 0, response: {  } }
+  //       // 则以下代码片断可直接适用
+  //       // if (ev instanceof HttpResponse) {
+  //       //   const body = ev.body;
+  //       //   if (body && body.status !== 0) {
+  //       //     this.injector.get(NzMessageService).error(body.msg);
+  //       //     // 注意：这里如果继续抛出错误会被行254的 catchError 二次拦截，导致外部实现的 Pipe、subscribe 操作被中断，例如：this.http.get('/').subscribe() 不会触发
+  //       //     // 如果你希望外部实现，需要手动移除行254
+  //       //     return throwError({});
+  //       //   } else {
+  //       //     // 重新修改 `body` 内容为 `response` 内容，对于绝大多数场景已经无须再关心业务状态码
+  //       //     return of(new HttpResponse(Object.assign(ev, { body: body.response })));
+  //       //     // 或者依然保持完整的格式
+  //       //     return of(ev);
+  //       //   }
+  //       // }
+  //       break;
+  //     case 401:
+  //       if (this.refreshTokenEnabled && this.refreshTokenType === 're-request') {
+  //         // return this.tryRefreshToken(ev, req, next);
+  //       }
+  //       this.toLogin(ev);
+  //       break;
+  //     case 403:
+  //       // Check if 403 is due to expired token
+  //       if (isTokenExpired) {
+  //         this.toLogin(ev);
+  //       }
+  //       // this.goTo(`/exception/${ev.status}`);
+  //       break;
+  //     case 404:
+  //     case 500:
+  //       // this.goTo(`/exception/${ev.status}`);
+  //       break;
+  //     default:
+  //       if (ev instanceof HttpErrorResponse) {
+  //         console.warn(
+  //           'Unknown errors, mostly caused by the backend does not support cross-domain CORS or invalid configuration, please refer to https://ng-alain.com/docs/server to solve cross-domain issues',
+  //           ev,
+  //         );
+  //       }
+  //       break;
+  //   }
+  //   if (ev instanceof HttpErrorResponse) {
+  //     return throwError(() => ev);
+  //   } else {
+  //     return of(ev);
+  //   }
+  // }
 
   private getAdditionalHeaders(headers?: HttpHeaders): { [name: string]: string } {
     const res: { [name: string]: string } = {};
