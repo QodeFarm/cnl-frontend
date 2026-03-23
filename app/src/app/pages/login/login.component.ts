@@ -123,17 +123,17 @@ constructor(private router: Router, private userService: UserService, private ht
     // this.sendDebugRequest();
   }
 
-  // sendDebugRequest(): void {
-  //   this.http.get('https://apicore.cnlerp.com/api/v1/users/clienthost/', {
-  //     headers: {
-  //       'X-Frontend-URL': window.location.href
-  //     }
-  //   }).subscribe(response => {
-  //     console.log('Debug API Response:', response);
-  //   }, error => {
-  //     console.error('Debug API Error:', error);
-  //   });
-  // }
+  sendDebugRequest(): void {
+    this.http.get('https://apicore.cnlerp.com/api/v1/users/clienthost/', {
+      headers: {
+        'X-Frontend-URL': window.location.href
+      }
+    }).subscribe(response => {
+      console.log('Debug API Response:', response);
+    }, error => {
+      console.error('Debug API Error:', error);
+    });
+  }
 
   formSubmiiterd(res: any) {
     // Log the complete response to check its structure
