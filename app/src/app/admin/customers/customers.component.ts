@@ -952,6 +952,7 @@ generatePassword(field: any) {
 }
 
 // Generate credentials for existing customer (when editing)
+// Generate credentials for existing customer (when editing)
 generateCustomerCredentials() {
   if (!this.CustomerEditID) {
     this.notification.error('Please save the customer first', '');
@@ -965,6 +966,25 @@ generateCustomerCredentials() {
         this.formConfig.model.customer_data.username = res.username;
         this.formConfig.model.customer_data.password_display = res.password;
         this.formConfig.model.customer_data.is_portal_user = true;
+        
+        // Show credentials in a modal for copying
+        this.modal.success({
+          nzTitle: 'Credentials Generated',
+          nzContent: `
+            <div style="padding: 16px 0;">
+              <p><strong>Username:</strong> ${res.username}</p>
+              <p><strong>Password:</strong> ${res.password}</p>
+              <p><small class="text-muted">These credentials will be sent via WhatsApp.</small></p>
+            </div>
+          `,
+          nzOkText: 'Copy & Close',
+          nzOnOk: () => {
+            const credentials = `Username: ${res.username}\nPassword: ${res.password}`;
+            navigator.clipboard.writeText(credentials).then(() => {
+              this.notification.success('Credentials copied to clipboard', '');
+            });
+          }
+        });
         
         this.notification.success('Credentials generated successfully', '');
       }
@@ -982,32 +1002,75 @@ showSendCredentialsPopup() {
     return;
   }
   
-  // Use NzModalService or your preferred modal
+  // Check if customer has phone number
+  const hasPhone = this.formConfig.model.customer_addresses?.some(
+    (addr: any) => addr.phone && addr.phone.trim() !== ''
+  );
+
+  let content = 'Do you want to send the login credentials to the customer via WhatsApp?';
+  if (!hasPhone) {
+    content = 'Warning: No phone number found in customer addresses. Please add a phone number first.';
+    this.modal.warning({
+      nzTitle: 'Cannot Send',
+      nzContent: content,
+      nzOkText: 'OK'
+    });
+    return;
+  }
+
   const modal = this.modal.confirm({
-    nzTitle: 'Send Credentials to Customer',
-    nzContent: 'Do you want to send the login credentials to the customer via email?',
+    nzTitle: 'Send Credentials via WhatsApp',
+    nzContent: content,
     nzOkText: 'Yes, Send',
+    nzOkType: 'primary',
     nzCancelText: 'No',
     nzOnOk: () => this.sendCredentialsToCustomer()
   });
 }
 
 // Send credentials to customer
+// sendCredentialsToCustomer() {
+//   this.http.post(`customers/send-credentials/${this.CustomerEditID}/`, {}).subscribe(
+//     (res: any) => {
+//       if (res.success) {
+//         this.notification.success('Credentials sent successfully to customer', '');
+//       } else {
+//         this.notification.warning(res.message || 'Failed to send credentials', '');
+//       }
+//     },
+//     (error) => {
+//       this.notification.error('Error sending credentials', '');
+//     }
+//   );
+// }
+
+// Send credentials to customer
+// Send credentials to customer
 sendCredentialsToCustomer() {
   this.http.post(`customers/send-credentials/${this.CustomerEditID}/`, {}).subscribe(
     (res: any) => {
       if (res.success) {
-        this.notification.success('Credentials sent successfully to customer', '');
+        // Handle different modes
+        if (res.mode === 'click_to_chat' && res.whatsapp_url) {
+          // Local development - open WhatsApp in new tab
+          window.open(res.whatsapp_url, '_blank');
+          this.notification.success('WhatsApp opened! Send the message to customer', '');
+        } else if (res.mode === 'wati') {
+          // Production - message sent directly
+          this.notification.success('Credentials sent via WhatsApp successfully', '');
+        } else {
+          this.notification.success(res.message || 'Credentials sent successfully', '');
+        }
       } else {
         this.notification.warning(res.message || 'Failed to send credentials', '');
       }
     },
     (error) => {
-      this.notification.error('Error sending credentials', '');
+      console.error('Send credentials error:', error);
+      this.notification.error('Error sending credentials', error.error?.message || '');
     }
   );
 }
-
 
   setFormConfig() {
     this.CustomerEditID = null;

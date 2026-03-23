@@ -10,12 +10,20 @@
         
         <div class="d-flex gap-2 align-items-center">
           <!-- Portal Actions -->
-          <div class="btn-group me-2" *ngIf="CustomerEditID && formConfig?.model?.customer_data?.is_portal_user">
+          <!-- <div class="btn-group me-2" *ngIf="CustomerEditID && formConfig?.model?.customer_data?.is_portal_user">
             <button type="button" class="btn btn-info" (click)="generateCustomerCredentials()" nz-tooltip="Generate new username/password">
               <i class="fas fa-key me-1"></i>Generate
             </button>
             <button type="button" class="btn btn-success" (click)="showSendCredentialsPopup()" nz-tooltip="Send credentials to customer via email">
               <i class="fas fa-envelope me-1"></i>Send
+            </button>
+          </div> -->
+          <div class="btn-group me-2" *ngIf="CustomerEditID && formConfig?.model?.customer_data?.is_portal_user">
+            <button type="button" class="btn btn-info" (click)="generateCustomerCredentials()" nz-tooltip="Generate new username/password">
+              <i class="fas fa-key me-1"></i>Generate
+            </button>
+            <button type="button" class="btn btn-success" (click)="showSendCredentialsPopup()" nz-tooltip="Send credentials to customer via WhatsApp">
+              <i class="fab fa-whatsapp me-1"></i>Send via WhatsApp
             </button>
           </div>
 
