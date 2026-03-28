@@ -10222,4 +10222,95 @@ export const gstConfig: TaCurdConfig = {
       }
     ]
   }
-};
+}
+
+export const OrdersSalesmanConfig: TaCurdConfig = {
+  drawerSize: 500,
+  drawerPlacement: 'top',
+  tableConfig: {
+    apiUrl: 'masters/orders_salesman/',
+    hideFilters: true,
+    pkId: 'order_salesman_id',
+    pageSize: 10,
+    globalSearch: {
+      keys: ['order_salesman_id', 'name', 'code']
+    },
+    defaultSort: { key: 'is_deleted', value: 'ascend' },
+    cols: [
+      { fieldKey: 'name', name: 'Name', sort: true },
+      { fieldKey: 'code', name: 'Code' },
+      { fieldKey: 'phone', name: 'Phone' },
+      {
+        fieldKey: 'order_salesman_id',
+        name: 'Action',
+        type: 'action',
+        actions: [
+          { type: 'delete', label: 'Delete', confirm: true, confirmMsg: 'Sure to delete?', apiUrl: 'masters/orders_salesman' },
+          { type: 'restore', label: 'Restore', confirm: true, confirmMsg: 'Sure to restore?', apiUrl: 'masters/orders_salesman' },
+          { type: 'edit', label: 'Edit' }
+        ]
+      }
+    ]
+  },
+  formConfig: {
+    url: 'masters/orders_salesman/',
+    title: 'Salesman',
+    pkId: 'order_salesman_id',
+    exParams: [],
+    fields: [
+      {
+        fieldGroupClassName: 'row',
+        fieldGroup: [
+          {
+            key: 'name',
+            type: 'input',
+            className: 'col-md-6 col-12 pb-3 px-1',
+            templateOptions: {
+              label: 'Name',
+              placeholder: 'Enter Salesman Name',
+              required: true
+            }
+          },
+          {
+            key: 'code',
+            type: 'input',
+            className: 'col-md-6 col-12 pb-3 px-1',
+            templateOptions: {
+              label: 'Code',
+              placeholder: 'Enter Code'
+            }
+          },
+          {
+            key: 'phone',
+            type: 'input',
+            className: 'col-md-6 col-12 pb-3 px-1',
+            templateOptions: {
+              label: 'Phone',
+              placeholder: 'Enter Phone Number'
+            }
+          },
+          {
+            key: 'email',
+            type: 'input',
+            className: 'col-md-6 col-12 pb-3 px-1',
+            templateOptions: {
+              label: 'Email',
+              placeholder: 'Enter Email',
+              type: 'email'
+            }
+          },
+          {
+            key: 'commission_rate',
+            type: 'input',
+            className: 'col-md-6 col-12 pb-3 px-1',
+            templateOptions: {
+              label: 'Commission Rate (%)',
+              placeholder: 'Enter Commission Rate',
+              type: 'number'
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

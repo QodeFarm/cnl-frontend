@@ -99,6 +99,7 @@ const routes: Routes = [
       { path: 'sale-receipt', data: { title: 'Order Acknowledgement', moduleName: 'sale-receipt' }, canActivate: [], loadComponent: () => import('./admin/sales/sale-receipt/sale-receipt.component').then(m => m.SaleReceiptComponent) },
       { path: 'sales/debit-note', data: { title: 'Sale Debit Note', moduleName: 'debit-note' }, canActivate: [], loadComponent: () => import('./admin/sales/debit-note/debit-note.component').then(m => m.DebitNoteComponent) },
       { path: 'sales/credit-note', data: { title: 'Sale Credit Note', moduleName: 'credit-note' }, canActivate: [], loadComponent: () => import('./admin/sales/credit-note/credit-note.component').then(m => m.CreditNoteComponent) },
+      { path: 'sales/delivery-challan', data: { title: 'Delivery Challan', moduleName: 'delivery-challan' }, loadComponent: () => import('./admin/sales/delivery-challan/delivery-challan.component').then(m => m.DeliveryChallanComponent) },
       { path: 'customers', data: { title: 'Customers', moduleName: 'customers' }, canActivate: [], loadComponent: () => import('./admin/customers/customers.component').then(m => m.CustomersComponent) },
       { path: 'sales/payment-receipt', data: { title: 'Payment Receipt', moduleName: "payment-receipt" }, loadComponent: () => import('./admin/sales/payment-receipt/payment-receipt.component').then(m => m.PaymentReceiptComponent) },
 
