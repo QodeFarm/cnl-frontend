@@ -1,7 +1,15 @@
 <!-- Begin Page Content -->
+
 <div class="container-fluid pt-3">
     <!-- Smart Insights — top-right -->
     <div class="si-chip-row">
+        <!-- <div class="dashboard-header mb-3"> -->
+            <div class="d-flex justify-content-end">
+                <button class="btn-add-graph" (click)="openAddGraphModal()">
+                    <span class="icon" style="color: white;">➕</span> Add Custom Graph
+                </button>
+            </div>
+        <!-- </div> -->
         <button class="si-chip" (click)="openSmartInsights()" [attr.aria-busy]="!aiLoaded">
             <span class="si-chip-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -32,13 +40,6 @@
         </div>
     </div>
 
-    <div class="dashboard-header mb-3">
-        <div class="d-flex justify-content-end">
-            <button class="btn-add-graph" (click)="openAddGraphModal()">
-                <span class="icon">➕</span> Add Custom Graph
-            </button>
-        </div>
-    </div>
     <!-- Replace your existing static cards with this -->
 <div class="row">
     <!-- Loading State -->
@@ -121,7 +122,9 @@
 <div class="dynamic-graphs-section container-fluid" *ngIf="dynamicGraphs.length > 0">
     <div class="row">
         <div class="col-12">
-            <h3 class="dynamic-graphs-heading">Custom Graphs</h3>
+            <div class="graph-header-wrapper">
+                <h3 class="dynamic-graphs-heading">Custom Graphs</h3>
+            </div>
         </div>
     </div>
     <div class="row dynamic-graphs-grid">

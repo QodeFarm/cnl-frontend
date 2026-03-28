@@ -995,38 +995,117 @@ generateCustomerCredentials() {
   );
 }
 
-// Show popup to send credentials
-showSendCredentialsPopup() {
-  if (!this.CustomerEditID) {
-    this.notification.error('Please save the customer first', '');
-    return;
-  }
-  
-  // Check if customer has phone number
-  const hasPhone = this.formConfig.model.customer_addresses?.some(
-    (addr: any) => addr.phone && addr.phone.trim() !== ''
-  );
+customerName = '';
+hasPhoneNumber = false;
+hasEmail = false;
 
-  let content = 'Do you want to send the login credentials to the customer via WhatsApp?';
-  if (!hasPhone) {
-    content = 'Warning: No phone number found in customer addresses. Please add a phone number first.';
+// Add these methods to your component
+
+showSendCredentialsPopup() {
+  // Get customer name
+  this.customerName = this.formConfig.model.customer_data?.name || 'Customer';
+  
+  // Check phone number
+  const address = this.formConfig.model.customer_addresses?.find((addr: any) => addr.phone);
+  const phone = address?.phone || '';
+  this.hasPhoneNumber = phone && phone.trim() !== '';
+  
+  // Check email from addresses
+  const emailAddress = this.formConfig.model.customer_addresses?.find((addr: any) => addr.email);
+  this.hasEmail = emailAddress?.email && emailAddress.email.trim() !== '';
+  
+  if (!this.hasPhoneNumber && !this.hasEmail) {
     this.modal.warning({
-      nzTitle: 'Cannot Send',
-      nzContent: content,
+      nzTitle: 'Cannot Send Credentials',
+      nzContent: 'No phone number or email found. Please add contact information in customer addresses first.',
       nzOkText: 'OK'
     });
     return;
   }
+  
+  // If only email is missing, show warning but still allow WhatsApp
+  if (!this.hasEmail) {
+    this.modal.warning({
+      nzTitle: 'No Email Found',
+      nzContent: 'No email address found in customer addresses. Only WhatsApp option will be available.',
+      nzOkText: 'OK'
+    });
+  }
+  
+  // If only phone is missing, show warning but still allow email
+  if (!this.hasPhoneNumber) {
+    this.modal.warning({
+      nzTitle: 'No Phone Number Found',
+      nzContent: 'No phone number found in customer addresses. Only Email option will be available.',
+      nzOkText: 'OK'
+    });
+  }
+  
+  // Show the modal
+  const modalElement = document.getElementById('sendCredentialsModal');
+  if (modalElement) {
+    const bootstrapModal = new (window as any).bootstrap.Modal(modalElement);
+    bootstrapModal.show();
+  }
+}
 
-  const modal = this.modal.confirm({
-    nzTitle: 'Send Credentials via WhatsApp',
-    nzContent: content,
-    nzOkText: 'Yes, Send',
-    nzOkType: 'primary',
-    nzCancelText: 'No',
-    nzOnOk: () => this.sendCredentialsToCustomer()
+sendViaEmail() {
+  // Call your existing email API
+  this.http.post(`customers/send-credentials/${this.CustomerEditID}/?method=email`, {}).subscribe(
+    (res: any) => {
+      if (res.success) {
+        this.notification.success('Credentials sent successfully via email!', '');
+      } else {
+        this.notification.error(res.message, '');
+      }
+    },
+    (error) => {
+      this.notification.error('Failed to send email', '');
+    }
+  );
+}
+
+sendViaWhatsApp() {
+  // Show message that WhatsApp is under construction
+  this.modal.info({
+    nzTitle: 'WhatsApp Template Under Construction',
+    nzContent: 'WhatsApp template is currently under construction. Please use email to send credentials.',
+    nzOkText: 'OK'
   });
 }
+
+// Show popup to send credentials
+// showSendCredentialsPopup() {
+//   if (!this.CustomerEditID) {
+//     this.notification.error('Please save the customer first', '');
+//     return;
+//   }
+  
+//   // Check if customer has phone number
+//   const hasPhone = this.formConfig.model.customer_addresses?.some(
+//     (addr: any) => addr.phone && addr.phone.trim() !== ''
+//   );
+
+//   let content = 'Do you want to send the login credentials to the customer via WhatsApp?';
+//   if (!hasPhone) {
+//     content = 'Warning: No phone number found in customer addresses. Please add a phone number first.';
+//     this.modal.warning({
+//       nzTitle: 'Cannot Send',
+//       nzContent: content,
+//       nzOkText: 'OK'
+//     });
+//     return;
+//   }
+
+//   const modal = this.modal.confirm({
+//     nzTitle: 'Send Credentials via WhatsApp',
+//     nzContent: content,
+//     nzOkText: 'Yes, Send',
+//     nzOkType: 'primary',
+//     nzCancelText: 'No',
+//     nzOnOk: () => this.sendCredentialsToCustomer()
+//   });
+// }
 
 // Send credentials to customer
 // sendCredentialsToCustomer() {

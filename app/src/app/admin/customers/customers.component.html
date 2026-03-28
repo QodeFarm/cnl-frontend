@@ -18,12 +18,21 @@
               <i class="fas fa-envelope me-1"></i>Send
             </button>
           </div> -->
-          <div class="btn-group me-2" *ngIf="CustomerEditID && formConfig?.model?.customer_data?.is_portal_user">
+          <!-- <div class="btn-group me-2" *ngIf="CustomerEditID && formConfig?.model?.customer_data?.is_portal_user">
             <button type="button" class="btn btn-info" (click)="generateCustomerCredentials()" nz-tooltip="Generate new username/password">
               <i class="fas fa-key me-1"></i>Generate
             </button>
             <button type="button" class="btn btn-success" (click)="showSendCredentialsPopup()" nz-tooltip="Send credentials to customer via WhatsApp">
               <i class="fab fa-whatsapp me-1"></i>Send via WhatsApp
+            </button>
+          </div> -->
+
+          <div class="btn-group me-2" *ngIf="CustomerEditID && formConfig?.model?.customer_data?.is_portal_user">
+            <button type="button" class="btn btn-info" (click)="generateCustomerCredentials()" nz-tooltip="Generate new username/password">
+              <i class="fas fa-key me-1"></i>Generate
+            </button>
+            <button type="button" class="btn btn-success" (click)="showSendCredentialsPopup()" nz-tooltip="Send credentials to customer">
+              <i class="fas fa-paper-plane me-1"></i>Send Credentials
             </button>
           </div>
 
@@ -294,6 +303,8 @@
       </div>
     </div>
   </div>
+
+
 </div>
 
   <!-- Import Modal -->
@@ -900,3 +911,28 @@
     }
   }
 </style>
+
+<!-- Simple Send Credentials Modal -->
+<div class="modal fade" id="sendCredentialsModal" tabindex="-1" aria-labelledby="sendCredentialsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Send Credentials</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="d-grid gap-3">
+          <!-- Email Option -->
+          <button class="btn btn-outline-primary btn-lg py-3" (click)="sendViaEmail()" data-bs-dismiss="modal">
+            <i class="fas fa-envelope me-2"></i> Send via Email
+          </button>
+          
+          <!-- WhatsApp Option -->
+          <button class="btn btn-outline-success btn-lg py-3" (click)="sendViaWhatsApp()" data-bs-dismiss="modal">
+            <i class="fab fa-whatsapp me-2"></i> Send via WhatsApp
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

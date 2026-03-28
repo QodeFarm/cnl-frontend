@@ -74,6 +74,7 @@
 .si-chip-row {
   display: flex;
   justify-content: flex-end;
+  gap: 12px;
   margin-bottom: 10px;
 }
 
@@ -598,7 +599,7 @@ h4 {
 
 /* Add Graph Button */
 .btn-add-graph {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #41539b;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -613,9 +614,16 @@ h4 {
     box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
+
 .btn-add-graph:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+.icon {
+    color: white;
+    font-weight: bold;
+    display: inline-block;
+    margin-right: 5px;
 }
 
 .btn-add-graph .icon {
@@ -630,13 +638,29 @@ h4 {
     border-radius: 15px;
 }
 
+// .dynamic-graphs-heading {
+//     color: #2d3748;
+//     font-size: 1.5rem;
+//     font-weight: 600;
+//     margin-bottom: 20px;
+//     padding-bottom: 10px;
+//     border-bottom: 2px solid #e2e8f0;
+// }
+
+.graph-header-wrapper {
+    background: #41539b; /* Navy blue matching your sidebar */
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 .dynamic-graphs-heading {
-    color: #2d3748;
+    color: white; /* White text for contrast */
     font-size: 1.5rem;
     font-weight: 600;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #e2e8f0;
+    margin: 0;
+    padding: 15px 20px;
+    border-bottom: none;
 }
 
 .dynamic-graphs-grid {
@@ -664,7 +688,7 @@ h4 {
     justify-content: space-between;
     align-items: center;
     padding: 15px 20px;
-    background: #2f3b6b;  /* Navy blue background */
+    background: #41539b;  /* Navy blue background */
     border-bottom: 1px solid #0f1a3d;  /* Darker navy for border */
 }
 
@@ -1131,7 +1155,7 @@ h4 {
     justify-content: space-between;
     align-items: center;
     padding: 20px 24px;
-    background: #1e2a5a;  /* Navy blue */
+    background: #41539b;  /* Navy blue */
     color: white;
 }
 
@@ -1167,7 +1191,7 @@ h4 {
 }
 
 .delete-message strong {
-    color: #1e2a5a;  /* Navy blue */
+    color: #41539b;  /* Navy blue */
     font-weight: 600;
 }
 

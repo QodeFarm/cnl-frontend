@@ -436,3 +436,80 @@
     color: #333;
   }
 }
+
+//styling for the sending emial or whatsapp
+/* Send Credentials Modal Styles */
+.send-option {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  margin-bottom: 10px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.send-option:hover {
+  background: #e9ecef;
+  transform: translateX(5px);
+}
+
+.send-option.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #f8f9fa;
+}
+
+.option-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.whatsapp-bg {
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+}
+
+.email-bg {
+  background: linear-gradient(135deg, #EA4335 0%, #C5221F 100%);
+}
+
+.option-content {
+  flex: 1;
+}
+
+.option-content h6 {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.option-arrow {
+  color: #adb5bd;
+  transition: all 0.2s;
+}
+
+.send-option:hover:not(.disabled) .option-arrow {
+  color: #667eea;
+  transform: translateX(3px);
+}
+
+.success-icon, .error-icon {
+  animation: scaleIn 0.3s ease;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
