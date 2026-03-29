@@ -24,21 +24,21 @@ export class CustomerPortalLayoutComponent implements OnInit {
       path: 'dashboard', 
       icon: 'fa-chart-pie', 
       label: 'Dashboard',
-      description: 'Overview & stats',
+      // description: 'Overview & stats',
       active: false
     },
     { 
       path: 'profile', 
       icon: 'fa-user-circle', 
       label: 'My Profile',
-      description: 'Personal information',
+      // description: 'Personal information',
       active: false
     },
     { 
       path: 'sales-orders', 
       icon: 'fa-shopping-cart', 
       label: 'Sales Orders',
-      description: 'View & create orders',
+      // description: 'View & create orders',
       active: false,
       badge: 3
     },
@@ -46,7 +46,7 @@ export class CustomerPortalLayoutComponent implements OnInit {
       path: 'invoices', 
       icon: 'fa-file-invoice', 
       label: 'Invoices',
-      description: 'Payment history',
+      // description: 'Payment history',
       active: false,
       badge: 2
     },
@@ -54,28 +54,28 @@ export class CustomerPortalLayoutComponent implements OnInit {
       path: 'returns', 
       icon: 'fa-undo-alt', 
       label: 'Returns',
-      description: 'Return requests',
+      // description: 'Return requests',
       active: false
     },
     { 
       path: 'credit-notes', 
       icon: 'fa-credit-card', 
       label: 'Credit Notes',
-      description: 'Available credits',
+      // description: 'Available credits',
       active: false
     },
     { 
       path: 'ledger', 
       icon: 'fa-book-open', 
       label: 'Payment Receipts',
-      description: 'Transaction history',
+      // description: 'Transaction history',
       active: false
     },
     { 
       path: 'downloads', 
       icon: 'fa-download', 
       label: 'Downloads',
-      description: 'Documents & files',
+      // description: 'Documents & files',
       active: false
     }
   ];

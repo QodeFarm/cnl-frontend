@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-customer-profile',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   template: `
     <div class="profile-container">
       <!-- Cover Image -->
@@ -18,13 +19,13 @@ import { RouterModule } from '@angular/router';
       <div class="profile-header">
         <div class="profile-avatar">
           <div class="avatar-circle">
-            {{ getInitials(customer?.name) }}
+            {{ getInitials(customerData?.name) }}
           </div>
         </div>
         <div class="profile-title">
-          <h1>{{ customer?.name || 'Customer Name' }}</h1>
-          <p class="customer-code">Customer Code: {{ customer?.code || 'N/A' }}</p>
-          <div class="badge" *ngIf="customer?.is_portal_user">
+          <h1>{{ customerData?.name || 'Customer Name' }}</h1>
+          <p class="customer-code">Customer Code: {{ customerData?.code || 'N/A' }}</p>
+          <div class="badge" *ngIf="customerData?.is_portal_user">
             <i class="fas fa-check-circle"></i> Active Member
           </div>
         </div>
@@ -48,7 +49,7 @@ import { RouterModule } from '@angular/router';
       </div>
 
       <!-- Profile Content -->
-      <div class="profile-content" *ngIf="!loading && customer">
+      <div class="profile-content" *ngIf="!loading && customerData">
         <!-- Quick Info Cards -->
         <div class="info-cards">
           <div class="info-card">
@@ -57,7 +58,7 @@ import { RouterModule } from '@angular/router';
             </div>
             <div class="card-content">
               <span class="card-label">Member Since</span>
-              <span class="card-value">{{ customer.registration_date | date:'MMM d, y' }}</span>
+              <span class="card-value">{{ customerData.registration_date | date:'MMM d, y' }}</span>
             </div>
           </div>
           <div class="info-card">
@@ -66,7 +67,7 @@ import { RouterModule } from '@angular/router';
             </div>
             <div class="card-content">
               <span class="card-label">Credit Limit</span>
-              <span class="card-value">{{ customer.credit_limit | currency:'INR' }}</span>
+              <span class="card-value">{{ (customerData.credit_limit || 0) | currency:'INR' }}</span>
             </div>
           </div>
           <div class="info-card">
@@ -75,7 +76,7 @@ import { RouterModule } from '@angular/router';
             </div>
             <div class="card-content">
               <span class="card-label">Last Login</span>
-              <span class="card-value">{{ customer.last_login | date:'medium' || 'First time' }}</span>
+              <span class="card-value">{{ customerData.last_login | date:'medium' }}</span>
             </div>
           </div>
         </div>
@@ -90,20 +91,24 @@ import { RouterModule } from '@angular/router';
             <div class="section-content">
               <div class="info-row">
                 <div class="info-label">Full Name</div>
-                <div class="info-value" *ngIf="!isEditing">{{ customer.name }}</div>
+                <div class="info-value" *ngIf="!isEditing">{{ customerData.name }}</div>
                 <input *ngIf="isEditing" type="text" [(ngModel)]="editedCustomer.name" class="edit-input">
               </div>
               <div class="info-row">
                 <div class="info-label">Username</div>
-                <div class="info-value">{{ customer.username }}</div>
+                <div class="info-value">{{ customerData.username }}</div>
+              </div>
+              <div class="info-row">
+                <div class="info-label">Customer Code</div>
+                <div class="info-value">{{ customerData.code }}</div>
               </div>
               <div class="info-row">
                 <div class="info-label">GST Number</div>
-                <div class="info-value">{{ customer.gst || 'Not provided' }}</div>
+                <div class="info-value">{{ customerData.gst || 'Not provided' }}</div>
               </div>
               <div class="info-row">
                 <div class="info-label">PAN Number</div>
-                <div class="info-value">{{ customer.pan || 'Not provided' }}</div>
+                <div class="info-value">{{ customerData.pan || 'Not provided' }}</div>
               </div>
             </div>
           </div>
@@ -131,7 +136,7 @@ import { RouterModule } from '@angular/router';
                 <div class="info-label">
                   <i class="fas fa-globe"></i> Website
                 </div>
-                <div class="info-value">{{ customer.website || 'Not provided' }}</div>
+                <div class="info-value">{{ customerData.website || 'Not provided' }}</div>
               </div>
             </div>
           </div>
@@ -150,15 +155,21 @@ import { RouterModule } from '@angular/router';
                 <i class="fas fa-home"></i> Billing Address
               </div>
               <div class="address-content">
-                <p class="address-line">{{ billingAddress.address }}</p>
-                <p class="address-line">{{ billingAddress.city }}, {{ billingAddress.state }} - {{ billingAddress.pin_code }}</p>
-                <p class="address-line">{{ billingAddress.country }}</p>
+                <p class="address-line">{{ formatAddress(billingAddress) }}</p>
                 <div class="address-contact" *ngIf="billingAddress.phone">
                   <i class="fas fa-phone"></i> {{ billingAddress.phone }}
                 </div>
                 <div class="address-contact" *ngIf="billingAddress.email">
                   <i class="fas fa-envelope"></i> {{ billingAddress.email }}
                 </div>
+              </div>
+            </div>
+            <div class="address-card" *ngIf="!billingAddress && customerAddresses && customerAddresses.length === 0">
+              <div class="address-badge billing">
+                <i class="fas fa-home"></i> Billing Address
+              </div>
+              <div class="address-content">
+                <p class="address-line">No billing address found</p>
               </div>
             </div>
 
@@ -168,9 +179,7 @@ import { RouterModule } from '@angular/router';
                 <i class="fas fa-truck"></i> Shipping Address
               </div>
               <div class="address-content">
-                <p class="address-line">{{ shippingAddress.address }}</p>
-                <p class="address-line">{{ shippingAddress.city }}, {{ shippingAddress.state }} - {{ shippingAddress.pin_code }}</p>
-                <p class="address-line">{{ shippingAddress.country }}</p>
+                <p class="address-line">{{ formatAddress(shippingAddress) }}</p>
                 <div class="address-contact" *ngIf="shippingAddress.phone">
                   <i class="fas fa-phone"></i> {{ shippingAddress.phone }}
                 </div>
@@ -179,50 +188,12 @@ import { RouterModule } from '@angular/router';
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        <!-- Account Statistics -->
-        <div class="stats-section">
-          <div class="section-header">
-            <i class="fas fa-chart-line"></i>
-            <h2>Account Statistics</h2>
-          </div>
-          <div class="stats-grid">
-            <div class="stat-box">
-              <div class="stat-icon">
-                <i class="fas fa-shopping-cart"></i>
+            <div class="address-card" *ngIf="!shippingAddress && customerAddresses && customerAddresses.length === 0">
+              <div class="address-badge shipping">
+                <i class="fas fa-truck"></i> Shipping Address
               </div>
-              <div class="stat-details">
-                <span class="stat-label">Total Orders</span>
-                <span class="stat-number">{{ stats.totalOrders || 0 }}</span>
-              </div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-icon">
-                <i class="fas fa-file-invoice"></i>
-              </div>
-              <div class="stat-details">
-                <span class="stat-label">Invoices</span>
-                <span class="stat-number">{{ stats.totalInvoices || 0 }}</span>
-              </div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-icon">
-                <i class="fas fa-undo-alt"></i>
-              </div>
-              <div class="stat-details">
-                <span class="stat-label">Returns</span>
-                <span class="stat-number">{{ stats.totalReturns || 0 }}</span>
-              </div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-icon">
-                <i class="fas fa-credit-card"></i>
-              </div>
-              <div class="stat-details">
-                <span class="stat-label">Credit Notes</span>
-                <span class="stat-number">{{ stats.totalCreditNotes || 0 }}</span>
+              <div class="address-content">
+                <p class="address-line">No shipping address found</p>
               </div>
             </div>
           </div>
@@ -240,7 +211,7 @@ import { RouterModule } from '@angular/router';
     /* Cover Image */
     .profile-cover {
       height: 200px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #224385 0%, #764ba2 100%);
       border-radius: 20px 20px 0 0;
       position: relative;
       margin-bottom: 80px;
@@ -271,7 +242,7 @@ import { RouterModule } from '@angular/router';
     .avatar-circle {
       width: 120px;
       height: 120px;
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      background: linear-gradient(135deg, #224385, #764ba2);
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -335,7 +306,7 @@ import { RouterModule } from '@angular/router';
     }
 
     .btn-edit {
-      background: #667eea;
+      background: #224385;
       color: white;
     }
 
@@ -377,7 +348,7 @@ import { RouterModule } from '@angular/router';
       width: 40px;
       height: 40px;
       border: 3px solid #f1f5f9;
-      border-top-color: #667eea;
+      border-top-color: #224385;
       border-radius: 50%;
       animation: spin 1s linear infinite;
       margin-bottom: 16px;
@@ -421,7 +392,7 @@ import { RouterModule } from '@angular/router';
     .card-icon {
       width: 50px;
       height: 50px;
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      background: linear-gradient(135deg, #224385, #764ba2);
       border-radius: 12px;
       display: flex;
       align-items: center;
@@ -474,7 +445,7 @@ import { RouterModule } from '@angular/router';
 
     .section-header i {
       font-size: 20px;
-      color: #667eea;
+      color: #224385;
     }
 
     .section-header h2 {
@@ -512,7 +483,7 @@ import { RouterModule } from '@angular/router';
     .info-label i {
       width: 20px;
       margin-right: 5px;
-      color: #667eea;
+      color: #224385;
     }
 
     .edit-input {
@@ -526,7 +497,7 @@ import { RouterModule } from '@angular/router';
 
     .edit-input:focus {
       outline: none;
-      border-color: #667eea;
+      border-color: #224385;
     }
 
     /* Addresses Section */
@@ -553,7 +524,7 @@ import { RouterModule } from '@angular/router';
     }
 
     .address-card:hover {
-      border-color: #667eea;
+      border-color: #224385;
       box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
     }
 
@@ -588,6 +559,7 @@ import { RouterModule } from '@angular/router';
       margin: 0;
       color: #475569;
       font-size: 14px;
+      line-height: 1.5;
     }
 
     .address-contact {
@@ -595,7 +567,7 @@ import { RouterModule } from '@angular/router';
       align-items: center;
       gap: 8px;
       margin-top: 5px;
-      color: #667eea;
+      color: #224385;
       font-size: 13px;
     }
 
@@ -630,14 +602,14 @@ import { RouterModule } from '@angular/router';
     }
 
     .stat-box:hover {
-      border-color: #667eea;
+      border-color: #224385;
       transform: translateY(-2px);
     }
 
     .stat-icon {
       width: 45px;
       height: 45px;
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      background: linear-gradient(135deg, #224385, #764ba2);
       border-radius: 10px;
       display: flex;
       align-items: center;
@@ -662,6 +634,15 @@ import { RouterModule } from '@angular/router';
       font-size: 20px;
       font-weight: 600;
       color: #333;
+    }
+
+    pre {
+      background: #fff;
+      padding: 10px;
+      border-radius: 5px;
+      overflow-x: auto;
+      font-size: 11px;
+      margin: 5px 0;
     }
 
     /* Responsive */
@@ -696,71 +677,247 @@ import { RouterModule } from '@angular/router';
   `]
 })
 export class CustomerProfileComponent implements OnInit {
-  customer: any = null;
+  customerData: any = null;  // This will hold customer_data from the response
+  customerAddresses: any[] = [];  // This will hold customer_addresses from the response
   contactInfo: any = { email: '', phone: '' };
   billingAddress: any = null;
   shippingAddress: any = null;
-  stats: any = { totalOrders: 12, totalInvoices: 8, totalReturns: 2, totalCreditNotes: 3 };
+  // stats: any = { totalOrders: 12, totalInvoices: 8, totalReturns: 2, totalCreditNotes: 3 };
   
   loading: boolean = true;
   isEditing: boolean = false;
   editedCustomer: any = {};
+  debugInfo: any = null;
 
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
+    console.log('CustomerProfileComponent initialized');
     this.loadCustomerProfile();
   }
 
   loadCustomerProfile() {
-    this.loading = true;
-    this.http.get('customers/portal/profile/').subscribe({
-      next: (res: any) => {
+  console.log('Loading customer profile...');
+  this.loading = true;
+  
+  // Get customer ID from localStorage or service
+  const userStr = localStorage.getItem('user');
+  const user = userStr ? JSON.parse(userStr) : null;
+  const customerId = user?.id;
+  
+  console.log('Customer ID from localStorage:', customerId);
+  
+  if (!customerId) {
+    console.error('No customer ID found in localStorage');
+    this.loading = false;
+    this.debugInfo = { error: 'No customer ID found in localStorage' };
+    return;
+  }
+  
+  // Call the correct endpoint that returns the nested structure
+  this.http.get(`customers/customers/${customerId}/`).subscribe({
+    next: (res: any) => {
+      console.log('Full API Response:', res);
+      
+      // Check if the response has the expected structure with count, message, and data
+      if (res && res.message === 'Success' && res.data) {
+        console.log('Success response with nested data structure');
+        
+        // Extract the nested data
+        this.customerData = res.data.customer_data;
+        this.customerAddresses = res.data.customer_addresses || [];
+        
+        console.log('Extracted customer data:', this.customerData);
+        console.log('Extracted addresses:', this.customerAddresses);
+        
+        this.editedCustomer = { ...this.customerData };
+        
+        // Extract contact info and addresses
+        this.extractContactInfo();
+        this.extractAddresses();
+        // this.loadStats();
+        
+        // Set debug info for troubleshooting
+        this.debugInfo = {
+          fullResponse: res,
+          customerData: this.customerData,
+          customerAddresses: this.customerAddresses,
+          billingAddress: this.billingAddress,
+          shippingAddress: this.shippingAddress,
+          contactInfo: this.contactInfo
+        };
+        
         this.loading = false;
-        if (res.success && res.data) {
-          this.customer = res.data;
-          this.editedCustomer = { ...this.customer };
-          this.extractContactInfo();
-          this.extractAddresses();
-          this.loadStats();
-        }
-      },
-      error: (err) => {
+      } 
+      // Handle alternative response structure (if any)
+      else if (res && res.success === 1 && res.data) {
+        console.log('Alternative success response structure');
+        this.customerData = res.data.customer_data;
+        this.customerAddresses = res.data.customer_addresses || [];
+        
+        this.editedCustomer = { ...this.customerData };
+        this.extractContactInfo();
+        this.extractAddresses();
+        // this.loadStats();
+        
+        this.debugInfo = {
+          fullResponse: res,
+          customerData: this.customerData,
+          customerAddresses: this.customerAddresses,
+          billingAddress: this.billingAddress,
+          shippingAddress: this.shippingAddress,
+          contactInfo: this.contactInfo
+        };
+        
         this.loading = false;
-        console.error('Error loading profile:', err);
       }
-    });
-  }
-
-  loadStats() {
-    // Load stats from various APIs
-    // this.http.get('customers/portal/sales-orders/').subscribe(...)
-    // For now using mock data
-  }
+      else {
+        console.error('Unexpected API response structure:', res);
+        this.loading = false;
+        this.debugInfo = { 
+          error: 'Unexpected API response structure', 
+          response: res,
+          expected: 'Response should have message="Success" and data with customer_data and customer_addresses'
+        };
+      }
+    },
+    error: (err) => {
+      this.loading = false;
+      console.error('Error loading profile:', err);
+      this.debugInfo = { 
+        error: err.message, 
+        status: err.status,
+        statusText: err.statusText
+      };
+    }
+  });
+}
 
   extractContactInfo() {
-    if (this.customer?.customer_addresses) {
-      const commAddress = this.customer.customer_addresses.find((a: any) => a.address_type === 'Communication');
+    console.log('Extracting contact info from addresses...');
+    console.log('Customer addresses:', this.customerAddresses);
+    
+    if (this.customerAddresses && this.customerAddresses.length > 0) {
+      // Try to find Communication address first
+      const commAddress = this.customerAddresses.find((a: any) => a.address_type === 'Communication');
       if (commAddress) {
-        this.contactInfo.email = commAddress.email;
-        this.contactInfo.phone = commAddress.phone;
+        console.log('Found Communication address:', commAddress);
+        if (commAddress.email) this.contactInfo.email = commAddress.email;
+        if (commAddress.phone) this.contactInfo.phone = commAddress.phone;
       } else {
-        const anyAddress = this.customer.customer_addresses.find((a: any) => a.email || a.phone);
+        // Fallback to any address with email/phone
+        const anyAddress = this.customerAddresses.find((a: any) => a.email || a.phone);
         if (anyAddress) {
-          this.contactInfo.email = anyAddress.email;
-          this.contactInfo.phone = anyAddress.phone;
+          console.log('Found fallback address:', anyAddress);
+          if (anyAddress.email) this.contactInfo.email = anyAddress.email;
+          if (anyAddress.phone) this.contactInfo.phone = anyAddress.phone;
+        } else {
+          console.log('No contact info found in addresses');
         }
       }
+    } else {
+      console.log('No addresses found to extract contact info');
     }
+    
+    console.log('Extracted contact info:', this.contactInfo);
   }
 
   extractAddresses() {
-    if (this.customer?.customer_addresses) {
-      this.billingAddress = this.customer.customer_addresses.find((a: any) => a.address_type === 'Billing');
-      this.shippingAddress = this.customer.customer_addresses.find((a: any) => a.address_type === 'Shipping');
+    console.log('Extracting addresses...');
+    console.log('Customer addresses array:', this.customerAddresses);
+    
+    if (this.customerAddresses && this.customerAddresses.length > 0) {
+      // Log each address to see their structure
+      this.customerAddresses.forEach((addr: any, index: number) => {
+        console.log(`Address ${index}:`, addr);
+        console.log(`Address type: ${addr.address_type}`);
+        console.log(`Address fields:`, Object.keys(addr));
+      });
+      
+      this.billingAddress = this.customerAddresses.find((a: any) => a.address_type === 'Billing');
+      this.shippingAddress = this.customerAddresses.find((a: any) => a.address_type === 'Shipping');
+      
+      console.log('Found billing address:', this.billingAddress);
+      console.log('Found shipping address:', this.shippingAddress);
+      
+      // If no specific billing/shipping, check if there are other types
+      if (!this.billingAddress && !this.shippingAddress) {
+        console.log('No billing/shipping addresses found, checking other types...');
+        const otherAddresses = this.customerAddresses.filter((a: any) => 
+          a.address_type !== 'Billing' && a.address_type !== 'Shipping'
+        );
+        console.log('Other addresses:', otherAddresses);
+        
+        // Use the first address as default for both if available
+        if (otherAddresses.length > 0) {
+          this.billingAddress = otherAddresses[0];
+          this.shippingAddress = otherAddresses[0];
+          console.log('Using first address as default:', otherAddresses[0]);
+        }
+      }
+    } else {
+      console.log('No customer addresses found');
     }
   }
 
+  formatAddress(address: any): string {
+  if (!address) {
+    console.log('formatAddress called with null/undefined address');
+    return 'Address not available';
+  }
+  
+  console.log('Formatting address:', address);
+  
+  // Handle different possible address structures
+  let addressParts = [];
+  
+  // Add the main address line
+  if (address.address) {
+    addressParts.push(address.address);
+  }
+  
+  // Handle city - could be a string or an object
+  let city = '';
+  if (typeof address.city === 'string') {
+    city = address.city;
+  } else if (address.city && address.city.city_name) {
+    city = address.city.city_name;
+  } else if (address.city_name) {
+    city = address.city_name;
+  }
+  if (city) addressParts.push(city);
+  
+  // Handle state - could be a string or an object
+  let state = '';
+  if (typeof address.state === 'string') {
+    state = address.state;
+  } else if (address.state && address.state.state_name) {
+    state = address.state.state_name;
+  } else if (address.state_name) {
+    state = address.state_name;
+  }
+  if (state) addressParts.push(state);
+  
+  // Handle PIN code
+  let pinCode = address.pin_code || address.pincode || address.zip_code || address.postal_code;
+  if (pinCode) addressParts.push(pinCode);
+  
+  // Handle country - could be a string or an object
+  let country = '';
+  if (typeof address.country === 'string') {
+    country = address.country;
+  } else if (address.country && address.country.country_name) {
+    country = address.country.country_name;
+  } else if (address.country_name) {
+    country = address.country_name;
+  }
+  if (country) addressParts.push(country);
+  
+  const formattedAddress = addressParts.filter(part => part && part.toString().trim()).join(', ');
+  console.log('Formatted address:', formattedAddress);
+  
+  return formattedAddress || 'Address incomplete';
+}
   getInitials(name: string): string {
     if (!name) return 'U';
     return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
@@ -772,12 +929,19 @@ export class CustomerProfileComponent implements OnInit {
 
   cancelEdit() {
     this.isEditing = false;
-    this.editedCustomer = { ...this.customer };
+    this.editedCustomer = { ...this.customerData };
   }
 
   saveProfile() {
-    // Implement save logic
-    console.log('Saving:', this.editedCustomer);
+    console.log('Saving profile:', this.editedCustomer);
+    // Implement save logic here
     this.isEditing = false;
   }
+
+  // loadStats() {
+  //   console.log('Loading stats...');
+  //   // Load stats from various APIs
+  //   // this.http.get('customers/portal/sales-orders/').subscribe(...)
+  //   // For now using mock data
+  // }
 }
