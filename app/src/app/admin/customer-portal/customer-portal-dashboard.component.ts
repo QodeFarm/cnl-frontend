@@ -154,7 +154,7 @@ import { RouterModule } from '@angular/router';
 
     /* Welcome Banner */
     .welcome-banner {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #224385 0%, #2a5298 100%);
       border-radius: 16px;
       padding: 32px;
       margin-bottom: 32px;
@@ -162,25 +162,28 @@ import { RouterModule } from '@angular/router';
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
     .welcome-content h1 {
       font-size: 28px;
       margin: 0 0 8px 0;
       font-weight: 600;
+      color: white;
     }
 
     .welcome-content p {
       font-size: 16px;
       margin: 0;
       opacity: 0.9;
+      color: white;
     }
 
     .date-display {
       font-size: 18px;
       font-weight: 500;
       opacity: 0.9;
+      color: white;
     }
 
     /* Stats Grid */
@@ -201,13 +204,13 @@ import { RouterModule } from '@angular/router';
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
       transition: all 0.3s ease;
       cursor: pointer;
-      border: 1px solid #f0f0f0;
+      border: 1px solid #e2e8f0;
     }
 
     .stat-card:hover {
       transform: translateY(-4px);
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-      border-color: #667eea;
+      border-color: #224385;
     }
 
     .stat-icon {
@@ -227,7 +230,7 @@ import { RouterModule } from '@angular/router';
 
     .stat-details h3 {
       font-size: 14px;
-      color: #666;
+      color: #4a5568;
       margin: 0 0 8px 0;
       font-weight: 500;
       text-transform: uppercase;
@@ -237,14 +240,14 @@ import { RouterModule } from '@angular/router';
     .stat-number {
       font-size: 32px;
       font-weight: 700;
-      color: #333;
+      color: #1a202c;
       margin: 0;
       line-height: 1;
     }
 
     .stat-label {
       font-size: 12px;
-      color: #999;
+      color: #718096;
     }
 
     /* Quick Actions */
@@ -254,11 +257,12 @@ import { RouterModule } from '@angular/router';
       padding: 24px;
       margin-bottom: 32px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e2e8f0;
     }
 
     .quick-actions h2 {
       font-size: 20px;
-      color: #333;
+      color: #1a202c;
       margin: 0 0 20px 0;
       font-weight: 600;
     }
@@ -283,14 +287,14 @@ import { RouterModule } from '@angular/router';
     }
 
     .action-btn.primary {
-      background: #667eea;
+      background: #224385;
       color: white;
     }
 
     .action-btn.primary:hover {
-      background: #5a67d8;
+      background: #1a3468;
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      box-shadow: 0 4px 12px rgba(34, 67, 133, 0.4);
     }
 
     .action-btn.secondary {
@@ -311,11 +315,12 @@ import { RouterModule } from '@angular/router';
       padding: 24px;
       margin-bottom: 32px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e2e8f0;
     }
 
     .recent-activity h2 {
       font-size: 20px;
-      color: #333;
+      color: #1a202c;
       margin: 0 0 20px 0;
       font-weight: 600;
     }
@@ -337,6 +342,7 @@ import { RouterModule } from '@angular/router';
 
     .activity-item:hover {
       background: #f1f5f9;
+      transform: translateX(4px);
     }
 
     .activity-icon {
@@ -361,13 +367,13 @@ import { RouterModule } from '@angular/router';
     .activity-title {
       font-size: 16px;
       font-weight: 500;
-      color: #333;
+      color: #1a202c;
       margin: 0 0 4px 0;
     }
 
     .activity-time {
       font-size: 12px;
-      color: #999;
+      color: #718096;
       margin: 0;
     }
 
@@ -385,30 +391,33 @@ import { RouterModule } from '@angular/router';
     .no-activity {
       text-align: center;
       padding: 40px;
-      color: #999;
+      color: #718096;
     }
 
     .no-activity i {
       font-size: 48px;
       margin-bottom: 16px;
       opacity: 0.5;
+      color: #718096;
     }
 
     .no-activity p {
       margin: 0;
+      color: #718096;
     }
 
     /* Account Summary */
     .account-summary {
-      background: white;
+      background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
       border-radius: 16px;
       padding: 24px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e2e8f0;
     }
 
     .account-summary h2 {
       font-size: 20px;
-      color: #333;
+      color: #1a202c;
       margin: 0 0 20px 0;
       font-weight: 600;
     }
@@ -420,22 +429,31 @@ import { RouterModule } from '@angular/router';
     }
 
     .summary-card {
-      background: #f8fafc;
-      padding: 16px;
+      background: white;
+      padding: 20px;
       border-radius: 12px;
       text-align: center;
+      border: 1px solid #e2e8f0;
+      transition: all 0.3s ease;
+    }
+
+    .summary-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-color: #224385;
     }
 
     .summary-label {
       font-size: 14px;
-      color: #666;
+      color: #4a5568;
       margin-bottom: 8px;
+      font-weight: 500;
     }
 
     .summary-value {
       font-size: 20px;
       font-weight: 700;
-      color: #333;
+      color: #1a202c;
     }
 
     /* Loading Overlay */
@@ -445,7 +463,7 @@ import { RouterModule } from '@angular/router';
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 0.9);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -456,8 +474,8 @@ import { RouterModule } from '@angular/router';
     .spinner {
       width: 40px;
       height: 40px;
-      border: 3px solid #f1f5f9;
-      border-top-color: #667eea;
+      border: 3px solid #e2e8f0;
+      border-top-color: #224385;
       border-radius: 50%;
       animation: spin 1s linear infinite;
       margin-bottom: 16px;
@@ -465,6 +483,11 @@ import { RouterModule } from '@angular/router';
 
     @keyframes spin {
       to { transform: rotate(360deg); }
+    }
+
+    .loading-overlay p {
+      color: #4a5568;
+      font-size: 14px;
     }
 
     /* Responsive Design */
@@ -488,6 +511,10 @@ import { RouterModule } from '@angular/router';
       .action-btn {
         width: 100%;
         justify-content: center;
+      }
+      
+      .summary-cards {
+        grid-template-columns: 1fr;
       }
     }
   `]
@@ -521,7 +548,6 @@ export class CustomerPortalDashboardComponent implements OnInit {
     this.customerId = user.id || '';
     this.username = user.username || '';
     
-    // Get last login from customer data
     this.loadCustomerData();
   }
 
@@ -532,11 +558,12 @@ export class CustomerPortalDashboardComponent implements OnInit {
   loadCustomerData() {
     if (!this.customerId) return;
     
-    this.http.get(`customers/customers/${this.customerId}/`).subscribe({
+    this.http.get(`customers/customer/${this.customerId}/`).subscribe({
       next: (res: any) => {
-        if (res && res.data) {
+        if (res && res.data && res.data.customer_data) {
           this.lastLogin = res.data.customer_data.last_login ? new Date(res.data.customer_data.last_login) : null;
           this.accountSummary.creditLimit = res.data.customer_data.credit_limit || 0;
+          this.updateAvailableCredit();
         }
       },
       error: (err) => console.error('Error loading customer data:', err)
@@ -549,7 +576,6 @@ export class CustomerPortalDashboardComponent implements OnInit {
       return;
     }
 
-    // Load all stats in parallel
     Promise.all([
       this.loadSalesOrders(),
       this.loadInvoices(),
@@ -557,17 +583,25 @@ export class CustomerPortalDashboardComponent implements OnInit {
       this.loadCreditNotes(),
       this.loadOutstanding()
     ]).then(() => {
+      this.updateAvailableCredit();
+      this.loadRecentActivity();
       this.loading = false;
     }).catch(() => {
       this.loading = false;
     });
   }
 
+  updateAvailableCredit() {
+    this.accountSummary.availableCredit = this.accountSummary.creditLimit - this.accountSummary.outstanding;
+  }
+
   loadSalesOrders(): Promise<void> {
     return new Promise((resolve) => {
       this.http.get(`sales/sale_order/?customer_id=${this.customerId}`).subscribe({
         next: (res: any) => {
-          this.stats.salesOrders = res.data?.length || 0;
+          if (res && res.data) {
+            this.stats.salesOrders = res.data.length || 0;
+          }
           resolve();
         },
         error: (err) => {
@@ -582,7 +616,9 @@ export class CustomerPortalDashboardComponent implements OnInit {
     return new Promise((resolve) => {
       this.http.get(`sales/sale_invoice_order/?customer_id=${this.customerId}`).subscribe({
         next: (res: any) => {
-          this.stats.invoices = res.data?.length || 0;
+          if (res && res.data) {
+            this.stats.invoices = res.data.length || 0;
+          }
           resolve();
         },
         error: (err) => {
@@ -597,7 +633,9 @@ export class CustomerPortalDashboardComponent implements OnInit {
     return new Promise((resolve) => {
       this.http.get(`sales/sale_return_order/?customer_id=${this.customerId}`).subscribe({
         next: (res: any) => {
-          this.stats.returns = res.data?.length || 0;
+          if (res && res.data) {
+            this.stats.returns = res.data.length || 0;
+          }
           resolve();
         },
         error: (err) => {
@@ -612,7 +650,9 @@ export class CustomerPortalDashboardComponent implements OnInit {
     return new Promise((resolve) => {
       this.http.get(`sales/sale_credit_notes/?customer_id=${this.customerId}`).subscribe({
         next: (res: any) => {
-          this.stats.creditNotes = res.data?.length || 0;
+          if (res && res.data) {
+            this.stats.creditNotes = res.data.length || 0;
+          }
           resolve();
         },
         error: (err) => {
@@ -627,9 +667,13 @@ export class CustomerPortalDashboardComponent implements OnInit {
     return new Promise((resolve) => {
       this.http.get(`sales/sale_invoice_order/?customer_id=${this.customerId}`).subscribe({
         next: (res: any) => {
-            this.accountSummary.outstanding = res.pending_amount || 0;
-            // this.accountSummary.availableCredit = this.accountSummary.creditLimit - this.accountSummary.outstanding;
-
+          if (res && res.pending_amount) {
+            this.accountSummary.outstanding = res.pending_amount;
+          } else if (res && res.data && res.data.pending_amount) {
+            this.accountSummary.outstanding = res.data.pending_amount;
+          } else {
+            this.accountSummary.outstanding = 0;
+          }
           resolve();
         },
         error: (err) => {
@@ -645,20 +689,21 @@ export class CustomerPortalDashboardComponent implements OnInit {
     const activities: any[] = [];
     
     // Get recent sales orders
-    this.http.get(`sales/sale_order/?customer_id=${this.customerId}&limit=3`).subscribe({
+    this.http.get(`sales/sale_order/?customer_id=${this.customerId}&limit=5`).subscribe({
       next: (res: any) => {
-        if (res.data) {
+        if (res && res.data && Array.isArray(res.data)) {
           res.data.forEach((order: any) => {
             activities.push({
               type: 'order',
-              title: `Sales Order #${order.order_no} ${order.status}`,
+              title: `Sales Order #${order.order_no || order.id}`,
               time: new Date(order.created_at),
-              status: order.flow_status?.flow_status_name || 'pending'
+              status: order.flow_status?.flow_status_name?.toLowerCase() || 'pending'
             });
           });
         }
-        this.recentActivities = activities.sort((a, b) => b.time - a.time).slice(0, 5);
-      }
+        this.recentActivities = activities.sort((a, b) => b.time.getTime() - a.time.getTime()).slice(0, 5);
+      },
+      error: (err) => console.error('Error loading recent activity:', err)
     });
   }
 

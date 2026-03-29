@@ -30,7 +30,7 @@ const routes: Routes = [
       {
         path: 'profile',
         canActivate: [CustomerPortalGuard],
-        loadComponent: () => import('./admin/customers/customers.component').then(m => m.CustomersComponent),
+        loadComponent: () => import('./admin/customer-portal/customer-profile.component').then(m => m.CustomerProfileComponent),
         data: { 
           title: 'My Profile', 
           moduleName: 'customer-portal',

@@ -1,16 +1,16 @@
 <div class="portal-container">
   <!-- Sidebar -->
   <aside class="sidebar">
-    <!-- Logo Section -->
+    <!-- Logo Section - Matching targeted design -->
     <div class="sidebar-header">
       <div class="logo">
-        <span class="logo-icon">C&L</span>
-        <span class="logo-text">Customer Portal</span>
+        <div class="logo-main">C&L</div>
+        <div class="logo-sub">Customer Portal</div>
       </div>
     </div>
 
-    <!-- User Profile Section -->
-    <div class="user-profile">
+    <!-- User Profile Section (Hidden as per your code) -->
+    <!-- <div class="user-profile">
       <div class="avatar">
         {{ customerInitials }}
       </div>
@@ -18,26 +18,22 @@
         <h4>{{ customerName }}</h4>
         <p>Customer Account</p>
       </div>
-    </div>
+    </div> -->
 
-    <!-- Navigation Menu -->
-    <!-- Navigation Menu -->
-<nav class="sidebar-nav">
-  <ul class="nav-menu">
-    <li class="nav-item" *ngFor="let item of menuItems">
-      <a class="nav-link" [class.active]="item.active" (click)="navigate(item.path)">
-        <div class="nav-icon">
-          <i class="fas {{ item.icon }}"></i>
-          <span class="badge" *ngIf="item.badge">{{ item.badge }}</span>
-        </div>
-        <!-- LABEL - Make sure this is NOT hidden -->
-        <div class="nav-content">
-          <span class="nav-label">{{ item.label }}</span>
-        </div>
-      </a>
-    </li>
-  </ul>
-</nav>
+    <!-- Navigation Menu - With proper spacing and labels -->
+    <nav class="sidebar-nav">
+      <ul class="nav-menu">
+        <li class="nav-item" *ngFor="let item of menuItems">
+          <a class="nav-link" [class.active]="item.active" (click)="navigate(item.path)">
+            <div class="nav-icon">
+              <i class="fas {{ item.icon }}"></i>
+              <span class="badge" *ngIf="item.badge">{{ item.badge }}</span>
+            </div>
+            <div class="nav-label">{{ item.label }}</div>
+          </a>
+        </li>
+      </ul>
+    </nav>
 
     <!-- Sidebar Footer -->
     <div class="sidebar-footer">
