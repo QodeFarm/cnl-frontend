@@ -1,0 +1,88 @@
+<div class="container-fluid p-3">
+
+  <!-- ===== ADMIN VIEW ===== -->
+  <div *ngIf="!isCustomerPortal">
+
+    <!-- Page Header Banner -->
+    <div class="sale-invoice-banner page-component-header">
+      <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+        <button type="button" class="btn pl-0">
+          <span *ngIf="DeliveryChallanEditID" class="custom-heading">Update Delivery Challan</span>
+          <span *ngIf="!DeliveryChallanEditID" class="custom-heading">Create Delivery Challan</span>
+        </button>
+        <div style="display: flex; gap: 10px; align-items: center; justify-content: end; flex-wrap: wrap;">
+          <!-- Convert to Invoice — only show when editing an unconverted challan -->
+          <button
+            *ngIf="DeliveryChallanEditID && !formConfig.model?.['delivery_challan']?.['is_converted']"
+            type="button"
+            class="btn btn-success"
+            (click)="convertToInvoice()"
+            [disabled]="isConverting">
+            <span *ngIf="!isConverting">Convert to Invoice</span>
+            <span *ngIf="isConverting">Converting...</span>
+          </button>
+          <!-- Converted badge -->
+          <span
+            *ngIf="formConfig.model?.['delivery_challan']?.['is_converted']"
+            class="badge bg-success converted-badge">
+            ✓ Converted to Invoice
+          </span>
+          <!-- Open list modal -->
+          <button
+            type="button"
+            class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#dcListModal"
+            (click)="showDeliveryChallanListFn()">
+            Delivery Challan List
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Form -->
+    <div class="row custom-form">
+      <div class="col-12 px-1" *ngIf="showForm">
+        <ta-form #deliveryChallanForm [options]="formConfig"></ta-form>
+      </div>
+    </div>
+
+  </div>
+  <!-- ===== END ADMIN VIEW ===== -->
+
+  <!-- ===== CUSTOMER PORTAL VIEW ===== -->
+  <div *ngIf="isCustomerPortal">
+    <div class="customer-portal-info">
+      <h3>My Delivery Challans</h3>
+      <p>View all delivery challans dispatched for your orders.</p>
+    </div>
+    <app-delivery-challan-list
+      [isCustomerPortal]="true"
+      (edit)="editDeliveryChallan($event)"
+      class="custom-list">
+    </app-delivery-challan-list>
+  </div>
+  <!-- ===== END CUSTOMER PORTAL VIEW ===== -->
+
+</div>
+
+<!-- ===== Delivery Challan List Modal ===== -->
+<div class="modal fade custom-modal" id="dcListModal" tabindex="-1" aria-labelledby="dcListModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="dcListModalLabel">Delivery Challan List</h5>
+        <button type="button" id="dcModalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" *ngIf="showDeliveryChallanList">
+        <app-delivery-challan-list
+          (edit)="editDeliveryChallan($event)">
+        </app-delivery-challan-list>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+

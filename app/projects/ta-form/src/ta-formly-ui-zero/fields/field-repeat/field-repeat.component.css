@@ -20,12 +20,11 @@
      Actions body        = 1
    ============================================================ */
 
-/* ---------- Column 0 – Checkbox ---------- */
+/* ---------- Column 0 – First sticky column (checkbox or product) ---------- */
 .sticky-col-0 {
     position: sticky;
     left: 0;
     min-width: 50px;
-    max-width: 50px;
     z-index: 2;
     background: #ffffff;
 }

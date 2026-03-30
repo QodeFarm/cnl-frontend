@@ -237,9 +237,9 @@ export class FieldRepeatComponent extends FieldArrayType implements OnInit, OnDe
   ngOnInit(): void {
     const currentUrl = this.router.url || '';
 
-    // Enable sticky columns only when the table starts with a selectItem (checkbox) column.
+    // Enable sticky columns when table starts with a selectItem (checkbox) or product column.
     const firstFieldKey = (this.field?.fieldArray as any)?.fieldGroup?.[0]?.key;
-    this.hasStickyColumns = firstFieldKey === 'selectItem';
+    this.hasStickyColumns = firstFieldKey === 'selectItem' || firstFieldKey === 'product';
 
     // Per-field control: check templateOptions for hideActions flag
     // If set, respect it. Otherwise fall back to URL-based restriction.
