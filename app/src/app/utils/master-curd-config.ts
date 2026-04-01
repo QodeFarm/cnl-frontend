@@ -2,16 +2,13 @@ import { TaCurdConfig } from "@ta/ta-curd";
 import { HttpClient } from '@angular/common/http';
 
 export const customerCudConfig: TaCurdConfig = {
-    drawerSize: 500,
+    drawerSize: 700,
     drawerPlacement: 'top',
     tableConfig: {
         apiUrl: 'customers/customers/?summary=true',
         showCheckbox: false,
         pkId: "customer_id",
         hideFilters: true,
-        export: {
-            downloadName: 'customers'
-        },
         fixedFilters: [
             {
                 key: 'summary',
@@ -20,44 +17,37 @@ export const customerCudConfig: TaCurdConfig = {
         ],
         pageSize: 10,
         "globalSearch": {
-            keys: ['created_at', 'name', 'email', 'phone', 'gst', 'city_id', 'ledger_account_id']
+            keys: ['name', 'phone', 'code', 'city_id']
         },
-        // // defaultSort: { key: 'created_at', value: 'descend' },
-              defaultSort: { key: 'is_deleted', value: 'ascend' },
+        defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
             {
-                fieldKey: 'name',
-                name: 'Name',
-                sort: true
+                fieldKey: 'code',
+                name: 'Code',
+                sort: false,
+                width: '100px',
             },
-            // {
-            //     fieldKey: 'email',
-            //     name: 'Email',
-            //     sort: false,
-            // },
+            {
+                fieldKey: 'name',
+                name: 'Customer Name',
+                sort: true,
+                displayType: 'map',
+                mapFn: (currentValue: any, row: any, col: any) => {
+                    const cityName = row?.city?.city_name;
+                    return cityName ? `${row.name} [${cityName}]` : row.name;
+                },
+            },
             {
                 fieldKey: 'phone',
                 name: 'Phone',
                 sort: false,
-            },
-            // {
-            //     fieldKey: 'gst',
-            //     name: 'GST',
-            //     sort: true,
-            // },
-            {
-                fieldKey: 'city_id',
-                name: 'City Name',
-                sort: false,
-                displayType: 'map',
-                mapFn: (currentValue: any, row: any, col: any) => {
-                    return row.city.city_name;
-                },
+                width: '140px',
             },
             {
-              fieldKey: "code",
+              fieldKey: "actions",
               name: "Action",
               type: 'action',
+              width: '80px',
               actions: [
                 {
                   type: 'delete',
@@ -79,20 +69,6 @@ export const customerCudConfig: TaCurdConfig = {
                 }
               ]
             },
-            // {
-            //     fieldKey: 'ledger_account_id',
-            //     name: 'Ledger Account',
-            //     sort: true,
-            //     displayType: 'map',
-            //     mapFn: (currentValue: any, row: any, col: any) => {
-            //         return row.ledger_account.name;
-            //     },
-            // },
-            // {
-            //     fieldKey: 'pin_code',
-            //     name: 'Pin Code',
-            //     sort: true,
-            // }
         ]
     },
     formConfig: {
@@ -7708,7 +7684,6 @@ export const productsCrudConfig: TaCurdConfig = {
     tableConfig: {
       apiUrl: 'products/products/?summary=true',
       showCheckbox: false,
-      title: 'Product',
       pkId: "product_id",
       hideFilters: true,
       fixedFilters: [
@@ -7721,7 +7696,6 @@ export const productsCrudConfig: TaCurdConfig = {
       globalSearch: {
         keys: ['created_at', 'name', 'code', 'unit_options', 'balance', 'sales_rate', 'mrp', 'dis_amount', 'print_name', 'hsn_code', 'barcode']
       },
-      export: { downloadName: 'ProductsList' },
       // defaultSort: { key: 'code', value: 'descend' },
       defaultSort: { key: 'is_deleted', value: 'ascend' },
       cols: [

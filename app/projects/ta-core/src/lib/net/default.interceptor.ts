@@ -89,62 +89,79 @@ export class DefaultInterceptor implements HttpInterceptor {
 
     // Handle 400 errors specifically
     if (ev.status === 400) {
-      const responseBody = ev.error;  // Response is in `ev.error`
+      const responseBody = ev.error;
 
-      // Case 1: Handle field-level validation errors first (highest priority)
+      // Case 1: Root-level DRF field errors — { field: ["error msg"], ... }
+      // (bare serializer errors with no wrapper)
       if (responseBody && typeof responseBody === 'object') {
-        // Check for typical Django/DRF validation error format
-        const hasFieldErrors = Object.keys(responseBody).some(key => 
-          Array.isArray(responseBody[key]) && responseBody[key].length > 0
+        const wrapperKeys = new Set(['count', 'message', 'msg', 'data', 'errors', 'error', 'status_code']);
+        const hasRootFieldErrors = Object.keys(responseBody).some(key =>
+          !wrapperKeys.has(key) && Array.isArray(responseBody[key]) && responseBody[key].length > 0
         );
-        
-        if (hasFieldErrors) {
-          let errorMessages: string[] = [];
-          
-          Object.keys(responseBody).forEach((key) => {
-            if (Array.isArray(responseBody[key])) {
-              const formattedKey = key.replace(/_/g, ' ').toUpperCase();
-              errorMessages.push(`<strong>${formattedKey}:</strong> ${responseBody[key].join(', ')}`);
+        if (hasRootFieldErrors) {
+          const msgs: string[] = [];
+          Object.keys(responseBody).forEach(key => {
+            if (!wrapperKeys.has(key) && Array.isArray(responseBody[key])) {
+              msgs.push(`<strong>${this.humanKey(key)}:</strong> ${responseBody[key].join(', ')}`);
             }
           });
-          
-          if (errorMessages.length > 0) {
-            this.showError(errorMessages.join('<br>'));
-            return;
-          }
+          if (msgs.length) { this.showError(msgs.join('<br>')); return; }
         }
       }
-      
-      // Case 2: Handle form validation errors with nested 'errors' object
-      if (responseBody?.errors && typeof responseBody.errors === 'object') {
-        let errorMessages: string[] = [];
-        
-        Object.keys(responseBody.errors).forEach((key) => {
-          const formattedKey = key.replace(/_/g, ' ').toUpperCase();
-          errorMessages.push(`<strong>${formattedKey}:</strong> ${responseBody.errors[key].join(', ')}`);
+
+      // Case 2: Errors in responseBody.data (most common in this codebase)
+      // build_response(0, "ValidationError :", errors_dict, 400)
+      // → errors_dict becomes "data" in the JSON
+      if (responseBody?.data && typeof responseBody.data === 'object'
+          && !Array.isArray(responseBody.data)
+          && Object.keys(responseBody.data).length > 0) {
+        const errorText = this.formatErrors(responseBody);
+        if (errorText) { this.showError(errorText); return; }
+      }
+
+      // Case 3: Errors in responseBody.errors keyword argument
+      // build_response(0, "...", [], errors=serializer.errors, status=400)
+      if (responseBody?.errors && typeof responseBody.errors === 'object'
+          && Object.keys(responseBody.errors).length > 0) {
+        const msgs: string[] = [];
+        Object.keys(responseBody.errors).forEach(key => {
+          const val = responseBody.errors[key];
+          const msg = Array.isArray(val) ? val.join(', ')
+                    : typeof val === 'string' ? val
+                    : JSON.stringify(val);
+          msgs.push(`<strong>${this.humanKey(key)}:</strong> ${msg}`);
         });
-        
-        if (errorMessages.length > 0) {
-          this.showError(errorMessages.join('<br>'));
+        if (msgs.length) { this.showError(msgs.join('<br>')); return; }
+      }
+
+      // Case 4: {"error": "..."} shape — some views return this instead of "message"
+      if (responseBody?.error && typeof responseBody.error === 'string') {
+        this.showError(responseBody.error);
+        return;
+      }
+
+      // Case 5: {"msg": "..."} shape — some views return this instead of "message"
+      if (responseBody?.msg && typeof responseBody.msg === 'string') {
+        this.showError(responseBody.msg);
+        return;
+      }
+
+      // Case 6: Generic message — strip "ValidationError" prefix if present
+      if (responseBody?.message && typeof responseBody.message === 'string') {
+        let msg = responseBody.message.trim();
+        // Strip "ValidationError :" or "ValidationError:" prefix and show the actual error
+        const vePrefixMatch = msg.match(/^ValidationError\s*:\s*(.*)/);
+        if (vePrefixMatch && vePrefixMatch[1]) {
+          msg = vePrefixMatch[1].trim();
+        }
+        if (msg && msg !== 'Form validation failed') {
+          this.showError(msg);
           return;
         }
       }
-      
-      // Case 3: If there's a message in the response
-      if (responseBody?.message) {
-        this.showError(responseBody.message);
-        return;
-      }
-      
-      // Case 4: If we have data with errors
-      if (responseBody?.data && Object.keys(responseBody.data).length > 0) {
-        const errorText = this.formatErrors(responseBody);
-        this.showError(errorText);
-        return;
-      }
-      
-      // Case 5: Generic 400 error with no specific details
-      this.showError("Bad Request! Please check your input.");
+
+      // Case 7: Absolute fallback
+      this.showError('Validation failed. Please check all required fields and try again.');
       return;
     }
 
@@ -510,41 +527,112 @@ export class DefaultInterceptor implements HttpInterceptor {
   }
 
   showError(message: string): void {
+    // Split multi-line errors (separated by <br>) into list items
+    const lines = message.split(/<br\s*\/?>/i).map(l => l.trim()).filter(Boolean);
+    const bodyHtml = lines.length > 1
+      ? `<ul class="error-modal-list">${lines.map(l => `<li>${l}</li>`).join('')}</ul>`
+      : `<p class="error-modal-single">${message}</p>`;
+
     const modalRef = this.modelSvc.create({
-      // nzTitle: 'Error :',
-      nzContent: `<p>${message}</p>`, // Display the error message
-      nzClosable: false, // Disable the close button
+      nzTitle: null,
+      nzContent: `<div class="error-modal-wrap">
+                    <div class="error-modal-header">
+                      <span class="error-modal-icon">&#9888;</span>
+                      <span class="error-modal-heading">Validation Error</span>
+                    </div>
+                    <div class="error-modal-body">${bodyHtml}</div>
+                  </div>`,
+      nzClosable: false,
       nzFooter: [
         {
-          label: 'OK',
+          label: 'OK, Got it',
           type: 'primary',
-          onClick: () => modalRef.destroy(), // Close the modal when OK is clicked
+          onClick: () => modalRef.destroy(),
         },
       ],
-      nzCentered: true, // Center the modal
-      nzWrapClassName: 'error-modal', // Custom class for styling
+      nzCentered: true,
+      nzWidth: 460,
+      nzWrapClassName: 'error-modal',
     });
   };
 
+  /** Convert snake_case / camelCase key to "Title Case" for display */
+  private humanKey(key: string): string {
+    return key
+      .replace(/_/g, ' ')
+      .replace(/([a-z])([A-Z])/g, '$1 $2')
+      .replace(/\b\w/g, c => c.toUpperCase());
+  }
+
+  /**
+   * Parses the backend's nested error structure from responseBody.data into
+   * human-readable HTML lines.
+   *
+   * Handles both formats emitted by the backend:
+   *  - { sale_order: [{ name: ["required"] }], sale_order_items: [{ product_id: ["required"] }] }
+   *  - { customer_data: { name: ["required"], phone: ["invalid"] } }
+   */
   formatErrors(responseBody: any): string {
-    if (!responseBody?.data) return responseBody?.message || 'An unknown error occurred';
-  
-    let errorMessages: string[] = [];
-  
-    Object.entries(responseBody.data).forEach(([key, value]) => {
-      const processMessages = (subKey: string, messages: any) => {
-        if (Array.isArray(messages)) {
-          messages.forEach((msg) => errorMessages.push(`<b>${key.toUpperCase()}</b> - ${subKey} - ${msg}<br>`));
+    if (!responseBody?.data || typeof responseBody.data !== 'object') {
+      return '';
+    }
+
+    const lines: string[] = [];
+
+    const addLine = (section: string, field: string, messages: any) => {
+      const msgStr = Array.isArray(messages)
+        ? messages.join(', ')
+        : typeof messages === 'string'
+          ? messages
+          : JSON.stringify(messages);
+      if (!msgStr) return;
+      const sectionLabel = this.humanKey(section);
+      const fieldLabel = this.humanKey(field);
+      lines.push(`<strong>${sectionLabel} → ${fieldLabel}:</strong> ${msgStr}`);
+    };
+
+    // Detect flat serializer errors: { "name": ["required"], "email": ["invalid"] }
+    // vs nested section errors: { "sale_order": [{ "name": ["required"] }] }
+    // Flat = every value is a string[] (array of error strings directly)
+    const entries = Object.entries(responseBody.data);
+    const isFlat = entries.length > 0 && entries.every(
+      ([, val]) => Array.isArray(val) && val.every((v: any) => typeof v === 'string')
+    );
+
+    if (isFlat) {
+      // Flat field-level errors: { field: ["error msg", ...], ... }
+      entries.forEach(([field, messages]) => {
+        const msgStr = (messages as string[]).join(', ');
+        if (msgStr) {
+          lines.push(`<strong>${this.humanKey(field)}:</strong> ${msgStr}`);
         }
-      };
-  
-      if (Array.isArray(value)) {
-        value.forEach(item => typeof item === 'object' && Object.entries(item).forEach(([subKey, messages]) => processMessages(subKey, messages)));
-      } else if (typeof value === 'object') {
-        Object.entries(value).forEach(([subKey, messages]) => processMessages(subKey, messages));
-      }
-    });
-  
-    return errorMessages.length ? errorMessages.join('') : responseBody.message || 'Unknown error';
+      });
+    } else {
+      // Nested section errors
+      entries.forEach(([section, value]) => {
+        if (Array.isArray(value)) {
+          // Array of objects (e.g. list of row errors from a repeating section)
+          value.forEach((item: any, idx: number) => {
+            if (item && typeof item === 'object') {
+              Object.entries(item).forEach(([field, messages]) => {
+                const sectionWithRow = value.length > 1
+                  ? `${section} (row ${idx + 1})`
+                  : section;
+                addLine(sectionWithRow, field, messages);
+              });
+            }
+          });
+        } else if (value && typeof value === 'object') {
+          // Flat object { field: ["error"] }
+          Object.entries(value).forEach(([field, messages]) => {
+            addLine(section, field, messages);
+          });
+        } else if (typeof value === 'string') {
+          lines.push(`<strong>${this.humanKey(section)}:</strong> ${value}`);
+        }
+      });
+    }
+
+    return lines.length ? lines.join('<br>') : '';
   }
 }

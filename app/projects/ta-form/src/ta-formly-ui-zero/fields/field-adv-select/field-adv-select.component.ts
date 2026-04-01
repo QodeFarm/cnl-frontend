@@ -103,6 +103,7 @@ export class FieldAdvSelectComponent extends FieldType implements OnInit, AfterC
     // Everything else = outside → close the dropdown
     this.dropdownOpen = false;
     this.showCurdDiv = false;
+    this.props?.curdConfig?.tableConfig?.resetSearch?.();
     this.cdr.detectChanges();
   }
   ngOnInit(): void {
@@ -110,10 +111,16 @@ export class FieldAdvSelectComponent extends FieldType implements OnInit, AfterC
     this.to.placeholder = this.to.placeholder || 'Please Select';
     if (this.props.curdConfig && this.props.curdConfig.tableConfig) {
       this.props.curdConfig.tableConfig.rowSelectionEnabled = true;
+      // Selection popup: hide toolbar clutter — title, refresh, export, horizontal scroll
+      this.props.curdConfig.tableConfig.hideRefreshBtn = true;
+      this.props.curdConfig.tableConfig.export = undefined;
+      this.props.curdConfig.tableConfig.title = undefined;
+      this.props.curdConfig.tableConfig.scrollX = undefined;
       this.props.curdConfig.tableConfig.rowSelection = (row) => {
         this.formControl.setValue(row);
         this.dropdownOpen = false;
         this.showCurdDiv = false;
+        this.props?.curdConfig?.tableConfig?.resetSearch?.();
       }
     }
 
@@ -258,12 +265,20 @@ export class FieldAdvSelectComponent extends FieldType implements OnInit, AfterC
         this.overlayMaxHeight = Math.min(maxH, vh * 0.7) + 'px';
 
         // --- Horizontal: clamp desired width so panel stays in viewport ---
-        const desiredW = this.props?.curdConfig?.drawerSize || 500;
+        const desiredW = this.props?.curdConfig?.drawerSize || 700;
         const spaceRight = vw - rect.left - margin;
         const spaceLeft = rect.right - margin;
         const maxW = Math.max(spaceRight, spaceLeft, 300);
         this.overlayWidth = Math.min(desiredW, maxW);
       }
+
+      // Auto-focus the search input inside the overlay after it renders
+      setTimeout(() => {
+        const searchInput = document.querySelector(
+          '.adv-select-custom-overlay-panel input[type="text"]'
+        ) as HTMLInputElement;
+        if (searchInput) searchInput.focus();
+      }, 150);
     }
   }
 
@@ -271,6 +286,7 @@ export class FieldAdvSelectComponent extends FieldType implements OnInit, AfterC
   cancelDropdown(): void {
     this.dropdownOpen = false;
     this.showCurdDiv = false;
+    this.props?.curdConfig?.tableConfig?.resetSearch?.();
   }
 
   /** Clear the selected value and close dropdown */
@@ -279,10 +295,10 @@ export class FieldAdvSelectComponent extends FieldType implements OnInit, AfterC
     this.lazySelectedItem = null;
     this.dropdownOpen = false;
     this.showCurdDiv = false;
+    this.props?.curdConfig?.tableConfig?.resetSearch?.();
     this.cdr.detectChanges();
   }
   openDrawer(row?: any) {
-    debugger;
     this.formTitle = 'Create ' + this.props.curdConfig.formConfig.title;
     this.props.curdConfig.formConfig.model = {};
     if (row) {
