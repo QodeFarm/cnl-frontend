@@ -44,3 +44,7 @@ div:hover .hover-show {
   color: #374151;
   font-weight: 400;
 }
+
+/* NOTE: adv-select-footer styles live in global styles.scss
+   because CDK overlay renders outside this component's DOM tree
+   and Angular's emulated view encapsulation does not reach it. */

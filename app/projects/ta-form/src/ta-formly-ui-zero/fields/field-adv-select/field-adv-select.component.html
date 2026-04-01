@@ -16,12 +16,12 @@
         <div style="padding: 8px 12px; background-color: white; width: 100%;">
             <ta-curd-modal [options]="props.curdConfig" [nestLevel]="currentNestLevel" [maxNestLevel]="maxNestLevel" class="custom-list"></ta-curd-modal>
         </div>
-        <!-- Footer: Cancel & Clear buttons (Align Books ERP style) -->
+        <!-- Footer: Cancel & Clear buttons (compact ERP style) -->
         <div class="adv-select-footer">
-            <button nz-button nzType="primary" (click)="cancelDropdown()" class="adv-select-footer-btn">
+            <button nz-button nzType="default" nzSize="small" (click)="cancelDropdown()" class="adv-select-footer-btn">
                 Cancel
             </button>
-            <button nz-button nzType="primary" (click)="clearAndClose()" class="adv-select-footer-btn">
+            <button nz-button nzType="default" nzSize="small" (click)="clearAndClose()" class="adv-select-footer-btn adv-select-footer-btn-clear">
                 Clear
             </button>
         </div>

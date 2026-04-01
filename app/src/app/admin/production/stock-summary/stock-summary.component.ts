@@ -100,22 +100,16 @@ export class StockSummaryComponent {
           },
           displayAsHtml: true
         },
-        // {
-        //   fieldKey: 'period_start',
-        //   name: 'Period Start',
-        //   type: 'date'
-        // },
-        // {
-        //   fieldKey: 'period_end',
-        //   name: 'Period End',
-        //   type: 'date'
-        // },
         {
-          fieldKey: 'created_at',
-          name: 'Created At',
-          type: 'datetime',
-          displayType: 'datetime'
-
+          fieldKey: 'period_end',
+          name: 'Last Transaction',
+          sort: true,
+          displayType: 'map',
+          mapFn: (currentValue: any) => {
+            if (!currentValue) return '—';
+            const d = new Date(currentValue);
+            return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+          }
         }
       ]
     },

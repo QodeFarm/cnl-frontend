@@ -131,6 +131,13 @@ export class MaterialIssueComponent implements OnInit, OnDestroy {
         if (newItem.unit_options_id && typeof newItem.unit_options_id === 'object' && newItem.unit_options_id.unit_options_id) {
           newItem.unit_options_id = newItem.unit_options_id.unit_options_id;
         }
+        // Convert empty strings to null for numeric fields.
+        // HTML number inputs return "" when cleared — Django rejects "" for Integer/DecimalField.
+        ['no_of_boxes', 'quantity', 'rate', 'amount', 'mrp'].forEach(field => {
+          if (newItem[field] === '' || newItem[field] === undefined) {
+            newItem[field] = null;
+          }
+        });
         return newItem;
       });
     }

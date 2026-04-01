@@ -994,6 +994,11 @@ downloadData(event: any) {
       this.options.pageSize = 10;
     }
     this.options.reload = () => { this.reload() };
+    this.options.resetSearch = () => {
+      this.globalSearchValue = '';
+      if (this.options.globalSearch) { this.options.globalSearch.value = null; }
+      this.loadDataFromServer();
+    };
 
     if (!this.options.pageSizeOptions) {
       this.options.pageSizeOptions = [10, 20, 30, 50, 100, 300, 500, 1000]

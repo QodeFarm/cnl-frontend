@@ -222,7 +222,7 @@
             </div>
 
             <!-- Refresh Button -->
-            <div>
+            <div *ngIf="!options.hideRefreshBtn">
                 <button nz-button nzType="primary" (click)="refreshIcon()" style="margin-left: 5px;">
                     <i nz-icon nzType="sync" nzTheme="outline"></i>
                 </button>

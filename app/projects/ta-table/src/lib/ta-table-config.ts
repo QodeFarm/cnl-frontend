@@ -25,9 +25,11 @@ export interface TaTableConfig {
   defaultSort?: { key?: string, value?: 'ascend' | 'descend' },
   checkedRows?: any[],
   reload?: () => any,
+  resetSearch?: () => any,
   rowSelectionEnabled?: boolean
   rowSelection?: (row: any) => any;
   hideFilters?: boolean; // Controls whether to hide filters regardless of URL
+  hideRefreshBtn?: boolean; // Hides the refresh button (useful in selection popups)
 }
 
 export interface Export {

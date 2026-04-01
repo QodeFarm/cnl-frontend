@@ -393,7 +393,7 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         <a (click)="closeMenu()" class="collapse-item" *ngFor="let sm of m.module_sections"
                             [routerLink]="[sm.sec_link]" routerLinkActive="active"
-                            [routerLinkActiveOptions]="{ exact: true }">{{sm.section_name}}</a>
+                            [routerLinkActiveOptions]="{ exact: true }" [title]="sm.section_name">{{sm.section_name}}</a>
                     </div>
                 </div>
                 <!-- Has children — search mode (auto-expanded) -->
@@ -407,7 +407,7 @@
                     <div class="py-2 collapse-inner">
                         <a (click)="closeMenu(); clearMenuSearch()" class="collapse-item"
                             *ngFor="let sm of m.module_sections" [routerLink]="[sm.sec_link]" routerLinkActive="active"
-                            [routerLinkActiveOptions]="{ exact: true }">{{sm.section_name}}</a>
+                            [routerLinkActiveOptions]="{ exact: true }" [title]="sm.section_name">{{sm.section_name}}</a>
                     </div>
                 </div>
             </li>
