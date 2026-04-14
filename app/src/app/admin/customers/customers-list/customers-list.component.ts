@@ -71,6 +71,16 @@ export class CustomersListComponent {
     },
     // defaultSort: { key: 'is_deleted', value: 'ascend' },
     defaultSort: { key: 'created_at', value: 'descend' },
+    extraFields: [
+      { fieldKey: 'customer_code',        name: 'Customer Code'              },
+      { fieldKey: 'pan',                  name: 'PAN'                        },
+      { fieldKey: 'website',              name: 'Website'                    },
+      { fieldKey: 'is_sub_customer',      name: 'Sub Customer',   displayType: 'map', mapFn: (v: any) => v ? 'Yes' : 'No' },
+      { fieldKey: 'customer_common',      name: 'Common Customer',displayType: 'map', mapFn: (v: any) => v ? 'Yes' : 'No' },
+      { fieldKey: 'enable_portal_access', name: 'Portal Access',  displayType: 'map', mapFn: (v: any) => v ? 'Yes' : 'No' },
+      { fieldKey: 'tds_applicable',       name: 'TDS Applicable', displayType: 'map', mapFn: (v: any) => v ? 'Yes' : 'No' },
+      { fieldKey: 'gst_suspend',          name: 'GST Suspend',    displayType: 'map', mapFn: (v: any) => v ? 'Yes' : 'No' },
+    ],
     cols: [
       {
         fieldKey: 'name',
@@ -148,8 +158,8 @@ export class CustomersListComponent {
       },
 
       {
-        fieldKey: "code",
-        name: "Action",
+        fieldKey: 'code',
+        name: 'Action',
         type: 'action',
         actions: [
           {

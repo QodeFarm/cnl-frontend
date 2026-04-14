@@ -4706,3 +4706,297 @@ body.col-resizing * {
         border-radius: 16px 16px 0 0;
     }
 }
+
+// ============================================================
+// COLUMN CHOOSER — professional ERP dropdown panel
+// Brand: #142768 navy  |  custom absolute panel (no CDK overlay)
+// ============================================================
+
+// ── Wrapper: establishes positioning context ─────────────────
+ta-table .col-chooser-wrapper {
+    position: relative;
+    display: inline-block;
+    margin-left: 5px;
+}
+
+// ── Backdrop: transparent, covers entire viewport to catch outside clicks ──
+.col-chooser-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 998;
+    background: transparent;
+}
+
+// ── Trigger button ──────────────────────────────────────────
+ta-table .col-chooser-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border-color: #d9d9d9;
+    color: #555;
+    font-size: 13px;
+    transition: all 0.2s;
+
+    &:hover {
+        border-color: #142768;
+        color: #142768;
+        background: #f0f3ff;
+    }
+
+    .col-chooser-btn-label {
+        font-size: 13px;
+        font-weight: 500;
+    }
+}
+
+// Badge: number of hidden columns
+ta-table .col-hidden-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #142768;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    min-width: 17px;
+    height: 17px;
+    border-radius: 9px;
+    padding: 0 4px;
+    line-height: 1;
+}
+
+// ── Panel container ─────────────────────────────────────────
+.col-chooser-panel {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    z-index: 999;
+    width: 260px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 8px 28px rgba(20, 39, 104, 0.16);
+    border: 1px solid #dde3f5;
+    overflow: hidden;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+
+    // ── Header ─────────────────────────────────────────────
+    .col-chooser-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 14px;
+        background: #142768;
+
+        .col-chooser-title {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .col-chooser-reset {
+            color: rgba(255,255,255,0.70);
+            font-size: 11px;
+            cursor: pointer;
+            text-decoration: underline dotted;
+            transition: color 0.2s;
+            white-space: nowrap;
+
+            &:hover { color: #fff; }
+        }
+    }
+
+    // ── Section label (SHOWING / ADD MORE FIELDS) ───────────
+    .col-chooser-section-label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 7px 14px 4px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.7px;
+        color: #8898aa;
+        text-transform: uppercase;
+        background: #f8f9fd;
+        border-bottom: 1px solid #eef0f8;
+
+        .col-chooser-count {
+            font-weight: 600;
+            color: #142768;
+            font-size: 11px;
+            letter-spacing: 0;
+            text-transform: none;
+        }
+    }
+
+    // ── Shared list styles ──────────────────────────────────
+    .col-chooser-list {
+        list-style: none;
+        margin: 0;
+        padding: 4px 0;
+        max-height: 230px;
+        overflow-y: auto;
+
+        &::-webkit-scrollbar       { width: 3px; }
+        &::-webkit-scrollbar-track { background: transparent; }
+        &::-webkit-scrollbar-thumb { background: #c8d0e8; border-radius: 2px; }
+    }
+
+    // ── Row shared ──────────────────────────────────────────
+    .col-chooser-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 5px 14px;
+        transition: background 0.15s;
+
+        &:hover { background: #f0f3ff; }
+
+        .col-chooser-label {
+            flex: 1;
+            cursor: pointer;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+
+        // ✕ remove button for user-added cols
+        .col-remove-btn {
+            flex-shrink: 0;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 10px;
+            color: #aab;
+            cursor: pointer;
+            transition: all 0.15s;
+            margin-left: 6px;
+
+            &:hover {
+                background: #fde8e8;
+                color: #e53e3e;
+            }
+        }
+    }
+
+    // ── Divider between sections ────────────────────────────
+    .col-chooser-divider {
+        height: 1px;
+        background: #eef0f8;
+        margin: 2px 0;
+    }
+
+    // ── Search bar ──────────────────────────────────────────
+    .col-chooser-search {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 14px 5px;
+        border-bottom: 1px solid #eef0f8;
+        background: #fafbff;
+
+        .col-search-icon {
+            color: #aab;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .col-search-input {
+            flex: 1;
+            border: none !important;
+            box-shadow: none !important;
+            background: transparent !important;
+            font-size: 12px;
+            padding: 0;
+            height: 22px;
+            color: #2d3748;
+
+            &::placeholder { color: #bbb; }
+            &:focus { outline: none; box-shadow: none !important; }
+        }
+    }
+
+    // ── "Add More" row ──────────────────────────────────────
+    .col-chooser-extra-list {
+        max-height: 160px;
+    }
+
+    .col-chooser-add-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 5px 12px 5px 14px;
+        transition: background 0.15s;
+
+        &:hover { background: #f0f3ff; }
+
+        .col-extra-name {
+            flex: 1;
+            font-size: 13px;
+            color: #4a5568;
+        }
+
+        .col-add-btn {
+            flex-shrink: 0;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 1.5px solid #142768;
+            background: transparent;
+            color: #142768;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.15s;
+            padding: 0;
+
+            &:hover {
+                background: #142768;
+                color: #fff;
+            }
+        }
+    }
+
+    // ── No results message ──────────────────────────────────
+    .col-chooser-no-results {
+        padding: 10px 14px;
+        font-size: 12px;
+        color: #aab;
+        text-align: center;
+        font-style: italic;
+    }
+
+    // ── Footer ─────────────────────────────────────────────
+    .col-chooser-footer {
+        padding: 6px 14px;
+        font-size: 11px;
+        color: #8898aa;
+        text-align: right;
+        border-top: 1px solid #eef0f8;
+        background: #f8f9fd;
+    }
+}
+
+// nz-checkbox brand color override — scoped to the panel
+.col-chooser-panel {
+    .ant-checkbox-checked .ant-checkbox-inner {
+        background-color: #142768 !important;
+        border-color:     #142768 !important;
+    }
+    .ant-checkbox-wrapper:hover .ant-checkbox-inner,
+    .ant-checkbox:hover          .ant-checkbox-inner,
+    .ant-checkbox-input:focus  + .ant-checkbox-inner {
+        border-color: #142768 !important;
+    }
+}

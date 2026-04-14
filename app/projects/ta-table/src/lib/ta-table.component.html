@@ -227,6 +227,98 @@
                     <i nz-icon nzType="sync" nzTheme="outline"></i>
                 </button>
             </div>
+
+            <!-- Column Chooser Button + Custom Panel -->
+            <div class="col-chooser-wrapper">
+                <!-- Backdrop: closes panel when user clicks outside -->
+                <div *ngIf="showColChooser" class="col-chooser-backdrop" (click)="showColChooser = false"></div>
+
+                <button nz-button nzType="default" class="col-chooser-btn"
+                    nz-tooltip nzTooltipTitle="Manage Columns"
+                    (click)="showColChooser = !showColChooser; $event.stopPropagation()">
+                    <i nz-icon nzType="appstore" nzTheme="outline"></i>
+                    <span class="col-chooser-btn-label">Columns</span>
+                    <span *ngIf="hiddenColCount > 0" class="col-hidden-badge">{{ hiddenColCount }}</span>
+                </button>
+
+                <!-- Custom panel — absolutely positioned below the button, always stays open while typing -->
+                <div *ngIf="showColChooser" class="col-chooser-panel" (click)="$event.stopPropagation()">
+
+                    <!-- Header -->
+                    <div class="col-chooser-header">
+                        <span class="col-chooser-title">
+                            <i nz-icon nzType="table" nzTheme="outline"></i>
+                            Columns
+                        </span>
+                        <a *ngIf="hasCustomizations" class="col-chooser-reset" (click)="resetColVisibility()">
+                            Reset
+                        </a>
+                    </div>
+
+                    <!-- ── Section 1: Current columns ── -->
+                    <div class="col-chooser-section-label">
+                        SHOWING
+                        <span class="col-chooser-count">{{ visibleColCount }} / {{ choosableCols.length }}</span>
+                    </div>
+                    <ul class="col-chooser-list">
+                        <li *ngFor="let col of choosableCols" class="col-chooser-item">
+                            <label nz-checkbox
+                                [ngModel]="!col.hidden"
+                                (ngModelChange)="setColVisibility(col, $event)"
+                                class="col-chooser-label">
+                                {{ col.name }}
+                            </label>
+                            <!-- ✕ only on user-added columns -->
+                            <span *ngIf="col['_isAdded']"
+                                class="col-remove-btn"
+                                nz-tooltip nzTooltipTitle="Remove field"
+                                (click)="removeAddedCol(col)">
+                                ✕
+                            </span>
+                        </li>
+                    </ul>
+
+                    <!-- ── Section 2: Add more fields (shown only when extra cols exist) ── -->
+                    <ng-container *ngIf="extraCols.length > 0">
+                        <div class="col-chooser-divider"></div>
+                        <div class="col-chooser-section-label">ADD MORE FIELDS</div>
+
+                        <!-- Search bar — plain input, no nz-input to avoid interference -->
+                        <div class="col-chooser-search">
+                            <i nz-icon nzType="search" nzTheme="outline" class="col-search-icon"></i>
+                            <input
+                                type="text"
+                                [value]="colSearchTerm"
+                                (input)="colSearchTerm = $any($event.target).value"
+                                placeholder="Search fields..."
+                                class="col-search-input"
+                                autocomplete="off" />
+                        </div>
+
+                        <!-- Available fields list -->
+                        <ul class="col-chooser-list col-chooser-extra-list">
+                            <li *ngFor="let col of filteredExtraCols" class="col-chooser-add-item">
+                                <span class="col-extra-name">{{ col.name }}</span>
+                                <button class="col-add-btn"
+                                    nz-tooltip nzTooltipTitle="Add to table"
+                                    (click)="addExtraCol(col)">
+                                    <i nz-icon nzType="plus" nzTheme="outline"></i>
+                                </button>
+                            </li>
+                            <li *ngIf="filteredExtraCols.length === 0" class="col-chooser-no-results">
+                                No fields match "{{ colSearchTerm }}"
+                            </li>
+                        </ul>
+                    </ng-container>
+
+                    <!-- Footer -->
+                    <div class="col-chooser-footer">
+                        {{ visibleColCount }} of {{ choosableCols.length }} columns visible
+                    </div>
+
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
@@ -244,7 +336,7 @@
 
             <ng-container *ngFor="let c of options.cols">
 
-                <th style="min-width: 150px;" (nzSortOrderChange)="nzSortOrderChange($event)"
+                <th *ngIf="!c.hidden" style="min-width: 150px;" (nzSortOrderChange)="nzSortOrderChange($event)"
                     [nzColumnKey]="c.sortKey || c.fieldKey" [nzFilterFn]="false" [nzSortDirections]="(c.sort)?[]:[null]"
                     [nzSortOrder]="c.sortOrder" [nzSortFn]="c.sort" [nzWidth]="c.width" nzCustomFilter>{{c.name}}
                     <nz-filter-trigger *ngIf="c.filter" [(nzVisible)]="c.visible"
@@ -274,7 +366,7 @@
                 (nzCheckedChange)="onItemChecked(data[options.pkId], $event)" [nzDisabled]="false"
                 [nzLabel]="data.name"></td>
             <ng-container *ngFor="let c of options.cols">
-                <td style="min-width: 150px;" [ngClass]="c.tdClassName" [nzEllipsis]="c.ellipsis"
+                <td *ngIf="!c.hidden" style="min-width: 150px;" [ngClass]="c.tdClassName" [nzEllipsis]="c.ellipsis"
                     (click)="options.rowSelectionEnabled && c.type != 'action' && onRowSelect(data)">
                     <label class="col-name">{{c.name}} :</label>
 
@@ -344,7 +436,7 @@
     </ng-container>
     <ng-container *ngIf="col.fieldKey !== 'products'">
         <!-- Default rendering for other columns -->
-        <ta-table-cell-dynamic [col]="col" [row]="row" [value]="row[col.fieldKey]"></ta-table-cell-dynamic>
+        <ta-table-cell-dynamic [col]="col" [row]="row" [value]="resolveValue(row, col.fieldKey)"></ta-table-cell-dynamic>
     </ng-container>
 </ng-template>
 
