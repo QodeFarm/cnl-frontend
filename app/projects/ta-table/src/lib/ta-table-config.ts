@@ -30,6 +30,12 @@ export interface TaTableConfig {
   rowSelection?: (row: any) => any;
   hideFilters?: boolean; // Controls whether to hide filters regardless of URL
   hideRefreshBtn?: boolean; // Hides the refresh button (useful in selection popups)
+  /**
+   * Optional extra fields the user can add to this list.
+   * Define once per list component; users see them in ADD MORE FIELDS.
+   * fieldKey supports dot-notation for nested values: "customer.email"
+   */
+  extraFields?: ColumnItem[];
 }
 
 export interface Export {
@@ -60,6 +66,7 @@ export interface ColumnItem {
   isEditSumbmit?: (row: any, value: any, col: any) => any;
   ellipsis?: boolean;
   width?: any;
+  hidden?: boolean;
   [any: string]: any;
 }
 interface Action {

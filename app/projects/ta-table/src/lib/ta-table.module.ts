@@ -20,6 +20,7 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { DateRangeFilterComponent } from './ta-filters/date-range-filter/date-range-filter.component';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
+import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 @NgModule({
   declarations: [
     TaTableComponent,
@@ -43,7 +44,8 @@ import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
     NzSpaceModule,
     NzSelectModule,
     NzDatePickerModule,
-    NzToolTipModule
+    NzToolTipModule,
+    NzCheckboxModule
   ],
   providers: [TaTableService],
   exports: [

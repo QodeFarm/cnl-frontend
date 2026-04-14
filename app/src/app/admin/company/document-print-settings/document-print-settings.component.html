@@ -1,0 +1,310 @@
+<div class="dps-wrapper">
+
+  <!-- ── Page Header ── -->
+  <div class="dps-page-header">
+    <div class="dps-header-left">
+      <div class="dps-header-icon">
+        <span nz-icon nzType="printer" nzTheme="outline"></span>
+      </div>
+      <div>
+        <h1 class="dps-page-title">Document Print Settings</h1>
+        <p class="dps-page-sub">Configure print layout, columns, and style for each document type</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Document Type Tab Bar ── -->
+  <div class="dps-doctype-bar">
+    <div
+      *ngFor="let tab of docTypeTabs"
+      class="dps-doctype-tab"
+      [class.active]="activeDocType === tab.key"
+      [class.dirty]="tabState[tab.key]?.isDirty && activeDocType !== tab.key"
+      (click)="onTabChange(tab.key)">
+      <span nz-icon [nzType]="tab.icon" nzTheme="outline"></span>
+      <span>{{ tab.label }}</span>
+      <span *ngIf="tabState[tab.key]?.isDirty" class="unsaved-dot" nz-tooltip nzTooltipTitle="Unsaved changes"></span>
+    </div>
+  </div>
+
+  <!-- ── Main Card ── -->
+  <div class="dps-card">
+
+    <!-- Loading -->
+    <div *ngIf="currentState?.loading" class="dps-loading">
+      <nz-spin nzSize="large"></nz-spin>
+      <p>Loading settings...</p>
+    </div>
+
+    <!-- Loaded -->
+    <div *ngIf="!currentState?.loading && currentTemplate" class="dps-body">
+
+      <!-- LEFT: Template Sidebar -->
+      <div class="dps-sidebar">
+        <div class="sidebar-head">
+          <span class="sidebar-title">Templates</span>
+          <button nz-button nzSize="small" class="btn-new-tpl" (click)="createNewTemplate()">
+            <span nz-icon nzType="plus"></span> New
+          </button>
+        </div>
+        <div class="sidebar-list">
+          <div
+            *ngFor="let tpl of currentState?.templates"
+            class="tpl-item"
+            [class.active]="currentTemplate?.template_id === tpl.template_id"
+            (click)="selectTemplate(tpl)">
+            <div class="tpl-row-top">
+              <span class="tpl-name">{{ tpl.template_name }}</span>
+              <nz-tag *ngIf="tpl.is_default" nzColor="blue" class="tpl-badge">Default</nz-tag>
+            </div>
+            <div class="tpl-row-meta">
+              {{ getPaperSizeLabel(tpl.paper_size) }} &nbsp;·&nbsp;
+              <span class="mini-dot" [attr.data-theme]="tpl.style_config?.color_theme || 'navy'"></span>
+              {{ (tpl.style_config?.color_theme || 'Navy') | titlecase }}
+            </div>
+            <button
+              nz-button nzType="text" nzSize="small" nzDanger
+              class="tpl-del-btn"
+              nz-tooltip nzTooltipTitle="Delete"
+              (click)="$event.stopPropagation(); deleteTemplate(tpl)">
+              <span nz-icon nzType="delete"></span>
+            </button>
+          </div>
+          <div *ngIf="!currentState?.templates?.length" class="tpl-empty">
+            <span nz-icon nzType="inbox" nzTheme="outline"></span>
+            <span>No saved templates yet.<br>Configure the settings on the right and click <strong>Save Template</strong> to create your first one.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Settings Panel -->
+      <div class="dps-panel">
+
+        <!-- Topbar -->
+        <div class="panel-topbar">
+          <div class="topbar-left">
+            <span class="topbar-label">Template Name</span>
+            <input
+              #templateNameInput
+              nz-input class="tpl-name-input"
+              [(ngModel)]="currentTemplate.template_name"
+              (ngModelChange)="markDirty()"
+              placeholder="e.g. Standard Invoice" />
+            <label nz-checkbox
+              [(ngModel)]="currentTemplate.is_default"
+              (ngModelChange)="markDirty()"
+              nz-tooltip
+              nzTooltipTitle="Only the Default template is used when generating print documents. At least one template must be set as Default.">
+              Set as Default
+            </label>
+          </div>
+          <div class="topbar-right">
+            <button nz-button nzType="default" (click)="resetToDefaults()">
+              <span nz-icon nzType="reload"></span> Reset
+            </button>
+            <button nz-button nzType="primary"
+              [nzLoading]="currentState?.saving"
+              [nzDisabled]="!currentState?.isDirty && (currentState?.templates?.length || 0) > 0"
+              (click)="saveTemplate()">
+              <span nz-icon nzType="save"></span> Save Template
+            </button>
+          </div>
+        </div>
+
+        <!-- Inner Tabs -->
+        <div class="panel-tabs-area">
+          <nz-tabset nzSize="default" [nzAnimated]="false">
+
+            <!-- Layout & Style -->
+            <nz-tab [nzTitle]="layoutTitle">
+              <ng-template #layoutTitle>
+                <span nz-icon nzType="layout" nzTheme="outline"></span>&nbsp;Layout &amp; Style
+              </ng-template>
+              <div class="tab-body">
+                <div class="style-grid">
+
+                  <div class="sec-card">
+                    <div class="sec-card-head"><span nz-icon nzType="file" nzTheme="outline"></span> Paper &amp; Font</div>
+                    <div class="sec-card-body">
+                      <div class="frow-v">
+                        <label class="flabel-v">Paper Size</label>
+                        <nz-select [(ngModel)]="currentTemplate.paper_size" (ngModelChange)="onStyleChange()" class="fctl-full">
+                          <nz-option *ngFor="let ps of getPaperSizes()" [nzValue]="ps.value" [nzLabel]="ps.label"></nz-option>
+                        </nz-select>
+                      </div>
+                      <div class="frow-v">
+                        <label class="flabel-v">Font Size</label>
+                        <nz-select [(ngModel)]="currentTemplate.style_config.font_size" (ngModelChange)="onStyleChange()" class="fctl-full">
+                          <nz-option *ngFor="let fs of getFontSizes()" [nzValue]="fs.value" [nzLabel]="fs.label"></nz-option>
+                        </nz-select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="sec-card">
+                    <div class="sec-card-head"><span nz-icon nzType="bg-colors" nzTheme="outline"></span> Color Theme</div>
+                    <div class="sec-card-body">
+                      <div class="theme-palette">
+                        <div
+                          *ngFor="let t of getColorThemes()"
+                          class="theme-chip"
+                          [class.selected]="currentTemplate.style_config.color_theme === t.value"
+                          [attr.data-theme]="t.value"
+                          nz-tooltip [nzTooltipTitle]="t.label"
+                          (click)="currentTemplate.style_config.color_theme = t.value; onStyleChange()">
+                          <span *ngIf="currentTemplate.style_config.color_theme === t.value" nz-icon nzType="check"></span>
+                        </div>
+                      </div>
+                      <div class="theme-label">
+                        <span class="mini-dot" [attr.data-theme]="currentTemplate.style_config.color_theme"></span>
+                        {{ currentTemplate.style_config.color_theme | titlecase }} Theme
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="sec-card">
+                    <div class="sec-card-head"><span nz-icon nzType="copy" nzTheme="outline"></span> Print Copies</div>
+                    <div class="sec-card-body">
+                      <div class="frow">
+                        <label class="flabel">Copies</label>
+                        <nz-select [ngModel]="currentTemplate.copy_config?.num_copies || 1" (ngModelChange)="onNumCopiesChange($event)" class="fctl-short">
+                          <nz-option *ngFor="let n of getCopyCountOptions()" [nzValue]="n" [nzLabel]="n + (n === 1 ? ' Copy' : ' Copies')"></nz-option>
+                        </nz-select>
+                      </div>
+                      <nz-divider nzDashed nzOrientation="left" nzText="Copy Labels" class="small-divider"></nz-divider>
+                      <div *ngFor="let label of currentTemplate.copy_config?.copy_labels; let ci = index; trackBy: trackByIndex" class="frow">
+                        <label class="flabel">Copy {{ ci + 1 }}</label>
+                        <input nz-input class="fctl"
+                          [(ngModel)]="currentTemplate.copy_config!.copy_labels[ci]"
+                          (ngModelChange)="markDirty()"
+                          placeholder="e.g. Original" />
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </nz-tab>
+
+            <!-- Columns -->
+            <nz-tab [nzTitle]="columnsTitle">
+              <ng-template #columnsTitle>
+                <span nz-icon nzType="table" nzTheme="outline"></span>&nbsp;Columns
+              </ng-template>
+              <div class="tab-body">
+                <div class="col-info-bar">
+                  <span nz-icon nzType="info-circle" nzTheme="fill"></span>
+                  Toggle columns on/off. Use arrows to reorder. Required columns cannot be hidden.
+                </div>
+                <div class="col-table">
+                  <div class="col-thead">
+                    <span>Order</span>
+                    <span>Show</span>
+                    <span>Column Name</span>
+                    <span>Status</span>
+                  </div>
+                  <div
+                    *ngFor="let col of currentTemplate.column_config; let ci = index"
+                    class="col-trow"
+                    [class.col-off]="!col.visible">
+                    <div class="col-order">
+                      <button nz-button nzType="text" nzSize="small" (click)="moveColumnUp(ci)" [disabled]="ci === 0" class="ord-btn"><span nz-icon nzType="up"></span></button>
+                      <span class="ord-num">{{ ci + 1 }}</span>
+                      <button nz-button nzType="text" nzSize="small" (click)="moveColumnDown(ci)" [disabled]="ci === currentTemplate.column_config.length - 1" class="ord-btn"><span nz-icon nzType="down"></span></button>
+                    </div>
+                    <div class="col-toggle">
+                      <nz-switch [ngModel]="col.visible" (ngModelChange)="col.visible = $event; markDirty()" [nzDisabled]="isColumnRequired(col.key)" nzSize="small"></nz-switch>
+                    </div>
+                    <div class="col-name">{{ col.label }}</div>
+                    <div class="col-status">
+                      <nz-tag *ngIf="isColumnRequired(col.key)" nzColor="orange">Required</nz-tag>
+                      <nz-tag *ngIf="!isColumnRequired(col.key) && col.visible" nzColor="success">Visible</nz-tag>
+                      <nz-tag *ngIf="!isColumnRequired(col.key) && !col.visible" nzColor="default">Hidden</nz-tag>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </nz-tab>
+
+            <!-- Sections -->
+            <nz-tab [nzTitle]="sectionsTitle">
+              <ng-template #sectionsTitle>
+                <span nz-icon nzType="appstore" nzTheme="outline"></span>&nbsp;Sections
+              </ng-template>
+              <div class="tab-body">
+                <div class="sections-grid">
+                  <div *ngFor="let group of getSectionGroupKeys()" class="sec-group">
+                    <div class="sec-group-head">{{ group }}</div>
+                    <div class="sec-group-body">
+                      <div *ngFor="let sec of sectionGroups[group]" class="sec-row">
+                        <span class="sec-label">{{ sec.label }}</span>
+                        <nz-switch
+                          [ngModel]="getSectionValue(sec.key)"
+                          (ngModelChange)="currentTemplate.section_config[sec.key] = $event; markDirty()"
+                          nzSize="small">
+                        </nz-switch>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </nz-tab>
+
+            <!-- Custom Text -->
+            <nz-tab [nzTitle]="textTitle">
+              <ng-template #textTitle>
+                <span nz-icon nzType="edit" nzTheme="outline"></span>&nbsp;Custom Text
+              </ng-template>
+              <div class="tab-body">
+                <div class="custom-text-grid">
+
+                  <div class="ct-item">
+                    <div class="ct-head"><span nz-icon nzType="file-protect" nzTheme="outline"></span> Terms &amp; Conditions</div>
+                    <textarea nz-input [nzAutosize]="{ minRows: 4, maxRows: 8 }"
+                      [(ngModel)]="currentTemplate.custom_text.terms_conditions"
+                      (ngModelChange)="markDirty()"
+                      placeholder="Enter terms and conditions..."></textarea>
+                  </div>
+
+                  <div class="ct-item">
+                    <div class="ct-head"><span nz-icon nzType="message" nzTheme="outline"></span> Notes</div>
+                    <textarea nz-input [nzAutosize]="{ minRows: 3, maxRows: 6 }"
+                      [(ngModel)]="currentTemplate.custom_text.notes"
+                      (ngModelChange)="markDirty()"
+                      placeholder="e.g. Thank you for your business..."></textarea>
+                  </div>
+
+                  <div class="ct-item">
+                    <div class="ct-head"><span nz-icon nzType="solution" nzTheme="outline"></span> Declaration</div>
+                    <textarea nz-input [nzAutosize]="{ minRows: 3, maxRows: 6 }"
+                      [(ngModel)]="currentTemplate.custom_text.declaration"
+                      (ngModelChange)="markDirty()"
+                      placeholder="Declaration text near signature area..."></textarea>
+                  </div>
+
+                  <div class="ct-item">
+                    <div class="ct-head"><span nz-icon nzType="align-center" nzTheme="outline"></span> Footer Note</div>
+                    <input nz-input
+                      [(ngModel)]="currentTemplate.custom_text.footer_note"
+                      (ngModelChange)="markDirty()"
+                      placeholder="Short one-line footer note" />
+                  </div>
+
+                </div>
+              </div>
+            </nz-tab>
+
+          </nz-tabset>
+        </div>
+
+      </div>
+      <!-- end dps-panel -->
+
+    </div>
+    <!-- end dps-body -->
+
+  </div>
+  <!-- end dps-card -->
+
+</div>
+

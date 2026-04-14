@@ -11,7 +11,7 @@ import {
 } from 'ng-zorro-antd/table';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
-import { TaParamsConfig, TaTableConfig } from './ta-table-config';
+import { ColumnItem, TaParamsConfig, TaTableConfig } from './ta-table-config';
 import { TaTableService } from './ta-table.service';
 import moment from 'moment';
 import { HttpClient } from '@angular/common/http';
@@ -940,6 +940,172 @@ downloadData(event: any) {
   })
 };
 
+  // ── Column Chooser ─────────────────────────────────────────────────────────
+  showColChooser   = false;
+  extraCols: ColumnItem[] = [];   // fields from options.extraFields not yet added to the table
+  colSearchTerm    = '';
+
+  /** All cols the user can toggle — excludes the Action column */
+  get choosableCols(): ColumnItem[] {
+    return (this.options.cols || []).filter(c => c.type !== 'action');
+  }
+
+  /** Count of visible (non-hidden) choosable cols */
+  get visibleColCount(): number {
+    return this.choosableCols.filter(c => !c.hidden).length;
+  }
+
+  /** Count of hidden columns — drives the badge */
+  get hiddenColCount(): number {
+    return this.choosableCols.length - this.visibleColCount;
+  }
+
+  /** True when user has hidden or added any column — shows Reset link */
+  get hasCustomizations(): boolean {
+    return this.choosableCols.some(c => c.hidden || c['_isAdded']);
+  }
+
+  /** Extra cols filtered live as user types in the search box */
+  get filteredExtraCols(): ColumnItem[] {
+    const term = this.colSearchTerm.trim().toLowerCase();
+    if (!term) return this.extraCols;
+    return this.extraCols.filter(c => (c.name || '').toLowerCase().includes(term));
+  }
+
+  /** Unique localStorage key per page */
+  private _colPrefKey(): string {
+    return `ta_col_prefs_${this.router.url}`;
+  }
+
+  /**
+   * Populate extraCols from the developer-defined options.extraFields list.
+   * Called once in ngOnInit after _loadColPrefs() so that previously-added
+   * fields are correctly restored from localStorage before this runs.
+   */
+  private _initExtraColsFromConfig(): void {
+    const pool = (this.options.extraFields || []).map(f => ({ ...f })); // shallow copy
+    this._restoreAddedCols(pool);
+  }
+
+  /**
+   * Resolve a field value from a row using dot-notation fieldKey.
+   * "customer.email" → row.customer?.email
+   * "order_no"       → row.order_no
+   */
+  resolveValue(row: any, fieldKey: string): any {
+    if (!fieldKey || !fieldKey.includes('.')) return row?.[fieldKey];
+    return fieldKey.split('.').reduce((obj, key) => obj?.[key], row);
+  }
+
+  /** snake_case → "Title Case" */
+  private _toLabel(key: string): string {
+    return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  }
+
+  /** Restore hidden state on existing cols (called from ngOnInit) */
+  private _loadColPrefs(): void {
+    try {
+      const raw = localStorage.getItem(this._colPrefKey());
+      if (!raw) return;
+      const prefs: { hidden?: string[]; added?: string[] } = JSON.parse(raw);
+      (prefs.hidden || []).forEach(key => {
+        const col = (this.options.cols || []).find(c => c.fieldKey === key);
+        if (col) col.hidden = true;
+      });
+    } catch { /* ignore corrupt data */ }
+  }
+
+  /** Restore previously added extra cols (called after auto-discovery) */
+  private _restoreAddedCols(discovered: ColumnItem[]): void {
+    try {
+      const raw = localStorage.getItem(this._colPrefKey());
+      const prefs: { hidden?: string[]; added?: string[] } = raw ? JSON.parse(raw) : {};
+      const addedKeys = new Set(prefs.added || []);
+
+      const stillInPool: ColumnItem[] = [];
+      discovered.forEach(col => {
+        if (addedKeys.has(col.fieldKey!)) {
+          col['_isAdded'] = true;
+          // Insert before the Action column so order is preserved
+          const actionIdx = (this.options.cols || []).findIndex(c => c.type === 'action');
+          if (actionIdx >= 0) {
+            this.options.cols!.splice(actionIdx, 0, col);
+          } else {
+            this.options.cols!.push(col);
+          }
+        } else {
+          stillInPool.push(col);
+        }
+      });
+      this.extraCols = stillInPool;
+    } catch {
+      this.extraCols = discovered;
+    }
+  }
+
+  /** Persist hidden + added state to localStorage */
+  private _saveColPrefs(): void {
+    const hidden = (this.options.cols || [])
+      .filter(c => c.hidden && c.fieldKey && !c['_isAdded'])
+      .map(c => c.fieldKey as string);
+    const added = (this.options.cols || [])
+      .filter(c => c['_isAdded'] && c.fieldKey)
+      .map(c => c.fieldKey as string);
+
+    if (hidden.length === 0 && added.length === 0) {
+      localStorage.removeItem(this._colPrefKey());
+    } else {
+      localStorage.setItem(this._colPrefKey(), JSON.stringify({ hidden, added }));
+    }
+  }
+
+  /** Checkbox toggle — visible = true means show, false means hide */
+  setColVisibility(col: any, visible: boolean): void {
+    col.hidden = !visible;
+    this._saveColPrefs();
+  }
+
+  /** Move a field from the "Add More" pool into the active table */
+  addExtraCol(col: ColumnItem): void {
+    col['_isAdded'] = true;
+    const actionIdx = (this.options.cols || []).findIndex(c => c.type === 'action');
+    if (actionIdx >= 0) {
+      this.options.cols!.splice(actionIdx, 0, col);
+    } else {
+      this.options.cols!.push(col);
+    }
+    this.extraCols = this.extraCols.filter(c => c.fieldKey !== col.fieldKey);
+    this.colSearchTerm = '';
+    this._saveColPrefs();
+  }
+
+  /** Remove a user-added field and return it to the pool */
+  removeAddedCol(col: ColumnItem): void {
+    this.options.cols = (this.options.cols || []).filter(c => c.fieldKey !== col.fieldKey);
+    delete col['_isAdded'];
+    col.hidden = false;
+    this.extraCols = [...this.extraCols, col]
+      .sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    this._saveColPrefs();
+  }
+
+  /** Reset to original developer layout — remove all user customizations */
+  resetColVisibility(): void {
+    const added = (this.options.cols || []).filter(c => c['_isAdded']);
+    added.forEach(col => {
+      delete col['_isAdded'];
+      col.hidden = false;
+      this.extraCols.push(col);
+    });
+    this.extraCols.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    this.options.cols = (this.options.cols || []).filter(c => !c['_isAdded']);
+    (this.options.cols || []).forEach(c => { delete c.hidden; });
+    localStorage.removeItem(this._colPrefKey());
+    this.showColChooser = false;
+    this.colSearchTerm  = '';
+  }
+  // ── End Column Chooser ──────────────────────────────────────────────────────
+
   searchValue = '';
   visible = false;
   total = 1;
@@ -1104,7 +1270,13 @@ downloadData(event: any) {
     // Reset filter values when component is initialized
     // This ensures filters are cleared when modal is reopened
     this.resetFilterValues();
-   
+
+    // Restore any column visibility preferences saved from a previous session
+    this._loadColPrefs();
+
+    // Populate ADD MORE FIELDS pool from developer-defined options.extraFields
+    this._initExtraColsFromConfig();
+
     // // Check if current URL is '/admin/hrms/employee-attendance' to show employee filter
     // this.isEmployeeFilterVisible = currentUrl === '/admin/hrms/employee-attendance';
 
@@ -1165,7 +1337,7 @@ downloadData(event: any) {
         this.loading = false;
         this.total = data.totalCount; // mock the total data here
         this.rows = data.data || data;
-        
+
         // ✅ Sync Opening/Closing Balance with Account Ledger Component during pagination (ERP Standard)
         if (window['accountLedgerComponentInstance'] && this.isAccountLedgerPage) {
           const instance = window['accountLedgerComponentInstance'];

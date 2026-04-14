@@ -50,7 +50,7 @@ export class TableCellDynamicComponent implements OnInit {
         break;
 
       default:
-        this.html = this.row[this.col.fieldKey];
+        this.html = this.value;
         break;
     }
   }
