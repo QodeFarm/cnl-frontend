@@ -1,0 +1,877 @@
+// ── Project Design Tokens ────────────────────────────────────────────
+$primary:       #142768;
+$primary-hover: #1a3278;
+$primary-light: #eef2fa;
+$primary-mid:   #3b5bbd;
+$border:        #e8e8e8;
+$bg-page:       #f5f6fa;
+$bg-white:      #ffffff;
+$bg-surface:    #fafafa;
+$text-dark:     #1a1a2e;
+$text-mid:      #595959;
+$text-light:    #8c8c8c;
+$warning:       #faad14;
+$success:       #52c41a;
+$font:          'Poppins', sans-serif;
+
+// ── Wrapper ──────────────────────────────────────────────────────────
+.dps-wrapper {
+  font-family: $font;
+  background: $bg-page;
+  min-height: 100vh;
+  padding: 20px 24px 32px;
+}
+
+// ── Page Header ──────────────────────────────────────────────────────
+.dps-page-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.dps-header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.dps-header-icon {
+  width: 42px;
+  height: 42px;
+  background-color: $primary;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 18px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(20, 39, 104, 0.3);
+}
+
+.dps-page-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: $text-dark;
+  line-height: 1.2;
+}
+
+.dps-page-sub {
+  margin: 3px 0 0;
+  font-size: 12px;
+  color: $text-light;
+}
+
+// ── Document Type Tab Bar ──────────────────────────────────────────
+.dps-doctype-bar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: $bg-white;
+  border: 1px solid $border;
+  border-radius: 8px;
+  padding: 5px 6px;
+  margin-bottom: 14px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+.dps-doctype-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 13px;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: $text-mid;
+  border: 1px solid transparent;
+  transition: all 0.18s ease;
+  position: relative;
+
+  &:hover {
+    background: $primary-light;
+    color: $primary;
+  }
+
+  &.active {
+    background-color: $primary;
+    color: #fff;
+    border-color: $primary;
+    box-shadow: 0 2px 6px rgba(20, 39, 104, 0.25);
+  }
+
+  &.dirty:not(.active) {
+    border-color: $warning;
+    color: darken($warning, 20%);
+    background: #fffbe6;
+  }
+
+  [nz-icon] { font-size: 12px; }
+
+  .unsaved-dot {
+    width: 6px;
+    height: 6px;
+    background: $warning;
+    border-radius: 50%;
+  }
+}
+
+// ── Main Card ────────────────────────────────────────────────────────
+.dps-card {
+  background: $bg-white;
+  border: 1px solid $border;
+  border-radius: 8px;
+  overflow: hidden;
+  min-height: 540px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+// ── Loading ──────────────────────────────────────────────────────────
+.dps-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 0;
+  gap: 14px;
+  color: $text-light;
+  font-size: 13px;
+}
+
+// ── Body split ───────────────────────────────────────────────────────
+.dps-body {
+  display: flex;
+  min-height: 540px;
+}
+
+// ── Left Sidebar ─────────────────────────────────────────────────────
+.dps-sidebar {
+  width: 210px;
+  flex-shrink: 0;
+  border-right: 1px solid $border;
+  background: $bg-surface;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px 10px;
+  border-bottom: 1px solid $border;
+}
+
+.sidebar-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: $text-dark;
+}
+
+.btn-new-tpl {
+  font-size: 12px;
+  border-color: $primary !important;
+  color: $primary !important;
+  border-radius: 5px !important;
+  height: 26px !important;
+  padding: 0 8px !important;
+
+  &:hover {
+    background: $primary-light !important;
+  }
+}
+
+.sidebar-list {
+  flex: 1;
+  padding: 8px;
+  overflow-y: auto;
+}
+
+.tpl-item {
+  position: relative;
+  padding: 9px 12px;
+  margin-bottom: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background: $bg-white;
+  transition: all 0.15s;
+
+  &:hover {
+    border-color: lighten($primary, 40%);
+    background: $primary-light;
+    .tpl-del-btn { opacity: 1; }
+  }
+
+  &.active {
+    border-color: $primary;
+    background: $primary-light;
+    box-shadow: 0 1px 4px rgba(20, 39, 104, 0.12);
+  }
+}
+
+.tpl-row-top {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding-right: 24px; // reserve space so delete button never overlaps badge/name
+}
+
+.tpl-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: $text-dark;
+  flex: 1;
+  min-width: 0;        // required for flex text truncation to work
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tpl-badge {
+  font-size: 10px;
+  padding: 0 5px;
+  line-height: 16px;
+  height: 16px;
+  flex-shrink: 0;      // badge never shrinks
+}
+
+.tpl-row-meta {
+  font-size: 11px;
+  color: $text-light;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tpl-del-btn {
+  position: absolute;
+  top: 6px;
+  right: 4px;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+.tpl-empty {
+  padding: 36px 12px;
+  text-align: center;
+  font-size: 12px;
+  color: $text-light;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.5;
+  [nz-icon] { font-size: 32px; opacity: 0.25; }
+}
+
+// ── Right Panel ───────────────────────────────────────────────────────
+.dps-panel {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+// ── Panel Topbar ─────────────────────────────────────────────────────
+.panel-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 18px;
+  border-bottom: 1px solid $border;
+  background: $bg-surface;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.topbar-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: $text-mid;
+  white-space: nowrap;
+}
+
+.tpl-name-input {
+  max-width: 240px;
+  font-size: 13px;
+  border-radius: 5px !important;
+}
+
+// ── Panel Tabs Area ──────────────────────────────────────────────────
+.panel-tabs-area {
+  flex: 1;
+  padding: 0 18px 18px;
+
+  ::ng-deep {
+    .ant-tabs-nav {
+      margin-bottom: 14px;
+    }
+    .ant-tabs-tab {
+      font-size: 13px;
+      font-family: $font;
+      color: $text-mid;
+      padding: 10px 0;
+
+      .anticon { margin-right: 5px; }
+    }
+    .ant-tabs-tab:hover {
+      color: $primary;
+    }
+    .ant-tabs-tab-active .ant-tabs-tab-btn {
+      color: $primary !important;
+      font-weight: 600;
+    }
+    .ant-tabs-ink-bar {
+      background: $primary !important;
+    }
+  }
+}
+
+.tab-body { padding-top: 4px; }
+
+// ── Style Grid ───────────────────────────────────────────────────────
+.style-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.sec-card {
+  border: 1px solid $border;
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+.sec-card-head {
+  padding: 9px 14px;
+  background: $bg-surface;
+  border-bottom: 1px solid $border;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: $primary;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  [nz-icon] { font-size: 13px; }
+}
+
+.sec-card-body { padding: 14px; }
+
+// Horizontal row (label + control side-by-side)
+.frow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  &:last-child { margin-bottom: 0; }
+  &.modal-row { margin: 0; }
+}
+
+// Vertical row (label above, full-width control below) — for selects with long options
+.frow-v {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 12px;
+  &:last-child { margin-bottom: 0; }
+}
+
+.flabel {
+  min-width: 80px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: $text-mid;
+  white-space: nowrap;
+}
+
+// Label for vertical layout
+.flabel-v {
+  font-size: 12px;
+  font-weight: 500;
+  color: $text-mid;
+}
+
+.fctl { flex: 1; font-size: 13px; }
+.fctl-short { width: 120px; font-size: 13px; }
+.fctl-full { width: 100%; font-size: 13px; }
+
+.small-divider { margin: 10px 0 6px !important; font-size: 11px !important; }
+
+// ── Color Theme ──────────────────────────────────────────────────────
+.theme-palette {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.theme-chip {
+  width: 32px;
+  height: 32px;
+  border-radius: 7px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 14px;
+  transition: transform 0.15s, box-shadow 0.15s;
+
+  &:hover { transform: scale(1.1); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+  &.selected { border-color: $text-dark; transform: scale(1.07); box-shadow: 0 2px 8px rgba(0,0,0,0.22); }
+
+  &[data-theme='blue']    { background: #1890ff; }
+  &[data-theme='navy']    { background: $primary; }
+  &[data-theme='green']   { background: #52c41a; }
+  &[data-theme='orange']  { background: #fa8c16; }
+  &[data-theme='grey']    { background: #8c8c8c; }
+  &[data-theme='purple']  { background: #722ed1; }
+  &[data-theme='teal']    { background: #13c2c2; }
+  &[data-theme='none']    { background: #f0f0f0; border-color: #d9d9d9; color: #aaa; }
+}
+
+.theme-label {
+  font-size: 12px;
+  color: $text-mid;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+// Color dot (shared)
+.mini-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+
+  &[data-theme='blue']    { background: #1890ff; }
+  &[data-theme='navy']    { background: $primary; }
+  &[data-theme='green']   { background: #52c41a; }
+  &[data-theme='orange']  { background: #fa8c16; }
+  &[data-theme='grey']    { background: #8c8c8c; }
+  &[data-theme='purple']  { background: #722ed1; }
+  &[data-theme='teal']    { background: #13c2c2; }
+  &[data-theme='none']    { background: #d9d9d9; }
+}
+
+// ── Columns Table ─────────────────────────────────────────────────────
+.col-info-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  background: #fffbe6;
+  border: 1px solid #ffe58f;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #7c5800;
+  margin-bottom: 12px;
+  [nz-icon] { color: $warning; flex-shrink: 0; }
+}
+
+.col-table {
+  border: 1px solid $border;
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+.col-thead {
+  display: grid;
+  grid-template-columns: 88px 56px 1fr 110px;
+  padding: 7px 14px;
+  background: $bg-surface;
+  border-bottom: 1px solid $border;
+  font-size: 11px;
+  font-weight: 700;
+  color: $text-light;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.col-trow {
+  display: grid;
+  grid-template-columns: 88px 56px 1fr 110px;
+  padding: 7px 14px;
+  border-bottom: 1px solid #f5f5f5;
+  align-items: center;
+  transition: background 0.12s;
+  &:last-child { border-bottom: none; }
+  &:hover { background: $primary-light; }
+  &.col-off { opacity: 0.5; }
+}
+
+.col-order {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+
+.ord-btn {
+  color: $text-light !important;
+  width: 20px !important;
+  height: 20px !important;
+  padding: 0 !important;
+  min-width: unset !important;
+  &:hover:not([disabled]) { color: $primary !important; }
+  &[disabled] { opacity: 0.25; }
+}
+
+.ord-num {
+  width: 18px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: $text-light;
+}
+
+.col-toggle, .col-name, .col-status { display: flex; align-items: center; }
+.col-name { font-size: 13px; font-weight: 500; color: $text-dark; }
+
+// ── Sections Grid ─────────────────────────────────────────────────────
+.sections-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 12px;
+}
+
+.sec-group {
+  border: 1px solid $border;
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+.sec-group-head {
+  padding: 7px 14px;
+  background: $bg-surface;
+  border-bottom: 1px solid $border;
+  font-size: 11px;
+  font-weight: 700;
+  color: $primary;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.sec-group-body { padding: 2px 0; }
+
+.sec-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 14px;
+  border-bottom: 1px solid #f5f5f5;
+  transition: background 0.12s;
+  &:last-child { border-bottom: none; }
+  &:hover { background: $primary-light; }
+}
+
+.sec-label {
+  font-size: 12.5px;
+  color: $text-dark;
+}
+
+// ── Custom Text ──────────────────────────────────────────────────────
+.custom-text-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ct-item {
+  border: 1px solid $border;
+  border-radius: 7px;
+  overflow: hidden;
+
+  textarea, input {
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    font-size: 13px;
+    padding: 10px 14px !important;
+    &:focus { box-shadow: none !important; }
+  }
+}
+
+.ct-head {
+  padding: 8px 14px;
+  background: $bg-surface;
+  border-bottom: 1px solid $border;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: $primary;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  [nz-icon] { font-size: 13px; }
+}
+
+// ── Button overrides (match project theme — flat colors, no gradients) ──
+::ng-deep {
+  .dps-wrapper {
+    .ant-btn-primary {
+      background-color: $primary !important;
+      border-color: $primary !important;
+      &:hover, &:focus {
+        background-color: $primary-hover !important;
+        border-color: $primary-hover !important;
+      }
+    }
+    .ant-btn-default:hover {
+      border-color: $primary !important;
+      color: $primary !important;
+    }
+    .ant-checkbox-checked .ant-checkbox-inner {
+      background-color: $primary !important;
+      border-color: $primary !important;
+    }
+    .ant-switch-checked {
+      background-color: $primary !important;
+    }
+  }
+}
+
+// Modal theming moved to global styles.scss — modals render at document.body,
+// ::ng-deep inside a component cannot reach them reliably.
+
+// ── Create Modal inner layout ─────────────────────────────────────────
+.dps-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dps-modal-desc {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: $primary-light;
+  border: 1px solid lighten($primary, 45%);
+  border-radius: 7px;
+  padding: 10px 14px;
+  font-size: 12.5px;
+  color: $primary;
+  line-height: 1.55;
+}
+
+.dps-modal-info-icon {
+  color: $primary-mid;
+  font-size: 15px;
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════
+// RESPONSIVE — Tablet  ≤ 1024px
+// ═══════════════════════════════════════════════════════════════════════
+@media (max-width: 1024px) {
+  .dps-wrapper { padding: 14px 14px 24px; }
+
+  .dps-sidebar { width: 170px; }
+
+  .tpl-name-input { max-width: 200px; }
+
+  .style-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+  .sections-grid {
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  }
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════
+// RESPONSIVE — Mobile  ≤ 768px
+// ═══════════════════════════════════════════════════════════════════════
+@media (max-width: 768px) {
+
+  // ── Wrapper & page header ──────────────────────────────────────────
+  .dps-wrapper { padding: 10px 10px 20px; }
+
+  .dps-page-header { margin-bottom: 12px; }
+  .dps-header-icon { width: 36px; height: 36px; font-size: 16px; }
+  .dps-page-title  { font-size: 16px; }
+  .dps-page-sub    { font-size: 11px; }
+
+  // ── Doc-type tab bar ───────────────────────────────────────────────
+  // Already scrollable — just tighten padding on small screens
+  .dps-doctype-tab { padding: 6px 10px; font-size: 11.5px; }
+
+  // ── Main card — no fixed min-height on mobile ──────────────────────
+  .dps-card { min-height: unset; }
+
+  // ── Body: sidebar stacks ABOVE panel ──────────────────────────────
+  .dps-body {
+    flex-direction: column;
+    min-height: unset;
+  }
+
+  // ── Sidebar: full-width compact band ──────────────────────────────
+  .dps-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid $border;
+    max-height: 210px; // enough for 2–3 templates + header, scroll for more
+  }
+
+  .sidebar-head { padding: 10px 12px; }
+
+  // Template items: two-column grid so list doesn't go too tall
+  .sidebar-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    padding: 8px;
+    max-height: 152px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tpl-item {
+    margin-bottom: 0;
+    padding: 7px 10px;
+  }
+
+  // Delete button always reachable (no hover on touch screens)
+  .tpl-del-btn { opacity: 1 !important; }
+
+  // ── Panel topbar: two rows on mobile ──────────────────────────────
+  .panel-topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+  }
+  .topbar-left  { width: 100%; gap: 8px; }
+  .topbar-right { width: 100%; justify-content: flex-end; }
+
+  // Template name input goes full-width on mobile
+  .tpl-name-input { max-width: none; flex: 1; min-width: 0; width: 100%; }
+
+  // ── Panel tabs: tighter padding ───────────────────────────────────
+  .panel-tabs-area { padding: 0 10px 14px; }
+
+  ::ng-deep {
+    .dps-wrapper, .dps-panel {
+      .ant-tabs-tab { font-size: 12px; padding: 9px 4px; }
+      .ant-tabs-tab .anticon { margin-right: 3px; }
+    }
+  }
+
+  // ── Layout & Style — single column on mobile ──────────────────────
+  .style-grid { grid-template-columns: 1fr; }
+
+  // ── Sections — two columns on mobile, one on very small ───────────
+  .sections-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 8px;
+  }
+
+  // ── Columns table: hide "Order" column to save space ──────────────
+  // The up/down arrows are hard to use on mobile; hide the column.
+  .col-thead {
+    grid-template-columns: 52px 1fr 100px;
+    padding: 7px 10px;
+    font-size: 10.5px;
+  }
+  .col-trow {
+    grid-template-columns: 52px 1fr 100px;
+    padding: 7px 10px;
+  }
+  .col-order { display: none; }
+
+  .col-name  { font-size: 12.5px; }
+  .col-info-bar { font-size: 11.5px; }
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════
+// RESPONSIVE — Small mobile  ≤ 480px
+// ═══════════════════════════════════════════════════════════════════════
+@media (max-width: 480px) {
+
+  .dps-wrapper { padding: 8px 8px 16px; }
+
+  // ── Page header: hide subtitle to save vertical space ─────────────
+  .dps-page-sub { display: none; }
+  .dps-page-title { font-size: 15px; }
+  .dps-header-icon { width: 32px; height: 32px; font-size: 14px; border-radius: 8px; }
+  .dps-header-left { gap: 10px; }
+
+  // ── Doc-type tabs: icon only, no label text on tiny screens ───────
+  .dps-doctype-tab {
+    padding: 6px 8px;
+    font-size: 0; // hides text
+    gap: 0;
+    [nz-icon] { font-size: 14px; } // icon remains visible
+    .unsaved-dot { display: block; } // keep dirty indicator
+  }
+
+  // ── Sidebar: single column template list ──────────────────────────
+  .sidebar-list { grid-template-columns: 1fr; max-height: 140px; }
+
+  // ── Sections: single column on very small screens ─────────────────
+  .sections-grid { grid-template-columns: 1fr; }
+
+  // ── Panel topbar: stack label+input vertically ────────────────────
+  .topbar-label { font-size: 11.5px; }
+
+  // Buttons: equal width row that fills the available space
+  .topbar-right {
+    gap: 6px;
+    button { flex: 1; font-size: 12px; }
+  }
+
+  // ── Tab text: icon + short text ───────────────────────────────────
+  ::ng-deep {
+    .dps-wrapper, .dps-panel {
+      .ant-tabs-tab { font-size: 11.5px; }
+    }
+  }
+
+  // ── Custom text textareas take full viewport on small phones ──────
+  .ct-item textarea { font-size: 12px !important; }
+
+  // ── Columns table: tighter on tiny screens ────────────────────────
+  .col-thead {
+    grid-template-columns: 48px 1fr 88px;
+    font-size: 10px;
+  }
+  .col-trow {
+    grid-template-columns: 48px 1fr 88px;
+    padding: 6px 8px;
+  }
+  .col-name { font-size: 12px; }
+}

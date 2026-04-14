@@ -4614,3 +4614,95 @@ body.col-resizing * {
 .adv-select-curd-container .ant-table-tbody > tr.selectable-row:hover > td {
     background: #e6f7ff !important;
 }
+
+// ============================================================
+// DOCUMENT PRINT SETTINGS — Modal Theming (global, renders at body)
+// Follows project standard: flat #142768 header, 16px radius, centered
+// ============================================================
+
+.dps-confirm-modal,
+.dps-create-modal {
+    .ant-modal-content {
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .ant-modal-header {
+        background-color: #142768;
+        border-bottom: none;
+        padding: 16px 24px;
+        border-radius: 16px 16px 0 0;
+    }
+
+    .ant-modal-title {
+        color: #fff !important;
+        font-size: 16px !important;
+        font-weight: 600 !important;
+        text-align: center;
+    }
+
+    .ant-modal-close {
+        color: #fff;
+        &:hover { color: rgba(255, 255, 255, 0.8); }
+    }
+
+    .ant-modal-body {
+        padding: 20px 24px;
+        background-color: #fff;
+        font-size: 13.5px;
+        color: #595959;
+        line-height: 1.6;
+        strong { color: #1a1a2e; }
+    }
+
+    .ant-modal-footer {
+        padding: 12px 24px 16px;
+        border-top: 1px solid #e8e8e8;
+        background-color: #fff;
+        border-radius: 0 0 16px 16px;
+        text-align: right;
+
+        .ant-btn {
+            height: 36px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .ant-btn-default {
+            &:hover {
+                border-color: #142768 !important;
+                color: #142768 !important;
+            }
+        }
+
+        .ant-btn-primary:not(.ant-btn-dangerous) {
+            background-color: #142768 !important;
+            border-color: #142768 !important;
+            font-weight: 600;
+            &:hover {
+                background-color: #1e3a8a !important;
+                border-color: #1e3a8a !important;
+            }
+        }
+
+        .ant-btn-dangerous.ant-btn-primary {
+            background-color: #cf1322 !important;
+            border-color: #cf1322 !important;
+            color: #fff !important;
+            font-weight: 600;
+            &:hover {
+                background-color: #a8071a !important;
+                border-color: #a8071a !important;
+            }
+        }
+    }
+}
+
+// Delete modal — red header
+.dps-confirm-danger {
+    .ant-modal-header {
+        background-color: #cf1322 !important;
+        border-radius: 16px 16px 0 0;
+    }
+}
