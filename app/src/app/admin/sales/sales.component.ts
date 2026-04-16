@@ -3319,7 +3319,7 @@ createSaleOrder() {
       /* -------------------------------------------------
         SEND WHATSAPP
       -------------------------------------------------- */
-      this.sendSaleOrderWhatsapp(parentOrderId);
+      // this.sendSaleOrderWhatsapp(parentOrderId);
 
       /* -------------------------------------------------
         CREATE CHILD SALE ORDERS
