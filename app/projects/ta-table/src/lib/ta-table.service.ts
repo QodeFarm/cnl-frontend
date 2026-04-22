@@ -25,20 +25,20 @@ export class TaTableService {
   }
   deleterow(apiUrl: string, row: any, options?: any) {
     if (row[options.pkId]) {
-      return this.http.delete(apiUrl + '/' + row[options.pkId]);
+      const base = apiUrl.replace(/\/$/, '');
+      return this.http.delete(`${base}/${row[options.pkId]}/`);
     }
     return null;
   }
 
-restorerow(apiUrl: string, row: any, options?: any) {
-  if (row[options.pkId]) {
-    console.log("apiUrl : ", apiUrl);
-    const payload = { is_deleted: false };
-    // Using PUT for restore – can be adjusted based on API
-    return this.http.patch(apiUrl + '/' + row[options.pkId], payload);
+  restorerow(apiUrl: string, row: any, options?: any) {
+    if (row[options.pkId]) {
+      const base = apiUrl.replace(/\/$/, '');
+      const payload = { is_deleted: false };
+      return this.http.patch(`${base}/${row[options.pkId]}/`, payload);
+    }
+    return null;
   }
-  return null;
-}
 
 onAction(event: any) {
   if (event.action.type === 'restore') {

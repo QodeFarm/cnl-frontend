@@ -186,8 +186,10 @@
             <ng-template #suffixIconButton>
                 <i nz-icon class="ant-input-clear-icon" style="position: absolute;z-index: 9;right: 40px;top:12px"
                     nzTheme="fill" nzType="close-circle" *ngIf="globalSearchValue" (click)="globalSearchClear()"></i>
-                <button nz-button nzType="primary" nzSearch (click)="globalSearch()"><i nz-icon
-                        nzType="search"></i></button>
+                <button nz-button nzType="primary" nzSearch (click)="globalSearch()"
+                    nz-tooltip nzTooltipTitle="Search records" nzTooltipPlacement="bottom">
+                    <i nz-icon nzType="search"></i>
+                </button>
             </ng-template>
             <!-- <button nz-button (click)="exportExcel()" *ngIf="options.export"> <i nz-icon nzType="file-excel"
                     nzTheme="outline"></i> Export</button> -->
@@ -216,20 +218,22 @@
 
             <!--  Excel Export Button -->
             <div class="filter-group" *ngIf="options.export">
-                <button nz-button nzType="primary" (click)="exportExcel()">
+                <button nz-button nzType="primary" (click)="exportExcel()"
+                    nz-tooltip nzTooltipTitle="Export to Excel" nzTooltipPlacement="bottom">
                     <i nz-icon nzType="file-excel" nzTheme="outline"></i>
                 </button>
             </div>
 
             <!-- Refresh Button -->
             <div *ngIf="!options.hideRefreshBtn">
-                <button nz-button nzType="primary" (click)="refreshIcon()" style="margin-left: 5px;">
+                <button nz-button nzType="primary" (click)="refreshIcon()" style="margin-left: 5px;"
+                    nz-tooltip nzTooltipTitle="Refresh data" nzTooltipPlacement="bottom">
                     <i nz-icon nzType="sync" nzTheme="outline"></i>
                 </button>
             </div>
 
             <!-- Column Chooser Button + Custom Panel -->
-            <div class="col-chooser-wrapper">
+            <div class="col-chooser-wrapper" *ngIf="!options?.hideColChooser">
                 <!-- Backdrop: closes panel when user clicks outside -->
                 <div *ngIf="showColChooser" class="col-chooser-backdrop" (click)="showColChooser = false"></div>
 
@@ -421,7 +425,10 @@
     <ng-content nz-col select="[bottom-left]">
     </ng-content>
     <span class="total-record d-none d-sm-inline-block me-2">Total Records - {{total}} </span>
-    <button nz-button nzType="default" nzShape="circle" (click)="refresh()"><i nz-icon nzType="sync"></i></button>
+    <button nz-button nzType="default" nzShape="circle" (click)="refresh()"
+        nz-tooltip nzTooltipTitle="Refresh data" nzTooltipPlacement="top">
+        <i nz-icon nzType="sync"></i>
+    </button>
     <div nz-row nzGutter="8">
         <div nz-col nzXs="24" nzSm="12" nzMd="12">
         </div>

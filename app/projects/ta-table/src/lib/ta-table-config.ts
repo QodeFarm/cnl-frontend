@@ -30,6 +30,7 @@ export interface TaTableConfig {
   rowSelection?: (row: any) => any;
   hideFilters?: boolean; // Controls whether to hide filters regardless of URL
   hideRefreshBtn?: boolean; // Hides the refresh button (useful in selection popups)
+  hideColChooser?: boolean; // Hides the Columns chooser button (useful in selection popups)
   /**
    * Optional extra fields the user can add to this list.
    * Define once per list component; users see them in ADD MORE FIELDS.

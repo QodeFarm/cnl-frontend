@@ -72,9 +72,10 @@ export class TaFormComponent implements OnInit {
   }
 
   onSubmit() {
-    // Mark form as submitted for validation display
+    // Mark form as submitted and touch all controls so validation errors are visible
     this.formlyOptions.formState.submitted = true;
-    
+    this.form.markAllAsTouched();
+
     if (this.form.valid) {
       if (this.options.url) {
         this.isLoading = true;

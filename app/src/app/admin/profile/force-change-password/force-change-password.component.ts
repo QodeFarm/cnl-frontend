@@ -3,8 +3,12 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { AbstractControl, AbstractControlOptions, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
+
+import { HttpClient } from '@angular/common/http';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { TaLocalStorage } from '@ta/ta-core';
+import { SiteConfigService } from '@ta/ta-core';
 
 @Component({
   selector: 'app-force-change-password',
@@ -15,118 +19,120 @@ import { TaLocalStorage } from '@ta/ta-core';
 })
 export class ForceChangePasswordComponent implements OnInit {
 
-  // Form options for ta-form
-  options: any = {
-    url: "users/force_change_password/",
-    submit: {
-      label: "Set Password",
-      icon: 'lock',
-      showSuccessMsg: false, // Suppress default notification - we show our own custom message
-      submittedFn: (res: any) => {
-        this.onPasswordChanged(res);
-      },
-    },
-    reset: {
-      label: "Clear",
-    },
-    fields: [
-      {
-        fieldGroupClassName: 'row',
-        fieldGroup: [
-          {
-            key: 'password',
-            type: 'input',
-            className: 'col-12 mb-2',
-            templateOptions: {
-              label: 'New Password',
-              type: 'password',
-              placeholder: 'Enter a strong password',
-              required: true,
-              minLength: 8,
-              description: 'Use at least 8 characters with uppercase, lowercase, numbers & symbols.',
-            },
-            expressionProperties: {
-              'templateOptions.description': (model: any, formState: any, field: any) => {
-                const password = model?.password || '';
-                if (!password) return 'Use at least 8 characters with uppercase, lowercase, numbers & symbols.';
-                const strength = this.getPasswordStrength(password);
-                return `Password strength: ${strength.label}`;
-              }
-            }
-          },
-          {
-            key: 'confirm_password',
-            type: 'input',
-            className: 'col-12 mb-2',
-            templateOptions: {
-              label: 'Confirm Password',
-              type: 'password',
-              placeholder: 'Re-enter your new password',
-              required: true,
-              description: 'Both passwords must match.',
-            },
-            validators: {
-              fieldMatch: {
-                expression: (control: any) => {
-                  const password = control.root.get('password');
-                  return !password || control.value === password.value;
-                },
-                message: 'Password and Confirm Password do not match.',
-              },
-            },
-          }
-        ]
-      }
-    ]
-  };
+  form!: FormGroup;
+  isLoading = false;
+  showPassword = false;
+  showConfirmPassword = false;
 
-  constructor(private router: Router, private message: NzMessageService) {}
+  requirements = [
+    { key: 'minLength',   label: 'At least 8 characters',           met: false },
+    { key: 'uppercase',   label: 'One uppercase letter (A–Z)',       met: false },
+    { key: 'lowercase',   label: 'One lowercase letter (a–z)',       met: false },
+    { key: 'number',      label: 'One number (0–9)',                 met: false },
+    { key: 'special',     label: 'One special character (!@#$...)',  met: false },
+  ];
+
+  strength = 0;
+  strengthLabel = '';
+  strengthClass = '';
+
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private http: HttpClient,
+    private message: NzMessageService,
+    private siteConfig: SiteConfigService
+  ) {}
 
   ngOnInit(): void {
-    // Verify user should be on this page
     const forceChange = localStorage.getItem('force_password_change');
     if (forceChange !== 'true') {
       this.router.navigateByUrl('/admin/dashboard');
+      return;
+    }
+
+    const formOptions: AbstractControlOptions = { validators: this.passwordMatchValidator };
+    this.form = this.fb.group(
+      {
+        password:         ['', [Validators.required, Validators.minLength(8)]],
+        confirm_password: ['', [Validators.required]],
+      },
+      formOptions
+    );
+
+    this.form.get('password')!.valueChanges.subscribe(val => {
+      this.evaluatePassword(val || '');
+    });
+  }
+
+  private passwordMatchValidator: ValidatorFn = (control: AbstractControl) => {
+    const pw  = control.get('password')?.value;
+    const cpw = control.get('confirm_password')?.value;
+    return pw && cpw && pw !== cpw ? { mismatch: true } : null;
+  };
+
+  evaluatePassword(pw: string): void {
+    this.requirements[0].met = pw.length >= 8;
+    this.requirements[1].met = /[A-Z]/.test(pw);
+    this.requirements[2].met = /[a-z]/.test(pw);
+    this.requirements[3].met = /[0-9]/.test(pw);
+    this.requirements[4].met = /[^a-zA-Z0-9]/.test(pw);
+
+    this.strength = this.requirements.filter(r => r.met).length;
+
+    if (this.strength <= 2) {
+      this.strengthLabel = 'Weak';
+      this.strengthClass = 'weak';
+    } else if (this.strength <= 3) {
+      this.strengthLabel = 'Fair';
+      this.strengthClass = 'fair';
+    } else if (this.strength === 4) {
+      this.strengthLabel = 'Good';
+      this.strengthClass = 'good';
+    } else {
+      this.strengthLabel = 'Strong';
+      this.strengthClass = 'strong';
     }
   }
 
-  // Calculate password strength
-  getPasswordStrength(password: string): { label: string, class: string } {
-    let strength = 0;
-    
-    if (password.length >= 8) strength++;
-    if (password.length >= 12) strength++;
-    if (/[a-z]/.test(password)) strength++;
-    if (/[A-Z]/.test(password)) strength++;
-    if (/[0-9]/.test(password)) strength++;
-    if (/[^a-zA-Z0-9]/.test(password)) strength++;
+  get passwordControl()        { return this.form.get('password')!; }
+  get confirmPasswordControl() { return this.form.get('confirm_password')!; }
 
-    if (strength <= 2) return { label: 'Weak 🔴', class: 'text-danger' };
-    if (strength <= 4) return { label: 'Medium 🟡', class: 'text-warning' };
-    return { label: 'Strong 🟢', class: 'text-success' };
+  get passwordTouched()        { return this.passwordControl.touched; }
+  get confirmTouched()         { return this.confirmPasswordControl.touched; }
+  get mismatch()               { return this.form.hasError('mismatch') && this.confirmTouched; }
+  get strengthPercent()        { return (this.strength / 5) * 100; }
+
+  onSubmit(): void {
+    this.form.markAllAsTouched();
+    if (this.form.invalid) return;
+
+    this.isLoading = true;
+    const baseUrl = this.siteConfig.CONFIG.baseUrl;
+    const payload = {
+      password:         this.passwordControl.value,
+      confirm_password: this.confirmPasswordControl.value,
+    };
+
+    this.http.post(`${baseUrl}users/force_change_password/`, payload).subscribe({
+      next: () => {
+        this.isLoading = false;
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('force_password_change');
+        localStorage.removeItem('user');
+        TaLocalStorage.removeItem('user');
+        this.message.success('Password set successfully! Please sign in with your new password.');
+        setTimeout(() => this.router.navigateByUrl('/login'), 1800);
+      },
+      error: () => {
+        this.isLoading = false;
+      }
+    });
   }
 
-  // Handle successful password change
-  onPasswordChanged(res: any): void {
-    console.log('Password changed successfully, clearing session...');
-    
-    // Clear ALL authentication data from localStorage
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('force_password_change');
-    
-    // Clear TaLocalStorage user data
-    TaLocalStorage.removeItem('user');
-    
-    // Also clear any other auth-related items
-    localStorage.removeItem('user');
-    
-    // Show success message
-    this.message.success('Password updated successfully! Please login with your new password.');
-    
-    // Redirect to login page (not dashboard!)
-    setTimeout(() => {
-      this.router.navigateByUrl('/login');
-    }, 1500);
+  onClear(): void {
+    this.form.reset();
+    this.evaluatePassword('');
   }
 }

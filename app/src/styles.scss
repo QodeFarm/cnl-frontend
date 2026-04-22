@@ -3902,6 +3902,8 @@ ta-table,
     border-radius: 4px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
     overflow: hidden;
+    // Ensure popup is always wide enough for readable content
+    min-width: 520px;
     // Prevent panel from going off-screen
     max-width: calc(100vw - 32px);
 
@@ -3921,6 +3923,8 @@ ta-table,
             display: flex;
             flex-direction: column;
             padding: 8px 12px !important;
+            box-sizing: border-box !important;
+            width: 100% !important;
         }
 
         // ============================================================
@@ -3950,26 +3954,40 @@ ta-table,
             }
         }
 
-        // Search bar row - proper spacing between all elements
+        // Search bar row - properly bounded, no overflow
         .ta-row {
             gap: 8px !important;
             flex-shrink: 0;
+            width: 100% !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
+            flex-wrap: nowrap !important;
 
-            // Search input group
+            // Search input group — fills available space
             nz-input-group {
                 margin-right: 0 !important;
+                flex: 1 1 auto !important;
+                min-width: 0 !important;
+
+                input {
+                    width: 100% !important;
+                    min-width: 0 !important;
+                    box-sizing: border-box !important;
+                }
             }
 
             // Filter groups with buttons
             .filter-group {
                 margin-left: 0 !important;
                 margin-right: 0 !important;
+                flex-shrink: 0;
             }
 
-            // All buttons in the row
+            // All buttons in the row — don't grow, don't shrink unexpectedly
             .ant-btn {
                 margin-left: 0 !important;
                 margin-right: 0 !important;
+                flex-shrink: 0;
             }
 
             // Direct child divs (button wrappers)
@@ -4003,9 +4021,7 @@ ta-table,
                 overflow: hidden;
             }
 
-            // .ant-table-container is the SINGLE scroll container.
-            // Header + body scroll together horizontally;
-            // body scrolls vertically within max-height.
+            // Both axes scroll so users can reach all columns including ACTION.
             .ant-table-container {
                 overflow: auto !important;
                 max-height: 30vh !important;
@@ -4582,6 +4598,7 @@ body.col-resizing * {
     min-width: 0 !important;
 }
 
+
 // Clip any remaining overflow at every level of the table scroll hierarchy
 .adv-select-curd-container,
 .adv-select-curd-container .ant-table-wrapper,
@@ -4595,7 +4612,6 @@ body.col-resizing * {
 // Compact table rows inside selection popups
 .adv-select-curd-container .ant-table-tbody > tr > td {
     padding: 5px 8px !important;
-    max-width: 0;          // forces ellipsis to work in fixed-layout table
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     white-space: nowrap !important;

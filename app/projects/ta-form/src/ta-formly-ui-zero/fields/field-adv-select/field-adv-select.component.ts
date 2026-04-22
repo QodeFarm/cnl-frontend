@@ -111,8 +111,9 @@ export class FieldAdvSelectComponent extends FieldType implements OnInit, AfterC
     this.to.placeholder = this.to.placeholder || 'Please Select';
     if (this.props.curdConfig && this.props.curdConfig.tableConfig) {
       this.props.curdConfig.tableConfig.rowSelectionEnabled = true;
-      // Selection popup: hide toolbar clutter — title, refresh, export, horizontal scroll
+      // Selection popup: hide toolbar clutter — title, refresh, export, columns chooser, horizontal scroll
       this.props.curdConfig.tableConfig.hideRefreshBtn = true;
+      this.props.curdConfig.tableConfig.hideColChooser = true;
       this.props.curdConfig.tableConfig.export = undefined;
       this.props.curdConfig.tableConfig.title = undefined;
       this.props.curdConfig.tableConfig.scrollX = undefined;
@@ -268,7 +269,7 @@ export class FieldAdvSelectComponent extends FieldType implements OnInit, AfterC
         const desiredW = this.props?.curdConfig?.drawerSize || 700;
         const spaceRight = vw - rect.left - margin;
         const spaceLeft = rect.right - margin;
-        const maxW = Math.max(spaceRight, spaceLeft, 300);
+        const maxW = Math.max(spaceRight, spaceLeft, 520);
         this.overlayWidth = Math.min(desiredW, maxW);
       }
 
