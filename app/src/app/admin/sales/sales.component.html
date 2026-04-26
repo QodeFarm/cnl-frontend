@@ -338,7 +338,7 @@
 </div>
 
 <!-- 🔥 NEW: Warning modal for zero invoiceable quantity -->
-<div class="custom-dialog-overlay" *ngIf="isNoQuantityWarningOpen">
+<!-- <div class="custom-dialog-overlay" *ngIf="isNoQuantityWarningOpen">
     <div class="custom-dialog-box warning-box">
         <h3>⚠️ Cannot Create Invoice</h3>
         <p>No items have invoiceable quantity greater than zero.</p>
@@ -349,7 +349,7 @@
             <button class="btn-confirm" (click)="closeNoQuantityWarning()">OK</button>
         </div>
     </div>
-</div>
+</div> -->
 
 <!-- Success Message at the Top Right -->
 <div *ngIf="isInvoiceCreated" class="toast-message">

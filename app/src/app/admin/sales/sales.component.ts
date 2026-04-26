@@ -895,11 +895,11 @@ invoiceCreationHandler() {
     return invoiceableQty > 0;
   });
 
-  if (!hasValidQuantity) {
-    // Show warning modal popup if no items have invoiceable quantity > 0
-    this.showNoQuantityWarning();
-    return; // Exit the function, don't proceed with invoice creation
-  }
+  // if (!hasValidQuantity) {
+  //   // Show warning modal popup if no items have invoiceable quantity > 0
+  //   this.showNoQuantityWarning();
+  //   return; // Exit the function, don't proceed with invoice creation
+  // }
 
   let items_value = 0;
   let tax_amount = 0;
