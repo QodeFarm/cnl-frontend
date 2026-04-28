@@ -1,4 +1,5 @@
-import { Component, Input, OnInit, Output, ViewChild, forwardRef } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, Output, ViewChild, forwardRef } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { FormGroup, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { FormlyFieldConfig, FormlyForm, FormlyFormOptions, FormlyModule } from '@ngx-formly/core';
 import { TaActionService, TaCoreModule, TaLocalStorage } from '@ta/ta-core';
@@ -31,7 +32,8 @@ import { Router } from '@angular/router';
   styles: [
   ]
 })
-export class TaFormComponent implements OnInit {
+export class TaFormComponent implements OnInit, OnDestroy {
+  private valueChangesSub: Subscription | null = null;
   @ViewChild("formlyForm", { static: false })
   formlyForm: FormlyForm | any;
   @Input() options: TaFormConfig | any;
@@ -59,9 +61,9 @@ export class TaFormComponent implements OnInit {
       }
     }
     if (this.options.valueChangeFn) {
-      this.form.valueChanges.subscribe(res => {
+      this.valueChangesSub = this.form.valueChanges.subscribe(() => {
         this.options.valueChangeFn(this.options.model);
-      })
+      });
     }
 
     if (this.options.formState) {
@@ -69,6 +71,10 @@ export class TaFormComponent implements OnInit {
       this.options.showActionBtn = (this.formlyOptions.formState.viewMode) ? false : true;
     }
     this.showForm = true;
+  }
+
+  ngOnDestroy(): void {
+    this.valueChangesSub?.unsubscribe();
   }
 
   onSubmit() {

@@ -1,1 +1,23 @@
 /* Journal Voucher List Component Styles */
+
+::ng-deep {
+  .jv-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+  }
+
+  .jv-submitted {
+    background: rgba(22, 163, 74, 0.12);
+    color: #15803d;
+  }
+
+  .jv-cancelled {
+    background: rgba(220, 38, 38, 0.10);
+    color: #b91c1c;
+  }
+}

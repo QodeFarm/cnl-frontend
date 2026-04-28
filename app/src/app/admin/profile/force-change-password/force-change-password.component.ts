@@ -125,8 +125,10 @@ export class ForceChangePasswordComponent implements OnInit {
         this.message.success('Password set successfully! Please sign in with your new password.');
         setTimeout(() => this.router.navigateByUrl('/login'), 1800);
       },
-      error: () => {
+      error: (err: any) => {
         this.isLoading = false;
+        const msg = err?.error?.message || err?.error?.detail || 'Failed to change password. Please try again.';
+        this.message.error(msg);
       }
     });
   }

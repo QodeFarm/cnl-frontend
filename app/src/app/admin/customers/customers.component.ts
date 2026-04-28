@@ -17,6 +17,7 @@ import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { BulkEditModalComponent } from '../utils/bulk-edit-modal/bulk-edit-modal.component';
 import { BulkField } from '../utils/bulk-operations.service';
 import { LocalStorageService } from 'projects/ta-core/src/lib/services/local-storage.service';
+import { ledgerAccountsConfig } from '../../utils/master-curd-config';
 
 
 @Component({
@@ -35,6 +36,16 @@ import { LocalStorageService } from 'projects/ta-core/src/lib/services/local-sto
   styleUrls: ['./customers.component.scss']
 })
 export class CustomersComponent {
+
+  // Filtered curdConfig — shows only AccountsReceivable accounts (stable purpose flag, not group name)
+  customerLedgerCurdConfig = {
+    ...ledgerAccountsConfig,
+    tableConfig: {
+      ...ledgerAccountsConfig.tableConfig,
+      apiUrl: 'customers/ledger_accounts/?group_purpose=AccountsReceivable'
+    }
+  };
+
   showCustomerList: boolean = false;
   showForm: boolean = false;
   CustomerEditID: any;
@@ -1276,22 +1287,39 @@ sendCredentialsToCustomer() {
                       templateOptions: {
                         dataKey: 'ledger_account_id',
                         dataLabel: 'name',
-                        label: 'Ledger Account',
-                        placeholder: 'Ledger Account',
-                        required: false,
+                        label: 'Under Ledger',
+                        placeholder: 'Select Under Ledger',
+                        required: true,
                         lazy: {
-                          url: 'customers/ledger_accounts/',
+                          url: 'customers/ledger_accounts/?group_purpose=AccountsReceivable',
                           lazyOneTime: true
-                        }
+                        },
+                        curdConfig: this.customerLedgerCurdConfig
                       },
                       hooks: {
+                        onInit: (field: any) => {
+                          // Auto-select "Sundry Debtors" for new customers
+                          const isNewRecord = !field.model?.customer_data?.customer_id &&
+                                             !field.formControl?.value;
+                          if (isNewRecord) {
+                            this.http.get('customers/ledger_accounts/?group_purpose=AccountsReceivable&search=Sundry Debtors&limit=5').subscribe({
+                              next: (res: any) => {
+                                const accounts = res?.data || res?.results || [];
+                                const sundryDebtors = accounts.find((a: any) =>
+                                  a.name?.toLowerCase().includes('sundry debtor')
+                                );
+                                if (sundryDebtors) {
+                                  field.formControl.setValue(sundryDebtors);
+                                }
+                              },
+                              error: () => {}
+                            });
+                          }
+                        },
                         onChanges: (field: any) => {
                           field.formControl.valueChanges.subscribe((data: any) => {
-                            console.log('ledger_account', data);
                             if (this.formConfig && this.formConfig.model && this.formConfig.model['customer_data']) {
-                              this.formConfig.model['customer_data']['ledger_account_id'] = data.ledger_account_id;
-                            } else {
-                              console.error('Form config or Customer data model is not defined.');
+                              this.formConfig.model['customer_data']['ledger_account_id'] = data?.ledger_account_id;
                             }
                           });
                         }

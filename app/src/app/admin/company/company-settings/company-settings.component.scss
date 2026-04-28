@@ -1,0 +1,313 @@
+// ── Design tokens (matches rest of project) ──────────────────────────
+$primary:       #142768;
+$primary-hover: #1a3278;
+$primary-light: #eef2fa;
+$border:        #e8e8e8;
+$bg-page:       #f5f6fa;
+$bg-white:      #ffffff;
+$text-dark:     #1a1a2e;
+$text-mid:      #595959;
+$text-light:    #8c8c8c;
+$font:          'Poppins', sans-serif;
+
+// ── Wrapper ───────────────────────────────────────────────────────────
+.cs-wrapper {
+  font-family: $font;
+  background: $bg-page;
+  min-height: 100vh;
+  padding: 20px 24px 32px;
+}
+
+// ── Page Header ───────────────────────────────────────────────────────
+.cs-page-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.cs-header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.cs-header-icon {
+  width: 42px;
+  height: 42px;
+  background-color: $primary;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.cs-page-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: $text-dark;
+  line-height: 1.2;
+}
+
+.cs-page-sub {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: $text-light;
+}
+
+// ── Body layout: left nav + right content ────────────────────────────
+.cs-body {
+  display: flex;
+  gap: 0;
+  background: $bg-white;
+  border: 1px solid $border;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+  min-height: calc(100vh - 130px);
+}
+
+// ── Left Navigation ───────────────────────────────────────────────────
+.cs-nav {
+  width: 180px;
+  min-width: 180px;
+  background: #f8f9fc;
+  border-right: 1px solid $border;
+  padding: 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cs-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  margin: 0 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  position: relative;
+
+  &:hover:not(.disabled) {
+    background: $primary-light;
+
+    .cs-nav-icon { color: $primary; }
+    .cs-nav-label { color: $primary; }
+  }
+
+  &.active {
+    background: $primary-light;
+    border-left: 3px solid $primary;
+    padding-left: 13px;
+
+    .cs-nav-icon { color: $primary; }
+    .cs-nav-label { color: $primary; font-weight: 600; }
+  }
+
+  &.disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+}
+
+.cs-nav-icon {
+  font-size: 16px;
+  color: $text-light;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.cs-nav-label {
+  font-size: 13px;
+  color: $text-mid;
+  flex: 1;
+  white-space: nowrap;
+}
+
+.cs-nav-soon {
+  font-size: 9px;
+  font-weight: 600;
+  color: $text-light;
+  background: #f0f0f0;
+  border-radius: 3px;
+  padding: 1px 5px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+// ── Right Content ─────────────────────────────────────────────────────
+.cs-content {
+  flex: 1;
+  padding: 24px 28px;
+  overflow-y: auto;
+}
+
+// ── Module Header ─────────────────────────────────────────────────────
+.cs-module-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.cs-module-icon {
+  width: 36px;
+  height: 36px;
+  background: $primary-light;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: $primary;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.cs-module-title {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 600;
+  color: $text-dark;
+}
+
+.cs-module-desc {
+  margin: 0;
+  font-size: 12px;
+  color: $text-light;
+  max-width: 560px;
+  line-height: 1.5;
+}
+
+.cs-save-btn {
+  margin-left: auto;
+  min-width: 100px;
+  height: 34px;
+  font-size: 13px;
+  background: $primary !important;
+  border-color: $primary !important;
+  flex-shrink: 0;
+
+  &:hover {
+    background: $primary-hover !important;
+    border-color: $primary-hover !important;
+  }
+}
+
+// ── Field Groups ──────────────────────────────────────────────────────
+.cs-group {
+  margin-bottom: 24px;
+}
+
+.cs-group-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: $text-light;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 14px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid $border;
+}
+
+.cs-fields-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px 28px;
+
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cs-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cs-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: $text-mid;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.cs-info {
+  color: #c0c0c0;
+  font-size: 13px;
+  cursor: help;
+  line-height: 1;
+  display: flex;
+
+  &:hover { color: $primary; }
+}
+
+.cs-tag {
+  font-size: 10px;
+  height: 17px;
+  line-height: 17px;
+  padding: 0 5px;
+  border-radius: 3px;
+}
+
+.cs-select {
+  width: 100%;
+}
+
+// ── Info Note ─────────────────────────────────────────────────────────
+.cs-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 14px;
+  background: $primary-light;
+  border: 1px solid #c8d5f0;
+  border-radius: 6px;
+  font-size: 12px;
+  color: $primary;
+  margin-top: 8px;
+
+  span[nz-icon] {
+    font-size: 14px;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+}
+
+// ── Coming Soon ───────────────────────────────────────────────────────
+.cs-coming-soon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+
+  h3 {
+    margin: 16px 0 8px;
+    font-size: 16px;
+    font-weight: 600;
+    color: $text-mid;
+  }
+
+  p {
+    margin: 0;
+    font-size: 13px;
+    color: $text-light;
+  }
+}
+
+.cs-soon-icon {
+  font-size: 40px;
+  color: #d0d0d0;
+}

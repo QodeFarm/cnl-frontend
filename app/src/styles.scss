@@ -2159,6 +2159,52 @@ nz-modal {
     }
 }
 
+// Fix dropdown header color — sb-admin-2.css hardcodes #394c8f, override with project primary
+.topbar .dropdown-list .dropdown-header {
+    background-color: #142768 !important;
+    border-color: #142768 !important;
+}
+
+// Configuration dropdown — single column, no text wrapping
+.config-drop-list {
+    flex-direction: column;
+    min-width: 220px;
+    padding: 6px 0.75rem 10px;
+
+    li {
+        width: 100%;
+        padding: 3px 2px;
+
+        a {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            white-space: nowrap;
+            font-size: 13.5px;
+            padding: 5px 8px;
+            border-radius: 5px;
+            transition: background 0.15s, color 0.15s;
+            color: #2d2d2d;
+
+            i {
+                width: 16px;
+                text-align: center;
+                font-size: 13px;
+                color: #6b7280;
+                flex-shrink: 0;
+            }
+
+            &:hover {
+                background: #eef2fa;
+                color: #142768;
+                text-decoration: none;
+
+                i { color: #142768; }
+            }
+        }
+    }
+}
+
 .cdk-overlay-container {
     z-index: 1060 !important;
 }
@@ -2488,23 +2534,8 @@ nz-modal {
 
         .ta-cell.filter-alignments {
             .filter-group {
-
                 .ant-picker,
-                .ant-select {
-                    width: 100% !important;
-                }
-            }
-        }
-    }
-
-    .ant-table-content {
-        table {
-            tr {
-
-                th:not(:first-child),
-                td:not(:first-child) {
-                    width: 150px;
-                }
+                .ant-select { width: 100% !important; }
             }
         }
     }
@@ -3257,54 +3288,82 @@ nz-modal {
 /* NZ Confirm Modal - Delete Confirmation Fix */
 .ant-modal-confirm {
     .ant-modal-content {
-        border-radius: 12px;
+        border-radius: 10px;
         overflow: hidden;
     }
 
     .ant-modal-body {
-        padding: 24px 24px 20px;
+        padding: 28px 28px 20px;
     }
 
     .ant-modal-confirm-body {
-        display: flex;
-        align-items: flex-start;
-        gap: 16px;
-
-        .ant-modal-confirm-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #262626;
-            line-height: 1.5;
+        // Icon floats left; title + content stack vertically beside it
+        &::after {
+            content: '';
+            display: table;
+            clear: both;
         }
 
-        >.anticon {
+        > .anticon {
+            float: left;
             font-size: 22px;
-            margin-top: 2px;
+            color: #142768 !important;
+            margin-right: 14px;
+            margin-top: 3px;
+        }
+
+        .ant-modal-confirm-title {
+            display: block;
+            overflow: hidden;
+            font-size: 16px;
+            font-weight: 600;
+            color: #142768;
+            line-height: 1.4;
+        }
+
+        .ant-modal-confirm-content {
+            display: block;
+            overflow: hidden;
+            margin-top: 6px;
+            font-size: 14px;
+            color: #595959;
+            line-height: 1.6;
         }
     }
 
     .ant-modal-confirm-btns {
         display: flex;
         justify-content: flex-end;
-        gap: 12px;
+        gap: 10px;
         margin-top: 24px;
 
         .ant-btn {
-            min-width: 70px;
-            height: 36px;
+            min-width: 80px;
+            height: 34px;
             border-radius: 6px;
+            font-size: 13px;
             font-weight: 500;
 
             &.ant-btn-default {
                 border: 1px solid #d9d9d9;
+                color: #595959;
 
                 &:hover {
-                    border-color: #1890ff;
-                    color: #1890ff;
+                    border-color: #142768;
+                    color: #142768;
                 }
             }
 
             &.ant-btn-primary {
+                background: #142768;
+                border-color: #142768;
+                color: #fff;
+
+                &:hover {
+                    background: #1a3593;
+                    border-color: #1a3593;
+                }
+
                 &.ant-btn-dangerous {
                     background: #ff4d4f;
                     border-color: #ff4d4f;
@@ -3827,12 +3886,12 @@ ta-table,
     .ant-select-dropdown {
         border-radius: 4px;
         box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
-        overflow: hidden;
+        overflow: visible;
 
-        // Table wrapper inside popup
+        // Table wrapper inside popup — allow natural width
         .ant-table-wrapper {
             border-radius: 4px;
-            overflow: hidden;
+            overflow: visible;
         }
 
         // Table styles
@@ -3901,10 +3960,11 @@ ta-table,
 .adv-select-custom-overlay-panel {
     border-radius: 4px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-    overflow: hidden;
-    // Ensure popup is always wide enough for readable content
-    min-width: 520px;
-    // Prevent panel from going off-screen
+    overflow: visible;
+    // Panel grows to fit content — same pattern as Alignbooks
+    width: max-content !important;
+    min-width: 480px;
+    // Never overflow the viewport
     max-width: calc(100vw - 32px);
 
     .adv-select-curd-container {
@@ -3912,19 +3972,21 @@ ta-table,
         // max-height is set dynamically via inline style from the component.
         // This fallback is for safety only.
         max-height: 70vh;
-        overflow: hidden;
+        // overflow-y clips vertical content; overflow-x is auto-coerced to auto by browser.
+        // Because the panel is width:max-content, horizontal content never overflows, so
+        // no horizontal scrollbar appears even though overflow-x is technically auto.
+        overflow-y: auto;
+        overflow-x: visible;
         display: flex;
         flex-direction: column;
 
-        // Inner wrapper – scrolls when space is tight so pagination stays reachable
+        // Inner wrapper — vertical scroll handled by parent; no extra clip needed
         >div {
-            overflow-y: auto !important;
-            overflow-x: hidden !important;
+            overflow: visible !important;
             display: flex;
             flex-direction: column;
             padding: 8px 12px !important;
             box-sizing: border-box !important;
-            width: 100% !important;
         }
 
         // ============================================================
@@ -3954,20 +4016,20 @@ ta-table,
             }
         }
 
-        // Search bar row - properly bounded, no overflow
+        // Search bar row - expands with panel, no overflow
         .ta-row {
             gap: 8px !important;
             flex-shrink: 0;
-            width: 100% !important;
+            min-width: 0;
             box-sizing: border-box !important;
-            overflow: hidden !important;
+            overflow: visible !important;
             flex-wrap: nowrap !important;
 
             // Search input group — fills available space
             nz-input-group {
                 margin-right: 0 !important;
                 flex: 1 1 auto !important;
-                min-width: 0 !important;
+                min-width: 200px !important;
 
                 input {
                     width: 100% !important;
@@ -4245,6 +4307,346 @@ ta-curd-modal,
         background: #f0f4ff;
         color: #142768;
         border: 1px solid #91b4ff;
+    }
+}
+
+// ============================================================
+// ACCOUNT LEDGER — TABLE CELL COLORS
+// Used via [innerHTML] in mapFn — inline styles are stripped by Angular
+// ============================================================
+.ledger-dr {
+    color: #dc2626;
+    font-weight: 600;
+    font-family: 'Roboto Mono', 'Consolas', monospace;
+}
+
+.ledger-cr {
+    color: #16a34a;
+    font-weight: 600;
+    font-family: 'Roboto Mono', 'Consolas', monospace;
+}
+
+.ledger-muted {
+    color: #9ca3af;
+    font-weight: 400;
+}
+
+.ledger-bal {
+    font-size: 13px;
+    letter-spacing: 0.2px;
+}
+
+// ============================================================
+// ACCOUNT LEDGER — FULLY RESPONSIVE FILTER BAR
+// Breakpoints: ≥1200px (desktop), 768–1199px (tablet), <768px (mobile)
+// ============================================================
+app-account-ledger {
+
+    // ── Always: overflow visible so dropdowns are never clipped ──
+    .customer-title-alignment,
+    .ta-cell.filter-alignments,
+    .filter-alignments .ta-row {
+        overflow: visible !important;
+    }
+
+    // ── Always: remove stray per-item margins, use gap instead ──
+    .filter-alignments .filter-group {
+        margin-top: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    // ── Always: account ledger filter group flex ──
+    .account-ledger-filters {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    // ── Desktop (≥1200px): everything on ONE row ──────────────────
+    @media (min-width: 1200px) {
+        .customer-title-alignment {
+            flex-wrap: nowrap !important;
+            align-items: center !important;
+            gap: 8px;
+        }
+
+        .ta-cell.filter-alignments {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+        .filter-alignments .ta-row {
+            flex-wrap: nowrap !important;
+            align-items: center !important;
+            gap: 8px;
+        }
+
+        .ta-cell.mt-2.ms-2 {
+            flex: 0 0 auto;
+            margin-top: 0 !important;
+            margin-left: 8px !important;
+        }
+
+        // Widths that fit one row at 1200px+
+        .al-select-type,    .al-select-type .ant-select    { width: 140px !important; }
+        .al-select-account, .al-select-account .ant-select { width: 190px !important; }
+        .al-select-city,    .al-select-city .ant-select    { width: 130px !important; }
+
+        #quickPeriod.quick-period-select { width: 120px !important; }
+        #fromDate.date-picker             { width: 115px !important; }
+        #toDate.date-picker               { width: 115px !important; }
+    }
+
+    // ── Tablet (768px–1199px): two clean rows ─────────────────────
+    @media (min-width: 768px) and (max-width: 1199px) {
+        .customer-title-alignment {
+            flex-wrap: wrap !important;
+            gap: 8px;
+        }
+
+        .ta-cell.filter-alignments {
+            width: 100%;
+            flex: 0 0 100%;
+        }
+
+        .filter-alignments .ta-row {
+            flex-wrap: wrap !important;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .account-ledger-filters {
+            flex-wrap: wrap !important;
+            width: 100%;
+        }
+
+        .ta-cell.mt-2.ms-2 {
+            width: 100%;
+            flex: 0 0 100%;
+            margin-top: 8px !important;
+            margin-left: 0 !important;
+
+            .ant-input-group-wrapper {
+                width: 100% !important;
+            }
+        }
+
+        // On tablet: selects expand to fill available space
+        .al-select-type    { flex: 1 !important; min-width: 120px !important; }
+        .al-select-account { flex: 2 !important; min-width: 160px !important; }
+        .al-select-city    { flex: 1 !important; min-width: 110px !important; }
+
+        .al-select-type .ant-select,
+        .al-select-account .ant-select,
+        .al-select-city .ant-select { width: 100% !important; }
+
+        #quickPeriod.quick-period-select { width: 130px !important; }
+        #fromDate.date-picker             { width: 130px !important; }
+        #toDate.date-picker               { width: 130px !important; }
+    }
+
+    // ── Mobile (<768px): fully stacked ────────────────────────────
+    @media (max-width: 767px) {
+        .customer-title-alignment {
+            flex-wrap: wrap !important;
+            gap: 8px;
+        }
+
+        .ta-cell.filter-alignments,
+        .ta-cell.mt-2.ms-2 {
+            width: 100% !important;
+            flex: 0 0 100% !important;
+            margin: 0 !important;
+        }
+
+        .filter-alignments .ta-row {
+            flex-wrap: wrap !important;
+            gap: 8px;
+        }
+
+        .account-ledger-filters {
+            flex-wrap: wrap !important;
+            width: 100%;
+        }
+
+        // Each select takes half width on mobile
+        .al-select-type,
+        .al-select-account,
+        .al-select-city {
+            flex: 0 0 calc(50% - 4px) !important;
+        }
+
+        .al-select-type .ant-select,
+        .al-select-account .ant-select,
+        .al-select-city .ant-select {
+            width: 100% !important;
+        }
+
+        // Date pickers: each half width
+        #quickPeriod.quick-period-select,
+        #fromDate.date-picker,
+        #toDate.date-picker {
+            width: calc(50% - 4px) !important;
+        }
+
+        // Search bar full width
+        .ta-cell.mt-2.ms-2 .ant-input-group-wrapper {
+            width: 100% !important;
+        }
+    }
+}
+
+
+// ============================================================
+// GLOBAL — RESPONSIVE TABLE & FILTER BAR (all list pages)
+// Applies to every page using ta-table
+// ============================================================
+
+// ── Tablet (768–1199px) ───────────────────────────────────────
+@media (max-width: 1199px) {
+    // Tables scroll horizontally rather than squashing columns
+    .ant-table-content {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    // Filter groups expand to fill their row
+    .customer-title-alignment .ta-cell.filter-alignments {
+        .filter-group {
+            .ant-picker,
+            .ant-select { width: 100% !important; }
+        }
+    }
+}
+
+// ── Mobile (<768px) ───────────────────────────────────────────
+@media (max-width: 767px) {
+
+    // Filter row wraps
+    .customer-title-alignment {
+        flex-wrap: wrap !important;
+        gap: 8px;
+        padding: 8px 0 !important;
+    }
+
+    // Each ta-cell in the filter bar takes full row
+    .customer-title-alignment .ta-cell {
+        width: 100% !important;
+        flex: 0 0 100% !important;
+        margin: 0 !important;
+    }
+
+    // Filter groups: 2 per row
+    .customer-title-alignment .ta-cell.filter-alignments {
+        .ta-row { flex-wrap: wrap !important; gap: 8px; }
+
+        .filter-group.col {
+            flex: 0 0 calc(50% - 4px) !important;
+            max-width: calc(50% - 4px) !important;
+            margin: 0 !important;
+            padding: 0 !important;
+
+            .ant-select,
+            .ant-picker { width: 100% !important; }
+        }
+    }
+
+    // Search bar takes full width
+    .ta-cell.ms-2 {
+        margin-left: 0 !important;
+        width: 100% !important;
+
+        .ant-input-group-wrapper { width: 100% !important; }
+
+        // Action buttons wrap below search
+        .ta-row.flex-nowrap {
+            flex-wrap: wrap !important;
+            gap: 6px;
+        }
+    }
+
+    // Forms: stack all columns to full width
+    .ant-row .ant-col,
+    .ant-row [class*="col-"] {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+    }
+
+    // Reduce padding on container
+    .container-fluid {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+
+    // Table cells: let them scroll, don't force min-width
+    .ant-table-content table th,
+    .ant-table-content table td {
+        white-space: nowrap;
+        min-width: auto !important;
+    }
+
+    // Pagination: compact
+    .ant-pagination {
+        flex-wrap: wrap;
+        gap: 4px;
+
+        .ant-pagination-options { margin-left: 0 !important; }
+    }
+}
+
+// ── Small mobile (<480px) ─────────────────────────────────────
+@media (max-width: 479px) {
+
+    // Filter groups: 1 per row on very small screens
+    .customer-title-alignment .ta-cell.filter-alignments {
+        .filter-group.col {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+        }
+    }
+
+    // Modals take full screen
+    .ant-modal {
+        max-width: 100% !important;
+        margin: 0 !important;
+
+        .ant-modal-content { border-radius: 0 !important; }
+    }
+
+    // Drawers take full width
+    .ant-drawer-content-wrapper {
+        width: 100% !important;
+    }
+
+    // Tabs: scroll horizontally
+    .ant-tabs-nav-list {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+// ============================================================
+// JOURNAL VOUCHER STATUS BADGES
+// ============================================================
+.jv-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+
+    &.jv-posted {
+        background: #e6f4ea;
+        color: #1a7f37;
+    }
+
+    &.jv-draft {
+        background: #fff8e1;
+        color: #b45309;
     }
 }
 
@@ -4599,14 +5001,20 @@ body.col-resizing * {
 }
 
 
-// Clip any remaining overflow at every level of the table scroll hierarchy
-.adv-select-curd-container,
+// Table containers inside popup — let width be driven by content
 .adv-select-curd-container .ant-table-wrapper,
 .adv-select-curd-container .ant-table-container,
-.adv-select-curd-container .ant-table-content,
-.adv-select-curd-container .ant-table-body,
-.adv-select-curd-container .ant-table-scroll {
-    overflow-x: hidden !important;
+.adv-select-curd-container .ant-table-content {
+    overflow: visible !important;
+    width: max-content !important;
+    min-width: 100% !important;
+}
+
+// The actual <table> element drives the panel width
+.adv-select-curd-container table {
+    width: max-content !important;
+    min-width: 100% !important;
+    table-layout: auto !important;
 }
 
 // Compact table rows inside selection popups

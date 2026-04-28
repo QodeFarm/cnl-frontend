@@ -168,6 +168,7 @@ const routes: Routes = [
       { path: 'company', data: { title: 'Company', moduleName: 'company' }, canActivate: [], loadComponent: () => import('./admin/company/company.component').then(m => m.CompanyComponent) },
       { path: 'company/branches', data: { title: 'Branches', moduleName: 'branches' }, canActivate: [], loadComponent: () => import('./admin/company/branches/branches.component').then(m => m.BranchesComponent) },
       { path: 'company/document-print-settings', data: { title: 'Document Print Settings', moduleName: 'document-print-settings' }, canActivate: [], loadComponent: () => import('./admin/company/document-print-settings/document-print-settings.component').then(m => m.DocumentPrintSettingsComponent) },
+      { path: 'company/company-settings', data: { title: 'Company Settings', moduleName: 'company-settings' }, canActivate: [], loadComponent: () => import('./admin/company/company-settings/company-settings.component').then(m => m.CompanySettingsComponent) },
 
       //Company Module
       { path: 'reminders', data: { title: 'Reminders', moduleName: 'reminders' }, canActivate: [], loadComponent: () => import('./admin/reminders/reminders.component').then(m => m.RemindersComponent) },

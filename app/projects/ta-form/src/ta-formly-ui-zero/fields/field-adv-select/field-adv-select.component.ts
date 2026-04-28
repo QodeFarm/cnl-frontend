@@ -255,9 +255,8 @@ export class FieldAdvSelectComponent extends FieldType implements OnInit, AfterC
       const triggerEl = this.elRef.nativeElement.querySelector('.dropdown-toggle');
       if (triggerEl) {
         const rect = triggerEl.getBoundingClientRect();
-        const vw = window.innerWidth;
         const vh = window.innerHeight;
-        const margin = 16; // breathing room from edges
+        const margin = 16;
 
         // --- Vertical: pick the bigger gap (above vs below) ---
         const spaceBelow = vh - rect.bottom - margin;
@@ -265,12 +264,8 @@ export class FieldAdvSelectComponent extends FieldType implements OnInit, AfterC
         const maxH = Math.max(spaceBelow, spaceAbove, 250);
         this.overlayMaxHeight = Math.min(maxH, vh * 0.7) + 'px';
 
-        // --- Horizontal: clamp desired width so panel stays in viewport ---
-        const desiredW = this.props?.curdConfig?.drawerSize || 700;
-        const spaceRight = vw - rect.left - margin;
-        const spaceLeft = rect.right - margin;
-        const maxW = Math.max(spaceRight, spaceLeft, 520);
-        this.overlayWidth = Math.min(desiredW, maxW);
+        // Width is always auto — panel expands to fit column content, capped by CSS max-width
+        this.overlayWidth = 'auto';
       }
 
       // Auto-focus the search input inside the overlay after it renders

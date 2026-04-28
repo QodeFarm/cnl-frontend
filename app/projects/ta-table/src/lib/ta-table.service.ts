@@ -24,7 +24,7 @@ export class TaTableService {
       .get<{ results: any[] }>(`${arg.apiUrl}${expKey}${queryString}`);
   }
   deleterow(apiUrl: string, row: any, options?: any) {
-    if (row[options.pkId]) {
+    if (options?.pkId && row[options.pkId]) {
       const base = apiUrl.replace(/\/$/, '');
       return this.http.delete(`${base}/${row[options.pkId]}/`);
     }
@@ -32,7 +32,7 @@ export class TaTableService {
   }
 
   restorerow(apiUrl: string, row: any, options?: any) {
-    if (row[options.pkId]) {
+    if (options?.pkId && row[options.pkId]) {
       const base = apiUrl.replace(/\/$/, '');
       const payload = { is_deleted: false };
       return this.http.patch(`${base}/${row[options.pkId]}/`, payload);
