@@ -7,6 +7,8 @@ import { AuthguardGuard } from './guards/authguard.guard';
 import { ForcePasswordChangeGuard } from './guards/force-password-change.guard';
 import { CustomerPortalGuard } from './guards/customer-portal.guard';
 import { CustomerLoginComponent } from './admin/customer-portal/customer-login.component';
+import { CustomerResetPasswordComponent } from './admin/customer-portal/customer-reset-password/customer-reset-password.component';
+import { CustomerForgotPasswordComponent } from './admin/customer-portal/customer-forgot-password/customer-forgot-password.component';
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login' },
@@ -14,6 +16,22 @@ const routes: Routes = [
     path: 'customer_portal_login',
     component: CustomerLoginComponent,
   },
+  {
+    path: 'customer-portal/forgot-password',
+    component: CustomerForgotPasswordComponent,
+  },
+  {
+    path: 'customer-portal/reset-password/:token',
+    component: CustomerResetPasswordComponent,
+  },
+  
+  // Keep your old path for backward compatibility
+  {
+    path: 'customer_portal_login',
+    redirectTo: 'customer-portal/login',
+    pathMatch: 'full'
+  },
+
   {
     path: 'customer-portal',  // Use hyphen for consistency
     canActivate: [CustomerPortalGuard],
@@ -250,6 +268,6 @@ const routes: Routes = [
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class AppRoutingModule { }

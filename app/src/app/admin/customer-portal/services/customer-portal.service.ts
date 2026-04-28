@@ -16,6 +16,26 @@ export class CustomerPortalService {
     return user.id || null;
   }
 
+  // ========== FORGOT PASSWORD METHODS ==========
+  
+   // Forgot password - request reset link
+  forgotPassword(username: string): Observable<any> {
+    return this.http.post(`customers/portal/forgot-password/`, { username });
+  }
+  
+  // ✅ Add this method to validate token
+  validateResetToken(token: string): Observable<any> {
+    return this.http.post(`customers/portal/validate-token/`, { token });
+  }
+  
+  // Reset password
+  resetPassword(token: string, newPassword: string, confirmPassword: string): Observable<any> {
+    return this.http.post(`customers/portal/reset-password/${token}/`, {
+      new_password: newPassword,
+      confirm_password: confirmPassword
+    });
+  }
+
   // Sales Orders - Filtered by customer
   getSalesOrders(): Observable<any> {
     const customerId = this.getCustomerId();
