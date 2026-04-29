@@ -13,6 +13,7 @@ import { NzResultModule } from 'ng-zorro-antd/result';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { BulkEditModalComponent } from '../utils/bulk-edit-modal/bulk-edit-modal.component';
 import { BulkField, BulkOperationsService } from '../utils/bulk-operations.service';
+import { ledgerAccountsConfig } from '../../utils/master-curd-config';
 
 @Component({
   selector: 'app-vendors',
@@ -23,6 +24,16 @@ import { BulkField, BulkOperationsService } from '../utils/bulk-operations.servi
 })
 
 export class VendorsComponent {
+
+  // Filtered curdConfig — shows only AccountsPayable accounts (stable purpose flag, not group name)
+  vendorLedgerCurdConfig = {
+    ...ledgerAccountsConfig,
+    tableConfig: {
+      ...ledgerAccountsConfig.tableConfig,
+      apiUrl: 'customers/ledger_accounts/?group_purpose=AccountsPayable'
+    }
+  };
+
   showVendorList: boolean = false;
   showForm: boolean = false;
   VendorEditID: any;
@@ -558,22 +569,39 @@ editVendor(event) {
                       templateOptions: {
                         dataKey: 'ledger_account_id',
                         dataLabel: 'name',
-                        label: 'Ledger Account',
-                        placeholder: 'Ledger Account',
-                        required: false,
+                        label: 'Under Ledger',
+                        placeholder: 'Select Under Ledger',
+                        required: true,
                         lazy: {
-                          url: 'customers/ledger_accounts/',
+                          url: 'customers/ledger_accounts/?group_purpose=AccountsPayable',
                           lazyOneTime: true
-                        }
+                        },
+                        curdConfig: this.vendorLedgerCurdConfig
                       },
                       hooks: {
+                        onInit: (field: any) => {
+                          // Auto-select "Sundry Creditors" for new vendors
+                          const isNewRecord = !field.model?.vendor_id &&
+                                             !field.formControl?.value;
+                          if (isNewRecord) {
+                            this.http.get('customers/ledger_accounts/?group_purpose=AccountsPayable&search=Sundry%20Creditors&limit=5').subscribe({
+                              next: (res: any) => {
+                                const accounts = res?.data || res?.results || [];
+                                const sundryCreditors = accounts.find((a: any) =>
+                                  a.name?.toLowerCase() === 'sundry creditors'
+                                );
+                                if (sundryCreditors) {
+                                  field.formControl.setValue(sundryCreditors);
+                                }
+                              },
+                              error: () => {}
+                            });
+                          }
+                        },
                         onChanges: (field: any) => {
                           field.formControl.valueChanges.subscribe((data: any) => {
-                            console.log('ledger_account', data);
                             if (this.formConfig && this.formConfig.model && this.formConfig.model['vendor_data']) {
-                              this.formConfig.model['vendor_data']['ledger_account_id'] = data.ledger_account_id;
-                            } else {
-                              console.error('Form config or Vendor data model is not defined.');
+                              this.formConfig.model['vendor_data']['ledger_account_id'] = data?.ledger_account_id;
                             }
                           });
                         }

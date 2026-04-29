@@ -118,6 +118,7 @@ export class AdminLayoutComponent {
       this.checkAndAddRouteTab({ name: route.data.title, component: route.component, key: route.data.moduleName, url: this.router.url, active: true });
       console.log('data', route.data.title, this.router.url);
     });
+
   }
 
   @HostListener('window:resize', ['$event'])

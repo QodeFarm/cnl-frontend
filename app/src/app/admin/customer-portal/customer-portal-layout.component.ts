@@ -1,5 +1,5 @@
 // customer-portal/customer-portal-layout.component.ts
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
@@ -13,7 +13,8 @@ import { filter } from 'rxjs/operators';
   templateUrl: './customer-portal-layout.component.html',
   styleUrls: ['./customer-portal-layout.component.css']
 })
-export class CustomerPortalLayoutComponent implements OnInit {
+export class CustomerPortalLayoutComponent implements OnInit, OnDestroy {
+  private clockInterval: ReturnType<typeof setInterval> | null = null;
   customerName: string = '';
   customerInitials: string = '';
   pageTitle: string = 'Dashboard';
@@ -107,11 +108,17 @@ export class CustomerPortalLayoutComponent implements OnInit {
 
     // Update time every minute
     this.updateTime();
-    setInterval(() => this.updateTime(), 60000);
+    this.clockInterval = setInterval(() => this.updateTime(), 60000);
   }
 
   ngOnInit() {
     console.log('✅ Layout loaded, customer:', this.customerName);
+  }
+
+  ngOnDestroy(): void {
+    if (this.clockInterval !== null) {
+      clearInterval(this.clockInterval);
+    }
   }
 
   updateTime() {

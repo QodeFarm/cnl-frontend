@@ -27,7 +27,7 @@ export class JournalVoucherListComponent {
     pkId: "journal_voucher_id",
     pageSize: 10,
     "globalSearch": {
-      keys: ['voucher_no', 'voucher_date', 'voucher_type', 'narration', 'total_debit', 'total_credit', 'is_posted']
+      keys: ['voucher_no', 'voucher_date', 'voucher_type', 'narration', 'total_debit', 'total_credit', 'status']
     },
     export: { downloadName: 'JournalVoucherList' },
     defaultSort: { key: 'created_at', value: 'descend' },
@@ -62,11 +62,13 @@ export class JournalVoucherListComponent {
         mapFn: (val: any) => val ? `₹${parseFloat(val).toFixed(2)}` : '₹0.00'
       },
       {
-        fieldKey: 'is_posted',
-        name: 'Posted',
+        fieldKey: 'status',
+        name: 'Status',
         sort: true,
         displayType: 'map',
-        mapFn: (val: any) => val ? 'Yes' : 'No'
+        mapFn: (val: any) => val === 'Cancelled'
+          ? '<span class="jv-badge jv-cancelled">Cancelled</span>'
+          : '<span class="jv-badge jv-submitted">Submitted</span>'
       },
       {
         fieldKey: 'narration',
@@ -84,14 +86,14 @@ export class JournalVoucherListComponent {
             apiUrl: 'finance/journal_vouchers',
             confirm: true,
             confirmMsg: "Sure to delete?",
+            conditionFn: (row: any) => row.status !== 'Cancelled'
           },
           {
             type: 'callBackFn',
             icon: 'fa fa-pen',
             label: '',
             tooltip: "Edit this record",
-            callBackFn: (row, action) => {
-              console.log(row);
+            callBackFn: (row: any, action: any) => {
               this.edit.emit(row.journal_voucher_id);
             }
           }

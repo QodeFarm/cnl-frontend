@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { TaFormConfig, TaFormComponent } from '@ta/ta-form';
 import { JournalVoucherListComponent } from './journal-voucher-list/journal-voucher-list.component';
 import { CommonModule } from '@angular/common';
@@ -7,75 +7,66 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { FormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
+import { NzNotificationModule, NzNotificationService } from 'ng-zorro-antd/notification';
+import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
 
 @Component({
   selector: 'app-journal-voucher',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, JournalVoucherListComponent, FormsModule],
+  imports: [CommonModule, AdminCommmonModule, JournalVoucherListComponent, FormsModule, NzNotificationModule, NzModalModule],
   templateUrl: './journal-voucher.component.html',
   styleUrls: ['./journal-voucher.component.scss']
 })
-export class JournalVoucherComponent implements OnInit {
+export class JournalVoucherComponent implements OnInit, OnDestroy {
   showJournalVoucherList: boolean = false;
   showForm: boolean = false;
   JournalVoucherEditID: any;
   voucherNumber: string | null = null;
-  
-  // Total calculations
+  voucherStatus: string = 'Submitted';
+
   totalDebit: number = 0;
   totalCredit: number = 0;
-  
-  // Expense claim options for pull
+
   expenseClaimOptions: any[] = [];
   selectedExpenseClaimId: string = '';
-  
+
   @ViewChild(JournalVoucherListComponent) JournalVoucherListComponent!: JournalVoucherListComponent;
   @ViewChild('journalVoucherForm') journalVoucherForm!: TaFormComponent;
 
-  // Track subscriptions for cleanup
   private subscriptions: Subscription[] = [];
 
-  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef,
+    private notification: NzNotificationService,
+    private modal: NzModalService
+  ) {}
 
   nowDate = () => {
     const date = new Date();
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   }
 
-  // Get the next voucher number from the API
   getVoucherNo() {
     this.voucherNumber = null;
-    
     return this.http.get('masters/generate_order_no/?type=JV').subscribe(
       (res: any) => {
-        console.log('Voucher API response:', res);
         if (res?.data?.order_number) {
           this.voucherNumber = res.data.order_number;
-          console.log('Setting voucher number to:', this.voucherNumber);
-          
-          // Update the nested model if it exists
           if (this.formConfig?.model?.journal_voucher) {
             this.formConfig.model.journal_voucher.voucher_no = this.voucherNumber;
           }
-          
-          // Update form control if it exists (nested path)
           if (this.journalVoucherForm?.form) {
-            const voucherNoControl = this.journalVoucherForm.form.get('journal_voucher.voucher_no');
-            if (voucherNoControl) {
-              voucherNoControl.setValue(this.voucherNumber);
-            }
+            const ctrl = this.journalVoucherForm.form.get('journal_voucher.voucher_no');
+            if (ctrl) ctrl.setValue(this.voucherNumber);
           }
-          
           this.cdr.detectChanges();
         }
       },
-      error => {
-        console.error('Error getting voucher number:', error);
-      }
+      error => console.error('Error getting voucher number:', error)
     );
   }
 
-  // Load expense claims for the pull from expense claim dropdown
   loadExpenseClaims() {
     this.http.get('finance/expense_claims/').subscribe(
       (res: any) => {
@@ -86,27 +77,18 @@ export class JournalVoucherComponent implements OnInit {
           }));
         }
       },
-      error => {
-        console.error('Error loading expense claims:', error);
-      }
+      error => console.error('Error loading expense claims:', error)
     );
   }
 
-  // Pull expense claim data
   pullExpenseClaim() {
-    if (!this.selectedExpenseClaimId) {
-      return;
-    }
-
+    if (!this.selectedExpenseClaimId) return;
     this.http.get(`finance/journal_vouchers/pull_expense_claim/${this.selectedExpenseClaimId}/`).subscribe(
       (res: any) => {
         if (res?.data) {
-          // Pre-populate the form with expense claim data
           const expenseData = res.data;
-          
           if (this.formConfig?.model) {
-            // Update lines from expense claim
-            if (expenseData.lines && expenseData.lines.length > 0) {
+            if (expenseData.lines?.length > 0) {
               this.formConfig.model.voucher_lines = expenseData.lines.map((line: any) => ({
                 ledger_account: line.ledger_account,
                 ledger_account_id: line.ledger_account_id,
@@ -114,23 +96,19 @@ export class JournalVoucherComponent implements OnInit {
                 amount: line.amount || 0,
                 customer: line.customer,
                 customer_id: line.customer_id,
+                party_type: 'customer',
                 remark: line.remark || ''
               }));
             }
-            
-            // Update narration if available
             if (expenseData.narration && this.formConfig.model.journal_voucher) {
               this.formConfig.model.journal_voucher.narration = expenseData.narration;
             }
-            
             this.calculateTotals();
             this.cdr.detectChanges();
           }
         }
       },
-      error => {
-        console.error('Error pulling expense claim:', error);
-      }
+      error => console.error('Error pulling expense claim:', error)
     );
   }
 
@@ -140,7 +118,7 @@ export class JournalVoucherComponent implements OnInit {
     this.JournalVoucherEditID = null;
     this.totalDebit = 0;
     this.totalCredit = 0;
-    
+
     this.loadExpenseClaims();
     this.setFormConfig();
     this.getVoucherNo();
@@ -152,56 +130,70 @@ export class JournalVoucherComponent implements OnInit {
     document.getElementById('modalClose')?.click();
   }
 
-  // Calculate total debit and credit
   calculateTotals() {
-    this.totalDebit = 0;
-    this.totalCredit = 0;
-    
+    let debit = 0;
+    let credit = 0;
     if (this.formConfig?.model?.voucher_lines) {
       this.formConfig.model.voucher_lines.forEach((line: any) => {
         const amount = parseFloat(line.amount) || 0;
-        if (line.entry_type === 'Debit') {
-          this.totalDebit += amount;
-        } else if (line.entry_type === 'Credit') {
-          this.totalCredit += amount;
-        }
+        if (line.entry_type === 'Debit') debit += amount;
+        else if (line.entry_type === 'Credit') credit += amount;
       });
     }
-    
-    // Update model totals
+    this.totalDebit = debit;
+    this.totalCredit = credit;
     if (this.formConfig?.model?.journal_voucher) {
       this.formConfig.model.journal_voucher.total_debit = this.totalDebit;
       this.formConfig.model.journal_voucher.total_credit = this.totalCredit;
     }
   }
 
-  // Clear subscriptions
   clearSubscriptions() {
-    this.subscriptions.forEach(sub => {
-      try { sub.unsubscribe(); } catch (e) { /* ignore */ }
-    });
+    this.subscriptions.forEach(sub => { try { sub.unsubscribe(); } catch (e) {} });
     this.subscriptions = [];
+  }
+
+  ngOnDestroy() {
+    this.clearSubscriptions();
   }
 
   editJournalVoucher(event: any) {
     this.JournalVoucherEditID = event;
     this.clearSubscriptions();
-    
+
     this.http.get('finance/journal_vouchers/' + event).subscribe((res: any) => {
-      if (res && res.data) {
-        this.formConfig.model = res.data;
-        this.formConfig.showActionBtn = true;
+      if (res?.data) {
+        const voucher = res.data;
+        this.voucherStatus = voucher.journal_voucher?.status || voucher.status || 'Submitted';
+        const isCancelled = this.voucherStatus === 'Cancelled';
+
+        this.formConfig.model = voucher;
         this.formConfig.pkId = 'journal_voucher_id';
-        this.formConfig.submit.label = 'Update';
         this.formConfig.model['journal_voucher_id'] = this.JournalVoucherEditID;
-        
-        // Sort voucher lines by created_at if available
-        if (this.formConfig.model?.voucher_lines && Array.isArray(this.formConfig.model.voucher_lines)) {
+
+        if (isCancelled) {
+          // Cancelled voucher — view only
+          this.formConfig.showActionBtn = false;
+          this.formConfig.formState = { viewMode: true };
+        } else {
+          this.formConfig.showActionBtn = true;
+          this.formConfig.formState = { viewMode: false };
+          this.formConfig.submit.label = 'Update';
+        }
+
+        if (Array.isArray(this.formConfig.model?.voucher_lines)) {
           this.formConfig.model.voucher_lines.sort((a: any, b: any) => {
-            return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+            const ta = a.created_at ? new Date(a.created_at).getTime() : 0;
+            const tb = b.created_at ? new Date(b.created_at).getTime() : 0;
+            return ta - tb;
+          });
+          this.formConfig.model.voucher_lines = this.formConfig.model.voucher_lines.map((line: any) => {
+            if (line.customer_id || line.customer) return { ...line, party_type: 'customer' };
+            if (line.vendor_id || line.vendor)     return { ...line, party_type: 'vendor' };
+            return line;
           });
         }
-        
+
         this.calculateTotals();
         this.showForm = true;
         this.cdr.detectChanges();
@@ -217,6 +209,7 @@ export class JournalVoucherComponent implements OnInit {
 
   showJournalVoucherForm() {
     this.JournalVoucherEditID = null;
+    this.voucherStatus = 'Submitted';
     this.clearSubscriptions();
     this.showForm = true;
     this.totalDebit = 0;
@@ -224,41 +217,53 @@ export class JournalVoucherComponent implements OnInit {
     this.getVoucherNo();
   }
 
-  // Post voucher to ledger
-  postVoucher() {
-    if (!this.JournalVoucherEditID) {
-      console.error('Cannot post: No voucher ID');
-      return;
-    }
+  cancelVoucher() {
+    if (!this.JournalVoucherEditID) return;
 
-    this.http.post(`finance/journal_vouchers/${this.JournalVoucherEditID}/post/`, {}).subscribe(
-      (res: any) => {
-        console.log('Voucher posted successfully:', res);
-        alert('Voucher posted to ledger successfully!');
-        this.ngOnInit();
-      },
-      error => {
-        console.error('Error posting voucher:', error);
-        alert('Error posting voucher: ' + (error.error?.message || 'Unknown error'));
+    this.modal.confirm({
+      nzTitle: 'Cancel Voucher',
+      nzContent: 'This will remove the voucher\'s impact from the Account Ledger and mark it as Cancelled. This cannot be undone.',
+      nzOkText: 'Yes, Cancel Voucher',
+      nzOkType: 'primary',
+      nzOkDanger: true,
+      nzCancelText: 'Go Back',
+      nzCentered: true,
+      nzOnOk: () => {
+        this.http.post(`finance/journal_vouchers/${this.JournalVoucherEditID}/cancel/`, {}).subscribe(
+          () => {
+            this.notification.success('Cancelled', 'Voucher has been cancelled and removed from ledger.');
+            this.ngOnInit();
+          },
+          error => {
+            const msg = error.error?.message || 'An unexpected error occurred.';
+            this.notification.error('Cancel Failed', msg);
+          }
+        );
       }
-    );
+    });
   }
 
   setFormConfig() {
     this.clearSubscriptions();
     this.JournalVoucherEditID = null;
-    
+
     this.formConfig = {
       url: "finance/journal_vouchers/",
-      formState: {
-        viewMode: false,
-      },
+      formState: { viewMode: false },
       showActionBtn: true,
       exParams: [
         {
           key: 'voucher_lines',
           type: 'script',
-          value: 'data.voucher_lines.filter(line => line.ledger_account?.ledger_account_id || line.ledger_account_id).map(line => ({...line, ledger_account_id: line.ledger_account?.ledger_account_id || line.ledger_account_id, customer_id: line.customer?.customer_id || line.customer_id, vendor_id: line.vendor?.vendor_id || line.vendor_id, employee_id: line.employee?.employee_id || line.employee_id}))'
+          value: `data.voucher_lines
+            .filter(line => line.ledger_account?.ledger_account_id || line.ledger_account_id)
+            .map(line => ({
+              ...line,
+              ledger_account_id: line.ledger_account?.ledger_account_id || line.ledger_account_id,
+              customer_id: line.customer?.customer_id || line.customer_id || null,
+              vendor_id:   line.vendor?.vendor_id   || line.vendor_id   || null,
+              employee_id: line.employee?.employee_id || line.employee_id
+            }))`
         }
       ],
       submit: {
@@ -266,9 +271,7 @@ export class JournalVoucherComponent implements OnInit {
         submittedFn: () => this.ngOnInit()
       },
       reset: {
-        resetFn: () => {
-          this.ngOnInit();
-        }
+        resetFn: () => this.ngOnInit()
       },
       model: {
         journal_voucher: {
@@ -279,11 +282,11 @@ export class JournalVoucherComponent implements OnInit {
           expense_claim_id: null,
           narration: ''
         },
-        voucher_lines: [{}, {}, {}, {}, {}],
+        voucher_lines: [{}, {}],
         attachments: []
       },
       fields: [
-        // Header Section - journal_voucher
+        // ── Header ───────────────────────────────────────────────────────────
         {
           fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
           key: 'journal_voucher',
@@ -292,21 +295,18 @@ export class JournalVoucherComponent implements OnInit {
               key: 'voucher_date',
               type: 'date',
               defaultValue: this.nowDate(),
-              className: 'col-md-4 col-sm-6 col-12',
-              templateOptions: {
-                label: 'Date',
-                placeholder: 'Select date',
-                required: true,
-              }
+              className: 'col-md-3 col-sm-6 col-12',
+              templateOptions: { label: 'Date', placeholder: 'Select date', required: true }
             },
             {
               key: 'voucher_no',
               type: 'input',
-              className: 'col-md-4 col-sm-6 col-12',
+              className: 'col-md-3 col-sm-6 col-12',
               templateOptions: {
                 label: 'Voucher No',
-                placeholder: 'Enter Voucher No',
+                placeholder: 'Auto-generated',
                 required: false,
+                disabled: true,
               },
               hooks: {
                 onInit: (field: any) => {
@@ -319,24 +319,36 @@ export class JournalVoucherComponent implements OnInit {
             {
               key: 'voucher_type',
               type: 'select',
-              className: 'col-md-4 col-sm-6 col-12',
+              className: 'col-md-2 col-sm-6 col-12',
               defaultValue: 'Journal',
               templateOptions: {
                 label: 'Voucher Type',
                 required: true,
                 options: [
-                  { value: 'Journal', label: 'Journal' },
-                  { value: 'Contra', label: 'Contra' },
-                  { value: 'Receipt', label: 'Receipt' },
-                  { value: 'Payment', label: 'Payment' },
-                  { value: 'DebitNote', label: 'Debit Note' },
+                  { value: 'Journal',    label: 'Journal' },
+                  { value: 'Contra',     label: 'Contra' },
+                  { value: 'Receipt',    label: 'Receipt' },
+                  { value: 'Payment',    label: 'Payment' },
+                  { value: 'DebitNote',  label: 'Debit Note' },
                   { value: 'CreditNote', label: 'Credit Note' }
                 ]
               }
+            },
+            {
+              key: 'reference_no',
+              type: 'input',
+              className: 'col-md-2 col-sm-6 col-12',
+              templateOptions: { label: 'Reference No', placeholder: 'e.g. INV-001', required: false }
+            },
+            {
+              key: 'reference_date',
+              type: 'date',
+              className: 'col-md-2 col-sm-6 col-12',
+              templateOptions: { label: 'Reference Date', placeholder: 'Select date', required: false }
             }
           ]
         },
-        // Voucher Lines (Table)
+        // ── Voucher Lines ─────────────────────────────────────────────────────
         {
           key: 'voucher_lines',
           type: 'table',
@@ -344,21 +356,12 @@ export class JournalVoucherComponent implements OnInit {
           templateOptions: {
             title: 'Journal Voucher Lines',
             addText: 'Add Line',
-            tableCols: [
-              { name: 'ledger_account', label: 'Ledger Account' },
-              { name: 'is_panel', label: 'Panel' },
-              { name: 'is_investment', label: 'Investment' },
-              { name: 'customer', label: 'Party (Customer)' },
-              { name: 'entry_type', label: 'Debit/Credit' },
-              { name: 'amount', label: 'Amount' },
-              { name: 'bill_no', label: 'Bill No' },
-              { name: 'tds_applicable', label: 'TDS' },
-              { name: 'remark', label: 'Remark' },
-              { name: 'employee', label: 'Employee' }
-            ]
+            // tableCols presence enables the <thead> — labels come from each field's templateOptions.label
+            tableCols: true
           },
           fieldArray: {
             fieldGroup: [
+              // ── Ledger Account ──
               {
                 key: 'ledger_account',
                 type: 'select',
@@ -369,10 +372,7 @@ export class JournalVoucherComponent implements OnInit {
                   options: [],
                   hideLabel: true,
                   required: false,
-                  lazy: {
-                    url: 'customers/ledger_accounts/',
-                    lazyOneTime: true
-                  },
+                  lazy: { url: 'customers/ledger_accounts/', lazyOneTime: true },
                 },
                 hooks: {
                   onChanges: (field: any) => {
@@ -384,81 +384,43 @@ export class JournalVoucherComponent implements OnInit {
                       if (!this.formConfig.model['voucher_lines'][index]) {
                         this.formConfig.model['voucher_lines'][index] = {};
                       }
-                      this.formConfig.model['voucher_lines'][index]['ledger_account_id'] = data?.ledger_account_id;
-                    });
-                    this.subscriptions.push(sub);
-                  }
-                }
-              },
-              {
-                key: 'is_panel',
-                type: 'checkbox',
-                defaultValue: false,
-                templateOptions: {
-                  label: 'Panel',
-                  hideLabel: true,
-                  required: false
-                }
-              },
-              {
-                key: 'is_investment',
-                type: 'checkbox',
-                defaultValue: false,
-                templateOptions: {
-                  label: 'Investment',
-                  hideLabel: true,
-                  required: false
-                }
-              },
-              {
-                key: 'customer',
-                type: 'select',
-                templateOptions: {
-                  label: 'Party (Customer)',
-                  dataKey: 'customer_id',
-                  dataLabel: 'name',
-                  options: [],
-                  hideLabel: true,
-                  required: false,
-                  lazy: {
-                    url: 'customers/customers/?summary=true',
-                    lazyOneTime: true
-                  },
-                },
-                hooks: {
-                  onChanges: (field: any) => {
-                    const sub = field.formControl.valueChanges.pipe(
-                      debounceTime(50),
-                      distinctUntilChanged((a: any, b: any) => a?.customer_id === b?.customer_id)
-                    ).subscribe((data: any) => {
-                      const index = field.parent.key;
-                      if (!this.formConfig.model['voucher_lines'][index]) {
-                        this.formConfig.model['voucher_lines'][index] = {};
+                      const row = this.formConfig.model['voucher_lines'][index];
+                      row['ledger_account_id'] = data?.ledger_account_id;
+
+                      // Set party_type from ledger group purpose — hideExpression reads this
+                      const purpose = data?.ledger_group?.purpose;
+                      if (purpose === 'AccountsReceivable') {
+                        row['party_type'] = 'customer';
+                      } else if (purpose === 'AccountsPayable') {
+                        row['party_type'] = 'vendor';
+                      } else {
+                        row['party_type'] = null;
                       }
-                      this.formConfig.model['voucher_lines'][index]['customer_id'] = data?.customer_id;
+                      // Clear any previously selected party when ledger changes
+                      row['customer'] = null; row['customer_id'] = null;
+                      row['vendor']   = null; row['vendor_id']   = null;
                     });
                     this.subscriptions.push(sub);
                   }
                 }
               },
+              // ── Dr/Cr ──
               {
                 key: 'entry_type',
                 type: 'select',
                 defaultValue: 'Debit',
                 templateOptions: {
-                  label: 'Debit/Credit',
+                  label: 'Dr/Cr',
                   hideLabel: true,
                   required: false,
                   options: [
-                    { value: 'Debit', label: 'Debit' },
-                    { value: 'Credit', label: 'Credit' }
+                    { value: 'Debit',  label: 'Dr' },
+                    { value: 'Credit', label: 'Cr' }
                   ]
                 },
                 hooks: {
                   onChanges: (field: any) => {
-                    const sub = field.formControl.valueChanges.pipe(
-                      debounceTime(100)
-                    ).subscribe(() => {
+                    const sub = field.formControl.valueChanges.pipe(debounceTime(100)).subscribe(() => {
                       this.calculateTotals();
                       this.cdr.detectChanges();
                     });
@@ -466,6 +428,7 @@ export class JournalVoucherComponent implements OnInit {
                   }
                 }
               },
+              // ── Amount ──
               {
                 key: 'amount',
                 type: 'input',
@@ -473,15 +436,13 @@ export class JournalVoucherComponent implements OnInit {
                 templateOptions: {
                   label: 'Amount',
                   type: 'number',
-                  placeholder: '₹0.00',
+                  placeholder: '0.00',
                   hideLabel: true,
                   required: false
                 },
                 hooks: {
                   onChanges: (field: any) => {
-                    const sub = field.formControl.valueChanges.pipe(
-                      debounceTime(100)
-                    ).subscribe(() => {
+                    const sub = field.formControl.valueChanges.pipe(debounceTime(100)).subscribe(() => {
                       this.calculateTotals();
                       this.cdr.detectChanges();
                     });
@@ -489,6 +450,86 @@ export class JournalVoucherComponent implements OnInit {
                   }
                 }
               },
+              // ── Party (anonymous wrapper → ONE column, TWO lazy fields) ──
+              // The wrapper has no key/type so its children render in the same <td>.
+              // hideExpression on each child shows Customer OR Vendor based on party_type.
+              {
+                templateOptions: { label: 'Party', hideLabel: true },
+                fieldGroup: [
+                  {
+                    key: 'customer',
+                    type: 'select',
+                    templateOptions: {
+                      label: 'Party',
+                      dataKey: 'customer_id',
+                      dataLabel: 'name',
+                      options: [],
+                      hideLabel: true,
+                      required: false,
+                      placeholder: 'Select Customer',
+                      lazy: { url: 'customers/customer/?minimal=true', lazyOneTime: true },
+                    },
+                    hideExpression: (model: any) => model?.party_type !== 'customer',
+                    hooks: {
+                      onChanges: (field: any) => {
+                        const sub = field.formControl.valueChanges.pipe(
+                          debounceTime(50),
+                          distinctUntilChanged((a: any, b: any) => a?.customer_id === b?.customer_id)
+                        ).subscribe((data: any) => {
+                          const index = field.parent?.parent?.key;
+                          if (this.formConfig.model['voucher_lines'][index] != null) {
+                            this.formConfig.model['voucher_lines'][index]['customer_id'] = data?.customer_id || null;
+                          }
+                        });
+                        this.subscriptions.push(sub);
+                      }
+                    }
+                  },
+                  {
+                    key: 'vendor',
+                    type: 'select',
+                    templateOptions: {
+                      label: 'Party',
+                      dataKey: 'vendor_id',
+                      dataLabel: 'name',
+                      options: [],
+                      hideLabel: true,
+                      required: false,
+                      placeholder: 'Select Vendor',
+                      lazy: { url: 'vendors/vendors/?minimal=true', lazyOneTime: true },
+                    },
+                    hideExpression: (model: any) => model?.party_type !== 'vendor',
+                    hooks: {
+                      onChanges: (field: any) => {
+                        const sub = field.formControl.valueChanges.pipe(
+                          debounceTime(50),
+                          distinctUntilChanged((a: any, b: any) => a?.vendor_id === b?.vendor_id)
+                        ).subscribe((data: any) => {
+                          const index = field.parent?.parent?.key;
+                          if (this.formConfig.model['voucher_lines'][index] != null) {
+                            this.formConfig.model['voucher_lines'][index]['vendor_id'] = data?.vendor_id || null;
+                          }
+                        });
+                        this.subscriptions.push(sub);
+                      }
+                    }
+                  },
+                  // ── N/A placeholder — keeps the column filled when no party applies ──
+                  {
+                    key: '_party_na',
+                    type: 'input',
+                    templateOptions: {
+                      label: 'Party',
+                      placeholder: 'N/A',
+                      hideLabel: true,
+                      required: false,
+                      disabled: true,
+                    },
+                    hideExpression: (model: any) => model?.party_type === 'customer' || model?.party_type === 'vendor',
+                  }
+                ]
+              },
+              // ── Bill No ──
               {
                 key: 'bill_no',
                 type: 'input',
@@ -499,16 +540,14 @@ export class JournalVoucherComponent implements OnInit {
                   required: false
                 }
               },
+              // ── TDS ──
               {
                 key: 'tds_applicable',
                 type: 'checkbox',
                 defaultValue: false,
-                templateOptions: {
-                  label: 'TDS',
-                  hideLabel: true,
-                  required: false
-                }
+                templateOptions: { label: 'TDS', hideLabel: true, required: false }
               },
+              // ── Remark ──
               {
                 key: 'remark',
                 type: 'input',
@@ -519,6 +558,7 @@ export class JournalVoucherComponent implements OnInit {
                   required: false
                 }
               },
+              // ── Employee ──
               {
                 key: 'employee',
                 type: 'select',
@@ -529,10 +569,7 @@ export class JournalVoucherComponent implements OnInit {
                   options: [],
                   hideLabel: true,
                   required: false,
-                  lazy: {
-                    url: 'hrms/employees/',
-                    lazyOneTime: true
-                  },
+                  lazy: { url: 'hrms/employees/', lazyOneTime: true },
                 },
                 hooks: {
                   onChanges: (field: any) => {
@@ -553,7 +590,7 @@ export class JournalVoucherComponent implements OnInit {
             ]
           }
         },
-        // Narration and Attachments Section
+        // ── Narration + Attachments ───────────────────────────────────────────
         {
           fieldGroupClassName: "ant-row custom-form-block px-0 mx-0",
           fieldGroup: [

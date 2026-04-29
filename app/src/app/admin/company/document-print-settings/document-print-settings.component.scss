@@ -46,7 +46,6 @@ $font:          'Poppins', sans-serif;
   color: #fff;
   font-size: 18px;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(20, 39, 104, 0.3);
 }
 
 .dps-page-title {
@@ -102,7 +101,6 @@ $font:          'Poppins', sans-serif;
     background-color: $primary;
     color: #fff;
     border-color: $primary;
-    box-shadow: 0 2px 6px rgba(20, 39, 104, 0.25);
   }
 
   &.dirty:not(.active) {

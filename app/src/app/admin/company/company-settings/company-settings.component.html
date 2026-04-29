@@ -1,0 +1,254 @@
+<div class="cs-wrapper">
+
+  <!-- ── Page Header ──────────────────────────────────────────────────── -->
+  <div class="cs-page-header">
+    <div class="cs-header-left">
+      <div class="cs-header-icon">
+        <span nz-icon nzType="setting" nzTheme="outline"></span>
+      </div>
+      <div>
+        <h1 class="cs-page-title">Company Settings</h1>
+        <p class="cs-page-sub">Configure module-level defaults for your organisation</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Body: left nav + right content ──────────────────────────────── -->
+  <div class="cs-body">
+
+    <!-- Left Module Navigation -->
+    <aside class="cs-nav">
+      <div
+        *ngFor="let mod of modules"
+        class="cs-nav-item"
+        [class.active]="activeModule === mod.key"
+        [class.disabled]="!mod.available"
+        (click)="setActiveModule(mod.key, mod.available)"
+        nz-tooltip
+        [nzTooltipTitle]="!mod.available ? 'Coming soon' : null"
+        nzTooltipPlacement="right">
+        <div class="cs-nav-icon">
+          <span nz-icon [nzType]="mod.icon" nzTheme="outline"></span>
+        </div>
+        <span class="cs-nav-label">{{ mod.label }}</span>
+        <span *ngIf="!mod.available" class="cs-nav-soon">Soon</span>
+      </div>
+    </aside>
+
+    <!-- Right Content Panel -->
+    <main class="cs-content">
+      <nz-spin [nzSpinning]="loading" nzTip="Loading...">
+
+        <!-- ── FINANCE MODULE ─────────────────────────────────────────── -->
+        <ng-container *ngIf="activeModule === 'finance'">
+
+          <div class="cs-module-header">
+            <div class="cs-module-icon">
+              <span nz-icon nzType="fund" nzTheme="outline"></span>
+            </div>
+            <div>
+              <h2 class="cs-module-title">Finance Settings</h2>
+              <p class="cs-module-desc">
+                Default ledger accounts for automated journal entries on sale invoices,
+                purchase invoices, credit notes and returns.
+              </p>
+            </div>
+            <button
+              nz-button
+              nzType="primary"
+              class="cs-save-btn"
+              [nzLoading]="saving"
+              [disabled]="loading"
+              (click)="onSave()">
+              <span nz-icon nzType="save" nzTheme="outline"></span>
+              Save
+            </button>
+          </div>
+
+          <nz-divider></nz-divider>
+
+          <!-- Field group: Sales & Purchase (core, required) -->
+          <div class="cs-group">
+            <div class="cs-group-label">Core Accounts</div>
+            <div class="cs-fields-grid">
+
+              <div class="cs-field">
+                <label class="cs-label">
+                  Default Sales Ledger Account
+                  <span nz-tooltip nzTooltipTitle="Used when posting journal entries for sale invoices." class="cs-info">
+                    <span nz-icon nzType="question-circle" nzTheme="outline"></span>
+                  </span>
+                  <nz-tag nzColor="error" class="cs-tag">Required</nz-tag>
+                </label>
+                <nz-select
+                  [(ngModel)]="settings.sales_ledger_account"
+                  nzPlaceHolder="Select sales ledger account"
+                  nzShowSearch class="cs-select">
+                  <nz-option *ngFor="let a of generalAccounts"
+                    [nzValue]="a.ledger_account_id" [nzLabel]="a.name">
+                  </nz-option>
+                </nz-select>
+              </div>
+
+              <div class="cs-field">
+                <label class="cs-label">
+                  Default Purchase Ledger Account
+                  <span nz-tooltip nzTooltipTitle="Used when posting journal entries for purchase invoices." class="cs-info">
+                    <span nz-icon nzType="question-circle" nzTheme="outline"></span>
+                  </span>
+                  <nz-tag nzColor="error" class="cs-tag">Required</nz-tag>
+                </label>
+                <nz-select
+                  [(ngModel)]="settings.purchase_ledger_account"
+                  nzPlaceHolder="Select purchase ledger account"
+                  nzShowSearch class="cs-select">
+                  <nz-option *ngFor="let a of generalAccounts"
+                    [nzValue]="a.ledger_account_id" [nzLabel]="a.name">
+                  </nz-option>
+                </nz-select>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Field group: Receivables & Payables -->
+          <div class="cs-group">
+            <div class="cs-group-label">Receivables &amp; Payables</div>
+            <div class="cs-fields-grid">
+
+              <div class="cs-field">
+                <label class="cs-label">
+                  Default Accounts Receivable
+                  <span nz-tooltip nzTooltipTitle="Default receivables ledger for customer transactions." class="cs-info">
+                    <span nz-icon nzType="question-circle" nzTheme="outline"></span>
+                  </span>
+                </label>
+                <nz-select
+                  [(ngModel)]="settings.receivables_account"
+                  nzPlaceHolder="Select receivables account"
+                  nzShowSearch nzAllowClear class="cs-select">
+                  <nz-option *ngFor="let a of customerAccounts"
+                    [nzValue]="a.ledger_account_id" [nzLabel]="a.name">
+                  </nz-option>
+                </nz-select>
+              </div>
+
+              <div class="cs-field">
+                <label class="cs-label">
+                  Default Accounts Payable
+                  <span nz-tooltip nzTooltipTitle="Default payables ledger for vendor transactions." class="cs-info">
+                    <span nz-icon nzType="question-circle" nzTheme="outline"></span>
+                  </span>
+                </label>
+                <nz-select
+                  [(ngModel)]="settings.payables_account"
+                  nzPlaceHolder="Select payables account"
+                  nzShowSearch nzAllowClear class="cs-select">
+                  <nz-option *ngFor="let a of vendorAccounts"
+                    [nzValue]="a.ledger_account_id" [nzLabel]="a.name">
+                  </nz-option>
+                </nz-select>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Field group: Cash, Bank, Discount, Round-off -->
+          <div class="cs-group">
+            <div class="cs-group-label">Other Defaults</div>
+            <div class="cs-fields-grid">
+
+              <div class="cs-field">
+                <label class="cs-label">
+                  Default Cash Account
+                  <span nz-tooltip nzTooltipTitle="Default cash ledger used in payment transactions." class="cs-info">
+                    <span nz-icon nzType="question-circle" nzTheme="outline"></span>
+                  </span>
+                </label>
+                <nz-select
+                  [(ngModel)]="settings.cash_account"
+                  nzPlaceHolder="Select cash account"
+                  nzShowSearch nzAllowClear class="cs-select">
+                  <nz-option *ngFor="let a of cashAccounts"
+                    [nzValue]="a.ledger_account_id" [nzLabel]="a.name">
+                  </nz-option>
+                </nz-select>
+              </div>
+
+              <div class="cs-field">
+                <label class="cs-label">
+                  Default Bank Account
+                  <span nz-tooltip nzTooltipTitle="Default bank ledger used in payment transactions." class="cs-info">
+                    <span nz-icon nzType="question-circle" nzTheme="outline"></span>
+                  </span>
+                </label>
+                <nz-select
+                  [(ngModel)]="settings.bank_account"
+                  nzPlaceHolder="Select bank account"
+                  nzShowSearch nzAllowClear class="cs-select">
+                  <nz-option *ngFor="let a of bankAccounts"
+                    [nzValue]="a.ledger_account_id" [nzLabel]="a.name">
+                  </nz-option>
+                </nz-select>
+              </div>
+
+              <div class="cs-field">
+                <label class="cs-label">
+                  Default Discount Account
+                  <span nz-tooltip nzTooltipTitle="Ledger account for posting trade discounts on invoices." class="cs-info">
+                    <span nz-icon nzType="question-circle" nzTheme="outline"></span>
+                  </span>
+                </label>
+                <nz-select
+                  [(ngModel)]="settings.discount_account"
+                  nzPlaceHolder="Select discount account"
+                  nzShowSearch nzAllowClear class="cs-select">
+                  <nz-option *ngFor="let a of generalAccounts"
+                    [nzValue]="a.ledger_account_id" [nzLabel]="a.name">
+                  </nz-option>
+                </nz-select>
+              </div>
+
+              <div class="cs-field">
+                <label class="cs-label">
+                  Default Round-off Account
+                  <span nz-tooltip nzTooltipTitle="Ledger account for posting rounding differences." class="cs-info">
+                    <span nz-icon nzType="question-circle" nzTheme="outline"></span>
+                  </span>
+                </label>
+                <nz-select
+                  [(ngModel)]="settings.round_off_account"
+                  nzPlaceHolder="Select round-off account"
+                  nzShowSearch nzAllowClear class="cs-select">
+                  <nz-option *ngFor="let a of generalAccounts"
+                    [nzValue]="a.ledger_account_id" [nzLabel]="a.name">
+                  </nz-option>
+                </nz-select>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Info note -->
+          <div class="cs-note">
+            <span nz-icon nzType="info-circle" nzTheme="outline"></span>
+            These defaults apply automatically when generating journal entries.
+            Manage ledger accounts under <strong>Finance → Ledger Accounts</strong>.
+          </div>
+
+        </ng-container>
+
+        <!-- ── COMING SOON placeholder ───────────────────────────────── -->
+        <ng-container *ngIf="activeModule !== 'finance'">
+          <div class="cs-coming-soon">
+            <span nz-icon nzType="tool" nzTheme="outline" class="cs-soon-icon"></span>
+            <h3>Coming Soon</h3>
+            <p>Settings for this module will be available in a future update.</p>
+          </div>
+        </ng-container>
+
+      </nz-spin>
+    </main>
+
+  </div><!-- /cs-body -->
+</div>

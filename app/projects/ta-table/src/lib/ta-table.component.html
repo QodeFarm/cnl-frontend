@@ -5,55 +5,45 @@
     <div class="ta-cell filter-alignments">
         <div class="ta-row p-0 justify-content-end">
 
-            <!-- Show only if isAccountLedgerPage is true -->
-            <div class="filter-group col p-0 mt-2" style="margin-right: 10px; display:flex" *ngIf="isAccountLedgerPage">
-                <!-- First Select Box: Customer / Vendor / General -->
+            <!-- Account Ledger filters: account type, account name, city -->
+            <div class="filter-group col p-0 account-ledger-filters" *ngIf="isAccountLedgerPage">
                 <nz-select [(ngModel)]="selectedAccountType" (ngModelChange)="onAccountTypeChange()"
-                    nzPlaceHolder="Select Ledger" style="width: 200px; margin-right: 8px" nzAllowClear>
+                    nzPlaceHolder="Account Type" class="al-select-type" nzAllowClear>
                     <nz-option *ngFor="let option of accountTypeOptions" [nzValue]="option.value"
                         [nzLabel]="option.label"></nz-option>
                 </nz-select>
 
-                <!-- Second Select Box: Searchable Names Based on Selection -->
-                <nz-select 
-                    [(ngModel)]="selectedAccountId" 
+                <nz-select
+                    [(ngModel)]="selectedAccountId"
                     (ngModelChange)="onAccountChange()"
-                    nzPlaceHolder="Search & Select Resource" 
-                    style="width: 220px" 
-                    [nzDisabled]="!selectedAccountType" 
+                    nzPlaceHolder="Search account"
+                    class="al-select-account"
+                    [nzDisabled]="!selectedAccountType"
                     nzAllowClear
                     nzShowSearch
                     nzServerSearch
                     [nzLoading]="accountSearchLoading"
                     (nzOnSearch)="onAccountSearch($event)"
-                    [nzNotFoundContent]="accountSearchLoading ? 'Searching...' : 'No results found. Type to search.'">
-                    <nz-option 
-                        *ngFor="let option of accountOptions" 
+                    [nzNotFoundContent]="accountSearchLoading ? 'Searching...' : 'No results'">
+                    <nz-option
+                        *ngFor="let option of accountOptions"
                         [nzValue]="option.value"
                         [nzLabel]="option.label"
                         nzCustomContent>
-                        <div>
-                            <span style="font-weight: 500;">{{ option.label }}</span>
-                            <span *ngIf="option.code" style="color: #888; font-size: 12px; margin-left: 8px;">({{ option.code }})</span>
-                        </div>
+                        <span style="font-weight:500;">{{ option.label }}</span>
+                        <span *ngIf="option.code" style="color:#888;font-size:11px;margin-left:6px;">({{ option.code }})</span>
                     </nz-option>
                 </nz-select>
 
-                <!-- Third Select Box: Names Based on Selection -->
                 <nz-select
                     [(ngModel)]="selectedCity"
-                    nzPlaceHolder="Select City"
-                    style="width: 180px"
+                    nzPlaceHolder="City"
+                    class="al-select-city"
                     [nzDisabled]="isCityDisabled"
                     nzAllowClear
                     (ngModelChange)="applyFilters()">
-
-                    <nz-option
-                    *ngFor="let city of cityOptions"
-                    [nzValue]="city.value"
-                    [nzLabel]="city.label">
+                    <nz-option *ngFor="let city of cityOptions" [nzValue]="city.value" [nzLabel]="city.label">
                     </nz-option>
-
                 </nz-select>
             </div>
 
@@ -186,8 +176,10 @@
             <ng-template #suffixIconButton>
                 <i nz-icon class="ant-input-clear-icon" style="position: absolute;z-index: 9;right: 40px;top:12px"
                     nzTheme="fill" nzType="close-circle" *ngIf="globalSearchValue" (click)="globalSearchClear()"></i>
-                <button nz-button nzType="primary" nzSearch (click)="globalSearch()"><i nz-icon
-                        nzType="search"></i></button>
+                <button nz-button nzType="primary" nzSearch (click)="globalSearch()"
+                    nz-tooltip nzTooltipTitle="Search records" nzTooltipPlacement="bottom">
+                    <i nz-icon nzType="search"></i>
+                </button>
             </ng-template>
             <!-- <button nz-button (click)="exportExcel()" *ngIf="options.export"> <i nz-icon nzType="file-excel"
                     nzTheme="outline"></i> Export</button> -->
@@ -216,20 +208,22 @@
 
             <!--  Excel Export Button -->
             <div class="filter-group" *ngIf="options.export">
-                <button nz-button nzType="primary" (click)="exportExcel()">
+                <button nz-button nzType="primary" (click)="exportExcel()"
+                    nz-tooltip nzTooltipTitle="Export to Excel" nzTooltipPlacement="bottom">
                     <i nz-icon nzType="file-excel" nzTheme="outline"></i>
                 </button>
             </div>
 
             <!-- Refresh Button -->
             <div *ngIf="!options.hideRefreshBtn">
-                <button nz-button nzType="primary" (click)="refreshIcon()" style="margin-left: 5px;">
+                <button nz-button nzType="primary" (click)="refreshIcon()" style="margin-left: 5px;"
+                    nz-tooltip nzTooltipTitle="Refresh data" nzTooltipPlacement="bottom">
                     <i nz-icon nzType="sync" nzTheme="outline"></i>
                 </button>
             </div>
 
             <!-- Column Chooser Button + Custom Panel -->
-            <div class="col-chooser-wrapper">
+            <div class="col-chooser-wrapper" *ngIf="!options?.hideColChooser">
                 <!-- Backdrop: closes panel when user clicks outside -->
                 <div *ngIf="showColChooser" class="col-chooser-backdrop" (click)="showColChooser = false"></div>
 
@@ -421,7 +415,10 @@
     <ng-content nz-col select="[bottom-left]">
     </ng-content>
     <span class="total-record d-none d-sm-inline-block me-2">Total Records - {{total}} </span>
-    <button nz-button nzType="default" nzShape="circle" (click)="refresh()"><i nz-icon nzType="sync"></i></button>
+    <button nz-button nzType="default" nzShape="circle" (click)="refresh()"
+        nz-tooltip nzTooltipTitle="Refresh data" nzTooltipPlacement="top">
+        <i nz-icon nzType="sync"></i>
+    </button>
     <div nz-row nzGutter="8">
         <div nz-col nzXs="24" nzSm="12" nzMd="12">
         </div>
