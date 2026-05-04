@@ -103,7 +103,7 @@ export class LedgerAccountListComponent {
             // sort: true,
             displayType: "map",
             mapFn: (currentValue: any, row: any, col: any) => {
-              return `${row.ledger_group.name}`;
+              return row.ledger_group ? row.ledger_group.name : '-';
             },
           },
           {

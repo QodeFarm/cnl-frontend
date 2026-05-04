@@ -63,10 +63,10 @@ export function initialConfigLoad(siteS: SiteConfigService) {
       multi: true
     },
     { provide: HTTP_INTERCEPTORS, useClass: DefaultInterceptor, multi: true },
-    { 
-      provide: HTTP_INTERCEPTORS, 
-      useClass: CustomerPortalInterceptor,  // New interceptor
-      multi: true 
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: CustomerPortalInterceptor,
+      multi: true
     },
     { provide: ErrorHandler, useClass: GlobalErrorHandlerService },
     { provide: NZ_I18N, useValue: en_US },

@@ -44,7 +44,7 @@ export class UserComponent {
           name: 'Role',
           sort: true,
           displayType: "map",
-          mapFn: (currentValue: any, row: any, col: any) => {
+          mapFn: (_currentValue: any, row: any, _col: any) => {
             return `${row.role?.role_name || '--'}`;
           },
         },
@@ -63,7 +63,7 @@ export class UserComponent {
         //       label: 'Delete',
         //       confirm: true,
         //       confirmMsg: "Sure to delete?",
-        //       apiUrl: 'users/create_user'
+        //       apiUrl: 'users/create_user/'
         //     },
         //     {
         //       type: 'edit',
@@ -83,9 +83,6 @@ export class UserComponent {
               confirmMsg: "Sure to delete?",
               apiUrl: 'users/create_user',
               isVisible: (row: any) => {
-                // Get logged in user details
-                const loggedInUser = this.taLocal.getItem('user');
-                // Hide delete if current row is admin user
                 return row.role?.role_name !== 'Admin';
               }
             },

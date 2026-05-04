@@ -1052,7 +1052,7 @@ export const ledgerAccountsConfig: TaCurdConfig = {
           // sort: true,
           displayType: "map",
           mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.ledger_group.name}`;
+            return row.ledger_group ? row.ledger_group.name : '-';
           },
         },
         {
@@ -2722,7 +2722,7 @@ export const LedgerGroupsConfig: TaCurdConfig = {
           // sort: true,
           displayType: "map",
           mapFn: (currentValue: any, row: any, col: any) => {
-            return `${row.under_group.name}`;
+            return row.under_group ? row.under_group.name : '-';
           },
         },
 
@@ -2766,7 +2766,7 @@ export const LedgerGroupsConfig: TaCurdConfig = {
         {
           key: 'under_group_id',
           type: 'script',
-          value: 'data.under_group.ledger_group_id'
+          value: 'data.under_group ? data.under_group.ledger_group_id : null'
         }
       ],
       fields: [
@@ -2870,6 +2870,9 @@ export const LedgerGroupsConfig: TaCurdConfig = {
   hooks: {
     onChanges: (field: any) => {
       field.formControl.valueChanges.subscribe((selectedGroup: any) => {
+        // Skip code regeneration in edit mode — existing code must not change
+        if (field.model?.ledger_group_id) return;
+
         // Get HttpClient using injector
         let http: HttpClient | null = null;
         try {
@@ -2884,43 +2887,84 @@ export const LedgerGroupsConfig: TaCurdConfig = {
         
         const codeField = field.form.get('code');
         
+        // --- Nature filtering helpers ---
+        const ALL_NATURE_OPTIONS = [
+          { label: 'Asset',               value: 'Asset' },
+          { label: 'Fixed Asset',         value: 'FixedAsset' },
+          { label: 'Accounts Receivable', value: 'AccountsReceivable' },
+          { label: 'Cash / Bank',         value: 'CashBank' },
+          { label: 'Current Asset',       value: 'CurrentAsset' },
+          { label: 'Liability',           value: 'Liability' },
+          { label: 'Accounts Payable',    value: 'AccountsPayable' },
+          { label: 'Current Liability',   value: 'CurrentLiability' },
+          { label: 'Income',              value: 'Income' },
+          { label: 'Sales',               value: 'Sales' },
+          { label: 'Expense',             value: 'Expense' },
+          { label: 'Direct Expense',      value: 'DirectExpense' },
+          { label: 'Purchase',            value: 'Purchase' },
+        ];
+        const NATURE_FAMILIES: Record<string, string[]> = {
+          Asset:     ['Asset', 'FixedAsset', 'AccountsReceivable', 'CashBank', 'CurrentAsset'],
+          Liability: ['Liability', 'AccountsPayable', 'CurrentLiability'],
+          Income:    ['Income', 'Sales'],
+          Expense:   ['Expense', 'DirectExpense', 'Purchase'],
+        };
+        const getNatureFamily = (nature: string): string[] => {
+          for (const values of Object.values(NATURE_FAMILIES)) {
+            if (values.includes(nature)) return values;
+          }
+          return ALL_NATURE_OPTIONS.map(o => o.value);
+        };
+        const natureFormlyField = field.parent?.fieldGroup?.find((f: any) => f.key === 'nature');
+        const natureControl = field.form?.get('nature');
+
         if (selectedGroup && selectedGroup.ledger_group_id) {
           // Update the model with the UUID for API submission
           if (field.model) {
             field.model['under_group_id'] = selectedGroup.ledger_group_id;
           }
-          
+
+          // Filter nature options based on parent group's nature
+          if (natureFormlyField && selectedGroup.nature) {
+            const family = getNatureFamily(selectedGroup.nature);
+            natureFormlyField.templateOptions.options = ALL_NATURE_OPTIONS.filter(o => family.includes(o.value));
+            // Clear nature if current value is not in the new family
+            if (natureControl?.value && !family.includes(natureControl.value)) {
+              natureControl.setValue(null);
+            }
+          }
+
           // Regenerate code based on new parent
           if (http && codeField) {
             const url = `masters/generate_ledger_code/?type=group&parent_id=${selectedGroup.ledger_group_id}`;
-            http.get(url).subscribe((res: any) => {
-              if (res?.data?.code) {
-                codeField.setValue(res.data.code);
-                if (field.model) {
-                  field.model['code'] = res.data.code;
+            http.get(url).subscribe({
+              next: (res: any) => {
+                if (res?.data?.code) {
+                  codeField.setValue(res.data.code);
+                  if (field.model) field.model['code'] = res.data.code;
                 }
-              }
-            }, (error) => {
-              console.error('Error generating code:', error);
+              },
+              error: (err: any) => { console.error('Error generating code:', err); }
             });
           }
         } else if (selectedGroup === null || selectedGroup === undefined) {
-          // Handle clear/null case - regenerate root level code
+          // No parent — root level: show all nature options
+          if (natureFormlyField) {
+            natureFormlyField.templateOptions.options = ALL_NATURE_OPTIONS;
+          }
           if (field.model) {
             field.model['under_group_id'] = null;
           }
-          
           // Regenerate code for root level
           if (http && codeField) {
-            http.get('masters/generate_ledger_code/?type=group').subscribe((res: any) => {
-              if (res?.data?.code) {
-                codeField.setValue(res.data.code);
-                if (field.model) {
-                  field.model['code'] = res.data.code;
+            http.get('masters/generate_ledger_code/?type=group').subscribe({
+              next: (res: any) => {
+                if (res?.data?.code) {
+                  codeField.setValue(res.data.code);
+                  if (field.model) field.model['code'] = res.data.code;
                 }
-              }
-            }, (error) => {
-              console.error('Error generating code:', error);
+              },
+              error: (err: any) => { console.error('Error generating code:', err); }
             });
           }
         }
@@ -2968,11 +3012,26 @@ export const LedgerGroupsConfig: TaCurdConfig = {
 // },
             {
               key: 'nature',
-              type: 'input',
+              type: 'select',
               className: 'col-md-6 col-12 pb-3 pb-md-0 px-1',
               templateOptions: {
                 label: 'Nature',
-                placeholder: 'Enter Nature'
+                placeholder: 'Select Nature',
+                options: [
+                  { label: 'Asset',               value: 'Asset' },
+                  { label: 'Fixed Asset',         value: 'FixedAsset' },
+                  { label: 'Accounts Receivable', value: 'AccountsReceivable' },
+                  { label: 'Cash / Bank',         value: 'CashBank' },
+                  { label: 'Current Asset',       value: 'CurrentAsset' },
+                  { label: 'Liability',           value: 'Liability' },
+                  { label: 'Accounts Payable',    value: 'AccountsPayable' },
+                  { label: 'Current Liability',   value: 'CurrentLiability' },
+                  { label: 'Income',              value: 'Income' },
+                  { label: 'Sales',               value: 'Sales' },
+                  { label: 'Expense',             value: 'Expense' },
+                  { label: 'Direct Expense',      value: 'DirectExpense' },
+                  { label: 'Purchase',            value: 'Purchase' },
+                ]
               }
             },
             {

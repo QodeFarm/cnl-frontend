@@ -21,12 +21,12 @@
                     </button>
                 </div> -->
                 
-                <!-- Post Voucher Button (Only for Edit) -->
-                <button *ngIf="JournalVoucherEditID && formConfig?.model && !formConfig?.model?.is_posted" 
-                        (click)="postVoucher()" 
-                        type="button" 
-                        class="btn btn-success">
-                    Post to Ledger
+                <!-- Cancel Voucher Button (only for edit, only if not already cancelled) -->
+                <button *ngIf="JournalVoucherEditID && voucherStatus !== 'Cancelled'"
+                        (click)="cancelVoucher()"
+                        type="button"
+                        class="btn btn-warning">
+                    Cancel Voucher
                 </button>
                 
                 <button (click)="showJournalVoucherListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#journalVoucherListModal">

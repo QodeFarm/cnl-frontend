@@ -529,10 +529,12 @@ ledgerAccount() {
       // Then try to use the component instance if available
       if (window['accountLedgerComponentInstance'] &&
         typeof window['accountLedgerComponentInstance'].loadLedgerData === 'function') {
-        console.log("Using global reference to AccountLedgerComponent");
+        const selectedOption = this.accountOptions?.find((o: any) => o.value === this.selectedAccountId);
+        const accountName = selectedOption?.label || '';
         window['accountLedgerComponentInstance'].loadLedgerData(
           this.selectedAccountType,
-          this.selectedAccountId
+          this.selectedAccountId,
+          accountName
         );
         return;
       }
@@ -685,7 +687,7 @@ applyFilters() {
     window['accountLedgerComponentInstance'].selectedAccountType = this.selectedAccountType;
     window['accountLedgerComponentInstance'].selectedAccountId = this.selectedAccountId;
     window['accountLedgerComponentInstance'].selectedCity = this.selectedCity;
-    window['accountLedgerComponentInstance'].quickPeriod = this.selectedQuickPeriod;
+    window['accountLedgerComponentInstance'].selectedPeriod = this.selectedQuickPeriod;
     window['accountLedgerComponentInstance'].fromDate = this.fromDate;
     window['accountLedgerComponentInstance'].toDate = this.toDate;
   }
@@ -704,13 +706,18 @@ applyFilters() {
         this.rows = response.data;
         this.total = response.totalCount || response.count || response.data.length;
         
-        // ✅ Sync Opening/Closing Balance with Account Ledger Component (ERP Standard)
+        // Sync balance summary with Account Ledger Component
         if (window['accountLedgerComponentInstance'] && this.isAccountLedgerPage) {
           const instance = window['accountLedgerComponentInstance'];
           instance.openingBalance = response.opening_balance || '0.00';
           instance.closingBalance = response.closing_balance || '0.00';
-          instance.totalDebit = response.total_debit || this.calculatePageTotalDebit(response.data);
-          instance.totalCredit = response.total_credit || this.calculatePageTotalCredit(response.data);
+          instance.totalDebit     = response.total_debit    || '0.00';
+          instance.totalCredit    = response.total_credit   || '0.00';
+          instance.finalBalance   = response.final_balance  || response.closing_balance || '0.00';
+          if (response.account_name) instance.accountName   = response.account_name;
+          if (response.account_type) instance.accountTypeLabel =
+            response.account_type === 'customer' ? 'Customer' :
+            response.account_type === 'vendor'   ? 'Vendor'   : 'Ledger Account';
           instance.showBalanceSummary = response.data.length > 0;
         }
       } else {
@@ -835,18 +842,19 @@ applyFilters() {
   //    return queryParts.length ? '&' + queryParts.join('&') : '';
   // }
 
-  generateQueryString(filters: { 
-    quickPeriod?: string | null, 
-    fromDate?: Date | null, 
-    toDate?: Date | null, 
-    status?: string | null, 
-    employee?: string | number | null, 
-    group?: string | number | null, 
-    category?: string | number | null, 
-    type?: string | number | null, 
+  generateQueryString(filters: {
+    quickPeriod?: string | null,
+    fromDate?: Date | null,
+    toDate?: Date | null,
+    status?: string | null,
+    employee?: string | number | null,
+    group?: string | number | null,
+    category?: string | number | null,
+    type?: string | number | null,
     warehouse?: string | number | null,
     ledgerAccount?: string | number | null,
-    stockStatus?: string | null
+    stockStatus?: string | null,
+    city?: string | null
     }): string {
     const queryParts: string[] = [];
 
@@ -900,6 +908,10 @@ applyFilters() {
       queryParts.push(`ledger_account_id=${encodeURIComponent(filters.ledgerAccount.toString())}`);
     }
 
+    if (filters.city) {
+      queryParts.push(`city=${encodeURIComponent(filters.city.toString())}`);
+    }
+
     return queryParts.length ? '&' + queryParts.join('&') : '';
     }
 
@@ -911,33 +923,30 @@ applyFilters() {
     return `${year}-${month}-${day}`;
   }
 
-  // Also update downloadData to use the same logic
-downloadData(event: any) {
-  const tableParamConfig: TaParamsConfig = {
-    apiUrl: this.options.apiUrl,
-    pageIndex: this.pageIndex,
-    pageSize: this.pageSize,
-  }
+  downloadData(event: any) {
+  const full_path = this.options.apiUrl;
+  const name_of_file = full_path.split('/')[1];
 
-  this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
-    this.loading = false;
-    const full_path = this.options.apiUrl
-    const name_of_file = full_path.split('/')[1]
-    let url = full_path;
-    let connector = url.includes('?') ? '&' : '?';
-    const query = this.applyFilters();
-    url = `${url}${connector}summary=true${query ? '&' + query.split('?')[1] : ''}&download=excel`;
+  // Build download URL from the last filter URL — strip page/limit, add download=excel
+  let baseUrl = this.lastApiUrl || full_path;
+  baseUrl = baseUrl.replace(/([?&])page=\d+/, '$1').replace(/([?&])limit=\d+/, '$1')
+                   .replace(/[?&]{2,}/g, '?').replace(/[?&]$/, '');
+  const connector = baseUrl.includes('?') ? '&' : '?';
+  const downloadUrl = `${baseUrl}${connector}download=excel`;
 
-    const download_url = url;
-    this.http.get(download_url, { responseType: 'blob' }).subscribe((blob: Blob) => {
+  this.http.get(downloadUrl, { responseType: 'blob' }).subscribe({
+    next: (blob: Blob) => {
       const a = document.createElement('a');
       const objectUrl = URL.createObjectURL(blob);
       a.href = objectUrl;
-      a.download = `${name_of_file}.xlsx`
+      a.download = `${name_of_file}.xlsx`;
       a.click();
       URL.revokeObjectURL(objectUrl);
-    });
-  })
+    },
+    error: (err: any) => {
+      console.error('Download failed:', err);
+    }
+  });
 };
 
   // ── Column Chooser ─────────────────────────────────────────────────────────
@@ -1338,15 +1347,15 @@ downloadData(event: any) {
         this.total = data.totalCount; // mock the total data here
         this.rows = data.data || data;
 
-        // ✅ Sync Opening/Closing Balance with Account Ledger Component during pagination (ERP Standard)
+        // Sync balance summary with Account Ledger Component during pagination
         if (window['accountLedgerComponentInstance'] && this.isAccountLedgerPage) {
           const instance = window['accountLedgerComponentInstance'];
-          const rowData = data.data || data;
           instance.openingBalance = data.opening_balance || '0.00';
           instance.closingBalance = data.closing_balance || '0.00';
-          instance.totalDebit = data.total_debit || this.calculatePageTotalDebit(rowData);
-          instance.totalCredit = data.total_credit || this.calculatePageTotalCredit(rowData);
-          instance.showBalanceSummary = (data.data && data.data.length > 0) || (Array.isArray(data) && data.length > 0);
+          instance.totalDebit     = data.total_debit    || '0.00';
+          instance.totalCredit    = data.total_credit   || '0.00';
+          instance.finalBalance   = data.final_balance  || data.closing_balance || '0.00';
+          instance.showBalanceSummary = !!(data.data && data.data.length > 0);
         }
         
         if (this.options.showCheckbox) {
@@ -1602,7 +1611,7 @@ downloadData(event: any) {
 
   ngOnDestroy() {
     this.actionObservable$.unsubscribe();
-    // Clean up the search subject to prevent memory leaks
+    this.filtersObservable$.unsubscribe();
     this.accountSearchSubject.complete();
   }
   // Additional code for handling action button events in the table(added this code for file upload)(start)

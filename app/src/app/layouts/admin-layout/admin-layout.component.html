@@ -189,9 +189,12 @@
                     <h6 class="dropdown-header">
                         Configuration
                     </h6>
-                    <ul class="custom-header-drop-list">
+                    <ul class="custom-header-drop-list config-drop-list">
                         <li>
-                            <a [routerLink]="['/admin/company']"><i class="fa fa-building "></i> Company</a>
+                            <a [routerLink]="['/admin/company']"><i class="fa fa-building"></i> Company</a>
+                        </li>
+                        <li>
+                            <a [routerLink]="['/admin/company/company-settings']"><i class="fas fa-sliders-h"></i> Company Settings</a>
                         </li>
                         <li>
                             <a [routerLink]="['/admin/company/branches']"><i class="fa fa-sitemap"></i> Branches</a>
@@ -203,7 +206,7 @@
                             <a [routerLink]="['/admin/users/roles']"><i class="fa fa-user-cog"></i> User Roles</a>
                         </li>
                         <li>
-                            <a [routerLink]="['/admin/customfields']"><i class="fa fa-user-cog"></i> Custom fields</a>
+                            <a [routerLink]="['/admin/customfields']"><i class="fa fa-user-cog"></i> Custom Fields</a>
                         </li>
                         <li>
                             <a [routerLink]="['/admin/reminders']"><i class="fa fa-bell"></i> Reminders</a>

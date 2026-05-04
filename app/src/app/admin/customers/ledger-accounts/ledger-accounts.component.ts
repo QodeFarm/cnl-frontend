@@ -145,11 +145,9 @@ showLedgerAccountsListFn() {
               templateOptions: {
                 label: 'Type',
                 options: [
-                  { value: 'Bank', label: 'Bank' },
-                  { value: 'Cash', label: 'Cash' },
                   { value: 'General', label: 'General' },
-                  // { value: 'Customer', label: 'Customer' },
-                  // { value: 'Vendor', label: 'Vendor' },
+                  { value: 'Cash', label: 'Cash' },
+                  { value: 'Bank', label: 'Bank' },
                 ],
                 required: true
               }
@@ -214,6 +212,9 @@ showLedgerAccountsListFn() {
                 onInit: ((http) => {
                   return (field: any) => {
                     field.formControl.valueChanges.subscribe((selectedGroup: any) => {
+                      // Skip code regeneration in edit mode — existing code must not change
+                      if (field.model?.ledger_account_id) return;
+
                       if (selectedGroup && selectedGroup.ledger_group_id) {
                         // Update ledger_group_id in model
                         if (field.model) {

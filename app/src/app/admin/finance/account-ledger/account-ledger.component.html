@@ -1,58 +1,66 @@
-<div class="container-fluid pt-3 account-ledger-wrapper">
-  <div class="row">
-    <div class="col-12 px-2 py-1 ledger-content">
+<div class="container-fluid p-3">
+<div class="account-ledger-page">
 
-      <ta-curd-modal
-        [options]="curdConfig"
-        class="custom-list">
-      </ta-curd-modal>
+  <!-- ── Account + Balance Summary Bar (shown once account is selected) ──── -->
+  <div class="ledger-summary-bar" *ngIf="showBalanceSummary">
 
-      <!-- ERP Standard: Balance Summary Bar + Print Action (below table) -->
-      <div class="ledger-footer-section" *ngIf="showBalanceSummary">
-        <!-- Print Action (Left) -->
-        <div class="ledger-footer">
-          <select class="form-select print-select" (change)="onPrintSelect($event)">
-            <option value="" disabled selected hidden>Print Document</option>
-            <option value="preview">Preview</option>
-            <option value="print">Print</option>
-          </select>
-        </div>
-
-        <!-- Balance Summary (Right) -->
-        <div class="ledger-balance-summary">
-          <div class="balance-row">
-            <div class="balance-item opening">
-              <span class="balance-label">Opening Balance:</span>
-              <span class="balance-amount">₹{{ openingBalance }}</span>
-            </div>
-            <div class="balance-item totals">
-              <span class="balance-label">Total Debit:</span>
-              <span class="balance-amount debit">₹{{ totalDebit }}</span>
-              <span class="balance-separator">|</span>
-              <span class="balance-label">Total Credit:</span>
-              <span class="balance-amount credit">₹{{ totalCredit }}</span>
-            </div>
-            <div class="balance-item closing">
-              <span class="balance-label">Closing Balance:</span>
-              <span class="balance-amount" [ngClass]="{'positive': isPositiveBalance, 'negative': !isPositiveBalance}">
-                ₹{{ closingBalance }}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Print Action when no data (fallback) -->
-      <div class="ledger-footer" *ngIf="!showBalanceSummary">
-        <select class="form-select print-select" (change)="onPrintSelect($event)">
-          <option value="" disabled selected hidden>Print Document</option>
-          <option value="preview">Preview</option>
-          <option value="print">Print</option>
-          <option value="whatsapp">whatsapp</option>
-        </select>
-      </div>
-
+    <!-- Account identity -->
+    <div class="ledger-identity">
+      <span class="ledger-type-badge">{{ accountTypeLabel }}</span>
+      <span class="ledger-account-name">{{ accountName }}</span>
     </div>
-  </div>
-</div>
 
+    <!-- Balance stats -->
+    <div class="ledger-stats">
+      <div class="ledger-stat stat-opening">
+        <div class="stat-label">Opening Balance</div>
+        <div class="stat-value neutral">₹{{ openingBalance }}</div>
+      </div>
+      <div class="ledger-stat stat-debit">
+        <div class="stat-label">Total Debit</div>
+        <div class="stat-value dr">₹{{ totalDebit }}</div>
+      </div>
+      <div class="ledger-stat stat-credit">
+        <div class="stat-label">Total Credit</div>
+        <div class="stat-value cr">₹{{ totalCredit }}</div>
+      </div>
+      <div class="ledger-stat stat-closing">
+        <div class="stat-label">Closing Balance</div>
+        <div class="stat-value closing" [class.cr]="isPositiveBalance" [class.dr]="!isPositiveBalance">
+          ₹{{ finalBalance }}
+          <span class="bal-suffix">{{ isPositiveBalance ? 'Dr' : 'Cr' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Print / Export -->
+    <div class="ledger-actions">
+      <button nz-button nz-dropdown [nzDropdownMenu]="printMenu"
+              class="ledger-print-btn" nzType="primary">
+        <span nz-icon nzType="printer" nzTheme="outline"></span>
+        Print / Export
+        <span nz-icon nzType="down"></span>
+      </button>
+      <nz-dropdown-menu #printMenu="nzDropdownMenu">
+        <ul nz-menu>
+          <li nz-menu-item (click)="onPreviewClick()">
+            <span nz-icon nzType="file-pdf" nzTheme="outline"></span>
+            &nbsp; Preview PDF
+          </li>
+          <li nz-menu-item (click)="onPrintClick()">
+            <span nz-icon nzType="printer" nzTheme="outline"></span>
+            &nbsp; Print
+          </li>
+        </ul>
+      </nz-dropdown-menu>
+    </div>
+
+  </div>
+
+  <!-- ── Ledger Table (title comes from tableConfig, matches all other modules) -->
+  <div class="ledger-table-wrapper">
+    <ta-curd-modal [options]="curdConfig" class="custom-list"></ta-curd-modal>
+  </div>
+
+</div>
+</div>

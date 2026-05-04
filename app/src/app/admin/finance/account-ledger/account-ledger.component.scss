@@ -1,216 +1,301 @@
-/* Make ta-curd-modal footer reference point */
-.account-ledger-wrapper {
-  position: relative;
-}
+// ── Design tokens ────────────────────────────────────────────────────────────
+$primary:       #142768;
+$primary-hover: #1a3278;
+$primary-light: #eef2fa;
+$border:        #e5e7eb;
+$bg-page:       #f5f6fa;
+$text-dark:     #1e293b;
+$text-mid:      #475569;
+$text-light:    #94a3b8;
 
-/* ========================================
-   ERP Standard: Ledger Balance Summary Bar
-   Clean, professional accounting-style design
-   ======================================== */
-
-.ledger-balance-summary {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  margin: 8px 0 8px 0;
-  padding: 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.balance-row {
+// ── Page wrapper ─────────────────────────────────────────────────────────────
+.account-ledger-page {
   display: flex;
-  align-items: stretch;
-  justify-content: space-between;
-  min-height: 48px;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.balance-item {
+
+// ── Summary bar ───────────────────────────────────────────────────────────────
+.ledger-summary-bar {
   display: flex;
   align-items: center;
-  padding: 10px 16px;
-  gap: 8px;
-  
-  &.opening {
-    background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
-    border-right: 1px solid #e2e8f0;
-    border-radius: 6px 0 0 6px;
-    min-width: 180px;
-  }
-  
-  &.totals {
-    flex: 1;
-    justify-content: center;
-    background: #fff;
-    gap: 6px;
-  }
-  
-  &.closing {
-    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-    border-left: 1px solid #e2e8f0;
-    border-radius: 0 6px 6px 0;
-    min-width: 200px;
-    justify-content: flex-end;
-  }
+  gap: 0;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  min-height: 60px;
 }
 
-.balance-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: #475569;
+// ── Account identity (left block) ─────────────────────────────────────────────
+.ledger-identity {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding: 12px 20px;
+  border-right: 1px solid #e5e7eb;
+  background: #f8fafc;
+  flex-shrink: 0;
+  min-width: 200px;
+  max-width: 260px;
+}
+
+.ledger-type-badge {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
+  color: #142768;
+  background: rgba(20, 39, 104, 0.09);
+  padding: 2px 7px;
+  border-radius: 3px;
+  width: fit-content;
+}
+
+.ledger-account-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+// ── Balance stats (center) ────────────────────────────────────────────────────
+.ledger-stats {
+  display: flex;
+  align-items: stretch;
+  flex: 1;
+}
+
+.ledger-stat {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 20px;
+  flex: 1;
+  border-right: 1px solid #f1f5f9;
+
+  &:last-of-type {
+    border-right: none;
+  }
+
+  // Subtle tints per stat type
+  &.stat-debit   { background: rgba(220, 38, 38, 0.03); }
+  &.stat-credit  { background: rgba(22, 163, 74, 0.03); }
+  &.stat-closing { background: rgba(20, 39, 104, 0.04); }
+}
+
+.stat-label {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #94a3b8;
+  margin-bottom: 4px;
   white-space: nowrap;
 }
 
-.balance-amount {
+.stat-value {
   font-size: 14px;
   font-weight: 700;
-  font-family: 'Roboto Mono', 'Consolas', 'Courier New', monospace;
-  color: #1e293b;
-  
-  &.debit {
-    color: #dc2626;
-  }
-  
-  &.credit {
-    color: #16a34a;
-  }
-  
-  &.positive {
-    color: #16a34a;
-    font-size: 15px;
-  }
-  
-  &.negative {
-    color: #dc2626;
-    font-size: 15px;
-  }
-}
-
-.balance-separator {
-  color: #94a3b8;
-  margin: 0 8px;
-  font-weight: 300;
-  font-size: 14px;
-}
-
-/* ========================================
-   Footer Section: Print + Balance aligned
-   ======================================== */
-
-.ledger-footer-section {
+  font-family: 'Roboto Mono', 'Consolas', monospace;
+  color: #334155;
   display: flex;
-  align-items: stretch;
-  justify-content: space-between;
-  gap: 16px;
-  margin-top: 8px;
-  padding: 0;
+  align-items: baseline;
+  gap: 4px;
+
+  &.dr      { color: #dc2626; }
+  &.cr      { color: #16a34a; }
+  &.neutral { color: #475569; }
+
+  &.closing {
+    font-size: 15px;
+  }
 }
 
-.ledger-footer-section .ledger-balance-summary {
-  flex: 1;
-  margin: 0;
+.bal-suffix {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  opacity: 0.75;
+  font-family: 'Poppins', sans-serif;
 }
 
-.ledger-footer {
+// ── Actions (right block of summary bar) ─────────────────────────────────────
+.ledger-actions {
+  padding: 0 16px;
+  border-left: 1px solid #e5e7eb;
   display: flex;
   align-items: center;
-  z-index: 5;
+  flex-shrink: 0;
+  background: #f8fafc;
 }
 
-/* Size */
-.print-select {
-  width: 150px;
-  height: 36px;
+.ledger-print-btn.ant-btn {
+  background-color: #142768 !important;
+  border-color: #142768 !important;
+  color: #ffffff !important;
   font-size: 13px;
-  border-radius: 4px;
-  border: 1px solid #d1d5db;
-  background: #fff;
-  cursor: pointer;
-  
+  font-weight: 500;
+  height: 34px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 6px;
+  white-space: nowrap;
+
   &:hover {
-    border-color: #9ca3af;
-  }
-  
-  &:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    background-color: #1a3593 !important;
+    border-color: #1a3593 !important;
   }
 }
 
-/* ========================================
-   Table Column Alignments (ERP Standard)
-   ======================================== */
 
-// Right-align numeric columns and ensure consistent styling
-::ng-deep .account-ledger-wrapper {
-  // Target all table cells in the last 3 columns (Debit, Credit, Running Balance)
-  .ant-table-tbody > tr > td:nth-last-child(1),  // Running Balance (last)
-  .ant-table-tbody > tr > td:nth-last-child(2),  // Credit (2nd from last)
-  .ant-table-tbody > tr > td:nth-last-child(3) { // Debit (3rd from last)
-    text-align: right !important;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
-    font-weight: 500 !important;
-    font-size: 14px !important;
-    color: #1e293b !important;
-  }
-  
-  // Header alignment for last 3 columns
-  .ant-table-thead > tr > th:nth-last-child(1),
-  .ant-table-thead > tr > th:nth-last-child(2),
-  .ant-table-thead > tr > th:nth-last-child(3) {
-    text-align: right !important;
-  }
-  
-  // Ensure consistent cell rendering
-  .ant-table-cell {
-    vertical-align: middle;
-  }
-  
-  // Consistent row height
-  .ant-table-tbody > tr > td {
-    padding: 12px 16px !important;
+// ── Table wrapper: give the ta-table filter bar a clean panel look ────────────
+.ledger-table-wrapper {
+
+  ::ng-deep {
+
+    // Filter panel card — wraps Customer + account + city + date pickers + search
+    .customer-title-alignment {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 10px 14px !important;
+      margin-bottom: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      overflow: visible !important;
+    }
+
+    // Remove stray top-margin on table-level cells introduced by mt-2
+    .customer-title-alignment .ta-cell {
+      margin-top: 0 !important;
+    }
+
+    // Right-align numeric columns (Debit=4th, Credit=5th, Balance=6th)
+    .ant-table-tbody > tr > td:nth-child(4),
+    .ant-table-tbody > tr > td:nth-child(5),
+    .ant-table-tbody > tr > td:nth-child(6) {
+      text-align: right !important;
+    }
+
+    .ant-table-thead > tr > th:nth-child(4),
+    .ant-table-thead > tr > th:nth-child(5),
+    .ant-table-thead > tr > th:nth-child(6) {
+      text-align: right !important;
+    }
+
+    .ant-table-tbody > tr > td {
+      padding: 10px 14px !important;
+      vertical-align: middle;
+    }
   }
 }
 
-/* Responsive adjustments */
-@media (max-width: 992px) {
-  .balance-row {
-    flex-direction: column;
-  }
-  
-  .balance-item {
-    width: 100%;
-    justify-content: space-between !important;
-    border-radius: 0 !important;
-    border-right: none !important;
-    border-left: none !important;
-    border-bottom: 1px solid #e2e8f0;
-    padding: 8px 12px;
-    min-width: auto !important;
-    
-    &:last-child {
-      border-bottom: none;
-    }
-    
-    &.opening {
-      border-radius: 6px 6px 0 0 !important;
-    }
-    
-    &.closing {
-      border-radius: 0 0 6px 6px !important;
-    }
-  }
-  
-  .balance-item.totals {
+// ── Responsive: Tablet (768–1199px) ──────────────────────────────────────────
+@media (max-width: 1199px) {
+  .ledger-summary-bar {
     flex-wrap: wrap;
-    justify-content: center !important;
-    gap: 4px;
   }
-  
-  .ledger-footer-section {
-    flex-direction: column;
-    gap: 12px;
+
+  .ledger-identity {
+    min-width: unset;
+    max-width: 100%;
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .ledger-stats {
+    width: 100%;
+  }
+
+  .ledger-stat {
+    flex: 1;
+    padding: 8px 12px;
+  }
+
+  .ledger-actions {
+    border-left: none;
+    border-top: 1px solid #e5e7eb;
+    width: 100%;
+    justify-content: flex-end;
+    padding: 10px 16px;
+    background: #fff;
+  }
+
+}
+
+// ── Responsive: Mobile (<768px) ───────────────────────────────────────────────
+@media (max-width: 767px) {
+  .ledger-summary-bar {
+    border-radius: 6px;
+  }
+
+  .ledger-stats {
+    flex-wrap: wrap;
+  }
+
+  .ledger-stat {
+    flex: 0 0 50%;
+    border-right: none;
+    border-bottom: 1px solid #f1f5f9;
+    padding: 10px;
+
+    &:nth-child(odd) {
+      border-right: 1px solid #f1f5f9;
+    }
+  }
+
+  .stat-label {
+    font-size: 9px;
+  }
+
+  .stat-value {
+    font-size: 13px;
+  }
+
+  .ledger-table-wrapper {
+    ::ng-deep {
+      .customer-title-alignment {
+        padding: 8px 10px !important;
+      }
+
+      // Right-align numeric cols: still works with 50%+ content scroll
+      .ant-table-content {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+    }
+  }
+}
+
+// ── Responsive: Small mobile (<480px) ────────────────────────────────────────
+@media (max-width: 479px) {
+  .ledger-identity {
+    padding: 10px 12px;
+  }
+
+  .ledger-account-name {
+    font-size: 12px;
+  }
+
+  .ledger-stat {
+    flex: 0 0 50%;
+  }
+
+  .ledger-print-btn.ant-btn {
+    font-size: 12px;
+    padding: 0 10px;
+    height: 30px;
   }
 }
