@@ -984,6 +984,7 @@ export function calculateTotalAmount(data: any, modelName: string, form: any) {
     products.forEach((product: any) => {
       const quantity = Number(product.quantity ?? 0);
       const rate = Number(product.rate ?? 0);
+      console.log("Quantity: ", quantity, " Rate: ", rate);
 
       const itemValue = quantity * rate; // Total before discount
 
