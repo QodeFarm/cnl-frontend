@@ -1673,7 +1673,7 @@ loadQuickpackProducts() {
                         const quantity = field.form.controls.quantity.value;
                         const rate = data;
                         if (rate && quantity) {
-                          field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity));
+                          field.form.controls.amount.setValue(parseFloat(rate) * parseFloat(quantity));
                         }
                       }
                     });
