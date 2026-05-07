@@ -1,1 +1,26 @@
 /* Dialog styles handled globally in styles.scss */
+
+::ng-deep .action-delivered {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 5px;
+  background: #dcfce7 !important;
+  color: #15803d !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  padding: 3px 10px !important;
+  border-radius: 20px !important;
+  border: none !important;
+  cursor: default !important;
+  pointer-events: none;
+  line-height: 1.6;
+
+  &::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #16a34a;
+    flex-shrink: 0;
+  }
+}

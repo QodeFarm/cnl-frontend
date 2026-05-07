@@ -1,51 +1,70 @@
+<!-- ═══ Account Ledger: dedicated filter panel ══════════════════════════════ -->
+<div class="al-filter-panel" *ngIf="isAccountLedgerPage">
+
+    <!-- Row 1: account type + account search + city -->
+    <div class="al-filter-row-1">
+
+        <!-- Account type segment -->
+        <nz-radio-group [(ngModel)]="selectedAccountType" (ngModelChange)="onAccountTypeChange()"
+            nzButtonStyle="solid" nzSize="default" class="al-type-radio">
+            <label nz-radio-button nzValue="customer">Customer</label>
+            <label nz-radio-button nzValue="vendor">Vendor</label>
+            <label nz-radio-button nzValue="general">General</label>
+        </nz-radio-group>
+
+        <!-- Account search: takes remaining width -->
+        <nz-select
+            [(ngModel)]="selectedAccountId"
+            (ngModelChange)="onAccountChange()"
+            [nzPlaceHolder]="selectedAccountType ? 'Search ' + selectedAccountType + ' by name or code...' : 'Select account type first'"
+            class="al-account-select"
+            [nzDisabled]="!selectedAccountType"
+            nzAllowClear nzShowSearch nzServerSearch
+            [nzLoading]="accountSearchLoading"
+            (nzOnSearch)="onAccountSearch($event)"
+            nzDropdownClassName="al-account-dropdown"
+            [nzNotFoundContent]="accountSearchLoading ? 'Searching...' : (selectedAccountType ? 'No results found' : 'Select account type first')">
+            <nz-option *ngFor="let option of accountOptions"
+                [nzValue]="option.value" [nzLabel]="option.label" nzCustomContent>
+                <div class="al-account-option">
+                    <span class="al-account-name">{{ option.label }}</span>
+                    <span *ngIf="option.code" class="al-account-code">{{ option.code }}</span>
+                </div>
+            </nz-option>
+        </nz-select>
+
+        <!-- City: only for customer/vendor, not general -->
+        <nz-select *ngIf="selectedAccountType && selectedAccountType !== 'general'"
+            [(ngModel)]="selectedCity" nzPlaceHolder="All Cities"
+            class="al-city-select" [nzDisabled]="isCityDisabled"
+            nzAllowClear nzShowSearch (ngModelChange)="applyFilters()">
+            <nz-option *ngFor="let city of cityOptions" [nzValue]="city.value" [nzLabel]="city.label"></nz-option>
+        </nz-select>
+
+    </div>
+
+    <!-- Row 2: date/period filters — only shown once a specific account is selected -->
+    <div class="al-filter-row-2" *ngIf="selectedAccountId">
+        <span class="al-period-label">Period</span>
+        <nz-select [(ngModel)]="selectedQuickPeriod" (ngModelChange)="onQuickPeriodChange(); applyFilters()"
+            nzPlaceHolder="Quick Period" class="al-period-select" nzAllowClear>
+            <nz-option *ngFor="let p of quickPeriodOptions" [nzValue]="p.value" [nzLabel]="p.label"></nz-option>
+        </nz-select>
+        <nz-date-picker [(ngModel)]="fromDate" nzPlaceHolder="From date"
+            class="al-date-picker" (ngModelChange)="applyFilters()" nzAllowClear></nz-date-picker>
+        <nz-date-picker [(ngModel)]="toDate" nzPlaceHolder="To date"
+            class="al-date-picker" (ngModelChange)="applyFilters()" nzAllowClear></nz-date-picker>
+    </div>
+
+</div>
+
+<!-- ═══ Main header row: title + other module filters + search/actions ════ -->
 <div class="ta-row p-0 justify-content-end customer-title-alignment">
     <div class="ta-cell" *ngIf="options.title">
         <span class="custom-heading"> {{options.title}}</span>
     </div>
     <div class="ta-cell filter-alignments">
         <div class="ta-row p-0 justify-content-end">
-
-            <!-- Account Ledger filters: account type, account name, city -->
-            <div class="filter-group col p-0 account-ledger-filters" *ngIf="isAccountLedgerPage">
-                <nz-select [(ngModel)]="selectedAccountType" (ngModelChange)="onAccountTypeChange()"
-                    nzPlaceHolder="Account Type" class="al-select-type" nzAllowClear>
-                    <nz-option *ngFor="let option of accountTypeOptions" [nzValue]="option.value"
-                        [nzLabel]="option.label"></nz-option>
-                </nz-select>
-
-                <nz-select
-                    [(ngModel)]="selectedAccountId"
-                    (ngModelChange)="onAccountChange()"
-                    nzPlaceHolder="Search account"
-                    class="al-select-account"
-                    [nzDisabled]="!selectedAccountType"
-                    nzAllowClear
-                    nzShowSearch
-                    nzServerSearch
-                    [nzLoading]="accountSearchLoading"
-                    (nzOnSearch)="onAccountSearch($event)"
-                    [nzNotFoundContent]="accountSearchLoading ? 'Searching...' : 'No results'">
-                    <nz-option
-                        *ngFor="let option of accountOptions"
-                        [nzValue]="option.value"
-                        [nzLabel]="option.label"
-                        nzCustomContent>
-                        <span style="font-weight:500;">{{ option.label }}</span>
-                        <span *ngIf="option.code" style="color:#888;font-size:11px;margin-left:6px;">({{ option.code }})</span>
-                    </nz-option>
-                </nz-select>
-
-                <nz-select
-                    [(ngModel)]="selectedCity"
-                    nzPlaceHolder="City"
-                    class="al-select-city"
-                    [nzDisabled]="isCityDisabled"
-                    nzAllowClear
-                    (ngModelChange)="applyFilters()">
-                    <nz-option *ngFor="let city of cityOptions" [nzValue]="city.value" [nzLabel]="city.label">
-                    </nz-option>
-                </nz-select>
-            </div>
 
 
             <!-- Employee Filter -->
@@ -98,24 +117,23 @@
 
 
 
-            <!-- Quick Period Dropdown -->
-            <div class="filter-group col p-0 mt-2" style="margin-left: 5px;" *ngIf="isButtonVisible || isStockForecastPage">
+            <!-- Quick Period Dropdown (hidden for account-ledger — shown in dedicated panel above) -->
+            <div class="filter-group col p-0 mt-2" style="margin-left: 5px;" *ngIf="(isButtonVisible && !isAccountLedgerPage) || isStockForecastPage">
                 <nz-select id="quickPeriod" [(ngModel)]="selectedQuickPeriod" (ngModelChange)="onQuickPeriodChange(); applyFilters()"
                     [nzPlaceHolder]="isStockForecastPage ? 'Analysis Period' : 'Quick Period'" class="quick-period-select" nzAllowClear>
-                    <!-- Use stock forecast specific options for that page, otherwise use regular options -->
-                    <nz-option *ngFor="let period of (isStockForecastPage ? stockForecastPeriodOptions : quickPeriodOptions)" 
+                    <nz-option *ngFor="let period of (isStockForecastPage ? stockForecastPeriodOptions : quickPeriodOptions)"
                         [nzValue]="period.value" [nzLabel]="period.label"></nz-option>
                 </nz-select>
             </div>
 
-            <!-- From Date Picker (hidden for Stock Forecast - uses period_name for calculation) -->
-            <div class="filter-group col p-0 mt-2" style="margin-left: 5px;" *ngIf="isButtonVisible && !isStockForecastPage">
+            <!-- From Date Picker -->
+            <div class="filter-group col p-0 mt-2" style="margin-left: 5px;" *ngIf="isButtonVisible && !isStockForecastPage && !isAccountLedgerPage">
                 <nz-date-picker id="fromDate" [(ngModel)]="fromDate" nzPlaceHolder="From date" class="date-picker"
                     style="width: 130px;" (ngModelChange)="applyFilters()" nzAllowClear></nz-date-picker>
             </div>
 
-            <!-- To Date Picker (hidden for Stock Forecast - uses period_name for calculation) -->
-            <div class="filter-group col p-0 mt-2" style="margin-left: 5px;" *ngIf="isButtonVisible && !isStockForecastPage">
+            <!-- To Date Picker -->
+            <div class="filter-group col p-0 mt-2" style="margin-left: 5px;" *ngIf="isButtonVisible && !isStockForecastPage && !isAccountLedgerPage">
                 <nz-date-picker id="toDate" [(ngModel)]="toDate" nzPlaceHolder="To date" class="date-picker"
                     style="width: 130px;" (ngModelChange)="applyFilters()" nzAllowClear></nz-date-picker>
             </div>
@@ -170,7 +188,7 @@
             <ng-content nz-col select="[before-search]">
             </ng-content>
             <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton">
-                <input type="text" nz-input placeholder="Search" [(ngModel)]="globalSearchValue"
+                <input type="text" nz-input [placeholder]="options?.globalSearch?.label || 'Search'" [(ngModel)]="globalSearchValue"
                     (ngModelChange)="globalSearch()" />
             </nz-input-group>
             <ng-template #suffixIconButton>

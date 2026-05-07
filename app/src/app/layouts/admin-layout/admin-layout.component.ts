@@ -1,10 +1,12 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, AsyncPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Component, HostListener, ElementRef, Renderer2, ChangeDetectorRef } from '@angular/core';
+import { trigger, transition, style, animate } from '@angular/animations';
 import { ActivatedRoute, Route, Router, RouterModule, RoutesRecognized, NavigationEnd } from '@angular/router';
-import { LocalStorageService } from '@ta/ta-core';
+import { LocalStorageService, LoadingService } from '@ta/ta-core';
 import { AdminCommonService } from 'src/app/services/admin-common.service';
 import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { filter, map, mergeMap } from 'rxjs/operators';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { CustomfieldsModule } from 'src/app/admin/customfields/customfields.module';
@@ -41,7 +43,15 @@ export interface Tab {
   templateUrl: './admin-layout.component.html',
   styleUrls: ['./admin-layout.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, NzTabsModule, CustomfieldsModule]
+  imports: [CommonModule, AsyncPipe, FormsModule, RouterModule, NzTabsModule, CustomfieldsModule],
+  animations: [
+    trigger('pageEnter', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(10px)' }),
+        animate('220ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+      ])
+    ])
+  ]
 })
 export class AdminLayoutComponent {
   menulList = <any>[];
@@ -86,6 +96,7 @@ export class AdminLayoutComponent {
   public currentHoverTabKey: string;
   public tabs: Tab[] = [];
   showContain = false;
+  loading$: Observable<boolean>;
 
   // Reminders logic
   remindersCount: number = 0;
@@ -95,7 +106,8 @@ export class AdminLayoutComponent {
   isForcePasswordChange: boolean = false;
 
   private recognition: SpeechRecognitionEvent | null = null;
-  constructor(private activatedRoute: ActivatedRoute, private cd: ChangeDetectorRef, private elementRef: ElementRef, private http: HttpClient, private renderer: Renderer2, private router: Router, private taLoacal: LocalStorageService, private aS: AdminCommonService) {
+  constructor(private activatedRoute: ActivatedRoute, private cd: ChangeDetectorRef, private elementRef: ElementRef, private http: HttpClient, private renderer: Renderer2, private router: Router, private taLoacal: LocalStorageService, private aS: AdminCommonService, private loadingService: LoadingService) {
+    this.loading$ = this.loadingService.httpLoading$;
     this.aS.action$.subscribe(res => {
       console.log(res);
     });
@@ -824,6 +836,25 @@ export class AdminLayoutComponent {
     console.log('Form Data:', formData);
   }
   selectedTabIndex = 0;
+  isRefreshing = false;
+
+  refreshCurrentTab(): void {
+    if (this.isRefreshing) return;
+    const activeTab = this.tabs[this.selectedTabIndex];
+    if (!activeTab?.component) return;
+
+    this.isRefreshing = true;
+    const comp = activeTab.component;
+    activeTab.component = null;
+    this.cd.detectChanges();
+
+    setTimeout(() => {
+      activeTab.component = comp;
+      this.cd.detectChanges();
+      this.isRefreshing = false;
+    }, 120);
+  }
+
   // tabs based on routing
   disposeTab(tab: Tab) {
     if (this.tabs.length > 1) {

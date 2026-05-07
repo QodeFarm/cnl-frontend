@@ -18,7 +18,7 @@
     </div>
 
     <div class="row  custom-form">
-        <div class="col-12 px-1" *ngIf="orderNumber">   <!--removed show form -->
+        <div class="col-12 px-1" *ngIf="!PurchaseReturnOrderEditID || orderNumber">
             <ta-form #purchasereturnForm [options]="formConfig"></ta-form>
         </div>
     </div>

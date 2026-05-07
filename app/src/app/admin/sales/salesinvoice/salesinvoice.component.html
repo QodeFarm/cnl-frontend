@@ -17,7 +17,7 @@
                           class="dropdown-select m-0 "
                           [(ngModel)]="selectedQuickpack">
                           <option value="" disabled selected aria-disabled="true">Quickpack</option>
-                          <option *ngFor="let quickpack of quickpackOptions" 
+                          <option *ngFor="let quickpack of quickpackOptions; trackBy: trackByPackId"
                                   [value]="quickpack.quick_pack_id">
                               {{ quickpack.name }}
                           </option>
@@ -41,7 +41,7 @@
     </div>
 
     <div class="row custom-form">
-      <div class="col-12 px-1" *ngIf="invoiceNumber">
+      <div class="col-12 px-1" *ngIf="!SaleInvoiceEditID || invoiceNumber">
 
         <!-- Customer Info Strip -->
         <div *ngIf="showCustomerInfoBanner" class="customer-info-strip">
@@ -134,7 +134,7 @@
                     <div class="form-group">
                         <label for="tableSelect">Select Table</label>
                         <select id="tableSelect" class="form-control form-select" [(ngModel)]="selectedTable" name="selectedTable">
-                            <option *ngFor="let table of availableTables" [value]="table">{{table}}</option>
+                            <option *ngFor="let table of availableTables; trackBy: trackByIndex" [value]="table">{{table}}</option>
                         </select>
                     </div>
                 </form>

@@ -1,0 +1,46 @@
+.orders-list-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 260px;
+}
+
+// ── Empty state ───────────────────────────────────────────────────────────────
+.no-orders-empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  gap: 8px;
+
+  .empty-icon {
+    font-size: 40px;
+    line-height: 1;
+    opacity: 0.5;
+  }
+
+  .empty-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+  }
+
+  .empty-sub {
+    font-size: 13px;
+    color: #94a3b8;
+    margin: 0;
+    text-align: center;
+  }
+}
+
+// ── Footer buttons ────────────────────────────────────────────────────────────
+.orders-list-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 0 0;
+  border-top: 1px solid #e5e7eb;
+  margin-top: 8px;
+}

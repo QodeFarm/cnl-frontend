@@ -17,7 +17,8 @@ export const customerCudConfig: TaCurdConfig = {
         ],
         pageSize: 10,
         "globalSearch": {
-            keys: ['name', 'phone', 'code', 'city_id']
+            keys: ['name', 'phone', 'code', 'city_id'],
+            label: 'Search by name, phone or code...'
         },
         defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
@@ -9192,7 +9193,8 @@ export const VendorCurdConfig: TaCurdConfig = {
     ],
     pageSize: 10,
     globalSearch: {
-      keys: ['created_at','name','gst_no','email','phone','vendor_category_id','ledger_account','city_id']
+      keys: ['created_at','name','gst_no','email','phone','vendor_category_id','ledger_account','city_id'],
+      label: 'Search by name, phone or GST...'
     },
     export: {downloadName: 'VendorList'},
     // defaultSort: { key: 'created_at', value: 'descend' },

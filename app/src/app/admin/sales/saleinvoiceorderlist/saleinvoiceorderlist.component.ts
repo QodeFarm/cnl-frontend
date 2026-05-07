@@ -29,7 +29,7 @@ export class SaleinvoiceorderlistComponent implements OnChanges{
   constructor(private http: HttpClient) {}
 
   tableConfig: TaTableConfig = {
-    apiUrl: 'sales/sale_order/?summary=true',
+    apiUrl: 'sales/sale_order/?summary=true&flow_status_name=Ready for Invoice',
     showCheckbox: true,
     pkId: 'sale_order_id',
     pageSize: 10,
@@ -37,12 +37,11 @@ export class SaleinvoiceorderlistComponent implements OnChanges{
       keys: [
         'order_date',
         'order_no',
-        // 'sale_type',
         'customer',
         'amount',
         'tax',
         'advance_amount',
-        'status_name'
+        'flow_status_name'
       ]
     },
     cols: [
@@ -66,6 +65,12 @@ export class SaleinvoiceorderlistComponent implements OnChanges{
         fieldKey: 'order_date',
         name: 'Order Date',
         displayType: 'date'
+      },
+      {
+        fieldKey: 'flow_status_name',
+        name: 'Flow Status',
+        displayType: 'map',
+        mapFn: (_: any, row: any) => row.flow_status?.flow_status_name || row.flow_status_name || '—'
       },
       {
         fieldKey: 'products',
@@ -108,7 +113,7 @@ export class SaleinvoiceorderlistComponent implements OnChanges{
   updateTableConfig() {
     this.tableConfig = {
       ...this.tableConfig,
-      apiUrl: `sales/sale_order/?summary=true&status_name=Pending&customer_id=${this.selectedCustomerId}`
+      apiUrl: `sales/sale_order/?summary=true&flow_status_name=Ready for Invoice&customer_id=${this.selectedCustomerId}`
     };
 
     setTimeout(() => {

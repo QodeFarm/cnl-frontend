@@ -1,4 +1,9 @@
-<header>
+<!-- Global HTTP loading bar -->
+<div class="global-progress-bar" [class.global-progress-bar--active]="loading$ | async">
+    <div class="global-progress-bar__fill"></div>
+</div>
+
+<header class="sticky-header">
     <!-- Topbar -->
     <nav class="navbar navbar-expand navbar-light topbar static-top justify-content-between">
 
@@ -252,6 +257,13 @@
                 </div>
             </li> -->
 
+            <!-- Refresh current tab -->
+            <li class="nav-item no-arrow mx-1">
+                <a class="nav-link refresh-tab-btn" role="button" (click)="refreshCurrentTab()" title="Refresh page">
+                    <i class="fas fa-sync-alt fa-fw" [class.fa-spin]="isRefreshing"></i>
+                </a>
+            </li>
+
             <!-- Bell icon -->
             <li class="nav-item no-arrow mx-1">
                 <a class="nav-link" role="button" (click)="openReminders()">
@@ -437,7 +449,7 @@
 
     <!-- Content Wrapper -->
     <!-- <div id="content-wrapper" class="d-flex flex-column"> -->
-    <div id="content-wrapper" class="d-flex flex-column" *ngIf="showContain">
+    <div id="content-wrapper" *ngIf="showContain">
 
 
         <!-- Main Content -->
@@ -451,11 +463,13 @@
         <!-- Page Heading -->
         <!-- <h1 class="h3 mb-4 text-gray-800">Blank Page</h1> -->
         <!-- <router-outlet></router-outlet> -->
-        <div class="tab  flex-fill h-100 px-0 bg-white d-flex flex-column">
+        <div class="tab px-0 bg-white">
             <nz-tabset [(nzSelectedIndex)]="selectedTabIndex" nzType="editable-card" nzHideAdd
                 (nzClose)="removeTab($event)">
                 <nz-tab (nzSelect)="onTabSelect(tab)" [nzClosable]="true" [nzTitle]="tab.name" *ngFor="let tab of tabs">
-                    <ng-container *ngComponentOutlet="tab.component;"></ng-container>
+                    <div *ngIf="tab.component" @pageEnter>
+                        <ng-container *ngComponentOutlet="tab.component"></ng-container>
+                    </div>
                 </nz-tab>
             </nz-tabset>
 

@@ -158,6 +158,24 @@ export class PurchaseInvoiceComponent {
   dataToPopulate: any;
   hasDataPopulated: boolean = false;
   entitiesList: any[] = [];
+
+  private resetToNewForm(): void {
+    this.PurchaseInvoiceEditID = null;
+    this.setFormConfig();
+    if (this.formConfig.model?.purchase_invoice_orders) {
+      this.formConfig.model['purchase_invoice_orders']['order_type'] = 'purchase_invoice';
+    }
+    if (this.formConfig.fields?.[2]) {
+      this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = true;
+      this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide = true;
+    }
+    this.getInvoiceNo();
+  }
+
+  trackByIndex(index: number): number {
+    return index;
+  }
+
   ngOnInit() {
 
     this.showPurchaseInvoiceList = false;
@@ -603,7 +621,7 @@ loadQuickpackProducts() {
       .subscribe(response => {
         this.showSuccessToast = true;
         this.toastMessage = 'Record created successfully';
-        this.ngOnInit();
+        this.resetToNewForm();
         setTimeout(() => {
           this.showSuccessToast = false;
         }, 3000); // Hide toast after 3 seconds
@@ -663,7 +681,7 @@ loadQuickpackProducts() {
       .subscribe(response => {
         this.showSuccessToast = true;
         this.toastMessage = "Record updated successfully"; // Set the toast message for update
-        this.ngOnInit();
+        this.resetToNewForm();
         setTimeout(() => {
           this.showSuccessToast = false;
         }, 3000);
@@ -714,7 +732,7 @@ loadQuickpackProducts() {
       },
       reset: {
         resetFn: () => {
-          this.ngOnInit();
+          this.resetToNewForm();
         }
       },
       model: {

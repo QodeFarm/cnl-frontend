@@ -39,6 +39,7 @@ export class SalesComponent {
   notificationActionFn: (() => void) | null = null;
   workOrderNotifRef: any = null;
   orderNumber: any;
+  private saleTypesCache: any[] | null = null;
   invoiceData: any;
   invoiceNumber: string = '';
   salesReceiptForm: FormGroup;
@@ -46,6 +47,8 @@ export class SalesComponent {
   showInvoiceListModal: boolean = false;
   showForm: boolean = false;
   SaleOrderEditID: any;
+  // Tracks flow_status selected in dropdown BEFORE the form is saved
+  selectedFlowStatusName: string = '';
   productOptions: any;
   customerDetails: Object;
   customerOrders: any[] = [];
@@ -946,7 +949,6 @@ invoiceCreationHandler() {
     this.createSaleInvoice(invoiceData).subscribe(
       response => {
         console.log('Sale invoice created successfully', response);
-        this.showInvoiceCreatedMessage();
 
         itemsToInvoice.forEach(item => {
           if (item.invoiced === 'NO') {
@@ -1307,7 +1309,7 @@ closeNoQuantityWarning() {
   }
 
   private fetchWorkflowStages(workflowId: string) {
-    this.http.get('sales/work_flow/' + workflowId).subscribe({
+    this.http.get('sales/work_flow/' + workflowId + '/').subscribe({
       next: (res: any) => {
         if (res?.data?.workflow_stages) {
           this.workflowStages = res.data.workflow_stages
@@ -1797,6 +1799,18 @@ closeNoQuantityWarning() {
 
     // Log the final products to confirm the update
     console.log("Final Products List in sale_order_items:", this.formConfig.model['sale_order_items']);
+  }
+
+  trackByIndex(index: number): number {
+    return index;
+  }
+
+  trackByPackId(index: number, pack: any): any {
+    return pack?.quick_pack_id ?? index;
+  }
+
+  trackByStageId(index: number, stage: any): any {
+    return stage?.flow_status_id ?? index;
   }
 
   ngOnDestroy() {
@@ -3405,7 +3419,7 @@ createSaleOrder() {
         this.showSuccessToast = false;
       }, 3000);
 
-      this.ngOnInit();
+      this.resetToNewForm();
     },
 
     error: err => {
@@ -3458,7 +3472,47 @@ createSaleOrder() {
     }
   }
 
+  private resetToNewForm(): void {
+    this.showForm = false;
+    this.SaleOrderEditID = null;
+    this.shouldAutoInvoice = false;
+    this.selectedFlowStatusName = '';
+    this.customerNotes = '';
+    this.customerTransporterName = '';
+    this.customerTransportNotes = '';
+    this.customerOutstandingAmount = 0;
+    this.showCustomerInfoBanner = false;
+    this.postUpdateAction = null;
+    this.workflowStages = [];
+    this.isLoadingStages = false;
+    if (this.workflowCheckboxSub) {
+      this.workflowCheckboxSub.unsubscribe();
+      this.workflowCheckboxSub = null;
+    }
+    this.setFormConfig();
+    this.formConfig.model['sale_order']['order_type'] = 'sale_order';
+    this.formConfig.fields[0].fieldGroup[0].fieldGroup[7].hide = true;
+    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = true;
+    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide = true;
+    this.getOrderNo();
+    this.initDraftAutoSave();
+  }
+
   goToDispatch(): void {
+    // If user changed dropdown to Dispatch but hasn't clicked Update yet, auto-save first
+    if (this.selectedFlowStatusName === 'Dispatch' && this.SaleOrderEditID) {
+      const flowStatusId = this.formConfig.model?.['sale_order']?.['flow_status_id'];
+      if (flowStatusId) {
+        this.http.patch(`sales/sale_order/${this.SaleOrderEditID}/`, { flow_status_id: flowStatusId }).subscribe({
+          next: () => this.router.navigate(['/admin/sales/sales-dispatch']),
+          error: err => {
+            console.error('Failed to save flow status before dispatch', err);
+            this.router.navigate(['/admin/sales/sales-dispatch']);
+          }
+        });
+        return;
+      }
+    }
     this.router.navigate(['/admin/sales/sales-dispatch']);
   }
 
@@ -3657,7 +3711,7 @@ createSaleOrder() {
         if (this.postUpdateAction) {
           this.pendingWorkOrderSaleOrderId = this.SaleOrderEditID;
         }
-        this.ngOnInit();
+        this.resetToNewForm();
       }, error => {
         console.error('Error updating record:', error);
         if (error.status === 403 && error.error?.data?.credit_limit_exceeded) {
@@ -3666,7 +3720,7 @@ createSaleOrder() {
           return;
         }
         if (error?.error?.message === "Update is not allowed, please contact Product team.") {
-          this.ngOnInit();
+          this.resetToNewForm();
         }
       });
   }
@@ -5458,7 +5512,7 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
       reset: {
         resetFn: () => {
           this.clearDraft(); // Clear draft on reset
-          this.ngOnInit();
+          this.resetToNewForm();
         }
       },
       model: {
@@ -5559,10 +5613,8 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
                       const modelSaleOrder = this.formConfig.model?.sale_order || {};
                       let orderGenerated = false;
 
-                      this.http.get(lazyUrl).subscribe((response: any) => {
-                        const saleTypes = response.data;
+                      const applySaleTypes = (saleTypes: any[]) => {
                         field.templateOptions.options = saleTypes;
-
                         const currentSaleTypeId = modelSaleOrder.sale_type_id;
                         if (currentSaleTypeId) {
                           const matchedOption = saleTypes.find(opt => opt.sale_type_id === currentSaleTypeId);
@@ -5576,7 +5628,16 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
                             modelSaleOrder.sale_type_id = defaultOption.sale_type_id;
                           }
                         }
-                      });
+                      };
+
+                      if (this.saleTypesCache) {
+                        applySaleTypes(this.saleTypesCache);
+                      } else {
+                        this.http.get(lazyUrl).subscribe((response: any) => {
+                          this.saleTypesCache = response.data;
+                          applySaleTypes(this.saleTypesCache!);
+                        });
+                      }
 
                       field.formControl.valueChanges.subscribe((data: any) => {
                         if (data && data.sale_type_id) {
@@ -6473,6 +6534,10 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
       field.formControl.valueChanges.subscribe(data => {
         if (data && data.flow_status_id) {
           this.formConfig.model['sale_order']['flow_status_id'] = data.flow_status_id;
+          // Track selected name so buttons react before the form is saved
+          this.selectedFlowStatusName = data.flow_status_name || '';
+        } else {
+          this.selectedFlowStatusName = '';
         }
       });
 

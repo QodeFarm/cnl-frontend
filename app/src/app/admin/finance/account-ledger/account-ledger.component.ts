@@ -44,6 +44,10 @@ export class AccountLedgerComponent implements OnInit, AfterViewInit, OnDestroy 
     return parseFloat(this.finalBalance) > 0;
   }
 
+  get absBalance(): string {
+    return Math.abs(parseFloat(this.finalBalance) || 0).toFixed(2);
+  }
+
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
@@ -180,12 +184,17 @@ export class AccountLedgerComponent implements OnInit, AfterViewInit, OnDestroy 
         {
           fieldKey: 'voucher_no',
           name: 'Voucher No',
-          sort: false,
+          sort: true,
+          displayType: 'map',
+          mapFn: (value: any) => {
+            if (!value) return '—';
+            return `<span class="ledger-voucher">${value}</span>`;
+          }
         },
         {
           fieldKey: 'created_at',
           name: 'Date',
-          sort: false,
+          sort: true,
           displayType: 'date'
         },
         {
@@ -203,7 +212,7 @@ export class AccountLedgerComponent implements OnInit, AfterViewInit, OnDestroy 
         {
           fieldKey: 'debit',
           name: 'Debit',
-          sort: false,
+          sort: true,
           displayType: 'map',
           mapFn: (_: any, row: any) => {
             const v = parseFloat(row.debit) || 0;
@@ -214,7 +223,7 @@ export class AccountLedgerComponent implements OnInit, AfterViewInit, OnDestroy 
         {
           fieldKey: 'credit',
           name: 'Credit',
-          sort: false,
+          sort: true,
           displayType: 'map',
           mapFn: (_: any, row: any) => {
             const v = parseFloat(row.credit) || 0;
@@ -230,8 +239,8 @@ export class AccountLedgerComponent implements OnInit, AfterViewInit, OnDestroy 
           mapFn: (_: any, row: any) => {
             const v   = parseFloat(row.running_balance || row.balance) || 0;
             const abs = `₹${Math.abs(v).toFixed(2)}`;
-            if (v > 0) return `<span class="ledger-cr ledger-bal">${abs} Dr</span>`;
-            if (v < 0) return `<span class="ledger-dr ledger-bal">${abs} Cr</span>`;
+            if (v > 0) return `<span class="ledger-dr ledger-bal">${abs} <em class="bal-tag">Dr</em></span>`;
+            if (v < 0) return `<span class="ledger-cr ledger-bal">${abs} <em class="bal-tag">Cr</em></span>`;
             return '<span class="ledger-muted">₹0.00</span>';
           }
         }
