@@ -16,7 +16,7 @@
     </div>
 
     <div class="row custom-form">
-      <div class="col-12 px-1" *ngIf="orderNumber">
+      <div class="col-12 px-1" *ngIf="!SaleCreditnoteEditID || orderNumber">
         <ta-form #salescreditnoteForm [options]="formConfig"></ta-form>
       </div>
     </div>

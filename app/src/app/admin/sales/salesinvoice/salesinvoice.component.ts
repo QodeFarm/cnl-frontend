@@ -44,7 +44,9 @@ export class SalesinvoiceComponent {
   noOrdersMessage: string = '';
   selectedOrder: any;
   // noOrdersMessage: string;
-  // customerOrders: any[] = []; 
+  // customerOrders: any[] = [];
+  // Tracks sale_order_ids pulled into this invoice so we can update their flow_status after creation
+  private pulledSaleOrderIds: Set<string> = new Set(); 
 
   
     // ========== DRAFT AUTO-SAVE PROPERTIES ==========
@@ -227,6 +229,7 @@ ngOnInit() {
             this.showSaleInvoiceList = false;
             this.showForm = true;
             this.SaleInvoiceEditID = null;
+            this.pulledSaleOrderIds.clear();
             // Reset customer info banner
             this.customerNotes = '';
             this.customerTransporterName = '';
@@ -872,6 +875,8 @@ getPendingOrdersByCustomer(customerId: string) {
       console.error('Invalid saleOrderId:', saleOrderId);
       return;
     }
+    // Track this order so we can update its flow_status after invoice creation
+    this.pulledSaleOrderIds.add(saleOrderId);
     // Fetch sale invoice details using the saleInvoiceId
     this.http.get(`sales/sale_order/${saleOrderId}`).subscribe((res: any) => {
       if (res && res.data) {
@@ -886,6 +891,7 @@ getPendingOrdersByCustomer(customerId: string) {
             order_type: this.formConfig.model.sale_invoice_order.order_type || 'sale_invoice',
             invoice_date: this.nowDate(),
             invoice_no: this.formConfig.model.sale_invoice_order.invoice_no,
+            sale_order_id: saleOrderId,
             ref_no: orderData.ref_no,
             ref_date: orderData.ref_date,
             tax: orderData.tax,
@@ -1039,6 +1045,11 @@ getPendingOrdersByCustomer(customerId: string) {
   handleProductPull(selectedProducts: any[]) {
     console.log('Pulled selected products in OrdersListComponent:', selectedProducts);
 
+    // Track the sale order IDs so we can update flow_status after invoice creation
+    selectedProducts.forEach(p => {
+      if (p.sale_order_id) this.pulledSaleOrderIds.add(p.sale_order_id);
+    });
+
     // Retrieve or initialize the current sale_invoice_items list
     let existingProducts = this.formConfig.model['sale_invoice_items'] || [];
 
@@ -1116,6 +1127,38 @@ getPendingOrdersByCustomer(customerId: string) {
 
     // Log the final products to confirm the update
     console.log("Final Products List in sale_invoice_items:", this.formConfig.model['sale_invoice_items']);
+  }
+
+  private advancePulledOrdersToDelivery(): void {
+    if (this.pulledSaleOrderIds.size === 0) return;
+
+    // Snapshot IDs into a local array immediately — before any async call.
+    // ngOnInit() runs synchronously after this method is called and clears
+    // pulledSaleOrderIds, so we must not rely on the Set inside the callback.
+    const orderIds = [...this.pulledSaleOrderIds];
+    this.pulledSaleOrderIds.clear();
+
+    this.http.get<any>('masters/flow_status/?flow_status_name=Delivery In progress').subscribe(
+      (res) => {
+        const deliveryStatus = res?.data?.[0];
+        if (!deliveryStatus?.flow_status_id) return;
+
+        const patchPayload = { flow_status_id: deliveryStatus.flow_status_id };
+        orderIds.forEach(saleOrderId => {
+          this.http.patch(`sales/sale_order/${saleOrderId}/`, patchPayload).subscribe({
+            error: (err) => console.error(`Failed to advance sale order ${saleOrderId} to Delivery In progress`, err)
+          });
+        });
+      }
+    );
+  }
+
+  trackByIndex(index: number): number {
+    return index;
+  }
+
+  trackByPackId(index: number, pack: any): any {
+    return pack?.quick_pack_id ?? index;
   }
 
   ngOnDestroy() {
@@ -1588,7 +1631,9 @@ createSaleInovice() {
       this.clearDraft(); // Clear draft on successful creation
       this.showSuccessToast = true;
       this.toastMessage = 'Record created successfully';
-      this.ngOnInit();
+      // Advance pulled sale orders to "Delivery In Progress" now that invoice is created
+      this.advancePulledOrdersToDelivery();
+      this.resetToNewForm();
       setTimeout(() => {
         this.showSuccessToast = false;
       }, 3000);
@@ -1655,7 +1700,7 @@ createSaleInovice() {
         console.log("ENtered 2 .....")
         this.showSuccessToast = true;
         this.toastMessage = "Record updated successfully"; // Set the toast message for update
-        this.ngOnInit();
+        this.resetToNewForm();
         setTimeout(() => {
           this.showSuccessToast = false;
         }, 3000);
@@ -1665,8 +1710,7 @@ createSaleInovice() {
           //  Check if backend error matches mstcnl restriction
           const errorMessage = error?.error?.message || '';
           if (errorMessage === "Update is not allowed, please contact Product team.") {
-            // Re-run ngOnInit when this specific error occurs
-            this.ngOnInit();
+            this.resetToNewForm();
           }
 
           // Your global logic will still show the custom error popup automatically
@@ -1676,6 +1720,26 @@ createSaleInovice() {
   }
 
   //=====================================================
+  private resetToNewForm(): void {
+    this.SaleInvoiceEditID = null;
+    this.pulledSaleOrderIds.clear();
+    this.showSaleInvoiceList = false;
+    this.customerNotes = '';
+    this.customerTransporterName = '';
+    this.customerTransportNotes = '';
+    this.showCustomerInfoBanner = false;
+    this.setFormConfig();
+    if (this.formConfig.model?.sale_invoice_order) {
+      this.formConfig.model['sale_invoice_order']['order_type'] = 'sale_invoice';
+    }
+    if (this.formConfig.fields?.[2]) {
+      this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = true;
+      this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide = true;
+    }
+    this.getInvoiceNo();
+    this.initDraftAutoSave();
+  }
+
   setFormConfig() {
     this.SaleInvoiceEditID = null;
 
@@ -1716,7 +1780,7 @@ createSaleInovice() {
       },
       reset: {
         resetFn: () => {
-          this.ngOnInit();
+          this.resetToNewForm();
         }
       },
       model: {

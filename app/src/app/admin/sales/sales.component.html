@@ -43,7 +43,7 @@
 
                                 <option value="" disabled selected aria-disabled="true">Quickpack</option>
 
-                                <option *ngFor="let quickpack of quickpackOptions" [value]="quickpack.quick_pack_id">
+                                <option *ngFor="let quickpack of quickpackOptions; trackBy: trackByPackId" [value]="quickpack.quick_pack_id">
                                     {{ quickpack.name }}
                                 </option>
 
@@ -111,11 +111,11 @@
                     Create Work Order
                 </button>
 
-                <!-- Go to Dispatch — only when flow_status is Dispatch -->
+                <!-- Go to Dispatch — shown when saved as Dispatch OR dropdown just changed to Dispatch -->
                 <button
-                    *ngIf="SaleOrderEditID && formConfig.model?.sale_order?.flow_status?.flow_status_name === 'Dispatch'"
+                    *ngIf="SaleOrderEditID && (formConfig.model?.sale_order?.flow_status?.flow_status_name === 'Dispatch' || selectedFlowStatusName === 'Dispatch')"
                     (click)="goToDispatch()" type="button" class="btn btn-primary">
-                    Go to Dispatch
+                    {{ selectedFlowStatusName === 'Dispatch' ? 'Save & Go to Dispatch' : 'Go to Dispatch' }}
                 </button>
 
                 <!-- View Invoices — invoice exists from Ready for Invoice onwards -->
@@ -150,14 +150,14 @@
     <div class="row custom-form">
         <!--  removed this commented line because when I refresh the page form is not displaying *checkAction="{ moduleName: 'Sales', sectionName: 'Sale Order', actionName: 'Create' }" -->
 
-        <div class="col-12 px-1" *ngIf="orderNumber || showForm">
+        <div class="col-12 px-1" *ngIf="!SaleOrderEditID || orderNumber || showForm">
 
             <!-- ====== FLOW STATUS GUIDANCE STRIP ====== -->
             <!-- Edit mode: show stepper with current progress -->
             <div *ngIf="SaleOrderEditID && formConfig.model?.sale_order?.flow_status?.flow_status_name"
                 class="workflow-stepper-strip">
                 <div *ngIf="workflowStages.length > 0" class="wf-stepper">
-                    <ng-container *ngFor="let stage of workflowStages; let last = last">
+                    <ng-container *ngFor="let stage of workflowStages; let last = last; trackBy: trackByStageId">
                         <div class="wf-step"
                             [class.wf-completed]="getStageState(stage.flow_status_name) === 'completed'"
                             [class.wf-current]="getStageState(stage.flow_status_name) === 'current'"
@@ -190,7 +190,7 @@
             <div *ngIf="!SaleOrderEditID && formConfig.model?.sale_order?.use_workflow && workflowStages.length > 0"
                 class="workflow-stepper-strip">
                 <div class="wf-stepper">
-                    <ng-container *ngFor="let stage of workflowStages; let first = first; let last = last">
+                    <ng-container *ngFor="let stage of workflowStages; let first = first; let last = last; trackBy: trackByStageId">
                         <div class="wf-step" [class.wf-preview-first]="first" [class.wf-upcoming]="!first">
                             <span class="wf-dot"></span>
                             <span class="wf-label">{{ stage.flow_status_name }}</span>
@@ -311,7 +311,7 @@
                         <label for="tableSelect">Select Table</label>
                         <select id="tableSelect" class="form-control form-select" [(ngModel)]="selectedTable"
                             name="selectedTable">
-                            <option *ngFor="let table of availableTables" [value]="table">{{table}}</option>
+                            <option *ngFor="let table of availableTables; trackBy: trackByIndex" [value]="table">{{table}}</option>
                         </select>
                     </div>
                 </form>
@@ -430,7 +430,7 @@
             <div class="work-order-field">
                 <label class="work-order-label">Products for Production</label>
                 <div class="work-order-product-list">
-                    <div *ngFor="let p of selectedOrder?.productDetails; let last = last"
+                    <div *ngFor="let p of selectedOrder?.productDetails; let last = last; trackBy: trackByIndex"
                         class="work-order-product-row"
                         [class.no-border]="last">
                         <span class="work-order-product-name">
@@ -650,7 +650,7 @@
 
             <tbody>
 
-              <ng-container *ngFor="let pack of quickpackOptions">
+              <ng-container *ngFor="let pack of quickpackOptions; trackBy: trackByPackId">
 
                 <!-- Quickpack Row -->
                 <tr>
@@ -710,7 +710,7 @@
 
                       <tbody>
 
-                        <tr *ngFor="let product of pack.products">
+                        <tr *ngFor="let product of pack.products; trackBy: trackByIndex">
 
                           <td style="text-align:center">
 

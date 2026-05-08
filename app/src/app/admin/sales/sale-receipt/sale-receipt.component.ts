@@ -136,15 +136,16 @@ export class SaleReceiptComponent implements OnInit {
             actions: [
               {
                 type: 'callBackFn',
-                label: 'Confirm Delivery',  // Static label required by table
-                callBackFn: (row: any) => {
-                  if (row?.flow_status?.flow_status_name === 'Completed') {
-                    // alert('Already Completed');  // Or disable the button if needed
-                    this.showDialog();
-                  } else {
-                    this.openModal(row);
-                  }
-                },
+                label: 'Confirm Delivery',
+                conditionFn: (row: any) => row?.flow_status?.flow_status_name !== 'Completed',
+                callBackFn: (row: any) => this.openModal(row),
+              },
+              {
+                type: 'callBackFn',
+                label: 'Delivered',
+                cssClass: 'action-delivered',
+                conditionFn: (row: any) => row?.flow_status?.flow_status_name === 'Completed',
+                callBackFn: () => {},
               }
             ]
           }                                                       

@@ -863,6 +863,19 @@ loadQuickpackProducts() {
     console.log("Final Products List in purchase_order_items:", this.formConfig.model['purchase_order_items']);
   }
 
+  private resetToNewForm(): void {
+    this.PurchaseOrderEditID = null;
+    this.setFormConfig();
+    this.formConfig.model['purchase_order_data']['order_type'] = 'purchase_order';
+    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = true;
+    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide = true;
+    this.getOrderNo();
+  }
+
+  trackByIndex(index: number): number {
+    return index;
+  }
+
   ngOnDestroy() {
     // Ensure modals are disposed of correctly
     document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
@@ -926,7 +939,7 @@ loadQuickpackProducts() {
       .subscribe(response => {
         this.showSuccessToast = true;
         this.toastMessage = 'Record created successfully';
-        this.ngOnInit();
+        this.resetToNewForm();
         setTimeout(() => {
           this.showSuccessToast = false;
         }, 3000); // Hide toast after 3 seconds
@@ -986,7 +999,7 @@ loadQuickpackProducts() {
       .subscribe(response => {
         this.showSuccessToast = true;
         this.toastMessage = "Record updated successfully"; // Set the toast message for update
-        this.ngOnInit();
+        this.resetToNewForm();
         setTimeout(() => {
           this.showSuccessToast = false;
         }, 3000);
@@ -1038,7 +1051,7 @@ loadQuickpackProducts() {
       },
       reset: {
         resetFn: () => {
-            this.ngOnInit();
+            this.resetToNewForm();
           }
       },
       model: {

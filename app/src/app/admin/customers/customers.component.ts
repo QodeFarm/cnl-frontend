@@ -1331,6 +1331,7 @@ sendCredentialsToCustomer() {
                       type: 'checkbox',
                       templateOptions: {
                         label: 'Customer Common for Sales and Purchase',
+                        description: 'This customer will also appear in Vendor selection for Purchase Orders.',
                       }
                     },
                     {

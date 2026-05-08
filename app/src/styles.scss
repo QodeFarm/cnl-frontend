@@ -1,5 +1,158 @@
 /* You can add global styles to this file, and also import other style files */
 
+/* ── Layout: header fixed, content-wrapper clips, tabset scrolls internally */
+header.sticky-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: 3.5rem;
+}
+
+#wrapper {
+  padding-top: 3.5rem !important;
+}
+
+#content-wrapper {
+  height: calc(100vh - 3.5rem);
+  overflow: hidden;
+}
+
+/* ═══ Account Ledger Filter Panel ═══════════════════════════════════════════ */
+
+/* Card wrapper — same visual style as the table header card */
+.al-filter-panel {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+/* Row 1: type buttons + account search + city */
+.al-filter-row-1 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+
+/* Row 2: period + date pickers — appears only after account is selected */
+.al-filter-row-2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.al-period-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+}
+
+/* ── Account type: navy segmented buttons ─────────────────────────────────── */
+.al-type-radio {
+  flex-shrink: 0;
+}
+
+.al-type-radio .ant-radio-button-wrapper {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  height: 34px !important;
+  line-height: 32px !important;
+  padding: 0 18px !important;
+}
+
+.al-type-radio .ant-radio-button-wrapper:first-child {
+  border-radius: 6px 0 0 6px !important;
+}
+
+.al-type-radio .ant-radio-button-wrapper:last-child {
+  border-radius: 0 6px 6px 0 !important;
+}
+
+.al-type-radio .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
+  background: #142768 !important;
+  border-color: #142768 !important;
+  color: #ffffff !important;
+}
+
+.al-type-radio .ant-radio-button-wrapper:hover:not(.ant-radio-button-wrapper-checked) {
+  color: #142768 !important;
+  background: #f0f3fb !important;
+}
+
+.al-type-radio .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled)::before {
+  background-color: #142768 !important;
+}
+
+/* ── Account search: fills remaining space ────────────────────────────────── */
+.al-account-select {
+  flex: 1 !important;
+  min-width: 200px;
+}
+
+/* ── City: fixed width ────────────────────────────────────────────────────── */
+.al-city-select {
+  width: 160px !important;
+  flex-shrink: 0;
+}
+
+/* ── Period select ────────────────────────────────────────────────────────── */
+.al-period-select {
+  width: 155px !important;
+  flex-shrink: 0;
+}
+
+/* ── Date pickers ─────────────────────────────────────────────────────────── */
+.al-date-picker {
+  width: 130px !important;
+  flex-shrink: 0;
+}
+
+/* ── Account dropdown popup ───────────────────────────────────────────────── */
+.al-account-dropdown {
+  min-width: 340px !important;
+}
+
+/* ── Option row inside account dropdown ───────────────────────────────────── */
+.al-account-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+}
+
+.al-account-name {
+  font-weight: 500;
+  color: #1e293b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.al-account-code {
+  font-size: 11px;
+  color: #94a3b8;
+  background: #f1f5f9;
+  padding: 2px 7px;
+  border-radius: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-family: monospace;
+  letter-spacing: 0.3px;
+}
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
 .select-adv-field .cdk-virtual-scroll-viewport,
@@ -5422,5 +5575,33 @@ ta-table .col-hidden-badge {
     .ant-checkbox:hover          .ant-checkbox-inner,
     .ant-checkbox-input:focus  + .ant-checkbox-inner {
         border-color: #142768 !important;
+    }
+}
+
+@media (min-width: 1025px) {
+    .sidebar {
+        position: fixed !important;
+        top: 56px !important;
+        left: 0 !important;
+        height: calc(100vh - 56px) !important;
+        z-index: 1000 !important;
+        overflow: visible !important;
+        pointer-events: none !important;
+    }
+
+    .sidebar .custome-horizental-scroll,
+    .sidebar .nav-item,
+    .sidebar .nav-item * {
+        pointer-events: auto !important;
+    }
+
+    #content-wrapper {
+        margin-left: 3.8rem !important;
+        width: calc(100% - 3.8rem) !important;
+    }
+
+    body.sidebar-toggled #content-wrapper {
+        margin-left: 14rem !important;
+        width: calc(100% - 14rem) !important;
     }
 }

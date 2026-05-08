@@ -469,6 +469,19 @@ checkAndPopulateData() {
     this.hide();
   }
 
+  private resetToNewForm(): void {
+    this.PurchaseReturnOrderEditID = null;
+    this.setFormConfig();
+    if (this.formConfig.model?.purchase_return_orders) {
+      this.formConfig.model['purchase_return_orders']['order_type'] = 'purchase_return';
+    }
+    if (this.formConfig.fields?.[2]) {
+      this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[5].hide = true;
+      this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[6].hide = true;
+    }
+    this.getOrderNo();
+  }
+
   getOrderNo() {
     this.orderNumber = null;
     this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
@@ -544,7 +557,7 @@ showSuccessToast = false;
       .subscribe(response => {
         this.showSuccessToast = true;
         this.toastMessage = 'Record created successfully';
-        this.ngOnInit();
+        this.resetToNewForm();
         setTimeout(() => {
           this.showSuccessToast = false;
         }, 3000); // Hide toast after 3 seconds
@@ -604,7 +617,7 @@ showSuccessToast = false;
       .subscribe(response => {
         this.showSuccessToast = true;
         this.toastMessage = "Record updated successfully"; // Set the toast message for update
-        this.ngOnInit();
+        this.resetToNewForm();
         setTimeout(() => {
           this.showSuccessToast = false;
         }, 3000);
@@ -654,7 +667,7 @@ showSuccessToast = false;
       },
       reset: {
         resetFn: () => {
-          this.ngOnInit();
+          this.resetToNewForm();
         }
       },
       model: {

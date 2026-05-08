@@ -65,6 +65,16 @@ export class DeliveryChallanComponent implements OnInit {
     });
   }
 
+  private resetToNewForm(): void {
+    this.DeliveryChallanEditID = null;
+    this.dataToPopulate = null;
+    this.challanNumber = null;
+    this.setFormConfig();
+    this.cdr.detectChanges();
+    this.showForm = true;
+    this.getOrderNo();
+  }
+
   getOrderNo(): void {
     this.http.get('masters/generate_order_no/?type=DC').subscribe((res: any) => {
       if (res?.data?.order_number) {
@@ -129,7 +139,7 @@ export class DeliveryChallanComponent implements OnInit {
     this.http.post('sales/delivery_challan/', payload).subscribe(
       (response: any) => {
         const challanNo = response?.data?.delivery_challan?.challan_no || '';
-        this.ngOnInit();
+        this.resetToNewForm();
         this.notification.success('Created', `Delivery Challan ${challanNo} created successfully`, { nzDuration: 3000, nzPlacement: 'topRight' });
       },
       (error) => {
@@ -158,7 +168,7 @@ export class DeliveryChallanComponent implements OnInit {
 
     this.http.put(`sales/delivery_challan/${challanId}/`, payload).subscribe(
       (response: any) => {
-        this.ngOnInit();
+        this.resetToNewForm();
         this.notification.success('Updated', 'Delivery Challan updated successfully', { nzDuration: 3000, nzPlacement: 'topRight' });
       },
       (error) => {
@@ -266,10 +276,7 @@ export class DeliveryChallanComponent implements OnInit {
       },
       reset: {
         resetFn: () => {
-          this.DeliveryChallanEditID = null;
-          this.dataToPopulate = null;
-          this.challanNumber = null;
-          this.ngOnInit();
+          this.resetToNewForm();
         }
       },
       model: {

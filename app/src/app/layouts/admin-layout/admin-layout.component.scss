@@ -1,8 +1,99 @@
+// ── Outer tab bar: nav stays fixed, content-holder scrolls ──────────────
+// .tab fills #content-wrapper (which is overflow:hidden + exact viewport height)
+.tab {
+  height: 100%;
+}
+
+// The outer editable-card tabset becomes a flex column filling its container.
+// Nav sits at the top (flex-shrink:0), content-holder scrolls below it.
+::ng-deep .ant-tabs-editable-card {
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+::ng-deep .ant-tabs-editable-card > .ant-tabs-nav {
+  flex-shrink: 0;
+  background: #fff;
+  margin-bottom: 0 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+::ng-deep .ant-tabs-editable-card > .ant-tabs-content-holder {
+  flex: 1 1 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  min-height: 0 !important;
+}
+
+::ng-deep .ant-tabs-editable-card > .ant-tabs-content-holder > .ant-tabs-content {
+  height: auto !important;
+}
+
+::ng-deep .ant-tabs-editable-card > .ant-tabs-content-holder > .ant-tabs-content > .ant-tabs-tabpane {
+  height: auto !important;
+}
+
+// ── Tab switching: smooth fade when switching tabs ──────────────────────
+::ng-deep .ant-tabs-tabpane {
+  transition: opacity 0.18s ease;
+}
+::ng-deep .ant-tabs-tabpane-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+// ── Global HTTP loading bar (top of page) ──────────────────────────────
+.global-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 10000;
+  background: transparent;
+  pointer-events: none;
+  overflow: hidden;
+
+  &__fill {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #1890ff 0%, #40a9ff 50%, #1890ff 100%);
+    background-size: 200% 100%;
+    transform: translateX(-100%);
+    opacity: 0;
+    transition: none;
+  }
+
+  &--active .global-progress-bar__fill {
+    animation: progress-slide 1.4s ease-in-out infinite;
+    opacity: 1;
+  }
+}
+
+@keyframes progress-slide {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+
 .navbar {
   p {
     margin: 0;
     font-size: 17px;
     color: #ffffff;
+  }
+}
+
+.refresh-tab-btn {
+  opacity: 0.8;
+  transition: opacity 0.2s, transform 0.2s;
+  &:hover {
+    opacity: 1;
+  }
+  i.fa-spin {
+    animation: fa-spin 0.6s infinite linear;
   }
 }
 

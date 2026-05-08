@@ -21,6 +21,7 @@ import { DateRangeFilterComponent } from './ta-filters/date-range-filter/date-ra
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
+import { NzRadioModule } from 'ng-zorro-antd/radio';
 @NgModule({
   declarations: [
     TaTableComponent,
@@ -45,7 +46,8 @@ import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
     NzSelectModule,
     NzDatePickerModule,
     NzToolTipModule,
-    NzCheckboxModule
+    NzCheckboxModule,
+    NzRadioModule
   ],
   providers: [TaTableService],
   exports: [

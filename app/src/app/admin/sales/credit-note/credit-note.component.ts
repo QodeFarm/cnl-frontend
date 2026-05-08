@@ -134,7 +134,7 @@ ngOnInit() {
       (response) => {
         this.showSuccessToast = true;
         this.toastMessage = 'Record Updated successfully';
-        this.ngOnInit();  // Optionally reset the form after successful submission
+        this.resetToNewForm();
         setTimeout(() => {
           this.showSuccessToast = false;
         }, 3000);
@@ -233,8 +233,17 @@ ngOnInit() {
   }
 
 
+  private resetToNewForm(): void {
+    this.SaleCreditnoteEditID = null;
+    this.setFormConfig();
+    this.getOrderNo();
+    if (this.formConfig.fields?.[0]?.fieldGroup?.[5]) {
+      this.formConfig.fields[0].fieldGroup[5].hide = true;
+    }
+  }
+
   getOrderNo() {
-    this.orderNumber = null; 
+    this.orderNumber = null;
         // Generate Sales Order Number
         this.http.get('masters/generate_order_no/?type=CN').subscribe((res: any) => {
           console.log("RES data in orderno : ", res.data.order_number)
@@ -274,7 +283,7 @@ ngOnInit() {
       },
       reset: {
         resetFn: () => {
-          this.ngOnInit();
+          this.resetToNewForm();
         }
       },
       model: {
@@ -573,7 +582,7 @@ ngOnInit() {
         next: (response) => {
           this.showSuccessToast = true;
           this.toastMessage = 'Record Created successfully';
-          this.ngOnInit();  // Optionally reset the form after successful submission
+          this.resetToNewForm();
           setTimeout(() => {
             this.showSuccessToast = false;
           }, 3000);

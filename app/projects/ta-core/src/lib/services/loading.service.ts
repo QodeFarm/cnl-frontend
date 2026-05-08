@@ -5,23 +5,41 @@ import { BehaviorSubject } from 'rxjs';
     providedIn: 'root',
 })
 export class LoadingService {
-    private requestCount = 0; // Track the number of ongoing requests
+    // ── Router navigation loading (big spinner in app.component) ──────────
+    private routerCount = 0;
     private _loading = new BehaviorSubject<boolean>(false);
     public readonly loading$ = this._loading.asObservable();
 
     show() {
-        this.requestCount++;
+        this.routerCount++;
         if (!this._loading.value) {
             this._loading.next(true);
         }
     }
 
     hide() {
-        if (this.requestCount > 0)
-            this.requestCount--;
-
-        if (this.requestCount === 0) {
+        if (this.routerCount > 0) this.routerCount--;
+        if (this.routerCount === 0) {
             this._loading.next(false);
+        }
+    }
+
+    // ── HTTP request loading (thin top progress bar in admin-layout) ───────
+    private httpCount = 0;
+    private _httpLoading = new BehaviorSubject<boolean>(false);
+    public readonly httpLoading$ = this._httpLoading.asObservable();
+
+    showHttp() {
+        this.httpCount++;
+        if (!this._httpLoading.value) {
+            this._httpLoading.next(true);
+        }
+    }
+
+    hideHttp() {
+        if (this.httpCount > 0) this.httpCount--;
+        if (this.httpCount === 0) {
+            this._httpLoading.next(false);
         }
     }
 }

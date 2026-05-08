@@ -42,7 +42,7 @@
 
     <!-- Main Form -->
     <div class="row custom-form">
-      <div class="col-12 px-1" *ngIf="showForm">
+      <div class="col-12 px-1" *ngIf="!DeliveryChallanEditID || showForm">
         <ta-form #deliveryChallanForm [options]="formConfig"></ta-form>
       </div>
     </div>

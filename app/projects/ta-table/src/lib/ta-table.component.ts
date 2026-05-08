@@ -13,6 +13,7 @@ import { Observable, Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { ColumnItem, TaParamsConfig, TaTableConfig } from './ta-table-config';
 import { TaTableService } from './ta-table.service';
+import { TaTableCacheService } from './ta-table-cache.service';
 import moment from 'moment';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -77,7 +78,7 @@ export class TaTableComponent implements OnDestroy {
   isEmployeeFilterVisible = false;
   setOfCheckedId = new Set<number>();
   selectedAccountType: string | null = null;
-  selectedAccountId: number | null = null;
+  selectedAccountId: string | null = null;
   isAccountLedgerPage: boolean;
   // Filters for product/inventory pages
   isProductFilterVisible = false;
@@ -467,6 +468,11 @@ ledgerAccount() {
 
 
 
+  clearAccountType() {
+    this.selectedAccountType = null;
+    this.onAccountTypeChange();
+  }
+
   onAccountTypeChange() {
     // Reset the selected account when account type changes or is cleared
     this.selectedAccountId = null;
@@ -512,7 +518,6 @@ ledgerAccount() {
   onAccountChange() {
   // CASE 1: Account is selected
   if (this.selectedAccountType && this.selectedAccountId) {
-    console.log("Account selected:", this.selectedAccountType, this.selectedAccountId);
 
     this.isCityDisabled = true;
     this.selectedCity = null;
@@ -710,7 +715,6 @@ applyFilters() {
         if (window['accountLedgerComponentInstance'] && this.isAccountLedgerPage) {
           const instance = window['accountLedgerComponentInstance'];
           instance.openingBalance = response.opening_balance || '0.00';
-          instance.closingBalance = response.closing_balance || '0.00';
           instance.totalDebit     = response.total_debit    || '0.00';
           instance.totalCredit    = response.total_credit   || '0.00';
           instance.finalBalance   = response.final_balance  || response.closing_balance || '0.00';
@@ -729,7 +733,6 @@ applyFilters() {
         if (window['accountLedgerComponentInstance'] && this.isAccountLedgerPage) {
           const instance = window['accountLedgerComponentInstance'];
           instance.openingBalance = '0.00';
-          instance.closingBalance = '0.00';
           instance.totalDebit = '0.00';
           instance.totalCredit = '0.00';
           instance.showBalanceSummary = false;
@@ -1137,7 +1140,8 @@ applyFilters() {
     private http: HttpClient,
     private router: Router,
     private elementRef: ElementRef,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private tableCache: TaTableCacheService
   ) {
     this.actionObservable$ = this.taTableS.actionObserval().subscribe((res: any) => {
       // if (res && res.action && res.action.type === 'delete') {
@@ -1295,7 +1299,7 @@ applyFilters() {
     //   this.isStatusButtonVisible = true;   // Show Status dropdown for other URLs
     // }
   }
-  loadDataFromServer(startIntial?: boolean): void {
+  loadDataFromServer(startIntial?: boolean, bypassCache = false): void {
 
     // let _pageIndex = this.pageIndex;
     // if(startIntial){
@@ -1341,23 +1345,45 @@ applyFilters() {
       fixedFilters: this.options.fixedFilters
     }
     if (tableParamConfig.apiUrl) {
+      // Cache is only used for selection popups (rowSelectionEnabled = true).
+      // Regular list pages always fetch fresh data.
+      const isSelectionPopup = !!this.options.rowSelectionEnabled;
+      const cacheKey = isSelectionPopup
+        ? `${tableParamConfig.apiUrl}|p${tableParamConfig.pageIndex}|s${tableParamConfig.pageSize}|q${tableParamConfig.globalSearch?.value || ''}`
+        : null;
+
+      if (isSelectionPopup && !bypassCache && cacheKey) {
+        const cached = this.tableCache.get(cacheKey);
+        if (cached) {
+          this.total = cached.totalCount;
+          this.rows = cached.data || cached;
+          if (this.options.showCheckbox) { this.refreshCheckedStatus(); }
+          this.cdr.detectChanges();
+          return;
+        }
+      }
+
       this.loading = true;
       this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
         this.loading = false;
-        this.total = data.totalCount; // mock the total data here
+        this.total = data.totalCount;
         this.rows = data.data || data;
+
+        // Store in cache for selection popups
+        if (isSelectionPopup && cacheKey) {
+          this.tableCache.set(cacheKey, data);
+        }
 
         // Sync balance summary with Account Ledger Component during pagination
         if (window['accountLedgerComponentInstance'] && this.isAccountLedgerPage) {
           const instance = window['accountLedgerComponentInstance'];
           instance.openingBalance = data.opening_balance || '0.00';
-          instance.closingBalance = data.closing_balance || '0.00';
           instance.totalDebit     = data.total_debit    || '0.00';
           instance.totalCredit    = data.total_credit   || '0.00';
           instance.finalBalance   = data.final_balance  || data.closing_balance || '0.00';
           instance.showBalanceSummary = !!(data.data && data.data.length > 0);
         }
-        
+
         if (this.options.showCheckbox) {
           this.refreshCheckedStatus();
         }
@@ -1464,7 +1490,7 @@ applyFilters() {
     // this.loadDataFromServer(true);
   }
   reload() {
-    this.loadDataFromServer();
+    this.loadDataFromServer(undefined, true);
   }
   globalSearchClear() {
     this.globalSearchValue = '';

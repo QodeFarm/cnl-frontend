@@ -557,7 +557,7 @@ async autoFillProductDetails(field, data) {
       (response) => {
         this.showSuccessToast = true;
         this.toastMessage = "Record updated successfully"; // Set the toast message for update
-        this.ngOnInit();
+        this.resetToNewForm();
         setTimeout(() => {
           this.showSuccessToast = false;
         }, 3000);
@@ -960,6 +960,19 @@ async autoFillProductDetails(field, data) {
     // document.body.style.overflow = '';
   }
 
+  private resetToNewForm(): void {
+    this.SaleReturnOrderEditID = null;
+    this.setFormConfig();
+    if (this.formConfig.model?.sale_return_order) {
+      this.formConfig.model['sale_return_order']['order_type'] = 'sale_return';
+    }
+    if (this.formConfig.fields?.[2]) {
+      this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[5].hide = true;
+      this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[6].hide = true;
+    }
+    this.getReturnNo();
+  }
+
   ngOnDestroy() {
     // Ensure modals are disposed of correctly
     document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
@@ -998,7 +1011,7 @@ async autoFillProductDetails(field, data) {
       },
       reset: {
         resetFn: () => {
-          this.ngOnInit();
+          this.resetToNewForm();
         }
       },
       model: {
@@ -3031,7 +3044,7 @@ async autoFillProductDetails(field, data) {
           } else if (returnOption === 'Cash') {
             this.showSuccessToast = true;
             this.toastMessage = 'Record created successfully';
-            this.ngOnInit();
+            this.resetToNewForm();
             setTimeout(() => {
               this.showSuccessToast = false;
             }, 3000);
@@ -3134,7 +3147,7 @@ async autoFillProductDetails(field, data) {
           (response) => {
             this.showSuccessToast = true;
             this.toastMessage = 'Sale-Return & Sale-Order created successfully';
-            this.ngOnInit();
+            this.resetToNewForm();
             setTimeout(() => {
               this.showSuccessToast = false;
             }, 3000);
@@ -3145,7 +3158,7 @@ async autoFillProductDetails(field, data) {
         );
       });
 
-      this.ngOnInit(); // remains as is
+      this.resetToNewForm(); // remains as is
     });
   }
 
@@ -3229,7 +3242,7 @@ async autoFillProductDetails(field, data) {
   //         // console.log("response sale order : ", response);
   //         this.showSuccessToast = true;
   //         this.toastMessage = 'Sale-Return & Sale-Order created successfully';
-  //         this.ngOnInit();
+  //         this.resetToNewForm();
   //         setTimeout(() => {
   //           this.showSuccessToast = false;
   //         }, 3000);
@@ -3268,7 +3281,7 @@ async autoFillProductDetails(field, data) {
       (response) => {
         this.showSuccessToast = true;
         this.toastMessage = 'Sale-returns & Credit-Note created successfully';
-        this.ngOnInit();
+        this.resetToNewForm();
         setTimeout(() => {
           this.showSuccessToast = false;
         }, 3000);
@@ -3278,7 +3291,7 @@ async autoFillProductDetails(field, data) {
       }
     );
 
-    this.ngOnInit();
+    this.resetToNewForm();
   }
 
 //===============================================

@@ -1034,6 +1034,7 @@ editVendor(event) {
                               type: 'checkbox',
                               templateOptions: {
                                 label: 'Vendor common for Sales and Purchase',
+                                description: 'This vendor will also appear in Customer selection for Sales Orders.',
                               }
                             },
                           ]

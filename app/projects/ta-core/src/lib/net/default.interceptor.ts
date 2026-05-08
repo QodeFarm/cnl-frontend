@@ -49,6 +49,10 @@ export class DefaultInterceptor implements HttpInterceptor {
   private skipErrorUrls = new Set<string>();
   // Flag to prevent duplicate session expiration notifications
   private isRedirectingToLogin = false;
+  // Deduplication: track active notification keys so identical errors only show once
+  private activeNotifications = new Set<string>();
+  // Cooldown window (ms) — duplicate notifications within this window are suppressed
+  private readonly NOTIFICATION_COOLDOWN_MS = 5000;
 
   constructor(private injector: Injector, private siteConfig: SiteConfigService, private loadingS: LoadingService) {
     if (this.refreshTokenType === 'auth-refresh') {
@@ -175,8 +179,10 @@ export class DefaultInterceptor implements HttpInterceptor {
     if (ev.error && ev.error.message) {
         errorText = ev.error.message; // Use API-provided message if available
     } else {
-        // Handle Specific Error Codes
         switch (ev.status) {
+            case 0:
+                errorText = "Unable to reach the server. Please check your connection.";
+                break;
             case 403:
                 errorText = "Access Denied! You do not have permission.";
                 break;
@@ -188,7 +194,15 @@ export class DefaultInterceptor implements HttpInterceptor {
                 break;
         }
     }
-    
+
+    // Use status code as deduplication key so identical errors don't stack
+    const notifKey = `${ev.status}:${errorText}`;
+    if (this.activeNotifications.has(notifKey)) {
+      return; // Already showing this notification — suppress duplicate
+    }
+    this.activeNotifications.add(notifKey);
+    setTimeout(() => this.activeNotifications.delete(notifKey), this.NOTIFICATION_COOLDOWN_MS);
+
     this.notification.error(
       'Error',
       errorText,
@@ -317,11 +331,16 @@ export class DefaultInterceptor implements HttpInterceptor {
         msg = errorMsg.error.message;
       }
       
-      this.notification.error('Session Expired', msg);
+      const sessionKey = `session:${msg}`;
+      if (!this.activeNotifications.has(sessionKey)) {
+        this.activeNotifications.add(sessionKey);
+        setTimeout(() => this.activeNotifications.delete(sessionKey), this.NOTIFICATION_COOLDOWN_MS);
+        this.notification.error('Session Expired', msg);
+      }
     }
-    
+
     this.goTo('/login');
-    
+
     // Reset the flag after a short delay to allow future redirects
     setTimeout(() => {
       this.isRedirectingToLogin = false;
@@ -329,8 +348,6 @@ export class DefaultInterceptor implements HttpInterceptor {
   }
 
   private handleData(ev: HttpErrorResponse, req: HttpRequest<any>, next: HttpHandler): Observable<any> {
-    this.loadingS.hide();
-    
     // Check if this is a customer portal request
     const isCustomerPortal = req.url.includes('customers/portal/');
     
@@ -488,7 +505,7 @@ export class DefaultInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     // 统一加上服务端前缀
     let url = req.url;
-    // this.loadingS.show();
+    this.loadingS.showHttp();
     if (!url.startsWith('https://') && !url.startsWith('http://') && !url.startsWith('assets')) {
       const baseUrl = this.siteConfig.CONFIG.baseUrl;
       url = baseUrl + url//environment.api.baseUrl + url;
@@ -520,7 +537,7 @@ export class DefaultInterceptor implements HttpInterceptor {
       }),
       catchError((err: HttpErrorResponse) => this.handleData(err, newReq, next)),
       finalize(() => {
-        // this.loadingS.hide();
+        this.loadingS.hideHttp();
       })
     );
 
