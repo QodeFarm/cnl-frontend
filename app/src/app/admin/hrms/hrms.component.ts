@@ -146,6 +146,16 @@ export class EmployeesComponent  implements OnInit {
                 required: true,
               },
             },
+            // {
+            //   key: 'phone',
+            //   type: 'input',
+            //   className: 'col-md-4 col-sm-6 col-12',
+            //   templateOptions: {
+            //     label: 'Phone',
+            //     placeholder: 'Enter with country code',
+            //     required: true,
+            //   },
+            // },
             {
               key: 'phone',
               type: 'input',
@@ -155,6 +165,25 @@ export class EmployeesComponent  implements OnInit {
                 placeholder: 'Enter with country code',
                 required: true,
               },
+              // Add hooks to modify the value
+              hooks: {
+                onInit: (field) => {
+                  // Optional: Set initial value with +91
+                  field.formControl.setValue('+91');
+                }
+              },
+              // Default value with +91
+              defaultValue: '+91',
+              // Or use expression properties
+              expressionProperties: {
+                'templateOptions.inputValue': (model) => {
+                  // Auto-prepend +91 if not present
+                  if (model.phone && !model.phone.startsWith('+')) {
+                    return '+91' + model.phone.replace(/^0+/, ''); // Remove leading zeros
+                  }
+                  return model.phone;
+                }
+              }
             },
             {
               key: 'gender',
