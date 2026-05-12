@@ -3,6 +3,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   selector: 'app-sale-receipt-list',
@@ -13,13 +14,16 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 })
 export class SaleReceiptListComponent {
 
-  @Output('edit') edit = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
 
   tableConfig: TaTableConfig = { //receipt_path
     apiUrl: 'sales/sale_receipts/',
     // title: 'Edit Sales Order List',
     showCheckbox:true,
     pkId: "sale_receipt_id",
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'sale_receipt_id', moduleName: 'Sales', sectionName: 'Sale Receipt', editEmitter: this.edit }),
+    },
     pageSize: 10,
     "globalSearch": {
       keys: ['sale_invoice_id','sale_invoice','receipt_name','description']
@@ -88,5 +92,5 @@ export class SaleReceiptListComponent {
     ]
   };
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private dblClickNav: DoubleClickNavigationService) {}
 }

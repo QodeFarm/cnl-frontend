@@ -4,6 +4,7 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   selector: 'app-financial-report-list',
@@ -14,7 +15,7 @@ import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 })
 export class FinancialReportListComponent {
 
-  @Output('edit') edit = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   refreshTable() {
@@ -25,6 +26,9 @@ export class FinancialReportListComponent {
     apiUrl: 'finance/financial_reports/',
     showCheckbox:true,
     pkId: "report_id",
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'report_id', moduleName: 'Finance', sectionName: 'Financial Report', editEmitter: this.edit }),
+    },
     pageSize: 10,
     "globalSearch": {
       keys: ['generated_at','report_name','report_type']
@@ -80,5 +84,5 @@ export class FinancialReportListComponent {
       }
     ]
   };
-  constructor(private router: Router) {}
+  constructor(private router: Router, private dblClickNav: DoubleClickNavigationService) {}
 }

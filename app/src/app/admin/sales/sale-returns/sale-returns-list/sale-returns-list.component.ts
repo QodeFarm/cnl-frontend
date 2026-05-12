@@ -15,7 +15,7 @@
 // })
 // export class SaleReturnsListComponent {
 //   //['sale_return_id', 'return_no', 'return_date', 'tax', 'return_reason', 'total_amount', 'due_date', 'tax_amount', 'customer_id', 'order_status_id', 'remarks']
-//   @Output('edit') edit = new EventEmitter<void>();
+//   @Output('edit') edit = new EventEmitter<any>();
 //   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
 //   refreshTable() {
@@ -439,6 +439,7 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router'; // Add this import
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   selector: 'app-sale-returns-list',
@@ -471,7 +472,7 @@ export class SaleReturnsListComponent implements OnInit {
     });
   }
 
-  @Output('edit') edit = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   refreshTable() {
@@ -815,21 +816,13 @@ export class SaleReturnsListComponent implements OnInit {
     };
   }
 
-  onRowDoubleClick(row: any) {
-    console.log('Double clicked row:', row);
-    this.edit.emit(row.sale_return_id);
-  }
-  
   //---------------print & Preview - end --------------------------
   tableConfig: TaTableConfig = {
     apiUrl: 'sales/sale_return_order/?summary=true',
     showCheckbox: true,
     pkId: "sale_return_id",
     rowEvents: {
-      dblclick: (row: any) => {
-        console.log('Row double-clicked:', row);
-        this.onRowDoubleClick(row);
-      }
+      dblclick: this.dblClickNav.createHandler({ pkField: 'sale_return_id', moduleName: 'Sales', sectionName: 'Sale Return', editEmitter: this.edit }),
     },
     fixedFilters: [
       {
@@ -922,8 +915,9 @@ export class SaleReturnsListComponent implements OnInit {
   };
 
   constructor(
-    private router: Router, 
+    private router: Router,
     private http: HttpClient,
-    private route: ActivatedRoute // Add this
+    private route: ActivatedRoute,
+    private dblClickNav: DoubleClickNavigationService
   ) {}
 }

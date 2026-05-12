@@ -3,6 +3,7 @@ import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   selector: 'app-branch-list',
@@ -14,8 +15,10 @@ import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 
 export class BranchListComponent {
 
-  @Output('edit') edit = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+
+  constructor(private dblClickNav: DoubleClickNavigationService) {}
 
   refreshTable() {
     this.taTableComponent?.refresh();
@@ -26,6 +29,9 @@ export class BranchListComponent {
     // title: 'Edit Sales Order List',
     showCheckbox:true,
     pkId: "branch_id",
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'branch_id', moduleName: 'Company', sectionName: 'Branch', editEmitter: this.edit }),
+    },
     pageSize: 10,
     "globalSearch": {
       keys: ['name','code','phone','email','address','city_id','state_id','status_id']

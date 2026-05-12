@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   selector: 'app-debit-note-list',
@@ -13,8 +14,8 @@ import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
   styleUrls: ['./debit-note-list.component.scss']
 })
 export class DebitNoteListComponent {
-  @Output('edit') edit = new EventEmitter<void>();
-  @Output('circle') circle = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
+  @Output('circle') circle = new EventEmitter<any>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   refreshTable() {
@@ -25,6 +26,9 @@ export class DebitNoteListComponent {
     apiUrl: 'sales/sale_debit_notes/',
     showCheckbox: true,
     pkId: "debit_note_id",
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'debit_note_id', moduleName: 'Sales', sectionName: 'Debit Note', editEmitter: this.edit }),
+    },
     pageSize: 10,
     "globalSearch": {
       keys: ['customer','debit_date','sale_invoice_id','debit_note_number','reason','total_amount','status_name']
@@ -123,5 +127,5 @@ export class DebitNoteListComponent {
     ]
   };
 
-constructor(private router: Router) {}
+constructor(private router: Router, private dblClickNav: DoubleClickNavigationService) {}
 }

@@ -4,6 +4,7 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   selector: 'app-reminders-list',
@@ -13,8 +14,8 @@ import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
   styleUrls: ['./reminders-list.component.scss']
 })
 export class RemindersListComponent {
-  @Output('edit') edit = new EventEmitter<void>();
-  @Output('circle') circle = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
+  @Output('circle') circle = new EventEmitter<any>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   refreshTable() {
@@ -25,6 +26,9 @@ export class RemindersListComponent {
     apiUrl: 'reminders/reminders/',
     showCheckbox:true,
     pkId: "reminder_id",
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'reminder_id', moduleName: 'Reminders', sectionName: 'Reminder', editEmitter: this.edit }),
+    },
     pageSize: 10,
     "globalSearch": {
       keys: ['reminder_type_id','subject','description','reminder_date','recurring_frequency']
@@ -95,6 +99,6 @@ export class RemindersListComponent {
       }
     ]
   };
-  constructor(private router: Router) {}
+  constructor(private router: Router, private dblClickNav: DoubleClickNavigationService) {}
 }
 

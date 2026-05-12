@@ -4,6 +4,7 @@ import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { TaTableComponent, TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   selector: 'app-bill-payments-list',
@@ -14,7 +15,7 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 })
 export class BillPaymentsListComponent {
 
-  @Output('edit') edit = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   refreshTable() {
@@ -311,6 +312,9 @@ private fallbackPrint(pdfBlob: Blob): void {
       apiUrl: 'purchase/bill_payments/',
       showCheckbox:true,
       pkId: "transaction_id",
+      rowEvents: {
+        dblclick: this.dblClickNav.createHandler({ pkField: 'transaction_id', moduleName: 'Purchase', sectionName: 'Bill Payment', editEmitter: this.edit }),
+      },
       fixedFilters: [
         // {
         //   key: 'summary',
@@ -440,8 +444,8 @@ private fallbackPrint(pdfBlob: Blob): void {
       ]
     };
   
-    constructor(private router: Router, private http: HttpClient) {
-  
+    constructor(private router: Router, private http: HttpClient, private dblClickNav: DoubleClickNavigationService) {
+
     }
 
 }

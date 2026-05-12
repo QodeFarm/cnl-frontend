@@ -4,6 +4,7 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component';
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 import { HttpClient } from '@angular/common/http';
 import { LocalStorageService } from '@ta/ta-core';
 
@@ -15,7 +16,7 @@ import { LocalStorageService } from '@ta/ta-core';
   styleUrls: ['./material-received-list.component.scss']
 })
 export class MaterialReceivedListComponent {
-  @Output('edit') edit = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   selectedFormat: string;
@@ -28,6 +29,9 @@ export class MaterialReceivedListComponent {
     apiUrl: 'production/material-received/?summary=true',
     showCheckbox: true,
     pkId: "material_received_id",
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'material_received_id', moduleName: 'Production', sectionName: 'Material Received', editEmitter: this.edit }),
+    },
     fixedFilters: [],
     export: {
       downloadName: 'MaterialReceivedList'
@@ -92,7 +96,7 @@ export class MaterialReceivedListComponent {
     ]
   };
 
-  constructor(private router: Router, private http: HttpClient, private localStorage: LocalStorageService) {}
+  constructor(private router: Router, private http: HttpClient, private localStorage: LocalStorageService, private dblClickNav: DoubleClickNavigationService) {}
 
   refreshTable() {
     this.taTableComponent?.refresh();

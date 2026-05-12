@@ -36,13 +36,13 @@ export class LeadsComponent {
 
   ngOnInit() {
     this.showLeadsList = false;
-    this.showForm = false;
     this.LeadsEditID = null;
     // set form config
     this.setFormConfig();
+    this.showForm = true;
     this.set_default_status_id(); // lead_status_id = 'Open'
     this.formConfig.fields[0].fieldGroup[5].hide = true; // Leads[lead_status_id]   hide = true
-    this.formConfig.fields[1].hide = true; // Interaction hide = ture
+    this.formConfig.fields[1].hide = true; // Interaction hide = true
   }
 
   formConfig: TaFormConfig = {};
@@ -52,6 +52,7 @@ export class LeadsComponent {
   }
 
   editLeads(event) {
+    this.showForm = false;
     this.LeadsEditID = event;
     this.http.get('leads/leads/' + event).subscribe((res: any) => {
       if (res && res.data) {
@@ -63,7 +64,7 @@ export class LeadsComponent {
         this.formConfig.model['lead_id'] = this.LeadsEditID;
         this.showForm = true;
         this.formConfig.fields[0].fieldGroup[5].hide = false; // Leads[lead_status_id]   hide = true
-        this.formConfig.fields[1].hide = false; // Interaction hide = ture
+        this.formConfig.fields[1].hide = false; // Interaction hide = true
       }
     })
     this.hide();

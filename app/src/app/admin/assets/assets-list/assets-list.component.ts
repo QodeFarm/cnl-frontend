@@ -4,6 +4,7 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   selector: 'app-assets-list',
@@ -17,7 +18,7 @@ export class AssetsListComponent {
   baseUrl: string = 'https://apicore.cnlerp.com/api/v1/';
   // baseUrl: string = 'http://127.0.0.1:8000/api/v1/';
 
-  @Output('edit') edit = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   refreshTable() {
@@ -28,6 +29,9 @@ export class AssetsListComponent {
     apiUrl: this.baseUrl + 'assets/assets/',
     showCheckbox:true,
     pkId: "asset_id",
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'asset_id', moduleName: 'Assets', sectionName: 'Asset', editEmitter: this.edit }),
+    },
     pageSize: 10,
     "globalSearch": {
       keys: ['purchase_date','name','price','asset_category_id','unit_options_id','location_id','asset_status_id']
@@ -113,7 +117,6 @@ export class AssetsListComponent {
             label: '',
             tooltip: "Edit this record",
             callBackFn: (row, action) => {
-              console.log(row);
               this.edit.emit(row.asset_id);
             }
           }
@@ -122,7 +125,7 @@ export class AssetsListComponent {
     ]
   };
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private dblClickNav: DoubleClickNavigationService) {}
 }
 
 

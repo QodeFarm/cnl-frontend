@@ -4,6 +4,7 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   selector: 'app-chart-of-accounts-list',
@@ -14,7 +15,7 @@ import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 })
 export class ChartOfAccountsListComponent {
 
-  @Output('edit') edit = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   refreshTable() {
@@ -25,6 +26,9 @@ export class ChartOfAccountsListComponent {
     apiUrl: 'finance/chart_of_accounts/',
     showCheckbox:true,
     pkId: "account_id",
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'account_id', moduleName: 'Finance', sectionName: 'Chart of Accounts', editEmitter: this.edit }),
+    },
     pageSize: 10,
     "globalSearch": {
       keys: ['created_at','account_code','account_name','account_type','parent_account_id','bank_account_id']
@@ -98,5 +102,5 @@ export class ChartOfAccountsListComponent {
       }
     ]
   };
-  constructor(private router: Router) {}
+  constructor(private router: Router, private dblClickNav: DoubleClickNavigationService) {}
 }

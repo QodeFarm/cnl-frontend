@@ -1,10 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, ViewChild } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
+import { DrilldownEditService } from 'src/app/services/drilldown-edit.service';
 import { TaFormComponent, TaFormConfig } from '@ta/ta-form';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { CreditNoteListComponent } from './credit-note-list/credit-note-list.component';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-credit-note',
@@ -13,7 +16,7 @@ import { ActivatedRoute } from '@angular/router';
   templateUrl: './credit-note.component.html',
   styleUrls: ['./credit-note.component.scss']
 })
-export class CreditNoteComponent {
+export class CreditNoteComponent implements OnDestroy {
   @ViewChild('salescreditnoteForm', { static: false }) salescreditnoteForm: TaFormComponent | undefined;
   @ViewChild(CreditNoteListComponent) CreditNoteListComponent!: CreditNoteListComponent;
   
@@ -24,6 +27,7 @@ export class CreditNoteComponent {
   loading = false;
   showForm: boolean = false;
   SaleCreditnoteEditID: any;
+  private drilldownSub: Subscription;
   // productOptions: any;
   customerDetails: Object;
   customerOrders: any[] = []; 
@@ -34,7 +38,7 @@ export class CreditNoteComponent {
     return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   }
 
-  constructor(private http: HttpClient, private cdr: ChangeDetectorRef, private route: ActivatedRoute,) { }
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef, private route: ActivatedRoute, private router: Router, private drilldownEditService: DrilldownEditService) { }
 
   // ngOnInit() {
   //   this.showSaleCreditnoteList = false;
@@ -71,6 +75,13 @@ export class CreditNoteComponent {
 isCustomerPortal: boolean = false;
 
 ngOnInit() {
+    this.drilldownSub = this.drilldownEditService.editRequest$
+      .pipe(filter(r => r.route === '/admin/sales/credit-note'))
+      .subscribe(r => {
+        if (r.editId === this.SaleCreditnoteEditID) return;
+        this.setFormConfig();
+        this.editSaleCreditnote(r.editId);
+      });
     // Check if this is customer portal
     this.route.data.subscribe(data => {
         this.isCustomerPortal = data['customerView'] || false;
@@ -83,6 +94,15 @@ ngOnInit() {
             return;
         }
         
+        // If navigated with editId, open in edit mode directly
+        const editId = window.history.state?.editId;
+        if (editId) {
+          history.replaceState({}, '', window.location.href);
+          this.setFormConfig();
+          this.editSaleCreditnote(editId);
+          return;
+        }
+
         // Admin Mode - Full functionality
         this.showSaleCreditnoteList = false;
         this.showForm = true;
@@ -147,6 +167,7 @@ ngOnInit() {
   }
 
   editSaleCreditnote(event) {
+    this.showForm = false;
     this.SaleCreditnoteEditID = event;
     this.http.get('sales/sale_credit_notes/' + event).subscribe((res: any) => {
       if (res && res.data) {
@@ -624,5 +645,9 @@ ngOnInit() {
       }
     );
   }
-  
+
+  ngOnDestroy() {
+    this.drilldownSub?.unsubscribe();
+  }
+
 }

@@ -150,7 +150,10 @@
     <div class="row custom-form">
         <!--  removed this commented line because when I refresh the page form is not displaying *checkAction="{ moduleName: 'Sales', sectionName: 'Sale Order', actionName: 'Create' }" -->
 
-        <div class="col-12 px-1" *ngIf="!SaleOrderEditID || orderNumber || showForm">
+        <div *ngIf="SaleOrderEditID && !showForm" class="col-12 p-3">
+          <nz-skeleton [nzActive]="true" [nzParagraph]="{ rows: 8 }"></nz-skeleton>
+        </div>
+        <div class="col-12 px-1" *ngIf="showForm">
 
             <!-- ====== FLOW STATUS GUIDANCE STRIP ====== -->
             <!-- Edit mode: show stepper with current progress -->

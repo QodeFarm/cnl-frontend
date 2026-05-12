@@ -1,10 +1,14 @@
 // import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
+import { DrilldownEditService } from 'src/app/services/drilldown-edit.service';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { BillPaymentsListComponent } from './bill-payments-list/bill-payments-list.component';
 import { TaTableComponent, TaTableConfig } from '@ta/ta-table';
 import { TaFormComponent } from '@ta/ta-form';
 import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -14,13 +18,14 @@ import { CommonModule } from '@angular/common';
   templateUrl: './bill-payments.component.html',
   styleUrls: ['./bill-payments.component.scss']
 })
-export class BillPaymentsComponent implements OnInit {
+export class BillPaymentsComponent implements OnInit, OnDestroy {
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
   @ViewChild('billpaymentreceiptForm', { static: false }) billpaymentreceiptForm: TaFormComponent | undefined;
   @ViewChild(BillPaymentsListComponent) billPaymentsListComponent!: BillPaymentsListComponent;
 
   showBillPaymentReceiptList: boolean = false;
   PurchaseOrderEditID: any = null;
+  private drilldownSub: Subscription;
   showSuccessToast = false;
   showErrorToast = false;
   toastMessage = '';
@@ -108,7 +113,7 @@ export class BillPaymentsComponent implements OnInit {
     
   };
 
-  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef, private route: ActivatedRoute, private router: Router, private drilldownEditService: DrilldownEditService) {}
 
   // Get the next voucher number from the API
   getVoucherNo() {
@@ -213,9 +218,22 @@ fetchVendorPaymentData(vendorId: string) {
   }
 
   ngOnInit() {
+    this.drilldownSub = this.drilldownEditService.editRequest$
+      .pipe(filter(r => r.route === '/admin/purchase/bill-payments'))
+      .subscribe(r => {
+        if (r.editId === this.PurchaseOrderEditID) return;
+        this.setFormConfig();
+        this.editBillPaymentReceipt(r.editId);
+      });
+    const editId = window.history.state?.editId;
+    if (editId) { history.replaceState({}, '', window.location.href); }
+    if (editId) {
+      this.setFormConfig();
+      this.editBillPaymentReceipt(editId);
+      return;
+    }
     this.getVoucherNo();
     this.setFormConfig();
-
   }
 
   /**  Create new Bill Payment (POST) */
@@ -582,5 +600,9 @@ fetchVendorPaymentData(vendorId: string) {
 
   hide() {
     document.getElementById('modalClose')?.click();
+  }
+
+  ngOnDestroy() {
+    this.drilldownSub?.unsubscribe();
   }
 }

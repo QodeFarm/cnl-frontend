@@ -382,6 +382,7 @@ export class VendorsComponent {
   // }
 
 editVendor(event) {
+  this.showForm = false;
   this.VendorEditID = event;
 
   this.http.get('vendors/vendors/' + event).subscribe((res: any) => {

@@ -1,10 +1,12 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { TaFormConfig, TaFormComponent } from '@ta/ta-form';
 import { JournalEntryListComponent } from './journal-entry-list/journal-entry-list.component';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
-import { map, debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { DrilldownEditService } from 'src/app/services/drilldown-edit.service';
+import { map, debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -14,7 +16,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './journal-entry.component.html',
   styleUrls: ['./journal-entry.component.scss']
 })
-export class JournalEntryComponent implements OnInit {
+export class JournalEntryComponent implements OnInit, OnDestroy {
   showJournalEntryList: boolean = false;
   showForm: boolean = false;
   JournalEntryEditID: any;
@@ -24,8 +26,9 @@ export class JournalEntryComponent implements OnInit {
 
   // Track subscriptions created inside Formly hooks so we can unsubscribe on re-open
   private ledgerAccountSubscriptions: Subscription[] = [];
+  private drilldownSub: Subscription;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private route: ActivatedRoute, private router: Router, private drilldownEditService: DrilldownEditService) {}
   
   // Get the next voucher number from the API
   getVoucherNo() {
@@ -62,14 +65,25 @@ export class JournalEntryComponent implements OnInit {
   
 
   ngOnInit() {
+    this.drilldownSub = this.drilldownEditService.editRequest$
+      .pipe(filter(r => r.route === '/admin/finance/journal-entry'))
+      .subscribe(r => {
+        if (r.editId === this.JournalEntryEditID) return;
+        this.setFormConfig();
+        this.editJournalEntry(r.editId);
+      });
+    const editId = window.history.state?.editId;
+    if (editId) { history.replaceState({}, '', window.location.href); }
+    if (editId) {
+      this.setFormConfig();
+      this.editJournalEntry(editId);
+      return;
+    }
     this.showJournalEntryList = false;
-    this.showForm = false;
     this.JournalEntryEditID = null;
-    
-    // Get voucher number first, then set form config
-    // We need to make sure the form config is set up after we get the voucher number
     this.getVoucherNo();
     this.setFormConfig();
+    this.showForm = true;
   }
 
   formConfig: TaFormConfig = {};
@@ -85,6 +99,7 @@ export class JournalEntryComponent implements OnInit {
 
 
   editJournalEntry(event) {
+    this.showForm = false;
     this.JournalEntryEditID = event;
     // clear previous subscriptions/messages to avoid duplicate handlers
     this.clearLedgerAccountSubscriptions();
@@ -638,5 +653,9 @@ export class JournalEntryComponent implements OnInit {
         }
      ]
     }
+  }
+
+  ngOnDestroy() {
+    this.drilldownSub?.unsubscribe();
   }
 }

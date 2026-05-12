@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   selector: 'app-work-order-list',
@@ -15,7 +16,7 @@ import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 })
 export class WorkOrderListComponent {
   
-  @Output('edit') edit = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   refreshTable() {
@@ -27,6 +28,9 @@ export class WorkOrderListComponent {
     showCheckbox: true,
     title: 'Work Order',
     pkId: "work_order_id",
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'work_order_id', moduleName: 'Production', sectionName: 'Work Order', editEmitter: this.edit }),
+    },
     fixedFilters: [
       {
         key: 'summary',
@@ -147,7 +151,7 @@ export class WorkOrderListComponent {
       }
     ]
   };
-  constructor(private router: Router, private http: HttpClient) {}
+  constructor(private router: Router, private http: HttpClient, private dblClickNav: DoubleClickNavigationService) {}
 
 }
 

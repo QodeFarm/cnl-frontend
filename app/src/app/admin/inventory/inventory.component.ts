@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { TaCurdConfig } from '@ta/ta-curd';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   standalone: true,
@@ -11,11 +12,13 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
   styleUrls: ['./inventory.component.scss']
 })
 export class InventoryComponent {
-  
+
   selectedTabKey: string | null = null;
   curdConfig: TaCurdConfig | null = null;
   loading: boolean = false;
   error: string | null = null;
+
+  constructor(private dblClickNav: DoubleClickNavigationService) {}
 
    ngOnInit() {
     // Load default tab on page load
@@ -30,8 +33,11 @@ export class InventoryComponent {
       hideAddBtn: true,
       tableConfig: {
         apiUrl: 'products/products/?view=inventory',
-        // title: 'Inventory', 
+        // title: 'Inventory',
         pkId: "product_id",
+        rowEvents: {
+          dblclick: this.dblClickNav.createNavigateHandler({ resolveFn: (row) => ({ route: '/admin/products', editId: String(row.product_id) }), moduleName: 'Products', sectionName: 'Product' }),
+        },
         pageSize: 10,
         globalSearch: {
           keys: [ 'name', 'code', 'category', 'warehouse_name', 'location_name', 'group_name' ,'type_name', 'stock_unit',' mrp', 'purchase_rate', 'sales_rate', 'wholesale_rate', 'dealer_rate', 'balance' ]
@@ -182,6 +188,9 @@ export class InventoryComponent {
         apiUrl: 'products/products/?view=non-inventory',
         // title: 'Non Inventory',
         pkId: "product_id",
+        rowEvents: {
+          dblclick: this.dblClickNav.createNavigateHandler({ resolveFn: (row) => ({ route: '/admin/products', editId: String(row.product_id) }), moduleName: 'Products', sectionName: 'Product' }),
+        },
         pageSize: 10,
         globalSearch: {
           keys: [ 'name', 'code', 'category' ]
@@ -221,6 +230,9 @@ export class InventoryComponent {
         apiUrl: 'products/products/?view=service',
         // title: 'Services',
         pkId: "product_id",
+        rowEvents: {
+          dblclick: this.dblClickNav.createNavigateHandler({ resolveFn: (row) => ({ route: '/admin/products', editId: String(row.product_id) }), moduleName: 'Products', sectionName: 'Product' }),
+        },
         pageSize: 10,
         globalSearch: {
           keys: ['name','code','category']

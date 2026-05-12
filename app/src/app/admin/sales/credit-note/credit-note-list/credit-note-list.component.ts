@@ -13,8 +13,8 @@
 //   styleUrls: ['./credit-note-list.component.scss']
 // })
 // export class CreditNoteListComponent {
-//   @Output('edit') edit = new EventEmitter<void>();
-//   @Output('circle') circle = new EventEmitter<void>();
+//   @Output('edit') edit = new EventEmitter<any>();
+//   @Output('circle') circle = new EventEmitter<any>();
 //   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
 //   refreshTable() {
@@ -133,6 +133,7 @@ import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 import { ActivatedRoute } from '@angular/router'; // Add this import
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   selector: 'app-credit-note-list',
@@ -166,8 +167,8 @@ export class CreditNoteListComponent implements OnInit {
     });
   }
 
-  @Output('edit') edit = new EventEmitter<void>();
-  @Output('circle') circle = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
+  @Output('circle') circle = new EventEmitter<any>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   refreshTable() {
@@ -217,6 +218,9 @@ export class CreditNoteListComponent implements OnInit {
     apiUrl: 'sales/sale_credit_notes/',
     showCheckbox: true,
     pkId: "credit_note_id",
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'credit_note_id', moduleName: 'Sales', sectionName: 'Credit Note', editEmitter: this.edit }),
+    },
     pageSize: 10,
     "globalSearch": {
       keys: ['customer','credit_date','sale_invoice_id','credit_note_number','reason','total_amount','status_name']
@@ -316,6 +320,7 @@ export class CreditNoteListComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private route: ActivatedRoute // Add this
+    private route: ActivatedRoute,
+    private dblClickNav: DoubleClickNavigationService
   ) {}
 }

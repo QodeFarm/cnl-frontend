@@ -15,7 +15,7 @@
 //   styleUrls: ['./payment-receipt-list.component.scss']
 // })
 // export class PaymentReceiptListComponent {
-//   @Output('edit') edit = new EventEmitter<void>();
+//   @Output('edit') edit = new EventEmitter<any>();
 //   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
 //    constructor(private router: Router, private http: HttpClient, private localStorage: LocalStorageService) {
@@ -473,6 +473,7 @@ import { TaTableComponent } from '@ta/ta-table';
 import { HttpClient } from '@angular/common/http';
 import { LocalStorageService } from '@ta/ta-core';
 import { ActivatedRoute } from '@angular/router'; // Add this import
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   selector: 'app-payment-receipt-list',
@@ -505,14 +506,15 @@ export class PaymentReceiptListComponent implements OnInit {
     });
   }
 
-  @Output('edit') edit = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   constructor(
-    private router: Router, 
-    private http: HttpClient, 
+    private router: Router,
+    private http: HttpClient,
     private localStorage: LocalStorageService,
-    private route: ActivatedRoute // Add this
+    private route: ActivatedRoute,
+    private dblClickNav: DoubleClickNavigationService
   ) {
     this.setApiUrlBasedOnUser();
   }
@@ -834,6 +836,9 @@ export class PaymentReceiptListComponent implements OnInit {
     apiUrl: '', //'sales/payment_transactions/',
     showCheckbox: true,
     pkId: "transaction_id",
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'transaction_id', moduleName: 'Sales', sectionName: 'Payment Receipt', editEmitter: this.edit }),
+    },
     pageSize: 10,
     "globalSearch": {
       keys: ['invoice_no', 'payment_receipt_no', 'payment_date', 'payment_method', 'payment_status']

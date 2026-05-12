@@ -3680,6 +3680,88 @@ ta-curd-modal {
 // ============================================================
 
 // ============================================================
+// STICKY ACTION COLUMN - BACKGROUND FIX (nzRight / ant-table-cell-fix-right)
+// ng-zorro's nzRight applies .ant-table-cell-fix-right but does not set
+// a background, so scrolling content bleeds through. These rules ensure
+// the sticky action cell is always opaque in every row state.
+// ============================================================
+ta-table,
+.ta-table,
+.custom-list,
+ta-curd-modal {
+
+    // Header sticky cell - match the navy header gradient
+    .ant-table-thead .ant-table-cell-fix-right {
+        background: linear-gradient(180deg, #1a3278 0%, #142768 100%) !important;
+        z-index: 3 !important;
+    }
+
+    // Body sticky cells - solid white (covers scrolling columns)
+    .ant-table-tbody .ant-table-cell-fix-right {
+        background: #ffffff !important;
+        z-index: 2 !important;
+    }
+
+    // Even-row zebra striping
+    .ant-table-tbody > tr:nth-child(even) > .ant-table-cell-fix-right {
+        background: #f8fafc !important;
+    }
+
+    // Row hover state
+    .ant-table-tbody > tr:hover > .ant-table-cell-fix-right {
+        background: #eef4ff !important;
+    }
+
+    // Row selected/clicked state
+    .ant-table-tbody > tr.ant-table-row-selected > .ant-table-cell-fix-right {
+        background: #e6f4ff !important;
+    }
+}
+
+// ============================================================
+// STICKY ACTION COLUMN - .ta-action-sticky CLASS
+// Applied via [class.ta-action-sticky]="c.type === 'action'" on <th>/<td>
+// in ta-table.component.html. Sticks the action column to the right edge
+// and ensures an opaque background in every row state.
+// ============================================================
+ta-table,
+.ta-table,
+.custom-list,
+ta-curd-modal {
+
+    // Header action cell - match the navy header gradient
+    .ant-table-thead th.ta-action-sticky {
+        position: sticky !important;
+        right: 0 !important;
+        z-index: 3 !important;
+        background: linear-gradient(180deg, #1a3278 0%, #142768 100%) !important;
+    }
+
+    // Body action cells - solid white so scrolling columns are hidden behind it
+    .ant-table-tbody td.ta-action-sticky {
+        position: sticky !important;
+        right: 0 !important;
+        z-index: 2 !important;
+        background: #ffffff !important;
+    }
+
+    // Even-row zebra striping
+    .ant-table-tbody > tr:nth-child(even) > td.ta-action-sticky {
+        background: #f8fafc !important;
+    }
+
+    // Row hover state
+    .ant-table-tbody > tr:hover > td.ta-action-sticky {
+        background: #eef4ff !important;
+    }
+
+    // Row selected/clicked state
+    .ant-table-tbody > tr.ant-table-row-selected > td.ta-action-sticky {
+        background: #e6f4ff !important;
+    }
+}
+
+// ============================================================
 // DROPDOWN/POPUP TABLE - NO STICKY COLUMNS
 // Ensures dropdown tables (advanced select, etc.) have normal scrolling
 // All columns (including Action) scroll together as a single unit
@@ -4113,29 +4195,23 @@ ta-table,
 .adv-select-custom-overlay-panel {
     border-radius: 4px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-    overflow: visible;
-    // Panel grows to fit content — same pattern as Alignbooks
+    overflow: hidden;
+    // Panel grows to fit content but never exits the viewport
     width: max-content !important;
     min-width: 480px;
-    // Never overflow the viewport
     max-width: calc(100vw - 32px);
 
     .adv-select-curd-container {
         border-radius: 4px;
         // max-height is set dynamically via inline style from the component.
-        // This fallback is for safety only.
         max-height: 70vh;
-        // overflow-y clips vertical content; overflow-x is auto-coerced to auto by browser.
-        // Because the panel is width:max-content, horizontal content never overflows, so
-        // no horizontal scrollbar appears even though overflow-x is technically auto.
         overflow-y: auto;
-        overflow-x: visible;
+        overflow-x: auto;
         display: flex;
         flex-direction: column;
 
-        // Inner wrapper — vertical scroll handled by parent; no extra clip needed
         >div {
-            overflow: visible !important;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
             padding: 8px 12px !important;

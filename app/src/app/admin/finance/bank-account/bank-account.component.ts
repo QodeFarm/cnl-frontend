@@ -38,6 +38,7 @@ export class BankAccountComponent {
   };
 
   editBankAccount(event) {
+    this.showForm = false;
     console.log('event', event);
     this.BankAccountEditID = event;
     this.http.get('finance/bank_accounts/' + event).subscribe((res: any) => {

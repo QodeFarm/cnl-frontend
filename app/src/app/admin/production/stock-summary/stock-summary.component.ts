@@ -22,6 +22,9 @@ export class StockSummaryComponent {
       apiUrl: 'production/stock-summary/',
       title: 'Stock Summary',
       pkId: 'summary_id',
+      rowEvents: {
+        dblclick: () => {} // read-only report — no drilldown
+      },
       pageSize: 10,
       globalSearch: {
         keys: ['product', 'group_name', 'category_name', 'hsn_code']

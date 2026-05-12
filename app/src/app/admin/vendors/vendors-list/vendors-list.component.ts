@@ -4,6 +4,7 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   selector: 'app-vendors-list',
@@ -14,7 +15,7 @@ import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 })
 export class VendorsListComponent {
 
-  @Output('edit') edit = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
   @Output('bulkEdit') bulkEdit = new EventEmitter<string[]>();
   @Output('exportVendors') exportVendors = new EventEmitter<string[]>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
@@ -55,6 +56,9 @@ export class VendorsListComponent {
     title: 'Vendors',
     showCheckbox:true,
     pkId: "vendor_id",
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'vendor_id', moduleName: 'Vendors', sectionName: 'Vendor', editEmitter: this.edit }),
+    },
     fixedFilters: [
       {
         key: 'summary',
@@ -102,6 +106,7 @@ export class VendorsListComponent {
         fieldKey: 'vendor_category_id',
         name: 'Vendor Category',
         sort: true,
+        hidden: true,
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
           return row.vendor_category?.name;
@@ -111,6 +116,7 @@ export class VendorsListComponent {
         fieldKey: 'ledger_account',
         name: 'Ledger Account',
         sort: true,
+        hidden: true,
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
           return row.ledger_account?.name;
@@ -120,6 +126,7 @@ export class VendorsListComponent {
         fieldKey: 'vendor_addresses',
         name: 'Billing Address',
         sort: true,
+        hidden: true,
         displayType: 'map',
         mapFn: (currentValue: any, row: any, col: any) => {
           return row.vendor_addresses.custom_billing_address;
@@ -158,5 +165,5 @@ export class VendorsListComponent {
     ]
   };
 
-  constructor(private router: Router) { }
+  constructor(private router: Router, private dblClickNav: DoubleClickNavigationService) { }
 }

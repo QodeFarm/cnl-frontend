@@ -37,6 +37,7 @@ export class WarehousesComponent {
   };
 
   editWarehouses(event) {
+    this.showForm = false;
     console.log('event', event);
     this.WarehousesEditID = event;
     this.http.get('inventory/warehouses/' + event).subscribe((res: any) => {

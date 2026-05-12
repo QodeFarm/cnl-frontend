@@ -40,10 +40,10 @@ export class TasksComponent implements OnInit {
 
   ngOnInit() {
     this.showTasksList = false;
-    this.showForm = false;
     this.TasksEditID = null;
     // Set form config
     this.setFormConfig();
+    this.showForm = true;
     this.set_default_status_id(); // lead_status_id = 'Open'
     
     //fetching customfields entity='tasks'.
@@ -74,6 +74,7 @@ export class TasksComponent implements OnInit {
   }
 
   editTasks(event) {
+    this.showForm = false;
     console.log('event', event);
     this.TasksEditID = event;
     this.http.get('tasks/task/' + event).subscribe((res: any) => {

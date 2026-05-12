@@ -22,10 +22,10 @@ export class WorkflowComponent {
 
   ngOnInit() {
     this.showWorkflowList = true;
-    this.showForm = false;
     this.workflowEditID = null;
     // Initialize form configuration
     this.setFormConfig();
+    this.showForm = true;
   }
 
   formConfig: TaFormConfig = {};
@@ -37,6 +37,7 @@ export class WorkflowComponent {
 
   // Edit Workflow
   editWorkflow(event: any) {
+    this.showForm = false;
     this.workflowEditID = event;
     this.http.get('sales/work_flow/' + event).subscribe((res: any) => {
       if (res && res.data) {

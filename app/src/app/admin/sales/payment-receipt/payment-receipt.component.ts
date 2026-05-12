@@ -1,11 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
+import { DrilldownEditService } from 'src/app/services/drilldown-edit.service';
 import { TaFormComponent } from '@ta/ta-form';
 import { TaTableComponent, TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { PaymentReceiptListComponent } from './payment-receipt-list/payment-receipt-list.component';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
  
 
 @Component({
@@ -15,13 +18,14 @@ import { ActivatedRoute } from '@angular/router';
   templateUrl: './payment-receipt.component.html',
   styleUrls: ['./payment-receipt.component.scss']
 })
-export class PaymentReceiptComponent implements OnInit {
+export class PaymentReceiptComponent implements OnInit, OnDestroy {
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
   @ViewChild('paymentreceiptForm', { static: false }) paymentreceiptForm: TaFormComponent | undefined;
   @ViewChild(PaymentReceiptListComponent) paymentReceiptListComponent!: PaymentReceiptListComponent;
 
   showPaymentReceiptList: boolean = false;
   SaleOrderEditID: any = null;
+  private drilldownSub: Subscription;
   showSuccessToast = false;
   showErrorToast = false;
   toastMessage = '';
@@ -109,7 +113,7 @@ export class PaymentReceiptComponent implements OnInit {
     
   };
 
-  constructor(private http: HttpClient, private cdr: ChangeDetectorRef, private route: ActivatedRoute) {}
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef, private route: ActivatedRoute, private router: Router, private drilldownEditService: DrilldownEditService) {}
 
   // ngOnInit() {
   //   this.getVoucherNo();
@@ -118,6 +122,13 @@ export class PaymentReceiptComponent implements OnInit {
   isCustomerPortal: boolean = false;
   showForm: boolean = true;
   ngOnInit() {
+    this.drilldownSub = this.drilldownEditService.editRequest$
+      .pipe(filter(r => r.route === '/admin/sales/payment-receipt'))
+      .subscribe(r => {
+        if (r.editId === this.SaleOrderEditID) return;
+        this.setFormConfig();
+        this.editPaymentReceipt(r.editId);
+      });
     // Check if this is customer portal
     this.route.data.subscribe(data => {
       this.isCustomerPortal = data['customerView'] || false;
@@ -138,6 +149,14 @@ export class PaymentReceiptComponent implements OnInit {
         return;
       }
       
+      const editId = window.history.state?.editId;
+      if (editId) {
+        history.replaceState({}, '', window.location.href);
+        this.setFormConfig();
+        this.editPaymentReceipt(editId);
+        return;
+      }
+
       // Admin Mode - Full functionality
       this.showForm = true;
       this.showPaymentReceiptList = false;
@@ -650,6 +669,7 @@ export class PaymentReceiptComponent implements OnInit {
   // }
 
 editPaymentReceipt(event) {
+  this.showForm = false;
   console.log('event', event);
 
   this.SaleOrderEditID = event;
@@ -687,6 +707,7 @@ editPaymentReceipt(event) {
       // UI update
       this.formConfig.showActionBtn = true;
       this.formConfig.submit.label = 'Update';
+      this.showForm = true;
 
       this.hide();
     }
@@ -696,5 +717,9 @@ editPaymentReceipt(event) {
 
   hide() {
     document.getElementById('modalClose')?.click();
+  }
+
+  ngOnDestroy() {
+    this.drilldownSub?.unsubscribe();
   }
 }

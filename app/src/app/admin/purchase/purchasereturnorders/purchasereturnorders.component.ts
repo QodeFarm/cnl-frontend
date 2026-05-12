@@ -1,7 +1,8 @@
-import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormComponent, TaFormConfig } from '@ta/ta-form';
-import { distinctUntilChanged } from 'rxjs/operators';
+import { distinctUntilChanged, filter } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { PurchasereturnordersListComponent } from './purchasereturnorders-list/purchasereturnorders-list.component';
@@ -11,6 +12,7 @@ import { ConstantPool } from '@angular/compiler';
 import { CustomFieldHelper } from '../../utils/custom_field_fetch';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { calculateTotalAmount, displayInformation, getUnitData, sumQuantities } from 'src/app/utils/display.utils';
+import { DrilldownEditService } from 'src/app/services/drilldown-edit.service';
 
 @Component({
   selector: 'app-purchasereturnorders',
@@ -19,13 +21,14 @@ import { calculateTotalAmount, displayInformation, getUnitData, sumQuantities } 
   templateUrl: './purchasereturnorders.component.html',
   styleUrls: ['./purchasereturnorders.component.scss']
 })
-export class PurchasereturnordersComponent {
+export class PurchasereturnordersComponent implements OnDestroy {
   @ViewChild('purchasereturnForm', { static: false }) purchasereturnForm: TaFormComponent | undefined;
   @ViewChild(PurchasereturnordersListComponent) PurchasereturnordersListComponent!: PurchasereturnordersListComponent;
   orderNumber: any;
   showPurchaseReturnOrderList: boolean = false;
   showForm: boolean = false;
   PurchaseReturnOrderEditID: any;
+  private drilldownSub: Subscription;
   productOptions: any;
   unitOptionOfProduct: any[] | string = []; // Initialize as an array by default
   nowDate = () => {
@@ -155,35 +158,48 @@ export class PurchasereturnordersComponent {
     private router: Router,
     private route: ActivatedRoute,
     private fb: FormBuilder,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private drilldownEditService: DrilldownEditService
   ) {}
 
   dataToPopulate: any;
   hasDataPopulated: boolean = false;
   entitiesList: any[] = [];
   ngOnInit() {
-
-    this.showPurchaseReturnOrderList = false;
-    this.showForm = false;
-    this.PurchaseReturnOrderEditID = null;
-    this.setFormConfig();
-    this.checkAndPopulateData(); 
-
-    //custom fields logic...
-    this.http.get('masters/entities/')
-      .subscribe((res: any) => {
-        this.entitiesList = res.data || []; // Adjust if the response format differs
+    this.drilldownSub = this.drilldownEditService.editRequest$
+      .pipe(filter(r => r.route === '/admin/purchase/purchasereturns'))
+      .subscribe(r => {
+        if (r.editId === this.PurchaseReturnOrderEditID) return;
+        this.setFormConfig();
+        this.editPurchaseReturnOrder(r.editId);
       });
+    // Shared setup for both create and edit
+    this.setFormConfig();
+
+    this.http.get('masters/entities/').subscribe((res: any) => {
+      this.entitiesList = res.data || [];
+    });
+
     CustomFieldHelper.fetchCustomFields(this.http, "purchase_returns", (customFields: any, customFieldMetadata: any) => {
       CustomFieldHelper.addCustomFieldsToFormConfig_3(customFields, customFieldMetadata, this.formConfig);
     });
-    
-    this.formConfig.model['purchase_return_orders']['order_type'] = 'purchase_return';
 
+    const editId = window.history.state?.editId;
+    if (editId) {
+      history.replaceState({}, '', window.location.href);
+      this.editPurchaseReturnOrder(editId);
+      return;
+    }
+
+    // Create mode only
+    this.showPurchaseReturnOrderList = false;
+    this.showForm = true;
+    this.PurchaseReturnOrderEditID = null;
+    this.checkAndPopulateData();
+    this.formConfig.model['purchase_return_orders']['order_type'] = 'purchase_return';
     this.getOrderNo();
     this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[5].hide = true;
     this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[6].hide = true;
-    // console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
   }
 
   // checkAndPopulateData() {
@@ -422,6 +438,7 @@ checkAndPopulateData() {
   }
 
   editPurchaseReturnOrder(event) {
+    this.showForm = false;
     this.PurchaseReturnOrderEditID = event;
     this.http.get('purchase/purchase_return_order/' + event).subscribe((res: any) => {
       if (res && res.data) {
@@ -472,6 +489,7 @@ checkAndPopulateData() {
   private resetToNewForm(): void {
     this.PurchaseReturnOrderEditID = null;
     this.setFormConfig();
+    this.showForm = true;
     if (this.formConfig.model?.purchase_return_orders) {
       this.formConfig.model['purchase_return_orders']['order_type'] = 'purchase_return';
     }
@@ -2400,5 +2418,9 @@ showSuccessToast = false;
 
   totalAmountCal() {
     calculateTotalAmount(this.formConfig.model, 'purchase_return_items', this.purchasereturnForm?.form);
+  }
+
+  ngOnDestroy() {
+    this.drilldownSub?.unsubscribe();
   }
 }

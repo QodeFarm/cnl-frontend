@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
@@ -15,7 +16,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class PurchaseInvoiceListComponent {
   
-  @Output('edit') edit = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   refreshTable() {
@@ -63,7 +64,6 @@ export class PurchaseInvoiceListComponent {
 
   // Method to handle "Email Sent" button click
   onMailLinkClick(): void {
-    console.log("We are in method ...")
     const selectedIds = this.taTableComponent.options.checkedRows;
     if (selectedIds.length === 0) {
       return this.showDialog();
@@ -92,6 +92,9 @@ export class PurchaseInvoiceListComponent {
     apiUrl: 'purchase/purchase_invoice_order/?summary=true',
     showCheckbox:true,
     pkId: "purchase_invoice_id",
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'purchase_invoice_id', moduleName: 'Purchase', sectionName: 'Purchase Invoice', editEmitter: this.edit }),
+    },
     fixedFilters: [
       {
         key: 'summary',
@@ -152,12 +155,14 @@ export class PurchaseInvoiceListComponent {
       {
         fieldKey: 'tax_amount',
         name: 'Tax amount',
-        sort: true
+        sort: true,
+        hidden: true
       },
       {
         fieldKey: 'advance_amount',
         name: 'Advance Amount',
-        sort: true
+        sort: true,
+        hidden: true
       },
       {
         fieldKey: 'status_name',
@@ -171,7 +176,8 @@ export class PurchaseInvoiceListComponent {
       {
         fieldKey: 'remarks',
         name: 'Remarks',
-        sort: true
+        sort: true,
+        hidden: true
       },
       {
         fieldKey: "code",
@@ -198,7 +204,6 @@ export class PurchaseInvoiceListComponent {
             label: '',
             tooltip: "Edit this record",
             callBackFn: (row, action) => {
-              console.log(row);
               this.edit.emit(row.purchase_invoice_id);
             }
           }
@@ -207,7 +212,7 @@ export class PurchaseInvoiceListComponent {
     ]
   };
 
-  constructor(private router: Router, private http: HttpClient) {
+  constructor(private router: Router, private http: HttpClient, private dblClickNav: DoubleClickNavigationService) {
 
   }
 }

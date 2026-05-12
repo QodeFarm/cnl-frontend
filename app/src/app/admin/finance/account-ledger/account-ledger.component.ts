@@ -3,6 +3,7 @@ import { Component, ViewChild, OnInit, AfterViewInit, OnDestroy } from '@angular
 import { TaCurdConfig } from '@ta/ta-curd';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { HttpClient } from '@angular/common/http';
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component';
 import { TaCurdModalComponent } from 'projects/ta-curd/src/lib/ta-curd-modal/ta-curd-modal.component';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
@@ -48,7 +49,7 @@ export class AccountLedgerComponent implements OnInit, AfterViewInit, OnDestroy 
     return Math.abs(parseFloat(this.finalBalance) || 0).toFixed(2);
   }
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private dblClickNav: DoubleClickNavigationService) {}
 
   ngOnInit() {
     this.curdConfig.tableConfig.apiUrl = '';
@@ -174,6 +175,35 @@ export class AccountLedgerComponent implements OnInit, AfterViewInit, OnDestroy 
       apiUrl: '',
       title: 'Account Ledger',
       pkId: 'journal_entry_line_id',
+      rowEvents: {
+        dblclick: this.dblClickNav.createNavigateHandler({
+          moduleName: 'Finance',
+          sectionName: 'Account Ledger',
+          resolveFn: (row: any) => {
+            const routeMap: Record<string, string> = {
+              sale_invoice:      '/admin/sales/salesinvoice',
+              sale_order:        '/admin/sales',
+              sale_return:       '/admin/sales/sale-returns',
+              credit_note:       '/admin/sales/credit-note',
+              debit_note:        '/admin/sales/debit-note',
+              delivery_challan:  '/admin/sales/delivery-challan',
+              payment_receipt:   '/admin/sales/payment-receipt',
+              purchase_invoice:  '/admin/purchase/purchase-invoice',
+              purchase_order:    '/admin/purchase',
+              purchase_return:   '/admin/purchase/purchasereturns',
+              bill_payment:      '/admin/purchase/bill-payments',
+              journal_entry:     '/admin/finance/journal-entry',
+              journal_voucher:   '/admin/finance/journal-voucher',
+            };
+            const srcType: string = row?.source_type;
+            const srcId: string   = row?.source_id;
+            if (!srcType || !srcId) return null;
+            const route = routeMap[srcType];
+            if (!route) return null;
+            return { route, editId: srcId };
+          }
+        }),
+      },
       pageSize: 10,
       globalSearch: {
         keys: ['voucher_no', 'description', 'debit', 'credit', 'running_balance']

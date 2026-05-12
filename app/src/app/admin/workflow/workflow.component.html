@@ -13,8 +13,11 @@
   </app-workflow-list>
 
 <!-- Show form only when editing -->
-<div class="row custom-form" *ngIf="showForm">
-  <div class="p-0">
+<div class="row custom-form">
+  <div *ngIf="workflowEditID && !showForm" class="col-12 p-3">
+    <nz-skeleton [nzActive]="true" [nzParagraph]="{ rows: 8 }"></nz-skeleton>
+  </div>
+  <div class="p-0" *ngIf="showForm">
 
     <!-- Header with Back button aligned right -->
     <div class="d-flex justify-content-between align-items-center mb-3">

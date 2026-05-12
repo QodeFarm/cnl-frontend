@@ -7,6 +7,8 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { MaterialReceivedListComponent } from './material-received-list/material-received-list.component';
 import { Subject, Subscription, debounceTime } from 'rxjs';
+import { filter } from 'rxjs/operators';
+import { DrilldownEditService } from 'src/app/services/drilldown-edit.service';
 import { LocalStorageService } from '@ta/ta-core';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -30,6 +32,8 @@ export class MaterialReceivedComponent implements OnInit, OnDestroy {
   formConfig: any = {};
   showMaterialReceivedList: boolean = false;
 
+  private drilldownSub: Subscription;
+
   // --- Draft auto-save properties ---
   private draftSaveSubject = new Subject<void>();
   private draftSaveSubscription: Subscription | null = null;
@@ -44,10 +48,27 @@ export class MaterialReceivedComponent implements OnInit, OnDestroy {
     private notification: NzNotificationService,
     private router: Router,
     private route: ActivatedRoute,
-    private localStorageService: LocalStorageService
+    private localStorageService: LocalStorageService,
+    private drilldownEditService: DrilldownEditService
   ) { }
 
   ngOnInit() {
+    this.drilldownSub = this.drilldownEditService.editRequest$
+      .pipe(filter(r => r.route === '/admin/production/material-received'))
+      .subscribe(r => {
+        if (r.editId === this.MaterialReceivedEditID) return;
+        this.setFormConfig();
+        this.editMaterialReceived(r.editId);
+      });
+
+    const editId = window.history.state?.editId;
+    if (editId) {
+      history.replaceState({}, '', window.location.href);
+      this.setFormConfig();
+      this.editMaterialReceived(editId);
+      return;
+    }
+
     this.showMaterialReceivedList = false;
     this.showForm = true;
     this.MaterialReceivedEditID = null;
@@ -58,6 +79,7 @@ export class MaterialReceivedComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.drilldownSub?.unsubscribe();
     if (this.draftSaveSubscription) {
       this.draftSaveSubscription.unsubscribe();
     }
@@ -423,6 +445,7 @@ export class MaterialReceivedComponent implements OnInit, OnDestroy {
   }
 
   editMaterialReceived(event) {
+    this.showForm = false;
     this.MaterialReceivedEditID = event;
     this.http.get('production/material-received/' + event).subscribe((res: any) => {
       if (res && res.data) {

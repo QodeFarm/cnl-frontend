@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Output } from '@angular/core';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   selector: 'app-customfields-list',
@@ -12,13 +13,16 @@ import { TaTableConfig } from '@ta/ta-table';
 })
 export class CustomfieldsListComponent {
 
-  @Output('edit') edit = new EventEmitter<void>(); // Emit custom field id for editing
+  @Output('edit') edit = new EventEmitter<any>(); // Emit custom field id for editing
 
   // Configuration for TaTable
   tableConfig: TaTableConfig = {
     apiUrl: 'customfields/customfieldscreate/', // API endpoint to fetch custom fields
     showCheckbox: true,
     pkId: 'custom_field_id', // Primary key identifier
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'custom_field_id', moduleName: 'Settings', sectionName: 'Custom Field', editEmitter: this.edit }),
+    },
     pageSize: 10,
     globalSearch: {
       keys: ['field_name', 'entity_id','field_type_id','is_required']
@@ -88,5 +92,5 @@ export class CustomfieldsListComponent {
     ]
   };
 
-  constructor() {}
+  constructor(private dblClickNav: DoubleClickNavigationService) {}
 }

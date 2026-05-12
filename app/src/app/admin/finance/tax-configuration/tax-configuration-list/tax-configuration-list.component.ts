@@ -4,6 +4,7 @@ import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   standalone: true,
@@ -13,7 +14,7 @@ import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
   styleUrls: ['./tax-configuration-list.component.scss']
 })
 export class TaxConfigurationListComponent {
-  @Output('edit') edit = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   refreshTable() {
@@ -24,6 +25,9 @@ export class TaxConfigurationListComponent {
     apiUrl: 'finance/tax_configurations/',
     showCheckbox:true,
     pkId: "tax_id",
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'tax_id', moduleName: 'Finance', sectionName: 'Tax Configuration', editEmitter: this.edit }),
+    },
     pageSize: 10,
     "globalSearch": {
       keys: ['created_at','tax_name','tax_rate','tax_type','is_active']
@@ -84,5 +88,5 @@ export class TaxConfigurationListComponent {
       }
     ]
   };
-  constructor(private router: Router) {}
+  constructor(private router: Router, private dblClickNav: DoubleClickNavigationService) {}
 }

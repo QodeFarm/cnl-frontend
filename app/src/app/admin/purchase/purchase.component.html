@@ -40,7 +40,10 @@
     </div>
 
     <div class="row custom-form">
-        <div class="col-12 px-1" *ngIf="!PurchaseOrderEditID || orderNumber">
+        <div *ngIf="PurchaseOrderEditID && !showForm" class="col-12 p-3">
+          <nz-skeleton [nzActive]="true" [nzParagraph]="{ rows: 8 }"></nz-skeleton>
+        </div>
+        <div class="col-12 px-1" *ngIf="showForm">
             <ta-form #purchaseForm [options]="formConfig"></ta-form>
         </div>
     </div>

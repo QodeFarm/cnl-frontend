@@ -4,6 +4,7 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   selector: 'app-employee-salary-list',
@@ -14,7 +15,7 @@ import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 })
 export class EmployeeSalaryListComponent {
 
-  @Output('edit') edit = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   refreshTable() {
@@ -25,6 +26,9 @@ export class EmployeeSalaryListComponent {
     apiUrl: 'hrms/employee_salary/',
     showCheckbox:true,
     pkId: "salary_id",
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'salary_id', moduleName: 'HRMS', sectionName: 'Employee Salary', editEmitter: this.edit }),
+    },
     pageSize: 10,
     "globalSearch": {
       keys: ['salary_start_date','salary_end_date','salary_amount','salary_currency','employee_id']
@@ -97,7 +101,7 @@ export class EmployeeSalaryListComponent {
       }
     ]
   };
-  constructor(private router: Router) {}
+  constructor(private router: Router, private dblClickNav: DoubleClickNavigationService) {}
 }
 
 

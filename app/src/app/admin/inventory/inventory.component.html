@@ -1,46 +1,58 @@
-<div class="container-fluid mt-4 custom-tabs">
-  <!-- Tabs Navigation -->
-  <ul class="nav nav-tabs nav-justified">
-    <li class="nav-item">
-      <a class="nav-link" [class.active]="selectedTabKey === 'inventory'" (click)="switchTab('inventory')">
-        Inventory
-        <!-- <small class="d-block text-muted small">Manage stock items</small> -->
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link"[class.active]="selectedTabKey === 'nonInventory'"(click)="switchTab('nonInventory')">
-        Non Inventory
-        <!-- <small class="d-block text-muted small">No stock management</small> -->
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" [class.active]="selectedTabKey === 'services'" (click)="switchTab('services')">
-        Service
-        <!-- <small class="d-block text-muted small">Manage services</small> -->
-      </a>
-    </li>
-  </ul>
+<div class="inventory-component container-fluid pt-3">
 
-  <!-- Tab Content -->
-  <div class="tab-content">
-    <div class="tab-pane fade show active">
-      <!-- Loading spinner -->
-      <div *ngIf="loading" class="p-3 text-center">
-        <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Loading...</span>
-        </div>
+  <!-- Page Header -->
+  <div class="inventory-banner">
+    <div class="banner-left">
+      <div class="banner-icon">
+        <i class="fas fa-warehouse"></i>
       </div>
-
-      <!-- Error message -->
-      <div *ngIf="error" class="alert alert-danger m-3">
-        {{ error }}
+      <div class="banner-text">
+        <span class="custom-heading">Inventory</span>
+        <small class="banner-subtitle">View and manage stock, non-inventory, and service items</small>
       </div>
-
-      <!-- Curd modal -->
-      <ng-container *ngIf="curdConfig && !loading && !error">
-        <ta-curd-modal [options]="curdConfig" class="custom-list"></ta-curd-modal>
-      </ng-container>
     </div>
   </div>
-</div>
 
+  <!-- Tab Navigation -->
+  <div class="inv-tabs-wrapper">
+    <ul class="nav inv-tabs">
+      <li class="nav-item">
+        <a class="nav-link" [class.active]="selectedTabKey === 'inventory'" (click)="switchTab('inventory')">
+          Inventory
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" [class.active]="selectedTabKey === 'nonInventory'" (click)="switchTab('nonInventory')">
+          Non Inventory
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" [class.active]="selectedTabKey === 'services'" (click)="switchTab('services')">
+          Service
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Tab Content -->
+  <div class="inv-tab-content">
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="inv-loading">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="error" class="alert alert-danger m-3">
+      {{ error }}
+    </div>
+
+    <!-- Table -->
+    <ng-container *ngIf="curdConfig && !loading && !error">
+      <ta-curd-modal [options]="curdConfig" class="custom-list"></ta-curd-modal>
+    </ng-container>
+
+  </div>
+</div>

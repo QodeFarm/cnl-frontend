@@ -17,9 +17,9 @@ export class CustomfieldsComponent {
 
   ngOnInit() {
     this.showCustomFieldList = false;
-    this.showForm = false;
     this.customFieldEditID = null;
     this.setFormConfig();
+    this.showForm = true;
   }
 
   formConfig: TaFormConfig = {};
@@ -29,6 +29,7 @@ export class CustomfieldsComponent {
   }
 
   editCustomField(event: any) {
+    this.showForm = false;
     this.customFieldEditID = event;
     this.http.get('customfields/customfieldscreate/' + event).subscribe((res: any) => {
       if (res && res.data) {

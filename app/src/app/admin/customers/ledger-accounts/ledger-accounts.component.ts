@@ -35,6 +35,7 @@ export class LedgerAccountsComponent {
   }
 
   editLedgerAccount(event: any) {
+    this.showForm = false;
     this.LedgerAccountsEditID = event;
     this.http.get('customers/ledger_accounts/' + event).subscribe((res: any) => {
       if (res) {

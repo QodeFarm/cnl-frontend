@@ -6,6 +6,7 @@ import { TaTableConfig } from '@ta/ta-table';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component';
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   selector: 'app-customers-list',
@@ -16,11 +17,11 @@ import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component';
 })
 export class CustomersListComponent {
 
-  @Output('edit') edit = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
   @Output('bulkEdit') bulkEdit = new EventEmitter<string[]>();
   @Output('exportCustomers') exportCustomers = new EventEmitter<string[]>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
-  constructor(private http: HttpClient, private router: Router, private message: NzMessageService) { }
+  constructor(private http: HttpClient, private router: Router, private message: NzMessageService, private dblClickNav: DoubleClickNavigationService) { }
 
   /** Selected customer IDs — read directly from ta-table's checkedRows */
   get selectedIds(): string[] {
@@ -56,6 +57,9 @@ export class CustomersListComponent {
     apiUrl: 'customers/customers/?summary=true',
     showCheckbox: true,
     pkId: "customer_id",
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'customer_id', moduleName: 'Customers', sectionName: 'Customer', editEmitter: this.edit }),
+    },
     export: {
       downloadName: 'customers'
     },
@@ -80,6 +84,9 @@ export class CustomersListComponent {
       { fieldKey: 'enable_portal_access', name: 'Portal Access',  displayType: 'map', mapFn: (v: any) => v ? 'Yes' : 'No' },
       { fieldKey: 'tds_applicable',       name: 'TDS Applicable', displayType: 'map', mapFn: (v: any) => v ? 'Yes' : 'No' },
       { fieldKey: 'gst_suspend',          name: 'GST Suspend',    displayType: 'map', mapFn: (v: any) => v ? 'Yes' : 'No' },
+      { fieldKey: 'ledger_account_id',    name: 'Ledger Account', displayType: 'map', mapFn: (_v: any, row: any) => row.ledger_account?.name || '' },
+      { fieldKey: 'pin_code',             name: 'Pin Code'                   },
+      { fieldKey: 'customer_addresses',   name: 'Shipping Address', displayType: 'map', mapFn: (_v: any, row: any) => row.customer_addresses?.custom_shipping_address || '' },
     ],
     cols: [
       {
@@ -88,26 +95,18 @@ export class CustomersListComponent {
         sort: true,
         isEdit: true,
         isEditSumbmit: (row, value, col) => {
-          console.log("isEditSumbmit", row, value, col );
-          // Implement your logic here
-          // For example, you can make an API call to save the edited value
-          // this.http.put(`api/sales/${row.sale_order_id}`, { total_amount: value }).subscribe(...);
-          
-
         },
         autoSave: {
-        apiUrl: row => `customers/customers/${row.customer_id}`,
-        method: 'patch',
-        body: (row: any, value: any, col: any) => {
-          return {
-            customer_id: row.customer_id,
-            name: value,
-            customer_addresses: row.customer_addresses // <-- add this line
-          };
+          apiUrl: row => `customers/customers/${row.customer_id}`,
+          method: 'patch',
+          body: (row: any, value: any, col: any) => {
+            return {
+              customer_id: row.customer_id,
+              name: value,
+              customer_addresses: row.customer_addresses
+            };
+          }
         }
-      }
-          
-       
       },
       {
         fieldKey: 'email',
@@ -129,32 +128,7 @@ export class CustomersListComponent {
         name: 'City Name',
         sort: false,
         displayType: 'map',
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return row.city.city_name;
-        },
-      },
-      {
-        fieldKey: 'ledger_account_id',
-        name: 'Ledger Account',
-        sort: true,
-        displayType: 'map',
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return row.ledger_account.name;
-        },
-      },
-      {
-        fieldKey: 'pin_code',
-        name: 'Pin Code',
-        sort: true,
-      },
-      {
-        fieldKey: 'customer_addresses',
-        name: 'Shipping Address',
-        sort: true,
-        displayType: 'map',
-        mapFn: (currentValue: any, row: any, col: any) => {
-          return row.customer_addresses.custom_shipping_address;
-        },
+        mapFn: (_v: any, row: any) => row.city?.city_name || '',
       },
 
       {
@@ -182,7 +156,6 @@ export class CustomersListComponent {
             label: '',
             tooltip: "Edit this record",
             callBackFn: (row, action) => {
-              console.log(row);
               this.edit.emit(row.customer_id);
             }
           }

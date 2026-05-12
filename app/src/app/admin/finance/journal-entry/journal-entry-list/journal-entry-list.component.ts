@@ -4,6 +4,7 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   selector: 'app-journal-entry-list',
@@ -14,7 +15,7 @@ import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 })
 export class JournalEntryListComponent {
 
-  @Output('edit') edit = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   refreshTable() {
@@ -25,6 +26,9 @@ export class JournalEntryListComponent {
     apiUrl: 'finance/journal_entries/',
     showCheckbox: true,
     pkId: "journal_entry_id",
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'journal_entry_id', moduleName: 'Finance', sectionName: 'Journal Entry', editEmitter: this.edit }),
+    },
     pageSize: 10,
     "globalSearch": {
       keys: ['entry_date', 'reference', 'description']
@@ -94,5 +98,5 @@ export class JournalEntryListComponent {
       }
     ]
   };
-  constructor(private router: Router) { }
+  constructor(private router: Router, private dblClickNav: DoubleClickNavigationService) { }
 }

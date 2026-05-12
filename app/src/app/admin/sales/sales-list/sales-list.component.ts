@@ -6,6 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 import { HttpClient } from '@angular/common/http';
 import { LocalStorageService } from '@ta/ta-core';
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   selector: 'app-sales-list',
@@ -15,7 +16,7 @@ import { LocalStorageService } from '@ta/ta-core';
   styleUrls: ['./sales-list.component.scss']
 })
 export class SalesListComponent implements OnInit {
-  @Output('edit') edit = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   // Add these properties
@@ -23,10 +24,11 @@ export class SalesListComponent implements OnInit {
   customerId: string | null = null;
 
   constructor(
-    private router: Router, 
-    private http: HttpClient, 
+    private router: Router,
+    private http: HttpClient,
     private localStorage: LocalStorageService,
-    private route: ActivatedRoute  // Add this
+    private route: ActivatedRoute,
+    private dblClickNav: DoubleClickNavigationService,
   ) {
     this.setApiUrlBasedOnUser();
   }
@@ -88,10 +90,6 @@ export class SalesListComponent implements OnInit {
     console.log('Updated table config for customer:', this.tableConfig);
   }
 
-  onRowDoubleClick(row: any) {
-    console.log('Double clicked row:', row);
-    this.edit.emit(row.sale_order_id);
-  }
 
   refreshTable() {
     this.taTableComponent?.refresh();
@@ -366,10 +364,7 @@ export class SalesListComponent implements OnInit {
     showCheckbox: true,
     pkId: "sale_order_id",
     rowEvents: {
-      dblclick: (row: any) => {
-        console.log('Row double-clicked:', row);
-        this.onRowDoubleClick(row);
-      }
+      dblclick: this.dblClickNav.createHandler({ pkField: 'sale_order_id', moduleName: 'Sales', sectionName: 'Sale Order', editEmitter: this.edit }),
     },
     fixedFilters: [],
     export: {
@@ -413,7 +408,8 @@ export class SalesListComponent implements OnInit {
       {
         fieldKey: 'sale_estimate',
         name: 'Sale Estimate',
-        sort: true
+        sort: true,
+        hidden: true
       },
       {
         fieldKey: 'total_amount',
@@ -421,7 +417,6 @@ export class SalesListComponent implements OnInit {
         sort: true,
         isEdit: true,
         isEditSumbmit(row, value, col) {
-          console.log("isEditSumbmit", row, value, col);
         },
         autoSave: {
           apiUrl: 'sales/sale_order',
@@ -442,7 +437,8 @@ export class SalesListComponent implements OnInit {
       {
         fieldKey: 'advance_amount',
         name: 'Advance Amt',
-        sort: true
+        sort: true,
+        hidden: true
       },
       {
         fieldKey: 'order_status',

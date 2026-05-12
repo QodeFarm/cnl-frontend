@@ -25,10 +25,10 @@ export class BomComponent {
 
   ngOnInit() {
     this.showBomList = false;
-    this.showForm = false;
     this.BomEditID = null;
     // set form config
     this.setFormConfig();
+    this.showForm = true;
   }
 
   formConfig: TaFormConfig = {};
@@ -38,6 +38,7 @@ export class BomComponent {
   }
 
   editBom(event) {
+    this.showForm = false;
     this.BomEditID = event;
     this.http.get('production/bom/' + event).subscribe((res: any) => {
       if (res && res.data) {

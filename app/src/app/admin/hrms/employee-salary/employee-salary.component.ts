@@ -39,6 +39,7 @@ export class EmployeeSalaryComponent {
   };
 
   editEmployeeSalary(event) {
+    this.showForm = false;
     console.log('event', event);
     this.EmployeeSalaryEditID = event;
     this.http.get('hrms/employee_salary/' + event).subscribe((res: any) => {

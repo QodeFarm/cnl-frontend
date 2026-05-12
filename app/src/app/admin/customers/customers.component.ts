@@ -566,7 +566,13 @@ submitCustomerForm() {
   formConfig: TaFormConfig = {};
 
   hide() {
-    document.getElementById('modalClose').click();
+    const modalEl = document.getElementById('exampleModal');
+    if (modalEl && (window as any).bootstrap) {
+      const modal = (window as any).bootstrap.Modal.getInstance(modalEl);
+      if (modal) { modal.hide(); return; }
+    }
+    // fallback
+    (document.getElementById('modalClose') as HTMLElement)?.click();
   }
 
   // editCustomer(event: string) {
@@ -659,6 +665,7 @@ submitCustomerForm() {
   // }
 
 editCustomer(event: string) {
+    this.showForm = false;
     this.CustomerEditID = event;
 
     this.http.get(`customers/customers/${event}`).subscribe(

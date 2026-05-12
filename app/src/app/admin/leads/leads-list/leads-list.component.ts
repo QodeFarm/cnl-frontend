@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 
 @Component({
@@ -16,7 +17,7 @@ import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 
 export class LeadsListComponent {
 
-  @Output('edit') edit = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   refreshTable() {
@@ -28,6 +29,9 @@ export class LeadsListComponent {
     // title: 'Edit Sales Order List',
     showCheckbox:true,
     pkId: "lead_id",
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'lead_id', moduleName: 'Leads', sectionName: 'Lead', editEmitter: this.edit }),
+    },
     pageSize: 10,
     "globalSearch": {
       keys: ['interaction_date','name','email','phone','lead_status','score','assignee','notes']
@@ -160,5 +164,5 @@ export class LeadsListComponent {
     ]
   };
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private dblClickNav: DoubleClickNavigationService) {}
 }

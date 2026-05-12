@@ -4,6 +4,7 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   selector: 'app-expense-item-list',
@@ -14,7 +15,7 @@ import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 })
 export class ExpenseItemListComponent {
 
-  @Output('edit') edit = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   refreshTable() {
@@ -25,6 +26,9 @@ export class ExpenseItemListComponent {
     apiUrl: 'finance/expense_items/',
     showCheckbox:true,
     pkId: "expense_item_id",
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'expense_item_id', moduleName: 'Finance', sectionName: 'Expense Item', editEmitter: this.edit }),
+    },
     pageSize: 10,    "globalSearch": {
       keys: ['expense_date', 'category_id', 'amount', 'description', 'vendor_id', 'employee_id', 'bank_account_id', 'status']
     },
@@ -117,5 +121,5 @@ export class ExpenseItemListComponent {
       }
     ]
   };
-  constructor(private router: Router) {}
+  constructor(private router: Router, private dblClickNav: DoubleClickNavigationService) {}
 }

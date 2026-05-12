@@ -1,11 +1,13 @@
 import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnInit, OnDestroy, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { TaFormConfig, TaFormComponent } from '@ta/ta-form';
 import { JournalVoucherListComponent } from './journal-voucher-list/journal-voucher-list.component';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { DrilldownEditService } from 'src/app/services/drilldown-edit.service';
 import { FormsModule } from '@angular/forms';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { NzNotificationModule, NzNotificationService } from 'ng-zorro-antd/notification';
 import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
@@ -34,12 +36,16 @@ export class JournalVoucherComponent implements OnInit, OnDestroy {
   @ViewChild('journalVoucherForm') journalVoucherForm!: TaFormComponent;
 
   private subscriptions: Subscription[] = [];
+  private drilldownSub: Subscription;
 
   constructor(
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
+    private route: ActivatedRoute,
+    private router: Router,
     private notification: NzNotificationService,
-    private modal: NzModalService
+    private modal: NzModalService,
+    private drilldownEditService: DrilldownEditService
   ) {}
 
   nowDate = () => {
@@ -113,8 +119,21 @@ export class JournalVoucherComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.drilldownSub = this.drilldownEditService.editRequest$
+      .pipe(filter(r => r.route === '/admin/finance/journal-voucher'))
+      .subscribe(r => {
+        if (r.editId === this.JournalVoucherEditID) return;
+        this.setFormConfig();
+        this.editJournalVoucher(r.editId);
+      });
+    const editId = window.history.state?.editId;
+    if (editId) { history.replaceState({}, '', window.location.href); }
+    if (editId) {
+      this.setFormConfig();
+      this.editJournalVoucher(editId);
+      return;
+    }
     this.showJournalVoucherList = false;
-    this.showForm = false;
     this.JournalVoucherEditID = null;
     this.totalDebit = 0;
     this.totalCredit = 0;
@@ -122,6 +141,7 @@ export class JournalVoucherComponent implements OnInit, OnDestroy {
     this.loadExpenseClaims();
     this.setFormConfig();
     this.getVoucherNo();
+    this.showForm = true;
   }
 
   formConfig: TaFormConfig = {};
@@ -154,10 +174,12 @@ export class JournalVoucherComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.drilldownSub?.unsubscribe();
     this.clearSubscriptions();
   }
 
   editJournalVoucher(event: any) {
+    this.showForm = false;
     this.JournalVoucherEditID = event;
     this.clearSubscriptions();
 

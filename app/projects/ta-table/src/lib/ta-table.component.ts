@@ -56,6 +56,20 @@ import { Router } from '@angular/router';
       .file-action-buttons button {
         margin-right: 8px;
       }
+      .row-dblclick {
+        cursor: pointer;
+      }
+      .row-dblclick:hover td {
+        background-color: rgba(24, 144, 255, 0.04) !important;
+        transition: background-color 0.15s ease;
+      }
+      @keyframes ta-new-arrival-pulse {
+        0%, 100% { background-color: transparent; }
+        40%, 60% { background-color: rgba(82, 196, 26, 0.32); }
+      }
+      .ta-row-new-arrival td {
+        animation: ta-new-arrival-pulse 1.6s ease-in-out infinite;
+      }
     `,
   ],
 })
@@ -1122,6 +1136,8 @@ applyFilters() {
   visible = false;
   total = 1;
   rows: any[] = [];
+  blinkingRowIds = new Set<string>();
+  private blinkTimeout: any;
   loading = false;
   pageIndex = 1;
   pageSize = 10;
@@ -1368,6 +1384,17 @@ applyFilters() {
         this.loading = false;
         this.total = data.totalCount;
         this.rows = data.data || data;
+
+        // Blink newly-arrived rows when requested (e.g. dispatch page polling)
+        if (this.options.newRowIds?.length) {
+          clearTimeout(this.blinkTimeout);
+          this.blinkingRowIds = new Set(this.options.newRowIds.map((id: any) => String(id)));
+          this.options.newRowIds = []; // consume so next refresh doesn't re-blink
+          this.blinkTimeout = setTimeout(() => {
+            this.blinkingRowIds.clear();
+            this.cdr.detectChanges();
+          }, 25000);
+        }
 
         // Store in cache for selection popups
         if (isSelectionPopup && cacheKey) {
@@ -1639,6 +1666,7 @@ applyFilters() {
     this.actionObservable$.unsubscribe();
     this.filtersObservable$.unsubscribe();
     this.accountSearchSubject.complete();
+    clearTimeout(this.blinkTimeout);
   }
   // Additional code for handling action button events in the table(added this code for file upload)(start)
   performAction(action: any, row: any) {
