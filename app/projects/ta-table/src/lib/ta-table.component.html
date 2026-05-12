@@ -337,7 +337,7 @@
 
 <!-- [nzTitle]="options.title"  (nzQueryParams)="onQueryParamsChange($event)"-->
 <nz-table #taTable nzShowSizeChanger [nzPageSizeOptions]="options.pageSizeOptions" [nzTableLayout]="options.tableLayout"
-    [nzBordered]="options.bordered" [nzScroll]="{ x: options.scrollX, y: options.scrollY }" [nzData]="rows"
+    [nzBordered]="options.bordered" [nzScroll]="{ x: options.scrollX || 'max-content', y: options.scrollY }" [nzData]="rows"
     [nzFrontPagination]="false" [nzShowTotal]="totalTemplate" [nzFooter]="footerTemplate" [nzLoading]="loading"
     [nzTotal]="total || 1" [nzPageSize]="options.pageSize" (nzQueryParams)="onQueryParamsChange($event)"
     [nzPageIndex]="pageIndex" [nzPaginationPosition]="options.paginationPosition">
@@ -350,7 +350,8 @@
 
                 <th *ngIf="!c.hidden" style="min-width: 150px;" (nzSortOrderChange)="nzSortOrderChange($event)"
                     [nzColumnKey]="c.sortKey || c.fieldKey" [nzFilterFn]="false" [nzSortDirections]="(c.sort)?[]:[null]"
-                    [nzSortOrder]="c.sortOrder" [nzSortFn]="c.sort" [nzWidth]="c.width" nzCustomFilter>{{c.name}}
+                    [nzSortOrder]="c.sortOrder" [nzSortFn]="c.sort" [nzWidth]="c.width" nzCustomFilter
+                    [class.ta-action-sticky]="c.type === 'action'">{{c.name}}
                     <nz-filter-trigger *ngIf="c.filter" [(nzVisible)]="c.visible"
                         [nzActive]="c.filterValue && c.filterValue.length > 0" [nzDropdownMenu]="menu">
                         <i nz-icon nzType="filter"></i>
@@ -373,12 +374,13 @@
         </tr> -->
     </thead>
     <tbody>
-        <tr *ngFor="let data of rows" [class.selectable-row]="options.rowSelectionEnabled" (dblclick)="options?.rowEvents?.dblclick?.(data)">
+        <tr *ngFor="let data of rows" [class.selectable-row]="options.rowSelectionEnabled" [class.row-dblclick]="!!options?.rowEvents?.dblclick" [class.ta-row-new-arrival]="blinkingRowIds.size > 0 && blinkingRowIds.has(data[options.pkId]?.toString())" (dblclick)="options?.rowEvents?.dblclick?.(data)">
             <td *ngIf="options.showCheckbox" style="width: 50px;" [nzChecked]="setOfCheckedId.has(data[options.pkId])"
                 (nzCheckedChange)="onItemChecked(data[options.pkId], $event)" [nzDisabled]="false"
                 [nzLabel]="data.name"></td>
             <ng-container *ngFor="let c of options.cols">
                 <td *ngIf="!c.hidden" style="min-width: 150px;" [ngClass]="c.tdClassName" [nzEllipsis]="c.ellipsis"
+                    [class.ta-action-sticky]="c.type === 'action'"
                     (click)="options.rowSelectionEnabled && c.type != 'action' && onRowSelect(data)">
                     <label class="col-name">{{c.name}} :</label>
 

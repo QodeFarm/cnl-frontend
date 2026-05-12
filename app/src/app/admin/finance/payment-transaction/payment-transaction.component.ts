@@ -70,6 +70,7 @@ export class PaymentTransactionComponent {
   };
 
   editPaymentTransaction(event) {
+    this.showForm = false;
     this.PaymentTransactionEditID = event;
     this.http.get('finance/payment_transactions/' + event).subscribe((res: any) => {
       if (res) {

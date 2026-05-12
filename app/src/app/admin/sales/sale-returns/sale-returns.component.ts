@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { TaFormComponent, TaFormConfig } from '@ta/ta-form';
-import { forkJoin, Observable } from 'rxjs';
-import { distinctUntilChanged } from 'rxjs/operators';
+import { forkJoin, Observable, Subscription } from 'rxjs';
+import { distinctUntilChanged, filter } from 'rxjs/operators';
 import { tap, switchMap } from 'rxjs/operators';
 import { ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -16,6 +16,7 @@ import { calculateTotalAmount, displayInformation, getUnitData, sumQuantities } 
 import { CustomFieldHelper } from '../../utils/custom_field_fetch';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { ReturnorderslistComponent } from '../returnorderslist/returnorderslist.component';
+import { DrilldownEditService } from 'src/app/services/drilldown-edit.service';
 declare var bootstrap;
 
 
@@ -34,6 +35,7 @@ export class SaleReturnsComponent {
   showSaleReturnOrderList: boolean = false;
   showForm: boolean = false;
   SaleReturnOrderEditID: any;
+  private drilldownSub: Subscription;
   SaleInvoiceEditID: any;
   productOptions: any;
   invoiceNumber: any;
@@ -170,35 +172,48 @@ export class SaleReturnsComponent {
     private router: Router,
     private route: ActivatedRoute,
     private fb: FormBuilder,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private drilldownEditService: DrilldownEditService
   ) { }
 
   dataToPopulate: any;
   salesReturnForm: FormGroup;
   entitiesList: any[] = [];
   ngOnInit() {
-
-    this.showSaleReturnOrderList = false;
-    this.showForm = false;
-    this.SaleReturnOrderEditID = null;
-    this.setFormConfig();
-    this.checkAndPopulateData();
-    //custom fields logic...
-    this.http.get('masters/entities/')
-      .subscribe((res: any) => {
-        this.entitiesList = res.data || []; // Adjust if the response format differs
+    this.drilldownSub = this.drilldownEditService.editRequest$
+      .pipe(filter(r => r.route === '/admin/sales/sale-returns'))
+      .subscribe(r => {
+        if (r.editId === this.SaleReturnOrderEditID) return;
+        this.setFormConfig();
+        this.editSaleReturnOrder(r.editId);
       });
+    // Shared setup for both create and edit
+    this.setFormConfig();
+
+    this.http.get('masters/entities/').subscribe((res: any) => {
+      this.entitiesList = res.data || [];
+    });
 
     CustomFieldHelper.fetchCustomFields(this.http, 'sale_return', (customFields: any, customFieldMetadata: any) => {
       CustomFieldHelper.addCustomFieldsToFormConfig_2(customFields, customFieldMetadata, this.formConfig);
     });
 
-    this.formConfig.model['sale_return_order']['order_type'] = 'sale_return';
+    const editId = window.history.state?.editId;
+    if (editId) {
+      history.replaceState({}, '', window.location.href);
+      this.editSaleReturnOrder(editId);
+      return;
+    }
 
+    // Create mode only
+    this.showSaleReturnOrderList = false;
+    this.showForm = true;
+    this.SaleReturnOrderEditID = null;
+    this.checkAndPopulateData();
+    this.formConfig.model['sale_return_order']['order_type'] = 'sale_return';
     this.getReturnNo();
     this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[5].hide = true;
     this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[6].hide = true;
-    // console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])  }
   }
 
   // checkAndPopulateData() {
@@ -571,6 +586,7 @@ async autoFillProductDetails(field, data) {
 
   // Modify your edit method to set up the form for editing
   editSaleReturnOrder(event) {
+    this.showForm = false;
     this.SaleReturnOrderEditID = event;
     this.http.get('sales/sale_return_order/' + event).subscribe((res: any) => {
       if (res && res.data) {
@@ -963,6 +979,7 @@ async autoFillProductDetails(field, data) {
   private resetToNewForm(): void {
     this.SaleReturnOrderEditID = null;
     this.setFormConfig();
+    this.showForm = true;
     if (this.formConfig.model?.sale_return_order) {
       this.formConfig.model['sale_return_order']['order_type'] = 'sale_return';
     }
@@ -974,6 +991,7 @@ async autoFillProductDetails(field, data) {
   }
 
   ngOnDestroy() {
+    this.drilldownSub?.unsubscribe();
     // Ensure modals are disposed of correctly
     document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
   }

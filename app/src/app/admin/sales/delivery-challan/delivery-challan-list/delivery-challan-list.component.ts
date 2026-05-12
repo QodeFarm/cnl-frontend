@@ -3,6 +3,7 @@ import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angu
 import { ActivatedRoute } from '@angular/router';
 import { TaTableConfig } from '@ta/ta-table';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component';
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { HttpClient } from '@angular/common/http';
 
@@ -28,7 +29,7 @@ export class DeliveryChallanListComponent implements OnInit {
   showSuccessToast = false;
   toastMessage = '';
 
-  constructor(private route: ActivatedRoute, private http: HttpClient) {}
+  constructor(private route: ActivatedRoute, private http: HttpClient, private dblClickNav: DoubleClickNavigationService) {}
 
   ngOnInit(): void {
     this.route.data.subscribe(data => {
@@ -234,6 +235,9 @@ export class DeliveryChallanListComponent implements OnInit {
     apiUrl: 'sales/delivery_challan/',
     showCheckbox: true,
     pkId: 'delivery_challan_id',
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'delivery_challan_id', moduleName: 'Sales', sectionName: 'Delivery Challan', editEmitter: this.edit }),
+    },
     pageSize: 10,
     globalSearch: {
       keys: ['challan_no', 'customer', 'challan_date', 'total_amount', 'status_name', 'is_converted']

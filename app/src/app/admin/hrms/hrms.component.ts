@@ -39,6 +39,7 @@ export class EmployeesComponent  implements OnInit {
   };
 
   editEmployee(event) {
+    this.showForm = false;
     console.log('event', event);
     this.EmployeeEditID = event;
     this.http.get('hrms/employees/' + event).subscribe((res: any) => {

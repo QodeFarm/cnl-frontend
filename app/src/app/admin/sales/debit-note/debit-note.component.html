@@ -14,12 +14,15 @@
     </div>
   
     <div class="row custom-form">
-      <div class="col-12 px-1" *ngIf="!SaleDebitnoteEditID || orderNumber">
+      <div *ngIf="SaleDebitnoteEditID && !showForm" class="col-12 p-3">
+        <nz-skeleton [nzActive]="true" [nzParagraph]="{ rows: 8 }"></nz-skeleton>
+      </div>
+      <div class="col-12 px-1" *ngIf="showForm">
         <ta-form #salesdebitnoteForm [options]="formConfig"></ta-form>
       </div>
     </div>
   </div>
-  
+
   <!-- Sales List Modal -->
   <div class="modal fade custom-modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl ">

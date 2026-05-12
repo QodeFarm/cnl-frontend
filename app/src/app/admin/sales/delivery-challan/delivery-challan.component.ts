@@ -1,7 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
+import { DrilldownEditService } from 'src/app/services/drilldown-edit.service';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TaFormComponent, TaFormConfig } from '@ta/ta-form';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { NzNotificationModule, NzNotificationService } from 'ng-zorro-antd/notification';
@@ -15,7 +18,7 @@ import { displayInformation, getUnitData } from 'src/app/utils/display.utils';
   templateUrl: './delivery-challan.component.html',
   styleUrls: ['./delivery-challan.component.scss']
 })
-export class DeliveryChallanComponent implements OnInit {
+export class DeliveryChallanComponent implements OnInit, OnDestroy {
 
   @ViewChild('deliveryChallanForm', { static: false }) deliveryChallanForm: TaFormComponent | undefined;
   @ViewChild(DeliveryChallanListComponent) deliveryChallanListComponent!: DeliveryChallanListComponent;
@@ -24,6 +27,7 @@ export class DeliveryChallanComponent implements OnInit {
   showDeliveryChallanList: boolean = false;
   showForm: boolean = false;
   DeliveryChallanEditID: any = null;
+  private drilldownSub: Subscription;
   isConverting: boolean = false;
   dataToPopulate: any = null;
   challanNumber: any = null;
@@ -39,10 +43,18 @@ export class DeliveryChallanComponent implements OnInit {
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
-    private notification: NzNotificationService
+    private router: Router,
+    private notification: NzNotificationService,
+    private drilldownEditService: DrilldownEditService
   ) {}
 
   ngOnInit(): void {
+    this.drilldownSub = this.drilldownEditService.editRequest$
+      .pipe(filter(r => r.route === '/admin/sales/delivery-challan'))
+      .subscribe(r => {
+        if (r.editId === this.DeliveryChallanEditID) return;
+        this.editDeliveryChallan(r.editId);
+      });
     this.route.data.subscribe(data => {
       this.isCustomerPortal = data['customerView'] || false;
 
@@ -50,6 +62,14 @@ export class DeliveryChallanComponent implements OnInit {
         this.showDeliveryChallanList = true;
         this.showForm = false;
         this.DeliveryChallanEditID = null;
+        return;
+      }
+
+      const editId = window.history.state?.editId;
+      if (editId) {
+        history.replaceState({}, '', window.location.href);
+        this.setFormConfig();
+        this.editDeliveryChallan(editId);
         return;
       }
 
@@ -1290,5 +1310,9 @@ export class DeliveryChallanComponent implements OnInit {
         }
       ]
     };
+  }
+
+  ngOnDestroy() {
+    this.drilldownSub?.unsubscribe();
   }
 }

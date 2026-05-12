@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 
 @Component({
@@ -14,7 +15,7 @@ import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
   styleUrls: ['./bom-list.component.scss']
 })
 export class BomListComponent {
-  @Output('edit') edit = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   refreshTable() {
@@ -25,6 +26,9 @@ export class BomListComponent {
     apiUrl: 'production/bom',
     showCheckbox: true,
     pkId: "bom_id",
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'bom_id', moduleName: 'Production', sectionName: 'BOM', editEmitter: this.edit }),
+    },
     // fixedFilters: [
     //   {
     //     key: 'summary',
@@ -96,5 +100,5 @@ export class BomListComponent {
     ]
   };
 
-constructor(private router: Router) {}
+constructor(private router: Router, private dblClickNav: DoubleClickNavigationService) {}
 }

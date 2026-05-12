@@ -55,7 +55,10 @@
     </div>
 
     <div class="row custom-form">
-        <div class="col-12 p-0">
+        <div *ngIf="JournalVoucherEditID && !showForm" class="col-12 p-3">
+          <nz-skeleton [nzActive]="true" [nzParagraph]="{ rows: 8 }"></nz-skeleton>
+        </div>
+        <div class="col-12 p-0" *ngIf="showForm">
             <ta-form #journalVoucherForm [options]="formConfig"></ta-form>
         </div>
     </div>

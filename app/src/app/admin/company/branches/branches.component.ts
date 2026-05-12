@@ -37,6 +37,7 @@ export class BranchesComponent {
   };
 
   editBranch(event) {
+    this.showForm = false;
     console.log('event', event);
     this.BranchEditID = event;
     this.http.get('company/branches/' + event).subscribe((res: any) => {

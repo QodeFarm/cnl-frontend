@@ -21,12 +21,15 @@
     </div>
   
     <div class="row custom-form">
-      <div class="col-12 px-1" *ngIf="returnNumber">
+      <div *ngIf="SaleReturnOrderEditID && !showForm" class="col-12 p-3">
+        <nz-skeleton [nzActive]="true" [nzParagraph]="{ rows: 8 }"></nz-skeleton>
+      </div>
+      <div class="col-12 px-1" *ngIf="showForm">
         <ta-form #salereturnForm [options]="formConfig"></ta-form>
       </div>
     </div>
   </div>
-  
+
   <div class="modal fade custom-modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
       <div class="modal-content">

@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   selector: 'app-products-list',
@@ -15,7 +16,7 @@ import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 })
 export class ProductsListComponent {
 
-  @Output('edit') edit = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
   @Output('bulkEdit') bulkEdit = new EventEmitter<string[]>();
   @Output('exportProducts') exportProducts = new EventEmitter<string[]>();
   @Output('mergeProducts') mergeProducts = new EventEmitter<void>();
@@ -61,6 +62,9 @@ export class ProductsListComponent {
     showCheckbox: true,
     title: 'Products',
     pkId: "product_id",
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'product_id', moduleName: 'Products', sectionName: 'Product', editEmitter: this.edit }),
+    },
     fixedFilters: [
       {
         key: 'summary',
@@ -289,6 +293,6 @@ export class ProductsListComponent {
       }
     ]
   };
-  constructor(private router: Router, private http: HttpClient) { }
+  constructor(private router: Router, private http: HttpClient, private dblClickNav: DoubleClickNavigationService) { }
 
 }

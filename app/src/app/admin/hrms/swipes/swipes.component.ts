@@ -39,6 +39,7 @@ export class SwipesComponent {
   };
 
   editSwipes(event) {
+    this.showForm = false;
     console.log('event', event);
     this.SwipesEditID = event;
     this.http.get('hrms/swipes/' + event).subscribe((res: any) => {

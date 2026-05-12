@@ -21,7 +21,7 @@
 //     console.log('Sorting table columns by "created_at"...');
     
 //   }
-//   @Output('edit') edit = new EventEmitter<void>();
+//   @Output('edit') edit = new EventEmitter<any>();
 //   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
 //   refreshTable() {
@@ -467,6 +467,7 @@ import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 import { HttpClient } from '@angular/common/http';
 import { LocalStorageService } from '@ta/ta-core';
 import { ActivatedRoute } from '@angular/router'; // Add this import
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   selector: 'app-salesinvoice-list',
@@ -503,7 +504,7 @@ export class SalesInvoiceListComponent implements OnInit {
     });
   }
 
-  @Output('edit') edit = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   refreshTable() {
@@ -844,21 +845,13 @@ export class SalesInvoiceListComponent implements OnInit {
     };
   }
 
-  onRowDoubleClick(row: any) {
-      console.log('Double clicked row:', row);
-      this.edit.emit(row.sale_invoice_id);
-  }
-  
   //---------------print & Preview - end --------------------------
   tableConfig: TaTableConfig = {
     apiUrl: '',//'sales/sale_invoice_order/?records_all=true',
     showCheckbox: true,
     pkId: "sale_invoice_id",
     rowEvents: {
-      dblclick: (row: any) => {
-        console.log('Row double-clicked:', row);
-        this.onRowDoubleClick(row);
-      }
+      dblclick: this.dblClickNav.createHandler({ pkField: 'sale_invoice_id', moduleName: 'Sales', sectionName: 'Sale Invoice', editEmitter: this.edit }),
     },
     fixedFilters: [
       // {
@@ -903,12 +896,14 @@ export class SalesInvoiceListComponent implements OnInit {
       {
         fieldKey: 'tax_amount',
         name: 'Tax Amount',
-        sort: true
+        sort: true,
+        hidden: true
       },
       {
         fieldKey: 'advance_amount',
         name: 'Advance Amount',
-        sort: true
+        sort: true,
+        hidden: true
       },
       {
         fieldKey: 'order_status',
@@ -922,7 +917,8 @@ export class SalesInvoiceListComponent implements OnInit {
       {
         fieldKey: 'remarks',
         name: 'Remarks',
-        sort: true
+        sort: true,
+        hidden: true
       },
       {
         fieldKey: "code",
@@ -959,10 +955,11 @@ export class SalesInvoiceListComponent implements OnInit {
   };
 
   constructor(
-    private router: Router, 
-    private http: HttpClient, 
+    private router: Router,
+    private http: HttpClient,
     private localStorage: LocalStorageService,
-    private route: ActivatedRoute // Add this
+    private route: ActivatedRoute,
+    private dblClickNav: DoubleClickNavigationService
   ) {
     this.setApiUrlBasedOnUser()
   }

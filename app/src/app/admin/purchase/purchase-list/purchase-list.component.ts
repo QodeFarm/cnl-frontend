@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
@@ -15,7 +16,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class PurchaseListComponent {
   
-  @Output('edit') edit = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   refreshTable() {
@@ -344,6 +345,9 @@ private fallbackPrint(pdfBlob: Blob): void {
     apiUrl: 'purchase/purchase_order/?summary=true',
     showCheckbox:true,
     pkId: "purchase_order_id",
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'purchase_order_id', moduleName: 'Purchase', sectionName: 'Purchase Order', editEmitter: this.edit }),
+    },
     fixedFilters: [
       {
         key: 'summary',
@@ -385,7 +389,8 @@ private fallbackPrint(pdfBlob: Blob): void {
       {
         fieldKey: 'tax_amount',
         name: 'Tax amount',
-        sort: true
+        sort: true,
+        hidden: true
       },
       {
         fieldKey: 'total_amount',
@@ -413,7 +418,8 @@ private fallbackPrint(pdfBlob: Blob): void {
       {
         fieldKey: 'remarks',
         name: 'Remarks',
-        sort: true
+        sort: true,
+        hidden: true
       },
       {
         fieldKey: "code",
@@ -449,7 +455,7 @@ private fallbackPrint(pdfBlob: Blob): void {
     ]
   };
 
-  constructor(private router: Router, private http: HttpClient) {
+  constructor(private router: Router, private http: HttpClient, private dblClickNav: DoubleClickNavigationService) {
 
   }
 }

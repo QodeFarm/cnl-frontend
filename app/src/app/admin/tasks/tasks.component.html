@@ -11,7 +11,10 @@
         </div>
     </div>
     <div class="row custom-form">
-        <div>
+        <div *ngIf="TasksEditID && !showForm" class="col-12 p-3">
+          <nz-skeleton [nzActive]="true" [nzParagraph]="{ rows: 8 }"></nz-skeleton>
+        </div>
+        <div *ngIf="showForm">
             <ta-form [options]="formConfig"></ta-form>
         </div>
     </div>

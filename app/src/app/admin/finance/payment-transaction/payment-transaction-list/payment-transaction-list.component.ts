@@ -4,6 +4,7 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   selector: 'app-payment-transaction-list',
@@ -14,7 +15,7 @@ import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 })
 export class PaymentTransactionListComponent {
 
-  @Output('edit') edit = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   refreshTable() {
@@ -25,6 +26,9 @@ export class PaymentTransactionListComponent {
     apiUrl: 'finance/payment_transactions/',
     showCheckbox:true,
     pkId: "payment_id",
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'payment_id', moduleName: 'Finance', sectionName: 'Payment Transaction', editEmitter: this.edit }),
+    },
     pageSize: 10,
     "globalSearch": {
       keys: ['payment_date','invoice_id','order_type','payment_method','payment_status','amount','reference_number','currency','transaction_type','notes']
@@ -115,6 +119,6 @@ export class PaymentTransactionListComponent {
       }
     ]
   };
-  constructor(private router: Router) {}
+  constructor(private router: Router, private dblClickNav: DoubleClickNavigationService) {}
 }
 

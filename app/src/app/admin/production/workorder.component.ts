@@ -92,6 +92,7 @@ export class WorkorderComponent implements OnInit {
   }
 
   editWorkorder(event: any) {
+    this.showForm = false;
     this.editMode = true;
     this.showCreateBomButton = false
     // this.hideFields(false); // Shows fields at indexes 5, 4, and 9

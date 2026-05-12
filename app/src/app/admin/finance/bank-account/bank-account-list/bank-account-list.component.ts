@@ -4,6 +4,7 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   selector: 'app-bank-account-list',
@@ -15,7 +16,7 @@ import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 })
 export class BankAccountListComponent {
 
-  @Output('edit') edit = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   refreshTable() {
@@ -26,6 +27,9 @@ export class BankAccountListComponent {
     apiUrl: 'finance/bank_accounts/',
     showCheckbox:true,
     pkId: "bank_account_id",
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'bank_account_id', moduleName: 'Finance', sectionName: 'Bank Account', editEmitter: this.edit }),
+    },
     pageSize: 10,
     "globalSearch": {
       keys: ['created_at','account_type','account_name','account_number','bank_name','branch_name',]
@@ -91,6 +95,6 @@ export class BankAccountListComponent {
       }
     ]
   };
-  constructor(private router: Router) {}
+  constructor(private router: Router, private dblClickNav: DoubleClickNavigationService) {}
 }
 

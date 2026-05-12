@@ -37,6 +37,7 @@ export class BudgetComponent {
   };
 
   editBudget(event) {
+    this.showForm = false;
     console.log('event', event);
     this.BudgetEditID = event;
     this.http.get('finance/budgets/' + event).subscribe((res: any) => {

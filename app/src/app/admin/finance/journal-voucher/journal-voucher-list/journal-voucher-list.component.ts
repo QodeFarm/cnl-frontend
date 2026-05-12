@@ -4,6 +4,7 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component';
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   selector: 'app-journal-voucher-list',
@@ -14,7 +15,7 @@ import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component';
 })
 export class JournalVoucherListComponent {
 
-  @Output('edit') edit = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   refreshTable() {
@@ -25,6 +26,9 @@ export class JournalVoucherListComponent {
     apiUrl: 'finance/journal_vouchers/',
     showCheckbox: true,
     pkId: "journal_voucher_id",
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'journal_voucher_id', moduleName: 'Finance', sectionName: 'Journal Voucher', editEmitter: this.edit }),
+    },
     pageSize: 10,
     "globalSearch": {
       keys: ['voucher_no', 'voucher_date', 'voucher_type', 'narration', 'total_debit', 'total_credit', 'status']
@@ -102,5 +106,5 @@ export class JournalVoucherListComponent {
     ]
   };
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private dblClickNav: DoubleClickNavigationService) {}
 }

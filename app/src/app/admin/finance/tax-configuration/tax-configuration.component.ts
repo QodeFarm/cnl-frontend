@@ -37,6 +37,7 @@ export class TaxConfigurationComponent {
   };
 
   editTaxConfiguration(event) {
+    this.showForm = false;
     console.log('event', event);
     this.TaxConfigurationEditID = event;
     this.http.get('finance/tax_configurations/' + event).subscribe((res: any) => {

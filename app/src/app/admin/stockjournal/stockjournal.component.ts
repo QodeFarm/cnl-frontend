@@ -1,8 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { TaCurdConfig } from '@ta/ta-curd';
+import { TaCurdModalComponent } from 'projects/ta-curd/src/lib/ta-curd-modal/ta-curd-modal.component';
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { MaterialListComponent } from './material-list/material-list.component';
 import { ChangeDetectorRef } from '@angular/core';
@@ -16,6 +18,11 @@ import { ChangeDetectorRef } from '@angular/core';
 })
 
 export class StockJournalComponent {
+
+  @ViewChild(TaCurdModalComponent) curdModalComponent!: TaCurdModalComponent;
+
+  constructor(private dblClickNav: DoubleClickNavigationService) {}
+
   curdConfig: TaCurdConfig = {
     drawerSize: 600,
     drawerPlacement: 'top',
@@ -24,6 +31,20 @@ export class StockJournalComponent {
       apiUrl: 'production/stock_journal/',
       title: 'Stock Journal',
       pkId: "journal_id",
+      rowEvents: {
+        dblclick: this.dblClickNav.createNavigateHandler({
+          moduleName: 'Production',
+          sectionName: 'Stock Journal',
+          resolveFn: (row) => {
+            const type = (row.transaction_type || '').toLowerCase();
+            const ref = row.reference_id;
+            if (!ref) return null;
+            if (type.includes('issue')) return { route: '/admin/production/material-issue', editId: ref };
+            if (type.includes('receive')) return { route: '/admin/production/material-received', editId: ref };
+            return null;
+          }
+        }),
+      },
       pageSize: 10,
       globalSearch: {
         keys: ['product', 'transaction_type', 'quantity', 'remarks']

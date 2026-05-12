@@ -4,6 +4,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { TaCurdConfig } from '@ta/ta-curd';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { HttpClient } from '@angular/common/http';
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   selector: 'app-leave-approvals',
@@ -14,7 +15,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class LeaveApprovalsComponent {
   @Output('edit') edit = new EventEmitter<void>();
-  @Output('circle') circle = new EventEmitter<void>();
+  @Output('circle') circle = new EventEmitter<any>();
 
   curdConfig: TaCurdConfig = {
     drawerSize: 500,
@@ -24,6 +25,9 @@ export class LeaveApprovalsComponent {
       apiUrl: 'hrms/leave_approvals/',
       title: 'Leave Approvals',
       pkId: "approval_id",
+      rowEvents: {
+        dblclick: this.dblClickNav.createHandler({ pkField: 'approval_id', moduleName: 'HRMS', sectionName: 'Leave Approval', editEmitter: this.edit }),
+      },
       pageSize: 10,
       showCheckbox: true,
       "globalSearch": {
@@ -153,7 +157,7 @@ export class LeaveApprovalsComponent {
     }
   }
 
-  constructor(private http: HttpClient) { };
+  constructor(private http: HttpClient, private dblClickNav: DoubleClickNavigationService) {};
 
   //=====================================Status = Approved ==============================================
 

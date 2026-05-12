@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   selector: 'app-workflow-list',
@@ -14,7 +15,7 @@ import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 })
 export class WorkflowListComponent {
 
-  @Output('edit') edit = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   refreshTable() {
@@ -25,6 +26,9 @@ export class WorkflowListComponent {
     apiUrl: 'sales/work_flow', // The endpoint for fetching workflows
     showCheckbox: true,
     pkId: "workflow_id", // Primary key identifier
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'workflow_id', moduleName: 'Sales', sectionName: 'Workflow', editEmitter: this.edit }),
+    },
     pageSize: 10,
     globalSearch: {
       keys: ['workflow_id', 'name']
@@ -65,5 +69,5 @@ export class WorkflowListComponent {
     ]
   };
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private dblClickNav: DoubleClickNavigationService) {}
 }

@@ -39,6 +39,7 @@ export class RemindersComponent {
   };
 
   editReminders(event) {
+    this.showForm = false;
     this.RemindersEditID = event;
     this.http.get('reminders/reminders/' + event).subscribe((res: any) => {
       if (res && res.data) {

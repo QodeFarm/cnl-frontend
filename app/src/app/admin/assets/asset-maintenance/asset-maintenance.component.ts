@@ -41,6 +41,7 @@ export class AssetMaintenanceComponent {
   };
 
   editAssetMaintenance(event) {
+    this.showForm = false;
     console.log('event', event);
     this.AssetMaintenanceEditID = event;
     this.http.get(this.baseUrl + 'assets/asset_maintenance/'  + event).subscribe((res: any) => {

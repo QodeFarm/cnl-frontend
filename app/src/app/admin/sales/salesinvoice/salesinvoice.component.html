@@ -1,7 +1,12 @@
 
 <div class="container-fluid p-3">
   <!-- Admin View - Create/Edit Form -->
-  <div *ngIf="!isCustomerPortal">
+  <div *ngIf="SaleInvoiceEditID && !showForm && !isCustomerPortal" class="row custom-form">
+    <div class="col-12 p-3">
+      <nz-skeleton [nzActive]="true" [nzParagraph]="{ rows: 8 }"></nz-skeleton>
+    </div>
+  </div>
+  <div *ngIf="!isCustomerPortal && showForm">
     <div class="sale-invoice-banner page-component-header">
       <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
         <button type="button" class="btn pl-0">
@@ -41,7 +46,7 @@
     </div>
 
     <div class="row custom-form">
-      <div class="col-12 px-1" *ngIf="!SaleInvoiceEditID || invoiceNumber">
+      <div class="col-12 px-1" *ngIf="showForm">
 
         <!-- Customer Info Strip -->
         <div *ngIf="showCustomerInfoBanner" class="customer-info-strip">

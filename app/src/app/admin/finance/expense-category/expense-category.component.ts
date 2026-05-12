@@ -37,6 +37,7 @@ export class ExpenseCategoryComponent {
   };
 
   editExpenseCategory(event) {
+    this.showForm = false;
     console.log('event', event);
     this.ExpenseCategoryEditID = event;
     this.http.get('finance/expense_categories/' + event).subscribe((res: any) => {

@@ -1,8 +1,11 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { TaFormConfig } from '@ta/ta-form';
+import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
+import { DrilldownEditService } from 'src/app/services/drilldown-edit.service';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { ProductsListComponent } from './products-list/products-list.component';
@@ -22,11 +25,12 @@ import { BulkField, BulkOperationsService } from '../utils/bulk-operations.servi
   standalone: true,
   styleUrls: ['./products.component.scss']
 })
-export class ProductsComponent implements OnInit {
+export class ProductsComponent implements OnInit, OnDestroy {
   showProductsList: boolean = false;
   showForm: boolean = false;
   ProductEditID: any;
   formConfig: TaFormConfig = {};
+  private drilldownSub: Subscription;
   dialogMessage: string = '';
   @ViewChild(ProductsListComponent) ProductsListComponent!: ProductsListComponent;
   @ViewChild(TaFormComponent) taFormComponent!: TaFormComponent;
@@ -51,7 +55,7 @@ export class ProductsComponent implements OnInit {
   } | null = null;
 
 
-  constructor(private http: HttpClient, private notification: NzNotificationService, private router: Router) { }
+  constructor(private http: HttpClient, private notification: NzNotificationService, private router: Router, private drilldownEditService: DrilldownEditService) { }
 
   // ─── Bulk Edit State ─────────────────────────────────────────
   showBulkEditModal = false;
@@ -155,22 +159,46 @@ export class ProductsComponent implements OnInit {
   }
 
   ngOnInit() {
+    // Drilldown: reused tab — another component navigated here with an editId
+    this.drilldownSub = this.drilldownEditService.editRequest$
+      .pipe(filter(r => r.route === '/admin/products'))
+      .subscribe(r => {
+        if (r.editId === this.ProductEditID) return;
+        this.setFormConfig();
+        this.editProducts(r.editId);
+      });
+
+    // Drilldown: fresh tab — router state set by createNavigateHandler
+    const editId = window.history.state?.editId;
+    if (editId) {
+      history.replaceState({}, '', window.location.href);
+      this.setFormConfig();
+      this.editProducts(editId);
+      return;
+    }
+
+    // Normal create mode
     this.showProductsList = false;
     this.showForm = true;
     this.ProductEditID = null;
-    // Reset selectedProductMode to default "Inventory" to ensure Attributes tab is visible by default
     this.selectedProductMode = "Inventory";
     this.setFormConfig();
-    // console.log('Check field : ',this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[7])
     this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[11].hide = true;
     this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[12].hide = true;
   }
 
+  ngOnDestroy() {
+    this.drilldownSub?.unsubscribe();
+  }
+
   hide() {
-    const modalCloseButton = document.getElementById('modalClose');
-    if (modalCloseButton) {
-      modalCloseButton.click();
+    const modalEl = document.getElementById('productModal');
+    if (modalEl && (window as any).bootstrap) {
+      const modal = (window as any).bootstrap.Modal.getInstance(modalEl);
+      if (modal) { modal.hide(); return; }
     }
+    // fallback
+    (document.getElementById('modalClose') as HTMLElement)?.click();
   }
 
   // editProducts(event: any) {
@@ -222,6 +250,7 @@ export class ProductsComponent implements OnInit {
   // }
 
 editProducts(event: any) {
+  this.showForm = false;
   console.log('event', event);
   this.ProductEditID = event;
 

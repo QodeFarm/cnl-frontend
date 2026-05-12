@@ -4,6 +4,7 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   selector: 'app-tasks-list',
@@ -14,7 +15,7 @@ import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 })
 export class TasksListComponent {
 
-  @Output('edit') edit = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   refreshTable() {
@@ -25,6 +26,9 @@ export class TasksListComponent {
     apiUrl: 'tasks/task/',
     showCheckbox:true,
     pkId: "task_id",
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'task_id', moduleName: 'Tasks', sectionName: 'Task', editEmitter: this.edit }),
+    },
     pageSize: 10,
     "globalSearch": {
       keys: ['title','user_id','group_id','description','priority_id','due_date','status_id']
@@ -118,5 +122,5 @@ export class TasksListComponent {
     ]
   };
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private dblClickNav: DoubleClickNavigationService) {}
 }

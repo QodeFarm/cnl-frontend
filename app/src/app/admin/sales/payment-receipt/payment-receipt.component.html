@@ -1,7 +1,12 @@
 <div class="container-fluid p-3">
-  
+
   <!-- Admin View - Create/Edit Form -->
-  <div *ngIf="!isCustomerPortal">
+  <div *ngIf="SaleOrderEditID && !showForm && !isCustomerPortal" class="row custom-form">
+    <div class="col-12 p-3">
+      <nz-skeleton [nzActive]="true" [nzParagraph]="{ rows: 8 }"></nz-skeleton>
+    </div>
+  </div>
+  <div *ngIf="!isCustomerPortal && showForm">
     <div class="payment-receipt-banner">
       <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
         <button type="button" class="btn pl-0" style="color: black;">

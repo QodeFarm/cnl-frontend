@@ -4,6 +4,7 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   selector: 'app-warehouses-list',
@@ -13,7 +14,7 @@ import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
   styleUrls: ['./warehouses-list.component.scss']
 })
 export class WarehousesListComponent {
-  @Output('edit') edit = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   refreshTable() {
@@ -24,6 +25,9 @@ export class WarehousesListComponent {
     apiUrl: 'inventory/warehouses/',
     showCheckbox:true,
     pkId: "warehouse_id",
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'warehouse_id', moduleName: 'Inventory', sectionName: 'Warehouse', editEmitter: this.edit }),
+    },
     pageSize: 10,
     "globalSearch": {
       keys: ['created_at','name','code','phone','city_id','state_id']
@@ -98,5 +102,5 @@ export class WarehousesListComponent {
     ]
   };
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private dblClickNav: DoubleClickNavigationService) {}
 }

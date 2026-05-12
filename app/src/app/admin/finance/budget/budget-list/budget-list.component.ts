@@ -4,6 +4,7 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   selector: 'app-budget-list',
@@ -14,7 +15,7 @@ import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 })
 export class BudgetListComponent {
 
-  @Output('edit') edit = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   refreshTable() {
@@ -25,6 +26,9 @@ export class BudgetListComponent {
     apiUrl: 'finance/budgets/',
     showCheckbox:true,
     pkId: "budget_id",
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'budget_id', moduleName: 'Finance', sectionName: 'Budget', editEmitter: this.edit }),
+    },
     pageSize: 10,
     "globalSearch": {
       keys: ['created_at','account_id','fiscal_year','allocated_amount','spent_amount']
@@ -89,7 +93,7 @@ export class BudgetListComponent {
       }
     ]
   };
-  constructor(private router: Router) {}
+  constructor(private router: Router, private dblClickNav: DoubleClickNavigationService) {}
 }
 
 

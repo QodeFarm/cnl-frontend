@@ -4,6 +4,7 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   selector: 'app-asset-maintenance-list',
@@ -17,7 +18,7 @@ export class AssetMaintenanceListComponent {
   baseUrl: string = 'https://apicore.cnlerp.com/api/v1/';
   // baseUrl: string = 'http://127.0.0.1:8000/api/v1/';
 
-  @Output('edit') edit = new EventEmitter<void>();
+  @Output('edit') edit = new EventEmitter<any>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   refreshTable() {
@@ -28,6 +29,9 @@ export class AssetMaintenanceListComponent {
     apiUrl: this.baseUrl + 'assets/asset_maintenance/',
     showCheckbox:true,
     pkId: "asset_maintenance_id",
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'asset_maintenance_id', moduleName: 'Assets', sectionName: 'Asset Maintenance', editEmitter: this.edit }),
+    },
     pageSize: 10,
     "globalSearch": {
       keys: ['asset_id','maintenance_date','asset_id','cost','maintenance_description']
@@ -94,5 +98,5 @@ export class AssetMaintenanceListComponent {
     ]
   };
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private dblClickNav: DoubleClickNavigationService) {}
 }

@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, ViewChild } from '@angular/core';
 import { TaFormComponent, TaFormConfig } from '@ta/ta-form';
-import { distinctUntilChanged } from 'rxjs/operators';
+import { distinctUntilChanged, filter } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { PurchaseInvoiceListComponent } from './purchase-invoice-list/purchase-invoice-list.component';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -9,6 +10,7 @@ import { FormBuilder } from '@angular/forms';
 import { CustomFieldHelper } from '../../utils/custom_field_fetch';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { calculateTotalAmount, displayInformation, getUnitData, sumQuantities } from 'src/app/utils/display.utils';
+import { DrilldownEditService } from 'src/app/services/drilldown-edit.service';
 
 @Component({
   selector: 'app-purchase-invoice',
@@ -18,12 +20,13 @@ import { calculateTotalAmount, displayInformation, getUnitData, sumQuantities } 
   styleUrls: ['./purchase-invoice.component.scss']
 })
 
-export class PurchaseInvoiceComponent {
+export class PurchaseInvoiceComponent implements OnDestroy {
   @ViewChild('purchaseinvoiceForm', { static: false }) purchaseinvoiceForm: TaFormComponent | undefined;
   invoiceNumber: any;
   showPurchaseInvoiceList: boolean = false;
   showForm: boolean = false;
   PurchaseInvoiceEditID: any;
+  private drilldownSub: Subscription;
   productOptions: any;
   @ViewChild(PurchaseInvoiceListComponent) PurchaseInvoiceListComponent!: PurchaseInvoiceListComponent;
 
@@ -152,7 +155,8 @@ export class PurchaseInvoiceComponent {
     private router: Router,
     private route: ActivatedRoute,
     private fb: FormBuilder,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private drilldownEditService: DrilldownEditService
   ) {}
 
   dataToPopulate: any;
@@ -162,6 +166,7 @@ export class PurchaseInvoiceComponent {
   private resetToNewForm(): void {
     this.PurchaseInvoiceEditID = null;
     this.setFormConfig();
+    this.showForm = true;
     if (this.formConfig.model?.purchase_invoice_orders) {
       this.formConfig.model['purchase_invoice_orders']['order_type'] = 'purchase_invoice';
     }
@@ -177,31 +182,41 @@ export class PurchaseInvoiceComponent {
   }
 
   ngOnInit() {
-
-    this.showPurchaseInvoiceList = false;
-    this.showForm = false;
-    this.PurchaseInvoiceEditID = null;
-    // set form config
-    this.setFormConfig();
-    this.checkAndPopulateData();
-    this.loadQuickpackOptions();
-
-    //custom fields logic...
-    this.http.get('masters/entities/')
-      .subscribe((res: any) => {
-        this.entitiesList = res.data || []; // Adjust if the response format differs
+    this.drilldownSub = this.drilldownEditService.editRequest$
+      .pipe(filter(r => r.route === '/admin/purchase/purchase-invoice'))
+      .subscribe(r => {
+        if (r.editId === this.PurchaseInvoiceEditID) return;
+        this.setFormConfig();
+        this.editPurchaseInvoice(r.editId);
       });
+    // Shared setup for both create and edit
+    this.setFormConfig();
+
+    this.http.get('masters/entities/').subscribe((res: any) => {
+      this.entitiesList = res.data || [];
+    });
 
     CustomFieldHelper.fetchCustomFields(this.http, 'purchase_invoice', (customFields: any, customFieldMetadata: any) => {
       CustomFieldHelper.addCustomFieldsToFormConfig_2(customFields, customFieldMetadata, this.formConfig);
     });
-    // set purchase_order default value
-    this.formConfig.model['purchase_invoice_orders']['order_type'] = 'purchase_invoice';
 
-    // to get PurchaseOrder number for save
+    const editId = window.history.state?.editId;
+    if (editId) {
+      history.replaceState({}, '', window.location.href);
+      this.editPurchaseInvoice(editId);
+      return;
+    }
+
+    // Create mode only
+    this.showPurchaseInvoiceList = false;
+    this.showForm = true;
+    this.PurchaseInvoiceEditID = null;
+    this.checkAndPopulateData();
+    this.loadQuickpackOptions();
+    this.formConfig.model['purchase_invoice_orders']['order_type'] = 'purchase_invoice';
     this.getInvoiceNo();
-    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide =true;  //Hiding order status in create field
-    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide =true;  //Hiding order status in create field
+    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = true;
+    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide = true;
   }
 
   // checkAndPopulateData() {
@@ -437,6 +452,7 @@ checkAndPopulateData() {
   }
 
   editPurchaseInvoice(event) {
+    this.showForm = false;
     this.PurchaseInvoiceEditID = event;
     this.http.get('purchase/purchase_invoice_order/' + event).subscribe((res: any) => {
       if (res && res.data) {
@@ -2625,6 +2641,10 @@ loadQuickpackProducts() {
 
   totalAmountCal() {
     calculateTotalAmount(this.formConfig.model, 'purchase_invoice_items', this.purchaseinvoiceForm?.form);
+  }
+
+  ngOnDestroy() {
+    this.drilldownSub?.unsubscribe();
   }
 
 }

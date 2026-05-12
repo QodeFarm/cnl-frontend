@@ -3,6 +3,7 @@ import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   selector: 'app-employee-list',
@@ -12,19 +13,24 @@ import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
   styleUrls: ['./employee-list.component.scss']
 })
 
-export class EmployeeListComponent { 
-  @Output('edit') edit = new EventEmitter<void>();
+export class EmployeeListComponent {
+  @Output('edit') edit = new EventEmitter<any>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+
+  constructor(private dblClickNav: DoubleClickNavigationService) {}
 
   refreshTable() {
     this.taTableComponent?.refresh();
-   };
+  };
 
   tableConfig: TaTableConfig = {
     apiUrl: 'hrms/employees/',
     // title: 'Edit Sales Order List',
     showCheckbox:true,
     pkId: "employee_id",
+    rowEvents: {
+      dblclick: this.dblClickNav.createHandler({ pkField: 'employee_id', moduleName: 'HRMS', sectionName: 'Employee', editEmitter: this.edit }),
+    },
     pageSize: 10,
     "globalSearch": {
       keys: ['hire_date','first_name','full_name','last_name','email','phone','address','hire_date','job_type_id','designation_id','department_id','shift_id','manager_id']

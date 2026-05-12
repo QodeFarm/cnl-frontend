@@ -37,6 +37,7 @@ export class ExpenseClaimComponent {
   };
 
   editExpenseClaim(event) {
+    this.showForm = false;
     console.log('event', event);
     this.ExpenseClaimEditID = event;
     this.http.get('finance/expense_claims/' + event).subscribe((res: any) => {

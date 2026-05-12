@@ -1,19 +1,20 @@
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
 import { TaFormComponent, TaFormConfig } from '@ta/ta-form';
-import { distinctUntilChanged, switchMap, tap } from 'rxjs/operators';
+import { distinctUntilChanged, filter, switchMap, tap } from 'rxjs/operators';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 import { CommonModule } from '@angular/common';
 import { PurchaseListComponent } from './purchase-list/purchase-list.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder } from '@angular/forms';
-import { forkJoin, Observable } from 'rxjs';
+import { forkJoin, Observable, Subscription } from 'rxjs';
 import { OrderListComponent } from './order-list/order-list.component';
 import { calculateTotalAmount, displayInformation, getUnitData, sumQuantities } from 'src/app/utils/display.utils';
 import { CustomFieldHelper } from '../utils/custom_field_fetch';
 // import { displayInformation, getUnitData, sumQuantities } from 'src/app/utils/display.utils';
 import { FormlyFieldConfig } from '@ngx-formly/core';
+import { DrilldownEditService } from 'src/app/services/drilldown-edit.service';
 declare var bootstrap;
 @Component({
   selector: 'app-purchase',
@@ -31,6 +32,7 @@ export class PurchaseComponent {
   showForm: boolean = false;
   vendorDetails: Object;
   PurchaseOrderEditID: any;
+  private drilldownSub: Subscription;
   productOptions: any;
   @ViewChild(PurchaseListComponent) PurchaseListComponent!: PurchaseListComponent;
   unitOptionOfProduct: any[] | string = []; // Initialize as an array by default
@@ -166,37 +168,49 @@ export class PurchaseComponent {
     private router: Router,
     private route: ActivatedRoute,
     private fb: FormBuilder,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private drilldownEditService: DrilldownEditService
   ) {}
 
   dataToPopulate: any;
   hasDataPopulated: boolean = false;
   entitiesList: any[] = [];
   ngOnInit() {
-    
-    this.showPurchaseOrderList = false;
-    this.showForm = true;
-    this.PurchaseOrderEditID = null;
-    // set form config
-    this.setFormConfig();
-    this.checkAndPopulateData();
-    this.loadQuickpackOptions();
-    //custom fields logic...
-    this.http.get('masters/entities/')
-      .subscribe((res: any) => {
-        this.entitiesList = res.data || []; // Adjust if the response format differs
+    this.drilldownSub = this.drilldownEditService.editRequest$
+      .pipe(filter(r => r.route === '/admin/purchase'))
+      .subscribe(r => {
+        if (r.editId === this.PurchaseOrderEditID) return;
+        this.setFormConfig();
+        this.editPurchaseOrder(r.editId);
       });
+    // Shared setup for both create and edit
+    this.setFormConfig();
+
+    this.http.get('masters/entities/').subscribe((res: any) => {
+      this.entitiesList = res.data || [];
+    });
+
     CustomFieldHelper.fetchCustomFields(this.http, 'purchase_order', (customFields: any, customFieldMetadata: any) => {
       CustomFieldHelper.addCustomFieldsToFormConfig_2(customFields, customFieldMetadata, this.formConfig);
     });
-    // set purchase_order default value
-    this.formConfig.model['purchase_order_data']['order_type'] = 'purchase_order';
 
-    // to get PurchaseOrder number for save
+    const editId = window.history.state?.editId;
+    if (editId) {
+      history.replaceState({}, '', window.location.href);
+      this.editPurchaseOrder(editId);
+      return;
+    }
+
+    // Create mode only
+    this.showPurchaseOrderList = false;
+    this.showForm = true;
+    this.PurchaseOrderEditID = null;
+    this.checkAndPopulateData();
+    this.loadQuickpackOptions();
+    this.formConfig.model['purchase_order_data']['order_type'] = 'purchase_order';
     this.getOrderNo();
-    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide =true;
-    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide =true;
-    // console.log("---------",this.formConfig.fields[2].fieldGroup[1].fieldGroup[0].fieldGroup[0].fieldGroup[1])
+    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = true;
+    this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide = true;
   }
 
   // checkAndPopulateData() {
@@ -435,6 +449,7 @@ export class PurchaseComponent {
   }
 
   editPurchaseOrder(event) {
+    this.showForm = false;
     console.log('event', event);
     this.PurchaseOrderEditID = event;
     this.http.get('purchase/purchase_order/' + event).subscribe((res: any) => {
@@ -877,6 +892,7 @@ loadQuickpackProducts() {
   }
 
   ngOnDestroy() {
+    this.drilldownSub?.unsubscribe();
     // Ensure modals are disposed of correctly
     document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
   }

@@ -37,6 +37,7 @@ export class ChartOfAccountsComponent {
   };
 
   editChartOfAccounts(event) {
+    this.showForm = false;
     console.log('event', event);
     this.ChartOfAccountsEditID = event;
     this.http.get('finance/chart_of_accounts/' + event).subscribe((res: any) => {

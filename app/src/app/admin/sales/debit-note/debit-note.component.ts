@@ -1,5 +1,9 @@
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
+import { DrilldownEditService } from 'src/app/services/drilldown-edit.service';
 import { TaFormComponent, TaFormConfig } from '@ta/ta-form';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
@@ -11,7 +15,7 @@ import { DebitNoteListComponent } from './debit-note-list/debit-note-list.compon
   templateUrl: './debit-note.component.html',
   styleUrls: ['./debit-note.component.scss']
 })
-export class DebitNoteComponent {
+export class DebitNoteComponent implements OnDestroy {
   @ViewChild('salesdebitnoteForm', { static: false }) salesdebitnoteForm: TaFormComponent | undefined;
   @ViewChild(DebitNoteListComponent) DebitNoteListComponent!: DebitNoteListComponent;
 
@@ -20,6 +24,7 @@ export class DebitNoteComponent {
   orderNumber: any;
   showForm: boolean = false;
   SaleDebitnoteEditID: any;
+  private drilldownSub: Subscription;
   productOptions: any;
   customerDetails: Object;
   customerOrders: any[] = []; 
@@ -30,14 +35,27 @@ export class DebitNoteComponent {
     return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   }
 
-  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) { }
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef, private route: ActivatedRoute, private router: Router, private drilldownEditService: DrilldownEditService) { }
 
   ngOnInit() {
+    this.drilldownSub = this.drilldownEditService.editRequest$
+      .pipe(filter(r => r.route === '/admin/sales/debit-note'))
+      .subscribe(r => {
+        if (r.editId === this.SaleDebitnoteEditID) return;
+        this.setFormConfig();
+        this.editSaleDebitnote(r.editId);
+      });
+    const editId = window.history.state?.editId;
+    if (editId) {
+      history.replaceState({}, '', window.location.href);
+      this.setFormConfig();
+      this.editSaleDebitnote(editId);
+      return;
+    }
 
     this.showSaleDebitnoteList = false;
     this.showForm = true;
     this.SaleDebitnoteEditID = null;
-
 
     this.setFormConfig();
     this.getOrderNo();
@@ -88,6 +106,7 @@ export class DebitNoteComponent {
   }
 
   editSaleDebitnote(event) {
+    this.showForm = false;
     this.SaleDebitnoteEditID = event;
     this.http.get('sales/sale_debit_notes/' + event).subscribe((res: any) => {
       if (res && res.data) {
@@ -545,5 +564,9 @@ export class DebitNoteComponent {
       }
     });
   }
-  
+
+  ngOnDestroy() {
+    this.drilldownSub?.unsubscribe();
+  }
+
 }

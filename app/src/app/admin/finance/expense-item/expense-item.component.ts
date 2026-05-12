@@ -37,6 +37,7 @@ export class ExpenseItemComponent {
   };
 
   editExpenseItem(event) {
+    this.showForm = false;
     console.log('event', event);
     this.ExpenseItemEditID = event;
     this.http.get('finance/expense_items/' + event).subscribe((res: any) => {

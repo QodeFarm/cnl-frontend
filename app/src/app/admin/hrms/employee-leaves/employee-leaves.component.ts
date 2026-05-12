@@ -37,6 +37,7 @@ export class EmployeeLeavesComponent implements OnInit {
   }
 
   editEmployeeLeaves(event) {
+    this.showForm = false;
     console.log('event', event);
     this.EmployeeLeavesEditID = event;
     this.http.get('hrms/employee_leaves/' + event).subscribe((res: any) => {

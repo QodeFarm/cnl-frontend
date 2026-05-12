@@ -3,6 +3,7 @@ import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { TaCurdConfig } from '@ta/ta-curd';
 import { TaTableComponent, TaTableModule } from '@ta/ta-table'; 
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
 
 @Component({
   selector: 'app-ledger-account-list',
@@ -12,9 +13,11 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
   styleUrls: ['./ledger-account-list.component.scss']
 })
 export class LedgerAccountListComponent {
-    @Output('edit') edit = new EventEmitter<void>();
+    @Output('edit') edit = new EventEmitter<any>();
     @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
-  
+
+    constructor(private dblClickNav: DoubleClickNavigationService) {}
+
     refreshTable() {
       this.taTableComponent?.refresh();
     };
@@ -25,6 +28,9 @@ export class LedgerAccountListComponent {
         apiUrl: 'customers/ledger_accounts/',
         title: 'Chart of Accounts',
         pkId: "ledger_account_id",
+        rowEvents: {
+          dblclick: this.dblClickNav.createHandler({ pkField: 'ledger_account_id', moduleName: 'Customers', sectionName: 'Ledger Account', editEmitter: this.edit }),
+        },
         pageSize: 10,
         "globalSearch": {
           keys: ['ledger_account_id', 'name', 'code', 'inactive', 'type', 'account_no', 'is_loan_account', 'address', 'pan', 'ledger_group_id']

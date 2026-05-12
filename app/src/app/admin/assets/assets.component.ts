@@ -30,7 +30,6 @@ export class AssetsComponent{
     this.AssetsEditID= null;
     // Set form config
     this.setFormConfig();
-    console.log('this.formConfig', this.formConfig);
   };
 
   formConfig: TaFormConfig = {};
@@ -40,7 +39,7 @@ export class AssetsComponent{
   }
 
   editAssets(event) {
-    console.log('event', event);
+    this.showForm = false;
     this.AssetsEditID = event;
     this.http.get(this.baseUrl + 'assets/assets/' + event).subscribe((res: any) => {
       if (res) {

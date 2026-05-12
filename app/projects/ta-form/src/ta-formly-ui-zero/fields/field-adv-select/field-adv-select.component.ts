@@ -256,6 +256,7 @@ export class FieldAdvSelectComponent extends FieldType implements OnInit, AfterC
       if (triggerEl) {
         const rect = triggerEl.getBoundingClientRect();
         const vh = window.innerHeight;
+        const vw = window.innerWidth;
         const margin = 16;
 
         // --- Vertical: pick the bigger gap (above vs below) ---
@@ -266,6 +267,26 @@ export class FieldAdvSelectComponent extends FieldType implements OnInit, AfterC
 
         // Width is always auto — panel expands to fit column content, capped by CSS max-width
         this.overlayWidth = 'auto';
+
+        // --- Horizontal: flip alignment when not enough space to the right ---
+        // Min panel width is 480px (from CSS). If space to the right of trigger < 480px,
+        // prefer end-alignment so the panel opens leftward from the trigger's right edge.
+        const spaceRight = vw - rect.right - margin;
+        if (spaceRight < 480) {
+          this.positions = [
+            { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top' },
+            { originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top' },
+            { originX: 'end', originY: 'top', overlayX: 'end', overlayY: 'bottom' },
+            { originX: 'start', originY: 'top', overlayX: 'start', overlayY: 'bottom' },
+          ];
+        } else {
+          this.positions = [
+            { originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top' },
+            { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top' },
+            { originX: 'start', originY: 'top', overlayX: 'start', overlayY: 'bottom' },
+            { originX: 'end', originY: 'top', overlayX: 'end', overlayY: 'bottom' },
+          ];
+        }
       }
 
       // Auto-focus the search input inside the overlay after it renders

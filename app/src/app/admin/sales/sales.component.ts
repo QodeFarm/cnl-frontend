@@ -21,6 +21,7 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzNotificationService, NzNotificationModule } from 'ng-zorro-antd/notification';
+import { DrilldownEditService } from 'src/app/services/drilldown-edit.service';
 declare var bootstrap;
 @Component({
   standalone: true,
@@ -47,6 +48,7 @@ export class SalesComponent {
   showInvoiceListModal: boolean = false;
   showForm: boolean = false;
   SaleOrderEditID: any;
+  private drilldownSub: Subscription;
   // Tracks flow_status selected in dropdown BEFORE the form is saved
   selectedFlowStatusName: string = '';
   productOptions: any;
@@ -401,7 +403,8 @@ export class SalesComponent {
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
     private localStorage: LocalStorageService,
-    private notification: NzNotificationService
+    private notification: NzNotificationService,
+    private drilldownEditService: DrilldownEditService
   ) { }
 
   dataToPopulate: any;
@@ -417,6 +420,13 @@ export class SalesComponent {
   loggedInCustomerData: any = null;
 
   ngOnInit() {
+    this.drilldownSub = this.drilldownEditService.editRequest$
+      .pipe(filter(r => r.route === '/admin/sales'))
+      .subscribe(r => {
+        if (r.editId === this.SaleOrderEditID) return;
+        this.setFormConfig();
+        this.editSaleOrder(r.editId);
+      });
      // Check if this is customer portal
     this.route.data.subscribe(data => {
       this.isCustomerPortal = data['customerView'] || false;
@@ -456,6 +466,13 @@ export class SalesComponent {
     //      shouldAutoInvoice=true BEFORE getOrderNo() is called below.
     //   2. Component already alive (tab reuse, ngOnInit won't fire again):
     //      subscription is already active and fires when params change.
+    // Handle editId from Account Ledger drilldown (passed via router state, not query params)
+    const drilldownEditId = window.history.state?.editId;
+    if (drilldownEditId) {
+      history.replaceState({}, '', window.location.href);
+      this.editSaleOrder(drilldownEditId);
+    }
+
     if (this.queryParamsSub) {
       this.queryParamsSub.unsubscribe();
     }
@@ -537,6 +554,11 @@ export class SalesComponent {
     });
     // set sale_order default value
     this.formConfig.model['sale_order']['order_type'] = 'sale_order';
+
+    // Show form for create mode (edit mode reveals form in HTTP callback)
+    if (!drilldownEditId && !this.shouldAutoInvoice) {
+      this.showForm = true;
+    }
 
     // Guard inside getOrderNo(): skips when shouldAutoInvoice or SaleOrderEditID is set.
     // shouldAutoInvoice is already true if queryParams emitted synchronously above.
@@ -1186,9 +1208,9 @@ closeNoQuantityWarning() {
   // }
 
   editSaleOrder(event) {
+    this.showForm = false;
     this.SaleOrderEditID = event;
     console.log("event : ", event);
-    this.showForm = false;
 
     this.http.get('sales/sale_order/' + event).subscribe((res: any) => {
       if (res && res.data) {
@@ -1814,6 +1836,7 @@ closeNoQuantityWarning() {
   }
 
   ngOnDestroy() {
+    this.drilldownSub?.unsubscribe();
     // Ensure modals are disposed of correctly
     document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
 
@@ -3490,6 +3513,7 @@ createSaleOrder() {
       this.workflowCheckboxSub = null;
     }
     this.setFormConfig();
+    this.showForm = true;
     this.formConfig.model['sale_order']['order_type'] = 'sale_order';
     this.formConfig.fields[0].fieldGroup[0].fieldGroup[7].hide = true;
     this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = true;
@@ -3504,7 +3528,7 @@ createSaleOrder() {
       const flowStatusId = this.formConfig.model?.['sale_order']?.['flow_status_id'];
       if (flowStatusId) {
         this.http.patch(`sales/sale_order/${this.SaleOrderEditID}/`, { flow_status_id: flowStatusId }).subscribe({
-          next: () => this.router.navigate(['/admin/sales/sales-dispatch']),
+          next: () => this.router.navigate(['/admin/sales/sales-dispatch'], { state: { highlightOrderId: String(this.SaleOrderEditID) } }),
           error: err => {
             console.error('Failed to save flow status before dispatch', err);
             this.router.navigate(['/admin/sales/sales-dispatch']);
@@ -3513,7 +3537,7 @@ createSaleOrder() {
         return;
       }
     }
-    this.router.navigate(['/admin/sales/sales-dispatch']);
+    this.router.navigate(['/admin/sales/sales-dispatch'], { state: { highlightOrderId: this.SaleOrderEditID ? String(this.SaleOrderEditID) : undefined } });
   }
 
   goToOrderAcknowledgement(): void {

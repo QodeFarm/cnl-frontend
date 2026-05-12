@@ -7,7 +7,8 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { MaterialIssueListComponent } from './material-issue-list/material-issue-list.component';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { Subject, Subscription } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import { debounceTime, filter } from 'rxjs/operators';
+import { DrilldownEditService } from 'src/app/services/drilldown-edit.service';
 import { LocalStorageService } from '@ta/ta-core';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -34,6 +35,8 @@ export class MaterialIssueComponent implements OnInit, OnDestroy {
   selectedTable: string;
   currentTable: string = 'Material Issue';
 
+  private drilldownSub: Subscription;
+
   // ========== DRAFT AUTO-SAVE PROPERTIES ==========
   private draftSaveSubject = new Subject<void>();
   private draftSaveSubscription: Subscription | null = null;
@@ -59,18 +62,29 @@ export class MaterialIssueComponent implements OnInit, OnDestroy {
     private notification: NzNotificationService,
     private router: Router,
     private route: ActivatedRoute,
-    private localStorage: LocalStorageService) { }
+    private localStorage: LocalStorageService,
+    private drilldownEditService: DrilldownEditService) { }
 
   ngOnInit() {
+    this.drilldownSub = this.drilldownEditService.editRequest$
+      .pipe(filter(r => r.route === '/admin/production/material-issue'))
+      .subscribe(r => {
+        if (r.editId === this.MaterialIssueEditID) return;
+        this.setFormConfig();
+        this.editMaterialIssue(r.editId);
+      });
+
+    const editId = window.history.state?.editId;
+    if (editId) {
+      history.replaceState({}, '', window.location.href);
+      this.setFormConfig();
+      this.editMaterialIssue(editId);
+      return;
+    }
+
     this.showMaterialIssueList = false;
     this.showForm = true;
     this.MaterialIssueEditID = null;
-    // this.formConfig.model = {
-    //   material_issue: {},
-    //   items: [{}],
-    //   attachments: []
-    // };
-    // this.showForm = true;
     this.setFormConfig();
     this.getIssueNo();
     this.initDraftAutoSave();
@@ -78,6 +92,7 @@ export class MaterialIssueComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.drilldownSub?.unsubscribe();
     if (this.draftSaveSubscription) {
       this.draftSaveSubscription.unsubscribe();
     }
@@ -509,6 +524,7 @@ displayInformation(product: any) {
 
 
     editMaterialIssue(event) {
+    this.showForm = false;
     console.log('Edit Material Issue ID===================:', event);
     this.MaterialIssueEditID = event;
     this.http.get('production/material-issues/' + event).subscribe((res: any) => {
