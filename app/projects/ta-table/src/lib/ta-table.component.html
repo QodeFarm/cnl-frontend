@@ -1,25 +1,25 @@
-<!-- ═══ Account Ledger: dedicated filter panel ══════════════════════════════ -->
+<!-- ═══ Account Ledger: single-row filter bar ════════════════════════════════ -->
 <div class="al-filter-panel" *ngIf="isAccountLedgerPage">
 
-    <!-- Row 1: account type + account search + city -->
-    <div class="al-filter-row-1">
+    <!-- Single row: account type + search + city | period + dates -->
+    <div class="al-filter-row">
 
-        <!-- Account type segment -->
+        <!-- Account type -->
         <nz-radio-group [(ngModel)]="selectedAccountType" (ngModelChange)="onAccountTypeChange()"
-            nzButtonStyle="solid" nzSize="default" class="al-type-radio">
+            nzButtonStyle="solid" nzSize="small" class="al-type-radio">
             <label nz-radio-button nzValue="customer">Customer</label>
             <label nz-radio-button nzValue="vendor">Vendor</label>
             <label nz-radio-button nzValue="general">General</label>
         </nz-radio-group>
 
-        <!-- Account search: takes remaining width -->
+        <!-- Account search -->
         <nz-select
             [(ngModel)]="selectedAccountId"
             (ngModelChange)="onAccountChange()"
-            [nzPlaceHolder]="selectedAccountType ? 'Search ' + selectedAccountType + ' by name or code...' : 'Select account type first'"
+            [nzPlaceHolder]="selectedAccountType ? 'Search ' + selectedAccountType + '...' : 'Select account type first'"
             class="al-account-select"
             [nzDisabled]="!selectedAccountType"
-            nzAllowClear nzShowSearch nzServerSearch
+            nzAllowClear nzShowSearch nzServerSearch nzSize="default"
             [nzLoading]="accountSearchLoading"
             (nzOnSearch)="onAccountSearch($event)"
             nzDropdownClassName="al-account-dropdown"
@@ -33,7 +33,7 @@
             </nz-option>
         </nz-select>
 
-        <!-- City: only for customer/vendor, not general -->
+        <!-- City: customer/vendor only -->
         <nz-select *ngIf="selectedAccountType && selectedAccountType !== 'general'"
             [(ngModel)]="selectedCity" nzPlaceHolder="All Cities"
             class="al-city-select" [nzDisabled]="isCityDisabled"
@@ -41,19 +41,22 @@
             <nz-option *ngFor="let city of cityOptions" [nzValue]="city.value" [nzLabel]="city.label"></nz-option>
         </nz-select>
 
-    </div>
+        <!-- Divider -->
+        <span class="al-filter-divider" *ngIf="selectedAccountId"></span>
 
-    <!-- Row 2: date/period filters — only shown once a specific account is selected -->
-    <div class="al-filter-row-2" *ngIf="selectedAccountId">
-        <span class="al-period-label">Period</span>
-        <nz-select [(ngModel)]="selectedQuickPeriod" (ngModelChange)="onQuickPeriodChange(); applyFilters()"
-            nzPlaceHolder="Quick Period" class="al-period-select" nzAllowClear>
-            <nz-option *ngFor="let p of quickPeriodOptions" [nzValue]="p.value" [nzLabel]="p.label"></nz-option>
-        </nz-select>
-        <nz-date-picker [(ngModel)]="fromDate" nzPlaceHolder="From date"
-            class="al-date-picker" (ngModelChange)="applyFilters()" nzAllowClear></nz-date-picker>
-        <nz-date-picker [(ngModel)]="toDate" nzPlaceHolder="To date"
-            class="al-date-picker" (ngModelChange)="applyFilters()" nzAllowClear></nz-date-picker>
+        <!-- Period + dates: only shown once account is selected -->
+        <ng-container *ngIf="selectedAccountId">
+            <span class="al-period-label">Period</span>
+            <nz-select [(ngModel)]="selectedQuickPeriod" (ngModelChange)="onQuickPeriodChange(); applyFilters()"
+                nzPlaceHolder="Quick Period" class="al-period-select" nzAllowClear>
+                <nz-option *ngFor="let p of quickPeriodOptions" [nzValue]="p.value" [nzLabel]="p.label"></nz-option>
+            </nz-select>
+            <nz-date-picker [(ngModel)]="fromDate" nzPlaceHolder="From date"
+                class="al-date-picker" (ngModelChange)="applyFilters()" nzAllowClear></nz-date-picker>
+            <nz-date-picker [(ngModel)]="toDate" nzPlaceHolder="To date"
+                class="al-date-picker" (ngModelChange)="applyFilters()" nzAllowClear></nz-date-picker>
+        </ng-container>
+
     </div>
 
 </div>

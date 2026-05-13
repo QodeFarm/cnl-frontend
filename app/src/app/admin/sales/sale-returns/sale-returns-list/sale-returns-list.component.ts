@@ -522,7 +522,7 @@ export class SaleReturnsListComponent implements OnInit {
   pendingAction: 'email' | 'preview' | 'print' | 'whatsapp' | null = null;
 
   // Show format selection popup
-  private showFormatDialog(action: 'email' | 'preview' | 'print' | 'whatsapp'): void {
+  showFormatDialog(action: 'email' | 'preview' | 'print' | 'whatsapp'): void {
     if (this.isCustomerPortal) {
       // For customers, only allow preview/print
       if (action === 'preview' || action === 'print') {

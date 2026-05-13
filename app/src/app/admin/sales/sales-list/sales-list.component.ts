@@ -99,7 +99,7 @@ export class SalesListComponent implements OnInit {
   pendingAction: 'email' | 'preview' | 'print' | 'whatsapp' | null = null;
 
   // Only show format dialog for customers if needed
-  private showFormatDialog(action: 'email' | 'preview' | 'print' | 'whatsapp'): void {
+  showFormatDialog(action: 'email' | 'preview' | 'print' | 'whatsapp'): void {
     if (this.isCustomerPortal) {
       // For customers, maybe just preview is enough
       if (action === 'preview' || action === 'print') {

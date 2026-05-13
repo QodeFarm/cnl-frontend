@@ -14,10 +14,10 @@ $color-cr:      #16a34a;
 .account-ledger-page {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
-// ── Summary bar ───────────────────────────────────────────────────────────────
+// ── Summary bar (compact single-line) ─────────────────────────────────────────
 .ledger-summary-bar {
   display: flex;
   align-items: center;
@@ -27,33 +27,34 @@ $color-cr:      #16a34a;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-  min-height: 64px;
+  min-height: 48px;
 }
 
 // ── Account identity (left block) ─────────────────────────────────────────────
 .ledger-identity {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 4px;
-  padding: 12px 20px;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
   border-right: 1px solid $border;
   background: #f8fafc;
   flex-shrink: 0;
-  min-width: 160px;
-  max-width: 240px;
+  min-width: 140px;
+  max-width: 220px;
 }
 
 .ledger-type-badge {
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.5px;
   text-transform: uppercase;
   color: $primary;
   background: rgba(20, 39, 104, 0.09);
-  padding: 2px 8px;
+  padding: 2px 7px;
   border-radius: 4px;
-  width: fit-content;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .ledger-account-name {
@@ -64,11 +65,10 @@ $color-cr:      #16a34a;
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 1.3;
-  max-width: 200px;
-  title: attr(title);
+  max-width: 180px;
 }
 
-// ── Balance stats (center) ────────────────────────────────────────────────────
+// ── Balance stats (center, compact single line) ───────────────────────────────
 .ledger-stats {
   display: flex;
   align-items: stretch;
@@ -77,10 +77,10 @@ $color-cr:      #16a34a;
 
 .ledger-stat {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  flex-direction: row;
   align-items: center;
-  padding: 10px 16px;
+  gap: 6px;
+  padding: 0 14px;
   flex: 1;
   border-right: 1px solid #f1f5f9;
 
@@ -97,39 +97,33 @@ $color-cr:      #16a34a;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.3px;
   color: $text-light;
-  margin-bottom: 4px;
   white-space: nowrap;
 }
 
 .stat-value {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   font-family: 'Roboto Mono', 'Consolas', monospace;
   color: #334155;
   display: flex;
   align-items: baseline;
-  gap: 4px;
+  gap: 3px;
 
-  // Dr = red (customer owes us / debit side)
   &.dr      { color: $color-dr; }
-  // Cr = green (we owe customer / credit side)
   &.cr      { color: $color-cr; }
   &.neutral { color: $text-mid; }
-
-  &.closing {
-    font-size: 15px;
-  }
+  &.closing { font-size: 14px; }
 }
 
 // Dr/Cr suffix badge in closing balance
 .bal-suffix {
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.5px;
   font-family: 'Poppins', sans-serif;
-  padding: 1px 5px;
+  padding: 1px 4px;
   border-radius: 3px;
 
   &.suffix-dr {
@@ -145,7 +139,7 @@ $color-cr:      #16a34a;
 
 // ── Actions (right block of summary bar) ─────────────────────────────────────
 .ledger-actions {
-  padding: 0 16px;
+  padding: 0 12px;
   border-left: 1px solid $border;
   display: flex;
   align-items: center;
@@ -159,8 +153,8 @@ $color-cr:      #16a34a;
   color: #ffffff !important;
   font-size: 13px;
   font-weight: 500;
-  height: 34px;
-  padding: 0 14px;
+  height: 32px;
+  padding: 0 12px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -178,52 +172,48 @@ $color-cr:      #16a34a;
 
   ::ng-deep {
 
-    // ── Account Ledger filter panel (inside ta-table) ──────────────────────
+    // ── Account Ledger filter panel (single compact row) ──────────────────
     .al-filter-panel {
       background: #ffffff;
       border: 1px solid $border;
       border-radius: 8px;
-      padding: 10px 14px;
-      margin-bottom: 8px;
+      padding: 8px 12px;
+      margin-bottom: 0;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .al-filter-row {
       display: flex;
-      flex-direction: column;
+      align-items: center;
       gap: 8px;
-    }
-
-    .al-filter-row-1 {
-      display: flex;
-      align-items: center;
-      gap: 10px;
       flex-wrap: nowrap;
     }
 
-    .al-filter-row-2 {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: nowrap;
-      padding-top: 2px;
-      border-top: 1px solid #f1f5f9;
+    .al-filter-divider {
+      width: 1px;
+      height: 22px;
+      background: $border;
+      flex-shrink: 0;
+      margin: 0 4px;
     }
 
     .al-account-select {
       flex: 1;
-      min-width: 0;
+      min-width: 160px;
     }
 
     .al-city-select {
-      width: 160px;
+      width: 140px;
       flex-shrink: 0;
     }
 
     .al-period-select {
-      width: 155px;
+      width: 140px;
       flex-shrink: 0;
     }
 
     .al-date-picker {
-      width: 135px;
+      width: 120px;
       flex-shrink: 0;
     }
 
@@ -336,8 +326,6 @@ $color-cr:      #16a34a;
     width: 100%;
     border-right: none;
     border-bottom: 1px solid $border;
-    flex-direction: row;
-    gap: 10px;
   }
 
   .ledger-stats {
@@ -346,7 +334,10 @@ $color-cr:      #16a34a;
 
   .ledger-stat {
     flex: 1;
-    padding: 8px 12px;
+    padding: 8px 10px;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
   }
 
   .ledger-actions {
@@ -354,8 +345,12 @@ $color-cr:      #16a34a;
     border-top: 1px solid $border;
     width: 100%;
     justify-content: flex-end;
-    padding: 10px 16px;
+    padding: 8px 12px;
     background: #fff;
+  }
+
+  .ledger-table-wrapper ::ng-deep .al-filter-row {
+    flex-wrap: wrap;
   }
 }
 
@@ -373,25 +368,16 @@ $color-cr:      #16a34a;
     flex: 0 0 50%;
     border-right: none;
     border-bottom: 1px solid #f1f5f9;
-    padding: 10px;
+    padding: 8px;
 
     &:nth-child(odd) {
       border-right: 1px solid #f1f5f9;
     }
   }
 
-  .stat-label {
-    font-size: 10px;
-  }
-
-  .stat-value {
-    font-size: 13px;
-  }
-
   .ledger-table-wrapper {
     ::ng-deep {
-      .al-filter-row-1,
-      .al-filter-row-2 {
+      .al-filter-row {
         flex-wrap: wrap;
       }
 
@@ -401,6 +387,10 @@ $color-cr:      #16a34a;
       .al-date-picker {
         width: 100% !important;
         flex: 1 1 140px;
+      }
+
+      .al-filter-divider {
+        display: none;
       }
 
       .ant-table-content {
@@ -414,7 +404,7 @@ $color-cr:      #16a34a;
 // ── Responsive: Small mobile ──────────────────────────────────────────────────
 @media (max-width: 479px) {
   .ledger-identity {
-    padding: 10px 12px;
+    padding: 8px 10px;
   }
 
   .ledger-account-name {
