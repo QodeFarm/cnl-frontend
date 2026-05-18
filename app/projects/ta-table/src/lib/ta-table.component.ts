@@ -1187,6 +1187,7 @@ applyFilters() {
       this.pageSize = this.options.pageSize;
     } else {
       this.options.pageSize = 10;
+      this.pageSize = 10;
     }
     this.options.reload = () => { this.reload() };
     this.options.resetSearch = () => {

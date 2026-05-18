@@ -1,22 +1,20 @@
-<!-- ═══ Account Ledger: dedicated filter panel ══════════════════════════════ -->
+<!-- ═══ Account Ledger: single-row filter bar ════════════════════════════════ -->
 <div class="al-filter-panel" *ngIf="isAccountLedgerPage">
+    <div class="al-filter-row">
 
-    <!-- Row 1: account type + account search + city -->
-    <div class="al-filter-row-1">
-
-        <!-- Account type segment -->
+        <!-- Account type toggle -->
         <nz-radio-group [(ngModel)]="selectedAccountType" (ngModelChange)="onAccountTypeChange()"
-            nzButtonStyle="solid" nzSize="default" class="al-type-radio">
+            nzButtonStyle="solid" class="al-type-radio">
             <label nz-radio-button nzValue="customer">Customer</label>
             <label nz-radio-button nzValue="vendor">Vendor</label>
             <label nz-radio-button nzValue="general">General</label>
         </nz-radio-group>
 
-        <!-- Account search: takes remaining width -->
+        <!-- Account search (fills available space) -->
         <nz-select
             [(ngModel)]="selectedAccountId"
             (ngModelChange)="onAccountChange()"
-            [nzPlaceHolder]="selectedAccountType ? 'Search ' + selectedAccountType + ' by name or code...' : 'Select account type first'"
+            [nzPlaceHolder]="selectedAccountType ? 'Search ' + selectedAccountType + '...' : 'Select account type first'"
             class="al-account-select"
             [nzDisabled]="!selectedAccountType"
             nzAllowClear nzShowSearch nzServerSearch
@@ -33,7 +31,7 @@
             </nz-option>
         </nz-select>
 
-        <!-- City: only for customer/vendor, not general -->
+        <!-- City filter: customer / vendor only -->
         <nz-select *ngIf="selectedAccountType && selectedAccountType !== 'general'"
             [(ngModel)]="selectedCity" nzPlaceHolder="All Cities"
             class="al-city-select" [nzDisabled]="isCityDisabled"
@@ -41,21 +39,21 @@
             <nz-option *ngFor="let city of cityOptions" [nzValue]="city.value" [nzLabel]="city.label"></nz-option>
         </nz-select>
 
-    </div>
+        <!-- Pipe divider + period controls: appear once an account is chosen -->
+        <ng-container *ngIf="selectedAccountId">
+            <span class="al-row-sep"></span>
+            <span class="al-period-label">Period</span>
+            <nz-select [(ngModel)]="selectedQuickPeriod" (ngModelChange)="onQuickPeriodChange(); applyFilters()"
+                nzPlaceHolder="Quick period" class="al-period-select" nzAllowClear>
+                <nz-option *ngFor="let p of quickPeriodOptions" [nzValue]="p.value" [nzLabel]="p.label"></nz-option>
+            </nz-select>
+            <nz-date-picker [(ngModel)]="fromDate" nzPlaceHolder="From date"
+                class="al-date-picker" (ngModelChange)="applyFilters()" nzAllowClear></nz-date-picker>
+            <nz-date-picker [(ngModel)]="toDate" nzPlaceHolder="To date"
+                class="al-date-picker" (ngModelChange)="applyFilters()" nzAllowClear></nz-date-picker>
+        </ng-container>
 
-    <!-- Row 2: date/period filters — only shown once a specific account is selected -->
-    <div class="al-filter-row-2" *ngIf="selectedAccountId">
-        <span class="al-period-label">Period</span>
-        <nz-select [(ngModel)]="selectedQuickPeriod" (ngModelChange)="onQuickPeriodChange(); applyFilters()"
-            nzPlaceHolder="Quick Period" class="al-period-select" nzAllowClear>
-            <nz-option *ngFor="let p of quickPeriodOptions" [nzValue]="p.value" [nzLabel]="p.label"></nz-option>
-        </nz-select>
-        <nz-date-picker [(ngModel)]="fromDate" nzPlaceHolder="From date"
-            class="al-date-picker" (ngModelChange)="applyFilters()" nzAllowClear></nz-date-picker>
-        <nz-date-picker [(ngModel)]="toDate" nzPlaceHolder="To date"
-            class="al-date-picker" (ngModelChange)="applyFilters()" nzAllowClear></nz-date-picker>
     </div>
-
 </div>
 
 <!-- ═══ Main header row: title + other module filters + search/actions ════ -->
@@ -348,7 +346,7 @@
 
             <ng-container *ngFor="let c of options.cols">
 
-                <th *ngIf="!c.hidden" style="min-width: 150px;" (nzSortOrderChange)="nzSortOrderChange($event)"
+                <th *ngIf="!c.hidden" [style.min-width]="c.width || '150px'" (nzSortOrderChange)="nzSortOrderChange($event)"
                     [nzColumnKey]="c.sortKey || c.fieldKey" [nzFilterFn]="false" [nzSortDirections]="(c.sort)?[]:[null]"
                     [nzSortOrder]="c.sortOrder" [nzSortFn]="c.sort" [nzWidth]="c.width" nzCustomFilter
                     [class.ta-action-sticky]="c.type === 'action'">{{c.name}}
@@ -379,7 +377,7 @@
                 (nzCheckedChange)="onItemChecked(data[options.pkId], $event)" [nzDisabled]="false"
                 [nzLabel]="data.name"></td>
             <ng-container *ngFor="let c of options.cols">
-                <td *ngIf="!c.hidden" style="min-width: 150px;" [ngClass]="c.tdClassName" [nzEllipsis]="c.ellipsis"
+                <td *ngIf="!c.hidden" [style.min-width]="c.width || '150px'" [ngClass]="c.tdClassName" [nzEllipsis]="c.ellipsis"
                     [class.ta-action-sticky]="c.type === 'action'"
                     (click)="options.rowSelectionEnabled && c.type != 'action' && onRowSelect(data)">
                     <label class="col-name">{{c.name}} :</label>
