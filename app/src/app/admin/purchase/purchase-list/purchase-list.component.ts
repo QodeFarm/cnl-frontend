@@ -27,7 +27,7 @@ selectedFormat: string = "CNL_Standard_Excl";
 pendingAction: 'email' | 'preview' | 'print' | 'whatsapp' | null = null;
 
 // Show format selection popup
-private showFormatDialog(action: 'email' | 'preview' | 'print'| 'whatsapp'): void {
+showFormatDialog(action: 'email' | 'preview' | 'print'| 'whatsapp'): void {
   this.pendingAction = action;
   const dialog = document.getElementById('formatDialog');
   if (dialog) dialog.style.display = 'flex';

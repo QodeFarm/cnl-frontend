@@ -72,7 +72,7 @@ export class DeliveryChallanListComponent implements OnInit {
   }
 
   // ─── Format dialog ───────────────────────────────────────────────────────────
-  private showFormatDialog(action: 'preview' | 'print'): void {
+  showFormatDialog(action: 'preview' | 'print'): void {
     this.pendingAction = action;
     const dialog = document.getElementById('dcFormatDialog');
     if (dialog) dialog.style.display = 'flex';

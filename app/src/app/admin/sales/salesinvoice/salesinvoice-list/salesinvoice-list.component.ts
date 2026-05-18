@@ -554,7 +554,7 @@ export class SalesInvoiceListComponent implements OnInit {
   pendingAction: 'email' | 'preview' | 'print' | 'whatsapp' | null = null;
 
   // Show format selection popup
-  private showFormatDialog(action: 'email' | 'preview' | 'print' | 'whatsapp'): void {
+  showFormatDialog(action: 'email' | 'preview' | 'print' | 'whatsapp'): void {
     if (this.isCustomerPortal) {
       // For customers, maybe only preview is enough
       if (action === 'preview' || action === 'print') {

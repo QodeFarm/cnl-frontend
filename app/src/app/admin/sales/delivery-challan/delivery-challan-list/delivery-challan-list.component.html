@@ -1,12 +1,21 @@
 <ta-table [options]="tableConfig" class="custom-list">
   <div class="bottom-left" bottom-left *ngIf="!isCustomerPortal">
     <div class="d-flex align-items-center">
-      <!-- Print Dropdown -->
-      <select class="form-select me-2" (change)="onPrintSelect($event)">
-        <option value="" disabled selected hidden>Print Document</option>
-        <option value="preview">Preview</option>
-        <option value="print">Print</option>
-      </select>
+      <button nz-button nz-dropdown [nzDropdownMenu]="printMenu" nzType="primary">
+        <span nz-icon nzType="printer" nzTheme="outline"></span>
+        Print Document
+        <span nz-icon nzType="down"></span>
+      </button>
+      <nz-dropdown-menu #printMenu="nzDropdownMenu">
+        <ul nz-menu>
+          <li nz-menu-item (click)="showFormatDialog('preview')">
+            <span nz-icon nzType="file-pdf" nzTheme="outline"></span>&nbsp; Preview
+          </li>
+          <li nz-menu-item (click)="showFormatDialog('print')">
+            <span nz-icon nzType="printer" nzTheme="outline"></span>&nbsp; Print
+          </li>
+        </ul>
+      </nz-dropdown-menu>
     </div>
   </div>
 </ta-table>

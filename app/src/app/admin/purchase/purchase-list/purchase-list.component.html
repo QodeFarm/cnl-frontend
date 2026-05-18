@@ -1,21 +1,36 @@
 <ta-table [options]="tableConfig"> 
     <div class="bottom-left" bottom-left>
-        <div class="d-flex align-items-center">
-            <!-- Mail Dropdown -->
-            <select class="form-select me-2" (change)="onSelect($event)">
-                <option value="" disabled selected hidden>Sending Mail</option>
-                <option value="email">Email</option>
-                <option value="whatsapp">WhatsApp</option>
-            </select>
-            <!-- Other Dropdown -->
-            <!-- Print Dropdown -->
-            <select class="form-select me-2" (change)="onPrintSelect($event)">
-                <option value="" disabled selected hidden>Print Document</option>
-                <option value="preview">Preview</option>
-                <option value="print">Print</option>
-            </select>
-            <!-- Reload Button -->
-            <!-- <button class="btn btn-primary text-nowrap">reload</button> -->
+        <div class="d-flex align-items-center gap-2">
+            <button nz-button nz-dropdown [nzDropdownMenu]="mailMenu" nzType="default">
+                <span nz-icon nzType="mail" nzTheme="outline"></span>
+                Send Mail
+                <span nz-icon nzType="down"></span>
+            </button>
+            <nz-dropdown-menu #mailMenu="nzDropdownMenu">
+                <ul nz-menu>
+                    <li nz-menu-item (click)="showFormatDialog('email')">
+                        <span nz-icon nzType="mail" nzTheme="outline"></span>&nbsp; Email
+                    </li>
+                    <li nz-menu-item (click)="showFormatDialog('whatsapp')">
+                        <span nz-icon nzType="message" nzTheme="outline"></span>&nbsp; WhatsApp
+                    </li>
+                </ul>
+            </nz-dropdown-menu>
+            <button nz-button nz-dropdown [nzDropdownMenu]="printMenu" nzType="primary">
+                <span nz-icon nzType="printer" nzTheme="outline"></span>
+                Print Document
+                <span nz-icon nzType="down"></span>
+            </button>
+            <nz-dropdown-menu #printMenu="nzDropdownMenu">
+                <ul nz-menu>
+                    <li nz-menu-item (click)="showFormatDialog('preview')">
+                        <span nz-icon nzType="file-pdf" nzTheme="outline"></span>&nbsp; Preview
+                    </li>
+                    <li nz-menu-item (click)="showFormatDialog('print')">
+                        <span nz-icon nzType="printer" nzTheme="outline"></span>&nbsp; Print
+                    </li>
+                </ul>
+            </nz-dropdown-menu>
         </div>
     </div>
 </ta-table>
