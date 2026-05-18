@@ -17,7 +17,7 @@
             [nzPlaceHolder]="selectedAccountType ? 'Search ' + selectedAccountType + '...' : 'Select account type first'"
             class="al-account-select"
             [nzDisabled]="!selectedAccountType"
-            nzAllowClear nzShowSearch nzServerSearch
+            nzAllowClear nzShowSearch nzServerSearch nzSize="default"
             [nzLoading]="accountSearchLoading"
             (nzOnSearch)="onAccountSearch($event)"
             nzDropdownClassName="al-account-dropdown"
