@@ -433,7 +433,22 @@ export class EmployeesComponent  implements OnInit {
                 required: false,
               }
             },
-          ]
+            {
+              className: 'col-sm-3 col-12 p-0',
+              fieldGroupClassName: "ant-row row mx-0 mt-2",
+              fieldGroup: [
+                {
+                  key: 'picture',
+                  type: 'file',
+                  className: 'ta-cell pr-md col d-flex justify-content-md-center pr-0',
+                  templateOptions: {
+                    label: 'Govt. ID',
+                    required: true
+                  }
+                }
+              ]
+            },
+          ],
         },
       ]
     }
