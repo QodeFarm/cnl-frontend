@@ -27,20 +27,7 @@
         </button>
     </div>
 
-    <div class="row">
-        <!-- Sales Card -->
-        <div class="dashboard-card px-1 col-md col-sm-4 col-6 h-100" (click)="openSalesModal()">
-            <div class="dashboard-card-body">
-                <div class="dashboard-card-head">Sales</div>
-                <div class="dashboard-card-content">
-                    <h5>Rs. {{currentWeekSales}}</h5>
-                    <p>{{percentageSalesChange}}% from last week</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Replace your existing static cards with this -->
+    <!-- Dynamic tiles below -->
 <div class="row">
     <!-- Loading State -->
     <div *ngIf="isLoadingTiles" class="col-12 text-center p-3">

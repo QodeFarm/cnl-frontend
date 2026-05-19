@@ -20,7 +20,7 @@ export class MaterialIssueListComponent {
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   selectedFormat: string;
-  pendingAction: 'email' | 'preview' | 'print' | null = null;
+  pendingAction: 'email' | 'preview' | 'print' | 'whatsapp' | null = null;
   showLoading = false;
   showSuccessToast = false;
   toastMessage = '';
@@ -137,7 +137,7 @@ export class MaterialIssueListComponent {
   // }
 
   // Format dialog logic
-  private showFormatDialog(action: 'email' | 'preview' | 'print'): void {
+  showFormatDialog(action: 'email' | 'preview' | 'print' | 'whatsapp'): void {
     this.pendingAction = action;
     const dialog = document.getElementById('formatDialog');
     if (dialog) dialog.style.display = 'flex';

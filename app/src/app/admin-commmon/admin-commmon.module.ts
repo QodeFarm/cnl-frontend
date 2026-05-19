@@ -9,6 +9,7 @@ import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzImageModule } from 'ng-zorro-antd/image';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzSegmentedModule } from 'ng-zorro-antd/segmented';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -27,6 +28,7 @@ const module = [NzListModule,
   NzAvatarModule,
   NzIconModule,
   NzButtonModule,
+  NzDropDownModule,
   NzImageModule,
   NzCardModule,
   NzSegmentedModule,

@@ -8,6 +8,7 @@ header.sticky-header {
   right: 0;
   z-index: 1000;
   height: 3.5rem;
+  background-color: #142768;
 }
 
 #wrapper {
@@ -19,110 +20,82 @@ header.sticky-header {
   overflow: hidden;
 }
 
-/* ═══ Account Ledger Filter Panel ═══════════════════════════════════════════ */
+/* ═══ Account Ledger — Filter Panel ══════════════════════════════════════════
+   Single-row bar: type toggle | account search | city | — | period | from | to
+   Responsive: wraps gracefully on tablet, stacks on mobile.
+   ══════════════════════════════════════════════════════════════════════════ */
 
-/* Card wrapper — same visual style as the table header card */
 .al-filter-panel {
   background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
-  padding: 12px 16px;
-  margin-bottom: 8px;
+  padding: 8px 14px;
+  margin-bottom: 0;
   box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 
-/* Row 1: type buttons + account search + city */
-.al-filter-row-1 {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: nowrap;
-}
-
-/* Row 2: period + date pickers — appears only after account is selected */
-.al-filter-row-2 {
+.al-filter-row {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px dashed #e2e8f0;
+  flex-wrap: nowrap;
+}
+
+/* Vertical pipe that separates account section from period section */
+.al-row-sep {
+  display: inline-block;
+  width: 1px;
+  height: 22px;
+  background: #dde3ed;
+  flex-shrink: 0;
+  margin: 0 2px;
 }
 
 .al-period-label {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   color: #64748b;
   white-space: nowrap;
+  flex-shrink: 0;
   letter-spacing: 0.3px;
 }
 
 /* ── Account type: navy segmented buttons ─────────────────────────────────── */
-.al-type-radio {
-  flex-shrink: 0;
-}
+.al-type-radio { flex-shrink: 0; }
 
 .al-type-radio .ant-radio-button-wrapper {
-  font-size: 13px !important;
+  font-size: 12px !important;
   font-weight: 600 !important;
-  height: 34px !important;
-  line-height: 32px !important;
-  padding: 0 18px !important;
+  height: 30px !important;
+  line-height: 28px !important;
+  padding: 0 14px !important;
 }
-
-.al-type-radio .ant-radio-button-wrapper:first-child {
-  border-radius: 6px 0 0 6px !important;
-}
-
-.al-type-radio .ant-radio-button-wrapper:last-child {
-  border-radius: 0 6px 6px 0 !important;
-}
+.al-type-radio .ant-radio-button-wrapper:first-child { border-radius: 5px 0 0 5px !important; }
+.al-type-radio .ant-radio-button-wrapper:last-child  { border-radius: 0 5px 5px 0 !important; }
 
 .al-type-radio .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
   background: #142768 !important;
   border-color: #142768 !important;
   color: #ffffff !important;
 }
-
 .al-type-radio .ant-radio-button-wrapper:hover:not(.ant-radio-button-wrapper-checked) {
   color: #142768 !important;
   background: #f0f3fb !important;
 }
-
 .al-type-radio .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled)::before {
   background-color: #142768 !important;
 }
 
-/* ── Account search: fills remaining space ────────────────────────────────── */
-.al-account-select {
-  flex: 1 !important;
-  min-width: 200px;
-}
+/* ── Inputs ────────────────────────────────────────────────────────────────── */
+.al-account-select { flex: 1 !important; min-width: 180px; }
+.al-city-select    { width: 140px !important; flex-shrink: 0; }
+.al-period-select  { width: 135px !important; flex-shrink: 0; }
+.al-date-picker    { width: 120px !important; flex-shrink: 0; }
 
-/* ── City: fixed width ────────────────────────────────────────────────────── */
-.al-city-select {
-  width: 160px !important;
-  flex-shrink: 0;
-}
+/* ── Account dropdown popup ────────────────────────────────────────────────── */
+.al-account-dropdown { min-width: 340px !important; }
 
-/* ── Period select ────────────────────────────────────────────────────────── */
-.al-period-select {
-  width: 155px !important;
-  flex-shrink: 0;
-}
-
-/* ── Date pickers ─────────────────────────────────────────────────────────── */
-.al-date-picker {
-  width: 130px !important;
-  flex-shrink: 0;
-}
-
-/* ── Account dropdown popup ───────────────────────────────────────────────── */
-.al-account-dropdown {
-  min-width: 340px !important;
-}
-
-/* ── Option row inside account dropdown ───────────────────────────────────── */
+/* ── Option row inside the account dropdown ────────────────────────────────── */
 .al-account-option {
   display: flex;
   align-items: center;
@@ -130,7 +103,6 @@ header.sticky-header {
   gap: 10px;
   width: 100%;
 }
-
 .al-account-name {
   font-weight: 500;
   color: #1e293b;
@@ -139,7 +111,6 @@ header.sticky-header {
   white-space: nowrap;
   flex: 1;
 }
-
 .al-account-code {
   font-size: 11px;
   color: #94a3b8;
@@ -150,6 +121,24 @@ header.sticky-header {
   flex-shrink: 0;
   font-family: monospace;
   letter-spacing: 0.3px;
+}
+
+/* ── Responsive: tablet — allow wrapping ────────────────────────────────────── */
+@media (max-width: 1199px) {
+  .al-filter-row { flex-wrap: wrap; }
+  .al-period-select { width: 120px !important; }
+  .al-date-picker   { width: 110px !important; }
+}
+
+/* ── Responsive: mobile — full-width inputs ─────────────────────────────────── */
+@media (max-width: 767px) {
+  .al-filter-panel  { padding: 8px 10px; }
+  .al-row-sep       { display: none; }
+
+  .al-account-select,
+  .al-city-select,
+  .al-period-select,
+  .al-date-picker   { width: 100% !important; flex: 1 1 140px; }
 }
 /* ═══════════════════════════════════════════════════════════════════════════ */
 
@@ -2175,11 +2164,34 @@ nz-modal {
     }
 }
 
+// Import-only modals: smaller centered popup (overrides .custom-modal's 95vw)
+#importModal.custom-modal .modal-dialog {
+    max-width: 540px !important;
+}
+
 .custom-modal {
+
+    .modal-dialog {
+        max-width: 95vw;
+        margin: 0.625rem auto;
+    }
+
+    .modal-content {
+        display: flex;
+        flex-direction: column;
+        max-height: calc(100vh - 1.25rem);
+        overflow: hidden;
+    }
+
+
+
+    // ── Header: pinned to top ─────────────────────────────────────────────────
     .modal-header {
+        flex-shrink: 0;
         background-color: #142768;
         color: #fff;
         padding: 8px 18px;
+        border-bottom: none;
 
         .modal-title {
             color: #fff;
@@ -2194,6 +2206,61 @@ nz-modal {
             margin-top: 2px;
             padding: 5px;
             font-size: 12px;
+        }
+    }
+
+    // ── Body: fills remaining height, scrolls when content overflows ──────────
+    .modal-body {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        padding: 10px 14px;
+
+        // ── Compact table rows (target both element and ng-zorro class) ───────
+        .ant-table-tbody > tr > td,
+        td.ant-table-cell { padding: 6px 12px !important; line-height: 1.3; }
+
+        .ant-table-thead > tr > th,
+        th.ant-table-cell { padding: 8px 12px !important; }
+
+        // ── Reduced column min-width ──────────────────────────────────────────
+        .ant-table-thead > tr > th,
+        th.ant-table-cell,
+        .ant-table-tbody > tr > td,
+        td.ant-table-cell { min-width: 120px !important; }
+
+        // ── Compact filter-row margins within the modal body ──────────────────
+        .filter-group.mt-2 { margin-top: 4px !important; }
+        .ta-cell.mt-2      { margin-top: 4px !important; }
+    }
+
+    // ── Footer ───────────────────────────────────────────────────────────────
+    .modal-footer {
+        flex-shrink: 0;
+        padding: 8px 16px;
+        border-top: 1px solid #e9ecef;
+        background-color: #f8fafc;
+        border-radius: 0 0 0.375rem 0.375rem;
+
+        // Restyle any standalone red close/danger button to neutral slate.
+        // Red is reserved for irreversible destructive actions only.
+        .btn-danger[data-bs-dismiss] {
+            background-color: #f1f5f9 !important;
+            border-color: #cbd5e1 !important;
+            color: #475569 !important;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 5px 18px;
+            transition: background-color 0.15s ease, border-color 0.15s ease,
+                        color 0.15s ease;
+
+            &:hover {
+                background-color: #e2e8f0 !important;
+                border-color: #94a3b8 !important;
+                color: #334155 !important;
+            }
+
+            &:focus { box-shadow: none !important; }
         }
     }
 }
@@ -4417,6 +4484,42 @@ nz-modal {
 // ============================================================
 
 // ============================================================
+// ── Global ta-table filter bar alignment ──────────────────────────────────
+ta-table,
+ta-curd-modal {
+    // Outer row: all cells vertically centered
+    .customer-title-alignment {
+        align-items: center !important;
+    }
+
+    // Filter row: centered, 8px gap between items
+    .filter-alignments .ta-row {
+        align-items: center !important;
+        gap: 8px;
+    }
+
+    // Each filter item: shrink to its content width instead of sharing
+    // the full row equally (Bootstrap .col gives flex: 1 0 0% which spreads them)
+    .filter-alignments .filter-group {
+        flex: 0 0 auto !important;
+        width: auto !important;
+        margin-top: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    // Compact, explicit widths for each control type
+    nz-select.quick-period-select { width: 130px; }
+    nz-select.select-field        { width: 155px; }
+    nz-date-picker.date-picker    { width: 130px !important; }
+
+    // Search + buttons cell: aligned with filters
+    .ta-cell.mt-2 {
+        margin-top: 0 !important;
+    }
+}
+
+// ============================================================
 // GLOBAL SEARCH BAR BUTTON SPACING
 // Ensures proper gaps between search input, buttons, and filter groups
 // ============================================================
@@ -5681,3 +5784,28 @@ ta-table .col-hidden-badge {
         width: calc(100% - 14rem) !important;
     }
 }
+
+// ── Double-click row affordance (global, all ta-table instances) ──────────────
+// The .row-dblclick class is applied by ta-table when rowEvents.dblclick is set.
+// Without a cursor change, users have no visual hint the row is interactive.
+.ant-table-tbody > tr.row-dblclick {
+    cursor: pointer;
+
+    &:hover > td {
+        background-color: #eef2ff !important; // faint indigo tint on hover
+    }
+}
+
+// ── Selectable rows (adv-select): consistent with dblclick affordance ─────────
+.ant-table-tbody > tr.selectable-row {
+    cursor: pointer;
+}
+
+// ── col-name labels: always hidden on desktop ─────────────────────────────────
+// theme.less hides them in .ant-table-content, but when nzScroll.y is set
+// nz-table moves the body into .ant-table-body — this covers both cases.
+.ant-table-content td .col-name,
+.ant-table-body td .col-name {
+    display: none !important;
+}
+

@@ -1,166 +1,142 @@
-// ── Design tokens ────────────────────────────────────────────────────────────
-$primary:       #142768;
-$primary-hover: #1a3278;
-$primary-light: #eef2fa;
-$border:        #e5e7eb;
-$bg-page:       #f5f6fa;
-$text-dark:     #1e293b;
-$text-mid:      #475569;
-$text-light:    #94a3b8;
-$color-dr:      #dc2626;
-$color-cr:      #16a34a;
+// ── Design tokens ─────────────────────────────────────────────────────────────
+$primary:    #142768;
+$primary-hv: #1a3278;
+$border:     #e5e7eb;
+$border-lt:  #f1f5f9;
+$text-dark:  #1e293b;
+$text-mid:   #475569;
+$text-light: #94a3b8;
+$color-dr:   #dc2626;
+$color-cr:   #16a34a;
 
-// ── Page wrapper ─────────────────────────────────────────────────────────────
+// ── Page layout ───────────────────────────────────────────────────────────────
 .account-ledger-page {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
+  overflow: hidden;
 }
 
-// ── Summary bar ───────────────────────────────────────────────────────────────
-.ledger-summary-bar {
+// ── Summary strip ─────────────────────────────────────────────────────────────
+.al-summary-strip {
   display: flex;
   align-items: center;
   gap: 0;
+  height: 70px;
   background: #ffffff;
   border: 1px solid $border;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-  min-height: 64px;
-}
-
-// ── Account identity (left block) ─────────────────────────────────────────────
-.ledger-identity {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 4px;
-  padding: 12px 20px;
-  border-right: 1px solid $border;
-  background: #f8fafc;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.08);
   flex-shrink: 0;
-  min-width: 160px;
-  max-width: 240px;
+  padding: 0 20px;
 }
 
-.ledger-type-badge {
+.al-strip-badge {
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.8px;
   text-transform: uppercase;
-  color: $primary;
-  background: rgba(20, 39, 104, 0.09);
-  padding: 2px 8px;
+  color: #fff;
+  background: $primary;
+  padding: 3px 10px;
   border-radius: 4px;
-  width: fit-content;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
-.ledger-account-name {
-  font-size: 13px;
+.al-strip-name {
+  font-size: 18px;
   font-weight: 700;
   color: $text-dark;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1.3;
   max-width: 200px;
-  title: attr(title);
+  flex-shrink: 0;
+  margin-left: 10px;
 }
 
-// ── Balance stats (center) ────────────────────────────────────────────────────
-.ledger-stats {
-  display: flex;
-  align-items: stretch;
-  flex: 1;
+// Vertical pipe between identity and stats
+.al-strip-sep {
+  width: 1px;
+  height: 26px;
+  background: $border;
+  flex-shrink: 0;
+  margin: 0 14px;
 }
 
-.ledger-stat {
+.al-strip-stat {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
-  padding: 10px 16px;
-  flex: 1;
-  border-right: 1px solid #f1f5f9;
+  padding: 0 14px;
+  height: 100%;
+  border-right: 1px solid $border-lt;
+  flex-shrink: 0;
 
-  &:last-of-type {
+  &.closing {
     border-right: none;
+    padding-right: 0;
   }
-
-  &.stat-debit   { background: rgba(220, 38, 38, 0.03); }
-  &.stat-credit  { background: rgba(22, 163, 74, 0.03); }
-  &.stat-closing { background: rgba(20, 39, 104, 0.04); }
 }
 
-.stat-label {
+.al-stat-label {
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.5px;
   color: $text-light;
-  margin-bottom: 4px;
+  line-height: 1;
+  margin-bottom: 5px;
   white-space: nowrap;
 }
 
-.stat-value {
-  font-size: 14px;
+.al-stat-value {
+  font-size: 17px;
   font-weight: 700;
   font-family: 'Roboto Mono', 'Consolas', monospace;
   color: #334155;
   display: flex;
   align-items: baseline;
-  gap: 4px;
+  gap: 3px;
+  white-space: nowrap;
+  line-height: 1;
 
-  // Dr = red (customer owes us / debit side)
   &.dr      { color: $color-dr; }
-  // Cr = green (we owe customer / credit side)
   &.cr      { color: $color-cr; }
   &.neutral { color: $text-mid; }
 
-  &.closing {
-    font-size: 15px;
+  em {
+    font-style: normal;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-family: 'Poppins', sans-serif;
   }
+
+  &.dr em { color: $color-dr; background: rgba(220,38,38,0.10); }
+  &.cr em { color: $color-cr; background: rgba(22,163,74,0.10); }
 }
 
-// Dr/Cr suffix badge in closing balance
-.bal-suffix {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  font-family: 'Poppins', sans-serif;
-  padding: 1px 5px;
-  border-radius: 3px;
-
-  &.suffix-dr {
-    color: $color-dr;
-    background: rgba(220, 38, 38, 0.10);
-  }
-
-  &.suffix-cr {
-    color: $color-cr;
-    background: rgba(22, 163, 74, 0.10);
-  }
-}
-
-// ── Actions (right block of summary bar) ─────────────────────────────────────
-.ledger-actions {
-  padding: 0 16px;
-  border-left: 1px solid $border;
+// Print button pushed to the right
+.al-strip-actions {
+  margin-left: auto;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
-  flex-shrink: 0;
-  background: #f8fafc;
 }
 
-.ledger-print-btn.ant-btn {
+.al-print-btn.ant-btn {
   background-color: $primary !important;
   border-color: $primary !important;
   color: #ffffff !important;
   font-size: 13px;
-  font-weight: 500;
-  height: 34px;
-  padding: 0 14px;
+  font-weight: 600;
+  height: 36px;
+  padding: 0 16px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -168,129 +144,54 @@ $color-cr:      #16a34a;
   white-space: nowrap;
 
   &:hover {
-    background-color: $primary-hover !important;
-    border-color: $primary-hover !important;
+    background-color: $primary-hv !important;
+    border-color: $primary-hv !important;
   }
 }
 
 // ── Table wrapper ─────────────────────────────────────────────────────────────
 .ledger-table-wrapper {
+  overflow: hidden;
 
   ::ng-deep {
-
-    // ── Account Ledger filter panel (inside ta-table) ──────────────────────
-    .al-filter-panel {
-      background: #ffffff;
-      border: 1px solid $border;
-      border-radius: 8px;
-      padding: 10px 14px;
-      margin-bottom: 8px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+    // Contain horizontal overflow inside the table body scroll container
+    .ant-table-body {
+      overflow-x: auto !important;
     }
-
-    .al-filter-row-1 {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: nowrap;
-    }
-
-    .al-filter-row-2 {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: nowrap;
-      padding-top: 2px;
-      border-top: 1px solid #f1f5f9;
-    }
-
-    .al-account-select {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .al-city-select {
-      width: 160px;
-      flex-shrink: 0;
-    }
-
-    .al-period-select {
-      width: 155px;
-      flex-shrink: 0;
-    }
-
-    .al-date-picker {
-      width: 135px;
-      flex-shrink: 0;
-    }
-
-    .al-period-label {
-      font-size: 12px;
-      font-weight: 600;
-      color: $text-mid;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    .al-type-radio {
-      flex-shrink: 0;
-    }
-
-    // Remove extra top-margin in table header panel when inside account ledger
-    .customer-title-alignment {
-      margin-top: 0 !important;
-    }
-
-    .customer-title-alignment .ta-cell {
-      margin-top: 0 !important;
-    }
-
-    // ── Numeric column alignment ───────────────────────────────────────────
+    // Numeric columns right-aligned
     .ant-table-tbody > tr > td:nth-child(4),
     .ant-table-tbody > tr > td:nth-child(5),
-    .ant-table-tbody > tr > td:nth-child(6) {
-      text-align: right !important;
-    }
+    .ant-table-tbody > tr > td:nth-child(6) { text-align: right !important; }
 
     .ant-table-thead > tr > th:nth-child(4),
     .ant-table-thead > tr > th:nth-child(5),
-    .ant-table-thead > tr > th:nth-child(6) {
-      text-align: right !important;
-    }
+    .ant-table-thead > tr > th:nth-child(6) { text-align: right !important; }
 
     .ant-table-tbody > tr > td {
       padding: 10px 14px !important;
       vertical-align: middle;
     }
 
-    // ── Dr / Cr inline amount styles ───────────────────────────────────────
+    // Dr / Cr colour styles (referenced by column mapFn)
     .ledger-dr {
       color: $color-dr;
       font-weight: 600;
       font-family: 'Roboto Mono', 'Consolas', monospace;
     }
-
     .ledger-cr {
       color: $color-cr;
       font-weight: 600;
       font-family: 'Roboto Mono', 'Consolas', monospace;
     }
-
     .ledger-muted {
       color: $text-light;
       font-size: 13px;
     }
-
     .ledger-bal {
       display: inline-flex;
       align-items: baseline;
       gap: 4px;
     }
-
-    // Small Dr/Cr badge inline with balance amount
     .bal-tag {
       font-style: normal;
       font-size: 9px;
@@ -301,133 +202,59 @@ $color-cr:      #16a34a;
       font-family: 'Poppins', sans-serif;
       vertical-align: middle;
     }
+    .ledger-dr .bal-tag { color: $color-dr; background: rgba(220,38,38,0.10); }
+    .ledger-cr .bal-tag { color: $color-cr; background: rgba(22,163,74,0.10); }
 
-    // Badge inherits color from parent span
-    .ledger-dr .bal-tag {
-      color: $color-dr;
-      background: rgba(220, 38, 38, 0.10);
-    }
-
-    .ledger-cr .bal-tag {
-      color: $color-cr;
-      background: rgba(22, 163, 74, 0.10);
-    }
-
-    // Consistent voucher number styling across all row types
     .ledger-voucher {
-      font-family: 'Roboto Mono', 'Consolas', monospace;
-      font-size: 12px;
-      font-weight: 600;
-      color: #1e40af;
-      letter-spacing: 0.2px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #333333;
+      white-space: nowrap;
     }
   }
 }
 
-// ── Responsive: Tablet ────────────────────────────────────────────────────────
+// ── Responsive: medium screens ────────────────────────────────────────────────
 @media (max-width: 1199px) {
-  .ledger-summary-bar {
+  .al-strip-name    { max-width: 130px; }
+  .al-strip-stat    { padding: 0 10px; }
+}
+
+// ── Responsive: tablet ────────────────────────────────────────────────────────
+@media (max-width: 991px) {
+  .al-summary-strip {
+    height: auto;
     flex-wrap: wrap;
-  }
-
-  .ledger-identity {
-    min-width: unset;
-    max-width: 100%;
-    width: 100%;
-    border-right: none;
-    border-bottom: 1px solid $border;
-    flex-direction: row;
-    gap: 10px;
-  }
-
-  .ledger-stats {
-    width: 100%;
-  }
-
-  .ledger-stat {
-    flex: 1;
     padding: 8px 12px;
+    gap: 4px 0;
+    border-radius: 8px;
   }
 
-  .ledger-actions {
-    border-left: none;
-    border-top: 1px solid $border;
-    width: 100%;
-    justify-content: flex-end;
-    padding: 10px 16px;
-    background: #fff;
-  }
-}
+  .al-strip-sep { display: none; }
 
-// ── Responsive: Mobile ────────────────────────────────────────────────────────
-@media (max-width: 767px) {
-  .ledger-summary-bar {
-    border-radius: 6px;
-  }
-
-  .ledger-stats {
-    flex-wrap: wrap;
-  }
-
-  .ledger-stat {
-    flex: 0 0 50%;
-    border-right: none;
-    border-bottom: 1px solid #f1f5f9;
-    padding: 10px;
-
-    &:nth-child(odd) {
-      border-right: 1px solid #f1f5f9;
-    }
-  }
-
-  .stat-label {
-    font-size: 10px;
-  }
-
-  .stat-value {
-    font-size: 13px;
-  }
-
-  .ledger-table-wrapper {
-    ::ng-deep {
-      .al-filter-row-1,
-      .al-filter-row-2 {
-        flex-wrap: wrap;
-      }
-
-      .al-account-select,
-      .al-city-select,
-      .al-period-select,
-      .al-date-picker {
-        width: 100% !important;
-        flex: 1 1 140px;
-      }
-
-      .ant-table-content {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-      }
-    }
-  }
-}
-
-// ── Responsive: Small mobile ──────────────────────────────────────────────────
-@media (max-width: 479px) {
-  .ledger-identity {
-    padding: 10px 12px;
-  }
-
-  .ledger-account-name {
-    font-size: 12px;
-  }
-
-  .ledger-stat {
-    flex: 0 0 50%;
-  }
-
-  .ledger-print-btn.ant-btn {
-    font-size: 12px;
+  .al-strip-stat {
+    height: 36px;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
     padding: 0 10px;
-    height: 30px;
   }
+
+  .al-stat-label::after { content: ':'; }
+
+  .al-strip-actions { margin-left: auto; }
+}
+
+// ── Responsive: mobile ────────────────────────────────────────────────────────
+@media (max-width: 767px) {
+  .al-summary-strip { padding: 8px 10px; }
+
+  .al-strip-name    { max-width: 110px; }
+
+  .al-strip-stat    { padding: 0 8px; }
+}
+
+// ── Responsive: small mobile — show only closing balance ──────────────────────
+@media (max-width: 479px) {
+  .al-strip-stat:not(.closing) { display: none; }
 }

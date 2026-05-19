@@ -1,44 +1,47 @@
-<div class="container-fluid p-3">
+<div class="container-fluid p-2">
 <div class="account-ledger-page">
 
-  <!-- ── Account + Balance Summary Bar (shown once account is selected) ──── -->
-  <div class="ledger-summary-bar" *ngIf="showBalanceSummary">
+  <!-- ── Compact summary strip ─────────────────────────────────────────────── -->
+  <div class="al-summary-strip" *ngIf="showBalanceSummary">
 
-    <!-- Account identity -->
-    <div class="ledger-identity">
-      <span class="ledger-type-badge">{{ accountTypeLabel }}</span>
-      <span class="ledger-account-name" [title]="accountName">{{ accountName }}</span>
+    <span class="al-strip-badge">{{ accountTypeLabel }}</span>
+    <span class="al-strip-name" [title]="accountName">{{ accountName }}</span>
+    <span class="al-strip-sep"></span>
+
+    <div class="al-strip-stat">
+      <span class="al-stat-label">Opening</span>
+      <span class="al-stat-value neutral">₹{{ openingBalance }}</span>
     </div>
 
-    <!-- Balance stats -->
-    <div class="ledger-stats">
-      <div class="ledger-stat stat-opening">
-        <div class="stat-label">Opening Balance</div>
-        <div class="stat-value neutral">₹{{ openingBalance }}</div>
-      </div>
-      <div class="ledger-stat stat-debit">
-        <div class="stat-label">Total Debit</div>
-        <div class="stat-value" [class.dr]="totalDebit !== '0.00'" [class.neutral]="totalDebit === '0.00'">₹{{ totalDebit }}</div>
-      </div>
-      <div class="ledger-stat stat-credit">
-        <div class="stat-label">Total Credit</div>
-        <div class="stat-value" [class.cr]="totalCredit !== '0.00'" [class.neutral]="totalCredit === '0.00'">₹{{ totalCredit }}</div>
-      </div>
-      <div class="ledger-stat stat-closing">
-        <div class="stat-label">Closing Balance</div>
-        <div class="stat-value closing" [class.dr]="isPositiveBalance" [class.cr]="!isPositiveBalance">
-          ₹{{ absBalance }}
-          <span class="bal-suffix" [class.suffix-dr]="isPositiveBalance" [class.suffix-cr]="!isPositiveBalance">
-            {{ isPositiveBalance ? 'Dr' : 'Cr' }}
-          </span>
-        </div>
-      </div>
+    <div class="al-strip-stat">
+      <span class="al-stat-label">Total Debit</span>
+      <span class="al-stat-value"
+        [class.dr]="totalDebit !== '0.00'"
+        [class.neutral]="totalDebit === '0.00'">₹{{ totalDebit }}</span>
     </div>
 
-    <!-- Print / Export -->
-    <div class="ledger-actions">
+    <div class="al-strip-stat">
+      <span class="al-stat-label">Total Credit</span>
+      <span class="al-stat-value"
+        [class.cr]="totalCredit !== '0.00'"
+        [class.neutral]="totalCredit === '0.00'">₹{{ totalCredit }}</span>
+    </div>
+
+    <div class="al-strip-stat closing">
+      <span class="al-stat-label">Closing</span>
+      <span class="al-stat-value"
+        [class.dr]="isPositiveBalance"
+        [class.cr]="!isPositiveBalance">
+        ₹{{ absBalance }}
+        <em [class.suffix-dr]="isPositiveBalance" [class.suffix-cr]="!isPositiveBalance">
+          {{ isPositiveBalance ? 'Dr' : 'Cr' }}
+        </em>
+      </span>
+    </div>
+
+    <div class="al-strip-actions">
       <button nz-button nz-dropdown [nzDropdownMenu]="printMenu"
-              class="ledger-print-btn" nzType="primary">
+              class="al-print-btn" nzType="primary" nzSize="small">
         <span nz-icon nzType="printer" nzTheme="outline"></span>
         Print / Export
         <span nz-icon nzType="down"></span>
@@ -46,12 +49,10 @@
       <nz-dropdown-menu #printMenu="nzDropdownMenu">
         <ul nz-menu>
           <li nz-menu-item (click)="onPreviewClick()">
-            <span nz-icon nzType="file-pdf" nzTheme="outline"></span>
-            &nbsp; Preview PDF
+            <span nz-icon nzType="file-pdf" nzTheme="outline"></span>&nbsp; Preview PDF
           </li>
           <li nz-menu-item (click)="onPrintClick()">
-            <span nz-icon nzType="printer" nzTheme="outline"></span>
-            &nbsp; Print
+            <span nz-icon nzType="printer" nzTheme="outline"></span>&nbsp; Print
           </li>
         </ul>
       </nz-dropdown-menu>
@@ -59,7 +60,7 @@
 
   </div>
 
-  <!-- ── Ledger Table (title comes from tableConfig, matches all other modules) -->
+  <!-- ── Ledger table ───────────────────────────────────────────────────────── -->
   <div class="ledger-table-wrapper">
     <ta-curd-modal [options]="curdConfig" class="custom-list"></ta-curd-modal>
   </div>

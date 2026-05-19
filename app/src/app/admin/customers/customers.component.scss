@@ -189,6 +189,17 @@
 
 /* Dialog styles handled globally in styles.scss */
 
+// ── Import modal: isolated styles, does NOT affect customer list modal ─────────
+#importModal {
+    .modal-content {
+        background: #ffffff;
+        border-radius: 8px;
+        border: none;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+    }
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 // Import Loading & Results Styles
 .import-loading-container {
   display: flex;

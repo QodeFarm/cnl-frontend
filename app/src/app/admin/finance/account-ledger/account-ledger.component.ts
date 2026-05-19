@@ -205,6 +205,7 @@ export class AccountLedgerComponent implements OnInit, AfterViewInit, OnDestroy 
         }),
       },
       pageSize: 10,
+      scrollY: 'calc(100vh - 430px)',
       globalSearch: {
         keys: ['voucher_no', 'description', 'debit', 'credit', 'running_balance']
       },
@@ -214,6 +215,7 @@ export class AccountLedgerComponent implements OnInit, AfterViewInit, OnDestroy 
         {
           fieldKey: 'voucher_no',
           name: 'Voucher No',
+          width: '190px',
           sort: true,
           displayType: 'map',
           mapFn: (value: any) => {
@@ -224,12 +226,14 @@ export class AccountLedgerComponent implements OnInit, AfterViewInit, OnDestroy 
         {
           fieldKey: 'created_at',
           name: 'Date',
+          width: '110px',
           sort: true,
           displayType: 'date'
         },
         {
           fieldKey: 'description',
           name: 'Description',
+          width: '340px',
           sort: false,
           displayType: 'map',
           mapFn: (value: any) => {
@@ -242,6 +246,7 @@ export class AccountLedgerComponent implements OnInit, AfterViewInit, OnDestroy 
         {
           fieldKey: 'debit',
           name: 'Debit',
+          width: '120px',
           sort: true,
           displayType: 'map',
           mapFn: (_: any, row: any) => {
@@ -253,6 +258,7 @@ export class AccountLedgerComponent implements OnInit, AfterViewInit, OnDestroy 
         {
           fieldKey: 'credit',
           name: 'Credit',
+          width: '120px',
           sort: true,
           displayType: 'map',
           mapFn: (_: any, row: any) => {
@@ -264,6 +270,7 @@ export class AccountLedgerComponent implements OnInit, AfterViewInit, OnDestroy 
         {
           fieldKey: 'running_balance',
           name: 'Balance',
+          width: '150px',
           sort: false,
           displayType: 'map',
           mapFn: (_: any, row: any) => {
