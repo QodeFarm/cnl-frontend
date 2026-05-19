@@ -932,12 +932,277 @@ export function getUnitData(unitInfo: any) {
 // }
 
 
-export function calculateTotalAmount(data: any, modelName: string, form: any) {
-  // if (!data) return;
+// export function calculateTotalAmount(data: any, modelName: string, form: any) {
+//   // if (!data) return;
 
-  // -----------------------------
-  // MODEL MAPPING
-  // -----------------------------
+//   // -----------------------------
+//   // MODEL MAPPING
+//   // -----------------------------
+//   let parentModel = modelName.replace('_items', '');
+
+//   const modelMapping: { [key: string]: string } = {
+//     sale_invoice: 'sale_invoice_order',
+//     purchase_order: 'purchase_order_data',
+//     purchase_invoice: 'purchase_invoice_orders',
+//     sale_return: 'sale_return_order',
+//     purchase_return: 'purchase_return_orders'
+//   };
+
+//   parentModel = modelMapping[parentModel] || parentModel;
+
+//   // -----------------------------
+//   // INITIALIZE VARIABLES
+//   // -----------------------------
+//   const products = data[modelName] || [];
+  
+//   let totalBaseAmount = 0;        // Total of product base prices (tax exclusive)
+//   let totalDiscount = 0;          // Total discount amount
+//   let totalRate = 0;              // Total before discount (quantity * rate)
+//   let totalTaxAmount = 0;         // Total tax (products + shipping)
+  
+//   let productTaxAmount = 0;        // Tax from products only
+//   let shippingTaxAmount = 0;       // Tax from shipping only
+
+//   // -----------------------------
+//   // COMPANY & CUSTOMER DETAILS
+//   // -----------------------------
+//   const companyState = 'Andhra Pradesh';
+//   const billingAddress = data[parentModel]?.billing_address || '';
+//   const isLocalState = !billingAddress || billingAddress.includes(companyState);
+
+//   // Tax types
+//   const productTaxType = data[parentModel]?.tax || 'Exclusive';
+//   const shippingTaxType = data?.order_shipments?.tax || productTaxType;
+
+//   const isPurchaseInvoice = parentModel === 'purchase_invoice_orders';
+//   const isWithoutTaxPurchase = isPurchaseInvoice && data[parentModel]?.voucher === 'Purchase';
+
+//   // -----------------------------
+//   // PRODUCT CALCULATION
+//   // -----------------------------
+//   if (products.length) {
+//     products.forEach((product: any) => {
+//       const quantity = parseFloat(product.quantity ?? 0);
+//       const rate = parseFloat(product.rate ?? 0);
+//       console.log("Quantity: ", quantity, " Rate: ", rate);
+
+//       const itemValue = quantity * rate; // Total before discount
+
+//       // Calculate discount
+//       let discountAmount = 0;
+//       if (product.discount_amount && parseFloat(product.discount_amount) > 0) {
+//         discountAmount = parseFloat(product.discount_amount);
+//       } else {
+//         const discountPercentage = parseFloat(product.discount ?? 0);
+//         discountAmount = (itemValue * discountPercentage) / 100;
+//       }
+
+//       const amountBeforeTax = itemValue - discountAmount; // Value after discount, before tax
+      
+//       let baseAmount = amountBeforeTax; // Tax-exclusive base price
+//       let gstValue = 0; // Tax amount
+
+//       // Calculate product tax
+//       if (!isWithoutTaxPurchase && product.product?.gst_input) {
+//         const gstPercent = parseFloat(product.product.gst_input);
+
+//         if (productTaxType === 'Inclusive') {
+//           // Extract tax from inclusive price
+//           baseAmount = amountBeforeTax / (1 + gstPercent / 100);
+//           gstValue = amountBeforeTax - baseAmount;
+//         } else {
+//           // Add tax to exclusive price
+//           baseAmount = amountBeforeTax;
+//           gstValue = (amountBeforeTax * gstPercent) / 100;
+//         }
+//       }
+
+//       // Store calculated values
+//       product.item_value = itemValue.toFixed(2);
+//       product.discount_amount = discountAmount.toFixed(2);
+//       product.base_amount = baseAmount.toFixed(2); // Tax-exclusive amount
+//       product.tax_amount = gstValue.toFixed(2); // Tax on this product
+
+//       // Accumulate totals
+//       totalRate += itemValue;
+//       totalBaseAmount += baseAmount;
+//       totalDiscount += discountAmount;
+//       productTaxAmount += gstValue;
+
+//       // Split tax into CGST/SGST/IGST based on location
+//       if (!isWithoutTaxPurchase && product.product?.gst_input) {
+//         if (isLocalState) {
+//           product.cgst = (gstValue / 2).toFixed(2);
+//           product.sgst = (gstValue / 2).toFixed(2);
+//           product.igst = 0.00;
+//         } else {
+//           product.igst = gstValue.toFixed(2);
+//           product.cgst = 0.00;
+//           product.sgst = 0.00;
+//         }
+//       } else {
+//         product.cgst = 0.00;
+//         product.sgst = 0.00;
+//         product.igst = 0.00;
+//       }
+//     });
+//   }
+
+//   // -----------------------------
+//   // SHIPPING CALCULATION
+//   // -----------------------------
+//   const shippingCharges = Number(data?.order_shipments?.shipping_charges ?? 0);
+//   const shippingGstPercent = Number(data?.order_shipments?.shipping_gst ?? 0);
+  
+//   let shippingBaseAmount = shippingCharges; // Tax-exclusive shipping amount
+
+//   if (shippingCharges > 0 && shippingGstPercent > 0) {
+//     if (shippingTaxType === 'Inclusive') {
+//       // Extract tax from inclusive shipping charge
+//       shippingBaseAmount = shippingCharges / (1 + shippingGstPercent / 100);
+//       shippingTaxAmount = shippingCharges - shippingBaseAmount;
+//     } else {
+//       // Add tax to exclusive shipping charge
+//       shippingBaseAmount = shippingCharges;
+//       shippingTaxAmount = (shippingCharges * shippingGstPercent) / 100;
+//     }
+
+//     // Store shipping details (optional - for reference)
+//     if (data.order_shipments) {
+//       data.order_shipments.base_amount = shippingBaseAmount.toFixed(2);
+//       data.order_shipments.tax_amount = shippingTaxAmount.toFixed(2);
+//       data.order_shipments.total_amount = (shippingBaseAmount + shippingTaxAmount).toFixed(2);
+//     }
+//   }
+
+//   // -----------------------------
+//   // TOTAL TAX CALCULATION
+//   // -----------------------------
+//   totalTaxAmount = productTaxAmount + shippingTaxAmount;
+
+//   // -----------------------------
+//   // UPDATE PRODUCT FORM CONTROLS
+//   // -----------------------------
+//   products.forEach((product: any, index: number) => {
+//     const itemControls = form?.controls?.[modelName]?.controls?.[index];
+
+//     if (itemControls && itemControls instanceof FormGroup) {
+//       const controls = itemControls.controls;
+
+//       if (controls['cgst']) controls['cgst'].setValue(product.cgst || 0.00);
+//       if (controls['sgst']) controls['sgst'].setValue(product.sgst || 0.00);
+//       if (controls['igst']) controls['igst'].setValue(product.igst || 0.00);
+//       if (controls['base_amount']) controls['base_amount'].setValue(product.base_amount || 0.00);
+//       if (controls['tax_amount']) controls['tax_amount'].setValue(product.tax_amount || 0.00);
+//     }
+//   });
+
+//   // -----------------------------
+//   // UPDATE MAIN FORM CONTROLS
+//   // -----------------------------
+//   if (form?.controls?.[parentModel]?.controls) {
+//     const controls: any = form.controls[parentModel].controls;
+
+//     // Sub-totals
+//     if (controls.item_value)
+//       controls.item_value.setValue(totalRate.toFixed(2));
+
+//     if (controls.taxable_amount)
+//       controls.taxable_amount.setValue(totalBaseAmount.toFixed(2));
+
+//     if (controls.discount)
+//       controls.discount.setValue(totalDiscount.toFixed(2));
+
+//     if (controls.tax_amount)
+//       controls.tax_amount.setValue(totalTaxAmount.toFixed(2));
+
+//     // Shipping
+//     if (controls.shipping_charges) {
+//       controls.shipping_charges.setValue(shippingCharges.toFixed(2));
+      
+//       // Sync model
+//       data[parentModel] = {
+//         ...data[parentModel],
+//         shipping_charges: Number(shippingCharges.toFixed(2))
+//       };
+//     }
+
+//     // Other adjustments
+//     const cessAmount = Number(data[parentModel]?.cess_amount ?? 0);
+//     const advanceAmount = Number(data[parentModel]?.advance_amount ?? 0);
+//     const saleOrderDiscount = Number(data[parentModel]?.dis_amt ?? 0);
+//     const roundOff = Number(data[parentModel]?.round_off ?? 0);
+
+//     // -----------------------------
+//     // CALCULATE PRODUCT TOTAL BASED ON ITS TAX TYPE
+//     // -----------------------------
+//     let productTotalToAdd = totalBaseAmount; // Default to base
+    
+//     if (productTaxType === 'Exclusive') {
+//       // For Exclusive: base + tax
+//       productTotalToAdd = totalBaseAmount + productTaxAmount;
+//     } else {
+//       // For Inclusive: base amount is what we add (tax already included in product display)
+//       // But wait - in Inclusive, the user sees amountBeforeTax as the total
+//       // We need to use the original amountBeforeTax from products
+//       productTotalToAdd = products.reduce((sum, product) => {
+//         return sum + (Number(product.item_value) - parseFloat(product.discount_amount));
+//       }, 0);
+//     }
+
+//     // -----------------------------
+//     // CALCULATE SHIPPING TOTAL BASED ON ITS TAX TYPE
+//     // -----------------------------
+//     let shippingTotalToAdd = shippingCharges;
+    
+//     if (shippingTaxType === 'Exclusive') {
+//       // For Exclusive: base + tax
+//       shippingTotalToAdd = shippingCharges + shippingTaxAmount;
+//     }
+//     // For Inclusive: shippingCharges already includes tax
+
+//     // -----------------------------
+//     // FINAL TOTAL CALCULATION - CORRECTED
+//     // -----------------------------
+//     const finalAmount = 
+//       productTotalToAdd +           // Product total based on its tax type
+//       shippingTotalToAdd +          // Shipping total based on its tax type
+//       cessAmount -                  // Cess
+//       saleOrderDiscount -           // Order-level discount
+//       advanceAmount +               // Advance payment
+//       roundOff;                     // Round off
+
+//     if (controls.total_amount) {
+//       controls.total_amount.setValue(finalAmount.toFixed(2));
+      
+//       // Sync model
+//       data[parentModel] = {
+//         ...data[parentModel],
+//         total_amount: Number(finalAmount.toFixed(2))
+//       };
+//     }
+
+//     // Calculate amount in words (optional)
+//     if (controls.amount_in_words) {
+//       controls.amount_in_words.setValue(numberToWords(finalAmount));
+//     }
+//   }
+
+//   // -----------------------------
+//   // RETURN CALCULATED VALUES
+//   // -----------------------------
+//   return {
+//     totalBaseAmount,
+//     totalTaxAmount,
+//     productTaxAmount,
+//     shippingTaxAmount,
+//     totalDiscount,
+//     // finalAmount
+//   };
+// }
+
+export function calculateTotalAmount(data: any, modelName: string, form: any) {
+
   let parentModel = modelName.replace('_items', '');
 
   const modelMapping: { [key: string]: string } = {
@@ -954,93 +1219,167 @@ export function calculateTotalAmount(data: any, modelName: string, form: any) {
   // INITIALIZE VARIABLES
   // -----------------------------
   const products = data[modelName] || [];
-  
-  let totalBaseAmount = 0;        // Total of product base prices (tax exclusive)
-  let totalDiscount = 0;          // Total discount amount
-  let totalRate = 0;              // Total before discount (quantity * rate)
-  let totalTaxAmount = 0;         // Total tax (products + shipping)
-  
-  let productTaxAmount = 0;        // Tax from products only
-  let shippingTaxAmount = 0;       // Tax from shipping only
+
+  let totalBaseAmount = 0;
+  let totalDiscount = 0;
+  let totalRate = 0;
+  let totalTaxAmount = 0;
+
+  let productTaxAmount = 0;
+  let shippingTaxAmount = 0;
 
   // -----------------------------
   // COMPANY & CUSTOMER DETAILS
   // -----------------------------
   const companyState = 'Andhra Pradesh';
-  const billingAddress = data[parentModel]?.billing_address || '';
-  const isLocalState = !billingAddress || billingAddress.includes(companyState);
+
+  const billingAddress =
+    data[parentModel]?.billing_address || '';
+
+  const isLocalState =
+    !billingAddress ||
+    billingAddress.includes(companyState);
 
   // Tax types
-  const productTaxType = data[parentModel]?.tax || 'Exclusive';
-  const shippingTaxType = data?.order_shipments?.tax || productTaxType;
+  const productTaxType =
+    data[parentModel]?.tax || 'Exclusive';
 
-  const isPurchaseInvoice = parentModel === 'purchase_invoice_orders';
-  const isWithoutTaxPurchase = isPurchaseInvoice && data[parentModel]?.voucher === 'Purchase';
+  const shippingTaxType =
+    data?.order_shipments?.tax || productTaxType;
+
+  const isPurchaseInvoice =
+    parentModel === 'purchase_invoice_orders';
+
+  const isWithoutTaxPurchase =
+    isPurchaseInvoice &&
+    data[parentModel]?.voucher === 'Purchase';
 
   // -----------------------------
   // PRODUCT CALCULATION
   // -----------------------------
   if (products.length) {
+
     products.forEach((product: any) => {
-      const quantity = Number(product.quantity ?? 0);
-      const rate = Number(product.rate ?? 0);
-      console.log("Quantity: ", quantity, " Rate: ", rate);
 
-      const itemValue = quantity * rate; // Total before discount
+      const quantity =
+        parseFloat(product.quantity ?? 0) || 0;
 
-      // Calculate discount
+      const rate =
+        parseFloat(product.rate ?? 0) || 0;
+
+      const itemValue = quantity * rate;
+
+      // -----------------------------
+      // DISCOUNT CALCULATION
+      // -----------------------------
       let discountAmount = 0;
-      if (product.discount_amount && Number(product.discount_amount) > 0) {
-        discountAmount = Number(product.discount_amount);
+
+      const discountType =
+        product.discount_type || 'percentage';
+
+      if (discountType === 'amount') {
+
+        discountAmount =
+          parseFloat(product.discount_amount ?? 0) || 0;
+
       } else {
-        const discountPercentage = Number(product.discount ?? 0);
-        discountAmount = (itemValue * discountPercentage) / 100;
+
+        const discountPercentage =
+          parseFloat(product.discount ?? 0) || 0;
+
+        discountAmount =
+          (itemValue * discountPercentage) / 100;
       }
 
-      const amountBeforeTax = itemValue - discountAmount; // Value after discount, before tax
-      
-      let baseAmount = amountBeforeTax; // Tax-exclusive base price
-      let gstValue = 0; // Tax amount
+      const amountBeforeTax =
+        itemValue - discountAmount;
 
-      // Calculate product tax
-      if (!isWithoutTaxPurchase && product.product?.gst_input) {
-        const gstPercent = Number(product.product.gst_input);
+      // -----------------------------
+      // TAX CALCULATION
+      // -----------------------------
+      let baseAmount = amountBeforeTax;
+      let gstValue = 0;
+
+      if (
+        !isWithoutTaxPurchase &&
+        product.product?.gst_input
+      ) {
+
+        const gstPercent =
+          parseFloat(product.product.gst_input) || 0;
 
         if (productTaxType === 'Inclusive') {
-          // Extract tax from inclusive price
-          baseAmount = amountBeforeTax / (1 + gstPercent / 100);
-          gstValue = amountBeforeTax - baseAmount;
+
+          baseAmount =
+            amountBeforeTax / (1 + gstPercent / 100);
+
+          gstValue =
+            amountBeforeTax - baseAmount;
+
         } else {
-          // Add tax to exclusive price
+
           baseAmount = amountBeforeTax;
-          gstValue = (amountBeforeTax * gstPercent) / 100;
+
+          gstValue =
+            (amountBeforeTax * gstPercent) / 100;
         }
       }
 
-      // Store calculated values
-      product.item_value = itemValue.toFixed(2);
-      product.discount_amount = discountAmount.toFixed(2);
-      product.base_amount = baseAmount.toFixed(2); // Tax-exclusive amount
-      product.tax_amount = gstValue.toFixed(2); // Tax on this product
+      // -----------------------------
+      // STORE VALUES
+      // -----------------------------
+      product.item_value =
+        itemValue.toFixed(2);
 
-      // Accumulate totals
+      product.discount_amount =
+        discountAmount.toFixed(2);
+
+      product.base_amount =
+        baseAmount.toFixed(2);
+
+      product.tax_amount =
+        gstValue.toFixed(2);
+
+      // -----------------------------
+      // TOTALS
+      // -----------------------------
       totalRate += itemValue;
+
       totalBaseAmount += baseAmount;
+
       totalDiscount += discountAmount;
+
       productTaxAmount += gstValue;
 
-      // Split tax into CGST/SGST/IGST based on location
-      if (!isWithoutTaxPurchase && product.product?.gst_input) {
+      // -----------------------------
+      // GST SPLIT
+      // -----------------------------
+      if (
+        !isWithoutTaxPurchase &&
+        product.product?.gst_input
+      ) {
+
         if (isLocalState) {
-          product.cgst = (gstValue / 2).toFixed(2);
-          product.sgst = (gstValue / 2).toFixed(2);
+
+          product.cgst =
+            (gstValue / 2).toFixed(2);
+
+          product.sgst =
+            (gstValue / 2).toFixed(2);
+
           product.igst = 0.00;
+
         } else {
-          product.igst = gstValue.toFixed(2);
+
+          product.igst =
+            gstValue.toFixed(2);
+
           product.cgst = 0.00;
           product.sgst = 0.00;
         }
+
       } else {
+
         product.cgst = 0.00;
         product.sgst = 0.00;
         product.igst = 0.00;
@@ -1051,49 +1390,101 @@ export function calculateTotalAmount(data: any, modelName: string, form: any) {
   // -----------------------------
   // SHIPPING CALCULATION
   // -----------------------------
-  const shippingCharges = Number(data?.order_shipments?.shipping_charges ?? 0);
-  const shippingGstPercent = Number(data?.order_shipments?.shipping_gst ?? 0);
-  
-  let shippingBaseAmount = shippingCharges; // Tax-exclusive shipping amount
+  const shippingCharges =
+    parseFloat(
+      data?.order_shipments?.shipping_charges ?? 0
+    ) || 0;
 
-  if (shippingCharges > 0 && shippingGstPercent > 0) {
+  const shippingGstPercent =
+    parseFloat(
+      data?.order_shipments?.shipping_gst ?? 0
+    ) || 0;
+
+  let shippingBaseAmount = shippingCharges;
+
+  if (
+    shippingCharges > 0 &&
+    shippingGstPercent > 0
+  ) {
+
     if (shippingTaxType === 'Inclusive') {
-      // Extract tax from inclusive shipping charge
-      shippingBaseAmount = shippingCharges / (1 + shippingGstPercent / 100);
-      shippingTaxAmount = shippingCharges - shippingBaseAmount;
+
+      shippingBaseAmount =
+        shippingCharges /
+        (1 + shippingGstPercent / 100);
+
+      shippingTaxAmount =
+        shippingCharges - shippingBaseAmount;
+
     } else {
-      // Add tax to exclusive shipping charge
+
       shippingBaseAmount = shippingCharges;
-      shippingTaxAmount = (shippingCharges * shippingGstPercent) / 100;
+
+      shippingTaxAmount =
+        (shippingCharges * shippingGstPercent) / 100;
     }
 
-    // Store shipping details (optional - for reference)
     if (data.order_shipments) {
-      data.order_shipments.base_amount = shippingBaseAmount.toFixed(2);
-      data.order_shipments.tax_amount = shippingTaxAmount.toFixed(2);
-      data.order_shipments.total_amount = (shippingBaseAmount + shippingTaxAmount).toFixed(2);
+
+      data.order_shipments.base_amount =
+        shippingBaseAmount.toFixed(2);
+
+      data.order_shipments.tax_amount =
+        shippingTaxAmount.toFixed(2);
+
+      data.order_shipments.total_amount =
+        (
+          shippingBaseAmount +
+          shippingTaxAmount
+        ).toFixed(2);
     }
   }
 
   // -----------------------------
-  // TOTAL TAX CALCULATION
+  // TOTAL TAX
   // -----------------------------
-  totalTaxAmount = productTaxAmount + shippingTaxAmount;
+  totalTaxAmount =
+    productTaxAmount + shippingTaxAmount;
 
   // -----------------------------
   // UPDATE PRODUCT FORM CONTROLS
   // -----------------------------
   products.forEach((product: any, index: number) => {
-    const itemControls = form?.controls?.[modelName]?.controls?.[index];
 
-    if (itemControls && itemControls instanceof FormGroup) {
+    const itemControls =
+      form?.controls?.[modelName]?.controls?.[index];
+
+    if (
+      itemControls &&
+      itemControls instanceof FormGroup
+    ) {
+
       const controls = itemControls.controls;
 
-      if (controls['cgst']) controls['cgst'].setValue(product.cgst || 0.00);
-      if (controls['sgst']) controls['sgst'].setValue(product.sgst || 0.00);
-      if (controls['igst']) controls['igst'].setValue(product.igst || 0.00);
-      if (controls['base_amount']) controls['base_amount'].setValue(product.base_amount || 0.00);
-      if (controls['tax_amount']) controls['tax_amount'].setValue(product.tax_amount || 0.00);
+      if (controls['cgst'])
+        controls['cgst'].setValue(
+          product.cgst || 0.00
+        );
+
+      if (controls['sgst'])
+        controls['sgst'].setValue(
+          product.sgst || 0.00
+        );
+
+      if (controls['igst'])
+        controls['igst'].setValue(
+          product.igst || 0.00
+        );
+
+      if (controls['base_amount'])
+        controls['base_amount'].setValue(
+          product.base_amount || 0.00
+        );
+
+      if (controls['tax_amount'])
+        controls['tax_amount'].setValue(
+          product.tax_amount || 0.00
+        );
     }
   });
 
@@ -1101,95 +1492,149 @@ export function calculateTotalAmount(data: any, modelName: string, form: any) {
   // UPDATE MAIN FORM CONTROLS
   // -----------------------------
   if (form?.controls?.[parentModel]?.controls) {
-    const controls: any = form.controls[parentModel].controls;
 
-    // Sub-totals
+    const controls: any =
+      form.controls[parentModel].controls;
+
+    // -----------------------------
+    // SUB TOTALS
+    // -----------------------------
     if (controls.item_value)
-      controls.item_value.setValue(totalRate.toFixed(2));
+      controls.item_value.setValue(
+        totalRate.toFixed(2)
+      );
 
     if (controls.taxable_amount)
-      controls.taxable_amount.setValue(totalBaseAmount.toFixed(2));
+      controls.taxable_amount.setValue(
+        totalBaseAmount.toFixed(2)
+      );
 
     if (controls.discount)
-      controls.discount.setValue(totalDiscount.toFixed(2));
+      controls.discount.setValue(
+        totalDiscount.toFixed(2)
+      );
 
     if (controls.tax_amount)
-      controls.tax_amount.setValue(totalTaxAmount.toFixed(2));
+      controls.tax_amount.setValue(
+        totalTaxAmount.toFixed(2)
+      );
 
-    // Shipping
+    // -----------------------------
+    // SHIPPING
+    // -----------------------------
     if (controls.shipping_charges) {
-      controls.shipping_charges.setValue(shippingCharges.toFixed(2));
-      
-      // Sync model
+
+      controls.shipping_charges.setValue(
+        shippingCharges.toFixed(2)
+      );
+
       data[parentModel] = {
         ...data[parentModel],
-        shipping_charges: Number(shippingCharges.toFixed(2))
+        shipping_charges:
+          parseFloat(shippingCharges.toFixed(2))
       };
     }
 
-    // Other adjustments
-    const cessAmount = Number(data[parentModel]?.cess_amount ?? 0);
-    const advanceAmount = Number(data[parentModel]?.advance_amount ?? 0);
-    const saleOrderDiscount = Number(data[parentModel]?.dis_amt ?? 0);
-    const roundOff = Number(data[parentModel]?.round_off ?? 0);
+    // -----------------------------
+    // OTHER ADJUSTMENTS
+    // -----------------------------
+    const cessAmount =
+      parseFloat(
+        data[parentModel]?.cess_amount ?? 0
+      ) || 0;
+
+    const advanceAmount =
+      parseFloat(
+        data[parentModel]?.advance_amount ?? 0
+      ) || 0;
+
+    const saleOrderDiscount =
+      parseFloat(
+        data[parentModel]?.dis_amt ?? 0
+      ) || 0;
+
+    const roundOff =
+      parseFloat(
+        data[parentModel]?.round_off ?? 0
+      ) || 0;
 
     // -----------------------------
-    // CALCULATE PRODUCT TOTAL BASED ON ITS TAX TYPE
+    // PRODUCT TOTAL
     // -----------------------------
-    let productTotalToAdd = totalBaseAmount; // Default to base
-    
+    let productTotalToAdd =
+      totalBaseAmount;
+
     if (productTaxType === 'Exclusive') {
-      // For Exclusive: base + tax
-      productTotalToAdd = totalBaseAmount + productTaxAmount;
+
+      productTotalToAdd =
+        totalBaseAmount + productTaxAmount;
+
     } else {
-      // For Inclusive: base amount is what we add (tax already included in product display)
-      // But wait - in Inclusive, the user sees amountBeforeTax as the total
-      // We need to use the original amountBeforeTax from products
-      productTotalToAdd = products.reduce((sum, product) => {
-        return sum + (Number(product.item_value) - Number(product.discount_amount));
-      }, 0);
+
+      productTotalToAdd =
+        products.reduce((sum, product) => {
+
+          return (
+            sum +
+            (
+              parseFloat(product.item_value) -
+              parseFloat(product.discount_amount)
+            )
+          );
+
+        }, 0);
     }
 
     // -----------------------------
-    // CALCULATE SHIPPING TOTAL BASED ON ITS TAX TYPE
+    // SHIPPING TOTAL
     // -----------------------------
-    let shippingTotalToAdd = shippingCharges;
-    
+    let shippingTotalToAdd =
+      shippingCharges;
+
     if (shippingTaxType === 'Exclusive') {
-      // For Exclusive: base + tax
-      shippingTotalToAdd = shippingCharges + shippingTaxAmount;
+
+      shippingTotalToAdd =
+        shippingCharges + shippingTaxAmount;
     }
-    // For Inclusive: shippingCharges already includes tax
 
     // -----------------------------
-    // FINAL TOTAL CALCULATION - CORRECTED
+    // FINAL TOTAL
     // -----------------------------
-    const finalAmount = 
-      productTotalToAdd +           // Product total based on its tax type
-      shippingTotalToAdd +          // Shipping total based on its tax type
-      cessAmount -                  // Cess
-      saleOrderDiscount -           // Order-level discount
-      advanceAmount +               // Advance payment
-      roundOff;                     // Round off
+    const finalAmount =
+
+      productTotalToAdd +
+      shippingTotalToAdd +
+      cessAmount -
+      saleOrderDiscount -
+      advanceAmount +
+      roundOff;
 
     if (controls.total_amount) {
-      controls.total_amount.setValue(finalAmount.toFixed(2));
-      
-      // Sync model
+
+      controls.total_amount.setValue(
+        finalAmount.toFixed(2)
+      );
+
       data[parentModel] = {
         ...data[parentModel],
-        total_amount: Number(finalAmount.toFixed(2))
+        total_amount:
+          parseFloat(finalAmount.toFixed(2))
       };
     }
 
-    // Calculate amount in words (optional)
+    // -----------------------------
+    // AMOUNT IN WORDS
+    // -----------------------------
     if (controls.amount_in_words) {
-      controls.amount_in_words.setValue(numberToWords(finalAmount));
+
+      controls.amount_in_words.setValue(
+        numberToWords(finalAmount)
+      );
     }
   }
 
   // -----------------------------
-  // RETURN CALCULATED VALUES
+  // RETURN VALUES
   // -----------------------------
   return {
     totalBaseAmount,
@@ -1197,7 +1642,6 @@ export function calculateTotalAmount(data: any, modelName: string, form: any) {
     productTaxAmount,
     shippingTaxAmount,
     totalDiscount,
-    // finalAmount
   };
 }
 
