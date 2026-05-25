@@ -158,34 +158,25 @@ export class EmployeesComponent  implements OnInit {
             //   },
             // },
             {
-              key: 'phone',
-              type: 'input',
-              className: 'col-md-4 col-sm-6 col-12',
-              templateOptions: {
-                label: 'Phone',
-                placeholder: 'Enter with country code',
-                required: true,
-              },
-              // Add hooks to modify the value
-              hooks: {
-                onInit: (field) => {
-                  // Optional: Set initial value with +91
-                  field.formControl.setValue('+91');
-                }
-              },
-              // Default value with +91
-              defaultValue: '+91',
-              // Or use expression properties
-              expressionProperties: {
-                'templateOptions.inputValue': (model) => {
-                  // Auto-prepend +91 if not present
-                  if (model.phone && !model.phone.startsWith('+')) {
-                    return '+91' + model.phone.replace(/^0+/, ''); // Remove leading zeros
-                  }
-                  return model.phone;
-                }
-              }
-            },
+  key: 'phone',
+  type: 'input',
+  className: 'col-md-4 col-sm-6 col-12',
+  templateOptions: {
+    label: 'Phone',
+    placeholder: 'Enter with country code',
+    required: true,
+  },
+  defaultValue: '+91',
+  hooks: {
+    onInit: (field) => {
+      const currentValue = field.formControl.value;
+
+      if (!currentValue) {
+        field.formControl.setValue('+91');
+      }
+    }
+  }
+},
             {
               key: 'gender',
               type: 'select',
@@ -434,18 +425,18 @@ export class EmployeesComponent  implements OnInit {
               }
             },
             {
-              className: 'col-sm-3 col-12 p-0',
+              className: 'col-12 custom-form-card-block w-100 p-0',
               fieldGroupClassName: "ant-row row mx-0 mt-2",
               fieldGroup: [
                 {
                   key: 'picture',
                   type: 'file',
-                  className: 'ta-cell pr-md col d-flex justify-content-md-center pr-0',
-                  templateOptions: {
-                    label: 'Govt. ID',
-                    required: true
-                  }
-                }
+                  className: 'ta-cell col-12 col-md-6 custom-file-attachement',
+                  props: {
+                    "displayStyle": "files",
+                    "multiple": true,
+                    label: 'Govt. Id',
+                  },}
               ]
             },
           ],
