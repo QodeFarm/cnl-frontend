@@ -1,0 +1,207 @@
+<div class="profile-container">
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Loading your profile...</p>
+  </div>
+
+  <!-- Profile Content -->
+  <div class="profile-content" *ngIf="!loading">
+    <!-- Cover Image -->
+    <div class="profile-cover">
+      <div class="cover-gradient"></div>
+    </div>
+
+    <!-- Profile Header -->
+    <div class="profile-header">
+      <div class="profile-avatar">
+        <div class="avatar-circle">
+          {{ getInitials() }}
+        </div>
+      </div>
+      <div class="profile-title">
+        <h1>{{ employeeData.full_name || employeeData.first_name + ' ' + employeeData.last_name }}</h1>
+        <p class="employee-code">{{ employeeData.designation || 'Employee' }} | {{ employeeData.department || 'General' }}</p>
+        <div class="badge" *ngIf="employeeData.username">
+          <i class="fas fa-check-circle"></i> Portal Access Enabled
+        </div>
+      </div>
+      <div class="profile-actions">
+        <button class="btn-edit" *ngIf="!isEditing" (click)="toggleEdit()">
+          <i class="fas fa-edit"></i> Edit Profile
+        </button>
+        <div class="action-buttons" *ngIf="isEditing">
+          <button class="btn-save" (click)="saveProfile()">
+            <i class="fas fa-save"></i> Save
+          </button>
+          <button class="btn-cancel" (click)="toggleEdit()">
+            <i class="fas fa-times"></i> Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Grid -->
+    <div class="profile-grid">
+      <!-- Personal Information -->
+      <div class="profile-section">
+        <div class="section-header">
+          <i class="fas fa-user-circle"></i>
+          <h2>Personal Information</h2>
+        </div>
+        <div class="section-content">
+          <div class="info-row">
+            <div class="info-label">First Name</div>
+            <div class="info-value" *ngIf="!isEditing">{{ employeeData.first_name || '-' }}</div>
+            <input *ngIf="isEditing" class="form-control" [(ngModel)]="employeeData.first_name" placeholder="First Name">
+          </div>
+          <div class="info-row">
+            <div class="info-label">Last Name</div>
+            <div class="info-value" *ngIf="!isEditing">{{ employeeData.last_name || '-' }}</div>
+            <input *ngIf="isEditing" class="form-control" [(ngModel)]="employeeData.last_name" placeholder="Last Name">
+          </div>
+          <div class="info-row">
+            <div class="info-label">Gender</div>
+            <div class="info-value" *ngIf="!isEditing">{{ employeeData.gender || '-' }}</div>
+            <select *ngIf="isEditing" class="form-control" [(ngModel)]="employeeData.gender">
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Date of Birth</div>
+            <div class="info-value" *ngIf="!isEditing">{{ employeeData.date_of_birth || '-' }}</div>
+            <input *ngIf="isEditing" class="form-control" type="date" [(ngModel)]="employeeData.date_of_birth">
+          </div>
+          <div class="info-row">
+            <div class="info-label">Nationality</div>
+            <div class="info-value" *ngIf="!isEditing">{{ employeeData.nationality || '-' }}</div>
+            <input *ngIf="isEditing" class="form-control" [(ngModel)]="employeeData.nationality" placeholder="Nationality">
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Information -->
+      <div class="profile-section">
+        <div class="section-header">
+          <i class="fas fa-address-card"></i>
+          <h2>Contact Information</h2>
+        </div>
+        <div class="section-content">
+          <div class="info-row">
+            <div class="info-label"><i class="fas fa-envelope"></i> Email</div>
+            <div class="info-value" *ngIf="!isEditing">{{ employeeData.email || '-' }}</div>
+            <input *ngIf="isEditing" class="form-control" type="email" [(ngModel)]="employeeData.email" placeholder="Email">
+          </div>
+          <div class="info-row">
+            <div class="info-label"><i class="fas fa-phone"></i> Phone</div>
+            <div class="info-value" *ngIf="!isEditing">{{ employeeData.phone || '-' }}</div>
+            <input *ngIf="isEditing" class="form-control" [(ngModel)]="employeeData.phone" placeholder="Phone">
+          </div>
+          <div class="info-row">
+            <div class="info-label"><i class="fas fa-map-marker-alt"></i> Address</div>
+            <div class="info-value" *ngIf="!isEditing">{{ employeeData.address || '-' }}</div>
+            <textarea *ngIf="isEditing" class="form-control" [(ngModel)]="employeeData.address" rows="3" placeholder="Address"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Emergency Contact Section -->
+    <div class="profile-section full-width">
+      <div class="section-header">
+        <i class="fas fa-ambulance"></i>
+        <h2>Emergency Contact</h2>
+      </div>
+      <div class="section-content">
+        <div class="info-row">
+          <div class="info-label">Contact Number</div>
+          <div class="info-value" *ngIf="!isEditing">{{ employeeData.emergency_contact || '-' }}</div>
+          <input *ngIf="isEditing" class="form-control" [(ngModel)]="employeeData.emergency_contact" placeholder="Emergency Contact Number">
+        </div>
+        <div class="info-row">
+          <div class="info-label">Relationship</div>
+          <div class="info-value" *ngIf="!isEditing">{{ employeeData.emergency_contact_relationship || '-' }}</div>
+          <input *ngIf="isEditing" class="form-control" [(ngModel)]="employeeData.emergency_contact_relationship" placeholder="Relationship">
+        </div>
+      </div>
+    </div>
+
+    <!-- Employment Details Section -->
+    <div class="profile-section full-width">
+      <div class="section-header">
+        <i class="fas fa-briefcase"></i>
+        <h2>Employment Details</h2>
+      </div>
+      <div class="section-content">
+        <div class="info-row">
+          <div class="info-label">Designation</div>
+          <div class="info-value">{{ employeeData.designation || '-' }}</div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">Department</div>
+          <div class="info-value">{{ employeeData.department || '-' }}</div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">Hire Date</div>
+          <div class="info-value">{{ formatDate(employeeData.hire_date) }}</div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">Member Since</div>
+          <div class="info-value">{{ formatDate(employeeData.created_at) }}</div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">Username</div>
+          <div class="info-value">{{ employeeData.username || '-' }}</div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">Last Login</div>
+          <div class="info-value">{{ employeeData.last_login | date:'medium' || 'Never' }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Leave Balance Section -->
+    <!-- Leave Balance Section -->
+    <div class="profile-section full-width" *ngIf="leaveBalances.length > 0">
+    <div class="section-header">
+        <i class="fas fa-calendar-alt"></i>
+        <h2>Leave Balance</h2>
+        <span class="header-badge">{{ leaveBalances.length }} Types</span>
+    </div>
+    <div class="leave-balance-grid">
+        <div class="leave-card" *ngFor="let leave of leaveBalances">
+        <div class="leave-card-icon">
+            <i class="fas fa-umbrella-beach"></i>
+        </div>
+        <div class="leave-card-content">
+            <div class="leave-type">{{ leave.leave_type?.leave_type_name || '-' }}</div>
+            <div class="leave-balance-wrapper">
+            <span class="leave-balance-value">{{ leave.leave_balance }}</span>
+            <span class="leave-balance-unit">days</span>
+            </div>
+            <div class="leave-year">
+            <i class="fas fa-calendar"></i> {{ leave.year }}
+            </div>
+            <div class="leave-progress">
+            <div class="progress-bar" [style.width.%]="getLeavePercentage(leave)"></div>
+            </div>
+            <div class="leave-description" *ngIf="leave.leave_type?.description">
+            <i class="fas fa-info-circle"></i> {{ leave.leave_type?.description }}
+            </div>
+        </div>
+        </div>
+    </div>
+    </div>
+  </div>
+</div>
+
+<!-- Custom Toast -->
+<div class="toast-message" [class.error]="toastType === 'error'" *ngIf="showToastMessage">
+  <div class="tick-circle">
+    <span class="tick-mark">✓</span>
+  </div>
+  <span class="toast-message-text">{{ toastMessage }}</span>
+  <span class="toast-close" (click)="showToastMessage = false">x</span>
+</div>

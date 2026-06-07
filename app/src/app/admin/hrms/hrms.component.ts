@@ -69,6 +69,115 @@ export class EmployeesComponent  implements OnInit {
     }
   };
 
+generatedUsername: string = '';
+generatedPassword: string = '';
+
+// Generate credentials for employee
+generateEmployeeCredentials() {
+  if (!this.EmployeeEditID) {
+    alert('Please save the employee first');
+    return;
+  }
+  
+  this.http.post(`hrms/employees/generate-credentials/${this.EmployeeEditID}/`, {}).subscribe(
+    (res: any) => {
+      if (res.success) {
+        // Store generated credentials
+        this.generatedUsername = res.username;
+        this.generatedPassword = res.password;
+        
+        // Update form fields
+        this.formConfig.model.employee.username = res.username;
+        this.formConfig.model.employee.password_display = res.password;
+        this.formConfig.model.employee.is_portal_user = true;
+        
+        // Show the credentials modal
+        const modalElement = document.getElementById('credentialsModal');
+        if (modalElement) {
+          const modal = new (window as any).bootstrap.Modal(modalElement);
+          modal.show();
+        }
+      } else {
+        alert(res.message || 'Error generating credentials');
+      }
+    },
+    (error) => {
+      alert('Error generating credentials');
+    }
+  );
+}
+
+// Copy single field to clipboard
+copyToClipboard(text: string) {
+  navigator.clipboard.writeText(text).then(() => {
+    this.showToast('Copied to clipboard!');
+  });
+}
+
+// Copy both username and password
+copyAllCredentials() {
+  const credentials = `Username: ${this.generatedUsername}\nPassword: ${this.generatedPassword}`;
+  navigator.clipboard.writeText(credentials).then(() => {
+    this.showToast('All credentials copied to clipboard!');
+  });
+}
+
+showSuccessToast: boolean = false;
+toastMessage: string = '';
+
+// Show toast message
+showToast(message: string) {
+  this.toastMessage = message;
+  this.showSuccessToast = true;
+  setTimeout(() => {
+    this.showSuccessToast = false;
+  }, 3000);
+}
+
+// Show send credentials popup
+showSendCredentialsPopup() {
+  if (!this.EmployeeEditID) {
+    alert('Please save the employee first');
+    return;
+  }
+  
+  const method = confirm('Send credentials via Email?\n\nClick OK for Email, Cancel for WhatsApp');
+  if (method) {
+    this.sendViaEmail();
+  } else {
+    this.sendViaWhatsApp();
+  }
+}
+
+// Send via email
+sendViaEmail() {
+  this.http.post(`hrms/employees/send-credentials/${this.EmployeeEditID}/?method=email`, {}).subscribe(
+    (res: any) => {
+      alert(res.success ? '✅ Credentials sent via email!' : (res.message || 'Failed to send'));
+    },
+    () => alert('Failed to send email')
+  );
+}
+
+// Send via WhatsApp
+sendViaWhatsApp() {
+  alert('WhatsApp template under construction. Please use email.');
+}
+
+findField(key: string): any {
+  const search = (fields: any[]): any => {
+    for (const f of fields) {
+      if (f.key === key) return f;
+      if (f.fieldGroup) {
+        const found = search(f.fieldGroup);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+  return search(this.formConfig.fields || []);
+}
+
   setFormConfig() {
     this.EmployeeEditID = null;
     this.formConfig = {
@@ -424,6 +533,60 @@ export class EmployeesComponent  implements OnInit {
                 required: false,
               }
             },
+            // Add this at the end of your employee fieldGroup (before closing brackets)
+
+{
+  className: 'col-12 mt-3',
+  fieldGroupClassName: 'row',
+  fieldGroup: [
+    {
+      className: 'col-12',
+      key: 'is_portal_user',
+      type: 'checkbox',
+      templateOptions: {
+        label: 'Enable Employee Portal Access',
+        description: 'Allow employee to login and view their data'
+      },
+      hooks: {
+        onChanges: (field: any) => {
+          const isEnabled = field.formControl.value;
+          const portalFields = ['username', 'password_display'];
+          portalFields.forEach(fieldKey => {
+            const portalField = this.findField(fieldKey);
+            if (portalField) portalField.hide = !isEnabled;
+          });
+        }
+      }
+    },
+    {
+      className: 'col-md-4 col-sm-6 col-12',
+      key: 'username',
+      type: 'input',
+      hide: true,
+      templateOptions: {
+        label: 'Portal Username',
+        placeholder: 'Auto-generated',
+        description: 'Leave empty to auto-generate from name'
+      }
+    },
+    {
+      className: 'col-md-4 col-sm-6 col-12',
+      key: 'password_display',
+      type: 'input',
+      hide: true,
+      templateOptions: {
+        label: 'Password',
+        readonly: true,
+        description: 'Click Generate to create password'
+      }
+    },
+    {
+      key: 'password',
+      type: 'input',
+      hide: true
+    }
+  ]
+},
             {
               className: 'col-12 custom-form-card-block w-100 p-0',
               fieldGroupClassName: "ant-row row mx-0 mt-2",

@@ -1362,35 +1362,64 @@ closeNoQuantityWarning() {
   }
   // ===============================================
 
+  // getOrderNo() {
+  //   // Skip if we are in Edit mode
+  //   if (this.SaleOrderEditID || this.shouldAutoInvoice) {
+  //     return;
+  //   }
+  //   this.orderNumber = null;
+  //   this.shippingTrackingNumber = null;
+
+  //   const saleTypeObj = this.formConfig.model['sale_order']?.sale_type_id;
+  //   const saleTypeName = saleTypeObj?.name?.toLowerCase() || '';
+  //   const orderPrefix = saleTypeName === 'Other' ? 'SOO' : 'SO';
+
+  //   // 1. Shipping number
+  //   this.http.get('masters/generate_order_no/?type=SHIP').subscribe((shipRes: any) => {
+  //     if (shipRes?.data?.order_number) {
+  //       this.shippingTrackingNumber = shipRes.data.order_number;
+  //       this.formConfig.model['order_shipments']['shipping_tracking_no'] = this.shippingTrackingNumber;
+
+  //       // 2. Sales order number
+  //       this.http.get(`masters/generate_order_no/?type=${orderPrefix}`).subscribe((orderRes: any) => {
+  //         if (orderRes?.data?.order_number) {
+  //           this.orderNumber = orderRes.data.order_number;
+  //           this.formConfig.model['sale_order']['order_no'] = this.orderNumber;
+  //         }
+  //       });
+  //     }
+  //   });
+  // }
+
   getOrderNo() {
-    // Skip if we are in Edit mode
-    if (this.SaleOrderEditID || this.shouldAutoInvoice) {
-      return;
-    }
-    this.orderNumber = null;
-    this.shippingTrackingNumber = null;
-
-    const saleTypeObj = this.formConfig.model['sale_order']?.sale_type_id;
-    const saleTypeName = saleTypeObj?.name?.toLowerCase() || '';
-    const orderPrefix = saleTypeName === 'Other' ? 'SOO' : 'SO';
-
-    // 1. Shipping number
-    this.http.get('masters/generate_order_no/?type=SHIP').subscribe((shipRes: any) => {
-      if (shipRes?.data?.order_number) {
-        this.shippingTrackingNumber = shipRes.data.order_number;
-        this.formConfig.model['order_shipments']['shipping_tracking_no'] = this.shippingTrackingNumber;
-
-        // 2. Sales order number
-        this.http.get(`masters/generate_order_no/?type=${orderPrefix}`).subscribe((orderRes: any) => {
-          if (orderRes?.data?.order_number) {
-            this.orderNumber = orderRes.data.order_number;
-            this.formConfig.model['sale_order']['order_no'] = this.orderNumber;
-          }
-        });
-      }
-    });
+  // Skip if we are in Edit mode
+  if (this.SaleOrderEditID || this.shouldAutoInvoice) {
+    return;
   }
+  this.orderNumber = null;
+  this.shippingTrackingNumber = null;
 
+  // Get the current sale type from the form model
+  const saleTypeObj = this.formConfig.model['sale_order']?.sale_type_id;
+  const saleTypeName = saleTypeObj?.name?.toLowerCase() || '';
+  const orderPrefix = saleTypeName === 'other' ? 'SOO' : 'SO';
+
+  // 1. Shipping number
+  this.http.get('masters/generate_order_no/?type=SHIP').subscribe((shipRes: any) => {
+    if (shipRes?.data?.order_number) {
+      this.shippingTrackingNumber = shipRes.data.order_number;
+      this.formConfig.model['order_shipments']['shipping_tracking_no'] = this.shippingTrackingNumber;
+
+      // 2. Sales order number
+      this.http.get(`masters/generate_order_no/?type=${orderPrefix}`).subscribe((orderRes: any) => {
+        if (orderRes?.data?.order_number) {
+          this.orderNumber = orderRes.data.order_number;
+          this.formConfig.model['sale_order']['order_no'] = this.orderNumber;
+        }
+      });
+    }
+  });
+}
 
 
   // Displays the sales order list modal
@@ -3442,7 +3471,7 @@ createSaleOrder() {
         this.showSuccessToast = false;
       }, 3000);
 
-      this.resetToNewForm();
+      this.ngOnInit();
     },
 
     error: err => {
@@ -5617,78 +5646,86 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
                 //   }
                 // },  
                 {
-                  key: 'sale_type',
-                  type: 'select',
-                  className: 'col-md-4 col-sm-6 col-12',
-                  templateOptions: {
-                    label: 'Sale type',
-                    dataKey: 'sale_type_id',
-                    dataLabel: 'name',
-                    required: true,
-                    options: [],
-                    lazy: {
-                      url: 'masters/sale_types/',
-                      lazyOneTime: true
-                    },
-                  },
-                  hooks: {
-                    onInit: (field: any) => {
-                      const lazyUrl = field.templateOptions.lazy.url;
-                      const modelSaleOrder = this.formConfig.model?.sale_order || {};
-                      let orderGenerated = false;
+  key: 'sale_type',
+  type: 'select',
+  className: 'col-md-4 col-sm-6 col-12',
+  templateOptions: {
+    label: 'Sale type',
+    dataKey: 'sale_type_id',
+    dataLabel: 'name',
+    required: true,
+    options: [],
+    lazy: {
+      url: 'masters/sale_types/',
+      lazyOneTime: true
+    },
+  },
+  hooks: {
+    onInit: (field: any) => {
+      const lazyUrl = field.templateOptions.lazy.url;
+      const modelSaleOrder = this.formConfig.model?.sale_order || {};
 
-                      const applySaleTypes = (saleTypes: any[]) => {
-                        field.templateOptions.options = saleTypes;
-                        const currentSaleTypeId = modelSaleOrder.sale_type_id;
-                        if (currentSaleTypeId) {
-                          const matchedOption = saleTypes.find(opt => opt.sale_type_id === currentSaleTypeId);
-                          if (matchedOption) {
-                            field.formControl.setValue(matchedOption, { emitEvent: false });
-                          }
-                        } else {
-                          const defaultOption = saleTypes.find(option => option.name === 'Advance Order');
-                          if (defaultOption) {
-                            field.formControl.setValue(defaultOption, { emitEvent: false });
-                            modelSaleOrder.sale_type_id = defaultOption.sale_type_id;
-                          }
-                        }
-                      };
+      const applySaleTypes = (saleTypes: any[]) => {
+        field.templateOptions.options = saleTypes;
+        const currentSaleTypeId = modelSaleOrder.sale_type_id;
+        if (currentSaleTypeId) {
+          const matchedOption = saleTypes.find(opt => opt.sale_type_id === currentSaleTypeId);
+          if (matchedOption) {
+            field.formControl.setValue(matchedOption, { emitEvent: true });
+          }
+        } else {
+          const defaultOption = saleTypes.find(option => option.name === 'Advance Order');
+          if (defaultOption) {
+            field.formControl.setValue(defaultOption, { emitEvent: true });
+            modelSaleOrder.sale_type_id = defaultOption.sale_type_id;
+          }
+        }
+      };
 
-                      if (this.saleTypesCache) {
-                        applySaleTypes(this.saleTypesCache);
-                      } else {
-                        this.http.get(lazyUrl).subscribe((response: any) => {
-                          this.saleTypesCache = response.data;
-                          applySaleTypes(this.saleTypesCache!);
-                        });
-                      }
+      if (this.saleTypesCache) {
+        applySaleTypes(this.saleTypesCache);
+      } else {
+        this.http.get(lazyUrl).subscribe((response: any) => {
+          this.saleTypesCache = response.data;
+          applySaleTypes(this.saleTypesCache!);
+        });
+      }
 
-                      field.formControl.valueChanges.subscribe((data: any) => {
-                        if (data && data.sale_type_id) {
-                          modelSaleOrder.sale_type_id = data.sale_type_id;
-
-                          if (!this.SaleOrderEditID && !orderGenerated) {
-                            orderGenerated = true;
-                            const prefix = data.name === 'Other' ? 'SOO' : 'SO';
-
-                            this.http.get(`masters/generate_order_no/?type=${prefix}`).subscribe((res: any) => {
-                              if (res?.data?.order_number) {
-                                this.orderNumber = res.data.order_number;
-                                modelSaleOrder.order_no = this.orderNumber;
-
-                                //  setValue only if field exists in form
-                                const orderNoControl = field.form.get('order_no');
-                                if (orderNoControl) {
-                                  orderNoControl.setValue(this.orderNumber);
-                                }
-                              }
-                            });
-                          }
-                        }
-                      });
-                    }
-                  }
-                },
+      // Track the previous sale type name to detect actual changes
+      let previousSaleTypeName = '';
+      
+      field.formControl.valueChanges.subscribe((data: any) => {
+        if (data && data.sale_type_id) {
+          modelSaleOrder.sale_type_id = data.sale_type_id;
+          const currentSaleTypeName = data.name;
+          
+          // Regenerate order number only if:
+          // 1. Not in edit mode
+          // 2. Sale type name actually changed (prevents duplicate calls)
+          // 3. The order number field exists
+          if (!this.SaleOrderEditID && previousSaleTypeName !== currentSaleTypeName) {
+            previousSaleTypeName = currentSaleTypeName;
+            
+            const prefix = data.name === 'Other' ? 'SOO' : 'SO';
+            
+            this.http.get(`masters/generate_order_no/?type=${prefix}`).subscribe((res: any) => {
+              if (res?.data?.order_number) {
+                this.orderNumber = res.data.order_number;
+                modelSaleOrder.order_no = this.orderNumber;
+                
+                // Update the order_no field if it exists
+                const orderNoControl = field.form.get('order_no');
+                if (orderNoControl) {
+                  orderNoControl.setValue(this.orderNumber);
+                }
+              }
+            });
+          }
+        }
+      });
+    }
+  }
+},
                 // {
                 //   key: 'sale_type',
                 //   type: 'select',
