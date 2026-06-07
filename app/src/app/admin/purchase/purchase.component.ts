@@ -508,24 +508,74 @@ export class PurchaseComponent {
     this.hide();
   }
 
-  getOrderNo() {
-    this.orderNumber = null;
-    this.shippingTrackingNumber = null;
-    this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
-        if (res && res.data && res.data.order_number) {
-          this.shippingTrackingNumber = res.data.order_number;
-          this.formConfig.model['order_shipments']['shipping_tracking_no'] = this.shippingTrackingNumber;
-    this.http.get('masters/generate_order_no/?type=PO').subscribe((res: any) => {
-      console.log(res);
-      if (res && res.data && res.data.order_number) {
-        this.formConfig.model['purchase_order_data']['order_no'] = res.data.order_number;
-        this.orderNumber = res.data.order_number;
-      }
+  // getOrderNo() {
+  //   this.orderNumber = null;
+  //   this.shippingTrackingNumber = null;
+  //   this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
+  //       if (res && res.data && res.data.order_number) {
+  //         this.shippingTrackingNumber = res.data.order_number;
+  //         this.formConfig.model['order_shipments']['shipping_tracking_no'] = this.shippingTrackingNumber;
+  //   this.http.get('masters/generate_order_no/?type=PO').subscribe((res: any) => {
+  //     console.log(res);
+  //     if (res && res.data && res.data.order_number) {
+  //       this.formConfig.model['purchase_order_data']['order_no'] = res.data.order_number;
+  //       this.orderNumber = res.data.order_number;
+  //     }
        
+  //     });
+  //   }
+  //   });
+  // }
+
+  getOrderNo() {
+  if (this.PurchaseOrderEditID) {
+    return;
+  }
+  
+  this.orderNumber = null;
+  this.shippingTrackingNumber = null;
+  
+  this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
+    if (res && res.data && res.data.order_number) {
+      this.shippingTrackingNumber = res.data.order_number;
+      this.formConfig.model['order_shipments']['shipping_tracking_no'] = this.shippingTrackingNumber;
+      
+      this.http.get('masters/generate_order_no/?type=PO').subscribe((res: any) => {
+        console.log(res);
+        if (res && res.data && res.data.order_number) {
+          this.formConfig.model['purchase_order_data']['order_no'] = res.data.order_number;
+          this.orderNumber = res.data.order_number;
+          console.log("Purchase Order NO: ", this.orderNumber);
+          
+          // FIX: Update the order_no form control
+          this.updateOrderNoControl();
+          
+          this.cdr.detectChanges(); // Trigger change detection
+        }
       });
     }
-    });
-  }
+  });
+}
+
+// Add this helper method
+updateOrderNoControl() {
+  if (!this.formConfig?.fields) return;
+  
+  const searchAndUpdate = (fields: any[]): boolean => {
+    for (const field of fields) {
+      if (field.key === 'order_no' && field.formControl) {
+        field.formControl.setValue(this.formConfig.model['purchase_order_data']['order_no']);
+        console.log('Order No control updated:', field.formControl.value);
+        return true;
+      }
+      if (field.fieldGroup && searchAndUpdate(field.fieldGroup)) return true;
+      if (field.fieldArray?.fieldGroup && searchAndUpdate(field.fieldArray.fieldGroup)) return true;
+    }
+    return false;
+  };
+  
+  searchAndUpdate(this.formConfig.fields);
+}
 
   showPurchaseOrderListFn() {
     this.showPurchaseOrderList = true;

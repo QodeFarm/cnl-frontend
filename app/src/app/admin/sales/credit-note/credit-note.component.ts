@@ -263,17 +263,60 @@ ngOnInit() {
     }
   }
 
-  getOrderNo() {
-    this.orderNumber = null;
-        // Generate Sales Order Number
-        this.http.get('masters/generate_order_no/?type=CN').subscribe((res: any) => {
-          console.log("RES data in orderno : ", res.data.order_number)
-          if (res.data && res.data.order_number) {
-            this.orderNumber = res.data.order_number;
-            this.formConfig.model['sale_credit_note']['credit_note_number'] = this.orderNumber;
-          }
-        });
+  // getOrderNo() {
+  //   this.orderNumber = null;
+  //       // Generate Sales Order Number
+  //       this.http.get('masters/generate_order_no/?type=CN').subscribe((res: any) => {
+  //         console.log("RES data in orderno : ", res.data.order_number)
+  //         if (res.data && res.data.order_number) {
+  //           this.orderNumber = res.data.order_number;
+  //           this.formConfig.model['sale_credit_note']['credit_note_number'] = this.orderNumber;
+  //         }
+  //       });
+  // }
+
+getOrderNo() {
+  if (this.SaleCreditnoteEditID) {
+    return;
   }
+  
+  this.orderNumber = null;
+  
+  // Generate Credit Note Number
+  this.http.get('masters/generate_order_no/?type=CN').subscribe((res: any) => {
+    console.log("RES data in orderno : ", res.data.order_number)
+    if (res.data && res.data.order_number) {
+      this.orderNumber = res.data.order_number;
+      this.formConfig.model['sale_credit_note']['credit_note_number'] = this.orderNumber;
+      console.log("Credit Note NO: ", this.orderNumber);
+      
+      // FIX: Update the credit_note_number form control
+      this.updateCreditNoteNoControl();
+      
+      this.cdr.detectChanges(); // Trigger change detection
+    }
+  });
+}
+
+// Add this helper method
+updateCreditNoteNoControl() {
+  if (!this.formConfig?.fields) return;
+  
+  const searchAndUpdate = (fields: any[]): boolean => {
+    for (const field of fields) {
+      if (field.key === 'credit_note_number' && field.formControl) {
+        field.formControl.setValue(this.formConfig.model['sale_credit_note']['credit_note_number']);
+        console.log('Credit Note No control updated:', field.formControl.value);
+        return true;
+      }
+      if (field.fieldGroup && searchAndUpdate(field.fieldGroup)) return true;
+      if (field.fieldArray?.fieldGroup && searchAndUpdate(field.fieldArray.fieldGroup)) return true;
+    }
+    return false;
+  };
+  
+  searchAndUpdate(this.formConfig.fields);
+}
 
   // Displays the sales order list modal
   showSaleCreditNoteListFn() {
@@ -366,8 +409,8 @@ ngOnInit() {
                 label: 'Credit note no',
                 placeholder: 'Enter Credit note no',
                 required: true,
-                readonly: true
-                // disabled: true
+                readonly: true,
+                disabled: true
               }
             },
             {
