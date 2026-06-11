@@ -3,26 +3,11 @@
         <div class="col-12 px-0"
             style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
             <div style="display: flex; align-items: center; gap: 6px;">
-                <button type="button" class="btn pl-0">
+                <button type="button" class="btn p-0">
                     <span *ngIf="SaleOrderEditID" class="custom-heading">Update Sales Order</span>
                     <span *ngIf="!SaleOrderEditID" class="custom-heading">Create Sales Order</span>
                 </button>
-                <!-- <button class="btn-primary" (click)="openDocPreview()" title="Help">i</button> -->
-                <button class="btn-primary" (click)="openDocPreview()" title="Help" style="border: none;
-                    border-radius: 50%;
-                    width: 22px;
-                    height: 22px;
-                    font-size: 14px;
-                    font-weight: bold;
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    line-height: 1;
-                    padding: 0;
-                    transition: all .2s ease-in-out;">
-                    i
-                </button>
+                <app-help-icon topic="sale-order"></app-help-icon>
 
             </div>
 

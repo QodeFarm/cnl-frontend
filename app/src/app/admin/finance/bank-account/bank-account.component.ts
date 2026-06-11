@@ -4,12 +4,13 @@ import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { BankAccountListComponent } from './bank-account-list/bank-account-list.component';
+import { HelpIconComponent } from '../../help/help-icon.component';
 
 
 @Component({
   selector: 'app-bank-account',
   standalone: true,
-  imports: [CommonModule,AdminCommmonModule, BankAccountListComponent],
+  imports: [CommonModule,AdminCommmonModule, BankAccountListComponent, HelpIconComponent],
   templateUrl: './bank-account.component.html',
   styleUrls: ['./bank-account.component.scss']
 })

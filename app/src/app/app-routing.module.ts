@@ -106,6 +106,7 @@ const routes: Routes = [
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
       { path: 'profile', data: { title: 'Profile', moduleName: 'profile' }, canActivate: [], loadChildren: () => import('./admin/profile/profile.module').then(m => m.ProfileModule) },
       { path: 'dashboard', data: { title: 'Dashbord', moduleName: 'dashboard' }, canActivate: [], loadComponent: () => import('./admin/dashboard/dashboard.component').then(m => m.DashboardComponent) },
+      { path: 'help', data: { title: 'User Guide', moduleName: 'help' }, canActivate: [], loadComponent: () => import('./admin/help/help.component').then(m => m.HelpComponent) },
       { path: 'profile/change-password', data: { title: 'Change Password', moduleName: 'change-password' }, canActivate: [], loadComponent: () => import('./admin/profile/change-password/change-password.component').then(m => m.ChangePasswordComponent) },
       { path: 'force-change-password', data: { title: 'Set New Password', moduleName: 'force-change-password' }, canActivate: [], loadComponent: () => import('./admin/profile/force-change-password/force-change-password.component').then(m => m.ForceChangePasswordComponent) },
       // { path: 'users', data: { title: 'Users', moduleName: 'Users' }, canActivate: [], loadChildren: () => import('./admin/user/user.component').then(m => m.UserComponent) },
@@ -142,6 +143,9 @@ const routes: Routes = [
       { path: 'hrms/employee-leave-balance', data: { title: 'Employee Leave Balance', moduleName: 'employee-leave-balance' }, canActivate: [], loadComponent: () => import('./admin/hrms/employee-leave-balance/employee-leave-balance.component').then(m => m.EmployeeLeaveBalanceComponent) },
       { path: 'hrms/employee-attendance', data: { title: 'Employee Attendance', moduleName: 'employee-attendance' }, canActivate: [], loadComponent: () => import('./admin/hrms/employee-attendance/employee-attendance.component').then(m => m.EmployeeAttendanceComponent) },
       { path: 'hrms/swipes', data: { title: 'Swipes', moduleName: 'swipes' }, canActivate: [], loadComponent: () => import('./admin/hrms/swipes/swipes.component').then(m => m.SwipesComponent) },
+      { path: 'hrms/timesheets', data: { title: 'Timesheets', moduleName: 'timesheets' }, canActivate: [], loadComponent: () => import('./admin/hrms/timesheets/timesheets.component').then(m => m.TimesheetsComponent) },
+      { path: 'hrms/timesheet-approvals', data: { title: 'Timesheet Approvals', moduleName: 'timesheet-approvals' }, canActivate: [], loadComponent: () => import('./admin/hrms/timesheets/timesheet-approvals/timesheet-approvals.component').then(m => m.TimesheetApprovalsComponent) },
+      { path: 'hrms/billable-hours', data: { title: 'Billable Hours', moduleName: 'billable-hours' }, canActivate: [], loadComponent: () => import('./admin/hrms/timesheets/billable-hours/billable-hours.component').then(m => m.BillableHoursComponent) },
 
       //Products Module
       { path: 'inventory', data: { title: 'Inventory', moduleName: 'inventory' }, canActivate: [], loadComponent: () => import('./admin/inventory/inventory.component').then(m => m.InventoryComponent) },

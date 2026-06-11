@@ -1280,8 +1280,35 @@ onResize() {
     }, 100); // Delay to ensure modal and canvas are rendered  
   }
 
+  // Shared colour palette for the breakdown charts (cycled to fit the data)
+  private chartPalette = ['#87CEEB', '#FF7F50', '#3CB371', '#FFCE56', '#9966FF', '#FF6384', '#36A2EB', '#4BC0C0', '#FF9F40', '#C9CBCF'];
+  private buildPalette(n: number): string[] {
+    const out: string[] = [];
+    for (let i = 0; i < n; i++) { out.push(this.chartPalette[i % this.chartPalette.length]); }
+    return out;
+  }
+
   openReceivablesModal() {
     this.isReceivablesModalOpen = true;
+    // Live data: outstanding receivables grouped by ageing bucket
+    this.http.get(`${this.baseUrl}dashboard/Receivables_Breakdown_chart/`).subscribe({
+      next: (res: any) => {
+        const rows: any[] = Array.isArray(res) ? res : (res?.data || res?.results || []);
+        const byCategory: { [k: string]: number } = {};
+        for (const r of rows) {
+          const cat = r.aging_category || 'Other';
+          byCategory[cat] = (byCategory[cat] || 0) + (Number(r.outstanding_amount) || 0);
+        }
+        const labels = Object.keys(byCategory);
+        this.receivablesData.labels = labels.length ? labels : ['No outstanding'];
+        this.receivablesData.datasets[0].data = labels.length ? labels.map(l => byCategory[l]) : [0];
+        this.receivablesData.datasets[0].backgroundColor = this.buildPalette(Math.max(labels.length, 1));
+        this.renderReceivablesChart();
+      },
+      error: () => this.renderReceivablesChart()
+    });
+  }
+  private renderReceivablesChart() {
     setTimeout(() => {
       this.ensureChartCreatedWithDelay(
         this.receivablesChartCanvas,
@@ -1294,6 +1321,25 @@ onResize() {
 
   openPayablesModal() {
     this.isPayablesModalOpen = true;
+    // Live data: outstanding payables grouped by vendor
+    this.http.get(`${this.baseUrl}purchase/purchase_order/?outstanding_purchases=true`).subscribe({
+      next: (res: any) => {
+        const rows: any[] = Array.isArray(res) ? res : (res?.data || res?.results || []);
+        const byVendor: { [k: string]: number } = {};
+        for (const r of rows) {
+          const v = r.vendor_name || 'Unknown';
+          byVendor[v] = (byVendor[v] || 0) + (Number(r.outstanding_amount) || 0);
+        }
+        const labels = Object.keys(byVendor);
+        this.payablesData.labels = labels.length ? labels : ['No outstanding'];
+        this.payablesData.datasets[0].data = labels.length ? labels.map(l => byVendor[l]) : [0];
+        this.payablesData.datasets[0].backgroundColor = this.buildPalette(Math.max(labels.length, 1));
+        this.renderPayablesChart();
+      },
+      error: () => this.renderPayablesChart()
+    });
+  }
+  private renderPayablesChart() {
     setTimeout(() => {
       this.ensureChartCreatedWithDelay(
         this.payablesChartCanvas,
@@ -1302,10 +1348,23 @@ onResize() {
         chart => this.payablesChart = chart
       );
     }, 100);
-  }  
+  }
 
   openLiquidityModal() {
     this.isLiquidityModelOpen = true;
+    // Live data: balance per bank account
+    this.http.get(`${this.baseUrl}finance/bank_accounts/`).subscribe({
+      next: (res: any) => {
+        const rows: any[] = Array.isArray(res) ? res : (res?.data || res?.results || []);
+        const labels = rows.map(r => r.bank_name || r.account_name || 'Bank');
+        this.liquidityData.labels = labels.length ? labels : ['No bank accounts'];
+        this.liquidityData.datasets[0].data = labels.length ? rows.map(r => Number(r.balance) || 0) : [0];
+        this.renderLiquidityChart();
+      },
+      error: () => this.renderLiquidityChart()
+    });
+  }
+  private renderLiquidityChart() {
     setTimeout(() => {
       this.ensureChartCreatedWithDelay(
         this.liquidityChartCanvas,

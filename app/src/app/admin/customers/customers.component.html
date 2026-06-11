@@ -3,11 +3,14 @@
   <ng-container *ngIf="!isCustomerPortal">
     <div class="customers-banner">
       <div class="col-12 px-0" style="display: flex; justify-content: space-between;align-items: center;">
-        <button (click)="CustomerEditID = null" type="button" class="btn pl-0" style="color: black;">
-          <span *ngIf="CustomerEditID" class="custom-heading">Update Customer</span>
-          <span *ngIf="!CustomerEditID" class="custom-heading">Create Customer</span>
-        </button>
-        
+        <div class="d-flex align-items-center" style="gap: 6px;">
+          <button (click)="CustomerEditID = null" type="button" class="btn p-0" style="color: black;">
+            <span *ngIf="CustomerEditID" class="custom-heading">Update Customer</span>
+            <span *ngIf="!CustomerEditID" class="custom-heading">Create Customer</span>
+          </button>
+          <app-help-icon topic="customers"></app-help-icon>
+        </div>
+
         <div class="d-flex gap-2 align-items-center">
           <!-- Portal Actions -->
           <!-- <div class="btn-group me-2" *ngIf="CustomerEditID && formConfig?.model?.customer_data?.is_portal_user">

@@ -2,13 +2,14 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, ViewChild} from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { EmployeeListComponent } from './employee-list/employee-list.component';
+import { HelpIconComponent } from '../help/help-icon.component';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 @Component({
   selector: 'app-hrms',
   standalone: true,
-  imports: [CommonModule,AdminCommmonModule,EmployeeListComponent],
+  imports: [CommonModule,AdminCommmonModule,EmployeeListComponent, HelpIconComponent],
   templateUrl: './hrms.component.html',
   styleUrls: ['./hrms.component.scss']
 })
@@ -425,17 +426,26 @@ export class EmployeesComponent  implements OnInit {
               }
             },
             {
-              className: 'col-12 custom-form-card-block w-100 p-0',
-              fieldGroupClassName: "ant-row row mx-0 mt-2",
+              className: 'col-12 custom-form-card-block w-100 p-0 govt-id-card',
+              fieldGroupClassName: "ant-row row mx-0 mt-2 w-100",
               fieldGroup: [
+                {
+                  type: 'template',
+                  className: 'col-12',
+                  template: `
+                    <div class="govt-id-header">
+                      <div class="govt-id-title"><i class="fas fa-id-card"></i>Identity Documents (Govt. ID)</div>
+                      <div class="govt-id-hint">Upload Aadhaar, PAN, Passport or Driving Licence — image or PDF, more than one allowed.</div>
+                    </div>
+                  `
+                },
                 {
                   key: 'picture',
                   type: 'file',
-                  className: 'ta-cell col-12 col-md-6 custom-file-attachement',
+                  className: 'ta-cell col-12 custom-file-attachement govt-id-upload',
                   props: {
                     "displayStyle": "files",
                     "multiple": true,
-                    label: 'Govt. Id',
                   },}
               ]
             },

@@ -1,10 +1,13 @@
 <div class="container-fluid p-3">
     <div class="asset-maintenance-banner">
         <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
-            <button (click)="AssetMaintenanceEditID = null" type="button" class="btn pl-0" style="color: black;">
+            <div class="d-flex align-items-center" style="gap: 6px;">
+              <button (click)="AssetMaintenanceEditID = null" type="button" class="btn p-0" style="color: black;">
                 <span *ngIf="AssetMaintenanceEditID" class="custom-heading">Update Asset Maintenance</span>
                 <span *ngIf="!AssetMaintenanceEditID" class="custom-heading">Create Asset Maintenance</span>
-            </button>
+              </button>
+              <app-help-icon topic="asset-maintenance"></app-help-icon>
+            </div>
             <button (click)="showAssetMaintenanceListFn()" type="button" class="btn btn-primary header-right-btn" data-bs-toggle="modal" data-bs-target="#exampleModal">
                 Asset Maintenance List
             </button>

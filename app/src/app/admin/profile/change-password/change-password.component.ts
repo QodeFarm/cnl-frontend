@@ -3,11 +3,12 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { HelpIconComponent } from '../../help/help-icon.component';
 
 @Component({
   selector: 'app-change-password',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule],
+  imports: [CommonModule, AdminCommmonModule, HelpIconComponent],
   templateUrl: './change-password.component.html',
   styleUrls: ['./change-password.component.scss']
 })

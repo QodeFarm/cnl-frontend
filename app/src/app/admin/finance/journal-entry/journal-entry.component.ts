@@ -8,11 +8,12 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { DrilldownEditService } from 'src/app/services/drilldown-edit.service';
 import { map, debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
+import { HelpIconComponent } from '../../help/help-icon.component';
 
 @Component({
   selector: 'app-journal-entry',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, JournalEntryListComponent],
+  imports: [CommonModule, AdminCommmonModule, JournalEntryListComponent, HelpIconComponent],
   templateUrl: './journal-entry.component.html',
   styleUrls: ['./journal-entry.component.scss']
 })

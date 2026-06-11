@@ -5,6 +5,7 @@ import { ProfileRoutingModule } from './profile-routing.module';
 import { ChangePasswordComponent } from './change-password/change-password.component';
 import { ProfileComponent } from './profile.component';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { HelpIconComponent } from '../help/help-icon.component';
 
 
 @NgModule({
@@ -15,7 +16,8 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
   imports: [
     CommonModule,
     ProfileRoutingModule,
-    AdminCommmonModule
+    AdminCommmonModule,
+    HelpIconComponent
   ],
   exports:[
     // ChangePasswordComponent

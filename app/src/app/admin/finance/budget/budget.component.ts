@@ -4,11 +4,12 @@ import { TaFormConfig } from '@ta/ta-form';
 import { BudgetListComponent } from './budget-list/budget-list.component';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { HelpIconComponent } from '../../help/help-icon.component';
 
 @Component({
   selector: 'app-budget',
   standalone: true,
-  imports: [CommonModule,AdminCommmonModule, BudgetListComponent],
+  imports: [CommonModule,AdminCommmonModule, BudgetListComponent, HelpIconComponent],
   templateUrl: './budget.component.html',
   styleUrls: ['./budget.component.scss']
 })

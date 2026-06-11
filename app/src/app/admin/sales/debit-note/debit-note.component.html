@@ -1,10 +1,13 @@
 <div class="container-fluid p-3">
     <div class="sale-debit-banner">
       <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
-        <button type="button" class="btn pl-0">
-          <span *ngIf="SaleDebitnoteEditID" class="custom-heading">Update Debit Note</span>
-          <span *ngIf="!SaleDebitnoteEditID" class="custom-heading">Create Debit Note</span>
-        </button>
+        <div class="d-flex align-items-center" style="gap: 6px;">
+          <button type="button" class="btn p-0">
+            <span *ngIf="SaleDebitnoteEditID" class="custom-heading">Update Debit Note</span>
+            <span *ngIf="!SaleDebitnoteEditID" class="custom-heading">Create Debit Note</span>
+          </button>
+          <app-help-icon topic="sales-returns-notes"></app-help-icon>
+        </div>
         <div style="display: flex; gap: 10px; align-items: center;justify-content: end;flex-wrap: wrap;">
           <button (click)="showSaleDebitNoteListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
             Debit Note List

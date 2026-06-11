@@ -13,11 +13,12 @@ import { CustomFieldHelper } from '../../utils/custom_field_fetch';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { calculateTotalAmount, displayInformation, getUnitData, sumQuantities } from 'src/app/utils/display.utils';
 import { DrilldownEditService } from 'src/app/services/drilldown-edit.service';
+import { HelpIconComponent } from '../../help/help-icon.component';
 
 @Component({
   selector: 'app-purchasereturnorders',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, PurchasereturnordersListComponent],
+  imports: [CommonModule, AdminCommmonModule, PurchasereturnordersListComponent, HelpIconComponent],
   templateUrl: './purchasereturnorders.component.html',
   styleUrls: ['./purchasereturnorders.component.scss']
 })

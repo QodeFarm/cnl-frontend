@@ -18,6 +18,7 @@ import { BulkEditModalComponent } from '../utils/bulk-edit-modal/bulk-edit-modal
 import { BulkField } from '../utils/bulk-operations.service';
 import { LocalStorageService } from 'projects/ta-core/src/lib/services/local-storage.service';
 import { ledgerAccountsConfig } from '../../utils/master-curd-config';
+import { HelpIconComponent } from '../help/help-icon.component';
 
 
 @Component({
@@ -31,7 +32,8 @@ import { ledgerAccountsConfig } from '../../utils/master-curd-config';
     NzProgressModule,
     NzResultModule,
     NzAlertModule,
-    BulkEditModalComponent],
+    BulkEditModalComponent,
+    HelpIconComponent],
   standalone: true,
   styleUrls: ['./customers.component.scss']
 })

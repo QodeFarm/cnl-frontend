@@ -4,12 +4,13 @@ import { TaFormConfig } from '@ta/ta-form';
 import { PaymentTransactionListComponent } from './payment-transaction-list/payment-transaction-list.component';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { HelpIconComponent } from '../../help/help-icon.component';
 
 
 @Component({
   selector: 'app-payment-transaction',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, PaymentTransactionListComponent],
+  imports: [CommonModule, AdminCommmonModule, PaymentTransactionListComponent, HelpIconComponent],
   templateUrl: './payment-transaction.component.html',
   styleUrls: ['./payment-transaction.component.scss']
 })

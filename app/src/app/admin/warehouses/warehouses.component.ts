@@ -4,10 +4,11 @@ import { Component, ViewChild } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { WarehousesListComponent } from './warehouses-list/warehouses-list.component';
+import { HelpIconComponent } from '../help/help-icon.component';
 
 @Component({
   standalone: true,
-  imports: [CommonModule,AdminCommmonModule,WarehousesListComponent],
+  imports: [CommonModule,AdminCommmonModule,WarehousesListComponent, HelpIconComponent],
   selector: 'app-warehouses',
   templateUrl: './warehouses.component.html',
   styleUrls: ['./warehouses.component.scss']

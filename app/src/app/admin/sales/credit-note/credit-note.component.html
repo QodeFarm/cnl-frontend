@@ -3,10 +3,13 @@
   <div *ngIf="!isCustomerPortal">
     <div class="sale-credit-banner">
       <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
-        <button type="button" class="btn pl-0">
-          <span *ngIf="SaleCreditnoteEditID" class="custom-heading">Update Credit Note</span>
-          <span *ngIf="!SaleCreditnoteEditID" class="custom-heading">Create Credit Note</span>
-        </button>
+        <div class="d-flex align-items-center" style="gap: 6px;">
+          <button type="button" class="btn p-0">
+            <span *ngIf="SaleCreditnoteEditID" class="custom-heading">Update Credit Note</span>
+            <span *ngIf="!SaleCreditnoteEditID" class="custom-heading">Create Credit Note</span>
+          </button>
+          <app-help-icon topic="sales-returns-notes"></app-help-icon>
+        </div>
         <div style="display: flex; gap: 10px; align-items: center;justify-content: end;flex-wrap: wrap;">
           <button (click)="showSaleCreditNoteListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
             Credit Note List

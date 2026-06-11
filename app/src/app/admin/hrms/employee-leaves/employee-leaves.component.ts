@@ -4,11 +4,12 @@ import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { EmployeeLeavesListComponent } from './employee-leaves-list/employee-leaves-list.component';
+import { HelpIconComponent } from '../../help/help-icon.component';
 
 @Component({
   selector: 'app-employee-leaves',
   standalone: true,
-  imports: [CommonModule,AdminCommmonModule,EmployeeLeavesListComponent],
+  imports: [CommonModule,AdminCommmonModule,EmployeeLeavesListComponent, HelpIconComponent],
   templateUrl: './employee-leaves.component.html',
   styleUrls: ['./employee-leaves.component.scss']
 })

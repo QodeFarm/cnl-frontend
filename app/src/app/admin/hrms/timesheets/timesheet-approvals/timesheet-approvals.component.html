@@ -1,0 +1,59 @@
+<div class="container-fluid pt-3">
+  <div class="row">
+    <div class="col-12 p-0">
+
+      <ta-curd-modal [options]="curdConfig" class="custom-list">
+
+        <!-- Bulk Approve button — appears when rows are checked -->
+        <div class="after-search me-2" after-search>
+          <button
+            class="btn btn-success text-nowrap"
+            *ngIf="checkedCount > 0"
+            (click)="bulkApprove()">
+            <i class="fa fa-check me-1"></i>
+            Bulk Approve ({{ checkedCount }})
+          </button>
+        </div>
+
+      </ta-curd-modal>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ── Reject Timesheet Modal ───────────────────────────────────────────────── -->
+<nz-modal
+  [(nzVisible)]="showRejectModal"
+  nzTitle="Reject Timesheet"
+  [nzFooter]="rejectFooter"
+  (nzOnCancel)="cancelRejectModal()"
+  [nzWidth]="480">
+
+  <ng-container *nzModalContent>
+    <p style="color:#555; margin-bottom:12px;">
+      Please provide a reason so the employee knows what to correct.
+    </p>
+    <label style="font-size:13px; font-weight:500; color:#444; display:block; margin-bottom:6px;">
+      Rejection Reason <span class="text-danger">*</span>
+    </label>
+    <textarea
+      [(ngModel)]="rejectionReason"
+      rows="4"
+      placeholder="e.g. Hours on Thursday appear incorrect. Please review and resubmit."
+      style="width:100%; border:1px solid #d9d9d9; border-radius:6px;
+             padding:8px 10px; font-size:13px; resize:vertical;
+             outline:none; font-family:inherit;">
+    </textarea>
+  </ng-container>
+
+  <ng-template #rejectFooter>
+    <button class="btn btn-outline-secondary me-2" (click)="cancelRejectModal()">
+      Cancel
+    </button>
+    <button class="btn btn-danger" (click)="confirmReject()">
+      Confirm Rejection
+    </button>
+  </ng-template>
+
+</nz-modal>

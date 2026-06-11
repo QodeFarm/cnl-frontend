@@ -11,11 +11,12 @@ import { CustomFieldHelper } from '../../utils/custom_field_fetch';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { calculateTotalAmount, displayInformation, getUnitData, sumQuantities } from 'src/app/utils/display.utils';
 import { DrilldownEditService } from 'src/app/services/drilldown-edit.service';
+import { HelpIconComponent } from '../../help/help-icon.component';
 
 @Component({
   selector: 'app-purchase-invoice',
   standalone: true,
-  imports: [AdminCommmonModule, PurchaseInvoiceListComponent],
+  imports: [AdminCommmonModule, PurchaseInvoiceListComponent, HelpIconComponent],
   templateUrl: './purchase-invoice.component.html',
   styleUrls: ['./purchase-invoice.component.scss']
 })

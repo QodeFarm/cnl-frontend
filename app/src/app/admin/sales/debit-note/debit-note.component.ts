@@ -8,10 +8,11 @@ import { TaFormComponent, TaFormConfig } from '@ta/ta-form';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { DebitNoteListComponent } from './debit-note-list/debit-note-list.component';
+import { HelpIconComponent } from '../../help/help-icon.component';
 @Component({
   selector: 'app-debit-note',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule,DebitNoteListComponent],
+  imports: [CommonModule, AdminCommmonModule, DebitNoteListComponent, HelpIconComponent],
   templateUrl: './debit-note.component.html',
   styleUrls: ['./debit-note.component.scss']
 })

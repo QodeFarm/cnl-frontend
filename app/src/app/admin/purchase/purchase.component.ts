@@ -15,10 +15,11 @@ import { CustomFieldHelper } from '../utils/custom_field_fetch';
 // import { displayInformation, getUnitData, sumQuantities } from 'src/app/utils/display.utils';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { DrilldownEditService } from 'src/app/services/drilldown-edit.service';
+import { HelpIconComponent } from '../help/help-icon.component';
 declare var bootstrap;
 @Component({
   selector: 'app-purchase',
-  imports: [CommonModule, AdminCommmonModule, PurchaseListComponent, OrderListComponent],
+  imports: [CommonModule, AdminCommmonModule, PurchaseListComponent, OrderListComponent, HelpIconComponent],
   standalone: true,
   templateUrl: './purchase.component.html',
   styleUrls: ['./purchase.component.scss']

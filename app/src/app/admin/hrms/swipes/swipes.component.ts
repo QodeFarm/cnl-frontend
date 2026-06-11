@@ -4,11 +4,12 @@ import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { SwipesListComponent } from './swipes-list/swipes-list.component';
+import { HelpIconComponent } from '../../help/help-icon.component';
 
 @Component({
   selector: 'app-swipes',
   standalone: true,
-  imports: [CommonModule,AdminCommmonModule,SwipesListComponent],
+  imports: [CommonModule,AdminCommmonModule,SwipesListComponent, HelpIconComponent],
   templateUrl: './swipes.component.html',
   styleUrls: ['./swipes.component.scss']
 })
