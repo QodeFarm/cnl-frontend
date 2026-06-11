@@ -507,21 +507,68 @@ checkAndPopulateData() {
   }
 
 
-  getInvoiceNo() {
-    this.invoiceNumber = null;
-    this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
-      if (res && res.data && res.data.order_number) {
-        this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
+  // getInvoiceNo() {
+  //   this.invoiceNumber = null;
+  //   this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
+  //     if (res && res.data && res.data.order_number) {
+  //       this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
 
-        this.http.get('masters/generate_order_no/?type=PO-INV').subscribe((res: any) => {
-          if (res && res.data && res.data.order_number) {
-            this.formConfig.model['purchase_invoice_orders']['invoice_no'] = res.data.order_number;
-            this.invoiceNumber = res.data.order_number;
-          }
-        });;
-      }
-    });
+  //       this.http.get('masters/generate_order_no/?type=PO-INV').subscribe((res: any) => {
+  //         if (res && res.data && res.data.order_number) {
+  //           this.formConfig.model['purchase_invoice_orders']['invoice_no'] = res.data.order_number;
+  //           this.invoiceNumber = res.data.order_number;
+  //         }
+  //       });;
+  //     }
+  //   });
+  // }
+
+getInvoiceNo() {
+  if (this.PurchaseInvoiceEditID) {
+    return;
   }
+  
+  this.invoiceNumber = null;
+  
+  this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
+    if (res && res.data && res.data.order_number) {
+      this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
+
+      this.http.get('masters/generate_order_no/?type=PO-INV').subscribe((res: any) => {
+        if (res && res.data && res.data.order_number) {
+          this.formConfig.model['purchase_invoice_orders']['invoice_no'] = res.data.order_number;
+          this.invoiceNumber = res.data.order_number;
+          console.log("Purchase Invoice NO: ", this.invoiceNumber);
+          
+          // FIX: Update the invoice_no form control
+          this.updateInvoiceNoControl();
+          
+          this.cdr.detectChanges(); // Trigger change detection
+        }
+      });
+    }
+  });
+}
+
+// Add this helper method
+updateInvoiceNoControl() {
+  if (!this.formConfig?.fields) return;
+  
+  const searchAndUpdate = (fields: any[]): boolean => {
+    for (const field of fields) {
+      if (field.key === 'invoice_no' && field.formControl) {
+        field.formControl.setValue(this.formConfig.model['purchase_invoice_orders']['invoice_no']);
+        console.log('Purchase Invoice No control updated:', field.formControl.value);
+        return true;
+      }
+      if (field.fieldGroup && searchAndUpdate(field.fieldGroup)) return true;
+      if (field.fieldArray?.fieldGroup && searchAndUpdate(field.fieldArray.fieldGroup)) return true;
+    }
+    return false;
+  };
+  
+  searchAndUpdate(this.formConfig.fields);
+}
 
   showPurchaseInvoiceListFn() {
     this.showPurchaseInvoiceList = true;

@@ -501,21 +501,68 @@ checkAndPopulateData() {
     this.getOrderNo();
   }
 
-  getOrderNo() {
-    this.orderNumber = null;
-    this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
-      if (res && res.data && res.data.order_number) {
-        this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
+  // getOrderNo() {
+  //   this.orderNumber = null;
+  //   this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
+  //     if (res && res.data && res.data.order_number) {
+  //       this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
 
-        this.http.get('masters/generate_order_no/?type=PR').subscribe((res: any) => {
-          if (res && res.data && res.data.order_number) {
-            this.formConfig.model['purchase_return_orders']['return_no'] = res.data.order_number;
-            this.orderNumber = res.data.order_number;
-          }
-        });;
-      }
-    });
+  //       this.http.get('masters/generate_order_no/?type=PR').subscribe((res: any) => {
+  //         if (res && res.data && res.data.order_number) {
+  //           this.formConfig.model['purchase_return_orders']['return_no'] = res.data.order_number;
+  //           this.orderNumber = res.data.order_number;
+  //         }
+  //       });;
+  //     }
+  //   });
+  // }
+
+getOrderNo() {
+  if (this.PurchaseReturnOrderEditID) {
+    return;
   }
+  
+  this.orderNumber = null;
+  
+  this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
+    if (res && res.data && res.data.order_number) {
+      this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
+
+      this.http.get('masters/generate_order_no/?type=PR').subscribe((res: any) => {
+        if (res && res.data && res.data.order_number) {
+          this.formConfig.model['purchase_return_orders']['return_no'] = res.data.order_number;
+          this.orderNumber = res.data.order_number;
+          console.log("Purchase Return NO: ", this.orderNumber);
+          
+          // FIX: Update the return_no form control
+          this.updateReturnNoControl();
+          
+          this.cdr.detectChanges(); // Trigger change detection
+        }
+      });
+    }
+  });
+}
+
+// Add this helper method
+updateReturnNoControl() {
+  if (!this.formConfig?.fields) return;
+  
+  const searchAndUpdate = (fields: any[]): boolean => {
+    for (const field of fields) {
+      if (field.key === 'return_no' && field.formControl) {
+        field.formControl.setValue(this.formConfig.model['purchase_return_orders']['return_no']);
+        console.log('Purchase Return No control updated:', field.formControl.value);
+        return true;
+      }
+      if (field.fieldGroup && searchAndUpdate(field.fieldGroup)) return true;
+      if (field.fieldArray?.fieldGroup && searchAndUpdate(field.fieldArray.fieldGroup)) return true;
+    }
+    return false;
+  };
+  
+  searchAndUpdate(this.formConfig.fields);
+}
 
   showPurchaseReturnOrderListFn() {
     this.showPurchaseReturnOrderList = true;

@@ -648,21 +648,68 @@ async autoFillProductDetails(field, data) {
   }
 
 
-  getReturnNo() {
-    this.returnNumber = null;
-    this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
-      if (res && res.data && res.data.order_number) {
-        this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
+  // getReturnNo() {
+  //   this.returnNumber = null;
+  //   this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
+  //     if (res && res.data && res.data.order_number) {
+  //       this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
         
-        this.http.get('masters/generate_order_no/?type=SR').subscribe((res: any) => {
-          if (res && res.data && res.data.order_number) {
-            this.formConfig.model['sale_return_order']['return_no'] = res.data.order_number;
-            this.returnNumber = res.data.order_number;
-          }
-        });;
-      }
-    });
+  //       this.http.get('masters/generate_order_no/?type=SR').subscribe((res: any) => {
+  //         if (res && res.data && res.data.order_number) {
+  //           this.formConfig.model['sale_return_order']['return_no'] = res.data.order_number;
+  //           this.returnNumber = res.data.order_number;
+  //         }
+  //       });;
+  //     }
+  //   });
+  // }
+
+  getReturnNo() {
+  if (this.SaleReturnOrderEditID) {
+    return;
   }
+  
+  this.returnNumber = null;
+  
+  this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
+    if (res && res.data && res.data.order_number) {
+      this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
+      
+      this.http.get('masters/generate_order_no/?type=SR').subscribe((res: any) => {
+        if (res && res.data && res.data.order_number) {
+          this.formConfig.model['sale_return_order']['return_no'] = res.data.order_number;
+          this.returnNumber = res.data.order_number;
+          console.log("Return NO: ", this.returnNumber);
+          
+          // FIX: Update the return_no form control
+          this.updateReturnNoControl();
+          
+          this.cdr.detectChanges(); // Trigger change detection
+        }
+      });
+    }
+  });
+}
+
+// Add this helper method
+updateReturnNoControl() {
+  if (!this.formConfig?.fields) return;
+  
+  const searchAndUpdate = (fields: any[]): boolean => {
+    for (const field of fields) {
+      if (field.key === 'return_no' && field.formControl) {
+        field.formControl.setValue(this.formConfig.model['sale_return_order']['return_no']);
+        console.log('Return No control updated:', field.formControl.value);
+        return true;
+      }
+      if (field.fieldGroup && searchAndUpdate(field.fieldGroup)) return true;
+      if (field.fieldArray?.fieldGroup && searchAndUpdate(field.fieldArray.fieldGroup)) return true;
+    }
+    return false;
+  };
+  
+  searchAndUpdate(this.formConfig.fields);
+}
 
   showSalesReturnOrderListFn() {
     this.showSaleReturnOrderList = true;
@@ -1121,7 +1168,7 @@ async autoFillProductDetails(field, data) {
                     placeholder: 'Enter Return No',
                     required: true,
                     readonly: true,
-                    // disabled: true
+                    disabled: true
                   },
                 },
                 {

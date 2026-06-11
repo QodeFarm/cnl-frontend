@@ -1,21 +1,47 @@
 <div class="container-fluid p-3">
     <div class="employee-banner">
-        <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
-            <div class="d-flex align-items-center" style="gap: 6px;">
-              <button type="button" class="btn p-0" >
+        <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <button type="button" class="btn pl-0">
                 <span *ngIf="EmployeeEditID" class="custom-heading">Update Employee</span>
                 <span *ngIf="!EmployeeEditID" class="custom-heading">Create Employee</span>
-              </button>
-              <app-help-icon topic="hrms-employee"></app-help-icon>
-            </div>
-            <button (click)="showEmployeesListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                Employee List
             </button>
+            <app-help-icon topic="hrms-employee"></app-help-icon>
+
+            
+            <div class="d-flex gap-2 align-items-center flex-wrap">
+                <!-- Portal Actions - Show only when editing an employee with portal access -->
+                <div class="btn-group me-2" *ngIf="EmployeeEditID && formConfig?.model?.employee?.is_portal_user">
+                    <button type="button" class="btn btn-info" (click)="generateEmployeeCredentials()">
+                        <i class="fas fa-key me-1"></i>Generate Credentials
+                    </button>
+                    <button type="button" class="btn btn-success" (click)="showSendCredentialsPopup()">
+                        <i class="fas fa-paper-plane me-1"></i>Send Credentials
+                    </button>
+                </div>
+
+                <!-- Employee List Button -->
+                <button (click)="showEmployeesListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                    <i class="fas fa-list me-1"></i>Employee List
+                </button>
+            </div>
         </div>
     </div>
+
+    <!-- Portal Status Banner (shows when portal access is enabled) -->
+    <div class="row mt-3" *ngIf="EmployeeEditID && formConfig?.model?.employee?.is_portal_user">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Portal Access Enabled</strong>
+                <span class="ms-3">Username: {{ formConfig.model.employee?.username || 'Not set' }}</span>
+                <span class="ms-3">Last Login: {{ formConfig.model.employee?.last_login || 'Never' }}</span>
+            </div>
+        </div>
+    </div>
+
     <div class="row custom-form">
         <div *ngIf="EmployeeEditID && !showForm" class="col-12 p-3">
-          <nz-skeleton [nzActive]="true" [nzParagraph]="{ rows: 8 }"></nz-skeleton>
+            <nz-skeleton [nzActive]="true" [nzParagraph]="{ rows: 8 }"></nz-skeleton>
         </div>
         <div class="col-12 px-1" *ngIf="showForm">
             <ta-form [options]="formConfig"></ta-form>
@@ -23,11 +49,9 @@
     </div>
 </div>
 
-
 <!-- Employees Modal -->
-
 <div class="modal fade custom-modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl ">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Employee List</h5>
@@ -38,8 +62,92 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-                <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Credentials Modal - For displaying generated credentials -->
+<div class="modal fade" id="credentialsModal" tabindex="-1" aria-labelledby="credentialsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <h5 class="modal-title" id="credentialsModalLabel">
+                    <i class="fas fa-key me-2"></i>Credentials Generated
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="credentials-card">
+                    <div class="credential-field">
+                        <label><i class="fas fa-user"></i> Username</label>
+                        <div class="credential-value">
+                            <code>{{ generatedUsername }}</code>
+                            <button class="btn-copy" (click)="copyToClipboard(generatedUsername)">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                        </div>
+                    </div>
+                    <div class="credential-field">
+                        <label><i class="fas fa-lock"></i> Password</label>
+                        <div class="credential-value">
+                            <code>{{ generatedPassword }}</code>
+                            <button class="btn-copy" (click)="copyToClipboard(generatedPassword)">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                        </div>
+                    </div>
+                    <div class="alert alert-warning mt-3">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <small>These credentials will be shown only once. Please save them securely and share with the employee.</small>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" (click)="copyAllCredentials()">
+                    <i class="fas fa-copy me-1"></i>Copy All
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Send Credentials Modal -->
+<div class="modal fade" id="sendCredentialsModal" tabindex="-1" aria-labelledby="sendCredentialsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Send Credentials</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-grid gap-3">
+                    <button class="btn btn-outline-primary btn-lg py-3" (click)="sendViaEmail()" data-bs-dismiss="modal">
+                        <i class="fas fa-envelope me-2"></i> Send via Email
+                    </button>
+                    <button class="btn btn-outline-success btn-lg py-3" (click)="sendViaWhatsApp()" data-bs-dismiss="modal">
+                        <i class="fab fa-whatsapp me-2"></i> Send via WhatsApp
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Toast -->
+<div id="customToast" class="toast-message" *ngIf="showSuccessToast">
+    <div class="tick-circle">
+        <span class="tick-mark">✓</span>
+    </div>
+    <span class="toast-message-text">{{ toastMessage }}</span>
+    <span class="toast-close" (click)="showSuccessToast = false">x</span>
+</div>
+
+<!-- Custom Dialog -->
+<div id="customDialog" class="custom-dialog-overlay" style="display: none;">
+    <div class="custom-dialog-box">
+        <p>⚠️ Please fill in all required fields before submitting.</p>
+        <!-- <button class="btn-ok" id="dialogOkButton" (click)="closeDialog()">OK</button> -->
     </div>
 </div>
