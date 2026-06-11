@@ -4,11 +4,12 @@ import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { LedgerAccountListComponent } from './ledger-account-list/ledger-account-list.component';
+import { HelpIconComponent } from '../../help/help-icon.component';
 
 @Component({
   selector: 'app-ledger-accounts',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, LedgerAccountListComponent], 
+  imports: [CommonModule, AdminCommmonModule, LedgerAccountListComponent, HelpIconComponent],
   templateUrl: './ledger-accounts.component.html',
   styleUrls: ['./ledger-accounts.component.scss']
 })

@@ -1,10 +1,13 @@
 <div class="container-fluid p-3">
     <div class="products-banner">
         <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
-            <button (click)="ProductEditID = null" type="button" class="btn pl-0" style="color: black;">
+            <div class="d-flex align-items-center" style="gap: 6px;">
+              <button (click)="ProductEditID = null" type="button" class="btn p-0" style="color: black;">
                 <span *ngIf="ProductEditID" class="custom-heading">Update Products</span>
                 <span *ngIf="!ProductEditID" class="custom-heading">Create Products</span>
-            </button>
+              </button>
+              <app-help-icon topic="products"></app-help-icon>
+            </div>
             <!-- <button (click)="showProductsListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productModal">Products List
             </button> -->
             <!-- Button Group: Import + Products List -->

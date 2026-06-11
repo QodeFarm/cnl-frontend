@@ -1,0 +1,86 @@
+<div class="container-fluid pt-3">
+    <div class="row">
+        <div class="col-12 p-0">
+
+            <ta-curd-modal [options]="curdConfig" class="custom-list">
+                <!-- Create Invoice button — appears when one or more rows are checked -->
+                <div class="after-search me-2" after-search>
+                    <button
+                        class="btn btn-primary text-nowrap"
+                        *ngIf="checkedCount > 0"
+                        (click)="openCreateInvoice()">
+                        <i class="fa fa-file-invoice me-1"></i>
+                        Create Invoice ({{ checkedCount }})
+                    </button>
+                </div>
+            </ta-curd-modal>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- ── Create Invoice Modal ─────────────────────────────────────────────────── -->
+<nz-modal
+    [(nzVisible)]="showInvoiceModal"
+    nzTitle="Create Invoice from Billable Hours"
+    [nzFooter]="modalFooter"
+    (nzOnCancel)="cancelInvoiceModal()"
+    [nzWidth]="520">
+
+    <ng-container *nzModalContent>
+        <div class="bh-modal-body">
+
+            <!-- Summary -->
+            <div class="bh-summary">
+                <div class="bh-summary-row">
+                    <span class="bh-label">Customer</span>
+                    <span class="bh-value">{{ modalCustomerName }}</span>
+                </div>
+                <div class="bh-summary-row">
+                    <span class="bh-label">Timesheets selected</span>
+                    <span class="bh-value">{{ modalCount }}</span>
+                </div>
+                <div class="bh-summary-row">
+                    <span class="bh-label">Total Hours</span>
+                    <span class="bh-value">{{ modalTotalHours | number:'1.2-2' }} hrs</span>
+                </div>
+                <div class="bh-summary-row bh-total">
+                    <span class="bh-label">Invoice Amount</span>
+                    <span class="bh-value bh-amount">₹ {{ modalTotalAmount | number:'1.2-2' }}</span>
+                </div>
+            </div>
+
+            <!-- Service item picker -->
+            <div class="bh-field">
+                <label class="bh-field-label">Service Item <span class="text-danger">*</span></label>
+                <nz-select
+                    [(ngModel)]="selectedProductId"
+                    nzShowSearch
+                    nzAllowClear
+                    nzPlaceHolder="Select service item (e.g. Professional Services)"
+                    class="w-100">
+                    <nz-option
+                        *ngFor="let p of products"
+                        [nzValue]="p.product_id"
+                        [nzLabel]="p.name">
+                    </nz-option>
+                </nz-select>
+                <div class="bh-hint">The selected service item appears as the invoice line; hours become the quantity.</div>
+            </div>
+
+        </div>
+    </ng-container>
+
+    <ng-template #modalFooter>
+        <button class="btn btn-danger me-2" (click)="cancelInvoiceModal()" [disabled]="isCreating">
+            Cancel
+        </button>
+        <button class="btn btn-primary" (click)="confirmCreateInvoice()" [disabled]="isCreating">
+            <i class="fa fa-spinner fa-spin me-1" *ngIf="isCreating"></i>
+            <i class="fa fa-check me-1" *ngIf="!isCreating"></i>
+            Create Invoice
+        </button>
+    </ng-template>
+
+</nz-modal>

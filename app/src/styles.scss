@@ -436,6 +436,78 @@ header.sticky-header {
     border-right: 1px solid #142768;
 }
 
+/* ── Option A · Part 1: expanded sidebar scrolls, brand/search stay pinned ─────
+   In expanded mode (.sidebar.toggled) the menu can be taller than the screen.
+   The menu items live in .custome-horizental-scroll (a sibling BELOW the search
+   row), so making that the scroll area keeps the search bar fixed and lets the
+   list scroll — every link reachable. Scoped to .toggled so the collapsed-mode
+   fly-out (which must overflow visibly) is left completely alone. */
+.sidebar.toggled {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+
+    .custome-horizental-scroll {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+
+        &::-webkit-scrollbar { width: 6px; }
+        &::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.3); border-radius: 3px; }
+        &::-webkit-scrollbar-track { background: transparent; }
+    }
+}
+
+/* ── Option A · Part 2: collapsed-mode fly-out (CDK overlay, body-level) ───────
+   Rendered inside .cdk-overlay-container so it's never clipped; CDK keeps it on
+   screen (flip/shift via fallback positions + push). Clean panel: module title
+   + a list that only scrolls if it's taller than the whole viewport. */
+.sb-flyout {
+    background: #fff;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    box-shadow: 0 6px 22px rgba(20, 39, 104, 0.18);
+    min-width: 210px;
+    max-height: calc(100vh - 16px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.sb-flyout__title {
+    flex: 0 0 auto;
+    font-weight: 700;
+    font-size: 14px;
+    color: #142768;
+    padding: 10px 16px;
+    border-bottom: 1px solid #eef0f4;
+}
+.sb-flyout__list {
+    overflow-y: auto;
+    padding: 6px 0;
+
+    &::-webkit-scrollbar { width: 6px; }
+    &::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.25); border-radius: 3px; }
+}
+.sb-flyout__item {
+    display: block;
+    padding: 8px 16px;
+    color: #3a3b45;
+    text-decoration: none;
+    white-space: nowrap;
+    font-size: 13.5px;
+
+    &:hover { background: #eef2ff; color: #142768; }
+    &.active { background: #eef2ff; color: #142768; font-weight: 600; }
+}
+
+/* In collapsed mode, modules WITH a submenu show their name in the fly-out
+   title, so suppress the theme's floating hover-tooltip for them to avoid a
+   duplicate label overlapping the panel. Plain modules keep their tooltip. */
+.sidebar:not(.toggled) .nav-item.sub-menu:hover .nav-link span {
+    display: none !important;
+}
+
 // .nav-link.dashboard span{
 //   z-index: 1;
 //   position: relative;
@@ -669,6 +741,8 @@ header.sticky-header {
         }
 
         &.active {
+            background-color: #ffffff;
+
             span {
                 color: #142768 !important;
             }

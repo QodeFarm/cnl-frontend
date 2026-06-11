@@ -10,6 +10,9 @@ import { Observable } from 'rxjs';
 import { filter, map, mergeMap } from 'rxjs/operators';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { CustomfieldsModule } from 'src/app/admin/customfields/customfields.module';
+import { OverlayModule, ConnectedPosition } from '@angular/cdk/overlay';
+import { HelpService } from 'src/app/admin/help/help.service';
+import { resolveHelpTopic } from 'src/app/admin/help/help-topic-map';
 declare var bootstrap;
 interface SpeechRecognitionResult {
   transcript: string; // Holds the recognized speech as text
@@ -43,7 +46,7 @@ export interface Tab {
   templateUrl: './admin-layout.component.html',
   styleUrls: ['./admin-layout.component.scss'],
   standalone: true,
-  imports: [CommonModule, AsyncPipe, FormsModule, RouterModule, NzTabsModule, CustomfieldsModule],
+  imports: [CommonModule, AsyncPipe, FormsModule, RouterModule, NzTabsModule, CustomfieldsModule, OverlayModule],
   animations: [
     trigger('pageEnter', [
       transition(':enter', [
@@ -58,6 +61,39 @@ export class AdminLayoutComponent {
   menuSearchText = '';
   filteredMenuList: any[] = [];
   isMenuSearching = false;
+
+  // ── Collapsed-mode fly-out (Angular CDK Overlay) ──────────────────────────
+  // When the sidebar is collapsed (icon rail), hovering a module opens its
+  // submenu in a CDK overlay rendered at the document root — so it's never
+  // clipped by the sidebar and CDK auto-positions it (flip/shift via the
+  // fallback positions + push) to stay fully on screen. In expanded mode the
+  // template uses the inline accordion instead (no overlay).
+  isSidebarExpanded = false;
+  flyoutIndex: number | null = null;
+  private flyoutCloseTimer: any = null;
+  readonly flyoutPositions: ConnectedPosition[] = [
+    { originX: 'end', originY: 'top',    overlayX: 'start', overlayY: 'top',    offsetX: 6 },
+    { originX: 'end', originY: 'bottom', overlayX: 'start', overlayY: 'bottom', offsetX: 6 },
+    { originX: 'end', originY: 'center', overlayX: 'start', overlayY: 'center', offsetX: 6 },
+  ];
+
+  openFlyout(i: number): void {
+    this.keepFlyoutOpen();
+    this.flyoutIndex = i;
+  }
+  /** Cancel a pending close (e.g. the cursor moved from the icon into the panel). */
+  keepFlyoutOpen(): void {
+    if (this.flyoutCloseTimer) { clearTimeout(this.flyoutCloseTimer); this.flyoutCloseTimer = null; }
+  }
+  /** Close shortly after leaving, leaving a grace gap to reach the panel. */
+  scheduleCloseFlyout(): void {
+    this.keepFlyoutOpen();
+    this.flyoutCloseTimer = setTimeout(() => { this.flyoutIndex = null; this.flyoutCloseTimer = null; }, 150);
+  }
+  closeFlyout(): void {
+    this.keepFlyoutOpen();
+    this.flyoutIndex = null;
+  }
 
   onMenuSearchChange(): void {
     const term = this.menuSearchText?.trim().toLowerCase() || '';
@@ -106,7 +142,18 @@ export class AdminLayoutComponent {
   isForcePasswordChange: boolean = false;
 
   private recognition: SpeechRecognitionEvent | null = null;
-  constructor(private activatedRoute: ActivatedRoute, private cd: ChangeDetectorRef, private elementRef: ElementRef, private http: HttpClient, private renderer: Renderer2, private router: Router, private taLoacal: LocalStorageService, private aS: AdminCommonService, private loadingService: LoadingService) {
+  /**
+   * Context-aware help: open the User Guide on the topic for the active tab.
+   * Falls back to the guide home when the screen has no mapped topic.
+   */
+  openContextHelp(): void {
+    const active = this.tabs?.[this.selectedTabIndex];
+    const topicId = resolveHelpTopic(active?.key, active?.name);
+    if (topicId) { this.helpService.openTopic(topicId); }
+    this.router.navigateByUrl('/admin/help');
+  }
+
+  constructor(private activatedRoute: ActivatedRoute, private cd: ChangeDetectorRef, private elementRef: ElementRef, private http: HttpClient, private renderer: Renderer2, private router: Router, private taLoacal: LocalStorageService, private aS: AdminCommonService, private loadingService: LoadingService, private helpService: HelpService) {
     this.loading$ = this.loadingService.httpLoading$;
     this.aS.action$.subscribe(res => {
       console.log(res);
@@ -159,6 +206,8 @@ export class AdminLayoutComponent {
       this.renderer.removeClass(sidebarElement, 'toggled');
       this.renderer.removeClass(menuOverlayElement, 'menuBglayer');
     }
+    this.isSidebarExpanded = false;
+    this.closeFlyout();
   }
 
   isAdmin: boolean = false;
@@ -532,8 +581,9 @@ export class AdminLayoutComponent {
       collapse.classList.remove('show');
     });
   }
+
   isActive(parentLink: string, children: any[]): boolean {
-    return children.some(child => this.router.isActive(child.link, true));
+    return children.some(child => this.router.isActive(child.sec_link || child.link, true));
   }
 
   menuToggle() {
@@ -545,6 +595,10 @@ export class AdminLayoutComponent {
     const menuOverlay: any = document.querySelector(".menu-overlay");
     sidebar.classList.toggle("toggled");
     menuOverlay.classList.toggle("menuBglayer");
+    // Track mode so the template renders the right submenu style, and never
+    // leave a collapsed fly-out open across a mode switch.
+    this.isSidebarExpanded = sidebar.classList.contains("toggled");
+    this.closeFlyout();
     // Check if the "sidebar" element has the class "toggled"
     if (sidebar.classList.contains("toggled")) {
       // Get all elements with class "collapse" that are descendants of the "sidebar" element

@@ -4,12 +4,13 @@ import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { EmployeeSalaryListComponent } from './employee-salary-list/employee-salary-list.component';
+import { HelpIconComponent } from '../../help/help-icon.component';
 
 
 @Component({
   selector: 'app-employee-salary',
   standalone: true,
-  imports: [CommonModule,AdminCommmonModule,EmployeeSalaryListComponent],
+  imports: [CommonModule,AdminCommmonModule,EmployeeSalaryListComponent, HelpIconComponent],
   templateUrl: './employee-salary.component.html',
   styleUrls: ['./employee-salary.component.scss']
 })

@@ -1,10 +1,13 @@
 <div class="vendors-component container-fluid pt-3">
   <div class="vendors-banner">
     <div class="col-12 px-0" style="display: flex; justify-content: space-between;align-items: center;">
-      <button (click)="VendorEditID = null" type="button" class="btn pl-0" style="color: black;">
-        <span *ngIf="VendorEditID" class="custom-heading">Update Vendor</span>
-        <span *ngIf="!VendorEditID" class="custom-heading">Create Vendor</span>
-      </button>
+      <div class="d-flex align-items-center" style="gap: 6px;">
+        <button (click)="VendorEditID = null" type="button" class="btn p-0" style="color: black;">
+          <span *ngIf="VendorEditID" class="custom-heading">Update Vendor</span>
+          <span *ngIf="!VendorEditID" class="custom-heading">Create Vendor</span>
+        </button>
+        <app-help-icon topic="vendors"></app-help-icon>
+      </div>
       <!-- <button (click)="showVendorListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#vendorListModal">Vendor List
       </button> -->
        <!-- Button Group: Import + Customer List -->

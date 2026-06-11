@@ -14,11 +14,12 @@ import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { BulkEditModalComponent } from '../utils/bulk-edit-modal/bulk-edit-modal.component';
 import { BulkField, BulkOperationsService } from '../utils/bulk-operations.service';
 import { ledgerAccountsConfig } from '../../utils/master-curd-config';
+import { HelpIconComponent } from '../help/help-icon.component';
 
 @Component({
   selector: 'app-vendors',
   templateUrl: './vendors.component.html',
-  imports: [CommonModule, AdminCommmonModule, VendorsListComponent, NzSpinModule, NzProgressModule, NzResultModule, NzAlertModule, BulkEditModalComponent],
+  imports: [CommonModule, AdminCommmonModule, VendorsListComponent, NzSpinModule, NzProgressModule, NzResultModule, NzAlertModule, BulkEditModalComponent, HelpIconComponent],
   standalone: true,
   styleUrls: ['./vendors.component.scss']
 })

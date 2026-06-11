@@ -13,10 +13,11 @@ import { LocalStorageService } from '@ta/ta-core';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { HelpIconComponent } from '../../help/help-icon.component';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, MaterialIssueListComponent, NzModalModule, NzButtonModule, NzIconModule],
+  imports: [CommonModule, AdminCommmonModule, MaterialIssueListComponent, NzModalModule, NzButtonModule, NzIconModule, HelpIconComponent],
   selector: 'app-material-issue',
   templateUrl: './material-issue.component.html',
   styleUrls: ['./material-issue.component.scss']

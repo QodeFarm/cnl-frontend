@@ -22,10 +22,11 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzNotificationService, NzNotificationModule } from 'ng-zorro-antd/notification';
 import { DrilldownEditService } from 'src/app/services/drilldown-edit.service';
+import { HelpIconComponent } from '../help/help-icon.component';
 declare var bootstrap;
 @Component({
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, OrderslistComponent, SalesListComponent, SalesInvoiceListComponent, NzModalModule, NzButtonModule, NzIconModule, NzSelectModule, NzNotificationModule],
+  imports: [CommonModule, AdminCommmonModule, OrderslistComponent, SalesListComponent, SalesInvoiceListComponent, NzModalModule, NzButtonModule, NzIconModule, NzSelectModule, NzNotificationModule, HelpIconComponent],
   selector: 'app-sales',
   templateUrl: './sales.component.html',
   styleUrls: ['./sales.component.scss']

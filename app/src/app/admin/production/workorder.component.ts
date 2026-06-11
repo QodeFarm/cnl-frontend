@@ -4,6 +4,7 @@ import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule, DatePipe, formatDate } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { WorkOrderListComponent } from './work-order-list/work-order-list.component';
+import { HelpIconComponent } from '../help/help-icon.component';
 import { TaCurdConfig } from '@ta/ta-curd';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 
@@ -11,7 +12,7 @@ import { FormlyFieldConfig } from '@ngx-formly/core';
 @Component({
   selector: 'app-production',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, WorkOrderListComponent],
+  imports: [CommonModule, AdminCommmonModule, WorkOrderListComponent, HelpIconComponent],
   templateUrl: './workorder.component.html',
   styleUrls: ['./workorder.component.scss']
 })

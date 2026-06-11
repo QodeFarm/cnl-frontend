@@ -10,11 +10,12 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { NzNotificationModule, NzNotificationService } from 'ng-zorro-antd/notification';
 import { DeliveryChallanListComponent } from './delivery-challan-list/delivery-challan-list.component';
 import { displayInformation, getUnitData } from 'src/app/utils/display.utils';
+import { HelpIconComponent } from '../../help/help-icon.component';
 
 @Component({
   selector: 'app-delivery-challan',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, DeliveryChallanListComponent, NzNotificationModule],
+  imports: [CommonModule, AdminCommmonModule, DeliveryChallanListComponent, NzNotificationModule, HelpIconComponent],
   templateUrl: './delivery-challan.component.html',
   styleUrls: ['./delivery-challan.component.scss']
 })

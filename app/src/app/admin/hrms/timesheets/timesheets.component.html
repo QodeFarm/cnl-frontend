@@ -1,0 +1,86 @@
+<div class="container-fluid p-3">
+
+    <!-- Banner -->
+    <div class="timesheets-banner">
+        <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <button type="button" class="btn p-0">
+                    <span *ngIf="TimesheetEditID" class="custom-heading">Update Timesheet</span>
+                    <span *ngIf="!TimesheetEditID" class="custom-heading">Create Timesheet</span>
+                </button>
+                <app-help-icon topic="hrms-timesheets"></app-help-icon>
+                <nz-tag [nzColor]="statusColor" class="ts-status-tag">{{ timesheetStatus }}</nz-tag>
+            </div>
+            <button (click)="showTimesheetsListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#timesheetsModal">
+                Timesheets List
+            </button>
+        </div>
+    </div>
+
+    <!-- Live summary strip -->
+    <div class="ts-summary" *ngIf="showForm || loadingEdit">
+        <div class="ts-summary-item">
+            <span class="ts-summary-icon"><i class="fa fa-clock"></i></span>
+            <div>
+                <div class="ts-summary-value">{{ totalHours | number:'1.2-2' }} <small>hrs</small></div>
+                <div class="ts-summary-label">Total Hours</div>
+            </div>
+        </div>
+        <div class="ts-summary-divider"></div>
+        <div class="ts-summary-item">
+            <span class="ts-summary-icon"><i class="fa fa-calendar-check"></i></span>
+            <div>
+                <div class="ts-summary-value">{{ totalDays }}</div>
+                <div class="ts-summary-label">Days Logged</div>
+            </div>
+        </div>
+        <div class="ts-summary-divider"></div>
+        <div class="ts-summary-item">
+            <span class="ts-summary-icon"><i class="fa fa-calendar"></i></span>
+            <div>
+                <div class="ts-summary-value ts-period">{{ periodLabel }}</div>
+                <div class="ts-summary-label">Period</div>
+            </div>
+        </div>
+
+        <!-- Billable amount — only shown when the timesheet is marked billable -->
+        <ng-container *ngIf="isBillable">
+            <div class="ts-summary-divider"></div>
+            <div class="ts-summary-item">
+                <span class="ts-summary-icon ts-summary-icon--billable"><i class="fa fa-rupee-sign"></i></span>
+                <div>
+                    <div class="ts-summary-value ts-billable">{{ billableAmount | number:'1.2-2' }}</div>
+                    <div class="ts-summary-label">Billable Amount</div>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+
+    <div class="row custom-form">
+        <div *ngIf="loadingEdit" class="col-12 p-3">
+            <nz-skeleton [nzActive]="true" [nzParagraph]="{ rows: 8 }"></nz-skeleton>
+        </div>
+        <div class="col-12 px-1" *ngIf="showForm">
+            <ta-form [options]="formConfig"></ta-form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Timesheets Modal -->
+<div class="modal fade custom-modal" id="timesheetsModal" tabindex="-1" aria-labelledby="timesheetsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="timesheetsModalLabel">Timesheets List</h5>
+                <button type="button" id="tsModalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" *ngIf="showTimesheetsList">
+                <app-timesheets-list (edit)="editTimesheet($event)" class="custom-list"></app-timesheets-list>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
