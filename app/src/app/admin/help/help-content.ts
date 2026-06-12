@@ -2519,7 +2519,7 @@ export const HELP_SECTIONS: HelpSection[] = [
     id: 'ai',
     title: 'AI & Smart Insights',
     icon: 'fas fa-robot',
-    summary: 'Automatic alerts, forecasts and a voice assistant.',
+    summary: 'Automatic alerts, forecasts and smart insights.',
     topics: [
       {
         id: 'ai-dashboard',
@@ -2543,16 +2543,6 @@ export const HELP_SECTIONS: HelpSection[] = [
           },
           { type: 'para', text: 'Use **What-If** to test scenarios, and **Customize Dashboard** to choose which insights you see.' },
           { type: 'tip', text: 'Start your day on the AI Dashboard — "Needs Your Attention" is the fastest way to know what to act on.' }
-        ]
-      },
-      {
-        id: 'voice-assistant',
-        title: 'Voice Assistant',
-        blocks: [
-          { type: 'lead', text: 'Use your voice to work with CNL instead of typing.' },
-          { type: 'path', text: 'Menu ▸ Voice Assistant (or the microphone in the top bar)' },
-          { type: 'para', text: 'Click **Start Voice Recognition** and speak your request.' },
-          { type: 'tip', text: 'Handy when your hands are busy — for example on the shop floor or warehouse.' }
         ]
       }
     ]
