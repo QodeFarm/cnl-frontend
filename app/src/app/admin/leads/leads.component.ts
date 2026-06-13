@@ -4,12 +4,13 @@ import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { LeadsListComponent } from './leads-list/leads-list.component';
+import { HelpIconComponent } from '../help/help-icon.component';
 
 
 @Component({
   selector: 'app-leads',
   standalone: true,
-  imports: [CommonModule,AdminCommmonModule,LeadsListComponent],
+  imports: [CommonModule,AdminCommmonModule,LeadsListComponent, HelpIconComponent],
   templateUrl: './leads.component.html',
   styleUrls: ['./leads.component.scss']
 })

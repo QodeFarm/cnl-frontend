@@ -1,10 +1,13 @@
 <div class="container-fluid p-3">
     <div class="reminders-banner">
         <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
-            <button (click)="RemindersEditID = null" type="button" class="btn pl-0" style="color: black;">
+            <div class="d-flex align-items-center" style="gap: 6px;">
+            <button (click)="RemindersEditID = null" type="button" class="btn p-0" style="color: black;">
             <span *ngIf="RemindersEditID" class="custom-heading">Update Reminders</span>
             <span *ngIf="!RemindersEditID" class="custom-heading">Create Reminders</span>
             </button>
+            <app-help-icon topic="reminders-setup"></app-help-icon>
+            </div>
             <button (click)="showRemindersListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
                 Reminders List
             </button>

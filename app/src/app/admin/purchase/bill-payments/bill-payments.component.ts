@@ -10,11 +10,12 @@ import { TaFormComponent } from '@ta/ta-form';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { HelpIconComponent } from '../../help/help-icon.component';
 
 @Component({
   selector: 'app-bill-payments',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, BillPaymentsListComponent],
+  imports: [CommonModule, AdminCommmonModule, BillPaymentsListComponent, HelpIconComponent],
   templateUrl: './bill-payments.component.html',
   styleUrls: ['./bill-payments.component.scss']
 })

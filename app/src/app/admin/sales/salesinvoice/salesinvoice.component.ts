@@ -18,6 +18,7 @@ import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { SaleinvoiceorderlistComponent } from '../saleinvoiceorderlist/saleinvoiceorderlist.component';
+import { HelpIconComponent } from '../../help/help-icon.component';
 
 
 
@@ -26,7 +27,7 @@ declare var bootstrap;
   selector: 'app-salesinvoice',
   standalone: true,
   imports: [AdminCommmonModule, OrderslistComponent, SaleinvoiceorderlistComponent,
-    SalesInvoiceListComponent, NzModalModule, NzButtonModule, NzIconModule],
+    SalesInvoiceListComponent, NzModalModule, NzButtonModule, NzIconModule, HelpIconComponent],
   templateUrl: './salesinvoice.component.html',
   styleUrls: ['./salesinvoice.component.scss']
 })
@@ -270,6 +271,20 @@ ngOnInit() {
         }
         this.initDraftAutoSave();
         this.checkAndRestoreDraft();
+
+        // Arrived from "Create Invoice" (Billable Hours): open the Sales Invoice
+        // List modal so the user lands on the list (to view/print the new
+        // invoice) rather than a blank create form.
+        if (window.history.state?.openInvoiceList) {
+            history.replaceState({}, '', window.location.href);
+            setTimeout(() => {
+                this.showSaleInvoiceListFn();
+                const modalEl = document.getElementById('exampleModal');
+                if (modalEl && (window as any).bootstrap) {
+                    new (window as any).bootstrap.Modal(modalEl).show();
+                }
+            }, 300);
+        }
     });
 }
   // ngOnInit() {

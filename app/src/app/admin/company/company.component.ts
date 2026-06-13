@@ -7,11 +7,12 @@ import { switchMap, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { HelpIconComponent } from '../help/help-icon.component';
 
 @Component({
   selector: 'app-company',
   standalone: true,
-  imports: [CommonModule,AdminCommmonModule],
+  imports: [CommonModule,AdminCommmonModule, HelpIconComponent],
   templateUrl: './company.component.html',
   styleUrls: ['./company.component.scss']
 })

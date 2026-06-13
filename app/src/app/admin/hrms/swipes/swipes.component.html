@@ -1,10 +1,13 @@
 <div class="container-fluid p-3">
     <div class="swipes-banner">
         <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
-            <button type="button" class="btn pl-0" >
+            <div class="d-flex align-items-center" style="gap: 6px;">
+              <button type="button" class="btn p-0" >
                 <span *ngIf="SwipesEditID" class="custom-heading">Update Swipes</span>
                 <span *ngIf="!SwipesEditID" class="custom-heading">Create Swipes</span>
-            </button>
+              </button>
+              <app-help-icon topic="hrms-swipes"></app-help-icon>
+            </div>
             <button (click)="showSwipesListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
                 Swipes List
             </button>

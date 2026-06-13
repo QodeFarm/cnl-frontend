@@ -1,9 +1,12 @@
-<div class="container-fluid ps-3">
+<div class="container-fluid p-3">
   <div class="workflow-banner">
-    <h4 class="custom-heading" *ngIf="showWorkflowList">Workflow List</h4>
-    <!-- <button class="btn btn-primary" (click)="backToList()" *ngIf="showForm">
-        Back to List
-      </button> -->
+    <div class="col-12 px-0 d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3" *ngIf="showWorkflowList">
+      <div class="d-flex align-items-center" style="gap: 6px;">
+        <h4 class="custom-heading mb-0">Workflow List</h4>
+        <app-help-icon topic="workflow"></app-help-icon>
+      </div>
+      <button class="btn btn-primary" (click)="createWorkflow()">Create Workflow</button>
+    </div>
   </div>
 
   <!-- Show list -->
@@ -21,7 +24,10 @@
 
     <!-- Header with Back button aligned right -->
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h4 class="custom-heading">Edit Workflow</h4>
+      <div class="d-flex align-items-center" style="gap: 6px;">
+        <h4 class="custom-heading mb-0">{{ workflowEditID ? 'Edit Workflow' : 'Create Workflow' }}</h4>
+        <app-help-icon topic="workflow"></app-help-icon>
+      </div>
       <button class="btn btn-primary" (click)="backToList()">
         Back to List
       </button>

@@ -4,11 +4,12 @@ import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { QuickpacksListComponent } from './quickpacks-list/quickpacks-list.component';
+import { HelpIconComponent } from '../help/help-icon.component';
 
 @Component({
   selector: 'app-quickpacks',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, QuickpacksListComponent],
+  imports: [CommonModule, AdminCommmonModule, QuickpacksListComponent, HelpIconComponent],
   templateUrl: './quickpacks.component.html',
   styleUrls: ['./quickpacks.component.scss']
 })

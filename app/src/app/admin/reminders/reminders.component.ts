@@ -4,11 +4,12 @@ import { Component, ViewChild } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { RemindersListComponent } from './reminders-list/reminders-list.component';
+import { HelpIconComponent } from '../help/help-icon.component';
 
 @Component({
   selector: 'app-reminders',
   standalone: true,
-  imports: [CommonModule,AdminCommmonModule, RemindersListComponent],
+  imports: [CommonModule,AdminCommmonModule, RemindersListComponent, HelpIconComponent],
   templateUrl: './reminders.component.html',
   styleUrls: ['./reminders.component.scss']
 })

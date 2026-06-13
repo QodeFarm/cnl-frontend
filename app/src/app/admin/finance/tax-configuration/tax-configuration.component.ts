@@ -4,11 +4,12 @@ import { TaFormConfig } from '@ta/ta-form';
 import { TaxConfigurationListComponent } from './tax-configuration-list/tax-configuration-list.component';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
+import { HelpIconComponent } from '../../help/help-icon.component';
 
 @Component({
   selector: 'app-tax-configuration',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, TaxConfigurationListComponent],
+  imports: [CommonModule, AdminCommmonModule, TaxConfigurationListComponent, HelpIconComponent],
   templateUrl: './tax-configuration.component.html',
   styleUrls: ['./tax-configuration.component.scss']
 })

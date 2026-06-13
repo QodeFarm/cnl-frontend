@@ -1,0 +1,65 @@
+// Billable Hours — create-invoice modal styling (scoped to this component).
+
+.bh-modal-body {
+  padding: 4px 0;
+}
+
+.bh-summary {
+  background: #f8fafc;
+  border: 1px solid #e6eaf0;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 18px;
+}
+
+.bh-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+
+  & + .bh-summary-row { border-top: 1px dashed #e6eaf0; }
+}
+
+.bh-summary-row.bh-total {
+  border-top: 1px solid #d9e0ea;
+  margin-top: 4px;
+  padding-top: 9px;
+}
+
+.bh-label {
+  font-size: 13px;
+  color: #6c757d;
+}
+
+.bh-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #142768;
+}
+
+.bh-value.bh-amount {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1a7f3c;
+}
+
+.bh-field {
+  margin-top: 4px;
+}
+
+.bh-field-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 6px;
+}
+
+.bh-hint {
+  font-size: 11px;
+  color: #8a93a5;
+  margin-top: 6px;
+}
+
+::ng-deep .ant-select { width: 100%; }

@@ -16,12 +16,13 @@ import { NzResultModule } from 'ng-zorro-antd/result';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { BulkEditModalComponent } from '../utils/bulk-edit-modal/bulk-edit-modal.component';
 import { BulkField, BulkOperationsService } from '../utils/bulk-operations.service';
+import { HelpIconComponent } from '../help/help-icon.component';
 
 
 @Component({
   selector: 'app-products',
   templateUrl: './products.component.html',
-  imports: [CommonModule, AdminCommmonModule, ProductsListComponent, NzSpinModule, NzProgressModule, NzResultModule, NzAlertModule, BulkEditModalComponent],
+  imports: [CommonModule, AdminCommmonModule, ProductsListComponent, NzSpinModule, NzProgressModule, NzResultModule, NzAlertModule, BulkEditModalComponent, HelpIconComponent],
   standalone: true,
   styleUrls: ['./products.component.scss']
 })

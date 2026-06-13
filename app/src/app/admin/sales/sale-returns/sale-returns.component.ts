@@ -17,13 +17,14 @@ import { CustomFieldHelper } from '../../utils/custom_field_fetch';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { ReturnorderslistComponent } from '../returnorderslist/returnorderslist.component';
 import { DrilldownEditService } from 'src/app/services/drilldown-edit.service';
+import { HelpIconComponent } from '../../help/help-icon.component';
 declare var bootstrap;
 
 
 @Component({
   selector: 'app-sale-returns',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, SaleReturnsListComponent, ReturnorderslistComponent],
+  imports: [CommonModule, AdminCommmonModule, SaleReturnsListComponent, ReturnorderslistComponent, HelpIconComponent],
   templateUrl: './sale-returns.component.html',
   styleUrls: ['./sale-returns.component.scss']
 })

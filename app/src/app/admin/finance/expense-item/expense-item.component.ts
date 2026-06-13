@@ -4,11 +4,12 @@ import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { ExpenseItemListComponent } from './expense-item-list/expense-item-list.component';
+import { HelpIconComponent } from '../../help/help-icon.component';
 
 @Component({
   selector: 'app-expense-item',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, ExpenseItemListComponent],
+  imports: [CommonModule, AdminCommmonModule, ExpenseItemListComponent, HelpIconComponent],
   templateUrl: './expense-item.component.html',
   styleUrls: ['./expense-item.component.scss']
 })

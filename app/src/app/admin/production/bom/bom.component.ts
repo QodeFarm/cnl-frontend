@@ -4,13 +4,14 @@ import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { BomListComponent } from './bom-list/bom-list.component';
+import { HelpIconComponent } from '../../help/help-icon.component';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-bom',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, BomListComponent],
+  imports: [CommonModule, AdminCommmonModule, BomListComponent, HelpIconComponent],
   templateUrl: './bom.component.html',
   styleUrls: ['./bom.component.scss']
 })

@@ -8,11 +8,12 @@ import { TaFormComponent, TaFormConfig } from '@ta/ta-form';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { CreditNoteListComponent } from './credit-note-list/credit-note-list.component';
 import { ActivatedRoute, Router } from '@angular/router';
+import { HelpIconComponent } from '../../help/help-icon.component';
 
 @Component({
   selector: 'app-credit-note',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, CreditNoteListComponent],
+  imports: [CommonModule, AdminCommmonModule, CreditNoteListComponent, HelpIconComponent],
   templateUrl: './credit-note.component.html',
   styleUrls: ['./credit-note.component.scss']
 })
