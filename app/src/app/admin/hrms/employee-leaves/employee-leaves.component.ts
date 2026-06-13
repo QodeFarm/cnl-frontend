@@ -29,27 +29,49 @@ export class EmployeeLeavesComponent implements OnInit {
     private route: ActivatedRoute
   ) {};
 
+  // ngOnInit() {
+  //   this.route.data.subscribe(data => {
+  //     this.isEmployeePortal = data['employeeView'] || false;
+      
+  //     if (this.isEmployeePortal) {
+  //       console.log("We are in the employee logged portal...")
+  //       const user = JSON.parse(localStorage.getItem('employee_user') || '{}');
+  //       this.loggedEmployeeId = user.id || '';
+        
+  //       // First fetch employee data, then set form config
+  //       this.fetchEmployeeAndSetForm();
+  //       // REMOVED: this.setFormConfig(); - Don't call it here, it will be called after fetch
+  //     } else {
+  //       // Admin mode - normal flow
+  //       this.showEmployeeLeavesList = false;
+  //       this.showForm = true;
+  //       this.EmployeeLeavesEditID = null;
+  //       this.setFormConfig();
+  //     }
+  //   });
+  // };
+
   ngOnInit() {
+    // First, check if this is employee portal and get employee data
     this.route.data.subscribe(data => {
       this.isEmployeePortal = data['employeeView'] || false;
       
       if (this.isEmployeePortal) {
-        console.log("We are in the employee logged portal...")
+        // Get logged-in employee data from localStorage (similar to customer portal)
         const user = JSON.parse(localStorage.getItem('employee_user') || '{}');
-        this.loggedEmployeeId = user.id || '';
+        this.loggedEmployeeId = user.id;
+        this.loggedEmployeeData = user;
         
-        // First fetch employee data, then set form config
-        this.fetchEmployeeAndSetForm();
-        // REMOVED: this.setFormConfig(); - Don't call it here, it will be called after fetch
-      } else {
-        // Admin mode - normal flow
-        this.showEmployeeLeavesList = false;
-        this.showForm = true;
-        this.EmployeeLeavesEditID = null;
-        this.setFormConfig();
+        console.log('Employee Portal Mode - Employee ID:', this.loggedEmployeeId);
       }
+      
+      // Now set form config (after we have the portal mode and employee ID)
+      this.showEmployeeLeavesList = false;
+      this.showForm = true;
+      this.EmployeeLeavesEditID = null;
+      this.setFormConfig();
     });
-  };
+  }
 
   fetchEmployeeAndSetForm() {
     console.log("logged employee - 1 : ", this.loggedEmployeeId);
@@ -156,62 +178,64 @@ export class EmployeeLeavesComponent implements OnInit {
           key: 'employee_leaves',
           fieldGroup: [
             {
-  key: 'employee',
-  type: 'select',  // You may need to create this custom type or use 'select'
-  className: 'col-md-4 col-sm-6 col-12',
-  props: {
-    label: 'Employee',
-    dataKey: 'employee_id',
-    dataLabel: "first_name",
-    options: [],
-    lazy: this.isEmployeePortal 
-      ? `hrms/employees/${this.loggedEmployeeId}/`  // Single employee for portal
-      : 'hrms/employees/?summary=true',  // All employees for admin
-    lazyOneTime: true,
-    required: true,
-    disabled: this.isEmployeePortal  // Disable for employees
-  },
-  hooks: {
-    onInit: (field: any) => {
-      // For employee portal, auto-set the employee
-      if (this.isEmployeePortal && this.loggedEmployeeId) {
-        // Fetch employee data first
-        this.http.get(`hrms/employees/${this.loggedEmployeeId}/`).subscribe({
-          next: (res: any) => {
-            if (res && res.data) {
-              const emp = res.data.employee || res.data;
-              const employeeData = {
-                employee_id: emp.employee_id,
-                first_name: `${emp.first_name} ${emp.last_name}`,
-                last_name: ''
-              };
-              
-              setTimeout(() => {
-                field.formControl.setValue(employeeData);
-                field.formControl.disable(); // Ensure it's disabled
-                
-                // Update the model
-                if (this.formConfig && this.formConfig.model && this.formConfig.model['employee_leaves']) {
-                  this.formConfig.model['employee_leaves']['employee_id'] = emp.employee_id;
-                }
-              }, 500);
-            }
-          },
-          error: (err) => console.error('Error fetching employee:', err)
-        });
-      }
+              key: 'employee',
+              type: 'select',  // You need to create this custom type OR use 'select'
+              className: 'col-md-4 col-sm-6 col-12',
+              props: {
+                label: 'Employee',
+                dataKey: 'employee_id',
+                dataLabel: "first_name",
+                options: [],
+                lazy: {
+                  url: this.isEmployeePortal 
+                    ? `hrms/employees/${this.loggedEmployeeId}/`  // Single employee for portal
+                    : 'hrms/employees/?summary=true',  // All employees for admin
+                  lazyOneTime: true
+                },
+                required: true,
+                disabled: this.isEmployeePortal  // Disable for employees
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  // For employee portal, auto-set the employee
+                  if (this.isEmployeePortal && this.loggedEmployeeId) {
+                    // Fetch employee data first
+                    this.http.get(`hrms/employees/${this.loggedEmployeeId}/`).subscribe({
+                      next: (res: any) => {
+                        if (res && res.data) {
+                          const emp = res.data.employee || res.data;
+                          const employeeData = {
+                            employee_id: emp.employee_id,
+                            first_name: `${emp.first_name} ${emp.last_name}`,
+                            last_name: ''
+                          };
+                          
+                          setTimeout(() => {
+                            field.formControl.setValue(employeeData);
+                            field.formControl.disable(); // Ensure it's disabled
+                            
+                            // Update the model
+                            if (this.formConfig?.model?.employee_leaves) {
+                              this.formConfig.model.employee_leaves.employee_id = emp.employee_id;
+                            }
+                          }, 500);
+                        }
+                      },
+                      error: (err) => console.error('Error fetching employee:', err)
+                    });
+                  }
 
-      // Handle value changes
-      field.formControl.valueChanges.subscribe(data => {
-        if (data && data.employee_id) {
-          if (this.formConfig && this.formConfig.model && this.formConfig.model['employee_leaves']) {
-            this.formConfig.model['employee_leaves']['employee_id'] = data.employee_id;
-          }
-        }
-      });
-    }
-  }
-},
+                  // Handle value changes for both modes
+                  field.formControl.valueChanges.subscribe(data => {
+                    if (data && data.employee_id) {
+                      if (this.formConfig?.model?.employee_leaves) {
+                        this.formConfig.model.employee_leaves.employee_id = data.employee_id;
+                      }
+                    }
+                  });
+                }
+              }
+            },
             {
               key: 'leave_type',
               type: 'leaveTypes-dropdown',
