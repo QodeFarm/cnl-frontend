@@ -155,49 +155,100 @@
 
 // Toast message styles
 .toast-message {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background-color: #4caf50;
-    color: white;
-    padding: 12px 24px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    z-index: 10000;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    animation: slideIn 0.3s ease-out;
-    
-    .tick-circle {
-        width: 20px;
-        height: 20px;
-        background-color: white;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        
-        .tick-mark {
-            color: #4caf50;
-            font-size: 12px;
-            font-weight: bold;
-        }
-    }
-    
-    .toast-message-text {
-        font-size: 14px;
-    }
-    
-    .toast-close {
-        cursor: pointer;
-        margin-left: 10px;
-        font-weight: bold;
-        
-        &:hover {
-            opacity: 0.8;
-        }
-    }
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #fff;
+  /* Pure white background */
+  color: #0e0d0d;
+  /* Dark grey text */
+  padding: 12px 30px;
+  width: 370px;
+  /* Wider box */
+  height: 60px;
+  border-radius: 0px;
+  /* No rounded corners */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  /* Soft shadow */
+  display: flex;
+  align-items: center;
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  z-index: 1000;
+  animation: fadeIn 0.4s ease-in-out;
+  border: 2px solid #dcdcdc;
+  /* Subtle border */
+}
+
+/* Circle with white inside and green border */
+.tick-circle {
+  width: 23px;
+  /* Slightly smaller */
+  height: 23px;
+  background-color: #fff;
+  /* White inside */
+  border: 2px solid #28a745;
+  /* Green border */
+  border-radius: 50%;
+  /* Perfect circle */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  /* Space between icon and text */
+}
+
+/* Smaller tick mark inside the white circle */
+.tick-mark {
+  color: #28a745;
+  /* Green tick */
+  font-size: 12px;
+  /* Smaller size */
+  // font-weight: bold;
+  line-height: 1;
+  /* Perfectly centered */
+}
+
+.toast-message-text {
+  flex: 1;
+  color: rgb(41, 41, 41);
+  font-size: 16px;
+  font-weight: 500;
+  /* Medium weight */
+}
+
+/* Close button (X symbol) */
+.toast-close {
+  font-size: 16px;
+  color: rgb(73, 73, 73);
+  cursor: pointer;
+  margin-left: 12px;
+  /* Space between text and close button */
+}
+
+.toast-close:hover {
+  color: #000;
+  /* Darker on hover */
+}
+
+/* Smart navigation action button inside toast */
+.toast-action-btn {
+  background: #1e40af;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 10px;
+  white-space: nowrap;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: #1e3a8a;
+  }
 }
 
 @keyframes slideIn {

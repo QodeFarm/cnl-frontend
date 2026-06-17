@@ -75,10 +75,10 @@ generatedPassword: string = '';
 
 // Generate credentials for employee
 generateEmployeeCredentials() {
-  if (!this.EmployeeEditID) {
-    alert('Please save the employee first');
-    return;
-  }
+  // if (!this.EmployeeEditID) {
+  //   alert('Please save the employee first');
+  //   return;
+  // }
   
   this.http.post(`hrms/employees/generate-credentials/${this.EmployeeEditID}/`, {}).subscribe(
     (res: any) => {
@@ -135,35 +135,137 @@ showToast(message: string) {
   }, 3000);
 }
 
-// Show send credentials popup
-showSendCredentialsPopup() {
-  if (!this.EmployeeEditID) {
-    alert('Please save the employee first');
-    return;
-  }
-  
-  const method = confirm('Send credentials via Email?\n\nClick OK for Email, Cancel for WhatsApp');
-  if (method) {
-    this.sendViaEmail();
-  } else {
-    this.sendViaWhatsApp();
+// Add this method to hide the credentials modal
+hideCredentialsModal() {
+  const modalElement = document.getElementById('credentialsModal');
+  if (modalElement) {
+    const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
+    if (modal) {
+      modal.hide();
+    }
   }
 }
 
-// Send via email
+// Update your showSendCredentialsPopup method to use the correct modal
+// showSendCredentialsPopup() {
+//   if (!this.EmployeeEditID) {
+//     this.showToast('⚠️ Please save the employee first');
+//     return;
+//   }
+  
+//   // Show the send credentials modal
+//   const modalElement = document.getElementById('sendCredentialsModal');
+//   if (modalElement) {
+//     const modal = new (window as any).bootstrap.Modal(modalElement);
+//     modal.show();
+//   }
+// }
+
+// In your employee component .ts file
+
+// Replace the existing sendViaEmail and sendViaWhatsApp methods
 sendViaEmail() {
+  // Close the modal first
+  const modalElement = document.getElementById('sendCredentialsModal');
+  if (modalElement) {
+    const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
+    if (modal) modal.hide();
+  }
+  
+  // Show loading toast
+  this.showToast('📧 Sending credentials via email...');
+  
   this.http.post(`hrms/employees/send-credentials/${this.EmployeeEditID}/?method=email`, {}).subscribe(
     (res: any) => {
-      alert(res.success ? '✅ Credentials sent via email!' : (res.message || 'Failed to send'));
+      if (res.success) {
+        this.showToast('✅ Credentials sent successfully via email!');
+        // Update last_sent timestamp in UI if needed
+      } else {
+        this.showToast('❌ ' + (res.message || 'Failed to send email'));
+      }
     },
-    () => alert('Failed to send email')
+    (error) => {
+      console.error('Email send error:', error);
+      this.showToast('❌ Failed to send email. Please check email configuration.');
+    }
   );
 }
 
-// Send via WhatsApp
 sendViaWhatsApp() {
-  alert('WhatsApp template under construction. Please use email.');
+  // Close the modal first
+  const modalElement = document.getElementById('sendCredentialsModal');
+  if (modalElement) {
+    const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
+    if (modal) modal.hide();
+  }
+  
+  // Check if employee has WhatsApp number
+  const phone = this.formConfig?.model?.employee?.phone;
+  if (!phone || phone === '+91') {
+    this.showToast('⚠️ Please add a valid phone number for the employee first');
+    return;
+  }
+  
+  this.showToast('📱 Sending credentials via WhatsApp...');
+  
+  this.http.post(`hrms/employees/send-credentials/${this.EmployeeEditID}/?method=whatsapp`, {}).subscribe(
+    (res: any) => {
+      if (res.success) {
+        this.showToast('✅ Credentials sent successfully via WhatsApp!');
+      } else {
+        this.showToast('❌ ' + (res.message || 'Failed to send WhatsApp message'));
+      }
+    },
+    (error) => {
+      console.error('WhatsApp send error:', error);
+      this.showToast('❌ Failed to send WhatsApp. Please check WhatsApp configuration.');
+    }
+  );
 }
+
+showSendCredentialsPopup() {
+  if (!this.EmployeeEditID) {
+    this.showToast('⚠️ Please save the employee first');
+    return;
+  }
+  
+  // Show the custom modal
+  const modalElement = document.getElementById('sendCredentialsModal');
+  if (modalElement) {
+    const modal = new (window as any).bootstrap.Modal(modalElement);
+    modal.show();
+  }
+}
+
+// // Show send credentials popup
+// showSendCredentialsPopup() {
+//   if (!this.EmployeeEditID) {
+//     alert('Please save the employee first');
+//     return;
+//   }
+  
+//   const method = confirm('Send credentials via Email?\n\nClick OK for Email, Cancel for WhatsApp');
+//   if (method) {
+//     this.sendViaEmail();
+//   } else {
+//     this.sendViaWhatsApp();
+//   }
+// }
+
+// // Send via email
+// sendViaEmail() {
+//   this.http.post(`hrms/employees/send-credentials/${this.EmployeeEditID}/?method=email`, {}).subscribe(
+//     (res: any) => {
+//       alert(res.success ? '✅ Credentials sent via email!' : (res.message || 'Failed to send'));
+//     },
+//     () => alert('Failed to send email')
+//   );
+// }
+
+// // Send via WhatsApp
+// sendViaWhatsApp() {
+//   alert('WhatsApp template under construction. Please use email.');
+// }
 
 findField(key: string): any {
   const search = (fields: any[]): any => {
@@ -178,6 +280,7 @@ findField(key: string): any {
   };
   return search(this.formConfig.fields || []);
 }
+
 
   setFormConfig() {
     this.EmployeeEditID = null;
