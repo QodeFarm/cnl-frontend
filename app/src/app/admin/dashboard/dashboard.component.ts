@@ -1747,10 +1747,13 @@ ngOnDestroy() {
   }
   
   fetchWorkOrders(): void {
-    const apiUrl = `${this.baseUrl}production/work_order/`;
+    const apiUrl = `${this.baseUrl}production/work_order/?summary=true`;
+    console.log('Fetching work orders from:', apiUrl);
     this.http.get(apiUrl).subscribe(
       (response: any) => {
+        console.log('Work orders response:', response);
         if (response?.data) {
+          console.log("Entered into the method...")
           this.workOrders = response.data.map((workOrder: any) => ({
             name: workOrder.product?.name || 'Unknown Product',
             quantity: workOrder.quantity || 0,
