@@ -68,13 +68,13 @@ export class ProductCategoriesComponent  {
     fields: 
       [ 
         {
-          fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
-          fieldGroup: 
+          fieldGroupClassName: "row col-12 p-0 m-0 custom-form",
+          fieldGroup:
         [
 	       {
             key: 'category_name',
             type: 'input',
-            className: 'col-md-6 col-12 px-1 pb-md-0 pb-3',
+            className: 'col-md-6 col-12 px-1 pb-3',
             templateOptions: {
               label: 'Category Name',
               required: true
@@ -88,7 +88,7 @@ export class ProductCategoriesComponent  {
           {
             key: 'code',
             type: 'input',
-            className: 'col-md-6 col-12 px-1',
+            className: 'col-md-6 col-12 px-1 pb-3',
             templateOptions: {
               label: 'Code',
               required: true

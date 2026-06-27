@@ -4755,13 +4755,13 @@ export const productGroupsConfig: TaCurdConfig = {
         fields:
             [
                 {
-                    fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
+                    fieldGroupClassName: "row col-12 p-0 m-0 custom-form",
                     fieldGroup:
                         [
                             {
                                 key: 'group_name',
                                 type: 'text',
-                                className: 'col-md-6 col-12 px-1 pb-md-0 pb-3',
+                                className: 'col-md-6 col-12 px-1 pb-3',
                                 templateOptions: {
                                     label: 'Group Name',
                                     required: true
@@ -4773,7 +4773,7 @@ export const productGroupsConfig: TaCurdConfig = {
                                 }
                             },
                             {
-                              className: 'col-md-6 col-12 px-1 pb-md-0 pb-3',
+                              className: 'col-md-6 col-12 px-1 pb-3',
                               key: 'code',
                               type: 'input',
                               templateOptions: {
@@ -4858,7 +4858,7 @@ export const productGroupsConfig: TaCurdConfig = {
 
                             // },
                             {
-                              className: 'col-md-6 col-12 px-1 pb-md-0 pb-3',
+                              className: 'col-md-6 col-12 px-1 pb-3',
                               key: 'product_mode',
                               type: 'select',
                               templateOptions: {
@@ -4918,7 +4918,7 @@ export const productGroupsConfig: TaCurdConfig = {
 
                             },
                             {
-                              className: 'col-md-6 col-12 px-1 pb-md-0 pb-3',
+                              className: 'col-md-6 col-12 px-1 pb-3',
                               key: 'under_group_id',
                               type: 'productGroups-dropdown',
                               templateOptions: {
@@ -4926,7 +4926,7 @@ export const productGroupsConfig: TaCurdConfig = {
                                 dataKey: 'product_group_id',
                                 dataLabel: "group_name",
                                 options: [],
-                                required: true,
+                                required: false,
                                 lazy: {
                                   url: 'products/product_groups/',
                                   lazyOneTime: true
@@ -4947,7 +4947,7 @@ export const productGroupsConfig: TaCurdConfig = {
                             {
                                 key: 'description',
                                 type: 'textarea',
-                                className: 'col-md-6 col-12 px-1',
+                                className: 'col-md-6 col-12 px-1 pb-3',
                                 templateOptions: {
                                     label: 'Description',
                                     required: false
@@ -5245,13 +5245,13 @@ export const productCategoriesConfig: TaCurdConfig = {
         fields:
             [
                 {
-                    fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
+                    fieldGroupClassName: "row col-12 p-0 m-0 custom-form",
                     fieldGroup:
                         [
                             {
                                 key: 'category_name',
                                 type: 'input',
-                                className: 'col-md-6 col-12 px-1 pb-md-0 pb-3',
+                                className: 'col-md-6 col-12 px-1 pb-3',
                                 templateOptions: {
                                     label: 'Category Name',
                                     required: true
@@ -5265,7 +5265,7 @@ export const productCategoriesConfig: TaCurdConfig = {
                             {
                                 key: 'code',
                                 type: 'input',
-                                className: 'col-md-6 col-12 px-1',
+                                className: 'col-md-6 col-12 px-1 pb-3',
                                 templateOptions: {
                                     label: 'Code',
                                     required: true
