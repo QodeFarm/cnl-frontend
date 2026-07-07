@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+﻿import { CommonModule } from '@angular/common';
 import { Component, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -1491,6 +1491,7 @@ export class SalesRepotsComponent {
   //   this.totalRecords = data.length; //  Update total records dynamically
   // }
 }
+
 
 
 
