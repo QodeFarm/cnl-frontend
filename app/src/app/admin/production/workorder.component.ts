@@ -1665,7 +1665,9 @@ closeSyncModal() {
                                 console.error(`Products at index ${currentRowIndex} is not defined. Initializing...`);
                                 this.formConfig.model['bom'][currentRowIndex] = {};
                               }
-                              this.formConfig.model['bom'][currentRowIndex]['product_id'] = data?.product_id;
+                              // Write to the row's own model object (captured currentRowIndex
+                              // goes stale after a formly row delete). Fallback = old behaviour.
+                              (field.parent?.model ?? this.formConfig.model['bom'][currentRowIndex])['product_id'] = data?.product_id;
                               this.loadProductVariations(field);
                               
                               // Display product info when a product is selected (similar to Sales Order)

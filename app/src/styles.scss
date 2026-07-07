@@ -778,6 +778,16 @@ header.sticky-header {
     }
 }
 
+/* Matched-substring highlight in menu search results. Global (not component-
+   scoped) because it is injected via [innerHTML] and so carries no Angular
+   view-encapsulation attribute. */
+.sidebar .menu-search-hl {
+    background: transparent;
+    color: #ffd54a;
+    font-weight: 700;
+    padding: 0;
+}
+
 /* ── Search-expanded base layout (non-hover state) ── */
 .sidebar.toggled .sub-menu-items.search-expanded {
     display: block !important;
@@ -5843,6 +5853,8 @@ ta-table .col-hidden-badge {
     }
 
     .sidebar .custome-horizental-scroll,
+    .sidebar .sidebar-search-wrapper,
+    .sidebar .sidebar-search-wrapper *,
     .sidebar .nav-item,
     .sidebar .nav-item * {
         pointer-events: auto !important;

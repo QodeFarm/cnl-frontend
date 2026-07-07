@@ -1632,17 +1632,14 @@ updateReturnNoControl() {
               
                     // Subscribe to value changes (to update sizes dynamically)
                     field.formControl.valueChanges.subscribe((data: any) => {
-                      if (!this.formConfig.model['sale_return_items'][currentRowIndex]) {
-                        console.error(`Products at index ${currentRowIndex} is not defined. Initializing...`);
-                        this.formConfig.model['sale_return_items'][currentRowIndex] = {};
+                      // Write to the row's own model object (captured currentRowIndex goes
+                      // stale after a formly row delete). Fallback preserves old behaviour.
+                      const currentItem = field.parent?.model ?? this.formConfig.model['sale_return_items'][currentRowIndex];
+                      if (currentItem) {
+                        currentItem['product_id'] = data?.product_id;
+                        //  Store gst_input from product summary
+                        currentItem['gst_input'] = data?.gst_input || 0;
                       }
-                      this.formConfig.model['sale_return_items'][currentRowIndex]['product_id'] = data?.product_id;
-
-                      const currentItem = this.formConfig.model['sale_return_items'][currentRowIndex];
-                      currentItem['product_id'] = data?.product_id;
-
-                      //  Store gst_input from product summary
-                      currentItem['gst_input'] = data?.gst_input || 0;
                       this.loadProductVariations(field);
                       this.autoFillProductDetails(field, data); // to fill the remaining fields when product is selected.
                     });
@@ -1754,7 +1751,7 @@ updateReturnNoControl() {
                         console.warn(`Product missing for row ${currentRowIndex}, skipping color fetch.`);
                         return;
                       }
-                      this.formConfig.model['sale_return_items'][currentRowIndex]['size_id'] = selectedSize?.size_id;
+                      (field.parent?.model ?? this.formConfig.model['sale_return_items'][currentRowIndex])['size_id'] = selectedSize?.size_id;
               
                       const size_id = selectedSize?.size_id || null;
                       const url = size_id
@@ -1830,7 +1827,7 @@ updateReturnNoControl() {
                         return;
                       }
 
-                      this.formConfig.model['sale_return_items'][currentRowIndex]['color_id'] = selectedColor?.color_id;
+                      (field.parent?.model ?? this.formConfig.model['sale_return_items'][currentRowIndex])['color_id'] = selectedColor?.color_id;
               
                       const color_id = selectedColor?.color_id || null;
                       console.log('color_id :', color_id)
@@ -1969,6 +1966,9 @@ updateReturnNoControl() {
                       if (field.form && field.form.controls && field.form.controls.quantity && data) {
                         const quantity = field.form.controls.quantity.value;
                         const rate = data;
+                        // Keep the row's own model rate in sync (formly implicit sync can
+                        // lag after a row delete + re-add, corrupting the total).
+                        if (field.parent?.model) { field.parent.model.rate = data; }
                         if (rate && quantity) {
                           field.form.controls.amount.setValue(parseFloat(rate) * parseFloat(quantity));
                         }
