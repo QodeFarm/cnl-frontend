@@ -234,11 +234,15 @@ export const TAB_CONFIGS: TabConfig[] = [
           columns: [
             { key: 'product_name', label: 'Product', linkRoute: '/products' },
             { key: 'revenue', label: 'Revenue', type: 'currency' },
-            { key: 'cost', label: 'Cost', type: 'currency' },
-            { key: 'profit', label: 'Profit', type: 'currency',
-              cellClass: (item) => item.profit < 0 ? 'text-danger' : 'text-success-val' },
+            // cost / profit / margin are null for NO_COST products — show
+            // "Cost not set" / "—", never a fake ₹0 or 0% (flow.md / CLAUDE.md §3).
+            { label: 'Cost', type: 'custom',
+              render: (item, ctx) => item.cost != null ? ctx.formatCurrency(item.cost) : 'Cost not set' },
+            { label: 'Profit', type: 'custom',
+              cellClass: (item) => item.profit != null && item.profit < 0 ? 'text-danger' : 'text-success-val',
+              render: (item, ctx) => item.profit != null ? ctx.formatCurrency(item.profit) : '—' },
             { key: 'margin_pct', label: 'Margin %', type: 'custom',
-              render: (item) => (item.margin_pct || 0).toFixed(1) + '%' },
+              render: (item) => item.margin_pct != null ? item.margin_pct.toFixed(1) + '%' : '—' },
             { key: 'status', label: 'Status', type: 'badge',
               badgeClass: (item) => ({ RED: 'ai-badge-red', YELLOW: 'ai-badge-yellow', GREEN: 'ai-badge-green' } as any)[item.status] || '' }
           ],
@@ -582,7 +586,11 @@ export const TAB_CONFIGS: TabConfig[] = [
             columns: [
               { key: 'product_name', label: 'Product', linkRoute: '/products' },
               { key: 'balance', label: 'Qty' },
-              { key: 'dead_stock_value', label: 'Value', type: 'currency' },
+              // dead_stock_value is null when the product has no purchase cost set
+              // — show "Cost not set", never a fake ₹0 (flow.md / CLAUDE.md §3).
+              { label: 'Value', type: 'custom',
+                render: (item, ctx) => item.dead_stock_value != null
+                  ? ctx.formatCurrency(item.dead_stock_value) : 'Cost not set' },
               { label: 'Days Idle', type: 'custom',
                 render: (item) => item.days_since_last_sale || 'Never sold' },
               { label: 'Action', type: 'custom', cellClass: 'recommendation-text',

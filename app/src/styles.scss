@@ -4509,7 +4509,7 @@ ta-curd-modal {
     }
 
     // Compact, explicit widths for each control type
-    nz-select.quick-period-select { width: 130px; }
+    nz-select.quick-period-select { width: 148px; }
     nz-select.select-field        { width: 155px; }
     nz-date-picker.date-picker    { width: 130px !important; }
 
@@ -4727,7 +4727,7 @@ app-account-ledger {
         .al-select-account, .al-select-account .ant-select { width: 190px !important; }
         .al-select-city,    .al-select-city .ant-select    { width: 130px !important; }
 
-        #quickPeriod.quick-period-select { width: 120px !important; }
+        #quickPeriod.quick-period-select { width: 140px !important; }
         #fromDate.date-picker             { width: 115px !important; }
         #toDate.date-picker               { width: 115px !important; }
     }
@@ -5809,3 +5809,69 @@ ta-table .col-hidden-badge {
     display: none !important;
 }
 
+
+/* ─── Report cell badges ──────────────────────────────────────────────
+   Rendered inside TaTable cells via [innerHTML]. Angular's HTML sanitizer
+   STRIPS inline style attributes, so badges MUST use classes (class is kept)
+   + these GLOBAL (non-encapsulated) styles. */
+.rpt-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.6;
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
+.rpt-badge--green  { background: #f6ffed; color: #52c41a; border-color: rgba(82,196,26,0.25); }
+.rpt-badge--orange { background: #fff7e6; color: #fa8c16; border-color: rgba(250,140,22,0.25); }
+.rpt-badge--red    { background: #fff1f0; color: #ff4d4f; border-color: rgba(255,77,79,0.25); }
+.rpt-badge--blue   { background: #e6f7ff; color: #1890ff; border-color: rgba(24,144,255,0.25); }
+.rpt-badge--grey   { background: #f5f5f5; color: #595959; border-color: rgba(89,89,89,0.25); }
+
+/* Journal Book "Particulars" auto-narration — muted, like the legacy report.
+   Rendered via TaTable [innerHTML], so the class must live in GLOBAL styles. */
+.rpt-narration { display: inline-block; margin-top: 2px; color: #8c8c8c; font-size: 12px; font-style: italic; }
+
+/* ─── Report Quick Period dropdown ───────────────────────────────────────────
+   On Sale/Purchase Register the summary strip pushes the trigger lower, so cdk
+   measured the (tall) panel as not fitting below and FLIPPED it UP — where the
+   fixed top navbar (higher stacking than the overlay container) clipped it.
+   Fix: force the OVERLAY PANE that holds this dropdown to be short, so cdk
+   measures it small, keeps it BELOW the trigger, and it never reaches the navbar. */
+.cdk-overlay-pane:has(.rpt-quick-period-dd) {
+    max-height: 236px !important;
+}
+.rpt-quick-period-dd {
+    z-index: 1200 !important;
+    max-height: 236px !important;
+    border-radius: 8px !important;
+    box-shadow: 0 6px 24px rgba(20, 39, 104, 0.18) !important;
+    background: #fff !important;
+
+    cdk-virtual-scroll-viewport,
+    .ant-select-dropdown-list,
+    nz-option-container {
+        max-height: 200px !important;
+    }
+    .ant-select-item {
+        min-height: 32px;
+        line-height: 24px;
+        font-size: 13px;
+    }
+    .ant-select-item-option-selected {
+        background: #e6f0ff !important;
+        font-weight: 600;
+    }
+}
+
+/* ─── Overlays above the fixed top navbar ─────────────────────────────────────
+   The app navbar is position:fixed; z-index:10000 (admin-layout). The cdk overlay
+   container was at ~1060, so ANY dropdown/datepicker that reached the navbar area
+   (e.g. the Quick Period flipping up on summary-strip reports) was painted over and
+   clipped. Lift the overlay container above the navbar so overlays are never hidden.
+   (Modals already render full-screen above the navbar, so this is the correct order.) */
+.cdk-overlay-container {
+    z-index: 10001 !important;
+}
