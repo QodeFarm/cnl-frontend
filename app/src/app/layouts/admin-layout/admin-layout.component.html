@@ -389,9 +389,13 @@
         <li class="sidebar-search-wrapper">
             <div class="sidebar-search-box">
                 <i class="fas fa-search sidebar-search-icon"></i>
-                <input type="text" class="sidebar-search-input" placeholder="Search menu..." [ngModel]="menuSearchText"
-                    (ngModelChange)="menuSearchText = $event; onMenuSearchChange()" autocomplete="off" />
-                <i *ngIf="menuSearchText" class="fas fa-times sidebar-search-clear" (click)="clearMenuSearch()"></i>
+                <input #menuSearchInput type="text" class="sidebar-search-input" placeholder="Search menu..."
+                    [ngModel]="menuSearchText" (ngModelChange)="menuSearchText = $event; onMenuSearchChange()"
+                    (keydown)="onSearchKeydown($event)" autocomplete="off" spellcheck="false"
+                    aria-label="Search menu" />
+                <kbd *ngIf="!menuSearchText" class="sidebar-search-kbd">{{ shortcutLabel }}</kbd>
+                <i *ngIf="menuSearchText" class="fas fa-times sidebar-search-clear" (click)="clearMenuSearch()"
+                    title="Clear search"></i>
             </div>
         </li>
         <ul class="custome-horizental-scroll" style="list-style: none; padding: 0; margin: 0;">
@@ -403,9 +407,12 @@
                 [ngClass]="{'sub-menu': (m.module_sections && m.module_sections.length > 0)}">
                 <!-- No children -->
                 <a *ngIf="!(m.module_sections && m.module_sections.length > 0)" class="nav-link"
+                    [class.result-active]="isMenuSearching && m._ri === activeResultIndex"
                     [routerLink]="[m.sec_link]" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
                     (click)="closeMenu()">
-                    <i class="" [ngClass]="m.mod_icon"></i><span>{{m.module_name}}</span>
+                    <i class="" [ngClass]="m.mod_icon"></i>
+                    <span *ngIf="!isMenuSearching">{{m.module_name}}</span>
+                    <span *ngIf="isMenuSearching" [innerHTML]="highlightMatch(m.module_name)"></span>
                 </a>
                 <!-- Has children — COLLAPSED sidebar: CDK overlay fly-out on hover -->
                 <ng-container *ngIf="m.module_sections && m.module_sections.length > 0 && !isMenuSearching && !isSidebarExpanded">
@@ -459,8 +466,10 @@
                     class="sub-menu-items search-expanded">
                     <div class="py-2 collapse-inner">
                         <a (click)="closeMenu(); clearMenuSearch()" class="collapse-item"
+                            [class.result-active]="sm._ri === activeResultIndex"
                             *ngFor="let sm of m.module_sections" [routerLink]="[sm.sec_link]" routerLinkActive="active"
-                            [routerLinkActiveOptions]="{ exact: true }" [title]="sm.section_name">{{sm.section_name}}</a>
+                            [routerLinkActiveOptions]="{ exact: true }" [title]="sm.section_name"
+                            [innerHTML]="highlightMatch(sm.section_name)"></a>
                     </div>
                 </div>
             </li>

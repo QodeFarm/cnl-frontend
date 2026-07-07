@@ -2573,7 +2573,10 @@ createSaleInovice() {
                         console.error(`Products at index ${currentRowIndex} is not defined. Initializing...`);
                         this.formConfig.model['sale_invoice_items'][currentRowIndex] = {};
                       }
-                      this.formConfig.model['sale_invoice_items'][currentRowIndex]['product_id'] = data?.product_id;
+                      // Write to the row's OWN model object (formly renumbers row keys on
+                      // delete, so the captured currentRowIndex goes stale). Fallback keeps
+                      // old behaviour if the row model is ever unavailable.
+                      (field.parent?.model ?? this.formConfig.model['sale_invoice_items'][currentRowIndex])['product_id'] = data?.product_id;
                       this.loadProductVariations(field);
                       this.autoFillProductDetails(field, data); // to fill the remaining fields when product is selected.
                       this.triggerDraftSave(); // Auto-save draft on product change
@@ -2684,7 +2687,7 @@ createSaleInovice() {
                         console.warn(`Product missing for row ${currentRowIndex}, skipping color fetch.`);
                         return;
                       }
-                      this.formConfig.model['sale_invoice_items'][currentRowIndex]['size_id'] = selectedSize?.size_id;
+                      (field.parent?.model ?? this.formConfig.model['sale_invoice_items'][currentRowIndex])['size_id'] = selectedSize?.size_id;
               
                       const size_id = selectedSize?.size_id || null;
                       const url = size_id
@@ -2760,7 +2763,7 @@ createSaleInovice() {
                         return;
                       }
 
-                      this.formConfig.model['sale_invoice_items'][currentRowIndex]['color_id'] = selectedColor?.color_id;
+                      (field.parent?.model ?? this.formConfig.model['sale_invoice_items'][currentRowIndex])['color_id'] = selectedColor?.color_id;
               
                       const color_id = selectedColor?.color_id || null;
                       console.log('color_id :', color_id)
@@ -3037,6 +3040,10 @@ createSaleInovice() {
                       if (field.form && field.form.controls && field.form.controls.quantity && data) {
                         const quantity = field.form.controls.quantity.value;
                         const rate = data;
+                        // Keep the row's own model rate in sync — formly's implicit
+                        // control→model sync can lag after a row delete + re-add, which
+                        // corrupted the order total.
+                        if (field.parent?.model) { field.parent.model.rate = data; }
                         if (rate && quantity) {
                           field.form.controls.amount.setValue(parseFloat(rate) * parseFloat(quantity));
                         }
