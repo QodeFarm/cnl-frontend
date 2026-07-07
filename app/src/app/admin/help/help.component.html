@@ -1,0 +1,106 @@
+<div class="help-wrap">
+
+  <!-- LEFT: topic list -->
+  <aside class="help-nav">
+    <div class="help-nav__search">
+      <i class="fas fa-search"></i>
+      <input type="text" placeholder="Search help…" [(ngModel)]="searchText" autocomplete="off" />
+      <i *ngIf="searchText" class="fas fa-times help-nav__clear" (click)="searchText = ''"></i>
+    </div>
+
+    <div class="help-nav__scroll">
+      <div class="help-nav__section" *ngFor="let s of filteredSections">
+        <button type="button" class="help-nav__section-title"
+                [class.open]="isOpen(s)" (click)="toggleSection(s)">
+          <i class="help-nav__section-icon" [ngClass]="s.icon"></i>
+          <span class="help-nav__section-label">{{ s.title }}</span>
+          <i class="fas fa-chevron-down help-nav__chevron"></i>
+        </button>
+        <div class="help-nav__items" *ngIf="isOpen(s)">
+          <a class="help-nav__item"
+             *ngFor="let t of s.topics"
+             [class.active]="isActiveTopic(t)"
+             (click)="selectTopic(s, t)">{{ t.title }}</a>
+        </div>
+      </div>
+
+      <div class="help-nav__empty" *ngIf="filteredSections.length === 0">
+        No help topics found.
+      </div>
+    </div>
+  </aside>
+
+  <!-- RIGHT: reading panel -->
+  <section class="help-content" *ngIf="activeTopic">
+    <div class="help-breadcrumb">{{ activeSection.title }}</div>
+    <h2 class="help-title">{{ activeTopic.title }}</h2>
+
+    <ng-container *ngFor="let b of activeTopic.blocks">
+
+      <p class="help-lead" *ngIf="b.type === 'lead'" [innerHTML]="format(b.text || '')"></p>
+
+      <h3 class="help-subheading" *ngIf="b.type === 'subheading'">{{ b.text }}</h3>
+
+      <p class="help-para" *ngIf="b.type === 'para'" [innerHTML]="format(b.text || '')"></p>
+
+      <div class="help-path" *ngIf="b.type === 'path'">
+        <i class="fas fa-location-arrow"></i><span>{{ b.text }}</span>
+      </div>
+
+      <!-- Field table -->
+      <div class="help-table-wrap" *ngIf="b.type === 'fields'">
+        <table class="help-table">
+          <thead>
+            <tr><th>Field</th><th>Required</th><th>What to enter</th><th>Why it matters</th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let f of b.fields">
+              <td><strong>{{ f.name }}</strong></td>
+              <td>{{ f.required }}</td>
+              <td>{{ f.enter }}</td>
+              <td>{{ f.why }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Generic table -->
+      <div class="help-table-wrap" *ngIf="b.type === 'table'">
+        <table class="help-table">
+          <thead>
+            <tr><th *ngFor="let c of b.columns">{{ c }}</th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of b.rows">
+              <td *ngFor="let cell of r" [innerHTML]="format(cell)"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Steps -->
+      <ol class="help-steps" *ngIf="b.type === 'steps'">
+        <li *ngFor="let i of b.items" [innerHTML]="format(i)"></li>
+      </ol>
+
+      <!-- Checklist (click to tick; your ticks are saved in this browser) -->
+      <ul class="help-checklist" *ngIf="b.type === 'checklist'">
+        <li *ngFor="let i of b.items; let idx = index"
+            [class.done]="isChecked(checkKey(idx))"
+            (click)="toggleCheck(checkKey(idx))">
+          <i [ngClass]="isChecked(checkKey(idx)) ? 'fas fa-check-square' : 'far fa-square'"></i>
+          <span [innerHTML]="format(i)"></span>
+        </li>
+      </ul>
+
+      <!-- Callouts -->
+      <div class="help-callout help-callout--tip" *ngIf="b.type === 'tip'">
+        <i class="fas fa-lightbulb"></i><span [innerHTML]="format(b.text || '')"></span>
+      </div>
+      <div class="help-callout help-callout--warn" *ngIf="b.type === 'warn'">
+        <i class="fas fa-exclamation-triangle"></i><span [innerHTML]="format(b.text || '')"></span>
+      </div>
+
+    </ng-container>
+  </section>
+</div>

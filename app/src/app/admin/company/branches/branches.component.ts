@@ -4,11 +4,12 @@ import { Component, ViewChild } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { BranchListComponent } from './branch-list/branch-list.component';
+import { HelpIconComponent } from '../../help/help-icon.component';
 
 @Component({
   selector: 'app-branches',
   standalone: true,
-  imports: [CommonModule,AdminCommmonModule, BranchListComponent],
+  imports: [CommonModule,AdminCommmonModule, BranchListComponent, HelpIconComponent],
   templateUrl: './branches.component.html',
   styleUrls: ['./branches.component.scss']
 })

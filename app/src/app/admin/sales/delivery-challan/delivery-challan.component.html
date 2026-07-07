@@ -6,10 +6,13 @@
     <!-- Page Header Banner -->
     <div class="sale-invoice-banner page-component-header">
       <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-        <button type="button" class="btn pl-0">
-          <span *ngIf="DeliveryChallanEditID" class="custom-heading">Update Delivery Challan</span>
-          <span *ngIf="!DeliveryChallanEditID" class="custom-heading">Create Delivery Challan</span>
-        </button>
+        <div class="d-flex align-items-center" style="gap: 6px;">
+          <button type="button" class="btn p-0">
+            <span *ngIf="DeliveryChallanEditID" class="custom-heading">Update Delivery Challan</span>
+            <span *ngIf="!DeliveryChallanEditID" class="custom-heading">Create Delivery Challan</span>
+          </button>
+          <app-help-icon topic="sales-dispatch"></app-help-icon>
+        </div>
         <div style="display: flex; gap: 10px; align-items: center; justify-content: end; flex-wrap: wrap;">
           <!-- Convert to Invoice — only show when editing an unconverted challan -->
           <button

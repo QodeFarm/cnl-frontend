@@ -22,10 +22,11 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzNotificationService, NzNotificationModule } from 'ng-zorro-antd/notification';
 import { DrilldownEditService } from 'src/app/services/drilldown-edit.service';
+import { HelpIconComponent } from '../help/help-icon.component';
 declare var bootstrap;
 @Component({
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, OrderslistComponent, SalesListComponent, SalesInvoiceListComponent, NzModalModule, NzButtonModule, NzIconModule, NzSelectModule, NzNotificationModule],
+  imports: [CommonModule, AdminCommmonModule, OrderslistComponent, SalesListComponent, SalesInvoiceListComponent, NzModalModule, NzButtonModule, NzIconModule, NzSelectModule, NzNotificationModule, HelpIconComponent],
   selector: 'app-sales',
   templateUrl: './sales.component.html',
   styleUrls: ['./sales.component.scss']
@@ -1362,35 +1363,64 @@ closeNoQuantityWarning() {
   }
   // ===============================================
 
+  // getOrderNo() {
+  //   // Skip if we are in Edit mode
+  //   if (this.SaleOrderEditID || this.shouldAutoInvoice) {
+  //     return;
+  //   }
+  //   this.orderNumber = null;
+  //   this.shippingTrackingNumber = null;
+
+  //   const saleTypeObj = this.formConfig.model['sale_order']?.sale_type_id;
+  //   const saleTypeName = saleTypeObj?.name?.toLowerCase() || '';
+  //   const orderPrefix = saleTypeName === 'Other' ? 'SOO' : 'SO';
+
+  //   // 1. Shipping number
+  //   this.http.get('masters/generate_order_no/?type=SHIP').subscribe((shipRes: any) => {
+  //     if (shipRes?.data?.order_number) {
+  //       this.shippingTrackingNumber = shipRes.data.order_number;
+  //       this.formConfig.model['order_shipments']['shipping_tracking_no'] = this.shippingTrackingNumber;
+
+  //       // 2. Sales order number
+  //       this.http.get(`masters/generate_order_no/?type=${orderPrefix}`).subscribe((orderRes: any) => {
+  //         if (orderRes?.data?.order_number) {
+  //           this.orderNumber = orderRes.data.order_number;
+  //           this.formConfig.model['sale_order']['order_no'] = this.orderNumber;
+  //         }
+  //       });
+  //     }
+  //   });
+  // }
+
   getOrderNo() {
-    // Skip if we are in Edit mode
-    if (this.SaleOrderEditID || this.shouldAutoInvoice) {
-      return;
-    }
-    this.orderNumber = null;
-    this.shippingTrackingNumber = null;
-
-    const saleTypeObj = this.formConfig.model['sale_order']?.sale_type_id;
-    const saleTypeName = saleTypeObj?.name?.toLowerCase() || '';
-    const orderPrefix = saleTypeName === 'Other' ? 'SOO' : 'SO';
-
-    // 1. Shipping number
-    this.http.get('masters/generate_order_no/?type=SHIP').subscribe((shipRes: any) => {
-      if (shipRes?.data?.order_number) {
-        this.shippingTrackingNumber = shipRes.data.order_number;
-        this.formConfig.model['order_shipments']['shipping_tracking_no'] = this.shippingTrackingNumber;
-
-        // 2. Sales order number
-        this.http.get(`masters/generate_order_no/?type=${orderPrefix}`).subscribe((orderRes: any) => {
-          if (orderRes?.data?.order_number) {
-            this.orderNumber = orderRes.data.order_number;
-            this.formConfig.model['sale_order']['order_no'] = this.orderNumber;
-          }
-        });
-      }
-    });
+  // Skip if we are in Edit mode
+  if (this.SaleOrderEditID || this.shouldAutoInvoice) {
+    return;
   }
+  this.orderNumber = null;
+  this.shippingTrackingNumber = null;
 
+  // Get the current sale type from the form model
+  const saleTypeObj = this.formConfig.model['sale_order']?.sale_type_id;
+  const saleTypeName = saleTypeObj?.name?.toLowerCase() || '';
+  const orderPrefix = saleTypeName === 'other' ? 'SOO' : 'SO';
+
+  // 1. Shipping number
+  this.http.get('masters/generate_order_no/?type=SHIP').subscribe((shipRes: any) => {
+    if (shipRes?.data?.order_number) {
+      this.shippingTrackingNumber = shipRes.data.order_number;
+      this.formConfig.model['order_shipments']['shipping_tracking_no'] = this.shippingTrackingNumber;
+
+      // 2. Sales order number
+      this.http.get(`masters/generate_order_no/?type=${orderPrefix}`).subscribe((orderRes: any) => {
+        if (orderRes?.data?.order_number) {
+          this.orderNumber = orderRes.data.order_number;
+          this.formConfig.model['sale_order']['order_no'] = this.orderNumber;
+        }
+      });
+    }
+  });
+}
 
 
   // Displays the sales order list modal
@@ -1608,23 +1638,21 @@ closeNoQuantityWarning() {
   // FETCH CUSTOMER OUTSTANDING
   // =========================
 
-  this.http.get(`sales/payment_transactions/?customer_id=${customerId}`).subscribe(
+  // Customer outstanding = live pending balance across the customer's invoices,
+  // computed server-side. Do NOT sum payment_transactions.outstanding_amount here:
+  // that column is a per-payment running snapshot, so multi-installment invoices
+  // double-count (an already-cleared balance still showed as outstanding).
+  this.http.get(`customers/outstanding/${customerId}/`).subscribe(
 
     (outRes: any) => {
 
-      if (outRes?.data) {
+      const totalOutstanding = parseFloat(outRes?.outstanding_amount) || 0;
 
-        const totalOutstanding = outRes.data.reduce((sum: number, trx: any) => {
-          return sum + (parseFloat(trx.outstanding_amount) || 0);
-        }, 0);
+      this.customerOutstandingAmount = totalOutstanding;
 
-        this.customerOutstandingAmount = totalOutstanding;
-
-        // Show banner also if outstanding exists
-        if (totalOutstanding > 0) {
-          this.showCustomerInfoBanner = true;
-        }
-
+      // Show banner also if outstanding exists
+      if (totalOutstanding > 0) {
+        this.showCustomerInfoBanner = true;
       }
 
     },
@@ -3442,7 +3470,7 @@ createSaleOrder() {
         this.showSuccessToast = false;
       }, 3000);
 
-      this.resetToNewForm();
+      this.ngOnInit();
     },
 
     error: err => {
@@ -5617,78 +5645,86 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
                 //   }
                 // },  
                 {
-                  key: 'sale_type',
-                  type: 'select',
-                  className: 'col-md-4 col-sm-6 col-12',
-                  templateOptions: {
-                    label: 'Sale type',
-                    dataKey: 'sale_type_id',
-                    dataLabel: 'name',
-                    required: true,
-                    options: [],
-                    lazy: {
-                      url: 'masters/sale_types/',
-                      lazyOneTime: true
-                    },
-                  },
-                  hooks: {
-                    onInit: (field: any) => {
-                      const lazyUrl = field.templateOptions.lazy.url;
-                      const modelSaleOrder = this.formConfig.model?.sale_order || {};
-                      let orderGenerated = false;
+  key: 'sale_type',
+  type: 'select',
+  className: 'col-md-4 col-sm-6 col-12',
+  templateOptions: {
+    label: 'Sale type',
+    dataKey: 'sale_type_id',
+    dataLabel: 'name',
+    required: true,
+    options: [],
+    lazy: {
+      url: 'masters/sale_types/',
+      lazyOneTime: true
+    },
+  },
+  hooks: {
+    onInit: (field: any) => {
+      const lazyUrl = field.templateOptions.lazy.url;
+      const modelSaleOrder = this.formConfig.model?.sale_order || {};
 
-                      const applySaleTypes = (saleTypes: any[]) => {
-                        field.templateOptions.options = saleTypes;
-                        const currentSaleTypeId = modelSaleOrder.sale_type_id;
-                        if (currentSaleTypeId) {
-                          const matchedOption = saleTypes.find(opt => opt.sale_type_id === currentSaleTypeId);
-                          if (matchedOption) {
-                            field.formControl.setValue(matchedOption, { emitEvent: false });
-                          }
-                        } else {
-                          const defaultOption = saleTypes.find(option => option.name === 'Advance Order');
-                          if (defaultOption) {
-                            field.formControl.setValue(defaultOption, { emitEvent: false });
-                            modelSaleOrder.sale_type_id = defaultOption.sale_type_id;
-                          }
-                        }
-                      };
+      const applySaleTypes = (saleTypes: any[]) => {
+        field.templateOptions.options = saleTypes;
+        const currentSaleTypeId = modelSaleOrder.sale_type_id;
+        if (currentSaleTypeId) {
+          const matchedOption = saleTypes.find(opt => opt.sale_type_id === currentSaleTypeId);
+          if (matchedOption) {
+            field.formControl.setValue(matchedOption, { emitEvent: true });
+          }
+        } else {
+          const defaultOption = saleTypes.find(option => option.name === 'Advance Order');
+          if (defaultOption) {
+            field.formControl.setValue(defaultOption, { emitEvent: true });
+            modelSaleOrder.sale_type_id = defaultOption.sale_type_id;
+          }
+        }
+      };
 
-                      if (this.saleTypesCache) {
-                        applySaleTypes(this.saleTypesCache);
-                      } else {
-                        this.http.get(lazyUrl).subscribe((response: any) => {
-                          this.saleTypesCache = response.data;
-                          applySaleTypes(this.saleTypesCache!);
-                        });
-                      }
+      if (this.saleTypesCache) {
+        applySaleTypes(this.saleTypesCache);
+      } else {
+        this.http.get(lazyUrl).subscribe((response: any) => {
+          this.saleTypesCache = response.data;
+          applySaleTypes(this.saleTypesCache!);
+        });
+      }
 
-                      field.formControl.valueChanges.subscribe((data: any) => {
-                        if (data && data.sale_type_id) {
-                          modelSaleOrder.sale_type_id = data.sale_type_id;
-
-                          if (!this.SaleOrderEditID && !orderGenerated) {
-                            orderGenerated = true;
-                            const prefix = data.name === 'Other' ? 'SOO' : 'SO';
-
-                            this.http.get(`masters/generate_order_no/?type=${prefix}`).subscribe((res: any) => {
-                              if (res?.data?.order_number) {
-                                this.orderNumber = res.data.order_number;
-                                modelSaleOrder.order_no = this.orderNumber;
-
-                                //  setValue only if field exists in form
-                                const orderNoControl = field.form.get('order_no');
-                                if (orderNoControl) {
-                                  orderNoControl.setValue(this.orderNumber);
-                                }
-                              }
-                            });
-                          }
-                        }
-                      });
-                    }
-                  }
-                },
+      // Track the previous sale type name to detect actual changes
+      let previousSaleTypeName = '';
+      
+      field.formControl.valueChanges.subscribe((data: any) => {
+        if (data && data.sale_type_id) {
+          modelSaleOrder.sale_type_id = data.sale_type_id;
+          const currentSaleTypeName = data.name;
+          
+          // Regenerate order number only if:
+          // 1. Not in edit mode
+          // 2. Sale type name actually changed (prevents duplicate calls)
+          // 3. The order number field exists
+          if (!this.SaleOrderEditID && previousSaleTypeName !== currentSaleTypeName) {
+            previousSaleTypeName = currentSaleTypeName;
+            
+            const prefix = data.name === 'Other' ? 'SOO' : 'SO';
+            
+            this.http.get(`masters/generate_order_no/?type=${prefix}`).subscribe((res: any) => {
+              if (res?.data?.order_number) {
+                this.orderNumber = res.data.order_number;
+                modelSaleOrder.order_no = this.orderNumber;
+                
+                // Update the order_no field if it exists
+                const orderNoControl = field.form.get('order_no');
+                if (orderNoControl) {
+                  orderNoControl.setValue(this.orderNumber);
+                }
+              }
+            });
+          }
+        }
+      });
+    }
+  }
+},
                 // {
                 //   key: 'sale_type',
                 //   type: 'select',
@@ -7240,11 +7276,14 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
 
                     // Subscribe to value changes (to update sizes dynamically)
                     field.formControl.valueChanges.subscribe((data: any) => {
-                      if (!this.formConfig.model['sale_order_items'][currentRowIndex]) {
-                        console.error(`Products at index ${currentRowIndex} is not defined. Initializing...`);
-                        this.formConfig.model['sale_order_items'][currentRowIndex] = {};
-                      }
-                      this.formConfig.model['sale_order_items'][currentRowIndex]['product_id'] = data?.product_id;
+                      // Write to the row's OWN model object, not a captured index.
+                      // formly renumbers row keys when a row is deleted, so a cached
+                      // `currentRowIndex` goes stale and would write product_id to the
+                      // wrong row — leaving the real row without a product_id, which the
+                      // backend then discards (row silently lost on edit).
+                      const row = field.parent?.model;
+                      if (!row) { return; }
+                      row['product_id'] = data?.product_id;
                       this.loadProductVariations(field);
                       this.autoFillProductDetails(field, data); // to fill the remaining fields when product is selected.
                       this.triggerDraftSave(); // Auto-save draft on product change
@@ -7253,8 +7292,8 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
                     // Product Info Text code
                     field.formControl.valueChanges.subscribe(async selectedProductId => {
                       const unit = this.getUnitData(selectedProductId);
-                      const row = this.formConfig.model.sale_order_items[currentRowIndex];
-                      this.displayInformation(row.product, null, null, unit, '', '');
+                      const row = field.parent?.model;
+                      this.displayInformation(row?.product, null, null, unit, '', '');
                       console.log('executed from product info text code');
                     }); // end of product info text code
                   }
@@ -7352,12 +7391,15 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
 
                     // Subscribe to value changes (Merged from onInit & onChanges)
                     field.formControl.valueChanges.subscribe((selectedSize: any) => {
-                      const product = this.formConfig.model.sale_order_items[currentRowIndex]?.product;
+                      // Use the row's live model object (not a stale captured index)
+                      // so a size selection can't land on the wrong row after a delete.
+                      const row = field.parent?.model;
+                      const product = row?.product;
                       if (!product?.product_id) {
-                        console.warn(`Product missing for row ${currentRowIndex}, skipping color fetch.`);
+                        console.warn('Product missing for row, skipping color fetch.');
                         return;
                       }
-                      this.formConfig.model['sale_order_items'][currentRowIndex]['size_id'] = selectedSize?.size_id;
+                      row['size_id'] = selectedSize?.size_id;
 
                       const size_id = selectedSize?.size_id || null;
                       const url = size_id
@@ -7430,12 +7472,15 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
 
                     // Subscribe to value changes & avoid unnecessary API calls
                     field.formControl.valueChanges.subscribe((selectedColor: any) => {
-                      if (!row.product?.product_id) {
-                        console.warn(`Product missing for row ${currentRowIndex}, skipping color update.`);
+                      // Prefer the row's live model object over a stale captured index,
+                      // so a color selection can't be written to the wrong row after a delete.
+                      const row = field.parent?.model ?? this.formConfig.model.sale_order_items[currentRowIndex];
+                      if (!row?.product?.product_id) {
+                        console.warn('Product missing for row, skipping color update.');
                         return;
                       }
 
-                      this.formConfig.model['sale_order_items'][currentRowIndex]['color_id'] = selectedColor?.color_id;
+                      row['color_id'] = selectedColor?.color_id;
 
                       const color_id = selectedColor?.color_id || null;
                       console.log('color_id :', color_id)
@@ -7750,6 +7795,13 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
 
                       if (!field.form || !field.form.controls) return;
 
+                      // Keep the row's own model in sync with the typed qty (defensive:
+                      // same value formly syncs, but guards against the control→model
+                      // desync seen on rate after a row delete + re-add).
+                      if (field.parent?.model) {
+                        field.parent.model.quantity = quantity;
+                      }
+
                       const rate = Number(field.form.controls.rate?.value || 0);
                       const discount = Number(field.form.controls.discount?.value || 0);
                       const availableQty = Number(field.form.controls.available_qty?.value || 0);
@@ -7860,6 +7912,14 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
 
                     // Subscribe to value changes to update amount
                     field.formControl.valueChanges.subscribe(data => {
+                      // Force the row's OWN model to match the typed rate. After a row
+                      // delete + re-add, formly's control→model sync for this cell can
+                      // desync — the input showed the new rate while the model kept a
+                      // stale one, so the total (which reads the model) was wrong.
+                      // Writing to field.parent.model guarantees model == what's shown.
+                      if (field.parent?.model) {
+                        field.parent.model.rate = data;
+                      }
                       if (field.form && field.form.controls && field.form.controls.quantity && data) {
                         const quantity = field.form.controls.quantity.value;
                         const rate = data;

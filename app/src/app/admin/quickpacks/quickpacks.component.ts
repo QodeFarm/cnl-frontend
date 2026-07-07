@@ -4,11 +4,12 @@ import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { QuickpacksListComponent } from './quickpacks-list/quickpacks-list.component';
+import { HelpIconComponent } from '../help/help-icon.component';
 
 @Component({
   selector: 'app-quickpacks',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, QuickpacksListComponent],
+  imports: [CommonModule, AdminCommmonModule, QuickpacksListComponent, HelpIconComponent],
   templateUrl: './quickpacks.component.html',
   styleUrls: ['./quickpacks.component.scss']
 })
@@ -237,8 +238,10 @@ export class QuickpacksComponent implements OnInit {
                               }
                             } else {
                               console.log(`For Product: ${product.name}  - No Size and Colors are available setting those to Null**`)
-                              this.formConfig.model.quick_pack_data_items[currentRowIndex]['size_id'] = null;
-                              this.formConfig.model.quick_pack_data_items[currentRowIndex]['color_id'] = null;
+                              // Write to the row's own model object (captured currentRowIndex
+                              // goes stale after a formly row delete). Fallback = old behaviour.
+                              const qpRow = parentArray?.model ?? this.formConfig.model.quick_pack_data_items[currentRowIndex];
+                              if (qpRow) { qpRow['size_id'] = null; qpRow['color_id'] = null; }
                             }
                           });
                         } else {

@@ -11,11 +11,12 @@ import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { NzNotificationModule, NzNotificationService } from 'ng-zorro-antd/notification';
 import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
+import { HelpIconComponent } from '../../help/help-icon.component';
 
 @Component({
   selector: 'app-journal-voucher',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, JournalVoucherListComponent, FormsModule, NzNotificationModule, NzModalModule],
+  imports: [CommonModule, AdminCommmonModule, JournalVoucherListComponent, FormsModule, NzNotificationModule, NzModalModule, HelpIconComponent],
   templateUrl: './journal-voucher.component.html',
   styleUrls: ['./journal-voucher.component.scss']
 })

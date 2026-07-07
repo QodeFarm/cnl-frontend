@@ -18,6 +18,7 @@ import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { SaleinvoiceorderlistComponent } from '../saleinvoiceorderlist/saleinvoiceorderlist.component';
+import { HelpIconComponent } from '../../help/help-icon.component';
 
 
 
@@ -26,7 +27,7 @@ declare var bootstrap;
   selector: 'app-salesinvoice',
   standalone: true,
   imports: [AdminCommmonModule, OrderslistComponent, SaleinvoiceorderlistComponent,
-    SalesInvoiceListComponent, NzModalModule, NzButtonModule, NzIconModule],
+    SalesInvoiceListComponent, NzModalModule, NzButtonModule, NzIconModule, HelpIconComponent],
   templateUrl: './salesinvoice.component.html',
   styleUrls: ['./salesinvoice.component.scss']
 })
@@ -270,6 +271,20 @@ ngOnInit() {
         }
         this.initDraftAutoSave();
         this.checkAndRestoreDraft();
+
+        // Arrived from "Create Invoice" (Billable Hours): open the Sales Invoice
+        // List modal so the user lands on the list (to view/print the new
+        // invoice) rather than a blank create form.
+        if (window.history.state?.openInvoiceList) {
+            history.replaceState({}, '', window.location.href);
+            setTimeout(() => {
+                this.showSaleInvoiceListFn();
+                const modalEl = document.getElementById('exampleModal');
+                if (modalEl && (window as any).bootstrap) {
+                    new (window as any).bootstrap.Modal(modalEl).show();
+                }
+            }, 300);
+        }
     });
 }
   // ngOnInit() {
@@ -681,29 +696,88 @@ async autoFillProductDetails(field, data) {
   // }
 
   getInvoiceNo() {
-    this.invoiceNumber = null;
-
-    // Get bill_type from form model
-    const billType = this.formConfig.model?.sale_invoice_order?.bill_type || '';
-    const prefix = billType === 'OTHERS' ? 'SOO-INV' : 'SO-INV';
-
-    // First generate shipping number
-    this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
-      if (res?.data?.order_number) {
-        this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
-
-        // Now generate invoice number based on bill_type
-        this.http.get(`masters/generate_order_no/?type=${prefix}`).subscribe((res: any) => {
-          if (res?.data?.order_number) {
-            this.formConfig.model['sale_invoice_order']['invoice_no'] = res.data.order_number;
-            this.invoiceNumber = res.data.order_number;
-            console.log("SaleInvoice NO: ", this.invoiceNumber);
-            console.log("get SaleInvoice number called");
-          }
-        });
-      }
-    });
+  if (this.SaleInvoiceEditID) {
+    return;
   }
+  
+  this.invoiceNumber = null;
+
+  // Get bill_type from form model
+  const billType = this.formConfig.model?.sale_invoice_order?.bill_type || '';
+  const prefix = billType === 'OTHERS' ? 'SOO-INV' : 'SO-INV';
+
+  // First generate shipping number
+  this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
+    if (res?.data?.order_number) {
+      this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
+
+      // Now generate invoice number based on bill_type
+      this.http.get(`masters/generate_order_no/?type=${prefix}`).subscribe((res: any) => {
+        if (res?.data?.order_number) {
+          this.formConfig.model['sale_invoice_order']['invoice_no'] = res.data.order_number;
+          this.invoiceNumber = res.data.order_number;
+          console.log("SaleInvoice NO: ", this.invoiceNumber);
+          
+          // FIX: Update the invoice_no form control
+          this.updateInvoiceNoControl();
+          
+          this.cdr.detectChanges(); // Trigger change detection
+        }
+      });
+    }
+  });
+}
+
+// Add this helper method inside your component class
+updateInvoiceNoControl() {
+  if (!this.formConfig?.fields) return;
+  
+  // Search for invoice_no field and update its formControl
+  const searchAndUpdate = (fields: any[]): boolean => {
+    for (const field of fields) {
+      if (field.key === 'invoice_no' && field.formControl) {
+        field.formControl.setValue(this.formConfig.model['sale_invoice_order']['invoice_no']);
+        console.log('Invoice No control updated:', field.formControl.value);
+        return true;
+      }
+      if (field.fieldGroup && searchAndUpdate(field.fieldGroup)) return true;
+      if (field.fieldArray?.fieldGroup && searchAndUpdate(field.fieldArray.fieldGroup)) return true;
+    }
+    return false;
+  };
+  
+  searchAndUpdate(this.formConfig.fields);
+}
+
+  // getInvoiceNo() {
+  //   // this.invoiceNumber = null;
+
+  //   // Get bill_type from form model
+  //   const billType = this.formConfig.model?.sale_invoice_order?.bill_type || '';
+  //   const prefix = billType === 'OTHERS' ? 'SOO-INV' : 'SO-INV';
+
+  //   // First generate shipping number
+  //   this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
+  //     if (res?.data?.order_number) {
+  //       this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
+
+  //       // Now generate invoice number based on bill_type
+  //       this.http.get(`masters/generate_order_no/?type=${prefix}`).subscribe((res: any) => {
+  //         console.log("We entered in the invoice no method...");
+  //         console.log("Response for invoice number: ", res?.data?.order_number);
+  //         if (res?.data?.order_number) {
+  //           console.log("We entered in the invoice no method -2...");
+  //           this.formConfig.model['sale_invoice_order']['invoice_no'] = res.data.order_number;
+  //           this.invoiceNumber = res.data.order_number;
+  //           console.log("SaleInvoice NO: ", this.invoiceNumber);
+  //           console.log("get SaleInvoice number called");
+  //         }
+
+  //         this.cdr.detectChanges(); 
+  //       });
+  //     }
+  //   });
+  // }
 
 
   showSaleInvoiceListFn() {
@@ -1648,6 +1722,11 @@ createSaleInovice() {
       setTimeout(() => {
         this.showSuccessToast = false;
       }, 3000);
+
+      setTimeout(() => {
+        this.updateInvoiceNoControl();
+        this.cdr.detectChanges();
+      }, 100);
     }, error => {
       console.error('Error creating record:', error);
     });
@@ -1742,14 +1821,39 @@ createSaleInovice() {
     this.setFormConfig();
     if (this.formConfig.model?.sale_invoice_order) {
       this.formConfig.model['sale_invoice_order']['order_type'] = 'sale_invoice';
+      this.formConfig.model['sale_invoice_order']['bill_type'] = 'CASH'; // Reset to default
+      this.formConfig.model['sale_invoice_order']['invoice_no'] = ''; // Clear invoice_no
     }
     if (this.formConfig.fields?.[2]) {
       this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = true;
       this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide = true;
     }
-    this.getInvoiceNo();
+    
+    // Clear the invoice_no form control value
+    this.updateInvoiceNoControl();
+    
+    this.getInvoiceNo(); // This will generate new number
     this.initDraftAutoSave();
   }
+  // private resetToNewForm(): void {
+  //   this.SaleInvoiceEditID = null;
+  //   this.pulledSaleOrderIds.clear();
+  //   this.showSaleInvoiceList = false;
+  //   this.customerNotes = '';
+  //   this.customerTransporterName = '';
+  //   this.customerTransportNotes = '';
+  //   this.showCustomerInfoBanner = false;
+  //   this.setFormConfig();
+  //   if (this.formConfig.model?.sale_invoice_order) {
+  //     this.formConfig.model['sale_invoice_order']['order_type'] = 'sale_invoice';
+  //   }
+  //   if (this.formConfig.fields?.[2]) {
+  //     this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = true;
+  //     this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide = true;
+  //   }
+  //   this.getInvoiceNo();
+  //   this.initDraftAutoSave();
+  // }
 
   setFormConfig() {
     this.SaleInvoiceEditID = null;
@@ -1812,57 +1916,112 @@ createSaleInovice() {
               className: 'col-lg-9 col-md-8 col-12 p-0',
               fieldGroupClassName: "ant-row mx-0 row align-items-end mt-2",
               fieldGroup: [           
+                // {
+                //   key: 'bill_type',
+                //   type: 'select',
+                //   className: 'col-md-4 col-sm-6 col-12',
+                //   templateOptions: {
+                //     label: 'Bill type',
+                //     options: [
+                //       { label: 'Cash', value: 'CASH' },
+                //       { label: 'Credit', value: 'CREDIT' },
+                //       { label: 'Others', value: 'OTHERS' }
+                //     ],
+                //     required: true
+                //   },
+                //   hooks: {
+                //     onInit: (field: any) => {
+                //       const billTypeControl = field.formControl;
+                //       const invoiceModel = this.formConfig.model?.sale_invoice_order || {};
+
+                //       // Set default value or existing one
+                //       if (this.dataToPopulate?.sale_invoice_order?.bill_type && billTypeControl) {
+                //         billTypeControl.setValue(this.dataToPopulate.sale_invoice_order.bill_type, { emitEvent: false });
+                //       } else {
+                //         billTypeControl.setValue('CASH', { emitEvent: false });
+                //         invoiceModel.bill_type = 'CASH';
+                //       }
+
+                //       let invoiceGenerated = false;
+
+                //       billTypeControl.valueChanges.subscribe((billType: string) => {
+                //         invoiceModel.bill_type = billType;
+
+                //         if (!this.SaleInvoiceEditID && !invoiceGenerated) {
+                //           invoiceGenerated = true;
+                //           const prefix = billType?.toLowerCase() === 'others' ? 'SOO-INV' : 'SO-INV';
+
+                //           this.http.get(`masters/generate_order_no/?type=${prefix}`).subscribe((res: any) => {
+                //             if (res?.data?.order_number) {
+                //               this.invoiceNumber = res.data.order_number;
+                //               invoiceModel.invoice_no = this.invoiceNumber;
+
+                //               const invoiceNoControl = field.form.get('invoice_no');
+                //               if (invoiceNoControl) {
+                //                 invoiceNoControl.setValue(this.invoiceNumber);
+                //               }
+                //             }
+                //           });
+                //         }
+                //       });
+                //     }
+                //   }
+                // },  
                 {
-                  key: 'bill_type',
-                  type: 'select',
-                  className: 'col-md-4 col-sm-6 col-12',
-                  templateOptions: {
-                    label: 'Bill type',
-                    options: [
-                      { label: 'Cash', value: 'CASH' },
-                      { label: 'Credit', value: 'CREDIT' },
-                      { label: 'Others', value: 'OTHERS' }
-                    ],
-                    required: true
-                  },
-                  hooks: {
-                    onInit: (field: any) => {
-                      const billTypeControl = field.formControl;
-                      const invoiceModel = this.formConfig.model?.sale_invoice_order || {};
+  key: 'bill_type',
+  type: 'select',
+  className: 'col-md-4 col-sm-6 col-12',
+  templateOptions: {
+    label: 'Bill type',
+    options: [
+      { label: 'Cash', value: 'CASH' },
+      { label: 'Credit', value: 'CREDIT' },
+      { label: 'Others', value: 'OTHERS' }
+    ],
+    required: true
+  },
+  hooks: {
+    onInit: (field: any) => {
+      const billTypeControl = field.formControl;
+      const invoiceModel = this.formConfig.model?.sale_invoice_order || {};
 
-                      // Set default value or existing one
-                      if (this.dataToPopulate?.sale_invoice_order?.bill_type && billTypeControl) {
-                        billTypeControl.setValue(this.dataToPopulate.sale_invoice_order.bill_type, { emitEvent: false });
-                      } else {
-                        billTypeControl.setValue('CASH', { emitEvent: false });
-                        invoiceModel.bill_type = 'CASH';
-                      }
+      // Set default value or existing one
+      if (this.dataToPopulate?.sale_invoice_order?.bill_type && billTypeControl) {
+        billTypeControl.setValue(this.dataToPopulate.sale_invoice_order.bill_type, { emitEvent: false });
+      } else {
+        billTypeControl.setValue('CASH', { emitEvent: false });
+        invoiceModel.bill_type = 'CASH';
+      }
 
-                      let invoiceGenerated = false;
+      // REMOVED the invoiceGenerated flag
+      // let invoiceGenerated = false;  // DELETE THIS LINE
 
-                      billTypeControl.valueChanges.subscribe((billType: string) => {
-                        invoiceModel.bill_type = billType;
+      billTypeControl.valueChanges.subscribe((billType: string) => {
+        invoiceModel.bill_type = billType;
 
-                        if (!this.SaleInvoiceEditID && !invoiceGenerated) {
-                          invoiceGenerated = true;
-                          const prefix = billType?.toLowerCase() === 'others' ? 'SOO-INV' : 'SO-INV';
+        // REMOVED the !invoiceGenerated condition
+        if (!this.SaleInvoiceEditID) {  // REMOVED: && !invoiceGenerated
+          // invoiceGenerated = true;  // DELETE THIS LINE
+          const prefix = billType?.toLowerCase() === 'others' ? 'SOO-INV' : 'SO-INV';
 
-                          this.http.get(`masters/generate_order_no/?type=${prefix}`).subscribe((res: any) => {
-                            if (res?.data?.order_number) {
-                              this.invoiceNumber = res.data.order_number;
-                              invoiceModel.invoice_no = this.invoiceNumber;
+          this.http.get(`masters/generate_order_no/?type=${prefix}`).subscribe((res: any) => {
+            if (res?.data?.order_number) {
+              this.invoiceNumber = res.data.order_number;
+              invoiceModel.invoice_no = this.invoiceNumber;
 
-                              const invoiceNoControl = field.form.get('invoice_no');
-                              if (invoiceNoControl) {
-                                invoiceNoControl.setValue(this.invoiceNumber);
-                              }
-                            }
-                          });
-                        }
-                      });
-                    }
-                  }
-                },                     
+              const invoiceNoControl = field.form.get('invoice_no');
+              if (invoiceNoControl) {
+                invoiceNoControl.setValue(this.invoiceNumber);
+              }
+              
+              this.cdr.detectChanges(); // Add this to force UI update
+            }
+          });
+        }
+      });
+    }
+  }
+},                   
                 {
                   key: 'customer',
                   type: 'customer-dropdown',
@@ -1919,7 +2078,7 @@ createSaleInovice() {
                     placeholder: 'Enter Invoice No',
                     required: true,
                     readonly: false,
-                    disabled: false
+                    disabled: true
 
                   },
                   hooks: {
@@ -2414,7 +2573,10 @@ createSaleInovice() {
                         console.error(`Products at index ${currentRowIndex} is not defined. Initializing...`);
                         this.formConfig.model['sale_invoice_items'][currentRowIndex] = {};
                       }
-                      this.formConfig.model['sale_invoice_items'][currentRowIndex]['product_id'] = data?.product_id;
+                      // Write to the row's OWN model object (formly renumbers row keys on
+                      // delete, so the captured currentRowIndex goes stale). Fallback keeps
+                      // old behaviour if the row model is ever unavailable.
+                      (field.parent?.model ?? this.formConfig.model['sale_invoice_items'][currentRowIndex])['product_id'] = data?.product_id;
                       this.loadProductVariations(field);
                       this.autoFillProductDetails(field, data); // to fill the remaining fields when product is selected.
                       this.triggerDraftSave(); // Auto-save draft on product change
@@ -2525,7 +2687,7 @@ createSaleInovice() {
                         console.warn(`Product missing for row ${currentRowIndex}, skipping color fetch.`);
                         return;
                       }
-                      this.formConfig.model['sale_invoice_items'][currentRowIndex]['size_id'] = selectedSize?.size_id;
+                      (field.parent?.model ?? this.formConfig.model['sale_invoice_items'][currentRowIndex])['size_id'] = selectedSize?.size_id;
               
                       const size_id = selectedSize?.size_id || null;
                       const url = size_id
@@ -2601,7 +2763,7 @@ createSaleInovice() {
                         return;
                       }
 
-                      this.formConfig.model['sale_invoice_items'][currentRowIndex]['color_id'] = selectedColor?.color_id;
+                      (field.parent?.model ?? this.formConfig.model['sale_invoice_items'][currentRowIndex])['color_id'] = selectedColor?.color_id;
               
                       const color_id = selectedColor?.color_id || null;
                       console.log('color_id :', color_id)
@@ -2878,6 +3040,10 @@ createSaleInovice() {
                       if (field.form && field.form.controls && field.form.controls.quantity && data) {
                         const quantity = field.form.controls.quantity.value;
                         const rate = data;
+                        // Keep the row's own model rate in sync — formly's implicit
+                        // control→model sync can lag after a row delete + re-add, which
+                        // corrupted the order total.
+                        if (field.parent?.model) { field.parent.model.rate = data; }
                         if (rate && quantity) {
                           field.form.controls.amount.setValue(parseFloat(rate) * parseFloat(quantity));
                         }

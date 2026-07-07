@@ -4,6 +4,7 @@ import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule, DatePipe, formatDate } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { WorkOrderListComponent } from './work-order-list/work-order-list.component';
+import { HelpIconComponent } from '../help/help-icon.component';
 import { TaCurdConfig } from '@ta/ta-curd';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 
@@ -11,7 +12,7 @@ import { FormlyFieldConfig } from '@ngx-formly/core';
 @Component({
   selector: 'app-production',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, WorkOrderListComponent],
+  imports: [CommonModule, AdminCommmonModule, WorkOrderListComponent, HelpIconComponent],
   templateUrl: './workorder.component.html',
   styleUrls: ['./workorder.component.scss']
 })
@@ -1664,7 +1665,9 @@ closeSyncModal() {
                                 console.error(`Products at index ${currentRowIndex} is not defined. Initializing...`);
                                 this.formConfig.model['bom'][currentRowIndex] = {};
                               }
-                              this.formConfig.model['bom'][currentRowIndex]['product_id'] = data?.product_id;
+                              // Write to the row's own model object (captured currentRowIndex
+                              // goes stale after a formly row delete). Fallback = old behaviour.
+                              (field.parent?.model ?? this.formConfig.model['bom'][currentRowIndex])['product_id'] = data?.product_id;
                               this.loadProductVariations(field);
                               
                               // Display product info when a product is selected (similar to Sales Order)

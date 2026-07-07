@@ -4,10 +4,11 @@ import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { WorkflowListComponent } from './workflow-list/workflow-list.component';
+import { HelpIconComponent } from '../help/help-icon.component';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, WorkflowListComponent],
+  imports: [CommonModule, AdminCommmonModule, WorkflowListComponent, HelpIconComponent],
   selector: 'app-workflow',
   templateUrl: './workflow.component.html',
   styleUrls: ['./workflow.component.scss']
@@ -25,6 +26,15 @@ export class WorkflowComponent {
     this.workflowEditID = null;
     // Initialize form configuration
     this.setFormConfig();
+    // The list is the default view; the form opens only for Create or Edit
+    // (showing both at once stacked the list and form together).
+    this.showForm = false;
+  }
+
+  // Open a fresh form to create a new workflow
+  createWorkflow() {
+    this.setFormConfig();        // builds an empty form (also clears workflowEditID)
+    this.showWorkflowList = false;
     this.showForm = true;
   }
 

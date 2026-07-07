@@ -4,10 +4,11 @@ import { Component, ViewChild } from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { AssetMaintenanceListComponent } from './asset-maintenance-list/asset-maintenance-list.component';
+import { HelpIconComponent } from '../../help/help-icon.component';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, AssetMaintenanceListComponent],
+  imports: [CommonModule, AdminCommmonModule, AssetMaintenanceListComponent, HelpIconComponent],
   selector: 'app-asset-maintenance',
   templateUrl: './asset-maintenance.component.html',
   styleUrls: ['./asset-maintenance.component.scss']

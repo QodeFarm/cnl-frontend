@@ -5,13 +5,14 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TasksListComponent } from './tasks-list/tasks-list.component';
+import { HelpIconComponent } from '../help/help-icon.component';
 import { UserService } from 'src/app/services/user.service';  // Import the UserService
 import { CustomFieldHelper } from '../utils/custom_field_fetch';
 
 @Component({
   selector: 'app-tasks',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, TasksListComponent],
+  imports: [CommonModule, AdminCommmonModule, TasksListComponent, HelpIconComponent],
   templateUrl: './tasks.component.html',
   styleUrls: ['./tasks.component.scss']
 })

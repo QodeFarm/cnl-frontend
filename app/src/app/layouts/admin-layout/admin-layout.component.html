@@ -222,6 +222,9 @@
                         <li>
                             <a [routerLink]="['/admin/company/document-print-settings']"><i class="fas fa-print"></i> Document Print Settings</a>
                         </li>
+                        <li>
+                            <a [routerLink]="['/admin/help']"><i class="fas fa-question-circle"></i> User Guide</a>
+                        </li>
                     </ul>
                 </div>
             </li>
@@ -256,6 +259,13 @@
                     </ul>
                 </div>
             </li> -->
+
+            <!-- User Guide / Help (context-aware: opens the topic for the active tab) -->
+            <li class="nav-item no-arrow mx-1">
+                <a class="nav-link" role="button" (click)="openContextHelp()" title="Help for this screen">
+                    <i class="fas fa-question-circle fa-fw"></i>
+                </a>
+            </li>
 
             <!-- Refresh current tab -->
             <li class="nav-item no-arrow mx-1">
@@ -379,9 +389,13 @@
         <li class="sidebar-search-wrapper">
             <div class="sidebar-search-box">
                 <i class="fas fa-search sidebar-search-icon"></i>
-                <input type="text" class="sidebar-search-input" placeholder="Search menu..." [ngModel]="menuSearchText"
-                    (ngModelChange)="menuSearchText = $event; onMenuSearchChange()" autocomplete="off" />
-                <i *ngIf="menuSearchText" class="fas fa-times sidebar-search-clear" (click)="clearMenuSearch()"></i>
+                <input #menuSearchInput type="text" class="sidebar-search-input" placeholder="Search menu..."
+                    [ngModel]="menuSearchText" (ngModelChange)="menuSearchText = $event; onMenuSearchChange()"
+                    (keydown)="onSearchKeydown($event)" autocomplete="off" spellcheck="false"
+                    aria-label="Search menu" />
+                <kbd *ngIf="!menuSearchText" class="sidebar-search-kbd">{{ shortcutLabel }}</kbd>
+                <i *ngIf="menuSearchText" class="fas fa-times sidebar-search-clear" (click)="clearMenuSearch()"
+                    title="Clear search"></i>
             </div>
         </li>
         <ul class="custome-horizental-scroll" style="list-style: none; padding: 0; margin: 0;">
@@ -393,27 +407,55 @@
                 [ngClass]="{'sub-menu': (m.module_sections && m.module_sections.length > 0)}">
                 <!-- No children -->
                 <a *ngIf="!(m.module_sections && m.module_sections.length > 0)" class="nav-link"
+                    [class.result-active]="isMenuSearching && m._ri === activeResultIndex"
                     [routerLink]="[m.sec_link]" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
                     (click)="closeMenu()">
-                    <i class="" [ngClass]="m.mod_icon"></i><span>{{m.module_name}}</span>
+                    <i class="" [ngClass]="m.mod_icon"></i>
+                    <span *ngIf="!isMenuSearching">{{m.module_name}}</span>
+                    <span *ngIf="isMenuSearching" [innerHTML]="highlightMatch(m.module_name)"></span>
                 </a>
-                <!-- Has children — normal mode (no search) -->
-                <a *ngIf="m.module_sections && m.module_sections.length > 0 && !isMenuSearching"
-                    class="nav-link collapsed" [ngClass]="{ 'active': isActive(m.sec_link, m.module_sections)}"
-                    [attr.data-bs-toggle]="'collapse'" [attr.data-bs-target]="'#collapseMenu'+i"
-                    [attr.aria-expanded]="'true'" [attr.aria-controls]="'collapseMenu'+i">
-                    <i [ngClass]="m.mod_icon"></i>
-                    <span>{{m.module_name}}</span>
-                </a>
-                <div *ngIf="m.module_sections && m.module_sections.length > 0 && !isMenuSearching"
-                    id="collapseMenu{{i}}" class="collapse sub-menu-items" [attr.aria-labelledby]="'heading'+i"
-                    [attr.data-parent]="'#accordionSidebar'">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <a (click)="closeMenu()" class="collapse-item" *ngFor="let sm of m.module_sections"
-                            [routerLink]="[sm.sec_link]" routerLinkActive="active"
-                            [routerLinkActiveOptions]="{ exact: true }" [title]="sm.section_name">{{sm.section_name}}</a>
+                <!-- Has children — COLLAPSED sidebar: CDK overlay fly-out on hover -->
+                <ng-container *ngIf="m.module_sections && m.module_sections.length > 0 && !isMenuSearching && !isSidebarExpanded">
+                    <a class="nav-link collapsed" [ngClass]="{ 'active': isActive(m.sec_link, m.module_sections)}"
+                        cdkOverlayOrigin #trig="cdkOverlayOrigin"
+                        (mouseenter)="openFlyout(i)" (mouseleave)="scheduleCloseFlyout()">
+                        <i [ngClass]="m.mod_icon"></i>
+                        <span>{{m.module_name}}</span>
+                    </a>
+                    <ng-template cdkConnectedOverlay
+                        [cdkConnectedOverlayOrigin]="trig"
+                        [cdkConnectedOverlayOpen]="flyoutIndex === i"
+                        [cdkConnectedOverlayPositions]="flyoutPositions"
+                        [cdkConnectedOverlayPush]="true"
+                        [cdkConnectedOverlayViewportMargin]="8">
+                        <div class="sb-flyout" (mouseenter)="keepFlyoutOpen()" (mouseleave)="scheduleCloseFlyout()">
+                            <div class="sb-flyout__title">{{m.module_name}}</div>
+                            <div class="sb-flyout__list">
+                                <a class="sb-flyout__item" *ngFor="let sm of m.module_sections"
+                                    [routerLink]="[sm.sec_link]" routerLinkActive="active"
+                                    [routerLinkActiveOptions]="{ exact: true }"
+                                    (click)="closeFlyout(); closeMenu()" [title]="sm.section_name">{{sm.section_name}}</a>
+                            </div>
+                        </div>
+                    </ng-template>
+                </ng-container>
+                <!-- Has children — EXPANDED sidebar: inline accordion -->
+                <ng-container *ngIf="m.module_sections && m.module_sections.length > 0 && !isMenuSearching && isSidebarExpanded">
+                    <a class="nav-link collapsed" [ngClass]="{ 'active': isActive(m.sec_link, m.module_sections)}"
+                        [attr.data-bs-toggle]="'collapse'" [attr.data-bs-target]="'#collapseMenu'+i"
+                        [attr.aria-expanded]="'true'" [attr.aria-controls]="'collapseMenu'+i">
+                        <i [ngClass]="m.mod_icon"></i>
+                        <span>{{m.module_name}}</span>
+                    </a>
+                    <div id="collapseMenu{{i}}" class="collapse sub-menu-items" [attr.aria-labelledby]="'heading'+i"
+                        [attr.data-parent]="'#accordionSidebar'">
+                        <div class="bg-white py-2 collapse-inner rounded">
+                            <a (click)="closeMenu()" class="collapse-item" *ngFor="let sm of m.module_sections"
+                                [routerLink]="[sm.sec_link]" routerLinkActive="active"
+                                [routerLinkActiveOptions]="{ exact: true }" [title]="sm.section_name">{{sm.section_name}}</a>
+                        </div>
                     </div>
-                </div>
+                </ng-container>
                 <!-- Has children — search mode (auto-expanded) -->
                 <a *ngIf="m.module_sections && m.module_sections.length > 0 && isMenuSearching" class="nav-link"
                     [ngClass]="{ 'active': isActive(m.sec_link, m.module_sections)}">
@@ -424,8 +466,10 @@
                     class="sub-menu-items search-expanded">
                     <div class="py-2 collapse-inner">
                         <a (click)="closeMenu(); clearMenuSearch()" class="collapse-item"
+                            [class.result-active]="sm._ri === activeResultIndex"
                             *ngFor="let sm of m.module_sections" [routerLink]="[sm.sec_link]" routerLinkActive="active"
-                            [routerLinkActiveOptions]="{ exact: true }" [title]="sm.section_name">{{sm.section_name}}</a>
+                            [routerLinkActiveOptions]="{ exact: true }" [title]="sm.section_name"
+                            [innerHTML]="highlightMatch(sm.section_name)"></a>
                     </div>
                 </div>
             </li>

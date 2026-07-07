@@ -13,11 +13,12 @@ import { CustomFieldHelper } from '../../utils/custom_field_fetch';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { calculateTotalAmount, displayInformation, getUnitData, sumQuantities } from 'src/app/utils/display.utils';
 import { DrilldownEditService } from 'src/app/services/drilldown-edit.service';
+import { HelpIconComponent } from '../../help/help-icon.component';
 
 @Component({
   selector: 'app-purchasereturnorders',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, PurchasereturnordersListComponent],
+  imports: [CommonModule, AdminCommmonModule, PurchasereturnordersListComponent, HelpIconComponent],
   templateUrl: './purchasereturnorders.component.html',
   styleUrls: ['./purchasereturnorders.component.scss']
 })
@@ -500,21 +501,68 @@ checkAndPopulateData() {
     this.getOrderNo();
   }
 
-  getOrderNo() {
-    this.orderNumber = null;
-    this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
-      if (res && res.data && res.data.order_number) {
-        this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
+  // getOrderNo() {
+  //   this.orderNumber = null;
+  //   this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
+  //     if (res && res.data && res.data.order_number) {
+  //       this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
 
-        this.http.get('masters/generate_order_no/?type=PR').subscribe((res: any) => {
-          if (res && res.data && res.data.order_number) {
-            this.formConfig.model['purchase_return_orders']['return_no'] = res.data.order_number;
-            this.orderNumber = res.data.order_number;
-          }
-        });;
-      }
-    });
+  //       this.http.get('masters/generate_order_no/?type=PR').subscribe((res: any) => {
+  //         if (res && res.data && res.data.order_number) {
+  //           this.formConfig.model['purchase_return_orders']['return_no'] = res.data.order_number;
+  //           this.orderNumber = res.data.order_number;
+  //         }
+  //       });;
+  //     }
+  //   });
+  // }
+
+getOrderNo() {
+  if (this.PurchaseReturnOrderEditID) {
+    return;
   }
+  
+  this.orderNumber = null;
+  
+  this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
+    if (res && res.data && res.data.order_number) {
+      this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
+
+      this.http.get('masters/generate_order_no/?type=PR').subscribe((res: any) => {
+        if (res && res.data && res.data.order_number) {
+          this.formConfig.model['purchase_return_orders']['return_no'] = res.data.order_number;
+          this.orderNumber = res.data.order_number;
+          console.log("Purchase Return NO: ", this.orderNumber);
+          
+          // FIX: Update the return_no form control
+          this.updateReturnNoControl();
+          
+          this.cdr.detectChanges(); // Trigger change detection
+        }
+      });
+    }
+  });
+}
+
+// Add this helper method
+updateReturnNoControl() {
+  if (!this.formConfig?.fields) return;
+  
+  const searchAndUpdate = (fields: any[]): boolean => {
+    for (const field of fields) {
+      if (field.key === 'return_no' && field.formControl) {
+        field.formControl.setValue(this.formConfig.model['purchase_return_orders']['return_no']);
+        console.log('Purchase Return No control updated:', field.formControl.value);
+        return true;
+      }
+      if (field.fieldGroup && searchAndUpdate(field.fieldGroup)) return true;
+      if (field.fieldArray?.fieldGroup && searchAndUpdate(field.fieldArray.fieldGroup)) return true;
+    }
+    return false;
+  };
+  
+  searchAndUpdate(this.formConfig.fields);
+}
 
   showPurchaseReturnOrderListFn() {
     this.showPurchaseReturnOrderList = true;
@@ -1161,7 +1209,9 @@ showSuccessToast = false;
                         console.error(`Products at index ${currentRowIndex} is not defined. Initializing...`);
                         this.formConfig.model['purchase_return_items'][currentRowIndex] = {};
                       }
-                      this.formConfig.model['purchase_return_items'][currentRowIndex]['product_id'] = data?.product_id;
+                      // Write to the row's own model object (captured currentRowIndex goes
+                      // stale after a formly row delete). Fallback preserves old behaviour.
+                      (field.parent?.model ?? this.formConfig.model['purchase_return_items'][currentRowIndex])['product_id'] = data?.product_id;
                       this.loadProductVariations(field);
                       this.autoFillProductDetails(field, data); // to fill the remaining fields when product is selected.
                     });
@@ -1273,7 +1323,7 @@ showSuccessToast = false;
                         console.warn(`Product missing for row ${currentRowIndex}, skipping color fetch.`);
                         return;
                       }
-                      this.formConfig.model['purchase_return_items'][currentRowIndex]['size_id'] = selectedSize?.size_id;
+                      (field.parent?.model ?? this.formConfig.model['purchase_return_items'][currentRowIndex])['size_id'] = selectedSize?.size_id;
               
                       const size_id = selectedSize?.size_id || null;
                       const url = size_id
@@ -1349,7 +1399,7 @@ showSuccessToast = false;
                         return;
                       }
 
-                      this.formConfig.model['purchase_return_items'][currentRowIndex]['color_id'] = selectedColor?.color_id;
+                      (field.parent?.model ?? this.formConfig.model['purchase_return_items'][currentRowIndex])['color_id'] = selectedColor?.color_id;
               
                       const color_id = selectedColor?.color_id || null;
                       console.log('color_id :', color_id)
@@ -1525,6 +1575,9 @@ showSuccessToast = false;
                       if (field.form && field.form.controls && field.form.controls.quantity && data) {
                         const quantity = field.form.controls.quantity.value;
                         const rate = data;
+                        // Keep the row's own model rate in sync (formly implicit sync can
+                        // lag after a row delete + re-add, corrupting the total).
+                        if (field.parent?.model) { field.parent.model.rate = data; }
                         if (rate && quantity) {
                           field.form.controls.amount.setValue(parseFloat(rate) * parseFloat(quantity));
                         }

@@ -1,10 +1,13 @@
 <div class="container-fluid p-3">
     <div class="employee-leaves-banner">
         <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
-            <button type="button" class="btn pl-0" >
+            <div class="d-flex align-items-center" style="gap: 6px;">
+              <button type="button" class="btn p-0" >
                 <span *ngIf="EmployeeLeavesEditID" class="custom-heading">Update Leaves</span>
                 <span *ngIf="!EmployeeLeavesEditID" class="custom-heading">Create Leaves</span>
-            </button>
+              </button>
+              <app-help-icon topic="hrms-leaves"></app-help-icon>
+            </div>
             <button (click)="showEmployeeLeavesListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
                 Leaves List
             </button>
@@ -20,9 +23,7 @@
     </div>
 </div>
 
-
 <!-- Employee Leaves Modal -->
-
 <div class="modal fade custom-modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl ">
         <div class="modal-content">
@@ -35,7 +36,6 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-                <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
             </div>
         </div>
     </div>

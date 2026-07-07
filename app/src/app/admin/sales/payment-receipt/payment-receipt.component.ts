@@ -9,12 +9,13 @@ import { TaTableComponent, TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { PaymentReceiptListComponent } from './payment-receipt-list/payment-receipt-list.component';
 import { ActivatedRoute, Router } from '@angular/router';
- 
+import { HelpIconComponent } from '../../help/help-icon.component';
+
 
 @Component({
   selector: 'app-payment-receipt',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, PaymentReceiptListComponent],
+  imports: [CommonModule, AdminCommmonModule, PaymentReceiptListComponent, HelpIconComponent],
   templateUrl: './payment-receipt.component.html',
   styleUrls: ['./payment-receipt.component.scss']
 })

@@ -4,11 +4,12 @@ import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { AssetsListComponent } from './assets-list/assets-list.component';
+import { HelpIconComponent } from '../help/help-icon.component';
 
 @Component({
   selector: 'app-assets',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, AssetsListComponent],
+  imports: [CommonModule, AdminCommmonModule, AssetsListComponent, HelpIconComponent],
   templateUrl: './assets.component.html',
   styleUrls: ['./assets.component.scss']
 })

@@ -1,0 +1,263 @@
+/* ── Identity Documents (Govt. ID) section — Employee form only ─────────
+   Scoped restyle of the shared file widget for this screen; the widget
+   itself (used by Sales, Purchase, Products…) is untouched. */
+:host ::ng-deep .govt-id-card {
+
+  .govt-id-header {
+    padding: 12px 12px 0;
+
+    .govt-id-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #142768;
+
+      i {
+        color: #1890ff;
+        font-size: 15px;
+      }
+    }
+
+    .govt-id-hint {
+      font-size: 12.5px;
+      color: #8a94a6;
+      margin: 2px 0 0 23px;
+    }
+  }
+
+  .govt-id-upload {
+    padding: 10px 12px 14px;
+
+    /* dropzone + camera button as one aligned row (wraps on mobile) */
+    ta-field-file {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: flex-start;
+
+      ta-file-upload {
+        flex: 1 1 320px;
+        min-width: 240px;
+      }
+
+      ta-camera-capture {
+        flex: 0 0 auto;
+      }
+    }
+
+    .ant-upload.ant-upload-drag {
+      border: 1.5px dashed #c3cbd9;
+      border-radius: 8px;
+      background: #f8fafd;
+      transition: border-color .2s ease, background .2s ease;
+
+      &:hover {
+        border-color: #1890ff;
+        background: #f0f7ff;
+      }
+
+      .ant-upload-btn {
+        background: transparent;
+        padding: 14px 12px !important;
+      }
+
+      .ant-upload-text {
+        font-size: 13px;
+        color: #5a6577;
+      }
+    }
+
+    /* compact upload icon (hidden app-wide; restored just for this card) */
+    .ant-upload-drag-icon {
+      display: block !important;
+      margin-bottom: 2px;
+
+      .anticon {
+        font-size: 20px;
+        color: #1890ff;
+      }
+    }
+
+    /* camera button sized to mirror the dropzone — one professional row */
+    .camera-capture-btn {
+      margin-top: 0;
+      min-height: 76px;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 18px;
+      border-radius: 8px;
+
+      .btn-text {
+        font-size: 12.5px;
+      }
+    }
+  }
+}
+// Credentials Modal Styles
+.credentials-card {
+    padding: 8px 0;
+    
+    .credential-field {
+        margin-bottom: 24px;
+        
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 13px;
+            
+            i {
+                margin-right: 8px;
+                color: #667eea;
+            }
+        }
+        
+        .credential-value {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f8f9fa;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            
+            code {
+                flex: 1;
+                font-size: 14px;
+                color: #2c3e50;
+                word-break: break-all;
+                font-family: monospace;
+            }
+            
+            .btn-copy {
+                background: #667eea;
+                color: white;
+                border: none;
+                padding: 6px 14px;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 12px;
+                transition: all 0.2s;
+                white-space: nowrap;
+                
+                &:hover {
+                    background: #5a67d8;
+                    transform: translateY(-1px);
+                }
+            }
+        }
+    }
+}
+
+// Toast message styles
+.toast-message {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #fff;
+  /* Pure white background */
+  color: #0e0d0d;
+  /* Dark grey text */
+  padding: 12px 30px;
+  width: 370px;
+  /* Wider box */
+  height: 60px;
+  border-radius: 0px;
+  /* No rounded corners */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  /* Soft shadow */
+  display: flex;
+  align-items: center;
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  z-index: 1000;
+  animation: fadeIn 0.4s ease-in-out;
+  border: 2px solid #dcdcdc;
+  /* Subtle border */
+}
+
+/* Circle with white inside and green border */
+.tick-circle {
+  width: 23px;
+  /* Slightly smaller */
+  height: 23px;
+  background-color: #fff;
+  /* White inside */
+  border: 2px solid #28a745;
+  /* Green border */
+  border-radius: 50%;
+  /* Perfect circle */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  /* Space between icon and text */
+}
+
+/* Smaller tick mark inside the white circle */
+.tick-mark {
+  color: #28a745;
+  /* Green tick */
+  font-size: 12px;
+  /* Smaller size */
+  // font-weight: bold;
+  line-height: 1;
+  /* Perfectly centered */
+}
+
+.toast-message-text {
+  flex: 1;
+  color: rgb(41, 41, 41);
+  font-size: 16px;
+  font-weight: 500;
+  /* Medium weight */
+}
+
+/* Close button (X symbol) */
+.toast-close {
+  font-size: 16px;
+  color: rgb(73, 73, 73);
+  cursor: pointer;
+  margin-left: 12px;
+  /* Space between text and close button */
+}
+
+.toast-close:hover {
+  color: #000;
+  /* Darker on hover */
+}
+
+/* Smart navigation action button inside toast */
+.toast-action-btn {
+  background: #1e40af;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 10px;
+  white-space: nowrap;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: #1e3a8a;
+  }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}

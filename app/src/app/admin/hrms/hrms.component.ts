@@ -2,13 +2,14 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, ViewChild} from '@angular/core';
 import { TaFormConfig } from '@ta/ta-form';
 import { EmployeeListComponent } from './employee-list/employee-list.component';
+import { HelpIconComponent } from '../help/help-icon.component';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 @Component({
   selector: 'app-hrms',
   standalone: true,
-  imports: [CommonModule,AdminCommmonModule,EmployeeListComponent],
+  imports: [CommonModule,AdminCommmonModule,EmployeeListComponent, HelpIconComponent],
   templateUrl: './hrms.component.html',
   styleUrls: ['./hrms.component.scss']
 })
@@ -68,6 +69,218 @@ export class EmployeesComponent  implements OnInit {
       this.EmployeeListComponent.refreshTable();
     }
   };
+
+generatedUsername: string = '';
+generatedPassword: string = '';
+
+// Generate credentials for employee
+generateEmployeeCredentials() {
+  // if (!this.EmployeeEditID) {
+  //   alert('Please save the employee first');
+  //   return;
+  // }
+  
+  this.http.post(`hrms/employees/generate-credentials/${this.EmployeeEditID}/`, {}).subscribe(
+    (res: any) => {
+      if (res.success) {
+        // Store generated credentials
+        this.generatedUsername = res.username;
+        this.generatedPassword = res.password;
+        
+        // Update form fields
+        this.formConfig.model.employee.username = res.username;
+        this.formConfig.model.employee.password_display = res.password;
+        this.formConfig.model.employee.is_portal_user = true;
+        
+        // Show the credentials modal
+        const modalElement = document.getElementById('credentialsModal');
+        if (modalElement) {
+          const modal = new (window as any).bootstrap.Modal(modalElement);
+          modal.show();
+        }
+      } else {
+        alert(res.message || 'Error generating credentials');
+      }
+    },
+    (error) => {
+      alert('Error generating credentials');
+    }
+  );
+}
+
+// Copy single field to clipboard
+copyToClipboard(text: string) {
+  navigator.clipboard.writeText(text).then(() => {
+    this.showToast('Copied to clipboard!');
+  });
+}
+
+// Copy both username and password
+copyAllCredentials() {
+  const credentials = `Username: ${this.generatedUsername}\nPassword: ${this.generatedPassword}`;
+  navigator.clipboard.writeText(credentials).then(() => {
+    this.showToast('All credentials copied to clipboard!');
+  });
+}
+
+showSuccessToast: boolean = false;
+toastMessage: string = '';
+
+// Show toast message
+showToast(message: string) {
+  this.toastMessage = message;
+  this.showSuccessToast = true;
+  setTimeout(() => {
+    this.showSuccessToast = false;
+  }, 3000);
+}
+
+// Add this method to hide the credentials modal
+hideCredentialsModal() {
+  const modalElement = document.getElementById('credentialsModal');
+  if (modalElement) {
+    const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
+    if (modal) {
+      modal.hide();
+    }
+  }
+}
+
+// Update your showSendCredentialsPopup method to use the correct modal
+// showSendCredentialsPopup() {
+//   if (!this.EmployeeEditID) {
+//     this.showToast('⚠️ Please save the employee first');
+//     return;
+//   }
+  
+//   // Show the send credentials modal
+//   const modalElement = document.getElementById('sendCredentialsModal');
+//   if (modalElement) {
+//     const modal = new (window as any).bootstrap.Modal(modalElement);
+//     modal.show();
+//   }
+// }
+
+// In your employee component .ts file
+
+// Replace the existing sendViaEmail and sendViaWhatsApp methods
+sendViaEmail() {
+  // Close the modal first
+  const modalElement = document.getElementById('sendCredentialsModal');
+  if (modalElement) {
+    const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
+    if (modal) modal.hide();
+  }
+  
+  // Show loading toast
+  this.showToast('📧 Sending credentials via email...');
+  
+  this.http.post(`hrms/employees/send-credentials/${this.EmployeeEditID}/?method=email`, {}).subscribe(
+    (res: any) => {
+      if (res.success) {
+        this.showToast('✅ Credentials sent successfully via email!');
+        // Update last_sent timestamp in UI if needed
+      } else {
+        this.showToast('❌ ' + (res.message || 'Failed to send email'));
+      }
+    },
+    (error) => {
+      console.error('Email send error:', error);
+      this.showToast('❌ Failed to send email. Please check email configuration.');
+    }
+  );
+}
+
+sendViaWhatsApp() {
+  // Close the modal first
+  const modalElement = document.getElementById('sendCredentialsModal');
+  if (modalElement) {
+    const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
+    if (modal) modal.hide();
+  }
+  
+  // Check if employee has WhatsApp number
+  const phone = this.formConfig?.model?.employee?.phone;
+  if (!phone || phone === '+91') {
+    this.showToast('⚠️ Please add a valid phone number for the employee first');
+    return;
+  }
+  
+  this.showToast('📱 Sending credentials via WhatsApp...');
+  
+  this.http.post(`hrms/employees/send-credentials/${this.EmployeeEditID}/?method=whatsapp`, {}).subscribe(
+    (res: any) => {
+      if (res.success) {
+        this.showToast('✅ Credentials sent successfully via WhatsApp!');
+      } else {
+        this.showToast('❌ ' + (res.message || 'Failed to send WhatsApp message'));
+      }
+    },
+    (error) => {
+      console.error('WhatsApp send error:', error);
+      this.showToast('❌ Failed to send WhatsApp. Please check WhatsApp configuration.');
+    }
+  );
+}
+
+showSendCredentialsPopup() {
+  if (!this.EmployeeEditID) {
+    this.showToast('⚠️ Please save the employee first');
+    return;
+  }
+  
+  // Show the custom modal
+  const modalElement = document.getElementById('sendCredentialsModal');
+  if (modalElement) {
+    const modal = new (window as any).bootstrap.Modal(modalElement);
+    modal.show();
+  }
+}
+
+// // Show send credentials popup
+// showSendCredentialsPopup() {
+//   if (!this.EmployeeEditID) {
+//     alert('Please save the employee first');
+//     return;
+//   }
+  
+//   const method = confirm('Send credentials via Email?\n\nClick OK for Email, Cancel for WhatsApp');
+//   if (method) {
+//     this.sendViaEmail();
+//   } else {
+//     this.sendViaWhatsApp();
+//   }
+// }
+
+// // Send via email
+// sendViaEmail() {
+//   this.http.post(`hrms/employees/send-credentials/${this.EmployeeEditID}/?method=email`, {}).subscribe(
+//     (res: any) => {
+//       alert(res.success ? '✅ Credentials sent via email!' : (res.message || 'Failed to send'));
+//     },
+//     () => alert('Failed to send email')
+//   );
+// }
+
+// // Send via WhatsApp
+// sendViaWhatsApp() {
+//   alert('WhatsApp template under construction. Please use email.');
+// }
+
+findField(key: string): any {
+  const search = (fields: any[]): any => {
+    for (const f of fields) {
+      if (f.key === key) return f;
+      if (f.fieldGroup) {
+        const found = search(f.fieldGroup);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+  return search(this.formConfig.fields || []);
+}
+
 
   setFormConfig() {
     this.EmployeeEditID = null;
@@ -158,34 +371,25 @@ export class EmployeesComponent  implements OnInit {
             //   },
             // },
             {
-              key: 'phone',
-              type: 'input',
-              className: 'col-md-4 col-sm-6 col-12',
-              templateOptions: {
-                label: 'Phone',
-                placeholder: 'Enter with country code',
-                required: true,
-              },
-              // Add hooks to modify the value
-              hooks: {
-                onInit: (field) => {
-                  // Optional: Set initial value with +91
-                  field.formControl.setValue('+91');
-                }
-              },
-              // Default value with +91
-              defaultValue: '+91',
-              // Or use expression properties
-              expressionProperties: {
-                'templateOptions.inputValue': (model) => {
-                  // Auto-prepend +91 if not present
-                  if (model.phone && !model.phone.startsWith('+')) {
-                    return '+91' + model.phone.replace(/^0+/, ''); // Remove leading zeros
-                  }
-                  return model.phone;
-                }
-              }
-            },
+  key: 'phone',
+  type: 'input',
+  className: 'col-md-4 col-sm-6 col-12',
+  templateOptions: {
+    label: 'Phone',
+    placeholder: 'Enter with country code',
+    required: true,
+  },
+  defaultValue: '+91',
+  hooks: {
+    onInit: (field) => {
+      const currentValue = field.formControl.value;
+
+      if (!currentValue) {
+        field.formControl.setValue('+91');
+      }
+    }
+  }
+},
             {
               key: 'gender',
               type: 'select',
@@ -433,19 +637,82 @@ export class EmployeesComponent  implements OnInit {
                 required: false,
               }
             },
+            // Add this at the end of your employee fieldGroup (before closing brackets)
+
+{
+  className: 'col-12 mt-3',
+  fieldGroupClassName: 'row',
+  fieldGroup: [
+    {
+      className: 'col-12',
+      key: 'is_portal_user',
+      type: 'checkbox',
+      templateOptions: {
+        label: 'Enable Employee Portal Access',
+        description: 'Allow employee to login and view their data'
+      },
+      hooks: {
+        onChanges: (field: any) => {
+          const isEnabled = field.formControl.value;
+          const portalFields = ['username', 'password_display'];
+          portalFields.forEach(fieldKey => {
+            const portalField = this.findField(fieldKey);
+            if (portalField) portalField.hide = !isEnabled;
+          });
+        }
+      }
+    },
+    {
+      className: 'col-md-4 col-sm-6 col-12',
+      key: 'username',
+      type: 'input',
+      hide: true,
+      templateOptions: {
+        label: 'Portal Username',
+        placeholder: 'Auto-generated',
+        description: 'Leave empty to auto-generate from name'
+      }
+    },
+    {
+      className: 'col-md-4 col-sm-6 col-12',
+      key: 'password_display',
+      type: 'input',
+      hide: true,
+      templateOptions: {
+        label: 'Password',
+        readonly: true,
+        description: 'Click Generate to create password'
+      }
+    },
+    {
+      key: 'password',
+      type: 'input',
+      hide: true
+    }
+  ]
+},
             {
-              className: 'col-sm-3 col-12 p-0',
-              fieldGroupClassName: "ant-row row mx-0 mt-2",
+              className: 'col-12 custom-form-card-block w-100 p-0 govt-id-card',
+              fieldGroupClassName: "ant-row row mx-0 mt-2 w-100",
               fieldGroup: [
+                {
+                  type: 'template',
+                  className: 'col-12',
+                  template: `
+                    <div class="govt-id-header">
+                      <div class="govt-id-title"><i class="fas fa-id-card"></i>Identity Documents (Govt. ID)</div>
+                      <div class="govt-id-hint">Upload Aadhaar, PAN, Passport or Driving Licence — image or PDF, more than one allowed.</div>
+                    </div>
+                  `
+                },
                 {
                   key: 'picture',
                   type: 'file',
-                  className: 'ta-cell pr-md col d-flex justify-content-md-center pr-0',
-                  templateOptions: {
-                    label: 'Govt. ID',
-                    required: true
-                  }
-                }
+                  className: 'ta-cell col-12 custom-file-attachement govt-id-upload',
+                  props: {
+                    "displayStyle": "files",
+                    "multiple": true,
+                  },}
               ]
             },
           ],

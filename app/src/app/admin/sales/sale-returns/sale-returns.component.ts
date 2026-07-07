@@ -17,13 +17,14 @@ import { CustomFieldHelper } from '../../utils/custom_field_fetch';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { ReturnorderslistComponent } from '../returnorderslist/returnorderslist.component';
 import { DrilldownEditService } from 'src/app/services/drilldown-edit.service';
+import { HelpIconComponent } from '../../help/help-icon.component';
 declare var bootstrap;
 
 
 @Component({
   selector: 'app-sale-returns',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, SaleReturnsListComponent, ReturnorderslistComponent],
+  imports: [CommonModule, AdminCommmonModule, SaleReturnsListComponent, ReturnorderslistComponent, HelpIconComponent],
   templateUrl: './sale-returns.component.html',
   styleUrls: ['./sale-returns.component.scss']
 })
@@ -647,21 +648,68 @@ async autoFillProductDetails(field, data) {
   }
 
 
-  getReturnNo() {
-    this.returnNumber = null;
-    this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
-      if (res && res.data && res.data.order_number) {
-        this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
+  // getReturnNo() {
+  //   this.returnNumber = null;
+  //   this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
+  //     if (res && res.data && res.data.order_number) {
+  //       this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
         
-        this.http.get('masters/generate_order_no/?type=SR').subscribe((res: any) => {
-          if (res && res.data && res.data.order_number) {
-            this.formConfig.model['sale_return_order']['return_no'] = res.data.order_number;
-            this.returnNumber = res.data.order_number;
-          }
-        });;
-      }
-    });
+  //       this.http.get('masters/generate_order_no/?type=SR').subscribe((res: any) => {
+  //         if (res && res.data && res.data.order_number) {
+  //           this.formConfig.model['sale_return_order']['return_no'] = res.data.order_number;
+  //           this.returnNumber = res.data.order_number;
+  //         }
+  //       });;
+  //     }
+  //   });
+  // }
+
+  getReturnNo() {
+  if (this.SaleReturnOrderEditID) {
+    return;
   }
+  
+  this.returnNumber = null;
+  
+  this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
+    if (res && res.data && res.data.order_number) {
+      this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
+      
+      this.http.get('masters/generate_order_no/?type=SR').subscribe((res: any) => {
+        if (res && res.data && res.data.order_number) {
+          this.formConfig.model['sale_return_order']['return_no'] = res.data.order_number;
+          this.returnNumber = res.data.order_number;
+          console.log("Return NO: ", this.returnNumber);
+          
+          // FIX: Update the return_no form control
+          this.updateReturnNoControl();
+          
+          this.cdr.detectChanges(); // Trigger change detection
+        }
+      });
+    }
+  });
+}
+
+// Add this helper method
+updateReturnNoControl() {
+  if (!this.formConfig?.fields) return;
+  
+  const searchAndUpdate = (fields: any[]): boolean => {
+    for (const field of fields) {
+      if (field.key === 'return_no' && field.formControl) {
+        field.formControl.setValue(this.formConfig.model['sale_return_order']['return_no']);
+        console.log('Return No control updated:', field.formControl.value);
+        return true;
+      }
+      if (field.fieldGroup && searchAndUpdate(field.fieldGroup)) return true;
+      if (field.fieldArray?.fieldGroup && searchAndUpdate(field.fieldArray.fieldGroup)) return true;
+    }
+    return false;
+  };
+  
+  searchAndUpdate(this.formConfig.fields);
+}
 
   showSalesReturnOrderListFn() {
     this.showSaleReturnOrderList = true;
@@ -1120,7 +1168,7 @@ async autoFillProductDetails(field, data) {
                     placeholder: 'Enter Return No',
                     required: true,
                     readonly: true,
-                    // disabled: true
+                    disabled: true
                   },
                 },
                 {
@@ -1584,17 +1632,14 @@ async autoFillProductDetails(field, data) {
               
                     // Subscribe to value changes (to update sizes dynamically)
                     field.formControl.valueChanges.subscribe((data: any) => {
-                      if (!this.formConfig.model['sale_return_items'][currentRowIndex]) {
-                        console.error(`Products at index ${currentRowIndex} is not defined. Initializing...`);
-                        this.formConfig.model['sale_return_items'][currentRowIndex] = {};
+                      // Write to the row's own model object (captured currentRowIndex goes
+                      // stale after a formly row delete). Fallback preserves old behaviour.
+                      const currentItem = field.parent?.model ?? this.formConfig.model['sale_return_items'][currentRowIndex];
+                      if (currentItem) {
+                        currentItem['product_id'] = data?.product_id;
+                        //  Store gst_input from product summary
+                        currentItem['gst_input'] = data?.gst_input || 0;
                       }
-                      this.formConfig.model['sale_return_items'][currentRowIndex]['product_id'] = data?.product_id;
-
-                      const currentItem = this.formConfig.model['sale_return_items'][currentRowIndex];
-                      currentItem['product_id'] = data?.product_id;
-
-                      //  Store gst_input from product summary
-                      currentItem['gst_input'] = data?.gst_input || 0;
                       this.loadProductVariations(field);
                       this.autoFillProductDetails(field, data); // to fill the remaining fields when product is selected.
                     });
@@ -1706,7 +1751,7 @@ async autoFillProductDetails(field, data) {
                         console.warn(`Product missing for row ${currentRowIndex}, skipping color fetch.`);
                         return;
                       }
-                      this.formConfig.model['sale_return_items'][currentRowIndex]['size_id'] = selectedSize?.size_id;
+                      (field.parent?.model ?? this.formConfig.model['sale_return_items'][currentRowIndex])['size_id'] = selectedSize?.size_id;
               
                       const size_id = selectedSize?.size_id || null;
                       const url = size_id
@@ -1782,7 +1827,7 @@ async autoFillProductDetails(field, data) {
                         return;
                       }
 
-                      this.formConfig.model['sale_return_items'][currentRowIndex]['color_id'] = selectedColor?.color_id;
+                      (field.parent?.model ?? this.formConfig.model['sale_return_items'][currentRowIndex])['color_id'] = selectedColor?.color_id;
               
                       const color_id = selectedColor?.color_id || null;
                       console.log('color_id :', color_id)
@@ -1921,6 +1966,9 @@ async autoFillProductDetails(field, data) {
                       if (field.form && field.form.controls && field.form.controls.quantity && data) {
                         const quantity = field.form.controls.quantity.value;
                         const rate = data;
+                        // Keep the row's own model rate in sync (formly implicit sync can
+                        // lag after a row delete + re-add, corrupting the total).
+                        if (field.parent?.model) { field.parent.model.rate = data; }
                         if (rate && quantity) {
                           field.form.controls.amount.setValue(parseFloat(rate) * parseFloat(quantity));
                         }

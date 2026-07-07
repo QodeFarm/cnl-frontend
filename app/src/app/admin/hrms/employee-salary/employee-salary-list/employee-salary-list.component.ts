@@ -1,10 +1,11 @@
-import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableConfig } from '@ta/ta-table';
 import { Router } from '@angular/router';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-employee-salary-list',
@@ -13,18 +14,24 @@ import { DoubleClickNavigationService } from 'src/app/services/double-click-navi
   templateUrl: './employee-salary-list.component.html',
   styleUrls: ['./employee-salary-list.component.scss']
 })
-export class EmployeeSalaryListComponent {
+export class EmployeeSalaryListComponent implements OnInit {
 
   @Output('edit') edit = new EventEmitter<any>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+  
+  // Employee portal properties
+  isEmployeePortal: boolean = false;
+  employeeId: string | null = null;
 
   refreshTable() {
-   this.taTableComponent?.refresh();
+    if (this.taTableComponent) {
+      this.taTableComponent.refresh();
+    }
   };
 
   tableConfig: TaTableConfig = {
     apiUrl: 'hrms/employee_salary/',
-    showCheckbox:true,
+    showCheckbox: true,
     pkId: "salary_id",
     rowEvents: {
       dblclick: this.dblClickNav.createHandler({ pkField: 'salary_id', moduleName: 'HRMS', sectionName: 'Employee Salary', editEmitter: this.edit }),
@@ -62,7 +69,6 @@ export class EmployeeSalaryListComponent {
         sort: true,
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {
-          // Concatenate first_name and last_name correctly
           const firstName = row.employee?.first_name || '';
           const lastName = row.employee?.last_name || '';
           return `${firstName} ${lastName}`.trim();
@@ -101,8 +107,61 @@ export class EmployeeSalaryListComponent {
       }
     ]
   };
-  constructor(private router: Router, private dblClickNav: DoubleClickNavigationService) {}
-}
-
-
   
+  constructor(
+    private router: Router, 
+    private dblClickNav: DoubleClickNavigationService,
+    private route: ActivatedRoute
+  ) {}
+
+  ngOnInit() {
+    this.route.data.subscribe(data => {
+      this.isEmployeePortal = data['employeeView'] || false;
+      
+      if (this.isEmployeePortal) {
+        const user = JSON.parse(localStorage.getItem('employee_user') || '{}');
+        let rawEmployeeId = user.id || null;
+        
+        // Remove hyphens from UUID to match database format
+        if (rawEmployeeId) {
+          this.employeeId = rawEmployeeId.replace(/-/g, '');
+        }
+        
+        console.log('Employee Portal Mode - Original Employee ID:', rawEmployeeId);
+        console.log('Employee Portal Mode - Formatted Employee ID:', this.employeeId);
+        
+        // Update API URL with employee filter (without hyphens)
+        this.tableConfig.apiUrl = `hrms/employee_salary/?employee_id=${this.employeeId}`;
+        
+        // Remove actions for employees
+        this.tableConfig.cols = this.tableConfig.cols.map(col => {
+          if (col.fieldKey === 'code') {
+            col.actions = [];
+          }
+          return col;
+        });
+        
+        // Remove export and checkboxes
+        this.tableConfig.export = undefined;
+        this.tableConfig.showCheckbox = false;
+        
+        // Update title
+        this.tableConfig.title = 'My Salary Details';
+        
+        // Remove Employee column
+        this.tableConfig.cols = this.tableConfig.cols.filter(
+          (col: any) => col.fieldKey !== 'employee_id'
+        );
+        
+        console.log('Updated API URL for Employee Portal:', this.tableConfig.apiUrl);
+        
+        // Force refresh after view is initialized
+        setTimeout(() => {
+          if (this.taTableComponent) {
+            this.taTableComponent.refresh();
+          }
+        }, 100);
+      }
+    });
+  }
+}

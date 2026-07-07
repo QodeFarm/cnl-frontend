@@ -9,6 +9,17 @@ import { CustomerPortalGuard } from './guards/customer-portal.guard';
 import { CustomerLoginComponent } from './admin/customer-portal/customer-login.component';
 import { CustomerResetPasswordComponent } from './admin/customer-portal/customer-reset-password/customer-reset-password.component';
 import { CustomerForgotPasswordComponent } from './admin/customer-portal/customer-forgot-password/customer-forgot-password.component';
+import { EmployeeLoginComponent } from './admin/employee-portal/employee-login/employee-login.component';
+import { EmployeeDashboardComponent } from './admin/employee-portal/employee-dashboard.component';
+import { EmployeePortalLayoutComponent } from './admin/employee-portal/employee-portal-layout.component';
+import { EmployeeLeavesComponent } from './admin/hrms/employee-leaves/employee-leaves.component';
+import { EmployeeAttendanceComponent } from './admin/hrms/employee-attendance/employee-attendance.component';
+import { EmployeeSalaryComponent } from './admin/hrms/employee-salary/employee-salary.component';
+import { EmployeeAuthGuard } from './admin/employee-portal/employee-auth.guard';
+import { EmployeeLeavesListComponent } from './admin/hrms/employee-leaves/employee-leaves-list/employee-leaves-list.component';
+import { EmployeeLeaveBalanceComponent } from './admin/hrms/employee-leave-balance/employee-leave-balance.component';
+import { EmployeeProfileComponent } from './admin/employee-portal/employee-profile.component';
+import { EmployeeSalaryListComponent } from './admin/hrms/employee-salary/employee-salary-list/employee-salary-list.component';
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login' },
@@ -30,6 +41,36 @@ const routes: Routes = [
     path: 'customer_portal_login',
     redirectTo: 'customer-portal/login',
     pathMatch: 'full'
+  },
+
+  // Employee Portal Login Routes (outside the protected area)
+   {
+    path: 'employee-portal/login',
+    component: EmployeeLoginComponent,
+    pathMatch: 'full'  // Add this to match exactly
+  },
+  
+  // Employee Portal Layout - This will only load for /employee-portal (not /employee-portal/login)
+  {
+    path: 'employee-portal',
+    component: EmployeePortalLayoutComponent,
+    canActivate: [EmployeeAuthGuard],
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: 'dashboard', component: EmployeeDashboardComponent },
+      // { path: 'my-profile', component: EmployeeProfileComponent },
+      {
+        path: 'my-profile',
+        component: EmployeeProfileComponent,
+        data: { employeeView: true }
+      },
+      { path: 'my-leaves', component: EmployeeLeavesListComponent, data: { employeeView: true } },
+      { path: 'apply-leave', component: EmployeeLeavesComponent, data: { employeeView: true } },
+      { path: 'attendance', component: EmployeeAttendanceComponent, data: { employeeView: true } },
+      { path: 'salary', component: EmployeeSalaryListComponent, data: { employeeView: true } },
+      // { path: 'salary-slips', component: SalarySlipsComponent },
+      { path: 'leave-balance', component: EmployeeLeaveBalanceComponent, data: { employeeView: true } },
+    ]
   },
 
   {
@@ -106,6 +147,7 @@ const routes: Routes = [
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
       { path: 'profile', data: { title: 'Profile', moduleName: 'profile' }, canActivate: [], loadChildren: () => import('./admin/profile/profile.module').then(m => m.ProfileModule) },
       { path: 'dashboard', data: { title: 'Dashbord', moduleName: 'dashboard' }, canActivate: [], loadComponent: () => import('./admin/dashboard/dashboard.component').then(m => m.DashboardComponent) },
+      { path: 'help', data: { title: 'User Guide', moduleName: 'help' }, canActivate: [], loadComponent: () => import('./admin/help/help.component').then(m => m.HelpComponent) },
       { path: 'profile/change-password', data: { title: 'Change Password', moduleName: 'change-password' }, canActivate: [], loadComponent: () => import('./admin/profile/change-password/change-password.component').then(m => m.ChangePasswordComponent) },
       { path: 'force-change-password', data: { title: 'Set New Password', moduleName: 'force-change-password' }, canActivate: [], loadComponent: () => import('./admin/profile/force-change-password/force-change-password.component').then(m => m.ForceChangePasswordComponent) },
       // { path: 'users', data: { title: 'Users', moduleName: 'Users' }, canActivate: [], loadChildren: () => import('./admin/user/user.component').then(m => m.UserComponent) },
@@ -142,6 +184,9 @@ const routes: Routes = [
       { path: 'hrms/employee-leave-balance', data: { title: 'Employee Leave Balance', moduleName: 'employee-leave-balance' }, canActivate: [], loadComponent: () => import('./admin/hrms/employee-leave-balance/employee-leave-balance.component').then(m => m.EmployeeLeaveBalanceComponent) },
       { path: 'hrms/employee-attendance', data: { title: 'Employee Attendance', moduleName: 'employee-attendance' }, canActivate: [], loadComponent: () => import('./admin/hrms/employee-attendance/employee-attendance.component').then(m => m.EmployeeAttendanceComponent) },
       { path: 'hrms/swipes', data: { title: 'Swipes', moduleName: 'swipes' }, canActivate: [], loadComponent: () => import('./admin/hrms/swipes/swipes.component').then(m => m.SwipesComponent) },
+      { path: 'hrms/timesheets', data: { title: 'Timesheets', moduleName: 'timesheets' }, canActivate: [], loadComponent: () => import('./admin/hrms/timesheets/timesheets.component').then(m => m.TimesheetsComponent) },
+      { path: 'hrms/timesheet-approvals', data: { title: 'Timesheet Approvals', moduleName: 'timesheet-approvals' }, canActivate: [], loadComponent: () => import('./admin/hrms/timesheets/timesheet-approvals/timesheet-approvals.component').then(m => m.TimesheetApprovalsComponent) },
+      { path: 'hrms/billable-hours', data: { title: 'Billable Hours', moduleName: 'billable-hours' }, canActivate: [], loadComponent: () => import('./admin/hrms/timesheets/billable-hours/billable-hours.component').then(m => m.BillableHoursComponent) },
 
       //Products Module
       { path: 'inventory', data: { title: 'Inventory', moduleName: 'inventory' }, canActivate: [], loadComponent: () => import('./admin/inventory/inventory.component').then(m => m.InventoryComponent) },

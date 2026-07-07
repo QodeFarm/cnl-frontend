@@ -17,6 +17,7 @@ import { TaTableCacheService } from './ta-table-cache.service';
 import moment from 'moment';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 
 @Component({
   selector: 'ta-table',
@@ -1169,7 +1170,8 @@ applyFilters() {
     private router: Router,
     private elementRef: ElementRef,
     private cdr: ChangeDetectorRef,
-    private tableCache: TaTableCacheService
+    private tableCache: TaTableCacheService,
+    private notification: NzNotificationService
   ) {
     this.actionObservable$ = this.taTableS.actionObserval().subscribe((res: any) => {
       // if (res && res.action && res.action.type === 'delete') {
@@ -1582,7 +1584,8 @@ applyFilters() {
     // console.log('nzSortOrderChange', event);
   }
   deleteRow(action: any) {
-    this.taTableS.deleterow(action.action.apiUrl, action.data, this.options).subscribe(res => {
+    this.taTableS.deleterow(action.action.apiUrl, action.data, this.options).subscribe((res: any) => {
+      this.notification.success(res?.message || 'Record deleted successfully.', '');
       this.loadDataFromServer();
     });
   }
@@ -1667,7 +1670,8 @@ applyFilters() {
   }
 
   restoreRow(action: any) {
-  this.taTableS.restorerow(action.action.apiUrl, action.data, this.options).subscribe(res => {
+  this.taTableS.restorerow(action.action.apiUrl, action.data, this.options).subscribe((res: any) => {
+    this.notification.success(res?.message || 'Record restored successfully.', '');
     this.loadDataFromServer();
   });
 }

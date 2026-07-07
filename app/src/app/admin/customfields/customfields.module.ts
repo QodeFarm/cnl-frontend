@@ -5,6 +5,7 @@ import { CustomfieldsRoutingModule } from './customfields-routing.module';
 import { CustomfieldsComponent } from './customfields.component';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { CustomfieldsListComponent } from './customfields-list/customfields-list.component';
+import { HelpIconComponent } from '../help/help-icon.component';
 
 
 @NgModule({
@@ -17,6 +18,7 @@ import { CustomfieldsListComponent } from './customfields-list/customfields-list
     CommonModule,
     CustomfieldsRoutingModule,
     CustomfieldsListComponent,
+    HelpIconComponent,
   ],
   exports: [
     CustomfieldsComponent,

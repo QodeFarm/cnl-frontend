@@ -11,11 +11,12 @@ import { CustomFieldHelper } from '../../utils/custom_field_fetch';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { calculateTotalAmount, displayInformation, getUnitData, sumQuantities } from 'src/app/utils/display.utils';
 import { DrilldownEditService } from 'src/app/services/drilldown-edit.service';
+import { HelpIconComponent } from '../../help/help-icon.component';
 
 @Component({
   selector: 'app-purchase-invoice',
   standalone: true,
-  imports: [AdminCommmonModule, PurchaseInvoiceListComponent],
+  imports: [AdminCommmonModule, PurchaseInvoiceListComponent, HelpIconComponent],
   templateUrl: './purchase-invoice.component.html',
   styleUrls: ['./purchase-invoice.component.scss']
 })
@@ -506,21 +507,68 @@ checkAndPopulateData() {
   }
 
 
-  getInvoiceNo() {
-    this.invoiceNumber = null;
-    this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
-      if (res && res.data && res.data.order_number) {
-        this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
+  // getInvoiceNo() {
+  //   this.invoiceNumber = null;
+  //   this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
+  //     if (res && res.data && res.data.order_number) {
+  //       this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
 
-        this.http.get('masters/generate_order_no/?type=PO-INV').subscribe((res: any) => {
-          if (res && res.data && res.data.order_number) {
-            this.formConfig.model['purchase_invoice_orders']['invoice_no'] = res.data.order_number;
-            this.invoiceNumber = res.data.order_number;
-          }
-        });;
-      }
-    });
+  //       this.http.get('masters/generate_order_no/?type=PO-INV').subscribe((res: any) => {
+  //         if (res && res.data && res.data.order_number) {
+  //           this.formConfig.model['purchase_invoice_orders']['invoice_no'] = res.data.order_number;
+  //           this.invoiceNumber = res.data.order_number;
+  //         }
+  //       });;
+  //     }
+  //   });
+  // }
+
+getInvoiceNo() {
+  if (this.PurchaseInvoiceEditID) {
+    return;
   }
+  
+  this.invoiceNumber = null;
+  
+  this.http.get('masters/generate_order_no/?type=SHIP').subscribe((res: any) => {
+    if (res && res.data && res.data.order_number) {
+      this.formConfig.model['order_shipments']['shipping_tracking_no'] = res.data.order_number;
+
+      this.http.get('masters/generate_order_no/?type=PO-INV').subscribe((res: any) => {
+        if (res && res.data && res.data.order_number) {
+          this.formConfig.model['purchase_invoice_orders']['invoice_no'] = res.data.order_number;
+          this.invoiceNumber = res.data.order_number;
+          console.log("Purchase Invoice NO: ", this.invoiceNumber);
+          
+          // FIX: Update the invoice_no form control
+          this.updateInvoiceNoControl();
+          
+          this.cdr.detectChanges(); // Trigger change detection
+        }
+      });
+    }
+  });
+}
+
+// Add this helper method
+updateInvoiceNoControl() {
+  if (!this.formConfig?.fields) return;
+  
+  const searchAndUpdate = (fields: any[]): boolean => {
+    for (const field of fields) {
+      if (field.key === 'invoice_no' && field.formControl) {
+        field.formControl.setValue(this.formConfig.model['purchase_invoice_orders']['invoice_no']);
+        console.log('Purchase Invoice No control updated:', field.formControl.value);
+        return true;
+      }
+      if (field.fieldGroup && searchAndUpdate(field.fieldGroup)) return true;
+      if (field.fieldArray?.fieldGroup && searchAndUpdate(field.fieldArray.fieldGroup)) return true;
+    }
+    return false;
+  };
+  
+  searchAndUpdate(this.formConfig.fields);
+}
 
   showPurchaseInvoiceListFn() {
     this.showPurchaseInvoiceList = true;
@@ -1352,7 +1400,9 @@ loadQuickpackProducts() {
                         console.error(`Products at index ${currentRowIndex} is not defined. Initializing...`);
                         this.formConfig.model['purchase_invoice_items'][currentRowIndex] = {};
                       }
-                      this.formConfig.model['purchase_invoice_items'][currentRowIndex]['product_id'] = data?.product_id;
+                      // Write to the row's own model object (captured currentRowIndex goes
+                      // stale after a formly row delete). Fallback preserves old behaviour.
+                      (field.parent?.model ?? this.formConfig.model['purchase_invoice_items'][currentRowIndex])['product_id'] = data?.product_id;
                       this.loadProductVariations(field);
                       this.autoFillProductDetails(field, data); // to fill the remaining fields when product is selected.
                     });
@@ -1461,7 +1511,7 @@ loadQuickpackProducts() {
                         console.warn(`Product missing for row ${currentRowIndex}, skipping color fetch.`);
                         return;
                       }
-                      this.formConfig.model['purchase_invoice_items'][currentRowIndex]['size_id'] = selectedSize?.size_id;
+                      (field.parent?.model ?? this.formConfig.model['purchase_invoice_items'][currentRowIndex])['size_id'] = selectedSize?.size_id;
               
                       const size_id = selectedSize?.size_id || null;
                       const url = size_id
@@ -1537,7 +1587,7 @@ loadQuickpackProducts() {
                         return;
                       }
 
-                      this.formConfig.model['purchase_invoice_items'][currentRowIndex]['color_id'] = selectedColor?.color_id;
+                      (field.parent?.model ?? this.formConfig.model['purchase_invoice_items'][currentRowIndex])['color_id'] = selectedColor?.color_id;
               
                       const color_id = selectedColor?.color_id || null;
                       console.log('color_id :', color_id)
@@ -1706,6 +1756,9 @@ loadQuickpackProducts() {
                       if (field.form && field.form.controls && field.form.controls.quantity && data) {
                         const quantity = field.form.controls.quantity.value;
                         const rate = data;
+                        // Keep the row's own model rate in sync (formly implicit sync can
+                        // lag after a row delete + re-add, corrupting the total).
+                        if (field.parent?.model) { field.parent.model.rate = data; }
                         if (rate && quantity) {
                           field.form.controls.amount.setValue(parseFloat(rate) * parseFloat(quantity));
                         }
