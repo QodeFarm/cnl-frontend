@@ -1,1 +1,194 @@
-<a class="btn btn-primary" href="http://localhost:54501/" role="button" target="_blank">CNL Report App</a>
+<!-- ── DETAIL VIEW ─────────────────────────────────────────────── -->
+<ng-container *ngIf="view === 'detail' && selectedSalesReport">
+  <app-report-detail
+    [report]="selectedSalesReport"
+    [showBackButton]="true"
+    (back)="backToHub()">
+  </app-report-detail>
+</ng-container>
+
+<!-- ── HUB VIEW ──────────────────────────────────────────────────── -->
+<ng-container *ngIf="view === 'hub'">
+  <div class="hub">
+
+    <!-- Page Header -->
+    <div class="hub-header">
+      <div class="hub-title-group">
+        <h2 class="hub-title">Reports</h2>
+        <p class="hub-subtitle">Centralized reports across all modules — Sales, Purchase, Finance and more</p>
+      </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon stat-icon--blue">
+          <span nz-icon nzType="bar-chart" nzTheme="outline"></span>
+        </div>
+        <div class="stat-body">
+          <div class="stat-value">{{ allReports.length }}</div>
+          <div class="stat-label">Total Reports</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon stat-icon--green">
+          <span nz-icon nzType="check-circle" nzTheme="outline"></span>
+        </div>
+        <div class="stat-body">
+          <div class="stat-value">{{ totalActive }}</div>
+          <div class="stat-label">Active Reports</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon stat-icon--purple">
+          <span nz-icon nzType="appstore" nzTheme="outline"></span>
+        </div>
+        <div class="stat-body">
+          <div class="stat-value">{{ totalModules }}</div>
+          <div class="stat-label">Modules</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Body: Sidebar + Table -->
+    <div class="hub-body">
+
+      <!-- Module Sidebar -->
+      <aside class="module-sidebar">
+        <div class="sidebar-heading">MODULES</div>
+        <ul class="sidebar-list">
+          <li
+            *ngFor="let mod of moduleOrder"
+            class="sidebar-item"
+            [class.active]="activeModule === mod"
+            (click)="setModule(mod)">
+            <div class="sidebar-item-left">
+              <span
+                *ngIf="mod !== 'All'"
+                class="module-dot"
+                [style.background]="moduleMeta[mod].color">
+              </span>
+              <span *ngIf="mod === 'All'" class="module-dot module-dot--all"></span>
+              <span class="sidebar-item-name">{{ mod === 'All' ? 'All Modules' : mod + ' Reports' }}</span>
+            </div>
+            <div class="sidebar-item-right">
+              <span class="count-badge">{{ getModuleCount(mod) }}</span>
+              <span
+                *ngIf="getModuleActiveCount(mod) > 0"
+                class="active-dot"
+                title="{{ getModuleActiveCount(mod) }} active">
+              </span>
+            </div>
+          </li>
+        </ul>
+      </aside>
+
+      <!-- Reports Panel -->
+      <div class="reports-panel">
+
+        <!-- Toolbar -->
+        <div class="panel-toolbar">
+          <div class="search-wrap">
+            <span nz-icon nzType="search" nzTheme="outline" class="search-icon"></span>
+            <input
+              class="search-input"
+              type="text"
+              [(ngModel)]="searchText"
+              placeholder="Search by report name, module or description..."
+            />
+            <button class="search-clear" *ngIf="searchText" (click)="clearSearch()">
+              <span nz-icon nzType="close-circle" nzTheme="fill"></span>
+            </button>
+          </div>
+          <div class="results-count">
+            <strong>{{ filteredReports.length }}</strong> of {{ allReports.length }} reports
+            <nz-tag *ngIf="activeModule !== 'All'" [nzColor]="getModuleMeta(activeModule)?.color" class="active-mod-tag">
+              {{ activeModule }}
+            </nz-tag>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-scroll">
+          <table class="reports-table">
+            <thead>
+              <tr>
+                <th class="col-name">Report Name</th>
+                <th class="col-module">Module</th>
+                <th class="col-type">Type</th>
+                <th class="col-status">Status</th>
+                <th class="col-action">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="let report of filteredReports"
+                class="report-row row-active"
+                (click)="openReport(report)">
+
+                <!-- Name + Description -->
+                <td class="col-name">
+                  <div class="report-name-cell">
+                    <div class="report-icon-wrap"
+                      [style.background]="moduleMeta[report.module].bgColor"
+                      [style.color]="moduleMeta[report.module].color">
+                      <span nz-icon [nzType]="moduleMeta[report.module].icon" nzTheme="outline"></span>
+                    </div>
+                    <div class="report-text">
+                      <div class="report-name">{{ report.name }}</div>
+                      <div class="report-desc">{{ report.description }}</div>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Module tag -->
+                <td class="col-module">
+                  <span
+                    class="module-tag"
+                    [style.background]="moduleMeta[report.module].bgColor"
+                    [style.color]="moduleMeta[report.module].color"
+                    [style.border-color]="moduleMeta[report.module].color + '33'">
+                    {{ report.module }}
+                  </span>
+                </td>
+
+                <!-- Report Type -->
+                <td class="col-type">
+                  <span class="type-badge" [ngClass]="'type-' + report.reportType.toLowerCase()">
+                    {{ report.reportType }}
+                  </span>
+                </td>
+
+                <!-- Status -->
+                <td class="col-status">
+                  <span class="status-badge status-active">
+                    <span class="status-dot"></span> Active
+                  </span>
+                </td>
+
+                <!-- Action -->
+                <td class="col-action">
+                  <button
+                    class="view-btn"
+                    (click)="openReport(report); $event.stopPropagation()">
+                    View <span nz-icon nzType="arrow-right" nzTheme="outline"></span>
+                  </button>
+                </td>
+              </tr>
+
+              <!-- Empty state -->
+              <tr *ngIf="filteredReports.length === 0">
+                <td colspan="5" class="empty-row">
+                  <span nz-icon nzType="inbox" nzTheme="outline"></span>
+                  <span>No reports match your search</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</ng-container>

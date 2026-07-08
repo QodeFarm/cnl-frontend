@@ -1,0 +1,149 @@
+<!-- Breadcrumb / back navigation — sits above the table, no padding waste -->
+<div class="container-fluid pt-3 pb-0">
+  <div class="row">
+    <div class="col-12 px-2">
+      <div class="report-breadcrumb">
+        <a *ngIf="showBackButton" class="breadcrumb-back" (click)="back.emit()">
+          <span nz-icon nzType="arrow-left" nzTheme="outline"></span>
+          Back to Reports
+        </a>
+        <span *ngIf="showBackButton" class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current">{{ report?.name }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Summary strip — appears after data loads, shows report totals at a glance.
+     Fields come from displayedSummaryFields: the report's explicit strip when
+     declared, otherwise auto-derived from the backend summary response. -->
+<div class="container-fluid py-0" *ngIf="hasSummary && displayedSummaryFields.length">
+  <div class="row">
+    <div class="col-12 px-2">
+      <div class="summary-strip">
+        <div class="summary-item" *ngFor="let field of displayedSummaryFields">
+          <span class="summary-label">{{ field.label }}</span>
+          <span class="summary-value" [class.summary-value--currency]="field.currency">
+            {{ formatSummaryValue(field) }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Active filter chips — one-click removable, shown only when a filter is set -->
+<div class="container-fluid py-0" *ngIf="hasActiveFilters">
+  <div class="row">
+    <div class="col-12 px-2">
+      <div class="report-filter-chips">
+        <span class="filter-chip" *ngFor="let chip of activeFilterChips">
+          <span class="chip-label">{{ chip.label }}:</span>
+          <span class="chip-value">{{ chip.valueLabel }}</span>
+          <span class="chip-remove" (click)="removeFilter(chip.key)">✕</span>
+        </span>
+        <a class="chip-clear-all" (click)="clearFilters()">Clear all</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- More Filters — dropdown content anchored to the "More" button (Layer-3 advanced filters) -->
+<ng-template #moreFiltersTpl>
+  <div class="more-filters-popover">
+    <div class="mfp-head">
+      <span class="mfp-title">More Filters</span>
+      <a class="mfp-clear" *ngIf="activeMoreCount" (click)="clearFilters()">Clear</a>
+    </div>
+    <div class="mfp-grid">
+      <div class="mfp-item" *ngFor="let mc of moreControls">
+        <label class="mfp-label">{{ mc.control.label }}</label>
+
+        <nz-select *ngIf="mc.control.type === 'select' || mc.control.type === 'staticSelect'"
+          [(ngModel)]="filterValues[mc.key]"
+          (ngModelChange)="onFilterChange()"
+          [nzPlaceHolder]="mc.control.placeholder || mc.control.label"
+          [nzAllowClear]="true"
+          [nzShowSearch]="mc.control.type === 'select'"
+          [nzOptions]="filterOptions[mc.key]"
+          nzSize="small"
+          style="width: 100%;">
+        </nz-select>
+
+        <input *ngIf="mc.control.type === 'number'" type="number"
+          class="mfp-input"
+          [(ngModel)]="filterValues[mc.key]"
+          (change)="onFilterChange()"
+          [placeholder]="mc.control.placeholder || mc.control.label" />
+
+        <input *ngIf="mc.control.type === 'text'" type="text"
+          class="mfp-input"
+          [(ngModel)]="filterValues[mc.key]"
+          (change)="onFilterChange()"
+          [placeholder]="mc.control.placeholder || mc.control.label" />
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Table — title removed from options so TaTable toolbar has full width for all filters + search on one line -->
+<div class="container-fluid pt-1">
+  <div class="row">
+    <div class="col-12 px-2 py-1">
+
+      <ta-table
+        *ngIf="tableConfig"
+        [options]="tableConfig"
+        class="custom-list"
+        (dataLoaded)="onDataLoaded($event)">
+
+        <!-- Layer-2 filters projected into the [before-search] slot — Register Type
+             (Sale Register only) + the report's backend-loaded dropdown filters -->
+        <div before-search class="report-filter-bar">
+
+          <nz-select
+            *ngIf="hasFilter('registerType')"
+            [(ngModel)]="registerType"
+            (ngModelChange)="onRegisterTypeChange()"
+            nzPlaceHolder="Register Type"
+            [nzDropdownMatchSelectWidth]="false"
+            style="width: 150px; min-width: 150px;">
+            <nz-option *ngFor="let o of report.registerTypes" [nzValue]="o.value" [nzLabel]="o.label"></nz-option>
+          </nz-select>
+
+          <!-- Data-driven [nzOptions] enables nz-select's built-in virtual scroll,
+               so large lists (e.g. thousands of customers) render without freezing.
+               IMPORTANT: do NOT set [nzDropdownMatchSelectWidth]="false" here — it
+               forces ng-zorro to measure every option's width, which renders all
+               rows at once and freezes the page. Leave it at the default (true) so
+               the panel matches the select width and virtual scroll stays active.
+               Long names are searchable via the type-ahead box. -->
+          <nz-select
+            *ngFor="let bc of barControls"
+            [(ngModel)]="filterValues[bc.key]"
+            (ngModelChange)="onFilterChange()"
+            [nzPlaceHolder]="bc.control.placeholder || bc.control.label"
+            [nzAllowClear]="true"
+            [nzShowSearch]="bc.control.type === 'select'"
+            [nzOptions]="filterOptions[bc.key]"
+            [style.width.px]="bc.control.width || 160"
+            [style.min-width.px]="bc.control.width || 160">
+          </nz-select>
+
+          <!-- More Filters — opens an advanced (Layer-3) dropdown anchored to the button -->
+          <button *ngIf="hasMoreFilters" type="button" class="more-filters-toggle"
+            [class.is-open]="moreFiltersOpen"
+            nz-popover nzPopoverTrigger="click" nzPopoverPlacement="bottomRight"
+            [nzPopoverContent]="moreFiltersTpl" [(nzPopoverVisible)]="moreFiltersOpen">
+            <span nz-icon nzType="filter" nzTheme="outline"></span>
+            More
+            <span *ngIf="activeMoreCount" class="more-count">{{ activeMoreCount }}</span>
+          </button>
+
+        </div>
+
+      </ta-table>
+
+    </div>
+  </div>
+</div>
