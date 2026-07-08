@@ -224,7 +224,10 @@ export class AccountLedgerComponent implements OnInit, AfterViewInit, OnDestroy 
           }
         },
         {
-          fieldKey: 'created_at',
+          // Accounting date (entry_date, falls back to created_at for legacy rows) —
+          // NOT created_at, which is the row's creation timestamp and never reflects
+          // an edited invoice/voucher date.
+          fieldKey: 'date',
           name: 'Date',
           width: '110px',
           sort: true,
