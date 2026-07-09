@@ -980,7 +980,7 @@ preprocessFormData() {
                     {
                       className: 'col-md-4 col-sm-6 col-12 gst-field-col',
                       key: 'gst',
-                      type: 'gst-dropdown',
+                      type: 'select',
                       templateOptions: {
                         label: 'GST Percentage',
                         dataKey: 'gst_id',
@@ -993,6 +993,18 @@ preprocessFormData() {
                         }
                       },
                       hooks: {
+                        onChanges: (field: any) => {
+                          console.log("GST field onChanges triggered : ", field.formControl.value);
+                          field.formControl.valueChanges.subscribe((data: any) => {
+                            console.log("GST changed to:", data);
+                            if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
+                              this.formConfig.model['products']['gst_id'] = data?.gst_id;
+                            } else {
+                              console.error('Form config or gst_id data model is not defined.');
+                            }
+                          });
+                        },
+
                         onInit: (field: any) => {
                           // Inject GST Portal link below the dropdown inside the same column
                           setTimeout(() => {
@@ -1008,16 +1020,7 @@ preprocessFormData() {
                             }
                           }, 300);
                         },
-                        onChanges: (field: any) => {
-                          field.formControl.valueChanges.subscribe((data: any) => {
-                            console.log("GST changed to:", data);
-                            if (this.formConfig && this.formConfig.model && this.formConfig.model['products']) {
-                              this.formConfig.model['products']['gst_id'] = data?.gst;
-                            } else {
-                              console.error('Form config or gst_id data model is not defined.');
-                            }
-                          });
-                        }
+                        
                       }
                     },
                     // {
